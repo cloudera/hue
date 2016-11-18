@@ -112,7 +112,7 @@ ${ hueIcons.symbols() }
             <li class="dropdown-submenu">
               <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflows') }</a>
               <ul class="dropdown-menu">
-                <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
+                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
                 <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
                 <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
               </ul>
@@ -219,13 +219,6 @@ ${ hueIcons.symbols() }
       </div>
     </div>
 
-##     <div style="position: fixed; bottom: 0; left: 0">
-##       Create Table<br/>
-##       Import File<br/>
-##       Import Queries<br/>
-##       [+]
-##     </div>
-
     <div class="left-panel" data-bind="css: { 'side-panel-closed': !leftAssistVisible() }">
       <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-left-side-panel" data-bind="visible: ! leftAssistVisible(), toggle: leftAssistVisible"><i class="fa fa-chevron-right"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-left-side-panel" data-bind="visible: leftAssistVisible, toggle: leftAssistVisible"><i class="fa fa-chevron-left"></i></a>
@@ -264,6 +257,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
+      <div id="embeddable_oozie_wf" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -350,7 +344,8 @@ ${ assist.assistPanel() }
         self.EMBEDDABLE_PAGE_URLS = {
           editor: '/notebook/editor_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
-          search: '/search/embeddable/new_search'
+          search: '/search/embeddable/new_search',
+          oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true'
         };
 
         self.embeddable_cache = {};

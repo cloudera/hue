@@ -84,7 +84,7 @@ def databases(request):
     'is_navigator_enabled': has_navigator(request.user),
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
-    'is_embeddable': request.REQUEST.get('is_embeddable', False),
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
