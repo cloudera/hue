@@ -955,6 +955,12 @@ h6 {
 }
 
 /* styling for the imported apps */
+
+.page-content .navbar-inner {
+  background-color: transparent;
+  border: none;
+}
+
 .page-content .navbar.navbar-inverse.navbar-fixed-top {
   position: static;
 }
