@@ -291,8 +291,10 @@ ${ hueIcons.symbols() }
 </div>
 
 <script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
+<script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
@@ -381,20 +383,18 @@ ${ assist.assistPanel() }
                 // load just CSS and JS files that are not loaded before
                 r.find('script[src]').each(function(){
                   var jsFile = $(this).attr('src').split('?')[0];
-                  if (LOADED_JS.indexOf(jsFile) > -1){
-                    $(this).remove();
-                  }
-                  else {
+                  if (LOADED_JS.indexOf(jsFile) === -1){
                     LOADED_JS.push(jsFile);
+                    $(this).clone().appendTo($('head'));
+                    $(this).remove();
                   }
                 });
                 r.find('link[href]').each(function(){
                   var cssFile = $(this).attr('href').split('?')[0];
-                  if (LOADED_CSS.indexOf(cssFile) > -1){
-                    $(this).remove();
-                  }
-                  else {
+                  if (LOADED_CSS.indexOf(cssFile) === -1){
                     LOADED_CSS.push(cssFile);
+                    $(this).clone().appendTo($('head'));
+                    $(this).remove();
                   }
                 });
                 self.embeddable_cache[newVal] = r;
