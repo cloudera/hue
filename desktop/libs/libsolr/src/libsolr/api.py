@@ -605,7 +605,7 @@ class SolrApi(object):
 
   def _get_aggregate_function(self, facet):
     f = facet['properties']['aggregate']
-    
+
     if not f['ops']:
       f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
     
@@ -618,6 +618,8 @@ class SolrApi(object):
       fields = []
       for _f in f['ops']:
         fields.append(self.__get_aggregate_function(_f))
+      if f['function'] == 'percentile':
+        fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
     
   def _get_range_borders(self, collection, query):
