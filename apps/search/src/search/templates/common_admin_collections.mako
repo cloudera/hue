@@ -164,8 +164,6 @@ ${ commonshare() | n,unicode }
 ${ commonimportexport(request) | n,unicode }
 
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('search/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 

@@ -98,7 +98,7 @@ ${ fb_components.menubar() }
 </div>
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.visible.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
+
 <script type="text/javascript" charset="utf-8">
 (function () {
   <%
