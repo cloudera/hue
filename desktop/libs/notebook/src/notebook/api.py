@@ -125,13 +125,14 @@ def _execute_notebook(request, notebook, snippet):
         else:
           _snippet['status'] = 'failed'
 
-        history.update_data(notebook)
-        history.save()
+        if history:  # If _historify failed, history will be None
+          history.update_data(notebook)
+          history.save()
 
-        response['history_id'] = history.id
-        response['history_uuid'] = history.uuid
-        if notebook['isSaved']: # Keep track of history of saved queries
-          response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
+          response['history_id'] = history.id
+          response['history_uuid'] = history.uuid
+          if notebook['isSaved']: # Keep track of history of saved queries
+            response['history_parent_uuid'] = history.dependencies.filter(type__startswith='query-').latest('last_modified').uuid
   except QueryError, ex: # We inject the history information from _historify() to the failed queries
     if response.get('history_id'):
       ex.extra['history_id'] = response['history_id']

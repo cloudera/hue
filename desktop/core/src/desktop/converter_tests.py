@@ -159,6 +159,40 @@ class TestDocumentConverter(object):
       query.delete()
       query2.delete()
 
+  def test_convert_hive_query_with_invalid_name(self):
+    sql = 'SELECT * FROM sample_07'
+    settings = [
+      {'key': 'hive.exec.scratchdir', 'value': '/tmp/mydir'},
+      {'key': 'hive.querylog.location', 'value': '/tmp/doc2'}
+    ]
+    file_resources = [{'type': 'jar', 'path': '/tmp/doc2/test.jar'}]
+    functions = [{'name': 'myUpper', 'class_name': 'org.hue.udf.MyUpper'}]
+    design = hql_query(sql, database='etl', settings=settings, file_resources=file_resources, functions=functions)
+
+    query = SavedQuery.objects.create(
+      type=SavedQuery.TYPES_MAPPING['hql'],
+      owner=self.user,
+      data=design.dumps(),
+      name='Test / Hive query',
+      desc='Test Hive query'
+    )
+    doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
+
+    try:
+      # Test that corresponding doc2 is created after convert
+      assert_equal(0, Document2.objects.filter(owner=self.user, type='query-hive').count())
+
+      converter = DocumentConverter(self.user)
+      converter.convert()
+
+      assert_equal(1, Document2.objects.filter(owner=self.user, type='query-hive').count())
+
+      doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
+      # Verify Document2 name is stripped of invalid chars
+      assert_equal('Test  Hive query', doc2.data_dict['name'])
+    finally:
+      query.delete()
+
 
   def test_convert_impala_query(self):
     sql = 'SELECT * FROM sample_07'
