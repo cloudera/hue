@@ -1987,12 +1987,22 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
-    <!-- ko if: ['sum', 'avg', 'mul', 'unique'].indexOf($data.function()) != -1 -->
+    <!-- ko if: ['sum', 'avg', 'mul', 'unique', 'percentile'].indexOf($data.function()) != -1 -->
       <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
     <!-- /ko -->
     
     <!-- ko if: $data.function() == 'field' -->
       <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
+    <!-- /ko -->
+
+    <!-- ko if: $data.function() == 'percentile' -->
+      <!-- ko foreach: percentiles() -->
+        <input type="number" class="input-mini" data-bind="value: value"/>
+        <a href="javascript: void(0)" data-bind="click: function() { $parent.percentiles.push(ko.mapping.fromJS({'value': 50})); }">
+          <i class="fa fa-plus" title="${ _('Add') }"></i>
+        </a>
+        <i class="fa fa-minus" title="${ _('Delete') }"></i>
+      <!-- /ko -->
     <!-- /ko -->
 
     <a href="javascript: void(0)" data-bind="click: function() {
@@ -2003,7 +2013,7 @@ ${ dashboard.layout_skeleton() }
 
     <br/>
     <a href="javascript: void(0)" data-bind="click: function() {
-        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'field', 'value': '2', 'ops': []}]})); }
+        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
       ">
       <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
     </a>
