@@ -91,7 +91,7 @@ ${ hueIcons.symbols() }
         <span class="hamburger-inner"></span>
       </span>
       </a>
-      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip" href="/home">
+      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip"  href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }">
         <svg style="margin-top:8px;margin-left:8px;height: 30px;width:120px;display: inline-block;">
           <use xlink:href="#hue-logo"></use>
         </svg>
