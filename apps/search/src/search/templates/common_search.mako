@@ -1987,9 +1987,9 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
-    ##<!-- ko if: ['sum', 'avg', 'unique', 'percentile', 'mul', 'add', 'sub', 'ms'].indexOf($data.function()) != -1 -->
+    <!-- ko if: $data.function() != 'field' -->
       <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
-    ##<!-- /ko -->
+    <!-- /ko -->
     
     <!-- ko if: $data.function() == 'field' -->
       <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
@@ -2015,7 +2015,7 @@ ${ dashboard.layout_skeleton() }
 
     <br/>
     <a href="javascript: void(0)" data-bind="click: function() {
-        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': '', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
+        ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': '', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
       ">
       <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
     </a>
