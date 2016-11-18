@@ -24,8 +24,8 @@ from desktop.views import _ko
 <%def name="all()">
   <script type="text/html" id="hue-drop-down-template">
     <!-- ko if: !dropDownVisible() || !searchable -->
-    <a class="inactive-action active-database margin-left-10" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
-      <span data-bind="text: value, visible: ! dropDownVisible()"  title="${ _('Selected database') }"></span>
+    <a class="inactive-action hue-drop-down-active margin-left-10" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
+      <span data-bind="text: value, visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
       <i class="fa fa-caret-down"></i>
     </a>
     <!-- /ko -->
@@ -58,6 +58,7 @@ from desktop.views import _ko
         self.entries = params.entries;
         self.searchable = params.searchable || false;
         self.foreachVisible = params.foreachVisible || false;
+        self.linkTitle = params.linkTitle || '${ _('Selected entry') }';
 
         var closeOnOutsideClick = function (e) {
           var $input = $(element).find('.hue-drop-down-input');

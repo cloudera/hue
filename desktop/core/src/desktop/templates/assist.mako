@@ -2024,17 +2024,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="functions-panel-template">
     <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
-      <div class="assist-function-type-switch" data-bind="foreach: availableTypes">
-        <!-- ko if: $index() > 0 -->
-        |
-        <!-- /ko -->
-        <!-- ko if: $data === $parent.activeType() -->
-        <span style="font-weight: 600; color: #338BB8;" data-bind="text: $data"></span>
-        <!-- /ko -->
-        <!-- ko ifnot: $data === $parent.activeType() -->
-        <a class="black-link" href="javascript:void(0);" data-bind="click: function () { $parent.activeType($data); }, text: $data"></a>
-        <!-- /ko -->
-      </div>
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
       <ul class="assist-function-categories" data-bind="foreach: activeCategories">
         <li>
           <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
@@ -2061,9 +2051,9 @@ from metadata.conf import has_navigator
         self.categories = {};
 
         self.activeType = ko.observable();
-        self.availableTypes = ['hive', 'impala', 'pig'];
+        self.availableTypes = ko.observableArray(['hive', 'impala', 'pig']);
 
-        self.availableTypes.forEach(function (type) {
+        self.availableTypes().forEach(function (type) {
           self.initFunctions(type);
         })
 
@@ -2073,7 +2063,7 @@ from metadata.conf import has_navigator
           self.activeCategories(self.categories[newValue]);
         });
 
-        self.activeType(self.availableTypes[0]);
+        self.activeType(self.availableTypes()[0]);
       }
 
       FunctionsPanel.prototype.initFunctions = function (dialect) {
