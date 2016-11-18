@@ -38,7 +38,6 @@ ${ editorComponents.commonHTML(with_assist=False) }
 
 ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }
-${ notebookKoComponents.snippetDbSelection() }
 
 ${ editorComponents.commonJS(is_embeddable=True) }
 

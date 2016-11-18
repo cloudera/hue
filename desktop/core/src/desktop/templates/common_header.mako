@@ -24,6 +24,9 @@ home_url = url('desktop.views.home')
 if USE_NEW_EDITOR.get():
   home_url = url('desktop.views.home2')
 %>
+
+<%namespace name="koComponents" file="/ko_components.mako" />
+
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
   %if selected:
@@ -216,6 +219,8 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+
+  ${ koComponents.all() }
 
   <script type="text/javascript" charset="utf-8">
 

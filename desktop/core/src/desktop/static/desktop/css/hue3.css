@@ -2410,6 +2410,16 @@ body {
   border-bottom: 1px solid #DDD;
 }
 
+.hue-drop-down-input {
+  width: 175px !important;
+  height: 12px !important;
+  font-size: 12px !important;
+  border: 1px solid rgba(0,0,0,0.2) !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
+  margin-left: -1px;
+}
+
 .hue-context-menu {
   display: none;
   position: fixed;
