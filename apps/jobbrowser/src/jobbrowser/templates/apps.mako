@@ -19,12 +19,14 @@
   from django.utils.translation import ugettext as _
 %>
 
+% if not is_embeddable:
 ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
-
 <%namespace name="assist" file="/assist.mako" />
+% endif
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/basictable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+% if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -36,6 +38,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   }
 % endif
 </style>
+% endif
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
@@ -44,6 +47,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+
+% if not is_embeddable:
 
 ${ assist.assistJSModels() }
 
@@ -56,6 +61,7 @@ ${ assist.assistPanel() }
   <i class="fa fa-chevron-right"></i>
 </a>
 
+% endif
 
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
     <div class="navbar-inner">
@@ -76,12 +82,12 @@ ${ assist.assistPanel() }
       </div>
     </div>
 </div>
-
+<div id="jobbrowser">
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
-
+        % if not is_embeddable:
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
             <i class="fa fa-chevron-left"></i>
@@ -105,7 +111,7 @@ ${ assist.assistPanel() }
             }"></div>
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-
+        % endif
         <div class="content-panel">
 
           <div class="container-fluid">
@@ -187,6 +193,7 @@ ${ assist.assistPanel() }
       </div>
     </div>
   </div>
+</div>
 </div>
 
 
@@ -432,7 +439,7 @@ ${ assist.assistPanel() }
       };
 
       viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
-      ko.applyBindings(viewModel);
+      ko.applyBindings(viewModel, $('#jobbrowser')[0]);
 
       var loadHash = function () {
         var h = window.location.hash;
@@ -459,4 +466,6 @@ ${ assist.assistPanel() }
   })();
 </script>
 
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+% endif
