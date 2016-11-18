@@ -827,7 +827,7 @@ def augment_solr_response(response, collection, query):
         if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
           dimension = 3
           # Single dimension or dimension 2 with analytics
-          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
+          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] not in ('count', 'unique'):
             counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:
@@ -842,11 +842,11 @@ def augment_solr_response(response, collection, query):
               extraSeries.append({'counts': _c, 'label': name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
-          facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate'] == 'count']
+          facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
           count = response['facets'][name]
           _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
-        elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate'] not in ('count', 'unique'):
+        elif not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] not in ('count', 'unique'):
           # Single dimension or dimension 2 with analytics
           dimension = 1
           counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]

@@ -249,7 +249,7 @@ class SolrApi(object):
   def _n_facet_dimension(self, widget, _f, facets, dim):
     facet = facets[0]
     f_name = 'd%s' % dim
-    print facets
+
     if facet['aggregate']['function'] == 'count':
       _f['facet'] = {
           f_name: {
