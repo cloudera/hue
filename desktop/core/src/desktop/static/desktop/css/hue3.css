@@ -2765,8 +2765,17 @@ body {
   margin-top: -13px !important;
 }
 
+.hue-spinner-center.hue-spinner-xlarge {
+  margin-left: -30px !important;
+  margin-top: -30px !important;
+}
+
 .hue-spinner-large {
   font-size: 26px !important;
+}
+
+.hue-spinner-xlarge {
+  font-size: 60px !important;
 }
 
 .hue-spinner i {

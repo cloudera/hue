@@ -342,7 +342,7 @@
         spin = value();
       } else {
         $.extend(options, value);
-        spin = ko.isObservable(value.spin) ? value.spin() : value.spin;
+        spin = typeof value.spin === 'function' ? value.spin() : value.spin;
       }
 
       ko.virtualElements.emptyNode(element);
@@ -355,6 +355,9 @@
           $spinner.addClass('fa fa-spinner fa-spin');
           if (options.size === 'large') {
             $spinner.addClass('hue-spinner-large');
+          }
+          if (options.size === 'xlarge') {
+            $spinner.addClass('hue-spinner-xlarge');
           }
           if (options.center) {
             $spinner.addClass('hue-spinner-center');
