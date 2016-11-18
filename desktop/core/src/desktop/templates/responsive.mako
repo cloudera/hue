@@ -200,18 +200,17 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav">
       <ul class="left-nav-menu">
-        <li class="header">&nbsp;</li>
-        <li class="header">Applications</li>
-        <li><a href="javascript: void(0);">Reporter</a></li>
-        <li><a href="javascript: void(0);">Hive</a></li>
-        <li><a href="javascript: void(0);">Impala</a></li>
-        <li><a href="javascript: void(0);">Dashboards</a></li>
-        <li><a href="javascript: void(0);">Oozie</a></li>
+        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
+        <li><a href="javascript: void(0);">Reports</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Hive</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Impala</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('search') }">Dashboards</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }">Oozie</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
-        <li class="header">Browse</li>
+        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Metastore</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job Browser</a></li>
@@ -220,7 +219,7 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
       <div class="left-nav-drop">
-        <i class="fa fa-fw fa-cloud-upload"></i> <span>Drop files here</span>
+        <i class="fa fa-fw fa-cloud-upload"></i> <span>${ _('Drop files here') }</span>
       </div>
     </div>
 
