@@ -422,9 +422,10 @@ ${ assist.assistPanel() }
         }
 
         huePubSub.subscribe('switch.app', function (name) {
-          console.log(name);
           self.currentApp(name);
         });
+
+        self.currentApp('editor');
       };
 
       ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
