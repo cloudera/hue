@@ -210,7 +210,7 @@ ${ hueIcons.symbols() }
         <li class="header">Browse</li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Metastore</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
-        <li><a href="javascript: void(0);">Job Browser</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job Browser</a></li>
         <li><a href="javascript: void(0);">File Browser</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
@@ -259,6 +259,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
       <div id="embeddable_oozie_wf" class="embeddable"></div>
+      <div id="embeddable_jobbrowser" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -367,7 +368,8 @@ ${ assist.assistPanel() }
           editor: '/notebook/editor_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
           search: '/search/embeddable/new_search',
-          oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true'
+          oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
+          jobbrowser: '/jobbrowser/apps?is_embeddable=true'
         };
 
         self.embeddable_cache = {};
