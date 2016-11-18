@@ -266,12 +266,33 @@ ${ hueIcons.symbols() }
       sidePanelVisible: rightAssistVisible,
       orientation: 'right',
       onPosition: function() { huePubSub.publish('split.draggable.position') }
-    }"><div class="resize-bar">&nbsp;</div></div>
+    }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
-    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }">
-      <a href="javascript:void(0);" style="z-index: 1000; display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
+    <div class="right-panel" data-bind="visible: { 'side-panel-closed': !rightAssistVisible() }">
+      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
-      <div style="position: absolute; top: 15px; bottom: 0; left: 0; right: 0;" data-bind="component: { name: 'functions-panel' }"></div>
+
+      <div data-bind="visible: rightAssistVisible" style="display: none; height: 100%; width: 100%; position: relative;">
+        <ul class="right-panel-tabs nav nav-pills">
+          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }"><a href="#functions" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="#functions" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="#functions" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedules') }</a></li>
+        </ul>
+
+        <div class="right-panel-tab-content tab-content">
+          <!-- ko if: activeRightTab() === 'assistant' -->
+          <div>Assistant</div>
+          <!-- /ko -->
+
+          <!-- ko if: activeRightTab() === 'functions' -->
+          <div style="" data-bind="component: { name: 'functions-panel' }"></div>
+          <!-- /ko -->
+
+          <!-- ko if: activeRightTab() === 'schedules' -->
+          <div>Schedules</div>
+          <!-- /ko -->
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -416,6 +437,7 @@ ${ assist.assistPanel() }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.rightAssistVisible = ko.observable();
+        self.activeRightTab = ko.observable('functions');
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
         self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }

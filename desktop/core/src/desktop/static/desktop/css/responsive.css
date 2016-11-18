@@ -444,6 +444,31 @@ body {
   bottom: 0;
 }
 
+.right-panel-tabs {
+  margin-top: 8px;
+  border-bottom: 1px solid #F1F1F1;
+  padding-left: 14px;
+}
+
+.right-panel-tabs > li > a {
+  font-size: 13px;
+  padding: 6px 5px 8px 5px;
+  margin-bottom: 0;
+}
+
+.right-panel-tabs > li.active > a {
+  padding: 6px 5px 8px 5px;
+}
+.right-panel-tab-content {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: none;
+}
+
 .assist-function-categories,
 .assist-functions {
   list-style: none;
@@ -506,8 +531,7 @@ a:visited {
 }
 
 .assist-function-type-switch {
-  text-align: right;
-  padding: 5px 10px;
+  padding: 8px 10px;
   font-size: 15px;
 }
 
