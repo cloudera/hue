@@ -1461,7 +1461,7 @@ ${ hueIcons.symbols() }
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true } }" style="display: inline-block"></div>
+    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
 
    <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->

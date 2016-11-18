@@ -2420,6 +2420,11 @@ body {
   margin-left: -1px;
 }
 
+.hue-drop-down-active span {
+  font-size: 12px;
+  font-weight: lighter;
+}
+
 .hue-context-menu {
   display: none;
   position: fixed;
