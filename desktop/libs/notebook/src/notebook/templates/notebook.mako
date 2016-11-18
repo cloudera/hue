@@ -52,7 +52,6 @@ ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
-${ notebookKoComponents.snippetDbSelection() }
 
 ${ editorComponents.commonJS() }
 

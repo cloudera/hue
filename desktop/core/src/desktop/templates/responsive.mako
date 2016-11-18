@@ -22,6 +22,7 @@
   from metadata.conf import has_optimizer
 %>
 
+<%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
 
@@ -333,8 +334,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
+${ koComponents.all() }
 ${ assist.assistJSModels() }
-
 ${ assist.assistPanel() }
 
 <script type="text/javascript" charset="utf-8">
