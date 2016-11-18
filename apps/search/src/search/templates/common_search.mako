@@ -1987,7 +1987,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="metric-form">
   <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
-    <!-- ko if: ['sum', 'avg', 'mul', 'unique', 'percentile'].indexOf($data.function()) != -1 -->
+    <!-- ko if: ['sum', 'avg', 'unique', 'percentile', 'mul', 'add', 'sub', 'ms'].indexOf($data.function()) != -1 -->
       <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
     <!-- /ko -->
     
@@ -2005,15 +2005,17 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
     <!-- /ko -->
 
-    <a href="javascript: void(0)" data-bind="click: function() {
-        $parent.ops.pop($data); }
-      ">
+    <!-- ko if: ['mul', 'add', 'sub'].indexOf($data.function()) != -1 -->
+      <i class="fa fa-plus" title="${ _('Add') }"></i>
+    <!-- /ko -->
+
+    <a href="javascript: void(0)" data-bind="click: function() { $parent.ops.pop($data); }">
       <i class="fa fa-minus" title="${ _('Delete') }"></i>
     </a>
 
     <br/>
     <a href="javascript: void(0)" data-bind="click: function() {
-        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': 'price', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
+        $data.ops.push(ko.mapping.fromJS({'function': 'mul', 'ops': [{'function': 'field', 'value': '', 'ops': []}, {'function': 'field', 'value': '1', 'ops': []}]})); }
       ">
       <i class="fa fa-plus" title="${ _('Add formula operation') }"></i>
     </a>
@@ -2021,6 +2023,7 @@ ${ dashboard.layout_skeleton() }
       <span data-bind="template: { name: 'metric-form' }"></span>
     <!-- /ko -->
   </div>
+
   <div data-bind="visible: ! $root.isEditing(), text: getHitOption($data.function)" class="muted"></div>
 </script>
 
@@ -2705,6 +2708,9 @@ var HIT_OPTIONS = [
   { value: "median", label: "${ _('Median') }" },
   { value: "percentile", label: "${ _('Percentiles') }" },
   { value: "mul", label: "${ _('Multiply') }" },
+  { value: "add", label: "${ _('Add') }" },
+  { value: "sub", label: "${ _('Substract') }" },
+  { value: "ms", label: "${ _('Substract dates') }" },
 ];
 
 function getHitOption(value){
