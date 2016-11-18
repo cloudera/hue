@@ -626,7 +626,7 @@ var Collection = function (vm, collection) {
     if (typeof facet.properties.facets != 'undefined') {
       $.each(facet.properties.facets(), function (index, pivotFacet) {
         if (pivotFacet.aggregate) {
-          pivotFacet.aggregate.subscribe(function () {
+          pivotFacet.aggregate.function.subscribe(function () {
             vm.search();
           });
         }
@@ -813,6 +813,33 @@ var Collection = function (vm, collection) {
 
     if (pivot != null) {
       pivot.aggregate.subscribe(function() {
+        vm.search();
+      });
+      facet.properties.facets.push(pivot);
+      vm.search();
+    }
+  }
+
+  self.addPivotFacetValue2 = function(facet) {
+    var pivot = null;
+
+    pivot = ko.mapping.fromJS({
+      'field': ko.mapping.toJS(facet.properties.facets_form.field),
+      'limit': ko.mapping.toJS(facet.properties.facets_form.limit),
+      'mincount': ko.mapping.toJS(facet.properties.facets_form.mincount),
+      'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
+    });
+      
+      facet.properties.facets_form.field(null);
+      facet.properties.facets_form.limit(5);
+      facet.properties.facets_form.mincount(1);
+      
+      facet.properties.facets_form.aggregate.function('count');
+      facet.properties.facets_form.aggregate.ops.removeAll();
+      facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS({'value': 50}));
+
+    if (pivot != null) {
+      pivot.aggregate.function.subscribe(function() {
         vm.search();
       });
       facet.properties.facets.push(pivot);
