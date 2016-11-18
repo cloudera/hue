@@ -220,12 +220,15 @@ class OptimizerApi(object):
     return self._exec('get-top-filters', args)
 
 
-  def top_aggs(self, database_name, table_name, column_name=None):
-    return self._exec('get-top-aggs', [
-        '--tenant', self._product_name,
-        '--db-name', database_name.lower(),
-        '--table-name', table_name.lower()
-    ])
+  def top_aggs(self, db_tables=None):
+    args = [
+        '--tenant', self._product_name
+    ]
+    if db_tables:
+      args += ['--db-table-list']
+      args.extend([db_table.lower() for db_table in db_tables])
+
+    return self._exec('get-top-aggs', args)
 
 
   def top_columns(self, db_tables=None):
