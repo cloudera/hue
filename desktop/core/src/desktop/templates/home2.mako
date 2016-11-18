@@ -25,13 +25,10 @@
 ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>

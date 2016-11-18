@@ -306,7 +306,6 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 </div>
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 <style type="text/css">

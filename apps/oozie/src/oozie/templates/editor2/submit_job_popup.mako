@@ -118,7 +118,6 @@
 </div>
 
 
-<script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-datepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-timepicker.min.css') }" type="text/css" media="screen" title="no title" charset="utf-8" />
 

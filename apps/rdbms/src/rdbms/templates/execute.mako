@@ -362,9 +362,6 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('rdbms/js/rdbms.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>

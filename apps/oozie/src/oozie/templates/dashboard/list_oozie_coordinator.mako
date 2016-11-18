@@ -492,7 +492,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <div id="rerun-coord-modal" class="modal hide"></div>
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_coordinator.has_sla:
@@ -508,7 +507,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <script src="${ static('desktop/js/bootstrap-spinedit.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/bootstrap-slider.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ko.hue-bindings.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }" type="text/javascript" charset="utf-8"></script>
 

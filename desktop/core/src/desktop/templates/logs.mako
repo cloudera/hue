@@ -92,9 +92,6 @@ ${layout.menubar(section='log_view')}
 
 </div>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
-
-
 <script>
   var LiveDebugging = function () {
     var self = this;

@@ -484,7 +484,6 @@ function i18n(text) {
 canWrite = ${ str(can_write).lower() };
 </script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/knockout.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
