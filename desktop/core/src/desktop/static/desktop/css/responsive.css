@@ -466,7 +466,7 @@ body {
   width: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  border: none;
+  border: none !important;
 }
 
 .assist-function-categories,
@@ -957,8 +957,11 @@ h6 {
 /* styling for the imported apps */
 
 .page-content .navbar-inner {
+  margin: 10px 10px 0 10px;
   background-color: transparent;
   border: none;
+  border-bottom: 1px solid #f1f1f1;
+  padding-bottom: 8px;
 }
 
 .page-content .navbar.navbar-inverse.navbar-fixed-top {
