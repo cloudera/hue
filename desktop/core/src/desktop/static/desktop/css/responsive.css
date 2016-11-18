@@ -65,7 +65,7 @@ body {
   position: relative;
   background-color: #338BB8;
   width: 100%;
-  z-index: 999999;
+  z-index: 1049;
 }
 
 .top-nav-left {
@@ -301,11 +301,11 @@ body {
   -ms-flex: 1;
   flex: 1;
   position: relative;
-  /*overflow-y: auto;*/
 }
 
 .page-content .content-panel {
   overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .left-nav {
@@ -940,10 +940,35 @@ h6 {
 }
 
 /* editor */
-.progress {
+#editorComponents .progress {
   border: none;
 }
 
-.context-panel {
+#editorComponents .context-panel {
   display: none;
+}
+
+#editorComponents .snippet {
+  margin-right: 0;
+}
+
+/* search */
+#searchComponents .search-bar, #searchComponents .card-toolbar {
+  position: static;
+}
+
+#searchComponents .card-toolbar {
+  zoom: 0.8;
+}
+
+#searchComponents .card-toolbar a, #searchComponents .card-toolbar .draggable-widget {
+  float: left;
+}
+
+#searchComponents .card-toolbar .draggable-widget a {
+  float: none;
+}
+
+#searchComponents .form-search .input-append .search-query {
+  width: 50px;
 }

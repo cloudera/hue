@@ -96,15 +96,16 @@ ${ hueIcons.symbols() }
         <button class="btn dropdown-toggle" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
+
         <ul class="dropdown-menu">
           % if 'beeswax' in apps:
-            <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
           % endif
           % if 'impala' in apps: ## impala requires beeswax anyway
             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
           % endif
           % if 'search' in apps:
-            <li><a href="${ url('search:new_search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
+            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
           % endif
           % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
@@ -206,7 +207,7 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header">Browse</li>
-        <li><a href="javascript: void(0);">Metastore</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Metastore</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
         <li><a href="javascript: void(0);">Job Browser</a></li>
         <li><a href="javascript: void(0);">File Browser</a></li>
@@ -258,17 +259,8 @@ ${ hueIcons.symbols() }
     }"><div class="resize-bar">&nbsp;</div></div>
 
 
-    <div class="page-content" data-bind="niceScroll">
-      <!-- ko ifnot: currentApp() -->
-      Load
-      <a href="#" data-bind="click: function(){ currentApp('editor') }">editor</a> |
-      <a href="#" data-bind="click: function(){ currentApp('metastore') }">metastore</a> |
-      <a href="#" data-bind="click: function(){ currentApp('search') }">search</a>
-      <!-- /ko -->
-
-      <!-- ko if: isLoadingEmbeddable -->
-      <i class="fa fa-spinner fa-spin"></i>
-      <!-- /ko -->
+    <div class="page-content" data-bind="niceScroll: {horizrailenabled: false}">
+      <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge' } --><!-- /ko -->
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
