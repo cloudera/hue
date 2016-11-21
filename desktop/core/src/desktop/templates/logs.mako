@@ -68,15 +68,20 @@ ${layout.menubar(section='log_view')}
         <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
       </%def>
       <%def name="creation()">
-        ${ _('Host') }: <span style="display: inline-block; margin-right: 10px">${ hostname }</span>
-
-        <label class="checkbox" for="forcedDebug" style="display: inline-block; margin-right: 10px">${_('Force DEBUG level')}</label>
-        <input type="checkbox" id="forcedDebug" data-bind="checked: forcedDebug" style="vertical-align: middle">
-
-        <label class="checkbox" for="wrap" style="display: inline-block; margin-right: 10px">${_('Wrap logs')}</label>
-        <input id="wrapLogs" id="wrap" type="checkbox" checked="checked">
-
-        <a href="/desktop/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+        <form class="form-inline">
+            <label class="checkbox margin-right-10">
+              ${ _('Host') }: ${ hostname }
+            </label>
+            <label class="checkbox margin-right-10">
+              <input type="checkbox" id="forcedDebug" data-bind="checked: forcedDebug">
+              ${_('Force DEBUG level')}
+            </label>
+            <label class="checkbox margin-right-10">
+              <input id="wrapLogs" id="wrap" type="checkbox" checked="checked">
+              ${_('Wrap logs')}
+            </label>
+            <a href="/desktop/download_logs" class="btn"><i class="fa fa-download"></i> ${_('Download entire log as zip')}</a>
+        </form>
       </%def>
     </%actionbar:render>
 
