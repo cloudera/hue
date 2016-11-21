@@ -140,7 +140,7 @@ var SqlAutocompleter2 = (function () {
             value.tables.forEach(function (table) {
               var tableParts = table.split('.');
               if (!existingTables[tableParts[tableParts.length - 1]]) {
-                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + table : table;
+                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + self.convertNavOptQualifiedIdentifier(table, database) : self.convertNavOptQualifiedIdentifier(table, database);
                 joinRequired = true;
               }
             });
@@ -152,7 +152,7 @@ var SqlAutocompleter2 = (function () {
               if (!first) {
                 suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
               }
-              suggestionString += joinColPair.columns[0] + ' = ' + joinColPair.columns[1];
+              suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database);
               first = false;
             });
             completions.push({
@@ -186,7 +186,7 @@ var SqlAutocompleter2 = (function () {
                 if (!first) {
                   suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
                 }
-                suggestionString += joinColPair.columns[0] + ' = ' + joinColPair.columns[1];
+                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database);
                 first = false;
               });
               completions.push({
@@ -324,6 +324,16 @@ var SqlAutocompleter2 = (function () {
       completions = completions.concat(columnSuggestions);
       self.finalizeCompletions(completions, callback, editor);
     });
+  };
+
+  SqlAutocompleter2.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, defaultDatabase) {
+    var self = this;
+
+    if (qualifiedIdentifier.indexOf(defaultDatabase) === 0) {
+      return qualifiedIdentifier.substring(defaultDatabase.length + 1);
+    }
+    // TODO: Take care of aliases
+    return qualifiedIdentifier;
   };
 
   SqlAutocompleter2.prototype.mergeColumns = function (columnSuggestions) {
