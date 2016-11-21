@@ -75,16 +75,18 @@ class Job(object):
 
   @property
   def validated_name(self):
+    xml_entities = {
+            '"': '&quot;',
+            '\'': '&apos;',
+            '&': '&amp;',
+            '<': '&lt;',
+            '>': '&gt;',
+    }
     good_name = []
 
     for c in self.name[:40]:
-      if not good_name:
-        if not re.match('[a-zA-Z_\{\$\}]', c):
-          c = '_'
-      else:
-        if not re.match('[\-_a-zA-Z0-9\{\$\}]', c):
-          c = '_'
-      good_name.append(c)
+        c = xml_entities.get(c, c)
+        good_name.append(c)
 
     return ''.join(good_name)
 
