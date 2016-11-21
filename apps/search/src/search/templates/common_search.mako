@@ -144,6 +144,7 @@ from django.utils.translation import ugettext as _
                        <i class="fa fa-table"></i>
          </a>
     </div>
+
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableResultset() },
                     draggable: {data: draggableHtmlResultset(),
                     isEnabled: availableDraggableResultset,
@@ -160,6 +161,7 @@ from django.utils.translation import ugettext as _
                        <i class="fa fa-code"></i>
          </a>
     </div>
+
     <div data-bind="css: { 'draggable-widget': true, 'disabled': !availableDraggableFilter() },
                     draggable: {data: draggableFilter(), isEnabled: availableDraggableFilter,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -167,17 +169,6 @@ from django.utils.translation import ugettext as _
          title="${_('Filter Bar')}" rel="tooltip" data-placement="top">
          <a data-bind="style: { cursor: $root.availableDraggableFilter() ? 'move' : 'default' }">
                        <i class="fa fa-filter"></i>
-         </a>
-    </div>
-
-    <div data-bind="visible: $root.isLatest,
-                    css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
-                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
-                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
-                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
-         title="${_('Counter')}" rel="tooltip" data-placement="top">
-         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
-                       <i class="fa fa-superscript" style="font-size: 110%"></i>
          </a>
     </div>
 
@@ -191,8 +182,18 @@ from django.utils.translation import ugettext as _
          </a>
     </div>
 
-
+    <div data-bind="visible: $root.isLatest,
+                    css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
+                    draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
+                    options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
+                              'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
+         title="${_('Counter')}" rel="tooltip" data-placement="top">
+         <a data-bind="style: { cursor: $root.availableDraggableNumbers() ? 'move' : 'default' }">
+                       <i class="fa fa-superscript" style="font-size: 110%"></i>
+         </a>
+    </div>
       </%def>
+
       <%def name="widgets()">
     <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
@@ -1028,7 +1029,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Click to analyze field') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
