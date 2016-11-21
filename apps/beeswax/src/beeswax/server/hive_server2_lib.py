@@ -654,7 +654,12 @@ class HiveServerClient:
 
         # Only check last 40 documents for performance
         for doc in docs[:40]:
-          snippet_data = json.loads(doc.data)['snippets'][0]
+          try:
+            snippet_data = json.loads(doc.data)['snippets'][0]
+          except (KeyError, IndexError):
+            # data might not contain a 'snippets' field or it might be empty
+            LOG.warn('No snippets in Document2 object of type query-hive')
+            continue
           session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
           status = snippet_data.get('status')
 
