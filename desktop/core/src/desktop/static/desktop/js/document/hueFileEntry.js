@@ -278,9 +278,7 @@ var HueFileEntry = (function () {
       entry.selected(true);
     }
     if (self.selectedEntry()) {
-      if (! self.selectedEntry().document()) {
-        self.selectedEntry().loadDocument();
-      }
+      self.selectedEntry().loadDocument();
       $('#shareDocumentModal').modal('show');
     }
   };
