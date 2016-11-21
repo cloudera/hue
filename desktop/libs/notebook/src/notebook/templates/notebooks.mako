@@ -108,7 +108,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
         <th>${ _('Name') }</th>
         <th>${ _('Description') }</th>
         <th>${ _('Owner') }</th>
-        <th width="10%">${ _('Last Modified') }</th>
+        <th style="width: 170px">${ _('Last Modified') }</th>
       </tr>
     </thead>
     <tbody data-bind="foreach: { data: jobs }">
@@ -164,13 +164,10 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
     </div>
   </form>
 </div>
-
-${ commonimportexport(request) | n,unicode }
-
-
 </div>
 
 
+${ commonimportexport(request) | n,unicode }
 ${ commonshare() | n,unicode }
 
 
