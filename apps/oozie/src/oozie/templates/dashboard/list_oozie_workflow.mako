@@ -458,11 +458,24 @@ ${ utils.slaGlobal() }
   ko.applyBindings(actionsViewModel, $("#actions")[0]);
 
   % if layout_json != '':
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }); 
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#graph")[0]);
   viewModel.isViewer = ko.observable(true);
   viewModel.init();
   fullLayout(viewModel);
+
+  var globalFilechooserOptions = {
+    skipInitialPathIfEmpty: true,
+    showExtraHome: true,
+    uploadFile: true,
+    createFolder: true,
+    extraHomeProperties: {
+      label: '${ _('Workspace') }',
+      icon: 'fa-folder-open',
+      path: viewModel.workflow.properties.deployment_dir()
+    },
+    deploymentDir: viewModel.workflow.properties.deployment_dir()
+  }
   %endif
 
   var CHART_LABELS = {
