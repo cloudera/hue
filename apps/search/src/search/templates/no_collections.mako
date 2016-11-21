@@ -46,16 +46,8 @@ ${ commonheader(_('Search'), "search", user, request, "120px") | n,unicode }
       <h1>${ _('It seems there is nothing to search on ...') }</h1>
       % if user.is_superuser:
       <h1>
-        ${ _('... First create a search dashboard with ') }
-        <a class="btn importBtn" href="${ url('search:new_search') }">
-          <i class="fa fa-file-o"></i> ${ _('Dashboard') }
-        </a>
-      </h1>
-      <h1>
-        ${ _('... or create a search index with ') }
-        <a class="btn importBtn" href="${ url('indexer:collections') }">
-          <i class="fa fa-database"></i> ${ _('Indexer') }
-        </a>
+        ${ _('What about creating a') }
+        <a href="${ url('indexer:collections') }">${ _('new index') }</a> ?
       </h1>
       % endif
     </div>
