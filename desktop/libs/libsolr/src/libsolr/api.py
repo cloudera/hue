@@ -172,7 +172,7 @@ class SolrApi(object):
               del _f['mincount'] # Numeric fields do not support
 
           if facet['properties']['facets']:
-            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 2)
+            self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1)
             if facet['widgetType'] == 'text-facet-widget':
               _f['sort'] = {'d2': facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
@@ -253,25 +253,40 @@ class SolrApi(object):
 
   def _n_facet_dimension(self, widget, _f, facets, dim):
     facet = facets[0]
-    f_name = 'd%s' % dim
+    f_name = 'd_%02d:%s' % (dim, facet['field'])
 
     if facet['aggregate']['function'] == 'count':
-      _f['facet'] = {
-          f_name: {
-              'type': 'terms',
-              'field': '%(field)s' % facet,
-              'limit': int(facet.get('limit', 10)),
-              'mincount': int(facet['mincount'])
-          }
+      if dim == 1:
+        _f['facet'] = {f_name: {}}
+        _f = _f['facet']
+
+      _f[f_name] = {
+          'type': 'terms',
+          'field': '%(field)s' % facet,
+          'limit': int(facet.get('limit', 10)),
+          'mincount': int(facet['mincount'])
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
+
       if len(facets) > 1: # Get n+1 dimension
-        self._n_facet_dimension(widget, _f['facet'][f_name], facets[1:], dim+1)
+        if facets[1]['aggregate']['function'] == 'count':
+          self._n_facet_dimension(widget, _f['facet'][f_name], facets[1:], dim + 1)
+        else:
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim)
     else:
+      agg_function = self._get_aggregate_function(facet)
       _f['facet'] = {
-          f_name: self._get_aggregate_function(facet)
+          'agg_00:%s' % agg_function: agg_function
       }
+      for i, _f_agg in enumerate(facets[1:], 1): # Get n+1 dimension
+        if _f_agg['aggregate']['function'] != 'count':
+          agg_function = self._get_aggregate_function(_f_agg)
+          _f['facet']['agg_%02d:%s' % (i, agg_function)] = agg_function
+        else:
+          print 'aaa'
+          self._n_facet_dimension(widget, _f['facet'], [_f_agg], dim + 1)
+        # else go into _get_aggregate_function()
 
 
   def suggest(self, collection, query):
@@ -616,7 +631,7 @@ class SolrApi(object):
 
     if not f['ops']:
       f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
-    
+
     return self.__get_aggregate_function(f)
 
   def __get_aggregate_function(self, f):
@@ -626,10 +641,13 @@ class SolrApi(object):
       fields = []
       for _f in f['ops']:
         fields.append(self.__get_aggregate_function(_f))
-      if f['function'] == 'percentile':
+      if f['function'] == 'median':
+        f['function'] = 'percentile'
+        fields.append('50')
+      elif f['function'] == 'percentiles':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
-    
+
   def _get_range_borders(self, collection, query):
     props = {}
     GAPS = {
