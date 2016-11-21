@@ -19,7 +19,7 @@ from django.utils.translation import ugettext as _
 
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from desktop.views import _ko
+from desktop.views import _ko, antixss
 
 from metadata.conf import has_optimizer
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
@@ -3083,7 +3083,7 @@ ${ hueIcons.symbols() }
   (function () {
     ko.options.deferUpdates = true;
 
-    var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode }, {
+    var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
       user: '${ user.username }',
       userId: ${ user.id },
       % if is_embeddable:
