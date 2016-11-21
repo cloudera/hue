@@ -400,23 +400,18 @@ from desktop.views import _ko
           <div class="input-append">
             <input id="documentShareTypeahead" type="text" style="width: 420px" placeholder="${_('Type a username or a group name')}">
             <div class="btn-group" style="overflow:visible">
-              <a class="btn" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
-              <a class="btn dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
+              <a class="btn btn-primary" data-bind="click: function () { if (selectedUserOrGroup()) { handleTypeAheadSelection() }}, css: { 'disabled': !selectedUserOrGroup() }"><i class="fa fa-plus-circle"></i> <span data-bind="text: selectedPerm() == 'read' ? '${ _('Read') }' : '${ _('Modify') }'"></span></a>
+              <a class="btn btn-primary dropdown-toggle" data-bind="css: { 'disabled': !selectedUserOrGroup() }" data-toggle="dropdown"><span class="caret"></span></a>
               <ul class="dropdown-menu">
-                <li><a data-bind="click: function () { selectedPerm('read') }" href="javascript:void(0)">${ _('Read') }</a></li>
-                <li><a data-bind="click: function () { selectedPerm('write') }" href="javascript:void(0)">${ _('Modify') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('read'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Read') }</a></li>
+                <li><a data-bind="click: function () { selectedPerm('write'); handleTypeAheadSelection() }" href="javascript:void(0)"><i class="fa fa-plus"></i> ${ _('Modify') }</a></li>
               </ul>
             </div>
           </div>
         </div>
       </div>
       <div class="modal-footer">
-        <!-- ko if: selectedUserOrGroup()  -->
-        <a class="btn btn-primary" data-bind="click: handleTypeAheadSelection" href="javascript:void(0)">${ _('Add') }</a>
-        <!-- /ko -->
-        <!-- ko ifnot: selectedUserOrGroup() -->
-        <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Close')}</a>
-        <!-- /ko -->
+        <a href="#" data-dismiss="modal" class="btn disable-feedback disable-enter">${_('Close')}</a>
       </div>
       <!-- /ko -->
       <!-- /ko -->
@@ -1021,9 +1016,10 @@ from desktop.views import _ko
           self.searchVisible(false);
         });
 
+        var keepSelectionSelector = '.doc-browser-entries, .doc-browser-folder-actions, .doc-browser-header, .doc-browser-search-container, .modal';
         $(document).click(function (event) {
           var $target = $(event.target);
-          if ($target.parents('.doc-browser-entries, .doc-browser-folder-actions, .doc-browser-header, .doc-browser-search-container, .modal').length === 0) {
+          if (!$target.is(keepSelectionSelector) && $target.parents(keepSelectionSelector).length === 0) {
             self.activeEntry().selectedEntries().forEach(function (entry) {
               entry.selected(false);
             });
