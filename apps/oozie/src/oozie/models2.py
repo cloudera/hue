@@ -25,6 +25,7 @@ import uuid
 from datetime import datetime, timedelta
 from dateutil.parser import parse
 from string import Template
+from xml.sax.saxutils import escape
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
@@ -75,20 +76,10 @@ class Job(object):
 
   @property
   def validated_name(self):
-    xml_entities = {
-            '"': '&quot;',
-            '\'': '&apos;',
-            '&': '&amp;',
-            '<': '&lt;',
-            '>': '&gt;',
-    }
-    good_name = []
-
-    for c in self.name[:40]:
-        c = xml_entities.get(c, c)
-        good_name.append(c)
-
-    return ''.join(good_name)
+    return ''.join(escape(self.name[:40], entities={
+        "'": "&apos;",
+        "\"": "&quot;"
+    }))
 
   def __str__(self):
     return '%s' % force_unicode(self.name)
