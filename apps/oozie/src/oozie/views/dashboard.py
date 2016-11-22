@@ -45,7 +45,7 @@ from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
 from liboozie.submission2 import Submission
 
-from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2
+from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2, ENABLE_OOZIE_BACKEND_FILTERING
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
 from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bundle, Coordinator, get_link, History as OldHistory
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
@@ -194,7 +194,7 @@ def list_oozie_workflows(request):
     if request.GET.get('startcreatedtime'):
       kwargs['filters'].extend([('startcreatedtime', request.GET.get('startcreatedtime'))])
 
-    if request.GET.get('text'):
+    if request.GET.get('text') and ENABLE_OOZIE_BACKEND_FILTERING.get():
       kwargs['filters'].extend([('text', request.GET.get('text'))])
 
     if request.GET.get('offset'):
@@ -235,7 +235,7 @@ def list_oozie_coordinators(request):
     if request.GET.get('offset'):
       kwargs['offset'] = request.GET.get('offset')
 
-    if request.GET.get('text'):
+    if request.GET.get('text') and ENABLE_OOZIE_BACKEND_FILTERING.get():
       kwargs['filters'].extend([('text', request.GET.get('text'))])
 
     json_jobs = []
@@ -271,7 +271,7 @@ def list_oozie_bundles(request):
     if request.GET.get('offset'):
       kwargs['offset'] = request.GET.get('offset')
 
-    if request.GET.get('text'):
+    if request.GET.get('text') and ENABLE_OOZIE_BACKEND_FILTERING.get():
       kwargs['filters'].extend([('text', request.GET.get('text'))])
 
     json_jobs = []

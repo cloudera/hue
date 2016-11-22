@@ -18,6 +18,7 @@
 <%!
   from desktop.views import commonheader, commonfooter
   from django.utils.translation import ugettext as _
+  from oozie.conf import ENABLE_OOZIE_BACKEND_FILTERING
 %>
 
 <%namespace name="layout" file="../navigation-bar.mako" />
@@ -33,7 +34,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
   <div class="card-body" style="padding-bottom: 20px">
   <p>
   <form>
-    <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search for username, name, etc...') }">
+    <input type="text" id="filterInput" class="input-xlarge search-query" placeholder="${ _('Search partial name, submitter or complete Id') }">
 
     <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
       <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
@@ -303,11 +304,17 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     });
 
     $("#filterInput").keyup(function () {
-      if (filterTimeout != null) {
-        clearTimeout(filterTimeout);
-      }
-      filterTimeout = setTimeout(refreshTables, 500);
-      refreshPagination();
+      % if ENABLE_OOZIE_BACKEND_FILTERING.get():
+        if (filterTimeout != null) {
+          clearTimeout(filterTimeout);
+        }
+        filterTimeout = setTimeout(refreshTables, 500);
+        refreshPagination();
+      % else:
+        runningTable.fnFilter($(this).val());
+        completedTable.fnFilter($(this).val());
+        drawTable();
+      % endif
     });
 
 
@@ -413,6 +420,9 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     }
 
     function getTextFilter() {
+      % if not ENABLE_OOZIE_BACKEND_FILTERING.get():
+        return '';
+      % endif
       var filterBtn = $("#filterInput");
       var textFilter = '';
       if (filterBtn.val()) {
