@@ -1563,18 +1563,27 @@ ${ hueIcons.symbols() }
     </div>
     <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">${ _('The current query has been redacted to hide sensitive information.') }</div>
   </div>
+
   <div class="alert alert-error alert-error-gradient" data-bind="visible: hasComplexity">
     <div style="float:left;">
       <svg class="hi" style="height: 20px; width: 20px;">
         <use xlink:href="#hi-warning"></use>
       </svg>
     </div>
-    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
-      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexityLevel"></span>
-      <span data-bind="text: complexity"></span>
-      </span><span data-bind="text: complexityRecommendation"></span>
+    <!-- ko if: hasComplexity -->
+    <div style="margin-left: 30px; line-height: 20px; vertical-align: middle;">
+      <!-- ko if: complexity().risk().length == 0 -->
+        <span style="margin-right:10px; font-weight: bold;">
+          ${ _('No risks were detected in this query.') }
+        </span>
+      <!-- /ko -->
+      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexity().risk"></span>
+      <span data-bind="text: complexity().riskAnalysis"></span>
+      <span data-bind="text: complexity().riskRecommendation"></span>
     </div>
+    <!-- /ko -->
   </div>
+
   <div class="alert" data-bind="visible: hasSuggestion">
     <div style="float:left;">
       <svg class="hi" style="height: 20px; width: 20px;">
@@ -1584,23 +1593,21 @@ ${ hueIcons.symbols() }
     <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
       <!-- ko if: hasSuggestion -->
       <!-- ko with: suggestion() -->
-      <!-- ko if: queryStatus() == 'SUCCESS' -->
-        ${ _('The query is compatible! Click to') } <a href="/notebook/editor?type=impala">${ _('execute') }</a> ${ _('with Impala') }.
-      <!-- /ko -->
-      <!-- ko if: errorDetail.errorString -->
-        ${ _('Query is not compatible with Impala') }.
-        <br>
-        <span style="font-weight: bold;"></span><span data-bind="text: errorDetail.errorString"></span>
-      <!-- /ko -->
-      <!-- ko if: clauseStatus.From -->
-        <br>
-        <!-- ko if: clauseStatus.From.category -->
-          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.category"></span>
+        <!-- ko if: queryError.encounteredString().length == 0 -->
+          ${ _('The query is compatible!') } <a href="javascript:void(0)" data-bind="click: function() { $parent.type('impala') }">${ _('Execute with Impala?') }</a>
         <!-- /ko -->
-        <!-- ko if: clauseStatus.From.suggestedFix -->
-          <span style="font-weight: bold;"></span><span data-bind="text: clauseStatus.From.suggestedFix"></span>
+        <!-- ko if: queryError.encounteredString -->
+          ${ _('Query is not compatible with Impala.') }
+          <br>
+          <span data-bind="text: queryError.encounteredString"></span>
+          <span data-bind="text: queryError.errorString"></span>
         <!-- /ko -->
-      <!-- /ko -->
+        <!-- ko if: queryError.expectedString -->
+          <br>
+          <!-- ko if: queryError.expectedString -->
+            <span data-bind="text: queryError.expectedString"></span>
+          <!-- /ko -->
+        <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -2194,11 +2201,19 @@ ${ hueIcons.symbols() }
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
           </a>
         </li>
+        <!-- ko if: $root.isOptimizerEnabled -->
+        <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: queryCompatibility, visible: $root.isOptimizerEnabled" title="${ _('Get Impala compatibility hints') }">
+          <a href="javascript:void(0)" data-bind="click: queryCompatibility" title="${ _('Get Impala compatibility hints') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
           </a>
         </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: getComplexity" title="${ _('Get recommendations on query risks and optimizations') }">
+            <i class="fa fa-fw fa-check"></i> ${_('Check complexity')}
+          </a>
+        </li>
+        <!-- /ko -->
       </ul>
     </div>
     <!-- /ko -->
