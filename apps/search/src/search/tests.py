@@ -30,6 +30,7 @@ from desktop.models import Document2
 
 from search.api import _round_number_range
 from search.models import Collection2
+from search.search_controller import SearchController
 
 
 QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
@@ -97,6 +98,35 @@ class TestSearchBase(object):
 
     self.collection = Collection2(user=self.user, name='collection_1')
 
+    MockResource.set_solr_response("""{
+      "responseHeader": {
+        "status": 0,
+        "QTime": 0,
+        "params": {
+          "indent": "true",
+          "q": "*:*",
+          "_": "1442953203972",
+          "wt": "json"
+        }
+      },
+      "response": {
+        "numFound": 1,
+        "start": 0,
+        "docs": [
+          {
+            "id": "change.me",
+            "title": [
+              "val1",
+              "val2",
+              "[val3]",
+              "val4"
+            ],
+            "_version_": 1513046095083602000
+          }
+        ]
+      }
+      }""")
+
   def tearDown(self):
     # Remove monkey patching
     resource.Resource = self.prev_resource
@@ -113,57 +143,149 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true('search' in response.content, response.content)
 
   def test_share_dashboard(self):
-      doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
-                                     data=self.collection.data, parent_directory=self.home_dir)
+    doc = Document2.objects.create(name='test_dashboard', type='search-dashboard', owner=self.user,
+                                   data=self.collection.data, parent_directory=self.home_dir)
 
-      # owner can view document
-      response = self.c.get('/desktop/api2/doc/', {'uuid': doc.uuid})
-      data = json.loads(response.content)
-      assert_equal(doc.uuid, data['document']['uuid'], data)
+    # owner can view document
+    response = self.c.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
-      # other user cannot view document
-      response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
-      data = json.loads(response.content)
-      assert_equal(-1, data['status'])
+    # other user cannot view document
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
 
-      # Share read perm by users
-      response = self.c.post("/desktop/api2/doc/share", {
-          'uuid': json.dumps(doc.uuid),
-          'data': json.dumps({
-              'read': {
-                  'user_ids': [
-                      self.user.id,
-                      self.user_not_me.id
-                  ],
-                  'group_ids': [],
-              },
-              'write': {
-                  'user_ids': [],
-                  'group_ids': [],
-              }
-          })
-      })
+    # There are no collections with user_not_me
+    search_controller = SearchController(self.user_not_me)
+    hue_collections = search_controller.get_search_collections()
+    assert_true(len(hue_collections) == 0)
 
-      assert_equal(0, json.loads(response.content)['status'], response.content)
-      assert_true(doc.can_read(self.user))
-      assert_true(doc.can_write(self.user))
-      assert_true(doc.can_read(self.user_not_me))
-      assert_false(doc.can_write(self.user_not_me))
+    # Share read perm by users
+    response = self.c.post("/desktop/api2/doc/share", {
+        'uuid': json.dumps(doc.uuid),
+        'data': json.dumps({
+            'read': {
+                'user_ids': [
+                    self.user.id,
+                    self.user_not_me.id
+                ],
+                'group_ids': [],
+            },
+            'write': {
+                'user_ids': [],
+                'group_ids': [],
+            }
+        })
+    })
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+    assert_true(doc.can_read(self.user))
+    assert_true(doc.can_write(self.user))
+    assert_true(doc.can_read(self.user_not_me))
+    assert_false(doc.can_write(self.user_not_me))
 
-      # other user can view document
-      response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
-      data = json.loads(response.content)
-      assert_equal(doc.uuid, data['document']['uuid'], data)
+    # other user can view document
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc.uuid, data['document']['uuid'], data)
 
-      # other user can open dashboard
-      response = self.c.post(reverse('search:search'), {
-          'collection': json.dumps(self._get_collection_param(self.collection)),
-          'query': json.dumps(QUERY)
-      })
+    # other user can open dashboard
+    response = self.c.post(reverse('search:search'), {
+        'collection': json.dumps(self._get_collection_param(self.collection)),
+        'query': json.dumps(QUERY)
+    })
 
-      data = json.loads(response.content)
-      assert_true('response' in data, data)
-      assert_true('docs' in data['response'], data)
+    data = json.loads(response.content)
+    assert_true('response' in data, data)
+    assert_true('docs' in data['response'], data)
+
+    # For self.user_not_me
+    search_controller = SearchController(self.user_not_me)
+    hue_collections = search_controller.get_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
+    hue_collections = search_controller.get_owner_search_collections()
+    assert_equal(len(hue_collections), 0)
+
+    hue_collections = search_controller.get_shared_search_collections()
+    assert_equal(len(hue_collections), 0)
+
+    # For self.user
+    search_controller = SearchController(self.user)
+    hue_collections = search_controller.get_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
+    hue_collections = search_controller.get_owner_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
+    hue_collections = search_controller.get_shared_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
+    user_not_me_home_dir = Document2.objects.get_home_directory(user=self.user_not_me)
+    doc1 = Document2.objects.create(name='test_dashboard1', type='search-dashboard', owner=self.user_not_me,
+                                   data=self.collection.data, parent_directory=user_not_me_home_dir)
+    # self.user_not_me can view document
+    response = self.client_not_me.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
+    data = json.loads(response.content)
+    assert_equal(doc1.uuid, data['document']['uuid'], data)
+
+    # self.user cannot view document
+    response = self.c.get('/desktop/api2/doc/', {'uuid': doc1.uuid})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'])
+
+    # Share read perm by users
+    response = self.client_not_me.post("/desktop/api2/doc/share", {
+        'uuid': json.dumps(doc1.uuid),
+        'data': json.dumps({
+            'read': {
+                'user_ids': [
+                    self.user.id,
+                ],
+                'group_ids': [],
+            },
+            'write': {
+                'user_ids': [],
+                'group_ids': [],
+            }
+        })
+    })
+    assert_equal(0, json.loads(response.content)['status'], response.content)
+    assert_true(doc1.can_read(self.user))
+    assert_false(doc1.can_write(self.user))
+    assert_true(doc1.can_read(self.user_not_me))
+    assert_true(doc1.can_write(self.user_not_me))
+
+    # For self.user_not_me
+    search_controller = SearchController(self.user_not_me)
+    hue_collections = search_controller.get_search_collections()
+    assert_equal(len(hue_collections), 2)
+
+    hue_collections = search_controller.get_owner_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard1')
+
+    hue_collections = search_controller.get_shared_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard1')
+
+    # For self.user
+    search_controller = SearchController(self.user)
+    hue_collections = search_controller.get_search_collections()
+    assert_equal(len(hue_collections), 2)
+
+    hue_collections = search_controller.get_owner_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
+    hue_collections = search_controller.get_shared_search_collections()
+    assert_equal(len(hue_collections), 1)
+    assert_equal(hue_collections[0].name, 'test_dashboard')
+
 
   def test_update_document(self):
     # Regular user
