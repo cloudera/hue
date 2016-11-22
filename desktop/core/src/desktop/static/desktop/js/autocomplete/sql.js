@@ -1486,7 +1486,7 @@ case 1163:
       if (!lastTablePrimary.subQueryAlias) {
         this.$.suggestJoins = {
           prependJoin: true,
-          tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+          tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
         };
       }
    
@@ -1540,7 +1540,7 @@ case 1181:
          suggestJoins({
            prependJoin: false,
            joinType: $$[$0-3],
-           tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+           tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
          })
        }
      }
@@ -4895,7 +4895,7 @@ var linkTablePrimaries = function () {
     parser.yy.result.suggestJoinConditions.tables = [];
     parser.yy.result.suggestJoinConditions.tablePrimaries.forEach(function (tablePrimary) {
       if (!tablePrimary.subQueryAlias) {
-        parser.yy.result.suggestJoinConditions.tables.push({ identifierChain: tablePrimary.identifierChain.concat() });
+        parser.yy.result.suggestJoinConditions.tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
       }
     });
     delete parser.yy.result.suggestJoinConditions.tablePrimaries;
