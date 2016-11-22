@@ -792,7 +792,7 @@ var linkTablePrimaries = function () {
     parser.yy.result.suggestJoinConditions.tables = [];
     parser.yy.result.suggestJoinConditions.tablePrimaries.forEach(function (tablePrimary) {
       if (!tablePrimary.subQueryAlias) {
-        parser.yy.result.suggestJoinConditions.tables.push({ identifierChain: tablePrimary.identifierChain.concat() });
+        parser.yy.result.suggestJoinConditions.tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
       }
     });
     delete parser.yy.result.suggestJoinConditions.tablePrimaries;
