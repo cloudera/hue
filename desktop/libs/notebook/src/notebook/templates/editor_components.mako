@@ -1611,9 +1611,9 @@ ${ hueIcons.symbols() }
       <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
-          <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
+          <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
           <!-- ko if: statementPath() -->
-          <div class="pull-left" style="margin-top: 4px">
+          <div class="inline-block" style="margin-top: 4px">
             <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
               <i class="fa fa-external-link-square"></i>
             </a>
@@ -1644,7 +1644,7 @@ ${ hueIcons.symbols() }
         <div class="clearfix margin-bottom-20"></div>
       <!-- /ko -->
 
-      <div class="ace-editor" data-bind="visible: statementType() !== 'document' || statementType() === 'document' && !associatedDocumentLoading(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
+      <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
         expandStar: '${ _ko("Shift + Click to replace with all columns") }',
