@@ -297,12 +297,6 @@ ${ components.menubar() }
   <!-- /ko -->
 </script>
 
-% if not is_embeddable:
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
-  <i class="fa fa-chevron-right"></i>
-</a>
-% endif
-
 <script type="text/html" id="metastore-databases">
   <div class="actionbar-actions" data-bind="dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
@@ -1089,7 +1083,13 @@ ${ components.menubar() }
 </script>
 
 <span id="metastoreComponents">
-<div class="main-content">
+  % if not is_embeddable:
+  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function () { $root.isLeftPanelVisible(true); }">
+    <i class="fa fa-chevron-right"></i>
+  </a>
+  % endif
+
+  <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
       % if not is_embeddable:
