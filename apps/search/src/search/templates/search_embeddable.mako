@@ -22,6 +22,6 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="common_search" file="common_search.mako" />
 
-<span id="searchComponents">
+<div id="searchComponents">
 ${ common_search.page_structure(is_embeddable=True) }
-</span>
+</div>
