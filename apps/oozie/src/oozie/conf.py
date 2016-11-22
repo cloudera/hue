@@ -81,6 +81,13 @@ ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
 )
 
+ENABLE_OOZIE_BACKEND_FILTERING = Config(
+  key='enable_oozie_backend_filtering',
+  default=False,
+  type=coerce_bool,
+  help=_t('Flag to enable Oozie backend filtering instead of doing it at the page level in Javascript. Requires Oozie 4.3+.')
+)
+
 ENABLE_DOCUMENT_ACTION = Config(
   key="enable_document_action",
   help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
