@@ -2036,10 +2036,11 @@ from metadata.conf import has_navigator
   <script type="text/html" id="functions-panel-template">
     <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
       <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
-      <ul class="assist-function-categories" data-bind="foreach: activeCategories">
+      <div style="margin: 5px 10px 0 10px"><input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'"></div>
+      <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
         <li>
           <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-          <ul class="assist-functions" data-bind="slideVisible: open, foreach: functions">
+          <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
             <li>
               <!-- ko if: typeof description !== 'undefined' && description !== '' -->
               <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
@@ -2063,12 +2064,19 @@ from metadata.conf import has_navigator
 
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
+        self.query = ko.observable();
 
         self.availableTypes().forEach(function (type) {
           self.initFunctions(type);
-        })
+        });
 
         self.activeCategories = ko.observable();
+
+        self.filteredCategories = ko.pureComputed(function () {
+          return self.activeCategories().filter(function (category) {
+            return category.filteredFunctions().length > 0;
+          })
+        });
 
         self.activeType.subscribe(function (newValue) {
           self.activeCategories(self.categories[newValue]);
@@ -2083,7 +2091,7 @@ from metadata.conf import has_navigator
         var functions = dialect === 'Pig' ? PigFunctions.CATEGORIZED_FUNCTIONS : SqlFunctions.CATEGORIZED_FUNCTIONS[dialect.toLowerCase()];
 
         functions.forEach(function (category) {
-          self.categories[dialect].push({
+          var koCategory = {
             name: category.name,
             open: ko.observable(false),
             functions: $.map(category.functions, function(fn) {
@@ -2092,8 +2100,18 @@ from metadata.conf import has_navigator
                 open: ko.observable(false),
                 description: fn.description
               }
+            }),
+            filteredFunctions: ko.pureComputed(function () {
+              if (self.query()) {
+                return koCategory.functions.filter(function (fn) {
+                  return fn.signature.toLowerCase().indexOf(self.query().toLowerCase()) !== -1 || fn.description.toLowerCase().indexOf(self.query().toLowerCase()) !== -1;
+                });
+              } else {
+                return koCategory.functions;
+              }
             })
-          })
+          };
+          self.categories[dialect].push(koCategory)
         });
       };
 
