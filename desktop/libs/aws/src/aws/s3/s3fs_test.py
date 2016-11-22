@@ -222,8 +222,12 @@ class S3FSTest(S3TestBase):
       assert_true('file_one.txt' in dst_ls)
       assert_true('file_two.txt' in dst_ls)
 
-      # Assert that only the renamed directory, and not an empty file, exists
+      # Assert that the children files are not duplicated at top-level destination
       bucket_ls = self.bucket.list()
+      assert_false('file_one.txt' in bucket_ls)
+      assert_false('file_two.txt' in bucket_ls)
+
+      # Assert that only the renamed directory, and not an empty file, exists
       assert_equal(1, len([key for key in bucket_ls if key.name.strip('/') == self.get_key(dst_dir).name.strip('/')]))
 
 

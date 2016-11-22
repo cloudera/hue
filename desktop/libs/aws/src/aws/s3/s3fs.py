@@ -395,8 +395,6 @@ class S3FileSystem(object):
   def rename(self, old, new):
     new = s3.abspath(old, new)
     self.copy(old, new, recursive=True)
-    if self.isdir(old):
-      self.rename_star(old, new)
     self.rmtree(old, skipTrash=True)
 
   @translate_s3_error
