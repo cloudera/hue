@@ -2336,7 +2336,7 @@ TablePrimaryOrJoinedTable
       if (!lastTablePrimary.subQueryAlias) {
         $$.suggestJoins = {
           prependJoin: true,
-          tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+          tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
         };
       }
    }
@@ -2417,7 +2417,7 @@ Join_EDIT
          suggestJoins({
            prependJoin: false,
            joinType: $1,
-           tables: [{ identifierChain: lastTablePrimary.identifierChain }]
+           tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
          })
        }
      }

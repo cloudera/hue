@@ -140,7 +140,8 @@ var SqlAutocompleter2 = (function () {
             value.tables.forEach(function (table) {
               var tableParts = table.split('.');
               if (!existingTables[tableParts[tableParts.length - 1]]) {
-                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + self.convertNavOptQualifiedIdentifier(table, database) : self.convertNavOptQualifiedIdentifier(table, database);
+                var identifier = self.convertNavOptQualifiedIdentifier(table, database, parseResult.suggestJoins.tables, false);
+                suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
                 joinRequired = true;
               }
             });
@@ -152,7 +153,7 @@ var SqlAutocompleter2 = (function () {
               if (!first) {
                 suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
               }
-              suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database);
+              suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoins.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoins.tables, true);
               first = false;
             });
             completions.push({
@@ -186,7 +187,7 @@ var SqlAutocompleter2 = (function () {
                 if (!first) {
                   suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
                 }
-                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database);
+                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoinConditions.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database,parseResult.suggestJoinConditions.tables, true);
                 first = false;
               });
               completions.push({
@@ -326,14 +327,27 @@ var SqlAutocompleter2 = (function () {
     });
   };
 
-  SqlAutocompleter2.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, defaultDatabase) {
+  SqlAutocompleter2.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, defaultDatabase, tables, hasColumn) {
     var self = this;
 
-    if (qualifiedIdentifier.indexOf(defaultDatabase) === 0) {
-      return qualifiedIdentifier.substring(defaultDatabase.length + 1);
+    var aliases = [];
+    var tablesHasDefaultDatabase = false
+    tables.forEach(function (table) {
+      tablesHasDefaultDatabase = tablesHasDefaultDatabase || table.identifierChain[0].name.toLowerCase() === defaultDatabase.toLowerCase();
+      if (table.alias) {
+        aliases.push({ qualifiedName: $.map(table.identifierChain, function (identifier) { return identifier.name }).join('.').toLowerCase(), alias: table.alias });
+      }
+    });
+
+    for (var i = 0; i < aliases.length; i++) {
+      if (qualifiedIdentifier.toLowerCase().indexOf(aliases[i].qualifiedName) === 0) {
+        return aliases[i].alias + qualifiedIdentifier.substring(aliases[i].qualifiedName.length);
+      } else if (qualifiedIdentifier.toLowerCase().indexOf(defaultDatabase.toLowerCase() + '.' + aliases[i].qualifiedName) === 0) {
+        return aliases[i].alias + qualifiedIdentifier.substring((defaultDatabase + '.' + aliases[i].qualifiedName).length);
+      }
     }
-    // TODO: Take care of aliases
-    return qualifiedIdentifier;
+
+    return qualifiedIdentifier.toLowerCase().indexOf(defaultDatabase.toLowerCase()) === 0 && !tablesHasDefaultDatabase ? qualifiedIdentifier.substring(defaultDatabase.length + 1) : qualifiedIdentifier;
   };
 
   SqlAutocompleter2.prototype.mergeColumns = function (columnSuggestions) {
