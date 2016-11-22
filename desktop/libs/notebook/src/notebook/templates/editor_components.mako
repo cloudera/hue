@@ -1696,21 +1696,35 @@ ${ hueIcons.symbols() }
     </div>
     <!-- /ko -->
 
+    <!-- ko if: chartType() != '' && chartType() === ko.HUE_CHARTS.TYPES.PIECHART -->
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
-      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
-      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
-      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('legend')}</li>
+      <li class="nav-header">${_('value')}</li>
     </ul>
     <div>
-      <select data-bind="options: ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.PIECHART, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(chartType()) > -1) ? ( chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? result.cleanedDateTimeMeta : result.cleanedMeta ) : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
+      <select data-bind="options: result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle, dropdownAutoWidth: true}" class="input-medium"></select>
+    </div>
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+      <li class="nav-header">${_('legend')}</li>
+    </ul>
+    <div>
+      <select data-bind="options: result.cleanedMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: chartType() != '' && chartType() !== ko.HUE_CHARTS.TYPES.PIECHART -->
+    <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
+      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
+      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('latitude')}</li>
+    </ul>
+    <div>
+      <select data-bind="options: ([ko.HUE_CHARTS.TYPES.BARCHART, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.TIMELINECHART].indexOf(chartType()) > -1) ? ( chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART ? result.cleanedDateTimeMeta : result.cleanedMeta ) : result.cleanedNumericMeta, value: chartX, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartX, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
-      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
+      <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP].indexOf(chartType()) == -1" class="nav-header">${_('y-axis')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('value')}</li>
       <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.MAP" class="nav-header">${_('longitude')}</li>
-      <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="nav-header">${_('value')}</li>
     </ul>
 
     <div style="overflow-y: auto; max-height: 220px" data-bind="visible: chartType() != '' && ((chartType() == ko.HUE_CHARTS.TYPES.BARCHART && !chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.LINECHART || chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART)">
@@ -1718,9 +1732,10 @@ ${ hueIcons.symbols() }
         <li><label class="checkbox"><input type="checkbox" data-bind="checkedValue: name, checked: $parent.chartYMulti" /> <span data-bind="text: $data.name"></span></label></li>
       </ul>
     </div>
-    <div data-bind="visible: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART && chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.PIECHART || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
+    <div data-bind="visible: (chartType() == ko.HUE_CHARTS.TYPES.BARCHART && chartXPivot()) || chartType() == ko.HUE_CHARTS.TYPES.MAP || chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP || chartType() == ko.HUE_CHARTS.TYPES.SCATTERCHART">
       <select data-bind="options: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? result.cleanedMeta : result.cleanedNumericMeta, value: chartYSingle, optionsText: 'name', optionsValue: 'name', optionsCaption: '${_ko('Choose a column...')}', select2: { width: '100%', placeholder: '${ _ko("Choose a column...") }', update: chartYSingle, dropdownAutoWidth: true}" class="input-medium"></select>
     </div>
+    <!-- /ko -->
 
     <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() === ko.HUE_CHARTS.TYPES.BARCHART">
       <li class="nav-header">${_('group')}</li>
