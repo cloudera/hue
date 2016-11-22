@@ -20,6 +20,7 @@ import logging
 
 from django.db.models import Q
 
+from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 from libsolr.api import SolrApi
 
@@ -38,21 +39,32 @@ class SearchController(object):
     self.user = user
 
   def get_search_collections(self):
-    return [d.content_object for d in Document.objects.get_docs(self.user, Document2, extra='search-dashboard').order_by('-id')]
+    if USE_NEW_EDITOR.get():
+      return Document2.objects.documents(user=self.user).search_documents(types=['search-dashboard'], order_by='-id')
+    else:
+      return [d.content_object for d in Document.objects.get_docs(self.user, Document2, extra='search-dashboard').order_by('-id')]
 
   def get_shared_search_collections(self):
     # Those are the ones appearing in the menu
-    docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), extra='search-dashboard')
-
-    return [d.content_object for d in docs.order_by('-id')]
+    if USE_NEW_EDITOR.get():
+      return Document2.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), type='search-dashboard').order_by('-id')
+    else:
+      docs = Document.objects.filter(Q(owner=self.user) | Q(owner__username__in=SAMPLE_USER_OWNERS), extra='search-dashboard')
+      return [d.content_object for d in docs.order_by('-id')]
 
   def get_owner_search_collections(self):
-    if self.user.is_superuser:
-      docs = Document.objects.filter(extra='search-dashboard')
+    if USE_NEW_EDITOR.get():
+      if self.user.is_superuser:
+        docs = Document2.objects.filter(type='search-dashboard')
+      else:
+        docs = Document2.objects.filter(type='search-dashboard', owner=self.user)
+      return docs
     else:
-      docs = Document.objects.filter(extra='search-dashboard', owner=self.user)
-
-    return [d.content_object for d in docs.order_by('-id')]
+      if self.user.is_superuser:
+        docs = Document.objects.filter(extra='search-dashboard')
+      else:
+        docs = Document.objects.filter(extra='search-dashboard', owner=self.user)
+      return [d.content_object for d in docs.order_by('-id')]
 
   def get_icon(self, name):
     if name == 'Twitter':
