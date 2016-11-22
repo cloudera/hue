@@ -126,13 +126,14 @@
   <div class="container-fluid">
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">
-      <div class="card card-additional card-home span12">
-        <a class="pointer pull-right" data-bind="click: $root.collection.unloadQDefinition"><i class="fa fa-times"></i></a>
+      <div class="card card-additional card-home span12" style="background-color: #F5F5F5">
         <strong data-bind="editable: $root.selectedQDefinition().name, editableOptions: {enabled: true, placement: 'right'}"></strong>
         <!-- ko if: $root.selectedQDefinition().hasChanged() -->
         &nbsp;&nbsp;
         <a class="pointer" data-bind="click: $root.collection.reloadQDefinition" title="${ _('Reload this definition') }"><i class="fa fa-undo"></i></a> <a class="pointer" data-bind="click: $root.collection.updateQDefinition" title="${ _('Update the definition') }"><i class="fa fa-save"></i></a>
         <!-- /ko -->
+        &nbsp;&nbsp;
+        <a class="pointer" data-bind="click: $root.collection.unloadQDefinition" title="${ _('Close this definition') }"><i class="fa fa-times"></i></a>
       </div>
     </div>
     <!-- /ko -->
