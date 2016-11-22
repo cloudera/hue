@@ -27,8 +27,10 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
+from libsentry.privilege_checker import PrivilegeChecker
 from notebook.models import Notebook
 
+from metadata.conf import NAVIGATOR
 from metadata.optimizer_client import OptimizerApi
 
 
@@ -98,6 +100,15 @@ def top_tables(request):
       'is_fact': table['type'] != 'Dimension'
       } for table in data['results']
   ]
+
+  if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+    checker = PrivilegeChecker(user=request.user)
+    action = 'SELECT'
+
+    for table in tables:
+      paths = _get_table_name(table['name'])
+      table.update({u'db': paths['database'], u'table': paths['table'], u'column': None, u'server': u'server1'})
+    tables = checker.filter_objects(tables, action) #, getkey=getkey)
 
   response['top_tables'] = tables
   response['status'] = 0
