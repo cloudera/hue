@@ -189,7 +189,7 @@ ${ layout.menubar(section='hdfs') }
                     </span>
                   </div>
                 </div>
-                <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x"></i></div>
+                <div class="loading-popover center" data-bind="visible: $root.assist.isLoadingAcls()"><i class="fa fa-spinner fa-spin fa-5x muted"></i></div>
             </div>
           </div>
           </div>
