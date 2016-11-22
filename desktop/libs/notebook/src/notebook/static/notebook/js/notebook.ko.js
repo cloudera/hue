@@ -428,12 +428,15 @@ var EditorViewModel = (function() {
     self.statementPath.subscribe(function(newVal) {
       self.getExternalStatement();
     });
+    self.externalStatementLoaded = ko.observable(false);
     self.getExternalStatement = function() {
+      self.externalStatementLoaded(false);
       $.post("/notebook/api/get_external_statement", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
+          self.externalStatementLoaded(true);
           self.statement_raw(data.statement);
           self.ace().setValue(self.statement_raw(), 1);
         } else {
