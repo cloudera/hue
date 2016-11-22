@@ -2505,7 +2505,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }] }] },
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
             suggestKeywords: ['LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
@@ -6193,7 +6193,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
           }
         });
@@ -6207,7 +6207,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
             suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']
           }
         });
@@ -6222,7 +6222,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ON', 'FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER'],
-            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }] }, { identifierChain: [{ name: 'table2' }] }] }
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }, { identifierChain: [{ name: 'table2' }], alias: 't2' }] }
           }
         });
       });
@@ -6317,7 +6317,7 @@
             containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] }
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
             }
           });
         });
@@ -6395,7 +6395,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
               suggestKeywords: ['LATERAL VIEW', 'CROSS', 'FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT OUTER']
             }
           });
@@ -6464,7 +6464,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }] }] },
+              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
               suggestTables: {},
               suggestDatabases: { appendDot: true }
             }
@@ -6498,7 +6498,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] }
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
             }
           });
         });
@@ -6580,7 +6580,7 @@
             containsKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT OUTER', 'ON', 'RIGHT', 'RIGHT OUTER', 'USING'],
             expectedResult: {
               lowerCase: false,
-              suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }] }, { identifierChain: [{ name: 'table2' }] }] }
+              suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }, { identifierChain: [{ name: 'table2' }], alias: 't2' }] }
             }
           });
         });
@@ -6593,7 +6593,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }] }] },
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
               suggestKeywords: ['FULL', 'FULL OUTER', 'INNER', 'LEFT', 'LEFT ANTI', 'LEFT OUTER', 'LEFT SEMI', 'RIGHT', 'RIGHT ANTI', 'RIGHT OUTER', 'RIGHT SEMI']
             }
           });
@@ -6662,7 +6662,7 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }] }] },
+              suggestJoins: { prependJoin: false, joinType: 'LEFT OUTER JOIN', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
               suggestTables: {},
               suggestDatabases: { appendDot: true },
               suggestKeywords: ['[BROADCAST]', '[SHUFFLE]']
