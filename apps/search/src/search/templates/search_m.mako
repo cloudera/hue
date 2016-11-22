@@ -24,8 +24,8 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader_m(_('Search'), "search", user, request, "80px") | n,unicode }
 
-<span id="searchComponents">
+<div id="searchComponents">
 ${ common_search.page_structure(is_mobile=True) }
-</span>
+</div>
 
 ${ commonfooter_m(request, messages) | n,unicode }
