@@ -560,7 +560,6 @@ var EditorViewModel = (function() {
       self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
       self.delayedStatement.subscribe(function (val) {
         //self.getComplexity();
-        self.hasSuggestion(false);
       }, self);
     }
 
@@ -653,11 +652,9 @@ var EditorViewModel = (function() {
 
     self.is_redacted = ko.observable(typeof snippet.is_redacted != "undefined" && snippet.is_redacted != null ? snippet.is_redacted : false);
 
-    self.complexity = ko.observable('');
-    self.complexityLevel = ko.observable('');
-    self.complexityRecommendation = ko.observable('');
+    self.complexity = ko.observable();
     self.hasComplexity = ko.computed(function () {
-      return self.complexity().length > 0;
+      return self.complexity();
     });
 
     self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
@@ -1056,7 +1053,7 @@ var EditorViewModel = (function() {
         targetPlatform: 'impala'
       }, function(data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility.Impala));
+         self.suggestion(ko.mapping.fromJS(data.query_compatibility));
          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
@@ -1365,16 +1362,14 @@ var EditorViewModel = (function() {
 
     self.getComplexity = function () {
       logGA('get_query_risk');
-      self.complexity('');
+      self.complexity(null);
 
       $.post("/notebook/api/optimizer/statement_risk", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
         if (data.status == 0) {
-          self.complexityLevel(data.query_complexity.risk);
-          self.complexity(data.query_complexity.riskAnalysis);
-          self.complexityRecommendation(data.query_complexity.riskRecommendation);
+          self.complexity(ko.mapping.fromJS(data.query_complexity));
         } else {
           $(document).trigger("error", data.message);
         }
