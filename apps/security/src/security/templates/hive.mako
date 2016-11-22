@@ -283,11 +283,13 @@ ${ layout.menubar(section='hive1') }
 
           <table class="card-marginbottom" data-bind="visible: $root.roles().length > 0 && ! $root.isLoadingRoles()">
             <thead>
-              <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
-              <th width="2%"></th>
-              <th width="20%" style="text-align:left">${ _('Name') }</th>
-              <th width="74%" style="text-align:left">${ _('Groups') }</th>
-              <th width="3%"></th>
+              <tr>
+                <th width="1%"><div data-bind="click: $root.selectAllRoles, css: { hueCheckbox: true, 'fa': true, 'fa-check': allRolesSelected }"></div></th>
+                <th width="2%"></th>
+                <th width="20%" style="text-align:left">${ _('Name') }</th>
+                <th width="74%" style="text-align:left">${ _('Groups') }</th>
+                <th width="3%"></th>
+              </tr>
             </thead>
             <tbody data-bind="foreach: $root.filteredRoles">
               <tr>
@@ -302,7 +304,7 @@ ${ layout.menubar(section='hive1') }
                 <td data-bind="click: function() { if (showPrivileges()) { showPrivileges(false); } else { $root.list_sentry_privileges_by_role($data);} }" class="pointer">
                   <a data-bind="attr: {'href': name}"></a>
                   <i class="fa fa-cube muted"></i>
-                  <span data-bind="text: name"/>
+                  <span data-bind="text: name"></span>
                 </td>
                 <td>
                   <!-- ko if: $root.is_sentry_admin -->
@@ -344,14 +346,14 @@ ${ layout.menubar(section='hive1') }
                 </td>
               </tr>
               <tr>
-                <td colspan="2"></td>
+                <td></td>
                 <td colspan="4">
                   <div data-bind="template: { name: 'privilege', foreach: $data.privileges }, visible: $data.showPrivileges">
                   </div>
                 </td>
               </tr>
               <tr data-bind="visible: $data.showPrivileges">
-                <td colspan="2"></td>
+                <td></td>
                 <td colspan="4">
                   <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0), visible: $root.is_sentry_admin">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
@@ -366,6 +368,7 @@ ${ layout.menubar(section='hive1') }
       </div>
 
     </div> <!-- /span10 -->
+</div>
 </div>
 
 
@@ -399,7 +402,7 @@ ${ layout.menubar(section='hive1') }
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Save') }</button>
-    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}"">${ _('Update') }</button>
+    <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Update') }</button>
   </div>
 </div>
 
