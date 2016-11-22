@@ -1986,11 +1986,11 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="metric-form">
-  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">    
+  <div data-bind="visible: $root.isEditing" style="margin-bottom: 20px">
     <!-- ko if: $data.function() != 'field' -->
       <select data-bind="options: HIT_OPTIONS, optionsText: 'label', optionsValue: 'value', value: $data.function" class="input-medium"></select>
     <!-- /ko -->
-    
+
     <!-- ko if: $data.function() == 'field' -->
       <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
     <!-- /ko -->
@@ -2462,7 +2462,7 @@ ${ dashboard.layout_skeleton() }
                   <li>
                     <span class="badge badge-info badge-left pointer">
                       <span data-bind="text: name, attr:{'title': ko.mapping.toJSON(data, null, 2)}, click: $root.collection.loadQDefinition"></span>
-                    </span><span class="badge badge-right trash-share" data-bind="click: $root.collection.removeQDefinition"> <i class="fa fa-times"></i></span></li>
+                    </span><span class="badge badge-right trash-share" data-bind="click: $root.collection.removeQDefinition"> <i class="fa fa-times"></i></span>
                   </li>
                 </ul>
               </div>
