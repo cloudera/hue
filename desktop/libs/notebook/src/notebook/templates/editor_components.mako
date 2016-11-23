@@ -3265,9 +3265,12 @@ ${ hueIcons.symbols() }
     window.importExternalNotebook = importExternalNotebook;
 
     var hideFixedHeaders = function() {
-      $(".jHueTableExtenderClonedContainer").hide();
-      $(".jHueTableExtenderClonedContainerColumn").hide();
-      $(".jHueTableExtenderClonedContainerCell").hide();
+      $('.jHueTableExtenderClonedContainer').hide();
+      $('.jHueTableExtenderClonedContainerColumn').hide();
+      $('.jHueTableExtenderClonedContainerCell').hide();
+      $('.fixed-header-row').hide();
+      $('.fixed-first-cell').hide();
+      $('.fixed-first-column').hide();
     };
 
     window.hideFixedHeaders = hideFixedHeaders;
@@ -3292,6 +3295,9 @@ ${ hueIcons.symbols() }
         $(".jHueTableExtenderClonedContainer").show();
         $(".jHueTableExtenderClonedContainerColumn").show();
         $(".jHueTableExtenderClonedContainerCell").show();
+        $('.fixed-header-row').show();
+        $('.fixed-first-cell').show();
+        $('.fixed-first-column').show();
       };
 
       if (timeout){
@@ -3713,11 +3719,17 @@ ${ hueIcons.symbols() }
             $(".jHueTableExtenderClonedContainer").hide();
             $(".jHueTableExtenderClonedContainerColumn").hide();
             $(".jHueTableExtenderClonedContainerCell").hide();
+            $('.fixed-header-row').hide();
+            $('.fixed-first-cell').hide();
+            $('.fixed-first-column').hide();
           },
           stop: function (e, ui) {
             $(".jHueTableExtenderClonedContainer").show();
             $(".jHueTableExtenderClonedContainerColum").show();
             $(".jHueTableExtenderClonedContainerCell").show();
+            $('.fixed-header-row').show();
+            $('.fixed-first-cell').show();
+            $('.fixed-first-column').show();
             draggableHelper($(this), e, ui, true);
             redrawFixedHeaders();
             ui.helper.first().removeAttr("style");
