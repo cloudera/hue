@@ -155,10 +155,24 @@ var AssistDbEntry = (function () {
       offset.left += positionAdjustment.left;
       offset.top += positionAdjustment.top;
     }
+
+    var type;
+    if (self.definition.isColumn) {
+      type = 'column';
+    } else if (self.definition.isComplex) {
+      type = 'complex';
+    } else if (self.definition.isTable) {
+      type = 'table';
+    } else if (self.definition.isView) {
+      type = 'view';
+    } else {
+      type = 'database';
+    }
+
     self.statsVisible(true);
     huePubSub.publish('sql.context.popover.show', {
       data: {
-        type: self.definition.isColumn ? 'column' : (self.definition.isComplex ? 'complex' : (self.definition.isTable ? 'table' : 'database')),
+        type: type,
         identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
       orientation: 'right',
