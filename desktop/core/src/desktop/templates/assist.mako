@@ -548,8 +548,8 @@ from metadata.conf import has_navigator
       <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
     </ul>
     <!-- /ko -->
-    <!-- ko template: { if: ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
-    <!-- ko template: { if: ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && (definition.isTable || definition.isView), name: 'assist-no-table-entries' } --><!-- /ko -->
+    <!-- ko template: { if: ! hasErrors() && ! hasEntries() && ! loading() && definition.isDatabase, name: 'assist-no-database-entries' } --><!-- /ko -->
     <!-- ko if: hasErrors -->
     <ul class="assist-tables">
       <!-- ko if: definition.isTable -->
