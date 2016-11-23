@@ -2332,11 +2332,21 @@ TablePrimaryOrJoinedTable
  : TablePrimary
    {
       $$ = $1;
-      var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
-      if (!lastTablePrimary.subQueryAlias) {
+
+      var idx = parser.yy.latestTablePrimaries.length - 1;
+      var tables = [];
+      do {
+        var tablePrimary = parser.yy.latestTablePrimaries[idx];
+        if (!tablePrimary.subQueryAlias) {
+          tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
+        }
+        idx--;
+      } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
+
+      if (tables.length > 0) {
         $$.suggestJoins = {
           prependJoin: true,
-          tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
+          tables: tables
         };
       }
    }
@@ -2372,6 +2382,7 @@ Joins
      if ($4.suggestKeywords) {
        $$.suggestKeywords = $4.suggestKeywords;
      }
+     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
    }
  | Joins JoinType OptionalImpalaBroadcastOrShuffle TablePrimary OptionalJoinCondition
    {
@@ -2387,6 +2398,7 @@ Joins
      if ($4.suggestKeywords) {
        $$.suggestKeywords = $4.suggestKeywords;
      }
+     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
    }
  ;
 
@@ -2412,12 +2424,21 @@ Join_EDIT
        suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
      if (!$2) {
-       var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
-       if (!lastTablePrimary.subQueryAlias) {
+       var idx = parser.yy.latestTablePrimaries.length - 1;
+       var tables = [];
+       do {
+         var tablePrimary = parser.yy.latestTablePrimaries[idx];
+         if (!tablePrimary.subQueryAlias) {
+           tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
+         }
+         idx--;
+       } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
+
+       if (tables.length > 0) {
          suggestJoins({
            prependJoin: false,
            joinType: $1,
-           tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
+           tables: tables
          })
        }
      }
