@@ -1185,6 +1185,7 @@ from metadata.conf import has_navigator
         self.isFunction = params.data.type === 'function';
         self.isHdfs = params.data.type === 'hdfs';
         self.isAsterisk = params.data.type === 'asterisk';
+        self.isView = params.data.type === 'view';
 
         if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(self.data, self.sourceType);
@@ -1194,6 +1195,10 @@ from metadata.conf import has_navigator
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-table'
+        } else if (self.isView) {
+          self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, false);
+          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          self.iconClass = 'fa-eye'
         } else if (self.isComplex) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, false, true);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
