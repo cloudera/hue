@@ -5903,6 +5903,21 @@
         });
       });
 
+      it('should suggest joins for "SELECT * FROM testTable1 JOIN testTable2 JOIN |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable1 JOIN testTable2 JOIN ',
+          afterCursor: '',
+          hasLocations: true,
+          dialect: 'generic',
+          expectedResult: {
+            lowerCase: false,
+            suggestJoins: { prependJoin: false, joinType: 'JOIN', tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
       it('should suggest keywords for "SELECT * FROM testTable1 INNER |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable1 INNER ',

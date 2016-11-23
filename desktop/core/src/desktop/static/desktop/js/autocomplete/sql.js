@@ -1482,11 +1482,21 @@ break;
 case 1163:
 
       this.$ = $$[$0];
-      var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
-      if (!lastTablePrimary.subQueryAlias) {
+
+      var idx = parser.yy.latestTablePrimaries.length - 1;
+      var tables = [];
+      do {
+        var tablePrimary = parser.yy.latestTablePrimaries[idx];
+        if (!tablePrimary.subQueryAlias) {
+          tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
+        }
+        idx--;
+      } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
+
+      if (tables.length > 0) {
         this.$.suggestJoins = {
           prependJoin: true,
-          tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
+          tables: tables
         };
       }
    
@@ -1505,6 +1515,7 @@ case 1170:
      if ($$[$0].suggestKeywords) {
        this.$.suggestKeywords = $$[$0].suggestKeywords;
      }
+     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
    
 break;
 case 1171:
@@ -1521,6 +1532,7 @@ case 1171:
      if ($$[$0-1].suggestKeywords) {
        this.$.suggestKeywords = $$[$0-1].suggestKeywords;
      }
+     parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1].join = true;
    
 break;
 case 1172:
@@ -1535,12 +1547,21 @@ case 1181:
        suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
      if (!$$[$0-2]) {
-       var lastTablePrimary = parser.yy.latestTablePrimaries[parser.yy.latestTablePrimaries.length - 1];
-       if (!lastTablePrimary.subQueryAlias) {
+       var idx = parser.yy.latestTablePrimaries.length - 1;
+       var tables = [];
+       do {
+         var tablePrimary = parser.yy.latestTablePrimaries[idx];
+         if (!tablePrimary.subQueryAlias) {
+           tables.unshift(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain, alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain })
+         }
+         idx--;
+       } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
+
+       if (tables.length > 0) {
          suggestJoins({
            prependJoin: false,
            joinType: $$[$0-3],
-           tables: [ lastTablePrimary.alias ? { identifierChain: lastTablePrimary.identifierChain, alias: lastTablePrimary.alias } : { identifierChain: lastTablePrimary.identifierChain }]
+           tables: tables
          })
        }
      }
