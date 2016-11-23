@@ -20,7 +20,11 @@ from __future__ import absolute_import
 from nose.tools import assert_raises, assert_false, eq_
 from nose import SkipTest
 
+from django.contrib.auth.models import User
+
 from desktop.lib.fs import ProxyFS
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_permission, remove_from_group
 
 
 def test_fs_selection():
@@ -29,8 +33,11 @@ def test_fs_selection():
   except ImportError:
     raise SkipTest("Skips until HUE-2947 is resolved")
 
+  make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
 
   proxy_fs.isdir('s3a://bucket/key')
   s3fs.isdir.assert_called_once_with('s3a://bucket/key')
@@ -50,8 +57,11 @@ def test_fs_selection():
 
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs():
+  make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+
   s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
   f = proxy_fs._get_fs
 
   eq_(f('s3a://bucket'), s3fs)
@@ -68,8 +78,12 @@ def test_multi_fs_selection():
     from mock import MagicMock
   except ImportError:
     raise SkipTest("Skips until HUE-2947 is resolved")
+
+  make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
 
   proxy_fs.copy('s3a://bucket1/key', 's3a://bucket2/key')
   s3fs.copy.assert_called_once_with('s3a://bucket1/key', 's3a://bucket2/key')
@@ -89,8 +103,12 @@ def test_multi_fs_selection():
 
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs_pair():
+  make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+
   s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
+
   f = proxy_fs._get_fs_pair
 
   eq_(f('s3a://bucket1/key', 's3a://bucket2/key'), (s3fs, s3fs))
@@ -103,3 +121,52 @@ def test__get_fs_pair():
 
 def test_constructor_given_invalid_arguments():
   assert_raises(ValueError, ProxyFS, {'s3a': {}}, 'hdfs')
+
+
+
+class MockFs():
+  def setuser(self, user): pass
+
+
+class TestFsPermissions(object):
+
+  def test_fs_permissions_regular_user(self):
+    user_client = make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
+    user = User.objects.get(username='test')
+
+    proxy_fs = ProxyFS({'s3a': MockFs(), 'hdfs': MockFs()}, 'hdfs')
+    f = proxy_fs._get_fs
+
+    proxy_fs.setuser(user)
+
+    # No perms by default
+    assert_raises(Exception, f, 's3a://bucket')
+    assert_raises(Exception, f, 'S3A://bucket/key')
+    f('hdfs://path')
+    f('/tmp')
+
+    try:
+      # Add perm
+      add_permission(user.username, 'has_s3', permname='s3_access', appname='filebrowser')
+
+      f('s3a://bucket')
+      f('S3A://bucket/key')
+      f('hdfs://path')
+      f('/tmp')
+    finally:
+      remove_from_group('test', 'has_s3')
+
+
+  def test_fs_permissions_admin_user(self):
+    user_client = make_logged_in_client(username='admin', groupname='default', recreate=True, is_superuser=True)
+    user = User.objects.get(username='admin')
+
+    proxy_fs = ProxyFS({'s3a': MockFs(), 'hdfs': MockFs()}, 'hdfs')
+    f = proxy_fs._get_fs
+
+    proxy_fs.setuser(user)
+
+    f('s3a://bucket')
+    f('S3A://bucket/key')
+    f('hdfs://path')
+    f('/tmp')
