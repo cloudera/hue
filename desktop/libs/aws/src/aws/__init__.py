@@ -46,6 +46,6 @@ def _make_client(identifier):
   return Client.from_config(client_conf)
 
 
-def get_s3fs(identifier='default'):
-   connection = get_client(identifier).get_s3_connection()
-   return S3FileSystem(connection)
+def get_s3fs(user, identifier='default'):
+  connection = get_client(identifier).get_s3_connection()
+  return S3FileSystem(connection)
