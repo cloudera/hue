@@ -1457,7 +1457,7 @@ ${ hueIcons.symbols() }
 </script>
 
 <script type="text/html" id="editor-snippet-header">
-  <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;">
+  <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode() ? '40px' : '0' }">
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
