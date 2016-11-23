@@ -55,7 +55,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       if ((xhr.responseText === '/* login required */' || xhr.status === 403) && !isLoginRequired) {
         isLoginRequired = true;
         $('.blurred').removeClass('blurred');
-        $('body').children(':not(#login-modal)').addClass('blurred');
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
           if (xhr.status === 403) {
@@ -63,6 +62,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             $('#login-modal').modal('show');
           }
           else {
+            $('body').children(':not(#login-modal)').addClass('blurred');
             $('#login-modal .logged-out').show();
             $('#login-modal').modal({
               backdrop: 'static',
