@@ -137,9 +137,11 @@ var SqlAutocompleter2 = (function () {
             });
 
             var joinRequired = false;
+            var tablesAdded = false;
             value.tables.forEach(function (table) {
               var tableParts = table.split('.');
               if (!existingTables[tableParts[tableParts.length - 1]]) {
+                tablesAdded = true;
                 var identifier = self.convertNavOptQualifiedIdentifier(table, database, parseResult.suggestJoins.tables, false);
                 suggestionString += joinRequired ? (parseResult.lowerCase ? ' join ' : ' JOIN ') + identifier : identifier;
                 joinRequired = true;
@@ -147,21 +149,27 @@ var SqlAutocompleter2 = (function () {
             });
 
             if (value.joinCols.length > 0) {
+              if (!tablesAdded && parseResult.suggestJoins.prependJoin) {
+                suggestionString = '';
+                tablesAdded = true;
+              }
               suggestionString += parseResult.lowerCase ? ' on ' : ' ON ';
             }
-            value.joinCols.forEach(function (joinColPair) {
-              if (!first) {
-                suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
-              }
-              suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoins.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoins.tables, true);
-              first = false;
-            });
-            completions.push({
-              value: suggestionString,
-              meta: 'join',
-              weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.ACTIVE_JOIN,
-              docHTML: self.createJoinHtml(suggestionString)
-            });
+            if (tablesAdded) {
+              value.joinCols.forEach(function (joinColPair) {
+                if (!first) {
+                  suggestionString += parseResult.lowerCase ? ' and ' : ' AND ';
+                }
+                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], database, parseResult.suggestJoins.tables, true) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], database, parseResult.suggestJoins.tables, true);
+                first = false;
+              });
+              completions.push({
+                value: suggestionString,
+                meta: 'join',
+                weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.ACTIVE_JOIN,
+                docHTML: self.createJoinHtml(suggestionString)
+              });
+            }
           });
           joinsDeferral.resolve();
         },
