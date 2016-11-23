@@ -100,6 +100,69 @@
       });
     });
 
+    it('should report locations for "SELECT s07.description, s07.salary, s08.salary,\\r\\n' +
+        '  s08.salary - s07.salary\\r\\n' +
+        'FROM\\r\\n' +
+        '  sample_07 s07 JOIN sample_08 s08\\r\\n' +
+        'ON ( s07.code = s08.code)\\r\\n' +
+        'WHERE\\r\\n' +
+        '  s07.salary < s08.salary\\r\\n' +
+        'ORDER BY s08.salary-s07.salary DESC\\r\\n' +
+        'LIMIT 1000;|"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT s07.description, s07.salary, s08.salary,\r\n' +
+        '  s08.salary - s07.salary\r\n' +
+        'FROM\r\n' +
+        '  sample_07 s07 JOIN sample_08 s08\r\n' +
+        'ON ( s07.code = s08.code)\r\n' +
+        'WHERE\r\n' +
+        '  s07.salary < s08.salary\r\n' +
+        'ORDER BY s08.salary-s07.salary DESC\r\n' +
+        'LIMIT 1000;',
+        expectedLocations: [
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 23 }, identifierChain: [{ name: 'sample_07' }, { name: 'description' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 29, last_column: 35 }, identifierChain: [{ name: 'sample_07' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 40 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 47 }, identifierChain: [{ name: 'sample_08' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 2, last_line: 2, first_column: 3, last_column: 6 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'column', location: { first_line: 2, last_line: 2, first_column: 7, last_column: 13 }, identifierChain: [{ name: 'sample_08' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 2, last_line: 2, first_column: 16, last_column: 19 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 2, last_line: 2, first_column: 20, last_column: 26 }, identifierChain: [{ name: 'sample_07' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 4, last_line: 4, first_column: 3, last_column: 12 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'table', location: { first_line: 4, last_line: 4, first_column: 22, last_column: 31 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'table', location: { first_line: 5, last_line: 5, first_column: 6, last_column: 9 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 5, last_line: 5, first_column: 10, last_column: 14 }, identifierChain: [{ name: 'sample_07' }, { name: 'code' }] },
+          { type: 'table', location: { first_line: 5, last_line: 5, first_column: 17, last_column: 20 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'column', location: { first_line: 5, last_line: 5, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'sample_08' }, { name: 'code' }] },
+          { type: 'table', location: { first_line: 7, last_line: 7, first_column: 3, last_column: 6 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 7, last_line: 7, first_column: 7, last_column: 13 }, identifierChain: [{ name: 'sample_07' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 7, last_line: 7, first_column: 16, last_column: 19 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'column', location: { first_line: 7, last_line: 7, first_column: 20, last_column: 26 }, identifierChain: [{ name: 'sample_08' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 8, last_line: 8, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'sample_08' }] },
+          { type: 'column', location: { first_line: 8, last_line: 8, first_column: 14, last_column: 20 }, identifierChain: [{ name: 'sample_08' }, { name: 'salary' }] },
+          { type: 'table', location: { first_line: 8, last_line: 8, first_column: 21, last_column: 24 }, identifierChain: [{ name: 'sample_07' }] },
+          { type: 'column', location: { first_line: 8, last_line: 8, first_column: 25, last_column: 31 }, identifierChain: [{ name: 'sample_07' }, { name: 'salary'} ]}
+        ]
+      });
+    });
+
+
+
+    it('should report locations for "SELECT * FROM foo WHERE bar IN (id+1-1, id+1-2);|"', function() {
+      assertLocations({
+        beforeCursor: 'SELECT * FROM foo WHERE bar IN (id+1-1, id+1-2);',
+        expectedLocations: [
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'foo' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 18 }, identifierChain: [{ name: 'foo' }]},
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 25, last_column: 28 }, identifierChain:[{ name: 'foo' }, { name: 'bar'}]},
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 33, last_column: 35 }, identifierChain: [{ name: 'foo' }, { name: 'id'}]},
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 41, last_column: 43 }, identifierChain: [{ name: 'foo' }, { name: 'id'}]}
+        ]
+      });
+    });
+
     it('should report locations for "SELECT CASE cos(boo.a) > baa.boo \\n' +
         '\\tWHEN baa.b THEN true \\n' +
         '\\tWHEN boo.c THEN false \\n' +
