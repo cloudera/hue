@@ -98,11 +98,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
 
 
 def is_enabled():
-  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw()
-
-
-def is_default_configured():
-  return is_enabled() and (AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None or has_iam_metadata())
+  return 'default' in AWS_ACCOUNTS.keys() and AWS_ACCOUNTS['default'].get_raw() and (AWS_ACCOUNTS['default'].ACCESS_KEY_ID.get() is not None or has_iam_metadata())
 
 
 def has_iam_metadata():
@@ -111,18 +107,14 @@ def has_iam_metadata():
 
 
 def has_s3_access(user):
-  return user.is_authenticated and user.is_active and \
-         (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser"))
+  return not user.is_anonymous() and (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser")) and is_enabled()
 
 
 def config_validator(user):
   res = []
 
   if is_enabled():
-    if not is_default_configured():  # Make a redundant call to is_enabled so that we only check default if it's non-empty
-      res.append(('aws.aws_accounts', 'Default AWS account is not configured'))
-
-    regions = get_regions('s3')  # S3 is only supported service so far
+    regions = get_regions('s3')
     region_names = [r.name for r in regions]
 
     for name in AWS_ACCOUNTS.keys():

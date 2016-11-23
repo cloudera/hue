@@ -33,7 +33,7 @@ import desktop.redaction
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.python_util import force_dict_to_strings
 
-from aws.conf import is_default_configured as is_s3_enabled
+from aws.conf import is_enabled as is_s3_enabled
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)

@@ -21,9 +21,15 @@ import errno
 
 from urlparse import urlparse
 
+from django.contrib.auth.models import User
+
+from aws.conf import has_s3_access
+from aws.s3 import S3A_ROOT
+
 
 class ProxyFS(object):
-  def __init__(self, filesystems_dict, default_scheme):
+
+  def __init__(self, filesystems_dict, default_scheme, default_user=None):
     if default_scheme not in filesystems_dict:
       raise ValueError(
         'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, filesystems_dict.keys()))
@@ -32,6 +38,7 @@ class ProxyFS(object):
     self._fs_set = set(self._fs_dict.values())
     self._default_scheme = default_scheme
     self._default_fs = self._fs_dict[self._default_scheme]
+    self.user = default_user
 
   def __getattr__(self, item):
     if hasattr(self, "_default_fs"):
@@ -46,6 +53,15 @@ class ProxyFS(object):
       object.__setattr__(self, key, value)
 
   def _get_scheme(self, path):
+    if path.lower().startswith(S3A_ROOT):
+      from desktop.auth.backend import rewrite_user # Avoid cyclic loop
+      try:
+        user = User.objects.get(username=self.user)
+        if not has_s3_access(rewrite_user(user)):
+          raise IOError(errno.EPERM, "Missing permissions for %s" % path)
+      except User.DoesNotExist:
+        raise IOError(errno.EPERM, "Can't check permissions for %s on %s" % (self.user, path))
+
     split = urlparse(path)
     if split.scheme:
       return split.scheme
@@ -73,8 +89,9 @@ class ProxyFS(object):
     return src_fs, self._get_fs(dst)
 
   def setuser(self, user):
-    """Set a new user. Return the current user."""
+    """Set a new user. Return the past current user."""
     curr = self.user
+    self.user = user
     for fs in self._fs_set:
       fs.setuser(user)
     return curr
