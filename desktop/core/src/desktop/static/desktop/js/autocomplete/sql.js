@@ -5306,6 +5306,9 @@ var lexerModified = false;
  * Main parser function
  */
 parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
+  // Jison counts CRLF as two lines in the locations
+  beforeCursor = beforeCursor.replace(/\r\n|\n\r/gm, '\n');
+  afterCursor = afterCursor.replace(/\r\n|\n\r/gm, '\n');
   parser.yy.result = {locations: []};
   parser.yy.lowerCase = false;
   parser.yy.locations = [];
