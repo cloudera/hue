@@ -1252,7 +1252,7 @@ SelectStatement_EDIT
        suggestFunctions();
      }
      if ($3.suggestColumns) {
-       suggestColumns();
+       suggestColumns({ identifierChain: [], source: 'select' });
      }
      if ($3.suggestTables) {
        suggestTables({ prependQuestionMark: true, prependFrom: true });
@@ -1284,7 +1284,7 @@ SelectStatement_EDIT
      }
      suggestKeywords(keywords);
      suggestFunctions();
-     suggestColumns();
+     suggestColumns({ identifierChain: [], source: 'select' });
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
@@ -1292,6 +1292,9 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList_EDIT TableExpression
    {
      selectListNoTableSuggest($3, $2);
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'select';
+     }
    }
  | 'SELECT' OptionalAllOrDistinct 'CURSOR' TableExpression
    {
@@ -1312,7 +1315,7 @@ SelectStatement_EDIT
      }
      suggestKeywords(keywords);
      suggestFunctions();
-     suggestColumns();
+     suggestColumns({ identifierChain: [], source: 'select' });
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    }
@@ -1530,10 +1533,25 @@ OptionalSelectConditions
 
 OptionalSelectConditions_EDIT
  : WhereClause_EDIT OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'where';
+     }
+   }
  | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'group by';
+     }
+   }
  | OptionalWhereClause OptionalGroupByClause HavingClause_EDIT OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause_EDIT OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause_EDIT OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
+   {
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'order by';
+     }
+   }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy_EDIT OptionalLimitClause OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause_EDIT OptionalOffsetClause
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OffsetClause_EDIT
