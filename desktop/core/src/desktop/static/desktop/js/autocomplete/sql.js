@@ -501,7 +501,7 @@ case 764:
        suggestFunctions();
      }
      if ($$[$0].suggestColumns) {
-       suggestColumns();
+       suggestColumns({ identifierChain: [], source: 'select' });
      }
      if ($$[$0].suggestTables) {
        suggestTables({ prependQuestionMark: true, prependFrom: true });
@@ -534,14 +534,17 @@ case 765:
      }
      suggestKeywords(keywords);
      suggestFunctions();
-     suggestColumns();
+     suggestColumns({ identifierChain: [], source: 'select' });
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
-case 767: case 772:
+case 767:
 
      selectListNoTableSuggest($$[$0-1], $$[$0-2]);
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'select';
+     }
    
 break;
 case 768:
@@ -563,7 +566,7 @@ case 768:
      }
      suggestKeywords(keywords);
      suggestFunctions();
-     suggestColumns();
+     suggestColumns({ identifierChain: [], source: 'select' });
      suggestTables({ prependQuestionMark: true, prependFrom: true });
      suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
@@ -583,6 +586,11 @@ case 771:
      checkForSelectListKeywords($$[$0-1]);
      suggestTables({ prependFrom: true });
      suggestDatabases({ prependFrom: true, appendDot: true });
+   
+break;
+case 772:
+
+     selectListNoTableSuggest($$[$0-1], $$[$0-2]);
    
 break;
 case 774: case 850: case 881: case 894: case 898: case 936: case 940: case 945: case 965: case 987: case 988: case 1064: case 1066: case 1068: case 1132: case 1142: case 1155: case 1167: case 1266: case 1324: case 1490: case 1491: case 1516: case 1517: case 1518: case 1709: case 1864: case 1878:
@@ -733,6 +741,27 @@ case 801:
        [true, true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      if (keywords.length > 0) {
        this.$ = { suggestKeywords: keywords, empty: !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] }
+     }
+   
+break;
+case 802:
+
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'where';
+     }
+   
+break;
+case 803:
+
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'group by';
+     }
+   
+break;
+case 806:
+
+     if (parser.yy.result.suggestColumns) {
+       parser.yy.result.suggestColumns.source = 'order by';
      }
    
 break;
