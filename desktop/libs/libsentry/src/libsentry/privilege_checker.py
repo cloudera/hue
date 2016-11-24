@@ -60,7 +60,7 @@ class PrivilegeChecker(object):
     self.api_v2 = api_v2 if api_v2 else get_api_v2(self.user, component='solr')
 
 
-  def filter_objects(self, authorizableSet, action='READ'):
+  def filter_objects(self, authorizableSet, action='READ', key=None):
     """
     Given a set of authorizable Sentry objects and a requested action, return a filtered set of objects that the user
     has privileges to perform the given action upon.
@@ -68,21 +68,20 @@ class PrivilegeChecker(object):
       V1 - {'column': 'total_emp', 'table': 'sample_08', 'db': 'default', 'server': 'server1', 'URI': None}
       V2 - {'component': 'solr', 'serviceName': 'server1', 'type': 'COLLECTION', 'name': 'twitter_demo', 'URI': None}
     :param action: requested action-level that we should check privileges against (default: READ)
+    :param key: a function that will be applied to each object in the authorizableSet to convert it to a Sentry format
     """
     action = action.upper()
     filtered_objects = []
-    privileges = []
+
+    # Apply Sentry formatting key function
+    authorizableSet = self._to_sentry_authorizables(objects=authorizableSet, key=key)
 
     # Separate V1 (Hive) and V2 (Solr) authorizable objects
     v1_authorizables = [obj for obj in authorizableSet if 'db' in obj]
     v2_authorizables = [obj for obj in authorizableSet if 'component' in obj]
 
     if v1_authorizables:
-      user_roles = self.api_v1.list_sentry_roles_by_group('*')  # Get all roles for user
-      for role in user_roles:
-        role_privileges = self.api_v1.list_sentry_privileges_by_role(role['name'])
-        privileges.extend(role_privileges)  # This may result in duplicates but will get reduced in hierarchy tree
-
+      privileges = self._get_privileges_for_user(self.api_v1)
       privilege_hierarchy = self._to_privilege_hierarchy_v1(privileges)
 
       for authorizable in v1_authorizables:
@@ -90,19 +89,39 @@ class PrivilegeChecker(object):
           filtered_objects.append(authorizable)
 
     if v2_authorizables:
-      privileges = []
-      user_roles = self.api_v2.list_sentry_roles_by_group('*')  # Get all roles for user
-      for role in user_roles:
-        role_privileges = self.api_v2.list_sentry_privileges_by_role(role['name'])
-        privileges.extend(role_privileges)
+      privileges = self._get_privileges_for_user(self.api_v2)
+      privilege_hierarchy = self._to_privilege_hierarchy_v2(privileges)
 
-        privilege_hierarchy = self._to_privilege_hierarchy_v2(privileges)
-
-        for authorizable in v2_authorizables:
-          if self._is_object_action_authorized_v2(hierarchy=privilege_hierarchy, object=authorizable, action=action):
-            filtered_objects.append(authorizable)
+      for authorizable in v2_authorizables:
+        if self._is_object_action_authorized_v2(hierarchy=privilege_hierarchy, object=authorizable, action=action):
+          filtered_objects.append(authorizable)
 
     return filtered_objects
+
+
+  def _to_sentry_authorizables(self, objects, key=None):
+
+    def add_default_server(object):
+      if 'db' in object and not object.get('server'):  # V1
+        object.update({'server': 'server1'})
+      elif 'component' in object and not object.get('serviceName'):  # V2
+        object.update({'serviceName': 'server1'})
+      return object
+
+    if key:
+      objects = [key(obj) for obj in objects]
+
+    objects = [add_default_server(obj) for obj in objects]
+    return objects
+
+
+  def _get_privileges_for_user(self, api):
+    privileges = []
+    user_roles = api.list_sentry_roles_by_group('*')  # Get all roles for user
+    for role in user_roles:
+      role_privileges = api.list_sentry_privileges_by_role(role['name'])
+      privileges.extend(role_privileges)  # This may result in duplicates but will get reduced in hierarchy tree
+    return privileges
 
 
   def _to_privilege_hierarchy_v1(self, privileges):
