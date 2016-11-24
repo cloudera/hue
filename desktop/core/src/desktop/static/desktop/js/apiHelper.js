@@ -1391,6 +1391,44 @@ var ApiHelper = (function () {
     }));
   };
 
+  ApiHelper.prototype.createNavDbTablesJson = function (options) {
+    var self = this;
+    var dbTables = [];
+    options.tables.forEach(function (table) {
+      var clonedIdentifierChain = table.identifierChain.concat();
+      var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
+      dbTables.push(database + '.' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
+    });
+    return ko.mapping.toJSON(dbTables);
+  };
+
+  /**
+   * Fetches the top columns for the given tables
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {Object[]} options.tables
+   * @param {Object[]} options.tables.identifierChain
+   * @param {string} options.tables.identifierChain.name
+   * @param {string} [options.defaultDatabase]
+   */
+  ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
+    var self = this;
+    self.fetchNavCached('/metadata/api/optimizer/top_columns', options, function (data) {
+      // TODO: cache empty result for speed?
+      return typeof data.values !== 'undefined' && (
+        (typeof data.values.filterColumns !== 'undefined' && data.values.filterColumns.length > 0) ||
+        (typeof data.values.groupbyColumns !== 'undefined' && data.values.groupbyColumns.length > 0) ||
+        (typeof data.values.joinColumns !== 'undefined' && data.values.joinColumns.length > 0) ||
+        (typeof data.values.orderbyColumns !== 'undefined' && data.values.orderbyColumns.length > 0) ||
+        (typeof data.values.selectColumns !== 'undefined' && data.values.selectColumns.length > 0));
+    });
+  };
+
   /**
    * Fetches the popular joins for the given tables
    *
@@ -1408,15 +1446,17 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
 
-    var dbTables = [];
-    options.tables.forEach(function (table) {
-      var clonedIdentifierChain = table.identifierChain.concat();
-      var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
-      dbTables.push(database + '.' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
+    self.fetchNavCached('/metadata/api/optimizer/top_joins', options, function (data) {
+      return typeof data.values !== 'undefined' && data.values.length > 0;
     });
+  };
 
-    var url = '/metadata/api/optimizer/top_joins';
-    var hash = ko.mapping.toJSON(dbTables).hashCode();
+  ApiHelper.prototype.fetchNavCached = function (url, options, cacheCondition) {
+    var self = this;
+
+    var dbTablesJson = self.createNavDbTablesJson(options);
+
+    var hash = dbTablesJson.hashCode();
 
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
@@ -1428,13 +1468,13 @@ var ApiHelper = (function () {
         type: 'post',
         url: url,
         data: {
-          dbTables: ko.mapping.toJSON(dbTables)
+          dbTables: dbTablesJson
         },
         timeout: options.timeout
       })
       .done(function (data) {
         if (data.status === 0 && !self.successResponseIsError(data)) {
-          if (typeof data.values !== 'undefined' && data.values.length > 0) {
+          if (cacheCondition(data)) {
             storeInCache(data);
           }
           options.successCallback(data);
