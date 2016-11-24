@@ -264,29 +264,81 @@ var SqlAutocompleter2 = (function () {
     }
 
     if (parseResult.suggestColumns) {
-      var suggestColumnsDeferral =  $.Deferred();
-      if (self.snippet.type() === 'hive' && /[^\.]$/.test(beforeCursor)) {
-        completions.push({value: 'BLOCK__OFFSET__INSIDE__FILE', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
-        completions.push({value: 'INPUT__FILE__NAME', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
-      }
-      if (parseResult.suggestColumns.types && parseResult.suggestColumns.types[0] === 'COLREF') {
-        colRefDeferral.done(function () {
-          parseResult.suggestColumns.tables.forEach(function (table) {
-            if (colRef !== null) {
-              deferrals.push(self.addColumns(parseResult, table, database, [colRef.type.toUpperCase()], columnSuggestions));
-            } else {
-              deferrals.push(self.addColumns(parseResult, table, database, ['T'], columnSuggestions));
+      var topColumnsDeferral = $.Deferred();
+      deferrals.push(topColumnsDeferral);
+      if (HAS_OPTIMIZER && typeof parseResult.suggestColumns.source !== 'undefined') {
+        self.snippet.getApiHelper().fetchNavOptTopColumns({
+          sourceType: self.snippet.type(),
+          timeout: self.timeout,
+          defaultDatabase: database,
+          silenceErrors: true,
+          tables: parseResult.suggestColumns.tables,
+          successCallback: function (data) {
+            var topColumns = {};
+            var values = [];
+            switch (parseResult.suggestColumns.source) {
+              case 'select':
+                values = data.values.selectColumns;
+                break;
+              case 'group by':
+                values = data.values.groupbyColumns;
+                break;
+              case 'order by':
+                values = data.values.orderbyColumns;
+                break;
+              default:
+                values = [];
             }
-          });
-          suggestColumnsDeferral.resolve();
+            values.forEach(function (col) {
+              // TODO: Take care of databases and multiple tables properly
+              topColumns[col.columnName.split('.').pop()] = col;
+            });
+
+            topColumnsDeferral.resolve(topColumns);
+          },
+          errorCallback: topColumnsDeferral.resolve
         });
       } else {
-        parseResult.suggestColumns.tables.forEach(function (table) {
-          deferrals.push(self.addColumns(parseResult, table, database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
-        });
-        suggestColumnsDeferral.resolve();
+        topColumnsDeferral.resolve({});
       }
+
+      var adjustNavWeights = function (suggestions, topColumns) {
+        suggestions.forEach(function (suggestion) {
+          if (typeof topColumns[suggestion.value] !== 'undefined') {
+            suggestion.weight += Math.min(topColumns[suggestion.value].columnCount, 99);
+            suggestion.meta = suggestion.meta + ' *';
+            suggestion.docHTML = self.createTopHtml(topColumns[suggestion.value])
+          }
+        })
+      };
+
+      var suggestColumnsDeferral = $.Deferred();
       deferrals.push(suggestColumnsDeferral);
+      topColumnsDeferral.done(function (topColumns) {
+        if (self.snippet.type() === 'hive' && /[^\.]$/.test(beforeCursor)) {
+          completions.push({value: 'BLOCK__OFFSET__INSIDE__FILE', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
+          completions.push({value: 'INPUT__FILE__NAME', meta: 'virtual', weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN});
+        }
+        if (parseResult.suggestColumns.types && parseResult.suggestColumns.types[0] === 'COLREF') {
+          colRefDeferral.done(function () {
+            parseResult.suggestColumns.tables.forEach(function (table) {
+              if (colRef !== null) {
+                deferrals.push(self.addColumns(parseResult, table, database, [colRef.type.toUpperCase()], columnSuggestions));
+              } else {
+                deferrals.push(self.addColumns(parseResult, table, database, ['T'], columnSuggestions));
+              }
+            });
+            adjustNavWeights(columnSuggestions, topColumns);
+            suggestColumnsDeferral.resolve();
+          });
+        } else {
+          parseResult.suggestColumns.tables.forEach(function (table) {
+            deferrals.push(self.addColumns(parseResult, table, database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
+          });
+          adjustNavWeights(columnSuggestions, topColumns);
+          suggestColumnsDeferral.resolve();
+        }
+      });
     }
 
     if (parseResult.suggestDatabases) {
@@ -336,10 +388,8 @@ var SqlAutocompleter2 = (function () {
   };
 
   SqlAutocompleter2.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, defaultDatabase, tables, hasColumn) {
-    var self = this;
-
     var aliases = [];
-    var tablesHasDefaultDatabase = false
+    var tablesHasDefaultDatabase = false;
     tables.forEach(function (table) {
       tablesHasDefaultDatabase = tablesHasDefaultDatabase || table.identifierChain[0].name.toLowerCase() === defaultDatabase.toLowerCase();
       if (table.alias) {
@@ -393,6 +443,13 @@ var SqlAutocompleter2 = (function () {
       }
       delete suggestion.table;
     }
+  };
+
+  SqlAutocompleter2.prototype.createTopHtml = function (value) {
+    // TODO: Show more relevant details here
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular column, count: ' + value.columnCount + '</span></p>';
+    html += '<div>';
+    return html;
   };
 
   SqlAutocompleter2.prototype.createJoinHtml = function (value) {
