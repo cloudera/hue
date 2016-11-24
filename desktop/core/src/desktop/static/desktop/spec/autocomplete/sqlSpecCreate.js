@@ -2296,7 +2296,7 @@
             suggestAggregateFunctions: true,
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
-            suggestColumns:  { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
+            suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2382,7 +2382,7 @@
               suggestAggregateFunctions: true,
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
-              suggestColumns: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
+              suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestKeywords: ['*']
             }
           });
