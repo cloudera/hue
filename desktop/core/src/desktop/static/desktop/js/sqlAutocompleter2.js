@@ -224,7 +224,7 @@ var SqlAutocompleter2 = (function () {
           suggestFunctionsDeferral.resolve();
         });
       } else {
-        SqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions);
+        SqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions, DEFAULT_WEIGHTS.UDF);
         suggestFunctionsDeferral.resolve();
       }
       deferrals.push(suggestFunctionsDeferral);
