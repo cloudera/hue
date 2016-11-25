@@ -87,6 +87,12 @@ var ApiHelper = (function () {
     });
   }
 
+  ApiHelper.prototype.isDatabase = function (name, sourceType) {
+    var self = this;
+    return typeof self.lastKnownDatabases[sourceType] !== 'undefined'
+        && self.lastKnownDatabases[sourceType].filter(function (knownDb) { return knownDb.toLowerCase() === name.toLowerCase() }).length === 1;
+  };
+
   ApiHelper.prototype.hasExpired = function (timestamp) {
     return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
   };

@@ -274,7 +274,7 @@ var SqlAutocompleter2 = (function () {
           silenceErrors: true,
           tables: parseResult.suggestColumns.tables,
           successCallback: function (data) {
-            var topColumns = {};
+            var topColumns = [];
             var values = [];
             switch (parseResult.suggestColumns.source) {
               case 'select':
@@ -290,26 +290,39 @@ var SqlAutocompleter2 = (function () {
                 values = [];
             }
             values.forEach(function (col) {
-              // TODO: Take care of databases and multiple tables properly
-              topColumns[col.columnName.split('.').pop()] = col;
+              col.path = col.tableName.split('.').concat(col.columnName.split('.').slice(1)).join('.');
             });
 
-            topColumnsDeferral.resolve(topColumns);
+            topColumnsDeferral.resolve(values);
           },
-          errorCallback: topColumnsDeferral.resolve
+          errorCallback: function () {
+            topColumnsDeferral.resolve([]);
+          }
         });
       } else {
-        topColumnsDeferral.resolve({});
+        topColumnsDeferral.resolve([]);
       }
 
       var adjustNavWeights = function (suggestions, topColumns) {
+        if (topColumns.length === 0) {
+          return;
+        }
         suggestions.forEach(function (suggestion) {
-          if (typeof topColumns[suggestion.value] !== 'undefined') {
-            suggestion.weight += Math.min(topColumns[suggestion.value].columnCount, 99);
-            suggestion.meta = suggestion.meta + ' *';
-            suggestion.docHTML = self.createTopHtml(topColumns[suggestion.value])
+          var path = '';
+          if (!self.snippet.getApiHelper().isDatabase(suggestion.table.identifierChain[0].name, self.snippet.type())) {
+            path = database + '.';
           }
-        })
+          path += $.map(suggestion.table.identifierChain, function (identifier) { return identifier.name }).join('.') + '.' + suggestion.value.replace(/[\[\]]/g, '');
+          for (var i = 0; i < topColumns.length; i++) {
+            // TODO: Switch to map once nav opt API is stable
+            if (path.toLowerCase().indexOf(topColumns[i].path.toLowerCase()) !== -1) {
+              suggestion.weight += Math.min(topColumns[i].columnCount, 99);
+              suggestion.meta = suggestion.meta + ' *';
+              suggestion.docHTML = self.createTopHtml(topColumns[i]);
+              break;
+            }
+          }
+        });
       };
 
       var suggestColumnsDeferral = $.Deferred();
