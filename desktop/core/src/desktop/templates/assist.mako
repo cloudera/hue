@@ -2049,7 +2049,7 @@ from metadata.conf import has_navigator
         <li>
           <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
           <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
-            <li>
+            <li data-bind="tooltip: { title: description, placement: 'left', delay: 400 }">
               <!-- ko if: typeof description !== 'undefined' && description !== '' -->
               <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
               <div data-bind="slideVisible: open, text: description"></div>
