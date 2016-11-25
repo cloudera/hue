@@ -517,7 +517,12 @@ a:visited {
 }
 
 .assist-functions {
-  margin: 0 0 0 20px;
+  margin: 0;
+}
+
+.assist-functions > li {
+  margin: 0 0 0 10px;
+  padding: 0 0 0 10px;
 }
 
 .assist-functions li {
