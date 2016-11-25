@@ -2035,8 +2035,16 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="functions-panel-template">
     <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
-      <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+
+      <div class="assist-inner-header">
+        <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+        <div class="assist-db-header-actions" style="margin-right:10px;">
+          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { searchVisible(!searchVisible()); query(''); }, css: { 'blue' : searchVisible }"><i class="pointer fa fa-filter" title="${ _('Filter') }"></i></a>
+        </div>
+      </div>
+      <!-- ko if: searchVisible -->
       <div style="margin: 5px 10px 0 10px"><input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'"></div>
+      <!-- /ko -->
       <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
         <li>
           <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
@@ -2065,6 +2073,7 @@ from metadata.conf import has_navigator
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
         self.query = ko.observable();
+        self.searchVisible = ko.observable(false);
 
         self.availableTypes().forEach(function (type) {
           self.initFunctions(type);
