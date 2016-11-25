@@ -53,11 +53,11 @@ class OptimizerApi(object):
 
   def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
     self._api_url = (api_url or get_optimizer_url()).strip('/')
-    self._product_name = product_name if product_name else OPTIMIZER.PRODUCT_NAME.get() # Aka "tenant"
-    self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
-    self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
     self._email = OPTIMIZER.EMAIL.get()
     self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
+    self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
+    self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
+    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "tenant"
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._client.set_verify(ssl_cert_ca_verify)
@@ -101,8 +101,8 @@ class OptimizerApi(object):
     return response
 
 
-  def get_tenant(self, email):
-    return self._exec('get-tenant', ['--email', email])
+  def get_tenant(self, email=None):
+    return self._exec('get-tenant', ['--email', email or self._email])
 
 
   def authenticate(self):
