@@ -279,14 +279,13 @@ class SolrApi(object):
       _f['facet'] = {
           'agg_00:%s' % agg_function: agg_function
       }
-      for i, _f_agg in enumerate(facets[1:], 1): # Get n+1 dimension
+      for i, _f_agg in enumerate(facets[1:], 1):
         if _f_agg['aggregate']['function'] != 'count':
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d:%s' % (i, agg_function)] = agg_function
         else:
-          print 'aaa'
-          self._n_facet_dimension(widget, _f['facet'], [_f_agg], dim + 1)
-        # else go into _get_aggregate_function()
+          self._n_facet_dimension(widget, _f['facet'], facets[i:], dim + 1) # Get n+1 dimension
+          break
 
 
   def suggest(self, collection, query):
