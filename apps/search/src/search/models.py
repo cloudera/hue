@@ -884,7 +884,7 @@ def augment_solr_response(response, collection, query):
         elif field == '_childDocuments_': # Nested documents
           escaped_value = value
         elif isinstance(value, list): # Multivalue field
-          escaped_value = [smart_unicode(val, errors='replace') for val in value]
+          escaped_value = [smart_unicode(escape(val), errors='replace') for val in value]
         else:
           value = smart_unicode(value, errors='replace')
           escaped_value = escape(value)
