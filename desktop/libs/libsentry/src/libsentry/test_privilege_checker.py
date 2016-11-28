@@ -45,7 +45,7 @@ class MockSentryApiV1(object):
       # Column SELECT
       {'column': 'column_select', 'grantOption': False, 'timestamp': 1478810590335, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'test_column', 'URI': '', 'server': 'server1'},
       # Table ALL
-      {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'SELECT', 'scope': 'TABLE', 'table': 'test_table_all', 'URI': '', 'server': 'server1'},
+      {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'ALL', 'scope': 'TABLE', 'table': 'test_table_all', 'URI': '', 'server': 'server1'},
       # Table INSERT
       {'column': '', 'grantOption': False, 'timestamp': 1478810513849, 'database': 'default', 'action': 'INSERT', 'scope': 'TABLE', 'table': 'test_table_insert', 'URI': '', 'server': 'server1'},
       # Table SELECT
@@ -85,7 +85,7 @@ class MockSentryApiV2(object):
       # URI ALL
       {'grantOption': False, 'timestamp': None, 'component': 'hdfs', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'URI', 'name': 'hdfs://ha-nn-uri/data/landing-skid'}]},
       # S3 URI ALL
-      {'grantOption': False, 'timestamp': None, 'component': 'hdfs', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'URI', 'name': 's3a://hue-datasets/test'}]},
+      {'grantOption': False, 'timestamp': None, 'component': 's3', 'serviceName': 'server1', 'grantorPrincipal': None, 'action': 'ALL', 'authorizables': [{'type': 'URI', 'name': 's3a://hue-datasets/test'}]},
     ]
 
 
@@ -103,14 +103,23 @@ class TestPrivilegeChecker(object):
 
 
   def test_to_sentry_authorizables(self):
-    authorizableSet = ['foo', 'bar', 'baz']
+    objectSet = ['foo', 'bar', 'baz', 'boom']
     expectedSet = [
       {'db': 'foo', 'server': 'server1'},
       {'db': 'bar', 'server': 'server1'},
       {'db': 'baz', 'server': 'server1'},
     ]
-    updatedSet = self.checker._to_sentry_authorizables(objects=authorizableSet, key=lambda x: {'db': x})
-    assert_equal(expectedSet, updatedSet, updatedSet)
+
+    def test_key_fn(obj):
+      if obj != 'boom':
+        return {'db': obj}
+      else:
+        return None
+
+    authorizableSet = self.checker._to_sentry_authorizables(objects=objectSet, key=test_key_fn)
+    assert_equal(expectedSet, authorizableSet, authorizableSet)
+    # Original list of objects should not be mutated
+    assert_true(['bar', 'baz', 'foo'], sorted(objectSet, reverse=True))
 
 
   def test_columns_select(self):
@@ -126,7 +135,7 @@ class TestPrivilegeChecker(object):
       {u'column': 'id', u'table': u'test_none', u'db': u'default', u'server': u'server1'},
     ]
 
-    filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
     expected_filtered_set = [
       {u'column': 'column_select', u'table': u'test_column', u'db': u'default', u'server': u'server1'},
      {u'column': 'id', u'table': u'test_table_select', u'db': u'default', u'server': u'server1'},
@@ -150,7 +159,7 @@ class TestPrivilegeChecker(object):
       {u'column': 'salary', u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
     ]
 
-    filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
     expected_filtered_set = [
       {u'column': 'column_all', u'table': u'test_column', u'db': u'default', u'server': u'server1'},
       {u'column': 'column_insert', u'table': u'test_column', u'db': u'default', u'server': u'server1'},
@@ -161,19 +170,94 @@ class TestPrivilegeChecker(object):
 
 
   def test_tables_select(self):
-    pass
+    action = 'SELECT'
+    authorizableSet = [
+      # table-level SELECT privileges exists
+      {u'column': '', u'table': u'test_table_select', u'db': u'default', u'server': u'server1'},
+      # table-level INSERT privileges exists
+      {u'column': '', u'table': u'test_table_insert', u'db': u'default', u'server': u'server1'},
+      # db-level SELECT privileges exist
+      {u'column': '', u'table': u'test_db_select', u'db': u'test_db_select', u'server': u'server1'},
+      # no privileges exist
+      {u'column': '', u'table': u'test_none', u'db': u'default', u'server': u'server1'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'column': '', u'table': u'test_table_insert', u'db': u'default', u'server': u'server1'},
+      {u'column': '', u'table': u'test_table_select', u'db': u'default', u'server': u'server1'},
+      {u'column': '', u'table': u'test_db_select', u'db': u'test_db_select', u'server': u'server1'}
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_tables_insert(self):
-    pass
+    action = 'INSERT'
+    authorizableSet = [
+      # table-level ALL privilege exists
+      {u'column': '', u'table': u'test_table_all', u'db': u'default', u'server': u'server1'},
+      # table-level INSERT privileges exist
+      {u'column': '', u'table': u'test_table_insert', u'db': u'default', u'server': u'server1'},
+      # SELECT, but not INSERT, privilege exists
+      {u'column': '', u'table': u'test_table_select', u'db': u'default', u'server': u'server1'},
+      # no privileges exist
+      {u'column': '', u'table': u'sample_07', u'db': u'default', u'server': u'server1'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'column': '', u'table': u'test_table_all', u'db': u'default', u'server': u'server1'},
+      {u'column': '', u'table': u'test_table_insert', u'db': u'default', u'server': u'server1'},
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_dbs_select(self):
-    pass
+    action = 'SELECT'
+    authorizableSet = [
+      # db-level SELECT privileges exists
+      {u'column': '', u'table': u'', u'db': u'test_db_select', u'server': u'server1'},
+      # db-level INSERT privileges exists
+      {u'column': '', u'table': u'', u'db': u'test_db_insert', u'server': u'server1'},
+      # no privileges exist
+      {u'column': '', u'table': u'', u'db': u'test_db_none', u'server': u'server1'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'column': '', u'table': u'', u'db': u'test_db_insert', u'server': u'server1'},
+      {u'column': '', u'table': u'', u'db': u'test_db_select', u'server': u'server1'},
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_dbs_insert(self):
-    pass
+    action = 'INSERT'
+    authorizableSet = [
+      # db-level ALL privilege exists
+      {u'column': '', u'table': u'', u'db': u'test_db_all', u'server': u'server1'},
+      # db-level INSERT privileges exist
+      {u'column': '', u'table': u'', u'db': u'test_db_insert', u'server': u'server1'},
+      # SELECT, but not INSERT, privilege exists
+      {u'column': '', u'table': u'', u'db': u'test_db_select', u'server': u'server1'},
+      # no privileges exist
+      {u'column': '', u'table': u'', u'db': u'test_db_none', u'server': u'server1'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'column': '', u'table': u'', u'db': u'test_db_all', u'server': u'server1'},
+      {u'column': '', u'table': u'', u'db': u'test_db_insert', u'server': u'server1'},
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_collections_query(self):
@@ -189,7 +273,7 @@ class TestPrivilegeChecker(object):
       {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'test_demo'},
     ]
 
-    filtered_set = self.checker.filter_objects(authorizableSet=authorizableSet, action=action)
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
     expected_filtered_set = [
       {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'twitter_demo'},
       {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'web_logs_demo'},
@@ -201,12 +285,65 @@ class TestPrivilegeChecker(object):
 
 
   def test_collections_update(self):
-    pass
+    action = 'UPDATE'
+    authorizableSet = [
+      # ALL privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'web_logs_demo'},
+      # UPDATE privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'yelp_demo'},
+      # QUERY privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'twitter_demo'},
+      # No privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'COLLECTION', u'name': u'test_demo'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'web_logs_demo'},
+      {u'type': u'COLLECTION', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'}
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
+                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_config(self):
-    pass
+    action = 'UPDATE'
+    authorizableSet = [
+      # ALL privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'yelp_demo'},
+      # No privilege
+      {u'component': u'solr', u'serviceName': u'server1', u'type': u'CONFIG', u'name': u'test_demo'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'type': u'CONFIG', u'serviceName': u'server1', u'component': u'solr', u'name': u'yelp_demo'}
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
+                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))
 
 
   def test_uri(self):
-    pass
+    action = 'UPDATE'
+    authorizableSet = [
+      # HDFS privilege
+      {u'component': u'hdfs', u'serviceName': u'server1', u'type': u'URI', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
+      # S3 privilege
+      {u'component': u's3', u'serviceName': u'server1', u'type': u'URI', u'name': u's3a://hue-datasets/test'},
+      # No privilege
+      {u'component': u's3', u'serviceName': u'server1', u'type': u'URI', u'name': u's3a://hue-datasets/none'},
+    ]
+
+    filtered_set = self.checker.filter_objects(objects=authorizableSet, action=action)
+    expected_filtered_set = [
+      {u'type': u'URI', u'serviceName': u'server1', u'component': u'hdfs', u'name': u'hdfs://ha-nn-uri/data/landing-skid'},
+      {u'type': u'URI', u'serviceName': u'server1', u'component': u's3',  u'name': u's3a://hue-datasets/test'}
+    ]
+
+    sort_keys = ['server', 'db', 'table', 'column', 'URI', 'serviceName', 'component', 'type', 'name']
+    assert_equal(expected_filtered_set, sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])),
+                 sorted(filtered_set, key=lambda obj: ([obj.get(key) for key in sort_keys])))

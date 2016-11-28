@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import copy
 import logging
 
 from collections import defaultdict
@@ -60,21 +61,22 @@ class PrivilegeChecker(object):
     self.api_v2 = api_v2 if api_v2 else get_api_v2(self.user, component='solr')
 
 
-  def filter_objects(self, authorizableSet, action='READ', key=None):
+  def filter_objects(self, objects, action='READ', key=None):
     """
     Given a set of authorizable Sentry objects and a requested action, return a filtered set of objects that the user
     has privileges to perform the given action upon.
-    :param authorizableSet: a list of Sentry authorizable objects which can consist of V1 or V2 objects:
+    :param objects: a list of objects that can be converted to Sentry authorizables using the key function;
+      objects should be converted to either V1 or V2 authorizables that utilize the following format:
       V1 - {'column': 'total_emp', 'table': 'sample_08', 'db': 'default', 'server': 'server1', 'URI': None}
       V2 - {'component': 'solr', 'serviceName': 'server1', 'type': 'COLLECTION', 'name': 'twitter_demo', 'URI': None}
     :param action: requested action-level that we should check privileges against (default: READ)
-    :param key: a function that will be applied to each object in the authorizableSet to convert it to a Sentry format
+    :param key: a function that will be applied to each object in the objects iterable to convert it to a Sentry format
     """
     action = action.upper()
     filtered_objects = []
 
     # Apply Sentry formatting key function
-    authorizableSet = self._to_sentry_authorizables(objects=authorizableSet, key=key)
+    authorizableSet = self._to_sentry_authorizables(objects=objects, key=key)
 
     # Separate V1 (Hive) and V2 (Solr) authorizable objects
     v1_authorizables = [obj for obj in authorizableSet if 'db' in obj]
@@ -100,6 +102,7 @@ class PrivilegeChecker(object):
 
 
   def _to_sentry_authorizables(self, objects, key=None):
+    authorizables =  copy.deepcopy(objects)
 
     def add_default_server(object):
       if 'db' in object and not object.get('server'):  # V1
@@ -109,10 +112,10 @@ class PrivilegeChecker(object):
       return object
 
     if key:
-      objects = [key(obj) for obj in objects]
+      authorizables = [key(obj) for obj in authorizables if key(obj)]
 
-    objects = [add_default_server(obj) for obj in objects]
-    return objects
+    authorizables = [add_default_server(obj) for obj in authorizables]
+    return authorizables
 
 
   def _get_privileges_for_user(self, api):
