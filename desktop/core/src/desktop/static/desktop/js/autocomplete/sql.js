@@ -660,6 +660,16 @@ case 792:
        keywords = keywords.concat(createWeightedKeywords($$[$0-1].suggestKeywords, 2));
      }
 
+     if ($$[$0-1].suggestFilters) {
+       suggestFilters($$[$0-1].suggestFilters);
+     }
+     if ($$[$0-1].suggestGroupBys) {
+       suggestGroupBys($$[$0-1].suggestGroupBys);
+     }
+     if ($$[$0-1].suggestOrderBys) {
+       suggestOrderBys($$[$0-1].suggestOrderBys);
+     }
+
      if ($$[$0-1].empty) {
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
@@ -739,8 +749,21 @@ case 801:
        [$$[$0-7], $$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
        [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [true, true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
+
      if (keywords.length > 0) {
-       this.$ = { suggestKeywords: keywords, empty: !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] }
+       this.$ = { suggestKeywords: keywords, empty: !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
+     } else {
+       this.$ = {};
+     }
+
+     if (!$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
+       this.$.suggestFilters = { prefix: 'WHERE', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
+     }
+     if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
+       this.$.suggestGroupBys = { prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
+     }
+     if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
+       this.$.suggestOrderBys = { prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
    
 break;
@@ -748,6 +771,9 @@ case 802:
 
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
+     }
+     if ($$[$0-7].emptyFilter) {
+       suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
@@ -779,6 +805,12 @@ case 810:
      if ($$[$0-8].columnReference) {
        this.$.columnReference = $$[$0-8].columnReference;
      }
+     if (!$$[$0-6]) {
+       suggestGroupBys({ prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+     if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    
 break;
 case 811:
@@ -795,6 +827,9 @@ case 811:
        this.$.columnReference = $$[$0-7].columnReference;
      }
      this.$.cursorAtEnd = !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0];
+     if (!$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    
 break;
 case 812:
@@ -804,12 +839,19 @@ case 812:
        [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
+     if (!$$[$0-4] && !$$[$0-3]) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    
 break;
 case 813:
 
      var keywords = getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
+     if (!$$[$0-3]) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+
    
 break;
 case 814:
@@ -889,6 +931,7 @@ case 852:
      suggestFunctions();
      suggestColumns();
      suggestKeywords(['EXISTS', 'NOT EXISTS']);
+     this.$ = { emptyFilter: true }
    
 break;
 case 855:
@@ -915,11 +958,13 @@ case 857:
 
      valueExpressionSuggest();
      suggestSelectListAliases();
+     suggestGroupBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
-case 858: case 896: case 1325: case 1600: case 1949: case 1950: case 1956: case 1965: case 1983: case 2037: case 2038: case 2043: case 2048: case 2052:
+case 858:
 
      suggestKeywords(['BY']);
+     suggestGroupBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
 case 865:
@@ -934,15 +979,40 @@ case 867:
      suggestKeywords(['SETS']);
    
 break;
-case 900: case 907:
+case 895:
 
+     if ($$[$0].emptyOrderBy) {
+       suggestOrderBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+   
+break;
+case 896:
+
+     suggestKeywords(['BY']);
+     suggestOrderBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+   
+break;
+case 900:
+
+     this.$ = { emptyOrderBy: false }
      valueExpressionSuggest();
      suggestAnalyticFunctions();
      suggestSelectListAliases();
    
 break;
+case 901: case 902: case 903:
+this.$ = { emptyOrderBy: false };
+break;
 case 904:
 this.$ = mergeSuggestKeywords($$[$0-1], $$[$0]);
+break;
+case 907:
+
+     this.$ = { emptyOrderBy: true }
+     valueExpressionSuggest();
+     suggestAnalyticFunctions();
+     suggestSelectListAliases();
+   
 break;
 case 908:
 
@@ -1898,6 +1968,11 @@ case 1321:
         suggestValueExpressionKeywords($$[$0-3]);
       }
     
+break;
+case 1325: case 1600: case 1949: case 1950: case 1956: case 1965: case 1983: case 2037: case 2038: case 2043: case 2048: case 2052:
+
+     suggestKeywords(['BY']);
+   
 break;
 case 1330:
 
@@ -4167,16 +4242,18 @@ _handle_error:
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
+
 var prepareNewStatement = function () {
   linkTablePrimaries();
   commitLocations();
 
   delete parser.yy.lateralViews;
-  delete parser.yy.latestTablePrimaries;
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
   parser.yy.subQueries = [];
   parser.yy.selectListAliases = [];
+  parser.yy.latestTablePrimaries = [];
 
   parser.parseError = function (message, error) {
     parser.yy.errors.push(error);
@@ -4533,6 +4610,13 @@ var commitLocations = function () {
 
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
+
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
+      delete parser.yy.result[suggestionType];
+    }
+  });
+
   if (typeof parser.yy.result.colRef !== 'undefined') {
     if (!parser.yy.result.colRef.linked || typeof parser.yy.result.colRef.identifierChain === 'undefined' || parser.yy.result.colRef.identifierChain.length === 0) {
       delete parser.yy.result.colRef;
@@ -4940,19 +5024,21 @@ var linkTablePrimaries = function () {
     return;
   }
 
-  var tablePrimaries = parser.yy.latestTablePrimaries;
-  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined' && parser.yy.result.suggestJoinConditions.tablePrimaries && !parser.yy.result.suggestJoinConditions.linked) {
-    parser.yy.result.suggestJoinConditions.tables = [];
-    parser.yy.result.suggestJoinConditions.tablePrimaries.forEach(function (tablePrimary) {
-      if (!tablePrimary.subQueryAlias) {
-        parser.yy.result.suggestJoinConditions.tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
-      }
-    });
-    delete parser.yy.result.suggestJoinConditions.tablePrimaries;
-    parser.yy.result.suggestJoinConditions.linked = true;
-  }
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tablePrimaries && !parser.yy.result[suggestionType].linked) {
+      parser.yy.result[suggestionType].tables = [];
+      parser.yy.result[suggestionType].tablePrimaries.forEach(function (tablePrimary) {
+        if (!tablePrimary.subQueryAlias) {
+          parser.yy.result[suggestionType].tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
+        }
+      });
+      delete parser.yy.result[suggestionType].tablePrimaries;
+      parser.yy.result[suggestionType].linked = true;
+    }
+  });
+
   if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
-    tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
+    var tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
     if (!parser.yy.result.suggestColumns.tables) {
       parser.yy.result.suggestColumns.tables = [];
     }
@@ -5193,6 +5279,18 @@ var suggestColumns = function (details) {
     details.identifierChain = [];
   }
   parser.yy.result.suggestColumns = details;
+};
+
+var suggestGroupBys = function (details) {
+  parser.yy.result.suggestGroupBys = details || {};
+};
+
+var suggestOrderBys = function (details) {
+  parser.yy.result.suggestOrderBys = details || {};
+};
+
+var suggestFilters = function (details) {
+  parser.yy.result.suggestFilters = details || {};
 };
 
 var suggestKeyValues = function (details) {
@@ -5449,9 +5547,13 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
     delete parser.yy.result.suggestColumns.linked;
   }
-  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined') {
-    delete parser.yy.result.suggestJoinConditions.linked;
-  }
+
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined') {
+      delete parser.yy.result[suggestionType].linked;
+    }
+  });
+  
   if (typeof parser.yy.result.colRef !== 'undefined') {
     delete parser.yy.result.colRef.linked;
   }

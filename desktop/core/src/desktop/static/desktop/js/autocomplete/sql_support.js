@@ -14,16 +14,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
+
 var prepareNewStatement = function () {
   linkTablePrimaries();
   commitLocations();
 
   delete parser.yy.lateralViews;
-  delete parser.yy.latestTablePrimaries;
   delete parser.yy.latestCommonTableExpressions;
   delete parser.yy.correlatedSubQuery;
   parser.yy.subQueries = [];
   parser.yy.selectListAliases = [];
+  parser.yy.latestTablePrimaries = [];
 
   parser.parseError = function (message, error) {
     parser.yy.errors.push(error);
@@ -380,6 +382,13 @@ var commitLocations = function () {
 
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
+
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
+      delete parser.yy.result[suggestionType];
+    }
+  });
+
   if (typeof parser.yy.result.colRef !== 'undefined') {
     if (!parser.yy.result.colRef.linked || typeof parser.yy.result.colRef.identifierChain === 'undefined' || parser.yy.result.colRef.identifierChain.length === 0) {
       delete parser.yy.result.colRef;
@@ -787,19 +796,21 @@ var linkTablePrimaries = function () {
     return;
   }
 
-  var tablePrimaries = parser.yy.latestTablePrimaries;
-  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined' && parser.yy.result.suggestJoinConditions.tablePrimaries && !parser.yy.result.suggestJoinConditions.linked) {
-    parser.yy.result.suggestJoinConditions.tables = [];
-    parser.yy.result.suggestJoinConditions.tablePrimaries.forEach(function (tablePrimary) {
-      if (!tablePrimary.subQueryAlias) {
-        parser.yy.result.suggestJoinConditions.tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
-      }
-    });
-    delete parser.yy.result.suggestJoinConditions.tablePrimaries;
-    parser.yy.result.suggestJoinConditions.linked = true;
-  }
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tablePrimaries && !parser.yy.result[suggestionType].linked) {
+      parser.yy.result[suggestionType].tables = [];
+      parser.yy.result[suggestionType].tablePrimaries.forEach(function (tablePrimary) {
+        if (!tablePrimary.subQueryAlias) {
+          parser.yy.result[suggestionType].tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
+        }
+      });
+      delete parser.yy.result[suggestionType].tablePrimaries;
+      parser.yy.result[suggestionType].linked = true;
+    }
+  });
+
   if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
-    tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
+    var tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
     if (!parser.yy.result.suggestColumns.tables) {
       parser.yy.result.suggestColumns.tables = [];
     }
@@ -1040,6 +1051,18 @@ var suggestColumns = function (details) {
     details.identifierChain = [];
   }
   parser.yy.result.suggestColumns = details;
+};
+
+var suggestGroupBys = function (details) {
+  parser.yy.result.suggestGroupBys = details || {};
+};
+
+var suggestOrderBys = function (details) {
+  parser.yy.result.suggestOrderBys = details || {};
+};
+
+var suggestFilters = function (details) {
+  parser.yy.result.suggestFilters = details || {};
 };
 
 var suggestKeyValues = function (details) {
@@ -1296,9 +1319,13 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
   if (typeof parser.yy.result.suggestColumns !== 'undefined') {
     delete parser.yy.result.suggestColumns.linked;
   }
-  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined') {
-    delete parser.yy.result.suggestJoinConditions.linked;
-  }
+
+  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
+    if (typeof parser.yy.result[suggestionType] !== 'undefined') {
+      delete parser.yy.result[suggestionType].linked;
+    }
+  });
+
   if (typeof parser.yy.result.colRef !== 'undefined') {
     delete parser.yy.result.colRef.linked;
   }

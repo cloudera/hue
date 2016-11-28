@@ -124,9 +124,12 @@
         dialect: 'generic',
         hasLocations: true,
         expectedResult: {
-          lowerCase: false,
           suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTableB' }] }] },
-          suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
+          suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+          suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+          suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+          suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN'],
+          lowerCase: false
         }
       });
     });
@@ -872,6 +875,8 @@
           containsColRefKeywords: true,
           expectedResult: {
             lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain:[{ name: 'testTable' }, { name: '${some_variable}' }]}
           }
         });
@@ -1301,7 +1306,10 @@
             containsKeywords: ['WINDOW'],
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'customers' }] }] }
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'customers' }] }] },
+              suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'customers' }] }] },
+              suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'customers' }] }] },
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'customers' }] }] }
             }
           });
         });
@@ -2492,6 +2500,9 @@
           expectedResult: {
             lowerCase: false,
             suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestKeywords: ['TABLESAMPLE', 'AS', 'LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
@@ -2506,6 +2517,9 @@
           expectedResult: {
             lowerCase: false,
             suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'db' }, { name: 'foo' }], alias: 'f' }] },
             suggestKeywords: ['LATERAL VIEW', 'WHERE', 'GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', 'CROSS JOIN', 'FULL JOIN', 'FULL OUTER JOIN', 'JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN']
           }
         });
@@ -2520,6 +2534,9 @@
           containsKeywords: ['ON'],
           expectedResult: {
             lowerCase: false,
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] },
             suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'foo' }] }, { identifierChain: [{ name: 'baz' }] }] }
           }
         });
@@ -2548,7 +2565,10 @@
           containsKeywords: ['WHERE', 'HAVING'],
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] }
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
@@ -2614,7 +2634,10 @@
           containsKeywords: ['AS', 'WHERE'],
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] }
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
@@ -3061,6 +3084,9 @@
           expectedResult: {
             lowerCase: false,
             suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTableB' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestKeywords: ['AS', 'WHERE', 'GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'OFFSET', 'UNION', 'FULL JOIN', 'FULL OUTER JOIN', 'INNER JOIN', 'JOIN', 'LEFT ANTI JOIN', 'LEFT JOIN', 'LEFT OUTER JOIN', 'LEFT SEMI JOIN', 'RIGHT ANTI JOIN', 'RIGHT JOIN', 'RIGHT OUTER JOIN', 'RIGHT SEMI JOIN']
           }
         });
@@ -4344,7 +4370,8 @@
         });
       });
 
-      it('should suggest columns for "SELECT a, b, c FROM testTable WHERE | RLIKE \'bla bla\'"', function() {
+      // TODO: This one causes an unrecoverable error after the cursor, we should suggest group by etc.
+      it('should suggest columns for "SELECT a, b, c FROM testTable WHERE d | RLIKE \'bla bla\'"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT a, b, c FROM testTable WHERE d ',
           afterCursor: ' RLIKE \'bla bla\'',
@@ -4353,7 +4380,10 @@
           containsColRefKeywords: true,
           expectedResult: {
             lowerCase: false,
-            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd'}] }
+            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd'}] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'd' }] }
           }
         });
       });
@@ -4366,6 +4396,8 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
@@ -4379,6 +4411,8 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
             suggestKeywords: ['GROUP BY', 'HAVING', 'ORDER BY', 'LIMIT', 'UNION', '<', '<=', '<>', '=', '>', '>=', 'AND', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN', 'OR']
           }
         });
@@ -4455,6 +4489,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
+            suggestGroupBys: {prefix: 'BY', tables: [{identifierChain: [{name: 'foo'}]}]},
             suggestKeywords: ['BY']
           }
         });
@@ -4467,7 +4502,9 @@
           hasLocations: true,
           containsKeywords: ['AND'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
@@ -4596,6 +4633,8 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
+              suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
               suggestKeywords: ['GROUP BY', 'HAVING', 'WINDOW', 'ORDER BY', 'CLUSTER BY', 'DISTRIBUTE BY', 'SORT BY', 'LIMIT', 'UNION', '<', '<=', '<=>', '<>', '=', '>', '>=', 'AND', 'BETWEEN',  'IN', 'IS NOT NULL', 'IS NULL',  'NOT BETWEEN', 'NOT IN', 'OR']
             }
           });
@@ -4613,7 +4652,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['EXISTS', 'NOT EXISTS']
+            suggestKeywords: ['EXISTS', 'NOT EXISTS'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4627,7 +4667,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-            suggestKeywords: ['EXISTS', 'NOT EXISTS']
+            suggestKeywords: ['EXISTS', 'NOT EXISTS'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4653,7 +4694,9 @@
           hasLocations: true,
           containsKeywords: ['AND', '<'],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4665,7 +4708,9 @@
           hasLocations: true,
           containsKeywords: ['AND', '='],
           expectedResult: {
-            lowerCase: false
+            lowerCase: false,
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
           }
         });
       });
@@ -4769,7 +4814,9 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a'}] }
+            colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a'}] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4926,6 +4973,7 @@
           containsColRefKeywords: true,
           expectedResult: {
             lowerCase: false,
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             colRef: { identifierChain: [{ name: 'testTable' }, { name: 'a' }] }
           }
         });
@@ -4938,7 +4986,8 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['BY']
+            suggestKeywords: ['BY'],
+            suggestOrderBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4953,7 +5002,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
-            suggestColumns: { source: 'order by', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+            suggestColumns: { source: 'order by', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestOrderBys: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4965,10 +5015,11 @@
           hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
-            lowerCase: false,
+            suggestColumns: { source: 'order by', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
-            suggestColumns: { source: 'order by', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] }
+            suggestOrderBys: { tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
+            lowerCase: false
           }
         });
       });
@@ -5233,7 +5284,8 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['BY']
+            suggestKeywords: ['BY'],
+            suggestGroupBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -5249,7 +5301,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestColumns: { source: 'group by', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
-            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }]
+            suggestIdentifiers: [{ name: 'tta.', type: 'alias' }, { name: 'testTableB.', type: 'table' }],
+            suggestGroupBys: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] }
           }
         });
       });
@@ -5311,7 +5364,8 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { source: 'group by', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+            suggestColumns: { source: 'group by', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestGroupBys: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -5325,7 +5379,8 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestColumns: { source: 'group by', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] }
+            suggestColumns: { source: 'group by', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
+            suggestGroupBys: { tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] }
           }
         });
       });
@@ -5383,6 +5438,7 @@
             containsColRefKeywords: true,
             expectedResult: {
               lowerCase: false,
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
               colRef: { identifierChain: [{ name: 'database_two' }, { name: 'testTable' }, { name: 'b'}] }
             }
           });
@@ -5598,7 +5654,10 @@
           containsKeywords: ['TABLESAMPLE', 'AS'],
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'boo' }] }] }
           }
         });
       });
@@ -5612,7 +5671,10 @@
           containsKeywords: ['TABLESAMPLE', 'AS'],
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] }
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'boo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'boo' }] }] }
           }
         });
       });
@@ -6040,7 +6102,10 @@
           containsKeywords: ['ON'],
           expectedResult: {
             lowerCase: false,
-            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
+            suggestJoinConditions: { prependOn: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable1' }] }, { identifierChain: [{ name: 'testTable2' }] }] }
           }
         });
       });
@@ -6317,7 +6382,10 @@
           containsKeywords: ['JOIN'],
           expectedResult: {
             lowerCase: false,
-            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }] }
+            suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
+            suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'testTable1' }] }] }
           }
         });
       });
@@ -6332,7 +6400,10 @@
             containsKeywords: ['LEFT SEMI JOIN', 'CROSS JOIN'], // Tested in full above
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
             }
           });
         });
@@ -6499,6 +6570,7 @@
               suggestFunctions: {},
               suggestKeywords: ['EXISTS', 'NOT EXISTS'],
               suggestColumns: { source: 'where', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1'}, { identifierChain: [{ name: 'table2' }], alias: 't2' }] },
+              suggestFilters: { tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }, { identifierChain: [{ name: 'table2' }], alias: 't2' }] },
               suggestIdentifiers: [{ name: 't1.', type: 'alias' }, { name: 't2.', type: 'alias' }]
             }
           });
@@ -6513,7 +6585,10 @@
             hasLocations: true,
             expectedResult: {
               lowerCase: false,
-              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
+              suggestJoins: { prependJoin: true, tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestFilters: { prefix: 'WHERE', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] },
+              suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'table1' }], alias: 't1' }] }
             }
           });
         });
@@ -6698,7 +6773,9 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            colRef: { identifierChain: [{ name: 'foo' }, { name: 'bar' }] }
+            colRef: { identifierChain: [{ name: 'foo' }, { name: 'bar' }] },
+            suggestGroupBys: { prefix: 'GROUP BY', tables: [{ identifierChain: [{ name: 'foo' }] }] },
+            suggestOrderBys: { prefix: 'ORDER BY', tables: [{ identifierChain: [{ name: 'foo' }] }] }
           }
         });
       });
