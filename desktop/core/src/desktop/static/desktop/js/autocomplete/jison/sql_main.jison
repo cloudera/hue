@@ -1435,6 +1435,16 @@ TableExpression_EDIT
        keywords = keywords.concat(createWeightedKeywords($3.suggestKeywords, 2));
      }
 
+     if ($3.suggestFilters) {
+       suggestFilters($3.suggestFilters);
+     }
+     if ($3.suggestGroupBys) {
+       suggestGroupBys($3.suggestGroupBys);
+     }
+     if ($3.suggestOrderBys) {
+       suggestOrderBys($3.suggestOrderBys);
+     }
+
      if ($3.empty) {
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
@@ -1525,8 +1535,21 @@ OptionalSelectConditions
        [$1, $2, $3, $4, $5, $6, $6, $7, $8],
        [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [true, true, true, isHive(), true, isHive(), isHive() && !$5, true, isImpala()]);
+
      if (keywords.length > 0) {
-       $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 }
+       $$ = { suggestKeywords: keywords, empty: !$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8 };
+     } else {
+       $$ = {};
+     }
+
+     if (!$1 && !$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
+       $$.suggestFilters = { prefix: 'WHERE', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
+     }
+     if (!$2 && !$3 && !$4 && !$5 && !$6 && !$7 && !$8) {
+       $$.suggestGroupBys = { prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
+     }
+     if (!$5 && !$6 && !$7 && !$8) {
+       $$.suggestOrderBys = { prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() };
      }
    }
  ;
@@ -1536,6 +1559,9 @@ OptionalSelectConditions_EDIT
    {
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
+     }
+     if ($1.emptyFilter) {
+       suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    }
  | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
@@ -1572,6 +1598,12 @@ OptionalSelectConditions_EDIT
      if ($1.columnReference) {
        $$.columnReference = $1.columnReference;
      }
+     if (!$3) {
+       suggestGroupBys({ prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+     if (!$3 && !$4 && !$5 && !$6) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    }
  | OptionalWhereClause GroupByClause 'CURSOR' OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1587,6 +1619,9 @@ OptionalSelectConditions_EDIT
        $$.columnReference = $2.columnReference;
      }
      $$.cursorAtEnd = !$4 && !$5 && !$6 && !$7 && !$8 && !$9;
+     if (!$4 && !$5 && !$6) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    }
  | OptionalWhereClause OptionalGroupByClause HavingClause 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1595,11 +1630,18 @@ OptionalSelectConditions_EDIT
        [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
        [isHive(), true, isHive(), isHive() && !$6, true, isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$5 && !$6 && !$7 && !$8 && !$9 };
+     if (!$5 && !$6) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      var keywords = getKeywordsForOptionalsLR([$6, $7, $8, $9], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]);
      $$ = { suggestKeywords: keywords, cursorAtEnd: !$6 && !$7 && !$8 && !$9 };
+     if (!$6) {
+       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1640,6 +1682,7 @@ WhereClause_EDIT
      suggestFunctions();
      suggestColumns();
      suggestKeywords(['EXISTS', 'NOT EXISTS']);
+     $$ = { emptyFilter: true }
    }
  ;
 
@@ -1674,10 +1717,12 @@ GroupByClause_EDIT
    {
      valueExpressionSuggest();
      suggestSelectListAliases();
+     suggestGroupBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    }
  | AnyGroup 'CURSOR'
    {
      suggestKeywords(['BY']);
+     suggestGroupBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    }
  | AnyGroup 'BY' GroupByColumnList OptionalHiveGroupingSetsCubeOrRollup_EDIT
  ;
@@ -1778,9 +1823,15 @@ OrderByClause
 
 OrderByClause_EDIT
  : 'ORDER' 'BY' OrderByColumnList_EDIT
+   {
+     if ($3.emptyOrderBy) {
+       suggestOrderBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+   }
  | 'ORDER' 'CURSOR'
    {
      suggestKeywords(['BY']);
+     suggestOrderBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    }
  ;
 
@@ -1793,13 +1844,14 @@ OrderByColumnList_EDIT
  : OrderByIdentifier_EDIT
  | 'CURSOR' OrderByIdentifier
    {
+     $$ = { emptyOrderBy: false }
      valueExpressionSuggest();
      suggestAnalyticFunctions();
      suggestSelectListAliases();
    }
- | OrderByColumnList ',' OrderByIdentifier_EDIT
- | OrderByColumnList ',' OrderByIdentifier_EDIT ','
- | OrderByColumnList ',' OrderByIdentifier_EDIT ',' OrderByColumnList
+ | OrderByColumnList ',' OrderByIdentifier_EDIT                        -> { emptyOrderBy: false }
+ | OrderByColumnList ',' OrderByIdentifier_EDIT ','                    -> { emptyOrderBy: false }
+ | OrderByColumnList ',' OrderByIdentifier_EDIT ',' OrderByColumnList  -> { emptyOrderBy: false }
  ;
 
 OrderByIdentifier
@@ -1814,6 +1866,7 @@ OrderByIdentifier_EDIT
  | ValueExpression OptionalAscOrDesc OptionalImpalaNullsFirstOrLast_EDIT
  | AnyCursor OptionalAscOrDesc OptionalImpalaNullsFirstOrLast
    {
+     $$ = { emptyOrderBy: true }
      valueExpressionSuggest();
      suggestAnalyticFunctions();
      suggestSelectListAliases();
