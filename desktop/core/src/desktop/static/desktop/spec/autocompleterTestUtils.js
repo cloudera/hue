@@ -15,6 +15,13 @@
 // limitations under the License.
 
 var SqlTestUtils = (function() {
+
+  var jsonStringToJsString = function (jsonString) {
+    return jsonString.replace(/'([a-zA-Z]+)':/g, function (all, group) {
+      return group + ':';
+    }).replace(/([:{,])/g, function (all, group) { return group + ' ' }).replace(/[}]/g, ' }');
+  };
+
   return {
     autocompleteMatcher : {
       toEqualAutocompleteValues : function() {
@@ -142,8 +149,8 @@ var SqlTestUtils = (function() {
               pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                          '          Dialect: ' + testDefinition.dialect + '\n' +
-                         'Expected response: ' + JSON.stringify(testDefinition.expectedResult).replace(/["]/g, '\'') + '\n' +
-                         '  Parser response: ' + JSON.stringify(actualResponse).replace(/["]/g, '\'') +   '\n'
+                         'Expected response: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedResult).replace(/["]/g, '\'') + '\n') +
+                         '  Parser response: ' + jsonStringToJsString(JSON.stringify(actualResponse).replace(/["]/g, '\'') +   '\n')
             };
           }
         }
