@@ -32,6 +32,7 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
+    FILTER: 1300,
     ACTIVE_JOIN: 1200,
     JOIN_CONDITION: 1100,
     COLUMN: 1000,
@@ -263,6 +264,60 @@ var SqlAutocompleter2 = (function () {
       deferrals.push(suggestColRefKeywordsDeferral);
     }
 
+    if (HAS_OPTIMIZER && typeof parseResult.suggestFilters !== 'undefined') {
+      var topFiltersDeferral = $.Deferred();
+      deferrals.push(topFiltersDeferral);
+      self.snippet.getApiHelper().fetchNavOptTopFilters({
+        sourceType: self.snippet.type(),
+        timeout: self.timeout,
+        defaultDatabase: database,
+        silenceErrors: true,
+        tables: parseResult.suggestFilters.tables,
+        successCallback: function (data) {
+          data.values.forEach(function (value) {
+            if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
+              value.popularValues.forEach(function (popularValue) {
+                if (typeof popularValue.group !== 'undefined') {
+                  popularValue.group.forEach(function (grp) {
+                    var path = value.tableName.split('.').concat(grp.columnName.split('.').slice(1)).join('.');
+
+                    for (var i = 0; i < parseResult.suggestFilters.tables.length; i++) {
+                      var table = parseResult.suggestFilters.tables[i];
+                      var tablePath = '';
+                      if (table.identifierChain.length == 2) {
+                        tablePath = $.map(table.identifierChain, function (identifier) { return identifier.name }).join('.');
+                      } else if (table.identifierChain.length == 1) {
+                        tablePath = database + '.' + table.identifierChain[0].name;
+                      }
+                      if (path.indexOf(tablePath) === 0) {
+                        path = path.substring(tablePath.length + 1);
+                        if (table.alias) {
+                          path = table.alias + '.' + path;
+                        }
+                        break;
+                      }
+                    }
+                    var compVal = parseResult.suggestFilters.prefix ? (parseResult.lowerCase ? parseResult.suggestFilters.prefix.toLowerCase() : parseResult.suggestFilters.prefix) + ' ' : '';
+                    compVal += path + (parseResult.lowerCase ? grp.op.toLowerCase() : grp.op) + grp.literal;
+
+                    completions.push({
+                      value: compVal,
+                      meta: 'filter *',
+                      weight: DEFAULT_WEIGHTS.FILTER,
+                      docHTML: self.createFilterHtml()
+                    });
+                  });
+                }
+              });
+            }
+          });
+
+          topFiltersDeferral.resolve();
+        },
+        errorCallback: topFiltersDeferral.resolve
+      });
+    }
+
     if (parseResult.suggestColumns) {
       var topColumnsDeferral = $.Deferred();
       deferrals.push(topColumnsDeferral);
@@ -456,6 +511,13 @@ var SqlAutocompleter2 = (function () {
       }
       delete suggestion.table;
     }
+  };
+
+  SqlAutocompleter2.prototype.createFilterHtml = function () {
+    // TODO: Show more relevant details here
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular filter</span></p>';
+    html += '<div>';
+    return html;
   };
 
   SqlAutocompleter2.prototype.createTopHtml = function (value) {
