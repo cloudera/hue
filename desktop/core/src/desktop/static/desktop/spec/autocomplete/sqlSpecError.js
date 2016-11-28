@@ -90,7 +90,8 @@
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BY']
+          suggestKeywords: ['BY'],
+          suggestGroupBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
     });
@@ -102,7 +103,8 @@
         hasLocations: true,
         expectedResult: {
           lowerCase: false,
-          suggestKeywords: ['BY']
+          suggestKeywords: ['BY'],
+          suggestOrderBys: { prefix: 'BY', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
       });
     });
