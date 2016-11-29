@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
+var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestAggregateFunctions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
 
 var prepareNewStatement = function () {
   linkTablePrimaries();
@@ -384,7 +384,7 @@ var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
 
   SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
-    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
+    if (suggestionType !== 'suggestAggregateFunctions' && typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
       delete parser.yy.result[suggestionType];
     }
   });
@@ -1037,7 +1037,18 @@ var suggestFunctions = function (details) {
 };
 
 var suggestAggregateFunctions = function () {
-  parser.yy.result.suggestAggregateFunctions = true;
+  var primaries = [];
+  var aliases = {};
+  parser.yy.latestTablePrimaries.forEach(function (primary) {
+    if (typeof primary.alias !== 'undefined') {
+      aliases[primary.alias] = true;
+    }
+    // Drop if the first one refers to a table alias (...FROM tbl t, t.map tm ...)
+    if (typeof primary.identifierChain !== 'undefined' && !aliases[primary.identifierChain[0].name] && typeof primary.owner === 'undefined') {
+      primaries.push(primary);
+    }
+  });
+  parser.yy.result.suggestAggregateFunctions = { tablePrimaries: primaries };
 };
 
 var suggestAnalyticFunctions = function () {
