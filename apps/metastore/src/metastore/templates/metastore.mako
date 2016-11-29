@@ -1157,7 +1157,7 @@ ${ components.menubar() }
     </form>
   </div>
 
-  <div id="import-data-modal" class="modal hide fade"></div>
+  <div id="import-data-modal" class="modal hide fade" style="display: block;width: 640px;margin-left: -320px!important;"></div>
 </div>
 </span>
 <script type="text/javascript" charset="utf-8">

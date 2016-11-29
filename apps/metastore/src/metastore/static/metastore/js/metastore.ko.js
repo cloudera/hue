@@ -577,9 +577,9 @@ var MetastoreViewModel = (function () {
 
   MetastoreTable.prototype.showImportData = function () {
     var self = this;
+    $("#import-data-modal").empty().modal("show");
     $.get('/metastore/table/' + self.database.name + '/' + self.name + '/load', function (data) {
       $("#import-data-modal").html(data['data']);
-      $("#import-data-modal").modal("show");
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
     });
