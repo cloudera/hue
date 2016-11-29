@@ -34,7 +34,7 @@
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
@@ -49,7 +49,7 @@
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
@@ -64,7 +64,7 @@
         expectedResult: {
           lowerCase: false,
           suggestFunctions: {},
-          suggestAggregateFunctions: true,
+          suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
           suggestAnalyticFunctions: true,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
         }
