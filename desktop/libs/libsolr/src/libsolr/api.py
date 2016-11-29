@@ -254,7 +254,7 @@ class SolrApi(object):
 
   def _n_facet_dimension(self, widget, _f, facets, dim):
     facet = facets[0]
-    f_name = 'd_%02d:%s' % (dim, facet['field'])
+    f_name = 'dim_%02d:%s' % (dim, facet['field'])
 
     if facet['aggregate']['function'] == 'count':
       if dim == 1:
@@ -278,12 +278,12 @@ class SolrApi(object):
     else:
       agg_function = self._get_aggregate_function(facet)
       _f['facet'] = {
-          'agg_00:%s' % agg_function: agg_function
+          'agg_%02d_00:%s' % (dim, agg_function): agg_function
       }
       for i, _f_agg in enumerate(facets[1:], 1):
         if _f_agg['aggregate']['function'] != 'count':
           agg_function = self._get_aggregate_function(_f_agg)
-          _f['facet']['agg_%02d:%s' % (i, agg_function)] = agg_function
+          _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
           self._n_facet_dimension(widget, _f['facet'], facets[i:], dim + 1) # Get n+1 dimension
           break
@@ -623,7 +623,8 @@ class SolrApi(object):
     q_template = '(%s)' if len(query['qs']) >= 2 else '%s'
     return 'OR'.join([q_template % (q['q'] or EMPTY_QUERY.get()) for q in query['qs']]).encode('utf-8')
 
-  def _get_aggregate_function(self, facet):
+  @classmethod
+  def _get_aggregate_function(cls, facet):
     if 'properties' in facet:
       f = facet['properties']['aggregate'] # Level 1 facet
     else:
@@ -632,15 +633,16 @@ class SolrApi(object):
     if not f['ops']:
       f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
 
-    return self.__get_aggregate_function(f)
+    return cls.__get_aggregate_function(f)
 
-  def __get_aggregate_function(self, f):
+  @classmethod
+  def __get_aggregate_function(cls, f):
     if f['function'] == 'field':
       return f['value']
     else:
       fields = []
       for _f in f['ops']:
-        fields.append(self.__get_aggregate_function(_f))
+        fields.append(cls.__get_aggregate_function(_f))
       if f['function'] == 'median':
         f['function'] = 'percentile'
         fields.append('50')

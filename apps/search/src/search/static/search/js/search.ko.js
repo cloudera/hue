@@ -836,7 +836,7 @@ var Collection = function (vm, collection) {
       
       facet.properties.facets_form.aggregate.function('count');
       facet.properties.facets_form.aggregate.ops.removeAll();
-      facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS({'value': 50}));
+      facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS([{'value': 50}]));
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
