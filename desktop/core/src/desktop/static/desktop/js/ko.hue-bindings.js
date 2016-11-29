@@ -4876,6 +4876,19 @@
         element.selectize.setValue(options.value());
       }
     }
-  }
+  };
+
+  ko.bindingHandlers.tagsNotAllowed = {
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      var $element = $(element);
+      var params = allBindingsAccessor();
+      var valueObservable = ko.isObservable(params) ? params : (params.textInput ? params.textInput : params.value);
+      var value = valueObservable();
+      var escaped = value.replace(/<|>/g, '');
+      if (escaped !== value){
+        $element.val(escaped);
+      }
+    }
+  };
 
 })();
