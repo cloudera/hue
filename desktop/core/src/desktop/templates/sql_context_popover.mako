@@ -790,10 +790,10 @@ from metadata.conf import has_navigator
         }, 0);
       };
 
-      function DatabaseContextTabs(data, sourceType) {
+      function DatabaseContextTabs(data, sourceType, defaultDatabase) {
         var self = this;
         self.tabs = [
-          { id: 'tags', label: '${ _("Tags") }', template: 'sql-context-database-details', templateData: new TagsTab(data.identifierChain, sourceType, data.identifierChain[0].name) }
+          { id: 'tags', label: '${ _("Tags") }', template: 'sql-context-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
         ];
         self.activeTab = ko.observable('tags');
       }
@@ -1188,7 +1188,7 @@ from metadata.conf import has_navigator
         self.isView = params.data.type === 'view';
 
         if (self.isDatabase) {
-          self.contents = new DatabaseContextTabs(self.data, self.sourceType);
+          self.contents = new DatabaseContextTabs(self.data, self.sourceType, self.defaultDatabase);
           self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
           self.iconClass = 'fa-database';
         } else if (self.isTable) {
