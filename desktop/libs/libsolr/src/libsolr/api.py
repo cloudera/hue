@@ -174,7 +174,8 @@ class SolrApi(object):
           if facet['properties']['facets']:
             self._n_facet_dimension(facet, _f, facet['properties']['facets'], 1)
             if facet['widgetType'] == 'text-facet-widget':
-              _f['sort'] = {'d2': facet['properties']['sort']}
+              _fname = _f['facet'].keys()[0]
+              _f['sort'] = {_fname: facet['properties']['sort']}
               # domain = '-d2:NaN' # Solr 6.4
 
           json_facets[facet['id']] = _f
