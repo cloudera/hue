@@ -601,6 +601,7 @@ from django.utils.translation import ugettext as _
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/js/apiHelper.js') }"></script>
 
 
   <script charset="utf-8">
@@ -659,9 +660,38 @@ from django.utils.translation import ugettext as _
       }
     };
 
+    var apiHelper = ApiHelper.getInstance();
+
+    // migration to the new history
+    if ($.totalStorage('hue_fb_history')) {
+      var s3History = [],
+        hdfsHistory = [];
+      $.totalStorage('hue_fb_history').forEach(function(item) {
+        if (item.toLowerCase().indexOf('s3a://') === 0){
+          s3History.push(item);
+        }
+        else {
+          hdfsHistory.push(item);
+        }
+      });
+      $.totalStorage('hue_fb_history', null);
+      apiHelper.setInTotalStorage('fb', 'history_s3', s3History);
+      apiHelper.setInTotalStorage('fb', 'history_hdfs', hdfsHistory);
+    }
+
+    var getHistorySlug = function() {
+      var slug = 'history_';
+      if (viewModel && viewModel.isS3()){
+        slug += 's3';
+      }
+      else {
+        slug += 'hdfs';
+      }
+      return slug;
+    }
 
     var getHistory = function () {
-      return $.totalStorage('hue_fb_history') || [];
+      return apiHelper.getFromTotalStorage('fb', getHistorySlug(), [])
     };
 
     var showHistory = function () {
@@ -674,6 +704,9 @@ from django.utils.translation import ugettext as _
                 });
 
       $('#hashHistory').remove();
+      if (history.length === 0){
+        $('.history').addClass('no-history');
+      }
 
       history.forEach(function (item) {
         var url = '/filebrowser/#' + item,
@@ -689,7 +722,7 @@ from django.utils.translation import ugettext as _
       $('<li><a href="javascript:void(0)">${ _("Clear history...") }</a></li>')
           .appendTo(frag)
           .on('click', function(){
-            $.totalStorage('hue_fb_history', null);
+            apiHelper.setInTotalStorage('fb', getHistorySlug(), []);
             $('.history').addClass('no-history');
           });
 
@@ -714,8 +747,7 @@ from django.utils.translation import ugettext as _
         } else {
           history.unshift(history.splice(history.indexOf(path), 1)[0]);
         }
-
-        $.totalStorage('hue_fb_history', history.slice(0, 10));
+        apiHelper.setInTotalStorage('fb', getHistorySlug(), history.slice(0, 10));
       }
     };
 
@@ -1015,6 +1047,7 @@ from django.utils.translation import ugettext as _
       self.isS3.subscribe(function (newVal) {
         if (newVal) {
           huePubSub.publish('update.autocompleters');
+          huePubSub.publish('update.history');
         }
       });
 
@@ -1662,11 +1695,6 @@ from django.utils.translation import ugettext as _
     ko.applyBindings(viewModel);
 
     $(document).ready(function () {
-
-      if (getHistory().length == 0) {
-        $('.history').addClass('no-history');
-      }
-
       $('.historyLink').on('click', function (e) {
         if(getHistory().length > 0) {
           showHistory();
@@ -1956,6 +1984,15 @@ from django.utils.translation import ugettext as _
         });
       });
 
+      huePubSub.subscribe('update.history', function(){
+        if (getHistory().length == 0) {
+          $('.history').addClass('no-history');
+        }
+        else {
+          $('.history').removeClass('no-history');
+        }
+      });
+
 
       $("#copyForm").on("submit", function () {
         if ($.trim($("#copyDestination").val()) == "") {
@@ -2086,7 +2123,6 @@ from django.utils.translation import ugettext as _
           viewModel.targetPath(targetPath);
         }
       }
-      addPathToHistory(viewModel.targetPath())
 
       viewModel.retrieveData();
 
