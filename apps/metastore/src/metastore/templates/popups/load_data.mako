@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
         <div class="control-group">
             ${comps.bootstrapLabel(load_form["path"])}
             <div class="controls">
-                ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xlarge", file_chooser=True, show_errors=True)}
+                ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xxlarge", file_chooser=True, show_errors=True)}
             </div>
         </div>
 
@@ -40,7 +40,7 @@ from django.utils.translation import ugettext as _
             <div class="control-group">
                  ${comps.bootstrapLabel(load_form[pf])}
                  <div class="controls">
-                   ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xlarge'})}
+                   ${comps.field(load_form[pf], render_default=True, attrs={'klass': 'input-xxlarge'})}
                 </div>
             </div>
         % endfor
@@ -68,9 +68,13 @@ from django.utils.translation import ugettext as _
    #filechooser {
      display: none;
      min-height: 100px;
-     height: 250px;
+     height: 380px;
      overflow-y: auto;
      margin-top: 10px;
+   }
+
+   .modal-body {
+     max-height: 540px;
    }
 
    .form-horizontal .controls {
