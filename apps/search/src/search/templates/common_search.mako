@@ -2450,7 +2450,7 @@ ${ dashboard.layout_skeleton() }
           <fieldset>
             <legend><i class="fa fa-bookmark-o"></i> ${ _('Query definitions') }
               <div class="input-append" style="margin-left: 30px; margin-top: 4px">
-                <input id="newqname" type="text" class="input-xxlarge" data-bind="value: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown'" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
+                <input id="newqname" type="text" class="input-xxlarge" data-bind="textInput: $root.collection.newQDefinitionName, valueUpdate:'afterkeydown', tagsNotAllowed" style="margin-bottom: 0" placeholder="${ _('Add current query as...') }" />
                 <a title="${ _('Click on this button to add the currenty query as a new definition') }" class="btn plus-btn" data-bind="click: $root.collection.addQDefinition, css:{'disabled': $.trim($root.collection.newQDefinitionName()) == ''}" style="margin-top: 1px">
                   <i class="fa fa-plus"></i>
                 </a>
