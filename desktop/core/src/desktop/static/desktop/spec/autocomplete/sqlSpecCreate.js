@@ -445,7 +445,7 @@
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [] },
               suggestFunctions: {}
             }
           });
@@ -473,7 +473,7 @@
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [] },
               suggestFunctions: {}
             }
           });
@@ -2293,7 +2293,7 @@
           hasLocations:true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns:  { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
@@ -2379,7 +2379,7 @@
             hasLocations:true,
             expectedResult: {
               lowerCase: false,
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] },

@@ -377,7 +377,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] }
           }
@@ -395,7 +395,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] }
           }
@@ -527,7 +527,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] }
           }
@@ -579,7 +579,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }, { name: 'boo' }] }] }
           }
@@ -709,7 +709,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestTables: { prependFrom: true, prependQuestionMark: true },
             suggestDatabases:  { prependFrom: true, prependQuestionMark: true, appendDot: true }
@@ -727,7 +727,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestTables: { prependFrom: true, prependQuestionMark: true },
             suggestDatabases:  { prependFrom: true, prependQuestionMark: true, appendDot: true }
@@ -914,7 +914,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestTables: { prependFrom: true, prependQuestionMark: true },
             suggestDatabases:  { prependFrom: true, prependQuestionMark: true, appendDot: true }

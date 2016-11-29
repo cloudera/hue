@@ -283,8 +283,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
-            suggestAggregateFunctions: true,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }]}] },
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -299,8 +299,8 @@
             lowerCase: false,
             suggestFunctions: {},
             suggestAnalyticFunctions: true,
-            suggestAggregateFunctions: true,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }]}] },
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -339,7 +339,7 @@
               prependQuestionMark: true,
               prependFrom: true
             },
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestDatabases: {
@@ -358,7 +358,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -382,7 +382,7 @@
           doesNotContainKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -448,7 +448,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -463,7 +463,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -479,7 +479,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -494,7 +494,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -510,7 +510,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testWHERE' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testWHERE' }] }] }
@@ -568,7 +568,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testON' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testON' }] }] }
@@ -584,7 +584,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'transactions' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'transactions' }] }] }
@@ -600,7 +600,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }] }] },
@@ -618,7 +618,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
@@ -636,7 +636,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }, { name: 'col' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl1' }, { name: 'col' }] }, { identifierChain: [{ name: 'db' }, { name: 'tbl2' }] }] },
@@ -653,7 +653,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] }
@@ -668,7 +668,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: true,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'database one' }, { name: 'test table' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'database one' }, { name: 'test table' }] }] },
@@ -688,7 +688,7 @@
           hasLocations: true,
           dialect: 'hive',
           expectedResult: {
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }, { identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }] },
             suggestAnalyticFunctions: true,
             suggestKeywords: ['*', 'ALL', 'DISTINCT'],
             suggestFunctions: {},
@@ -711,7 +711,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -727,7 +727,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
@@ -743,7 +743,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableA' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'tableA' }] }] }
@@ -815,7 +815,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
@@ -830,7 +830,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
@@ -858,7 +858,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: '${some_variable}' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: '${some_variable}' }] }] }
@@ -929,7 +929,7 @@
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions:true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: { prependQuestionMark: true, prependFrom: true },
@@ -2767,7 +2767,7 @@
                 {type: 'function', location: { first_line: 1, last_line: 1, first_column: 37, last_column: 43 }, function: 'explode'},
                 {type: 'column', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 54 }, identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }
               ],
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestFunctions: {},
@@ -2787,7 +2787,7 @@
             noErrors: true,
             containsKeywords: ['*', 'ALL', 'DISTINCT'],
             expectedResult: {
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
@@ -2806,7 +2806,7 @@
             hasLocations: true,
             containsKeywords: ['*', 'ALL', 'DISTINCT'],
             expectedResult: {
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
@@ -2825,7 +2825,7 @@
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestKeywords: ['*','ALL','DISTINCT']
@@ -2886,7 +2886,7 @@
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
               suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTable' }] }] },
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedTable.', type: 'alias' }, { name: 'testKey', type: 'alias' }, { name: 'testValue', type: 'alias' }]
@@ -3063,7 +3063,7 @@
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['*', 'ALL', 'DISTINCT'],
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestAnalyticFunctions: true,
               suggestFunctions: {},
               suggestIdentifiers: [{ name: 'explodedMap.', type: 'alias' }, { name: 'testMapKey', type: 'alias' }, { name: 'testMapValue', type: 'alias' }],
@@ -3222,7 +3222,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*', 'ALL', 'DISTINCT', 'STRAIGHT_JOIN'],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
@@ -4737,7 +4737,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
@@ -4753,7 +4753,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
@@ -4770,7 +4770,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestAnalyticFunctions: true,
             suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
@@ -5510,7 +5510,7 @@
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
             }
@@ -5529,7 +5529,7 @@
             expectedResult: {
               lowerCase: false,
               suggestFunctions: {},
-              suggestAggregateFunctions: true,
+              suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
               suggestColumnAliases: [{ name: 'boo', types: ['BIGINT'] }]
             }
@@ -5823,7 +5823,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -5923,7 +5923,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: { prependQuestionMark: true, prependFrom: true },
@@ -6850,7 +6850,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -6875,7 +6875,7 @@
           hasLocations: true,
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -6922,7 +6922,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -6971,7 +6971,7 @@
               {type: 'table', location: { first_line: 1, last_line: 1, first_column: 45, last_column: 48}, identifierChain: [{ name: 'abc' }]},
               {type: 'column', location: { first_line: 1, last_line: 1, first_column: 55, last_column: 58}, identifierChain: [{ name: 'abc' }, { name: 'foo'}]}
             ],
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }, { identifierChain: [{ subQuery: 'bar' }] }] },
@@ -6994,7 +6994,7 @@
           hasLocations: true,
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 'bar' }] }] },
@@ -7083,7 +7083,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestTables: {
@@ -7107,7 +7107,10 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           dialect: 'hive',
           expectedResult: {
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [
+              { identifierChain: [{ name: 'someDb' }, { name: 'tableTwo' }], alias: 'tAlias' },
+              { identifierChain: [{ name: 'tableThree' }] }
+            ] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [
@@ -7137,7 +7140,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [{ identifierChain: [{ name: 'tableOne' }] }] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'tableOne' }] }] }
@@ -7152,7 +7155,7 @@
           hasLocations: true,
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 'subQueryTwo'}] }] },
@@ -7178,7 +7181,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 'subQueryThree'}] }] },
@@ -7207,7 +7210,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 'subQueryTwo'}] }] },
@@ -7232,7 +7235,7 @@
           containsKeywords: ['*', 'ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase:false,
-            suggestAggregateFunctions: true,
+            suggestAggregateFunctions: { tables: [] },
             suggestAnalyticFunctions: true,
             suggestFunctions: {},
             suggestColumns: { source: 'select', tables: [{ identifierChain: [{ subQuery: 'subQueryOne'}] }] },
