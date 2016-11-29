@@ -2404,7 +2404,7 @@ ${ dashboard.layout_skeleton() }
             <div class="control-group">
               <label class="control-label" for="settingsdescription">${ _('Description') }</label>
               <div class="controls">
-                <input id="settingsdescription" type="text" class="input-xlarge" data-bind="value: $root.collection.description" style="margin-bottom: 0" />
+                <input id="settingsdescription" type="text" class="input-xlarge" data-bind="textInput: $root.collection.description, tagsNotAllowed" style="margin-bottom: 0" />
               </div>
             </div>
             <div class="control-group">
@@ -2413,7 +2413,7 @@ ${ dashboard.layout_skeleton() }
                 <label class="checkbox" style="padding-top:0">
                   <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.suggest.enabled">
                   <span data-bind="visible: $root.collection.suggest.enabled">
-                    ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="value: $root.collection.suggest.dictionary" placeholder="${ _('Dictionary name or blank for default') }">
+                    ${ _('Dictionary') } <input type="text" class="input-xlarge" style="margin-bottom: 0; margin-left: 6px;" data-bind="textInput: $root.collection.suggest.dictionary, tagsNotAllowed" placeholder="${ _('Dictionary name or blank for default') }">
                   </span>
                 </label>
               </div>
