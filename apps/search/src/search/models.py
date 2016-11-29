@@ -738,8 +738,6 @@ def augment_solr_response(response, collection, query):
 
   selected_values = dict([(fq['id'], fq['filter']) for fq in query['fqs']])
 
-  print response.get('responseHeader').get('params').get('json.facet')
-
   if response and response.get('facet_counts'):
     for facet in collection['facets']:
       category = facet['type']
@@ -825,13 +823,20 @@ def augment_solr_response(response, collection, query):
         extraSeries = []
         counts = response['facets'][name]['buckets']
 
+        cols = ['%(field)s' % facet, 'count(%(field)s)' % facet]
+        for f in facet['properties']['facets']:
+          if f['aggregate']['function'] == 'count':
+            cols.append(f['field'])
+          cols.append(SolrApi._get_aggregate_function(f))
+        rows = []
+
         # For dim in dimensions
 
         # Number or Date range
         if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
           dimension = 3
           # Single dimension or dimension 2 with analytics
-          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] not in ('count', 'unique'):
+          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count':
             counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:
@@ -861,17 +866,21 @@ def augment_solr_response(response, collection, query):
             column = agg_keys[0]
           else:
             legend = facet['field'] # 'count(%s)' % legend
-
+            agg_keys = [column]
+          
+          _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
+          
           counts = [_v for _f in counts for _v in (_f['val'], _f[column])] # TODO: Create additional ordered dict for table view + download
-          counts = pairwise2(legend, selected_values.get(facet['id'], []), counts) # TODO use 'cat' for legend in graph
+          counts = pairwise2(legend, selected_values.get(facet['id'], []), counts) # TODO use 'cat' for legend in graph 
         else:
           # Dimension 2 with analytics or 1 with N aggregates
           dimension = 2
-          agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('d_')] # TODO sort
+          agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')] # TODO sort
+          agg_keys.sort(key=lambda a: a[4:])
 
-          counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys)
-
+          counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
           actual_dimension = 1 + sum([_f['aggregate']['function'] == 'count' for _f in collection_facet['properties']['facets']])
+
           counts = filter(lambda a: len(a['fq_fields']) == actual_dimension, counts)
 
         facet = {
@@ -881,7 +890,9 @@ def augment_solr_response(response, collection, query):
           'label': collection_facet['label'],
           'counts': counts,
           'extraSeries': extraSeries,
-          'dimension': dimension
+          'dimension': dimension,
+          'cols': cols,
+          'rows': rows
         }
 
         normalized_facets.append(facet)
@@ -977,41 +988,56 @@ def _augment_pivot_2d(name, facet_id, counts, selected_values):
   return augmented
 
 
-def _augment_stats_2d(name, facet, counts, selected_values, agg_keys):
+def _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows):
   fq_fields = []
   fq_values = []
   fq_filter = []
   _selected_values = [f['value'] for f in selected_values.get(facet['id'], [])]
   _fields = [facet['field']] + [facet['field'] for facet in facet['properties']['facets']]
 
-  return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys)
+  return __augment_stats_2d(counts, facet['field'], fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys, rows)
 
 
 # Clear one dimension
-def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys):
+def __augment_stats_2d(counts, label, fq_fields, fq_values, fq_filter, _selected_values, _fields, agg_keys, rows):
   augmented = []
 
-  for bucket in counts:
+  for bucket in counts: # For each dimension, go through each bucket and pick up the counts or aggregates, then go recursively in the next dimension
     val = bucket['val']
     count = bucket['count']
+    dim_row = [val]
 
     _fq_fields = fq_fields + _fields[0:1]
     _fq_values = fq_values + [val]
 
     for agg_key in agg_keys:
       if agg_key == 'count':
+        dim_row.append(count)
         augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
       elif agg_key.startswith('agg_'):
         label = fq_values[0] if len(_fq_fields) >= 2 else agg_key.split(':', 2)[1]
+        dim_row.append(count) 
+        dim_row.append(bucket[agg_key])        
         augmented.append(_get_augmented(bucket[agg_key], val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
       else:
-        augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values))
+        augmented.append(_get_augmented(count, val, label, _fq_values, _fq_fields, fq_filter, _selected_values)) # Needed?
 
-        # go rec
-        _agg_keys = [key for key, value in bucket[agg_key]['buckets'][0].items() if key.lower().startswith('agg_') or key.lower().startswith('d_')] # TODO sort
+        # Go rec
+        _agg_keys = [key for key, value in bucket[agg_key]['buckets'][0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+        _agg_keys.sort(key=lambda a: a[4:])
         if not _agg_keys:
           _agg_keys.append('count')
-        augmented += __augment_stats_2d(bucket[agg_key]['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:], _agg_keys)
+        next_dim = []
+        new_rows = []
+        augmented += __augment_stats_2d(bucket[agg_key]['buckets'], val, _fq_fields, _fq_values, fq_filter, _selected_values, _fields[1:], _agg_keys, next_dim)
+        for row in next_dim:          
+          new_rows.append(dim_row + row)
+        dim_row = new_rows
+
+    if dim_row and type(dim_row[0]) == list:
+      rows.extend(dim_row)
+    else:
+      rows.append(dim_row)
 
   return augmented
 
@@ -1024,7 +1050,7 @@ def _get_augmented(count, val, label, fq_values, fq_fields, fq_filter, _selected
       'selected': fq_values in _selected_values,
       'exclude': all([f['exclude'] for f in fq_filter if f['value'] == val]),
       'fq_fields': fq_fields,
-      'fq_values': fq_values,
+      'fq_values': fq_values
   }
 
 
