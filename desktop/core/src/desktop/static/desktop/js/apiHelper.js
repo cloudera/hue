@@ -1425,13 +1425,12 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
     self.fetchNavCached('/metadata/api/optimizer/top_columns', options, function (data) {
-      // TODO: cache empty result for speed?
       return typeof data.values !== 'undefined' && (
-        (typeof data.values.filterColumns !== 'undefined' && data.values.filterColumns.length > 0) ||
-        (typeof data.values.groupbyColumns !== 'undefined' && data.values.groupbyColumns.length > 0) ||
-        (typeof data.values.joinColumns !== 'undefined' && data.values.joinColumns.length > 0) ||
-        (typeof data.values.orderbyColumns !== 'undefined' && data.values.orderbyColumns.length > 0) ||
-        (typeof data.values.selectColumns !== 'undefined' && data.values.selectColumns.length > 0));
+        typeof data.values.filterColumns !== 'undefined' ||
+        typeof data.values.groupbyColumns !== 'undefined' ||
+        typeof data.values.joinColumns !== 'undefined' ||
+        typeof data.values.orderbyColumns !== 'undefined' ||
+        typeof data.values.selectColumns !== 'undefined');
     });
   };
 
@@ -1451,9 +1450,8 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
-
     self.fetchNavCached('/metadata/api/optimizer/top_joins', options, function (data) {
-      return typeof data.values !== 'undefined' && data.values.length > 0;
+      return typeof data.values !== 'undefined';
     });
   };
 
@@ -1473,9 +1471,8 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
     var self = this;
-
     self.fetchNavCached('/metadata/api/optimizer/top_filters', options, function (data) {
-      return typeof data.values !== 'undefined' && data.values.length > 0;
+      return typeof data.values !== 'undefined';
     });
   };
 
