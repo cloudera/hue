@@ -154,7 +154,7 @@ class TestFsPermissions(object):
       f('hdfs://path')
       f('/tmp')
     finally:
-      remove_from_group('test', 'has_s3')
+      remove_from_group(user.username, 'has_s3')
 
 
   def test_fs_permissions_admin_user(self):
