@@ -1077,7 +1077,7 @@ def test_session_secure_cookie():
       finally:
         for reset in resets:
           reset()
- 
+
       resets = [
         desktop.conf.SSL_CERTIFICATE.set_for_testing(present=None),
         desktop.conf.SSL_PRIVATE_KEY.set_for_testing(present=None),
