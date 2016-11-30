@@ -294,7 +294,7 @@ def edit_user(request, username=None):
       # Ensure home directory is created, if necessary.
       if form.cleaned_data.get('ensure_home_directory'):
         try:
-          ensure_home_directory(request.fs, get_profile(request.user))
+          ensure_home_directory(request.fs, instance.user)
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
 
@@ -483,7 +483,7 @@ def add_ldap_users(request):
       if users and form.cleaned_data['ensure_home_directory']:
         for user in users:
           try:
-            ensure_home_directory(request.fs, get_profile(user))
+            ensure_home_directory(request.fs, user)
           except (IOError, WebHdfsException), e:
             request.error(_("Cannot make home directory for user %s.") % user.username)
 
@@ -554,7 +554,7 @@ def add_ldap_groups(request):
             unique_users.add(user)
         for user in unique_users:
           try:
-            ensure_home_directory(request.fs, get_profile(user))
+            ensure_home_directory(request.fs, user)
           except (IOError, WebHdfsException), e:
             raise PopupException(_("Exception creating home directory for LDAP user %s in group %s.") % (user, group), detail=e)
 
@@ -635,7 +635,7 @@ def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=
   if is_ensuring_home_directory:
     for user in users:
       try:
-        ensure_home_directory(fs, get_profile(user))
+        ensure_home_directory(fs, user)
       except (IOError, WebHdfsException), e:
         raise PopupException(_("The import may not be complete, sync again."), detail=e)
 
@@ -677,13 +677,18 @@ def sync_ldap_groups(connection, failed_users=None):
   return groups
 
 
-def ensure_home_directory(fs, userprofile):
+def ensure_home_directory(fs, user):
   """
   Adds a users home directory if it doesn't already exist.
 
   Throws IOError, WebHdfsException.
   """
-  fs.do_as_user(username, fs.create_home_dir, userprofile.home_directory)
+  userprofile = get_profile(user)
+
+  if userprofile is not None and userprofile.home_directory:
+    fs.do_as_user(user.username, fs.create_home_dir, userprofile.home_directory)
+  else:
+    LOG.warn("Not creating home directory of %s as his profile is empty" % user)
 
 
 def sync_unix_users_and_groups(min_uid, max_uid, min_gid, max_gid, check_shell):
