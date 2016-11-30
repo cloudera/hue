@@ -24,12 +24,14 @@ import tempfile
 import urlparse
 from avro import schema, datafile, io
 
+from aws.s3.s3fs import S3FileSystemException
+from aws.s3.s3test_utils import get_test_bucket
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_str
 from nose.plugins.attrib import attr
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal
+from nose.tools import assert_true, assert_false, assert_equal, assert_not_equal, assert_raises
 
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access, add_to_group
@@ -42,7 +44,9 @@ from conf import MAX_SNAPPY_DECOMPRESSION_SIZE
 from lib.rwx import expand_mode
 from views import snappy_installed
 
+
 LOG = logging.getLogger(__name__)
+
 
 def cleanup_tree(cluster, path):
   try:
@@ -1136,3 +1140,45 @@ def test_location_to_url():
   assert_equal(prefix + '/var/lib/hadoop-hdfs', location_to_url('hdfs://localhost:8020/var/lib/hadoop-hdfs'))
   assert_equal(prefix + '/', location_to_url('hdfs://localhost:8020'))
   assert_equal(prefix + 's3a%3A//bucket/key', location_to_url('s3a://bucket/key'))
+
+
+class TestS3AccessPermissions(object):
+
+  def setUp(self):
+    self.client = make_logged_in_client(username="test", groupname="default", recreate=True, is_superuser=False)
+
+    self.user = User.objects.get(username="test")
+
+  def test_no_default_permissions(self):
+    response = self.client.get('/filebrowser/view=S3A://')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=S3A://bucket')
+    assert_equal(500, response.status_code)
+
+    response = self.client.get('/filebrowser/view=S3A://bucket/hue')
+    assert_equal(500, response.status_code)
+
+    response = self.client.post('/filebrowser/rmtree', dict(path=['S3A://bucket/hue']))
+    assert_equal(500, response.status_code)
+
+    # 500 for real currently
+    assert_raises(IOError, self.client.get, '/filebrowser/edit=S3A://bucket/hue')
+
+    # 500 for real currently
+    with tempfile.NamedTemporaryFile() as local_file:
+      DEST_DIR = 'S3A://bucket/hue'
+      LOCAL_FILE = local_file.name
+      assert_raises(S3FileSystemException, self.client.post, '/filebrowser/upload/file?dest=%s' % DEST_DIR, dict(dest=DEST_DIR, hdfs_file=file(LOCAL_FILE)))
+
+  def test_has_default_permissions(self):
+    if not get_test_bucket():
+      raise SkipTest
+
+    add_permission(self.user.username, 'has_s3', permname='s3_access', appname='filebrowser')
+
+    try:
+      response = self.client.get('/filebrowser/view=S3A://')
+      assert_equal(200, response.status_code)
+    finally:
+      remove_from_group(self.user.username, 'has_s3')
