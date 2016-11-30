@@ -105,6 +105,10 @@ class OptimizerApi(object):
     return self._exec('get-tenant', ['--email', email or self._email])
 
 
+  def create_tenant(self, group):
+    return self._exec('create-tenant', ['--user-group', group])
+
+
   def authenticate(self):
     try:
       data = {
