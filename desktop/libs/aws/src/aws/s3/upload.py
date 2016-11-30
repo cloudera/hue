@@ -117,7 +117,7 @@ class S3FileUploadHandler(FileUploadHandler):
     try:
       fs = request.fs
     except AttributeError:
-      fs = get_s3fs(request.user)
+      fs = get_s3fs()
 
     if not fs:
       raise S3FileUploadError(_("No S3 filesystem found."))

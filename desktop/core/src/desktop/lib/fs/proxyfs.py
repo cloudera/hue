@@ -38,7 +38,8 @@ class ProxyFS(object):
     self._fs_set = set(self._fs_dict.values())
     self._default_scheme = default_scheme
     self._default_fs = self._fs_dict[self._default_scheme]
-    self.user = default_user
+    if default_user is not None:
+      self.setuser(default_user)
 
   def __getattr__(self, item):
     if hasattr(self, "_default_fs"):
@@ -91,7 +92,6 @@ class ProxyFS(object):
   def setuser(self, user):
     """Set a new user. Return the past current user."""
     curr = self.user
-    self.user = user
     for fs in self._fs_set:
       fs.setuser(user)
     return curr
