@@ -124,10 +124,11 @@ def dt_login(request, from_modal=False):
           request.session.delete_test_cookie()
 
         auto_create_home_backends = ['AllowAllBackend', 'LdapBackend', 'SpnegoDjangoBackend']
-        if is_first_login_ever or any(backend in backend_names for backend in auto_create_home_backends):
+        if is_first_login_ever or any(backend in backend_names for backend in auto_create_home_backends)\
+                or (userprofile and userprofile.home_directory):
           # Create home directory for first user.
           try:
-            ensure_home_directory(request.fs, user.username)
+            ensure_home_directory(request.fs, userprofile)
           except (IOError, WebHdfsException), e:
             LOG.error(_('Could not create home directory.'), exc_info=e)
             request.error(_('Could not create home directory.'))
