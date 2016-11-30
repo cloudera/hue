@@ -32,7 +32,8 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    FILTER: 1300,
+    GROUP_BY: 1300,
+    FILTER: 1200,
     ACTIVE_JOIN: 1200,
     JOIN_CONDITION: 1100,
     COLUMN: 1000,
@@ -264,6 +265,26 @@ var SqlAutocompleter2 = (function () {
       deferrals.push(suggestColRefKeywordsDeferral);
     }
 
+    var createNavOptIdentifier = function(navOptTableName, navOptColumnName, tables) {
+      var path = navOptTableName + '.' + navOptColumnName.split('.').pop();
+      for (var i = 0; i < tables.length; i++) {
+        var tablePath = '';
+        if (tables[i].identifierChain.length == 2) {
+          tablePath = $.map(tables[i].identifierChain, function (identifier) { return identifier.name }).join('.');
+        } else if (tables[i].identifierChain.length == 1) {
+          tablePath = database + '.' + tables[i].identifierChain[0].name;
+        }
+        if (path.indexOf(tablePath) === 0) {
+          path = path.substring(tablePath.length + 1);
+          if (tables[i].alias) {
+            path = tables[i].alias + '.' + path;
+          }
+          break;
+        }
+      }
+      return path;
+    };
+
     if (HAS_OPTIMIZER && typeof parseResult.suggestFilters !== 'undefined') {
       var topFiltersDeferral = $.Deferred();
       deferrals.push(topFiltersDeferral);
@@ -279,27 +300,8 @@ var SqlAutocompleter2 = (function () {
               value.popularValues.forEach(function (popularValue) {
                 if (typeof popularValue.group !== 'undefined') {
                   popularValue.group.forEach(function (grp) {
-                    var path = value.tableName.split('.').concat(grp.columnName.split('.').slice(1)).join('.');
-
-                    for (var i = 0; i < parseResult.suggestFilters.tables.length; i++) {
-                      var table = parseResult.suggestFilters.tables[i];
-                      var tablePath = '';
-                      if (table.identifierChain.length == 2) {
-                        tablePath = $.map(table.identifierChain, function (identifier) { return identifier.name }).join('.');
-                      } else if (table.identifierChain.length == 1) {
-                        tablePath = database + '.' + table.identifierChain[0].name;
-                      }
-                      if (path.indexOf(tablePath) === 0) {
-                        path = path.substring(tablePath.length + 1);
-                        if (table.alias) {
-                          path = table.alias + '.' + path;
-                        }
-                        break;
-                      }
-                    }
                     var compVal = parseResult.suggestFilters.prefix ? (parseResult.lowerCase ? parseResult.suggestFilters.prefix.toLowerCase() : parseResult.suggestFilters.prefix) + ' ' : '';
-                    compVal += path + (parseResult.lowerCase ? grp.op.toLowerCase() : grp.op) + grp.literal;
-
+                    compVal += createNavOptIdentifier(value.tableName, grp.columnName, parseResult.suggestFilters.tables) + (parseResult.lowerCase ? grp.op.toLowerCase() : grp.op) + grp.literal;
                     completions.push({
                       value: compVal,
                       meta: 'filter *',
@@ -315,6 +317,33 @@ var SqlAutocompleter2 = (function () {
           topFiltersDeferral.resolve();
         },
         errorCallback: topFiltersDeferral.resolve
+      });
+    }
+
+    if (HAS_OPTIMIZER && typeof parseResult.suggestGroupBys !== 'undefined') {
+      var groupByDeferral = $.Deferred();
+      deferrals.push(groupByDeferral);
+      self.snippet.getApiHelper().fetchNavOptTopColumns({
+        sourceType: self.snippet.type(),
+        timeout: self.timeout,
+        defaultDatabase: database,
+        silenceErrors: true,
+        tables: parseResult.suggestGroupBys.tables,
+        successCallback: function (data) {
+          var prefix = parseResult.suggestGroupBys.prefix ? (parseResult.lowerCase ? parseResult.suggestGroupBys.prefix.toLowerCase() : parseResult.suggestGroupBys.prefix) + ' ' : '';
+          if (data.values.groupbyColumns) {
+            data.values.groupbyColumns.forEach(function (col) {
+              completions.push({
+                value: prefix + createNavOptIdentifier(col.tableName, col.columnName, parseResult.suggestGroupBys.tables),
+                meta: 'group *',
+                weight: DEFAULT_WEIGHTS.GROUP_BY + Math.min(col.columnCount, 99),
+                docHTML: self.createGroupByHtml()
+              });
+            });
+          }
+          groupByDeferral.resolve();
+        },
+        errorCallback: groupByDeferral.resolve
       });
     }
 
@@ -511,6 +540,13 @@ var SqlAutocompleter2 = (function () {
       }
       delete suggestion.table;
     }
+  };
+
+  SqlAutocompleter2.prototype.createGroupByHtml = function () {
+    // TODO: Show more relevant details here
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular group by</span></p>';
+    html += '<div>';
+    return html;
   };
 
   SqlAutocompleter2.prototype.createFilterHtml = function () {
