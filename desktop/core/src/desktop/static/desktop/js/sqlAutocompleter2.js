@@ -286,6 +286,25 @@ var SqlAutocompleter2 = (function () {
       return path;
     };
 
+    var createNavOptIdentifierForColumn = function(navOptColumn, tables) {
+      for (var i = 0; i < tables.length; i++) {
+        if (navOptColumn.dbName && (navOptColumn.dbName !== database || navOptColumn.dbName !== tables[i].identifierChain[0].name)) {
+          continue;
+        }
+        if (navOptColumn.tableName && navOptColumn.tableName === tables[i].identifierChain[tables[i].identifierChain.length - 1].name && tables[i].alias) {
+          return tables[i].alias + '.' + navOptColumn.columnName;
+        }
+      }
+
+      if (navOptColumn.dbName && navOptColumn.dbName !== database) {
+        return navOptColumn.dbName + '.' + navOptColumn.tableName + '.' + navOptColumn.columnName;
+      }
+      if (tables.length > 1) {
+        return navOptColumn.tableName + '.' + navOptColumn.columnName;
+      }
+      return navOptColumn.columnName;
+    };
+
     if (HAS_OPTIMIZER && typeof parseResult.suggestFilters !== 'undefined') {
       var topFiltersDeferral = $.Deferred();
       deferrals.push(topFiltersDeferral);
@@ -302,7 +321,15 @@ var SqlAutocompleter2 = (function () {
                 if (typeof popularValue.group !== 'undefined') {
                   popularValue.group.forEach(function (grp) {
                     var compVal = parseResult.suggestFilters.prefix ? (parseResult.lowerCase ? parseResult.suggestFilters.prefix.toLowerCase() : parseResult.suggestFilters.prefix) + ' ' : '';
-                    compVal += createNavOptIdentifier(value.tableName, grp.columnName, parseResult.suggestFilters.tables) + (parseResult.lowerCase ? grp.op.toLowerCase() : grp.op) + grp.literal;
+                    compVal += createNavOptIdentifier(value.tableName, grp.columnName, parseResult.suggestFilters.tables);
+                    if (!/^ /.test(grp.op)) {
+                      compVal += ' ';
+                    }
+                    compVal += parseResult.lowerCase ? grp.op.toLowerCase() : grp.op;
+                    if (!/ $/.test(grp.op)) {
+                      compVal += ' ';
+                    }
+                    compVal += grp.literal;
                     completions.push({
                       value: compVal,
                       meta: 'filter *',
@@ -322,7 +349,6 @@ var SqlAutocompleter2 = (function () {
     }
 
     if (HAS_OPTIMIZER && (typeof parseResult.suggestGroupBys !== 'undefined' || typeof parseResult.suggestOrderBys !== 'undefined')) {
-
       var tables = typeof parseResult.suggestGroupBys !== 'undefined' ? parseResult.suggestGroupBys.tables : typeof parseResult.suggestOrderBys.tables;
       var groupAndOrderByDeferral = $.Deferred();
       deferrals.push(groupAndOrderByDeferral);
@@ -337,7 +363,7 @@ var SqlAutocompleter2 = (function () {
             var prefix = parseResult.suggestGroupBys.prefix ? (parseResult.lowerCase ? parseResult.suggestGroupBys.prefix.toLowerCase() : parseResult.suggestGroupBys.prefix) + ' ' : '';
             data.values.groupbyColumns.forEach(function (col) {
               completions.push({
-                value: prefix + createNavOptIdentifier(col.tableName, col.columnName, parseResult.suggestGroupBys.tables),
+                value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestGroupBys.tables),
                 meta: 'group *',
                 weight: DEFAULT_WEIGHTS.GROUP_BY + Math.min(col.columnCount, 99),
                 docHTML: self.createGroupByHtml()
@@ -348,7 +374,7 @@ var SqlAutocompleter2 = (function () {
             var prefix = parseResult.suggestOrderBys.prefix ? (parseResult.lowerCase ? parseResult.suggestOrderBys.prefix.toLowerCase() : parseResult.suggestOrderBys.prefix) + ' ' : '';
             data.values.orderbyColumns.forEach(function (col) {
               completions.push({
-                value: prefix + createNavOptIdentifier(col.tableName, col.columnName, parseResult.suggestOrderBys.tables),
+                value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestOrderBys.tables),
                 meta: 'order *',
                 weight: DEFAULT_WEIGHTS.ORDER_BY + Math.min(col.columnCount, 99),
                 docHTML: self.createOrderByHtml()
