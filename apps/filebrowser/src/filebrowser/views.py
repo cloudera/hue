@@ -351,7 +351,7 @@ def listdir(request, path, chooser):
         'superuser': request.fs.superuser,
         'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
     }
 
     stats = request.fs.listdir_stats(path)

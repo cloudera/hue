@@ -259,10 +259,9 @@
           'padding': '0',
           'marginLeft': '10px',
           'marginBottom': '0',
-          'paddingLeft': '10px',
           'paddingRight': '10px',
           'float': 'left',
-          'width': '350px',
+          'width': '300px',
           'overflow-x': 'scroll',
           'overflow-y': 'hidden',
           'white-space': 'nowrap'
@@ -272,12 +271,17 @@
         var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
           _parent.navigateTo("/?default_to_home");
         });
+
+        if (_parent.options.fsSelected === 's3a') {
+          _homelink = $("<a>").addClass("nounderline muted").html('<i class="fa fa-cubes"></i> ').css("cursor", "pointer").click(function () {
+            _parent.navigateTo("S3A://");
+          });
+        }
+
         _homelink.appendTo(_home);
 
         $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
-        if (_parent.options.fsSelected !== 's3a') {
-          _home.appendTo($homeBreadcrumb);
-        }
+        _home.appendTo($homeBreadcrumb);
 
         if (_parent.options.showExtraHome) {
           var _extraHome = $("<li>");
@@ -298,7 +302,7 @@
           }
         });
 
-        var $editBreadcrumbs = $("<li>").css('marginRight', '10px');
+        var $editBreadcrumbs = $("<li>").css('marginRight', '2px');
         var $crumbLink = $("<span>").addClass('spacer');
         $crumbLink.html('&nbsp;').appendTo($editBreadcrumbs);
         $editBreadcrumbs.appendTo($scrollingBreadcrumbs);
@@ -327,6 +331,7 @@
         }
         $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
         $scrollingBreadcrumbs.appendTo($(_parent.element).find('.filechooser-tree'));
+        $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
         $scrollingBreadcrumbs.animate({
           'scrollLeft': $scrollingBreadcrumbs.width()
         });
