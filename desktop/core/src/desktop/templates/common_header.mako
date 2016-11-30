@@ -504,7 +504,7 @@ if USE_NEW_EDITOR.get():
       view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
     %>
     <li class="dropdown">
-      <a title="${ _('Administration') if view_profile else '' }" href="index.html#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+      <a title="${ _('Administration') if view_profile else '' }" href="#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
         <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
         % if view_profile:
           <b class="caret"></b>
