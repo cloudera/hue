@@ -47,6 +47,7 @@ var SqlAutocompleter2 = (function () {
     HDFS: 300,
     VIRTUAL_COLUMN: 200,
     COLREF_KEYWORD: 100,
+    VARIABLE: 50,
     JOIN: -1
   };
 
@@ -246,6 +247,9 @@ var SqlAutocompleter2 = (function () {
 
     if (parseResult.suggestValues) {
       var suggestValuesDeferral = $.Deferred();
+      if (parseResult.colRef && parseResult.colRef.identifierChain) {
+        completions.push({ value: '${' + parseResult.colRef.identifierChain[parseResult.colRef.identifierChain.length - 1].name + '}', meta: 'variable', weight: DEFAULT_WEIGHTS.VARIABLE });
+      }
       colRefDeferral.done(function () {
         if (colRef !== null) {
           self.addValues(parseResult, colRef, completions);
