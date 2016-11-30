@@ -140,7 +140,7 @@
     if (self.options.filesystems.length > 1) {
       var $ul = $('<ul>').addClass('nav nav-list').css('border', 'none');
       self.options.filesystems.forEach(function (fs) {
-        var $li = $('<li>').attr('data-fs', fs).addClass(self.options.fsSelected === fs ? 'active' : '').html('<a class="pointer" style="padding-left: 6px">' + fs.toUpperCase() + '</a>');
+        var $li = $('<li>').attr('data-fs', fs).addClass(self.options.fsSelected === fs ? 'active' : '').html('<a class="pointer" style="padding-left: 6px">' + (fs.toUpperCase() == 'S3A' ? 'S3' : fs.toUpperCase()) + '</a>');
         $li.on('click', function () {
           $(this).siblings().removeClass('active');
           $(this).addClass('active');
