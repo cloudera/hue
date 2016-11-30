@@ -142,29 +142,39 @@ ${ hueIcons.symbols() }
         </svg>
       </a>
       <div class="compose-action btn-group">
-        <button class="btn">${ _('Compose') }</button>
+        <button class="btn" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }" title="${ _('Compose a query') }">${ _('Compose') }</button>
         <button class="btn dropdown-toggle" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
 
         <ul class="dropdown-menu">
-          % if 'beeswax' in apps:
-            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+          % if 'beeswax' in apps and 'impala' in apps:
+            <li class="dropdown-submenu">
+              <a title="${_('Query editor')}" rel="navigator-tooltip" href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
+              <ul class="dropdown-menu">
+                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+              </ul>
+            </li>
           % endif
-          % if 'impala' in apps: ## impala requires beeswax anyway
-            <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+          % if 'beeswax' in apps and 'impala' not in apps:
+            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+          % endif
+          % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
+            <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
           % endif
           % if 'search' in apps:
             <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
           % endif
+          <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('notebook') }"><i class="fa fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
           % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
             <li class="dropdown-submenu">
-              <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflows') }</a>
+              <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflow') }</a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
+                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Schedule')}</a></li>
+                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundle')}</a></li>
               </ul>
             </li>
           % endif
@@ -213,7 +223,17 @@ ${ hueIcons.symbols() }
       % if user.is_authenticated() and section != 'login':
 
         <div class="compose-action btn-group">
-          <button class="btn">${user.username}</button>
+          <%
+            view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
+          %>
+          <button class="btn"
+          % if view_profile:
+            ### <a href="${ url('useradmin.views.edit_user', username=user.username) }"
+            data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
+          % endif
+          >
+          ${ user.username }
+          </button>
           % if user.is_superuser:
             <button class="btn dropdown-toggle" data-toggle="dropdown">
               <span class="caret"></span>
@@ -230,7 +250,7 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" >${ _('Jobs') } <div class="jobs-badge">20</div></button>
+          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">20</div></button>
           <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
             <span class="caret"></span>
           </button>
@@ -246,20 +266,23 @@ ${ hueIcons.symbols() }
     <div class="left-nav">
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
-        <li><a href="javascript: void(0);">Reports</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('home') }">Home</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Editor</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Hive</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Impala</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('search') }">Dashboards</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('search') }">Dashboard</a></li>
+        <li><a href="javascript: void(0);">Report</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }">Oozie</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Metastore</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Tables</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job Browser</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">File Browser</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">Files</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">S3</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>

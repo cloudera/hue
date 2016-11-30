@@ -74,7 +74,8 @@ def responsive(request):
     'apps': apps,
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
     'interpreters': get_interpreters(request.user),
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user)
+    'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
+    'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
   })
 
 def ko_editor(request):
