@@ -59,10 +59,6 @@ class S3FileUploadHandler(FileUploadHandler):
     self._part_num = 1
 
     if self._is_s3_upload():
-      # Check access permissions before attempting upload
-      if not self._fs.check_access(self.destination, permission='WRITE'):
-        raise S3FileUploadError(_('Insufficient permissions to write to S3 path "%s".') % self.destination)
-
       self.bucket_name, self.key_name = parse_uri(self.destination)[:2]
       # Verify that the path exists
       self._fs._stats(self.destination)
@@ -76,11 +72,18 @@ class S3FileUploadHandler(FileUploadHandler):
       LOG.info('Using S3FileUploadHandler to handle file upload.')
       self.target_path = self._fs.join(self.key_name, file_name)
 
-      # Create a multipart upload request
-      LOG.debug("Initiating S3 multipart upload to target path: %s" % self.target_path)
-      self._mp = self._bucket.initiate_multipart_upload(self.target_path)
-      self.file = SimpleUploadedFile(name=file_name, content='')
-      raise StopFutureHandlers()
+      try:
+        # Check access permissions before attempting upload
+        self._check_access()
+        # Create a multipart upload request
+        LOG.debug("Initiating S3 multipart upload to target path: %s" % self.target_path)
+        self._mp = self._bucket.initiate_multipart_upload(self.target_path)
+        self.file = SimpleUploadedFile(name=file_name, content='')
+        raise StopFutureHandlers()
+      except S3FileUploadError, e:
+        LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
+        self.request.META['upload_failed'] = e
+        raise StopUpload()
 
 
   def receive_data_chunk(self, raw_data, start):
@@ -124,6 +127,11 @@ class S3FileUploadHandler(FileUploadHandler):
 
   def _is_s3_upload(self):
     return self._get_scheme() and self._get_scheme().startswith('S3')
+
+
+  def _check_access(self):
+    if not self._fs.check_access(self.destination, permission='WRITE'):
+      raise S3FileUploadError(_('Insufficient permissions to write to S3 path "%s".') % self.destination)
 
 
   def _get_scheme(self):
