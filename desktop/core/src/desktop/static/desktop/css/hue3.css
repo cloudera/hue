@@ -2813,7 +2813,6 @@ body {
   -moz-transition: background-color .2s linear, opacity .2s linear;
   -o-transition: background-color .2s linear, opacity .2s linear;
   transition: background-color .2s linear, opacity .2s linear;
-  bottom: 3px;
   height: 9px;
 }
 
