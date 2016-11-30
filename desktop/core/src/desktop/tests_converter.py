@@ -16,6 +16,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from datetime import datetime
 import json
 
 from nose.tools import assert_equal, assert_false, assert_true
@@ -68,6 +69,10 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     query2 = SavedQuery.objects.create(
         type=SavedQuery.TYPES_MAPPING['hql'],
         owner=self.user,
@@ -111,7 +116,7 @@ class TestDocumentConverter(object):
       assert_equal(file_resources, doc2.data_dict['snippets'][0]['properties']['files'])
       assert_equal(functions, doc2.data_dict['snippets'][0]['properties']['functions'])
 
-      assert_false(doc.last_modified == doc2.last_modified)
+      assert_false(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       #
       # Query History
@@ -121,7 +126,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doch.name, doc2.data_dict['name'])
       assert_equal(doch.description, doc2.data_dict['description'])
-      assert_equal(doch.last_modified, doc2.last_modified)
+      assert_equal(doch.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('hive', doc2.data_dict['sessions'][0]['type'])
