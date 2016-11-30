@@ -63,6 +63,13 @@ class TestOptimizerApi(object):
     assert_equal('success', resp['status'], resp)
 
 
+  def test_create_tenant(self):
+    resp = self.api.create_tenant(group='hue')
+
+    assert_equal('success', resp['status'], resp)
+    assert_true('tenant' in resp, resp)
+
+
   def test_authenticate(self):
     resp = self.api.authenticate()
 
