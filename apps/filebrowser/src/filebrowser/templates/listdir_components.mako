@@ -1090,13 +1090,13 @@ from django.utils.translation import ugettext as _
       }
 
       self.getStats = function (callback) {
-        $.getJSON(self.targetPath() + "?pagesize=1&format=json", callback);
+        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=1&format=json", callback);
       };
 
       self.retrieveData = function () {
         self.isLoading(true);
 
-        $.getJSON(self.targetPath() + "?pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
+        $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
           if (data.error){
             $(document).trigger("error", data.error);
             self.isLoading(false);
@@ -1219,6 +1219,23 @@ from django.utils.translation import ugettext as _
         self.targetPageNum(1);
         self.retrieveData();
       };
+
+      self.openHome = function (vm, e) {
+        var isLeftButton = (e.which || e.button) === 1;
+        if (isLeftButton) {
+          if (! (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
+            e.stopPropagation();
+            e.preventDefault();
+            viewModel.targetPageNum(1);
+            viewModel.targetPath("${url('filebrowser.views.view', path='')}?default_to_home");
+            location.hash = '';
+            viewModel.retrieveData();
+          }
+          else {
+            window.open("${url('filebrowser.views.view', path='')}?default_to_home");
+          }
+        }
+      }
 
       self.viewFile = function (file) {
         if (file.type == "dir") {

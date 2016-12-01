@@ -30,7 +30,7 @@ from aws import get_client
             </span>
           </li>
         %else:
-          <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+          <li><a class="pointer homeLink" data-bind="click: $root.openHome, attr:{'href': '${url('filebrowser.views.view', path=urlencode(path))}?default_to_home'}"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         %endif
         <li>
             <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
