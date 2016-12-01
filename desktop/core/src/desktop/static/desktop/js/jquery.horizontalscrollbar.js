@@ -56,19 +56,22 @@
           }
         });
         $(el).parents('.dataTables_wrapper').bind('mousewheel', function (e) {
-          var _deltaX = -e.deltaX*e.deltaFactor,
-              _deltaY = -e.deltaY;
+          var _deltaX = e.deltaX*e.deltaFactor,
+              _deltaY = e.deltaY;
 
-          if (Math.abs(_deltaX) > Math.abs(_deltaY)) {
-            this.scrollLeft += -_deltaX / 2;
+          if (Math.abs(_deltaX) >= Math.abs(_deltaY)) {
+            var self = this;
+            self.scrollLeft += _deltaX;
+            e.preventDefault();
             e.stopPropagation();
             e.stopImmediatePropagation();
-            scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
-            window.clearTimeout(throttleScrollTimeout);
-            throttleScrollTimeout = window.setTimeout(function () {
-              $(el).parents('.dataTables_wrapper').trigger('scroll');
-            }, 50);
-            e.preventDefault();
+            if (self.scrollLeft > 0){
+              scrollbar.css("left", ((scrollbarRail[0].getBoundingClientRect().width - scrollbar[0].getBoundingClientRect().width) * (self.scrollLeft / (self.scrollWidth - self.getBoundingClientRect().width))) + "px");
+              window.clearTimeout(throttleScrollTimeout);
+              throttleScrollTimeout = window.setTimeout(function () {
+                $(el).parents('.dataTables_wrapper').trigger('scroll');
+              }, 50);
+            }
           }
         });
         scrollbarRail.addClass('hue-scrollbar-x-rail').appendTo($(el).parents(".dataTables_wrapper"));
