@@ -339,12 +339,11 @@ var AssistDbEntry = (function () {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
-        newEntries.sort(function (a, b) {
-          if (a.definition.isColumn && b.definition.isColumn) {
-            return 0;
-          }
-          return a.definition.name.localeCompare(b.definition.name);
-        });
+        if (newEntries.length > 0 && !newEntries[0].definition.isColumn) {
+          newEntries.sort(function (a, b) {
+            return a.definition.name.localeCompare(b.definition.name);
+          });
+        }
         self.entries(newEntries);
       }
       if (typeof callback === 'function') {
