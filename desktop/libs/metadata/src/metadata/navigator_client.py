@@ -205,12 +205,14 @@ class NavigatorApi(object):
     if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
       checker = PrivilegeChecker(user=self.user)
       action = 'SELECT'
-      for result in response['results']:
+
+      def getkey(result):
         if result['type'] == 'TABLE':
-          result.update({u'column': None, u'table': result['originalName'], u'db': result['parentPath'].strip('/'), u'server': u'server1'})
+          return {u'column': None, u'table': result['originalName'], u'db': result['parentPath'].strip('/')} #, 'server': 'server1'}
         else:
-          result.update({u'column': None, u'table': None, u'db': None, u'server': None})
-      response['results'] = checker.filter_objects(response['results'], action)
+          return {u'column': None, u'table': None, u'db': None, u'server': None}
+
+      response['results'] = checker.filter_objects(response['results'], action, key=getkey)
 
 
   def suggest(self, prefix=None):
