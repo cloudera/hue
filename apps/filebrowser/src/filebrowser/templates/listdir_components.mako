@@ -896,16 +896,21 @@ from django.utils.translation import ugettext as _
         show: function (breadcrumb, e) {
           var isLeftButton = (e.which || e.button) === 1;
           if (isLeftButton) {
-            e.stopPropagation();
-            e.preventDefault();
-            if (this.url == null || this.url == "") {
-              // forcing root on empty breadcrumb url
-              this.url = "/";
-            }
+            if (! (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
+              e.stopPropagation();
+              e.preventDefault();
+              if (this.url == null || this.url == "") {
+                // forcing root on empty breadcrumb url
+                this.url = "/";
+              }
 
-            viewModel.targetPageNum(1);
-            viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
-            location.hash = this.url;
+              viewModel.targetPageNum(1);
+              viewModel.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(this.url));
+              location.hash = this.url;
+            }
+            else {
+              window.open($(e.target).attr('href'));
+            }
           }
         }
       }
