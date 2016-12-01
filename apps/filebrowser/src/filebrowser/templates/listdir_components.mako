@@ -1220,21 +1220,29 @@ from django.utils.translation import ugettext as _
         self.retrieveData();
       };
 
-      self.openHome = function (vm, e) {
+      self.openDefaultFolder = function (vm, e, folderPath) {
         var isLeftButton = (e.which || e.button) === 1;
         if (isLeftButton) {
           if (! (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey)) {
             e.stopPropagation();
             e.preventDefault();
             viewModel.targetPageNum(1);
-            viewModel.targetPath("${url('filebrowser.views.view', path='')}?default_to_home");
+            viewModel.targetPath("${url('filebrowser.views.view', path='')}?" + folderPath);
             location.hash = '';
             viewModel.retrieveData();
           }
           else {
-            window.open("${url('filebrowser.views.view', path='')}?default_to_home");
+            window.open("${url('filebrowser.views.view', path='')}?" + folderPath);
           }
         }
+      }
+
+      self.openHome = function (vm, e) {
+        self.openDefaultFolder(vm, e, 'default_to_home');
+      }
+
+      self.openTrash = function (vm, e) {
+        self.openDefaultFolder(vm, e, 'default_to_trash');
       }
 
       self.viewFile = function (file) {

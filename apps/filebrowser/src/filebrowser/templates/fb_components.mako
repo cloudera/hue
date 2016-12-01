@@ -41,7 +41,7 @@ from aws import get_client
         </li>
         % if is_trash_enabled:
         <li class="pull-right">
-          <a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash" class="trashLink" title="${_('View trash')}">
+          <a class="pointer trashLink" data-bind="click: $root.openTrash, attr:{'href': '${url('filebrowser.views.view', path=urlencode(path))}?default_to_trash'}" title="${_('View trash')}">
             <i class="fa fa-trash-o"></i> ${_('Trash')}
           </a>
         </li>
