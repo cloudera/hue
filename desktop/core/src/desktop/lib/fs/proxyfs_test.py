@@ -34,10 +34,12 @@ def test_fs_selection():
     raise SkipTest("Skips until HUE-2947 is resolved")
 
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
-  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+  user = User.objects.get(username='test')
+  add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
 
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs.setuser(user)
 
   proxy_fs.isdir('s3a://bucket/key')
   s3fs.isdir.assert_called_once_with('s3a://bucket/key')
@@ -58,10 +60,14 @@ def test_fs_selection():
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs():
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
-  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+  user = User.objects.get(username='test')
 
-  s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
+  add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
+
+  s3fs, hdfs = MockFs(), MockFs()
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs.setuser(user)
+
   f = proxy_fs._get_fs
 
   eq_(f('s3a://bucket'), s3fs)
@@ -80,10 +86,12 @@ def test_multi_fs_selection():
     raise SkipTest("Skips until HUE-2947 is resolved")
 
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
-  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+  user = User.objects.get(username='test')
+  add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
 
   s3fs, hdfs = MagicMock(), MagicMock()
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs.setuser(user)
 
   proxy_fs.copy('s3a://bucket1/key', 's3a://bucket2/key')
   s3fs.copy.assert_called_once_with('s3a://bucket1/key', 's3a://bucket2/key')
@@ -104,10 +112,12 @@ def test_multi_fs_selection():
 # TODO: remove after HUE-2947 is resolved
 def test__get_fs_pair():
   make_logged_in_client(username='test', groupname='default', recreate=True, is_superuser=False)
-  add_permission('test', 'test', permname='s3_access', appname='filebrowser')
+  user = User.objects.get(username='test')
+  add_permission('test', 'has_s3', permname='s3_access', appname='filebrowser')
 
-  s3fs, hdfs = 'fake_s3', 'fake_hdfs'
-  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs', default_user='test')
+  s3fs, hdfs = MockFs(), MockFs()
+  proxy_fs = ProxyFS({'s3a': s3fs, 'hdfs': hdfs}, 'hdfs')
+  proxy_fs.setuser(user)
 
   f = proxy_fs._get_fs_pair
 
@@ -125,7 +135,10 @@ def test_constructor_given_invalid_arguments():
 
 
 class MockFs():
-  def setuser(self, user): pass
+  def __init__(self):
+    self.user = None
+
+  def setuser(self, user): self.user = user
 
 
 class TestFsPermissions(object):
@@ -135,9 +148,11 @@ class TestFsPermissions(object):
     user = User.objects.get(username='test')
 
     proxy_fs = ProxyFS({'s3a': MockFs(), 'hdfs': MockFs()}, 'hdfs')
+    proxy_fs.setuser(user)
+
     f = proxy_fs._get_fs
 
-    proxy_fs.setuser(user)
+    remove_from_group(user.username, 'has_s3')
 
     # No perms by default
     assert_raises(Exception, f, 's3a://bucket')
@@ -162,9 +177,9 @@ class TestFsPermissions(object):
     user = User.objects.get(username='admin')
 
     proxy_fs = ProxyFS({'s3a': MockFs(), 'hdfs': MockFs()}, 'hdfs')
-    f = proxy_fs._get_fs
-
     proxy_fs.setuser(user)
+
+    f = proxy_fs._get_fs
 
     f('s3a://bucket')
     f('S3A://bucket/key')
