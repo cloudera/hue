@@ -175,6 +175,7 @@ var AssistDbEntry = (function () {
         type: type,
         identifierChain: $.map(self.getHierarchy(), function (name) { return { name: name }})
       },
+      showInAssistEnabled: false,
       orientation: 'right',
       sourceType: self.sourceType,
       defaultDatabase: self.databaseName,
