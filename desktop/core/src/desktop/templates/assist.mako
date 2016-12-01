@@ -21,6 +21,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
+from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
 <%def name="assistJSModels()">
@@ -454,10 +455,12 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-items">
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+    %if ENABLE_QUERY_BUILDER.get():
     <!-- ko if: definition.isColumn -->
     <li class="divider"></li>
     <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
     <!-- /ko -->
+    %endif
   </script>
 
   <script type="text/html" id="query-builder-context-items">
