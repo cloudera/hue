@@ -1452,6 +1452,14 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
+
+        $('#deleteForm').ajaxForm({
+          dataType:  'json',
+          success: function() {
+            $("#deleteModal").modal('hide');
+            self.retrieveData();
+          }
+        });
       };
 
       self.deleteSelected = function () {
