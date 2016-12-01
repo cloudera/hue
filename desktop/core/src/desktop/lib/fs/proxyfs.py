@@ -29,7 +29,7 @@ from aws.s3 import S3A_ROOT
 
 class ProxyFS(object):
 
-  def __init__(self, filesystems_dict, default_scheme, default_user=None):
+  def __init__(self, filesystems_dict, default_scheme):
     if default_scheme not in filesystems_dict:
       raise ValueError(
         'Default scheme "%s" is not a member of provided schemes: %s' % (default_scheme, filesystems_dict.keys()))
@@ -38,8 +38,6 @@ class ProxyFS(object):
     self._fs_set = set(self._fs_dict.values())
     self._default_scheme = default_scheme
     self._default_fs = self._fs_dict[self._default_scheme]
-    if default_user is not None:
-      self.setuser(default_user)
 
   def __getattr__(self, item):
     if hasattr(self, "_default_fs"):
@@ -59,7 +57,7 @@ class ProxyFS(object):
       try:
         user = User.objects.get(username=self.user)
         if not has_s3_access(rewrite_user(user)):
-          raise IOError(errno.EPERM, "Missing permissions for %s" % path)
+          raise IOError(errno.EPERM, "Missing permissions for %s on %s" % (self.user, path,))
       except User.DoesNotExist:
         raise IOError(errno.EPERM, "Can't check permissions for %s on %s" % (self.user, path))
 
