@@ -560,7 +560,7 @@ class Collection2(object):
           <div class="span12">%s</div>
         </div>
         <br/>
-      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
+      </div>""" % ' '.join(['{{%s}}' % escape(field['name']) for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
       "showGrid": True,
@@ -599,7 +599,7 @@ class Collection2(object):
   @classmethod
   def _make_field(cls, field, attributes):
     return {
-        'name': str(field),
+        'name': str(escape(field)),
         'type': str(attributes.get('type', '')),
         'isId': attributes.get('required') and attributes.get('uniqueKey'),
         'isDynamic': 'dynamicBase' in attributes
