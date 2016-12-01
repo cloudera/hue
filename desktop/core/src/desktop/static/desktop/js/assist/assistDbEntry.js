@@ -243,17 +243,14 @@
       if (data.type === 'array' || data.type === 'map') {
         self.entries(newEntries);
         self.entries()[0].open(true);
-        return;
-      }
-
-      newEntries.sort(function (a, b) {
-        if (a.definition.isColumn && b.definition.isColumn) {
-          return 0;
+      } else {
+        if (newEntries.length > 0 && !newEntries[0].definition.isColumn) {
+          newEntries.sort(function (a, b) {
+            return a.definition.name.localeCompare(b.definition.name);
+          });
         }
-        return a.definition.name.localeCompare(b.definition.name);
-      });
-
-      self.entries(newEntries);
+        self.entries(newEntries);
+      }
     };
 
     var errorCallback = function () {
