@@ -681,8 +681,10 @@
         var $menu = $('#hueContextMenu_' + options.template);
         if ($menu.length === 0) {
           $menu = $('<ul id="hueContextMenu_' + options.template  + '" class="hue-context-menu" data-bind="template: { name: \'' + options.template + '\', data: viewModel, afterRender: afterRender }"></ul>').appendTo('body');
+        } else {
+          ko.cleanNode($menu[0]);
         }
-        ko.cleanNode($menu[0]);
+        $menu.data('active', true);
 
         $menu.css('top', 0);
         $menu.css('left', 0);
@@ -690,8 +692,10 @@
         $menu.show();
 
         var hideMenu = function () {
-          $menu.hide();
-          ko.cleanNode($menu[0]);
+          if (!$menu.data('active')) {
+            $menu.hide();
+            ko.cleanNode($menu[0]);
+          }
         };
 
         ko.applyBindings({
@@ -702,7 +706,10 @@
             $menu.css('top', (event.clientY + menuHeight > $(window).height()) ? $(window).height() - menuHeight : event.clientY);
             $menu.css('opacity', 1);
             $(options.scrollContainer).one('scroll', hideMenu);
-            $(document).one('click', hideMenu);
+            window.setTimeout(function () {
+              $menu.data('active', false);
+              $(document).one('click', hideMenu);
+            }, 100);
           },
           viewModel: viewModel
         }, $menu[0]);
