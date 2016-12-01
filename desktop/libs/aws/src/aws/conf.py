@@ -107,7 +107,7 @@ def has_iam_metadata():
 
 
 def has_s3_access(user):
-  return not user.is_anonymous() and (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser")) and is_enabled()
+  return user.is_authenticated() and user.is_active and (user.is_superuser or user.has_hue_permission(action="s3_access", app="filebrowser"))
 
 
 def config_validator(user):
