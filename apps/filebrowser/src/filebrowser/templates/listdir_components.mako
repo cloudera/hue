@@ -1528,7 +1528,28 @@ from django.utils.translation import ugettext as _
 
       self.createDirectory = function (formElement) {
         $(formElement).attr("action", "/filebrowser/mkdir?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
-        return true;
+        if ($.trim($("#newDirectoryNameInput").val()) == "") {
+          $("#directoryNameRequiredAlert").show();
+          $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+
+        if (fileExists($("#newDirectoryNameInput").val())) {
+          $("#directoryNameExistsAlert").find(".newName").text($("#newDirectoryNameInput").val());
+          $("#directoryNameExistsAlert").show();
+          $("#newDirectoryNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+        $(formElement).ajaxSubmit({
+          dataType:  'json',
+          success: function() {
+            $("#createDirectoryModal").modal('hide');
+            self.retrieveData();
+          }
+        });
+        return false;
       };
 
       self.createFile = function (formElement) {
@@ -2085,6 +2106,7 @@ from django.utils.translation import ugettext as _
       huePubSub.publish('update.autocompleters');
 
       $(".create-directory-link").click(function () {
+        $("#newDirectoryNameInput").val('');
         $("#createDirectoryModal").modal({
           keyboard:true,
           show:true
@@ -2097,24 +2119,6 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
-      });
-
-      $("#createDirectoryForm").submit(function () {
-        if ($.trim($("#newDirectoryNameInput").val()) == "") {
-          $("#directoryNameRequiredAlert").show();
-          $("#newDirectoryNameInput").addClass("fieldError");
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
-        }
-
-        if (fileExists($("#newDirectoryNameInput").val())) {
-          $("#directoryNameExistsAlert").find(".newName").text($("#newDirectoryNameInput").val());
-          $("#directoryNameExistsAlert").show();
-          $("#newDirectoryNameInput").addClass("fieldError");
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
-        }
-        return true;
       });
 
       $("#newDirectoryNameInput").focus(function () {
