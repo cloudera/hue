@@ -1352,7 +1352,20 @@ from django.utils.translation import ugettext as _
           show:true
         });
 
+        $('#copyForm').ajaxForm({
+          dataType:  'json',
+          success: function() {
+            $("#copyModal").modal('hide');
+            self.retrieveData();
+          },
+          error: function(xhr){
+            $.jHueNotify.error(xhr.responseText);
+            resetPrimaryButtonsStatus();
+          }
+        });
+
         $("#copyModal").on("shown", function(){
+          $("#copyDestination").val('');
           $("#copyModal .modal-footer div").show();
           $("#copyHdfsTree").remove();
           $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
