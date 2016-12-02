@@ -1389,7 +1389,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           label: '',
           field: '',
           dimension: 1,
-          extraSeries: []
+          extraSeries: [],
+          // Hue 4
+          hasRetrievedResults: true, // Temp
+          results: []
       });
     }
 
@@ -1596,6 +1599,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
                 if (!facet.has_data() || facet.hash() != _hash) {
                   facet.counts(new_facet.counts);
+
+                  if (typeof new_facet.docs != 'undefined') {
+                      var _docs = [];
+                      $.each(new_facet.docs, function (index, item) {
+                        _docs.push(self._make_result_doc(item, ""));
+                      });
+                      facet.results(_docs);
+                  }
                   facet.label(new_facet.label);
                   facet.field(new_facet.field);
                   facet.dimension(new_facet.dimension);
@@ -1606,7 +1617,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               });
 
               // Delete norm_facets that were deleted
-
               self.response(data);
 
               if (data.error) {
@@ -1616,7 +1626,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 var _resultsHash = ko.mapping.toJSON(data.response.docs);
 
                 if (self.resultsHash != _resultsHash) {
-
                   var _docs = [];
                   var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
                   $.each(data.response.docs, function (index, item) {

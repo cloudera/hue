@@ -883,6 +883,7 @@ def augment_solr_response(response, collection, query):
 
           counts = filter(lambda a: len(a['fq_fields']) == actual_dimension, counts)
 
+
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
@@ -891,8 +892,9 @@ def augment_solr_response(response, collection, query):
           'counts': counts,
           'extraSeries': extraSeries,
           'dimension': dimension,
-          'cols': cols,
-          'rows': rows
+#           'cols': cols,
+#           'rows': rows,
+          'docs': [dict(zip(cols, row)) for row in rows]
         }
 
         normalized_facets.append(facet)
