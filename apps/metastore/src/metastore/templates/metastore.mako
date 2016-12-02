@@ -540,19 +540,19 @@ ${ components.menubar() }
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
     % endif
   </div>
 </script>
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/beeswax/create/import_wizard/' + database().name }" title="${_('Create a new table from a file')}"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
-    <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/beeswax/create/create_table/' + database().name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i></a>
+    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/import_wizard/' + database().name }" title="${_('Create a new table from a file')}"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
+    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/create_table/' + database().name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i></a>
     % endif
   </div>
 </script>
@@ -562,25 +562,25 @@ ${ components.menubar() }
     <!-- ko with: database -->
     <!-- ko with: table -->
     % if USE_NEW_EDITOR.get():
-      <a class="inactive-action" data-bind="attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Query the table')}"><i class="fa fa-pencil-square-o"></i></a>
+      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Query the table')}"><i class="fa fa-pencil-square-o"></i></a>
     % else:
-      <a class="inactive-action" data-bind="attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
+      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-list"></i></a>
     % endif
-    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', 'hive'); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
-      <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
+      <a class="inactive-action margin-left-10" title="${_('View in Optimizer')}" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas"></i></a>
     <!-- /ko -->
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
-      <a class="inactive-action margin-left-10" href="#" data-bind="click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
+      <a class="inactive-action margin-left-10" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload"></i></a>
     % endif
     % if has_write_access:
-      <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
+      <a class="inactive-action margin-left-10" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times"></i></a>
     % endif
     <!-- ko if: tableDetails() -->
-      <a class="inactive-action margin-left-10" data-bind="visible: tableDetails().hdfs_link, attr: {'href': tableDetails().hdfs_link, 'rel': tableDetails().path_location}" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
+      <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, visible: tableDetails().hdfs_link, attr: {'href': tableDetails().hdfs_link, 'rel': tableDetails().path_location}" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o"></i></a>
       <!-- ko if: tableDetails().partition_keys.length -->
-      <a class="inactive-action margin-left-10" data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap"></i></a>
+      <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap"></i></a>
       <!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
