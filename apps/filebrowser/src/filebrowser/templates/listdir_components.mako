@@ -1533,7 +1533,28 @@ from django.utils.translation import ugettext as _
 
       self.createFile = function (formElement) {
         $(formElement).attr("action", "/filebrowser/touch?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
-        return true;
+        if ($.trim($("#newFileNameInput").val()) == "") {
+          $("#fileNameRequiredAlert").show();
+          $("#newFileNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+
+        if (fileExists($("#newFileNameInput").val())) {
+          $("#fileNameExistsAlert").find(".newName").text($("#newFileNameInput").val());
+          $("#fileNameExistsAlert").show();
+          $("#newFileNameInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+        $(formElement).ajaxSubmit({
+          dataType:  'json',
+          success: function() {
+            $("#createFileModal").modal('hide');
+            self.retrieveData();
+          }
+        });
+        return false;
       };
 
       self.restoreTrashSelected = function(formElement) {
@@ -2100,24 +2121,6 @@ from django.utils.translation import ugettext as _
         $("#newDirectoryNameInput").removeClass("fieldError");
         $("#directoryNameRequiredAlert").hide();
         $("#directoryNameExistsAlert").hide();
-      });
-
-      $("#createFileForm").submit(function () {
-        if ($.trim($("#newFileNameInput").val()) == "") {
-          $("#fileNameRequiredAlert").show();
-          $("#newFileNameInput").addClass("fieldError");
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
-        }
-
-        if (fileExists($("#newFileNameInput").val())) {
-          $("#fileNameExistsAlert").find(".newName").text($("#newFileNameInput").val());
-          $("#fileNameExistsAlert").show();
-          $("#newFileNameInput").addClass("fieldError");
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
-        }
-        return true;
       });
 
       $("#newFileNameInput").focus(function () {
