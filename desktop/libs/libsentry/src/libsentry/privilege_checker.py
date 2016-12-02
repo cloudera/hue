@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import copy
 import logging
 
 from collections import defaultdict
@@ -61,7 +60,7 @@ class PrivilegeChecker(object):
     self.api_v2 = api_v2 if api_v2 else get_api_v2(self.user, component='solr')
 
 
-  def filter_objects(self, objects, action='READ', key=None):
+  def filter_objects(self, objects, action='READ', key=lambda x: x.copy()):
     """
     Given a set of authorizable Sentry objects and a requested action, return a filtered set of objects that the user
     has privileges to perform the given action upon.
@@ -101,9 +100,7 @@ class PrivilegeChecker(object):
     return filtered_objects
 
 
-  def _to_sentry_authorizables(self, objects, key=None):
-    authorizables =  copy.deepcopy(objects)
-
+  def _to_sentry_authorizables(self, objects, key):
     def add_default_server(object):
       if 'db' in object and not object.get('server'):  # V1
         object.update({'server': 'server1'})
@@ -111,9 +108,7 @@ class PrivilegeChecker(object):
         object.update({'serviceName': 'server1'})
       return object
 
-    if key:
-      authorizables = [key(obj) for obj in authorizables if key(obj)]
-
+    authorizables = [key(obj) for obj in objects if key(obj)]
     authorizables = [add_default_server(obj) for obj in authorizables]
     return authorizables
 
