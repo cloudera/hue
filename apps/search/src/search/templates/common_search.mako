@@ -1580,59 +1580,200 @@ ${ dashboard.layout_skeleton() }
 </script>
 
 
-<script type="text/html" id="bucket-widget">
-  <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
-  </div>
+<script type="text/html" id="data-grid">
+##   <!-- ko if: $root.collection.template.isGridLayout() -->
 
-  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
-  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="with: $root.collection.getFacetById($parent.id())">
+  <div class="grid-row">
 
-      <span data-bind="template: { name: 'facet-toggle2' }"></span>
-
-      <div class="pull-right" style="margin-top: 40px">
-
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Sorting') }</span>
-          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
-            <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
-            <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
-            <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+    <div class="grid-left-bar">
+      <div>
+##         <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
+        <div style="margin-top:3px">
+          <a class="grid-side-btn active" href="javascript: void(0)"
+             data-bind="click: function(){ template.showChart(false); template.showGrid(true); }, css: {'active': template.showGrid() }" title="${_('Grid')}">
+            <i class="fa fa-th fa-fw"></i>
           </a>
         </div>
 
-      <!-- ko if: properties.isDate -->
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Chart Type') }</span>
-          <select class="input-small" data-bind="options: $root.timelineChartTypes,
-                       optionsText: 'label',
-                       optionsValue: 'value',
-                       value: properties.timelineChartType">
-          </select>
-        </div>
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Interval') }</span>
-          <select class="input-small" data-bind="options: $root.intervalOptions,
-                         optionsText: 'label',
-                         optionsValue: 'value',
-                         value: properties.gap">
-          </select>
-        </div>
-      <!-- /ko -->
+        <div class="dropdown">
+          <a class="grid-side-btn" style="padding-right:0" href="javascript:void(0)"
+             data-bind="css: {'active': template.showChart() }, click: function(){ template.showChart(true); template.showGrid(false); huePubSub.publish('gridChartForceUpdate'); }">
+            <i class="hcha hcha-bar-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART"></i>
+            <i class="hcha hcha-line-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART"
+               style="display: none;"></i>
+            <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART"
+               style="display: none;"></i>
+            <i class="fa fa-fw fa-map-marker" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP"
+               style="display: none;"></i>
+          </a>
+          <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
+             href="javascript: void(0)" data-bind="css: {'active': template.showChart()}">
+            <i class="fa fa-caret-down"></i>
+          </a>
 
-      <!-- ko if: properties.canRange -->
-        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
-          <span class="facet-field-label">${ _('Zoom') }</span>
-          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+          <ul class="dropdown-menu">
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.BARCHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}"
+                 class="active">
+                <i class="hcha hcha-bar-chart fa-fw"></i> ${_('Bars')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.LINECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="hcha hcha-line-chart fa-fw"></i> ${_('Lines')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.PIECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="fa fa-fw fa-map-marker chart-icon"></i> ${_('Marker Map')}
+              </a>
+            </li>
+          </ul>
         </div>
-      <!-- /ko -->
+
+        <div>
+          <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ template.showFieldList(!template.showFieldList())}, css: { 'blue' : template.showFieldList() }">
+            <!-- ko if: template.showFieldList() -->
+              <i class="fa fa-fw fa-chevron-left"></i>
+            <!-- /ko -->
+            <!-- ko ifnot: template.showFieldList() -->
+              <i class="fa fa-fw fa-columns"></i>
+            <!-- /ko -->
+          </a>
+        </div>
+        <form method="POST" action="${ url('search:download') }" style="display:inline">
+          ${ csrf_token(request) | n,unicode }
+          ##<input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+          ##<input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+          <input type="hidden" name="download">
+          <input type="hidden" name="type" value="">
+          <div class="dropdown">
+            <a class="grid-side-btn dropdown-toggle" style="padding-left:7px" data-toggle="dropdown">
+              <i class="fa fa-download fa-fw"></i>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('csv'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-csv"></i> CSV
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('xls'); $f.submit()}" title="${ _('Download first rows as XLS') }">
+                  <i class="hfo hfo-file-xls"></i> Excel
+                </a>
+              </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="hfo hfo-file-json"></i> JSON
+                </a>
+              </li>
+            </ul>
+          </div>
+        </form>
+##         <!-- /ko -->
+
       </div>
-      <div class="clearfix"></div>
     </div>
+  </div>
 
-    <!-- ko if: $root.collection.getFacetById($parent.id()) -->
+  <div class="grid-results">
+    <span data-bind="visible: $root.hasRetrievedResults() && $root.response().response">
+      <div data-bind="visible: template.showFieldList() && template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
+        <input type="text" data-bind="clearable: template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width:180px; margin-bottom:10px" />
+        <div style="margin-bottom: 8px">
+          <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(true)}, style: {'font-weight': template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: template.fields().length"></span>)</a>
+        </div>
+        <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
+          <a href="javascript: void(0)" class="btn btn-mini"
+            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }"
+            style="margin-right: 2px;">
+            <i class="fa fa-square-o"></i>
+          </a>
+          <strong>${_('Field Name')}</strong>
+        </div>
+        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
+          <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
+            <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
+            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
+          </div>
+        </div>
+        <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
+          <i class="fa fa-frown-o"></i>
+        </div>
+      </div>
+
+      <div data-bind="visible: template.showFieldList() && template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
+        ## <span data-bind="template: {name: 'grid-chart-settings', data: template.chartSettings}"></span>
+      </div>
+    </span>
+
+      <div class="widget-spinner" data-bind="visible: ! $parent.hasRetrievedResults() || ! $root.response().response">
+        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+      </div>
+
+      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length == 0 && $root.response().response">
+        <br/>
+        ${ _('Your search did not match any documents.') }
+      </div>
+
+      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showGrid()">
+        <!-- ko if: $root.response().response -->
+          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
+        <!-- /ko -->
+
+        <div id="result-main" style="overflow-x: auto">
+          <table id="result-container" data-bind="visible: $parent.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+            <thead>
+              <tr class="result-sorting" data-bind="visible: template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+              </tr>
+              <tr data-bind="visible: template.fieldsSelected().length == 0">
+                <th style="width: 18px">&nbsp;</th>
+                <th>${ _('Document') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: {data: $parent.results, as: 'doc'}" class="result-tbody">
+              <tr class="result-row" data-bind="style: {'backgroundColor': $index() % 2 == 0 ? '#FFF': '#F6F6F6'}">
+                <td>
+                  <a href="javascript:void(0)" data-bind="click: toggleDocDetails">
+                    <i class="fa" data-bind="css: {'fa-caret-right' : ! doc.showDetails(), 'fa-caret-down': doc.showDetails()}"></i>
+                    <!-- ko if: doc.childDocuments != undefined -->
+                    &nbsp(<span data-bind="text: doc.childDocuments().length"></span>)
+                    <!-- /ko -->
+                  </a>
+                </td>
+                <!-- ko foreach: row -->
+                  <td data-bind="html: $data"></td>
+                <!-- /ko -->
+              </tr>
+              <tr data-bind="visible: doc.showDetails" class="show-details">
+                <td>&nbsp;</td>
+                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+                  <span data-bind="template: {name: 'document-details', data: $data}"></span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+         <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
+           <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
+           <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
+             
+
+      <!-- ko with: $parent -->
+
       <!-- ko if: dimension() == 1 -->
         <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(),
           fqs: $root.query.fqs,
@@ -1679,9 +1820,92 @@ ${ dashboard.layout_skeleton() }
         onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
         <div class="clearfix"></div>
       <!-- /ko -->
-
+      
     <!-- /ko -->
+             
+##              <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
+##                    transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+##    
+##              <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
+##                    transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+##    
+##              <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+##                    transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+##    
+##              <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
+##                    transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+##              <div class="clearfix"></div>
+           </div>
+         </div>
+
+    </div>
   </div>
+
+##   <!-- /ko -->
+</script>
+
+
+
+<script type="text/html" id="bucket-widget">
+  <div class="widget-spinner" data-bind="visible: isLoading()">
+    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
+    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+  </div>
+
+  <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
+  <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
+
+    <!-- ko with: $root.collection.getFacetById($parent.id()) -->
+    <div>
+
+      <span data-bind="template: { name: 'facet-toggle2' }"></span>
+
+      <div class="pull-right" style="margin-top: 40px">
+
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Sorting') }</span>
+          <a href="javascript: void(0)" title="${ _('Toggle sort order') }" data-bind="click: $root.collection.toggleSortFacet">
+            <i class="fa" data-bind="css: { 'fa-caret-down': properties.sort() == 'desc', 'fa-caret-up': properties.sort() == 'asc' }"></i>
+            <span data-bind="visible: properties.sort() == 'desc'">${_('descending')}</span>
+            <span data-bind="visible: properties.sort() == 'asc'">${_('ascending')}</span>
+          </a>
+        </div>
+
+      <!-- ko if: properties.isDate -->
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Chart Type') }</span>
+          <select class="input-small" data-bind="options: $root.timelineChartTypes,
+                       optionsText: 'label',
+                       optionsValue: 'value',
+                       value: properties.timelineChartType">
+          </select>
+        </div>
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Interval') }</span>
+          <select class="input-small" data-bind="options: $root.intervalOptions,
+                         optionsText: 'label',
+                         optionsValue: 'value',
+                         value: properties.gap">
+          </select>
+        </div>
+      <!-- /ko -->
+
+      <!-- ko if: properties.canRange -->
+        <div class="inline-block" style="padding-bottom: 10px; padding-right: 20px">
+          <span class="facet-field-label">${ _('Zoom') }</span>
+          <a href="javascript:void(0)" data-bind="click: $root.collection.rangeZoomOut"><i class="fa fa-search-minus"></i> ${ _('reset') }</a>
+        </div>
+      <!-- /ko -->
+      </div>
+      <div class="clearfix"></div>
+    </div>
+
+      ##<span data-bind="template: {name: 'data-grid', data: $root.collection.getFacetById($parent.id())}"></span>
+      <span data-bind="template: { name: 'data-grid' }"></span>
+    ##<!-- /ko -->
+   <!-- /ko -->
+  </div>
+
   <!-- /ko -->
 </script>
 

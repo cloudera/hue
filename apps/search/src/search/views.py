@@ -45,7 +45,6 @@ from django.core.urlresolvers import reverse
 LOG = logging.getLogger(__name__)
 
 
-
 def index(request, is_mobile=False, is_embeddable=False):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
@@ -606,6 +605,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}}
       properties['facets'] = []
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
+
       if widget_type == 'pie2-widget':
         properties['scope'] = 'stack'
         properties['timelineChartType'] = 'bar'
@@ -635,7 +635,33 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'field': facet_field,
     'type': facet_type,
     'widgetType': widget_type,
-    'properties': properties
+    'properties': properties,
+    # Hue 4+
+    'template': {
+        "showFieldList": False,
+        "showGrid": False,
+        "showChart": True,
+        "chartSettings" : { # Use own?
+          'chartType': 'bars',
+          'chartSorting': 'none',
+          'chartScatterGroup': None,
+          'chartScatterSize': None,
+          'chartScope': 'world',
+          'chartX': None,
+          'chartYSingle': None,
+          'chartYMulti': [],
+          'chartData': [],
+          'chartMapLabel': None,
+        },
+        "fieldsAttributes": [],
+        "fieldsAttributesFilter": "",
+        "filteredAttributeFieldsAll": True,
+        "fields": [],
+        "fieldsSelected": [],
+        "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+        "hasDataForChart": True,
+        "rows": 25,
+    }
   }
 
 
