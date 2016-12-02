@@ -2296,6 +2296,7 @@
   }
 
   ko.bindingHandlers.tooltip = {
+    after: ['attr'],
     init: function (element, valueAccessor) {
       var local = ko.utils.unwrapObservable(valueAccessor()),
           options = {};
