@@ -1059,9 +1059,9 @@ from metadata.conf import has_navigator
             self.resizableHandles = "n, ne, e, se, s";
             self.resize = function (event, ui) {
               resizeLeftRightVertical(event, ui);
-              if (ui.size.width < 260) {
-                ui.size.width = 260;
-                $('.hue-popover').css('width', 260 + 'px');
+              if (ui.size.width < 310) {
+                ui.size.width = 310;
+                $('.hue-popover').css('width', 310 + 'px');
               }
             };
             break;
