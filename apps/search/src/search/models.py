@@ -560,7 +560,7 @@ class Collection2(object):
           <div class="span12">%s</div>
         </div>
         <br/>
-      </div>""" % ' '.join(['{{%s}}' % escape(field['name']) for field in fields]),
+      </div>""" % ' '.join(['{{%s}}' % field['name'] for field in fields]),
       "isGridLayout": True,
       "showFieldList": True,
       "showGrid": True,
