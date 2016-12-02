@@ -1476,6 +1476,27 @@ var ApiHelper = (function () {
     });
   };
 
+  /**
+   * Fetches the popular aggregate functions for the given tables
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {Object[]} options.tables
+   * @param {Object[]} options.tables.identifierChain
+   * @param {string} options.tables.identifierChain.name
+   * @param {string} [options.defaultDatabase]
+   */
+  ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
+    var self = this;
+    self.fetchNavCached('/metadata/api/optimizer/top_aggs', options, function (data) {
+      return typeof data.values !== 'undefined';
+    });
+  };
+
   ApiHelper.prototype.fetchNavCached = function (url, options, cacheCondition) {
     var self = this;
 
