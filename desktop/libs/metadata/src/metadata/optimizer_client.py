@@ -87,11 +87,14 @@ class OptimizerApi(object):
       if self._product_secret:
         cmd_args += ['--auth-config', self._product_secret]
 
+      LOG.info(' '.join(cmd_args + args))
       data = subprocess.check_output(cmd_args + args)
     except CalledProcessError, e:
       if command == 'upload' and e.returncode == 1:
         LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
         data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
+      else:
+        raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
     except RestException, e:
       raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
 
@@ -144,35 +147,61 @@ class OptimizerApi(object):
 
 
   def upload(self, queries, source_platform='generic', workload_id=None):
+    try:
+      with NamedTemporaryFile(suffix='.csv', delete=False) as f_queries, NamedTemporaryFile(suffix='.json', delete=False) as f_format: # Deleted later
 
-    with NamedTemporaryFile(suffix='.csv') as f:
-      try:
         content_generator = OptimizerDataAdapter(queries)
         queries_csv = export_csvxls.create_generator(content_generator, 'csv')
-  #       return self._root.post('/api/upload', data=data, files = {'file': ('hue-report.csv', list(queries_csv)[0])})
 
         for row in queries_csv:
-          f.write(row)
-  #       data = {
-  #           'fileLocation': f.name,
-  #           'sourcePlatform': source_platform,
-  # #           'workloadId',
-  # #           'version'
-  #       }
-        args = [
-            '--file-location', f.name,
-            '--file-name', os.path.basename(f.name),
-            '--source-platform', source_platform,
-            '--tenant', self._product_name
-        ]
-        if workload_id:
-          args += ['--workload-id', workload_id]
+          f_queries.write(row)
 
+        f_format.write("""{
+    "fileLocation": "%(query_file)s",
+    "tenant": "%(tenant)s",
+    "fileName": "%(query_file_name)s",
+    "sourcePlatform": "hive",
+    "colDelim": ",",
+    "rowDelim": "\\n",
+    "headerFields": [
+        {
+            "count": 0,
+            "coltype": "SQL_ID",
+            "use": true,
+            "tag": "",
+            "name": "SQL_ID"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "ELAPSED_TIME"
+        },
+        {
+            "count": 0,
+            "coltype": "SQL_QUERY",
+            "use": true,
+            "tag": "",
+            "name": "SQL_FULLTEXT"
+        }
+    ]
+}""" % {'tenant': self._product_name, 'query_file': f_queries.name, 'query_file_name': os.path.basename(f_queries.name)})
+
+      args = [
+          '--cli-input-json', 'file://%s' % f_format.name
+      ]
+      if workload_id:
+        args += ['--workload-id', workload_id]
+
+      try:
         return self._exec('upload', args)
-        ## return self._root.post('/api/upload', data=data, files={'fileLocation': ('hue-report.json', json.dumps(queries_formatted))})
+      finally:
+        os.remove(f_queries.name)
+        os.remove(f_format.name)
 
-      except RestException, e:
-        raise PopupException(e, title=_('Error while accessing Optimizer'))
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
   def upload_status(self, workload_id):
