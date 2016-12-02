@@ -210,6 +210,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   .main-content {
     top: 112px!important;
   }
+  .context-panel {
+    height: calc(100% - 104px);
+    top: 104px;
+  }
 % endif
 </style>
 
