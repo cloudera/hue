@@ -38,8 +38,8 @@ class TestOptimizerApi(object):
 
   @classmethod
   def setup_class(cls):
-    if not is_live_cluster() or not is_optimizer_enabled():
-      raise SkipTest
+#     if not is_live_cluster() or not is_optimizer_enabled():
+#       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
     cls.user = User.objects.get(username='test')
