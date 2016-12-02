@@ -322,6 +322,8 @@ except ImportError, e:
         self.downloadTruncated = ko.observable(false);
         self.downloadCounter = ko.observable(0);
 
+        self.checkDownloadInterval = -1;
+
         self.isPathEmpty = ko.pureComputed(function () {
           return self.savePath() === '';
         });
@@ -361,6 +363,7 @@ except ImportError, e:
         self.cancelDownload = function() {
           console.log('Cancel download');
           self.isDownloading(false);
+          window.clearInterval(self.checkDownloadInterval);
           $('#downloadProgressModal').modal('hide');
         };
       };
@@ -380,15 +383,14 @@ except ImportError, e:
         self.downloadCounter(0);
 
         var timesChecked = 0;
-        var checkDownloadInterval = -1;
-        checkDownloadInterval = window.setInterval(function () {
+        self.checkDownloadInterval = window.setInterval(function () {
           if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined') {
             if (timesChecked == 10) {
               $('#downloadProgressModal').modal('show');
             }
           }
           else {
-            window.clearInterval(checkDownloadInterval);
+            window.clearInterval(self.checkDownloadInterval);
             try {
               var cookieContent = $.cookie('download-' + self.snippet.id());
               var result = JSON.parse(cookieContent.substr(1, cookieContent.length - 2).replace(/\\"/g, '"').replace(/\\054/g, ','));
