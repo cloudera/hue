@@ -52,7 +52,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
-      if ((xhr.responseText === '/* login required */' || xhr.status === 403) && !isLoginRequired) {
+      var whiteListURLs = [
+        'filebrowser/copy?next='
+      ];
+      var whiteListed = false;
+      whiteListURLs.forEach(function(url){
+        if (settings.url.indexOf(url) > -1){
+          whiteListed = true;
+        }
+      });
+      if ((xhr.responseText === '/* login required */' || (xhr.status === 403 && !whiteListed)) && !isLoginRequired) {
         isLoginRequired = true;
         $('.blurred').removeClass('blurred');
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
