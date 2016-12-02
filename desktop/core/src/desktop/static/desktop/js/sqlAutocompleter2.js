@@ -32,11 +32,12 @@ var SqlAutocompleter2 = (function () {
 
   // Keyword weights come from the parser
   var DEFAULT_WEIGHTS = {
-    GROUP_BY: 1400,
-    ORDER_BY: 1300,
-    FILTER: 1200,
-    ACTIVE_JOIN: 1200,
-    JOIN_CONDITION: 1100,
+    POPULAR_AGGREGATE: 1500,
+    POPULAR_GROUP_BY: 1400,
+    POPULAR_ORDER_BY: 1300,
+    POPULAR_FILTER: 1200,
+    POPULAR_ACTIVE_JOIN: 1200,
+    POPULAR_JOIN_CONDITION: 1100,
     COLUMN: 1000,
     SAMPLE: 900,
     IDENTIFIER: 800,
@@ -170,7 +171,7 @@ var SqlAutocompleter2 = (function () {
               completions.push({
                 value: suggestionString,
                 meta: 'join',
-                weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.ACTIVE_JOIN,
+                weight: parseResult.suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.POPULAR_ACTIVE_JOIN,
                 docHTML: self.createJoinHtml(suggestionString)
               });
             }
@@ -205,7 +206,7 @@ var SqlAutocompleter2 = (function () {
               completions.push({
                 value: suggestionString,
                 meta: 'condition',
-                weight: DEFAULT_WEIGHTS.JOIN_CONDITION,
+                weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
                 docHTML: self.createJoinHtml(suggestionString)
               });
             }
@@ -230,6 +231,63 @@ var SqlAutocompleter2 = (function () {
       } else {
         SqlFunctions.suggestFunctions(self.snippet.type(), parseResult.suggestFunctions.types || ['T'], parseResult.suggestAggregateFunctions || false, parseResult.suggestAnalyticFunctions || false, completions, DEFAULT_WEIGHTS.UDF);
         suggestFunctionsDeferral.resolve();
+      }
+
+      if (HAS_OPTIMIZER && typeof parseResult.suggestAggregateFunctions !== 'undefined' && parseResult.suggestAggregateFunctions.tables.length > 0) {
+        var suggestAggregatesDeferral = $.Deferred();
+        deferrals.push(suggestAggregatesDeferral);
+        self.snippet.getApiHelper().fetchNavOptTopAggs({
+          sourceType: self.snippet.type(),
+          timeout: self.timeout,
+          defaultDatabase: database,
+          silenceErrors: true,
+          tables: parseResult.suggestAggregateFunctions.tables,
+          successCallback: function (data) {
+            if (data.values.length > 0) {
+
+              // TODO: Handle column conflicts with multiple tables
+
+              // Substitute qualified table identifiers with either alias or empty string
+              var substitutions = [];
+              parseResult.suggestAggregateFunctions.tables.forEach(function (table) {
+                var replaceWith = table.alias ? table.alias + '.' : '';
+                if (table.identifierChain.length > 1) {
+                  substitutions.push({
+                    replace: new RegExp($.map(table.identifierChain, function (identifier) {
+                          return identifier.name
+                        }).join('\.') + '\.', 'gi'),
+                    with: replaceWith
+                  })
+                } else if (table.identifierChain.length === 1) {
+                  substitutions.push({
+                    replace: new RegExp(database + '\.' + table.identifierChain[0].name + '\.', 'gi'),
+                    with: replaceWith
+                  });
+                  substitutions.push({
+                    replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
+                    with: replaceWith
+                  })
+                }
+              });
+
+              data.values.forEach(function (value) {
+                var clean = value.aggregateClause;
+                substitutions.forEach(function (substitution) {
+                  clean = clean.replace(substitution.replace, substitution.with);
+                });
+
+                completions.push({
+                  value: clean,
+                  meta: 'aggregate *',
+                  weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + value.totalQueryCount,
+                  docHTML: self.createAggregateHtml(value)
+                });
+              })
+            }
+            suggestAggregatesDeferral.resolve();
+          },
+          errorCallback: suggestAggregatesDeferral.resolve
+        });
       }
       deferrals.push(suggestFunctionsDeferral);
     }
@@ -337,7 +395,7 @@ var SqlAutocompleter2 = (function () {
                     completions.push({
                       value: compVal,
                       meta: 'filter *',
-                      weight: DEFAULT_WEIGHTS.FILTER,
+                      weight: DEFAULT_WEIGHTS.POPULAR_FILTER,
                       docHTML: self.createFilterHtml()
                     });
                   });
@@ -369,7 +427,7 @@ var SqlAutocompleter2 = (function () {
               completions.push({
                 value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestGroupBys.tables),
                 meta: 'group *',
-                weight: DEFAULT_WEIGHTS.GROUP_BY + Math.min(col.columnCount, 99),
+                weight: DEFAULT_WEIGHTS.POPULAR_GROUP_BY + Math.min(col.columnCount, 99),
                 docHTML: self.createGroupByHtml()
               });
             });
@@ -380,7 +438,7 @@ var SqlAutocompleter2 = (function () {
               completions.push({
                 value: prefix + createNavOptIdentifierForColumn(col, parseResult.suggestOrderBys.tables),
                 meta: 'order *',
-                weight: DEFAULT_WEIGHTS.ORDER_BY + Math.min(col.columnCount, 99),
+                weight: DEFAULT_WEIGHTS.POPULAR_ORDER_BY + Math.min(col.columnCount, 99),
                 docHTML: self.createOrderByHtml()
               });
             });
@@ -584,6 +642,13 @@ var SqlAutocompleter2 = (function () {
       }
       delete suggestion.table;
     }
+  };
+
+  SqlAutocompleter2.prototype.createAggregateHtml = function (value) {
+    // TODO: Show more relevant details here
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular aggregation: ' + value.aggregateClause + '</span></p>';
+    html += '<div>';
+    return html;
   };
 
   SqlAutocompleter2.prototype.createGroupByHtml = function () {
