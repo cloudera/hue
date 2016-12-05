@@ -53,7 +53,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
       var whiteListURLs = [
-        'filebrowser/copy?next='
+        'filebrowser/copy?next=',
+        'filebrowser/move?next='
       ];
       var whiteListed = false;
       whiteListURLs.forEach(function(url){
