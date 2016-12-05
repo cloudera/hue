@@ -1094,17 +1094,25 @@ ${ dashboard.layout_skeleton() }
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showChart()">
         <div data-bind="visible: !$root.collection.template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
         <div class="grid-chart-container" data-bind="visible: $root.collection.template.hasDataForChart" style="overflow-x: auto">
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART -->
           <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                 transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
+          <!-- /ko -->
 
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART -->
           <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
-                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+                transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true, isPivot: false},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
+          <!-- /ko -->
 
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART -->
           <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
+          <!-- /ko -->
 
+          <!-- ko if: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP -->
           <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                 transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
+          <!-- /ko -->
           <div class="clearfix"></div>
 
         </div>
