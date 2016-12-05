@@ -75,32 +75,39 @@ class PrivilegeChecker(object):
     filtered_objects = []
 
     # Apply Sentry formatting key function
-    authorizableSet = self._to_sentry_authorizables(objects=objects, key=key)
+    object_authorizables = self._to_sentry_authorizables(objects=objects, key=key)
 
     # Separate V1 (Hive) and V2 (Solr) authorizable objects
-    v1_authorizables = [obj for obj in authorizableSet if 'db' in obj]
-    v2_authorizables = [obj for obj in authorizableSet if 'component' in obj]
+    v1_authorizables = [(obj, auth) for (obj, auth) in object_authorizables if 'db' in auth]
+    v2_authorizables = [(obj, auth) for (obj, auth) in object_authorizables if 'component' in auth]
 
     if v1_authorizables:
       privileges = self._get_privileges_for_user(self.api_v1)
       privilege_hierarchy = self._to_privilege_hierarchy_v1(privileges)
 
-      for authorizable in v1_authorizables:
+      for (object, authorizable) in v1_authorizables:
         if self._is_object_action_authorized_v1(hierarchy=privilege_hierarchy, object=authorizable, action=action):
-          filtered_objects.append(authorizable)
+          filtered_objects.append(object)
 
     if v2_authorizables:
       privileges = self._get_privileges_for_user(self.api_v2)
       privilege_hierarchy = self._to_privilege_hierarchy_v2(privileges)
 
-      for authorizable in v2_authorizables:
+      for (object, authorizable) in v2_authorizables:
         if self._is_object_action_authorized_v2(hierarchy=privilege_hierarchy, object=authorizable, action=action):
-          filtered_objects.append(authorizable)
+          filtered_objects.append(object)
 
     return filtered_objects
 
 
   def _to_sentry_authorizables(self, objects, key):
+    """
+    Given a list of objects, return a list of tuples where the first item is the original object and second item is the
+    converted Sentry authorizable. Any non-Sentry objects are filtered out of the returned dictionary.
+    :param objects: original list of objects to convert to Sentry authorizables using they key function
+    :param key: a function that will be applied to each object to convert to a Sentry format
+    :return: a list of tuples (object, authorizable)
+    """
     def add_default_server(object):
       if 'db' in object and not object.get('server'):  # V1
         object.update({'server': 'server1'})
@@ -108,9 +115,9 @@ class PrivilegeChecker(object):
         object.update({'serviceName': 'server1'})
       return object
 
-    authorizables = [key(obj) for obj in objects if key(obj)]
-    authorizables = [add_default_server(obj) for obj in authorizables]
-    return authorizables
+    object_authorizables = [(obj, key(obj)) for obj in objects if key(obj)]
+    object_authorizables = [(obj, add_default_server(auth)) for (obj, auth) in object_authorizables]
+    return object_authorizables
 
 
   def _get_privileges_for_user(self, api):

@@ -105,9 +105,9 @@ class TestPrivilegeChecker(object):
   def test_to_sentry_authorizables(self):
     objectSet = ['foo', 'bar', 'baz', 'boom']
     expectedSet = [
-      {'db': 'foo', 'server': 'server1'},
-      {'db': 'bar', 'server': 'server1'},
-      {'db': 'baz', 'server': 'server1'},
+      ('foo', {'db': 'foo', 'server': 'server1'}),
+      ('bar', {'db': 'bar', 'server': 'server1'}),
+      ('baz', {'db': 'baz', 'server': 'server1'}),
     ]
 
     def test_key_fn(obj):
@@ -121,82 +121,30 @@ class TestPrivilegeChecker(object):
     # Original list of objects should not be mutated
     assert_true(['bar', 'baz', 'foo'], sorted(objectSet, reverse=True))
 
-    objectSet = [
-      {
-          u'identity': u'9282adb88478c2ce4beb13dbba997ef5',
-          u'serDeLibName': u'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe',
-          u'outputFormat': u'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
-          u'sourceType': u'HIVE',
-          u'inputFormat': u'org.apache.hadoop.mapred.TextInputFormat',
-          u'created': u'2016-07-25T17: 22: 18.000Z',
-          u'sourceId': u'4fbdadc6899638782fc8cb626176dc7b',
-          u'tags': [
-              u'asdf'
-          ],
-          u'deleted': False,
-          u'_version_': 1549818955715051520,
-          u'userEntity': False,
-          u'properties': {
-              u'1': u'2'
-          },
-          u'extractorRunId': u'4fbdadc6899638782fc8cb626176dc7b##1',
-          u'compressed': False,
-          u'parentPath': u'/default',
-          u'owner': u'admin',
-          u'originalName': u'sample_08',
-          u'type': u'TABLE',
-          u'lastAccessed': u'1970-01-01T00: 00: 00.000Z',
-          u'fileSystemPath': u'hdfs: //hue-team-1.vpc.cloudera.com: 8020/user/hive/warehouse/sample_08',
-          u'internalType': u'hv_table'
-      },
-      {
-          u'serDeLibName': u'org.apache.hadoop.hive.serde2.lazy.LazySimpleSerDe',
-          u'owner': u'admin',
-          u'fileSystemPath': u'hdfs: //hue-team-1.vpc.cloudera.com: 8020/user/hive/warehouse/sample_07',
-          u'lastModifiedBy': u'admin',
-          u'_version_': 1550478188023382016,
-          u'type': u'TABLE',
-          u'internalType': u'hv_table',
-          u'sourceType': u'HIVE',
-          u'inputFormat': u'org.apache.hadoop.mapred.TextInputFormat',
-          u'tags': [
-              u'hue-bugblitz',
-              u'vvvvv',
-              u'asdf',
-              u'ffff'
-          ],
-          u'deleted': False,
-          u'userEntity': False,
-          u'originalDescription': u'HueisaWebinterfaceforanalyzingdatawithApacheHadoop.HueisaWebinterfaceforanalyzingdatawithApacheHadoop.HueisaWebinterfaceforanalyzingdatawithApacheHadoop.HueisaWebinterfaceforanalyzingdatawithApacheHadoop.\n\nHueisaWebinterfaceforanalyzingdatawithApacheHadoop.HueisaWebinterfaceforanalyzingdatawithApacheHadoop.',
-          u'compressed': False,
-          u'identity': u'ea27302e11370a3927ac11cbb920891d',
-          u'outputFormat': u'org.apache.hadoop.hive.ql.io.HiveIgnoreKeyTextOutputFormat',
-          u'extractorRunId': u'4fbdadc6899638782fc8cb626176dc7b##8979',
-          u'created': u'2016-07-25T17: 22: 15.000Z',
-          u'sourceId': u'4fbdadc6899638782fc8cb626176dc7b',
-          u'lastModified': u'2016-09-28T16: 25: 07.000Z',
-          u'parentPath': u'/default',
-          u'originalName': u'sample_07',
-          u'lastAccessed': u'1970-01-01T00: 00: 00.000Z'
-      }
-    ]
-    expectedSet = [
-      {u'column': None, u'table': u'sample_08', u'db': u'default', 'server': 'server1'},
-      {u'column': None, u'table': u'sample_07', u'db': u'default', 'server': 'server1'}
-    ]
 
-    def test_key_fn(obj):
-      return {
-        'column': None,
-        'table': obj.get('originalName'),
-        'db': obj.get('parentPath', '').strip('/')
-      }
+  def test_end_to_end(self):
+      action = 'SELECT'
+      objectSet = [
+        {'name': 'test_table_select', 'db': 'default'},
+        {'name': 'test_table_insert', 'db': 'default'},
+        {'name': 'test_db_select', 'db': 'test_db_select'},
+        {'name': 'test_none', 'db': 'default'},
+        {'name': 'invalid_object'}
+      ]
+      expectedSet = [
+          {'name': 'test_table_select', 'db': 'default'},
+          {'name': 'test_table_insert', 'db': 'default'},
+          {'name': 'test_db_select', 'db': 'test_db_select'},
+      ]
 
-    authorizableSet = self.checker._to_sentry_authorizables(objects=objectSet, key=test_key_fn)
-    assert_equal(expectedSet, authorizableSet, authorizableSet)
-    # Original list of objects should not be mutated
-    assert_true(all('server' not in obj for obj in objectSet))
-    assert_true(all('db' not in obj for obj in objectSet))
+      def test_key_fn(obj):
+        if 'name' in obj and 'db' in obj:
+          return {'column': '', 'table': obj['name'], 'db': obj['db']}
+        else:
+          return None
+
+      filtered_set = self.checker.filter_objects(objects=objectSet, action=action, key=test_key_fn)
+      assert_equal(expectedSet, filtered_set, filtered_set)
 
 
   def test_columns_select(self):
