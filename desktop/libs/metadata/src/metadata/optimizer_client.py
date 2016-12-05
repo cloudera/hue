@@ -97,7 +97,8 @@ class OptimizerApi(object):
 
     if data:
       response = json.loads(data)
-      response['status'] = 'success'
+      if 'status' not in response:
+        response['status'] = 'success'
     return response
 
 
@@ -172,6 +173,13 @@ class OptimizerApi(object):
 
       except RestException, e:
         raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+  def upload_status(self, workload_id):
+    return self._exec('upload-status', [
+        '--tenant', self._product_name,
+        '--workload-id', workload_id
+    ])
 
 
   def top_tables(self, workfloadId=None, database_name='default'):

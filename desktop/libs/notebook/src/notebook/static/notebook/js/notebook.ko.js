@@ -1389,6 +1389,20 @@ var EditorViewModel = (function() {
       });
     };
 
+    self._getUploadStatus = function (workloadId) {
+        logGA('get_upload_status');
+
+        $.post("/metadata/api/optimizer/upload_status", {
+          workloadId: workloadId,
+        }, function(data) {
+          if (data.status == 0) {
+            $(document).trigger("info", data.upload_status.status.state);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        });
+      };
+
     self.getSimilarQueries = function () {
       logGA('get_query_similarity');
 

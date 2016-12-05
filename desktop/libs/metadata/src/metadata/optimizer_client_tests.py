@@ -110,7 +110,17 @@ class TestOptimizerApi(object):
     ]
 
     resp = self.api.upload(queries=queries)
-    assert_equal('success', resp['status'], resp)
+
+    assert_equal('status' in resp, resp)
+    assert_equal('state' in resp['status'], resp)
+    assert_equal('workloadId' in resp['status'], resp)
+
+    assert_true(resp['status']['state'] in ('WAITING', 'FINISHED', 'FAILED'), resp['status']['state'])
+
+    resp = self.api.upload_status(workfload_id=resp['status']['workloadId'])
+    assert_equal('status' in resp, resp)
+    assert_equal('state' in resp['status'], resp)
+    assert_equal('workloadId' in resp['status'], resp)
 
 
   def test_top_tables(self):
@@ -223,7 +233,7 @@ class TestOptimizerApi(object):
     assert_true('tables' in resp['results'][0], resp)
 
 
-  def test_top_databases(self): 
+  def test_top_databases(self):
     resp = self.api.top_databases()
 
     assert_equal('success', resp['status'], resp)

@@ -284,12 +284,27 @@ def upload_history(request):
 
   queries = [
       (doc.uuid, 1000, Notebook(document=doc).get_data()['snippets'][0]['statement'])
-      for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:25]
+      for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:10]
   ]
 
   api = OptimizerApi()
 
   response['upload_history'] = api.upload(queries=queries, source_platform=query_type)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def upload_status(request):
+  response = {'status': -1}
+
+  workload_id = request.POST.get('workloadId')
+
+  api = OptimizerApi()
+
+  response['upload_status'] = api.upload_status(workload_id=workload_id)
   response['status'] = 0
 
   return JsonResponse(response)
