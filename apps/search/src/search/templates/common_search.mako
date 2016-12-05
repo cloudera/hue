@@ -656,7 +656,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
 
-  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 5" style="opacity: 0.7">
+  <div class="filter-box" data-bind="visible: $root.isEditing() && properties.facets().length < 15" style="opacity: 0.7">
     <div class="title" style="border: 1px dashed #d8d8d8; border-bottom: none">
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-plus"></i> ${ _('Add') }
@@ -1054,7 +1054,9 @@ ${ dashboard.layout_skeleton() }
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showGrid()">
         <!-- ko if: $root.response().response -->
-          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
+          <!-- ko with: $root.collection --> ## Temp
+            <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
+          <!-- /ko -->
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
@@ -1402,7 +1404,7 @@ ${ dashboard.layout_skeleton() }
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-chevron-left" data-bind="
-        visible: $data.response.start * 1.0 >= $root.collection.template.rows() * 1.0,
+        visible: $data.response.start * 1.0 >= $parent.template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
     </i>
   </a>
@@ -1410,7 +1412,7 @@ ${ dashboard.layout_skeleton() }
   ${ _('Showing') }
   <span data-bind="text: ($data.response.start + 1)"></span>
   ${ _('to') }
-  <span data-bind="text: Math.min(($data.response.start + $root.collection.template.rows()), $data.response.numFound)"></span>
+  <span data-bind="text: Math.min(($data.response.start + $parent.template.rows()), $data.response.numFound)"></span>
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
   ${ _(' results') }
@@ -1418,7 +1420,7 @@ ${ dashboard.layout_skeleton() }
   <span data-bind="visible: $root.isEditing()">
     ${ _('Show') }
     <span class="spinedit-cnt">
-      <input type="text" data-bind="spinedit: $root.collection.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
+      <input type="text" data-bind="spinedit: $parent.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
     </span>
     ${ _('results per page') }
   </span>
@@ -1426,7 +1428,7 @@ ${ dashboard.layout_skeleton() }
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-chevron-right" data-bind="
-        visible: ($root.collection.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
+        visible: ($parent.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
     </i>
   </a>
@@ -1686,7 +1688,7 @@ ${ dashboard.layout_skeleton() }
   </div>
 
   <div class="grid-results">
-    <span data-bind="visible: $root.hasRetrievedResults() && $root.response().response">
+    <span data-bind="visible: $parent.hasRetrievedResults() && $parent.response().response">
       <div data-bind="visible: template.showFieldList() && template.showGrid()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
         <input type="text" data-bind="clearable: template.fieldsAttributesFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter fields')}" style="width:180px; margin-bottom:10px" />
         <div style="margin-bottom: 8px">
@@ -1694,20 +1696,20 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
           <a href="javascript: void(0)" class="btn btn-mini"
-            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }"
+            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': template.fields().length > 0 }"
             style="margin-right: 2px;">
             <i class="fa fa-square-o"></i>
           </a>
           <strong>${_('Field Name')}</strong>
         </div>
-        <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
+        <div class="fields-list" data-bind="foreach: template.filteredAttributeFields">
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
-            <input type="checkbox" data-bind="checkedValue: name, checked: $root.collection.template.fieldsSelected" style="margin: 0" />
-            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $root.collection.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <input type="checkbox" data-bind="checkedValue: name, checked: template.fieldsSelected" style="margin: 0" />
+            <div data-bind="text: name, css:{'field-selector': true, 'hoverable': template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $parent.fieldAnalysesName(name()); $parent.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
         </div>
-        <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
+        <div data-bind="visible: template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
           <i class="fa fa-frown-o"></i>
         </div>
       </div>
@@ -1717,19 +1719,19 @@ ${ dashboard.layout_skeleton() }
       </div>
     </span>
 
-      <div class="widget-spinner" data-bind="visible: ! $parent.hasRetrievedResults() || ! $root.response().response">
+      <div class="widget-spinner" data-bind="visible: ! $parent.hasRetrievedResults() || ! $parent.response().response">
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
       </div>
 
-      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length == 0 && $root.response().response">
+      <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length == 0 && $parent.response().response">
         <br/>
         ${ _('Your search did not match any documents.') }
       </div>
 
       <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showGrid()">
-        <!-- ko if: $root.response().response -->
-          <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
+        <!-- ko if: $parent.response().response -->
+          <div data-bind="template: {name: 'resultset-pagination', data: $parent.response()}" style="padding:8px; color:#666"></div>
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
@@ -1758,7 +1760,7 @@ ${ dashboard.layout_skeleton() }
               </tr>
               <tr data-bind="visible: doc.showDetails" class="show-details">
                 <td>&nbsp;</td>
-                <td data-bind="attr: {'colspan': $root.collection.template.fieldsSelected().length > 0 ? $root.collection.template.fieldsSelected().length + 1 : 2}">
+                <td data-bind="attr: {'colspan': $parent.template.fieldsSelected().length > 0 ? $parent.template.fieldsSelected().length + 1 : 2}">
                   <span data-bind="template: {name: 'document-details', data: $data}"></span>
                 </td>
               </tr>
