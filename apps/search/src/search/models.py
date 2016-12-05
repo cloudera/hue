@@ -892,8 +892,7 @@ def augment_solr_response(response, collection, query):
           'counts': counts,
           'extraSeries': extraSeries,
           'dimension': dimension,
-#           'cols': cols,
-#           'rows': rows,
+          'response': {'response': {'start': 0, 'numFound': len(rows)}},
           'docs': [dict(zip(cols, row)) for row in rows]
         }
 

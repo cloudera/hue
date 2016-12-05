@@ -774,6 +774,22 @@ var Collection = function (vm, collection) {
               vm.search();
             });
           }
+          facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
+            var _fields = [];
+
+            var _iterable = facet.template.fieldsAttributes();
+            if (! facet.template.filteredAttributeFieldsAll()){
+              _iterable = facet.template.fields();
+            }
+
+            $.each(_iterable, function (index, field) {
+              if (facet.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(facet.template.fieldsAttributesFilter().toLowerCase()) > -1){
+                _fields.push(field);
+              }
+            });
+
+            return _fields;
+          });
           self.facets.push(facet);
           vm.search();
         } else {
@@ -1392,7 +1408,9 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           extraSeries: [],
           // Hue 4
           hasRetrievedResults: true, // Temp
-          results: []
+          results: [],
+          response: '',
+          fieldAnalysesName: ''
       });
     }
 
@@ -1601,11 +1619,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   facet.counts(new_facet.counts);
 
                   if (typeof new_facet.docs != 'undefined') {
-                      var _docs = [];
-                      $.each(new_facet.docs, function (index, item) {
-                        _docs.push(self._make_result_doc(item, ""));
-                      });
-                      facet.results(_docs);
+                    var _docs = [];
+                    $.each(new_facet.docs, function (index, item) {
+                      _docs.push(self._make_result_doc(item, ""));
+                    });
+                    facet.results(_docs);
+                    facet.response(new_facet.response);
                   }
                   facet.label(new_facet.label);
                   facet.field(new_facet.field);
