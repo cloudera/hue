@@ -74,8 +74,9 @@ urlpatterns += patterns('notebook.api',
 
   url(r'^api/notebook/export_result/?$', 'export_result', name='export_result'),
 
-  url(r'^api/optimizer/statement_risk/?$', 'statement_risk', name='statement_risk'),
-  url(r'^api/optimizer/compatibility/?$', 'statement_compatibility', name='statement_compatibility'),
+  url(r'^api/optimizer/statement/risk/?$', 'statement_risk', name='statement_risk'),
+  url(r'^api/optimizer/statement/compatibility/?$', 'statement_compatibility', name='statement_compatibility'),
+  url(r'^api/optimizer/statement/similarity/?$', 'statement_similarity', name='statement_similarity'),
 )
 
 # Assist API

@@ -739,6 +739,24 @@ def statement_compatibility(request):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
+def statement_similarity(request):
+  response = {'status': -1, 'message': ''}
+
+  notebook = json.loads(request.POST.get('notebook', '{}'))
+  snippet = json.loads(request.POST.get('snippet', '{}'))
+  source_platform = request.POST.get('sourcePlatform')
+
+  api = get_api(request, snippet)
+
+  response['statement_similarity'] = api.statement_similarity(notebook, snippet, source_platform=source_platform)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@check_document_access_permission()
+@api_error_handler
 def get_external_statement(request):
   response = {'status': -1, 'message': ''}
 

@@ -166,7 +166,7 @@ def similar_queries(request):
   response = {'status': -1}
 
   source_platform = request.POST.get('sourcePlatform')
-  query = request.POST.get('query')
+  query = json.loads(request.POST.get('query'))
 
   api = OptimizerApi()
 
@@ -174,9 +174,9 @@ def similar_queries(request):
 
   if data['status'] == 'success':
     response['status'] = 0
-    response['similar_queries'] = json.loads(data['details']['similarQueries'])
+    response['similar_queries'] = data
   else:
-    response['message'] = 'Optimizer: %s' % data['details']
+    response['message'] = 'Optimizer: %s' % data
 
   return JsonResponse(response)
 

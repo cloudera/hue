@@ -37,7 +37,6 @@ urlpatterns = patterns('metadata.navigator_api',
 # Optimizer API
 urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer/upload_history/?$', 'upload_history', name='upload_history'),
-  url(r'^api/optimizer/similar_queries/?$', 'similar_queries', name='similar_queries'),
 
   #v2
   url(r'^api/optimizer/get_tenant/?$', 'get_tenant', name='get_tenant'),
@@ -53,4 +52,5 @@ urlpatterns += patterns('metadata.optimizer_api',
 
   url(r'^api/optimizer/query_risk/?$', 'query_risk', name='query_risk'),
   url(r'^api/optimizer/query_compatibility/?$', 'query_compatibility', name='query_compatibility'),
+  url(r'^api/optimizer/similar_queries/?$', 'similar_queries', name='similar_queries'),
 )

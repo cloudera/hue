@@ -206,7 +206,7 @@ class OptimizerApi(object):
 
 
   def similar_queries(self, source_platform, query):
-    return self._exec('get-query-risk', [
+    return self._exec('get-similar-queries', [
         '--tenant', self._product_name,
         '--source-platform', source_platform,
         '--query', query
