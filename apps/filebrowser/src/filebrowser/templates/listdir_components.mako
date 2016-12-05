@@ -1655,6 +1655,14 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
+
+        $('#purgeTrashForm').ajaxForm({
+          dataType:  'json',
+          success: function() {
+            $("#purgeTrashModal").modal('hide');
+            self.retrieveData();
+          }
+        });
       };
 
       self.uploadFile = (function () {
