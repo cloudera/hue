@@ -1323,7 +1323,22 @@ from django.utils.translation import ugettext as _
               show: true
             });
 
+            $('#moveForm').ajaxForm({
+              dataType:  'json',
+              success: function() {
+                $("#moveModal").modal('hide');
+                self.retrieveData();
+              },
+              error: function(xhr){
+                $.jHueNotify.error(xhr.responseText);
+                resetPrimaryButtonsStatus();
+              }
+            });
+
             $("#moveModal").on("shown", function () {
+              $("#moveDestination").val('');
+              $("#moveNameRequiredAlert").hide();
+              $("#moveForm").find("input[name='*dest_path']").removeClass("fieldError");
               $("#moveModal .modal-footer div").show();
               $("#moveHdfsTree").remove();
               $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
@@ -1374,6 +1389,8 @@ from django.utils.translation import ugettext as _
 
         $("#copyModal").on("shown", function(){
           $("#copyDestination").val('');
+          $("#copyNameRequiredAlert").hide();
+          $("#copyForm").find("input[name='*dest_path']").removeClass("fieldError");
           $("#copyModal .modal-footer div").show();
           $("#copyHdfsTree").remove();
           $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
