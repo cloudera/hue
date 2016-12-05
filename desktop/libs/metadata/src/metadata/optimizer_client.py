@@ -78,16 +78,16 @@ class OptimizerApi(object):
     response = {'status': 'error'}
 
     try:
-      data = subprocess.check_output([
-          'cws',
+      cmd_args = [
+          'ccs',
           'navopt',
           '--endpoint-url=%s' % self._api_url,
-          command,
-          '--auth-config',
-          self._product_secret
-         ] +
-         args
-      )
+          command
+      ]
+      if self._product_secret:
+        cmd_args += ['--auth-config', self._product_secret]
+
+      data = subprocess.check_output(cmd_args + args)
     except CalledProcessError, e:
       if command == 'upload' and e.returncode == 1:
         LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
