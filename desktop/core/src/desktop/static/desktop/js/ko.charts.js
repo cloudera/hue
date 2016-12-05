@@ -1086,12 +1086,12 @@
     var _hideSelection = options.hideSelection != null ? options.hideSelection : false;
 
     if ($(element).find("svg").length > 0 && (_datum.length == 0 || _datum[0].values.length == 0)) {
-      $(element).find("svg").empty();
+      $(element).find("svg").remove();
     }
 
     if (_datum.length > 0 && _datum[0].values.length > 0 && isNaN(_datum[0].values[0].y)) {
       _datum = [];
-      $(element).find("svg").empty();
+      $(element).find("svg").remove();
     }
 
     if ($(element).is(":visible")) {
@@ -1143,7 +1143,7 @@
           }
           if (_isDiscrete && !_isPivot) {
             if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
-              $(element).find("svg").empty();
+              $(element).find("svg").remove();
             }
             $(element).data('chart_type', 'discrete_bar');
             $(element).data('chart_pivot', false);
@@ -1161,7 +1161,7 @@
           }
           else if (_isDiscrete && _isPivot) {
             if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
-              $(element).find("svg").empty();
+              $(element).find("svg").remove();
             }
             $(element).data('chart_type', 'discrete_bar');
             $(element).data('chart_pivot', true);
@@ -1178,7 +1178,7 @@
           }
           else {
             if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
-              $(element).find("svg").empty();
+              $(element).find("svg").remove();
             }
             $(element).data('chart_type', 'multibar_brush');
             _chart = nv.models.multiBarWithBrushChart();
