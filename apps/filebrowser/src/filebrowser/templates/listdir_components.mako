@@ -1638,6 +1638,14 @@ from django.utils.translation import ugettext as _
           keyboard:true,
           show:true
         });
+
+        $('#restoreTrashForm').ajaxForm({
+          dataType:  'json',
+          success: function() {
+            $("#restoreTrashModal").modal('hide');
+            self.retrieveData();
+          }
+        });
       };
 
       self.purgeTrash = function(formElement) {
