@@ -1458,6 +1458,14 @@ from django.utils.translation import ugettext as _
             show: true
           });
 
+          $('#chmodForm').ajaxForm({
+            dataType:  'json',
+            success: function() {
+              $("#changePermissionModal").modal('hide');
+              self.retrieveData();
+            }
+          });
+
           // Initial values for form
           var permissions = ["sticky", "user_read", "user_write", "user_execute", "group_read", "group_write", "group_execute", "other_read", "other_write", "other_execute"].reverse();
           var mode = octal(self.selectedFile().mode) & 01777;
