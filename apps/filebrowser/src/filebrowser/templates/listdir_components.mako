@@ -1422,6 +1422,10 @@ from django.utils.translation import ugettext as _
 
           $("select[name=user]").val(self.selectedFile().stats.user);
 
+          $("#chownForm input[name='group_other']").removeClass("fieldError");
+          $("#chownForm input[name='user_other']").removeClass("fieldError");
+          $("#chownRequired").hide();
+
           if ($("select[name=group] option:contains('" + self.selectedFile().stats.group + "')").length > 0) {
             $("select[name=group]").val(self.selectedFile().stats.group);
           } else {
@@ -1434,6 +1438,14 @@ from django.utils.translation import ugettext as _
           $("#changeOwnerModal").modal({
             keyboard: true,
             show: true
+          });
+
+          $('#chownForm').ajaxForm({
+            dataType:  'json',
+            success: function() {
+              $("#changeOwnerModal").modal('hide');
+              self.retrieveData();
+            }
           });
         }
       };
