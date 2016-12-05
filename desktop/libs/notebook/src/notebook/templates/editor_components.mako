@@ -2217,6 +2217,11 @@ ${ hueIcons.symbols() }
             <i class="fa fa-fw fa-check"></i> ${_('Check complexity')}
           </a>
         </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: loadQueryHistory" title="${ _('Load past query history in order to improve recommendations') }">
+            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
+          </a>
+        </li>
         <!-- /ko -->
       </ul>
     </div>

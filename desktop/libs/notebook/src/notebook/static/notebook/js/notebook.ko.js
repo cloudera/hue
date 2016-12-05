@@ -1376,6 +1376,19 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.loadQueryHistory = function () {
+      logGA('load_query_history');
+
+      $.post("/metadata/api/optimizer/upload_history", {
+      }, function(data) {
+        if (data.status == 0) {
+          $(document).trigger("info", "Query uploaded successfully");
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
     self.autocompleter = new Autocompleter({
       snippet: self,
       user: vm.user,
