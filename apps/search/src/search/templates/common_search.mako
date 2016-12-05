@@ -1062,7 +1062,7 @@ ${ dashboard.layout_skeleton() }
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
-          <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+          <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
             <thead>
               <!-- ko if: $root.collection.template.fieldsSelected().length > 0 -->
               <tr class="result-sorting" data-bind="template: {name: 'result-sorting', data: $root.collection}">
@@ -1278,7 +1278,7 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
 
 
-      <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+      <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
         <thead>
           <tr>
             <th>&nbsp;</th>
@@ -1350,7 +1350,7 @@ ${ dashboard.layout_skeleton() }
       </table>
 
       <!-- ko if: doc.childDocuments != undefined -->
-        <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+        <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
           <thead>
             <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
             </tr>
@@ -1740,7 +1740,7 @@ ${ dashboard.layout_skeleton() }
         <!-- /ko -->
 
         <div id="result-main" style="overflow-x: auto">
-          <table id="result-container" data-bind="visible: $parent.hasRetrievedResults()" style="margin-top: 0; width: 100%">
+          <table id="result-container" data-bind="visible: $parent.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
             <thead>
               <tr class="result-sorting" data-bind="visible: template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
               </tr>
