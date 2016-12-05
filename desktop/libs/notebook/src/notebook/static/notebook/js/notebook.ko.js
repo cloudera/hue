@@ -1046,7 +1046,7 @@ var EditorViewModel = (function() {
       logGA('compatibility');
       self.suggestion(false);
 
-      $.post("/notebook/api/optimizer/compatibility", {
+      $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type(),
@@ -1364,7 +1364,7 @@ var EditorViewModel = (function() {
       logGA('get_query_risk');
       self.complexity(null);
 
-      $.post("/notebook/api/optimizer/statement_risk", {
+      $.post("/notebook/api/optimizer/statement/risk", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function(data) {
@@ -1382,7 +1382,23 @@ var EditorViewModel = (function() {
       $.post("/metadata/api/optimizer/upload_history", {
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", "Query uploaded successfully");
+          $(document).trigger("info", "N Queries uploaded successfully");
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
+    self.getSimilarQueries = function () {
+      logGA('get_query_similarity');
+
+      $.post("/notebook/api/optimizer/statement/similarity", {
+        notebook: ko.mapping.toJSON(notebook.getContext()),
+        snippet: ko.mapping.toJSON(self.getContext()),
+        sourcePlatform: self.type()
+      }, function(data) {
+        if (data.status == 0) {
+          console.log(data.statement_similarity);
         } else {
           $(document).trigger("error", data.message);
         }

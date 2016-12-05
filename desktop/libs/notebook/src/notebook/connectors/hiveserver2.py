@@ -525,6 +525,17 @@ class HS2Api(Api):
     return api.query_compatibility(source_platform, target_platform, query)
 
 
+  def statement_similarity(self, notebook, snippet, source_platform):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    query = response['statement']
+
+    api = OptimizerApi()
+
+    return api.similar_queries(source_platform, query)
+
+
   def upgrade_properties(self, lang='hive', properties=None):
     upgraded_properties = copy.deepcopy(self.get_properties(lang))
 
