@@ -37,6 +37,7 @@ urlpatterns = patterns('metadata.navigator_api',
 # Optimizer API
 urlpatterns += patterns('metadata.optimizer_api',
   url(r'^api/optimizer/upload_history/?$', 'upload_history', name='upload_history'),
+  url(r'^api/optimizer/upload_status/?$', 'upload_status', name='upload_status'),
 
   #v2
   url(r'^api/optimizer/get_tenant/?$', 'get_tenant', name='get_tenant'),
