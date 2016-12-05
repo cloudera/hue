@@ -1280,6 +1280,14 @@ from django.utils.translation import ugettext as _
 
         $("#renameForm").attr("action", "/filebrowser/rename?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
+        $('#renameForm').ajaxForm({
+          dataType:  'json',
+          success: function() {
+            $("#renameModal").modal('hide');
+            self.retrieveData();
+          }
+        });
+
         $("#renameModal").modal({
           keyboard:true,
           show:true
