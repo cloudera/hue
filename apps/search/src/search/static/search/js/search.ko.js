@@ -790,16 +790,18 @@ var Collection = function (vm, collection) {
 
             return _fields;
           });
-          facet.fields = ko.computed(function () {  // Dup of template.fields
-        	    var _fields = [];
-        	    $.each(facet.template.fieldsAttributes(), function (index, field) {
-        	      var position = facet.template.fieldsSelected.indexOf(field.name());
-        	      if (position != -1) {
-        	        _fields[position] = field;
-        	      }
-        	    });
-        	    return _fields;
-        	  });
+          facet.fields = facet.template.fieldsAttributes;
+
+          facet.template.fields = ko.computed(function () {  // Dup of template.fields
+            var _fields = [];
+            $.each(facet.template.fieldsAttributes(), function (index, field) {
+              var position = facet.template.fieldsSelected.indexOf(field.name());
+              if (position != -1) {
+                _fields[position] = field;
+              }
+            });
+            return _fields;
+          });
           self.facets.push(facet);
           vm.search();
         } else {
@@ -1410,7 +1412,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       self.norm_facets[facet_id] = ko.mapping.fromJS({
           id: facet_id,
           has_data: false,
-          hash: '',
+          resultHash: '',
           counts: [],
           label: '',
           field: '',
@@ -1625,7 +1627,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                 var facet = self.getFacetFromQuery(new_facet.id);
                 var _hash = ko.mapping.toJSON(new_facet);
 
-                if (!facet.has_data() || facet.hash() != _hash) {
+                if (!facet.has_data() || facet.resultHash() != _hash) {
                   facet.counts(new_facet.counts);
 
                   if (typeof new_facet.docs != 'undefined') {
@@ -1637,15 +1639,17 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                     facet.response(new_facet.response);
                     // Update template
                     var _facet_model = self.collection.getFacetById(new_facet.id);
+                    var _fields = []
                     $.each(new_facet.fieldsAttributes, function(index, item) {
-                      _facet_model.template.fieldsAttributes.push(ko.mapping.fromJS(item));
+                      _fields.push(ko.mapping.fromJS(item));
                     });
+                    _facet_model.template.fieldsAttributes(_fields);
                   }
                   facet.label(new_facet.label);
                   facet.field(new_facet.field);
                   facet.dimension(new_facet.dimension);
                   facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
-                  facet.hash(_hash);
+                  facet.resultHash(_hash);
                   facet.has_data(true);
                 }
               });

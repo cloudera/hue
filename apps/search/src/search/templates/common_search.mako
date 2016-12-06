@@ -1018,11 +1018,13 @@ ${ dashboard.layout_skeleton() }
           <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(true)}, style: {'font-weight': $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('All')} (<span data-bind="text: $root.collection.template.fieldsAttributes().length"></span>)</a> / <a href="javascript: void(0)" data-bind="click: function(){$root.collection.template.filteredAttributeFieldsAll(false)}, style: {'font-weight': ! $root.collection.template.filteredAttributeFieldsAll() ? 'bold': 'normal'}">${_('Current')} (<span data-bind="text: $root.collection.template.fields().length"></span>)</a>
         </div>
         <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
+          <!-- ko with: $root.collection -->
           <a href="javascript: void(0)" class="btn btn-mini"
             data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.collection.template.fields().length > 0 }"
             style="margin-right: 2px;">
             <i class="fa fa-square-o"></i>
           </a>
+          <!-- /ko -->
           <strong>${_('Field Name')}</strong>
         </div>
         <div class="fields-list" data-bind="foreach: $root.collection.template.filteredAttributeFields">
@@ -1033,7 +1035,7 @@ ${ dashboard.layout_skeleton() }
           </div>
         </div>
         <div data-bind="visible: $root.collection.template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
-          <i class="fa fa-frown-o"></i>
+          ${ _('No matches.') }
         </div>
       </div>
 
@@ -1054,7 +1056,7 @@ ${ dashboard.layout_skeleton() }
 
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length > 0 && $root.collection.template.showGrid()">
         <!-- ko if: $root.response().response -->
-          <!-- ko with: $root.collection --> ## Temp
+          <!-- ko with: $root.collection -->
             <div data-bind="template: {name: 'resultset-pagination', data: $root.response()}" style="padding:8px; color:#666"></div>
           <!-- /ko -->
         <!-- /ko -->
@@ -1710,7 +1712,7 @@ ${ dashboard.layout_skeleton() }
           </div>
         </div>
         <div data-bind="visible: template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
-          <i class="fa fa-frown-o"></i>
+          ${ _('No matches.') }
         </div>
       </div>
 
@@ -3741,22 +3743,25 @@ $(document).ready(function () {
 });
 
 
-  function toggleGridFieldsSelection() {
-    viewModel.resultsHash = '';
-    if (viewModel.collection.template.fields().length > 0) {
-      viewModel.collection.template.fieldsSelected([])
+  function toggleGridFieldsSelection(widget) {
+    widget.resultsHash = '';
+    if (widget.template.fields().length > 0) {
+      widget.template.fieldsSelected.removeAll();
     }
     else {
-      selectAllCollectionFields();
+      selectAllCollectionFields(widget);
     }
   }
 
-  function selectAllCollectionFields() {
+  function selectAllCollectionFields(widget) {
+    if (! widget) {
+      widget = viewModel.collection;
+    }    
     var _fields = [];
-    $.each(viewModel.collection.fields(), function (index, field) {
+    $.each(widget.fields(), function (index, field) {
       _fields.push(field.name());
     });
-    viewModel.collection.template.fieldsSelected(_fields);
+    widget.template.fieldsSelected(_fields);
   }
 
   function columnDropAdditionalHandler(widget) {
