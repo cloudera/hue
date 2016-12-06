@@ -600,14 +600,14 @@ var EditorViewModel = (function() {
       var type = self.chartType();
       logGA('chart/' + type);
 
-      if (type === ko.HUE_CHARTS.TYPES.MAP && self.chartMapLabel() === null && self.chartX() === null && self.result.cleanedNumericMeta().length === 2) {
+      if (type === ko.HUE_CHARTS.TYPES.MAP && (self.chartMapLabel() === null || typeof self.chartMapLabel() === 'undefined') && (self.chartX() === null || typeof self.chartX() === 'undefined') && self.result.cleanedNumericMeta().length === 2) {
         self.chartX(self.result.cleanedNumericMeta()[0].name);
         self.chartMapLabel(self.result.cleanedNumericMeta()[1].name);
         return;
       }
 
-      if (self.chartX() === null && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) && (self.result.cleanedNumericMeta().length === 1 || self.result.cleanedNumericMeta().length === 2)) {
-        self.chartX(self.result.cleanedNumericMeta()[0].name);
+      if ((self.chartX() === null || typeof self.chartX() === 'undefined') && (type == ko.HUE_CHARTS.TYPES.BARCHART || type == ko.HUE_CHARTS.TYPES.PIECHART || type == ko.HUE_CHARTS.TYPES.GRADIENTMAP) && self.result.cleanedStringMeta().length >= 1) {
+        self.chartX(self.result.cleanedStringMeta()[0].name);
       }
 
       if (self.result.cleanedNumericMeta().length > 0) {
