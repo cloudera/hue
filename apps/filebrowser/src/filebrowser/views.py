@@ -352,6 +352,7 @@ def listdir(request, path, chooser):
         'show_upload': (request.REQUEST.get('show_upload') == 'false' and (False,) or (True,))[0],
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
         'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+        'is_embeddable': request.GET.get('is_embeddable', False),
     }
 
     stats = request.fs.listdir_stats(path)
@@ -485,7 +486,8 @@ def listdir_paged(request, path):
         'is_sentry_managed': request.fs.is_sentry_managed(path),
         'apps': appmanager.get_apps_dict(request.user).keys(),
         'show_download_button': SHOW_DOWNLOAD_BUTTON.get(),
-        'show_upload_button': SHOW_UPLOAD_BUTTON.get()
+        'show_upload_button': SHOW_UPLOAD_BUTTON.get(),
+        'is_embeddable': request.GET.get('is_embeddable', False),
     }
     return render('listdir.mako', request, data)
 
