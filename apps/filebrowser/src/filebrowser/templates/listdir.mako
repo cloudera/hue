@@ -26,7 +26,9 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 <%namespace name="dir" file="listdir_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
+%if not is_embeddable:
 ${ commonheader(None, 'filebrowser', user, request) | n,unicode }
+%endif
 ${ fb_components.menubar() }
 
 <style type="text/css">
@@ -35,7 +37,7 @@ ${ fb_components.menubar() }
   }
 </style>
 
-<div class="container-fluid">
+<div id="filebrowser" class="container-fluid">
 
   <div class="card card-small">
     <div class="actionbar">
@@ -185,5 +187,6 @@ ${ fb_components.menubar() }
 
 </div>
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

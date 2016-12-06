@@ -1846,7 +1846,7 @@ from django.utils.translation import ugettext as _
     };
 
     var viewModel = new FileBrowserModel([], null, [], "/");
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#filebrowser')[0]);
 
     $(document).ready(function () {
       $('.historyLink').on('click', function (e) {

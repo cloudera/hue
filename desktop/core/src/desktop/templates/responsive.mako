@@ -214,7 +214,7 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Metastore</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job Browser</a></li>
-        <li><a href="javascript: void(0);">File Browser</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">File Browser</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
@@ -263,6 +263,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_search" class="embeddable"></div>
       <div id="embeddable_oozie_wf" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
+      <div id="embeddable_filebrowser" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -307,9 +308,14 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
+<script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
+<script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
+<script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -372,7 +378,8 @@ ${ assist.assistPanel() }
           metastore: '/metastore/tables/?is_embeddable=true',
           search: '/search/embeddable/new_search',
           oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
-          jobbrowser: '/jobbrowser/apps?is_embeddable=true'
+          jobbrowser: '/jobbrowser/apps?is_embeddable=true',
+          filebrowser: '/filebrowser/?is_embeddable=true'
         };
 
         self.embeddable_cache = {};
