@@ -1064,8 +1064,10 @@ ${ dashboard.layout_skeleton() }
         <div id="result-main" style="overflow-x: auto">
           <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%">
             <thead>
-              <tr class="result-sorting" data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+              <!-- ko if: $root.collection.template.fieldsSelected().length > 0 -->
+              <tr class="result-sorting" data-bind="template: {name: 'result-sorting', data: $root.collection}">
               </tr>
+              <!-- /ko -->
               <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
                 <th>${ _('Document') }</th>
@@ -1257,7 +1259,7 @@ ${ dashboard.layout_skeleton() }
       <div class="widget-section widget-settings-section" style="display: none">
         <div style="overflow-x: scroll; min-height: 40px">
           <table>
-            <tr class="result-sorting" data-bind="template: {name: 'result-sorting'}">
+            <tr class="result-sorting" data-bind="template: {name: 'result-sorting', data: $root.collection}">
             </tr>
           </table>
         </div>
@@ -1382,22 +1384,23 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 </script>
 
+
 <script type="text/html" id="result-sorting">
-<th style="width: 18px">&nbsp;</th>
-<!-- ko foreach: $root.collection.template.fieldsSelected -->
-<th data-bind="with: $root.collection.getTemplateField($data)" style="white-space: nowrap">
-  <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }"></span>
-  <i class="fa fa-sort inactive-action margin-right-10 margin-left-5" data-bind="click: $root.collection.toggleSortColumnGridLayout, css: { 'blue': sort.direction() != null, 'fa-sort-down': sort.direction() == 'desc', 'fa-sort-up': sort.direction() == 'asc' }" title="${ _('Click to sort') }"></i>
-  <!-- ko if: $root.isEditing -->
-    <!-- ko if: $index() > 0 -->
-    <i class="fa fa-caret-left inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left'); }" title="${ _('Move to the left') }"></i>
+  <th style="width: 18px">&nbsp;</th>
+  <!-- ko foreach: template.fieldsSelected -->
+  <th data-bind="with: $root.collection.getTemplateField($data, $parent.template.fields())" style="white-space: nowrap">
+    <span data-bind="text: name, click: $root.collection.toggleSortColumnGridLayout" title="${ _('Click to sort') }"></span>
+    <i class="fa fa-sort inactive-action margin-right-10 margin-left-5" data-bind="click: $root.collection.toggleSortColumnGridLayout, css: { 'blue': sort.direction() != null, 'fa-sort-down': sort.direction() == 'desc', 'fa-sort-up': sort.direction() == 'asc' }" title="${ _('Click to sort') }"></i>
+    <!-- ko if: $root.isEditing -->
+      <!-- ko if: $index() > 0 -->
+      <i class="fa fa-caret-left inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'left', $parents[1].template); }" title="${ _('Move to the left') }"></i>
+      <!-- /ko -->
+      <!-- ko if: $index() < $parents[1].template.fields().length - 1 -->
+      <i class="fa fa-caret-right inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right', $parents[1].template); }" title="${ _('Move to the right') }"></i>
+      <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: $index() < $root.collection.template.fields().length - 1 -->
-    <i class="fa fa-caret-right inactive-action" data-bind="click: function(){ $root.collection.translateSelectedField($index(), 'right'); }" title="${ _('Move to the right') }"></i>
-    <!-- /ko -->
+  </th>
   <!-- /ko -->
-</th>
-<!-- /ko -->
 </script>
 
 

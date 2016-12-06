@@ -638,7 +638,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'properties': properties,
     # Hue 4+
     'template': {
-        "showFieldList": False,
+        "showFieldList": True,
         "showGrid": False,
         "showChart": True,
         "chartSettings" : { # Use own?
