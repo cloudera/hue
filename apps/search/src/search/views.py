@@ -659,6 +659,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         "fields": [],
         "fieldsSelected": [],
         "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+        'leafletmapOn': False,
+        'isGridLayout': False,
         "hasDataForChart": True,
         "rows": 25,
     }
