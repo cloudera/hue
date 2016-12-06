@@ -183,8 +183,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   });
 </script>
 
-<script src="${ static('desktop/js/hue.utils.js') }"></script>
-
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />

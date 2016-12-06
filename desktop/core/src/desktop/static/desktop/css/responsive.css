@@ -959,6 +959,10 @@ h6 {
   background-color: #e5e5e5;
 }
 
+#sqlContextPopover .hue-popover {
+  position: fixed;
+}
+
 /* styling for the imported apps */
 
 .page-content .navbar-inner {
