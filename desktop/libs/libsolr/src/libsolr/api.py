@@ -257,9 +257,11 @@ class SolrApi(object):
     f_name = 'dim_%02d:%s' % (dim, facet['field'])
 
     if facet['aggregate']['function'] == 'count':
-      if dim == 1:
+      if 'facet' not in _f:
         _f['facet'] = {f_name: {}}
-        _f = _f['facet']
+      else:
+        _f['facet'][f_name] = {}
+      _f = _f['facet']
 
       _f[f_name] = {
           'type': 'terms',
@@ -272,7 +274,7 @@ class SolrApi(object):
 
       if len(facets) > 1: # Get n+1 dimension
         if facets[1]['aggregate']['function'] == 'count':
-          self._n_facet_dimension(widget, _f['facet'][f_name], facets[1:], dim + 1)
+          self._n_facet_dimension(widget, _f[f_name], facets[1:], dim + 1)
         else:
           self._n_facet_dimension(widget, _f[f_name], facets[1:], dim)
     else:
@@ -285,7 +287,7 @@ class SolrApi(object):
           agg_function = self._get_aggregate_function(_f_agg)
           _f['facet']['agg_%02d_%02d:%s' % (dim, i, agg_function)] = agg_function
         else:
-          self._n_facet_dimension(widget, _f['facet'], facets[i:], dim + 1) # Get n+1 dimension
+          self._n_facet_dimension(widget, _f, facets[i:], dim + 1) # Get n+1 dimension
           break
 
 
