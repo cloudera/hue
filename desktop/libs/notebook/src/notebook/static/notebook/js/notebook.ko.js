@@ -600,9 +600,25 @@ var EditorViewModel = (function() {
       var type = self.chartType();
       logGA('chart/' + type);
 
-      if (type === ko.HUE_CHARTS.TYPES.MAP && (self.chartMapLabel() === null || typeof self.chartMapLabel() === 'undefined') && (self.chartX() === null || typeof self.chartX() === 'undefined') && self.result.cleanedNumericMeta().length === 2) {
-        self.chartX(self.result.cleanedNumericMeta()[0].name);
-        self.chartMapLabel(self.result.cleanedNumericMeta()[1].name);
+      if (type === ko.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
+        if ((self.chartX() === null || typeof self.chartX() === 'undefined')) {
+          var name = self.result.cleanedNumericMeta()[0].name;
+          self.result.cleanedNumericMeta().forEach(function (fld) {
+            if (fld.name.toLowerCase().indexOf('lat') > -1 || fld.name.toLowerCase().indexOf('ltd') > -1) {
+              name = fld.name;
+            }
+          });
+          self.chartX(name);
+        }
+        if ((self.chartYSingle() === null || typeof self.chartYSingle() === 'undefined')) {
+          var name = self.result.cleanedNumericMeta()[1].name;
+          self.result.cleanedNumericMeta().forEach(function (fld) {
+            if (fld.name.toLowerCase().indexOf('lon') > -1 || fld.name.toLowerCase().indexOf('lng') > -1) {
+              name = fld.name;
+            }
+          });
+          self.chartYSingle(name);
+        }
         return;
       }
 
