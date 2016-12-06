@@ -1010,9 +1010,9 @@ var Collection = function (vm, collection) {
     return hasData;
   });
 
-  self.getTemplateField = function (name) {
+  self.getTemplateField = function (name, fields) {
     var _field = null;
-    $.each(self.template.fields(), function (index, field) {
+    $.each(fields, function (index, field) {
       if (field.name() == name) {
         _field = field;
         return false;
@@ -1293,14 +1293,16 @@ var Collection = function (vm, collection) {
     vm.search();
   }
 
-  self.translateSelectedField = function (index, direction) {
-    var array = self.template.fieldsSelected();
-    vm.resultsHash = '';
+  self.translateSelectedField = function (index, direction, template) {
+    var array = template.fieldsSelected();
+    if (self.template == template) {
+      vm.resultsHash = '';
+    }
 
     if (direction == 'left') {
-      self.template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
+      template.fieldsSelected.splice(index - 1, 2, array[index], array[index - 1]);
     } else {
-      self.template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
+      template.fieldsSelected.splice(index, 2, array[index + 1], array[index]);
     }
   };
 
