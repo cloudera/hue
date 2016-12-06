@@ -738,7 +738,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           </a>
           <!-- /ko -->
           <!-- ko if: parent === null -->
-          <div>
+          <div style="padding-left: 5px;">
             <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
             <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
           </div>
@@ -807,74 +807,62 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     </div>
   </script>
 
-  <script type="text/html" id="assist-document-panel">
-  <div class="assist-inner-panel">
-    <div class="assist-flex-header">
-      <!-- ko with: activeEntry -->
-      <div class="assist-inner-header assist-breadcrumb">
-      <!-- ko ifnot: isRoot -->
-      <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
-      </a>
-      <!-- /ko -->
-
-      <!-- ko if: isRoot -->
-      <div>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top;margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
-      </div>
-      <!-- /ko -->
-
-      <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
-      </div>
-      <!-- /ko -->
-    </div>
-    <div class="assist-flex-fill assist-file-scrollable">
-      <!-- ko with: activeEntry -->
-      <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
-         <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
-             <div class="assist-file-actions table-actions" style="opacity: 0;" >
-               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
-                 <i class='fa fa-info' title="${ _('Details') }"></i>
-               </a>
-             </div>
-             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
-               <!-- ko if: isDirectory -->
-               <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-               <!-- /ko -->
-               <!-- ko ifnot: isDirectory -->
-               <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-               <!-- /ko -->
-               <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
-             </a>
-           </li>
-         </ul>
-      </div>
-      <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
-        <span style="font-style: italic;">${_('Empty directory')}</span>
-      </div>
-      <div class="center" data-bind="visible: loading() && ! hasErrors()">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-      </div>
-      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-        <span>${ _('Error loading contents.') }</span>
-      </div>
-      <!-- /ko -->
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
-    </div>
-  </div>
-  </script>
-
   <script type="text/html" id="assist-documents-inner-panel">
     <div class="assist-inner-panel">
       <div class="assist-flex-panel">
-        <!-- ko template: 'assist-document-panel' --><!-- /ko -->
+        <!-- ko with: activeEntry -->
+        <div class="assist-flex-header assist-breadcrumb">
+          <!-- ko ifnot: isRoot -->
+          <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
+          </a>
+          <!-- /ko -->
+          <!-- ko if: isRoot -->
+          <div style="padding-left: 5px;">
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top;margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
+          </div>
+          <!-- /ko -->
+          <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-file-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
+             <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
+               <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+                 <div class="assist-file-actions table-actions" style="opacity: 0;" >
+                   <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
+                     <i class='fa fa-info' title="${ _('Details') }"></i>
+                   </a>
+                 </div>
+                 <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
+                   <!-- ko if: isDirectory -->
+                   <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+                   <!-- /ko -->
+                   <!-- ko ifnot: isDirectory -->
+                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+                   <!-- /ko -->
+                   <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
+                 </a>
+               </li>
+             </ul>
+          </div>
+          <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
+            <span style="font-style: italic;">${_('Empty directory')}</span>
+          </div>
+          <div class="center" data-bind="visible: loading() && ! hasErrors()">
+            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+          </div>
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
+          <!-- /ko -->
+          <!-- ko with: $parents[1] -->
+          <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+        </div>
+        <!-- /ko -->
       </div>
     </div>
   </script>
