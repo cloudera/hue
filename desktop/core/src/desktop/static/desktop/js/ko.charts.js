@@ -1102,7 +1102,7 @@
             $(element).find("svg").empty();
           }
           _chart = nv.models.multiBarWithBrushChart();
-          $(element).data('chart_type', 'multibar_brush');
+          if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
           var enableSelection = true;
           if (typeof options.enableSelection !== 'undefined') {
             enableSelection = options.enableSelection;
@@ -1145,7 +1145,7 @@
             if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
               $(element).find("svg").remove();
             }
-            $(element).data('chart_type', 'discrete_bar');
+            if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
             $(element).data('chart_pivot', false);
             _chart = nv.models.growingDiscreteBarChart()
               .x(function (d) {
@@ -1163,7 +1163,7 @@
             if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
               $(element).find("svg").remove();
             }
-            $(element).data('chart_type', 'discrete_bar');
+            if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
             $(element).data('chart_pivot', true);
             _chart = nv.models.growingMultiBarChart()
               .x(function (d) {
@@ -1180,7 +1180,7 @@
             if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
               $(element).find("svg").remove();
             }
-            $(element).data('chart_type', 'multibar_brush');
+            if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
             _chart = nv.models.multiBarWithBrushChart();
             _chart.tooltipContent(function (key, x, y) {
               return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
