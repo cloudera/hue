@@ -1094,188 +1094,186 @@
       $(element).find("svg").remove();
     }
 
-    if ($(element).is(":visible")) {
-      nv.addGraph(function () {
-        var _chart;
-        if (isTimeline) {
+    nv.addGraph(function () {
+      var _chart;
+      if (isTimeline) {
+        if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
+          $(element).find("svg").empty();
+        }
+        _chart = nv.models.multiBarWithBrushChart();
+        if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
+        var enableSelection = true;
+        if (typeof options.enableSelection !== 'undefined') {
+          enableSelection = options.enableSelection;
+        }
+        if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
+          _chart.enableSelection();
+        }
+        else {
+          _chart.disableSelection();
+        }
+        if (_hideSelection) {
+          _chart.hideSelection();
+        }
+        _chart.onSelectRange(function (from, to) {
+          chartsUpdatingState();
+          options.onSelectRange(from, to);
+        });
+        _chart.staggerLabels(true);
+        _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
+        _chart.multibar.hideable(true);
+        _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
+        _chart.onStateChange(options.onStateChange);
+        _chart.onChartUpdate(function () {
+          _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
+            insertLinebreaks(d, this);
+          });
+        });
+      }
+      else {
+        var _isDiscrete = false;
+        for (var j = 0; j < _datum.length; j++) {
+          for (var i = 0; i < _datum[j].values.length; i++) {
+            if (isNaN(_datum[j].values[i].x * 1)) {
+              _isDiscrete = true;
+              break;
+            }
+          }
+        }
+        if (_isDiscrete && !_isPivot) {
+          if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
+            $(element).find("svg").remove();
+          }
+          if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
+          $(element).data('chart_pivot', false);
+          _chart = nv.models.growingDiscreteBarChart()
+            .x(function (d) {
+              return d.x
+            })
+            .y(function (d) {
+              return d.y
+            })
+            .staggerLabels(true)
+            .tooltipContent(function (key, x, y) {
+              return '<h3>' + key + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
+            });
+        }
+        else if (_isDiscrete && _isPivot) {
           if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
-            $(element).find("svg").empty();
+            $(element).find("svg").remove();
           }
-          _chart = nv.models.multiBarWithBrushChart();
+          if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
+          $(element).data('chart_pivot', true);
+          _chart = nv.models.growingMultiBarChart()
+            .x(function (d) {
+              return d.x
+            })
+            .y(function (d) {
+              return d.y
+            })
+            .tooltipContent(function (key, x, y) {
+              return '<h3>' + key + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
+            });
+        }
+        else {
+          if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
+            $(element).find("svg").remove();
+          }
           if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
-          var enableSelection = true;
-          if (typeof options.enableSelection !== 'undefined') {
-            enableSelection = options.enableSelection;
-          }
-          if (_datum.length > 0 && _datum[0].values.length > 10 && enableSelection) {
+          _chart = nv.models.multiBarWithBrushChart();
+          _chart.tooltipContent(function (key, x, y) {
+            return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
+          });
+          if (_datum.length > 0 && _datum[0].values.length > 10) {
             _chart.enableSelection();
           }
-          else {
-            _chart.disableSelection();
-          }
-          if (_hideSelection) {
+
+          if (_isPivot || _hideSelection) {
             _chart.hideSelection();
           }
+          else {
+            _chart.xAxis.showMaxMin(false).tickFormat(d3.format(",0f"));
+          }
+          _chart.staggerLabels(true);
+          _chart.multibar.hideable(true);
+          _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
+          _chart.onStateChange(options.onStateChange);
           _chart.onSelectRange(function (from, to) {
             chartsUpdatingState();
             options.onSelectRange(from, to);
           });
-          _chart.staggerLabels(true);
-          _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
-          _chart.multibar.hideable(true);
-          _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
-          _chart.onStateChange(options.onStateChange);
-          _chart.onChartUpdate(function () {
+        }
+      }
+      if ($(element).width() < 300 && typeof _chart.showLegend != "undefined") {
+        _chart.showLegend(false);
+      }
+      _chart.transitionDuration(0);
+
+      _chart.yAxis
+        .tickFormat(d3.format("s"));
+
+      $(element).data("chart", _chart);
+
+      var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+      _d3.datum(_datum)
+        .transition().duration(150)
+        .each("end", function () {
+          if (options.onComplete != null) {
+            options.onComplete();
+          }
+          if (isTimeline) {
             _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
               insertLinebreaks(d, this);
             });
-          });
-        }
-        else {
-          var _isDiscrete = false;
-          for (var j = 0; j < _datum.length; j++) {
-            for (var i = 0; i < _datum[j].values.length; i++) {
-              if (isNaN(_datum[j].values[i].x * 1)) {
-                _isDiscrete = true;
-                break;
-              }
-            }
           }
-          if (_isDiscrete && !_isPivot) {
-            if ($(element).find("svg").length > 0 && $(element).find(".nv-multiBarWithLegend").length > 0) {
-              $(element).find("svg").remove();
-            }
-            if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
-            $(element).data('chart_pivot', false);
-            _chart = nv.models.growingDiscreteBarChart()
-              .x(function (d) {
-                return d.x
-              })
-              .y(function (d) {
-                return d.y
-              })
-              .staggerLabels(true)
-              .tooltipContent(function (key, x, y) {
-                return '<h3>' + key + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
-              });
-          }
-          else if (_isDiscrete && _isPivot) {
-            if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
-              $(element).find("svg").remove();
-            }
-            if (_datum.length > 0) $(element).data('chart_type', 'discrete_bar');
-            $(element).data('chart_pivot', true);
-            _chart = nv.models.growingMultiBarChart()
-              .x(function (d) {
-                return d.x
-              })
-              .y(function (d) {
-                return d.y
-              })
-              .tooltipContent(function (key, x, y) {
-                return '<h3>' + key + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
-              });
-          }
-          else {
-            if ($(element).find("svg").length > 0 && $(element).find(".nv-discreteBarWithAxes").length > 0) {
-              $(element).find("svg").remove();
-            }
-            if (_datum.length > 0) $(element).data('chart_type', 'multibar_brush');
-            _chart = nv.models.multiBarWithBrushChart();
-            _chart.tooltipContent(function (key, x, y) {
-              return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + ' on ' + hueUtils.htmlEncode(x) + '</p>'
-            });
-            if (_datum.length > 0 && _datum[0].values.length > 10) {
-              _chart.enableSelection();
-            }
+        }).call(_chart);
 
-            if (_isPivot || _hideSelection) {
-              _chart.hideSelection();
+      if (_chart.selectBars) {
+        var _field = (typeof options.field == "function") ? options.field() : options.field;
+        $.each(options.fqs(), function (cnt, item) {
+          if (item.id() == options.datum.widget_id) {
+            if (item.field() == _field) {
+              _chart.selectBars($.map(item.filter(), function (it) {
+                return it.value();
+              }));
             }
-            else {
-              _chart.xAxis.showMaxMin(false).tickFormat(d3.format(",0f"));
-            }
-            _chart.staggerLabels(true);
-            _chart.multibar.hideable(true);
-            _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
-            _chart.onStateChange(options.onStateChange);
-            _chart.onSelectRange(function (from, to) {
-              chartsUpdatingState();
-              options.onSelectRange(from, to);
-            });
-          }
-        }
-        if ($(element).width() < 300 && typeof _chart.showLegend != "undefined") {
-          _chart.showLegend(false);
-        }
-        _chart.transitionDuration(0);
-
-        _chart.yAxis
-          .tickFormat(d3.format("s"));
-
-        $(element).data("chart", _chart);
-
-        var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
-        _d3.datum(_datum)
-          .transition().duration(150)
-          .each("end", function () {
-            if (options.onComplete != null) {
-              options.onComplete();
-            }
-            if (isTimeline) {
-              _d3.selectAll("g.nv-x.nv-axis g text").each(function (d) {
-                insertLinebreaks(d, this);
+            if (Array.isArray(item.field())) {
+              _chart.selectBars({
+                field: item.field(),
+                selected: $.map(item.filter(), function (it) {
+                  return {values: it.value()};
+                })
               });
             }
-          }).call(_chart);
-
-        if (_chart.selectBars) {
-          var _field = (typeof options.field == "function") ? options.field() : options.field;
-          $.each(options.fqs(), function (cnt, item) {
-            if (item.id() == options.datum.widget_id) {
-              if (item.field() == _field) {
-                _chart.selectBars($.map(item.filter(), function (it) {
-                  return it.value();
-                }));
-              }
-              if (Array.isArray(item.field())) {
-                _chart.selectBars({
-                  field: item.field(),
-                  selected: $.map(item.filter(), function (it) {
-                    return {values: it.value()};
-                  })
-                });
-              }
-            }
-          });
-        }
-
-        if (!options.skipWindowResize) {
-          var _resizeTimeout = -1;
-          nv.utils.windowResize(function () {
-            window.clearTimeout(_resizeTimeout);
-            _resizeTimeout = window.setTimeout(function () {
-              _chart.update();
-            }, 200);
-          });
-        }
-
-        $(element).on("forceUpdate", function () {
-          _chart.update();
+          }
         });
+      }
 
-        return _chart;
-      }, function () {
-        var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
-        _d3.selectAll(".nv-bar").on("click",
-          function (d, i) {
-            if (typeof options.onClick != "undefined") {
-              chartsUpdatingState();
-              options.onClick(d);
-            }
-          });
+      if (!options.skipWindowResize) {
+        var _resizeTimeout = -1;
+        nv.utils.windowResize(function () {
+          window.clearTimeout(_resizeTimeout);
+          _resizeTimeout = window.setTimeout(function () {
+            _chart.update();
+          }, 200);
+        });
+      }
+
+      $(element).on("forceUpdate", function () {
+        _chart.update();
       });
-    }
+
+      return _chart;
+    }, function () {
+      var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+      _d3.selectAll(".nv-bar").on("click",
+        function (d, i) {
+          if (typeof options.onClick != "undefined") {
+            chartsUpdatingState();
+            options.onClick(d);
+          }
+        });
+    });
   }
 
   ko.bindingHandlers.partitionChart = {
