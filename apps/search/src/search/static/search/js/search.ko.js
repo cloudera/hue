@@ -802,6 +802,10 @@ var Collection = function (vm, collection) {
             });
             return _fields;
           });
+          facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
+             vm.getFacetFromQuery(facet.id()).resultHash('');
+             vm.search();
+          });
           self.facets.push(facet);
           vm.search();
         } else {
@@ -1634,11 +1638,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
                   if (typeof new_facet.docs != 'undefined') {
                     var _docs = [];
-                    $.each(new_facet.docs, function (index, item) {
-                      _docs.push(self._make_result_doc(item, ""));
-                    });
-                    facet.results(_docs);
-                    facet.response(new_facet.response);
+
                     // Update template
                     var _facet_model = self.collection.getFacetById(new_facet.id);
                     var _fields = []
@@ -1646,6 +1646,12 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                       _fields.push(ko.mapping.fromJS(item));
                     });
                     _facet_model.template.fieldsAttributes(_fields);
+
+                    $.each(new_facet.docs, function (index, item) {
+                      _docs.push(self._make_result_doc(item, "", _facet_model.template));
+                    });
+                    facet.results(_docs);
+                    facet.response(new_facet.response);
                   }
                   facet.label(new_facet.label);
                   facet.field(new_facet.field);
@@ -1669,7 +1675,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   var _docs = [];
                   var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
                   $.each(data.response.docs, function (index, item) {
-                    _docs.push(self._make_result_doc(item, _mustacheTmpl));
+                    _docs.push(self._make_result_doc(item, _mustacheTmpl, self.collection.template));
                   });
                   self.results(_docs);
                 }
@@ -1709,7 +1715,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
   };
 
-  self._make_result_doc = function(item, _mustacheTmpl) {
+  self._make_result_doc = function(item, _mustacheTmpl, template) {
       var row = [];
       var leafletmap = {};
       var _externalLink = item.externalLink;
@@ -1720,20 +1726,20 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       delete item["details"];
       delete item["hueId"];
       delete item["_childDocuments_"];
-      var fields = self.collection.template.fieldsSelected();
+      var fields = template.fieldsSelected();
       // Display selected fields or whole json document
       if (fields.length != 0) {
-        $.each(self.collection.template.fieldsSelected(), function (index, field) {
+        $.each(template.fieldsSelected(), function (index, field) {
           row.push(item[field]);
         });
       } else {
         row.push(ko.mapping.toJSON(item));
       }
-      if (self.collection.template.leafletmapOn()) {
+      if (template.leafletmapOn()) {
         leafletmap = {
-          'latitude': item[self.collection.template.leafletmap.latitudeField()],
-          'longitude': item[self.collection.template.leafletmap.longitudeField()],
-          'label': self.collection.template.leafletmap.labelField() ? item[self.collection.template.leafletmap.labelField()] : ""
+          'latitude': item[template.leafletmap.latitudeField()],
+          'longitude': item[template.leafletmap.longitudeField()],
+          'label': template.leafletmap.labelField() ? item[template.leafletmap.labelField()] : ""
         }
       }
       var doc = {
@@ -1752,7 +1758,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       if (_childDocuments) {
         var childRecords = [];
         $.each(_childDocuments, function (index, item) {
-          var record = self._make_result_doc(item, _mustacheTmpl);
+          var record = self._make_result_doc(item, _mustacheTmpl, self.collection.template);
           $.each(item, function(key, val) {
             var _field = ko.mapping.fromJS({
                 key: key,
@@ -1765,7 +1771,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         });
         doc['childDocuments'] = ko.observable(childRecords);
       }
-      if (!self.collection.template.isGridLayout()) {
+      if (!template.isGridLayout()) {
         // fix the fields that contain dots in the name
         addTemplateFunctions(item);
         if (self.additionalMustache != null && typeof self.additionalMustache == "function") {
