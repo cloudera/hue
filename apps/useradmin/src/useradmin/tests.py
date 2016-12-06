@@ -36,6 +36,7 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.views import home
 from hadoop import pseudo_hdfs4
+from hadoop.pseudo_hdfs4 import is_live_cluster
 
 import useradmin.conf
 from useradmin.forms import UserChangeForm
@@ -765,7 +766,8 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
   requires_hadoop = True
 
   def test_ensure_home_directory(self):
-    raise SkipTest
+    if not is_live_cluster():
+      raise SkipTest
 
     resets = [
       useradmin.conf.PASSWORD_POLICY.IS_ENABLED.set_for_testing(False),
@@ -780,6 +782,8 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       cluster.fs.setuser(cluster.superuser)
 
       # Create a user with a home directory
+      if cluster.fs.exists('/user/test1'):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test1')
       assert_false(cluster.fs.exists('/user/test1'))
       response = c.post('/useradmin/users/new', dict(username="test1", password1='test', password2='test', ensure_home_directory=True))
       assert_true(cluster.fs.exists('/user/test1'))
@@ -789,6 +793,8 @@ class TestUserAdminWithHadoop(BaseUserAdminTests):
       assert_equal('40755', '%o' % dir_stat.mode)
 
       # Create a user, then add their home directory
+      if cluster.fs.exists('/user/test2'):
+        cluster.fs.do_as_superuser(cluster.fs.rmtree, '/user/test2')
       assert_false(cluster.fs.exists('/user/test2'))
       response = c.post('/useradmin/users/new', dict(username="test2", password1='test', password2='test'))
       assert_false(cluster.fs.exists('/user/test2'))

@@ -294,7 +294,7 @@ def edit_user(request, username=None):
       # Ensure home directory is created, if necessary.
       if form.cleaned_data.get('ensure_home_directory'):
         try:
-          ensure_home_directory(request.fs, instance.user)
+          ensure_home_directory(request.fs, instance)
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
 
