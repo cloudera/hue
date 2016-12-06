@@ -44,6 +44,7 @@ def get_default_secret_key():
 def get_default_region():
   return AWS_ACCOUNTS['default'].REGION.get()
 
+DEFAULT_CALLING_FORMAT='boto.s3.connection.S3Connection.DefaultCallingFormat'
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
@@ -91,6 +92,28 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         key='region',
         default='us-east-1',
         type=str
+      ),
+      PROXY_ADDRESS=Config(
+        help='Alternate address for endpoint.',
+        key='proxy_address',
+        default=None,
+        type=str
+      ),
+      PROXY_PORT=Config(
+        help='Alternate port for endpoint.',
+        key='proxy_port',
+        default=None,
+        type=int
+      ),
+      CALLING_FORMAT=Config(
+        key='calling_format',
+        default=DEFAULT_CALLING_FORMAT,
+        type=str
+      ),
+      IS_SECURE=Config(
+        key='is_secure',
+        default=True,
+        type=coerce_bool
       )
     )
   )
