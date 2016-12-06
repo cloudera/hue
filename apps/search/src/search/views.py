@@ -177,8 +177,8 @@ def search(request):
       response = augment_solr_response(response, collection, query)
     except RestException, e:
       try:
-        message = json.loads(e.message)['error']
-        response['error'] = message.get('msg', message['trace'])
+        message = json.loads(e.message)
+        response['error'] = message['error'].get('msg', message['error']['trace'])
       except Exception, e2:
         LOG.exception('failed to extract json message: %s' % force_unicode(e2))
         LOG.exception('failed to parse json response: %s' % force_unicode(e))
