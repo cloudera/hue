@@ -427,6 +427,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       color: #444;
       font-size: 14px;
     }
+
+    .assist-filter {
+      margin-right: 8px;
+    }
+
+    .assist-filter input {
+      -webkit-box-sizing: border-box;
+      -moz-box-sizing: border-box;
+      box-sizing: border-box;
+      width: 100%;
+
+      border-radius: 4px;
+      border: 1px solid #DDD;
+      box-shadow: none;
+    }
   </style>
 
   <script type="text/html" id="assist-no-database-entries">
@@ -883,7 +898,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           <div>
             <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
           </div>
-          <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" style="width:90%;" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
+          <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
         </div>
         <div class="assist-flex-fill assist-collections-scrollable">
           <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -1043,7 +1058,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
-      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
@@ -1082,7 +1097,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         <label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
       </div>
-      <div><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" style="width:90%;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading()">
       <!-- ko template: 'assist-db-entries' --><!-- /ko -->
