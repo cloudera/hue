@@ -48,9 +48,9 @@ DEFAULT_CALLING_FORMAT='boto.s3.connection.S3Connection.DefaultCallingFormat'
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',
-  help='One entry for each AWS account',
+  help=_('One entry for each AWS account'),
   each=ConfigSection(
-    help='Information about single AWS account',
+    help=_('Information about single AWS account'),
     members=dict(
       ACCESS_KEY_ID=Config(
         key='access_key_id',
@@ -83,7 +83,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         private=True,
       ),
       ALLOW_ENVIRONMENT_CREDENTIALS=Config(
-        help='Allow to use environment sources of credentials (environment variables, EC2 profile).',
+        help=_('Allow to use environment sources of credentials (environment variables, EC2 profile).'),
         key='allow_environment_credentials',
         default=True,
         type=coerce_bool
@@ -94,13 +94,13 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         type=str
       ),
       PROXY_ADDRESS=Config(
-        help='Alternate address for endpoint.',
+        help=_('Alternate address for endpoint.'),
         key='proxy_address',
         default=None,
         type=str
       ),
       PROXY_PORT=Config(
-        help='Alternate port for endpoint.',
+        help=_('Alternate port for endpoint.'),
         key='proxy_port',
         default=None,
         type=int

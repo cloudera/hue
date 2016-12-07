@@ -1284,6 +1284,18 @@
       # AWS region to use
       ## region=us-east-1
 
+      # Endpoint overrides
+      ## proxy_address=
+      ## proxy_port=
+
+      # Secure connections are the default, but this can be explicitly overridden:
+      ## is_secure=true
+
+      # The default calling format uses https://<bucket-name>.s3.amazonaws.com but
+      # this may not make sense if DNS is not configured in this way for custom endpoints.
+      # e.g. Use boto.s3.connection.OrdinaryCallingFormat for https://s3.amazonaws.com/<bucket-name>
+      ## calling_format=boto.s3.connection.S3Connection.DefaultCallingFormat
+
 
 ###########################################################################
 # Settings for the Sentry lib
