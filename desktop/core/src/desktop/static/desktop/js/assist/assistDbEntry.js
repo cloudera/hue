@@ -36,10 +36,11 @@ var AssistDbEntry = (function () {
    * @param {Object} navigationSettings
    * @constructor
    */
-  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings) {
+  function AssistDbEntry (definition, parent, assistDbSource, filter, i18n, navigationSettings, sortFunctions) {
     var self = this;
     self.i18n = i18n;
     self.definition = definition;
+    self.sortFunctions = sortFunctions;
 
     self.assistDbSource = assistDbSource;
     self.parent = parent;
@@ -50,6 +51,7 @@ var AssistDbEntry = (function () {
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
     self.highlight = ko.observable(false);
     self.highlightParent = ko.observable(false);
+    self.activeSort = self.assistDbSource.activeSort;
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -71,6 +73,10 @@ var AssistDbEntry = (function () {
 
     self.hasEntries = ko.pureComputed(function() {
       return self.entries().length > 0;
+    });
+
+    self.assistDbSource.activeSort.subscribe(function (newSort) {
+      self.entries.sort(self.sortFunctions[newSort]);
     });
 
     self.filteredEntries = ko.pureComputed(function () {
@@ -250,10 +256,12 @@ var AssistDbEntry = (function () {
       self.loading(false);
 
       var newEntries = [];
+      var index = 0;
       if (typeof data.tables_meta !== "undefined") {
         newEntries = $.map(data.tables_meta, function(table) {
           return self.createEntry({
             name: table.name,
+            index: index++,
             displayName: table.name,
             title: table.name + (table.comment ? ' - ' + table.comment : ''),
             type: table.type,
@@ -277,6 +285,7 @@ var AssistDbEntry = (function () {
           }
           return self.createEntry({
             name: columnDef.name,
+            index: index++,
             displayName: displayName,
             title: title,
             isColumn: true,
@@ -287,6 +296,7 @@ var AssistDbEntry = (function () {
         newEntries = $.map(data.columns, function(columnName) {
           return self.createEntry({
             name: columnName,
+            index: index++,
             displayName: columnName,
             title: columnName,
             isColumn: true
@@ -297,6 +307,7 @@ var AssistDbEntry = (function () {
           newEntries = [
             self.createEntry({
               name: "key",
+              index: index++,
               displayName: "key (" + data.key.type + ")",
               title: "key (" + data.key.type + ")",
               type: data.key.type,
@@ -304,6 +315,7 @@ var AssistDbEntry = (function () {
             }),
             self.createEntry({
               name: "value",
+              index: index++,
               displayName: "value (" + data.value.type + ")",
               title: "value (" + data.value.type + ")",
               isMapValue: true,
@@ -315,6 +327,7 @@ var AssistDbEntry = (function () {
           newEntries = $.map(data.fields, function(field) {
             return self.createEntry({
               name: field.name,
+              index: index++,
               displayName: field.name + " (" + field.type + ")",
               title: field.name + " (" + field.type + ")",
               type: field.type,
@@ -325,6 +338,7 @@ var AssistDbEntry = (function () {
           newEntries = [
             self.createEntry({
               name: "item",
+              index: index++,
               displayName: "item (" + data.item.type + ")",
               title: "item (" + data.item.type + ")",
               isArray: true,
@@ -340,11 +354,7 @@ var AssistDbEntry = (function () {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
-        if (newEntries.length > 0 && !newEntries[0].definition.isColumn) {
-          newEntries.sort(function (a, b) {
-            return a.definition.name.localeCompare(b.definition.name);
-          });
-        }
+        newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
         self.entries(newEntries);
       }
       if (typeof callback === 'function') {
@@ -378,7 +388,7 @@ var AssistDbEntry = (function () {
    */
   AssistDbEntry.prototype.createEntry = function (definition) {
     var self = this;
-    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings)
+    return new AssistDbEntry(definition, self, self.assistDbSource, null, self.i18n, self.navigationSettings, self.sortFunctions)
   };
 
   AssistDbEntry.prototype.getHierarchy = function () {
