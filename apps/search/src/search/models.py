@@ -895,7 +895,7 @@ def augment_solr_response(response, collection, query):
           'dimension': dimension,
           'response': {'response': {'start': 0, 'numFound': len(rows)}},
           'docs': [dict(zip(cols, row)) for row in rows],
-          'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'string'}) for col in cols]
+          'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols]
         }
 
         normalized_facets.append(facet)

@@ -1442,7 +1442,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.toggledGridlayoutResultChevron(false);
   };
   self.fieldAnalyses = ko.observableArray([]);
-  self.fieldAnalysesName = ko.observableArray("");
+  self.fieldAnalysesName = ko.observable("");
   self.fieldsAnalysisAttributesNames = ko.computed(function () {
     var _fields = [];
     $.each(self.collection.template.fieldsAttributes(), function (index, field) {
