@@ -233,6 +233,10 @@ from desktop.views import _ko
       padding-right: 20px;
     }
 
+    .doc-browser-row a {
+      text-decoration: none;
+    }
+
     .doc-browser-row .doc-browser-attr-col {
       margin-bottom: 2px;
     }
