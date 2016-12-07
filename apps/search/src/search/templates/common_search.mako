@@ -1711,7 +1711,7 @@ ${ dashboard.layout_skeleton() }
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
-            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $parent.fieldAnalysesName(name()); $parent.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}" style="position:absolute; left: 168px; background-color: #FFF"></i>
+            <i class="fa fa-question-circle muted pointer analysis" data-bind="click: function(data, e) { $root.fieldAnalysesName(name()); $root.showFieldAnalysis(data, e); }, attr: {'title': '${ _ko('Analyze ') } ' + name() + ' (' + type() + ')'}, visible: type() != 'aggr'" style="position:absolute; left: 168px; background-color: #FFF"></i>
           </div>
         </div>
         <div data-bind="visible: template.filteredAttributeFields().length == 0" style="padding-left:4px; padding-top:5px; font-size:40px; color:#CCC">
