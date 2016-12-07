@@ -587,7 +587,7 @@ class WebHdfs(Hdfs):
     try:
       return self._root.get(path, params)
     except WebHdfsException, ex:
-      if ex.code == 500:
+      if ex.code == 500 or ex.code == 400:
         LOG.warn('Failed to check access to path %s, CHECKACCESS operation may not be supported.' % path)
         return None
       else:
