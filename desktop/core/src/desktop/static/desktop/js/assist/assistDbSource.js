@@ -25,6 +25,18 @@ var AssistDbSource = (function () {
         return sortFunctions.alpha(a, b);
       }
       return a.definition.index - b.definition.index;
+    },
+    popular: function (a, b) {
+      if (a.definition.popularity && !b.definition.popularity) {
+        return 1;
+      }
+      if (b.definition.popularity && !a.definition.popularity) {
+        return -1;
+      }
+      if (a.definition.popularity && b.definition.popularity) {
+        return a.definition.popularity - b.definition.popularity
+      }
+      return sortFunctions.creation(a, b);
     }
   };
 
@@ -58,7 +70,12 @@ var AssistDbSource = (function () {
     self.activeSort = ko.observable('alpha');
 
     self.activeSort.subscribe(function (newSort) {
-      self.databases.sort(sortFunctions[newSort]);
+      if (newSort === 'popular') {
+        // TODO: Sort popular databases
+        self.databases.sort(sortFunctions.alpha)
+      } else {
+        self.databases.sort(sortFunctions[newSort]);
+      }
     });
 
     self.filter = {

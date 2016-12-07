@@ -1409,6 +1409,24 @@ var ApiHelper = (function () {
   };
 
   /**
+   * Fetches the top tables for the given database
+   *
+   * @param {Object} options
+   * @param {string} options.sourceType
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {Object[]} options.database
+   */
+  ApiHelper.prototype.fetchNavOptTopTables = function (options) {
+    var self = this;
+    self.fetchNavCached('/metadata/api/optimizer/top_tables', options, function (data) {
+      return data.status === 0 && data.top_tables && data.top_tables.length > 0;
+    });
+  };
+
+  /**
    * Fetches the top columns for the given tables
    *
    * @param {Object} options
@@ -1500,9 +1518,18 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavCached = function (url, options, cacheCondition) {
     var self = this;
 
-    var dbTablesJson = self.createNavDbTablesJson(options);
-
-    var hash = dbTablesJson.hashCode();
+    var data, hash;
+    if (options.tables) {
+      data = {
+        dbTables: self.createNavDbTablesJson(options)
+      };
+      hash = data.dbTables.hashCode();
+    } else if (options.database) {
+      data = {
+        database: options.database
+      };
+      hash = data.database;
+    }
 
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
@@ -1513,9 +1540,7 @@ var ApiHelper = (function () {
       $.ajax({
         type: 'post',
         url: url,
-        data: {
-          dbTables: dbTablesJson
-        },
+        data: data,
         timeout: options.timeout
       })
       .done(function (data) {
