@@ -161,11 +161,11 @@ class WebHdfs(Hdfs):
     except AttributeError:
       return WebHdfs.DEFAULT_USER
 
-  @property
-  def trash_path(self):
+  def trash_path(self, path=None):
     trash_path = self.join(self.get_home_dir(), '.Trash')
     try:
-      path = '/'
+      if not path:
+        path = self.get_home_dir()
       params = self._getparams()
       params['op'] = 'GETTRASHROOT'
       json = self._root.get(path, params)
@@ -177,9 +177,8 @@ class WebHdfs(Hdfs):
         raise e
     return trash_path
 
-  @property
-  def current_trash_path(self):
-    return self.join(self.trash_path, self.TRASH_CURRENT)
+  def current_trash_path(self, path):
+    return self.join(self.trash_path(path), self.TRASH_CURRENT)
 
   def _getparams(self):
     return {
@@ -268,11 +267,11 @@ class WebHdfs(Hdfs):
   def isroot(self, path):
     return path == '/'
 
-  def _ensure_current_trash_directory(self):
+  def _ensure_current_trash_directory(self, path):
     """Create trash directory for a user if it doesn't exist."""
-    if self.exists(self.current_trash_path):
-      self.mkdir(self.current_trash_path)
-    return self.current_trash_path
+    if self.exists(self.current_trash_path(path)):
+      self.mkdir(self.current_trash_path(path))
+    return self.current_trash_path(path)
 
   def _trash(self, path, recursive=False):
     """
@@ -289,11 +288,11 @@ class WebHdfs(Hdfs):
     if not recursive and self.isdir(path):
       raise IOError(errno.EISDIR, _("File %s is a directory") % path)
 
-    if path.startswith(self.trash_path):
+    if path.startswith(self.trash_path(path)):
       raise IOError(errno.EPERM, _("File %s is already trashed") % path)
 
     # Make path (with timestamp suffix if necessary)
-    base_trash_path = self.join(self._ensure_current_trash_directory(), path[1:])
+    base_trash_path = self.join(self._ensure_current_trash_directory(path), path[1:])
     trash_path = base_trash_path
     while self.exists(trash_path):
       trash_path = base_trash_path + str(time.time())
@@ -345,13 +344,13 @@ class WebHdfs(Hdfs):
     Removing the root from ``path`` will provide the original path.
     Ensure parent directories exist and rename path.
     """
-    if not path.startswith(self.trash_path):
+    if not path.startswith(self.trash_path(path)):
       raise IOError(errno.EPERM, _("File %s is not in trash") % path)
 
     # Build original path
     original_path = []
     split_path = self.split(path)
-    while split_path[0] != self.trash_path:
+    while split_path[0] != self.trash_path(path):
       original_path.append(split_path[1])
       split_path = self.split(split_path[0])
     original_path.reverse()
@@ -369,8 +368,8 @@ class WebHdfs(Hdfs):
 
     Purge all trash in users ``trash_path``
     """
-    for timestamped_directory in self.listdir(self.trash_path):
-      self.rmtree(self.join(self.trash_path, timestamped_directory), True)
+    for timestamped_directory in self.listdir(self.trash_path()):
+      self.rmtree(self.join(self.trash_path(), timestamped_directory), True)
 
   def mkdir(self, path, mode=None):
     """

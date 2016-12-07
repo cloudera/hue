@@ -173,11 +173,11 @@ def view(request, path):
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
-        home_trash = request.fs.join(request.fs.trash_path, 'Current', request.user.get_home_directory()[1:])
+        home_trash = request.fs.join(request.fs.trash_path(path), 'Current', request.user.get_home_directory()[1:])
         if request.fs.isdir(home_trash):
             return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_trash)))
-        if request.fs.isdir(request.fs.trash_path):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path)))
+        if request.fs.isdir(request.fs.trash_path(path)):
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path(path))))
 
     try:
         decoded_path = urllib.unquote(path)
