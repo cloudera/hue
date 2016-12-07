@@ -15,6 +15,19 @@
 // limitations under the License.
 
 var AssistDbSource = (function () {
+
+  var sortFunctions = {
+    alpha: function (a, b) {
+      return a.definition.name.localeCompare(b.definition.name);
+    },
+    creation: function (a, b) {
+      if (!a.definition.isColumn || !a.definition.isComplex) {
+        return sortFunctions.alpha(a, b);
+      }
+      return a.definition.index - b.definition.index;
+    }
+  };
+
   /**
    * @param {Object} options
    * @param {Object} options.i18n
@@ -41,6 +54,12 @@ var AssistDbSource = (function () {
     self.highlight = ko.observable(false);
 
     self.invalidateOnRefresh = ko.observable('cache');
+
+    self.activeSort = ko.observable('alpha');
+
+    self.activeSort.subscribe(function (newSort) {
+      self.databases.sort(sortFunctions[newSort]);
+    });
 
     self.filter = {
       query: ko.observable("").extend({ rateLimit: 150 })
@@ -124,20 +143,23 @@ var AssistDbSource = (function () {
 
     var updateDatabases = function (names, lastSelectedDb) {
       dbIndex = {};
-      self.databases($.map(names, function(name) {
+      var dbs = $.map(names, function(name) {
         var database = new AssistDbEntry({
           name: name,
           displayName: name,
           title: name,
           isDatabase: true
-        }, null, self, nestedFilter, self.i18n, self.navigationSettings);
+        }, null, self, nestedFilter, self.i18n, self.navigationSettings, sortFunctions);
         dbIndex[name] = database;
         if (name === lastSelectedDb) {
           self.selectedDatabase(database);
           self.selectedDatabaseChanged();
         }
         return database;
-      }));
+      });
+
+      dbs.sort(sortFunctions[self.activeSort()]);
+      self.databases(dbs);
       self.reloading(false);
       self.loading(false);
       self.loaded(true);

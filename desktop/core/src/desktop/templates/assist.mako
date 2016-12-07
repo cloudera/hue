@@ -1023,6 +1023,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <div class="assist-db-header-actions">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
+      <!-- ko if: $parent.activeSort -->
+      <a class="inactive-action" data-toggle="dropdown" href="javascript:void(0)"><i class="pointer fa fa-sort" title="${_('Sort')}"></i></a>
+      <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
+        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Column order') }</a></li>
+        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }</a></li>
+      </ul>
+      <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <!-- ko if: sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
