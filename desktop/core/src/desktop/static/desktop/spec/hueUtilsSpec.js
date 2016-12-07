@@ -23,5 +23,17 @@
     it("should show the milliseconds in number format if the time is less than 60 seconds", function() {
       expect(Number(10123).toHHMMSS()).toEqual('10.123s');
     });
+
+    it("should have the String.startsWith polyfill", function() {
+      expect('banana'.startsWith('ba')).toBeTruthy();
+    });
+
+    it("should have the String.endsWith polyfill", function() {
+      expect('banana'.endsWith('na')).toBeTruthy();
+    });
+
+    it("should have the String.includes polyfill", function() {
+      expect('banana'.includes('anan')).toBeTruthy();
+    });
   });
 })();
