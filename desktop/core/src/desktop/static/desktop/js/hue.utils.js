@@ -14,7 +14,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Array polyfills for older browsers
+/*
+ * Array polyfills
+*/
 if (!('clean' in Array.prototype)) {
   Array.prototype.clean = function (deleteValue) {
     for (var i = 0; i < this.length; i++) {
@@ -26,8 +28,8 @@ if (!('clean' in Array.prototype)) {
     return this;
   };
 }
-if (!('move' in Array.prototype)) {
 
+if (!('move' in Array.prototype)) {
   Array.prototype.move = function (old_index, new_index) {
     if (new_index >= this.length) {
       var k = new_index - this.length;
@@ -39,8 +41,8 @@ if (!('move' in Array.prototype)) {
     return this;
   };
 }
-if (!('indexOf' in Array.prototype)) {
 
+if (!('indexOf' in Array.prototype)) {
   Array.prototype.indexOf = function (needle) {
     for (var i = 0; i < this.length; i++) {
       if (this[i] === needle) {
@@ -50,7 +52,6 @@ if (!('indexOf' in Array.prototype)) {
     return -1;
   };
 }
-// adding missing .filter for IE8
 
 if (!('filter' in Array.prototype)) {
   Array.prototype.filter = function (filter, that /*opt*/) {
@@ -69,6 +70,44 @@ Array.prototype.diff = function (a) {
     return a.indexOf(i) < 0;
   });
 };
+
+/*
+ * String polyfills
+*/
+if (!String.prototype.startsWith) {
+  String.prototype.startsWith = function (searchString, position) {
+    position = position || 0;
+    return this.substr(position, searchString.length) === searchString;
+  };
+}
+
+if (!String.prototype.endsWith) {
+  String.prototype.endsWith = function (searchString, position) {
+    var subjectString = this.toString();
+    if (typeof position !== 'number' || !isFinite(position) || Math.floor(position) !== position || position > subjectString.length) {
+      position = subjectString.length;
+    }
+    position -= searchString.length;
+    var lastIndex = subjectString.lastIndexOf(searchString, position);
+    return lastIndex !== -1 && lastIndex === position;
+  };
+}
+
+if (!String.prototype.includes) {
+  String.prototype.includes = function (search, start) {
+    'use strict';
+    if (typeof start !== 'number') {
+      start = 0;
+    }
+
+    if (start + search.length > this.length) {
+      return false;
+    } else {
+      return this.indexOf(search, start) !== -1;
+    }
+  };
+}
+
 /*
  * Add utility methods to the HUE object
 */
