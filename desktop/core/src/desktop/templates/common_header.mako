@@ -424,6 +424,9 @@ if USE_NEW_EDITOR.get():
 
       window.hueDebug = {
         viewModel: function (element) {
+          if (typeof element !== 'undefined' && typeof element === 'string') {
+            element = $(element)[0];
+          }
           return ko.dataFor(element || document.body);
         }
       }
