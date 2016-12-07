@@ -67,6 +67,7 @@ var AssistDbSource = (function () {
 
     self.invalidateOnRefresh = ko.observable('cache');
 
+    self.applyingSort = ko.observable(false);
     self.activeSort = ko.observable('alpha');
 
     self.activeSort.subscribe(function (newSort) {
