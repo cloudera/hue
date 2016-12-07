@@ -125,6 +125,10 @@ ${ fb_components.menubar() }
                 <i class="fa fa-play"></i> ${_('Extract')}
               </button>
             % endif
+             <button class="btn compressFilesBtn" title="${_('Compress')}"
+               data-bind="visible: selectedFiles().length > 0, click: confirmCompressFiles">
+               <i class="fa fa-play"></i> ${_('Compress')}
+             </button>
           % endif
         </div>
       </%def>

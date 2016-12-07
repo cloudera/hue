@@ -118,6 +118,28 @@ from django.utils.translation import ugettext as _
     <!-- /ko -->
   </div>
 
+  <!-- compress modal -->
+  <div id="confirmCompressModal" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${_('Compress Files')}</h3>
+    </div>
+    <!-- ko if: selectedFiles -->
+    <div class="modal-body">
+      <p>${_('Start a task to compress the selected file(s).')}</p>
+      <ul data-bind="foreach: selectedFiles()">
+        <li>
+          <span data-bind="text: $data.name"> </span>
+        </li>
+      </ul>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: compressSelectedFiles"/>
+    </div>
+    <!-- /ko -->
+  </div>
+
   <!-- delete modal -->
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
@@ -1608,6 +1630,13 @@ from django.utils.translation import ugettext as _
         });
       };
 
+      self.confirmCompressFiles = function() {
+        $("#confirmCompressModal").modal({
+          keyboard:true,
+          show:true
+        });
+      };
+
       self.extractSelectedArchive = function() {
         $("#confirmExtractModal").modal("hide");
         $.post("/filebrowser/extract_archive", {
@@ -1617,6 +1646,32 @@ from django.utils.translation import ugettext as _
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', data.history_uuid);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+      };
+
+      self.compressSelectedFiles = function() {
+        $("#confirmCompressModal").modal("hide");
+
+        var fileNames = [];
+        $(self.selectedFiles()).each(function (index, file) {
+          fileNames.push(file.name);
+        });
+
+        $.post("/filebrowser/compress_files", {
+          "files": fileNames,
+          "upload_path": self.currentPath(),
+        }, function (data) {
+          if (data.status == 0) {
+            var jobId = '';
+            if (data.handle) {
+              jobId = data.handle.id;
+            }
+            $.jHueNotify.info("${ _('Oozie job ') }" + jobId + "${_(' submitted for archive extraction.') }");
           } else {
             $(document).trigger("error", data.message);
           }
