@@ -86,6 +86,7 @@ var AssistDbEntry = (function () {
     self.applySort = function (sortName, entries) {
       if (sortName === 'popular' && self.definition.isDatabase) {
         if (self.assistDbSource.selectedDatabase() === self) {
+          self.assistDbSource.applyingSort(true);
           self.assistDbSource.apiHelper.fetchNavOptTopTables({
             sourceType: self.assistDbSource.sourceType,
             database: self.definition.name,
@@ -101,9 +102,11 @@ var AssistDbEntry = (function () {
                 }
                 entries.sort(self.sortFunctions.popular);
               });
+              self.assistDbSource.applyingSort(false);
             },
             errorCallback: function (data) {
               entries.sort(self.sortFunctions.creation);
+              self.assistDbSource.applyingSort(false);
             }
           });
           deferredSort = false;
