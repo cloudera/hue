@@ -1026,8 +1026,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- ko if: $parent.activeSort -->
       <a class="inactive-action" data-toggle="dropdown" href="javascript:void(0)"><i class="pointer fa fa-sort" title="${_('Sort')}"></i></a>
       <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
-        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Column order') }</a></li>
         <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }</a></li>
+        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Column order') }</a></li>
+        <!-- ko if: HAS_OPTIMIZER -->
+        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }</a></li>
+        <!-- /ko -->
       </ul>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>

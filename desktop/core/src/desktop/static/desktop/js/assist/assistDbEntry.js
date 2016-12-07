@@ -75,8 +75,48 @@ var AssistDbEntry = (function () {
       return self.entries().length > 0;
     });
 
+    var deferredSort = false;
+
+    self.assistDbSource.selectedDatabase.subscribe(function (newValue) {
+      if (newValue === self && deferredSort) {
+        self.applySort(self.assistDbSource.activeSort(), self.entries);
+      }
+    });
+
+    self.applySort = function (sortName, entries) {
+      if (sortName === 'popular' && self.definition.isDatabase) {
+        if (self.assistDbSource.selectedDatabase() === self) {
+          self.assistDbSource.apiHelper.fetchNavOptTopTables({
+            sourceType: self.assistDbSource.sourceType,
+            database: self.definition.name,
+            silenceErrors: true,
+            successCallback: function (data) {
+              var popularityIndex = {};
+              data.top_tables.forEach(function (topTable) {
+                popularityIndex[topTable.name] = topTable.popularity;
+              });
+              self.entries().forEach(function (entry) {
+                if (popularityIndex[entry.definition.name]) {
+                  entry.definition.popularity = popularityIndex[entry.definition.name];
+                }
+                entries.sort(self.sortFunctions.popular);
+              });
+            },
+            errorCallback: function (data) {
+              entries.sort(self.sortFunctions.creation);
+            }
+          });
+          deferredSort = false;
+        } else {
+          deferredSort = true;
+        }
+      } else {
+        entries.sort(self.sortFunctions[sortName]);
+      }
+    };
+
     self.assistDbSource.activeSort.subscribe(function (newSort) {
-      self.entries.sort(self.sortFunctions[newSort]);
+      self.applySort(newSort, self.entries);
     });
 
     self.filteredEntries = ko.pureComputed(function () {
@@ -354,7 +394,7 @@ var AssistDbEntry = (function () {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
-        newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
+        self.applySort(self.assistDbSource.activeSort(), newEntries);
         self.entries(newEntries);
       }
       if (typeof callback === 'function') {
