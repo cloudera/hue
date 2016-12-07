@@ -564,7 +564,7 @@ from django.utils.translation import ugettext as _
         <a href="#" data-bind="click: $root.viewFile"><i class="fa fa-level-up"></i></a>
         <!-- /ko -->
         <!-- ko if: name != '..' -->
-        <strong><a href="#" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
+        <strong><a href="#" class="draggable-fb" data-bind="drag: { enabled: (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, click: $root.viewFile, text: name, attr: { 'draggable': $.inArray(name, ['.', '..', '.Trash']) === -1 && !$root.isS3()}"></a></strong>
         <!-- /ko -->
       </td>
       <td>
@@ -642,6 +642,7 @@ from django.utils.translation import ugettext as _
         if (valueAccessor().enabled) {
           var dropOptions = {
             hoverClass: 'drag-hover',
+            accept: '.draggable-fb',
             drop: function (event, ui) {
               var destpath = valueAccessor().value.path;
 
