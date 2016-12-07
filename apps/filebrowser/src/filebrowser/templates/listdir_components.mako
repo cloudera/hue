@@ -709,7 +709,7 @@ from django.utils.translation import ugettext as _
       }
 
       history.forEach(function (item) {
-        var url = '/filebrowser/#' + item,
+        var url = '#' + item,
           list = $('<li><a href="' + url + '">' + item + '</a></li>');
 
         $(list).appendTo(frag);
