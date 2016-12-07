@@ -1314,6 +1314,18 @@ from django.utils.translation import ugettext as _
 
           $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
+          $('#moveForm').ajaxForm({
+            dataType:  'json',
+            success: function() {
+              $("#moveModal").modal('hide');
+              self.retrieveData();
+            },
+            error: function(xhr){
+              $.jHueNotify.error(xhr.responseText);
+              resetPrimaryButtonsStatus();
+            }
+          });
+
           if (mode === 'nomodal') {
             $.jHueNotify.info('${ _('Items moving to') } "' + $('#moveDestination').val() + '"');
             $("#moveForm").submit();
@@ -1321,18 +1333,6 @@ from django.utils.translation import ugettext as _
             $("#moveModal").modal({
               keyboard: true,
               show: true
-            });
-
-            $('#moveForm').ajaxForm({
-              dataType:  'json',
-              success: function() {
-                $("#moveModal").modal('hide');
-                self.retrieveData();
-              },
-              error: function(xhr){
-                $.jHueNotify.error(xhr.responseText);
-                resetPrimaryButtonsStatus();
-              }
             });
 
             $("#moveModal").on("shown", function () {
