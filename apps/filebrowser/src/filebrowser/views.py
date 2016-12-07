@@ -643,6 +643,7 @@ def display(request, path):
     dirname = posixpath.dirname(path)
     # Start with index-like data:
     data = _massage_stats(request, request.fs.stats(path))
+    data["is_embeddable"] = request.GET.get('is_embeddable', False)
     # And add a view structure:
     data["success"] = True
     data["view"] = {

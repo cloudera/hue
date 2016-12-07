@@ -11,14 +11,17 @@
 #loader {
   position: fixed;
   margin-top: 40px;
-  font-size: 50px;
-  text-align: center;
   width: 140px;
   height: 140px;
   line-height: 140px;
   -webkit-border-radius: 20px;
   -moz-border-radius: 20px;
   border-radius: 20px;
+}
+
+.loading {
+  font-size: 50px;
+  text-align: center;
 }
 
 .binary {
@@ -48,4 +51,9 @@ pre a:hover {
 .pagination-input {
   text-align: center;
   width: 40px;
+}
+
+dd {
+  margin-left: 0;
+  margin-bottom: 6px;
 }
