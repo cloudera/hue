@@ -282,10 +282,15 @@ def top_columns(request):
 def upload_history(request):
   response = {'status': -1}
 
+  n = request.POST.get('n')
   query_type = 'hive'
 
+  history = Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)
+  if n:
+    history = history[:n]
+
   queries = []
-  for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user):
+  for doc in history:
     query_data = Notebook(document=doc).get_data()
 
     try:
