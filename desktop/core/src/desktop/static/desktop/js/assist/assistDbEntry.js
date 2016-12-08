@@ -52,6 +52,7 @@ var AssistDbEntry = (function () {
     self.highlight = ko.observable(false);
     self.highlightParent = ko.observable(false);
     self.activeSort = self.assistDbSource.activeSort;
+    self.popularityIndex = {};
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -86,28 +87,11 @@ var AssistDbEntry = (function () {
     self.applySort = function (sortName, entries) {
       if (sortName === 'popular' && self.definition.isDatabase) {
         if (self.assistDbSource.selectedDatabase() === self) {
-          self.assistDbSource.applyingSort(true);
-          self.assistDbSource.apiHelper.fetchNavOptTopTables({
-            sourceType: self.assistDbSource.sourceType,
-            database: self.definition.name,
-            silenceErrors: true,
-            successCallback: function (data) {
-              var popularityIndex = {};
-              data.top_tables.forEach(function (topTable) {
-                popularityIndex[topTable.name] = topTable.popularity;
-              });
-              self.entries().forEach(function (entry) {
-                if (popularityIndex[entry.definition.name]) {
-                  entry.definition.popularity = popularityIndex[entry.definition.name];
-                }
-                entries.sort(self.sortFunctions.popular);
-              });
-              self.assistDbSource.applyingSort(false);
-            },
-            errorCallback: function (data) {
-              entries.sort(self.sortFunctions.creation);
-              self.assistDbSource.applyingSort(false);
+          self.entries().forEach(function (entry) {
+            if (self.popularityIndex[entry.definition.name]) {
+              entry.definition.popularity = self.popularityIndex[entry.definition.name];
             }
+            entries.sort(self.sortFunctions.popular);
           });
           deferredSort = false;
         } else {
@@ -195,6 +179,11 @@ var AssistDbEntry = (function () {
       return parts.slice(1).join("");
     });
   }
+
+  AssistDbEntry.prototype.setPopularityIndex = function (popularityIndex) {
+    var self = this;
+    self.popularityIndex = popularityIndex;
+  };
 
   AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var self = this;
