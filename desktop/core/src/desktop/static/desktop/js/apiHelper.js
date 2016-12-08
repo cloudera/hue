@@ -16,7 +16,6 @@
 
 var ApiHelper = (function () {
 
-  var TIME_TO_LIVE_IN_MILLIS = $.totalStorage('hue.cacheable.ttl.override') || $.totalStorage('hue.cacheable.ttl'); // 1 day by default, configurable with desktop.custom.cacheable_ttl in the .ini or $.totalStorage('hue.cacheable.ttl.override', 1234567890)
 
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var SAMPLE_API_PREFIX = "/notebook/api/sample/";
@@ -93,8 +92,8 @@ var ApiHelper = (function () {
         && self.lastKnownDatabases[sourceType].filter(function (knownDb) { return knownDb.toLowerCase() === name.toLowerCase() }).length === 1;
   };
 
-  ApiHelper.prototype.hasExpired = function (timestamp) {
-    return (new Date()).getTime() - timestamp > TIME_TO_LIVE_IN_MILLIS;
+  ApiHelper.prototype.hasExpired = function (timestamp, cacheType) {
+    return (new Date()).getTime() - timestamp > (hueDebug.cacheTimeout || CACHEABLE_TTL[cacheType]);
   };
 
   /**
@@ -1421,7 +1420,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopTables = function (options) {
     var self = this;
-    self.fetchNavCached('/metadata/api/optimizer/top_tables', options, function (data) {
+    self.fetchNavOptCached('/metadata/api/optimizer/top_tables', options, function (data) {
       return data.status === 0 && data.top_tables && data.top_tables.length > 0;
     });
   };
@@ -1442,7 +1441,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
-    self.fetchNavCached('/metadata/api/optimizer/top_columns', options, function (data) {
+    self.fetchNavOptCached('/metadata/api/optimizer/top_columns', options, function (data) {
       return typeof data.values !== 'undefined' && (
         typeof data.values.filterColumns !== 'undefined' ||
         typeof data.values.groupbyColumns !== 'undefined' ||
@@ -1468,7 +1467,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
-    self.fetchNavCached('/metadata/api/optimizer/top_joins', options, function (data) {
+    self.fetchNavOptCached('/metadata/api/optimizer/top_joins', options, function (data) {
       return typeof data.values !== 'undefined';
     });
   };
@@ -1489,7 +1488,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
     var self = this;
-    self.fetchNavCached('/metadata/api/optimizer/top_filters', options, function (data) {
+    self.fetchNavOptCached('/metadata/api/optimizer/top_filters', options, function (data) {
       return typeof data.values !== 'undefined';
     });
   };
@@ -1510,12 +1509,12 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
     var self = this;
-    self.fetchNavCached('/metadata/api/optimizer/top_aggs', options, function (data) {
+    self.fetchNavOptCached('/metadata/api/optimizer/top_aggs', options, function (data) {
       return typeof data.values !== 'undefined';
     });
   };
 
-  ApiHelper.prototype.fetchNavCached = function (url, options, cacheCondition) {
+  ApiHelper.prototype.fetchNavOptCached = function (url, options, cacheCondition) {
     var self = this;
 
     var data, hash;
@@ -1564,6 +1563,7 @@ var ApiHelper = (function () {
     fetchCached.bind(self)($.extend({}, options, {
       url: url,
       hash: hash,
+      cacheType: 'optimizer',
       fetchFunction: fetchFunction
     }));
   };
@@ -1616,6 +1616,7 @@ var ApiHelper = (function () {
    * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
+   * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
    * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    */
@@ -1629,7 +1630,7 @@ var ApiHelper = (function () {
 
     if (!options.noCache) {
       var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
-      if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp)) {
+      if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp, options.cacheType || 'default')) {
         options.successCallback(cachedData[options.url].data);
         return;
       }
@@ -1701,14 +1702,17 @@ var ApiHelper = (function () {
    * @param {string} [options.hash] - Optional hash to use as well as the url
    * @param {Function} options.fetchFunction
    * @param {Function} options.successCallback
+   * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
    * @param {Object} [options.editor] - Ace editor
    */
   var fetchCached = function (options) {
+    console.log(options.url + ' ' + options.cacheType);
     var self = this;
     var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
 
-    if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp)) {
+
+    if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.showSpinner();
       }

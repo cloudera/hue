@@ -18,7 +18,7 @@ from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
-from metadata.conf import has_optimizer
+from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop.views.home')
 if USE_NEW_EDITOR.get():
@@ -109,6 +109,11 @@ if USE_NEW_EDITOR.get():
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+
+    var CACHEABLE_TTL = {
+      default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
+      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
+    };
 
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
@@ -256,9 +261,6 @@ if USE_NEW_EDITOR.get():
     }
 
     $.fn.dataTableExt.sErrMode = "throw";
-
-    // sets global apiHelper TTL
-    $.totalStorage('hue.cacheable.ttl', ${conf.CUSTOM.CACHEABLE_TTL.get()});
 
     var IDLE_SESSION_TIMEOUT = -1;
 
