@@ -70,7 +70,6 @@ var AssistDbSource = (function () {
 
     self.invalidateOnRefresh = ko.observable('cache');
 
-    self.applyingSort = ko.observable(false);
     self.activeSort = ko.observable('alpha');
 
     self.activeSort.subscribe(function (newSort) {
@@ -178,6 +177,23 @@ var AssistDbSource = (function () {
         }
         return database;
       });
+
+      if (HAS_OPTIMIZER && dbs.length > 0) {
+        dbs.forEach(function (db) {
+          self.apiHelper.fetchNavOptTopTables({
+            sourceType: self.sourceType,
+            database: db.definition.name,
+            silenceErrors: true,
+            successCallback: function (data) {
+              var popularityIndex = {};
+              data.top_tables.forEach(function (topTable) {
+                popularityIndex[topTable.name] = topTable.popularity;
+              });
+              db.setPopularityIndex(popularityIndex);
+            }
+          });
+        });
+      }
 
       dbs.sort(sortFunctions[self.activeSort()]);
       self.databases(dbs);
