@@ -15,8 +15,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import json
 import logging
+import struct
 
 from django.http import Http404
 from django.utils.translation import ugettext as _
@@ -282,10 +284,17 @@ def upload_history(request):
 
   query_type = 'hive'
 
-  queries = [
-      (doc.uuid, 1000, Notebook(document=doc).get_data()['snippets'][0]['statement'])
-      for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:10]
-  ]
+  queries = []
+  for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:10]:
+    query_data = Notebook(document=doc).get_data()
+
+    try:
+      original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(query_data['snippets'][0]['result']['handle']['guid']))
+      execution_time = query_data['snippets'][0]['result']['executionTime'] * 100
+
+      queries.append((original_query_id, execution_time, query_data['snippets'][0]['statement']))
+    except Exception, e:
+      LOG.warning('Skipping upload of %s: %s' % (doc, e))
 
   api = OptimizerApi()
 
