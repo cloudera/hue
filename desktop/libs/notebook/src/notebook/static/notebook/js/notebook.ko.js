@@ -1398,26 +1398,30 @@ var EditorViewModel = (function() {
       $.post("/metadata/api/optimizer/upload_history", {
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", "N Queries uploaded successfully");
+          $(document).trigger("info", "Queries uploaded successfully. Preparing them...");
+          self.watchUploadStatus(data.upload_history.status.workloadId);
         } else {
           $(document).trigger("error", data.message);
         }
       });
     };
 
-    self._getUploadStatus = function (workloadId) {
-        logGA('get_upload_status');
-
-        $.post("/metadata/api/optimizer/upload_status", {
-          workloadId: workloadId,
-        }, function(data) {
-          if (data.status == 0) {
-            $(document).trigger("info", data.upload_status.status.state);
-          } else {
-            $(document).trigger("error", data.message);
+    self.watchUploadStatus = function (workloadId) {
+      $.post("/metadata/api/optimizer/upload_status", {
+        workloadId: workloadId,
+      }, function(data) {
+        if (data.status == 0) {
+          $(document).trigger("info", data.upload_status.status.state);
+          if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
+            window.setTimeout(function () {
+              self._getUploadStatus(workloadId);
+            }, 1000);
           }
-        });
-      };
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
 
     self.getSimilarQueries = function () {
       logGA('get_query_similarity');
