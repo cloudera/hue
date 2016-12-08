@@ -88,6 +88,13 @@ ENABLE_DBPROXY_SERVER = Config(
   default=True
 )
 
+DBPROXY_EXTRA_CLASSPATH = Config(
+  key="dbproxy_extra_classpath",
+  help=_t("Additional classes to put on the dbproxy classpath when starting. Values separated by ':'"),
+  type=str,
+  default=''
+)
+
 ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
