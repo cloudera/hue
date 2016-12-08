@@ -63,7 +63,8 @@ dynamic_patterns = patterns('desktop.auth.views',
 if USE_NEW_EDITOR.get():
   dynamic_patterns += patterns('desktop.views',
     (r'^home$','home2'),
-    (r'^home2$','home')
+    (r'^home2$','home'),
+    (r'^home_embeddable$','home_embeddable'),
   )
 else:
   dynamic_patterns += patterns('desktop.views',
