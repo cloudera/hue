@@ -305,6 +305,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_oozie_wf" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
+      <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
     </div>
 
@@ -424,24 +425,35 @@ ${ assist.assistPanel() }
           oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
           filebrowser: '/filebrowser/?is_embeddable=true',
+          fileviewer: 'filebrowser/view=',
           home: '/home_embeddable',
         };
+
+        self.SKIP_CACHE = ['fileviewer'];
 
         self.embeddable_cache = {};
 
         self.currentApp = ko.observable();
         self.isLoadingEmbeddable = ko.observable(false);
 
+        self.extraEmbeddableURLParams = ko.observable('');
+
+        huePubSub.subscribe('open.fb.file', function(path){
+          self.extraEmbeddableURLParams(path + '?is_embeddable=true');
+          self.currentApp('fileviewer');
+        });
+
         self.currentApp.subscribe(function(newVal){
           self.isLoadingEmbeddable(true);
           if (typeof self.embeddable_cache[newVal] === 'undefined'){
             $.ajax({
-              url: self.EMBEDDABLE_PAGE_URLS[newVal],
+              url: self.EMBEDDABLE_PAGE_URLS[newVal] + self.extraEmbeddableURLParams(),
               beforeSend:function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
               dataType:'html',
               success:function (response) {
+                self.extraEmbeddableURLParams('');
                 // TODO: remove the next lines
                 // hack to avoid css caching for development
                 var r = $(response);
@@ -463,7 +475,9 @@ ${ assist.assistPanel() }
                     $(this).remove();
                   }
                 });
-                self.embeddable_cache[newVal] = r;
+                if (self.SKIP_CACHE.indexOf(newVal) === -1) {
+                  self.embeddable_cache[newVal] = r;
+                }
                 $('#embeddable_' + newVal).html(r);
                 self.isLoadingEmbeddable(false);
               }

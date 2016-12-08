@@ -117,47 +117,38 @@ ${ fb_components.menubar() }
             </div>
           </div>
         <!-- /ko -->
-        % if breadcrumbs and not is_embeddable:
+        % if breadcrumbs:
           ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif
         <div class="card-body">
-          <!-- ko ifnot: $root.file -->
-            <div data-bind="visible: isLoading" class="loading">
-              <i class="fa fa-spinner fa-spin muted"></i>
-            </div>
-          <!-- /ko -->
-          <!-- ko if: $root.file -->
-            <!-- ko if: $root.file().stats.size() === 0 -->
+            <!-- ko if: $root.file() && $root.file().stats.size() === 0 -->
             <div class="center empty-wrapper">
               <i class="fa fa-frown-o"></i>
               <h1>${_('The current file is empty.')}</h1>
               <br/>
             </div>
             <!-- /ko -->
-            <!-- ko ifnot: $root.file().stats.size() === 0 -->
-            <!-- ko if: $root.file().view.contents && $root.file().view.masked_binary_data() -->
-            <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
-            <!-- /ko -->
-            <!-- ko if: ['avro', 'gzip', 'parquet', 'snappy'].indexOf($root.file().view.compression()) > -1 -->
-            <div class="alert alert-warning"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</div>
+            <!-- ko if: $root.file -->
+              <!-- ko ifnot: $root.file().stats.size() === 0 -->
+                <!-- ko if: $root.file().view.contents && $root.file().view.masked_binary_data() -->
+                <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
+                <!-- /ko -->
+                <!-- ko if: ['avro', 'gzip', 'parquet', 'snappy'].indexOf($root.file().view.compression()) > -1 -->
+                <div class="alert alert-warning"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</div>
+                <!-- /ko -->
+              <!-- /ko -->
             <!-- /ko -->
             <div id="fileArea" data-bind="css: {'loading': isLoading}">
               <div id="loader" class="loading" data-bind="visible: isLoading">
                 <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
                 <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
               </div>
-              <!-- ko if: $root.file().view.contents -->
                 <pre></pre>
-              <!-- /ko -->
-              <!-- ko ifnot: $root.file().view.contents -->
                 <table class="binary">
                   <tbody>
                   </tbody>
                 </table>
-              <!-- /ko -->
             </div>
-          <!-- /ko -->
-          <!-- /ko -->
         </div>
       </div>
     </div>
