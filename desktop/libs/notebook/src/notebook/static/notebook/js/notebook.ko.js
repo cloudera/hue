@@ -1392,10 +1392,11 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.loadQueryHistory = function () {
+    self.loadQueryHistory = function (n) {
       logGA('load_query_history');
 
       $.post("/metadata/api/optimizer/upload_history", {
+        n: n
       }, function(data) {
         if (data.status == 0) {
           $(document).trigger("info", "Queries uploaded successfully. Preparing them...");
@@ -1411,11 +1412,11 @@ var EditorViewModel = (function() {
         workloadId: workloadId,
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", data.upload_status.status.state);
+          $(document).trigger("info", "Query processing: " + data.upload_status.status.state);
           if (['WAITING', 'IN_PROGRESS'].indexOf(data.upload_status.status.state) != -1) {
             window.setTimeout(function () {
-              self._getUploadStatus(workloadId);
-            }, 1000);
+              self.watchUploadStatus(workloadId);
+            }, 2000);
           }
         } else {
           $(document).trigger("error", data.message);
