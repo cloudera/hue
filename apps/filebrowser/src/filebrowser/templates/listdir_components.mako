@@ -1251,7 +1251,8 @@ from django.utils.translation import ugettext as _
         self.openDefaultFolder(vm, e, 'default_to_trash');
       }
 
-      self.viewFile = function (file) {
+      self.viewFile = function (file, e) {
+        e.stopImmediatePropagation();
         if (file.type == "dir") {
           // Reset page number so that we don't hit a page that doesn't exist
           self.targetPageNum(1);
@@ -1260,7 +1261,11 @@ from django.utils.translation import ugettext as _
           self.targetPath("${url('filebrowser.views.view', path='')}" + stripHashes(file.path));
           location.hash = stripHashes(file.path);
         } else {
+          %if is_embeddable:
+          huePubSub.publish('open.fb.file', file.path);
+          %else:
           location.href = file.url;
+          %endif
         }
       };
 
