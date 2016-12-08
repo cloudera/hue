@@ -285,7 +285,7 @@ def upload_history(request):
   query_type = 'hive'
 
   queries = []
-  for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)[:10]:
+  for doc in Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user):
     query_data = Notebook(document=doc).get_data()
 
     try:
