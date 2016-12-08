@@ -28,10 +28,10 @@ var AssistDbSource = (function () {
     },
     popular: function (a, b) {
       if (a.definition.popularity && !b.definition.popularity) {
-        return 1;
+        return -1;
       }
       if (b.definition.popularity && !a.definition.popularity) {
-        return -1;
+        return 1;
       }
       if (a.definition.popularity && b.definition.popularity) {
         if (a.definition.popularity === b.definition.popularity) {
