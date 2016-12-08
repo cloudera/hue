@@ -1396,7 +1396,8 @@ var EditorViewModel = (function() {
       logGA('load_query_history');
 
       $.post("/metadata/api/optimizer/upload_history", {
-        n: n
+        n: typeof n != "undefined" ? n : null,
+        sourcePlatform: self.type()
       }, function(data) {
         if (data.status == 0) {
           $(document).trigger("info", "Queries uploaded successfully. Preparing them...");
@@ -1409,7 +1410,7 @@ var EditorViewModel = (function() {
 
     self.watchUploadStatus = function (workloadId) {
       $.post("/metadata/api/optimizer/upload_status", {
-        workloadId: workloadId,
+        workloadId: workloadId
       }, function(data) {
         if (data.status == 0) {
           $(document).trigger("info", "Query processing: " + data.upload_status.status.state);

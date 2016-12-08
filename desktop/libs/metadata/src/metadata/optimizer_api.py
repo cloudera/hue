@@ -283,9 +283,9 @@ def upload_history(request):
   response = {'status': -1}
 
   n = request.POST.get('n')
-  query_type = 'hive'
+  source_platform = request.POST.get('sourcePlatform', 'hive')
 
-  history = Document2.objects.get_history(doc_type='query-%s' % query_type, user=request.user)
+  history = Document2.objects.get_history(doc_type='query-%s' % source_platform, user=request.user)
   if n:
     history = history[:n]
 
@@ -303,7 +303,7 @@ def upload_history(request):
 
   api = OptimizerApi()
 
-  response['upload_history'] = api.upload(queries=queries, source_platform=query_type)
+  response['upload_history'] = api.upload(queries=queries, source_platform=source_platform)
   response['status'] = 0
 
   return JsonResponse(response)

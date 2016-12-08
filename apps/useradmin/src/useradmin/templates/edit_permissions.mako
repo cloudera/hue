@@ -68,7 +68,7 @@ ${layout.menubar(section='permissions')}
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No groups found.')}",
       width: 600,
-      height: 240
+      height: 500
     });
   });
 </script>
