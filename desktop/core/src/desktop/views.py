@@ -106,7 +106,7 @@ def home(request):
   })
 
 
-def home2(request):
+def home2(request, is_embeddable=False):
   try:
     converter = DocumentConverter(request.user)
     converter.convert()
@@ -115,10 +115,17 @@ def home2(request):
 
   apps = appmanager.get_apps_dict(request.user)
 
-  return render('home2.mako', request, {
+  template = 'home2.mako'
+  if is_embeddable:
+    template = 'home_embeddable.mako'
+
+  return render(template, request, {
     'apps': apps,
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
+
+def home_embeddable(request):
+  return home2(request, True)
 
 
 @access_log_level(logging.WARN)

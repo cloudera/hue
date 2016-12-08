@@ -69,6 +69,47 @@
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
+    // jHue plugins global configuration
+    jHueFileChooserGlobals = {
+      labels: {
+        BACK: "${_('Back')}",
+        SELECT_FOLDER: "${_('Select this folder')}",
+        CREATE_FOLDER: "${_('Create folder')}",
+        FOLDER_NAME: "${_('Folder name')}",
+        CANCEL: "${_('Cancel')}",
+        FILE_NOT_FOUND: "${_('The file has not been found')}",
+        UPLOAD_FILE: "${_('Upload a file')}",
+        FAILED: "${_('Failed')}"
+      },
+      user: "${ user.username }"
+    };
+
+    jHueHdfsTreeGlobals = {
+      labels: {
+        CREATE_FOLDER: "${_('Create folder')}",
+        FOLDER_NAME: "${_('Folder name')}",
+        CANCEL: "${_('Cancel')}"
+      }
+    };
+
+    jHueTableExtenderGlobals = {
+      labels: {
+        GO_TO_COLUMN: "${_('Go to column:')}",
+        PLACEHOLDER: "${_('column name...')}",
+        LOCK: "${_('Click to lock this row')}",
+        UNLOCK: "${_('Click to unlock this row')}"
+      }
+    };
+
+    jHueTourGlobals = {
+      labels: {
+        AVAILABLE_TOURS: "${_('Available tours')}",
+        NO_AVAILABLE_TOURS: "${_('None for this page.')}",
+        MORE_INFO: "${_('Read more about it...')}",
+        TOOLTIP_TITLE: "${_('Demo tutorials')}"
+      }
+    };
+
     ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
@@ -91,7 +132,7 @@ ${ hueIcons.symbols() }
         <span class="hamburger-inner"></span>
       </span>
       </a>
-      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip"  href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }">
+      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip"  href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('home') }">
         <svg style="margin-top:12px;margin-left:8px;height: 24px;width:120px;display: inline-block;">
           <use xlink:href="#hue-logo"></use>
         </svg>
@@ -264,6 +305,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_oozie_wf" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
+      <div id="embeddable_home" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -342,11 +384,13 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
+<script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
 ${ koComponents.all() }
 ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
+
 
 <script type="text/javascript" charset="utf-8">
 
@@ -379,7 +423,8 @@ ${ assist.assistPanel() }
           search: '/search/embeddable/new_search',
           oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
-          filebrowser: '/filebrowser/?is_embeddable=true'
+          filebrowser: '/filebrowser/?is_embeddable=true',
+          home: '/home_embeddable',
         };
 
         self.embeddable_cache = {};
