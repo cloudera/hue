@@ -19,7 +19,7 @@
   from django.utils.translation import ugettext as _
   from desktop.lib.i18n import smart_unicode
   from desktop.views import login_modal
-  from metadata.conf import has_optimizer
+  from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
