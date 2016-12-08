@@ -2095,7 +2095,7 @@ ${ hueIcons.symbols() }
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: status() == 'canceled'">
+    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: status() == 'canceled', click: function() { status('ready'); }" title="${ _('Click to hide') }">
       <ul class="unstyled">
         <li>${ _("The statement was canceled.") }</li>
       </ul>
