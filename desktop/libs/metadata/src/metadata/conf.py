@@ -70,6 +70,12 @@ OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
+    CACHEABLE_TTL=Config(
+      key='cacheable_ttl',
+      type=int,
+      help=_t('The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 to disable the cache.'),
+      default=432000000),
+
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)'),
