@@ -117,6 +117,34 @@ var AssistDbSource = (function () {
 
     self.selectedDatabase = ko.observable();
 
+    self.selectedDatabase.subscribe(function () {
+      var db = self.selectedDatabase();
+      if (HAS_OPTIMIZER && db && !db.popularityIndexSet) {
+        self.apiHelper.fetchNavOptTopTables({
+          sourceType: self.sourceType,
+          database: db.definition.name,
+          silenceErrors: true,
+          successCallback: function (data) {
+            var popularityIndex = {};
+            data.top_tables.forEach(function (topTable) {
+              popularityIndex[topTable.name] = topTable.popularity;
+            });
+            db.setPopularityIndex(popularityIndex);
+            if (self.activeSort() === 'popular') {
+              if (db.loading()) {
+                var subscription = db.loading.subscribe(function () {
+                  db.entries.sort(sortFunctions.popular);
+                  subscription.remove();
+                });
+              } else {
+                db.entries.sort(sortFunctions.popular);
+              }
+            }
+          }
+        });
+      }
+    });
+
     self.reloading = ko.observable(false);
 
     self.loadingTables = ko.pureComputed(function() {
@@ -177,23 +205,6 @@ var AssistDbSource = (function () {
         }
         return database;
       });
-
-      if (HAS_OPTIMIZER && dbs.length > 0) {
-        dbs.forEach(function (db) {
-          self.apiHelper.fetchNavOptTopTables({
-            sourceType: self.sourceType,
-            database: db.definition.name,
-            silenceErrors: true,
-            successCallback: function (data) {
-              var popularityIndex = {};
-              data.top_tables.forEach(function (topTable) {
-                popularityIndex[topTable.name] = topTable.popularity;
-              });
-              db.setPopularityIndex(popularityIndex);
-            }
-          });
-        });
-      }
 
       dbs.sort(sortFunctions[self.activeSort()]);
       self.databases(dbs);

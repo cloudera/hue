@@ -16,7 +16,6 @@
 
 var ApiHelper = (function () {
 
-
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
   var SAMPLE_API_PREFIX = "/notebook/api/sample/";
   var DOCUMENTS_API = "/desktop/api2/doc/";
@@ -1710,7 +1709,6 @@ var ApiHelper = (function () {
     var self = this;
     var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
-
 
     if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {

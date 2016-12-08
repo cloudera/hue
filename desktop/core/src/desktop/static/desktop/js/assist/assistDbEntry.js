@@ -53,6 +53,7 @@ var AssistDbEntry = (function () {
     self.highlightParent = ko.observable(false);
     self.activeSort = self.assistDbSource.activeSort;
     self.popularityIndex = {};
+    self.popularityIndexSet = false;
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -182,6 +183,7 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.setPopularityIndex = function (popularityIndex) {
     var self = this;
+    self.popularityIndexSet = true;
     self.popularityIndex = popularityIndex;
   };
 
