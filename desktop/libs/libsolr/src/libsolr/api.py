@@ -27,6 +27,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.conf import SERVER_USER
+from desktop.lib.conf import BoundConfig
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
@@ -43,12 +44,16 @@ LOG = logging.getLogger(__name__)
 def utf_quoter(what):
   return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=;,.?/\'')
 
+def search_enabled():
+  return type(SECURITY_ENABLED) == BoundConfig
 
 class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
-  def __init__(self, solr_url, user, security_enabled=SECURITY_ENABLED.get(), ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
+  def __init__(self, solr_url, user,
+               security_enabled=SECURITY_ENABLED.get() if search_enabled() else SECURITY_ENABLED.default,
+               ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
     self._url = solr_url
     self._user = user
     self._client = HttpClient(self._url, logger=LOG)
