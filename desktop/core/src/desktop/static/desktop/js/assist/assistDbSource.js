@@ -34,6 +34,9 @@ var AssistDbSource = (function () {
         return -1;
       }
       if (a.definition.popularity && b.definition.popularity) {
+        if (a.definition.popularity === b.definition.popularity) {
+          return sortFunctions.creation(a, b);
+        }
         return a.definition.popularity - b.definition.popularity
       }
       return sortFunctions.creation(a, b);
