@@ -36,6 +36,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 </%def>
 
 <%def name="assistPanel(is_s3_enabled=False)">
+  <%
+    home_dir = user.get_home_directory()
+    if not request.fs.isdir(home_dir):
+      home_dir = '/'
+  %>
+
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
   <%namespace name="nav_components" file="/nav_components.mako" />
 
@@ -1501,7 +1507,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         self.selectedHdfsEntry = ko.observable();
         self.reload = function () {
-          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '/');
+          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '${ home_dir }');
           var parts = lastKnownPath.split('/');
           parts.shift();
 
