@@ -104,7 +104,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
     var self = this;
-    return sourceType + "_" + self.user;
+    return sourceType + '_' + self.user + '_' + window.location.hostname;
   };
 
   /**
