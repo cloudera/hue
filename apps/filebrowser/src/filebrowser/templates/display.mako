@@ -225,8 +225,10 @@ ${ fb_components.menubar() }
     $.getJSON(_baseUrl, params, function (data) {
       var _html = "";
 
-      viewModel.file(ko.mapping.fromJS(data));
+      viewModel.file(ko.mapping.fromJS(data, { 'ignore': ['view.contents', 'view.xxd'] }));
       if (data.view.contents) {
+        $('#fileArea pre').show();
+        $('.binary').hide();
         var chunks = getChunks(startPage, endPage, data.view)
         for (var i = startPage; i <= endPage; i++) {
           pages[i] = chunks.shift();
@@ -244,6 +246,8 @@ ${ fb_components.menubar() }
 
       if (data.view.xxd != null) {
         pages[startPage] = data.view.xxd;
+        $('#fileArea pre').hide();
+        $('.binary').show();
 
         $(data.view.xxd).each(function (cnt, item) {
           _html += "<tr><td>" + formatHex(item[0], 7) + ":&nbsp;</td><td>";
