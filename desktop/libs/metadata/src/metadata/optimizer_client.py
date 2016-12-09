@@ -147,9 +147,11 @@ class OptimizerApi(object):
 
 
   def upload(self, queries, source_platform='generic', workload_id=None):
-    try:
-      with NamedTemporaryFile(suffix='.csv', delete=False) as f_queries, NamedTemporaryFile(suffix='.json', delete=False) as f_format: # Deleted later
+    with NamedTemporaryFile(suffix='.csv') as f_queries_path, NamedTemporaryFile(suffix='.json') as f_format_path:
+      pass
 
+    try:
+      with open(f_queries_path.name, 'w+') as f_queries, open(f_format_path.name, 'w+') as f_format:
         content_generator = OptimizerDataAdapter(queries)
         queries_csv = export_csvxls.create_generator(content_generator, 'csv')
 
@@ -194,14 +196,13 @@ class OptimizerApi(object):
       if workload_id:
         args += ['--workload-id', workload_id]
 
-      try:
-        return self._exec('upload', args)
-      finally:
-        os.remove(f_queries.name)
-        os.remove(f_format.name)
+      return self._exec('upload', args)
 
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
+    finally:
+      os.remove(f_queries_path.name)
+      os.remove(f_format_path.name)
 
 
   def upload_status(self, workload_id):
