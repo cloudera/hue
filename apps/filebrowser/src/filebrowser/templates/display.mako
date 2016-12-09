@@ -103,8 +103,7 @@ ${ fb_components.menubar() }
             <div class="form-inline pagination-input-form inline">
               <span>${_('Page')}</span>
               <input type="text" data-bind="value: page, valueUpdate: 'afterkeydown', event: { change: pageChanged }" class="pagination-input" />
-              <span data-bind="visible: totalPages() > MAX_PAGES_TO_ENABLE_SCROLLING || $root.mode() == 'binary'">
-              ${_('to')} <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" class="pagination-input"/></span>
+              ${_('to')} <input type="text" data-bind="value: upperPage, valueUpdate: 'afterkeydown', event: { change: upperPageChanged }" class="pagination-input"/>
               ${_('of')} <span data-bind="text: totalPages"></span>
             </div>
             <div class="pagination inline">
@@ -198,15 +197,8 @@ ${ fb_components.menubar() }
   function renderPages () {
     var _html = "";
     var fileAreaHeight = $("#fileArea").height();
-
-    if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING) { // enable scrolling
-      for (var i = 1; i <= viewModel.totalPages(); i++) {
-        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
-      }
-    } else {
-      for (i = viewModel.page(); i <= viewModel.upperPage(); i++) {
-        _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
-      }
+    for (var i = viewModel.page(); i <= viewModel.upperPage(); i++) {
+      _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
     }
     $("#fileArea pre").html(_html);
   }
@@ -255,10 +247,9 @@ ${ fb_components.menubar() }
         pages[startPage] = data.view.xxd;
 
         $(data.view.xxd).each(function (cnt, item) {
-          var i;
           _html += "<tr><td>" + formatHex(item[0], 7) + ":&nbsp;</td><td>";
 
-          for (i = 0; i < item[1].length; i++) {
+          for (var i = 0; i < item[1].length; i++) {
             _html += formatHex(item[1][i][0], 2) + " " + formatHex(item[1][i][1], 2) + " ";
           }
 
@@ -280,22 +271,13 @@ ${ fb_components.menubar() }
     var self = this;
 
     function changePage () {
-      if (self.totalPages() >= self.MAX_PAGES_TO_ENABLE_SCROLLING || self.mode() == "binary") {
-        renderPages();
-      }
+      renderPages();
       getContent(function () {
-        if (self.totalPages() >= self.MAX_PAGES_TO_ENABLE_SCROLLING || self.mode() == "binary") {
-          location.hash = "#p" + self.page() + (self.page() != self.upperPage() ? "-p" + self.upperPage() : "");
-          $("#fileArea").scrollTop(0);
-
-        } else {
-          location.hash = "#page" + self.page();
-        }
+        $("#fileArea").scrollTop(0);
       });
     }
 
-    self.MAX_ALLOWED_PAGES_PER_REQUEST = ${MAX_ALLOWED_PAGES_PER_REQUEST};
-    self.MAX_PAGES_TO_ENABLE_SCROLLING = 300;
+    self.MAX_ALLOWED_PAGES_PER_REQUEST = ${ MAX_ALLOWED_PAGES_PER_REQUEST };
     self.PAGES_PER_CHUNK = 50;
 
     self.isViewing = ko.observable(true);
@@ -450,50 +432,15 @@ ${ fb_components.menubar() }
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
     });
 
-    var _hashPage, _hashUpperPage, _resizeTimeout, _fileAreaScrollTimeout, i,
-      _hash = location.hash;
-
-    _hashPage = 1;
-    _hashUpperPage = 50;
-
-    if (_hash != "") {
-      if (_hash.indexOf("-") > -1) {
-        _hashPage = _hash.split("-")[0].substr(2) * 1;
-        _hashUpperPage = _hash.split("-")[1].substr(1) * 1;
-      } else {
-        _hashPage = _hash.substr(2) * 1;
-        _hashUpperPage = Math.min(viewModel.totalPages(), _hashPage + 50 - 1);
-      }
-
-      if (isNaN(_hashPage)) {
-        _hashPage = 1;
-      }
-
-      if (isNaN(_hashUpperPage)) {
-        _hashUpperPage = Math.min(viewModel.totalPages(), 50);
-      }
-
-      if (_hashUpperPage - _hashPage > viewModel.MAX_ALLOWED_PAGES_PER_REQUEST) {
-        _hashUpperPage = _hashPage + viewModel.MAX_ALLOWED_PAGES_PER_REQUEST;
-      }
-    }
-    viewModel.page(_hashPage);
-    viewModel.upperPage(_hashUpperPage);
-
-    viewModel.toggleDisables();
-
     setTimeout(function () {
       getContent(function () {
-        if (location.hash != "") {
-          location.hash = "#page" + viewModel.page();
-          location.hash = "#p" + viewModel.page() + (viewModel.page() != viewModel.upperPage() ? "-p" + viewModel.upperPage() : "");
-        }
+        viewModel.toggleDisables();
       });
     }, 100);
 
     resizeText();
 
-    _resizeTimeout = -1;
+    var _resizeTimeout = -1;
 
     $(window).on("resize", function () {
       clearTimeout(_resizeTimeout);
@@ -508,39 +455,6 @@ ${ fb_components.menubar() }
     });
 
     $("#fileArea").jHueScrollUp();
-
-    if (viewModel.totalPages() < viewModel.MAX_PAGES_TO_ENABLE_SCROLLING && viewModel.mode() == "text") { // enable scrolling
-      _fileAreaScrollTimeout = -1;
-      $("#fileArea").on("scroll", function () {
-        if (viewModel.compression() === 'gzip') {
-          $("#fileArea").off("scroll");
-          $(document).trigger('warn', "${_('Offsets are not supported with Gzip compression.')}");
-          return false;
-        }
-
-        if ($("#fileArea").scrollTop() < 30) {
-          viewModel.page(1);
-          viewModel.upperPage(viewModel.page());
-        } else {
-          for (i = 1; i <= viewModel.totalPages(); i++) {
-            if ($("#page" + i + " div").visible(true)) {
-              viewModel.page(i);
-              viewModel.upperPage(viewModel.page());
-            }
-          }
-        }
-        clearTimeout(_fileAreaScrollTimeout);
-        _fileAreaScrollTimeout = setTimeout(function () {
-          location.hash = "#p" + viewModel.page();
-          if (viewModel.page() > 1 && pages[viewModel.page() - 1] == null) {
-            viewModel.page(viewModel.page() - 1);
-            getContent();
-          } else if (pages[viewModel.page()] == null) {
-            getContent();
-          }
-        }, 100);
-      });
-    }
   });
 }());
 </script>
