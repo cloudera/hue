@@ -315,8 +315,8 @@ var EditorViewModel = (function() {
       }
     };
 
-    huePubSub.subscribe('assist.db.refresh', function (type) {
-      if (self.type() == type) {
+    huePubSub.subscribe('assist.db.refresh', function (options) {
+      if (self.type() == options.sourceType) {
         updateDatabases();
       }
     });
@@ -581,7 +581,7 @@ var EditorViewModel = (function() {
     self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
     window.setTimeout(function () {
       self.delayedDDLNotification.subscribe(function (val) {
-        huePubSub.publish('assist.db.refresh', self.type());
+        huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
       });
     }, 0);
 
