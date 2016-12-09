@@ -597,6 +597,10 @@ var Collection = function (vm, collection) {
     $(document).trigger("addFunctionToSource", self.template.selectedSourceFunction());
   };
 
+  self.widgetType = ko.computed(function() {
+     return self.template.isGridLayout() ? 'resultset-widget' : 'html-resultset-widget'; 
+  });
+
   if (collection.facets.length > 0) {
     collection.facets.forEach(function (f) {
       if (f.properties.facets_form && typeof f.properties.facets_form.field === 'undefined') {
@@ -624,7 +628,7 @@ var Collection = function (vm, collection) {
     }
 
     // For Hue 4 facets only
-    if (typeof facet.docs != 'undefined') {
+    if (typeof facet.template != 'undefined') {
       facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
         var _fields = [];
 
@@ -656,8 +660,8 @@ var Collection = function (vm, collection) {
       });
 
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
-         vm.getFacetFromQuery(facet.id()).resultHash('');
-         vm.search();
+        vm.getFacetFromQuery(facet.id()).resultHash('');
+        vm.search();
       });
     }
   }
