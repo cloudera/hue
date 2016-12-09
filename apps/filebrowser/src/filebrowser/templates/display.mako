@@ -74,7 +74,7 @@ ${ fb_components.menubar() }
            <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="fa fa-download"></i> ${_('Download')}</a></li>
           <!-- /ko -->
            <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
-           <li><a id="refreshBtn" href="#"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
+           <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
 
            <!-- ko if: $root.file().stats -->
            <li class="white">
@@ -138,7 +138,7 @@ ${ fb_components.menubar() }
               <!-- /ko -->
             <!-- /ko -->
             <div id="fileArea" data-bind="css: {'loading': isLoading}">
-              <div id="loader" class="loading" data-bind="visible: isLoading">
+              <div id="loader" data-bind="visible: isLoading">
                 <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
                 <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
               </div>
@@ -196,9 +196,8 @@ ${ fb_components.menubar() }
 
   function renderPages () {
     var _html = "";
-    var fileAreaHeight = $("#fileArea").height();
     for (var i = viewModel.page(); i <= viewModel.upperPage(); i++) {
-      _html += "<a id='page" + i + "'><div class='fill-file-area' style='height: " + fileAreaHeight + "px'></div></a>";
+      _html += "<a id='page" + i + "'><div class='fill-file-area'></div></a>";
     }
     $("#fileArea pre").html(_html);
   }
@@ -270,7 +269,7 @@ ${ fb_components.menubar() }
   function DisplayViewModel (params) {
     var self = this;
 
-    function changePage () {
+    self.changePage = function () {
       renderPages();
       getContent(function () {
         $("#fileArea").scrollTop(0);
@@ -340,7 +339,7 @@ ${ fb_components.menubar() }
       if (self.page() > self.upperPage()) {
         self.upperPage(self.page());
       }
-      changePage();
+      self.changePage();
     };
 
     self.upperPageChanged = function () {
@@ -359,7 +358,7 @@ ${ fb_components.menubar() }
         self.upperPage(self.page() + self.MAX_ALLOWED_PAGES_PER_REQUEST);
         $.jHueNotify.info("${_('Sorry, you cannot request for more than %s pages.' % MAX_ALLOWED_PAGES_PER_REQUEST)}");
       }
-      changePage();
+      self.changePage();
     };
 
     self.page.subscribe(function (value) {
@@ -382,7 +381,7 @@ ${ fb_components.menubar() }
           self.page(self.upperPage() + 1);
           self.upperPage(Math.min(self.page() + _difference, self.totalPages()));
         }
-        changePage();
+        self.changePage();
       }
     };
 
@@ -407,7 +406,7 @@ ${ fb_components.menubar() }
         var lastDiff = self.upperPage() - self.page() + 1;
         self.page(Math.max(1, self.totalPages() - lastDiff));
         self.upperPage(self.totalPages());
-        changePage();
+        self.changePage();
       }
     };
 
@@ -420,7 +419,7 @@ ${ fb_components.menubar() }
         } else {
           self.upperPage(Math.min(self.totalPages(), 50));
         }
-        changePage();
+        self.changePage();
       }
     };
   }
@@ -448,10 +447,6 @@ ${ fb_components.menubar() }
         resizeText();
         $('.fill-file-area').css('height', $("#fileArea").height() + 'px');
       }, 300);
-    });
-
-    $("#refreshBtn").click(function(){
-      window.location.reload();
     });
 
     $("#fileArea").jHueScrollUp();
