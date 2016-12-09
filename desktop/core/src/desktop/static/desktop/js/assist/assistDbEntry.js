@@ -239,9 +239,9 @@ var AssistDbEntry = (function () {
     self.editingSearch(self.isSearchVisible());
   };
 
-  AssistDbEntry.prototype.triggerRefresh = function () {
+  AssistDbEntry.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    self.assistDbSource.triggerRefresh();
+    self.assistDbSource.triggerRefresh(data, event);
   };
 
   AssistDbEntry.prototype.highlightInside = function (path) {

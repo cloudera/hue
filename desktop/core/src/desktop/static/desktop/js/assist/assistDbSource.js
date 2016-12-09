@@ -264,20 +264,27 @@ var AssistDbSource = (function () {
       $container.find(".assist-actions, .assist-db-header-actions").css('right', -$container.scrollLeft() + 'px');
     };
 
-    self.reload = function() {
+    self.reload = function(allCacheTypes) {
       self.reloading(true);
       huePubSub.publish('assist.clear.db.cache', {
         sourceType: self.sourceType,
         clearAll: true,
         invalidateImpala: self.invalidateOnRefresh()
       });
+      if (allCacheTypes) {
+        huePubSub.publish('assist.clear.db.cache', {
+          sourceType: self.sourceType,
+          cacheType: 'optimizer',
+          clearAll: true
+        });
+      }
       self.invalidateOnRefresh('cache');
       self.initDatabases();
     };
 
-    huePubSub.subscribe('assist.db.refresh', function (type) {
-      if (self.sourceType === type) {
-        self.reload();
+    huePubSub.subscribe('assist.db.refresh', function (options) {
+      if (self.sourceType === options.sourceType) {
+        self.reload(options.allCacheTypes);
       }
     });
   }
@@ -326,9 +333,9 @@ var AssistDbSource = (function () {
     self.editingSearch(self.isSearchVisible());
   };
 
-  AssistDbSource.prototype.triggerRefresh = function () {
+  AssistDbSource.prototype.triggerRefresh = function (data, event) {
     var self = this;
-    huePubSub.publish('assist.db.refresh', self.sourceType);
+    huePubSub.publish('assist.db.refresh', { sourceType: self.sourceType, allCacheTypes: event.shiftKey });
   };
 
   return AssistDbSource;

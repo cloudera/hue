@@ -819,8 +819,8 @@ var MetastoreViewModel = (function () {
       }
     };
 
-    huePubSub.subscribe('assist.db.refresh', function (type) {
-      if (type !== 'hive') {
+    huePubSub.subscribe('assist.db.refresh', function (options) {
+      if (options.sourceType !== 'hive') {
         return;
       }
       self.reloading(true);

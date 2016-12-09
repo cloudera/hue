@@ -726,14 +726,16 @@ var ApiHelper = (function () {
    * @param {string} [options.databaseName]
    * @param {boolean} [options.invalidateImpala]
    * @param {string} [options.tableName]
+   * @param {string} [options.cacheType] - Possible values 'default', 'optimizer. Default value 'default'
    * @param {string[]} [options.fields]
    * @param {boolean} [options.clearAll]
    */
   ApiHelper.prototype.clearDbCache = function (options) {
     var self = this;
     self.invalidateImpala = options.invalidateImpala || 'cache';
+    var cacheIdentifier = "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
     if (options.clearAll) {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), {});
+      $.totalStorage(cacheIdentifier, {});
     } else {
       var url = AUTOCOMPLETE_API_PREFIX;
       if (options.databaseName) {
@@ -745,9 +747,9 @@ var ApiHelper = (function () {
       if (options.fields) {
         url += options.fields.length > 0 ? "/" + options.fields.join("/") : "";
       }
-      var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+      var cachedData = $.totalStorage(cacheIdentifier) || {};
       delete cachedData[url];
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
+      $.totalStorage(cacheIdentifier, cachedData);
     }
   };
 
@@ -1615,7 +1617,7 @@ var ApiHelper = (function () {
    * @param {Function} options.cacheCondition - Determines whether it should be cached or not
    * @param {Function} options.successCallback
    * @param {Function} options.errorCallback
-   * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
+   * @param {string} [options.cacheType] - Possible values 'default', 'optimizer'. Default value 'default'
    * @param {Number} [options.timeout]
    * @param {Object} [options.editor] - Ace editor
    */
@@ -1705,9 +1707,9 @@ var ApiHelper = (function () {
    * @param {Object} [options.editor] - Ace editor
    */
   var fetchCached = function (options) {
-    console.log(options.url + ' ' + options.cacheType);
     var self = this;
-    var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+    var cacheIdentifier = "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
+    var cachedData = $.totalStorage(cacheIdentifier) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
 
     if (typeof cachedData[cachedId] == "undefined" || self.hasExpired(cachedData[cachedId].timestamp, options.cacheType || 'default')) {
@@ -1719,7 +1721,7 @@ var ApiHelper = (function () {
           timestamp: (new Date()).getTime(),
           data: data
         };
-        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
+        $.totalStorage(cacheIdentifier, cachedData);
       });
     } else {
       options.successCallback(cachedData[cachedId].data);
