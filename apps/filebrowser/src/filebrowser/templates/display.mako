@@ -43,11 +43,11 @@ ${ fb_components.menubar() }
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
             <!-- ko if: $root.file().view.mode() === 'binary' -->
-            <li><a href="${base_url}?mode=text&compression=${view['compression']}"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
+            <li><a class="pointer" data-bind="click: function(){ switchMode('text'); }"><i class="fa fa-font"></i> ${_('View as text')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.mode() === 'text' -->
-              <li><a href="${base_url}?mode=binary&compression=${view['compression']}"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchMode('binary'); }"><i class="fa fa-barcode"></i> ${_('View as binary')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "gzip" && $root.file().path().toLowerCase().endsWith('.gz') -->
@@ -314,6 +314,11 @@ ${ fb_components.menubar() }
               + "&compression=" + self.compression()
               + "&mode=" + self.mode();
     });
+
+    self.switchMode = function (newMode) {
+      self.mode(newMode);
+      self.changePage();
+    }
 
     self.toggleDisables = function () {
       $(".next-page").removeClass("disabled");
