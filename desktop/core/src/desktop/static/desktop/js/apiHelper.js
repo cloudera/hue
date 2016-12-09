@@ -92,7 +92,10 @@ var ApiHelper = (function () {
   };
 
   ApiHelper.prototype.hasExpired = function (timestamp, cacheType) {
-    return (new Date()).getTime() - timestamp > (hueDebug.cacheTimeout || CACHEABLE_TTL[cacheType]);
+    if (typeof hueDebug !== 'undefined' && typeof hueDebug.cacheTimeout !== 'undefined') {
+      return (new Date()).getTime() - timestamp > hueDebug.cacheTimeout;
+    }
+    return (new Date()).getTime() - timestamp > CACHEABLE_TTL[cacheType];
   };
 
   /**
