@@ -605,8 +605,7 @@ var Collection = function (vm, collection) {
     });
   }
 
-  self.facets = ko.mapping.fromJS(collection.facets);
-  $.each(self.facets(), function (index, facet) {
+  self._addObservablesToFacet = function(facet, vm) {
     facet.properties.limit.subscribe(function () {
       vm.search();
     });
@@ -618,6 +617,55 @@ var Collection = function (vm, collection) {
         vm.search();
       });
     }
+    if (facet.properties.aggregate) {
+      facet.properties.aggregate.function.subscribe(function () {
+        vm.search();
+      });
+    }
+
+    // For Hue 4 facets only
+    if (typeof facet.docs != 'undefined') {
+      facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
+        var _fields = [];
+
+        var _iterable = facet.template.fieldsAttributes();
+        if (! facet.template.filteredAttributeFieldsAll()){
+          _iterable = facet.template.fields();
+        }
+
+        $.each(_iterable, function (index, field) {
+          if (facet.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(facet.template.fieldsAttributesFilter().toLowerCase()) > -1){
+            _fields.push(field);
+          }
+        });
+
+        return _fields;
+      });
+
+      facet.fields = facet.template.fieldsAttributes;
+
+      facet.template.fields = ko.computed(function () {  // Dup of template.fields
+        var _fields = [];
+        $.each(facet.template.fieldsAttributes(), function (index, field) {
+          var position = facet.template.fieldsSelected.indexOf(field.name());
+          if (position != -1) {
+            _fields[position] = field;
+          }
+        });
+        return _fields;
+      });
+
+      facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
+         vm.getFacetFromQuery(facet.id()).resultHash('');
+         vm.search();
+      });
+    }
+  }
+
+  self.facets = ko.mapping.fromJS(collection.facets);
+  $.each(self.facets(), function (index, facet) {
+    self._addObservablesToFacet(facet, vm);
+
     if (facet.properties.aggregate && facet.properties.aggregate.function) {
       facet.properties.aggregate.function.subscribe(function () {
         vm.search();
@@ -758,54 +806,9 @@ var Collection = function (vm, collection) {
       }, function (data) {
         if (data.status == 0) {
           var facet = ko.mapping.fromJS(data.facet);
-          facet.properties.limit.subscribe(function () {
-            vm.search();
-          });
-          facet.properties.mincount.subscribe(function () {
-            vm.search();
-          });
-          if (facet.properties.gap) {
-            facet.properties.gap.subscribe(function () {
-              vm.search();
-            });
-          }
-          if (facet.properties.aggregate) {
-            facet.properties.aggregate.function.subscribe(function () {
-              vm.search();
-            });
-          }
-          facet.template.filteredAttributeFields = ko.computed(function() { // Dup of template.filteredAttributeFields
-            var _fields = [];
 
-            var _iterable = facet.template.fieldsAttributes();
-            if (! facet.template.filteredAttributeFieldsAll()){
-              _iterable = facet.template.fields();
-            }
+          self._addObservablesToFacet(facet, vm);
 
-            $.each(_iterable, function (index, field) {
-              if (facet.template.fieldsAttributesFilter() == "" || field.name().toLowerCase().indexOf(facet.template.fieldsAttributesFilter().toLowerCase()) > -1){
-                _fields.push(field);
-              }
-            });
-
-            return _fields;
-          });
-          facet.fields = facet.template.fieldsAttributes;
-
-          facet.template.fields = ko.computed(function () {  // Dup of template.fields
-            var _fields = [];
-            $.each(facet.template.fieldsAttributes(), function (index, field) {
-              var position = facet.template.fieldsSelected.indexOf(field.name());
-              if (position != -1) {
-                _fields[position] = field;
-              }
-            });
-            return _fields;
-          });
-          facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
-             vm.getFacetFromQuery(facet.id()).resultHash('');
-             vm.search();
-          });
           self.facets.push(facet);
           vm.search();
         } else {
