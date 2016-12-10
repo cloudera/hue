@@ -147,11 +147,16 @@ class OptimizerApi(object):
 
 
   def upload(self, queries, source_platform='generic', workload_id=None):
-    with NamedTemporaryFile(suffix='.csv') as f_queries_path, NamedTemporaryFile(suffix='.json') as f_format_path:
-      pass
+    f_queries_path = NamedTemporaryFile(suffix='.csv')
+    f_format_path = NamedTemporaryFile(suffix='.json')
+    f_queries_path.close()
+    f_format_path.close() # Reopened as real file below to work well with the command
 
     try:
-      with open(f_queries_path.name, 'w+') as f_queries, open(f_format_path.name, 'w+') as f_format:
+      f_queries = open(f_queries_path.name, 'w+')
+      f_format = open(f_format_path.name, 'w+')
+
+      try:
         content_generator = OptimizerDataAdapter(queries)
         queries_csv = export_csvxls.create_generator(content_generator, 'csv')
 
@@ -189,6 +194,10 @@ class OptimizerApi(object):
         }
     ]
 }""" % {'tenant': self._product_name, 'query_file': f_queries.name, 'query_file_name': os.path.basename(f_queries.name)})
+
+      finally:
+        f_queries.close()
+        f_format.close()
 
       args = [
           '--cli-input-json', 'file://%s' % f_format.name
