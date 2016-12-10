@@ -641,8 +641,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         "showFieldList": True,
         "showGrid": False,
         "showChart": True,
-        "chartSettings" : { # Use own?
-          'chartType': 'bars',
+        "chartSettings" : {
+          'chartType': 'bars', # Depends on widget type
           'chartSorting': 'none',
           'chartScatterGroup': None,
           'chartScatterSize': None,
