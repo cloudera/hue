@@ -613,7 +613,7 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <!-- ko ifnot: $root.isEditing -->
-  <span data-bind="foreach: properties.facets, visible: !$parents[1].isLoading()">
+  <span data-bind="foreach: properties.facets, visible: ! $parents[1].isLoading()">
     <div class="filter-box" style="opacity: 0.7">
       <div class="content content-readonly">
         <strong class="hit-title" data-bind="text: field, attr: {'title': field}"></strong>
@@ -918,6 +918,8 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="grid-chart-settings">
+
+<!-- ko if: $parent.widgetType() == 'resultset-widget' -->
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
     <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
     <li data-bind="visible: chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" class="nav-header">${_('region')}</li>
@@ -959,6 +961,8 @@ ${ dashboard.layout_skeleton() }
     <a rel="tooltip" data-placement="top" title="${_('Sort ascending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'asc'}, click: function(){ chartSorting('asc'); }"><i class="fa fa-sort-amount-asc fa-rotate-270"></i></a>
     <a rel="tooltip" data-placement="top" title="${_('Sort descending')}" href="javascript:void(0)" class="btn" data-bind="css: {'active': chartSorting() == 'desc'}, click: function(){ chartSorting('desc'); }"><i class="fa fa-sort-amount-desc fa-rotate-270"></i></a>
   </div>
+<!-- /ko -->
+
 </script>
 
 <script type="text/html" id="html-resultset-widget">
@@ -1380,7 +1384,6 @@ ${ dashboard.layout_skeleton() }
 
     <div class="grid-left-bar">
       <div>
-##         <!-- ko if: $root.response && $root.response().response && $root.response().response.numFound > 0 -->
         <div style="margin-top:3px">
           <a class="grid-side-btn active" href="javascript: void(0)"
              data-bind="click: function(){ template.showChart(false); template.showGrid(true); }, css: {'active': template.showGrid() }" title="${_('Grid')}">
@@ -1445,8 +1448,8 @@ ${ dashboard.layout_skeleton() }
         </div>
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
-          ##<input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
-          ##<input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
+          <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
+          <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
           <input type="hidden" name="download">
           <input type="hidden" name="type" value="">
           <div class="dropdown">
@@ -1472,7 +1475,6 @@ ${ dashboard.layout_skeleton() }
             </ul>
           </div>
         </form>
-##         <!-- /ko -->
 
       </div>
     </div>
@@ -1506,7 +1508,7 @@ ${ dashboard.layout_skeleton() }
       </div>
 
       <div data-bind="visible: template.showFieldList() && template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
-        ## <span data-bind="template: {name: 'grid-chart-settings', data: template.chartSettings}"></span>
+        <span data-bind="template: {name: 'grid-chart-settings', data: template.chartSettings}"></span>
       </div>
     </span>
 
@@ -1617,6 +1619,37 @@ ${ dashboard.layout_skeleton() }
            <!-- /ko -->
          <!-- /ko -->               
 
+
+    <!-- ko if: widgetType() == 'pie2-widget' -->
+      <!-- ko if: type() == 'range' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: rangePieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
+      <!-- /ko -->
+
+      <!-- ko if: type() == 'range-up' -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: rangeUpPieChartDataTransformer,
+        rangeUp: true,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
+      <!-- /ko -->
+
+      <!-- ko if: type().indexOf('range') == -1 -->
+      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
+        transformer: pieChartDataTransformer,
+        maxWidth: 250,
+        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+      <div class="clearfix"></div>
+      <!-- /ko -->
+    <!-- /ko -->  
+
          <!-- ko if: widgetType() == 'resultset-widget' -->
             <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                   transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
@@ -1697,7 +1730,6 @@ ${ dashboard.layout_skeleton() }
     </div>
 
     <span data-bind="template: { name: 'data-grid' }"></span>
-    ##<!-- /ko -->
    <!-- /ko -->
   </div>
 
@@ -1782,37 +1814,14 @@ ${ dashboard.layout_skeleton() }
 <script type="text/html" id="pie2-widget">
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
   <div class="row-fluid" data-bind="with: $root.getFacetFromQuery(id())">
-    <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
+
+    <!-- ko with: $root.collection.getFacetById($parent.id()) -->
+    <div style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-
-    <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <!-- ko if: type() == 'range' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: rangePieChartDataTransformer,
-        maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
-      <!-- ko if: type() == 'range-up' -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: rangeUpPieChartDataTransformer,
-        rangeUp: true,
-        maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
-      <!-- ko if: type().indexOf('range') == -1 -->
-      <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
-        transformer: pieChartDataTransformer,
-        maxWidth: 250,
-        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
-    </div>
+    
+    <span data-bind="template: { name: 'data-grid' }"></span>
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 
