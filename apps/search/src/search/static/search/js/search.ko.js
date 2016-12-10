@@ -665,7 +665,10 @@ var Collection = function (vm, collection) {
       });
       
       facet.template.chartSettings.chartType.subscribe(function(newValue) {
-        facet.widgetType(newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' : 'bucket-widget');
+        facet.widgetType(
+            newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
+            (newValue == ko.HUE_CHARTS.TYPES.TIMELINECHART ? 'timeline-widget' : 'bucket-widget')
+        );
       });
     }
   }
