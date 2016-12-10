@@ -25,6 +25,9 @@ from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, co
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
 
 
+DEFAULT_CALLING_FORMAT='boto.s3.connection.S3Connection.DefaultCallingFormat'
+
+
 def get_default_access_key_id():
   """
   Attempt to set AWS access key ID from script, else core-site, else None
@@ -42,9 +45,8 @@ def get_default_secret_key():
 
 
 def get_default_region():
-  return AWS_ACCOUNTS['default'].REGION.get()
+  return AWS_ACCOUNTS['default'].REGION.get() if 'default' in AWS_ACCOUNTS else 'us-east-1'
 
-DEFAULT_CALLING_FORMAT='boto.s3.connection.S3Connection.DefaultCallingFormat'
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
   'aws_accounts',

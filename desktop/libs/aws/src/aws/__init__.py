@@ -15,8 +15,6 @@
 # limitations under the License.
 from __future__ import absolute_import
 
-import aws.s3
-
 from aws import conf
 from aws.client import Client
 from aws.s3.s3fs import S3FileSystem
@@ -39,6 +37,9 @@ def _init_clients():
   CLIENT_CACHE = {}
   for identifier in conf.AWS_ACCOUNTS.keys():
     CLIENT_CACHE[identifier] = _make_client(identifier)
+  # If default configuration not initialized, initialize client connection with IAM metadata
+  if 'default' not in CLIENT_CACHE and conf.has_iam_metadata():
+    CLIENT_CACHE['default'] = Client()
 
 
 def _make_client(identifier):
