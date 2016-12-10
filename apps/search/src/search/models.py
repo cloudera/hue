@@ -824,9 +824,13 @@ def augment_solr_response(response, collection, query):
         counts = response['facets'][name]['buckets']
 
         cols = ['%(field)s' % facet, 'count(%(field)s)' % facet]
-        for f in facet['properties']['facets']:
+        last_x_col = 0
+        last_xx_col = 0
+        for i, f in enumerate(facet['properties']['facets']):
           if f['aggregate']['function'] == 'count':
             cols.append(f['field'])
+            last_xx_col = last_x_col
+            last_x_col = i + 2
           cols.append(SolrApi._get_aggregate_function(f))
         rows = []
 
@@ -836,7 +840,7 @@ def augment_solr_response(response, collection, query):
         if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
           dimension = 3
           # Single dimension or dimension 2 with analytics
-          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count':
+          if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1:
             column = 'count'
             if len(collection_facet['properties']['facets']) == 1:
               agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
@@ -852,11 +856,25 @@ def augment_solr_response(response, collection, query):
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
+
+            agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+            agg_keys.sort(key=lambda a: a[4:])
+
+            if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
+              agg_keys.insert(0, 'count')
+            counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
+
             _series = collections.defaultdict(list)
-            for f in counts:
-              for bucket in (f['d2']['buckets'] if 'd2' in f else []):
-                _series[bucket['val']].append(f['val'])
-                _series[bucket['val']].append(bucket['d3'] if 'd3' in bucket else bucket['count'])
+
+            for row in rows:
+              for i, cell in enumerate(row):
+                if i > last_x_col:
+                  legend = cols[i]
+                  if last_xx_col != last_x_col:
+                    legend = '%s %s' % (cols[i], row[last_x_col])
+                  _series[legend].append(row[last_xx_col])
+                  _series[legend].append(cell)
+
             for name, val in _series.iteritems():
               _c = range_pair(facet['field'], name, selected_values.get(facet['id'], []), val, 1, collection_facet)
               extraSeries.append({'counts': _c, 'label': name})
