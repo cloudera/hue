@@ -837,6 +837,9 @@ def augment_solr_response(response, collection, query):
           dimension = 3
           # Single dimension or dimension 2 with analytics
           if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count':
+            agg_keys = ['count']
+            _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
+
             counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:

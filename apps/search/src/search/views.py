@@ -579,6 +579,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
   elif widget_type == 'gradient-map-widget':
     facet_type = 'nested'
     properties['facets'] = []
+    properties['domain'] = {'blockParent': [], 'blockChildren': []}
     properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': 'count'}
     properties['scope'] = 'world'
     properties['limit'] = 100
@@ -642,7 +643,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         "showGrid": False,
         "showChart": True,
         "chartSettings" : {
-          'chartType': 'bars', # Depends on widget type
+          'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else 'bars'),
           'chartSorting': 'none',
           'chartScatterGroup': None,
           'chartScatterSize': None,
