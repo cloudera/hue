@@ -837,10 +837,18 @@ def augment_solr_response(response, collection, query):
           dimension = 3
           # Single dimension or dimension 2 with analytics
           if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count':
-            agg_keys = ['count']
+            column = 'count'
+            if len(collection_facet['properties']['facets']) == 1:
+              agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_')]
+              legend = agg_keys[0].split(':', 2)[1]
+              column = agg_keys[0]
+            else:
+              legend = facet['field'] # 'count(%s)' % legend
+              agg_keys = [column]
+
             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
-            counts = [_v for _f in counts for _v in (_f['val'], _f['d2'] if 'd2' in _f else _f['count'])]
+            counts = [_v for _f in counts for _v in (_f['val'], _f[column])]
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
