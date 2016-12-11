@@ -881,8 +881,19 @@ def augment_solr_response(response, collection, query):
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
           facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
-          count = response['facets'][name]
-          _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
+ 
+          column = 'count'
+          agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
+          agg_keys.sort(key=lambda a: a[4:])
+
+          if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
+            agg_keys.insert(0, 'count')
+          counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
+#             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
+          
+          print counts
+#           count = response['facets'][name]
+#           _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
         elif not collection_facet['properties']['facets'] or (collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1):
           # Dimension 1 with 1 count or agg
@@ -894,13 +905,13 @@ def augment_solr_response(response, collection, query):
             legend = agg_keys[0].split(':', 2)[1]
             column = agg_keys[0]
           else:
-            legend = facet['field'] # 'count(%s)' % legend
+            legend = facet['field']
             agg_keys = [column]
 
           _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
 
-          counts = [_v for _f in counts for _v in (_f['val'], _f[column])] # TODO: Create additional ordered dict for table view + download
-          counts = pairwise2(legend, selected_values.get(facet['id'], []), counts) # TODO use 'cat' for legend in graph
+          counts = [_v for _f in counts for _v in (_f['val'], _f[column])]
+          counts = pairwise2(legend, selected_values.get(facet['id'], []), counts)
         else:
           # Dimension 2 with analytics or 1 with N aggregates
           dimension = 2

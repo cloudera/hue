@@ -1627,11 +1627,11 @@ ${ dashboard.layout_skeleton() }
         <!-- ko if: widgetType() == 'gradient-map-widget' -->
           <!-- ko with: $parent -->
             <div data-bind="mapChart: {data: {counts: counts(), scope: $parent.properties.scope()},
-              transformer: mapChartDataTransformer,
+              transformer: gradientMapChartDataTransformer,
               maxWidth: 750,
               isScale: true,
               onClick: function(d) {
-                $root.query.togglePivotFacet({facet: {'fq_fields': d.cat, 'fq_values': d.value}, widget_id: id()});
+                $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
               },
               onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
            <!-- /ko -->
@@ -3142,6 +3142,7 @@ function mapChartDataTransformer(data) {
     item.values = item.pivot ? item.pivot[0].fq_values : item.fq_values;
     item.counts = item.pivot ? item.pivot[0].count : item.count; // unused yet
     item.is2d = item.pivot ? true : false; // unused yet
+
     if (item.value != null && item.value != "" && item.value.length < 4) {
       var _label = data.scope == "world" ? HueGeo.getISOAlpha3(item.value) : item.value.toUpperCase();
       var _found = false;
@@ -3156,6 +3157,42 @@ function mapChartDataTransformer(data) {
         _data.push({
           label: _label,
           value: item.pivot ? item.pivot[0].fq_values : item.count,
+          obj: item
+        });
+      }
+    }
+  });
+  return _data;
+}
+
+
+function gradientMapChartDataTransformer(data) {
+  var _data = [];
+  $(data.counts).each(function (cnt, item) {
+    item.is2d = item.fq_fields ? true : false;
+    item.fields = item.is2d ? item.fq_fields : [item.cat];
+    item.values = item.is2d ? item.fq_values : [item.value];
+    item.counts = item.count;
+    item.value = item.is2d ? item.fq_values[0] : item.value;
+    item.pivot = [];
+
+    if (item.value != null && item.value != "" && item.value.length < 4) {
+      var _label = data.scope == "world" ? HueGeo.getISOAlpha3(item.value) : item.value.toUpperCase();
+      var _found = false;
+      for (var i = 0; i < _data.length; i++) { // we group lower and upper cases together
+        if (_data[i].label == _label) {
+          _data[i].value += item.counts;
+          _data[i].obj.pivot.push({count: item.counts, value: item.is2d ? (/\)/.test(item.cat) ? item.cat : item.fq_values[item.fq_values.length - 1]) : item.value});
+          _found = true;
+
+          break;
+        }
+      }
+      if (! _found) {
+        item.pivot = [{count: item.count, value: item.is2d ? (/\)/.test(item.cat) ? item.cat : item.fq_values[item.fq_values.length - 1]) : item.value}];
+        _data.push({
+          label: _label,
+          value: item.counts,
           obj: item
         });
       }
