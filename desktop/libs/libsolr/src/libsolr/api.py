@@ -145,6 +145,7 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount']),
               'sort': {'count': facet['properties']['sort']},
           }
+          print facet
 
           if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
             _f['domain'] = {}
@@ -162,11 +163,15 @@ class SolrApi(object):
             })
             if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
               _f.update(self._get_time_filter_query(timeFilter, facet))
-          else:
+          else:            
             _f.update({
                 'type': 'terms',
                 'field': facet['field'],
-                'excludeTags': facet['id']
+                'excludeTags': facet['id'],
+                'offset': 0,
+                'numBuckets': True,
+                'allBuckets': True,
+                'prefix': ''
             })
             if facet['properties']['canRange'] and not facet['properties']['isDate']:
               del _f['mincount'] # Numeric fields do not support
@@ -267,7 +272,10 @@ class SolrApi(object):
           'type': 'terms',
           'field': '%(field)s' % facet,
           'limit': int(facet.get('limit', 10)),
-          'mincount': int(facet['mincount'])
+          'mincount': int(facet['mincount']),
+          'numBuckets': True,
+          'allBuckets': True,
+          'prefix': ''
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])

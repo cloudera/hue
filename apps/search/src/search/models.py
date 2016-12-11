@@ -922,7 +922,7 @@ def augment_solr_response(response, collection, query):
           'counts': counts,
           'extraSeries': extraSeries,
           'dimension': dimension,
-          'response': {'response': {'start': 0, 'numFound': len(rows)}},
+          'response': {'response': {'start': 0, 'numFound': response['facets'][name]['numBuckets']}}, # Todo * nested buckets + offsets
           'docs': [dict(zip(cols, row)) for row in rows],
           'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols]
         }
