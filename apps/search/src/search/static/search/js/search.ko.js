@@ -659,6 +659,8 @@ var Collection = function (vm, collection) {
         return _fields;
       });
 
+      facet.properties.facets_form.aggregate.percentiles = ko.mapping.fromJS([{'value': 50}]);
+
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
         vm.getFacetFromQuery(facet.id()).resultHash('');
         vm.search();
@@ -877,13 +879,13 @@ var Collection = function (vm, collection) {
       'aggregate': ko.mapping.toJS(facet.properties.facets_form.aggregate),
     });
 
-      facet.properties.facets_form.field(null);
-      facet.properties.facets_form.limit(5);
-      facet.properties.facets_form.mincount(1);
+    facet.properties.facets_form.field(null);
+    facet.properties.facets_form.limit(5);
+    facet.properties.facets_form.mincount(1);
 
-      facet.properties.facets_form.aggregate.function('count');
-      facet.properties.facets_form.aggregate.ops.removeAll();
-      facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS([{'value': 50}]));
+    facet.properties.facets_form.aggregate.function('count');
+    facet.properties.facets_form.aggregate.ops.removeAll();
+    facet.properties.facets_form.aggregate.percentiles(ko.mapping.fromJS([{'value': 50}]));
 
     if (pivot != null) {
       pivot.aggregate.function.subscribe(function() {
