@@ -1391,6 +1391,7 @@ ${ dashboard.layout_skeleton() }
             <i class="hcha hcha-line-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" style="display: none;"></i>
             <i class="hcha hcha-pie-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" style="display: none;"></i>
             <i class="fa fa-fw fa-line-chart" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART" style="display: none;"></i>
+            <i class="hcha hcha-map-chart fa-fw" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP" style="display: none;"></i>
             <i class="fa fa-fw fa-map-marker" data-bind="visible: template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP" style="display: none;"></i>
           </a>
           <a class="dropdown-toggle grid-side-btn" style="padding:0" data-toggle="dropdown"
@@ -1418,14 +1419,19 @@ ${ dashboard.layout_skeleton() }
                 <i class="hcha hcha-pie-chart fa-fw"></i> ${_('Pie')}
               </a>
             </li>
-            <!-- ko if: widgetType() != 'resultset-widget' -->
+            ##<!-- ko if: widgetType() != 'resultset-widget' -->
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.TIMELINECHART); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
-                <i class="fa fa-fw fa-line-chart"></i> ${_('timeline')}
+                <i class="fa fa-fw fa-line-chart"></i> ${_('Timeline')}
               </a>
             </li>
-            <!-- /ko -->
+            <li>
+              <a href="javascript:void(0)"
+                 data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.GRADIENTMAP}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.GRADIENTMAP); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
+                <i class="hcha fa-fw hcha-map-chart chart-icon"></i> ${_('Gradient Map')}
+              </a>
+            </li>
             <li>
               <a href="javascript:void(0)"
                  data-bind="css: {'active': template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP}, click: function(){ template.showChart(true); template.chartSettings.chartType(ko.HUE_CHARTS.TYPES.MAP); template.showGrid(false); huePubSub.publish('gridChartForceUpdate');}">
@@ -1618,19 +1624,31 @@ ${ dashboard.layout_skeleton() }
            <!-- /ko -->
          <!-- /ko -->               
 
+        <!-- ko if: widgetType() == 'gradient-map-widget' -->
+          <!-- ko with: $parent -->
+            <div data-bind="mapChart: {data: {counts: counts(), scope: $parent.properties.scope()},
+              transformer: mapChartDataTransformer,
+              maxWidth: 750,
+              isScale: true,
+              onClick: function(d) {
+                $root.query.togglePivotFacet({facet: {'fq_fields': d.cat, 'fq_values': d.value}, widget_id: id()});
+              },
+              onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+           <!-- /ko -->
+         <!-- /ko --> 
 
-    <!-- ko if: widgetType() == 'timeline-widget' -->
-      <!-- ko with: $parent -->
-      <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
-        type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
-        fqs: $root.query.fqs,
-        onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-        onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
-        onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-        onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
-      <div class="clearfix"></div>
-      <!-- /ko -->
-    <!-- /ko -->
+        <!-- ko if: widgetType() == 'timeline-widget' -->
+          <!-- ko with: $parent -->
+          <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
+            type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
+            fqs: $root.query.fqs,
+            onSelectRange: function(from, to){ $root.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+            onStateChange: function(state){ $root.collection.getFacetById($parent.id()).properties.stacked(state.stacked); },
+            onClick: function(d){ $root.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+            onComplete: function(){ $root.getWidgetById($parent.id()).isLoading(false) }}" />
+          <div class="clearfix"></div>
+          <!-- /ko -->
+        <!-- /ko -->
 
 
     <!-- ko if: widgetType() == 'pie2-widget' -->
@@ -2261,30 +2279,22 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-
+    
+    <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
-      <div data-bind="with: $root.collection.getFacetById($parent.id())">
+
         <!-- ko if: $data.properties.facets().length == 1 -->
           <div class="margin-bottom-10">
             <span data-bind="text: $data.properties.facets()[0].field"></span>
           </div>
         <!-- /ko -->
-      </div>
     </div>
 
-    <div data-bind="with: $root.collection.getFacetById($parent.id())">
-      <div data-bind="mapChart: {data: {counts: $parent.counts(), scope: $root.collection.getFacetById($parent.id()).properties.scope()},
-        transformer: mapChartDataTransformer,
-        maxWidth: 750,
-        isScale: true,
-        onClick: function(d) {
-          $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
-        },
-        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
-      <div class="clearfix"></div>
-    </div>
-  </div>
+      <span data-bind="template: { name: 'data-grid' }"></span>
+    <!-- /ko -->
+  </div>  
   <!-- /ko -->
+
   <div class="widget-spinner" data-bind="visible: isLoading()">
     <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
