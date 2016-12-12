@@ -345,6 +345,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       white-space: nowrap;
     }
 
+    .assist-flex-function-search {
+      overflow: hidden;
+      position: relative;
+      -ms-flex: 0 0 35px;
+      flex: 0 0 35px;
+      white-space: nowrap;
+    }
+
     .assist-flex-search {
       overflow: hidden;
       position: relative;
@@ -2056,33 +2064,40 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="functions-panel-template">
-    <div style="height: 100%; width: 100%; overflow-x: hidden; position: relative;" data-bind="niceScroll">
-
-      <div class="assist-inner-header">
-        <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
-        <div class="assist-db-header-actions" style="margin-right:10px;">
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { searchVisible(!searchVisible()); query(''); }, css: { 'blue' : searchVisible }"><i class="pointer fa fa-filter" title="${ _('Filter') }"></i></a>
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <div class="assist-flex-header">
+          <div class="assist-inner-header">
+            <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+            <div class="assist-db-header-actions" style="margin-right:10px;">
+              <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { searchVisible(!searchVisible()); query(''); }, css: { 'blue' : searchVisible }"><i class="pointer fa fa-filter" title="${ _('Filter') }"></i></a>
+            </div>
+          </div>
         </div>
-      </div>
-      <!-- ko if: searchVisible -->
-      <div style="margin: 5px 10px 0 10px"><input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'"></div>
-      <!-- /ko -->
-      <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
-        <li>
-          <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
-          <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
-            <li data-bind="tooltip: { title: description, placement: 'left', delay: 400 }">
-              <!-- ko if: typeof description !== 'undefined' && description !== '' -->
-              <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
-              <div data-bind="slideVisible: open, text: description"></div>
-              <!-- /ko -->
-              <!-- ko if: typeof description === 'undefined' || description === '' -->
-              <span class="assist-field-link" data-bind="text: signature"></span>
-              <!-- /ko -->
+        <div class="assist-flex-function-search" data-bind="visible: searchVisible">
+          <div class="assist-filter">
+            <input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+          </div>
+        </div>
+        <div class="assist-flex-fill">
+          <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
+            <li>
+              <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
+              <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
+                <li data-bind="tooltip: { title: description, placement: 'left', delay: 400 }">
+                  <!-- ko if: typeof description !== 'undefined' && description !== '' -->
+                  <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
+                  <div data-bind="slideVisible: open, text: description"></div>
+                  <!-- /ko -->
+                  <!-- ko if: typeof description === 'undefined' || description === '' -->
+                  <span class="assist-field-link" data-bind="text: signature"></span>
+                  <!-- /ko -->
+                </li>
+              </ul>
             </li>
           </ul>
-        </li>
-      </ul>
+        </div>
+      </div>
     </div>
   </script>
 
@@ -2104,6 +2119,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.activeCategories = ko.observable();
 
         self.filteredCategories = ko.pureComputed(function () {
+          if (! self.activeCategories()) {
+            return [];
+          }
           return self.activeCategories().filter(function (category) {
             return category.filteredFunctions().length > 0;
           })

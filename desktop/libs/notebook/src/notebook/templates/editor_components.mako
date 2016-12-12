@@ -1463,7 +1463,7 @@ ${ hueIcons.symbols() }
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
 
    <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->
@@ -1479,7 +1479,7 @@ ${ hueIcons.symbols() }
 <script type="text/html" id="snippet-header-statement-type">
   % if ENABLE_BATCH_EXECUTE.get():
   <!-- ko if: isSqlDialect() -->
-    <div data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
+    <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
   % endif
 </script>
