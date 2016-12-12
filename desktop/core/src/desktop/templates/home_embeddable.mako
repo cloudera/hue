@@ -36,6 +36,10 @@ ${ common_home.homeJSModels() }
   .nav-tabs > li.active {
     padding: 0;
   }
+
+  svg.hi {
+    width: 24px;
+  }
 </style>
 
 
