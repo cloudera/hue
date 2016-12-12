@@ -281,9 +281,9 @@ ${ hueIcons.symbols() }
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Tables</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Job</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Jobs</a></li>
         <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">Files</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">S3</a></li>
+        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser_s3') }">S3</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
@@ -333,6 +333,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_oozie_wf" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
+      <div id="embeddable_filebrowser_s3" class="embeddable"></div>
       <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
     </div>
@@ -453,6 +454,7 @@ ${ assist.assistPanel() }
           oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
           filebrowser: '/filebrowser/?is_embeddable=true',
+          filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
           fileviewer: 'filebrowser/view=',
           home: '/home_embeddable',
         };
