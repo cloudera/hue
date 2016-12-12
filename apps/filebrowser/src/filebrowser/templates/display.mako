@@ -51,15 +51,15 @@ ${ fb_components.menubar() }
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "gzip" && $root.file().path().toLowerCase().endsWith('.gz') -->
-              <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=gzip"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() !== "avro" && $root.file().view.compression() !== "snappy_avro" && $root.file().path().toLowerCase().endsWith('.avro') -->
-              <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=avro"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() !== "none" -->
-              <li><a href="${base_url}?offset=0&length=2000&mode=${view['mode']}&compression=none"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('none'); }"><i class="fa fa-times-circle"></i> ${_('Stop preview')}</a></li>
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
@@ -317,6 +317,13 @@ ${ fb_components.menubar() }
 
     self.switchMode = function (newMode) {
       self.mode(newMode);
+      self.changePage();
+    }
+
+    self.switchCompression = function (newCompression) {
+      self.compression(newCompression);
+      self.page(1);
+      self.upperPage(1);
       self.changePage();
     }
 
