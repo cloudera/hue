@@ -115,6 +115,8 @@ if USE_NEW_EDITOR.get():
       optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
+
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
       labels: {

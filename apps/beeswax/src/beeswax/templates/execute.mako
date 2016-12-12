@@ -1218,7 +1218,7 @@ var autocompleter = new Autocompleter({
   user: HIVE_AUTOCOMPLETE_USER,
   oldEditor: true,
   optEnabled: false,
-  timeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
+  timeout: AUTOCOMPLETE_TIMEOUT,
   useNewAutocompleter: false
 });
 

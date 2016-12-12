@@ -124,6 +124,7 @@ var AssistDbSource = (function () {
           sourceType: self.sourceType,
           database: db.definition.name,
           silenceErrors: true,
+          timeout: AUTOCOMPLETE_TIMEOUT,
           successCallback: function (data) {
             var popularityIndex = {};
             data.top_tables.forEach(function (topTable) {
