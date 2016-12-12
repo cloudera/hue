@@ -35,17 +35,14 @@ ${ fb_components.menubar() }
 
 <div class="container-fluid">
   <div class="row-fluid">
-    <div class="span2">
-      ${ fb_components.file_sidebar(path_enc, dirname_enc, stats, show_download_button) }
-    </div>
-    <div class="span10">
+    <div class="span12">
       <div class="card card-small">
       % if breadcrumbs:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
       %endif
         <div class="card-body">
           <p>
-            <form class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
+            <form id="saveForm" class="form-stacked" method="post" action="${url('filebrowser.views.save_file')}">
               ${ csrf_token(request) | n,unicode }
               % if form.errors:
               <div class="alert-message">
@@ -110,14 +107,34 @@ ${ fb_components.menubar() }
         $("#saveAsModal").modal("hide");
       });
 
-      $("#saveAsForm").submit(function () {
-        if ($.trim($("#saveAsForm").find("input[name='path']").val()) == "") {
-          $("#saveAsForm").find("input[name='path']").addClass("fieldError");
-          $("#saveAsNameRequiredAlert").show();
-          resetPrimaryButtonsStatus(); //globally available
-          return false;
+      $('#saveForm').ajaxForm({
+        dataType: 'json',
+        success: function (data) {
+          if (data && data.exists) {
+            resetPrimaryButtonsStatus();
+            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+          }
         }
-        return true;
+      });
+
+      $('#saveAsForm').ajaxForm({
+        dataType: 'json',
+        beforeSubmit: function() {
+          if ($.trim($("#saveAsForm").find("input[name='path']").val()) == "") {
+            $("#saveAsForm").find("input[name='path']").addClass("fieldError");
+            $("#saveAsNameRequiredAlert").show();
+            resetPrimaryButtonsStatus(); //globally available
+            return false;
+          }
+          return true;
+        },
+        success: function (data) {
+          if (data && data.exists) {
+            resetPrimaryButtonsStatus();
+            $("#saveAsModal").modal("hide");
+            $.jHueNotify.info(data.path + " ${ _('saved correctly') }")
+          }
+        }
       });
 
       $("#saveAsForm").find("input[name='path']").focus(function () {
@@ -139,10 +156,6 @@ ${ fb_components.menubar() }
           uploadFile:false
         });
         $("#fileChooserSaveModal").slideDown();
-      });
-
-      $("#refreshBtn").click(function(){
-        window.location.reload();
       });
 
       function resizeTextarea() {

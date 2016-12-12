@@ -259,13 +259,14 @@ def edit(request, path, form=None):
 
     data = dict(
         exists=(stats is not None),
-        stats=stats,
-        form=form,
         path=path,
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
-        breadcrumbs = parse_breadcrumbs(path),
-        show_download_button = SHOW_DOWNLOAD_BUTTON.get())
+        breadcrumbs=parse_breadcrumbs(path),
+        show_download_button=SHOW_DOWNLOAD_BUTTON.get())
+    if request.META.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest':
+        data['stats'] = stats;
+        data['form'] = form;
     return render("edit.mako", request, data)
 
 def save_file(request):
@@ -302,7 +303,6 @@ def save_file(request):
     except Exception, e:
         raise PopupException(_("The file could not be saved"), detail=e)
 
-    messages.info(request, _('Saved %(path)s.') % {'path': os.path.basename(path)})
     request.path = reverse("filebrowser.views.edit", kwargs=dict(path=path))
     return edit(request, path, form)
 
