@@ -470,7 +470,7 @@ var SqlAutocompleter2 = (function () {
               if (path.toLowerCase().indexOf(topColumns[i].path.toLowerCase()) !== -1) {
                 suggestion.weight += Math.min(topColumns[i].columnCount, 99);
                 suggestion.meta = suggestion.meta + ' *';
-                suggestion.docHTML = self.createTopHtml(topColumns[i]);
+                suggestion.docHTML = self.createTopColumnHtml(topColumns[i]);
                 break;
               }
             }
@@ -547,6 +547,37 @@ var SqlAutocompleter2 = (function () {
       deferrals.push(self.addHdfs(parseResult, completions));
     }
 
+    var adjustWeightsForTopTables = function (database, tableDeferral) {
+      if (HAS_OPTIMIZER) {
+        var topTablesDeferral = $.Deferred();
+        deferrals.push(topTablesDeferral);
+        self.snippet.getApiHelper().fetchNavOptTopTables({
+          database: database,
+          sourceType: self.snippet.type(),
+          successCallback: function (data) {
+            var popularityIndex = {};
+            data.top_tables.forEach(function (topTable) {
+              popularityIndex[topTable.name] = topTable.popularity;
+            });
+
+            topTablesDeferral.resolve(popularityIndex);
+          },
+          errorCallback: function () {
+            topTablesDeferral.resolve({});
+          }
+        });
+        $.when(topTablesDeferral, tableDeferral).done(function (popularityIndex, tableCompletions) {
+          tableCompletions.forEach(function (tableCompletion) {
+            if (typeof popularityIndex[tableCompletion.name] !== 'undefined') {
+              tableCompletion.meta = tableCompletion.meta + ' *';
+              tableCompletion.weight += Math.min(popularityIndex[tableCompletion.name], 99);
+              tableCompletion.docHTML = self.createTopTableHtml(popularityIndex[tableCompletion.name]);
+            }
+          });
+        });
+      }
+    };
+
     if (parseResult.suggestTables) {
       if (self.snippet.type() == 'impala' && parseResult.suggestTables.identifierChain && parseResult.suggestTables.identifierChain.length === 1) {
         var checkDbDeferral = $.Deferred();
@@ -557,7 +588,9 @@ var SqlAutocompleter2 = (function () {
               return db.toLowerCase() === parseResult.suggestTables.identifierChain[0].name.toLowerCase();
             });
             if (foundDb.length > 0) {
-              deferrals.push(self.addTables(parseResult, database, completions));
+              var tableDeferral = self.addTables(parseResult, database, completions);
+              deferrals.push(tableDeferral);
+              adjustWeightsForTopTables(database, tableDeferral);
             } else {
               parseResult.suggestColumns = { tables: [{ identifierChain: parseResult.suggestTables.identifierChain }] };
               delete parseResult.suggestTables;
@@ -574,7 +607,9 @@ var SqlAutocompleter2 = (function () {
         delete parseResult.suggestTables;
         deferrals.push(self.addColumns(parseResult, parseResult.suggestColumns.tables[0], database, parseResult.suggestColumns.types || ['T'], columnSuggestions));
       } else {
-        deferrals.push(self.addTables(parseResult, database, completions))
+        var tableDeferral = self.addTables(parseResult, database, completions);
+        deferrals.push(tableDeferral);
+        adjustWeightsForTopTables(database, tableDeferral);
       }
     }
 
@@ -671,7 +706,14 @@ var SqlAutocompleter2 = (function () {
     return html;
   };
 
-  SqlAutocompleter2.prototype.createTopHtml = function (value) {
+  SqlAutocompleter2.prototype.createTopTableHtml = function (popularity) {
+    // TODO: Show more relevant details here
+    var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular table, popularity: ' + popularity + '</span></p>';
+    html += '<div>';
+    return html;
+  };
+
+  SqlAutocompleter2.prototype.createTopColumnHtml = function (value) {
     // TODO: Show more relevant details here
     var html = '<div style="max-width: 600px; white-space: normal; overflow-y: auto; height: 100%; padding: 8px;"><p><span style="white-space: pre; font-family: monospace;">Popular column, count: ' + value.columnCount + '</span></p>';
     html += '<div>';
@@ -813,21 +855,27 @@ var SqlAutocompleter2 = (function () {
         sourceType: self.snippet.type(),
         databaseName: databaseName,
         successCallback: function (data) {
+          var tables = [];
           data.tables_meta.forEach(function (tablesMeta) {
             if (parseResult.suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
                 parseResult.suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
               return;
             }
-            completions.push({
+            var table = {
               value: prefix + self.backTickIfNeeded(tablesMeta.name),
               meta: tablesMeta.type.toLowerCase(),
-              weight: DEFAULT_WEIGHTS.TABLE
-            })
+              weight: DEFAULT_WEIGHTS.TABLE,
+              name: tablesMeta.name
+            };
+            completions.push(table);
+            tables.push(table);
           });
-          tableDeferred.resolve();
+          tableDeferred.resolve(tables);
         },
         silenceErrors: true,
-        errorCallback: tableDeferred.resolve,
+        errorCallback: function () {
+          tableDeferred.resolve([]);
+        },
         timeout: self.timeout
       });
     };
