@@ -39,8 +39,6 @@ ${ common_home.homeJSModels() }
 </style>
 
 
-${ common_home.navbar() }
-
 <div id="documentList" class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
