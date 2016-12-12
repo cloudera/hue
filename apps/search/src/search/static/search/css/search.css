@@ -693,6 +693,12 @@ em {
   color: #338bb8;
 }
 
+.card-widget .selectize-control {
+  width: 200px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
 @media screen and (max-width: 1000px) {
   .card-widget, .card-column {
     float: left !important;
