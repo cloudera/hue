@@ -458,7 +458,7 @@ ${ dashboard.layout_skeleton() }
             <span class="facet-field-label facet-field-label-fixed-width">
               ${ _('Field') }
             </span>
-            <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }'"></select>
+            <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Choose...') }', selectize: $root.collection.template.fieldsNames"></select>
           </span>
         </div>
 
@@ -660,7 +660,7 @@ ${ dashboard.layout_skeleton() }
       <a data-bind="visible: ko.toJSON(properties.facets_form.field), click: $root.collection.addPivotFacetValue2" class="pull-right" href="javascript:void(0)">
         <i class="fa fa-plus"></i> ${ _('Add') }
       </a>
-      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: properties.facets_form.field, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
       <div class="clearfix"></div>
     </div>
     <div class="content" style="border: 1px dashed #d8d8d8; border-top: none">
@@ -2000,7 +2000,7 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
 
     <!-- ko if: $data.function() == 'field' -->
-      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }'" class="hit-options" style="margin-bottom: 0"></select>
+      <select data-bind="options: $root.collection.template.fieldsNames, value: value, selectizeOptions: {create: true}, optionsCaption: '${ _ko('Field...') }', selectize: $root.collection.template.fieldsNames" class="hit-options" style="margin-bottom: 0"></select>
     <!-- /ko -->
 
     <!-- ko if: $data.function() == 'percentile' -->
@@ -2254,15 +2254,15 @@ ${ dashboard.layout_skeleton() }
   <div class="row-fluid">
     <div data-bind="visible: $root.isEditing" style="margin-top: 10px; margin-bottom: 20px;" class="leaflet-align">
       <span class="facet-field-label">${_('Latitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.latitudeField, optionsCaption: '${ _ko('Choose...') }', selectize: $root.collection.template.sortedGeogFieldsNames"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Longitude')}</span><div class="break-on-small-column"></div>
-      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _ko('Choose...') }'"></select>
+      <select data-bind="options: $root.collection.template.sortedGeogFieldsNames, value: $root.collection.template.leafletmap.longitudeField, optionsCaption: '${ _ko('Choose...') }', selectize: $root.collection.template.sortedGeogFieldsNames"></select>
       &nbsp;&nbsp;
       <div class="break-on-small-column"></div>
       <span class="facet-field-label">${_('Label')}</span><div class="break-on-small-column"></div>
-      <select data-bind="selectize: $root.collection.template.fieldsNames, options: $root.collection.template.fieldsNames, value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }'"></select>
+      <select data-bind="value: $root.collection.template.leafletmap.labelField, optionsCaption: '${ _ko('Choose...') }', selectize: $root.collection.template.fieldsNames"></select>
     </div>
 
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
