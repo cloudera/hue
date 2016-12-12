@@ -3140,7 +3140,7 @@ ${ hueIcons.symbols() }
       % if conf.USE_NEW_AUTOCOMPLETER.get():
       useNewAutocompleter: true,
       % endif
-      autocompleteTimeout: ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() },
+      autocompleteTimeout: AUTOCOMPLETE_TIMEOUT,
       snippetViewSettings: {
         default: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
