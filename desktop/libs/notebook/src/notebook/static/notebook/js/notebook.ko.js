@@ -378,7 +378,7 @@ var EditorViewModel = (function() {
         query: self.queriesFilter(),
         include_trashed: false
       });
-    }
+    };
 
     var lastQueriesPage = 1;
     self.currentQueryTab.subscribe(function (newValue) {
@@ -443,7 +443,7 @@ var EditorViewModel = (function() {
           self._ajaxError(data);
         }
       });
-    }
+    };
     self.associatedDocumentLoading = ko.observable(true);
     self.associatedDocument = ko.observable();
     self.associatedDocumentUuid = ko.observable(typeof snippet.associatedDocumentUuid != "undefined" && snippet.associatedDocumentUuid != null ? snippet.associatedDocumentUuid : null);
@@ -668,14 +668,6 @@ var EditorViewModel = (function() {
 
     self.is_redacted = ko.observable(typeof snippet.is_redacted != "undefined" && snippet.is_redacted != null ? snippet.is_redacted : false);
 
-    self.complexity = ko.observable();
-    self.hasComplexity = ko.computed(function () {
-      return self.complexity();
-    });
-
-    self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
-    self.hasSuggestion = ko.observable(false);
-
     self.chartType = ko.observable(typeof snippet.chartType != "undefined" && snippet.chartType != null ? snippet.chartType : ko.HUE_CHARTS.TYPES.BARCHART);
     self.chartType.subscribe(prepopulateChart);
     self.chartSorting = ko.observable(typeof snippet.chartSorting != "undefined" && snippet.chartSorting != null ? snippet.chartSorting : "none");
@@ -782,6 +774,62 @@ var EditorViewModel = (function() {
         wasBatchExecuted: self.wasBatchExecuted()
       };
     };
+
+    self.complexity = ko.observable();
+    self.hasComplexity = ko.computed(function () {
+      return self.complexity();
+    });
+
+    self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
+    self.hasSuggestion = ko.observable(false);
+
+    if (HAS_OPTIMIZER) {
+      var lastRequest;
+      var lastCheckedStatement;
+
+      var checkComplexity = function () {
+        if (lastCheckedStatement === self.statement_raw()) {
+          return;
+        }
+
+        if (lastRequest && lastRequest.readyState < 4) {
+          lastRequest.abort();
+        }
+        self.complexity(null);
+
+        logGA('get_query_risk');
+        lastRequest = $.ajax({
+          type: 'POST',
+          url: '/notebook/api/optimizer/statement/risk',
+          timeout: 10000, // 10 seconds
+          data: {
+            notebook: ko.mapping.toJSON(notebook.getContext()),
+            snippet: ko.mapping.toJSON(self.getContext())
+          },
+          success: function(data) {
+            if (data.status == 0) {
+              self.complexity(ko.mapping.fromJS(data.query_complexity));
+            } else {
+              // TODO: Silence errors
+              $(document).trigger('error', data.message);
+            }
+            lastCheckedStatement = self.statement_raw();
+          }
+        });
+      };
+
+      var changeThrottle = -1;
+
+      self.statement_raw.subscribe(function () {
+        if (self.type() === 'hive') {
+          window.clearTimeout(changeThrottle);
+          changeThrottle = window.setTimeout(checkComplexity, 2000);
+        }
+      });
+      if (self.statement_raw()) {
+        changeThrottle = window.setTimeout(checkComplexity, 2000);
+      }
+    }
 
     self._ajaxError = function (data, callback) {
       if (data.status == -2) { // Session expired
@@ -1056,7 +1104,7 @@ var EditorViewModel = (function() {
           self._ajaxError(data);
         }
       });
-    }
+    };
 
     self.queryCompatibility = function () {
       logGA('compatibility');
@@ -1373,22 +1421,6 @@ var EditorViewModel = (function() {
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText || textStatus);
         self.status('failed');
-      });
-    };
-
-    self.getComplexity = function () {
-      logGA('get_query_risk');
-      self.complexity(null);
-
-      $.post("/notebook/api/optimizer/statement/risk", {
-        notebook: ko.mapping.toJSON(notebook.getContext()),
-        snippet: ko.mapping.toJSON(self.getContext())
-      }, function(data) {
-        if (data.status == 0) {
-          self.complexity(ko.mapping.fromJS(data.query_complexity));
-        } else {
-          $(document).trigger("error", data.message);
-        }
       });
     };
 
