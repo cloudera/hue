@@ -132,18 +132,18 @@ ${ hueIcons.symbols() }
 <div class="main-page">
   <div class="top-nav">
     <div class="top-nav-left">
-      <a class="hamburger hamburger-hue pull-left" type="button">
+      <a class="hamburger hamburger-hue pull-left" type="button" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
       <span class="hamburger-box">
         <span class="hamburger-inner"></span>
       </span>
       </a>
-      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip"  href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('home') }">
+      <a class="nav-tooltip pull-left" title="${_('Homepage')}" rel="navigator-tooltip"  href="#" data-bind="click: function(){ onePageViewModel.currentApp('home') }">
         <svg style="margin-top:12px;margin-left:8px;height: 24px;width:120px;display: inline-block;">
           <use xlink:href="#hue-logo"></use>
         </svg>
       </a>
       <div class="compose-action btn-group">
-        <button class="btn" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }" title="${ _('Compose a query') }">${ _('Compose') }</button>
+        <button class="btn" data-bind="click: function(){ onePageViewModel.currentApp('editor') }" title="${ _('Compose a query') }">${ _('Compose') }</button>
         <button class="btn dropdown-toggle" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
@@ -151,29 +151,29 @@ ${ hueIcons.symbols() }
         <ul class="dropdown-menu">
           % if 'beeswax' in apps and 'impala' in apps:
             <li class="dropdown-submenu">
-              <a title="${_('Query editor')}" rel="navigator-tooltip" href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
+              <a title="${_('Query editor')}" rel="navigator-tooltip" href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
                 <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
               </ul>
             </li>
           % endif
           % if 'beeswax' in apps and 'impala' not in apps:
-            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+            <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
           % endif
           % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
           % endif
           % if 'search' in apps:
-            <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
+            <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
           % endif
-          <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('notebook') }"><i class="fa fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
+          <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
           % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
             <li class="dropdown-submenu">
               <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflow') }</a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
+                <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
                 <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Schedule')}</a></li>
                 <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundle')}</a></li>
               </ul>
@@ -230,7 +230,7 @@ ${ hueIcons.symbols() }
           <button class="btn"
           % if view_profile:
             ### <a href="${ url('useradmin.views.edit_user', username=user.username) }"
-            data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
+            data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
           % endif
           >
           ${ user.username }
@@ -251,7 +251,7 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">20</div></button>
+          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">20</div></button>
           <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
             <span class="caret"></span>
           </button>
@@ -264,26 +264,26 @@ ${ hueIcons.symbols() }
   </div>
 
   <div class="content-wrapper">
-    <div class="left-nav">
+    <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }">
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('home') }">Home</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Editor</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Hive</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('editor') }">Impala</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('search') }">Dashboard</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('home') }">Home</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Editor</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Hive</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Impala</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
         <li><a href="javascript: void(0);">Report</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('oozie_wf') }">Oozie</a></li>
+        <li><a data-bind="click: function () { currentApp('oozie_wf') }">Oozie</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('metastore') }">Tables</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('metastore') }">Tables</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('jobbrowser') }">Jobs</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser') }">Files</a></li>
-        <li><a href="javascript: { ko.dataFor($('.page-content')[0]).currentApp('filebrowser_s3') }">S3</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }">Jobs</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }">Files</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }">S3</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
@@ -434,7 +434,7 @@ ${ assist.assistPanel() }
       }
     };
 
-    (function () {
+    var onePageViewModel = (function () {
       var LOADED_JS = [];
       var LOADED_CSS = [];
 
@@ -532,11 +532,12 @@ ${ assist.assistPanel() }
         self.currentApp('editor');
       };
 
-      ko.applyBindings(new OnePageViewModel(), $('.page-content')[0]);
+      var onePageViewModel = new OnePageViewModel();
+      ko.applyBindings(onePageViewModel, $('.page-content')[0]);
+      return onePageViewModel;
     })();
 
-
-    (function () {
+    var sidePanelViewModel = (function () {
       function SidePanelViewModel () {
         var self = this;
         self.apiHelper = ApiHelper.getInstance();
@@ -552,11 +553,19 @@ ${ assist.assistPanel() }
       ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
+      return sidePanelViewModel;
     })();
 
-    (function () {
+    var topNavViewModel = (function (onePageViewModel) {
       function TopNavViewModel () {
         var self = this;
+        self.onePageViewModel = onePageViewModel;
+        self.leftNavVisible = ko.observable(false);
+
+        self.onePageViewModel.currentApp.subscribe(function () {
+          self.leftNavVisible(false);
+        });
+
         self.apiHelper = ApiHelper.getInstance();
         self.searchActive = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
@@ -662,29 +671,21 @@ ${ assist.assistPanel() }
       TopNavViewModel.prototype.performSearch = function () {
       };
 
+      var topNavViewModel = new TopNavViewModel();
+      ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
+      ko.applyBindings(topNavViewModel, $('.left-nav')[0]);
 
-      ko.applyBindings(new TopNavViewModel(), $('.top-nav')[0]);
-    })();
+      return topNavViewModel;
+    })(onePageViewModel);
 
     window.hueDebug = {
       viewModel: function (element) {
-        return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel();
+        return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
       },
-      onePageViewModel: function () {
-        return ko.dataFor($('.page-content')[0]);
-      },
-      sidePanelViewModel: function () {
-        return ko.dataFor($('.left-panel')[0]);
-      },
-      topNavViewModel: function () {
-        return ko.dataFor($('.top-nav')[0]);
-      }
+      onePageViewModel: onePageViewModel,
+      sidePanelViewModel: sidePanelViewModel,
+      topNavViewModel: topNavViewModel
     };
-  });
-
-  $(".hamburger").click(function () {
-    $(this).toggleClass("is-active");
-    $(".left-nav").toggleClass("left-nav-visible");
   });
 
   moment.locale(window.navigator.userLanguage || window.navigator.language);
