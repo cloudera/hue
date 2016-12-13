@@ -326,6 +326,7 @@ body {
 }
 
 .left-nav-menu {
+  padding-bottom: 60px;
   margin: 10px 0 0 0;
 }
 
@@ -383,9 +384,22 @@ body {
   position: absolute;
   bottom: 0;
   left: 0;
-  padding: 15px 30px;
   font-size: 16px;
-  width: 100%
+  background-color: #338BB8;
+  width: 0;
+}
+
+.left-nav-drop div {
+  margin: 15px 30px;
+}
+
+.left-nav-visible .left-nav-drop {
+  -webkit-transition: 0.4s width;
+  -moz-transition: 0.4s width;
+  -ms-transition: 0.4s width;
+  transition: 0.4s width;
+  width: 200px;
+  position: fixed;
 }
 
 .assist-panel {
