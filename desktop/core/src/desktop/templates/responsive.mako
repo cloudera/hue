@@ -822,6 +822,10 @@ ${ assist.assistPanel() }
     $(".modal:visible").find("input:not(.disable-autofocus):visible:first").focus();
   });
 
+  function resetPrimaryButtonsStatus() {
+    $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
+  }
+
     %if collect_usage:
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-40351920-1']);

@@ -30,14 +30,17 @@
 <%namespace name="edit" file="editor_components.mako" />
 <%namespace name="fb_components" file="fb_components.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
 ${ fb_components.menubar() }
+%endif
+
 
 <div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
       <div class="card card-small">
-      % if breadcrumbs:
+      % if breadcrumbs and not is_embeddable:
         ${fb_components.breadcrumbs(path, breadcrumbs)}
       %endif
         <div class="card-body">
@@ -183,4 +186,6 @@ ${ fb_components.menubar() }
     });
   </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

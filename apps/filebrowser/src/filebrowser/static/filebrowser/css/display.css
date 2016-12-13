@@ -1,3 +1,12 @@
+#fileviewer .card-body {
+  padding: 0;
+  margin: 0;
+}
+
+#fileviewer .hueBreadcrumbBar {
+  margin: 0;
+}
+
 #fileArea {
   overflow: auto;
   background-color: #F5F5F5;
