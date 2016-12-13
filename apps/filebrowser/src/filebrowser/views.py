@@ -263,6 +263,7 @@ def edit(request, path, form=None):
         filename=os.path.basename(path),
         dirname=os.path.dirname(path),
         breadcrumbs=parse_breadcrumbs(path),
+        is_embeddable=request.GET.get('is_embeddable', False),
         show_download_button=SHOW_DOWNLOAD_BUTTON.get())
     if request.META.get('HTTP_X_REQUESTED_WITH') != 'XMLHttpRequest':
         data['stats'] = stats;

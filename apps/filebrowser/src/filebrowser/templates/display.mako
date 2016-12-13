@@ -25,6 +25,7 @@
   path_enc = path
   dirname_enc = urlencode(view['dirname'])
   base_url = url('filebrowser.views.view', path=path_enc)
+  edit_url = url('filebrowser.views.edit', path=path_enc)
 %>
 <%namespace name="fb_components" file="fb_components.mako" />
 
@@ -63,18 +64,20 @@ ${ fb_components.menubar() }
             <!-- /ko -->
 
             <!-- ko if: $root.file().view.compression() && $root.file().view.compression() === "none" && $root.file().editable -->
-              <li><a href="${url('filebrowser.views.edit', path=path_enc)}"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
+              <li><a class="pointer" data-bind="click: $root.editFile"><i class="fa fa-pencil"></i> ${_('Edit file')}</a></li>
             <!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.isViewing -->
-            <li><a href="${url('filebrowser.views.view', path=path_enc)}"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
+            <li><a class="pointer" data-bind="click: $root.viewFile"><i class="fa fa-eye"></i> ${_('View file')}</a></li>
           <!-- /ko -->
 
+          <!-- ko if: $root.isViewing -->
           <!-- ko if: $root.file().show_download_button -->
            <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="fa fa-download"></i> ${_('Download')}</a></li>
           <!-- /ko -->
            <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
            <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
+          <!-- /ko -->
 
            <!-- ko if: $root.file().stats -->
            <li class="white">
@@ -98,7 +101,7 @@ ${ fb_components.menubar() }
     </div>
     <div class="span10">
       <div class="card card-small" style="margin-bottom: 5px">
-        <!-- ko if: $root.file() && ($root.file().view.compression() === null || $root.file().view.compression() === "avro" || $root.file().view.compression() === "none") -->
+        <!-- ko if: $root.isViewing() && $root.file() && ($root.file().view.compression() === null || $root.file().view.compression() === "avro" || $root.file().view.compression() === "none") -->
           <div class="pull-right" style="margin-right: 20px; margin-top: 14px;">
             <div class="form-inline pagination-input-form inline">
               <span>${_('Page')}</span>
@@ -119,7 +122,7 @@ ${ fb_components.menubar() }
         % if breadcrumbs:
           ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif
-        <div class="card-body">
+        <div class="card-body" style="padding: 0">
             <!-- ko if: $root.file() && $root.file().stats.size() === 0 -->
             <div class="center empty-wrapper">
               <i class="fa fa-frown-o"></i>
@@ -137,19 +140,25 @@ ${ fb_components.menubar() }
                 <!-- /ko -->
               <!-- /ko -->
             <!-- /ko -->
-            <div id="fileArea" data-bind="css: {'loading': isLoading}">
-              <div id="loader" data-bind="visible: isLoading">
-                <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-              </div>
-                <pre></pre>
-                <table class="binary">
-                  <tbody>
-                  </tbody>
-                </table>
+            <div id="loader" data-bind="visible: isLoading">
+              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
+              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
+            <!-- ko if: $root.isViewing -->
+            <div id="fileArea" data-bind="css: {'loading': isLoading}">
+              <pre></pre>
+              <table class="binary">
+                <tbody>
+                </tbody>
+              </table>
+            </div>
+            <!-- /ko -->
+            <!-- ko if not: $root.isViewing -->
+            <div id="fileeditor"></div>
+            <!-- /ko -->
         </div>
       </div>
+
     </div>
   </div>
 </div>
@@ -322,6 +331,30 @@ ${ fb_components.menubar() }
 
     self.switchCompression = function (newCompression) {
       self.compression(newCompression);
+      self.page(1);
+      self.upperPage(1);
+      self.changePage();
+    }
+
+    self.editFile = function() {
+      self.isViewing(false);
+      self.isLoading(true);
+      $.ajax({
+        url: '${ edit_url }' + '?is_embeddable=true',
+        beforeSend:function (xhr) {
+          xhr.setRequestHeader('X-Requested-With', 'Hue');
+        },
+        dataType:'html',
+        success:function (response) {
+          $('#fileeditor').html(response);
+          self.isLoading(false);
+        }
+      });
+    }
+
+    self.viewFile = function() {
+      $('#fileeditor').html('');
+      self.isViewing(true);
       self.page(1);
       self.upperPage(1);
       self.changePage();
