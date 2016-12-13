@@ -2203,16 +2203,11 @@ ${ hueIcons.symbols() }
             <i class="fa fa-fw fa-eraser"></i> ${_('Clear')}
           </a>
         </li>
-        <!-- ko if: $root.isOptimizerEnabled -->
+        <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
           <a href="javascript:void(0)" data-bind="click: queryCompatibility" title="${ _('Get Impala compatibility hints') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: getComplexity" title="${ _('Get recommendations on query risks and optimizations') }">
-            <i class="fa fa-fw fa-check"></i> ${_('Check complexity')}
           </a>
         </li>
         <li>
