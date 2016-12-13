@@ -411,7 +411,7 @@ var SqlAutocompleter2 = (function () {
     }
 
     if (HAS_OPTIMIZER && (typeof parseResult.suggestGroupBys !== 'undefined' || typeof parseResult.suggestOrderBys !== 'undefined')) {
-      var tables = typeof parseResult.suggestGroupBys !== 'undefined' ? parseResult.suggestGroupBys.tables : typeof parseResult.suggestOrderBys.tables;
+      var tables = typeof parseResult.suggestGroupBys !== 'undefined' ? parseResult.suggestGroupBys.tables : parseResult.suggestOrderBys.tables;
       var groupAndOrderByDeferral = $.Deferred();
       deferrals.push(groupAndOrderByDeferral);
       self.snippet.getApiHelper().fetchNavOptTopColumns({
