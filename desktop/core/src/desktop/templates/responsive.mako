@@ -288,7 +288,9 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
       <div class="left-nav-drop">
-        <i class="fa fa-fw fa-cloud-upload"></i> <span>${ _('Drop files here') }</span>
+        <div>
+          <i class="fa fa-fw fa-cloud-upload"></i> <span>${ _('Drop files here') }</span>
+        </div>
       </div>
     </div>
 
