@@ -1425,7 +1425,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptTopTables = function (options) {
     var self = this;
     self.fetchNavOptCached('/metadata/api/optimizer/top_tables', options, function (data) {
-      return data.status === 0 && data.top_tables && data.top_tables.length > 0;
+      return data.status === 0;
     });
   };
 
@@ -1446,12 +1446,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptTopColumns = function (options) {
     var self = this;
     self.fetchNavOptCached('/metadata/api/optimizer/top_columns', options, function (data) {
-      return typeof data.values !== 'undefined' && (
-        typeof data.values.filterColumns !== 'undefined' ||
-        typeof data.values.groupbyColumns !== 'undefined' ||
-        typeof data.values.joinColumns !== 'undefined' ||
-        typeof data.values.orderbyColumns !== 'undefined' ||
-        typeof data.values.selectColumns !== 'undefined');
+      return data.status === 0;
     });
   };
 
@@ -1472,7 +1467,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptPopularJoins = function (options) {
     var self = this;
     self.fetchNavOptCached('/metadata/api/optimizer/top_joins', options, function (data) {
-      return typeof data.values !== 'undefined';
+      return data.status === 0;
     });
   };
 
@@ -1493,7 +1488,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptTopFilters = function (options) {
     var self = this;
     self.fetchNavOptCached('/metadata/api/optimizer/top_filters', options, function (data) {
-      return typeof data.values !== 'undefined';
+      return data.status === 0;
     });
   };
 
@@ -1514,7 +1509,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchNavOptTopAggs = function (options) {
     var self = this;
     self.fetchNavOptCached('/metadata/api/optimizer/top_aggs', options, function (data) {
-      return typeof data.values !== 'undefined';
+      return data.status === 0;
     });
   };
 
