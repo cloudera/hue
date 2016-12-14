@@ -109,7 +109,7 @@ class TestOptimizerApi(object):
         "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;"
     ]
 
-    resp = self.api.upload(queries=queries)
+    resp = self.api.upload(data=queries, data_type='queries')
 
     assert_equal('status' in resp, resp)
     assert_equal('state' in resp['status'], resp)
@@ -121,6 +121,22 @@ class TestOptimizerApi(object):
     assert_equal('status' in resp, resp)
     assert_equal('state' in resp['status'], resp)
     assert_equal('workloadId' in resp['status'], resp)
+
+
+  def test_upload_table_stats(self):
+    stats = [
+        "TABLE_NAME,NUM_ROWS",
+        "TEST_TABLE,10",
+        "TEST1,110",
+    ]
+
+    resp = self.api.upload(data=stats, data_type='table_stats')
+
+    assert_equal('status' in resp, resp)
+    assert_equal('state' in resp['status'], resp)
+    assert_equal('workloadId' in resp['status'], resp)
+
+    assert_true(resp['status']['state'] in ('WAITING', 'FINISHED', 'FAILED'), resp['status']['state'])
 
 
   def test_top_tables(self):

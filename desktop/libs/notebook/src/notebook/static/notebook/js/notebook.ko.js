@@ -1422,7 +1422,7 @@ var EditorViewModel = (function() {
     self.loadQueryHistory = function (n) {
       logGA('load_query_history');
 
-      $.post("/metadata/api/optimizer/upload_history", {
+      $.post("/metadata/api/optimizer/upload/history", {
         n: typeof n != "undefined" ? n : null,
         sourcePlatform: self.type()
       }, function(data) {
@@ -1436,7 +1436,7 @@ var EditorViewModel = (function() {
     };
 
     self.watchUploadStatus = function (workloadId) {
-      $.post("/metadata/api/optimizer/upload_status", {
+      $.post("/metadata/api/optimizer/upload/status", {
         workloadId: workloadId
       }, function(data) {
         if (data.status == 0) {
