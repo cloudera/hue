@@ -965,6 +965,16 @@ class Document2Manager(models.Manager, Document2QueryMixin):
       return self.get(owner=user, parent_directory=None, name=Document2.HOME_DIR, type='directory')
     except Document2.DoesNotExist:
       return self.create_user_directories(user)
+    except Document2.MultipleObjectsReturned:
+      LOG.error('Multiple Home directories detected. Merging all into one.')
+
+      home_dirs = list(self.filter(owner=user, parent_directory=None, name=Document2.HOME_DIR, type='directory').order_by('-last_modified'))
+      parent_home_dir = home_dirs.pop()
+      for dir in home_dirs:
+        dir.children.exclude(name='.Trash').update(parent_directory=parent_home_dir)
+        dir.delete()
+
+      return parent_home_dir
 
   def get_by_path(self, user, path):
     """
@@ -1217,8 +1227,19 @@ class Document2(models.Model):
     return self
 
   def trash(self):
-    trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
-    self.move(trash_dir, self.owner)
+    try:
+      trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
+      self.move(trash_dir, self.owner)
+    except Document2.MultipleObjectsReturned:
+      LOG.error('Multiple Trash directories detected. Merging all into one.')
+
+      trash_dirs = list(Directory.objects.filter(name=self.TRASH_DIR, owner=self.owner).order_by('-last_modified'))
+      parent_trash_dir = trash_dirs.pop()
+      for dir in trash_dirs:
+        dir.children.update(parent_directory=parent_trash_dir)
+        dir.delete()
+
+      self.move(parent_trash_dir, self.owner)
 
   # TODO: restore
 
