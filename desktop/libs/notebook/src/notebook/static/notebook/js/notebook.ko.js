@@ -556,12 +556,6 @@ var EditorViewModel = (function() {
       });
       return statement;
     });
-    if (vm.isOptimizerEnabled()) {
-      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-      self.delayedStatement.subscribe(function (val) {
-        //self.getComplexity();
-      }, self);
-    }
 
     self.result = new Result(snippet, snippet.result);
     if (! self.result.hasSomeResults()) {
@@ -783,11 +777,15 @@ var EditorViewModel = (function() {
     self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
     self.hasSuggestion = ko.observable(false);
 
+    self.complexityCheckActive = ko.observable(false);
+
     if (HAS_OPTIMIZER) {
       var lastRequest;
       var lastCheckedStatement;
 
-      var checkComplexity = function () {
+      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+
+      self.checkComplexity = function () {
         if (lastCheckedStatement === self.statement_raw()) {
           return;
         }
@@ -818,16 +816,13 @@ var EditorViewModel = (function() {
         });
       };
 
-      var changeThrottle = -1;
-
-      self.statement_raw.subscribe(function () {
-        if (self.type() === 'hive') {
-          window.clearTimeout(changeThrottle);
-          changeThrottle = window.setTimeout(checkComplexity, 2000);
+      self.delayedStatement.subscribe(function () {
+        if (self.type() === 'hive' && self.complexityCheckActive()) {
+          self.checkComplexity();
         }
       });
-      if (self.statement_raw()) {
-        changeThrottle = window.setTimeout(checkComplexity, 2000);
+      if (self.statement_raw() && self.complexityCheckActive()) {
+        window.setTimeout(self.checkComplexity, 2000);
       }
     }
 
