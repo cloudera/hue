@@ -918,6 +918,69 @@ class TestDocument(object):
     test_doc.delete()
     test_dir.delete()
 
+  def test_multiple_home_directories(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+    test_doc1 = Document2.objects.create(name='test-doc1',
+                                         type='query-hive',
+                                         owner=self.user,
+                                         description='',
+                                         parent_directory=home_dir)
+
+    assert_equal(home_dir.children.count(), 3)
+
+    # Cannot create second home directory directly as it will fail in Document2.validate()
+    second_home_dir = Document2.objects.create(owner=self.user, parent_directory=None, name='second_home_dir', type='directory')
+    Document2.objects.filter(name='second_home_dir').update(name=Document2.HOME_DIR, parent_directory=None)
+    assert_equal(Document2.objects.filter(owner=self.user, name=Document2.HOME_DIR).count(), 2)
+
+    test_doc2 = Document2.objects.create(name='test-doc2',
+                                              type='query-hive',
+                                              owner=self.user,
+                                              description='',
+                                              parent_directory=second_home_dir)
+    assert_equal(second_home_dir.children.count(), 1)
+
+    merged_home_dir = Directory.objects.get_home_directory(self.user)
+    children = merged_home_dir.children.all().order_by('-last_modified')
+    assert_equal(children.count(), 4)
+    assert_equal(test_doc2.name, children[0].name)
+    assert_equal(test_doc1.name, children[1].name)
+
+  def test_multiple_trash_directories(self):
+    home_dir = Directory.objects.get_home_directory(self.user)
+    test_doc1 = Document2.objects.create(name='test-doc1',
+                                         type='query-hive',
+                                         owner=self.user,
+                                         description='',
+                                         parent_directory=home_dir)
+
+    assert_equal(home_dir.children.count(), 3)
+
+    # Cannot create second trash directory directly as it will fail in Document2.validate()
+    Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
+    Document2.objects.filter(name='second_trash_dir').update(name=Document2.TRASH_DIR)
+    assert_equal(Document2.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
+
+
+    test_doc2 = Document2.objects.create(name='test-doc2',
+                                              type='query-hive',
+                                              owner=self.user,
+                                              description='',
+                                              parent_directory=home_dir)
+    assert_equal(home_dir.children.count(), 5) # Including the second trash
+    assert_raises(Document2.MultipleObjectsReturned, Document2.objects.get, name=Document2.TRASH_DIR)
+
+    test_doc1.trash()
+    assert_equal(home_dir.children.count(), 3) # As trash documents are merged count is back to 3
+    merged_trash_dir = Document2.objects.get(name=Document2.TRASH_DIR)
+
+    test_doc2.trash()
+    children = merged_trash_dir.children.all().order_by('-last_modified')
+    assert_equal(children.count(), 2)
+    assert_equal(test_doc2.name, children[0].name)
+    assert_equal(test_doc1.name, children[1].name)
+
+
   def test_document_copy(self):
     name = 'Test Document2 Copy'
 
