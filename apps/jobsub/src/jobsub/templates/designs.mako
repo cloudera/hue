@@ -791,11 +791,14 @@ function redraw() {
  * Knockout doesn't work without this.
  * Clearing the table is necessary so multiple rows will not be added.
  */
+
 function reload() {
   designs.isLoading(true);
   $(document).one('load.designs', function() {
-    designTable.fnClearTable();
-    designTable.fnDestroy();
+    if (designTable != null){
+      designTable.fnClearTable();
+      designTable.fnDestroy();
+    }
   });
   $(document).one('initialized.designs', function() {
     designTable = $('#designTable').dataTable( designTableOptions );
@@ -814,10 +817,8 @@ $(document).bind('loaded.designs', function() {
     }
   });
 });
-$(document).bind('saved.design', reload);
-$(document).bind('deleted.design', reload);
-$(document).bind('cloned.design', reload);
-$(document).bind('restored.design', reload);
+
+$(document).bind('reload.designs', reload);
 
 reload();
 
