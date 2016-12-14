@@ -238,35 +238,35 @@
 }
 
 
-.nav {
+#editorComponents .nav {
   margin-bottom: 0;
 }
 
-.nav i {
+#editorComponents .nav i {
   line-height: 20px !important;
 }
 
-.nav-list > li > a, .nav-list .nav-header {
+#editorComponents .nav-list > li > a, #editorComponents .nav-list .nav-header {
   padding-left: 0;
   margin-left: 0;
   margin-bottom: -7px;
   margin-top: 10px!important;
 }
 
-.nav-list {
+#editorComponents .nav-list {
   padding-left: 0;
 }
 
-.dropdown-menu li {
+#editorComponents .dropdown-menu li {
   font-size: 14px;
 }
 
-.dropdown a.dropdown-toggle {
+#editorComponents .dropdown a.dropdown-toggle {
   padding-left: 10px;
   padding-right: 10px;
 }
 
-.search-bar {
+#editorComponents .search-bar {
   background-color: #F5F5F5;
   margin: 0;
   padding-bottom: 0;
@@ -280,20 +280,20 @@
   z-index: 1000;
 }
 
-.search-bar input {
+#editorComponents .search-bar input {
   margin-left: 10px;
   padding-right: 20px;
 }
 
-.search-bar ul li {
+#editorComponents .search-bar ul li {
   text-align: right;
 }
 
-.search-bar ul.dropdown-menu li {
+#editorComponents .search-bar ul.dropdown-menu li {
   text-align: left;
 }
 
-.tab-content {
+#editorComponents .tab-content {
   background-color: #FFFFFF;
   border-left: 1px solid #dddddd;
   border-right: 1px solid #dddddd;
@@ -338,7 +338,7 @@
   border: none;
 }
 
-.ui-sortable {
+#editorComponents .ui-sortable {
   background-color: #FFF;
   min-height: 0px;
 }
@@ -1001,7 +1001,7 @@ h4.header {
   width: 220px;
 }
 
-pre {
+#editorComponents pre {
   font-size: 11px;
 }
 

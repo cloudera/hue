@@ -25,6 +25,7 @@ from django.utils.translation import ugettext as _
 <%namespace name="util" file="util.mako" />
 
 ${ commonheader(_('Create table from file'), 'metastore', user, request) | n,unicode }
+<span id="editorComponents">
 ${ layout.metastore_menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -264,5 +265,6 @@ ${ assist.assistPanel() }
   })();
 </script>
 
+</span>
 
 ${ commonfooter(request, messages) | n,unicode }

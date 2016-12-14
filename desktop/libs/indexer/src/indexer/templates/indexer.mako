@@ -24,6 +24,7 @@
 <%namespace name="assist" file="/assist.mako" />
 
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
+<span id="editorComponents">
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -1056,5 +1057,5 @@ ${ assist.assistPanel() }
     });
   })();
 </script>
-
+</span>
 ${ commonfooter(request, messages) | n,unicode }
