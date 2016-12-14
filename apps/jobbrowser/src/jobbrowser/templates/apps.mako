@@ -24,6 +24,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <%namespace name="assist" file="/assist.mako" />
 % endif
 
+<span id="editorComponents">
+
 <link rel="stylesheet" href="${ static('desktop/ext/css/basictable.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 % if not is_embeddable:
@@ -465,7 +467,7 @@ ${ assist.assistPanel() }
     });
   })();
 </script>
-
+</span>
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 % endif

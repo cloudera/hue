@@ -33,10 +33,11 @@
 ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filename)), 'filebrowser', user, request) | n,unicode }
 %endif
 
+
 ${ fb_components.menubar() }
 
-<link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" />
 <div id="fileviewer" class="container-fluid">
+  <link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" type="text/css">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav" style="padding-top: 0">

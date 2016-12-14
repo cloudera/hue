@@ -61,6 +61,8 @@ ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 % endif
 
+<span id="editorComponents">
+
 ${ components.menubar() }
 
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
@@ -1289,7 +1291,7 @@ ${ components.menubar() }
     });
   })();
 </script>
-
+</span>
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 % endif
