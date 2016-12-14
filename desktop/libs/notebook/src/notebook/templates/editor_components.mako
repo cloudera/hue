@@ -2211,6 +2211,11 @@ ${ hueIcons.symbols() }
           </a>
         </li>
         <li>
+          <a href="javascript:void(0)" data-bind="click: checkComplexity" title="${ _('Get recommendations on query risks and optimizations') }">
+            <i class="fa fa-fw fa-check"></i> ${_('Check complexity')}
+          </a>
+        </li>
+        <li>
           <a href="javascript:void(0)" data-bind="click: getSimilarQueries" title="${ _('Expand query with similar queries suggestions') }">
             <i class="fa fa-fw fa-comments"></i> ${_('Show similarities')}
           </a>
