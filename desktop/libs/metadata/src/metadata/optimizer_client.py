@@ -51,6 +51,70 @@ class OptimizerApiException(PopupException):
 
 class OptimizerApi(object):
 
+  UPLOAD = {
+    'queries': {
+      'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT'],
+      'file_headers': """{
+    "fileLocation": "%(query_file)s",
+    "tenant": "%(tenant)s",
+    "fileName": "%(query_file_name)s",
+    "sourcePlatform": "%(source_platform)s",
+    "colDelim": ",",
+    "rowDelim": "\\n",
+    "headerFields": [
+        {
+            "count": 0,
+            "coltype": "SQL_ID",
+            "use": true,
+            "tag": "",
+            "name": "SQL_ID"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "ELAPSED_TIME"
+        },
+        {
+            "count": 0,
+            "coltype": "SQL_QUERY",
+            "use": true,
+            "tag": "",
+            "name": "SQL_FULLTEXT"
+        }
+    ]
+}"""
+    },
+    'table_stats': {
+        'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT'],
+        'file_headers': """{
+    "fileLocation": "%(query_file)s",
+    "tenant": "%(tenant)s",
+    "fileName": "%(query_file_name)s",
+    "sourcePlatform": "%(source_platform)s",
+    "colDelim": ",",
+    "rowDelim": "\\n",
+    "headerFields": [
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "TABLE_NAME"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "NUM_ROWS"
+        }
+    ]
+}"""
+    }
+  }
+
   def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
     self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._email = OPTIMIZER.EMAIL.get()
@@ -146,8 +210,15 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
 
 
-  def upload(self, queries, source_platform='generic', workload_id=None):
-    f_queries_path = NamedTemporaryFile(suffix='.csv')
+  def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
+    if data_type == 'table_stats':
+      data_headers = OptimizerApi.HEADERS_UPLOAD_TABLE_STATS
+      data_suffix = '.log'
+    else:
+      data_headers = OptimizerApi.HEADERS_UPLOAD_QUERIES
+      data_suffix = '.csv'
+
+    f_queries_path = NamedTemporaryFile(suffix=data_suffix)
     f_format_path = NamedTemporaryFile(suffix='.json')
     f_queries_path.close()
     f_format_path.close() # Reopened as real file below to work well with the command
@@ -157,43 +228,18 @@ class OptimizerApi(object):
       f_format = open(f_format_path.name, 'w+')
 
       try:
-        content_generator = OptimizerDataAdapter(queries)
+        content_generator = OptimizerDataAdapter(data, data_type=data_type)
         queries_csv = export_csvxls.create_generator(content_generator, 'csv')
 
         for row in queries_csv:
           f_queries.write(row)
 
-        f_format.write("""{
-    "fileLocation": "%(query_file)s",
-    "tenant": "%(tenant)s",
-    "fileName": "%(query_file_name)s",
-    "sourcePlatform": "hive",
-    "colDelim": ",",
-    "rowDelim": "\\n",
-    "headerFields": [
-        {
-            "count": 0,
-            "coltype": "SQL_ID",
-            "use": true,
-            "tag": "",
-            "name": "SQL_ID"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "ELAPSED_TIME"
-        },
-        {
-            "count": 0,
-            "coltype": "SQL_QUERY",
-            "use": true,
-            "tag": "",
-            "name": "SQL_FULLTEXT"
-        }
-    ]
-}""" % {'tenant': self._product_name, 'query_file': f_queries.name, 'query_file_name': os.path.basename(f_queries.name)})
+        f_format.write(data_headers % {
+            'source_platform': source_platform,
+            'tenant': self._product_name,
+            'query_file': f_queries.name,
+            'query_file_name': os.path.basename(f_queries.name)
+        })
 
       finally:
         f_queries.close()
@@ -312,12 +358,16 @@ class OptimizerApi(object):
     return self._exec('get-top-data-bases', args)
 
 
-def OptimizerDataAdapter(queries):
-  headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT']
-  if queries and len(queries[0]) == 3:
-    rows = queries
+def OptimizerDataAdapter(data, data_type='queries'):
+  headers = OptimizerApi.UPLOAD[data_type]['headers']
+
+  if data_type == 'table_stats':
+    rows = data
   else:
-    rows = ([str(uuid.uuid4()), 0.0, q] for q in queries)
+    if data and len(data[0]) == 3:
+      rows = data
+    else:
+      rows = ([str(uuid.uuid4()), 0.0, q] for q in data)
 
   yield headers, rows
 

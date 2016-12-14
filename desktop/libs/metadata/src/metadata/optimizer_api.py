@@ -35,6 +35,12 @@ from metadata.optimizer_client import OptimizerApi
 LOG = logging.getLogger(__name__)
 
 
+try:
+  from beeswax.api import get_table_stats
+except ImportError, e:
+  LOG.warn("Hive lib not enabled")
+
+
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
@@ -303,7 +309,35 @@ def upload_history(request):
 
   api = OptimizerApi()
 
-  response['upload_history'] = api.upload(queries=queries, source_platform=source_platform)
+  response['upload_history'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def upload_table_stats(request):
+  response = {'status': -1}
+
+  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  source_platform = request.POST.get('sourcePlatform', 'hive')
+
+  data = []
+  for db_table in db_tables:
+    path = _get_table_name(db_table)
+
+    try:
+      table = get_table_stats(request, database=path['database'], table=path['table'])
+      stats = dict((stat['data_type'], stat['comment']) for stat in json.loads(table.content)['stats'])
+
+      data.append((path['table'], stats.get('numRows', -1)))
+    except Exception, e:
+      LOG.warning('Skipping upload of %s: %s' % (db_table, e))
+
+  api = OptimizerApi()
+
+  response['upload_history'] = api.upload(data=data, data_type='table_stats', source_platform=source_platform)
   response['status'] = 0
 
   return JsonResponse(response)
