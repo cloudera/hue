@@ -35,6 +35,12 @@ ${ fb_components.menubar() }
   .tooltip.left {
     margin-left: -10px;
   }
+
+  %if is_embeddable:
+  #filebrowser .pagination {
+    position: inherit;
+  }
+  %endif
 </style>
 
 <div id="filebrowser" class="container-fluid">
