@@ -26,7 +26,7 @@
 
 ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
 
-<span id="editorComponents">
+<span id="editorComponents" class="notebook">
 ${ editorComponents.includes() }
 
 <style type="text/css">

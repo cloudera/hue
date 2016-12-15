@@ -61,7 +61,7 @@ ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 % endif
 
-<span id="editorComponents">
+<span class="notebook">
 
 ${ components.menubar() }
 

@@ -238,35 +238,35 @@
 }
 
 
-#editorComponents .nav {
+.notebook .nav {
   margin-bottom: 0;
 }
 
-#editorComponents .nav i {
+.notebook .nav i {
   line-height: 20px !important;
 }
 
-#editorComponents .nav-list > li > a, #editorComponents .nav-list .nav-header {
+.notebook .nav-list > li > a, .notebook .nav-list .nav-header {
   padding-left: 0;
   margin-left: 0;
   margin-bottom: -7px;
   margin-top: 10px!important;
 }
 
-#editorComponents .nav-list {
+.notebook .nav-list {
   padding-left: 0;
 }
 
-#editorComponents .dropdown-menu li {
+.notebook .dropdown-menu li {
   font-size: 14px;
 }
 
-#editorComponents .dropdown a.dropdown-toggle {
+.notebook .dropdown a.dropdown-toggle {
   padding-left: 10px;
   padding-right: 10px;
 }
 
-#editorComponents .search-bar {
+.notebook .search-bar {
   background-color: #F5F5F5;
   margin: 0;
   padding-bottom: 0;
@@ -280,20 +280,20 @@
   z-index: 1000;
 }
 
-#editorComponents .search-bar input {
+.notebook .search-bar input {
   margin-left: 10px;
   padding-right: 20px;
 }
 
-#editorComponents .search-bar ul li {
+.notebook .search-bar ul li {
   text-align: right;
 }
 
-#editorComponents .search-bar ul.dropdown-menu li {
+.notebook .search-bar ul.dropdown-menu li {
   text-align: left;
 }
 
-#editorComponents .tab-content {
+.notebook .tab-content {
   background-color: #FFFFFF;
   border-left: 1px solid #dddddd;
   border-right: 1px solid #dddddd;
@@ -338,7 +338,7 @@
   border: none;
 }
 
-#editorComponents .ui-sortable {
+.notebook .ui-sortable {
   background-color: #FFF;
   min-height: 0px;
 }
@@ -1001,7 +1001,7 @@ h4.header {
   width: 220px;
 }
 
-#editorComponents pre {
+.notebook pre {
   font-size: 11px;
 }
 
