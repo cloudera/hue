@@ -35,5 +35,19 @@
     it("should have the String.includes polyfill", function() {
       expect('banana'.includes('anan')).toBeTruthy();
     });
+
+    it("should change completely the URL", function () {
+      hueUtils.changeURL('/banana');
+      expect(window.location.pathname).toEqual('/banana');
+      hueUtils.changeURL('/jasmine');
+    });
+
+    it("should change just a parameter in the URL", function () {
+      hueUtils.changeURL('/banana?peeled=no');
+      hueUtils.changeURLParameter('peeled', 'yes');
+      expect(window.location.search).toEqual('?peeled=yes');
+      hueUtils.changeURL('/jasmine');
+    });
+
   });
 })();
