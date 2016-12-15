@@ -1085,6 +1085,18 @@ HiveDescribeStatement_EDIT
    {
      addTablePrimary($3);
    }
+ | '<hive>DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier DerivedColumnChain
+   {
+     if (!$2) {
+       suggestKeywords(['EXTENDED', 'FORMATTED']);
+     }
+   }
+ | '<hive>DESCRIBE' OptionalExtendedOrFormatted 'CURSOR' SchemaQualifiedTableIdentifier
+   {
+     if (!$2) {
+       suggestKeywords(['EXTENDED', 'FORMATTED']);
+     }
+   }
  | '<hive>DESCRIBE' OptionalExtendedOrFormatted SchemaQualifiedTableIdentifier 'CURSOR'
    {
      addTablePrimary($3);
