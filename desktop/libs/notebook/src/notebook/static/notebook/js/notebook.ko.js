@@ -969,7 +969,7 @@ var EditorViewModel = (function() {
         if (vm.editorMode() && data.history_id) {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
           if (vm.isResponsive()){
-            url = vm.URLS.responsive + '?editor=' + data.history_id;
+            url = vm.URLS.responsive + '&editor=' + data.history_id;
           }
           hueUtils.changeURL(url);
           notebook.id(data.history_id);
@@ -1810,7 +1810,7 @@ var EditorViewModel = (function() {
             }
 
             if (vm.isResponsive()){
-              hueUtils.changeURL(vm.URLS.responsive + '?editor=' + data.id);
+              hueUtils.changeURL(vm.URLS.responsive + '&editor=' + data.id);
             }
             else {
               hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
@@ -1818,7 +1818,7 @@ var EditorViewModel = (function() {
           }
           else {
             if (vm.isResponsive()){
-              hueUtils.changeURL(vm.URLS.responsive + '?notebook=' + data.id);
+              hueUtils.changeURL(vm.URLS.responsive + '&notebook=' + data.id);
             }
             else {
               hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
@@ -1999,7 +1999,7 @@ var EditorViewModel = (function() {
           self.id(null);
           self.uuid(UUID());
           if (vm.isResponsive()) {
-            hueUtils.changeURL(vm.URLS.responsive + '?type=' + vm.editorType());
+            hueUtils.changeURL(vm.URLS.responsive + '&type=' + vm.editorType());
           }
           else {
             hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
@@ -2149,7 +2149,7 @@ var EditorViewModel = (function() {
       editor: '/notebook/editor',
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
-      responsive: '/responsive'
+      responsive: '/responsive?app=editor'
     }
 
     self.user = options.user;
@@ -2394,7 +2394,7 @@ var EditorViewModel = (function() {
           if (typeof skipUrlChange === 'undefined'){
             if (self.editorMode()) {
               if (self.isResponsive()){
-                hueUtils.changeURL(self.URLS.responsive + '?editor=' + data.document.id);
+                hueUtils.changeURL(self.URLS.responsive + '&editor=' + data.document.id);
               }
               else {
                 hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
@@ -2402,10 +2402,10 @@ var EditorViewModel = (function() {
             }
             else {
               if (self.isResponsive()){
-                hueUtils.changeURL(self.URLS.responsive + '?notebook=' + data.document.id);
+                hueUtils.changeURL(self.URLS.responsive + '&notebook=' + data.document.id);
               }
               else {
-                hueUtils.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
+                hueUtils.changeURL(self.URLS.notebook + '&notebook=' + data.document.id);
               }
             }
           }
@@ -2435,14 +2435,14 @@ var EditorViewModel = (function() {
           }
           if (window.location.getParameter('type')) {
             if (self.isResponsive()){
-              hueUtils.changeURL(self.URLS.responsive + '?type=' + window.location.getParameter('type'));
+              hueUtils.changeURL(self.URLS.responsive + '&type=' + window.location.getParameter('type'));
             }
             else {
               hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + window.location.getParameter('type'));
             }
           } else {
             if (self.isResponsive()){
-              hueUtils.changeURL(self.URLS.responsive + '?type=' + self.editorType());
+              hueUtils.changeURL(self.URLS.responsive + '&type=' + self.editorType());
             }
             else {
               hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + self.editorType());

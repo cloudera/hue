@@ -501,33 +501,36 @@ ${ assist.assistPanel() }
           self.currentApp('fileviewer');
         });
 
-        self.currentApp.subscribe(function(newVal){
+        self.currentApp.subscribe(function (newVal) {
+          hueUtils.changeURLParameter('app', newVal);
           self.isLoadingEmbeddable(true);
-          if (typeof self.embeddable_cache[newVal] === 'undefined'){
+          if (typeof self.embeddable_cache[newVal] === 'undefined') {
             $.ajax({
               url: self.EMBEDDABLE_PAGE_URLS[newVal] + self.extraEmbeddableURLParams(),
-              beforeSend:function (xhr) {
+              beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
-              dataType:'html',
-              success:function (response) {
+              dataType: 'html',
+              success: function (response) {
                 self.extraEmbeddableURLParams('');
                 // TODO: remove the next lines
                 // hack to avoid css caching for development
                 var r = $(response);
-                r.find('link').each(function(){ $(this).attr('href', $(this).attr('href') + '?' + Math.random()) });
+                r.find('link').each(function () {
+                  $(this).attr('href', $(this).attr('href') + '?' + Math.random())
+                });
                 // load just CSS and JS files that are not loaded before
-                r.find('script[src]').each(function(){
+                r.find('script[src]').each(function () {
                   var jsFile = $(this).attr('src').split('?')[0];
-                  if (LOADED_JS.indexOf(jsFile) === -1){
+                  if (LOADED_JS.indexOf(jsFile) === -1) {
                     LOADED_JS.push(jsFile);
                     $(this).clone().appendTo($('head'));
                     $(this).remove();
                   }
                 });
-                r.find('link[href]').each(function(){
+                r.find('link[href]').each(function () {
                   var cssFile = $(this).attr('href').split('?')[0];
-                  if (LOADED_CSS.indexOf(cssFile) === -1){
+                  if (LOADED_CSS.indexOf(cssFile) === -1) {
                     LOADED_CSS.push(cssFile);
                     $(this).clone().appendTo($('head'));
                     $(this).remove();
@@ -547,15 +550,20 @@ ${ assist.assistPanel() }
           $('#embeddable_' + newVal).show();
         });
 
-        if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
+        if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]){
+          self.currentApp(window.location.getParameter('app'));
+        }
+        else if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
           self.currentApp('editor');
+        }
+        else {
+          self.currentApp('home');
         }
 
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
         });
 
-        self.currentApp('editor');
       };
 
       var onePageViewModel = new OnePageViewModel();
