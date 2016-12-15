@@ -177,31 +177,31 @@ ${ hueIcons.symbols() }
         <ul class="dropdown-menu">
           % if 'beeswax' in apps and 'impala' in apps:
             <li class="dropdown-submenu">
-              <a title="${_('Query editor')}" rel="navigator-tooltip" href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
+              <a title="${_('Query editor')}" rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
-                <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
               </ul>
             </li>
           % endif
           % if 'beeswax' in apps and 'impala' not in apps:
-            <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
           % endif
           % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
-            <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
           % endif
           % if 'search' in apps:
-            <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
+            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('search') }"><img src="${ static('search/art/icon_search_48.png') }" class="app-icon"/> ${ _('Dashboard') }</a></li>
           % endif
-          <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
+          <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
           % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
             <li class="dropdown-submenu">
               <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Workflow') }</a>
               <ul class="dropdown-menu">
-                <li><a href="#" data-bind="click: function(){ onePageViewModel.currentApp('oozie_wf') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
-                <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Schedule')}</a></li>
-                <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundle')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Schedule')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/> ${_('Bundle')}</a></li>
               </ul>
             </li>
           % endif
@@ -213,7 +213,7 @@ ${ hueIcons.symbols() }
             <ul class="dropdown-menu">
               % for interpreter in interpreters:
                 % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                <li><a href="${ url('notebook:editor') }?type=${ interpreter['type'] }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
                 % endif
               % endfor
               % if user.is_superuser:
@@ -299,7 +299,7 @@ ${ hueIcons.symbols() }
         <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Impala</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
         <li><a href="javascript: void(0);">Report</a></li>
-        <li><a data-bind="click: function () { currentApp('oozie_wf') }">Oozie</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }">Oozie</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
@@ -358,7 +358,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
-      <div id="embeddable_oozie_wf" class="embeddable"></div>
+      <div id="embeddable_oozie_workflow" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser_s3" class="embeddable"></div>
@@ -479,7 +479,7 @@ ${ assist.assistPanel() }
           editor: '/notebook/editor_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
           search: '/search/embeddable/new_search',
-          oozie_wf: '/oozie/editor/workflow/new/?is_embeddable=true',
+          oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
           filebrowser: '/filebrowser/?is_embeddable=true',
           filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
@@ -495,6 +495,11 @@ ${ assist.assistPanel() }
         self.isLoadingEmbeddable = ko.observable(false);
 
         self.extraEmbeddableURLParams = ko.observable('');
+
+        self.changeEditorType = function (type) {
+          self.extraEmbeddableURLParams('?type=' + type);
+          hueUtils.changeURLParameter('type', type);
+        }
 
         huePubSub.subscribe('open.fb.file', function(path){
           self.extraEmbeddableURLParams(path + '?is_embeddable=true');
