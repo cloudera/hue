@@ -529,7 +529,7 @@ parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) 
 
 parser.identifyPartials = function (beforeCursor, afterCursor) {
   var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-  var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*/);
+  var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
   return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
 };
 
