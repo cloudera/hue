@@ -198,7 +198,7 @@ if (!String.prototype.includes) {
 
   hueUtils.changeURLParameter = function (param, value) {
     var newSearch = '';
-    if (window.location.getParameter(param) !== '') {
+    if (window.location.getParameter(param, true) !== null) {
       newSearch += '?';
       window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
         if (p.split('=')[0] !== param) {
@@ -425,10 +425,13 @@ String.prototype.hashCode = function() {
 };
 
 if (!('getParameter' in window.location)) {
-  window.location.getParameter = function (name) {
+  window.location.getParameter = function (name, returnNull) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
     var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
         results = regex.exec(window.location.search);
+    if (returnNull && results === null){
+      return null;
+    }
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
   };
 }
