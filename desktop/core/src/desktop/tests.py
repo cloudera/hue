@@ -1101,3 +1101,13 @@ def test_get_data_link():
 
   assert_equal('/filebrowser/view=/data/hue/1', get_data_link({'type': 'hdfs', 'path': '/data/hue/1'}))
   assert_equal('/metastore/table/default/sample_07', get_data_link({'type': 'hive', 'database': 'default', 'table': 'sample_07'}))
+
+def test_get_dn():
+  assert_equal(['*'], desktop.conf.get_dn(''))
+  assert_equal(['*'], desktop.conf.get_dn('localhost'))
+  assert_equal(['*'], desktop.conf.get_dn('localhost.localdomain'))
+  assert_equal(['*'], desktop.conf.get_dn('hue'))
+  assert_equal(['*'], desktop.conf.get_dn('hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('sql.hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('finance.sql.hue.com'))
+  assert_equal(['.hue.com'], desktop.conf.get_dn('bank.finance.sql.hue.com'))
