@@ -69,12 +69,24 @@ def coerce_file(path):
 def coerce_timedelta(value):
   return datetime.timedelta(seconds=int(value))
 
-def get_dn():
+def get_dn(fqdn=None):
   """This function returns fqdn(if possible)"""
   val = []
   LOG = logging.getLogger(__name__)
   try:
-    val.append(socket.getfqdn())
+    if fqdn is None:
+      fqdn = socket.getfqdn()
+
+    if '.' in fqdn:
+      tups = fqdn.split('.')
+      if len(tups) > 2:
+        val.append(".%s" % ('.'.join(tups[-2:])))
+      else:
+        LOG.warning("allowed_hosts value to '*'. It is a security risk")
+        val.append('*')
+    else:
+      LOG.warning("allowed_hosts value to '*'. It is a security risk")
+      val.append('*')
   except:
     LOG.warning("allowed_hosts value to '*'. It is a security risk")
     val.append('*')
