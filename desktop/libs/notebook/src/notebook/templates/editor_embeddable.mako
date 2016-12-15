@@ -24,7 +24,7 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
-<span id="editorComponents">
+<span id="editorComponents" class="notebook">
 ${ editorComponents.includes(is_embeddable=True) }
 
 <style type="text/css">
