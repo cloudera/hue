@@ -124,7 +124,7 @@
       });
       %endif
 
-      ko.applyBindings(viewModel, $('#documentList')[0]);
+      ko.applyBindings(viewModel, $('#homeComponents')[0]);
 
       huePubSub.publish('init.tour');
 

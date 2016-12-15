@@ -163,7 +163,7 @@ ${ assist.assistPanel() }
 
 ${ common_home.navbar() }
 
-<div id="documentList" class="main-content">
+<div id="homeComponents" class="main-content">
 ##   Uncomment to enable the assist panel
 ##   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true); }" style="display:none;">
 ##     <i class="fa fa-chevron-right"></i>

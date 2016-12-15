@@ -1030,6 +1030,6 @@ h6 {
 }
 
 /* oozie workflow */
-#wfEditor .card-toolbar {
+#oozie_workflowComponents .card-toolbar {
   position: static;
 }

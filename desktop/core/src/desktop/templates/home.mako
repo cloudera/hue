@@ -112,7 +112,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
   </div>
 </div>
 
-<div id='documentList' class="container-fluid">
+<div id="homeComponents" class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -347,7 +347,7 @@ ${ commonshare() | n,unicode }
 
   $(document).ready(function () {
     viewModel = new HomeViewModel(JSON_TAGS, JSON_DOCS);
-    ko.applyBindings(viewModel, $('#documentList')[0]);
+    ko.applyBindings(viewModel, $('#homeComponents')[0]);
 
     shareViewModel = initSharing("#documentShareModal", viewModel.updateDoc);
 

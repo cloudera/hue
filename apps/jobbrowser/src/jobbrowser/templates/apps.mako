@@ -84,7 +84,7 @@ ${ assist.assistPanel() }
       </div>
     </div>
 </div>
-<div id="jobbrowser">
+<div id="jobbrowserComponents">
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
@@ -441,7 +441,7 @@ ${ assist.assistPanel() }
       };
 
       viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
-      ko.applyBindings(viewModel, $('#jobbrowser')[0]);
+      ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
 
       var loadHash = function () {
         var h = window.location.hash;

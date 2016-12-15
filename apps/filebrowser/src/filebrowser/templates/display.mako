@@ -36,7 +36,7 @@ ${ commonheader(_('%(filename)s - File Viewer') % dict(filename=truncate(filenam
 
 ${ fb_components.menubar() }
 
-<div id="fileviewer" class="container-fluid">
+<div id="fileviewerComponents" class="container-fluid">
   <link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" type="text/css">
   <div class="row-fluid">
     <div class="span2">
@@ -475,7 +475,7 @@ ${ fb_components.menubar() }
   }
 
   $(document).ready(function () {
-    ko.applyBindings(viewModel, $('#fileviewer')[0]);
+    ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");

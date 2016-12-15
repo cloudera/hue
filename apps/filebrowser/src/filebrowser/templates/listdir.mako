@@ -20,6 +20,7 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 
 from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
+
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -37,14 +38,13 @@ ${ fb_components.menubar() }
   }
 
   %if is_embeddable:
-  #filebrowser .pagination {
-    position: inherit;
-  }
+    .filebrowser .pagination {
+      position: inherit;
+    }
   %endif
 </style>
 
-<div id="filebrowser" class="container-fluid">
-
+<div id="${ path.startswith('S3A://') and 'filebrowser_s3Components' or 'filebrowserComponents' }" class="container-fluid filebrowser">
   <div class="card card-small">
     <div class="actionbar">
     <%actionbar:render>

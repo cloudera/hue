@@ -31,7 +31,7 @@ from oozie.conf import ENABLE_DOCUMENT_ACTION
 ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
 % endif
 
-<div id="wfEditor">
+<div id="oozie_workflowComponents">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
@@ -541,7 +541,7 @@ ${ dashboard.import_bindings() }
   ${ utils.slaGlobal() }
 
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
-  ko.applyBindings(viewModel, $("#wfEditor")[0]);
+  ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocUuid('${ doc_uuid }');
