@@ -43,7 +43,7 @@ ${ common_home.homeJSModels() }
 </style>
 
 
-<div id="documentList" class="main-content">
+<div id="homeComponents" class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
       <div class="content-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">

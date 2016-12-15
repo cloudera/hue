@@ -491,6 +491,14 @@ ${ assist.assistPanel() }
 
         self.embeddable_cache = {};
 
+        self.getActiveAppViewmodel = function () {
+          var koElementID = '#' + self.currentApp() + 'Components';
+          if ($(koElementID).length > 0 && ko.dataFor($(koElementID)[0])) {
+            return ko.dataFor($(koElementID)[0]);
+          }
+          return null;
+        }
+
         self.currentApp = ko.observable();
         self.isLoadingEmbeddable = ko.observable(false);
 
@@ -499,6 +507,11 @@ ${ assist.assistPanel() }
         self.changeEditorType = function (type) {
           self.extraEmbeddableURLParams('?type=' + type);
           hueUtils.changeURLParameter('type', type);
+          if (self.getActiveAppViewmodel()) {
+            self.getActiveAppViewmodel().selectedNotebook().selectedSnippet(type);
+            self.getActiveAppViewmodel().editorType(type);
+            self.getActiveAppViewmodel().newNotebook();
+          }
         }
 
         huePubSub.subscribe('open.fb.file', function(path){
@@ -556,10 +569,10 @@ ${ assist.assistPanel() }
         });
 
         if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]){
+          if (window.location.getParameter('type') !== '') {
+            self.changeEditorType(window.location.getParameter('type'));
+          }
           self.currentApp(window.location.getParameter('app'));
-        }
-        else if (window.location.getParameter('editor') !== '' || window.location.getParameter('type') !== ''){
-          self.currentApp('editor');
         }
         else {
           self.currentApp('home');
