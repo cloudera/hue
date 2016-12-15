@@ -53,23 +53,23 @@ var ApiHelper = (function () {
     });
 
     huePubSub.subscribe('assist.clear.hdfs.cache', function () {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hdfs'), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
     });
 
     huePubSub.subscribe('assist.clear.s3.cache', function () {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('s3'), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
     });
 
     huePubSub.subscribe('assist.clear.collections.cache', function () {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('collections'), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
     });
 
     huePubSub.subscribe('assist.clear.hbase.cache', function () {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('hbase'), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
     });
 
     huePubSub.subscribe('assist.clear.document.cache', function () {
-      $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix('document'), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
 
     huePubSub.subscribe('assist.clear.all.caches', function () {
@@ -105,6 +105,17 @@ var ApiHelper = (function () {
   ApiHelper.prototype.getTotalStorageUserPrefix = function (sourceType) {
     var self = this;
     return sourceType + '_' + self.user + '_' + window.location.hostname;
+  };
+
+  /**
+   * @param {object} options
+   * @param {string} options.sourceType
+   * @param {string} [options.cacheType] - Default value 'default'
+   * @returns {string}
+   */
+  ApiHelper.prototype.getAssistCacheIdentifier = function (options) {
+    var self = this;
+    return "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
   };
 
   /**
@@ -736,7 +747,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.clearDbCache = function (options) {
     var self = this;
     self.invalidateImpala = options.invalidateImpala || 'cache';
-    var cacheIdentifier = "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
+    var cacheIdentifier = self.getAssistCacheIdentifier(options);
     if (options.clearAll) {
       $.totalStorage(cacheIdentifier, {});
     } else {
@@ -1628,7 +1639,7 @@ var ApiHelper = (function () {
     }
 
     if (!options.noCache) {
-      var cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+      var cachedData = $.totalStorage(self.getAssistCacheIdentifier(options)) || {};
       if (typeof cachedData[options.url] !== "undefined" && ! self.hasExpired(cachedData[options.url].timestamp, options.cacheType || 'default')) {
         options.successCallback(cachedData[options.url].data);
         return;
@@ -1672,12 +1683,13 @@ var ApiHelper = (function () {
     }).success(function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
       if (!options.noCache && data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
-        cachedData = $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType)) || {};
+        var cacheIdentifier = self.getAssistCacheIdentifier(options);
+        cachedData = $.totalStorage(cacheIdentifier) || {};
         cachedData[options.url] = {
           timestamp: (new Date()).getTime(),
           data: data
         };
-        $.totalStorage("hue.assist." + self.getTotalStorageUserPrefix(options.sourceType), cachedData);
+        $.totalStorage(cacheIdentifier, cachedData);
       }
       while (queue.length > 0) {
         var next = queue.shift();
@@ -1706,7 +1718,7 @@ var ApiHelper = (function () {
    */
   var fetchCached = function (options) {
     var self = this;
-    var cacheIdentifier = "hue.assist." + (options.cacheType || 'default') + '.' + self.getTotalStorageUserPrefix(options.sourceType);
+    var cacheIdentifier = self.getAssistCacheIdentifier(options);
     var cachedData = $.totalStorage(cacheIdentifier) || {};
     var cachedId = options.hash ? options.url + options.hash : options.url;
 
