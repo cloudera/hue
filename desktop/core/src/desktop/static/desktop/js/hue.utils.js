@@ -196,6 +196,24 @@ if (!String.prototype.includes) {
     window.history.replaceState(null, null, newURL);
   }
 
+  hueUtils.changeURLParameter = function (param, value) {
+    var newSearch = '';
+    if (window.location.getParameter(param) !== '') {
+      newSearch += '?';
+      window.location.search.replace(/\?/gi, '').split('&').forEach(function (p) {
+        if (p.split('=')[0] !== param) {
+          newSearch += p;
+        }
+      });
+      newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+    }
+    else {
+      newSearch = window.location.search + (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value;
+    }
+
+    hueUtils.changeURL(window.location.pathname + newSearch);
+  }
+
   /**
    * @param {string} pseudoJson
    * @constructor
