@@ -465,12 +465,15 @@
 
     describe('partial removal', function () {
       it('should identify part lengths', function () {
-        var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', '(', ')', '[', ']', ';'];
+        var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', ')', '[', ']', ';'];
         expect(sql.identifyPartials('', '')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo', '')).toEqual({left: 3, right: 0});
         expect(sql.identifyPartials(' foo', '')).toEqual({left: 3, right: 0});
         expect(sql.identifyPartials('asdf 1234', '')).toEqual({left: 4, right: 0});
         expect(sql.identifyPartials('foo', 'bar')).toEqual({left: 3, right: 3});
+        expect(sql.identifyPartials('fo', 'o()')).toEqual({left: 2, right: 3});
+        expect(sql.identifyPartials('fo', 'o(')).toEqual({left: 2, right: 2});
+        expect(sql.identifyPartials('fo', 'o(bla bla)')).toEqual({left: 2, right: 10});
         expect(sql.identifyPartials('foo ', '')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo \'', '\'')).toEqual({left: 0, right: 0});
         expect(sql.identifyPartials('foo "', '"')).toEqual({left: 0, right: 0});
