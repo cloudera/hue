@@ -87,6 +87,32 @@
         });
       });
 
+      it('should handle DESCRIBE | tbl;', function () {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE ',
+          afterCursor: ' tbl;',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['EXTENDED', 'FORMATTED'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle DESCRIBE ext| db.tbl;', function () {
+        assertAutoComplete({
+          beforeCursor: 'DESCRIBE ext',
+          afterCursor: ' db.tbl;',
+          dialect: 'hive',
+          hasLocations: true,
+          containsKeywords: ['EXTENDED', 'FORMATTED'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
       it('should handle "DESCRIBE FORMATTED tbl;|"', function() {
         assertAutoComplete({
           beforeCursor: 'DESCRIBE FORMATTED tbl;',
