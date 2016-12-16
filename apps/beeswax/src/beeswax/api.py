@@ -739,6 +739,7 @@ def get_table_stats(request, database, table, column=None):
   else:
     table = db.get_table(database, table)
     stats = table.stats
+    response['columns'] = [column.name for column in table.cols]
 
   response['stats'] = stats
   response['status'] = 0

@@ -322,22 +322,41 @@ def upload_table_stats(request):
 
   db_tables = json.loads(request.POST.get('dbTables'), '[]')
   source_platform = request.POST.get('sourcePlatform', 'hive')
+  with_columns = json.loads(request.POST.get('with_columns', 'false'))
 
-  data = []
+  table_stats = []
+  column_stats = []
+
   for db_table in db_tables:
     path = _get_table_name(db_table)
 
     try:
-      table = get_table_stats(request, database=path['database'], table=path['table'])
-      stats = dict((stat['data_type'], stat['comment']) for stat in json.loads(table.content)['stats'])
+      full_table_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table']).content)
+      stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
-      data.append((db_table, stats.get('numRows', -1)))
+      table_stats.append((db_table, stats.get('numRows', -1)))
+
+      if with_columns:
+        for col in full_table_stats['columns']:
+          col_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table'], column=col).content)['stats']
+          col_stats = dict([(key, val) for col_stat in col_stats for key, val in col_stat.iteritems()])
+
+          column_stats.append(
+              (db_table, col, col_stats['data_type'],
+               int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
+               int(col_stats['num_nulls']) if col_stats['num_nulls'] != '' else -1,
+               int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1
+            )
+          )
     except Exception, e:
-      LOG.warning('Skipping upload of %s: %s' % (db_table, e))
+      LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
   api = OptimizerApi()
 
-  response['upload_history'] = api.upload(data=data, data_type='table_stats', source_platform=source_platform)
+  response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
+  if with_columns:
+    response['upload_cols_stats'] = api.upload(data=column_stats, data_type='cols_stats', source_platform=source_platform)
+
   response['status'] = 0
 
   return JsonResponse(response)
