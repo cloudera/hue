@@ -21,10 +21,11 @@ from django.utils.translation import ugettext as _
 <%namespace name="dashboard" file="/common_dashboard.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-
+% if not is_embeddable:
 ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
+% endif
 
-<div id="editor">
+<div id="oozie_bundleComponents">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
@@ -37,19 +38,13 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-play"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a title="${ _('Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsModal" data-bind="css: {'btn': true}, visible: canEdit">
       <i class="fa fa-cog"></i>
     </a>
-
-    &nbsp;&nbsp;&nbsp;
 
     <a type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true, 'disabled': $root.isSaving()}, visible: canEdit() && bundle.coordinators().length > 0">
       <i class="fa fa-save"></i>
@@ -62,12 +57,9 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-users"></i>
     </a>
 
-    &nbsp;&nbsp;&nbsp;
-
     <a class="btn" href="${ url('oozie:new_bundle') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-file-o"></i>
     </a>
-
   </div>
 </%def>
 
@@ -146,9 +138,17 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 </div>
 
 
-<div id="chooseCoordinatorDemiModal" class="demi-modal fade" data-backdrop="false">
+<div id="chooseCoordinatorDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="false">
+  %if is_embeddable:
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3>${ _('Choose a coordinator') }</h3>
+    </div>
+  %endif
   <div class="modal-body">
+    %if not is_embeddable:
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.coordinatorModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter coordinators')}" class="input" style="float: left" /><br/>
     </div>
@@ -168,7 +168,9 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
       </div>
     </div>
   </div>
+  %if not is_embeddable:
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+  %endif
 </div>
 
 
@@ -272,7 +274,7 @@ ${ dashboard.import_bindings() }
 
 <script type="text/javascript">
   var viewModel = new BundleEditorViewModel(${ bundle_json | n,unicode }, ${ coordinators_json | n,unicode }, ${ can_edit_json | n,unicode });
-  ko.applyBindings(viewModel, $("#editor")[0]);
+  ko.applyBindings(viewModel, $("#oozie_bundleComponents")[0]);
 
   viewModel.bundle.tracker().markCurrentStateAsClean();
 
@@ -340,4 +342,6 @@ ${ dashboard.import_bindings() }
   });
 </script>
 
+% if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+% endif
