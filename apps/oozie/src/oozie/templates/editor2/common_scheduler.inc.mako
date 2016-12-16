@@ -387,9 +387,17 @@ from django.utils.translation import ugettext as _
 
 <%def name="import_modals()">
 
-<div id="chooseWorkflowDemiModal" class="demi-modal fade" data-backdrop="false">
+<div id="chooseWorkflowDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="false">
+  %if is_embeddable:
+  <div class="modal-header" style="padding-bottom: 2px">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+    <h3>${ _('Choose a workflow') }</h3>
+  </div>
+  %endif
   <div class="modal-body">
+    %if not is_embeddable:
     <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
+    %endif
     <div style="float: left; margin-right: 10px;text-align: center">
       <input type="text" data-bind="clearable: $root.workflowModalFilter, valueUpdate:'afterkeydown'" placeholder="${_('Filter workflows')}" class="input" style="float: left" /><br/>
     </div>
@@ -410,7 +418,9 @@ from django.utils.translation import ugettext as _
       </div>
     </div>
   </div>
+  %if not is_embeddable:
   <div><a class="pointer demi-modal-chevron" data-dismiss="modal"><i class="fa fa-chevron-up"></i></a></div>
+  %endif
 </div>
 
 <div id="settingsModal" class="modal hide fade">
