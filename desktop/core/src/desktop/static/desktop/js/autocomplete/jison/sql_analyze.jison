@@ -29,49 +29,13 @@ DataDefinition_EDIT
  ;
 
 AnalyzeStatement
- : AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+ : '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+   {
+     addTablePrimary($3);
+   }
  ;
 
 AnalyzeStatement_EDIT
- : AnalyzeTableLeftPart_EDIT
- | AnalyzeTableLeftPart_EDIT '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
- | AnalyzeTableLeftPart 'CURSOR'
-   {
-     if (!$1.hasPartition) {
-       suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'COMPUTE STATISTICS', weight: 1 }]);
-     } else {
-       suggestKeywords(['COMPUTE STATISTICS']);
-     }
-   }
- | AnalyzeTableLeftPart '<hive>COMPUTE' 'CURSOR'
-   {
-     suggestKeywords(['STATISTICS']);
-   }
- | AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' 'CURSOR' OptionalForColumns OptionalCacheMetadata OptionalNoscan
-   {
-     suggestKeywords(getKeywordsForOptionalsLR([$5, $6, $7], [{ value: 'FOR COLUMNS', weight: 3 }, { value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
-   }
- | AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' ForColumns 'CURSOR' OptionalCacheMetadata OptionalNoscan
-   {
-     suggestKeywords(getKeywordsForOptionalsLR([$6, $7], [{ value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
-   }
- | AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns CacheMetadata 'CURSOR' OptionalNoscan
-   {
-     suggestKeywords(getKeywordsForOptionalsLR([$7], [{ value: 'NOSCAN', weight: 1 }]));
-   }
- | AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' ForColumns_EDIT OptionalCacheMetadata OptionalNoscan
- | AnalyzeTableLeftPart '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns CacheMetadata_EDIT OptionalNoscan
- ;
-
-AnalyzeTableLeftPart
- : '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec
-   {
-     addTablePrimary($3);
-     $$ = { hasPartition: $4 };
-   }
- ;
-
-AnalyzeTableLeftPart_EDIT
  : '<hive>ANALYZE' 'CURSOR'
    {
      suggestKeywords(['TABLE']);
@@ -91,6 +55,49 @@ AnalyzeTableLeftPart_EDIT
    {
      addTablePrimary($3);
    }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
+   {
+     addTablePrimary($3);
+     if (!$4) {
+       suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'COMPUTE STATISTICS', weight: 1 }]);
+     } else {
+       suggestKeywords(['COMPUTE STATISTICS']);
+     }
+   }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' 'CURSOR'
+   {
+     addTablePrimary($3);
+     suggestKeywords(['STATISTICS']);
+   }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' 'CURSOR' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+   {
+     addTablePrimary($3);
+     suggestKeywords(getKeywordsForOptionalsLR([$8, $9, $10], [{ value: 'FOR COLUMNS', weight: 3 }, { value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
+   }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' ForColumns 'CURSOR' OptionalCacheMetadata OptionalNoscan
+   {
+     addTablePrimary($3);
+     suggestKeywords(getKeywordsForOptionalsLR([$9, $10], [{ value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
+   }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns CacheMetadata 'CURSOR' OptionalNoscan
+   {
+     addTablePrimary($3);
+     suggestKeywords(getKeywordsForOptionalsLR([$10], [{ value: 'NOSCAN', weight: 1 }]));
+   }
+ | '<hive>ANALYZE' 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     suggestKeywords(['TABLE']);
+     addTablePrimary($3);
+   }
+ | '<hive>ANALYZE' 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+   {
+     suggestKeywords(['TABLE']);
+     addTablePrimary($3);
+   }
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns OptionalCacheMetadata OptionalNoscan
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' ForColumns_EDIT OptionalCacheMetadata OptionalNoscan
+ | '<hive>ANALYZE' '<hive>TABLE' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>COMPUTE' '<hive>STATISTICS' OptionalForColumns CacheMetadata_EDIT OptionalNoscan
  ;
 
 OptionalForColumns
@@ -165,6 +172,11 @@ InvalidateStatement_EDIT
      suggestDatabases({ appendDot: true });
    }
  | '<impala>INVALIDATE' '<impala>METADATA' SchemaQualifiedTableIdentifier_EDIT
+ | '<impala>INVALIDATE' 'CURSOR' SchemaQualifiedTableIdentifier
+   {
+     addTablePrimary($3);
+     suggestKeywords(['METADATA']);
+   }
  ;
 
 ComputeStatsStatement
@@ -189,6 +201,11 @@ ComputeStatsStatement_EDIT
      suggestDatabases({ appendDot: true });
    }
  | '<impala>COMPUTE' '<impala>STATS' SchemaQualifiedTableIdentifier_EDIT
+ | '<impala>COMPUTE' 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     addTablePrimary($3);
+     suggestKeywords(['STATS', 'INCREMENTAL STATS']);
+   }
  | '<impala>COMPUTE' 'CURSOR' '<impala>STATS' SchemaQualifiedTableIdentifier OptionalPartitionSpec
    {
      addTablePrimary($4);
@@ -196,6 +213,11 @@ ComputeStatsStatement_EDIT
    }
  | '<impala>COMPUTE' '<impala>INCREMENTAL' 'CURSOR'
    {
+     suggestKeywords(['STATS']);
+   }
+ | '<impala>COMPUTE' '<impala>INCREMENTAL' 'CURSOR' SchemaQualifiedTableIdentifier OptionalPartitionSpec
+   {
+     addTablePrimary($4);
      suggestKeywords(['STATS']);
    }
  | '<impala>COMPUTE' '<impala>INCREMENTAL' '<impala>STATS' 'CURSOR'
