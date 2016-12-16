@@ -410,7 +410,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH',
+              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
               'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
@@ -425,7 +425,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['ALTER', 'ANALYZE', 'CREATE', 'DELETE', 'DESCRIBE',
+            suggestKeywords: ['ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
               'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }

@@ -929,11 +929,11 @@ var suggestDdlAndDmlKeywords = function (extraKeywords) {
   }
 
   if (isHive()) {
-    keywords = keywords.concat(['ANALYZE', 'DELETE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
+    keywords = keywords.concat(['ANALYZE TABLE', 'DELETE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
   }
 
   if (isImpala()) {
-    keywords = keywords.concat(['COMPUTE', 'INVALIDATE', 'LOAD', 'REFRESH']);
+    keywords = keywords.concat(['COMPUTE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH']);
   }
 
   suggestKeywords(keywords);
