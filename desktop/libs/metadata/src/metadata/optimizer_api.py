@@ -331,7 +331,7 @@ def upload_table_stats(request):
       table = get_table_stats(request, database=path['database'], table=path['table'])
       stats = dict((stat['data_type'], stat['comment']) for stat in json.loads(table.content)['stats'])
 
-      data.append((path['table'], stats.get('numRows', -1)))
+      data.append((db_table, stats.get('numRows', -1)))
     except Exception, e:
       LOG.warning('Skipping upload of %s: %s' % (db_table, e))
 

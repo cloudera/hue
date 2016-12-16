@@ -87,7 +87,7 @@ class OptimizerApi(object):
 }"""
     },
     'table_stats': {
-        'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT'],
+        'headers': ['TABLE_NAME', 'NUM_ROWS'],
         'file_headers': """{
     "fileLocation": "%(query_file)s",
     "tenant": "%(tenant)s",
@@ -211,11 +211,11 @@ class OptimizerApi(object):
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
+    data_headers = OptimizerApi.UPLOAD[data_type]['file_headers']
+
     if data_type == 'table_stats':
-      data_headers = OptimizerApi.HEADERS_UPLOAD_TABLE_STATS
       data_suffix = '.log'
     else:
-      data_headers = OptimizerApi.HEADERS_UPLOAD_QUERIES
       data_suffix = '.csv'
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
