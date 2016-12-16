@@ -922,7 +922,7 @@ var getKeywordsForOptionalsLR = function (optionals, keywords, override) {
 };
 
 var suggestDdlAndDmlKeywords = function (extraKeywords) {
-  var keywords = ['ALTER', 'CREATE', 'DESCRIBE', 'DROP', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
+  var keywords = ['ALTER', 'CREATE', 'DESCRIBE', 'DROP', 'GRANT', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
 
   if (extraKeywords) {
     keywords = keywords.concat(extraKeywords);

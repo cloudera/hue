@@ -55,6 +55,7 @@
 <hive>'NONE'                               { return '<hive>NONE'; }
 <hive>'OF'                                 { return '<hive>OF'; }
 <hive>'OUT'                                { return '<hive>OUT'; }
+<hive>'REVOKE'                             { return '<hive>REVOKE'; }
 <hive>'ROLLUP'                             { return '<hive>ROLLUP'; }
 <hive>'TABLE'                              { return '<hive>TABLE'; }
 <hive>'USER'                               { return '<hive>USER'; }
@@ -62,6 +63,7 @@
 
 // Non-reserved Keywords
 <hive>'ADD'                                { return '<hive>ADD'; }
+<hive>'ADMIN'                              { return '<hive>ADMIN'; }
 <hive>'AFTER'                              { return '<hive>AFTER'; }
 <hive>'ANALYZE'                            { determineCase(yytext); return '<hive>ANALYZE'; }
 <hive>'ARCHIVE'                            { return '<hive>ARCHIVE'; }
@@ -114,6 +116,7 @@
 <hive>'LINES'                              { return '<hive>LINES'; }
 <hive>'LOAD'                               { determineCase(yytext); return '<hive>LOAD'; }
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
+<hive>'LOCK'                               { return '<hive>LOCK'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
 <hive>'METADATA'                           { return '<hive>METADATA'; }
 <hive>'MSCK'                               { return '<hive>MSCK'; }
@@ -127,6 +130,7 @@
 <hive>'PARQUET'                            { return '<hive>PARQUET'; }
 <hive>'PARTITIONED'                        { return '<hive>PARTITIONED'; }
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
+<hive>'PRIVILEGES'                         { return '<hive>PRIVILEGES'; }
 <hive>'PURGE'                              { return '<hive>PURGE'; }
 <hive>'RCFILE'                             { return '<hive>RCFILE'; }
 <hive>'REBUILD'                            { return '<hive>REBUILD'; }
@@ -145,6 +149,7 @@
 <hive>'SERDEPROPERTIES'                    { return '<hive>SERDEPROPERTIES'; }
 <hive>'SETS'                               { return '<hive>SETS'; }
 <hive>'SHOW'                               { determineCase(yytext); return '<hive>SHOW'; }
+<hive>'SHOW_DATABASE'                      { return '<hive>SHOW_DATABASE'; }
 <hive>'SKEWED'                             { return '<hive>SKEWED'; }
 <hive>'SKEWED LOCATION'                    { return '<hive>SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
 <hive>'SORT'                               { return '<hive>SORT'; }
@@ -228,10 +233,12 @@
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
+<impala>'REVOKE'                           { return '<impala>REVOKE'; }
 <impala>'SEQUENCEFILE'                     { return '<impala>SEQUENCEFILE'; }
 <impala>'SERDEPROPERTIES'                  { return '<impala>SERDEPROPERTIES'; }
 <impala>'SCHEMAS'                          { return '<impala>SCHEMAS'; }
 <impala>'SERIALIZE_FN'                     { return '<impala>SERIALIZE_FN'; }
+<impala>'SERVER'                           { return '<impala>SERVER'; }
 <impala>'STATS'                            { return '<impala>STATS'; }
 <impala>'STORED'                           { return '<impala>STORED'; }
 <impala>'STRAIGHT_JOIN'                    { return '<impala>STRAIGHT_JOIN'; }
@@ -243,6 +250,7 @@
 <impala>'TEXTFILE'                         { return '<impala>TEXTFILE'; }
 <impala>'UNCACHED'                         { return '<impala>UNCACHED'; }
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
+<impala>'URI'                              { return '<impala>URI'; }
 <impala>'USING'                            { return '<impala>USING'; }
 
 // Non-reserved Keywords
@@ -307,6 +315,7 @@
 'NOT'                                      { return 'NOT'; }
 'NULL'                                     { return 'NULL'; }
 'ON'                                       { return 'ON'; }
+'OPTION'                                   { return 'OPTION'; }
 'OR'                                       { return 'OR'; }
 'ORDER'                                    { return 'ORDER'; }
 'OUTER'                                    { return 'OUTER'; }

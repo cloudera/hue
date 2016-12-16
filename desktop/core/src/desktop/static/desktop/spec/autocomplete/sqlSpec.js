@@ -410,7 +410,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ALTER', 'COMPUTE', 'CREATE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
+              'DROP', 'EXPLAIN', 'GRANT', 'INSERT', 'INVALIDATE METADATA', 'LOAD', 'REFRESH',
               'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });
@@ -426,7 +426,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ALTER', 'ANALYZE TABLE', 'CREATE', 'DELETE', 'DESCRIBE',
-              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
+              'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'LOAD', 'MSCK',
               'RELOAD FUNCTION', 'RESET', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']
           }
         });

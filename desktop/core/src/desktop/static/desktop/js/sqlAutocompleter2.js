@@ -1103,7 +1103,7 @@ var SqlAutocompleter2 = (function () {
   };
 
   var extraHiveReservedKeywords = {
-    ASC: true, CLUSTER: true, DESC: true, DISTRIBUTE: true, FORMATTED: true, FUNCTION: true, INDEX: true, INDEXES: true, LIMIT: true, SCHEMA: true, SORT: true
+    ASC: true, CLUSTER: true, DESC: true, DISTRIBUTE: true, FORMATTED: true, FUNCTION: true, INDEX: true, INDEXES: true, LIMIT: true, LOCK: true, SCHEMA: true, SORT: true
   };
 
   var impalaReservedKeywords = {
