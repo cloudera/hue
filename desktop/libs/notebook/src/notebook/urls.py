@@ -33,6 +33,7 @@ import notebook.monkey_patches
 urlpatterns = patterns('notebook.views',
   url(r'^$', 'notebook', name='index'),
   url(r'^notebook/?$', 'notebook', name='notebook'),
+  url(r'^notebook_embeddable/?$', 'notebook_embeddable', name='notebook_embeddable'),
   url(r'^notebooks/?$', 'notebooks', name='notebooks'),
   url(r'^new/?$', 'new', name='new'),
   url(r'^download/?$', 'download', name='download'),

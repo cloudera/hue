@@ -77,9 +77,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
 
-% if ENABLE_QUERY_SCHEDULING.get():
-
-% endif
 
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
@@ -403,7 +400,7 @@ ${ hueIcons.symbols() }
 </%def>
 
 
-<%def name="commonHTML(with_assist=True)">
+<%def name="commonHTML(with_assist='true')">
 
 <div id="detailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
@@ -978,7 +975,7 @@ ${ hueIcons.symbols() }
 </div>
 % endif
 
-% if with_assist:
+% if with_assist == 'true':
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
   <i class="fa fa-chevron-right"></i>
 </a>
@@ -995,7 +992,7 @@ ${ hueIcons.symbols() }
 </div>
 
 <script type="text/html" id="notebook">
-  % if with_assist:
+  % if with_assist == 'true':
   <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isLeftPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
       <i class="fa fa-chevron-left"></i>
@@ -3578,7 +3575,7 @@ ${ hueIcons.symbols() }
       % else:
       viewModel = new EditorViewModel(${ editor_id or 'null' }, ${ notebooks_json | n,unicode }, VIEW_MODEL_OPTIONS);
       % endif
-      ko.applyBindings(viewModel, $('#editorComponents')[0]);
+      ko.applyBindings(viewModel, $('.editorComponents')[0]);
       viewModel.init();
 
       if (location.getParameter("github_status") != "") {
