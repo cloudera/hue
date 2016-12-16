@@ -25,7 +25,8 @@ urlpatterns = patterns('indexer.views',
   url(r'^indexes/$', 'indexes', name='indexes'),
 
   # V3
-  url(r'^indexer/$', 'indexer', name='indexer')
+  url(r'^indexer/$', 'indexer', name='indexer'),
+  url(r'^importer/$', 'importer', name='importer')
 )
 
 urlpatterns += patterns('indexer.api',

@@ -48,6 +48,7 @@ def indexes(request):
       'indexes_json': json.dumps(indexes)
   })
 
+
 def indexer(request):
   searcher = IndexController(request.user)
   indexes = searcher.get_indexes()
@@ -63,6 +64,23 @@ def indexer(request):
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type' : json.dumps(Field().to_dict())
   })
+
+
+def importer(request):
+  searcher = IndexController(request.user)
+  indexes = searcher.get_indexes()
+
+  for index in indexes:
+    index['isSelected'] = False
+
+  return render('importer.mako', request, {
+      'indexes_json': json.dumps(indexes),
+      'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
+      'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
+      'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
+      'default_field_type' : json.dumps(Field().to_dict())
+  })
+
 
 def install_examples(request, is_redirect=False):
   result = {'status': -1, 'message': ''}

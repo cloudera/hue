@@ -51,10 +51,12 @@ def _escape_white_space_characters(s, inverse = False):
 
   return s
 
+
 def _convert_format(format_dict, inverse=False):
   for field in format_dict:
     if isinstance(format_dict[field], basestring):
       format_dict[field] = _escape_white_space_characters(format_dict[field], inverse)
+
 
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
@@ -84,6 +86,7 @@ def guess_format(request):
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
 
   return JsonResponse(format_)
+
 
 def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
@@ -120,6 +123,7 @@ def guess_field_types(request):
 
     format_ = {
         "sample": sample['rows'][:4],
+        "sample_cols": sample.meta,
         "columns": [
             Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
             for col in sample.meta
