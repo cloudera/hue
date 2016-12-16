@@ -27,9 +27,9 @@ from oozie.conf import ENABLE_DOCUMENT_ACTION
 <%namespace name="workflow" file="common_workflow.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 
-% if not is_embeddable:
+%if not is_embeddable:
 ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
-% endif
+%endif
 
 <div id="oozie_workflowComponents">
 
@@ -799,6 +799,6 @@ ${ dashboard.import_bindings() }
 
 </script>
 
-% if not is_embeddable:
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
-% endif
+%endif

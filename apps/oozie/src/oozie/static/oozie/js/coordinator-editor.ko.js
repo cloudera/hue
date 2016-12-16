@@ -102,18 +102,22 @@ var CoordinatorEditorViewModel = (function () {
 
         // Append the new variables, reuse past variables in case of rename
         prev_variables = self.variables.slice();
-        $.each(data.parameters, function (index, param) {
-          if (prev_variables.filter(function(variable) { return param['name'] == variable.workflow_variable(); }).length == 0) {
-            var newVar;
-            if (removed_variables.length > 0) {
-              newVar = removed_variables.shift();
-              self.variables.push(newVar);
-            } else {
-              newVar = self.addVariable();
+        if (data.parameters) {
+          $.each(data.parameters, function (index, param) {
+            if (prev_variables.filter(function (variable) {
+                return param['name'] == variable.workflow_variable();
+              }).length == 0) {
+              var newVar;
+              if (removed_variables.length > 0) {
+                newVar = removed_variables.shift();
+                self.variables.push(newVar);
+              } else {
+                newVar = self.addVariable();
+              }
+              newVar.workflow_variable(param['name']);
             }
-            newVar.workflow_variable(param['name']);
-          }
-        });
+          });
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       });

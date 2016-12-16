@@ -359,6 +359,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
       <div id="embeddable_oozie_workflow" class="embeddable"></div>
+      <div id="embeddable_oozie_coordinator" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser_s3" class="embeddable"></div>
@@ -480,6 +481,7 @@ ${ assist.assistPanel() }
           metastore: '/metastore/tables/?is_embeddable=true',
           search: '/search/embeddable/new_search',
           oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
+          oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
           filebrowser: '/filebrowser/?is_embeddable=true',
           filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',

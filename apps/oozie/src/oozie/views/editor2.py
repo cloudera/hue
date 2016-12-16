@@ -525,6 +525,7 @@ def edit_coordinator(request):
       'credentials': credentials.credentials.keys(),
       'workflows': workflows,
       'doc_uuid': doc.uuid if doc else '',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit': doc is None or doc.doc.get().is_editable(request.user),
       'layout': django_mako.render_to_string('editor2/common_scheduler.mako', {'coordinator_json': coordinator.to_json_for_html()})
     })
@@ -534,6 +535,7 @@ def edit_coordinator(request):
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
