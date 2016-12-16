@@ -112,6 +112,61 @@ class OptimizerApi(object):
         }
     ]
 }"""
+    },
+    'cols_stats': {
+        'headers': ['table_name', 'column_name', 'data_type', 'num_distinct', 'num_nulls', 'avg_col_len'], # Lower case for some reason
+        'file_headers': """{
+    "fileLocation": "%(query_file)s",
+    "tenant": "%(tenant)s",
+    "fileName": "%(query_file_name)s",
+    "sourcePlatform": "%(source_platform)s",
+    "colDelim": ",",
+    "rowDelim": "\\n",
+    "headerFields": [
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "table_name"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "column_name"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "data_type"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "num_distinct"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "num_nulls"
+        },
+        {
+            "count": 0,
+            "coltype": "NONE",
+            "use": true,
+            "tag": "",
+            "name": "avg_col_len"
+        }
+    ]
+}"""
     }
   }
 
@@ -213,7 +268,7 @@ class OptimizerApi(object):
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
     data_headers = OptimizerApi.UPLOAD[data_type]['file_headers']
 
-    if data_type == 'table_stats':
+    if data_type in ('table_stats', 'cols_stats'):
       data_suffix = '.log'
     else:
       data_suffix = '.csv'
@@ -361,7 +416,7 @@ class OptimizerApi(object):
 def OptimizerDataAdapter(data, data_type='queries'):
   headers = OptimizerApi.UPLOAD[data_type]['headers']
 
-  if data_type == 'table_stats':
+  if data_type in ('table_stats', 'cols_stats'):
     rows = data
   else:
     if data and len(data[0]) == 3:
