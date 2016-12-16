@@ -201,7 +201,7 @@ ${ hueIcons.symbols() }
               <ul class="dropdown-menu">
                 <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
                 <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Schedule')}</a></li>
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/> ${_('Bundle')}</a></li>
+                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundle')}</a></li>
               </ul>
             </li>
           % endif
@@ -360,6 +360,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_search" class="embeddable"></div>
       <div id="embeddable_oozie_workflow" class="embeddable"></div>
       <div id="embeddable_oozie_coordinator" class="embeddable"></div>
+      <div id="embeddable_oozie_bundle" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser_s3" class="embeddable"></div>
@@ -482,6 +483,7 @@ ${ assist.assistPanel() }
           search: '/search/embeddable/new_search',
           oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
           oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
+          oozie_bundle: '/oozie/editor/bundle/new/?is_embeddable=true',
           jobbrowser: '/jobbrowser/apps?is_embeddable=true',
           filebrowser: '/filebrowser/?is_embeddable=true',
           filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',

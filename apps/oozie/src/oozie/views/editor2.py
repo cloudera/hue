@@ -746,6 +746,7 @@ def edit_bundle(request):
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
   })
 
