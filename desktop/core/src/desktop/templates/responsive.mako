@@ -169,7 +169,7 @@ ${ hueIcons.symbols() }
         </svg>
       </a>
       <div class="compose-action btn-group">
-        <button class="btn" data-bind="click: function(){ onePageViewModel.currentApp('editor') }" title="${ _('Compose a query') }">${ _('Compose') }</button>
+        <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Compose a query') }">${ _('Compose') }</button>
         <button class="btn dropdown-toggle" data-toggle="dropdown">
           <span class="caret"></span>
         </button>
@@ -177,7 +177,7 @@ ${ hueIcons.symbols() }
         <ul class="dropdown-menu">
           % if 'beeswax' in apps and 'impala' in apps:
             <li class="dropdown-submenu">
-              <a title="${_('Query editor')}" rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
+              <a title="${_('Query editor')}" rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-edit inline-block"></i> ${ _('Query') }</a>
               <ul class="dropdown-menu">
                 <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
                 <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
@@ -294,9 +294,9 @@ ${ hueIcons.symbols() }
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('home') }">Home</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Editor</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Hive</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('editor') }">Impala</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }">Editor</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }">Hive</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }">Impala</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
         <li><a href="javascript: void(0);">Report</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }">Oozie</a></li>
@@ -507,11 +507,14 @@ ${ assist.assistPanel() }
         self.changeEditorType = function (type) {
           self.extraEmbeddableURLParams('?type=' + type);
           hueUtils.changeURLParameter('type', type);
-          if (self.getActiveAppViewmodel()) {
-            self.getActiveAppViewmodel().selectedNotebook().selectedSnippet(type);
-            self.getActiveAppViewmodel().editorType(type);
-            self.getActiveAppViewmodel().newNotebook();
-          }
+          var checkForEditor = window.setInterval(function(){
+            if (self.getActiveAppViewmodel() && self.getActiveAppViewmodel().selectedNotebook && self.getActiveAppViewmodel().selectedNotebook()) {
+              self.getActiveAppViewmodel().selectedNotebook().selectedSnippet(type);
+              self.getActiveAppViewmodel().editorType(type);
+              self.getActiveAppViewmodel().newNotebook();
+              window.clearInterval(checkForEditor);
+            }
+          }, 100);
         }
 
         huePubSub.subscribe('open.fb.file', function(path){
