@@ -356,6 +356,7 @@ ${ hueIcons.symbols() }
     <div class="page-content" data-bind="niceScroll: {horizrailenabled: false}">
       <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge' } --><!-- /ko -->
       <div id="embeddable_editor" class="embeddable"></div>
+      <div id="embeddable_notebook" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
       <div id="embeddable_search" class="embeddable"></div>
       <div id="embeddable_oozie_workflow" class="embeddable"></div>
@@ -479,6 +480,7 @@ ${ assist.assistPanel() }
 
         self.EMBEDDABLE_PAGE_URLS = {
           editor: '/notebook/editor_embeddable',
+          notebook: '/notebook/notebook_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
           search: '/search/embeddable/new_search',
           oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',

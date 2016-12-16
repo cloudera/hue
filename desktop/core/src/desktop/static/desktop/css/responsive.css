@@ -995,16 +995,16 @@ h6 {
   box-shadow: none;
 }
 
-/* editor */
-#editorComponents .progress {
+/* editor and report */
+.editorComponents .progress {
   border: none;
 }
 
-#editorComponents .context-panel {
+.editorComponents .context-panel {
   display: none;
 }
 
-#editorComponents .snippet {
+.editorComponents .snippet {
   margin-right: 0;
 }
 

@@ -24,26 +24,32 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
-${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
-
-<span id="editorComponents" class="editorComponents notebook">
-${ editorComponents.includes() }
-
-<style type="text/css">
-  .snippet {
-    margin-right: 10px;
-  }
-</style>
-
+<span id="notebookComponents" class="editorComponents notebook">
+${ editorComponents.includes(is_embeddable=True) }
 ${ editorComponents.topBar() }
-${ editorComponents.commonHTML() }
+<%editorComponents:commonHTML with_assist='false'>
+  <%def name="addSnippetHTML()">
+    <h1 class="empty" data-bind="visible: $root.availableSnippets().length == 0">${ _('There are no snippets configured.') }</h1>
 
-${ assist.assistPanel() }
-${ assist.assistJSModels() }
+    <!-- ko if: $root.availableSnippets().length > 0 -->
+    <h1 class="empty" data-bind="visible: snippets().length == 0">${ _('Add a snippet to start your new notebook') }</h1>
+
+    <div class="add-snippet" data-bind="component: {
+      name: 'add-snippet-menu',
+      params: {
+        notebook: $data,
+        availableSnippets: $root.availableSnippets
+      }
+    }">
+    </div>
+    <!-- /ko -->
+  </%def>
+</%editorComponents:commonHTML>
+
 ${ configKoComponents.config() }
+${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
 
-${ editorComponents.commonJS() }
-</span>
+${ editorComponents.commonJS(is_embeddable=True) }
 
-${ commonfooter(request, messages) | n,unicode }
+</span>

@@ -24,7 +24,7 @@
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 
-<span id="editorComponents" class="notebook">
+<span id="editorComponents" class="editorComponents notebook">
 ${ editorComponents.includes(is_embeddable=True) }
 
 <style type="text/css">
@@ -34,7 +34,7 @@ ${ editorComponents.includes(is_embeddable=True) }
 </style>
 
 ${ editorComponents.topBar() }
-${ editorComponents.commonHTML(with_assist=False) }
+${ editorComponents.commonHTML(with_assist='false') }
 
 ${ configKoComponents.config() }
 ${ notebookKoComponents.downloadSnippetResults() }

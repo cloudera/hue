@@ -63,7 +63,7 @@ def notebooks(request):
 
 
 @check_document_access_permission()
-def notebook(request):
+def notebook(request, is_embeddable=False):
   notebook_id = request.GET.get('notebook')
 
   is_yarn_mode = False
@@ -73,7 +73,11 @@ def notebook(request):
   except:
     LOG.exception('Spark is not enabled')
 
-  return render('notebook.mako', request, {
+  template = 'notebook.mako'
+  if is_embeddable:
+    template = 'notebook_embeddable.mako'
+
+  return render(template, request, {
       'editor_id': notebook_id or None,
       'notebooks_json': '{}',
       'options_json': json.dumps({
@@ -86,6 +90,9 @@ def notebook(request):
       'is_yarn_mode': is_yarn_mode,
   })
 
+@check_document_access_permission()
+def notebook_embeddable(request):
+  return notebook(request, True)
 
 @check_document_access_permission()
 def editor(request, is_mobile=False, is_embeddable=False):
