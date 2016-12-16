@@ -3234,6 +3234,7 @@ ${ hueIcons.symbols() }
           snippetIcon: 'fa-terminal'
         },
         sqoop1: {
+          placeHolder: '${ _("Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1") }',
           snippetImage: '${ static("sqoop/art/icon_sqoop_48.png") }'
         },
         distcp: {
