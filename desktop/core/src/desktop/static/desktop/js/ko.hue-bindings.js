@@ -3327,7 +3327,7 @@
 
       editor.on("input", function () {
         if (editor.getValue().length == 0) {
-          if (!placeHolderVisible) {
+          if (!placeHolderVisible && placeHolderElement) {
             placeHolderElement.appendTo(editor.renderer.scroller);
             placeHolderVisible = true;
           }
