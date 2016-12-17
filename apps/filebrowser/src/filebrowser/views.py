@@ -54,6 +54,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.fs import splitpath
 from desktop.lib.i18n import smart_str
+from desktop.lib.tasks.compress_files.compress_utils import compress_files_in_hdfs
 from desktop.lib.tasks.extract_archive.extract_utils import extract_archive_in_hdfs
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
@@ -1364,7 +1365,7 @@ def compress_files_using_batch_job(request):
 
     if upload_path and file_names:
       try:
-        #response = compress_files_in_hdfs(request, file_names, upload_path)
+        response = compress_files_in_hdfs(request, file_names, upload_path)
       except Exception, e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
   else:
