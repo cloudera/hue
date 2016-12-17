@@ -1354,6 +1354,26 @@ def extract_archive_using_batch_job(request):
   return JsonResponse(response)
 
 
+@require_http_methods(["POST"])
+def compress_files_using_batch_job(request):
+
+  response = {'status': -1, 'data': ''}
+  if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+    upload_path = request.POST.get('upload_path', None)
+    file_names = request.POST.getlist('files[]')
+
+    if upload_path and file_names:
+      try:
+        #response = compress_files_in_hdfs(request, file_names, upload_path)
+      except Exception, e:
+        response['message'] = _('Exception occurred while compressing files: %s' % e)
+  else:
+    response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
+                            'has to be enabled before calling this method.')
+
+  return JsonResponse(response)
+
+
 def status(request):
     status = request.fs.status()
     data = {
