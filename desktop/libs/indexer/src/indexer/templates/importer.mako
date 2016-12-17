@@ -27,6 +27,13 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
 
 <span class="notebook">
 
+# Todo lot of those
+<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
+<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/autocompleter.js') }"></script>
+
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
@@ -271,6 +278,7 @@ ${ assist.assistPanel() }
             </form>
           </div>
 
+          <!-- if: createWizard.source.sampleCols -->
           <h3 class="card-heading simple">${_('Preview')}</h3>
           <div class="card-body">
             <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -300,6 +308,7 @@ ${ assist.assistPanel() }
               </table>
             </div>
           </div>
+          <!-- /ko -->
 
         </form>
       </div>
@@ -334,7 +343,7 @@ ${ assist.assistPanel() }
         <!-- /ko -->
 
         <!-- ko if: $root.createWizard.destination.ouputFormat() == 'table' -->
-          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: createWizard.destination.name, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
           <label class="checkbox">
             <input type="checkbox"> ${_('External loc')}
@@ -389,17 +398,14 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button href="javascript:void(0)" class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && !createWizard.indexingStarted()">
-          ${_('Create')} <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
+        <button href="javascript:void(0)" class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && ! createWizard.indexingStarted()">
+          ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '/oozie/list_oozie_workflow/' + createWizard.jobId() }" target="_blank" title="${ _('Open') }">
-          ${_('Oozie Status')}
-         </a>
         <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-          ${_('View indexing status')}
+          ${_('Status')}
         </a>
 
         ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.source.name() }, text: createWizard.source.name" target="_blank"></a>
@@ -423,7 +429,7 @@ ${ assist.assistPanel() }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
   <label>${ _('Type') }
-    <select class="input-small" data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
+    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
   </label>
 
   <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
@@ -439,6 +445,7 @@ ${ assist.assistPanel() }
   </span>
 
   <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Nested')}</a>
+  <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Comment')}</a>
 </script>
 
 
@@ -552,7 +559,7 @@ ${ assist.assistPanel() }
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,
         'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%; height: 4px">
-        <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
+        <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
       </div>
     <!-- /ko -->
   <!-- /ko -->
@@ -799,7 +806,7 @@ ${ assist.assistPanel() }
 
         if (self.inputFormat() == 'file') {
           if (self.path()) {
-            name = self.path().split('/').pop();
+            name = self.path().split('/').pop().split('.')[0];
           }
         } else if (self.inputFormat() == 'table') {
           if (val && self.table().split('.', 2).length == 2) {
@@ -811,7 +818,7 @@ ${ assist.assistPanel() }
           }
         }
 
-        return name.replace(' ', '_') + '_dashboard';
+        return name.replace(' ', '_');
       });
       self.defaultName.subscribe(function(newVal) {
         vm.createWizard.destination.name(newVal);
@@ -852,7 +859,8 @@ ${ assist.assistPanel() }
 
       self.operationTypes = ${operators_json | n};
 
-      self.fieldTypes = ${fields_json | n};
+      self.fieldTypes = ${fields_json | n}.solr;
+      self.hiveFieldTypes = ${fields_json | n}.hive;
       self.fileTypes = ${file_types_json | n};
 
 
@@ -875,8 +883,7 @@ ${ assist.assistPanel() }
 
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length;
-
-        return self.source.name().length > 0 && validFields;
+        return self.destination.name().length > 0 && validFields;
       });
 
       self.source.format.subscribe(function () {
@@ -950,14 +957,17 @@ ${ assist.assistPanel() }
       self.indexingError = ko.observable(false);
       self.indexingSuccess = ko.observable(false);
       self.indexFile = function () {
-        if (!self.readyToIndex()) return;
+        if (! self.readyToIndex()) {
+          return;
+        }
 
         self.indexingStarted(true);
         viewModel.isLoading(true);
         self.isIndexing(true);
 
-        $.post("${ url('indexer:index_file') }", {
-          "fileFormat": ko.mapping.toJSON(self.source)
+        $.post("${ url('indexer:importer_submit') }", {
+          "source": ko.mapping.toJSON(self.source),
+          "destination": ko.mapping.toJSON(self.destination)
         }, function (resp) {
           self.showCreate(true);
           self.editorId(resp.history_id);
@@ -966,10 +976,16 @@ ${ assist.assistPanel() }
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
             user: '${ user.username }',
             userId: ${ user.id },
-            languages: [{name: "Java SQL", type: "java"}],
+            languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
             snippetViewSettings: {
               java : {
                 snippetIcon: 'fa-file-archive-o '
+              },
+              hive: {
+                placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+                aceMode: 'ace/mode/hive',
+                snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+                sqlDialect: true
               }
             }
           });

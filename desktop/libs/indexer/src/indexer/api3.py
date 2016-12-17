@@ -20,7 +20,9 @@ import logging
 
 from django.utils.translation import ugettext as _
 
+from beeswax.create_table import _submit_create_and_load # Beware need to protect from blacklisting
 from beeswax.server import dbms
+from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
@@ -30,6 +32,8 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.smart_indexer import Indexer
+from notebook.models import make_notebook
+from notebook.api import _execute_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -65,11 +69,11 @@ def guess_format(request):
     indexer = Indexer(request.user, request.fs)
     stream = request.fs.open(file_format["path"])
     format_ = indexer.guess_format({
-      "file":{
+      "file": {
         "stream": stream,
         "name": file_format['path']
-        }
-      })
+      }
+    })
     _convert_format(format_)
   elif file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
@@ -140,6 +144,63 @@ def index_file(request):
 
   job_handle = _index(request, file_format, collection_name)
   return JsonResponse(job_handle)
+
+
+def importer_submit(request):
+  source = json.loads(request.POST.get('source', '{}'))
+  destination = json.loads(request.POST.get('destination', '{}'))
+
+  if destination['ouputFormat'] == 'index':
+    _convert_format(source["format"], inverse=True)
+    collection_name = source["name"]
+    job_handle = _index(request, source, collection_name)
+  else:
+    job_handle = _create_table(request, source, destination)
+
+  return JsonResponse(job_handle)
+
+
+def _create_table(request, source, destination):
+  # Create table from File  
+  delim = ','
+  table_name = destination['name']
+  load_data = True
+  skip_header = True
+  database = 'default'
+  path = source['path']
+
+  create_hql = django_mako.render_to_string("gen/create_table_statement.mako", {
+      'table': {
+          'name': table_name,
+          'comment': 'comment', # todo
+          'row_format': 'Delimited',
+          'field_terminator': delim,
+          'file_format': 'TextFile',
+          'load_data': load_data,
+          'path': path, 
+          'skip_header': skip_header
+       },
+      'columns': destination['columns'],
+      'partition_columns': [],
+      'database': database
+    }
+  )
+
+  try:
+    if load_data == 'IMPORT':
+        create_hql += "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, table_name)
+
+    #on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+
+    #query = hql_query(create_hql, database=database)
+    editor_type = 'hive'
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=create_hql, status='ready', database=database)
+    #_execute_notebook(request, notebook, snippet)
+    handle = notebook.execute(request) #, batch=True)
+    print handle
+    return handle
+  except Exception, e:
+    raise PopupException(_('The table could not be created.'), detail=e.message)
 
 
 def _index(request, file_format, collection_name, query=None):
