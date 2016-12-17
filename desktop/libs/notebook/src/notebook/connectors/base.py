@@ -179,7 +179,9 @@ class Notebook(object):
     from notebook.api import _execute_notebook # Cyclic dependency
 
     notebook_data = self.get_data()
-    snippet = {'wasBatchExecuted': batch, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
+    #snippet = {'wasBatchExecuted': batch, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
+    snippet = notebook_data['snippets'][0]
+    snippet['wasBatchExecuted'] = batch
 
     return _execute_notebook(request, notebook_data, snippet)
 
