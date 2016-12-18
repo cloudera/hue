@@ -32,11 +32,10 @@ from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import RestException
-from desktop.models import DefaultConfiguration, Document2
+from desktop.models import DefaultConfiguration
 from metadata.optimizer_client import OptimizerApi
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported,\
-  Notebook
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
 
 
 LOG = logging.getLogger(__name__)
