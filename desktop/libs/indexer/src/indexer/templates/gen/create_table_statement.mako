@@ -46,7 +46,7 @@ COMMENT "${col["comment"]|n}" \
 </%def>\
 #########################
 CREATE \
-% if table.get("load_data", "IMPORT") == 'EXTERNAL':
+% if table.get("external", False):
 EXTERNAL \
 % endif
 TABLE `${ '%s.%s' % (database, table["name"]) | n }`
@@ -85,9 +85,10 @@ ROW FORMAT \
 % if table.get("file_format") == "InputFormat":
 INPUTFORMAT ${table["input_format_class"] | n} OUTPUTFORMAT ${table["output_format_class"] | n}
 % endif
-% if table.get("load_data", "IMPORT") == 'EXTERNAL':
+% if table.get("external", False):
 LOCATION "${table["path"] | n}"
 % endif
 % if table.get("skip_header", False):
 TBLPROPERTIES("skip.header.line.count" = "1")
 % endif
+;

@@ -18,10 +18,9 @@
 import json
 import logging
 
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
-from beeswax.create_table import _submit_create_and_load # Beware need to protect from blacklisting
-from beeswax.server import dbms
 from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
@@ -33,10 +32,14 @@ from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.smart_indexer import Indexer
 from notebook.models import make_notebook
-from notebook.api import _execute_notebook
 
 
 LOG = logging.getLogger(__name__)
+
+try:
+  from beeswax.server import dbms
+except ImportError, e:
+  LOG.warn('Hive and HiveServer2 interfaces are not enabled')
 
 
 def _escape_white_space_characters(s, inverse = False):
@@ -153,6 +156,7 @@ def importer_submit(request):
   if destination['ouputFormat'] == 'index':
     _convert_format(source["format"], inverse=True)
     collection_name = source["name"]
+    source['columns'] = destination['columns']
     job_handle = _index(request, source, collection_name)
   else:
     job_handle = _create_table(request, source, destination)
@@ -163,20 +167,38 @@ def importer_submit(request):
 def _create_table(request, source, destination):
   # Create table from File  
   delim = ','
-  table_name = destination['name']
+  table_name = final_table_name = destination['name']
+  comment = 'comment'
+  external = True
   load_data = True
   skip_header = True
   database = 'default'
   path = source['path']
+  table_format = 'parquet' #'text'
 
-  create_hql = django_mako.render_to_string("gen/create_table_statement.mako", {
+  file_format = 'TextFile'
+  sql = ''
+  
+  # if external and non text and load_data, both bath !=
+  
+  
+  if table_format == 'parquet':
+    table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name # Or tmp table?
+    
+  if external and not request.fs.isdir(path):
+    path = request.fs.split(path)[0]
+    # If dir not empty, create data dir %(filename)_table and move file there...
+    
+    # Guess should accept a directory too
+
+  sql += django_mako.render_to_string("gen/create_table_statement.mako", {
       'table': {
           'name': table_name,
-          'comment': 'comment', # todo
+          'comment': comment,
           'row_format': 'Delimited',
           'field_terminator': delim,
-          'file_format': 'TextFile',
-          'load_data': load_data,
+          'file_format': file_format,
+          'external': external,
           'path': path, 
           'skip_header': skip_header
        },
@@ -186,19 +208,24 @@ def _create_table(request, source, destination):
     }
   )
 
+  if not external and load_data:
+    sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (path, database, table_name)
+
+  if table_format == 'parquet':
+    sql += '\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s` STORED AS %(file_format)s AS SELECT * FROM `%(database)s`.`%(table_name)s`;' % {
+        'database': database,
+        'final_table_name': final_table_name,
+        'table_name': table_name,
+        'file_format': table_format
+    }
+    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;' % {'database': database, 'table_name': table_name}
+
   try:
-    if load_data == 'IMPORT':
-        create_hql += "LOAD DATA INPATH '%s' INTO TABLE `%s.%s`" % (path, database, table_name)
-
-    #on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
-
-    #query = hql_query(create_hql, database=database)
     editor_type = 'hive'
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=create_hql, status='ready', database=database)
-    #_execute_notebook(request, notebook, snippet)
-    handle = notebook.execute(request) #, batch=True)
-    print handle
-    return handle
+    # on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database)
+
+    return notebook.execute(request, batch=False)
   except Exception, e:
     raise PopupException(_('The table could not be created.'), detail=e.message)
 

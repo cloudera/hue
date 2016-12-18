@@ -33,6 +33,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
+<script src="${ static('desktop/js/hue.json.js') }"></script>
+
 
 <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -213,7 +215,7 @@ ${ assist.assistPanel() }
           <span class="fa fa-check"></span>
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Pick data from') }</div>
+        <div class="caption">${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span></div>
       </li>
 
       <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
@@ -227,7 +229,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Move it to') }</div>
+        <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.ouputFormat"></span></div>
       </li>
     </ol>
 
@@ -249,9 +251,6 @@ ${ assist.assistPanel() }
               <label for="path" class="control-label"><div>${ _('Path') }</div>
                 <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
               </label>
-              <label class="checkbox">
-                <input type="checkbox" checked -bind=""> ${_('Import')}
-              </label>
             </div>
 
             <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -267,18 +266,16 @@ ${ assist.assistPanel() }
             </div>
           </div>
 
+          <!-- ko if: createWizard.source.show -->
           <h3 class="card-heading simple">${_('Format')}</h3>
           <div class="card-body">
-            <form class="form-inline">
               <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
 
               <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
-                <!-- ko template: {name: 'format-settings'}--><!-- /ko -->
+                <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
               </span>
-            </form>
           </div>
 
-          <!-- if: createWizard.source.sampleCols -->
           <h3 class="card-heading simple">${_('Preview')}</h3>
           <div class="card-body">
             <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -346,18 +343,21 @@ ${ assist.assistPanel() }
           <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
           <label class="checkbox">
-            <input type="checkbox"> ${_('External loc')}
+            <input type="checkbox" checked -bind=""> ${_('Import data')}
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" checked> ${_('Default location')}
           </label>
           <label for="path" class="control-label"><div>${ _('Path') }</div>
             <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
           </label>
           <label class="checkbox">
-            <input type="checkbox"> ${_('Delimiters')}
+            <input type="checkbox"> ${_('Custom delimiters')}
           </label>
           ## field, coll map delimieters
 
           <label class="checkbox">
-              <input type="checkbox" checked> ${_('Has headers')}
+              <input type="checkbox" checked> ${_('Use headers')}
             </label>
           <label class="checkbox">
               <input type="checkbox" checked> ${_('Bulk edit col names')}
@@ -445,6 +445,7 @@ ${ assist.assistPanel() }
   </span>
 
   <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Nested')}</a>
+  <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Comment')}</a>
 </script>
 
@@ -487,7 +488,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="operation-template">
   <div class="operation">
-    <select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name});, value: operation.type"></select>
+    <select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <label> ${ _('Number of expected fields') }
@@ -737,7 +738,7 @@ ${ assist.assistPanel() }
           self.getDocuments();
         }
       });
-      self.inputFormats = ko.observableArray(['file', 'table', 'query', 'manual']);
+      self.inputFormats = ko.observableArray(['file', 'text', 'table', 'query', 'dbms', 'nothing']);
 
       // File
       self.path = ko.observable('');
@@ -809,7 +810,7 @@ ${ assist.assistPanel() }
             name = self.path().split('/').pop().split('.')[0];
           }
         } else if (self.inputFormat() == 'table') {
-          if (val && self.table().split('.', 2).length == 2) {
+          if (self.table().split('.', 2).length == 2) {
             name = self.tableName();
           }
         } else if (self.inputFormat() == 'query') {
@@ -831,14 +832,14 @@ ${ assist.assistPanel() }
       self.name = ko.observable('');
 
       self.ouputFormat = ko.observable('table');
-      self.ouputFormats = ko.observableArray(['table', 'index']);
+      self.ouputFormats = ko.observableArray(['table', 'index', 'file']);
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
 
       // Table
       self.tableFormat = ko.observable('text');
-      self.tableFormats = ko.observableArray(['text', 'parquet', 'json', 'kudu']);
+      self.tableFormats = ko.observableArray(['text', 'parquet', 'json', 'orc', 'kudu']);
       self.hasHeader = ko.observable(false); // ?
       self.bulkEditColumns = ko.observable(false);
       self.partitionColumns = ko.observableArray();
@@ -919,7 +920,6 @@ ${ assist.assistPanel() }
 
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
-          //viewModel.currentStep(2);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
@@ -973,6 +973,7 @@ ${ assist.assistPanel() }
           self.editorId(resp.history_id);
           self.jobId(resp.handle.id);
           $('#notebook').html($('#notebook-progress').html());
+
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
             user: '${ user.username }',
             userId: ${ user.id },
@@ -989,8 +990,10 @@ ${ assist.assistPanel() }
               }
             }
           });
+          self.editorVM.editorMode(true);
           ko.cleanNode($("#notebook")[0]);
           ko.applyBindings(self.editorVM, $("#notebook")[0]);
+
           self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
             self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
               if (val == 100){
@@ -1006,6 +1009,7 @@ ${ assist.assistPanel() }
                 self.indexingError(true);
               }
             });
+            self.editorVM.selectedNotebook().snippets()[0].checkStatus();
           });
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
