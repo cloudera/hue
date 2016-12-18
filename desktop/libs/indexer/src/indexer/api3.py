@@ -174,22 +174,25 @@ def _create_table(request, source, destination):
   skip_header = True
   database = 'default'
   path = source['path']
-  table_format = 'parquet' #'text'
+  table_format = destination['tableFormat']
+  columns = destination['columns']
+  primary_keys = ['id']
 
   file_format = 'TextFile'
   sql = ''
   
   # if external and non text and load_data, both bath !=
   
-  
-  if table_format == 'parquet':
-    table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name # Or tmp table?
+  if load_data:
+    if table_format in ('parquet', 'kudu'):
+      table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name # Or tmp table?
     
   if external and not request.fs.isdir(path):
     path = request.fs.split(path)[0]
     # If dir not empty, create data dir %(filename)_table and move file there...
     
-    # Guess should accept a directory too
+    # Guess format should accept a directory too
+  # Kudu external table has extra prop
 
   sql += django_mako.render_to_string("gen/create_table_statement.mako", {
       'table': {
@@ -200,28 +203,44 @@ def _create_table(request, source, destination):
           'file_format': file_format,
           'external': external,
           'path': path, 
-          'skip_header': skip_header
+          'skip_header': skip_header,
+          'primary_keys': primary_keys if table_format == 'kudu' and not load_data else []
        },
-      'columns': destination['columns'],
+      'columns': columns,
       'partition_columns': [],
       'database': database
     }
   )
 
-  if not external and load_data:
+  if table_format == 'text' and not external and load_data:
     sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (path, database, table_name)
 
-  if table_format == 'parquet':
-    sql += '\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s` STORED AS %(file_format)s AS SELECT * FROM `%(database)s`.`%(table_name)s`;' % {
+  if table_format in ('parquet', 'kudu'):
+    file_format = table_format
+    if table_format == 'kudu':
+      columns_list = primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]
+    else:
+      columns_list = ['*']
+    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`
+      PRIMARY KEY (%(primary_keys)s)
+      DISTRIBUTE BY HASH INTO 16 BUCKETS
+      STORED AS %(file_format)s
+      AS SELECT %(columns_list)s
+      FROM `%(database)s`.`%(table_name)s`;''' % {
         'database': database,
         'final_table_name': final_table_name,
         'table_name': table_name,
-        'file_format': table_format
+        'file_format': file_format,
+        'columns_list': ', '.join(['`%s`' % col for col in columns_list]),
+        'primary_keys': ', '.join(primary_keys)
     }
-    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;' % {'database': database, 'table_name': table_name}
+    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;' % {
+        'database': database,
+        'table_name': table_name
+    }
 
   try:
-    editor_type = 'hive'
+    editor_type = 'impala' if table_format == 'kudu' else 'hive'
     # on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
     notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database)
 
