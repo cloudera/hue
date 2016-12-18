@@ -27,7 +27,7 @@ def col_type(col):
   return col["type"]
 %>\
 
-<%def name="column_list(columns)">\
+<%def name="column_list(table, columns)">\
 ## Returns (foo int, bar string)-like data for columns
 (
 <% first = True %>\
@@ -42,6 +42,9 @@ def col_type(col):
 COMMENT "${col["comment"]|n}" \
 %   endif
 % endfor
+% if table.get('primary_keys'):
+, PRIMARY KEY (${ ', '.join(table['primary_keys']) })
+% endif
 ) \
 </%def>\
 #########################
@@ -49,10 +52,10 @@ CREATE \
 % if table.get("external", False):
 EXTERNAL \
 % endif
-TABLE `${ '%s.%s' % (database, table["name"]) | n }`
-${column_list(columns)|n}
+TABLE ${ '`%s`.`%s`' % (database, table["name"]) | n }
+${ column_list(table, columns) | n }
 % if table["comment"]:
-COMMENT "${table["comment"] | n}"
+COMMENT "${table["comment"] | n }"
 % endif
 % if len(partition_columns) > 0:
 PARTITIONED BY ${column_list(partition_columns)|n}

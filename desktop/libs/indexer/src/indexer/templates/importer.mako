@@ -355,6 +355,7 @@ ${ assist.assistPanel() }
             <input type="checkbox"> ${_('Custom delimiters')}
           </label>
           ## field, coll map delimieters
+          ## regexp
 
           <label class="checkbox">
               <input type="checkbox" checked> ${_('Use headers')}
@@ -738,7 +739,7 @@ ${ assist.assistPanel() }
           self.getDocuments();
         }
       });
-      self.inputFormats = ko.observableArray(['file', 'text', 'table', 'query', 'dbms', 'nothing']);
+      self.inputFormats = ko.observableArray(['file', 'text', 'table', 'query', 'dbms', 'manual']);
 
       // File
       self.path = ko.observable('');
@@ -986,6 +987,12 @@ ${ assist.assistPanel() }
                 placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
                 aceMode: 'ace/mode/hive',
                 snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+                sqlDialect: true
+              },
+              impala: {
+                placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+                aceMode: 'ace/mode/impala',
+                snippetImage: '${ static("impala/art/icon_impala_48.png") }',
                 sqlDialect: true
               }
             }
