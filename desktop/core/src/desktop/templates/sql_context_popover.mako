@@ -435,8 +435,8 @@ from metadata.conf import has_navigator
             while (pubSubs.length > 0) {
               pubSubs.pop().remove();
             }
+            huePubSub.publish('sql.context.popover.hidden');
           }
-          huePubSub.publish('sql.context.popover.hidden');
         }
       };
 
