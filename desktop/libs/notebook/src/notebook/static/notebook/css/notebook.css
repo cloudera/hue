@@ -816,7 +816,7 @@ table.airy tr td {
 
 .snippet-side-btn.disabled {
   cursor: default !important;
-  color: #C2CFD8 !important;
+  opacity: 0.5;
 }
 
 .snippet-side-btn:focus {
