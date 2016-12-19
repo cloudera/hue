@@ -54,6 +54,7 @@ def indexer(request):
     index['isSelected'] = False
 
   return render('indexer.mako', request, {
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'indexes_json': json.dumps(indexes),
       'fields_json' : json.dumps([field.name for field in FIELD_TYPES]),
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
