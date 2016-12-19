@@ -46,7 +46,7 @@ var ListViewModel = function (options) {
     return self;
   };
 
-  self.searchQuery = ko.observable("");
+  self.searchQuery = ko.observable('');
 
   self.allVisibleSelected = ko.computed(function() {
     if (self.items().length === 0) {
@@ -68,17 +68,20 @@ var ListViewModel = function (options) {
     }
     return self.deselectAll();
   };
-  self.selected = function () {
-    var acc = [];
-    var items = self.items();
-    for (i = 0; i < items.length; i++) {
-      if (items[i].isSelected())
-        acc.push(items[i]);
-    }
-    return acc;
-  };
+  self.selected = ko.pureComputed(function () {
+    return self.items().filter(function (item) {
+      return item.isSelected();
+    })
+  });
+
+  self.selectedAndVisible = ko.pureComputed(function () {
+    return self.items().filter(function (item) {
+      return item.isSelected() && item.isVisible();
+    })
+  });
+
   self.batchSelected = function (action) {
-    var selected = self.selected();
+    var selected = self.selectedAndVisible();
     var batchCount = 0;
 
     for (q = 0; q < selected.length; q++) {
@@ -111,14 +114,14 @@ var ListViewModel = function (options) {
     });
   };
   self.disableSelected = function () {
-    confirm("Confirm Disable", "Disable these tables?", function () {
+    confirm('Confirm Disable', 'Are you sure you want to disable the ' + self.selectedAndVisible().length + ' selected tables?', function () {
       self.batchSelected(function () {
         return this.disable();
       });
     });
   };
   self.dropSelected = function () {
-    confirm("Confirm Delete", "Are you sure you want to drop the selected items? (WARNING: This cannot be undone!)", function () {
+    confirm('Confirm Delete', 'Are you sure you want to drop the ' + self.selectedAndVisible().length + ' selected items? (WARNING: This cannot be undone!)', function () {
       self.batchSelected(function () {
         var s = this;
         self.droppedTables.push(s);
