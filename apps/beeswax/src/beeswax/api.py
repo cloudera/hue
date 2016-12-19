@@ -634,6 +634,9 @@ def get_sample_data(request, database, table, column=None):
 
 def _get_sample_data(db, database, table, column):
   table_obj = db.get_table(database, table)
+  if table_obj.is_impala_only and db.client.query_server['server_name'] != 'impala':
+    query_server = get_query_server_config('impala')
+    db = dbms.get(db.client.user, query_server)
   sample_data = db.get_sample(database, table_obj, column)
   response = {'status': -1}
 
