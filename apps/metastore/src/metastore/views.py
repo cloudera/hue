@@ -36,7 +36,7 @@ from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_n
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery, MetaInstall
 from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config
+from beeswax.server.dbms import get_query_server_config, QueryServerException
 from filebrowser.views import location_to_url
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
@@ -230,9 +230,11 @@ def get_table_metadata(request, database, table):
       'hdfs_link': table_metadata.hdfs_link,
       'is_view': table_metadata.is_view
     }
-  except Exception, ex:
+  except:
+    msg = "Cannot get metadata for table: `%s`.`%s`"
+    LOG.exception(msg) % (database, table)
     response['status'] = 1
-    response['data'] = _("Cannot get metadata for table: `%s`.`%s`") % (database, table)
+    response['data'] = _(msg) % (database, table)
 
   return JsonResponse(response)
 

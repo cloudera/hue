@@ -225,6 +225,9 @@ def _create_table(request, source, destination):
       PRIMARY KEY (%(primary_keys)s)
       DISTRIBUTE BY HASH INTO 16 BUCKETS
       STORED AS %(file_format)s
+      TBLPROPERTIES(
+      'kudu.num_tablet_replicas' = '1'
+      )
       AS SELECT %(columns_list)s
       FROM `%(database)s`.`%(table_name)s`;''' % {
         'database': database,

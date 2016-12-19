@@ -199,8 +199,18 @@ class HiveServer2Dbms(object):
 
 
   def get_table(self, database, table_name):
-    return self.client.get_table(database, table_name)
-
+    try:
+      return self.client.get_table(database, table_name)
+    except QueryServerException, e:
+      LOG.debug("Seems like %s.%s is a Kudu table" % (database, table_name))
+      if 'java.lang.ClassNotFoundException' in e.message:
+        query_server = get_query_server_config('impala')
+        db = get(self.client.user, query_server)
+        table = db.get_table(database, table_name)
+        table.is_impala_only = True
+        return table
+      else:
+        raise e
 
   def alter_table(self, database, table_name, new_table_name=None, comment=None, tblproperties=None):
     hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
