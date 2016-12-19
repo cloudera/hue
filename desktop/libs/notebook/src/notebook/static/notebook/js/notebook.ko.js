@@ -1265,14 +1265,17 @@ var EditorViewModel = (function() {
             }
             else if (self.status() == 'available') {
               self.fetchResult(100);
-              self.fetchResultSize();
               self.progress(100);
-             if (self.isSqlDialect() && ! self.result.handle().has_result_set) { // DDL
-                self.ddlNotification(Math.random());
-                if (self.result.handle().has_more_statements) {
-                  setTimeout(function () {
-                    self.execute(); // Execute next, need to wait as we disabled fast click
-                  }, 1000);
+              if (self.isSqlDialect()) {
+                if (self.result.handle().has_result_set) {
+                  self.fetchResultSize();
+                } else { // Is DDL
+                  self.ddlNotification(Math.random());
+                  if (self.result.handle().has_more_statements) {
+                    setTimeout(function () {
+                      self.execute(); // Execute next, need to wait as we disabled fast click
+                    }, 1000);
+                  }
                 }
               }
               if (vm.successUrl()) {
