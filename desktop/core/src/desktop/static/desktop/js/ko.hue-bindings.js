@@ -3413,29 +3413,35 @@
           clearTimeout(tooltipTimeout);
           var selectionRange = editor.selection.getRange();
           if (selectionRange.isEmpty()) {
-            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX+5, e.clientY);
-            var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
-            if (token !== null && token.parseLocation && !disableTooltip) {
-              tooltipTimeout = window.setTimeout(function () {
-                var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
+            var pointerPosition = editor.renderer.screenToTextCoordinates(e.clientX + 5, e.clientY);
+            var endTestPosition = editor.renderer.screenToTextCoordinates(e.clientX + 15, e.clientY);
+            if (endTestPosition.column !== pointerPosition.column) {
+              var token = editor.session.getTokenAt(pointerPosition.row, pointerPosition.column);
+              if (token !== null && token.parseLocation && !disableTooltip) {
+                tooltipTimeout = window.setTimeout(function () {
+                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
-                var tooltipText = options.contextTooltip;
-                if (token.parseLocation.identifierChain) {
-                  tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
-                } else if (token.parseLocation.function) {
-                  tooltipText += ' (' + token.parseLocation.function + ')';
-                }
-                contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
-              }, 500);
-            } else {
-              hideContextTooltip();
-            }
-            if (lastHoveredToken !== token) {
-              clearActiveMarker();
-              if (token !== null && token.parseLocation) {
-                markLocation(token.parseLocation);
+                  var tooltipText = options.contextTooltip;
+                  if (token.parseLocation.identifierChain) {
+                    tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
+                  } else if (token.parseLocation.function) {
+                    tooltipText += ' (' + token.parseLocation.function + ')';
+                  }
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                }, 500);
+              } else {
+                hideContextTooltip();
               }
-              lastHoveredToken = token;
+              if (lastHoveredToken !== token) {
+                clearActiveMarker();
+                if (token !== null && token.parseLocation) {
+                  markLocation(token.parseLocation);
+                }
+                lastHoveredToken = token;
+              }
+            } else {
+              clearActiveMarker();
+              lastHoveredToken = null;
             }
           }
         });
