@@ -1818,7 +1818,7 @@ var EditorViewModel = (function() {
           }
           else {
             if (vm.isResponsive()){
-              hueUtils.changeURL(vm.URLS.responsive + '&notebook=' + data.id);
+              hueUtils.changeURL(vm.URLS.responsive_notebook + '&notebook=' + data.id);
             }
             else {
               hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
@@ -2149,7 +2149,8 @@ var EditorViewModel = (function() {
       editor: '/notebook/editor',
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
-      responsive: '/responsive?app=editor'
+      responsive: '/responsive?app=editor',
+      responsive_notebook: '/responsive?app=notebook'
     }
 
     self.user = options.user;
@@ -2402,7 +2403,7 @@ var EditorViewModel = (function() {
             }
             else {
               if (self.isResponsive()){
-                hueUtils.changeURL(self.URLS.responsive + '&notebook=' + data.document.id);
+                hueUtils.changeURL(self.URLS.responsive_notebook + '&notebook=' + data.document.id);
               }
               else {
                 hueUtils.changeURL(self.URLS.notebook + '&notebook=' + data.document.id);
@@ -2449,7 +2450,12 @@ var EditorViewModel = (function() {
             }
           }
         } else {
-          hueUtils.changeURL('/notebook/notebook');
+          if (self.isResponsive()){
+            hueUtils.changeURL(self.URLS.responsive_notebook);
+          }
+          else {
+            hueUtils.changeURL('/notebook/notebook');
+          }
         }
       });
     };
