@@ -54,7 +54,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     $(document).ajaxComplete(function (event, xhr, settings) {
       var whiteListURLs = [
         'filebrowser/copy?next=',
-        'filebrowser/move?next='
+        'filebrowser/move?next=',
+        'filebrowser/touch?next=',
+        'filebrowser/mkdir?next=',
+        'filebrowser/rmtree',
+        'filebrowser/chown?next=',
+        'filebrowser/chmod?next=',
+        'filebrowser/rename?next=',
+        'filebrowser/trash',
       ];
       var whiteListed = false;
       whiteListURLs.forEach(function(url){

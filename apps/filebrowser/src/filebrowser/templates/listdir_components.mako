@@ -767,6 +767,10 @@ from django.utils.translation import ugettext as _
             keyboard:true,
             show:true
           });
+        },
+        error: function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+          resetPrimaryButtonsStatus();
         }
       });
     };
@@ -1317,9 +1321,7 @@ from django.utils.translation import ugettext as _
 
         if (!isMoveOnSelf){
           hiddenFields($("#moveForm"), "src_path", paths);
-
           $("#moveForm").attr("action", "/filebrowser/move?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
-
           $('#moveForm').ajaxForm({
             dataType:  'json',
             success: function() {
@@ -1451,6 +1453,10 @@ from django.utils.translation import ugettext as _
             success: function() {
               $("#changeOwnerModal").modal('hide');
               self.retrieveData();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+              $(document).trigger("error", xhr.responseText);
+              resetPrimaryButtonsStatus();
             }
           });
         }
@@ -1481,6 +1487,10 @@ from django.utils.translation import ugettext as _
             success: function() {
               $("#changePermissionModal").modal('hide');
               self.retrieveData();
+            },
+            error: function (xhr, textStatus, errorThrown) {
+              $(document).trigger("error", xhr.responseText);
+              resetPrimaryButtonsStatus();
             }
           });
 
@@ -1522,6 +1532,10 @@ from django.utils.translation import ugettext as _
           success: function() {
             $("#deleteModal").modal('hide');
             self.retrieveData();
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+            resetPrimaryButtonsStatus();
           }
         });
       };
@@ -1598,6 +1612,10 @@ from django.utils.translation import ugettext as _
           success: function() {
             $("#createDirectoryModal").modal('hide');
             self.retrieveData();
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+            resetPrimaryButtonsStatus();
           }
         });
         return false;
@@ -1624,6 +1642,10 @@ from django.utils.translation import ugettext as _
           success: function() {
             $("#createFileModal").modal('hide');
             self.retrieveData();
+          },
+          error: function (xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+            resetPrimaryButtonsStatus();
           }
         });
         return false;
@@ -1650,6 +1672,10 @@ from django.utils.translation import ugettext as _
           success: function() {
             $("#restoreTrashModal").modal('hide');
             self.retrieveData();
+          },
+          error: function(xhr, textStatus, errorThrown) {
+            $(document).trigger("error", xhr.responseText);
+            resetPrimaryButtonsStatus();
           }
         });
       };
