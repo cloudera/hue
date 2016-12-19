@@ -454,6 +454,16 @@ ${ assist.assistPanel() }
 
 
 <script type="text/javascript" charset="utf-8">
+  (function () {
+    var proxiedKORegister = ko.components.register;
+    var LOADED_COMPONENTS = [];
+    ko.components.register = function () {
+      if (LOADED_COMPONENTS.indexOf(arguments[0]) === -1) {
+        LOADED_COMPONENTS.push(arguments[0]);
+        return proxiedKORegister.apply(this, arguments);
+      }
+    };
+  })();
 
   $(document).ready(function () {
     var options = {
@@ -552,16 +562,16 @@ ${ assist.assistPanel() }
                   if (LOADED_JS.indexOf(jsFile) === -1) {
                     LOADED_JS.push(jsFile);
                     $(this).clone().appendTo($('head'));
-                    $(this).remove();
                   }
+                  $(this).remove();
                 });
                 r.find('link[href]').each(function () {
                   var cssFile = $(this).attr('href').split('?')[0];
                   if (LOADED_CSS.indexOf(cssFile) === -1) {
                     LOADED_CSS.push(cssFile);
                     $(this).clone().appendTo($('head'));
-                    $(this).remove();
                   }
+                  $(this).remove();
                 });
                 if (self.SKIP_CACHE.indexOf(newVal) === -1) {
                   self.embeddable_cache[newVal] = r;
