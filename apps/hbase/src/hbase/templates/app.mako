@@ -398,11 +398,11 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         <!-- ko if: showingCurrent -->
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <a id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
-          <input data-bind="visible: mime().split('/')[0].toLowerCase() != 'application' && mime().split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary" value="${_('Save')}">
+          <input data-bind="visible: mime().split('/')[0].toLowerCase() != 'application' && mime().split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary disable-enter" value="${_('Save')}">
         <!-- /ko -->
         <!-- ko ifnot: showingCurrent -->
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
-          <input type="submit" class="btn btn-primary" value="${_('Revert')}">
+          <input type="submit" class="btn btn-primary disable-enter" value="${_('Revert')}">
         <!-- /ko -->
       </div>
     </script>
@@ -413,7 +413,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </script>
 
     <script id="cell_text_template" type="text/html">
-      <textarea id="codemirror_target" data-bind="text: value, disable: !showingCurrent()" data-use-post="true"></textarea>
+      <textarea id="ace_target_hidden" data-bind="text: value, disable: !showingCurrent()" data-use-post="true" style="display:none"></textarea>
+      <div id="ace_target"></div>
     </script>
 
     <script id="cell_application_template" type="text/html">
@@ -486,10 +487,13 @@ canWrite = ${ str(can_write).lower() };
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
-<script src="${ static('desktop/ext/js/codemirror-xml.js') }"></script>
-<script src="${ static('desktop/ext/js/codemirror-javascript.js') }"></script>
-<link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
+
+<script src="${ static('desktop/js/ace/ace.js') }"></script>
+<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
+<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
+<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+<script src="${ static('desktop/js/ace.extended.js') }"></script>
+
 
 <script src="${ static('hbase/js/base.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('hbase/js/utils.js') }" type="text/javascript" charset="utf-8"></script>

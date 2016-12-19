@@ -94,37 +94,37 @@ function launchModal(modal, data) {
   switch (modal) {
     case 'cell_edit_modal':
       if (data.mime().split('/')[0] == 'text') {
-        var target = document.getElementById('codemirror_target');
-        var mime = data.mime;
-        if (mime == "text/json") {
-          mime = {name: "javascript", json: true};
+        var target = document.getElementById('ace_target_hidden');
+        var mime = data.mime();
+        var aceMode = 'ace/mode/text';
+        switch (mime) {
+          case 'text/json':
+            aceMode = 'ace/mode/json';
+            break;
+          case 'text/xml':
+            aceMode = 'ace/mode/xml';
+            break;
         }
-        var cm = CodeMirror.fromTextArea(target, {
-          mode: mime,
-          tabMode: 'indent',
-          lineNumbers: true,
-          readOnly: $(target).is(":disabled")
+        var editor = ace.edit('ace_target');
+        editor.setOptions({
+          readOnly: $('#ace_target').is(':disabled')
         });
-        data.codeMirror = cm;
+        editor.setTheme($.totalStorage('hue.ace.theme') || 'ace/theme/hue');
+        editor.getSession().setMode(aceMode);
+        editor.setValue($(target).val(), -1);
+
+        data.ace = editor;
 
         var updateTimeout = 0;
-        cm.on("change", function(cm) {
+        editor.on("change", function() {
           clearTimeout(updateTimeout);
           updateTimeout = setTimeout(function () {
-            data.value(cm.getValue());
+            data.value(editor.getValue());
           }, 100);
         });
 
         data.showingCurrent.subscribe(function(showingCurrent) {
-          cm.options.readOnly = ! showingCurrent;
-          cm.refresh();
-        });
-
-        setTimeout(function () {
-          cm.refresh()
-        }, 401); //CM invis bug workaround
-        element.find('input[type=submit]').click(function () {
-          cm.save();
+          editor.setOption('readOnly', !showingCurrent)
         });
       }
       app.focusModel(data.content);
@@ -188,10 +188,9 @@ function showFullEditor(cellContent) {
     content: cellContent,
     mime: ko.observable(detectMimeType(currentValue)),
 
-    updateCodeMirror: function() {
-      if (this.codeMirror) {
-        this.codeMirror.setValue(this.value());
-        this.codeMirror.refresh()
+    updateAce: function() {
+      if (this.ace) {
+        this.ace.setValue(this.value(), -1);
       }
     },
 
@@ -201,7 +200,7 @@ function showFullEditor(cellContent) {
       }
       this.value(item.value);
       this.mime(detectMimeType(this.value()));
-      this.updateCodeMirror();
+      this.updateAce();
       this.showingCurrent(false);
       this.timestamp(item.timestamp);
     },
@@ -212,7 +211,7 @@ function showFullEditor(cellContent) {
         this.mime(detectMimeType(this.value()));
         this.showingCurrent(true);
         this.timestamp(this.content.timestamp);
-        this.updateCodeMirror();
+        this.updateAce();
       }
     }
   });

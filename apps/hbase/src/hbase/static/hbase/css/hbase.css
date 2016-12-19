@@ -533,8 +533,8 @@ ul#hbase-breadcrumbs li a {
   min-height: 600px;
 }
 
-#cell_edit_modal .CodeMirror {
-  height: 100%;
+#ace_target {
+  min-height: 400px;
 }
 
 #cell_edit_modal .modal-body {
