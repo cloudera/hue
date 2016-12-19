@@ -67,6 +67,7 @@ ENABLE_NEW_INDEXER = Config(
   default=False
 )
 
+
 # Unused
 BATCH_INDEXER_PATH = Config(
   key="batch_indexer_path",

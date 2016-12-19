@@ -155,7 +155,7 @@ def importer_submit(request):
 
   if destination['ouputFormat'] == 'index':
     _convert_format(source["format"], inverse=True)
-    collection_name = source["name"]
+    collection_name = destination["name"]
     source['columns'] = destination['columns']
     job_handle = _index(request, source, collection_name)
   else:
@@ -165,44 +165,72 @@ def importer_submit(request):
 
 
 def _create_table(request, source, destination):
-  # Create table from File  
-  delim = ','
+  return _create_table_from_a_file(request, source, destination)
+
+
+def _create_table_from_a_file(request, source, destination):
   table_name = final_table_name = destination['name']
-  comment = 'comment'
-  external = True
-  load_data = True
-  skip_header = True
-  database = 'default'
-  path = source['path']
   table_format = destination['tableFormat']
+
+  database = destination['database']
   columns = destination['columns']
-  primary_keys = ['id']
+  partition_columns = destination['partitionColumns']
+
+  comment = destination['description']
+
+  external = not destination['useDefaultLocation']
+  external_path = not destination['nonDefaultLocation']
+
+  load_data = destination['importData']
+  skip_header = destination['hasHeader']
+
+  primary_keys = destination['primaryKeys']
+
+  if destination['useCustomDelimiters']:
+    field_delimiter = destination['customFieldDelimiter']
+    collection_delimiter = destination['customCollectionDelimiter']
+    map_delimiter = destination['customMapDelimiter']
+    regexp_delimiter = destination['customRegexp']
+  else:
+    field_delimiter = ','
+    collection_delimiter = r'\\002'
+    map_delimiter = r'\\003'
+    regexp_delimiter = '.*'
+
+  source_path = source['path']
+
 
   file_format = 'TextFile'
+  extra_create_properties = ''
   sql = ''
-  
+
   # if external and non text and load_data, both bath !=
-  
+
   if load_data:
     if table_format in ('parquet', 'kudu'):
       table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name # Or tmp table?
-    
-  if external and not request.fs.isdir(path):
-    path = request.fs.split(path)[0]
+
+  if external:
+    if not request.fs.isdir(source_path): # File selected
+      source_path = request.fs.split(source_path)[0]
     # If dir not empty, create data dir %(filename)_table and move file there...
-    
+
     # Guess format should accept a directory too
   # Kudu external table has extra prop
+  sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
+      'database': database,
+      'table_name': table_name
+  }
 
   sql += django_mako.render_to_string("gen/create_table_statement.mako", {
       'table': {
           'name': table_name,
           'comment': comment,
           'row_format': 'Delimited',
-          'field_terminator': delim,
+          'field_terminator': field_delimiter,
           'file_format': file_format,
           'external': external,
-          'path': path, 
+          'path': source_path,
           'skip_header': skip_header,
           'primary_keys': primary_keys if table_format == 'kudu' and not load_data else []
        },
@@ -213,31 +241,34 @@ def _create_table(request, source, destination):
   )
 
   if table_format == 'text' and not external and load_data:
-    sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (path, database, table_name)
+    sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (source_path, database, table_name)
 
   if table_format in ('parquet', 'kudu'):
     file_format = table_format
     if table_format == 'kudu':
-      columns_list = primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]
-    else:
-      columns_list = ['*']
-    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`
-      PRIMARY KEY (%(primary_keys)s)
+      columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
+      extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
       DISTRIBUTE BY HASH INTO 16 BUCKETS
       STORED AS %(file_format)s
       TBLPROPERTIES(
       'kudu.num_tablet_replicas' = '1'
-      )
+      )""" % {
+        'file_format': file_format,
+        'primary_keys': ', '.join(primary_keys)
+      }
+    else:
+      columns_list = ['*']
+    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`
+      %(extra_create_properties)s
       AS SELECT %(columns_list)s
       FROM `%(database)s`.`%(table_name)s`;''' % {
         'database': database,
         'final_table_name': final_table_name,
         'table_name': table_name,
-        'file_format': file_format,
-        'columns_list': ', '.join(['`%s`' % col for col in columns_list]),
-        'primary_keys': ', '.join(primary_keys)
+        'extra_create_properties': extra_create_properties,
+        'columns_list': ', '.join(columns_list),
     }
-    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;' % {
+    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
         'database': database,
         'table_name': table_name
     }

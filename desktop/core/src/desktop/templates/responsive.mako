@@ -298,8 +298,9 @@ ${ hueIcons.symbols() }
         <li><a data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }">Hive</a></li>
         <li><a data-bind="click: function () { onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }">Impala</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
-        <li><a href="javascript: void(0);">Report</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('notebook') }"Report</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }">Oozie</a></li>
+        <li><a href="/indexer/importer/">Importer</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
@@ -605,7 +606,7 @@ ${ assist.assistPanel() }
           self.currentApp(window.location.getParameter('app'));
         }
         else {
-          self.currentApp('home');
+          self.currentApp('hive');
         }
 
         huePubSub.subscribe('switch.app', function (name) {
