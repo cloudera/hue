@@ -198,6 +198,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/hue.utils.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/jquery-2.1.1.min.js') }"></script>
   <script src="${ static('desktop/js/jquery.migration.js') }"></script>
+  <script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
   <script src="${ static('desktop/js/jquery.selector.js') }"></script>

@@ -39,7 +39,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 
 ${ assist.assistJSModels() }

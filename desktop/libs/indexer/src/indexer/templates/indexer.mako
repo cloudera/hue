@@ -23,10 +23,9 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
-<span class="notebook">
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/d3.v3.js') }" type="text/javascript" charset="utf-8"></script>
@@ -43,8 +42,11 @@ ${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 
+${ assist.assistPanel() }
+%endif
+
+<link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .show-assist {
@@ -113,8 +115,7 @@ ${ assist.assistJSModels() }
 
 </style>
 
-${ assist.assistPanel() }
-
+<span id="indexerComponents" class="notebook">
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
@@ -131,16 +132,17 @@ ${ assist.assistPanel() }
   </div>
 </div>
 
+%if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-
+%endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
-
+        %if not is_embeddable:
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
             <i class="fa fa-chevron-left"></i>
@@ -165,7 +167,7 @@ ${ assist.assistPanel() }
             }"></div>
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-
+        %endif
         <div class="content-panel">
           <div style="margin: 10px; margin-bottom: 100px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
@@ -1004,7 +1006,7 @@ ${ assist.assistPanel() }
         }
       }
       viewModel = new IndexerViewModel(options);
-      ko.applyBindings(viewModel);
+      ko.applyBindings(viewModel, $('#indexerComponents')[0]);
 
       var draggableMeta = {};
       huePubSub.subscribe('draggable.text.meta', function (meta) {
@@ -1058,4 +1060,7 @@ ${ assist.assistPanel() }
   })();
 </script>
 </span>
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

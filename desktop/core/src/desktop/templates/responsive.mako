@@ -367,6 +367,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_filebrowser_s3" class="embeddable"></div>
       <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
+      <div id="embeddable_indexer" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -425,6 +426,7 @@ ${ hueIcons.symbols() }
 
 <script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
 
+<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
 <script src="${ static('desktop/js/jquery.selector.js') }"></script>
@@ -501,6 +503,7 @@ ${ assist.assistPanel() }
           filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
           fileviewer: 'filebrowser/view=',
           home: '/home_embeddable',
+          indexer: '/indexer/indexer/?is_embeddable=true',
         };
 
         self.SKIP_CACHE = ['fileviewer'];
