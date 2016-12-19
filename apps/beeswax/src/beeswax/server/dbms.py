@@ -202,8 +202,9 @@ class HiveServer2Dbms(object):
     try:
       return self.client.get_table(database, table_name)
     except QueryServerException, e:
-      LOG.debug("Seems like %s.%s is a Kudu table" % (database, table_name))
-      if 'java.lang.ClassNotFoundException' in e.message:
+      LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
+
+      if 'java.lang.ClassNotFoundException' in e.message and [prop for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows() if 'KuduStorageHandler' in prop[0]]:
         query_server = get_query_server_config('impala')
         db = get(self.client.user, query_server)
         table = db.get_table(database, table_name)
@@ -211,6 +212,7 @@ class HiveServer2Dbms(object):
         return table
       else:
         raise e
+
 
   def alter_table(self, database, table_name, new_table_name=None, comment=None, tblproperties=None):
     hql = 'ALTER TABLE `%s`.`%s`' % (database, table_name)
@@ -473,6 +475,20 @@ class HiveServer2Dbms(object):
         ]
     else:
       return []
+
+
+  def get_table_properties(self, database, table, property_name=None):
+    hql = 'SHOW TBLPROPERTIES `%s`.`%s`' % (database, table)
+    if property_name:
+      hql += ' ("%s")' % property_name
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      result = self.fetch(handle, rows=100)
+      self.close(handle)
+      return result
 
 
   def get_top_terms(self, database, table, column, limit=30, prefix=None):
