@@ -71,6 +71,7 @@ class HiveServerTable(Table):
     self.table_schema = table_schema
     self.desc_results = desc_results
     self.desc_schema = desc_schema
+    self.is_impala_only = False # Aka Kudu
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
@@ -93,6 +94,9 @@ class HiveServerTable(Table):
 
   @property
   def path_location(self):
+    if self.is_impala_only:
+      return None
+
     try:
       rows = self.describe
       rows = [row for row in rows if row['col_name'].startswith('Location:')]
@@ -182,8 +186,8 @@ class HiveServerTable(Table):
           'properties': {
             'owner': props.get('Owner:'),
             'create_time': props.get('CreateTime:'),
-            'compressed': props.get('Compressed:', 'No') != 'No',
-            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else serde.rsplit('.', 1)[-1]),
+            'compressed': props.get('Compressed:', 'No') != 'No' or self.is_impala_only,
+            'format': 'parquet' if 'ParquetHiveSerDe' in serde else ('text' if 'LazySimpleSerDe' in serde else ('kudu' if self.is_impala_only else serde.rsplit('.', 1)[-1])),
         }
       }
 
@@ -1028,7 +1032,6 @@ class HiveServerTableCompatible(HiveServerTable):
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
-    self.is_impala_only = False
 
   @property
   def cols(self):
