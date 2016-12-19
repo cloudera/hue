@@ -157,9 +157,9 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <div id="hbase-page-clusterview" class="hbase-page"> <!-- maybe turn these into script tags, then populate them into #main and then rerender + apply bindings to old viemodels to have modular viewmodels? -->
     <div class="actionbar">
       <div style="padding-bottom: 20px">
-        <input type="text" class="input-large search-query" placeholder="${_('Search for Table Name')}" data-bind="value: views.tables.searchQuery, valueUpdate: 'afterkeydown'">
+        <input type="text" class="input-large search-query" placeholder="${_('Search for Table Name')}" data-bind="value: views.tables.searchQuery, clearable: views.tables.searchQuery, valueUpdate: 'afterkeydown'">
         % if can_write:
-          <span class="btn-group">
+          <span class="btn-group margin-left-10">
             <button class="btn" data-bind="enable: views.tables.canEnable, click: views.tables.enableSelected"><i class="fa fa-check-square"></i> ${_('Enable')}</button>
             <button class="btn" data-bind="enable: views.tables.canDisable, click: views.tables.disableSelected">
               <i class="fa fa-square-o"></i> ${_('Disable')}

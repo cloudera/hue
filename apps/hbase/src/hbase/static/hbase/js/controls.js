@@ -112,7 +112,7 @@ var DataTableViewModel = function (options) {
   };
 
   self.canDrop = ko.computed(function () {
-    var selected = self.selected();
+    var selected = self.selectedAndVisible();
     if (selected.length <= 0) return false;
     for (var i = 0; i < selected.length; i++) {
       if (selected[i].enabled()) return false;
@@ -121,7 +121,7 @@ var DataTableViewModel = function (options) {
   });
 
   self.canDisable = ko.computed(function () {
-    var selected = self.selected();
+    var selected = self.selectedAndVisible();
     if (selected.length <= 0) return false;
     for (var i = 0; i < selected.length; i++) {
       if (!selected[i].enabled()) return false;
@@ -130,7 +130,7 @@ var DataTableViewModel = function (options) {
   });
 
   self.canEnable = ko.computed(function () {
-    var selected = self.selected();
+    var selected = self.selectedAndVisible();
     if (selected.length <= 0) return false;
     for (var i = 0; i < selected.length; i++) {
       if (selected[i].enabled()) return false;
