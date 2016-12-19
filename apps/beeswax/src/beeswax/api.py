@@ -713,6 +713,11 @@ def analyze_table(request, database, table, columns=None):
   query_server = get_query_server_config(app_name)
   db = dbms.get(request.user, query_server)
 
+  table_obj = db.get_table(database, table)
+  if table_obj.is_impala_only and app_name != 'impala':
+    query_server = get_query_server_config('impala')
+    db = dbms.get(request.user, query_server)
+
   response = {'status': -1, 'message': '', 'redirect': ''}
 
   if request.method == "POST":
