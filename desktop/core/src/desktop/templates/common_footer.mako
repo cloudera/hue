@@ -52,30 +52,17 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
-      var whiteListURLs = [
-        'filebrowser/copy?next=',
-        'filebrowser/move?next=',
-        'filebrowser/touch?next=',
-        'filebrowser/mkdir?next=',
-        'filebrowser/rmtree',
-        'filebrowser/chown?next=',
-        'filebrowser/chmod?next=',
-        'filebrowser/rename?next=',
-        'filebrowser/trash',
-      ];
-      var whiteListed = false;
-      whiteListURLs.forEach(function(url){
-        if (settings.url.indexOf(url) > -1){
-          whiteListed = true;
-        }
-      });
-      if ((xhr.responseText === '/* login required */' || (xhr.status === 403 && !whiteListed)) && !isLoginRequired) {
-        isLoginRequired = true;
+      if (xhr.responseText === '/* login required */') {
+        isAutoLogout = settings.url == '/desktop/debug/is_idle';
+
+        // if isAutoLogout --> auto-logout
+        // else logged-out (but could we use a regular modal without any white, like the sample popup for example?)
+
         $('.blurred').removeClass('blurred');
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
           if (xhr.status === 403) {
-            $('#login-modal .wrong-token').show();
+            $('#login-modal .auto-logged-out').show();
             $('#login-modal').modal('show');
           }
           else {
