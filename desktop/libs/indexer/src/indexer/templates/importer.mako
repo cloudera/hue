@@ -243,7 +243,7 @@ ${ assist.assistPanel() }
           <div>
             <div class="control-group">
               <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
-                <select id="collectionType" data-bind="options: createWizard.source.inputFormats, value: createWizard.source.inputFormat"></select>
+                <select id="collectionType" data-bind="options: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
               </label>
             </div>
 
@@ -316,73 +316,106 @@ ${ assist.assistPanel() }
     <!-- ko if: currentStep() == 2 -->
     <div class="card step2">
 
+      <!-- ko with: createWizard.destination -->
       <div class="control-group">
         <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
-          <select id="collectionType" data-bind="options: createWizard.destination.ouputFormats, value: createWizard.destination.ouputFormat"></select>
+          <select id="collectionType" data-bind="options: ouputFormats, value: ouputFormat, optionsValue: 'value', optionsText: 'name'"></select>
         </label>
-      </div>
 
-      <div class="control-group>
         <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: createWizard.destination.name, valueUpdate: 'afterkeydown'" placeholder="${ _('Collection name') }">
-          <span class="help-inline muted" data-bind="visible: createWizard.isNameAvailable()">${ _('A new collection will be created') }</span>
-          <span class="help-inline muted" data-bind="visible: ! createWizard.isNameAvailable() && createWizard.destination.name().length > 0">
-          ${ _('Adding data to this existing collection') }
-          <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.destination.name() }, text: createWizard.destination.name" target="_blank"></a>
+          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+          <span class="help-inline muted" data-bind="visible: $root.createWizard.isNameAvailable()">
+            ${ _('Create a new ') } <span data-bind="text: ouputFormat"></span>
+          </span>
+          <span class="help-inline muted" data-bind="visible: ! $root.createWizard.isNameAvailable() && name().length > 0">
+            ${ _('Adding data to this existing ') } <span data-bind="text: ouputFormat"></span>
+            <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + name() }, text: name" target="_blank"></a>
           </span>
         </label>
       </div>
 
-      <h3 class="card-heading simple">${_('Fields')}</h3>
       <div class="card-body">
-        <!-- ko if: createWizard.isGuessingFieldTypes -->
-          <i class="fa fa-spinner fa-spin"></i>
-        <!-- /ko -->
+        ##<!-- ko if: createWizard.isGuessingFieldTypes -->
+        ##  <i class="fa fa-spinner fa-spin"></i>
+        ##<!-- /ko -->
 
-        <!-- ko if: $root.createWizard.destination.ouputFormat() == 'table' -->
-          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
-
-          <label class="checkbox">
-            <input type="checkbox" checked -bind=""> ${_('Import data')}
-          </label>
-          <label class="checkbox">
-            <input type="checkbox" checked> ${_('Default location')}
-          </label>
-          <label for="path" class="control-label"><div>${ _('Path') }</div>
-            <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
-          </label>
-          <label class="checkbox">
-            <input type="checkbox"> ${_('Custom delimiters')}
-          </label>
-          ## field, coll map delimieters
-          ## regexp
-
-          <label class="checkbox">
-              <input type="checkbox" checked> ${_('Use headers')}
-            </label>
-          <label class="checkbox">
-              <input type="checkbox" checked> ${_('Bulk edit col names')}
-            </label>
+        <!-- ko if: ouputFormat() == 'table' -->
+        <h3 class="card-heading simple">${_('Properties')}</h3>
+          <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
           <div class="control-group">
             <label for="collectionType" class="control-label"><div>${ _('Format') }</div>
-              <select id="collectionType" data-bind="options: $root.createWizard.destination.tableFormats, value: $root.createWizard.destination.tableFormat"></select>
+              <select id="collectionType" data-bind="options: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
 
+          ${_('Database')}
+          <label class="checkbox">
+            <input type="text" data-bind="value: database">
+          </label>
+
+
+          <label class="checkbox">
+            <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+          </label>
+
+          <label class="checkbox">
+            <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
+          </label>
+          <span data-bind="visible: ! useDefaultLocation()">
+            <label for="path" class="control-label"><div>${ _('External location') }</div>
+              <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+            </label>
+          </span>
+
+          <label class="checkbox">
+            <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom delimiters')}
+          </label>
+          <span data-bind="visible: useCustomDelimiters">
+            <div class="control-group">
+              <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
+                <select id="fieldDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <div class="control-group">
+              <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
+                <select id="collectionDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <div class="control-group">
+              <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
+                <select id="structDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              </label>
+            </div>
+            <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
+          </span>
+
+          <div class="row" style="margin-left: 8px">
+            <div class="span3">
+              <input type="checkbox" data-bind="checked: hasHeader">
+              ${_('Use first row as column names')} <a class="btn disable-feedback"><i class="fa fa-outdent"></i></a>
+            </div>
+            <div class="span3" data-bind="click: function() { alert('Hello'); }">
+              ${ _('Bulk edit column names') }<a class="btn"><i class="fa fa-edit"></i></a>
+            </div>
+          </div>
+
           <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+          ## partitionColumns
         <!-- /ko -->
 
-        <form class="form-inline" data-bind="foreach: createWizard.destination.columns">
-          <!-- ko if: $root.createWizard.destination.ouputFormat() == 'table' -->
+         <h3 class="card-heading simple">${_('Fields')}</h3>
+        <form class="form-inline" data-bind="foreach: columns">
+          <!-- ko if: $parent.ouputFormat() == 'table' -->
             <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
 
-          <!-- ko if: $root.createWizard.destination.ouputFormat() == 'index' -->
+          <!-- ko if: $parent.ouputFormat() == 'index' -->
             <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
         </form>
       </div>
+      <!-- /ko -->
     </div>
     <!-- /ko -->
 
@@ -739,13 +772,21 @@ ${ assist.assistPanel() }
           self.getDocuments();
         }
       });
-      self.inputFormats = ko.observableArray(['file', 'text', 'table', 'query', 'dbms', 'manual']);
+      self.inputFormats = ko.observableArray([
+          {'value': 'file', 'name': 'File'},
+          {'value': 'table', 'name': 'Table'},
+          {'value': 'text', 'name': 'Copy paste text'},
+          {'value': 'query', 'name': 'SQL Query'},
+          {'value': 'dbms', 'name': 'DBMS'},
+          {'value': 'manual', 'name': 'Manual with no input'},
+      ]);
 
       // File
       self.path = ko.observable('');
       self.path.subscribe(function(val) {
         if (val) {
           vm.createWizard.guessFormat();
+          vm.createWizard.destination.nonDefaultLocation(val);
         }
       })
 
@@ -831,19 +872,45 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable('');
+      self.description = ko.observable('');
 
       self.ouputFormat = ko.observable('table');
-      self.ouputFormats = ko.observableArray(['table', 'index', 'file']);
+      self.ouputFormats = ko.observableArray([
+          {'name': 'Table', 'value': 'table'},
+          {'name': 'Solr index', 'value': 'index'},
+          {'name': 'File', 'value': 'file'}
+      ]);
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
 
       // Table
+      self.database = ko.observable('default');
       self.tableFormat = ko.observable('text');
-      self.tableFormats = ko.observableArray(['text', 'parquet', 'json', 'orc', 'kudu']);
-      self.hasHeader = ko.observable(false); // ?
-      self.bulkEditColumns = ko.observable(false);
+      self.tableFormats = ko.observableArray([
+          {'value': 'text', 'name': 'Text'},
+          {'value': 'parquet', 'name': 'Parquet'},
+          {'value': 'json', 'name': 'Json'},
+          {'value': 'orc', 'name': 'ORC'},
+          {'value': 'kudu', 'name': 'Kudu'}
+      ]);
+      self.ouputFormat = ko.observable('table');
+
       self.partitionColumns = ko.observableArray();
+      self.primaryKeys = ko.observableArray();
+
+      self.importData = ko.observable(true);
+      self.useDefaultLocation = ko.observable(true);
+      self.nonDefaultLocation = ko.observable('');
+
+      self.useCustomDelimiters = ko.observable(false);
+      self.customFieldDelimiter = ko.observable(',');
+      self.customCollectionDelimiter = ko.observable('\\002');
+      self.customMapDelimiter = ko.observable('\\003');
+      self.customRegexp = ko.observable('');
+
+      self.kuduDistribute = ko.observableArray([]);
+      self.hasHeader = ko.observable(true);
 
       // Index
     };
@@ -871,6 +938,15 @@ ${ assist.assistPanel() }
 
       self.source = new Source(vm);
       self.destination = new Destination(vm);
+
+      self.customDelimiters = ko.observable([
+        {'value': '\\001', 'name': '^A (\\001)', 'ascii': 1},
+        {'value': '\\002', 'name': '^B (\\002)', 'ascii': 2},
+        {'value': '\\003', 'name': '^C (\\003)', 'ascii': 3},
+        {'value': '\\t', 'name': '^Tab (\\t)', 'ascii': 9},
+        {'value': ',', 'name': 'Comma (,)', 'ascii': 44},
+        {'value': ' ', 'name': 'Space', 'ascii': 32}
+      ]);
 
       self.editorId = ko.observable();
       self.jobId = ko.observable();

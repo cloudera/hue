@@ -1032,6 +1032,7 @@ class HiveServerTableCompatible(HiveServerTable):
 
     self.describe = HiveServerTTableSchema(self.desc_results, self.desc_schema).cols()
     self._details = None
+    self.is_impala_only = False
 
   @property
   def cols(self):

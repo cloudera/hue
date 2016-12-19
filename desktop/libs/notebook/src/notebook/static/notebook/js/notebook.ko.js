@@ -966,7 +966,7 @@ var EditorViewModel = (function() {
         self.statusForButtons('executed');
         stopLongOperationTimeout();
 
-        if (vm.editorMode() && data.history_id) {
+        if (vm.editorMode() && data.history_id && window.location.pathname != '/indexer/importer/') {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
           if (vm.isResponsive()){
             url = vm.URLS.responsive + '&editor=' + data.history_id;
@@ -2433,6 +2433,7 @@ var EditorViewModel = (function() {
         if (self.editorMode()) {
           self.selectedNotebook().newSnippet(self.editorType());
           huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
+
           if (window.location.getParameter('new') == '') {
             self.selectedNotebook().snippets()[0].statement_raw($.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user + '.' + window.location.getParameter('type')));
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
