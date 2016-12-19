@@ -274,7 +274,13 @@ ${ components.menubar() }
     </h4>
     <div class="row-fluid">
       <div>
-        <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}">${_('Location')}</a>
+        <i class="fa fa-fw fa-hdd-o muted"></i>
+        <!-- ko if: details.properties.format == 'kudu' -->
+          ${_('Stored in')} Kudu
+        <!-- /ko -->
+        <!-- ko if: details.properties.format != 'kudu' -->
+          <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}">${_('Location')}</a>
+        <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
         <!-- ko if: typeof last_modified_by !== 'undefined' -->
