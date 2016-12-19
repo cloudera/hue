@@ -3373,18 +3373,18 @@
         var tooltipTimeout = -1;
         var disableTooltip = false;
         var lastHoveredToken = null;
-        var activeMarker = null;
+        var activeMarkers = [];
+        var keepLastMarker = false;
 
         var hideContextTooltip = function () {
           clearTimeout(tooltipTimeout);
           contextTooltip.hide();
         };
 
-        var clearActiveMarker = function () {
+        var clearActiveMarkers = function () {
           hideContextTooltip();
-          if (activeMarker !== null) {
-            editor.session.removeMarker(activeMarker);
-            activeMarker = null;
+          while (activeMarkers.length > keepLastMarker ? 1 : 0) {
+            editor.session.removeMarker(activeMarkers.shift());
           }
         };
 
@@ -3396,17 +3396,20 @@
           } else {
             range = new AceRange(parseLocation.location.first_line - 1, parseLocation.location.first_column - 1, parseLocation.location.last_line - 1, parseLocation.location.last_column - 1);
           }
-          activeMarker = editor.session.addMarker(range, 'hue-ace-location');
+          activeMarkers.push(editor.session.addMarker(range, 'hue-ace-location'));
           return range;
         };
 
         huePubSub.subscribe('sql.context.popover.shown', function () {
           hideContextTooltip();
+          keepLastMarker = true;
           disableTooltip = true;
         });
 
         huePubSub.subscribe('sql.context.popover.hidden', function () {
           disableTooltip = false;
+          clearActiveMarkers();
+          keepLastMarker = false;
         });
 
         editor.on("mousemove", function (e) {
@@ -3433,26 +3436,26 @@
                 hideContextTooltip();
               }
               if (lastHoveredToken !== token) {
-                clearActiveMarker();
+                clearActiveMarkers();
                 if (token !== null && token.parseLocation) {
                   markLocation(token.parseLocation);
                 }
                 lastHoveredToken = token;
               }
             } else {
-              clearActiveMarker();
+              clearActiveMarkers();
               lastHoveredToken = null;
             }
           }
         });
 
         editor.on("input", function (e) {
-          clearActiveMarker();
+          clearActiveMarkers();
           lastHoveredToken = null;
         });
 
         editor.container.addEventListener("mouseout", function (e) {
-          clearActiveMarker();
+          clearActiveMarkers();
           clearTimeout(tooltipTimeout);
           contextTooltip.hide();
           lastHoveredToken = null;
