@@ -33,10 +33,10 @@
         <br/>
         <a id="reload" class="pointer">
         <span class="logged-out link-message" style="display: none">
-          ${ _('Reload this page to sign in again') }
+          ${ _('Your current action requires to reload this page to sign in again') }
         </span>
-        <span class="wrong-token link-message" style="display: none">
-          ${ _('Please reload this page') }
+        <span class="auto-logged-out link-message" style="display: none">
+          ${ _('We did not hear from you for about %s and for security reason Hue logged you out. Please reload this page to continue') % conf.AUTH.IDLE_SESSION_TIMEOUT.get() }
         </span>
         </a>
       </h4>
