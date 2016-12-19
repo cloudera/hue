@@ -1186,6 +1186,9 @@ ${ components.menubar() }
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
+        % if is_embeddable:
+        responsive: true,
+        % endif
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
           errorFetchingTableFields: '${_('An error occurred fetching the table fields. Please try again.')}',
