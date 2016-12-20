@@ -32,7 +32,9 @@ LOG = logging.getLogger(__name__)
 
 
 def collections(request, is_redirect=False):
-  return render('collections.mako', request, {})
+  return render('collections.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
+  })
 
 
 def indexes(request):
