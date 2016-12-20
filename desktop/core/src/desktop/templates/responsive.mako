@@ -543,6 +543,9 @@ ${ assist.assistPanel() }
 
         self.currentApp.subscribe(function (newVal) {
           hueUtils.changeURLParameter('app', newVal);
+          if (newVal !== 'editor') {
+            hueUtils.removeURLParameter('type');
+          }
           self.isLoadingEmbeddable(true);
           if (typeof self.embeddable_cache[newVal] === 'undefined') {
             $.ajax({

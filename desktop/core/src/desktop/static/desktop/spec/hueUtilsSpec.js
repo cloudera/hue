@@ -49,5 +49,12 @@
       hueUtils.changeURL('/jasmine');
     });
 
+    it("should remove a parameter in the URL", function () {
+      hueUtils.changeURL('/banana?peeled=no');
+      hueUtils.removeURLParameter('peeled');
+      expect(window.location.search).toEqual('');
+      hueUtils.changeURL('/jasmine');
+    });
+
   });
 })();
