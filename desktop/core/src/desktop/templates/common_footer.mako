@@ -54,23 +54,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     $(document).ajaxComplete(function (event, xhr, settings) {
       if (xhr.responseText === '/* login required */') {
         isAutoLogout = settings.url == '/desktop/debug/is_idle';
-
-        // if isAutoLogout --> auto-logout
-        // else logged-out (but could we use a regular modal without any white, like the sample popup for example?)
-
         $('.blurred').removeClass('blurred');
+
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
           $('#login-modal .link-message').hide();
-          if (xhr.status === 403) {
-            $('#login-modal .auto-logged-out').show();
-            $('#login-modal').modal('show');
-          }
-          else {
+          if (isAutoLogout) {
             $('body').children(':not(#login-modal)').addClass('blurred');
-            $('#login-modal .logged-out').show();
+            $('#login-modal .auto-logged-out').show();
             $('#login-modal').modal({
               backdrop: 'static',
               keyboard: false
+            });
+          }
+          else {
+            $('#login-modal .logged-out').show();
+            $('#login-modal').modal({
+              backdrop: false,
+              keyboard: true
             });
           }
           window.setTimeout(function () {

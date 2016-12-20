@@ -35,6 +35,10 @@
   border-radius: 4px;
 }
 
+.login-container a {
+  white-space: normal;
+}
+
 .login-container .logo {
   background-color: #FFF;
   width: 70px;

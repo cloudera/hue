@@ -26,28 +26,32 @@
 <div id="login-modal" class="modal fade hide" style="padding: 0px!important;box-shadow: none;background: transparent;">
 
   <div class="login-container">
-      <a href="#" class="close wrong-token link-message" data-dismiss="modal" style="display: none; margin: 10px">&times;</a>
+      <a href="#" class="close logged-out link-message" data-dismiss="modal" style="display: none; margin: 10px">&times;</a>
       <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70"></div>
-      <h4 class="muted" style="margin-bottom: 50px">
-        ${ _('Your session has expired.')}
-        <br/>
-        <a id="reload" class="pointer">
+      <h4 class="muted" style="margin-bottom: 50px; padding: 30px">
         <span class="logged-out link-message" style="display: none">
-          ${ _('Your current action requires to reload this page to sign in again') }
+          ${ _('Your session expired and your current action requires to') }
+          <a class="reload pointer">
+            ${ _('reload this page') }
+          </a>
         </span>
         <span class="auto-logged-out link-message" style="display: none">
-          ${ _('We did not hear from you for about %s and for security reason Hue logged you out. Please reload this page to continue') % conf.AUTH.IDLE_SESSION_TIMEOUT.get() }
+          ${ _('We did not hear from you for about') } <strong class="time">${ conf.AUTH.IDLE_SESSION_TIMEOUT.get() }</strong> ${ _('and for security reasons Hue logged you out') }
+          <div class="margin-top-30"></div>
+          <a class="reload pointer">
+            ${ _('Please reload this page to continue') }
+          </a>
         </span>
-        </a>
       </h4>
   </div>
 </div>
 
 <script>
   $(document).ready(function () {
-    $('#reload').on('click', function () {
+    $('.reload').on('click', function () {
       location.reload();
     });
+    $('.time').text(($('.time').text()*1000).toHHMMSS(true));
   });
 </script>
 

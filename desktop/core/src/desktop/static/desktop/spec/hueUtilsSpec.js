@@ -24,6 +24,10 @@
       expect(Number(10123).toHHMMSS()).toEqual('10.123s');
     });
 
+    it("should skip the seconds if it's zero and it's specified in the function", function() {
+      expect(Number(60000).toHHMMSS(true)).toEqual('1m');
+    });
+
     it("should have the String.startsWith polyfill", function() {
       expect('banana'.startsWith('ba')).toBeTruthy();
     });
