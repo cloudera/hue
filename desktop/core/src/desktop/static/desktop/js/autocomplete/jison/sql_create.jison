@@ -137,33 +137,6 @@ HdfsLocation_EDIT
  : HiveOrImpalaLocation HdfsPath_EDIT
  ;
 
-HdfsPath
- : 'HDFS_START_QUOTE' 'HDFS_PATH' 'HDFS_END_QUOTE'
- ;
-
-HdfsPath_EDIT
- : 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR' 'HDFS_PATH' 'HDFS_END_QUOTE'
-    {
-      suggestHdfs({ path: $2 });
-    }
- | 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR' 'HDFS_END_QUOTE'
-   {
-     suggestHdfs({ path: $2 });
-   }
- | 'HDFS_START_QUOTE' 'HDFS_PATH' 'PARTIAL_CURSOR'
-    {
-      suggestHdfs({ path: $2 });
-    }
- | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR' 'HDFS_END_QUOTE'
-   {
-     suggestHdfs({ path: '' });
-   }
- | 'HDFS_START_QUOTE' 'PARTIAL_CURSOR'
-    {
-      suggestHdfs({ path: '' });
-    }
- ;
-
 OptionalHiveDbProperties
  :
  | HiveDbProperties

@@ -324,4 +324,347 @@
       });
     });
   });
+
+  describe('sql.js IMPORT and EXPORT statements', function() {
+
+    beforeAll(function () {
+      sql.yy.parseError = function (msg) {
+        throw Error(msg);
+      };
+      jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
+    });
+
+    var assertAutoComplete = SqlTestUtils.assertAutocomplete;
+
+    describe('Hive specific', function () {
+      it('should handle "IMPORT EXTERNAL TABLE foo PARTITION (bar=1, boo=2) FROM \'/bla/bla\' LOCATION \'/ble/ble\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL TABLE foo PARTITION (bar=1, boo=2) FROM \'/bla/bla\' LOCATION \'/ble/ble\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "IMPORT TABLE foo PARTITION (bar=1, boo=2) FROM \'/bla/bla\' LOCATION \'/ble/ble\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT TABLE foo PARTITION (bar=1, boo=2) FROM \'/bla/bla\' LOCATION \'/ble/ble\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "IMPORT TABLE foo FROM \'/bla/bla\' LOCATION \'/ble/ble\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT TABLE foo FROM \'/bla/bla\' LOCATION \'/ble/ble\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "IMPORT FROM \'/bla/bla\' LOCATION \'/ble/ble\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT FROM \'/bla/bla\' LOCATION \'/ble/ble\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "IMPORT FROM \'/bla/bla\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT FROM \'/bla/bla\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "|"', function () {
+        assertAutoComplete({
+          beforeCursor: '',
+          afterCursor: '',
+          dialect: 'hive',
+          containsKeywords: ['EXPORT', 'IMPORT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "IMPORT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['EXTERNAL TABLE', 'FROM', 'TABLE']
+          }
+        });
+      });
+
+      it('should suggest keywords for "IMPORT EXTERNAL |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest tables for "IMPORT TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest tables for "IMPORT EXTERNAL TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "IMPORT TABLE bla |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT TABLE bla ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION', 'FROM']
+          }
+        });
+      });
+
+      it('should suggest keywords for "IMPORT EXTERNAL TABLE bla PARTITION (bla=1) |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FROM']
+          }
+        });
+      });
+
+      it('should suggest hdfs for "IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "IMPORT FROM \'/bla/bla\' |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT FROM \'/bla/bla\' ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['LOCATION']
+          }
+        });
+      });
+
+      it('should suggest hdfs for "IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'/bla/bla\' LOCATION \'|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'/bla/bla\' LOCATION \'/bla/',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '/bla/' }
+          }
+        });
+      });
+
+      it('should handle "EXPORT TABLE db.tbl PARTITION (foo=1, bar=2) TO \'/bla/bla\' FOR REPLICATION(\'blaaa\');|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl PARTITION (foo=1, bar=2) TO \'/bla/bla\' FOR REPLICATION(\'blaaa\');',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "EXPORT TABLE db.tbl TO \'/bla/bla\' FOR REPLICATION(\'blaaa\');|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\' FOR REPLICATION(\'blaaa\');',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should handle "EXPORT TABLE db.tbl TO \'/bla/bla\';|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\';',
+          afterCursor: '',
+          dialect: 'hive',
+          noErrors: true,
+          hasLocations: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: false
+          }
+        });
+      });
+
+      it('should suggest keywords for "EXPORT |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TABLE']
+          }
+        });
+      });
+
+      it('should suggest tables for "EXPORT TABLE |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE ',
+          afterCursor: '',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {},
+            suggestDatabases: { appendDot: true }
+          }
+        });
+      });
+
+      it('should suggest keywords for "EXPORT TABLE db.tbl |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['PARTITION', 'TO']
+          }
+        });
+      });
+
+      it('should suggest keywords for "EXPORT TABLE db.tbl PARTITION (bla=1) |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl PARTITION (bla=1) ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['TO']
+          }
+        });
+      });
+
+      it('should suggest hdfs for "EXPORT TABLE db.tbl PARTITION (bla=1) TO \'|"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl PARTITION (bla=1) TO \'',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestHdfs: { path: '' }
+          }
+        });
+      });
+
+      it('should suggest keywords for "EXPORT TABLE db.tbl TO \'/bla/bla\' |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\' ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FOR replication()']
+          }
+        });
+      });
+
+      it('should suggest keywords for "EXPORT TABLE db.tbl TO \'/bla/bla\' FOR |"', function () {
+        assertAutoComplete({
+          beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\' FOR ',
+          afterCursor: '',
+          dialect: 'hive',
+          hasLocations: true,
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['replication()']
+          }
+        });
+      });
+    });
+  });
 })();

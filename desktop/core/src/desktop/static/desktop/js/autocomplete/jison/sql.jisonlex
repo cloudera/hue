@@ -47,6 +47,7 @@
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'GROUPING'                           { return '<hive>GROUPING'; }
+<hive>'IMPORT'                             { determineCase(yytext); return '<hive>IMPORT'; }
 <hive>'INSERT'                             { determineCase(yytext); return '<hive>INSERT'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'LOCAL'                              { return '<hive>LOCAL'; }
@@ -97,6 +98,7 @@
 <hive>'ENABLE'                             { return '<hive>ENABLE'; }
 <hive>'EXCHANGE'                           { return '<hive>EXCHANGE'; }
 <hive>'EXPLAIN'                            { determineCase(yytext); return '<hive>EXPLAIN'; }
+<hive>'EXPORT'                             { determineCase(yytext); return '<hive>EXPORT'; }
 <hive>'FIELDS'                             { return '<hive>FIELDS'; }
 <hive>'FILE'                               { return '<hive>FILE'; }
 <hive>'FILEFORMAT'                         { return '<hive>FILEFORMAT'; }
@@ -136,6 +138,7 @@
 <hive>'REBUILD'                            { return '<hive>REBUILD'; }
 <hive>'RELOAD'                             { determineCase(yytext); return '<hive>RELOAD'; }
 <hive>'REPAIR'                             { return '<hive>REPAIR'; }
+<hive>'REPLICATION'                        { return '<hive>REPLICATION'; }
 <hive>'RECOVER'                            { return '<hive>RECOVER'; }
 <hive>'RENAME'                             { return '<hive>RENAME'; }
 <hive>'REPLACE'                            { return '<hive>REPLACE'; }
