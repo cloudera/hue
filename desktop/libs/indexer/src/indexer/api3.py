@@ -180,7 +180,7 @@ def _create_table_from_a_file(request, source, destination):
 
   source_path = source['path']
   external = not destination['useDefaultLocation']
-  external_path = not destination['nonDefaultLocation']
+  external_path = destination['nonDefaultLocation']
 
   load_data = destination['importData']
   skip_header = destination['hasHeader']
@@ -198,10 +198,20 @@ def _create_table_from_a_file(request, source, destination):
     map_delimiter = r'\\003'
     regexp_delimiter = '.*'
 
-
   file_format = 'TextFile'
+  row_format = 'Delimited'
+  serde_name = ''
+  serde_properties = ''
   extra_create_properties = ''
   sql = ''
+
+  if table_format == 'json':
+    row_format = 'serde'
+    serde_name = 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+    serde_properties = '''"separatorChar" = "\\t",
+   "quoteChar"     = "'",
+   "escapeChar"    = "\\\\"
+   '''
 
   if load_data:
     if table_format in ('parquet', 'kudu'):
@@ -225,8 +235,12 @@ def _create_table_from_a_file(request, source, destination):
       'table': {
           'name': table_name,
           'comment': comment,
-          'row_format': 'Delimited',
+          'row_format': row_format,
           'field_terminator': field_delimiter,
+          'collection_terminator': collection_delimiter,
+          'map_key_terminator': map_delimiter,
+          'serde_name': serde_name,
+          'serde_properties': serde_properties,
           'file_format': file_format,
           'external': external or load_data and table_format in ('parquet', 'kudu'),
           'path': external_path,

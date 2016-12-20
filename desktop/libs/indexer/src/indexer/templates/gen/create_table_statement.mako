@@ -63,7 +63,7 @@ PARTITIONED BY ${column_list(partition_columns)|n}
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here
 ROW FORMAT \
-% if table.has_key('row_format'):
+% if table.get('row_format'):
 %   if table["row_format"] == "Delimited":
   DELIMITED
 %     if table.has_key('field_terminator'):
@@ -76,9 +76,9 @@ ROW FORMAT \
     MAP KEYS TERMINATED BY '${table["map_key_terminator"] | n}'
 %     endif
 %   else:
-  SERDE ${table["serde_name"] | n}
+  SERDE '${table["serde_name"] | n}'
 %     if table["serde_properties"]:
-  WITH SERDEPROPERTIES ${table["serde_properties"] | n}
+  WITH SERDEPROPERTIES (${table["serde_properties"] | n})
 %     endif
 %   endif
 % endif
