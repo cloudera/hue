@@ -34,7 +34,7 @@ var Autocompleter = (function () {
 
     var initializeAutocompleter = function () {
       if (self.snippet.isSqlDialect() && options.useNewAutocompleter) {
-        self.autocompleter = new SqlAutocompleter2({
+        self.autocompleter = new SqlAutocompleter3({
           snippet: self.snippet,
           timeout: self.timeout
         });
