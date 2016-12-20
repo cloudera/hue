@@ -26,7 +26,7 @@
 
 ${ commonheader(_('Notebook'), app_name, user, request, "68px") | n,unicode }
 
-<span class="notebook">
+<span id="notebookComponents" class="notebook">
 ${ editorComponents.includes() }
 ${ editorComponents.topBar() }
 <%editorComponents:commonHTML>
@@ -54,7 +54,7 @@ ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
 
-${ editorComponents.commonJS() }
+${ editorComponents.commonJS(bindableElement='notebookComponents') }
 
 </span>
 ${ commonfooter(request, messages) | n,unicode }
