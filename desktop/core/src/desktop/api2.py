@@ -228,11 +228,10 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
     # If this is the user's home directory, fetch shared docs too
     if document.is_home_directory:
       children = directory.get_children_and_shared_documents(user=request.user)
+      response.update(_filter_documents(request, queryset=children, flatten=True))
     else:
       children = directory.get_children_documents()
-
-    # Filter and order results
-    response.update(_filter_documents(request, queryset=children, flatten=False))
+      response.update(_filter_documents(request, queryset=children, flatten=False))
 
   # Paginate and serialize Results
   if 'documents' in response:
