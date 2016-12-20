@@ -21,8 +21,12 @@
 
 <%namespace name="common_admin_collections" file="common_admin_collections.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Search'), "search", user, request, "29px") | n,unicode }
+%endif
 
 ${ common_admin_collections.page_structure() }
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

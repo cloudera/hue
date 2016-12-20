@@ -271,6 +271,7 @@ def admin_collections(request, is_redirect=False, is_mobile=False):
     template = 'admin_collections_m.mako'
 
   return render(template, request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
     'existing_hue_collections': existing_hue_collections,
     'is_redirect': is_redirect
   })
