@@ -306,6 +306,7 @@ ${ hueIcons.symbols() }
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('metastore') }">Tables</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('collections') }">Collections</a></li>
         <li><a href="javascript: void(0);">Indexes</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }">Jobs</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }">Files</a></li>
@@ -368,6 +369,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
       <div id="embeddable_indexer" class="embeddable"></div>
+      <div id="embeddable_collections" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -504,6 +506,7 @@ ${ assist.assistPanel() }
           fileviewer: 'filebrowser/view=',
           home: '/home_embeddable',
           indexer: '/indexer/indexer/?is_embeddable=true',
+          collections: '/search/admin/collections?is_embeddable=true',
         };
 
         self.SKIP_CACHE = ['fileviewer'];

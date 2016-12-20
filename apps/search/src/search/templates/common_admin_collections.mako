@@ -30,7 +30,7 @@
 <h3 style="text-align: center">${_('Dashboards')}</h3>
 %endif
 
-<div id="editor">
+<div id="collectionsComponents">
 %if not is_mobile:
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
@@ -182,7 +182,7 @@ ${ commonimportexport(request) | n,unicode }
   }
 
   var viewModel = new SearchCollectionsModel(appProperties);
-  ko.applyBindings(viewModel, $("#editor")[0]);
+  ko.applyBindings(viewModel, $("#collectionsComponents")[0]);
 
   shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocUuid('');
