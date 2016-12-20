@@ -21,8 +21,11 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unicode }
+%endif
 
+<div id="indexesComponents">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
@@ -476,6 +479,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 <!--/ Wizard -->
 <!--/ Edit collection page -->
 
+</div>
 
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
@@ -631,8 +635,10 @@ routie({
 });
 
 vm.manage.fetchCollections();
-ko.applyBindings(vm);
+ko.applyBindings(vm, $('#indexesComponents')[0]);
 
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
