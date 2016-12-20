@@ -55,22 +55,22 @@ ${ fb_components.menubar() }
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
-            <button href="#" class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
+            <button href="javascript: void(0)" class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
             data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && (!isS3() || (isS3() && !isS3Root()))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
             </button>
             <ul class="dropdown-menu" style="top: auto">
-              <li><a href="#" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1, click: renameFile,
+              <li><a href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1, click: renameFile,
               enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
-              <li><a href="#"title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
+              <li><a href="javascript: void(0)"title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
-              <li><a href="#" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
+              <li><a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
               % if show_download_button:
               <li>
-                <a href="#" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
+                <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
                   <i class="fa fa-fw fa-arrow-circle-o-down"></i> ${_('Download')}
                 </a>
               </li>
@@ -78,13 +78,13 @@ ${ fb_components.menubar() }
               <li class="divider" data-bind="visible: !isS3()"></li>
               % if is_fs_superuser:
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }">
-                <a href="#" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
+                <a href="javascript: void(0)" data-bind="visible: ! inTrash(), click: changeOwner, enable: selectedFiles().length > 0">
                   <i class="fa fa-fw fa-user"></i> ${_('Change owner / group')}
                 </a>
               </li>
               % endif
               <li data-bind="css: {'disabled': isCurrentDirSentryManaged() || selectedSentryFiles().length > 0 }, visible: !isS3()">
-                <a href="#" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
+                <a href="javascript: void(0)" data-bind="visible: ! inTrash(), click: changePermissions, enable: selectedFiles().length > 0">
                   <i class="fa fa-fw fa-list-alt"></i> ${_('Change permissions')}
                 </a>
               </li>
@@ -109,7 +109,7 @@ ${ fb_components.menubar() }
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu">
-              <li><a href="#" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
+              <li><a href="javascript: void(0)" class="delete-link" title="${_('Delete forever')}" data-bind="enable: selectedFiles().length > 0, click: deleteSelected"><i class="fa fa-bolt"></i> ${_('Delete forever')}</a></li>
             </ul>
           </div>
           <!-- /ko -->
@@ -138,25 +138,25 @@ ${ fb_components.menubar() }
           <!-- /ko -->
           <!-- ko ifnot: isS3 -->
           <div id="upload-dropdown" class="btn-group" style="vertical-align: middle">
-            <a href="#" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
+            <a href="javascript: void(0)" class="btn upload-link dropdown-toggle" title="${_('Upload')}" data-toggle="dropdown" data-bind="visible: !inTrash(), css: {'disabled': isS3() && isS3Root()}">
               <i class="fa fa-arrow-circle-o-up"></i> ${_('Upload')}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="fa fa-file-o"></i> ${_('Files')}</a></li>
-              <li><a href="#" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="fa fa-gift"></i> ${_('Zip/Tgz/Bz2 file')}</a></li>
+              <li><a href="javascript: void(0)" class="upload-link" title="${_('Files')}" data-bind="click: uploadFile"><i class="fa fa-file-o"></i> ${_('Files')}</a></li>
+              <li><a href="javascript: void(0)" class="upload-link" title="${_('Archive')}" data-bind="click: uploadArchive"><i class="fa fa-gift"></i> ${_('Zip/Tgz/Bz2 file')}</a></li>
             </ul>
           </div>
           <!-- /ko -->
           % endif
           <div class="btn-group" style="vertical-align: middle">
-            <a href="#" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
+            <a href="javascript: void(0)" data-toggle="dropdown" class="btn dropdown-toggle" data-bind="visible: !inTrash()">
               <i class="fa fa-plus-circle"></i> ${_('New')}
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu pull-right" style="top: auto">
-              <li data-bind="visible: !isS3() || isS3() && !isS3Root()"><a href="#" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
-              <li><a href="#" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> <span data-bind="visible: !isS3() || isS3() && !isS3Root()">${_('Directory')}</span><span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span></a></li>
+              <li data-bind="visible: !isS3() || isS3() && !isS3Root()"><a href="javascript: void(0)" class="create-file-link" title="${_('File')}"><i class="fa fa-file-o"></i> ${_('File')}</a></li>
+              <li><a href="javascript: void(0)" class="create-directory-link" title="${_('Directory')}"><i class="fa fa-folder"></i> <span data-bind="visible: !isS3() || isS3() && !isS3Root()">${_('Directory')}</span><span data-bind="visible: isS3() && isS3Root()">${_('Bucket')}</span></a></li>
             </ul>
           </div>
         </div>
