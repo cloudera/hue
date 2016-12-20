@@ -331,11 +331,6 @@
         }
         $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
         $scrollingBreadcrumbs.appendTo($(_parent.element).find('.filechooser-tree'));
-        $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
-        $scrollingBreadcrumbs.animate({
-          'scrollLeft': $scrollingBreadcrumbs.width()
-        });
-
         $hdfsAutocomplete.appendTo($(_parent.element).find('.filechooser-tree'));
 
         $hdfsAutocomplete.jHueHdfsAutocomplete({
@@ -520,8 +515,12 @@
           _actions.appendTo($(_parent.element).find('.filechooser-tree'));
         }
         window.setTimeout(function () {
-          $(_parent.element).parent().scrollTop(0)
-        }, 100);
+          $(_parent.element).parent().scrollTop(0);
+          $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
+          $scrollingBreadcrumbs.animate({
+            'scrollLeft': $scrollingBreadcrumbs.width()
+          });
+        }, 0);
       }
     }).error(function (e) {
       if (!_parent.options.suppressErrors) {
