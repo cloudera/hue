@@ -406,7 +406,7 @@ var hueDebugTimer = (function () {
 })();
 
 
-Number.prototype.toHHMMSS = function () {
+Number.prototype.toHHMMSS = function (skipZeroSeconds) {
   var n = this;
   var millis = n % 1000;
   n = (n - millis) / 1000;
@@ -416,7 +416,11 @@ Number.prototype.toHHMMSS = function () {
   n = (n - minutes) / 60;
   var hours = n % 24;
   var days = (n - hours) / 24;
-  return (days > 0 ? days + "d, " : "") + (hours > 0 ? hours + "h, " : "") + (minutes > 0 ? minutes + "m, " : "") + seconds + (millis > 0 && minutes == 0 && hours == 0 && days == 0 ? "." + millis : "") + "s";
+  var val = $.trim((days > 0 ? days + "d, " : "") + (hours > 0 ? hours + "h, " : "") + (minutes > 0 ? minutes + "m, " : "") + ((skipZeroSeconds && seconds === 0) ? '' : (seconds + (millis > 0 && minutes == 0 && hours == 0 && days == 0 ? "." + millis : "") + "s")));
+  if (val[val.length - 1] === ',') {
+    val = val.substr(0, val.length - 1);
+  }
+  return val;
 }
 
 String.prototype.hashCode = function() {
