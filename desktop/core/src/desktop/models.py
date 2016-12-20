@@ -1395,6 +1395,15 @@ class Directory(Document2):
     trashed_ids = [doc.id for doc in documents if Document2.TRASH_DIR in doc.parent_directory.path]
     documents = documents.exclude(id__in=trashed_ids)
 
+    # Optimizing roll up for /home by checking only with directories instead of all documents
+    # For all other directories roll up is done in _filter_documents()
+    directories_all = Document2.objects.filter(type='directory').exclude(id=self.id)
+    directories_inside_home = directories_all.filter(
+      (Q(document2permission__users=user) | Q(document2permission__groups__in=user.groups.all())) &
+        ~Q(owner=user)
+    )
+    documents = documents.exclude(parent_directory__in=directories_inside_home)
+
     return documents.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
 
