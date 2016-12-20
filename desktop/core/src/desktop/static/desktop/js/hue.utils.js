@@ -205,13 +205,19 @@ if (!String.prototype.includes) {
           newSearch += p;
         }
       });
-      newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+      if (value){
+        newSearch += (newSearch !== '?' ? '&' : '') + param + '=' + value;
+      }
     }
     else {
-      newSearch = window.location.search + (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value;
+      newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
     }
 
     hueUtils.changeURL(window.location.pathname + newSearch);
+  }
+
+  hueUtils.removeURLParameter = function (param) {
+    hueUtils.changeURLParameter(param, null);
   }
 
   /**
