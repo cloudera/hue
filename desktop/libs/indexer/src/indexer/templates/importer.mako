@@ -468,25 +468,40 @@ ${ assist.assistPanel() }
   <label>${ _('Name') }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
+
   <label>${ _('Type') }
-    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+  <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+
+  <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
+    <div data-bind="template: { name: 'table-field-template', foreach: nested }">
+    </div>
+    <a data-bind="click: function() { nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: level() + 1})); }"><i class="fa fa-plus"></i></a>    
+  <!-- /ko -->
   </label>
 
-  <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
-  <label data-bind="text: $root.createWizard.source.sample()[1][$index()]"></label>
-
-  <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
-    <i class="fa fa-sliders"></i>
-  </a>
-  <span data-bind="visible: showProperties">
-    <label class="checkbox">
-      <input type="checkbox" data-bind="checked: unique"> ${_('Primary key')}
-    </label>
-  </span>
-
-  <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Nested')}</a>
-  <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   ${_('Comment')}
+
+  <!-- ko if: level() > 0 -->
+    <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
+  <!-- /ko -->
+
+  <!-- ko if: level() == 0 -->
+    <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
+    <label data-bind="text: $root.createWizard.source.sample()[1][$index()]"></label>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="display-table-nested-field">
+  <!-- ko: if type() != 'array' -->
+    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+  <!-- /ko -->
+
+  <!-- ko: if type() == 'array' -->
+    <div data-bind="template: { name: 'display-table-nested-field', foreach: nested }">
+    </div>
+    <a data-bind="click: function() { nested.push('aa'); }"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
 </script>
 
 
@@ -544,7 +559,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="args-template">
   <!-- ko foreach: {data: operation.settings().getArguments(), as: 'argument'} -->
-    <!-- ko template: {name: 'arg-'+argument.type, data:{description: argument.description, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
+    <!-- ko template: {name: 'arg-' + argument.type, data: {description: argument.description, value: $parent.operation.settings()[argument.name]}}--><!-- /ko -->
   <!-- /ko -->
 </script>
 
@@ -897,7 +912,9 @@ ${ assist.assistPanel() }
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
           {'value': 'json', 'name': 'Json'},
-          {'value': 'kudu', 'name': 'Kudu'}
+          {'value': 'kudu', 'name': 'Kudu'},
+          {'value': 'orc', 'name': 'ORC'},
+          {'value': 'avro', 'name': 'Avro'}
       ]);
       self.ouputFormat = ko.observable('table');
 
@@ -1146,6 +1163,12 @@ ${ assist.assistPanel() }
         operation.load(operationData);
 
         koField.operations.push(operation);
+      });
+
+      koField.type.subscribe(function(newVal) {
+        if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
+          koField.nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: koField.level() + 1}));
+        }
       });
 
       return koField;

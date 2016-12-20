@@ -13,7 +13,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+
 import re
+
 
 class FieldType():
   def __init__(self, name, regex, heuristic_regex=None):
@@ -59,6 +61,8 @@ class Field(object):
       'required': self.required,
       'multiValued': self.multi_valued,
       'showProperties': self.show_properties,
+      'nested': [],
+      'level': 0,
     }
 
 FIELD_TYPES = [

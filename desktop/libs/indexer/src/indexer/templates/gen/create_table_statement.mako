@@ -27,8 +27,8 @@ def col_type(col):
   return col["type"]
 %>\
 
+
 <%def name="column_list(table, columns)">\
-## Returns (foo int, bar string)-like data for columns
 (
 <% first = True %>\
 % for col in columns:
@@ -37,7 +37,7 @@ def col_type(col):
 %   else:
 ,
 %   endif
-  `${col["name"]|n}` ${col_type(col)|n} \
+  `${ col["name"] | n }` ${ col_type(col) | n } \
 %   if col.get("comment"):
 COMMENT "${col["comment"]|n}" \
 %   endif
@@ -47,7 +47,8 @@ COMMENT "${col["comment"]|n}" \
 % endif
 ) \
 </%def>\
-#########################
+
+
 CREATE \
 % if table.get("external", False):
 EXTERNAL \

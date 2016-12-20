@@ -279,6 +279,20 @@ class CSVFormat(FileFormat):
   ]
   _extensions = ["csv", "tsv"]
 
+  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
+    self._delimiter = delimiter
+    self._line_terminator = line_terminator
+    self._quote_char = quote_char
+    self._has_header = has_header
+
+    # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
+    self._line_terminator = self._line_terminator.replace("\r\n", "\n")
+    self._sample_rows = self._get_sample_rows(sample)
+    self._num_columns = self._guess_num_columns(self._sample_rows)
+    self._fields = fields if fields else self._guess_fields(sample)
+
+    super(CSVFormat, self).__init__()
+
   @staticmethod
   def format_character(string):
     string = string.replace('"', '\\"')
@@ -347,7 +361,7 @@ class CSVFormat(FileFormat):
     quote_char = format_["quoteChar"].encode('utf-8')
     has_header = format_["hasHeader"]
     return cls(**{
-      "delimiter":delimiter,
+      "delimiter": delimiter,
       "line_terminator": line_terminator,
       "quote_char": quote_char,
       "has_header": has_header,
@@ -360,23 +374,6 @@ class CSVFormat(FileFormat):
       return cls._from_format(file_stream, format_)
     else:
       return cls._guess_from_file_stream(file_stream)
-
-  def __init__(self, delimiter=',', line_terminator='\n', quote_char='"', has_header=False, sample="", fields=None):
-    self._delimiter = delimiter
-    self._line_terminator = line_terminator
-    self._quote_char = quote_char
-    self._has_header = has_header
-
-    # sniffer insists on \r\n even when \n. This is safer and good enough for a preview
-    self._line_terminator = self._line_terminator.replace("\r\n", "\n")
-
-    self._sample_rows = self._get_sample_rows(sample)
-
-    self._num_columns = self._guess_num_columns(self._sample_rows)
-
-    self._fields = fields if fields else self._guess_fields(sample)
-
-    super(CSVFormat, self).__init__()
 
   @property
   def sample(self):
@@ -401,10 +398,10 @@ class CSVFormat(FileFormat):
   def get_format(self):
     format_ = super(CSVFormat, self).get_format()
     specific_format = {
-      "fieldSeparator":self.delimiter,
-      "recordSeparator":self.line_terminator,
-      "quoteChar":self.quote_char,
-      "hasHeader":self._has_header
+      "fieldSeparator": self.delimiter,
+      "recordSeparator": self.line_terminator,
+      "quoteChar": self.quote_char,
+      "hasHeader": self._has_header
     }
     format_.update(specific_format)
 
@@ -452,7 +449,7 @@ class CSVFormat(FileFormat):
     if self._has_header:
       header = first_row
     else:
-      header = ["field_%d" % (i+1) for i in range(self._num_columns)]
+      header = ["field_%d" % (i + 1) for i in range(self._num_columns)]
 
     return header
 
@@ -478,6 +475,7 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
 
 class HiveFormat(CSVFormat):
   FIELD_TYPE_TRANSLATE = {
@@ -517,7 +515,7 @@ class HiveFormat(CSVFormat):
       fields.append(Field(
         name=field["name"],
         field_type_name=cls.FIELD_TYPE_TRANSLATE.get(field['type'], 'string')
-        ))
+      ))
 
     return cls(**{
       "delimiter":',',
