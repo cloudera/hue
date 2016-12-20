@@ -50,6 +50,6 @@ ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
 
-${ editorComponents.commonJS(is_embeddable=True) }
+${ editorComponents.commonJS(is_embeddable=True, bindableElement='notebookComponents') }
 
 </span>
