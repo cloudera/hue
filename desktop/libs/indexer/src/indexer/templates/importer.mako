@@ -354,7 +354,6 @@ ${ assist.assistPanel() }
             <input type="text" data-bind="value: database">
           </label>
 
-
           <label class="checkbox">
             <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
           </label>
@@ -389,6 +388,13 @@ ${ assist.assistPanel() }
             </div>
             <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
           </span>
+
+          <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
+            <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
+              ## At least one selected
+              <select id="kuduPks" data-bind="options: columns, selectedOptions: primaryKeys, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
+            </label>
+          </div>
 
           <div class="row" style="margin-left: 8px">
             <div class="span3">
@@ -480,7 +486,7 @@ ${ assist.assistPanel() }
 
   <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Nested')}</a>
   <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
-  <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Comment')}</a>
+  ${_('Comment')}
 </script>
 
 
@@ -891,7 +897,6 @@ ${ assist.assistPanel() }
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
           {'value': 'json', 'name': 'Json'},
-          {'value': 'orc', 'name': 'ORC'},
           {'value': 'kudu', 'name': 'Kudu'}
       ]);
       self.ouputFormat = ko.observable('table');
@@ -1090,6 +1095,11 @@ ${ assist.assistPanel() }
                 self.isIndexing(false);
                 self.indexingStarted(false);
                 self.indexingError(true);
+              } else {
+                // if success of CREATE and one more DROP statement execute
+                if (self.editorVM.selectedNotebook().snippets()[0].result.handle().statement_id < self.editorVM.selectedNotebook().snippets()[0].result.handle().statements_count) {
+                  self.editorVM.selectedNotebook().snippets()[0].execute();
+                }
               }
             });
             self.editorVM.selectedNotebook().snippets()[0].checkStatus();

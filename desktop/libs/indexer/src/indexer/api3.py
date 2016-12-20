@@ -178,6 +178,7 @@ def _create_table_from_a_file(request, source, destination):
 
   comment = destination['description']
 
+  source_path = source['path']
   external = not destination['useDefaultLocation']
   external_path = not destination['nonDefaultLocation']
 
@@ -197,26 +198,24 @@ def _create_table_from_a_file(request, source, destination):
     map_delimiter = r'\\003'
     regexp_delimiter = '.*'
 
-  source_path = source['path']
-
 
   file_format = 'TextFile'
   extra_create_properties = ''
   sql = ''
 
-  # if external and non text and load_data, both bath !=
-
   if load_data:
     if table_format in ('parquet', 'kudu'):
-      table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name # Or tmp table?
+      table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
 
-  if external:
-    if not request.fs.isdir(source_path): # File selected
-      source_path = request.fs.split(source_path)[0]
-    # If dir not empty, create data dir %(filename)_table and move file there...
+  if external or load_data and table_format in ('parquet', 'kudu'):
+    if not request.fs.isdir(external_path): # File selected
+      external_path = request.fs.split(external_path)[0]
+      if len(request.fs.listdir(external_path)) != 1:
+        external_path = external_path + '_table' # If dir not just the file, create data dir and move file there.
+        request.fs.mkdir(source_path + '_table')
+        request.fs.rename(source_path, external_path)
 
-    # Guess format should accept a directory too
-  # Kudu external table has extra prop
+  
   sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
       'database': database,
       'table_name': table_name
@@ -229,8 +228,8 @@ def _create_table_from_a_file(request, source, destination):
           'row_format': 'Delimited',
           'field_terminator': field_delimiter,
           'file_format': file_format,
-          'external': external,
-          'path': source_path,
+          'external': external or load_data and table_format in ('parquet', 'kudu'),
+          'path': external_path,
           'skip_header': skip_header,
           'primary_keys': primary_keys if table_format == 'kudu' and not load_data else []
        },
