@@ -1237,10 +1237,10 @@ var EditorViewModel = (function() {
         } else if (data.status == 5) {
           // No supported yet for this snippet
         } else {
-          $(document).trigger("error", data.message);
+          //$(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
+        //$(document).trigger("error", xhr.responseText);
       });
     };
 
