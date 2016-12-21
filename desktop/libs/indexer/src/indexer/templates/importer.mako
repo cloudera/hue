@@ -407,48 +407,62 @@ ${ assist.assistPanel() }
           </div>
 
           <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
-            <div class="form-inline" data-bind="foreach: partitionColumns, visible: tableFormat() == 'kudu'">
-              ${ _('Columns') }
-              <select id="kuduPks" data-bind="options: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
-              <select data-bind="options: ['RANGE BY', 'HASH'], value: name"></select>
-
-              <!-- ko if: name() == 'HASH' -->
-                <input type="number" data-bind="value: int_val">
+            <div class="form-inline" data-bind="foreach: partitionColumns">
+              <!-- ko if: $parent.tableFormat() != 'kudu' -->
+                <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+                <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
               <!-- /ko -->
 
-              <!-- ko if: name() == 'RANGE BY' -->
-                <div class="form-inline" data-bind="foreach: range_partitions">
-                  <!-- ko if: name() == 'VALUES' -->
-                    <input type="input" data-bind="value: lower_val">
-                    <input type="checkbox" data-bind="checked: include_lower_val">
-                    <
-                    <span data-bind="text: '=', visible: include_lower_val"></span>
-                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
-                    <
-                    <span data-bind="text: '=', visible: include_upper_val"></span>
-                    <input type="input" data-bind="value: upper_val">
-                    <input type="checkbox" data-bind="checked: include_upper_val">
-                  <!-- /ko -->
+              <!-- ko if: $parent.tableFormat() == 'kudu' -->
+                ${ _('Columns') }
+                <select id="kuduPks" data-bind="options: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
+                <select data-bind="options: ['RANGE BY', 'HASH'], value: name"></select>
 
-                  <!-- ko if: name() == 'VALUE' -->
-                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
-                    <div class="form-inline" data-bind="foreach: values">
-                      <input type="text" data-bind="value: $data">
-                      <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
-                    </div>
-                    <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
-                  <!-- /ko -->
-                  <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
-                </div>
+                <!-- ko if: name() == 'HASH' -->
+                  <input type="number" data-bind="value: int_val">
+                <!-- /ko -->
 
-                <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+                <!-- ko if: name() == 'RANGE BY' -->
+                  <div class="form-inline" data-bind="foreach: range_partitions">
+                    <!-- ko if: name() == 'VALUES' -->
+                      <input type="input" data-bind="value: lower_val">
+                      <input type="checkbox" data-bind="checked: include_lower_val">
+                      <
+                      <span data-bind="text: '=', visible: include_lower_val"></span>
+                      <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
+                      <
+                      <span data-bind="text: '=', visible: include_upper_val"></span>
+                      <input type="input" data-bind="value: upper_val">
+                      <input type="checkbox" data-bind="checked: include_upper_val">
+                    <!-- /ko -->
+
+                    <!-- ko if: name() == 'VALUE' -->
+                      <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
+                      <div class="form-inline" data-bind="foreach: values">
+                        <input type="text" data-bind="value: $data">
+                        <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
+                      </div>
+                      <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
+                    <!-- /ko -->
+                    <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
+                  </div>
+
+                  <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+                <!-- /ko -->
+
+                <a data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+                <a data-bind="click: function() { $parent.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               <!-- /ko -->
-
-              <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
             </div>
-          </label>
 
-          <a data-bind="click: function() { partitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+            <!-- ko if: tableFormat() != 'kudu' -->
+              <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+            <!-- /ko -->
+
+            <!-- ko if: tableFormat() == 'kudu' -->
+              <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+            <!-- /ko -->
+          </label>
         <!-- /ko -->
 
          <h3 class="card-heading simple">${_('Fields')}</h3>
@@ -526,7 +540,7 @@ ${ assist.assistPanel() }
     <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
   <!-- /ko -->
 
-  <!-- ko if: level() == 0 -->
+  <!-- ko if: level() == 0 && typeof isPartition === 'undefined'-->
     <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
     <label data-bind="text: $root.createWizard.source.sample()[1][$index()]"></label>
   <!-- /ko -->
@@ -960,6 +974,7 @@ ${ assist.assistPanel() }
       self.ouputFormat = ko.observable('table');
 
       self.partitionColumns = ko.observableArray();
+      self.kuduPartitionColumns = ko.observableArray();
       self.primaryKeys = ko.observableArray();
 
       self.importData = ko.observable(true);
@@ -1221,6 +1236,7 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.loadField = loadField;
 
       // wizard related
       self.wizardEnabled = ko.observable(false);
