@@ -482,6 +482,10 @@ ${ assist.assistPanel() }
             <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
         </form>
+
+        <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && ouputFormat() == 'table' -->
+          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+        <!-- /ko -->
         <!-- /ko -->
 
         <!-- ko if: ouputFormat() == 'database' -->

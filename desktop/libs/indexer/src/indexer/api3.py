@@ -244,6 +244,9 @@ def _create_table_from_a_file(request, source, destination):
   extra_create_properties = ''
   sql = ''
 
+  if source['inputFormat'] == 'manual':
+    load_data = False
+
   if table_format == 'json':
     row_format = 'serde'
     serde_name = 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
