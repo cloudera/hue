@@ -268,7 +268,7 @@ ${ assist.assistPanel() }
             </div>
           </div>
 
-          <!-- ko if: createWizard.source.show -->
+          <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
           <h3 class="card-heading simple">${_('Format')}</h3>
           <div class="card-body">
             <label data-bind="visible: ! createWizard.prefill.source_type">${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
@@ -325,11 +325,11 @@ ${ assist.assistPanel() }
         </label>
 
         <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <!-- ko if: ouputFormat() != 'table' -->
+          <!-- ko if: ouputFormat() != 'table' || ouputFormat() != 'database' -->
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
           <!-- /ko -->
 
-          <!-- ko if: ouputFormat() == 'table' -->
+          <!-- ko if: ouputFormat() == 'table' || ouputFormat() == 'database' -->
             <label for="path" class="control-label">
               <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
             </label>
@@ -471,7 +471,8 @@ ${ assist.assistPanel() }
           </label>
         <!-- /ko -->
 
-         <h3 class="card-heading simple">${_('Fields')}</h3>
+        <!-- ko if: ouputFormat() == 'table' || ouputFormat() == 'index' -->
+        <h3 class="card-heading simple">${_('Fields')}</h3>
         <form class="form-inline" data-bind="foreach: columns">
           <!-- ko if: $parent.ouputFormat() == 'table' -->
             <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
@@ -481,6 +482,20 @@ ${ assist.assistPanel() }
             <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
         </form>
+        <!-- /ko -->
+
+        <!-- ko if: ouputFormat() == 'database' -->
+          <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+
+          <label class="checkbox">
+            <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
+          </label>
+          <span data-bind="visible: ! useDefaultLocation()">
+            <label for="path" class="control-label"><div>${ _('External location') }</div>
+              <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+            </label>
+          </span>
+        <!-- /ko -->
       </div>
       <!-- /ko -->
     </div>
@@ -929,6 +944,8 @@ ${ assist.assistPanel() }
           return self.table().length > 0;
         } else if (self.inputFormat() == 'query') {
           return self.query();
+        } else if (self.inputFormat() == 'manual') {
+          return true;
         }
       });
 
@@ -957,18 +974,30 @@ ${ assist.assistPanel() }
       });
     };
 
-    var Destination = function (vm) {
+    var Destination = function (vm, wizard) {
       var self = this;
 
       self.name = ko.observable('');
       self.description = ko.observable('');
 
       self.ouputFormat = ko.observable('table');
-      self.ouputFormats = ko.observableArray([
+      self.ouputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
           {'name': 'Solr index', 'value': 'index'},
-          {'name': 'File', 'value': 'file'}
+          {'name': 'File', 'value': 'file'},
+          {'name': 'Database', 'value': 'database'},
       ]);
+      self.ouputFormats = ko.computed(function() {
+        return $.grep(self.ouputFormatsList(), function(format) {
+          if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
+            return false;
+          }
+          else if (format.value == 'file' && wizard.source.inputFormat() != 'manual') {
+            return false;
+          }
+          return true;
+        })
+      });
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
@@ -1026,7 +1055,7 @@ ${ assist.assistPanel() }
       self.showCreate = ko.observable(false);
 
       self.source = new Source(vm, self);
-      self.destination = new Destination(vm);
+      self.destination = new Destination(vm, self);
 
       self.customDelimiters = ko.observable([
         {'value': '\\001', 'name': '^A (\\001)', 'ascii': 1},
@@ -1049,7 +1078,7 @@ ${ assist.assistPanel() }
       });
 
       self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length;
+        var validFields = self.destination.columns().length || self.destination.ouputFormat() == 'database';
         return self.destination.name().length > 0 && validFields;
       });
 

@@ -158,14 +158,48 @@ def importer_submit(request):
     collection_name = destination["name"]
     source['columns'] = destination['columns']
     job_handle = _index(request, source, collection_name)
+  elif destination['ouputFormat'] == 'database':
+    job_handle = create_database(request, source, destination)
   else:
     job_handle = _create_table(request, source, destination)
 
   return JsonResponse(job_handle)
 
 
+def create_database(request, source, destination):
+  database = destination['name']
+  comment = destination['description']
+
+  use_default_location = destination['useDefaultLocation']
+  external_path = destination['nonDefaultLocation']
+
+  sql = django_mako.render_to_string("gen/create_database_statement.mako", {
+      'database': {
+          'name': database,
+          'comment': comment,
+          'use_default_location': use_default_location,
+          'external_location': external_path,
+          'properties': [],
+      }
+    }
+  )
+
+  editor_type = 'hive'
+  on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
+
+  try:
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url)
+    return notebook.execute(request, batch=False)
+  except Exception, e:
+    raise PopupException(_('The table could not be created.'), detail=e.message)
+
+
 def _create_table(request, source, destination):
-  return _create_table_from_a_file(request, source, destination)
+  try:
+    notebook = _create_table_from_a_file(request, source, destination)
+    return notebook.execute(request, batch=False)
+  except Exception, e:
+    raise PopupException(_('The table could not be created.'), detail=e.message)
 
 
 def _create_table_from_a_file(request, source, destination):
@@ -291,14 +325,10 @@ def _create_table_from_a_file(request, source, destination):
         'table_name': table_name
     }
 
-  try:
     editor_type = 'impala' if table_format == 'kudu' else 'hive'
     on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
 
-    return notebook.execute(request, batch=False)
-  except Exception, e:
-    raise PopupException(_('The table could not be created.'), detail=e.message)
+    return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
 
 
 def _index(request, file_format, collection_name, query=None):
