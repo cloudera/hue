@@ -552,7 +552,13 @@ ${ components.menubar() }
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+      % if is_embeddable:
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { onePageViewModel.currentApp('importer') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+      % elif ENABLE_NEW_CREATE_TABLE.get():
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+      % else:
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }" href="${ url('beeswax:create_database') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+      % endif
     % endif
   </div>
 </script>
