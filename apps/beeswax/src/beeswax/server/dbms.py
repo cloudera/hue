@@ -278,7 +278,7 @@ class HiveServer2Dbms(object):
     return self.execute_and_watch(query, design=design)
 
 
-  def select_star_from(self, database, table, limit=10000):
+  def select_star_from(self, database, table, limit=1000):
     if table.partition_keys:  # Filter on max number of partitions for partitioned tables
       hql = self._get_sample_partition_query(database, table, limit=limit) # Currently need a limit
     else:
@@ -286,7 +286,7 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
-  def get_select_star_query(self, database, table, limit=10000):
+  def get_select_star_query(self, database, table, limit=1000):
     if table.partition_keys:  # Filter on max number of partitions for partitioned tables
       hql = self._get_sample_partition_query(database, table, limit=limit) # Currently need a limit
     else:

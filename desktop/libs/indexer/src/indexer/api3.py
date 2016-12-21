@@ -259,7 +259,7 @@ def _create_table_from_a_file(request, source, destination):
   if table_format in ('parquet', 'kudu'):
     if load_data:
       table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
-  
+
       sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
           'database': database,
           'table_name': table_name
@@ -269,7 +269,7 @@ def _create_table_from_a_file(request, source, destination):
       file_format = table_format
       skip_header = False
       if table_format == 'kudu':
-        columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]      
+        columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]
 
   if external or (load_data and table_format in ('parquet', 'kudu')):
     if not request.fs.isdir(external_path): # File selected

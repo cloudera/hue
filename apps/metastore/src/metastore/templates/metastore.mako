@@ -252,8 +252,9 @@ ${ components.menubar() }
     <div title="${ _('Created') }"><i class="fa fa-fw fa-clock-o muted"></i> <span data-bind="text: localeFormat(details.properties.create_time)"></span></div>
     <div title="${ _('Format') }">
       <i class="fa fa-fw fa-file-o muted"></i> <span data-bind="text: details.properties.format"></span>
-      <i class="fa fa-fw fa-archive muted"></i> <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span>
-      <span data-bind="visible: !details.stats.compressed" style="display:none;">${_('Not compressed')}</span>
+      <i class="fa fa-fw fa-archive muted"></i>
+      <span data-bind="visible: details.properties.compressed" style="display:none;">${_('Compressed')}</span>
+      <span data-bind="visible: ! details.properties.compressed" style="display:none;">${_('Not compressed')}</span>
     </div>
   </div>
   <!-- /ko -->

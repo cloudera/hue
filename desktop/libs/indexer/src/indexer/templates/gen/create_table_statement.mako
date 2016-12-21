@@ -57,10 +57,11 @@ COMMENT "${col["comment"]|n}" \
 </%def>
 
 <%def name="kudu_range_partition(partition)">
-% if partition['name'] == 'HASH':
-  HASH (${ ', '.join(partition['columns']) }) PARTITIONS ${ partition['int_val'] }
-% elif partition['name'] == 'RANGE BY':
-  RANGE BY (${ ', '.join(partition['columns']) }) (${ ', '.join(partition['range_partitions']) })
+PARTITION \
+% if partition['name'] == 'VALUES':
+  ${ partition['lower_val'] } <${ '=' if include_upper_val else '' } VALUES ${ '=' if include_upper_val else '' } ${ partition['upper_val'] }
+% elif partition['name'] == 'VALUE':
+  VALUE (${ ', '.join(partition['values']) })
 % endif
 </%def>
 
