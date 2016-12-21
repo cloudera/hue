@@ -2413,6 +2413,7 @@ class MockHiveServerTable(HiveServerTable):
             {'comment': '\\n                  ', 'col_name': '', 'data_type': 'line.delim          '},
             {'comment': '\\t                  ', 'col_name': '', 'data_type': 'serialization.format'}
         ]
+    self.is_impala_only = False
 
 
 class MockHiveServerTableForPartitions(HiveServerTable):
@@ -2481,7 +2482,8 @@ class MockHiveServerTableForPartitions(HiveServerTable):
         {'comment': 'NULL', 'col_name': 'Sort Columns:       ', 'data_type': '[]                  '},
         {'comment': 'NULL', 'col_name': 'Storage Desc Params:', 'data_type': 'NULL'},
         {'comment': '1       ', 'col_name': '', 'data_type': 'serialization.format'},
-  ]
+      ]
+    self.is_impala_only = False
 
 
 
