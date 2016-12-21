@@ -24,22 +24,8 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
-  coerce_json_dict, coerce_string, coerce_bool
+  coerce_json_dict, coerce_string, coerce_bool, coerce_csv
 
-
-def get_interpreters(user=None):
-  if not INTERPRETERS.get():
-    _default_interpreters()
-
-  interpreters = INTERPRETERS.get()
-
-  return [{
-      "name": interpreters[i].NAME.get(),
-      "type": i,
-      "interface": interpreters[i].INTERFACE.get(),
-      "options": interpreters[i].OPTIONS.get()}
-      for i in interpreters
-  ]
 
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
@@ -53,9 +39,35 @@ SHOW_NOTEBOOKS = Config(
     default=False
 )
 
+def _remove_duplications(a_list):
+  return list(OrderedDict.fromkeys(a_list))
+
+def get_ordered_interpreters(user=None):
+  if not INTERPRETERS.get():
+    _default_interpreters()
+
+  interpreters = INTERPRETERS.get()
+  interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
+
+  unknown_interpreters = set(interpreters_shown_on_wheel) - set(interpreters)
+  if unknown_interpreters:
+      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s"
+                       % unknown_interpreters)
+
+  reordered_interpreters = interpreters_shown_on_wheel + \
+                           [i for i in interpreters if i not in interpreters_shown_on_wheel]
+
+  return [{
+      "name": interpreters[i].NAME.get(),
+      "type": i,
+      "interface": interpreters[i].INTERFACE.get(),
+      "options": interpreters[i].OPTIONS.get()}
+      for i in reordered_interpreters
+  ]
+
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
-  help="One entry for each type of snippet. The first 5 will appear in the wheel.",
+  help="One entry for each type of snippet.",
   each=ConfigSection(
     help=_t("Define the name and how to connect and execute the language."),
     members=dict(
@@ -79,6 +91,15 @@ INTERPRETERS = UnspecifiedConfigSection(
       )
     )
   )
+)
+
+INTERPRETERS_SHOWN_ON_WHEEL = Config(
+  key="interpreters_shown_on_wheel",
+  help=_t("Comma separated list of interpreters that should be shown on the wheel. "
+          "This list takes precedence over the order in which the interpreter entries appear. "
+          "Only the first 5 interpreters will appear on the wheel."),
+  type=coerce_csv,
+  default=[]
 )
 
 ENABLE_DBPROXY_SERVER = Config(
