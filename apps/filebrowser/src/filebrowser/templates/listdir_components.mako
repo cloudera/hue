@@ -661,7 +661,9 @@ from django.utils.translation import ugettext as _
       }
     };
 
-    var apiHelper = ApiHelper.getInstance();
+    var apiHelper = ApiHelper.getInstance({
+      user: "${ user }"
+    });
 
     // migration to the new history
     if ($.totalStorage('hue_fb_history')) {
@@ -1103,7 +1105,7 @@ from django.utils.translation import ugettext as _
         $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=1&format=json", callback);
       };
 
-      self.retrieveData = function () {
+      self.retrieveData = function (clearAssistCache) {
         self.isLoading(true);
 
         $.getJSON(self.targetPath() + (self.targetPath().indexOf('?') > 0 ? '&' : '?') + "pagesize=" + self.recordsPerPage() + "&pagenum=" + self.targetPageNum() + "&filter=" + self.searchQuery() + "&sortby=" + self.sortBy() + "&descending=" + self.sortDescending() + "&format=json", function (data) {
@@ -1119,6 +1121,15 @@ from django.utils.translation import ugettext as _
           }
 
           self.updateFileList(data.files, data.page, data.breadcrumbs, data.current_dir_path, data.is_sentry_managed);
+
+          if (clearAssistCache) {
+            if (self.isS3()) {
+              huePubSub.publish('assist.clear.s3.cache');
+            }
+            else {
+              huePubSub.publish('assist.clear.hdfs.cache');
+            }
+          }
 
           if ($("#hueBreadcrumbText").is(":visible")) {
             $(".hueBreadcrumb").show();
@@ -1294,7 +1305,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#renameModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           }
         });
 
@@ -1326,7 +1337,7 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#moveModal").modal('hide');
-              self.retrieveData();
+              self.retrieveData(true);
             },
             error: function(xhr){
               $.jHueNotify.error(xhr.responseText);
@@ -1387,7 +1398,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#copyModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           },
           error: function(xhr){
             $.jHueNotify.error(xhr.responseText);
@@ -1452,7 +1463,7 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#changeOwnerModal").modal('hide');
-              self.retrieveData();
+              self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
               $(document).trigger("error", xhr.responseText);
@@ -1486,7 +1497,7 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#changePermissionModal").modal('hide');
-              self.retrieveData();
+              self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
               $(document).trigger("error", xhr.responseText);
@@ -1531,7 +1542,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#deleteModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1611,7 +1622,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#createDirectoryModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1641,7 +1652,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#createFileModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           },
           error: function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1671,7 +1682,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#restoreTrashModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           },
           error: function(xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1700,7 +1711,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#purgeTrashModal").modal('hide');
-            self.retrieveData();
+            self.retrieveData(true);
           }
         });
       };
@@ -1750,7 +1761,7 @@ from django.utils.translation import ugettext as _
             }
             if (self.pendingUploads() == 0) {
               $('#uploadFileModal').modal('hide');
-              self.retrieveData();
+              self.retrieveData(true);
             }
           },
           onSubmit: function (id, fileName, responseJSON) {
@@ -1820,7 +1831,7 @@ from django.utils.translation import ugettext as _
             }
             if (self.pendingUploads() == 0) {
               $('#uploadArchiveModal').modal('hide');
-              self.retrieveData();
+              self.retrieveData(true);
             }
           },
           onSubmit: function (id, fileName, responseJSON) {
@@ -2032,7 +2043,7 @@ from django.utils.translation import ugettext as _
                     $('#progressStatus').addClass('hide');
                     $('#progressStatusBar').addClass('hide');
                     $('#progressStatusBar div').css("width", "0");
-                    viewModel.retrieveData();
+                    viewModel.retrieveData(true);
                   },
                   2500);
             });
