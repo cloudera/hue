@@ -293,31 +293,27 @@ ${ hueIcons.symbols() }
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }">
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('home') }">Home</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }">Editor</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }">Hive</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }">Impala</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('notebook') }"Report</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }">Oozie</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('importer') }">Importer</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
+        <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('search') }"><a href="javascript: void(0);">Dashboard</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Report</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('metastore') }">Tables</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('collections') }">Collections</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('indexes') }">Indexes</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }">Jobs</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }">Files</a></li>
-        <li><a data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }">S3</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }"><a href="javascript: void(0);">S3</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
       <div class="left-nav-drop">
-        <div>
-          <i class="fa fa-fw fa-cloud-upload"></i> <span>${ _('Drop files here') }</span>
+        <div data-bind="click: function () { onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">
+          <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files or click') }
         </div>
       </div>
     </div>
