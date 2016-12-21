@@ -18,3 +18,11 @@
 from django.utils.translation import ugettext_lazy as _
 
 from desktop.lib.conf import Config
+
+
+ENABLE_NEW_CREATE_TABLE = Config(
+  key="enable_new_create_table",
+  help=_("Flag to turn on the new version of the create table wizard."),
+  type=bool,
+  default=False
+)
