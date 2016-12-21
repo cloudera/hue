@@ -214,7 +214,8 @@ def _create_table_from_a_file(request, source, destination):
 
   columns = destination['columns']
   partition_columns = destination['partitionColumns']
-
+  kudu_partition_columns = destination['kuduPartitionColumns']
+  print kudu_partition_columns
   comment = destination['description']
 
   source_path = source['path']
@@ -255,16 +256,22 @@ def _create_table_from_a_file(request, source, destination):
    "escapeChar"    = "\\\\"
    '''
 
-  if load_data:
-    if table_format in ('parquet', 'kudu'):
+  if table_format in ('parquet', 'kudu'):
+    if load_data:
       table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
-
+  
       sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
           'database': database,
           'table_name': table_name
       }
+    else:
+      row_format = ''
+      file_format = table_format
+      skip_header = False
+      if table_format == 'kudu':
+        columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]      
 
-  if external or load_data and table_format in ('parquet', 'kudu'):
+  if external or (load_data and table_format in ('parquet', 'kudu')):
     if not request.fs.isdir(external_path): # File selected
       external_path, external_file_name = request.fs.split(external_path)
 
@@ -287,10 +294,11 @@ def _create_table_from_a_file(request, source, destination):
           'external': external or load_data and table_format in ('parquet', 'kudu'),
           'path': external_path,
           'skip_header': skip_header,
-          'primary_keys': primary_keys if table_format == 'kudu' and not load_data else []
+          'primary_keys': primary_keys if table_format == 'kudu' and not load_data else [],
        },
       'columns': columns,
       'partition_columns': partition_columns,
+      'kudu_partition_columns': kudu_partition_columns,
       'database': database
     }
   )
@@ -298,10 +306,10 @@ def _create_table_from_a_file(request, source, destination):
   if table_format == 'text' and not external and load_data:
     sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (source_path, database, table_name)
 
-  if table_format in ('parquet', 'kudu'):
+  if load_data and table_format in ('parquet', 'kudu'):
     file_format = table_format
     if table_format == 'kudu':
-      columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
+      columns_list = ['`%s`' % col for col in primary_keys] + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]
       extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
       DISTRIBUTE BY HASH INTO 16 BUCKETS
       STORED AS %(file_format)s

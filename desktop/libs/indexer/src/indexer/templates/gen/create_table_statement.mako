@@ -48,23 +48,42 @@ COMMENT "${col["comment"]|n}" \
 ) \
 </%def>\
 
+<%def name="kudu_partition(partition)">
+% if partition['name'] == 'HASH':
+  HASH (${ ', '.join(partition['columns']) }) PARTITIONS ${ partition['int_val'] }
+% elif partition['name'] == 'RANGE BY':
+  RANGE BY (${ ', '.join(partition['columns']) }) (${ ', '.join([kudu_range_partition(range_partition) for range_partition in partition['range_partitions']]) })
+% endif
+</%def>
+
+<%def name="kudu_range_partition(partition)">
+% if partition['name'] == 'HASH':
+  HASH (${ ', '.join(partition['columns']) }) PARTITIONS ${ partition['int_val'] }
+% elif partition['name'] == 'RANGE BY':
+  RANGE BY (${ ', '.join(partition['columns']) }) (${ ', '.join(partition['range_partitions']) })
+% endif
+</%def>
+
 
 CREATE \
 % if table.get("external", False):
 EXTERNAL \
 % endif
 TABLE ${ '`%s`.`%s`' % (database, table["name"]) | n }
-${ column_list(table, columns) | n }
+${ column_list(table, columns) | n } \
 % if table["comment"]:
 COMMENT "${table["comment"] | n }"
 % endif
-% if len(partition_columns) > 0:
+% if partition_columns and table.get('file_format') != 'kudu':
 PARTITIONED BY ${ column_list(table, partition_columns) | n }
+% endif
+% if kudu_partition_columns  and table.get('file_format') == 'kudu':
+PARTITION BY ${ ', '.join([kudu_partition(partition) for partition in kudu_partition_columns]) | n }
 % endif
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here
-ROW FORMAT \
 % if table.get('row_format'):
+ROW FORMAT \
 %   if table["row_format"] == "Delimited":
   DELIMITED
 %     if table.has_key('field_terminator'):
@@ -84,7 +103,7 @@ ROW FORMAT \
 %   endif
 % endif
 % if table.has_key('file_format'):
-  STORED AS ${table["file_format"] | n} \
+  STORED AS ${ table["file_format"] | n } \
 % endif
 % if table.get("file_format") == "InputFormat":
 INPUTFORMAT ${table["input_format_class"] | n} OUTPUTFORMAT ${table["output_format_class"] | n}
