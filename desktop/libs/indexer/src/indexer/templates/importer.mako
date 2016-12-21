@@ -971,14 +971,13 @@ ${ assist.assistPanel() }
             name = val.name();
           }
         } else if (self.inputFormat() == 'manual') {
-          name = '.';
+          name = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
         }
 
         return name.replace(' ', '_');
       });
       self.defaultName.subscribe(function(newVal) {
-        var prefix = wizard.prefill.target_path ? wizard.prefill.target_path() + (newVal == '.' ? '' : '.') : '';
-        vm.createWizard.destination.name(prefix + newVal);
+        vm.createWizard.destination.name(newVal);
       });
     };
 
@@ -1024,7 +1023,9 @@ ${ assist.assistPanel() }
           {'value': 'json', 'name': 'Json'},
           {'value': 'kudu', 'name': 'Kudu'},
           {'value': 'orc', 'name': 'ORC'},
-          {'value': 'avro', 'name': 'Avro'}
+          {'value': 'avro', 'name': 'Avro'},
+          {'value': 'rcfile', 'name': 'RCFile'},
+          {'value': 'sequencefile', 'name': 'SequenceFile'}
       ]);
 
       self.partitionColumns = ko.observableArray();
@@ -1225,10 +1226,10 @@ ${ assist.assistPanel() }
                 var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                 if (! snippet.result.handle().has_more_statements) {
                   if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                  //  window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                   }
                 } else { // Perform last DROP statement execute
-                  //snippet.execute();
+                  snippet.execute();
                 }
               }
             });
