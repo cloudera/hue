@@ -47,6 +47,16 @@ class SparkConfiguration(object):
 
   PROPERTIES = [
     {
+      "name": "conf",
+      "nice_name": _("Spark Conf"),
+      "help_text": _("Add one or more Spark conf properties to the session."),
+      "type": "settings",
+      "is_yarn": False,
+      "multiple": True,
+      "defaultValue": [],
+      "value": [],
+    },
+    {
       "name": "jars",
       "nice_name": _("Jars"),
       "help_text": _("Add one or more JAR files to the list of resources."),
@@ -186,6 +196,17 @@ class SparkApi(Api):
       props['pyFiles'] = tmppyFiles.split(",")
       LOG.debug("Check List type: pyFiles was not a list")
 
+    # Convert the conf list to a dict for Livy
+    listitems = props['conf']
+    LOG.debug("Property Spark Conf kvp list from UI is: " + str(listitems))
+    confDict = {}
+    for i in range(len(listitems)):
+       kvp = listitems[i]
+       LOG.debug("Property Spark Conf key " + str(i) + " = " + str(kvp.get('key')))
+       LOG.debug("Property Spark Conf value " + str(i) + " = " + str(kvp.get('value')))
+       confDict[kvp.get('key')] = kvp.get('value')
+    props['conf'] = confDict
+    LOG.debug("Property Spark Conf dictionary is: " + str(confDict))
 
     props['kind'] = lang
 
