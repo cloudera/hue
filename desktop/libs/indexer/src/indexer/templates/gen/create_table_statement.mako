@@ -59,7 +59,7 @@ ${ column_list(table, columns) | n }
 COMMENT "${table["comment"] | n }"
 % endif
 % if len(partition_columns) > 0:
-PARTITIONED BY ${column_list(partition_columns)|n}
+PARTITIONED BY ${ column_list(table, partition_columns) | n }
 % endif
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here

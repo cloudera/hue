@@ -290,7 +290,7 @@ def _create_table_from_a_file(request, source, destination):
           'primary_keys': primary_keys if table_format == 'kudu' and not load_data else []
        },
       'columns': columns,
-      'partition_columns': [],
+      'partition_columns': partition_columns,
       'database': database
     }
   )
