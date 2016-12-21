@@ -325,10 +325,10 @@ def _create_table_from_a_file(request, source, destination):
         'table_name': table_name
     }
 
-    editor_type = 'impala' if table_format == 'kudu' else 'hive'
-    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+  editor_type = 'impala' if table_format == 'kudu' else 'hive'
+  on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-    return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
+  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
 
 
 def _index(request, file_format, collection_name, query=None):

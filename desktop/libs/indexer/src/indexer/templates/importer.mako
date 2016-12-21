@@ -325,7 +325,7 @@ ${ assist.assistPanel() }
         </label>
 
         <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <!-- ko if: ouputFormat() != 'table' || ouputFormat() != 'database' -->
+          <!-- ko if: ouputFormat() != 'table' && ouputFormat() != 'database' -->
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
           <!-- /ko -->
 
@@ -882,6 +882,9 @@ ${ assist.assistPanel() }
             {'value': 'file', 'name': 'File'},
             {'value': 'manual', 'name': 'Manually'},
         ]);
+        if (wizard.prefill.source_type() == 'manual') {
+          self.inputFormat(wizard.prefill.source_type());
+        }
       }
 
       // File
@@ -964,12 +967,14 @@ ${ assist.assistPanel() }
           if (self.query()) {
             name = val.name();
           }
+        } else if (self.inputFormat() == 'manual') {
+          name = '.';
         }
 
         return name.replace(' ', '_');
       });
       self.defaultName.subscribe(function(newVal) {
-        var prefix = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
+        var prefix = wizard.prefill.target_path ? wizard.prefill.target_path() + (newVal == '.' ? '' : '.') : '';
         vm.createWizard.destination.name(prefix + newVal);
       });
     };
@@ -998,6 +1003,12 @@ ${ assist.assistPanel() }
           return true;
         })
       });
+      if (wizard.prefill.target_type) {
+        self.ouputFormat(wizard.prefill.target_type());
+        if (wizard.prefill.target_type() == 'database') {
+          vm.currentStep(2);
+        };
+      }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
@@ -1012,7 +1023,6 @@ ${ assist.assistPanel() }
           {'value': 'orc', 'name': 'ORC'},
           {'value': 'avro', 'name': 'Avro'}
       ]);
-      self.ouputFormat = ko.observable('table');
 
       self.partitionColumns = ko.observableArray();
       self.kuduPartitionColumns = ko.observableArray();
@@ -1294,12 +1304,12 @@ ${ assist.assistPanel() }
       });
       self.nextStep = function () {
         if (self.nextStepVisible()){
-          self.currentStep(self.currentStep()+1);
+          self.currentStep(self.currentStep() + 1);
         }
       }
       self.previousStep = function () {
         if (self.previousStepVisible()){
-          self.currentStep(self.currentStep()-1);
+          self.currentStep(self.currentStep() - 1);
         }
       }
 
