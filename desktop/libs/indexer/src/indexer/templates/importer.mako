@@ -1226,7 +1226,7 @@ ${ assist.assistPanel() }
                 var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                 if (! snippet.result.handle().has_more_statements) {
                   if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                  //  window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                   }
                 } else { // Perform last DROP statement execute
                   snippet.execute();

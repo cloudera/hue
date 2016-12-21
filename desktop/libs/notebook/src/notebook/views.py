@@ -137,11 +137,10 @@ def new(request):
 
 
 def browse(request, database, table):
-  editor_type = request.GET.get('type', 'hive')
-
-  snippet = {'type': editor_type}
+  snippet = {'type': 'hive'}
   sql_select = get_api(request, snippet).get_select_star_query(snippet, database, table)
 
+  editor_type = snippet['type']
   editor = make_notebook(name='Browse', editor_type=editor_type, statement=sql_select, status='ready-execute')
 
   return render('editor.mako', request, {
