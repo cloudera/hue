@@ -22,10 +22,8 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
-
-<span class="notebook">
 
 # Todo lot of those
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -53,6 +51,10 @@ ${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
+${ assist.assistPanel() }
+
+%endif
+
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 
 <style type="text/css">
@@ -116,15 +118,14 @@ ${ assist.assistJSModels() }
     margin: 0;
   }
 
-  #notebook {
+  #importerNotebook {
     height: 5px;
     margin-top: 10px;
   }
 
 </style>
 
-${ assist.assistPanel() }
-
+<span id="importerComponents" class="notebook">
 <div class="navbar navbar-inverse navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
@@ -141,16 +142,17 @@ ${ assist.assistPanel() }
   </div>
 </div>
 
+%if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
   <i class="fa fa-chevron-right"></i>
 </a>
-
+%endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
       <div class="vertical-full row-fluid panel-container">
-
+        %if not is_embeddable:
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
             <i class="fa fa-chevron-left"></i>
@@ -175,7 +177,7 @@ ${ assist.assistPanel() }
             }"></div>
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
-
+        %endif
         <div class="content-panel">
           <div style="margin: 10px; margin-bottom: 100px">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
@@ -506,7 +508,7 @@ ${ assist.assistPanel() }
         ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.source.name() }, text: createWizard.source.name" target="_blank"></a>
       </span>
 
-      <div id="notebook"></div>
+      <div id="importerNotebook"></div>
     </div>
   </div>
 </script>
@@ -662,7 +664,7 @@ ${ assist.assistPanel() }
   <!--/ko -->
 </script>
 
-<script type="text/html" id="notebook-progress">
+<script type="text/html" id="importerNotebook-progress">
   <!-- ko with: selectedNotebook  -->
     <!-- ko foreach: snippets  -->
       <div class="progress-snippet progress active" data-bind="css: {
@@ -1126,7 +1128,7 @@ ${ assist.assistPanel() }
           self.showCreate(true);
           self.editorId(resp.history_id);
           self.jobId(resp.handle.id);
-          $('#notebook').html($('#notebook-progress').html());
+          $('#importerNotebook').html($('#importerNotebook-progress').html());
 
           self.editorVM = new EditorViewModel(resp.history_uuid, '', {
             user: '${ user.username }',
@@ -1151,8 +1153,8 @@ ${ assist.assistPanel() }
             }
           });
           self.editorVM.editorMode(true);
-          ko.cleanNode($("#notebook")[0]);
-          ko.applyBindings(self.editorVM, $("#notebook")[0]);
+          ko.cleanNode($("#importerNotebook")[0]);
+          ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
 
           self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
             self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
@@ -1286,7 +1288,7 @@ ${ assist.assistPanel() }
         }
       }
       viewModel = new IndexerViewModel(options);
-      ko.applyBindings(viewModel);
+      ko.applyBindings(viewModel, $('#importerComponents')[0]);
 
       var draggableMeta = {};
       huePubSub.subscribe('draggable.text.meta', function (meta) {
@@ -1340,4 +1342,7 @@ ${ assist.assistPanel() }
   })();
 </script>
 </span>
+
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

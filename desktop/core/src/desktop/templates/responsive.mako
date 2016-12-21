@@ -300,7 +300,7 @@ ${ hueIcons.symbols() }
         <li><a data-bind="click: function () { onePageViewModel.currentApp('search') }">Dashboard</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('notebook') }"Report</a></li>
         <li><a data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }">Oozie</a></li>
-        <li><a href="/indexer/importer/">Importer</a></li>
+        <li><a data-bind="click: function () { onePageViewModel.currentApp('importer') }">Importer</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li><a href="javascript: void(0);">Custom App 3</a></li>
@@ -370,6 +370,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
       <div id="embeddable_indexer" class="embeddable"></div>
+      <div id="embeddable_importer" class="embeddable"></div>
       <div id="embeddable_collections" class="embeddable"></div>
       <div id="embeddable_indexes" class="embeddable"></div>
     </div>
@@ -510,6 +511,7 @@ ${ assist.assistPanel() }
           indexer: '/indexer/indexer/?is_embeddable=true',
           collections: '/search/admin/collections?is_embeddable=true',
           indexes: '/indexer/?is_embeddable=true',
+          importer: '/indexer/importer/?is_embeddable=true',
         };
 
         self.SKIP_CACHE = ['fileviewer'];
@@ -606,7 +608,7 @@ ${ assist.assistPanel() }
           self.currentApp(window.location.getParameter('app'));
         }
         else {
-          self.currentApp('hive');
+          self.currentApp('editor');
         }
 
         huePubSub.subscribe('switch.app', function (name) {

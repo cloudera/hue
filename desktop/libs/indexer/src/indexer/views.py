@@ -79,6 +79,7 @@ def importer(request):
     index['isSelected'] = False
 
   return render('importer.mako', request, {
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'indexes_json': json.dumps(indexes),
       'fields_json' : json.dumps({'solr': [field.name for field in FIELD_TYPES], 'hive': HIVE_TYPES}),
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
