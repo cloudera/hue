@@ -1179,10 +1179,14 @@ ${ assist.assistPanel() }
                 self.isIndexing(false);
                 self.indexingStarted(false);
                 self.indexingError(true);
-              } else {
-                // if success of CREATE and one more DROP statement execute
-                if (self.editorVM.selectedNotebook().snippets()[0].result.handle().statement_id < self.editorVM.selectedNotebook().snippets()[0].result.handle().statements_count) {
-                  self.editorVM.selectedNotebook().snippets()[0].execute();
+              } else if (val == 'available') {
+                var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
+                if (! snippet.result.handle().has_more_statements) {
+                  if (self.editorVM.selectedNotebook().onSuccessUrl()) {
+                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                  }
+                } else { // Perform last DROP statement execute
+                  //snippet.execute();
                 }
               }
             });
