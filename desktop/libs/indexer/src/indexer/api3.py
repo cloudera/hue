@@ -169,10 +169,15 @@ def _create_table(request, source, destination):
 
 
 def _create_table_from_a_file(request, source, destination):
-  table_name = final_table_name = destination['name']
+  if '.' in destination['name']:
+    database, table_name = destination['name'].split('.', 1)
+  else:
+    database = 'default'
+    table_name = destination['name']
+  final_table_name = table_name
+
   table_format = destination['tableFormat']
 
-  database = destination['database']
   columns = destination['columns']
   partition_columns = destination['partitionColumns']
 

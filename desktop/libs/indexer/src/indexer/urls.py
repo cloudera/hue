@@ -27,6 +27,7 @@ urlpatterns = patterns('indexer.views',
   # V3
   url(r'^indexer/$', 'indexer', name='indexer'),
   url(r'^importer/$', 'importer', name='importer'),
+  url(r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$', 'importer_prefill', name='importer_prefill'),
 )
 
 urlpatterns += patterns('indexer.api',

@@ -271,11 +271,11 @@ ${ assist.assistPanel() }
           <!-- ko if: createWizard.source.show -->
           <h3 class="card-heading simple">${_('Format')}</h3>
           <div class="card-body">
-              <label>${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
+            <label data-bind="visible: ! createWizard.prefill.source_type">${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
 
-              <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
-                <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
-              </span>
+            <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
+              <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
+            </span>
           </div>
 
           <h3 class="card-heading simple">${_('Preview')}</h3>
@@ -320,12 +320,21 @@ ${ assist.assistPanel() }
 
       <!-- ko with: createWizard.destination -->
       <div class="control-group">
-        <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
+        <label for="collectionType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
           <select id="collectionType" data-bind="options: ouputFormats, value: ouputFormat, optionsValue: 'value', optionsText: 'name'"></select>
         </label>
 
         <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+          <!-- ko if: ouputFormat() != 'table' -->
+            <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+          <!-- /ko -->
+
+          <!-- ko if: ouputFormat() == 'table' -->
+            <label for="path" class="control-label">
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+            </label>
+          <!-- /ko -->
+
           <span class="help-inline muted" data-bind="visible: $root.createWizard.isNameAvailable()">
             ${ _('Create a new ') } <span data-bind="text: ouputFormat"></span>
           </span>
@@ -350,11 +359,6 @@ ${ assist.assistPanel() }
               <select id="collectionType" data-bind="options: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
-
-          ${_('Database')}
-          <label class="checkbox">
-            <input type="text" data-bind="value: database">
-          </label>
 
           <label class="checkbox">
             <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
@@ -837,7 +841,7 @@ ${ assist.assistPanel() }
       init();
     }
 
-    var Source = function (vm) {
+    var Source = function (vm, wizard) {
       var self = this;
 
       self.name = ko.observable('');
@@ -856,8 +860,14 @@ ${ assist.assistPanel() }
           {'value': 'text', 'name': 'Copy paste text'},
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'dbms', 'name': 'DBMS'},
-          {'value': 'manual', 'name': 'Manual with no input'},
+          {'value': 'manual', 'name': 'Manually'},
       ]);
+      if (wizard.prefill.source_type) {
+        self.inputFormats([
+            {'value': 'file', 'name': 'File'},
+            {'value': 'manual', 'name': 'Manually'},
+        ]);
+      }
 
       // File
       self.path = ko.observable('');
@@ -931,7 +941,7 @@ ${ assist.assistPanel() }
           }
         } else if (self.inputFormat() == 'table') {
           if (self.table().split('.', 2).length == 2) {
-            name = self.tableName();
+            name = self.table();
           }
         } else if (self.inputFormat() == 'query') {
           if (self.query()) {
@@ -942,7 +952,8 @@ ${ assist.assistPanel() }
         return name.replace(' ', '_');
       });
       self.defaultName.subscribe(function(newVal) {
-        vm.createWizard.destination.name(newVal);
+        var prefix = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
+        vm.createWizard.destination.name(prefix + newVal);
       });
     };
 
@@ -963,7 +974,6 @@ ${ assist.assistPanel() }
       self.columns = ko.observableArray();
 
       // Table
-      self.database = ko.observable('default');
       self.tableFormat = ko.observable('text');
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
@@ -1010,12 +1020,12 @@ ${ assist.assistPanel() }
       self.fieldTypes = ${fields_json | n}.solr;
       self.hiveFieldTypes = ${fields_json | n}.hive;
       self.fileTypes = ${file_types_json | n};
-
+      self.prefill = ko.mapping.fromJS(${prefill | n});
 
       self.show = ko.observable(true);
       self.showCreate = ko.observable(false);
 
-      self.source = new Source(vm);
+      self.source = new Source(vm, self);
       self.destination = new Destination(vm);
 
       self.customDelimiters = ko.observable([

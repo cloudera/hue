@@ -19,14 +19,17 @@ from django.utils.translation import ugettext as _
 
 from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
-from beeswax.conf import LIST_PARTITIONS_LIMIT
 from desktop.lib.i18n import smart_unicode
 from desktop.views import commonheader, commonfooter, _ko
+from beeswax.conf import LIST_PARTITIONS_LIMIT
+
+from metastore.conf import ENABLE_NEW_CREATE_TABLE
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
+
 % if not is_embeddable:
 ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
@@ -558,8 +561,14 @@ ${ components.menubar() }
   <div class="inline-block pull-right">
     <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
-    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/import_wizard/' + database().name }" title="${_('Create a new table from a file')}"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
-    <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/create_table/' + database().name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i></a>
+      % if is_embeddable:
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { onePageViewModel.currentApp('importer') }" title="${_('Create a new table')}"><i class="fa fa-plus"></i></a>
+      % elif ENABLE_NEW_CREATE_TABLE.get():
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '${ url('indexer:importer_prefill', source_type='table', target_type='table') }' + database().name }" title="${_('Create a new table')}"><i class="fa fa-plus"></i></a>
+      % else:
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/import_wizard/' + database().name }" title="${_('Create a new table from a file')}"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
+        <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/beeswax/create/create_table/' + database().name }" title="${_('Create a new table manually')}"><i class="fa fa-plus"></i></a>
+      % endif
     % endif
   </div>
 </script>
@@ -1300,6 +1309,7 @@ ${ components.menubar() }
   })();
 </script>
 </span>
+
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 % endif
