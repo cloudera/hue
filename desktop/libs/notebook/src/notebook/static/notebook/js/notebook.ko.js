@@ -1531,6 +1531,7 @@ var EditorViewModel = (function() {
     self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);
+    self.onSuccessUrl = ko.observable(typeof notebook.onSuccessUrl != "undefined" && notebook.onSuccessUrl != null ? notebook.onSuccessUrl : null);
     self.snippets = ko.observableArray();
     self.selectedSnippet = ko.observable(vm.editorType()); // Aka selectedSnippetType
     self.creatingSessionLocks = ko.observableArray();
@@ -2174,7 +2175,7 @@ var EditorViewModel = (function() {
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
     self.isFullscreenMode = ko.observable(false);
-    self.successUrl = ko.observable(options.success_url);
+    self.successUrl = ko.observable(options.success_url); // Deprecated
     self.isOptimizerEnabled = ko.observable(options.is_optimizer_enabled);
     self.isNavigatorEnabled = ko.observable(options.is_navigator_enabled);
 

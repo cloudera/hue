@@ -90,7 +90,7 @@ ROW FORMAT \
 INPUTFORMAT ${table["input_format_class"] | n} OUTPUTFORMAT ${table["output_format_class"] | n}
 % endif
 % if table.get("external", False):
-LOCATION "${table["path"] | n}"
+LOCATION '${table["path"] | n}'
 % endif
 % if table.get("skip_header", False):
 TBLPROPERTIES("skip.header.line.count" = "1")

@@ -222,19 +222,19 @@ def _create_table_from_a_file(request, source, destination):
     if table_format in ('parquet', 'kudu'):
       table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
 
+      sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
+          'database': database,
+          'table_name': table_name
+      }
+
   if external or load_data and table_format in ('parquet', 'kudu'):
     if not request.fs.isdir(external_path): # File selected
-      external_path = request.fs.split(external_path)[0]
-      if len(request.fs.listdir(external_path)) != 1:
-        external_path = external_path + '_table' # If dir not just the file, create data dir and move file there.
-        request.fs.mkdir(source_path + '_table')
-        request.fs.rename(source_path, external_path)
+      external_path, external_file_name = request.fs.split(external_path)
 
-  
-  sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
-      'database': database,
-      'table_name': table_name
-  }
+      if len(request.fs.listdir(external_path)) > 1:
+        external_path = external_path + '/%s_table' % external_file_name # If dir not just the file, create data dir and move file there.
+        request.fs.mkdir(external_path)
+        request.fs.rename(source_path, external_path)
 
   sql += django_mako.render_to_string("gen/create_table_statement.mako", {
       'table': {
@@ -293,8 +293,8 @@ def _create_table_from_a_file(request, source, destination):
 
   try:
     editor_type = 'impala' if table_format == 'kudu' else 'hive'
-    # on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database)
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
 
     return notebook.execute(request, batch=False)
   except Exception, e:
