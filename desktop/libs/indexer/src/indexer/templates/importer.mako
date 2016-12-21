@@ -406,8 +406,49 @@ ${ assist.assistPanel() }
             </div>
           </div>
 
-          <a class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
-          ## partitionColumns
+          <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
+            <div class="form-inline" data-bind="foreach: partitionColumns, visible: tableFormat() == 'kudu'">
+              ${ _('Columns') }
+              <select id="kuduPks" data-bind="options: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
+              <select data-bind="options: ['RANGE BY', 'HASH'], value: name"></select>
+
+              <!-- ko if: name() == 'HASH' -->
+                <input type="number" data-bind="value: int_val">
+              <!-- /ko -->
+
+              <!-- ko if: name() == 'RANGE BY' -->
+                <div class="form-inline" data-bind="foreach: range_partitions">
+                  <!-- ko if: name() == 'VALUES' -->
+                    <input type="input" data-bind="value: lower_val">
+                    <input type="checkbox" data-bind="checked: include_lower_val">
+                    <
+                    <span data-bind="text: '=', visible: include_lower_val"></span>
+                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
+                    <
+                    <span data-bind="text: '=', visible: include_upper_val"></span>
+                    <input type="input" data-bind="value: upper_val">
+                    <input type="checkbox" data-bind="checked: include_upper_val">
+                  <!-- /ko -->
+
+                  <!-- ko if: name() == 'VALUE' -->
+                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
+                    <div class="form-inline" data-bind="foreach: values">
+                      <input type="text" data-bind="value: $data">
+                      <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
+                    </div>
+                    <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
+                  <!-- /ko -->
+                  <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
+                </div>
+
+                <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+              <!-- /ko -->
+
+              <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+            </div>
+          </label>
+
+          <a data-bind="click: function() { partitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
         <!-- /ko -->
 
          <h3 class="card-heading simple">${_('Fields')}</h3>
@@ -475,7 +516,7 @@ ${ assist.assistPanel() }
   <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
     <div data-bind="template: { name: 'table-field-template', foreach: nested }">
     </div>
-    <a data-bind="click: function() { nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: level() + 1})); }"><i class="fa fa-plus"></i></a>    
+    <a data-bind="click: function() { nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: level() + 1})); }"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
   </label>
 
@@ -925,14 +966,13 @@ ${ assist.assistPanel() }
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
 
+      self.hasHeader = ko.observable(true);
+
       self.useCustomDelimiters = ko.observable(false);
       self.customFieldDelimiter = ko.observable(',');
       self.customCollectionDelimiter = ko.observable('\\002');
       self.customMapDelimiter = ko.observable('\\003');
       self.customRegexp = ko.observable('');
-
-      self.kuduDistribute = ko.observableArray([]);
-      self.hasHeader = ko.observable(true);
 
       // Index
     };
