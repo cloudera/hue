@@ -2986,6 +2986,23 @@ ${ hueIcons.symbols() }
             });
           }
         });
+        // fills in missing values
+        var longestSerie = 0;
+        _datum.forEach(function (d) {
+          if (d.values.length > longestSerie) {
+            longestSerie = d.values.length;
+          }
+        });
+        _datum.forEach(function (d) {
+          if (d.values.length < longestSerie) {
+            var zeroObj = jQuery.extend({}, d.values[0]);
+            zeroObj.x = '';
+            zeroObj.y = 0;
+            for (var i = d.values.length; i < longestSerie; i++) {
+              d.values.push(zeroObj)
+            }
+          }
+        });
       }
       else {
         rawDatum.snippet.result.meta().forEach(function (meta) {
