@@ -23,7 +23,7 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
 %if not is_embeddable:
-${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
+${ commonheader(_("Importer"), "search", user, request, "60px") | n,unicode }
 
 # Todo lot of those
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -132,8 +132,8 @@ ${ assist.assistPanel() }
       <div class="nav-collapse">
         <ul class="nav">
           <li class="currentApp">
-            <a href="/indexer/indexer">
-              <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
+            <a href="${ url('indexer:importer') }">
+              <i class="fa fa-database app-icon"></i> ${_('Importer')}</a>
             </a>
           </li>
         </ul>
