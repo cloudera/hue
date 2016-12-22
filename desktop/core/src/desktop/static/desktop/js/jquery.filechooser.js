@@ -367,6 +367,13 @@
           $scrollingBreadcrumbs.parents('.modal').find('.nicescroll-rails-vr').remove();
         }
 
+        var resizeBreadcrumbs = window.setInterval(function(){
+          if ($homeBreadcrumb.is(':visible') && $homeBreadcrumb.width() > 0){
+            window.clearInterval(resizeBreadcrumbs);
+            $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
+          }
+        }, 100);
+
         $(data.files).each(function (cnt, file) {
           var _addFile = true;
           if (_parent.options.filterExtensions != "" && file.type == "file") {
@@ -514,9 +521,9 @@
         if (_showActions) {
           _actions.appendTo($(_parent.element).find('.filechooser-tree'));
         }
+
         window.setTimeout(function () {
           $(_parent.element).parent().scrollTop(0);
-          $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
           $scrollingBreadcrumbs.animate({
             'scrollLeft': $scrollingBreadcrumbs.width()
           });
