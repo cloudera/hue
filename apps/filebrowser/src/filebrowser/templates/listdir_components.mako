@@ -550,7 +550,7 @@ from django.utils.translation import ugettext as _
 </div>
 
   <script id="fileTemplate" type="text/html">
-    <tr style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted() }">
+    <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
         <div data-bind="visible: name != '..', css: { hueCheckbox: name != '..', 'fa': name != '..', 'fa-check': selected }"></div>
       </td>
@@ -855,11 +855,13 @@ from django.utils.translation import ugettext as _
         }),
         selected: ko.observable(false),
         highlighted: ko.observable(file.highlighted || false),
+        deleted: ko.observable(file.deleted || false),
         handleSelect: function (row, e) {
           e.preventDefault();
           e.stopPropagation();
           this.selected(! this.selected());
           this.highlighted(false);
+          this.deleted(false);
           viewModel.allSelected(false);
         },
         // display the context menu when an item is right/context clicked
@@ -958,7 +960,7 @@ from django.utils.translation import ugettext as _
           }
         }
       });
-      self.lastUploadBatch = ko.observableArray([]);
+      self.filesToHighlight = ko.observableArray([]);
 
       self.fileNameSorting = function (l, r) {
         if (l.name == "..") {
@@ -1147,10 +1149,14 @@ from django.utils.translation import ugettext as _
         self.page(new Page(page));
 
         self.files(ko.utils.arrayMap(files, function (file) {
-          file.highlighted = self.lastUploadBatch.indexOf(file.path) > -1;
-          return new File(file);
+          file.highlighted = self.filesToHighlight.indexOf(file.path) > -1;
+          var f = new File(file);
+          window.setTimeout(function(){
+            f.highlighted(false);
+          }, 3000);
+          return f;
         }));
-        self.lastUploadBatch([]);
+        self.filesToHighlight([]);
         if (self.sortBy() == "name"){
           self.files.sort(self.fileNameSorting);
         }
@@ -1169,6 +1175,9 @@ from django.utils.translation import ugettext as _
 
         if ($('.row-highlighted').length > 0) {
           $(window).scrollTop($('.row-highlighted:eq(0)').offset().top - 150);
+        }
+        else if ($('.row-deleted').length > 0) {
+          $(window).scrollTop($('.row-deleted:eq(0)').offset().top - 150);
         }
         else {
           $(window).scrollTop(0);
@@ -1305,6 +1314,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#renameModal").modal('hide');
+            self.filesToHighlight.push(self.currentPath() + '/' + $('#newNameInput').val());
             self.retrieveData(true);
           }
         });
@@ -1337,6 +1347,7 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#moveModal").modal('hide');
+              self.filesToHighlight.push(self.currentPath() + '/' + $('#moveDestination').val());
               self.retrieveData(true);
             },
             error: function(xhr){
@@ -1398,6 +1409,7 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#copyModal").modal('hide');
+            self.filesToHighlight.push(self.currentPath() + '/' + $('#copyDestination').val());
             self.retrieveData(true);
           },
           error: function(xhr){
@@ -1463,6 +1475,9 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#changeOwnerModal").modal('hide');
+              $(self.selectedFiles()).each(function (index, file) {
+                self.filesToHighlight.push(file.path);
+              });
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -1497,6 +1512,9 @@ from django.utils.translation import ugettext as _
             dataType:  'json',
             success: function() {
               $("#changePermissionModal").modal('hide');
+              $(self.selectedFiles()).each(function (index, file) {
+                self.filesToHighlight.push(file.path);
+              });
               self.retrieveData(true);
             },
             error: function (xhr, textStatus, errorThrown) {
@@ -1542,7 +1560,17 @@ from django.utils.translation import ugettext as _
           dataType:  'json',
           success: function() {
             $("#deleteModal").modal('hide');
-            self.retrieveData(true);
+            window.setTimeout(function(){
+              $(self.selectedFiles()).each(function (index, file) {
+                file.deleted(true);
+              });
+              $(window).scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+            }, 500);
+            window.setTimeout(function(){
+              $(self.selectedFiles()).each(function (index, file) {
+                self.files.remove(file);
+              });
+            }, 1000);
           },
           error: function(xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -1621,6 +1649,7 @@ from django.utils.translation import ugettext as _
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
+            self.filesToHighlight.push(self.currentPath() + '/' + $('#newDirectoryNameInput').val());
             $("#createDirectoryModal").modal('hide');
             self.retrieveData(true);
           },
@@ -1651,6 +1680,7 @@ from django.utils.translation import ugettext as _
         $(formElement).ajaxSubmit({
           dataType:  'json',
           success: function() {
+            self.filesToHighlight.push(self.currentPath() + '/' + $('#newFileNameInput').val());
             $("#createFileModal").modal('hide');
             self.retrieveData(true);
           },
@@ -1757,7 +1787,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
-              self.lastUploadBatch.push(response.path);
+              self.filesToHighlight.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadFileModal').modal('hide');
@@ -1827,7 +1857,7 @@ from django.utils.translation import ugettext as _
             }
             else {
               $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
-              self.lastUploadBatch.push(response.path);
+              self.filesToHighlight.push(response.path);
             }
             if (self.pendingUploads() == 0) {
               $('#uploadArchiveModal').modal('hide');
@@ -2029,7 +2059,7 @@ from django.utils.translation import ugettext as _
                   }
                   else {
                     $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
-                    viewModel.lastUploadBatch.push(response.path);
+                    viewModel.filesToHighlight.push(response.path);
                   }
                 }
               }
