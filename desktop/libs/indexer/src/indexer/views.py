@@ -89,15 +89,9 @@ def importer_prefill(request, source_type, target_type, target_path=None):
 
 
 def _importer(request, prefill):
-  searcher = IndexController(request.user)
-  indexes = searcher.get_indexes()
-
-  for index in indexes:
-    index['isSelected'] = False
 
   return render('importer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'indexes_json': json.dumps(indexes),
       'fields_json' : json.dumps({'solr': [field.name for field in FIELD_TYPES], 'hive': HIVE_TYPES}),
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),

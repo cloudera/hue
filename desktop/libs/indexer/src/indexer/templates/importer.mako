@@ -335,12 +335,12 @@ ${ assist.assistPanel() }
             </label>
           <!-- /ko -->
 
-          <span class="help-inline muted" data-bind="visible: $root.createWizard.isNameAvailable()">
+          <span class="help-inline muted" data-bind="visible: $root.createWizard.isTargetExisting()">
             ${ _('Create a new ') } <span data-bind="text: ouputFormat"></span>
           </span>
-          <span class="help-inline muted" data-bind="visible: ! $root.createWizard.isNameAvailable() && name().length > 0">
-            ${ _('Adding data to this existing ') } <span data-bind="text: ouputFormat"></span>
-            <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + name() }, text: name" target="_blank"></a>
+          <span class="help-inline muted" data-bind="visible: ! $root.createWizard.isTargetExisting() && name().length > 0">
+            ${ _('Adding data to the existing ') } <span data-bind="text: ouputFormat"></span>
+            <a href="javascript:void(0)" data-bind="text: name" target="_blank"></a>
           </span>
         </label>
       </div>
@@ -1086,7 +1086,7 @@ ${ assist.assistPanel() }
 
       self.indexingStarted = ko.observable(false);
 
-      self.isNameAvailable = ko.computed(function () {
+      self.isTargetExisting = ko.computed(function () {
         var name = self.source.name();
         return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
       });
@@ -1317,14 +1317,10 @@ ${ assist.assistPanel() }
         }
       }
 
-      self.collections = ${ indexes_json | n }.
-      filter(function (index) {
-        return index.type == 'collection';
-      });
-
       self.createWizard = new CreateWizard(self);
       self.isLoading = ko.observable(false);
 
+      self.collections = [];
       self.collectionNameAvailable = function (name) {
         var matchingCollections = self.collections.filter(function (collection) {
           return collection.name == name;
