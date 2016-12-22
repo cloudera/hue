@@ -15,6 +15,60 @@
 // limitations under the License.
 
 (function () {
+  ko.extenders.numeric = function (target, config) {
+    var precision = typeof config.precision === 'undefined' ? config : config.precision;
+    var roundingMultiplier = Math.pow(10, precision);
+
+    var result = ko.computed({
+      read: target,
+      write: function (newValue) {
+        var current = target(),
+            newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
+            valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
+
+        if (newValue === '' && config.allowEmpty) {
+          valueToWrite = newValue;
+        }
+        if (valueToWrite !== current) {
+          target(valueToWrite);
+        } else {
+          if (newValue !== current) {
+            target.notifySubscribers(valueToWrite);
+          }
+        }
+      }
+    }).extend({ notify: 'always' });
+    result(target());
+    return result;
+  };
+
+  ko.extenders.maxLength = function (target, maxLength) {
+    var result = ko.computed({
+      read: target,
+      write: function (val) {
+        if (maxLength > 0) {
+          if (val.length > maxLength) {
+            var limitedVal = val.substring(0, maxLength);
+            if (target() === limitedVal) {
+              target.notifySubscribers();
+            }
+            else {
+              target(limitedVal);
+            }
+          }
+          else {
+            target(val);
+          }
+        }
+        else {
+          target(val);
+        }
+      }
+    }).extend({notify: 'always'});
+    result(target());
+    return result;
+  };
+
   ko.observableDefault = function () {
     var prop = arguments[0], defvalue = arguments[1] || null;
     return ko.observable(typeof prop != "undefined" && prop != null ? prop : defvalue);
@@ -840,33 +894,6 @@
       });
     },
     update: function() {}
-  };
-
-  ko.extenders.numeric = function (target, config) {
-    var precision = typeof config.precision === 'undefined' ? config : config.precision;
-    var roundingMultiplier = Math.pow(10, precision);
-
-    var result = ko.computed({
-      read: target,
-      write: function (newValue) {
-        var current = target(),
-            newValueAsNum = isNaN(newValue) ? 0 : parseFloat(+newValue),
-            valueToWrite = Math.round(newValueAsNum * roundingMultiplier) / roundingMultiplier;
-
-        if (newValue === '' && config.allowEmpty) {
-          valueToWrite = newValue;
-        }
-        if (valueToWrite !== current) {
-          target(valueToWrite);
-        } else {
-          if (newValue !== current) {
-            target.notifySubscribers(valueToWrite);
-          }
-        }
-      }
-    }).extend({ notify: 'always' });
-    result(target());
-    return result;
   };
 
   ko.bindingHandlers.numericTextInput = {
