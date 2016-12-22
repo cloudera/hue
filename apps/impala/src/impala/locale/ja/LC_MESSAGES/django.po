@@ -19,12 +19,12 @@ msgstr ""
 
 #: src/impala/api.py:51
 msgid "Successfully invalidated metadata"
-msgstr "正常に無効化されたメタデータ"
+msgstr "メタデータを無効化しました"
 
 #: src/impala/api.py:66
 #, python-format
 msgid "Successfully refreshed metadata for `%s`.`%s`"
-msgstr "`%s`.`%s` のメタデータが正常に更新されました"
+msgstr "`%s`.`%s` のメタデータをリフレッシュしました"
 
 #: src/impala/api.py:81
 msgid "get_exec_summary requires a valid query_history_id"
@@ -44,19 +44,19 @@ msgstr "Impala Server のポートです。"
 
 #: src/impala/conf.py:46
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Impala の Kerberos プリンシパル名。普通は 'impala/hostname.foo.com' です。"
+msgstr "Impala の Kerberos プリンシパル名。一般的には 'impala/hostname.foo.com' です。"
 
 #: src/impala/conf.py:52
 msgid "Turn on/off impersonation mechanism when talking to Impala."
-msgstr "Impala に通信する際の偽装メカニズムをオン／オフにします。"
+msgstr "Impala に通信する際のなりすましメカニズムをオン／オフします。"
 
 #: src/impala/conf.py:58
 msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
-msgstr "ダウンロード用に行の再フェッチをサポートできるよう、Impala にキャッシュさせる結果セットの最初の行数です。オプションおよび下位互換性を無効にするには 0 に設定します。"
+msgstr "Impalaのダウンロードを再フェッチするために、Impala にキャッシュを要求するための結果セットの最初の行数。オプションと下位互換性を無効にするには 0 に設定します。"
 
 #: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
-msgstr "Thrift コールのタイムアウト時間（秒）です。"
+msgstr "Thrift コールのタイムアウト時間（秒）。"
 
 #: src/impala/conf.py:72
 msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
