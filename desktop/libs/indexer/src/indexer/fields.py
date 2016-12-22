@@ -63,6 +63,8 @@ class Field(object):
       'showProperties': self.show_properties,
       'nested': [],
       'level': 0,
+      'length': 100,
+      'keyType': ''
     }
 
 FIELD_TYPES = [
