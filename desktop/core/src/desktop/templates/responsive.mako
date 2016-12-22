@@ -594,7 +594,7 @@ ${ assist.assistPanel() }
             self.isLoadingEmbeddable(false);
           }
           $('.embeddable').hide();
-          $('#embeddable_' + newVal).show();
+          $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
         });
 
         if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]){
