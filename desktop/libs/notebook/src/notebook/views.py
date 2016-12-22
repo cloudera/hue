@@ -114,7 +114,7 @@ def editor(request, is_mobile=False, is_embeddable=False):
       'notebooks_json': '{}',
       'editor_type': editor_type,
       'options_json': json.dumps({
-        'languages': get_interpreters(request.user),
+        'languages': get_ordered_interpreters(request.user),
         'mode': 'editor',
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
@@ -146,7 +146,7 @@ def browse(request, database, table):
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),
       'options_json': json.dumps({
-          'languages': get_interpreters(request.user),
+          'languages': get_ordered_interpreters(request.user),
           'mode': 'editor',
           'editor_type': editor_type
       }),

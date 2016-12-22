@@ -39,7 +39,7 @@ from django.views.decorators.http import require_http_methods, require_POST
 import django.views.debug
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from notebook.conf import get_interpreters
+from notebook.conf import get_ordered_interpreters
 
 import desktop.conf
 import desktop.log.log_buffer
@@ -73,7 +73,7 @@ def responsive(request):
   return render('responsive.mako', request, {
     'apps': apps,
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
-    'interpreters': get_interpreters(request.user),
+    'interpreters': get_ordered_interpreters(request.user),
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get()
   })
