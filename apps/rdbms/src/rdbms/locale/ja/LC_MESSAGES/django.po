@@ -74,7 +74,7 @@ msgstr "現在設定されているデータベースはありません。"
 msgid ""
 "Please go to your Hue configuration and add a database under the "
 "\"rdbms\" section."
-msgstr "Hue 設定に移動して、「rdbms」セクションの下にデータベースを追加してください。"
+msgstr "Hueの設定に移動して「rdbms」セクションの下にデータベースを追加してください。"
 
 #: src/rdbms/templates/execute.mako:32
 msgid "Assist"
@@ -106,7 +106,7 @@ msgstr "テーブル名..."
 
 #: src/rdbms/templates/execute.mako:55
 msgid "The selected database has no tables."
-msgstr "選択したデータベースにテーブルがありません。"
+msgstr "選択したデータベースにはテーブルがありません。"
 
 #: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
 msgid "Query name"
@@ -118,7 +118,7 @@ msgstr "クエリの説明"
 
 #: src/rdbms/templates/execute.mako:115
 msgid "Your query has the following error(s):"
-msgstr "クエリに次のエラーがあります："
+msgstr "クエリには次のエラーがあります："
 
 #: src/rdbms/templates/execute.mako:124
 msgid "Execute"
@@ -134,19 +134,19 @@ msgstr "名前を付けて保存..."
 
 #: src/rdbms/templates/execute.mako:127
 msgid "Explain"
-msgstr "新しい"
+msgstr "実行計画"
 
 #: src/rdbms/templates/execute.mako:128
 msgid "or create a"
-msgstr "クエリを説明"
+msgstr "または作成"
 
 #: src/rdbms/templates/execute.mako:128
 msgid "New query"
-msgstr "または作成"
+msgstr "新しいクエリ"
 
 #: src/rdbms/templates/execute.mako:154
 msgid "The server returned no results."
-msgstr "サーバーから結果が返されませんでした。"
+msgstr "サーバーから結果が返却されませんでした。"
 
 #: src/rdbms/templates/execute.mako:179
 msgid "Save your query"
