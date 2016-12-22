@@ -416,8 +416,8 @@ ${ assist.assistPanel() }
 
             <!-- ko if: tableFormat() != 'kudu' -->
             <div class="form-inline" data-bind="foreach: partitionColumns">
-                <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
-                <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+              <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+              <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
             </div>
             <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
             <!-- /ko -->
@@ -474,6 +474,7 @@ ${ assist.assistPanel() }
         <h3 class="card-heading simple">${_('Fields')}</h3>
         <form class="form-inline" data-bind="foreach: columns">
           <!-- ko if: $parent.ouputFormat() == 'table' -->
+            <span data-bind="text: ko.mapping.toJSON($data)"></span>
             <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
 
@@ -544,23 +545,33 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="table-field-template">
-  <label>${ _('Name') }
+  <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
 
   <label>${ _('Type') }
-  <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+  <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
+    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+  <!-- /ko -->
+  <!-- ko if: level() > 0 && $parent.type() == 'map' -->
+    <select class="input-small" data-bind="options: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
+    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+
+  <!-- /ko -->
+  <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
 
   <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
     <div data-bind="template: { name: 'table-field-template', foreach: nested }">
     </div>
-    <a data-bind="click: function() { nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: level() + 1})); }"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: function() { nested.push($root.loadField({operations: [], nested: [], name: '', type: '', 'keyType': '', level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
   </label>
 
-  ${_('Comment')}
+  <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
+    ${_('Comment')}
+  </span>
 
-  <!-- ko if: level() > 0 -->
+  <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
     <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
   <!-- /ko -->
 
@@ -1061,6 +1072,7 @@ ${ assist.assistPanel() }
       self.operationTypes = ${operators_json | n};
 
       self.fieldTypes = ${fields_json | n}.solr;
+      self.hivePrimitiveFieldTypes = ${fields_json | n}.hivePrimitive;
       self.hiveFieldTypes = ${fields_json | n}.hive;
       self.fileTypes = ${file_types_json | n};
       self.prefill = ko.mapping.fromJS(${prefill | n});
@@ -1279,11 +1291,13 @@ ${ assist.assistPanel() }
         koField.operations.push(operation);
       });
 
-      koField.type.subscribe(function(newVal) {
+      var autoExpand = function(newVal) {
         if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
-          koField.nested.push(ko.mapping.fromJS({operations: [], nested: [], name: '', type: '', level: koField.level() + 1}));
+          koField.nested.push(loadField({operations: [], nested: [], name: '', type: '', keyType: '', level: koField.level() + 1}));
         }
-      });
+      };
+      koField.type.subscribe(autoExpand);
+      koField.keyType.subscribe(autoExpand);
 
       return koField;
     }

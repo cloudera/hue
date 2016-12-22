@@ -92,7 +92,7 @@ def _importer(request, prefill):
 
   return render('importer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'fields_json' : json.dumps({'solr': [field.name for field in FIELD_TYPES], 'hive': HIVE_TYPES}),
+      'fields_json' : json.dumps({'solr': [field.name for field in FIELD_TYPES], 'hive': HIVE_TYPES, 'hivePrimitive': HIVE_PRIMITIVE_TYPES}),
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type' : json.dumps(Field().to_dict()),

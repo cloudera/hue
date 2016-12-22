@@ -17,13 +17,15 @@
 <%!
 def col_type(col):
   if col["type"] == "array":
-    return "array <%s>" % col["array_type"]
+    return "array <%s>" % col_type(col["nested"])
+  if col["type"] == "struct":
+    return "struct <%s>" % ', '.join(column_list(col["nested"]))
   elif col["type"] == "map":
-    return "map <%s, %s>" % (col["map_key_type"], col["map_value_type"])
+    return "map <%s, %s>" % (col["keyType"], '<%s>' % col_type(col["nested"]) if col["type"] in ('array', 'struct', 'map') else col["type"])
   elif col["type"] == "char":
-    return "char(%d)" % col["char_length"]
+    return "char(%d)" % col["length"]
   elif col["type"] == "varchar":
-    return "varchar(%d)" % col["varchar_length"]
+    return "varchar(%d)" % col["length"]
   return col["type"]
 %>\
 
