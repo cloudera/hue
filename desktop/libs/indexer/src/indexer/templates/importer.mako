@@ -474,7 +474,6 @@ ${ assist.assistPanel() }
         <h3 class="card-heading simple">${_('Fields')}</h3>
         <form class="form-inline" data-bind="foreach: columns">
           <!-- ko if: $parent.ouputFormat() == 'table' -->
-            <span data-bind="text: ko.mapping.toJSON($data)"></span>
             <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
 
@@ -578,19 +577,6 @@ ${ assist.assistPanel() }
   <!-- ko if: level() == 0 && typeof isPartition === 'undefined'-->
     <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
     <label data-bind="text: $root.createWizard.source.sample()[1][$index()]"></label>
-  <!-- /ko -->
-</script>
-
-
-<script type="text/html" id="display-table-nested-field">
-  <!-- ko: if type() != 'array' -->
-    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
-  <!-- /ko -->
-
-  <!-- ko: if type() == 'array' -->
-    <div data-bind="template: { name: 'display-table-nested-field', foreach: nested }">
-    </div>
-    <a data-bind="click: function() { nested.push('aa'); }"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
 </script>
 

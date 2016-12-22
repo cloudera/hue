@@ -17,18 +17,28 @@
 <%!
 def col_type(col):
   if col["type"] == "array":
-    return "array <%s>" % col_type(col["nested"])
+    return "array <%s>" % col_type(col["nested"][0])
   if col["type"] == "struct":
-    return "struct <%s>" % ', '.join(column_list(col["nested"]))
+    return "struct <%s>" % ', '.join(struct_column_list({}, col["nested"]))
   elif col["type"] == "map":
-    return "map <%s, %s>" % (col["keyType"], '<%s>' % col_type(col["nested"]) if col["type"] in ('array', 'struct', 'map') else col["type"])
+    return "map <%s, %s>" % (col["nested"][0]["keyType"], '%s' % col_type(col["nested"][0]) if col["type"] in ('array', 'struct', 'map') else col["type"])
   elif col["type"] == "char":
     return "char(%d)" % col["length"]
   elif col["type"] == "varchar":
     return "varchar(%d)" % col["length"]
   return col["type"]
-%>\
 
+%>
+
+<%!
+def struct_column_list(table, columns):
+  col_sql = []
+  for col in columns:
+    comment = ' COMMENT "%(comment)s"' % col if col.get("comment") else ''
+    col_sql.append('`%s`:%s%s' % (col["name"], col_type(col), comment))
+
+  return col_sql
+%>
 
 <%def name="column_list(table, columns)">\
 (
