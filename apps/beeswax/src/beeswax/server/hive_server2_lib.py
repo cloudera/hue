@@ -118,7 +118,7 @@ class HiveServerTable(Table):
     except:
       # Impala does not have it
       return rows
-
+  
   def _get_partition_column(self):
     rows = self.describe
     try:
@@ -790,7 +790,7 @@ class HiveServerClient:
     req = TGetTablesReq(schemaName=database, tableName=table_name)
     res = self.call(self._client.GetTables, req)
 
-    table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
+    table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)    
     self.close_operation(res.operationHandle)
 
     if partition_spec:

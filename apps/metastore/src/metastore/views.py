@@ -254,11 +254,27 @@ def describe_table(request, database, table):
       raise PopupException(_("Hive Error"), detail=e)
 
   if request.REQUEST.get("format", "html") == "json":
+    cols = []
+    extra_col_options = {}
+
+    if table.is_impala_only: # Expand columns information
+      query_server = get_query_server_config('impala')
+      db = dbms.get(request.user, query_server)
+
+      col_options = db.get_table_describe(database, table.name)
+      extra_col_options = dict([(col[0], dict(zip(col_options.cols(), col))) for col in col_options.rows()])
+
+    for col in table.cols:
+      col_props = {'name': col.name, 'type': col.type, 'comment': col.comment}
+      if extra_col_options:
+        col_props.update(extra_col_options.get(col.name, {}))
+      cols.append(col_props)
+
     return JsonResponse({
         'status': 0,
         'name': table.name,
         'partition_keys': [{'name': part.name, 'type': part.type} for part in table.partition_keys],
-        'cols': [{'name': col.name, 'type': col.type, 'comment': col.comment} for col in table.cols],
+        'cols': cols,
         'path_location': table.path_location,
         'hdfs_link': table.hdfs_link,
         'comment': table.comment,
