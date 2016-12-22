@@ -124,6 +124,9 @@ ${ components.menubar() }
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database().table().samples.loading() -->
             <span data-bind="text: name"></span>
+            <!-- ko if: typeof primary_key !== 'undefined' -->
+              <i class="fa fa-key"></i>
+            <!-- /ko -->
             <!-- /ko -->
             <!-- ko ifnot: $root.database().table().samples.loading() -->
             <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: scrollToColumn"></a>

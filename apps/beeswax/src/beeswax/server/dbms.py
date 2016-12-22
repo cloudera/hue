@@ -491,6 +491,18 @@ class HiveServer2Dbms(object):
       return result
 
 
+  def get_table_describe(self, database, table):
+    hql = 'DESCRIBE `%s`.`%s`' % (database, table)
+
+    query = hql_query(hql)
+    handle = self.execute_and_wait(query, timeout_sec=5.0)
+
+    if handle:
+      result = self.fetch(handle, rows=100)
+      self.close(handle)
+      return result
+
+
   def get_top_terms(self, database, table, column, limit=30, prefix=None):
     limit = min(limit, 100)
     prefix_match = ''
