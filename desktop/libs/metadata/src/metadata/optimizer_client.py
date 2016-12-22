@@ -191,7 +191,6 @@ class OptimizerApi(object):
 
     return self._token
 
-
   def _exec(self, command, args):
     data = None
     response = {'status': 'error'}
@@ -322,7 +321,7 @@ class OptimizerApi(object):
     ])
 
 
-  def top_tables(self, workfloadId=None, database_name='default'):
+  def top_tables(self, workfloadId=None, database_name='default'):        
     return self._exec('get-top-tables', [
         '--tenant', self._product_name,
         '--db-name', database_name.lower()
