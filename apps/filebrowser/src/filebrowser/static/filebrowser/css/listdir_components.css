@@ -217,12 +217,24 @@
   display: none;
 }
 
+.row-animated {
+  -webkit-transition: background-color 200ms linear;
+  -moz-transition: background-color 200ms linear;
+  -o-transition: background-color 200ms linear;
+  -ms-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+}
+
 .row-selected {
-  background: #e5e5e5;
+  background-color: #e5e5e5;
 }
 
 .row-highlighted {
-  background: #d9edf7;
+  background-color: #d9edf7;
+}
+
+.row-deleted {
+  background-color: #f2dede;
 }
 
 .context-menu {
