@@ -32,7 +32,14 @@ ko.bindingHandlers.selectize = {
     if (allBindingsAccessor.has('selectizeOptions')) {
       var passed_options = allBindingsAccessor.get('selectizeOptions')
       for (var attr_name in passed_options) {
-        options[attr_name] = passed_options[attr_name];
+        if (attr_name === 'maxLength') {
+          options.createFilter = function (input) {
+            return input.length <= passed_options[attr_name]
+          }
+        }
+        else {
+          options[attr_name] = passed_options[attr_name];
+        }
       }
     }
 
