@@ -301,6 +301,7 @@ body {
   -ms-flex: 1;
   flex: 1;
   position: relative;
+  overflow-x: hidden!important;
 }
 
 .page-content .content-panel {
