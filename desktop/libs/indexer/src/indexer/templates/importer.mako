@@ -22,8 +22,9 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="assist" file="/assist.mako" />
+
 %if not is_embeddable:
-${ commonheader(_("Importer"), "search", user, request, "60px") | n,unicode }
+${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 # Todo lot of those
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -52,7 +53,6 @@ ${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 ${ assist.assistPanel() }
-
 %endif
 
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
@@ -251,7 +251,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">
               <label for="path" class="control-label"><div>${ _('Path') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }">
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }" placeholder="${ _('Click or drag & drop') }">
               </label>
             </div>
 
