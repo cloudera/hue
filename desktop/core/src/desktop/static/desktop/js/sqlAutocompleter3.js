@@ -272,7 +272,7 @@ var SqlAutocompleter3 = (function () {
     self.timeout = options.timeout;
   }
 
-  SqlAutocompleter3.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
+  SqlAutocompleter3.prototype.autocomplete = function (beforeCursor, afterCursor, editor) {
     var self = this;
     var sourceType = self.snippet.type();
     var parseResult = sql.parseSql(beforeCursor, afterCursor, sourceType, false);
@@ -285,14 +285,13 @@ var SqlAutocompleter3 = (function () {
       editor.showSpinner();
     }
 
-    self.suggestions = new Suggestions({
+    return new Suggestions({
       parseResult: parseResult,
       sourceType: sourceType,
       defaultDatabase: parseResult.useDatabase || self.snippet.database(),
       timeout: self.timeout,
       callback: function () {
         editor.hideSpinner();
-        console.log(self);
       }
     });
   };

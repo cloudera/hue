@@ -411,6 +411,18 @@ var Autocomplete = function() {
 Autocomplete.startCommand = {
     name: "startAutocomplete",
     exec: function(editor) {
+        if (editor.useHueAutocompleter) {
+            var renderer = editor.renderer;
+            var lineHeight = renderer.layerConfig.lineHeight;
+            var pos = renderer.$cursorLayer.getPixelPosition(this.base, true);
+            var rect = editor.container.getBoundingClientRect();
+            pos.top += rect.top - renderer.layerConfig.offset;
+            pos.left += rect.left - editor.renderer.scrollLeft;
+            pos.left += renderer.gutterWidth;
+
+            huePubSub.publish('hue.ace.autocompleter.show', { position: pos, lineHeight: lineHeight });
+            return;
+        }
         if (!editor.completer)
             editor.completer = new Autocomplete();
         editor.completer.autoInsert = false;

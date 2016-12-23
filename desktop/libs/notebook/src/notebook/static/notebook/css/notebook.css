@@ -1158,3 +1158,15 @@ h4.header {
   width: 8px!important;
   margin-left: 10px!important;
 }
+
+.hue-ace-autocompleter {
+  position: absolute;
+  z-index: 100000;
+  width: 500px;
+  height: 250px;
+  border: 1px solid #DDD;
+  border-radius: 3px;
+  display: flex;
+  flex-direction: column;
+  background-color: #FFF;
+}

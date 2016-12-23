@@ -53,6 +53,7 @@ ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
+${ notebookKoComponents.hueAceAutocompleter() }
 
 ${ editorComponents.commonJS(bindableElement='notebookComponents') }
 
