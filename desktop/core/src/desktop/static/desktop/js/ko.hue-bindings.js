@@ -3325,10 +3325,27 @@
             editor.completers.push(langTools.snippetCompleter);
             editor.completers.push(langTools.textCompleter);
             editor.completers.push(langTools.keyWordCompleter);
+            editor.completers.push(snippet.autocompleter);
+          } else if (snippet.type() === 'hive' || snippet.type() === 'impala') {
+            editor.completers.push(snippet.autocompleter);
+            editor.useHueAutocompleter = true;
+          } else {
+            editor.completers.push(snippet.autocompleter);
           }
-          editor.completers.push(snippet.autocompleter);
         }
       };
+
+      huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
+        if ($('.hue-ace-autocompleter').length > 0) {
+          $('.hue-ace-autocompleter').remove();
+        }
+        var $hueAceAutocompleter = $('<div data-bind="component: { name: \'hueAceAutocompleter\', params: $data }">').addClass('hue-ace-autocompleter').css({ top: data.position.top + data.lineHeight + 3 + 'px', left: data.position.left  + 'px' });
+        $('body').append($hueAceAutocompleter);
+        ko.applyBindings({
+          snippet: snippet,
+          editor: editor
+        }, $hueAceAutocompleter[0]);
+      });
 
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());

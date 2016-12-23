@@ -444,3 +444,38 @@ except ImportError, e:
     })();
   </script>
 </%def>
+
+<%def name="hueAceAutocompleter()">
+  <script type="text/html" id="hue-ace-autocompleter">
+    <div style="flex: 1 1 30px; padding: 5px;"><div class="pull-right"><label class="checkbox"><input type="checkbox">${ _('Keywords') }</label></div></div>
+    <div style="flex: 1 1 100%; overflow-y: auto; padding: 0 5px;" data-bind="foreach: activeSuggestions">
+      <div style="clear: both;font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;"><div class="pull-left" data-bind="text: value"></div><div class="pull-right" data-bind="text: meta"></div></div>
+    </div>
+    <!-- /ko -->
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function () {
+      function HueAceAutocompleter (params, element) {
+        var self = this;
+        var snippet = params.snippet;
+        var editor = params.editor;
+        var autocompleter = new SqlAutocompleter3({ snippet: snippet, timeout: AUTOCOMPLETE_TIMEOUT });
+        self.suggestions = autocompleter.autocomplete(editor.getTextBeforeCursor(), editor.getTextAfterCursor(), editor);
+        self.activeSuggestions = ko.pureComputed(function () {
+          if (self.suggestions.keywords) {
+            return self.suggestions.keywords.suggestions();
+          }
+          return [];
+        });
+      }
+
+      ko.components.register('hueAceAutocompleter', {
+        viewModel: { createViewModel: function (params, componentInfo) {
+          return new HueAceAutocompleter(params, componentInfo.element);
+        }},
+        template: { element: 'hue-ace-autocompleter' }
+      });
+    })();
+  </script>
+</%def>
