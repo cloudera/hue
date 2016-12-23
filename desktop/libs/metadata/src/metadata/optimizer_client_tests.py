@@ -21,14 +21,14 @@ from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal, assert_true
 
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
 
 from desktop.auth.backend import rewrite_user
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
-from metadata.optimizer_client import OptimizerApi, is_optimizer_enabled
+from metadata.optimizer_client import OptimizerApi
+from metadata.conf import has_optimizer
 
 
 LOG = logging.getLogger(__name__)
@@ -38,7 +38,7 @@ class TestOptimizerApi(object):
 
   @classmethod
   def setup_class(cls):
-    if not is_live_cluster() or not is_optimizer_enabled():
+    if not is_live_cluster() or not has_optimizer():
       raise SkipTest
 
     cls.client = make_logged_in_client(username='test', is_superuser=False)
