@@ -4544,7 +4544,7 @@
           mousescrollstep: 60,
           scrollspeed: 1,
           cursorminheight: options.cursorminheight || 20,
-          horizrailenabled: options.horizrailenabled || true
+          horizrailenabled: typeof options.horizrailenabled !== 'undefined' ? options.horizrailenabled : true
         });
         $(element).addClass('nicescrollified');
       }
