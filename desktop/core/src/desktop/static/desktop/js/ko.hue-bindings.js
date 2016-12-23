@@ -1897,11 +1897,14 @@
         $resizer = $(element),
         $parent = $resizer.parents(options.parent),
         $target = $parent.find(options.target),
+        $mainScrollable = $(options.mainScrollable),
         onStart = options.onStart,
         onResize = options.onResize;
 
       var initialHeight = $.totalStorage('hue.editor.logs.size') || 80;
-      $target.css("height", initialHeight + "px");
+      window.setTimeout(function () {
+        $target.css("height", initialHeight + "px");
+      }, 0);
 
       var initialOffset = null;
       $resizer.draggable({
@@ -1915,7 +1918,7 @@
           }
         },
         drag: function (event, ui) {
-          var currentHeight = (ui.offset.top - initialOffset) + initialHeight;
+          var currentHeight = (ui.offset.top + $mainScrollable.scrollTop() - initialOffset) + initialHeight;
           $.totalStorage('hue.editor.logs.size', currentHeight);
           $target.css("height", currentHeight + "px");
           ui.offset.top = 0;
