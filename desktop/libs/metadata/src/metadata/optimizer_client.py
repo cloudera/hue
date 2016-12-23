@@ -22,7 +22,9 @@ import os
 import subprocess
 import uuid
 
+from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
+from urlparse import urlparse
 
 from django.utils.translation import ugettext as _
 
@@ -30,9 +32,9 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
+from navoptapi.api_lib import ApiLib
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
-from subprocess import CalledProcessError
 
 
 LOG = logging.getLogger(__name__)
@@ -41,15 +43,218 @@ LOG = logging.getLogger(__name__)
 _JSON_CONTENT_TYPE = 'application/json'
 
 
-def is_optimizer_enabled():
-  return get_optimizer_url() and OPTIMIZER.PRODUCT_NAME.get()
-
 
 class OptimizerApiException(PopupException):
   pass
 
 
 class OptimizerApi(object):
+
+  def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
+    self._api_url = (api_url or get_optimizer_url()).strip('/')
+    self._email = OPTIMIZER.EMAIL.get()
+    self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
+    self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
+    self._product_auth_secret = product_auth_secret if product_auth_secret else (OPTIMIZER.PRODUCT_AUTH_SECRET.get() and OPTIMIZER.PRODUCT_AUTH_SECRET.get().replace('\\n', '\n'))
+    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "workload"
+
+#     self._client = HttpClient(self._api_url, logger=LOG)
+#     self._client.set_verify(ssl_cert_ca_verify)
+# 
+#     self._root = resource.Resource(self._client)
+#     self._token = None
+
+    self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._product_secret, self._product_auth_secret)
+
+  def _authenticate(self, force=False):
+    if self._token is None or force:
+      self._token = self.authenticate()['token']
+
+    return self._token
+# 
+#   def _exec(self, command, args):
+#     data = None
+#     response = {'status': 'error'}
+# 
+#     try:
+#       cmd_args = [
+#           'ccs',
+#           'navopt',
+#           '--endpoint-url=%s' % self._api_url,
+#           command
+#       ]
+#       if self._product_secret:
+#         cmd_args += ['--auth-config', self._product_secret]
+# 
+#       LOG.info(' '.join(cmd_args + args))
+#       data = subprocess.check_output(cmd_args + args)
+#     except CalledProcessError, e:
+#       if command == 'upload' and e.returncode == 1:
+#         LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
+#         data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
+#       else:
+#         raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
+#     except RestException, e:
+#       raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
+# 
+#     if data:
+#       response = json.loads(data)
+#       if 'status' not in response:
+#         response['status'] = 'success'
+#     return response
+
+
+  def get_tenant(self, email=None):
+    return self._api.call_api("getTenant", {"email" : email or self._email}).json()
+
+
+  def create_tenant(self, group):
+    return self._api.call_api('createTenant', {'userGroup' : group}).json()
+
+
+  def authenticate(self):
+    try:
+      data = {
+          'productName': self._product_name,
+          'productSecret': self._product_secret,
+      }
+      return self._root.post('/api/authenticate', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+  def delete_workload(self, token, email=None):
+    try:
+      data = {
+          'email': email if email is not None else self._email,
+          'token': token,
+      }
+      return self._root.post('/api/deleteWorkload', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+
+
+  def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
+    data_headers = OptimizerApi.UPLOAD[data_type]['file_headers']
+
+    if data_type in ('table_stats', 'cols_stats'):
+      data_suffix = '.log'
+    else:
+      data_suffix = '.csv'
+
+    f_queries_path = NamedTemporaryFile(suffix=data_suffix)
+    f_format_path = NamedTemporaryFile(suffix='.json')
+    f_queries_path.close()
+    f_format_path.close() # Reopened as real file below to work well with the command
+
+    try:
+      f_queries = open(f_queries_path.name, 'w+')
+      f_format = open(f_format_path.name, 'w+')
+
+      try:
+        content_generator = OptimizerDataAdapter(data, data_type=data_type)
+        queries_csv = export_csvxls.create_generator(content_generator, 'csv')
+
+        for row in queries_csv:
+          f_queries.write(row)
+
+        f_format.write(data_headers % {
+            'source_platform': source_platform,
+            'tenant': self._product_name,
+            'query_file': f_queries.name,
+            'query_file_name': os.path.basename(f_queries.name)
+        })
+
+      finally:
+        f_queries.close()
+        f_format.close()
+
+      args = {
+          'cliInputJson': 'file://%s' % f_format.name
+      }
+      if workload_id:
+        args['workloadId'] = workload_id
+
+      return self._api.call_api('upload', {'tenant' : self._product_name, 'workfloadId': workload_id}).json()
+
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Optimizer'))
+    finally:
+      os.remove(f_queries_path.name)
+      os.remove(f_format_path.name)
+
+
+  def upload_status(self, workload_id):
+    return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workfloadId': workload_id}).json()
+
+
+  def top_tables(self, workfloadId=None, database_name='default'):    
+    return self._api.call_api('getTopTables', {'tenant' : self._product_name}).json()
+
+
+  def table_details(self, database_name, table_name):
+    return self._api.call_api('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower()}).json()
+
+
+  def query_compatibility(self, source_platform, target_platform, query):
+    return self._api.call_api('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform}).json()
+
+
+  def query_risk(self, query):
+    return self._api.call_api('getQueryRisk', {'tenant' : self._product_name, 'query': query}).json()
+
+
+  def similar_queries(self, source_platform, query):
+    return self._api.call_api('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query}).json()
+
+
+  def top_filters(self, db_tables=None):
+    args = {
+      'tenant' : self._product_name
+    }
+    if db_tables:
+      args['dbTableList'] = [db_table.lower() for db_table in db_tables]
+
+    return self._api.call_api('getTopFilters', args).json()
+
+
+  def top_aggs(self, db_tables=None):
+    args = {
+      'tenant' : self._product_name
+    }
+    if db_tables:
+      args['dbTableList'] = [db_table.lower() for db_table in db_tables]
+
+    return self._api.call_api('getTopAggs', args).json()
+
+
+  def top_columns(self, db_tables=None):
+    args = {
+      'tenant' : self._product_name
+    }
+    if db_tables:
+      args['dbTableList'] = [db_table.lower() for db_table in db_tables]
+
+    return self._api.call_api('getTopColumns', args).json()
+
+
+  def top_joins(self, db_tables=None):
+    args = {
+      'tenant' : self._product_name
+    }
+    if db_tables:
+      args['dbTableList'] = [db_table.lower() for db_table in db_tables]
+
+    return self._api.call_api('getTopJoins', args).json()
+
+
+  def top_databases(self, db_tables=None):
+    args = {
+      'tenant' : self._product_name
+    }
+
+    return self._api.call_api('getTopDataBases', args).json()
+
 
   UPLOAD = {
     'queries': {
@@ -169,247 +374,6 @@ class OptimizerApi(object):
 }"""
     }
   }
-
-  def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
-    self._api_url = (api_url or get_optimizer_url()).strip('/')
-    self._email = OPTIMIZER.EMAIL.get()
-    self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
-    self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
-    self._product_auth_secret = product_auth_secret if product_auth_secret else OPTIMIZER.PRODUCT_AUTH_SECRET.get()
-    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "workload"
-
-    self._client = HttpClient(self._api_url, logger=LOG)
-    self._client.set_verify(ssl_cert_ca_verify)
-
-    self._root = resource.Resource(self._client)
-    self._token = None
-
-
-  def _authenticate(self, force=False):
-    if self._token is None or force:
-      self._token = self.authenticate()['token']
-
-    return self._token
-
-  def _exec(self, command, args):
-    data = None
-    response = {'status': 'error'}
-
-    try:
-      cmd_args = [
-          'ccs',
-          'navopt',
-          '--endpoint-url=%s' % self._api_url,
-          command
-      ]
-      if self._product_secret:
-        cmd_args += ['--auth-config', self._product_secret]
-
-      LOG.info(' '.join(cmd_args + args))
-      data = subprocess.check_output(cmd_args + args)
-    except CalledProcessError, e:
-      if command == 'upload' and e.returncode == 1:
-        LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
-        data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
-      else:
-        raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
-    except RestException, e:
-      raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
-
-    if data:
-      response = json.loads(data)
-      if 'status' not in response:
-        response['status'] = 'success'
-    return response
-
-
-  def get_tenant(self, email=None):
-    return self._exec('get-tenant', ['--email', email or self._email])
-
-
-  def create_tenant(self, group):
-    return self._exec('create-tenant', ['--user-group', group])
-
-
-  def authenticate(self):
-    try:
-      data = {
-          'productName': self._product_name,
-          'productSecret': self._product_secret,
-      }
-      return self._root.post('/api/authenticate', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
-
-  def delete_workload(self, token, email=None):
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-      }
-      return self._root.post('/api/deleteWorkload', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
-
-  def get_status(self, token, email=None):
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-      }
-      return self._root.post('/api/getStatus', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
-
-  def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
-    data_headers = OptimizerApi.UPLOAD[data_type]['file_headers']
-
-    if data_type in ('table_stats', 'cols_stats'):
-      data_suffix = '.log'
-    else:
-      data_suffix = '.csv'
-
-    f_queries_path = NamedTemporaryFile(suffix=data_suffix)
-    f_format_path = NamedTemporaryFile(suffix='.json')
-    f_queries_path.close()
-    f_format_path.close() # Reopened as real file below to work well with the command
-
-    try:
-      f_queries = open(f_queries_path.name, 'w+')
-      f_format = open(f_format_path.name, 'w+')
-
-      try:
-        content_generator = OptimizerDataAdapter(data, data_type=data_type)
-        queries_csv = export_csvxls.create_generator(content_generator, 'csv')
-
-        for row in queries_csv:
-          f_queries.write(row)
-
-        f_format.write(data_headers % {
-            'source_platform': source_platform,
-            'tenant': self._product_name,
-            'query_file': f_queries.name,
-            'query_file_name': os.path.basename(f_queries.name)
-        })
-
-      finally:
-        f_queries.close()
-        f_format.close()
-
-      args = [
-          '--cli-input-json', 'file://%s' % f_format.name
-      ]
-      if workload_id:
-        args += ['--workload-id', workload_id]
-
-      return self._exec('upload', args)
-
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-    finally:
-      os.remove(f_queries_path.name)
-      os.remove(f_format_path.name)
-
-
-  def upload_status(self, workload_id):
-    return self._exec('upload-status', [
-        '--tenant', self._product_name,
-        '--workload-id', workload_id
-    ])
-
-
-  def top_tables(self, workfloadId=None, database_name='default'):        
-    return self._exec('get-top-tables', [
-        '--tenant', self._product_name,
-        '--db-name', database_name.lower()
-    ])
-
-
-  def table_details(self, database_name, table_name):
-    return self._exec('get-tables-detail', [
-        '--tenant', self._product_name,
-        '--db-name', database_name.lower(),
-        '--table-name', table_name.lower()
-    ])
-
-
-  def query_compatibility(self, source_platform, target_platform, query):
-    return self._exec('get-query-compatible', [
-        '--tenant', self._product_name,
-        '--source-platform', source_platform,
-        '--target-platform', target_platform,
-        '--query', query,
-    ])
-
-
-  def query_risk(self, query):
-    return self._exec('get-query-risk', [
-        '--tenant', self._product_name,
-        '--query', query
-    ])
-
-
-  def similar_queries(self, source_platform, query):
-    return self._exec('get-similar-queries', [
-        '--tenant', self._product_name,
-        '--source-platform', source_platform,
-        '--query', query
-    ])
-
-
-  def top_filters(self, db_tables=None):
-    args = [
-        '--tenant', self._product_name,
-    ]
-    if db_tables:
-      args += ['--db-table-list']
-      args.extend([db_table.lower() for db_table in db_tables])
-
-    return self._exec('get-top-filters', args)
-
-
-  def top_aggs(self, db_tables=None):
-    args = [
-        '--tenant', self._product_name
-    ]
-    if db_tables:
-      args += ['--db-table-list']
-      args.extend([db_table.lower() for db_table in db_tables])
-
-    return self._exec('get-top-aggs', args)
-
-
-  def top_columns(self, db_tables=None):
-    args = [
-        '--tenant', self._product_name
-    ]
-    if db_tables:
-      args += ['--db-table-list']
-      args.extend([db_table.lower() for db_table in db_tables])
-
-    return self._exec('get-top-columns', args)
-
-
-  def top_joins(self, db_tables=None):
-    args = [
-        '--tenant', self._product_name,
-    ]
-    if db_tables:
-      args += ['--db-table-list']
-      args.extend([db_table.lower() for db_table in db_tables])
-
-    return self._exec('get-top-joins', args)
-
-
-  def top_databases(self, db_tables=None):
-    args = [
-        '--tenant', self._product_name,
-    ]
-
-    return self._exec('get-top-data-bases', args)
 
 
 def OptimizerDataAdapter(data, data_type='queries'):

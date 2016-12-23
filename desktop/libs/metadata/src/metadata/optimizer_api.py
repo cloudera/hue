@@ -69,7 +69,7 @@ def get_tenant(request):
   api = OptimizerApi()
   data = api.get_tenant(email=email)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['data'] = data['tenant']
   else:
@@ -128,7 +128,7 @@ def table_details(request):
 
   data = api.table_details(database_name=database_name, table_name=table_name)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['details'] = data
   else:
@@ -150,7 +150,7 @@ def query_compatibility(request):
 
   data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['query_compatibility'] = data
   else:
@@ -170,7 +170,7 @@ def query_risk(request):
 
   data = api.query_risk(query=query)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['query_risk'] = data
   else:
@@ -191,7 +191,7 @@ def similar_queries(request):
 
   data = api.similar_queries(source_platform=source_platform, query=query)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['similar_queries'] = data
   else:
@@ -211,7 +211,7 @@ def top_filters(request):
   api = OptimizerApi()
   data = api.top_filters(db_tables=db_tables)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['values'] = data['results']
   else:
@@ -230,7 +230,7 @@ def top_joins(request):
   api = OptimizerApi()
   data = api.top_joins(db_tables=db_tables)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['values'] = data['results']
   else:
@@ -249,7 +249,7 @@ def top_aggs(request):
   api = OptimizerApi()
   data = api.top_aggs(db_tables=db_tables)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['values'] = data['results']
   else:
@@ -266,7 +266,7 @@ def top_databases(request):
   api = OptimizerApi()
   data = api.top_databases()
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['values'] = data['results']
   else:
@@ -285,7 +285,7 @@ def top_columns(request):
   api = OptimizerApi()
   data = api.top_columns(db_tables=db_tables)
 
-  if data['status'] == 'success':
+  if data:
     response['status'] = 0
     response['values'] = data
   else:
