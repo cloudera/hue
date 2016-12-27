@@ -2574,12 +2574,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     window.setTimeout(function () {
       if (vm.editorMode()) {
         $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
+        % if conf.CUSTOM.BANNER_TOP_HTML.get():
+          var bannerTopHeight = 30;
+        % else:
+          var bannerTopHeight = 0;
+        % endif
         $(el).jHueTableExtender2({
           mainScrollable: MAIN_SCROLLABLE,
           % if is_embeddable:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 50 },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 50 + bannerTopHeight },
           % else:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 + bannerTopHeight },
           % endif
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: "fixed"
