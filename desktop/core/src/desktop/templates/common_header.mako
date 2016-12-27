@@ -228,6 +228,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 
   ${ koComponents.all() }
