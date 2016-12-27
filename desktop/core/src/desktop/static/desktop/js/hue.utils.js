@@ -374,6 +374,97 @@ var huePubSub = (function () {
   };
 })();
 
+var hueDrop = (function () {
+  var draggableMeta = {};
+  huePubSub.subscribe('draggable.text.meta', function (meta) {
+    draggableMeta = meta;
+  });
+
+  return {
+    fromAssist: function (element, callback) {
+      if (typeof element === 'function' && !(element instanceof jQuery)) {
+        callback = element;
+      }
+      if (typeof element === 'string') {
+        element = $(element);
+      }
+      if (element.length > 0) {
+        element.droppable({
+          accept: '.draggableText',
+          drop: function (e, ui) {
+            var droppedText = ui.helper.text();
+            if (callback) {
+              callback({
+                text: ui.helper.text(),
+                meta: draggableMeta
+              });
+            }
+          }
+        });
+      }
+      else {
+        console.warn('hueDrop.fromAssist could not be attached to the element');
+      }
+    },
+    fromDesktop: function (element, callback, method) {
+      if (window.FileReader) {
+        if (typeof element === 'function' && !(element instanceof jQuery)) {
+          callback = element;
+        }
+        if (typeof element === 'string') {
+          element = $(element);
+        }
+
+        function handleFileSelect(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          var dt = e.dataTransfer;
+          var files = dt.files;
+          for (var i = 0, f; f = files[i]; i++) {
+            var reader = new FileReader();
+            reader.onload = (function (file) {
+              return function (e) {
+                callback(e.target.result);
+              };
+            })(f);
+            switch (method) {
+              case 'arrayBuffer':
+                reader.readAsArrayBuffer(f);
+                break;
+              case 'binaryString':
+                reader.readAsBinaryString(f);
+                break;
+              case 'dataURL':
+                reader.readAsDataURL(f);
+                break;
+              default:
+                reader.readAsText(f);
+            }
+          }
+        }
+
+        function handleDragOver(e) {
+          e.stopPropagation();
+          e.preventDefault();
+          e.dataTransfer.dropEffect = 'copy';
+        }
+
+        if (element.length > 0) {
+          element[0].addEventListener('dragover', handleDragOver, false);
+          element[0].addEventListener('drop', handleFileSelect, false);
+        }
+        else {
+          console.warn('hueDrop.fromDesktop could not be attached to the element');
+        }
+
+      }
+      else {
+        console.warn('FileReader is not supported by your browser. Please consider upgrading to fully experience Hue!')
+      }
+    }
+  };
+})();
+
 var hueDebugTimer = (function () {
   var initialTime = null;
   var times = [];
