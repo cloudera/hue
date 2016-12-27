@@ -21,10 +21,7 @@ from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
-<%namespace name="hueIcons" file="/hue_icons.mako" />
-
 <%def name="docBrowser()">
-  ${ hueIcons.symbols() }
 
   <script src="/static/desktop/ext/js/bootstrap-fileupload.js" type="text/javascript" charset="utf-8"></script>
   <link rel="stylesheet" href="/static/desktop/ext/css/bootstrap-fileupload.css">

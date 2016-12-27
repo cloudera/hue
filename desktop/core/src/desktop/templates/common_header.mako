@@ -26,6 +26,7 @@ if USE_NEW_EDITOR.get():
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
+<%namespace name="hueIcons" file="/hue_icons.mako" />
 
 <!DOCTYPE html>
 <%def name="is_selected(selected)">
@@ -414,19 +415,6 @@ if USE_NEW_EDITOR.get():
         }
       });
 
-      var _skew = -1;
-      $("[data-hover]").on("mouseover", function(){
-        var _this = $(this);
-        _skew = window.setTimeout(function(){
-          _this.attr("src", _this.data("hover"));
-        }, 3000);
-      });
-
-      $("[data-hover]").on("mouseout", function(){
-        $(this).attr("src", $(this).data("orig"));
-        window.clearTimeout(_skew);
-      });
-
       window.hueDebug = {
         viewModel: function (element) {
           if (typeof element !== 'undefined' && typeof element === 'string') {
@@ -439,6 +427,8 @@ if USE_NEW_EDITOR.get():
   </script>
 </head>
 <body>
+
+${ hueIcons.symbols() }
 
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   <div id="banner-top" class="banner">
@@ -549,7 +539,11 @@ if USE_NEW_EDITOR.get():
   % endif
 
   </div>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /></a>
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about">
+      <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
+        <use xlink:href="#hue-logo"></use>
+      </svg>
+    </a>
     % if user.is_authenticated() and section != 'login':
      <ul class="nav nav-pills pull-left">
        <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>

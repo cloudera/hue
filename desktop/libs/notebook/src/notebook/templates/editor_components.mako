@@ -25,8 +25,6 @@ from metadata.conf import has_optimizer
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
 %>
 
-<%namespace name="hueIcons" file="/hue_icons.mako" />
-
 <%def name="includes(is_embeddable=False)">
 <link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
 % if not is_embeddable:
@@ -209,8 +207,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   }
 % endif
 </style>
-
-${ hueIcons.symbols() }
 
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
