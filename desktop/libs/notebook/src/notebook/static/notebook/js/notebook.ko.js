@@ -920,7 +920,7 @@ var EditorViewModel = (function() {
         chartScatterGroup: typeof self.chartScatterGroup() !== "undefined" ? self.chartScatterGroup() : self.previousChartOptions.chartScatterGroup,
         chartScatterSize: typeof self.chartScatterSize() !== "undefined" ? self.chartScatterSize() : self.previousChartOptions.chartScatterSize
       };
-      $(document).trigger("executeStarted", self);
+      $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
       $(".jHueNotify").hide();
       logGA('execute/' + self.type());
