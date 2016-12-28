@@ -669,6 +669,9 @@ var EditorViewModel = (function() {
     self.chartScatterSize = ko.observable(typeof snippet.chartScatterSize != "undefined" && snippet.chartScatterSize != null ? snippet.chartScatterSize : null);
     self.chartScope = ko.observable(typeof snippet.chartScope != "undefined" && snippet.chartScope != null ? snippet.chartScope : "world");
     self.chartTimelineType = ko.observable(typeof snippet.chartTimelineType != "undefined" && snippet.chartTimelineType != null ? snippet.chartTimelineType : "bar");
+    self.chartLimits = ko.observableArray([5, 10, 25, 50, 100]);
+    self.chartLimit = ko.observable(typeof snippet.chartLimit != "undefined" && snippet.chartLimit != null ? snippet.chartLimit : null);
+    self.chartLimit.extend({notify: 'always'});
     self.chartX = ko.observable(typeof snippet.chartX != "undefined" && snippet.chartX != null ? snippet.chartX : null);
     self.chartX.extend({notify: 'always'});
     self.chartXPivot = ko.observable(typeof snippet.chartXPivot != "undefined" && snippet.chartXPivot != null ? snippet.chartXPivot : null);
@@ -727,6 +730,7 @@ var EditorViewModel = (function() {
     }
 
     self.result.meta.subscribe(function (newValue) {
+      self.chartLimit(self.previousChartOptions.chartLimit);
       self.chartX(guessMetaField(self.previousChartOptions.chartX));
       self.chartXPivot(self.previousChartOptions.chartXPivot);
       self.chartYSingle(guessMetaField(self.previousChartOptions.chartYSingle));
@@ -909,6 +913,7 @@ var EditorViewModel = (function() {
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,
         chartTimelineType: typeof self.chartTimelineType() !== "undefined" ? self.chartTimelineType() : self.previousChartOptions.chartTimelineType,
+        chartLimit: typeof self.chartLimit() !== "undefined" ? self.chartLimit() : self.previousChartOptions.chartLimit,
         chartX: typeof self.chartX() !== "undefined" ? self.chartX() : self.previousChartOptions.chartX,
         chartXPivot: typeof self.chartXPivot() !== "undefined" ? self.chartXPivot() : self.previousChartOptions.chartXPivot,
         chartYSingle: typeof self.chartYSingle() !== "undefined" ? self.chartYSingle() : self.previousChartOptions.chartYSingle,
@@ -2352,6 +2357,7 @@ var EditorViewModel = (function() {
           }
 
           snippet.previousChartOptions = {
+            chartLimit: typeof snippet.chartLimit() !== "undefined" ? snippet.chartLimit() : snippet.previousChartOptions.chartLimit,
             chartX: typeof snippet.chartX() !== "undefined" ? snippet.chartX() : snippet.previousChartOptions.chartX,
             chartXPivot: typeof snippet.chartXPivot() !== "undefined" ? snippet.chartXPivot() : snippet.previousChartOptions.chartXPivot,
             chartYSingle: typeof snippet.chartYSingle() !== "undefined" ? snippet.chartYSingle() : snippet.previousChartOptions.chartYSingle,
