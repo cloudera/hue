@@ -729,6 +729,9 @@ CUSTOM = ConfigSection(
                    default=86400000,
                    type=int,
                    help=_("The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache.")),
+    LOGO_SVG=Config("logo_svg",
+                   default="",
+                   help=_("SVG code to replace the default Hue logo in the top bar and sign in screen")),
 ))
 
 AUTH = ConfigSection(
