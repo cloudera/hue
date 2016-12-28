@@ -21,6 +21,8 @@
   from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 %>
 
+<%namespace name="hueIcons" file="/hue_icons.mako" />
+
 ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True) | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
@@ -40,6 +42,8 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   }
 </style>
 
+${ hueIcons.symbols() }
+
 <div class="navigator">
   <div class="pull-right">
 
@@ -48,7 +52,11 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   </ul>
 
   </div>
-  <a class="brand pull-left" href="/"><img src="${ static('desktop/art/hue-logo-mini-white.png') }" data-orig="${ static('desktop/art/hue-logo-mini-white.png') }" data-hover="${ static('desktop/art/hue-logo-mini-white-hover.png') }" /></a>
+  <a class="brand pull-left" href="/">
+    <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
+      <use xlink:href="#hue-logo"></use>
+    </svg>
+  </a>
 </div>
 
 
@@ -57,7 +65,14 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   <form method="POST" action="${action}" autocomplete="off">
     ${ csrf_token(request) | n,unicode }
 
-    <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70"></div>
+    % if conf.CUSTOM.LOGO_SVG.get():
+    <div class="empty-logo">
+    </div>
+    % else:
+    <div class="logo">
+      <img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70">
+    </div>
+    % endif
 
     %if first_login_ever:
       <div class="alert alert-info center">
@@ -127,6 +142,9 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
 
 <div class="trademark center muted">
+  % if conf.CUSTOM.LOGO_SVG.get():
+    ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: text-top;"> -
+  % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
 </div>
 

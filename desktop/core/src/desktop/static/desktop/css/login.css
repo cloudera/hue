@@ -53,6 +53,12 @@
   margin-bottom: 35px;
 }
 
+.login-container .empty-logo {
+  background-color: #FFF;
+  width: 70px;
+  height: 70px;
+}
+
 .login-container .logo img {
   margin-top: 2px;
 }
