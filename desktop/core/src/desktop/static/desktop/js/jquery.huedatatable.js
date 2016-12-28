@@ -444,7 +444,6 @@
           })
         })
       }
-
       self.fnDraw(true);
 
       if ($('.hue-datatable-search').is(':visible')){
@@ -478,6 +477,7 @@
       self.$table.unwrap();
       self.$table.data('isScrollAttached', null);
       self.$table.removeClass('table-huedatatable');
+      self.$table.parents(self.$table.data('oInit')['scrollable']).off('scroll', self.$table.parents(self.$table.data('oInit')['scrollable']).data('scrollFnDt'));
     };
 
     return self.each(function () {

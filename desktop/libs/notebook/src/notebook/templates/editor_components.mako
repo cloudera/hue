@@ -2554,6 +2554,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       },
       fnDrawCallback: function (oSettings) {
         if (vm.editorMode()) {
+          $('#queryResults').removeAttr('style');
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
           $(el).jHueHorizontalScrollbar();
@@ -3850,24 +3851,28 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         window.setTimeout(forceChartDraws, 50);
       });
 
-      $(document).on("executeStarted", function (e, snippet) {
-        var _el = $("#snippet_" + snippet.id()).find(".resultTable");
-        _el.data('scrollToCol', null);
-        _el.data('scrollToRow', null);
-        $("#snippet_" + snippet.id()).find(".progress-snippet").animate({
+      $(document).on("executeStarted", function (e, options) {
+        var $el = $("#snippet_" + options.snippet.id()).find(".resultTable");
+        if (options.vm.editorMode()) {
+          $('#queryResults').css({
+            height: $el.height() + 'px'
+          });
+        }
+        $el.data('scrollToCol', null);
+        $el.data('scrollToRow', null);
+        $("#snippet_" + options.snippet.id()).find(".progress-snippet").animate({
           height: "3px"
         }, 100);
-        if (_el.hasClass("dt")) {
-          _el.removeClass("dt");
-          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainer").remove();
-          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerColumn").remove();
-          $("#eT" + snippet.id() + "jHueTableExtenderClonedContainerCell").remove();
-          if (_el.hueDataTable()) {
-            _el.hueDataTable().fnClearTable();
-            _el.hueDataTable().fnDestroy();
+        if ($el.hasClass("dt")) {
+          $el.removeClass("dt");
+          $("#eT" + options.snippet.id() + "jHueTableExtenderClonedContainer").remove();
+          $("#eT" + options.snippet.id() + "jHueTableExtenderClonedContainerColumn").remove();
+          $("#eT" + options.snippet.id() + "jHueTableExtenderClonedContainerCell").remove();
+          if ($el.hueDataTable()) {
+            $el.hueDataTable().fnDestroy();
           }
-          _el.find("thead tr").empty();
-          _el.data('lockedRows', {});
+          $el.find("thead tr").empty();
+          $el.data('lockedRows', {});
         }
       });
 
