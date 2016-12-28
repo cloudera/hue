@@ -391,7 +391,9 @@ body {
 }
 
 .left-nav-drop div {
-  margin: 15px 30px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  text-align: center;
 }
 
 .left-nav-visible .left-nav-drop {

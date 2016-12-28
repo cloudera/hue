@@ -290,7 +290,7 @@ ${ hueIcons.symbols() }
   </div>
 
   <div class="content-wrapper">
-    <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }">
+    <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
