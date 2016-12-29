@@ -581,7 +581,7 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div class="doc-browser-container">
+    <div class="doc-browser-container" data-bind="docSelect: activeEntry.entries, docDroppable: { entries: activeEntry.entries }">
       <div class="doc-browser-action-bar">
         <h4 class="doc-browser-main-header">
           <div data-bind="with: activeEntry">
@@ -811,12 +811,12 @@ from desktop.views import _ko
           var dragToSelect = false;
           var alreadySelected = false;
           huePubSub.subscribe('doc.drag.to.select', function (value) {
-            alreadySelected = boundEntry.selected();
+            alreadySelected = boundEntry && boundEntry.selected ? boundEntry.selected() : false;
             dragToSelect = value;
           });
           $element.droppable({
             drop: function (ev, ui) {
-              if (! dragToSelect && boundEntry.isDirectory()) {
+              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 var entriesToMove = $.grep(allEntries(), function (entry) {
                   return entry.selected() && ! entry.isSharedWithMe();
                 });
@@ -828,7 +828,7 @@ from desktop.views import _ko
               $element.removeClass('doc-browser-drop-hover');
             },
             over: function () {
-              if (! dragToSelect && boundEntry.isDirectory()) {
+              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 var movableCount = allEntries().filter(function (entry) {
                   return entry.selected() && ! entry.isSharedWithMe();
                 }).length;
@@ -838,7 +838,7 @@ from desktop.views import _ko
               }
             },
             out: function (event, ui) {
-              if (! dragToSelect && boundEntry.isDirectory()) {
+              if (! dragToSelect && boundEntry.isDirectory && boundEntry.isDirectory()) {
                 $element.removeClass('doc-browser-drop-hover');
               }
             }
@@ -861,15 +861,15 @@ from desktop.views import _ko
               allRows = $('.doc-browser-row');
               var $container = $('.doc-browser-drag-container');
 
-              var selectedEntries = $.grep(allEntries(), function (entry) {
+              var selectedEntries = allEntries ? $.grep(allEntries(), function (entry) {
                 return entry.selected();
-              });
+              }) : [];
 
-              dragToSelect = ! boundEntry.selected();
+              dragToSelect = boundEntry && boundEntry.selected ? ! boundEntry.selected() : true;
 
               huePubSub.publish('doc.browser.dragging', {
                 selectedEntries: selectedEntries,
-                originEntry: boundEntry.parent,
+                originEntry: boundEntry ? boundEntry.parent : null,
                 dragToSelect: dragToSelect
               });
 
@@ -887,8 +887,10 @@ from desktop.views import _ko
                 selectedEntries = [];
               }
 
-              boundEntry.selected(true);
-              if (dragToSelect) {
+              if (boundEntry && boundEntry.selected) {
+                boundEntry.selected(true);
+              }
+              if (dragToSelect && allEntries) {
                 allEntries().forEach(function (entry) {
                   entry.alreadySelected = entry.selected();
                 })
@@ -948,7 +950,7 @@ from desktop.views import _ko
               }
             },
             helper: function (event) {
-              if (boundEntry.selected()) {
+              if (typeof boundEntry !== 'undefined' && boundEntry.selected && boundEntry.selected()) {
                 return $('<div>').addClass('doc-browser-drag-container');
               }
               return $('<div>');
@@ -961,29 +963,31 @@ from desktop.views import _ko
           });
 
           var clickHandler = function (clickedEntry, event) {
-            var clickedIndex = $.inArray(clickedEntry, allEntries());
+            if (allEntries) {
+              var clickedIndex = $.inArray(clickedEntry, allEntries());
 
-            if (event.metaKey || event.ctrlKey) {
-              clickedEntry.selected(!clickedEntry.selected());
-            } else if (event.shiftKey) {
-              var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-entry-index') || 0;
-              var lower = Math.min(lastClickedIndex, clickedIndex);
-              var upper = Math.max(lastClickedIndex, clickedIndex);
-              for (var i = lower; i <= upper; i++) {
-                allEntries()[i].selected(true);
-              }
-            } else {
-              $.each(allEntries(), function (idx, entry) {
-                if (entry !== clickedEntry) {
-                  entry.selected(false);
+              if (event.metaKey || event.ctrlKey) {
+                clickedEntry.selected(!clickedEntry.selected());
+              } else if (event.shiftKey) {
+                var lastClickedIndex = ko.utils.domData.get(document, 'last-clicked-entry-index') || 0;
+                var lower = Math.min(lastClickedIndex, clickedIndex);
+                var upper = Math.max(lastClickedIndex, clickedIndex);
+                for (var i = lower; i <= upper; i++) {
+                  allEntries()[i].selected(true);
                 }
+              } else {
+                $.each(allEntries(), function (idx, entry) {
+                  if (entry !== clickedEntry) {
+                    entry.selected(false);
+                  }
+                });
+                clickedEntry.selected(true);
+              }
+              var selectedEntries = $.grep(allEntries(), function (entry) {
+                return entry.selected();
               });
-              clickedEntry.selected(true);
+              ko.utils.domData.set(document, 'last-clicked-entry-index', selectedEntries.length > 0 ? clickedIndex : 0);
             }
-            var selectedEntries = $.grep(allEntries(), function (entry) {
-              return entry.selected();
-            });
-            ko.utils.domData.set(document, 'last-clicked-entry-index', selectedEntries.length > 0 ? clickedIndex : 0);
           };
 
           ko.bindingHandlers.multiClick.init(element, function () {
