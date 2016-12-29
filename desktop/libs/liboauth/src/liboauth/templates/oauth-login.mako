@@ -31,7 +31,8 @@ from django.utils.translation import ugettext as _
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
 
@@ -99,7 +100,7 @@ from django.utils.translation import ugettext as _
       height: 4px;
       width: 100%;
     }
-	
+
 	.btn.btn-large {
 			min-width: 38%;
 			margin: 8px 0 0 0;
