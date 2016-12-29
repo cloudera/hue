@@ -210,11 +210,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     var _code = (e.keyCode ? e.keyCode : e.which);
     if (_catchEnterKeyOnModals && $(".modal").is(":visible") && _code == 13) {
       var _currentModal = $(".modal:visible");
-      if (_currentModal.find(".btn-primary:not(.disable-enter)").length > 0) {
-        _currentModal.find(".btn-primary:not(.disable-enter)").click();
-      }
-      else if (_currentModal.find(".btn-danger:not(.disable-enter)").length > 0) {
-        _currentModal.find(".btn-danger:not(.disable-enter)").click();
+      if (!$('.jHueAutocompleteElement').is(':focus')){
+        if (_currentModal.find(".btn-primary:not(.disable-enter)").length > 0) {
+          _currentModal.find(".btn-primary:not(.disable-enter)").click();
+        }
+        else if (_currentModal.find(".btn-danger:not(.disable-enter)").length > 0) {
+          _currentModal.find(".btn-danger:not(.disable-enter)").click();
+        }
       }
     }
   });
