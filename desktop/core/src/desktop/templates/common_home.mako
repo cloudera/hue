@@ -21,7 +21,7 @@
 
 <%namespace name="docBrowser" file="/document_browser.mako" />
 
-<%def name="homeJSModels()">
+<%def name="homeJSModels(is_embeddable=False)">
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
   <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
   <script src="${ static('desktop/js/apiHelper.js') }"></script>
@@ -33,7 +33,7 @@
   <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
   <script src="${ static('desktop/js/home2.vm.js') }"></script>
 
-  ${ docBrowser.docBrowser() }
+  ${ docBrowser.docBrowser(is_embeddable) }
 </%def>
 
 
