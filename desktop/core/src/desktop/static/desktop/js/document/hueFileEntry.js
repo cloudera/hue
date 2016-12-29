@@ -503,6 +503,16 @@ var HueFileEntry = (function () {
     }
   };
 
+  HueFileEntry.prototype.openExternalLink = function (entry, event) {
+    event.preventDefault();
+    location.href = $(event.target).attr('href');
+  };
+
+  HueFileEntry.prototype.openResponsiveLink = function (entry, event) {
+    event.preventDefault();
+    huePubSub.publish('open.link', $(event.target).attr('href'));
+  };
+
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {

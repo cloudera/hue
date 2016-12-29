@@ -21,7 +21,7 @@
 
 <%namespace name="common_home" file="/common_home.mako" />
 
-${ common_home.homeJSModels() }
+${ common_home.homeJSModels(True) }
 
 <style type="text/css">
 

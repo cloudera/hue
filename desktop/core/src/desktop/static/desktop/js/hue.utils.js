@@ -277,6 +277,16 @@ if (!String.prototype.includes) {
     return width;
   }
 
+  hueUtils.getSearchParameter = function (search, name, returnNull) {
+    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+        results = regex.exec(search);
+    if (returnNull && results === null){
+      return null;
+    }
+    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+
 
 }(hueUtils = window.hueUtils || {}));
 
@@ -527,13 +537,7 @@ String.prototype.hashCode = function() {
 
 if (!('getParameter' in window.location)) {
   window.location.getParameter = function (name, returnNull) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(window.location.search);
-    if (returnNull && results === null){
-      return null;
-    }
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+    return hueUtils.getSearchParameter(window.location.search, name, returnNull);
   };
 }
 

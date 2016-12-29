@@ -541,9 +541,47 @@ ${ assist.assistPanel() }
           }, 100);
         }
 
-        huePubSub.subscribe('open.fb.file', function(path){
+        huePubSub.subscribe('open.fb.file', function (path) {
           self.extraEmbeddableURLParams(path + '?is_embeddable=true');
           self.currentApp('fileviewer');
+        });
+
+        huePubSub.subscribe('open.link', function (href) {
+          if (href.startsWith('/notebook/editor')){
+            if (location.getParameter('type') !== ''){
+              if (hueUtils.getSearchParameter(href, 'type') !== '' && hueUtils.getSearchParameter(href, 'type') !== location.getParameter('type')) {
+                self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
+              }
+            }
+            else {
+              if (hueUtils.getSearchParameter(href, 'type') !== ''){
+                self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
+              }
+              else {
+                self.changeEditorType('hive');
+              }
+              self.currentApp('editor')
+            }
+          }
+          else if (href.startsWith('/notebook')){
+            self.currentApp('notebook');
+          }
+          else if (href.startsWith('/pig')){
+            self.changeEditorType('pig');
+            self.currentApp('editor');
+          }
+          else if (href.startsWith('/search')){
+            self.currentApp('search');
+          }
+          else if (href.startsWith('/oozie/editor/workflow/new')){
+            self.currentApp('oozie_workflow');
+          }
+          else if (href.startsWith('/oozie/editor/coordinator/new')){
+            self.currentApp('oozie_coordinator');
+          }
+          else if (href.startsWith('/oozie/editor/bundle/new')){
+            self.currentApp('oozie_bundle');
+          }
         });
 
         self.currentApp.subscribe(function (newVal) {
