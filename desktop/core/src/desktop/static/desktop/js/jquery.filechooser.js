@@ -48,6 +48,8 @@
       filesystems: ['hdfs'],
       fsSelected: 'hdfs',
       user: "",
+      onNavigate: function () {
+      },
       onFileChoose: function () {
       },
       onFolderChoose: function () {
@@ -196,6 +198,7 @@
         }
         $.totalStorage(STORAGE_PREFIX + _parent.options.user + _parent.options.fsSelected, path);
         _parent.previousPath = path;
+        _parent.options.onNavigate(_parent.previousPath);
 
         var $search = $('<div>').html('<i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding-left: 20px">').css({
           'position': 'absolute',

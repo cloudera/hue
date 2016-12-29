@@ -321,8 +321,8 @@ from django.utils.translation import ugettext as _
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Move to')}</h3>
       </div>
-      <div class="modal-body">
-        <div id="moveHdfsTree"></div>
+      <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
+        <div id="moveFilechooser"></div>
       </div>
       <div class="modal-footer">
         <div>
@@ -330,7 +330,7 @@ from django.utils.translation import ugettext as _
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary disable-enter" type="submit" value="${_('Move')}"/>
+        <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
       </div>
     </div>
   </form>
@@ -343,8 +343,8 @@ from django.utils.translation import ugettext as _
         <a href="#" class="close" data-dismiss="modal">&times;</a>
         <h3>${_('Copy to')}</h3>
       </div>
-      <div class="modal-body">
-        <div id="copyHdfsTree"></div>
+      <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
+        <div id="copyFilechooser"></div>
       </div>
       <div class="modal-footer">
         <div>
@@ -352,7 +352,7 @@ from django.utils.translation import ugettext as _
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
         <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
-        <input class="btn btn-primary disable-enter" type="submit" value="${_('Copy')}"/>
+        <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
       </div>
     </div>
   </form>
@@ -597,7 +597,6 @@ from django.utils.translation import ugettext as _
     </tr>
   </script>
 
-  <script src="${ static('desktop/js/jquery.hdfstree.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1370,16 +1369,16 @@ from django.utils.translation import ugettext as _
               $("#moveNameRequiredAlert").hide();
               $("#moveForm").find("input[name='*dest_path']").removeClass("fieldError");
               $("#moveModal .modal-footer div").show();
-              $("#moveHdfsTree").remove();
-              $("<div>").attr("id", "moveHdfsTree").appendTo($("#moveModal .modal-body"));
-              $("#moveHdfsTree").jHueHdfsTree({
-                home: viewModel.isS3() ? "" : "/user/${ user }",
-                isS3: viewModel.isS3(),
-                initialPath: viewModel.currentPath(),
-                onPathChange: function (path) {
-                  $("#moveDestination").val((viewModel.isS3() ? "" : (path.indexOf("/") == 0 ? "" : "/")) + path);
-                  $("#moveNameRequiredAlert").hide();
-                }
+              $("#moveFilechooser").remove();
+              $("<div>").attr("id", "moveFilechooser").appendTo($("#moveModal .modal-body"));
+
+              $("#moveFilechooser").jHueFileChooser({
+                initialPath: $("#moveDestination").val(),
+                onNavigate: function (filePath) {
+                  $("#moveDestination").val(filePath);
+                },
+                createFolder: false,
+                uploadFile: false
               });
             });
           }
@@ -1418,21 +1417,20 @@ from django.utils.translation import ugettext as _
           }
         });
 
-        $("#copyModal").on("shown", function(){
+        $("#copyModal").on("shown", function () {
           $("#copyDestination").val('');
           $("#copyNameRequiredAlert").hide();
           $("#copyForm").find("input[name='*dest_path']").removeClass("fieldError");
           $("#copyModal .modal-footer div").show();
-          $("#copyHdfsTree").remove();
-          $("<div>").attr("id", "copyHdfsTree").appendTo($("#copyModal .modal-body"));
-          $("#copyHdfsTree").jHueHdfsTree({
-            home: viewModel.isS3() ? "" : "/user/${ user }",
-            isS3: viewModel.isS3(),
-            initialPath: viewModel.currentPath(),
-            onPathChange: function(path){
-              $("#copyDestination").val((viewModel.isS3() ? "" : (path.indexOf("/") == 0 ? "" : "/")) + path);
-              $("#copyNameRequiredAlert").hide();
-            }
+          $("#copyFilechooser").remove();
+          $("<div>").attr("id", "copyFilechooser").appendTo($("#copyModal .modal-body"));
+          $("#copyFilechooser").jHueFileChooser({
+            initialPath: $("#copyDestination").val(),
+            onNavigate: function (filePath) {
+              $("#copyDestination").val(filePath);
+            },
+            createFolder: false,
+            uploadFile: false
           });
         });
       };
@@ -2195,6 +2193,7 @@ from django.utils.translation import ugettext as _
       huePubSub.subscribe('update.autocompleters', function(){
         $("#moveDestination").jHueHdfsAutocomplete({
           showOnFocus: true,
+          skipEnter: true,
           skipKeydownEvents: true,
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
@@ -2203,6 +2202,7 @@ from django.utils.translation import ugettext as _
         });
         $("#copyDestination").jHueHdfsAutocomplete({
           showOnFocus: true,
+          skipEnter: true,
           skipKeydownEvents: true,
           onEnter: function (el) {
             $("#jHueHdfsAutocomplete").hide();
