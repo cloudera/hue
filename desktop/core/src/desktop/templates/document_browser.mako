@@ -1015,6 +1015,7 @@ from desktop.views import _ko
         huePubSub.subscribe('file.browser.directory.opened', function () {
           self.searchQuery('');
           self.searchVisible(false);
+          $('.tooltip').hide();
         });
 
         var keepSelectionSelector = '.doc-browser-entries, .doc-browser-folder-actions, .doc-browser-header, .doc-browser-search-container, .modal';
