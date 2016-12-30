@@ -144,8 +144,8 @@
 
 <div id="deleteModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Delete')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Confirm Delete')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to delete the selected dashboards?')}</p>

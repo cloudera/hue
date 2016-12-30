@@ -375,9 +375,9 @@ ${ layout.menubar(section='hive1') }
 
 <div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 data-bind="visible: ! $root.role().isEditing()">${ _('Add or select a role') }</h3>
-    <h3 data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title" data-bind="visible: ! $root.role().isEditing()">${ _('Add or select a role') }</h3>
+    <h3 class="modal-title" data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h3>
   </div>
   <div class="modal-body" data-bind="with: $root.role, visible: showCreateRole">
 
@@ -409,8 +409,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="grantPrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Grant privilege') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${ _('Grant privilege') }</h3>
   </div>
   <div class="modal-body">
 
@@ -433,8 +433,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="deleteRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Do you really want to delete the selected role(s)?') }</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${ _('Do you really want to delete the selected role(s)?') }</h3>
   </div>
   <div class="modal-footer">
     <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
@@ -445,8 +445,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="deletePrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Confirm the deletion?') }</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${ _('Confirm the deletion?') }</h3>
   </div>
   <div class="modal-body">
     ${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }
@@ -460,8 +460,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${ _('Select one operation') }</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${ _('Select one operation') }</h3>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
 
@@ -529,8 +529,8 @@ ${ layout.menubar(section='hive1') }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
       <div id="filechooser">

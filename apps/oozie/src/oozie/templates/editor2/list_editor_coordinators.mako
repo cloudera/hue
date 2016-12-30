@@ -121,8 +121,8 @@ ${ layout.menubar(section='coordinators', is_editor=True) }
   <form id="deleteWfForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteWfMessage">${ _('Delete the selected coordinator(s)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="deleteWfMessage">${ _('Delete the selected coordinator(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>

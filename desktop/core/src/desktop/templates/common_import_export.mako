@@ -29,8 +29,8 @@ from django.utils.translation import ugettext as _
 
 <div id="import-documents" class="modal hide fade fileupload-modal">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal" data-clear="fileupload">&times;</a>
-    <h3>${_('Import Hue documents')}</h3>
+    <a href="#" class="close" data-dismiss="modal" data-clear="fileupload"></a>
+    <h3 class="modal-title">${_('Import Hue documents')}</h3>
   </div>
   <div class="modal-body form-inline">
     <div class="pull-right">

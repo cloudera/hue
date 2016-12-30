@@ -286,8 +286,8 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a folder')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Choose a folder')}</h3>
   </div>
   <div class="modal-body">
     <div id="filechooser"></div>
@@ -297,8 +297,8 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <script type="text/html" id="delete-job-modal">
 <div class="modal-header">
-  <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
-  <h3 class="message">${_("Are you sure you'd like to delete this job?") }</h3>
+  <a href="javascript:void(0);" class="close" data-dismiss="modal"></a>
+  <h3 class="modal-title message">${_("Are you sure you'd like to delete this job?") }</h3>
 </div>
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.job">
@@ -309,8 +309,8 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <script type="text/html" id="delete-link-modal">
 <div class="modal-header">
-  <a href="javascript:void(0);" class="close" data-dismiss="modal">&times;</a>
-  <h3 class="message">${_("Are you sure you'd like to delete this link?") }</h3>
+  <a href="javascript:void(0);" class="close" data-dismiss="modal"></a>
+  <h3 class="modal-title message">${_("Are you sure you'd like to delete this link?") }</h3>
 </div>
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.link">

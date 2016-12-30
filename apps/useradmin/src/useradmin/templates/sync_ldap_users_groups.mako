@@ -36,8 +36,8 @@ from django.utils.translation import ugettext as _
 <form action="${path}" method="POST" class="form form-horizontal">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header left">
-    <button type="button" class="close" data-dismiss="modal">&times;</button>
-    <h3>${_('Sync LDAP users and groups')}</h3>
+    <button type="button" class="close" data-dismiss="modal"></button>
+    <h3 class="modal-title">${_('Sync LDAP users and groups')}</h3>
   </div>
   <div class="modal-body">
     <div class="alert alert-info left">

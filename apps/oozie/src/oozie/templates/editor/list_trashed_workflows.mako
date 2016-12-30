@@ -98,8 +98,8 @@ ${ layout.menubar(section='workflows') }
   <form id="destroyWfForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -115,8 +115,8 @@ ${ layout.menubar(section='workflows') }
   <form id="purgeWfsForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="purgeWfsMessage">${ _('Delete all trashed workflow(s)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="purgeWfsMessage">${ _('Delete all trashed workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -132,8 +132,8 @@ ${ layout.menubar(section='workflows') }
   <form id="restoreWfForm" action="${ url('oozie:restore_workflow') }" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="restoreWfMessage">${ _('Restore the selected workflow(s)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="restoreWfMessage">${ _('Restore the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>

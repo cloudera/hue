@@ -25,11 +25,11 @@
 <form action="${ action }" method="POST" class="form submit-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <a href="#" class="close" data-dismiss="modal"></a>
     % if header:
-      <h3>${header}</h3>
+      <h3 class="modal-title">${header}</h3>
     % else:
-      <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+      <h3 class="modal-title">${ _('Submit %(job)s?') % {'job': name} }</h3>
     % endif
   </div>
   <div class="modal-body">
@@ -93,7 +93,7 @@
           ${_('Email not set in ')}<a href="/useradmin/users/edit/${user.username}#step2" target="_blank"> ${_('profile.')} </a>
         % endif
         </label>
-        %endif       
+        %endif
       % if return_json:
         <input type="hidden" name="format" value="json">
       % endif
@@ -106,8 +106,8 @@
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
       <div id="filechooser">

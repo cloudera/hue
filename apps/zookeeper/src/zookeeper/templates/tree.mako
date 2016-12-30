@@ -67,7 +67,7 @@ ${ shared.header(_breadcrumbs, clusters, False) }
     <ul class="nav nav-tabs">
       %if znode.get('dataLength', 0) != 0:
         <li class="active"><a href="#text" data-toggle="tab">${ _('Text') }</a></li>
-        <li><a href="#base64" data-toggle="tab">${ _('Base64') } (${ znode.get('dataLength', 0) })</a></li>        
+        <li><a href="#base64" data-toggle="tab">${ _('Base64') } (${ znode.get('dataLength', 0) })</a></li>
         <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
       %else:
         <li><a href="#stats" data-toggle="tab">${ _('Stats') }</a></li>
@@ -80,7 +80,7 @@ ${ shared.header(_breadcrumbs, clusters, False) }
         % if user.is_superuser:
         <a href="${url('zookeeper:edit_as_text', id=cluster['id'], path=path)}" class="btn"><i class="fa fa-pencil"></i> ${_('Edit as Text')}</a>
         % endif
-      </div>      
+      </div>
       <div class="tab-pane" id="base64">
         <textarea id="textarea64" rows="25" readonly="readonly">${znode.get('data64', '')}</textarea>
         % if user.is_superuser:
@@ -115,8 +115,8 @@ ${ shared.footer() }
 
 <div id="removeModal" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Delete Znode?') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${ _('Delete Znode?') }</h3>
   </div>
   <div class="modal-body">
     <p class="question"></p>

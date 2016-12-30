@@ -189,8 +189,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Create New Table')}</h3>
+        <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+        <h3 class="modal-title">${_('Create New Table')}</h3>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
@@ -318,8 +318,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </form>
     <script id="new_row_modal_template" type="text/html">
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Insert New Row')}</h3>
+        <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+        <h3 class="modal-title">${_('Insert New Row')}</h3>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:app.cluster"/>
@@ -341,8 +341,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </form>
     <script id="new_column_modal_template" type="text/html">
       <div class="modal-header">
-          <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-          <h3>${_('Create New Column')}</h3>
+          <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+          <h3 class="modal-title">${_('Create New Column')}</h3>
         </div>
         <div class="modal-body controls">
           <input type="hidden" data-bind="value: app.cluster"/>
@@ -366,8 +366,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(timestamp())"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp(timestamp())"></span></small></h3>
+        <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+        <h3 class="modal-title">${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(timestamp())"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp(timestamp())"></span></small></h3>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -431,8 +431,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <div id="confirm-modal" action="createTable" method="POST" class="modal hide fade"></div>
   <script id="confirm_template" type="text/html">
     <div class="modal-header">
-      <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-      <h3 data-bind="text: title"></h3>
+      <a class="close" data-dismiss="modal" aria-hidden="true"></a>
+      <h3 class="modal-title" data-bind="text: title"></h3>
     </div>
     <div class="modal-body" data-bind="text: text">
     </div>

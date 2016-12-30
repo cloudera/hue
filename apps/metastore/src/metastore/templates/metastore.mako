@@ -523,8 +523,8 @@ ${ components.menubar() }
       <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
         ${ csrf_token(request) | n,unicode }
         <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
+          <a href="#" class="close" data-dismiss="modal"></a>
+          <h3 class="modal-title" id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
         </div>
         <div class="modal-body">
           <label class="checkbox" style="display: inline-block; margin-top: 5px">
@@ -1169,8 +1169,8 @@ ${ components.menubar() }
     <form method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Drop Table')}</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Drop Table')}</h3>
       </div>
       <div class="modal-body">
         <div>${_('Do you really want to drop the table')} <span style="font-weight: bold;" data-bind="text: database() && database().table() ? database().table().name : ''"></span>?</div>

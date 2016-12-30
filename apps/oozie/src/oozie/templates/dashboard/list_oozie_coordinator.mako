@@ -18,7 +18,7 @@
 <%!
   from desktop.views import commonheader, commonfooter, _ko
   from django.utils.translation import ugettext as _
-  
+
   from oozie.conf import ENABLE_V2
 %>
 
@@ -463,8 +463,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="confirmation_header"></h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title confirmation_header"></h3>
   </div>
   <div id="update-coord" class="span10">
     ${ utils.render_field_no_popover(update_coord_form['endTime'], show_label=True) }

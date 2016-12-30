@@ -87,8 +87,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
     <div id="filechooser">
@@ -101,8 +101,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete indexes')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Delete indexes')}</h3>
   </div>
   <div class="modal-body">
     <ul data-bind="foreach: selectedCloudCollections">
@@ -118,8 +118,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
   <div data-bind="if: collection()" class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Delete index ')} <span data-bind="text: collection().name"></span></h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Delete index ')} <span data-bind="text: collection().name"></span></h3>
   </div>
   <div class="modal-body"></div>
   <div data-bind="if: collection()" class="modal-footer">

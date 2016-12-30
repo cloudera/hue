@@ -383,8 +383,8 @@ ${ workflow.render() }
 
 <div id="settingsModal" class="modal fade hide">
   <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Workflow Settings') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${ _('Workflow Settings') }</h3>
   </div>
   <div class="modal-body">
       <h4>${ _('Variables') }</h4>
@@ -439,8 +439,8 @@ ${ workflow.render() }
 
 <div id="historyModal" class="modal fade hide">
   <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${ _('Submission History') }</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${ _('Submission History') }</h3>
   </div>
   <div class="modal-body">
     <table class="table table-condensed margin-top-20">
@@ -487,8 +487,8 @@ ${ workflow.render() }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
       <div id="filechooser">

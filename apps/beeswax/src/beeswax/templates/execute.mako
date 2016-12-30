@@ -616,8 +616,8 @@ ${ layout.menubar(section='query') }
 
   <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
     </div>
     <div class="modal-body">
       <div id="filechooser">
@@ -629,8 +629,8 @@ ${ layout.menubar(section='query') }
 
   <div id="chooseFolder" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Select a directory')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Select a directory')}</h3>
     </div>
     <div class="modal-body">
       <div id="folderchooser">
@@ -642,8 +642,8 @@ ${ layout.menubar(section='query') }
 
   <div id="choosePath" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Select a file or directory')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Select a file or directory')}</h3>
     </div>
     <div class="modal-body">
       <div id="pathchooser">
@@ -656,9 +656,9 @@ ${ layout.menubar(section='query') }
 
   <div id="saveAs" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <a href="#" class="close" data-dismiss="modal"></a>
 
-      <h3>${_('Choose a name')}</h3>
+      <h3 class="modal-title">${_('Choose a name')}</h3>
     </div>
     <form class="form-horizontal">
       <div class="control-group" id="saveas-query-name">
@@ -691,8 +691,8 @@ ${ layout.menubar(section='query') }
     </div>
 
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save Query Results')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Save Query Results')}</h3>
     </div>
     <div class="modal-body" style="padding: 4px">
       <!-- ko if: $root.design.results.save.saveTargetError() -->
@@ -765,8 +765,8 @@ ${ layout.menubar(section='query') }
 
 <div id="clearHistoryModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm History Clear')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Confirm History Clear')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to clear the query history?')}</p>
@@ -780,8 +780,8 @@ ${ layout.menubar(section='query') }
 %if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Invalid Query')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Invalid Query')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Query requires a select or an aggregate.')}</p>

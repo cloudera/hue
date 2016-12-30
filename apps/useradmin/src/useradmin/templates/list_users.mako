@@ -121,9 +121,8 @@ ${layout.menubar(section='users')}
     <form id="dropTableForm" action="${ url('useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-
-        <h3 id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title" id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>

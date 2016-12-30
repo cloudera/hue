@@ -86,8 +86,8 @@ ${ scheduler.import_modals() }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
       <div id="filechooser">

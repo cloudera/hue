@@ -99,8 +99,8 @@ from django.utils.translation import ugettext as _
   <!-- extract modal -->
   <div id="confirmExtractModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Extract Archive')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Extract Archive')}</h3>
     </div>
     <!-- ko if: selectedFile -->
     <div class="modal-body">
@@ -121,8 +121,8 @@ from django.utils.translation import ugettext as _
   <!-- delete modal -->
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm Delete')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
       <!-- ko if: isS3() && isS3Root() -->
@@ -153,8 +153,8 @@ from django.utils.translation import ugettext as _
   <!-- restore modal -->
   <div id="restoreTrashModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm Restore')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Confirm Restore')}</h3>
     </div>
     <div class="modal-body">
       <p>${_('Are you sure you want to restore these files?')}</p>
@@ -171,8 +171,8 @@ from django.utils.translation import ugettext as _
   <!-- purge modal -->
   <div id="purgeTrashModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm empty trash')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Confirm empty trash')}</h3>
     </div>
 
     <div class="modal-body">
@@ -189,12 +189,12 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- rename modal -->
-  <form id="renameForm" action="/filebrowser/rename?next=${current_request_path | n,unicode }" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="renameForm" action="/filebrowser/rename?next=${current_request_path | n,unicode }" method="POST" enctype="multipart/form-data">
     ${ csrf_token(request) | n,unicode }
     <div id="renameModal" class="modal hide fade">
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Renaming:')} <span id="renameFileName">file name</span></h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Renaming:')} <span id="renameFileName">file name</span></h3>
       </div>
       <div class="modal-body">
         <label>${_('New name')} <input id="newNameInput" name="dest_path" value="" type="text" class="input-xlarge"/></label>
@@ -215,15 +215,15 @@ from django.utils.translation import ugettext as _
 
   <!-- chown modal -->
   % if is_fs_superuser:
-  <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
+  <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked">
     ${ csrf_token(request) | n,unicode }
     <div id="changeOwnerModal" class="modal hide fade">
     <%
       select_filter = is_fs_superuser and 'SelectWithOther' or ''
     %>
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Change Owner/Group')}</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Change Owner/Group')}</h3>
       </div>
 
       <div class="modal-body change-owner-modal-body clearfix" >
@@ -238,7 +238,7 @@ from django.utils.translation import ugettext as _
         </div>
       </div>
 
-      <div class="modal-footer" style="padding-top: 10px;">
+      <div class="modal-footer">
         <div id="chownRequired" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Name is required.')}</span>
         </div>
@@ -250,14 +250,14 @@ from django.utils.translation import ugettext as _
   % endif
 
   <!-- chmod modal -->
-  <form action="/filebrowser/chmod" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix" id="chmodForm">
+  <form action="/filebrowser/chmod" method="POST" enctype="multipart/form-data" id="chmodForm">
     ${ csrf_token(request) | n,unicode }
     <div id="changePermissionModal" class="modal hide fade">
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Change Permissions')} </h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Change Permissions')}</h3>
       </div>
-      <div class="modal-body table-margin">
+      <div class="modal-body">
         <table class="table table-striped">
           <thead>
             <tr>
@@ -266,7 +266,7 @@ from django.utils.translation import ugettext as _
               <th class="center">${_('Group')}</th>
               <th class="center">${_('Other')}</th>
               <th class="center">&nbsp;</th>
-              <th width="120">&nbsp</th>
+              <th width="120">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
@@ -314,12 +314,12 @@ from django.utils.translation import ugettext as _
   </form>
 
   <!-- move modal -->
-  <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="moveForm" action="/filebrowser/move" method="POST" enctype="multipart/form-data">
     ${ csrf_token(request) | n,unicode }
     <div id="moveModal" class="modal hide fade">
-      <div class="modal-header" style="padding-bottom: 10px">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move to')}</h3>
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Move to')}</h3>
       </div>
       <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
         <div id="moveFilechooser"></div>
@@ -336,12 +336,12 @@ from django.utils.translation import ugettext as _
   </form>
 
   <!-- copy modal -->
-  <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="copyForm" action="/filebrowser/copy" method="POST" enctype="multipart/form-data">
     ${ csrf_token(request) | n,unicode }
     <div id="copyModal" class="modal hide fade">
-      <div class="modal-header" style="padding-bottom: 10px">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Copy to')}</h3>
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Copy to')}</h3>
       </div>
       <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
         <div id="copyFilechooser"></div>
@@ -360,10 +360,10 @@ from django.utils.translation import ugettext as _
   <!-- upload file modal -->
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0">&times;</a>
-      <h3>${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
+      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0"></a>
+      <h3 class="modal-title">${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
-    <div class="modal-body form-inline">
+    <div class="modal-body">
       <div id="fileUploader" class="uploader">
         <noscript>
           <p>${_('Enable JavaScript to use the file uploader.')}</p>
@@ -376,10 +376,10 @@ from django.utils.translation import ugettext as _
   <!-- upload archive modal -->
   <div id="uploadArchiveModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0">&times;</a>
-      <h3>${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
+      <a href="#" class="close" data-dismiss="modal" data-bind="visible: pendingUploads() == 0"></a>
+      <h3 class="modal-title">${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h3>
     </div>
-    <div class="modal-body form-inline">
+    <div class="modal-body">
       <div id="archiveUploader" class="uploader">
         <noscript>
           <p>${_('Enable JavaScript to use the file uploader.')}</p>
@@ -390,16 +390,16 @@ from django.utils.translation import ugettext as _
   </div>
 
   <!-- new directory modal -->
-  <form id="createDirectoryForm" data-bind="submit: createDirectory" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="createDirectoryForm" data-bind="submit: createDirectory" method="POST" enctype="multipart/form-data">
     ${ csrf_token(request) | n,unicode }
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <a href="#" class="close" data-dismiss="modal"></a>
         <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
-        <h3>${_('Create Directory')}</h3>
+        <h3 class="modal-title">${_('Create Directory')}</h3>
         <!-- /ko -->
         <!-- ko if: isS3() && isS3Root() -->
-        <h3>${_('Create Bucket')}</h3>
+        <h3 class="modal-title">${_('Create Bucket')}</h3>
         <!-- /ko -->
       </div>
       <div class="modal-body">
@@ -427,12 +427,12 @@ from django.utils.translation import ugettext as _
   </form>
 
   <!-- new file modal -->
-  <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="createFileForm" data-bind="submit: createFile" method="POST" enctype="multipart/form-data">
     ${ csrf_token(request) | n,unicode }
     <div id="createFileModal" class="modal hide fade">
         <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3>${_('Create File')}</h3>
+          <a href="#" class="close" data-dismiss="modal"></a>
+          <h3 class="modal-title">${_('Create File')}</h3>
         </div>
         <div class="modal-body">
           <label>${_('File Name')} <input id="newFileNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
@@ -454,9 +454,9 @@ from django.utils.translation import ugettext as _
   <!-- content summary modal -->
   <div id="contentSummaryModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <a href="#" class="close" data-dismiss="modal"></a>
       <!-- ko if: selectedFile -->
-      <h3 style="word-break: break-all">${_('Summary for')} <span data-bind="text: selectedFile().path"></span></h3>
+      <h3 class="modal-title" style="word-break: break-all">${_('Summary for')} <span data-bind="text: selectedFile().path"></span></h3>
       <!--/ko -->
     </div>
     <div class="modal-body">

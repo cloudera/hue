@@ -175,8 +175,8 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
   <div id="saveAsQueryModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save your query')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Save your query')}</h3>
     </div>
     <div class="modal-body">
       <form class="form-horizontal">

@@ -31,8 +31,8 @@
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close">&times;</a>
-        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
+        <a href="#" class="close"></a>
+        <h3 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">

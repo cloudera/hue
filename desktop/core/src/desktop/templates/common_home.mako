@@ -151,8 +151,8 @@
 <%def name="tour()">
 <div id="jHueTourModal" class="modal hide fade" tabindex="-1">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Did you know?')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${_('Did you know?')}</h3>
   </div>
   <div class="modal-body">
     <ul class="nav nav-tabs" style="margin-bottom: 0">

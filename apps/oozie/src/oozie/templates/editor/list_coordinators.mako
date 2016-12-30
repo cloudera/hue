@@ -138,8 +138,8 @@ ${ layout.menubar(section='coordinators') }
   <form id="trashForm" action="${ url('oozie:delete_coordinator') }" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashMessage">${ _('Move the selected coordinator(s) to trash?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="trashMessage">${ _('Move the selected coordinator(s) to trash?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -155,8 +155,8 @@ ${ layout.menubar(section='coordinators') }
   <form id="destroyForm" action="${ url('oozie:delete_coordinator') }?skip_trash=true" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyMessage">${ _('Delete the selected coordinator(s)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="destroyMessage">${ _('Delete the selected coordinator(s)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>

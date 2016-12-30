@@ -300,8 +300,8 @@ ${layout.menubar(section='query')}
         class="form form-inline form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save Query Results')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Save Query Results')}</h3>
     </div>
     <div class="modal-body">
       <label class="radio">

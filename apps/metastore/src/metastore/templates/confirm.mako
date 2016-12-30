@@ -21,8 +21,8 @@ from django.utils.translation import ugettext as _
 <form action="{{ url }}" method="POST">>
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="javascript:void(0);" class="close">&times;</a>
-    <h3>${ _('Confirm action') }</h3>
+    <a href="javascript:void(0);" class="close"></a>
+    <h3 class="modal-title">${ _('Confirm action') }</h3>
   </div>
   <div class="modal-body">
     <div class="alert-message block-message warning">

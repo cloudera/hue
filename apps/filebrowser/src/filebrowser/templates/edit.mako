@@ -75,8 +75,8 @@ ${ fb_components.menubar() }
     <form id="saveAsForm" action="${url('filebrowser.views.save_file')}" method="POST" class="form-stacked form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save as')}</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Save as')}</h3>
     </div>
     <div class="modal-body" style="max-height: 430px">
         <span class="help-block">${_("Enter the location where you would like to save the file.")}</span>

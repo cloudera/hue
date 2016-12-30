@@ -30,8 +30,8 @@
     <form class="form-horizontal" id="${node_type}-convert-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">
@@ -64,8 +64,8 @@
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
       <div class="modal-content">
@@ -104,11 +104,11 @@
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <a href="#" class="close" data-dismiss="modal"></a>
         <h3 class="message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h3>
       </div>
 
-      <div class="modal-content">
+      <div class="modal-body modal-content">
         <div class="container-fluid">
           <div class="row-fluid">
             <fieldset class="span12">

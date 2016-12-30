@@ -226,8 +226,8 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
   <div id="documentMoveModal" class="modal fade hide">
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Move to a project')}</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Move to a project')}</h3>
     </div>
     <div class="modal-body">
         <p>
@@ -300,8 +300,8 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 <div id="addTagModal" class="modal hide fade">
   <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${_('Create project')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+      <h3 class="modal-title">${_('Create project')}</h3>
     </div>
     <div class="modal-body">
       <p>
@@ -322,8 +322,8 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <div id="removeTagModal" class="modal hide fade">
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Confirm Delete')}</h3>
+        <a href="#" class="close" data-dismiss="modal"></a>
+        <h3 class="modal-title">${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
         <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
@@ -551,8 +551,8 @@ $(document).ready(function(){
 
   <div id="jHueTourModal" class="modal hide fade" tabindex="-1">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${_('Did you know?')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+      <h3 class="modal-title">${_('Did you know?')}</h3>
     </div>
     <div class="modal-body">
      <div class="row-fluid">

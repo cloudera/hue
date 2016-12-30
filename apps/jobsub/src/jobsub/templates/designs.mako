@@ -211,8 +211,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="trashWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -225,8 +225,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="destroyWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyWfMessage">${_('Delete selected designs?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="destroyWfMessage">${_('Delete selected designs?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -239,8 +239,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="purgeWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -253,8 +253,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="restoreWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="restoreWfMessage">${_('Restore selected designs?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="restoreWfMessage">${_('Restore selected designs?')}</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -265,8 +265,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
     <div class="chooser">
@@ -278,8 +278,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseDirectory" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a directory')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Choose a directory')}</h3>
   </div>
   <div class="modal-body">
     <div class="chooser">
@@ -291,8 +291,8 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="choosePath" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a path')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Choose a path')}</h3>
   </div>
   <div class="modal-body">
     <div class="chooser">

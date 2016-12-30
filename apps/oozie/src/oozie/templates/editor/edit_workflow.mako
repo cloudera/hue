@@ -404,8 +404,8 @@ ${ layout.menubar(section='workflows') }
 
 <div id="confirmation" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="message"></h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title message"></h3>
   </div>
   <div class="modal-body">
   </div>
@@ -417,8 +417,8 @@ ${ layout.menubar(section='workflows') }
 
 <div id="runUnsaved" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('The workflow has some unsaved changes')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('The workflow has some unsaved changes')}</h3>
   </div>
   <div class="modal-body">
     <p>

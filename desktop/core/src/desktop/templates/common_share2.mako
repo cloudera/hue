@@ -20,8 +20,8 @@ from django.utils.translation import ugettext as _
 <div id="documentShareModal" class="modal hide fade">
   <!-- ko if: selectedDoc() -->
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3>${_('Sharing settings')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
+    <h3 class="modal-title">${_('Sharing settings')}</h3>
   </div>
   <div class="modal-body">
     <div class="row-fluid">

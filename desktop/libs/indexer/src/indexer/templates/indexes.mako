@@ -46,7 +46,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
       </a>
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create index from a file') }
-      </a>      
+      </a>
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
       </a>
@@ -131,13 +131,13 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
   <div class="snippet-settings" data-bind="visible: createWizard.show">
 
     ${ _('Name') } <input type="text" data-bind="value: createWizard.name"/>
-    
+
     <!-- ko if: createWizard.name() -->
     <select data-bind="options: createWizard.availableWizards, value: createWizard.wizard, optionsText: 'name'" size="5"></select>
 
     <span data-bind="template: { name: 'create-index-from-file', data: createWizard.wizard }"></span>
     <span data-bind="template: { name: 'create-index-from-hive', data: createWizard.wizard }"></span>
-    
+
     <ul data-bind="foreach: createWizard.wizard().sample">
       <li>
         <div data-bind="foreach: $data">
@@ -205,8 +205,8 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
   <form id="deleteIndexForm" method="POST" data-bind="submit: deleteIndexes">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteIndexMessage">${ _('Delete the selected index(es)?') }</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title" id="deleteIndexMessage">${ _('Delete the selected index(es)?') }</h3>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -258,7 +258,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
         $(document).trigger("error", xhr.responseText);
       });
     }
-    
+
     self.edit = function(alias) {
       self.name(alias.name());
       self.chosenCollections(alias.collections());
@@ -294,9 +294,9 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
 
     self.show = ko.observable(false);
     self.showCreate = ko.observable(false);
-    
+
     self.fileWizard = new FileWizard(vm);
-    self.hiveWizard = new HiveWizard(vm);    
+    self.hiveWizard = new HiveWizard(vm);
 
     self.name = ko.observable('');
     self.wizard = ko.observable();

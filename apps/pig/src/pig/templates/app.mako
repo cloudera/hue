@@ -620,8 +620,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Confirm Delete')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Confirm Delete')}</h3>
     </div>
     <div class="modal-body">
       <p class="deleteMsg hide single">${_('Are you sure you want to delete this script?')}</p>
@@ -635,8 +635,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="logsModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Logs')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Logs')}</h3>
     </div>
     <div class="modal-body">
       <img src="${ static('desktop/art/spinner.gif') }" class="hide" />
@@ -649,8 +649,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="submitModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
     </div>
     <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
       <legend style="color:#666">${_('Script variables')}</legend>
@@ -669,8 +669,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="stopModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${_('No')}</a>
@@ -680,8 +680,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="chooseFile" class="modal hide fade">
       <div class="modal-header">
-          <a href="#" class="close" data-dismiss="modal">&times;</a>
-          <h3>${_('Choose a file')}</h3>
+          <a href="#" class="close" data-dismiss="modal"></a>
+          <h3 class="modal-title">${_('Choose a file')}</h3>
       </div>
       <div class="modal-body">
           <div id="filechooser">
@@ -693,8 +693,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="confirmModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Are you sure?')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Are you sure?')}</h3>
     </div>
     <div class="modal-body">
       <p>
@@ -709,8 +709,8 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="nameModal" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Save script')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Save script')}</h3>
     </div>
     <div class="modal-body">
       <p>

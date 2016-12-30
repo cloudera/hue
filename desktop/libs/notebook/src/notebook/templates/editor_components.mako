@@ -398,8 +398,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="detailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
-    <a data-dismiss="modal" class="pointer pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('Row details')}</h3>
+    <a data-dismiss="modal" class="close"></a>
+    <h3 class="modal-title">${_('Row details')}</h3>
   </div>
   <div class="modal-body">
     <table class="table table-striped table-condensed">
@@ -411,8 +411,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="helpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
-    <a data-dismiss="modal" class="pointer pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('Editor keyboard shortcuts')}</h3>
+    <a data-dismiss="modal" class="close"></a>
+    <h3 class="modal-title">${_('Editor keyboard shortcuts')}</h3>
   </div>
   <div class="modal-body">
 
@@ -926,8 +926,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('All Notebook content')}</h3>
+    <a href="javascript: void(0)" data-dismiss="modal" class="close"></a>
+    <h3 class="modal-title">${_('All Notebook content')}</h3>
   </div>
   <div class="modal-body">
     <pre data-bind="oneClickSelect, text: combinedContent"></pre>
@@ -939,8 +939,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
-    <a href="javascript: void(0)" data-dismiss="modal" class="pull-right"><i class="fa fa-times"></i></a>
-    <h3>${_('Import from Github')}</h3>
+    <a href="javascript: void(0)" data-dismiss="modal" class="close"></a>
+    <h3 class="modal-title">${_('Import from Github')}</h3>
   </div>
   <div class="modal-body">
     <div class="input-prepend">
@@ -957,8 +957,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 % if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Invalid Query')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Invalid Query')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Query requires a select or an aggregate.')}</p>
@@ -2322,8 +2322,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="chooseFile" class="modal hide fade" style="z-index: 10000;" tabindex="-1">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+      <a href="#" class="close" data-dismiss="modal"></a>
+      <h3 class="modal-title">${_('Choose a file')}</h3>
   </div>
   <div class="modal-body">
       <div id="filechooser">
@@ -2343,8 +2343,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="removeSnippetModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Remove')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Confirm Remove')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to remove this snippet?')}</p>
@@ -2368,12 +2368,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="saveAsModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <a href="#" class="close" data-dismiss="modal"></a>
     <!-- ko if: $root.editorMode() -->
-      <h3>${_('Save query as...')}</h3>
+    <h3 class="modal-title">${_('Save query as...')}</h3>
     <!-- /ko -->
     <!-- ko ifnot: $root.editorMode() -->
-      <h3>${_('Save notebook as...')}</h3>
+    <h3 class="modal-title">${_('Save notebook as...')}</h3>
     <!-- /ko -->
   </div>
 
@@ -2404,8 +2404,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="authModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Connect to the data source')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Connect to the data source')}</h3>
   </div>
   <div class="modal-body">
     <div class="row-fluid">
@@ -2432,8 +2432,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <div id="clearHistoryModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm History Clear')}</h3>
+    <a href="#" class="close" data-dismiss="modal"></a>
+    <h3 class="modal-title">${_('Confirm History Clear')}</h3>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to clear the query history?')}</p>
@@ -2448,7 +2448,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- ko with: $root.selectedNotebook() -->
   <div id="retryModal" class="modal hide fade" data-keyboard="false" data-backdrop="static">
     <div class="modal-header">
-      <h3>${_('Operation timed out')}</h3>
+      <h3 class="modal-title">${_('Operation timed out')}</h3>
     </div>
     <div class="modal-body">
       <p>${_('The operation timed out. Do you want to retry?')}</p>
