@@ -125,7 +125,7 @@ ${ layout.menubar(section='coordinators', is_editor=True) }
       <h3 class="modal-title" id="deleteWfMessage">${ _('Delete the selected coordinator(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
   </form>

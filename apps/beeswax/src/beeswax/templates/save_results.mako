@@ -66,7 +66,7 @@ ${layout.menubar(section='query')}
           </fieldset>
           <div class="form-actions" style="padding-left:10px">
             <input type="submit" name="save" value="${_('Save')}" class="btn btn-primary"/>
-            <input type="submit" name="cancel" value="${_('Cancel')}" class="btn"/>
+            <input type="submit" name="cancel" value="${_('Cancel')}" class="btn btn-link"/>
           </div>
         </form>
       </p>

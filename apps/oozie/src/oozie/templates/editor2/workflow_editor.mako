@@ -478,7 +478,7 @@ ${ workflow.render() }
     </table>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -493,8 +493,6 @@ ${ workflow.render() }
   <div class="modal-body">
       <div id="filechooser">
       </div>
-  </div>
-  <div class="modal-footer">
   </div>
 </div>
 

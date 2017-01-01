@@ -58,7 +58,7 @@ from django.utils.translation import ugettext as _
     </div>
 
     <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <a href="#" class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
         <button class="btn btn-primary" id="load-data-submit-btn" disabled="disabled">${_('Submit')}</button>
     </div>
 </form>

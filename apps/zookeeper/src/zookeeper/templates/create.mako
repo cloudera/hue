@@ -44,7 +44,7 @@ ${ shared.header(_breadcrumbs, clusters) }
   <br/>
   <br/>
   <input type="submit" class="btn btn-primary" value="${ _('Create Znode') }">
-  <a class="btn" href="${url('zookeeper:tree', id=cluster['id'], path=path)}">${ _('Cancel') }</a>
+  <a class="btn btn-link" href="${url('zookeeper:tree', id=cluster['id'], path=path)}">${ _('Cancel') }</a>
 </form>
 
 

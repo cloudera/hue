@@ -569,7 +569,7 @@ ${ layout.menubar(section='query') }
               </div>
               <!-- /ko -->
               <div class="form-actions" style="padding-left: 10px">
-                <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
+                <a class="btn btn-link" href="javascript:history.go(-1);">${_('Cancel')}</a>
                 <button data-bind="enable: $root.hasParametersFilled, click: tryExecuteParameterizedQuery" type="button" class="btn btn-primary">${_('Execute query')}</button>
               </div>
             </fieldset>
@@ -602,7 +602,7 @@ ${ layout.menubar(section='query') }
               </div>
               <!-- /ko -->
               <div class="form-actions" style="padding-left: 10px">
-                <a class="btn" href="javascript:history.go(-1);">${_('Cancel')}</a>
+                <a class="btn btn-link" href="javascript:history.go(-1);">${_('Cancel')}</a>
                 <button data-bind="enable: $root.hasParametersFilled, click: tryExplainParameterizedQuery" type="button" class="btn btn-primary">${_('Explain query')}</button>
               </div>
             </fieldset>
@@ -623,8 +623,6 @@ ${ layout.menubar(section='query') }
       <div id="filechooser">
       </div>
     </div>
-    <div class="modal-footer">
-    </div>
   </div>
 
   <div id="chooseFolder" class="modal hide fade">
@@ -636,8 +634,6 @@ ${ layout.menubar(section='query') }
       <div id="folderchooser">
       </div>
     </div>
-    <div class="modal-footer">
-    </div>
   </div>
 
   <div id="choosePath" class="modal hide fade">
@@ -648,8 +644,6 @@ ${ layout.menubar(section='query') }
     <div class="modal-body">
       <div id="pathchooser">
       </div>
-    </div>
-    <div class="modal-footer">
     </div>
   </div>
 
@@ -677,7 +671,7 @@ ${ layout.menubar(section='query') }
       </div>
     </form>
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+      <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
       <button data-bind="click: trySaveAsDesign" class="btn btn-primary">${_('Save')}</button>
     </div>
   </div>
@@ -756,7 +750,7 @@ ${ layout.menubar(section='query') }
       <a id="save-results-advanced" href="javascript:void(0)" class="pull-left">${ _('Show advanced fields') }</a>
       % endif
       <a id="save-results-simple" href="javascript:void(0)" class="pull-left hide">${ _('Hide advanced fields') }</a>
-      <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+      <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
       <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
     </div>
   </div>
@@ -772,7 +766,7 @@ ${ layout.menubar(section='query') }
     <p>${_('Are you sure you want to clear the query history?')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger disable-feedback" onclick="viewModel.clearQueryHistory()">${_('Yes')}</a>
   </div>
 </div>
@@ -787,7 +781,7 @@ ${ layout.menubar(section='query') }
     <p>${_('Query requires a select or an aggregate.')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 %endif

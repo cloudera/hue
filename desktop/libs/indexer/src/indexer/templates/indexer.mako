@@ -186,7 +186,6 @@ ${ assist.assistPanel() }
   <div class="modal-body">
     <div id="filechooser"></div>
   </div>
-  <div class="modal-footer"></div>
 </div>
 
 <script type="text/html" id="create-index-wizard">

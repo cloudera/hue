@@ -272,7 +272,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
               </div>
             </fieldset>
             <div class="form-actions">
-              <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
+              <a href="#link/edit-cancel" class="btn btn-link">${_('Cancel')}</a>
               <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
             </div>
           </form>
@@ -292,7 +292,6 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
   <div class="modal-body">
     <div id="filechooser"></div>
   </div>
-  <div class="modal-footer"></div>
 </div>
 
 <script type="text/html" id="delete-job-modal">
@@ -302,7 +301,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 </div>
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.job">
-  <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
+  <a class="btn btn-link" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
   <a data-bind="routie: {'url': 'job/delete/' + $root.job().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
 </script>
@@ -314,7 +313,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 </div>
 <div class="modal-body"></div>
 <div class="modal-footer" data-bind="if: $root.link">
-  <a class="btn" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
+  <a class="btn btn-link" href="javascript:void(0);" data-dismiss="modal">${_('No')}</a>
   <a data-bind="routie: {'url': 'link/delete/' + $root.link().id(), 'bubble': true}" data-dismiss="modal" class="btn btn-danger" href="javascript:void(0);">${_('Yes, delete it')}</a>
 </div>
 </script>

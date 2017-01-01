@@ -195,7 +195,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
       </form>
     </div>
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+      <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
       <button data-bind="click: modalSaveAsQuery" class="btn btn-primary">${_('Save')}</button>
     </div>
   </div>

@@ -209,7 +209,7 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
       <h3 class="modal-title" id="deleteIndexMessage">${ _('Delete the selected index(es)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
   </form>

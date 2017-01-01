@@ -628,7 +628,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       <p class="deleteMsg hide multiple">${_('Are you sure you want to delete these scripts?')}</p>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <a class="btn btn-danger" data-bind="click: deleteScripts">${_('Yes')}</a>
     </div>
   </div>
@@ -643,7 +643,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       <pre class="scroll hide"></pre>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('Close')}</a>
+      <a class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
     </div>
   </div>
 
@@ -662,7 +662,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       </div>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <a id="runScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: runScript">${_('Yes')}</a>
     </div>
   </div>
@@ -673,7 +673,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       <h3 class="modal-title">${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h3>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <a id="stopScriptBtn" class="btn btn-danger disable-feedback" data-bind="click: stopScript">${_('Yes')}</a>
     </div>
   </div>
@@ -686,8 +686,6 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       <div class="modal-body">
           <div id="filechooser">
           </div>
-      </div>
-      <div class="modal-footer">
       </div>
   </div>
 
@@ -702,7 +700,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       </p>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <a class="btn btn-danger disable-feedback" data-bind="click: confirmScript">${_('Yes')}</a>
     </div>
   </div>
@@ -722,7 +720,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       </p>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
       <button class="btn btn-primary disable-feedback" data-bind="click: saveScript, enable: currentScript().name() != '' && currentScript().name() != $root.LABELS.NEW_SCRIPT_NAME">${_('Save')}</button>
     </div>
   </div>

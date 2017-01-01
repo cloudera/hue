@@ -138,7 +138,7 @@ ${ layout.menubar(section='bundles') }
       <h3 class="modal-title" id="trashMessage">${ _('Move the selected bundle(s) to trash?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
     <div class="hide">
@@ -155,7 +155,7 @@ ${ layout.menubar(section='bundles') }
       <h3 class="modal-title" id="destroyMessage">${ _('Delete the selected bundle(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
     <div class="hide">

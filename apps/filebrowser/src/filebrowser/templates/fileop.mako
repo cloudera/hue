@@ -42,7 +42,7 @@ ${ csrf_token(request) | n,unicode }
 % endif
 <div>
 <input type="submit" value="${('Submit')}" class="btn btn-primary" />
-<a href="${urlencode(next)}" class="btn">${('Cancel')}</a>
+<a href="${urlencode(next)}" class="btn btn-link">${('Cancel')}</a>
 </div>
 </form>
 </div>

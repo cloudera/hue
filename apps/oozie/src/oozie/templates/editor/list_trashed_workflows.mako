@@ -102,7 +102,7 @@ ${ layout.menubar(section='workflows') }
       <h3 class="modal-title" id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
     <div class="hide">
@@ -119,7 +119,7 @@ ${ layout.menubar(section='workflows') }
       <h3 class="modal-title" id="purgeWfsMessage">${ _('Delete all trashed workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
     <div class="hide">
@@ -136,7 +136,7 @@ ${ layout.menubar(section='workflows') }
       <h3 class="modal-title" id="restoreWfMessage">${ _('Restore the selected workflow(s)?') }</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
       <input type="submit" class="btn btn-danger" value="${ _('Yes') }"/>
     </div>
     <div class="hide">

@@ -244,7 +244,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
         </p>
     </div>
     <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+       <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
     </div>
 </div>
 
@@ -314,7 +314,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
       <div id="saveProjectAlert" class="alert-message error hide" style="position: absolute; left: 78px;">
         <span class="label label-important"></span>
       </div>
-      <a href="#" data-dismiss="modal" class="btn">${_('Cancel')}</a>
+      <a href="#" data-dismiss="modal" class="btn btn-link">${_('Cancel')}</a>
       <a id="tagsNewBtn" href="#" class="btn btn-primary disable-feedback">${ _('Add') }</a>
     </div>
   </form>
@@ -329,7 +329,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
         <p>${_('Are you sure you want to delete the project')} <strong><span data-bind="text: selectedTagForDelete().name"></span></strong>? ${_('All its documents will be moved to the default tag.')}</p>
     </div>
     <div class="modal-footer">
-        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
         <a id="tagRemoveBtn" class="pointer btn btn-danger disable-feedback">${_('Yes')}</a>
     </div>
 </div>

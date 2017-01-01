@@ -476,15 +476,15 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
       <p class="confirmation_body"></p>
   </div>
   <div class="modal-footer danger hide">
-    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger btn-confirm disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
   <div class="modal-footer normal hide">
-    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-primary btn-confirm disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
   <div class="modal-footer update hide">
-    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
     <a class="btn btn-primary btn-confirm disable-feedback" href="javascript:void(0);">${_('Update')}</a>
   </div>
 </div>

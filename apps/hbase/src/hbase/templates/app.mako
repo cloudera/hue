@@ -200,7 +200,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         <a class="pointer action_addColumn"><i class="fa fa-plus-circle"></i> ${_('Add an additional column family')}</a>
       </div>
       <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+        <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
         <input type="submit" class="btn btn-primary" value="${_('Submit')}"/>
       </div>
     </form>
@@ -331,7 +331,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         <a class="btn action_addColumnValue"><i class="fa fa-plus-circle"></i> ${_('Add Field')}</a>
       </div>
       <div class="modal-footer">
-        <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+        <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
         <input type="submit" class="btn btn-primary" value="Submit" />
       </div>
     </script>
@@ -354,7 +354,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           <textarea placeholder = "${_('Cell Value')}"></textarea>
         </div>
         <div class="modal-footer">
-          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <a id="column-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
           <input type="submit" class="btn btn-primary" value="Submit">
         </div>
@@ -396,13 +396,18 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       </div>
       <div class="modal-footer">
         <!-- ko if: showingCurrent -->
-          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <a id="file-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
           <input data-bind="visible: mime().split('/')[0].toLowerCase() != 'application' && mime().split('/')[0].toLowerCase() != 'image'" type="submit" class="btn btn-primary disable-enter" value="${_('Save')}">
         <!-- /ko -->
         <!-- ko ifnot: showingCurrent -->
+<<<<<<< HEAD
           <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
           <input type="submit" class="btn btn-primary disable-enter" value="${_('Revert')}">
+=======
+          <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+          <input type="submit" class="btn btn-primary" value="${_('Revert')}">
+>>>>>>> eb69f70... [ui] Add btn-link to Cancel buttons.
         <!-- /ko -->
       </div>
     </script>
@@ -437,7 +442,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     <div class="modal-body" data-bind="text: text">
     </div>
     <div class="modal-footer">
-      <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+      <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
       <button class="confirm-submit btn btn-danger" data-dismiss="modal">${_('Confirm')}</button>
     </div>
   </script>

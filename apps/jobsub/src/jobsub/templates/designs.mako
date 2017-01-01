@@ -215,7 +215,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <h3 class="modal-title" id="trashWfMessage">${_('Move the selected designs to trash?')}</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: trashDesigns" />
     </div>
   </form>
@@ -229,7 +229,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <h3 class="modal-title" id="destroyWfMessage">${_('Delete selected designs?')}</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: destroyDesigns" />
     </div>
   </form>
@@ -243,7 +243,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <h3 class="modal-title" id="purgeWfMessage">${_('Delete all trashed designs?')}</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: destroyAllTrashedDesigns" />
     </div>
   </form>
@@ -257,7 +257,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <h3 class="modal-title" id="restoreWfMessage">${_('Restore selected designs?')}</h3>
     </div>
     <div class="modal-footer">
-      <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+      <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}" data-dismiss="modal" data-bind="click: restoreDesigns" />
     </div>
   </form>

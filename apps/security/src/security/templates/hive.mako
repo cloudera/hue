@@ -400,7 +400,7 @@ ${ layout.menubar(section='hive1') }
     </div>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().create, visible: ! $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Save') }</button>
     <button class="btn btn-primary disable-enter disable-feedback" data-bind="click: $root.role().update, visible: $root.role().isEditing(), css: {'disabled': $root.role().isLoading() || !$root.role().isValid()}">${ _('Update') }</button>
   </div>
@@ -425,7 +425,7 @@ ${ layout.menubar(section='hive1') }
 
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button data-loading-text="${ _('Saving...') }" class="btn btn-primary disable-enter" data-bind="click: $root.grant_privilege">${ _('Grant') }</button>
   </div>
 </div>
@@ -437,7 +437,7 @@ ${ layout.menubar(section='hive1') }
     <h3 class="modal-title">${ _('Do you really want to delete the selected role(s)?') }</h3>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: $root.deleteSelectedRoles">${ _('Yes') }</button>
   </div>
 </div>
@@ -452,7 +452,7 @@ ${ layout.menubar(section='hive1') }
     ${ _('Sentry will recursively delete the SERVER or DATABASE privileges you marked for deletion.') }
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button data-loading-text="${ _('Deleting...') }" class="btn btn-danger" data-bind="click: function() { $root.role().savePrivileges($root.roleToUpdate()); }">${ _('Yes, delete') }</button>
   </div>
 </div>
@@ -522,7 +522,7 @@ ${ layout.menubar(section='hive1') }
 
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button class="btn" data-bind="enable: $root.bulkAction(), css: {'btn-primary': $root.bulkAction() != 'delete', 'btn-danger': $root.bulkAction() == 'delete'}, click: $root.bulkPerfomAction">${ _('Confirm') }</button>
   </div>
 </div>

@@ -277,7 +277,7 @@ except ImportError, e:
         </form>
       </div>
       <div class="modal-footer">
-        <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
+        <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
         <button data-bind="click: trySaveResults, css: {'disabled': ! isValidDestination()}" class="btn btn-primary disable-feedback">${_('Save')}</button>
       </div>
     </div>
@@ -306,7 +306,7 @@ except ImportError, e:
         <button data-bind="click: cancelDownload" class="btn btn-danger disable-feedback">${_('Cancel Download')}</button>
         <!-- /ko -->
         <!-- ko if: downloadTruncated -->
-        <button class="btn disable-feedback" data-dismiss="modal">${_('Close')}</button>
+        <button class="btn btn-link disable-feedback" data-dismiss="modal">${_('Close')}</button>
         <!-- /ko -->
       </div>
     </div>

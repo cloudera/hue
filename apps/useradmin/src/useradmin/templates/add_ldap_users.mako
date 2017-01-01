@@ -49,7 +49,7 @@ ${ layout.menubar(section='users') }
       % else:
           <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
       % endif
-      <a href="${url('useradmin.views.list_users')}" class="btn">${_('Cancel')}</a>
+      <a href="${url('useradmin.views.list_users')}" class="btn btn-link">${_('Cancel')}</a>
     </div>
   </form>
 </div>

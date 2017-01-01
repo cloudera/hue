@@ -113,7 +113,7 @@ ${layout.menubar(section='groups')}
       <h3 class="modal-title" id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
     </div>
     <div class="modal-footer">
-      <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
+      <a href="javascript:void(0);" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
     <div class="hide">

@@ -93,8 +93,6 @@ ${ scheduler.import_modals() }
       <div id="filechooser">
       </div>
   </div>
-  <div class="modal-footer">
-  </div>
 </div>
 
 

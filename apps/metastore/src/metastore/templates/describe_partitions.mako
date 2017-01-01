@@ -169,7 +169,7 @@ ${ assist.assistPanel() }
       <h3 class="modal-title" id="dropPartitionMessage">${_('Confirm action')}</h3>
     </div>
     <div class="modal-footer">
-      <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+      <input type="button" class="btn btn-link" data-dismiss="modal" value="${_('Cancel')}" />
       <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
     </div>
     <select class="hide" name="partition_selection" data-bind="options: $root.availablePartitions, selectedOptions: $root.chosenPartitions" size="5" multiple="true"></select>

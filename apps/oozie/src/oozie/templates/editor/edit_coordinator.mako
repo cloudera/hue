@@ -326,7 +326,7 @@ ${ layout.menubar(section='coordinators') }
           </div>
           <div class="form-actions">
             <a href="#" class="btn btn-primary" id="update-dataset-btn">${ _('Update dataset') }</a>
-            <a href="#listDataset" class="btn">${ _('Cancel') }</a>
+            <a href="#listDataset" class="btn btn-link">${ _('Cancel') }</a>
           </div>
         </div>
 

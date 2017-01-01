@@ -334,7 +334,7 @@ ${ components.menubar() }
             </ul>
           </div>
           <div class="modal-footer">
-            <input type="button" class="btn" data-dismiss="modal" value="${_('No')}">
+            <input type="button" class="btn btn-link" data-dismiss="modal" value="${_('No')}">
             <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
           </div>
           <!-- ko foreach: selectedDatabases -->
@@ -532,7 +532,7 @@ ${ components.menubar() }
           </label>
         </div>
         <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" value="${_('No')}" />
+          <input type="button" class="btn btn-link" data-dismiss="modal" value="${_('No')}" />
           <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
         </div>
         <!-- ko foreach: selectedTables -->
@@ -1177,7 +1177,7 @@ ${ components.menubar() }
       </div>
       <div class="modal-footer">
         <input type="hidden" name="table_selection" data-bind="value: database() && database().table() ? database().table().name : ''" />
-        <input type="button" class="btn" data-dismiss="modal" value="${_('No')}"/>
+        <input type="button" class="btn btn-link" data-dismiss="modal" value="${_('No')}"/>
         <input type="submit" data-bind="click: function (vm, e) { var $form = $(e.target).parents('form'); $form.attr('action', '/metastore/tables/drop/' + vm.database().name); return true; }" class="btn btn-danger" value="${_('Yes, drop this table')}"/>
       </div>
     </form>

@@ -223,8 +223,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
       <div id="filechooser">
       </div>
   </div>
-  <div class="modal-footer">
-  </div>
 </div>
 
 

@@ -260,7 +260,7 @@ ${ layout.menubar(section='hdfs') }
   </div>
   <div class="modal-footer">
     <label class="checkbox pull-left"><input type="checkbox" data-bind="checked: $root.assist.recursive"> ${ _('Apply recursively to all subfolders and files') }</label>
-    <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+    <button class="btn btn-link" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
     <button class="btn" data-bind="enable: $root.assist.bulkAction(), css: {'btn-primary': $root.assist.bulkAction() != 'delete', 'btn-danger': $root.assist.bulkAction() == 'delete'}, click: $root.assist.bulkPerfomAction">${ _('Confirm') }</button>
   </div>
 </div>

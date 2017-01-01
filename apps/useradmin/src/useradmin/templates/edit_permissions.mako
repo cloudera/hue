@@ -55,7 +55,7 @@ ${layout.menubar(section='permissions')}
 
       <div class="form-actions">
         <input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
-        <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
+        <a href="/useradmin/permissions" class="btn btn-link">${_('Cancel')}</a>
       </div>
     </form>
   </div>

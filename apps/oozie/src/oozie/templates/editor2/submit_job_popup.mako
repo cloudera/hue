@@ -99,7 +99,7 @@
       % endif
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${ _('Cancel') }</a>
     <input id="submit-btn" type="submit" class="btn btn-primary" value="${ _('Submit') }"/>
   </div>
 </form>

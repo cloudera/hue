@@ -920,7 +920,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       </div>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -933,7 +933,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <pre data-bind="oneClickSelect, text: combinedContent"></pre>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="#" class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 
@@ -949,7 +949,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </div>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('Close')}</a>
     <a id ="importGithubBtn" href="#" class="btn btn-primary disable-feedback" data-bind="click: authorizeGithub">${_('Import')}</a>
   </div>
 </div>
@@ -964,7 +964,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <p>${_('Query requires a select or an aggregate.')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
+    <a class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
   </div>
 </div>
 % endif
@@ -2395,7 +2395,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </form>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
     <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"/>
   </div>
   <!-- /ko -->
@@ -2424,7 +2424,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </div>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
     <a class="btn btn-primary disable-feedback" data-dismiss="modal" data-bind="click: function() { $root.selectedNotebook().authSession(); }">${_('Connect')}</a>
   </div>
 </div>
@@ -2439,7 +2439,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <p>${_('Are you sure you want to clear the query history?')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger disable-feedback" data-bind="click: function() { $root.selectedNotebook().clearHistory(); }">${_('Yes')}</a>
   </div>
 </div>
@@ -2454,7 +2454,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <p>${_('The operation timed out. Do you want to retry?')}</p>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-bind="click: retryModalCancel">${_('No')}</a>
+      <a class="btn btn-link" data-bind="click: retryModalCancel">${_('No')}</a>
       <a class="btn btn-primary disable-feedback" data-bind="click: retryModalConfirm">${_('Yes, retry')}</a>
     </div>
   </div>

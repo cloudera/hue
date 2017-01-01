@@ -122,7 +122,7 @@ ${ shared.footer() }
     <p class="question"></p>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${ _('Cancel') }</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${ _('Cancel') }</a>
     <a id="removeBtnModal" href="#" class="btn btn-danger disable-feedback">${ _('Yes, delete it!') }</a>
   </div>
 </div>

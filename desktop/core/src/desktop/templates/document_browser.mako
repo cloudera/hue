@@ -412,7 +412,7 @@ from desktop.views import _ko
         </div>
       </div>
       <div class="modal-footer">
-        <a href="#" data-dismiss="modal" class="btn disable-feedback disable-enter">${_('Close')}</a>
+        <a href="#" data-dismiss="modal" class="btn btn-primary disable-feedback disable-enter">${_('Close')}</a>
       </div>
       <!-- /ko -->
       <!-- /ko -->
@@ -433,16 +433,6 @@ from desktop.views import _ko
               <span data-bind="visible: uploadFailed">${ _('Import failed!') }</span>
               <progress data-bind="visible: uploading() || uploadComplete()" id="importDocumentsProgress" value="0" max="100" style="width: 560px;"></progress>
             </div>
-            <div class="pull-right">
-              <!-- ko ifnot: uploading() || uploadComplete() -->
-              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
-              <input type="submit" class="btn btn-danger" data-clear="fileupload" data-bind="enable: importEnabled, click: upload" value="${ _('Import') }" />
-              <!-- /ko -->
-              <!-- ko if: uploading() || uploadComplete() -->
-              <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Close') }" />
-              <!-- /ko -->
-            </div>
-
             <div class="fileupload fileupload-new" data-provides="fileupload" data-bind="visible: !uploading() && !uploadComplete()">
               <span class="btn btn-file" style="line-height: 29px">
                 <span class="fileupload-new">${ _('Select json file') }</span>
@@ -454,6 +444,15 @@ from desktop.views import _ko
             </div>
             ${ csrf_token(request) | n,unicode }
             <input type="hidden" name="path" data-bind="value: definition().path" />
+          </div>
+          <div class="modal-footer">
+            <!-- ko ifnot: uploading() || uploadComplete() -->
+            <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Cancel') }" />
+            <input type="submit" class="btn btn-danger" data-clear="fileupload" data-bind="enable: importEnabled, click: upload" value="${ _('Import') }" />
+            <!-- /ko -->
+            <!-- ko if: uploading() || uploadComplete() -->
+            <input type="button" class="btn" data-clear="fileupload" data-bind="click: closeUploadModal" value="${ _('Close') }" />
+            <!-- /ko -->
           </div>
         </form>
       <!-- /ko -->
@@ -496,7 +495,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
       <div class="modal-footer">
-        <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: closeUploadModal"/>
+        <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn btn-primary" value="${ _('Close') }" data-bind="click: closeUploadModal"/>
       </div>
       <!-- /ko -->
     </div>
@@ -512,7 +511,7 @@ from desktop.views import _ko
           <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
         </div>
         <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" value="${ _('Cancel') }">
+          <input type="button" class="btn btn-link" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" value="${ _('Cancel') }">
           <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Create') }" data-bind="click: function () { if ($('#newDirectoryName').val()) { $data.createDirectory($('#newDirectoryName').val()); $('#createDirectoryModal').modal('hide'); } }"/>
         </div>
       </form>
@@ -530,7 +529,7 @@ from desktop.views import _ko
           <input id="renameDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
         </div>
         <div class="modal-footer">
-          <input type="button" class="btn" data-dismiss="modal" data-bind="click: function () { $('#renameDirectoryName').val(null) }" value="${ _('Cancel') }">
+          <input type="button" class="btn btn-link" data-dismiss="modal" data-bind="click: function () { $('#renameDirectoryName').val(null) }" value="${ _('Cancel') }">
           <input type="submit" class="btn btn-primary disable-feedback" value="${ _('Rename') }" data-bind="click: function () { if ($('#renameDirectoryName').val()) { $data.selectedEntry().renameDirectory($('#renameDirectoryName').val()); $('#renameDirectoryModal').modal('hide'); } }"/>
         </div>
       </form>
@@ -571,10 +570,10 @@ from desktop.views import _ko
       </div>
       <div class="modal-footer">
         <!-- ko if: entriesToDelete().length === 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Close') }">
+        <input type="button" class="btn btn-link" data-dismiss="modal" value="${ _('Close') }">
         <!-- /ko -->
         <!-- ko if: entriesToDelete().length > 0 -->
-        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+        <input type="button" class="btn btn-link" data-dismiss="modal" value="${ _('Cancel') }">
         <input type="submit" data-bind="click: function() { if (isTrash() || isTrashed()) { removeDocuments(true) } else { moveToTrash() } }" class="btn btn-danger" value="${_('Yes')}"/>
         <!-- /ko -->
       </div>

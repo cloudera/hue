@@ -550,7 +550,7 @@ ${ comps.menubar() }
     <p>${_('Are you sure you want to kill this job?')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a id="killJobBtn" class="btn btn-danger disable-feedback">${_('Yes')}</a>
   </div>
 </div>

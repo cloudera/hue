@@ -41,7 +41,7 @@
       </div>
 
       <div class="modal-footer">
-        <button data-dismiss="modal" class="btn">${ _('No')}</button>
+        <button data-dismiss="modal" class="btn btn-link">${ _('No')}</button>
         % if 'convert' in javascript_attrs:
           <button data-dismiss="modal" class="btn btn-primary" data-bind="visible: !$root.context().read_only, click: ${ javascript_attrs['convert'] }">${ _('Yes') }</button>
         % endif
@@ -83,7 +83,7 @@
       </div>
 
       <div class="modal-footer">
-        <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
+        <a class="btn btn-link cancelButton" href="javascript:void(0);">Cancel</a>
         <button class="btn btn-primary doneButton" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
       </div>
 
@@ -184,7 +184,7 @@
       </div>
 
       <div class="modal-footer">
-        <a class="btn cancelButton" href="javascript:void(0);">Cancel</a>
+        <a class="btn btn-link cancelButton" href="javascript:void(0);">Cancel</a>
         <button class="btn btn-primary doneButton" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
       </div>
 

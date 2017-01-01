@@ -112,7 +112,7 @@ from django.utils.translation import ugettext as _
       </ul>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
       <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: extractSelectedArchive"/>
     </div>
     <!-- /ko -->
@@ -144,7 +144,7 @@ from django.utils.translation import ugettext as _
     <div class="modal-footer">
       <form id="deleteForm" action="/filebrowser/rmtree" method="POST" enctype="multipart/form-data" class="form-stacked">
         ${ csrf_token(request) | n,unicode }
-        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
         <input type="submit" value="${_('Yes')}" class="btn btn-danger" />
       </form>
     </div>
@@ -162,7 +162,7 @@ from django.utils.translation import ugettext as _
     <div class="modal-footer">
       <form id="restoreTrashForm" action="/filebrowser/trash/restore" method="POST" enctype="multipart/form-data" class="form-stacked">
         ${ csrf_token(request) | n,unicode }
-        <a class="btn" data-dismiss="modal">${_('No')}</a>
+        <a class="btn btn-link" data-dismiss="modal">${_('No')}</a>
         <input type="submit" value="${_('Yes')}" class="btn btn-primary" />
       </form>
     </div>
@@ -182,7 +182,7 @@ from django.utils.translation import ugettext as _
     <div class="modal-footer">
       <form id="purgeTrashForm" action="/filebrowser/trash/purge" method="POST" enctype="multipart/form-data" class="form-stacked">
         ${ csrf_token(request) | n,unicode }
-        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Delete all')}" class="btn btn-danger" />
       </form>
     </div>
@@ -207,7 +207,7 @@ from django.utils.translation import ugettext as _
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
         <input id="renameSrcPath" type="hidden" name="src_path" type="text">
-        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <a class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Rename')}" class="btn btn-primary" />
       </div>
     </div>
@@ -242,7 +242,7 @@ from django.utils.translation import ugettext as _
         <div id="chownRequired" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Name is required.')}</span>
         </div>
-        <a class="btn" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
+        <a class="btn btn-link" onclick="$('#changeOwnerModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Submit')}" />
       </div>
     </div>
@@ -307,7 +307,7 @@ from django.utils.translation import ugettext as _
         </table>
       </div>
       <div class="modal-footer" style="padding-top: 10px;">
-        <a class="btn" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
+        <a class="btn btn-link" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
       </div>
     </div>
@@ -329,7 +329,7 @@ from django.utils.translation import ugettext as _
           <input type="text" class="input-xlarge disable-autofocus" value="" name="dest_path" id="moveDestination" placeholder="${_('Select a folder or paste a path...')}" />
           <span id="moveNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
-        <a class="btn" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
+        <a class="btn btn-link" onclick="$('#moveModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Move')}"/>
       </div>
     </div>
@@ -351,7 +351,7 @@ from django.utils.translation import ugettext as _
           <input type="text" class="input-xlarge disable-autofocus" value="" name="dest_path" id="copyDestination" placeholder="${_('Select a folder or paste a path...')}" />
           <span id="copyNameRequiredAlert" class="hide label label-important">${_('Required')}</span>
         </div>
-        <a class="btn" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
+        <a class="btn btn-link" onclick="$('#copyModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Copy')}"/>
       </div>
     </div>
@@ -420,7 +420,7 @@ from django.utils.translation import ugettext as _
         <div id="directoryNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
-        <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
+        <a class="btn btn-link" href="#" data-dismiss="modal">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Create')}" />
       </div>
     </div>
@@ -445,7 +445,7 @@ from django.utils.translation import ugettext as _
           <div id="fileNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
             <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
           </div>
-          <a class="btn" href="#" data-dismiss="modal">${_('Cancel')}</a>
+          <a class="btn btn-link" href="#" data-dismiss="modal">${_('Cancel')}</a>
           <input class="btn btn-primary" type="submit" value="${_('Create')}" />
         </div>
     </div>
@@ -489,7 +489,7 @@ from django.utils.translation import ugettext as _
       </table>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('Close')}</a>
+      <a class="btn btn-primary" data-dismiss="modal">${_('Close')}</a>
     </div>
   </div>
 

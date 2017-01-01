@@ -410,7 +410,7 @@ ${ layout.menubar(section='workflows') }
   <div class="modal-body">
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-primary" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>
@@ -426,7 +426,7 @@ ${ layout.menubar(section='workflows') }
     </p>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
     <a id="saveAndSubmitBtn" class="btn btn-primary" href="javascript:void(0);">${_('Save and submit')}</a>
   </div>
 </div>

@@ -46,7 +46,7 @@
       </div>
 
       <div class="modal-footer">
-        <a class="btn cancelButton" href="javascript:void(0);">${_('Cancel')}</a>
+        <a class="btn btn-link cancelButton" href="javascript:void(0);">${_('Cancel')}</a>
         <button class="btn btn-primary doneButton disable-feedback" type="button" data-bind="visible: !$root.context().read_only">${ _('Done')}</button>
       </div>
 

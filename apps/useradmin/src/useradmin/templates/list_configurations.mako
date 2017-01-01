@@ -114,8 +114,8 @@ ${layout.menubar(section='configurations')}
   </div>
   <!-- /ko -->
   <div class="form-actions">
+    <button class="btn btn-link" data-bind="click: function () { selectedApp(null) }">${ _('Cancel') }</button>
     <button class="btn btn-primary" data-bind="click: save">${ _('Update configuration') }</button>
-    <button class="btn" data-bind="click: function () { selectedApp(null) }">${ _('Cancel') }</button>
   </div>
 </script>
 

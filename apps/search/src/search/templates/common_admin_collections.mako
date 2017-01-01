@@ -151,7 +151,7 @@
     <p>${_('Are you sure you want to delete the selected dashboards?')}</p>
   </div>
   <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${ _('No') }</a>
+    <a class="btn btn-link" data-dismiss="modal">${ _('No') }</a>
     <a id="deleteModalBtn" class="btn btn-danger disable-feedback" data-bind="click: deleteCollections">${ _('Yes') }</a>
   </div>
 </div>

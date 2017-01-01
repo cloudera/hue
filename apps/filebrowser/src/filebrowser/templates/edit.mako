@@ -90,7 +90,7 @@ ${ fb_components.menubar() }
         </div>
         ${edit.render_field(form["contents"], hidden=True)}
         ${edit.render_field(form["encoding"], hidden=True)}
-        <a id="cancelSaveAsBtn" class="btn">${_('Cancel')}</a>
+        <a id="cancelSaveAsBtn" class="btn btn-link" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Save')}" class="btn btn-primary" />
     </div>
     </form>

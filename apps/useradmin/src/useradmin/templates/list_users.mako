@@ -125,7 +125,7 @@ ${layout.menubar(section='users')}
         <h3 class="modal-title" id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
       </div>
       <div class="modal-footer">
-        <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+        <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <div class="hide">

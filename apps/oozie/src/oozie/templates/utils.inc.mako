@@ -588,7 +588,7 @@ function renderCrons() {
     <h3 class="modal-title">${ _('Do you really want to kill the selected jobs?') }</h3>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>

@@ -30,7 +30,7 @@ from django.utils.translation import ugettext as _
     </div>
   </div>
   <div class="modal-footer">
+    <a href="#" class="btn btn-link secondary hideModal" data-dismiss="modal">${ _('No') }</a>
     <input type="submit" class="btn primary" value="${ _('Yes') }"/>
-    <a href="#" class="btn secondary hideModal">${ _('No') }</a>
   </div>
 </form>

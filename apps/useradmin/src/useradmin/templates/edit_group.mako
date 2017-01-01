@@ -75,7 +75,7 @@ ${layout.menubar(section='groups')}
               <input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
           % endif
         % endif
-        <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
+        <a href="/useradmin/groups" class="btn btn-link">${_('Cancel')}</a>
       </div>
     </form>
   </div>

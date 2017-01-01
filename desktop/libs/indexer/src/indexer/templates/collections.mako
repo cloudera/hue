@@ -110,8 +110,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
     </ul>
   </div>
   <div class="modal-footer">
-    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: removeCollections" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+    <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
+    <button data-bind="click: removeCollections" class="btn btn-primary" data-dismiss="modal">${_('Confirm')}</button>
   </div>
 </div>
 
@@ -123,8 +123,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
   </div>
   <div class="modal-body"></div>
   <div data-bind="if: collection()" class="modal-footer">
-    <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-    <button data-bind="click: removeCollection" class="btn btn-info" data-dismiss="modal">${_('Confirm')}</button>
+    <button class="btn btn-link" data-dismiss="modal">${_('Cancel')}</button>
+    <button data-bind="click: removeCollection" class="btn btn-primary" data-dismiss="modal">${_('Confirm')}</button>
   </div>
 </div>
 

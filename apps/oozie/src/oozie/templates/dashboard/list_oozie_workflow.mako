@@ -351,7 +351,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     <h3 class="modal-title message"></h3>
   </div>
   <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
+    <a href="#" class="btn btn-link" data-dismiss="modal">${_('No')}</a>
     <a class="btn btn-danger disable-feedback" href="javascript:void(0);">${_('Yes')}</a>
   </div>
 </div>

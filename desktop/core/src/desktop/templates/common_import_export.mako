@@ -87,7 +87,7 @@ from django.utils.translation import ugettext as _
     <!-- /ko -->
   </div>
   <div class="modal-footer">
-    <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: refreshPage"/>
+    <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn btn-primary" value="${ _('Close') }" data-bind="click: refreshPage"/>
   </div>
 </div>
 
