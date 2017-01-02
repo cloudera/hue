@@ -19,10 +19,8 @@
 import json
 import logging
 import os
-import subprocess
 import uuid
 
-from subprocess import CalledProcessError
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
@@ -30,8 +28,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
-from desktop.lib.rest.http_client import HttpClient, RestException
-from desktop.lib.rest import resource
+from desktop.lib.rest.http_client import RestException
 from navoptapi.api_lib import ApiLib
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
@@ -60,7 +57,7 @@ class OptimizerApi(object):
 
 #     self._client = HttpClient(self._api_url, logger=LOG)
 #     self._client.set_verify(ssl_cert_ca_verify)
-# 
+#
 #     self._root = resource.Resource(self._client)
 #     self._token = None
 
@@ -71,37 +68,6 @@ class OptimizerApi(object):
       self._token = self.authenticate()['token']
 
     return self._token
-# 
-#   def _exec(self, command, args):
-#     data = None
-#     response = {'status': 'error'}
-# 
-#     try:
-#       cmd_args = [
-#           'ccs',
-#           'navopt',
-#           '--endpoint-url=%s' % self._api_url,
-#           command
-#       ]
-#       if self._product_secret:
-#         cmd_args += ['--auth-config', self._product_secret]
-# 
-#       LOG.info(' '.join(cmd_args + args))
-#       data = subprocess.check_output(cmd_args + args)
-#     except CalledProcessError, e:
-#       if command == 'upload' and e.returncode == 1:
-#         LOG.info('Upload command is successful despite return code of 1: %s' % e.output)
-#         data = '\n'.join(e.output.split('\n')[3:]) # Beware removing of {"url":...}
-#       else:
-#         raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
-#     except RestException, e:
-#       raise OptimizerApiException(e, title=_('Error while accessing Optimizer'))
-# 
-#     if data:
-#       response = json.loads(data)
-#       if 'status' not in response:
-#         response['status'] = 'success'
-#     return response
 
 
   def get_tenant(self, email=None):
@@ -135,21 +101,16 @@ class OptimizerApi(object):
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
-    data_headers = OptimizerApi.UPLOAD[data_type]['file_headers']
-
     if data_type in ('table_stats', 'cols_stats'):
       data_suffix = '.log'
     else:
       data_suffix = '.csv'
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
-    f_format_path = NamedTemporaryFile(suffix='.json')
-    f_queries_path.close()
-    f_format_path.close() # Reopened as real file below to work well with the command
+    f_queries_path.close() # Reopened as real file below to work well with the command
 
     try:
       f_queries = open(f_queries_path.name, 'w+')
-      f_format = open(f_format_path.name, 'w+')
 
       try:
         content_generator = OptimizerDataAdapter(data, data_type=data_type)
@@ -158,37 +119,29 @@ class OptimizerApi(object):
         for row in queries_csv:
           f_queries.write(row)
 
-        f_format.write(data_headers % {
-            'source_platform': source_platform,
-            'tenant': self._product_name,
-            'query_file': f_queries.name,
-            'query_file_name': os.path.basename(f_queries.name)
-        })
-
       finally:
         f_queries.close()
-        f_format.close()
 
-      args = {
-          'cliInputJson': 'file://%s' % f_format.name
-      }
-      if workload_id:
-        args['workloadId'] = workload_id
-
-      return self._api.call_api('upload', {'tenant' : self._product_name, 'workfloadId': workload_id}).json()
+      response = self._api.call_api('upload', {
+          'tenant' : self._product_name,
+          'fileLocation': f_queries.name,
+          'sourcePlatform': source_platform,
+          'colDelim': ',',
+          'rowDelim': '\n',
+          'headerFields': OptimizerApi.UPLOAD[data_type]['headerFields']
+      })
+      return json.loads(response)
 
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     finally:
       os.remove(f_queries_path.name)
-      os.remove(f_format_path.name)
-
 
   def upload_status(self, workload_id):
-    return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workfloadId': workload_id}).json()
+    return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id}).json()
 
 
-  def top_tables(self, workfloadId=None, database_name='default'):    
+  def top_tables(self, workfloadId=None, database_name='default'):
     return self._api.call_api('getTopTables', {'tenant' : self._product_name}).json()
 
 
@@ -259,119 +212,101 @@ class OptimizerApi(object):
   UPLOAD = {
     'queries': {
       'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT'],
-      'file_headers': """{
-    "fileLocation": "%(query_file)s",
-    "tenant": "%(tenant)s",
-    "fileName": "%(query_file_name)s",
-    "sourcePlatform": "%(source_platform)s",
-    "colDelim": ",",
-    "rowDelim": "\\n",
-    "headerFields": [
-        {
-            "count": 0,
-            "coltype": "SQL_ID",
-            "use": true,
-            "tag": "",
-            "name": "SQL_ID"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "ELAPSED_TIME"
-        },
-        {
-            "count": 0,
-            "coltype": "SQL_QUERY",
-            "use": true,
-            "tag": "",
-            "name": "SQL_FULLTEXT"
-        }
-    ]
-}"""
+      "colDelim": ",",
+      "rowDelim": "\\n",
+      "headerFields": [
+          {
+              "count": 0,
+              "coltype": "SQL_ID",
+              "use": True,
+              "tag": "",
+              "name": "SQL_ID"
+          },
+          {
+              "count": 0,
+              "coltype": "NONE",
+              "use": True,
+              "tag": "",
+              "name": "ELAPSED_TIME"
+          },
+          {
+              "count": 0,
+              "coltype": "SQL_QUERY",
+              "use": True,
+              "tag": "",
+              "name": "SQL_FULLTEXT"
+          }
+      ]
     },
     'table_stats': {
         'headers': ['TABLE_NAME', 'NUM_ROWS'],
-        'file_headers': """{
-    "fileLocation": "%(query_file)s",
-    "tenant": "%(tenant)s",
-    "fileName": "%(query_file_name)s",
-    "sourcePlatform": "%(source_platform)s",
-    "colDelim": ",",
-    "rowDelim": "\\n",
-    "headerFields": [
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "TABLE_NAME"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "NUM_ROWS"
-        }
-    ]
-}"""
+        "colDelim": ",",
+        "rowDelim": "\\n",
+        "headerFields": [
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "TABLE_NAME"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "NUM_ROWS"
+            }
+        ]
     },
     'cols_stats': {
         'headers': ['table_name', 'column_name', 'data_type', 'num_distinct', 'num_nulls', 'avg_col_len'], # Lower case for some reason
-        'file_headers': """{
-    "fileLocation": "%(query_file)s",
-    "tenant": "%(tenant)s",
-    "fileName": "%(query_file_name)s",
-    "sourcePlatform": "%(source_platform)s",
-    "colDelim": ",",
-    "rowDelim": "\\n",
-    "headerFields": [
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "table_name"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "column_name"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "data_type"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "num_distinct"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "num_nulls"
-        },
-        {
-            "count": 0,
-            "coltype": "NONE",
-            "use": true,
-            "tag": "",
-            "name": "avg_col_len"
-        }
-    ]
-}"""
+        "colDelim": ",",
+        "rowDelim": "\\n",
+        "headerFields": [
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "table_name"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "column_name"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "data_type"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "num_distinct"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "num_nulls"
+            },
+            {
+                "count": 0,
+                "coltype": "NONE",
+                "use": True,
+                "tag": "",
+                "name": "avg_col_len"
+            }
+        ]
     }
   }
 
