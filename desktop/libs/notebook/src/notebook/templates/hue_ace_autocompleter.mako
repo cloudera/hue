@@ -74,8 +74,8 @@ from desktop.views import _ko
 
   <script type="text/javascript" charset="utf-8">
     (function () {
-      var aceUtil = ace.require("ace/autocomplete/util");
-      var HashHandler = ace.require("ace/keyboard/hash_handler").HashHandler;
+      var aceUtil = ace.require('ace/autocomplete/util');
+      var HashHandler = ace.require('ace/keyboard/hash_handler').HashHandler;
 
       ko.bindingHandlers.matchedText = {
         update: function (element, valueAccessor) {
@@ -113,10 +113,12 @@ from desktop.views import _ko
         self.base.$insertRight = true;
 
         self.prefixFilter = ko.observable(prefix.toLowerCase());
+
         self.activeSuggestions = ko.pureComputed(function () {
           if (self.suggestions.keywords) {
             return self.suggestions.keywords.suggestions();
           }
+
           return [];
         });
 
@@ -166,49 +168,44 @@ from desktop.views import _ko
           return self.activeSuggestions();
         });
 
-        self.selectedIndex = ko.observable(-1);
+        self.selectedIndex = ko.observable(0);
 
         self.keyboardHandler = new HashHandler();
         self.keyboardHandler.bindKeys({
-          "Up": function() {
+          'Up': function() {
             if (self.selectedIndex() > 0) {
               self.selectedIndex(self.selectedIndex() - 1);
               self.scrollSelectionIntoView();
-            } else if (self.selectedIndex() === -1) {
-              self.selectedIndex(0);
-              self.scrollSelectionIntoView();
             }
           },
-          "Down": function() {
+          'Down': function() {
             if (self.selectedIndex() < self.filteredSuggestions().length - 1) {
               self.selectedIndex(self.selectedIndex() + 1);
               self.scrollSelectionIntoView();
             }
           },
-          "Ctrl-Up|Ctrl-Home": function() {
+          'Ctrl-Up|Ctrl-Home': function() {
             self.selectedIndex(0);
             self.scrollSelectionIntoView();
           },
-          "Ctrl-Down|Ctrl-End": function() {
-            self.selectedIndex(self.filteredSuggestions().length - 1);
-            self.scrollSelectionIntoView();
+          'Ctrl-Down|Ctrl-End': function() {
+            if (self.filteredSuggestions().length > 0 ) {
+              self.selectedIndex(self.filteredSuggestions().length - 1);
+              self.scrollSelectionIntoView();
+            }
           },
-          "Esc": function() {
+          'Esc': function() {
             self.destroy();
           },
-          "Return": function() {
+          'Return': function() {
             self.insertSuggestion();
           },
-          "Shift-Return": function() {
+          'Shift-Return': function() {
             // TODO: Delete suffix
             self.insertSuggestion();
           },
-          "Tab": function() {
-            if (self.selectedIndex() === -1) {
-              self.selectedIndex(0);
-            } else {
-              self.insertSuggestion();
-            }
+          'Tab': function() {
+            self.insertSuggestion();
           }
         });
 
@@ -240,27 +237,32 @@ from desktop.views import _ko
           }
         };
 
+        var pubSubDestroy = huePubSub.subscribe('hue.ace.autocompleter.hide', function () {
+          self.destroy()
+        });
+
         self.destroy = function () {
           self.base.detach();
           window.clearTimeout(changeTimeout);
           $(document).off('click', closeOnClickOutside);
           self.editor.keyBinding.removeKeyboardHandler(self.keyboardHandler);
-          self.editor.off("changeSelection", self.changeListener);
-          self.editor.off("mousedown", self.mousedownListener);
-          self.editor.off("mousewheel", self.mousewheelListener);
+          self.editor.off('changeSelection', self.changeListener);
+          self.editor.off('mousedown', self.mousedownListener);
+          self.editor.off('mousewheel', self.mousewheelListener);
           $(element).remove();
+          pubSubDestroy.remove();
         };
 
         $(document).on('click', closeOnClickOutside);
         self.editor.keyBinding.addKeyboardHandler(self.keyboardHandler);
-        self.editor.on("changeSelection", self.changeListener);
-        self.editor.on("mousedown", self.mousedownListener);
-        self.editor.on("mousewheel", self.mousewheelListener);
+        self.editor.on('changeSelection', self.changeListener);
+        self.editor.on('mousedown', self.mousedownListener);
+        self.editor.on('mousewheel', self.mousewheelListener);
       }
 
       HueAceAutocompleter.prototype.insertSuggestion = function () {
         var self = this;
-        if (self.selectedIndex() === -1 || self.filteredSuggestions().length === 0) {
+        if (self.filteredSuggestions().length === 0) {
           self.destroy();
           return;
         }
@@ -271,16 +273,14 @@ from desktop.views import _ko
             self.editor.session.remove(range);
           }
         }
-        self.editor.execCommand("insertstring", self.filteredSuggestions()[self.selectedIndex()].value);
+        var value = self.filteredSuggestions()[self.selectedIndex()].value;
+        self.editor.execCommand('insertstring', /\.$/.test(value) ? value : value + ' ');
         self.editor.renderer.scrollCursorIntoView();
         self.destroy();
       };
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
         var self = this;
-        if (self.selectedIndex() === -1) {
-          return;
-        }
         var $autocompleterList = $('.autocompleter-list');
         var selected = $autocompleterList.children().eq(self.selectedIndex());
         var selectedTop = selected.position().top;
