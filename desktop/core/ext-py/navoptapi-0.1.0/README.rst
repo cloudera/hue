@@ -16,6 +16,14 @@ Example Usage for the Api
 * Create NavOpt object passing hostname, access key and private key:
   nav = ApiLib("navopt", "121.0.0.1", "e0819f3a-1e6f-4904-be69-5b704b299bbb", "-----BEGIN PRIVATE KEY-----\n..............\n-----END PRIVATE KEY-----")
 
+* Upload a file to NavOpt:
+   resp = nav.call_api("upload", {"tenant" : "6bd23dea-13aa-ce13-4a6d-1614151428fc", "fileLocation": "/Users/harshil/Downloads/tmpbUMdbb.csv", "sourcePlatform": "hive", "colDelim": ",", "rowDelim": "\n", "headerFields": [{"count": 0, "coltype": "SQL_ID", "use": True, "tag": "", "name": "SQL_ID"}, {"count": 0, "coltype": "NONE", "use": True, "tag": "", "name": "ELAPSED_TIME"}, {"count": 0, "coltype": "SQL_QUERY", "use": True, "tag": "", "name": "SQL_FULLTEXT"}]})
+   print resp
+
+* Get Status of the upload:
+  resp = nav.call_api("uploadStatus", {"tenant" : "6bd23dea-13aa-ce13-4a6d-1614151428fc", "workloadId": "10661f8a-83e1-4ff7-b2be-fabb2ee971bd"})
+  print json.dumps(resp.json(), indent=2)
+
 * Get Top Tables for a workload:
   resp = nav.call_api("getTopTables", {"tenant" : "d6d54b73-2bab-e413-5376-a805f5d4ae53"})
   print json.dumps(resp.json(), indent=2)
