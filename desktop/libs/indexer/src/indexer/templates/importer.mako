@@ -261,7 +261,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
               <label for="path" class="control-label"><div>${ _('Table') }</div>
-                <input type="text" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true">
+                <input type="text" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
               </label>
             </div>
 
@@ -335,7 +335,7 @@ ${ assist.assistPanel() }
 
           <!-- ko if: ouputFormat() == 'table' || ouputFormat() == 'database' -->
             <label for="path" class="control-label">
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
             </label>
           <!-- /ko -->
 

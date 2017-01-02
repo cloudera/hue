@@ -21,8 +21,8 @@ Description: Cloudera Navigator Optimizer Api SDK
         * Import the module
           from navoptapi.api_lib import *
         
-        * Create NavOpt object passing hostname, access key and private key:
-            nav = ApiLib("navopt", "121.0.0.1", "e0819f3a-1e6f-4904-be69-5b704b299bbb", "-----BEGIN PRIVATE KEY-----\n..............\n-----END PRIVATE KEY-----")
+        * Create NavOpt object passing hostname/address, access key and private key:
+          nav = ApiLib("navopt", "127.0.0.1", "e0819f3a-1e6f-4904-be69-4ftrf56983", "-----BEGIN PRIVATE KEY-----\ngm9aeam8fgZ5VXPbXRo9EYepZcWPWeYO1WjPyI\nF17opGTl9M/2H+kXmsmyPwLBSQE96Q==\n-----END PRIVATE KEY-----")
         
         * Upload a file to NavOpt:
            resp = nav.call_api("upload", {"tenant" : "6bd23dea-13aa-ce13-4a6d-1614151428fc", "fileLocation": "/Users/harshil/Downloads/tmpbUMdbb.csv", "sourcePlatform": "hive", "colDelim": ",", "rowDelim": "\n", "headerFields": [{"count": 0, "coltype": "SQL_ID", "use": True, "tag": "", "name": "SQL_ID"}, {"count": 0, "coltype": "NONE", "use": True, "tag": "", "name": "ELAPSED_TIME"}, {"count": 0, "coltype": "SQL_QUERY", "use": True, "tag": "", "name": "SQL_FULLTEXT"}]})
