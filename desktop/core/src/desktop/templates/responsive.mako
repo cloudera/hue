@@ -25,6 +25,7 @@
 <%namespace name="koComponents" file="/ko_components.mako" />
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="hueIcons" file="/hue_icons.mako" />
+<%namespace name="commonHeaderFooterComponents" file="/common_header_footer_components.mako" />
 
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
@@ -43,86 +44,8 @@
   <link href="${ static('desktop/css/responsive.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
 
-  <!--[if lt IE 9]>
-  <script type="text/javascript">
-    if (document.documentMode && document.documentMode < 9) {
-      location.href = "${ url('desktop.views.unsupported') }";
-    }
-  </script>
-  <![endif]-->
+  ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
-  <script type="text/javascript" charset="utf-8">
-    // check if it's a Firefox < 7
-    var _UA = navigator.userAgent.toLowerCase();
-    for (var i = 1; i < 7; i++) {
-      if (_UA.indexOf("firefox/" + i + ".") > -1) {
-        location.href = "${ url('desktop.views.unsupported') }";
-      }
-    }
-
-    // check for IE document modes
-    if (document.documentMode && document.documentMode < 9) {
-      location.href = "${ url('desktop.views.unsupported') }";
-    }
-
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
-    var LOGGED_USERNAME = '${ user.username }';
-    var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
-    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
-    var CACHEABLE_TTL = {
-      default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
-      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
-    };
-
-    // jHue plugins global configuration
-    jHueFileChooserGlobals = {
-      labels: {
-        BACK: "${_('Back')}",
-        SELECT_FOLDER: "${_('Select this folder')}",
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}",
-        FILE_NOT_FOUND: "${_('The file has not been found')}",
-        UPLOAD_FILE: "${_('Upload a file')}",
-        FAILED: "${_('Failed')}"
-      },
-      user: "${ user.username }"
-    };
-
-    jHueHdfsTreeGlobals = {
-      labels: {
-        CREATE_FOLDER: "${_('Create folder')}",
-        FOLDER_NAME: "${_('Folder name')}",
-        CANCEL: "${_('Cancel')}"
-      }
-    };
-
-    jHueTableExtenderGlobals = {
-      labels: {
-        GO_TO_COLUMN: "${_('Go to column:')}",
-        PLACEHOLDER: "${_('column name...')}",
-        LOCK: "${_('Click to lock this row')}",
-        UNLOCK: "${_('Click to unlock this row')}"
-      }
-    };
-
-    jHueTourGlobals = {
-      labels: {
-        AVAILABLE_TOURS: "${_('Available tours')}",
-        NO_AVAILABLE_TOURS: "${_('None for this page.')}",
-        MORE_INFO: "${_('Read more about it...')}",
-        TOOLTIP_TITLE: "${_('Demo tutorials')}"
-      }
-    };
-
-    ApiHelperGlobals = {
-      i18n: {
-        errorLoadingDatabases: '${ _('There was a problem loading the databases') }',
-        errorLoadingTablePreview: '${ _('There was a problem loading the preview') }'
-      },
-      user: '${ user.username }'
-    }
-  </script>
 </head>
 
 <body>
@@ -418,6 +341,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
+<script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
 <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
@@ -452,7 +376,23 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 
+<script type="text/javascript" charset="utf-8">
+(function () {
+    var proxiedKORegister = ko.components.register;
+    var LOADED_COMPONENTS = [];
+    ko.components.register = function () {
+      if (LOADED_COMPONENTS.indexOf(arguments[0]) === -1) {
+        LOADED_COMPONENTS.push(arguments[0]);
+        return proxiedKORegister.apply(this, arguments);
+      }
+    };
+  })();
+</script>
+
 ${ koComponents.all() }
+
+${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
+
 ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 
@@ -808,178 +748,9 @@ ${ assist.assistPanel() }
       topNavViewModel: topNavViewModel
     };
   });
-
-  moment.locale(window.navigator.userLanguage || window.navigator.language);
-  localeFormat = function (time) {
-    var mTime = time;
-    if (typeof ko !== 'undefined' && ko.isObservable(time)) {
-      mTime = time();
-    }
-    try {
-      mTime = new Date(mTime);
-      if (moment(mTime).isValid()) {
-        return moment.utc(mTime).format("L LT");
-      }
-    }
-    catch (e) {
-      return mTime;
-    }
-    return mTime;
-  };
-
-  // Add CSRF Token to all XHR Requests
-  var xrhsend = XMLHttpRequest.prototype.send;
-  XMLHttpRequest.prototype.send = function (data) {
-    % if request and request.COOKIES and request.COOKIES.get('csrftoken'):
-      this.setRequestHeader('X-CSRFToken', "${ request.COOKIES.get('csrftoken') }");
-    % else:
-      this.setRequestHeader('X-CSRFToken', "");
-    % endif
-
-    return xrhsend.apply(this, arguments);
-  };
-
-  $(document).ready(function () {
-##       // forces IE's ajax calls not to cache
-##       if ($.browser.msie) {
-##         $.ajaxSetup({ cache: false });
-##       }
-
-    // prevents framebusting and clickjacking
-    if (self == top) {
-      $("body").css({
-        'display': 'block',
-        'visibility': 'visible'
-      });
-    } else {
-      top.location = self.location;
-    }
-
-    %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
-      var idleTimer;
-
-      function resetIdleTimer() {
-        clearTimeout(idleTimer);
-        idleTimer = setTimeout(function () {
-          // Check if logged out
-          $.get('/desktop/debug/is_idle');
-        }, ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()} * 1000 + 1000
-        );
-      }
-
-      $(document).on('mousemove', resetIdleTimer);
-      $(document).on('keydown', resetIdleTimer);
-      $(document).on('click', resetIdleTimer);
-      resetIdleTimer();
-    %endif
-
-    % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
-      var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
-
-      function checkJobBrowserStatus(){
-        $.post("/jobbrowser/jobs/", {
-            "format": "json",
-            "state": "running",
-            "user": "${user.username}"
-          },
-          function(data) {
-            if (data != null && data.jobs != null) {
-              huePubSub.publish('jobbrowser.data', data.jobs);
-              if (data.jobs.length > 0){
-                $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
-              }
-              else {
-                $("#jobBrowserCount").addClass("hide");
-              }
-            }
-          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
-        }).fail(function () {
-          window.clearTimeout(checkJobBrowserStatusIdx);
-        });
-      }
-      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
-    % endif
-  });
-
 </script>
 
-<script type="text/javascript">
+${ commonHeaderFooterComponents.footer() }
 
-  $(document).ready(function () {
-     $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
-      $(window).trigger('zoom');
-    });
-
-    // global catch for ajax calls after the user has logged out
-    var isLoginRequired = false;
-    $(document).ajaxComplete(function (event, xhr, settings) {
-      if (xhr.responseText === '/* login required */' && !isLoginRequired) {
-        isLoginRequired = true;
-        $('body').children(':not(#login-modal)').addClass('blurred');
-        if ($('#login-modal').length > 0) {
-          $('#login-modal').modal('show');
-          window.setTimeout(function () {
-            $('.jHueNotify').remove();
-          }, 200);
-        }
-        else {
-          location.reload();
-        }
-      }
-    });
-
-    $('#login-modal').on('hidden', function () {
-      isLoginRequired = false;
-      $('.blurred').removeClass('blurred');
-    });
-
-    huePubSub.subscribe('hue.login.result', function (response) {
-      if (response.auth) {
-        $('#login-modal').modal('hide');
-        $.jHueNotify.info('${ _('You have signed in successfully!') }');
-        $('#login-modal .login-error').addClass('hide');
-      } else {
-        $('#login-modal .login-error').removeClass('hide');
-      }
-    });
-  });
-
-  $(".modal").on("shown", function () {
-    // safe ux enhancement: focus on the first editable input
-    $(".modal:visible").find("input:not(.disable-autofocus):visible:first").focus();
-  });
-
-  function resetPrimaryButtonsStatus() {
-    $(".btn-primary:not(.disable-feedback), .btn-danger:not(.disable-feedback)").button("reset");
-  }
-
-    %if collect_usage:
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-40351920-1']);
-
-      // We collect only 2 path levels: not hostname, no IDs, no anchors...
-      var _pathName = location.pathname;
-      var _splits = _pathName.substr(1).split("/");
-      _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
-
-      _gaq.push(['_trackPageview', '/remote/${ version }/' + _pathName]);
-
-      (function () {
-        var ga = document.createElement('script');
-        ga.type = 'text/javascript';
-        ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0];
-        s.parentNode.insertBefore(ga, s);
-      })();
-
-      function trackOnGA(path) {
-        if (typeof _gaq != "undefined" && _gaq != null) {
-          _gaq.push(['_trackPageview', '/remote/${ version }/' + path]);
-        }
-      }
-    %endif
-</script>
 </body>
 </html>
