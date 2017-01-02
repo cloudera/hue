@@ -155,15 +155,31 @@ function getCompletionPrefix(editor) {
 
 var doLiveAutocomplete = function(e) {
     var editor = e.editor;
+    var prefix = getCompletionPrefix(editor);
+    if (editor.useHueAutocompleter) {
+        if (prefix && e.command.name === "insertstring") {
+            var renderer = editor.renderer;
+            var lineHeight = renderer.layerConfig.lineHeight;
+            var pos = renderer.$cursorLayer.getPixelPosition(this.base, true);
+            var rect = editor.container.getBoundingClientRect();
+            pos.top += rect.top - renderer.layerConfig.offset;
+            pos.left += rect.left - editor.renderer.scrollLeft;
+            pos.left += renderer.gutterWidth;
+
+            huePubSub.publish('hue.ace.autocompleter.show', { position: pos, lineHeight: lineHeight });
+        } else if (e.command.name === "backspace" && !prefix) {
+            huePubSub.publish('hue.ace.autocompleter.hide');
+        }
+        return;
+    }
     var hasCompleter = editor.completer && editor.completer.activated;
 
     // We don't want to autocomplete with no prefix
     if (e.command.name === "backspace") {
-        if (hasCompleter && !getCompletionPrefix(editor))
+        if (hasCompleter && !prefix)
             editor.completer.detach();
     }
     else if (e.command.name === "insertstring") {
-        var prefix = getCompletionPrefix(editor);
         // Only autocomplete if there's a prefix that can be matched
         if (prefix && !hasCompleter) {
             if (!editor.completer) {
