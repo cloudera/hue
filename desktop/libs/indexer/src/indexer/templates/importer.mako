@@ -650,6 +650,13 @@ ${ assist.assistPanel() }
   </label>
 </script>
 
+<script type="text/html" id="arg-text-delimiter">
+  <label>
+    <span data-bind="text: description"></span>
+    <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
+  </label>
+</script>
+
 <script type="text/html" id="arg-checkbox">
   <label>
     <input type="checkbox" data-bind="checked: value">
@@ -1120,12 +1127,14 @@ ${ assist.assistPanel() }
       self.destination = new Destination(vm, self);
 
       self.customDelimiters = ko.observable([
-        {'value': '\\001', 'name': '^A (\\001)', 'ascii': 1},
-        {'value': '\\002', 'name': '^B (\\002)', 'ascii': 2},
-        {'value': '\\003', 'name': '^C (\\003)', 'ascii': 3},
-        {'value': '\\t', 'name': '^Tab (\\t)', 'ascii': 9},
-        {'value': ',', 'name': 'Comma (,)', 'ascii': 44},
-        {'value': ' ', 'name': 'Space', 'ascii': 32}
+        {'value': ',', 'name': 'Comma (,)'},
+        {'value': '\\t', 'name': '^Tab (\\t)'},
+        {'value': '\\n', 'name': 'New line'},
+        {'value': ' ', 'name': 'Space'},
+        {'value': '"', 'name': 'Double Quote'},
+        {'value': '\\001', 'name': '^A (\\001)'},
+        {'value': '\\002', 'name': '^B (\\002)'},
+        {'value': '\\003', 'name': '^C (\\003)'},
       ]);
 
       self.editorId = ko.observable();

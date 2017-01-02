@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from indexer.fields import Field, guess_field_type_from_samples
-from indexer.argument import TextArgument, CheckboxArgument
+from indexer.argument import TextArgument, CheckboxArgument, TextDelimiterArgument
 from indexer.operations import get_operator
 
 LOG = logging.getLogger(__name__)
@@ -272,9 +272,9 @@ class CSVFormat(FileFormat):
   _name = "csv"
   _description = _("CSV File")
   _args = [
-    TextArgument("fieldSeparator", "Field Separator"),
-    TextArgument("recordSeparator", "Record Separator"),
-    TextArgument("quoteChar", "Quote Character"),
+    TextDelimiterArgument("fieldSeparator", "Field Separator"),
+    TextDelimiterArgument("recordSeparator", "Record Separator"),
+    TextDelimiterArgument("quoteChar", "Quote Character"),
     CheckboxArgument("hasHeader", "Has Header")
   ]
   _extensions = ["csv", "tsv"]
