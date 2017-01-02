@@ -170,8 +170,7 @@ ${ hueIcons.symbols() }
       </div>
     </div>
     <div class="top-nav-right">
-      % if user.is_authenticated() and section != 'login':
-
+      % if user.is_authenticated() and section != 'login':        
         <div class="compose-action btn-group">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
@@ -200,7 +199,14 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">20</div></button>
+          <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">20</div></button>
+        </div>
+        <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
+          <span style="font-size: 15px; font-weight: 300">${_('Workflows')} (20)</span>
+        </div>
+
+        <div class="compose-action btn-group">
+          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } </button>
           <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
             <span class="caret"></span>
           </button>
@@ -668,6 +674,7 @@ ${ assist.assistPanel() }
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
         self.jobsPanelVisible = ko.observable(false);
+        self.historyPanelVisible = ko.observable(false);
 
         // TODO: Extract to common module (shared with nav search autocomplete)
         var SEARCH_FACET_ICON = 'fa-tags';

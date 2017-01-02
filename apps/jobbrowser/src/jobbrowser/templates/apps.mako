@@ -49,14 +49,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 
 % if not is_embeddable:
 
 ${ assist.assistJSModels() }
-
-<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
-
-
 ${ assist.assistPanel() }
 
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
@@ -200,7 +197,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="job-page">
-  <!-- ko if: type() == 'MAPREDUCE' -->
+  <!-- ko if: type() == 'MR2' -->
     <div data-bind="template: { name: 'job-mapreduce-page', data: $root.job() }"></div>
   <!-- /ko -->
 

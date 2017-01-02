@@ -180,6 +180,7 @@ def execute_and_watch(request):
   elif action == 'index_query':
     if not destination:
       destination = _get_snippet_name(notebook)
+
     sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
 
@@ -199,6 +200,8 @@ def execute_and_watch(request):
             for col in sample['meta']
         ]
     }
+
+    file_format['inputFormat'] = 'hs2_handle'
 
     job_handle = _index(request, file_format, destination, query=notebook['uuid'])
     return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
