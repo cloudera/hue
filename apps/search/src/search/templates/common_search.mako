@@ -1570,7 +1570,7 @@ ${ dashboard.layout_skeleton() }
          <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length > 0 && template.showChart()">
            <div data-bind="visible: ! template.hasDataForChart()" style="padding: 10px">${ _('Please select the chart parameters on the left.') }</div>
            <div class="grid-chart-container" data-bind="visible: template.hasDataForChart" style="overflow-x: auto">
-             
+
         <!-- ko if: widgetType() == 'bucket-widget' -->
           <!-- ko with: $parent -->
 
@@ -1595,7 +1595,7 @@ ${ dashboard.layout_skeleton() }
             />
             <div class="clearfix"></div>
           <!-- /ko -->
-    
+
           <!-- ko if: dimension() == 2 -->
             <div data-bind="barChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(),
               isPivot: true,
@@ -1609,7 +1609,7 @@ ${ dashboard.layout_skeleton() }
             />
             <div class="clearfix"></div>
           <!-- /ko -->
-    
+
           <!-- ko if: dimension() == 3 -->
           <div data-bind="timelineChart: {datum: {counts: counts(), extraSeries: extraSeries(), widget_id: $parent.id(), label: label()}, stacked: $root.collection.getFacetById($parent.id()).properties.stacked(), field: field, label: label(), transformer: timelineChartDataTransformer,
             type: $root.collection.getFacetById($parent.id()).properties.timelineChartType,
@@ -1622,7 +1622,7 @@ ${ dashboard.layout_skeleton() }
           <!-- /ko -->
 
            <!-- /ko -->
-         <!-- /ko -->               
+         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'gradient-map-widget' -->
           <!-- ko with: $parent -->
@@ -1635,7 +1635,7 @@ ${ dashboard.layout_skeleton() }
               },
               onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
            <!-- /ko -->
-         <!-- /ko --> 
+         <!-- /ko -->
 
         <!-- ko if: widgetType() == 'timeline-widget' -->
           <!-- ko with: $parent -->
@@ -1679,23 +1679,23 @@ ${ dashboard.layout_skeleton() }
         onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
-    <!-- /ko -->  
+    <!-- /ko -->
 
          <!-- ko if: widgetType() == 'resultset-widget' -->
             <div data-bind="attr:{'id': 'pieChart_'+id()}, pieChart: {data: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]),
                   transformer: pieChartDataTransformerGrid, maxWidth: 350, parentSelector: '.chart-container' }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.PIECHART" class="chart"></div>
-  
+
             <div data-bind="attr:{'id': 'barChart_'+id()}, barChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data}, fqs: ko.observableArray([]), hideSelection: true,
                   transformer: multiSerieDataTransformerGrid, stacked: false, showLegend: true},  stacked: true, showLegend: true, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.BARCHART" class="chart"></div>
-  
+
             <div data-bind="attr:{'id': 'lineChart_'+id()}, lineChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                   transformer: multiSerieDataTransformerGrid, showControls: false }, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.LINECHART" class="chart"></div>
-  
+
             <div data-bind="attr:{'id': 'leafletMapChart_'+id()}, leafletMapChart: {datum: {counts: $root.results(), sorting: $root.collection.template.chartSettings.chartSorting(), snippet: $data},
                   transformer: leafletMapChartDataTransformerGrid, showControls: false, height: 380, visible: $root.collection.template.chartSettings.chartType() == ko.HUE_CHARTS.TYPES.MAP, forceRedraw: true}" class="chart"></div>
             <div class="clearfix"></div>
          <!-- /ko -->
-         
+
            </div>
          </div>
 
@@ -1850,7 +1850,7 @@ ${ dashboard.layout_skeleton() }
     <div style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-    
+
     <span data-bind="template: { name: 'data-grid' }"></span>
     <!-- /ko -->
   </div>
@@ -2279,7 +2279,7 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="with: $root.collection.getFacetById($parent.id())" style="margin-bottom: 20px">
       <span data-bind="template: { name: 'facet-toggle2' }"></span>
     </div>
-    
+
     <!-- ko with: $root.collection.getFacetById($parent.id()) -->
     <div class="margin-bottom-10" data-bind="visible: ! $root.isEditing()">
 
@@ -2292,7 +2292,7 @@ ${ dashboard.layout_skeleton() }
 
       <span data-bind="template: { name: 'data-grid' }"></span>
     <!-- /ko -->
-  </div>  
+  </div>
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
@@ -2336,8 +2336,8 @@ ${ dashboard.layout_skeleton() }
   <!-- ko if: $root.fieldAnalysesName() -->
   <div data-bind="with: $root.getFieldAnalysis()">
     <div class="pull-right">
-        <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
-        <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet, typeahead: { target: stats.facet, source: $root.fieldsAnalysisAttributesNames, triggerOnFocus: true }" placeholder="${ _('Field name...') }"/>
+      <input type="text" data-bind="visible: section() == 'terms', clearable: terms.prefix, valueUpdate:'afterkeydown'" placeholder="${ _('Prefix filter...') }"/>
+      <input type="text" data-bind="visible: section() == 'stats', clearable: stats.facet, typeahead: { target: stats.facet, source: $root.fieldsAnalysisAttributesNames, triggerOnFocus: true }" placeholder="${ _('Field name...') }"/>
     </div>
     <ul class="nav nav-tabs" role="tablist">
       <li class="active"><a href="#analysis-terms" role="tab" data-toggle="tab" data-bind="click: function() { section('terms'); }">${ _('Terms') }</a></li>
@@ -3603,8 +3603,13 @@ $(document).ready(function () {
 });
 
 
-  function toggleGridFieldsSelection(widget) {
-    widget.resultsHash = '';
+  function toggleGridFieldsSelection(widget) {console.log();
+    if (widget.widgetType() == 'resultset-widget') {
+      viewModel.resultsHash = '';
+    } else {
+      widget.resultsHash = '';
+    }
+
     if (widget.template.fields().length > 0) {
       widget.template.fieldsSelected.removeAll();
     }
@@ -3616,7 +3621,7 @@ $(document).ready(function () {
   function selectAllCollectionFields(widget) {
     if (! widget) {
       widget = viewModel.collection;
-    }    
+    }
     var _fields = [];
     $.each(widget.fields(), function (index, field) {
       _fields.push(field.name());
