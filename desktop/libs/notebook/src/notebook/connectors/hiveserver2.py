@@ -35,7 +35,7 @@ from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
 from metadata.optimizer_client import OptimizerApi
 
-from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported
+from notebook.connectors.base import Api, QueryError, QueryExpired, OperationTimeout, OperationNotSupported, _get_snippet_name
 
 
 LOG = logging.getLogger(__name__)
@@ -350,10 +350,7 @@ class HS2Api(Api):
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
 
-      if notebook.get('name'):
-        file_name = '%(name)s' % notebook
-      else:
-        file_name = '%(type)s-%(id)s' % notebook
+      file_name = _get_snippet_name(notebook)
 
       return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name)
     except Exception, e:

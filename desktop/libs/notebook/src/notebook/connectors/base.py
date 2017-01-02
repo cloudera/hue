@@ -286,3 +286,7 @@ class Api(object):
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
 
   def statement_similarity(self, notebook, snippet, source_platform, target_platform): raise NotImplementedError()
+
+
+def _get_snippet_name(notebook):
+  return ('%(name)s' if notebook.get('name') else '%(type)s-%(id)s') % notebook
