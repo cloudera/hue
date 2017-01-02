@@ -170,7 +170,7 @@ except ImportError, e:
     </form>
 
     <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Get results') }">
+      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Export results') }">
         <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
         <!-- /ko -->
@@ -191,10 +191,17 @@ except ImportError, e:
           </a>
         </li>
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the results to a large file or a new table') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
             <i class="fa fa-fw fa-save"></i> ${ _('Export') }
           </a>
         </li>
+        % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Explore the result in an analytic dashboard') }">
+            <i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }
+          </a>
+        </li>
+        % endif
       </ul>
     </div>
 
@@ -207,7 +214,7 @@ except ImportError, e:
 
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save query result in')}</h3>
+        <h3>${_('Save query result in a')}</h3>
       </div>
       <div class="modal-body" style="padding: 4px">
         <form id="saveResultsForm" method="POST" class="form form-inline">
@@ -217,7 +224,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('A file (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
+                  &nbsp;${ _('File (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
@@ -232,7 +239,7 @@ except ImportError, e:
               <div class="controls" data-bind="visible: snippet.type() == 'hive'">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('A file (large result)') }
+                  &nbsp;${ _('File (large result)') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
@@ -246,7 +253,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hive-table">
-                  &nbsp;${ _('A new table') }
+                  &nbsp;${ _('Table') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
                   <input data-bind="hivechooser: savePath" type="text" name="target_table" class="input-xlarge margin-left-10" placeholder="${_('Table name or <database>.<table>')}">
@@ -258,7 +265,7 @@ except ImportError, e:
               <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="search-index">
-                  &nbsp;${ _('A search dashboard') }
+                  &nbsp;${ _('Dashboard') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'search-index'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown'" type="text" name="target_index" class="input-xlarge margin-left-10" placeholder="${_('Index name')}">
