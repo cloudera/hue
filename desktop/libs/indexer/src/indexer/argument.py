@@ -17,7 +17,7 @@
 from django.utils.translation import ugettext as _
 
 
-class Argument():
+class Argument(object):
   _type = None
   _default_value = None
 
@@ -47,6 +47,15 @@ class Argument():
 class TextArgument(Argument):
   _type = "text"
   _default_value = ""
+
+
+class TextDelimiterArgument(Argument):
+  _type = "text-delimiter"
+  _default_value = ""
+
+  def __init__(self, name, description=None, max_length=2):
+    super(TextDelimiterArgument, self).__init__(name, description=description)
+    self.max_length = max_length
 
 
 class CheckboxArgument(Argument):

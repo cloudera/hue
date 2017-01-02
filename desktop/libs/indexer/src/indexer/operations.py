@@ -13,8 +13,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+
 from django.utils.translation import ugettext as _
+
 from indexer.argument import TextArgument, CheckboxArgument, MappingArgument
+
 
 class Operator():
   def __init__(self, name, args, output_type):
