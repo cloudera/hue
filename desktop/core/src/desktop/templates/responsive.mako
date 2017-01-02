@@ -456,6 +456,7 @@ ${ koComponents.all() }
 ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 
+<iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 <script type="text/javascript" charset="utf-8">
   (function () {
@@ -906,6 +907,10 @@ ${ assist.assistPanel() }
 <script type="text/javascript">
 
   $(document).ready(function () {
+     $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
+      $(window).trigger('zoom');
+    });
+
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {

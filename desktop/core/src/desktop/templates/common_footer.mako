@@ -25,6 +25,8 @@ from desktop.views import login_modal
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
 
+<iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
+
 <script type="text/javascript">
   $(document).ready(function () {
     $(document).on("info", function (e, msg) {
@@ -35,6 +37,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
     $(document).on("error", function (e, msg) {
       $.jHueNotify.error(msg);
+    });
+
+    $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
+      $(window).trigger('zoom');
     });
 
     %if messages:
