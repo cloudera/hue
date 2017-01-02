@@ -3004,9 +3004,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                   return b.y - a.y
                 });
               }
-              if (rawDatum.snippet.chartLimit()) {
-                _data = _data.slice(1, rawDatum.snippet.chartLimit() + 1);
-              }
               _datum.push({
                 key: hueUtils.html2text(val),
                 values: _data
@@ -3031,6 +3028,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             }
           }
         });
+        if (rawDatum.snippet.chartLimit()) {
+          _datum = _datum.slice(1, rawDatum.snippet.chartLimit() + 1);
+        }
       }
       else {
         rawDatum.snippet.result.meta().forEach(function (meta) {
