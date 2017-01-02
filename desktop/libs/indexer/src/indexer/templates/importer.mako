@@ -335,12 +335,12 @@ ${ assist.assistPanel() }
             </label>
           <!-- /ko -->
 
-          <span class="help-inline muted" data-bind="visible: $root.createWizard.isTargetExisting()">
+          <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
             ${ _('Create a new ') } <span data-bind="text: ouputFormat"></span>
           </span>
-          <span class="help-inline muted" data-bind="visible: ! $root.createWizard.isTargetExisting() && name().length > 0">
+          <span class="help-inline muted" data-bind="visible: isTargetExisting()">
             ${ _('Adding data to the existing ') } <span data-bind="text: ouputFormat"></span>
-            <a href="javascript:void(0)" data-bind="text: name" target="_blank"></a>
+            <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
           </span>
         </label>
       </div>
@@ -982,8 +982,31 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable('');
-      self.description = ko.observable('');
+      self.name.subscribe(function (name) {
+        var exists = false;
 
+        if (name.length == 0) {
+          self.isTargetExisting(false);
+        }
+        else if (self.ouputFormat() == 'file') {
+          // Todo
+          // self.path()
+        }
+        else if (self.ouputFormat() == 'table') {
+          $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
+            self.isTargetExisting(data.code != 500);
+          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+        }
+        else if (self.ouputFormat() == 'index') {
+          $.post("/search/get_collection", {
+              name: self.name()
+          }, function (data) {
+            self.isTargetExisting(data.status == 0);
+          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+        }
+      });
+
+      self.description = ko.observable('');
       self.ouputFormat = ko.observable('table');
       self.ouputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
@@ -1012,7 +1035,30 @@ ${ assist.assistPanel() }
       self.format = ko.observable();
       self.columns = ko.observableArray();
 
+      self.isTargetExisting = ko.observable();
+      self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
+        if (self.isTargetExisting()) {
+          if (self.ouputFormat() == 'file') {
+            // Todo
+            return '';
+          }
+          else if (self.ouputFormat() == 'table') {
+            return '/metastore/table/' + self.databaseName() + '/' + self.tableName();
+          }
+          else if (self.ouputFormat() == 'index') {
+            return '${ url("indexer:collections") }#edit/' + self.name();
+          }
+        }
+        return '';
+      });
+
       // Table
+      self.tableName = ko.computed(function() {
+        return self.ouputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
+      });
+      self.databaseName = ko.computed(function() {
+        return self.ouputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default';
+      });
       self.tableFormat = ko.observable('text');
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
@@ -1083,11 +1129,6 @@ ${ assist.assistPanel() }
       self.editorVM = null;
 
       self.indexingStarted = ko.observable(false);
-
-      self.isTargetExisting = ko.computed(function () {
-        var name = self.source.name();
-        return viewModel && viewModel.collectionNameAvailable(name) && name.length > 0;
-      });
 
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.ouputFormat() == 'database';
@@ -1297,7 +1338,7 @@ ${ assist.assistPanel() }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.loadField = loadField;
 
-      // wizard related
+      // Wizard related
       self.wizardEnabled = ko.observable(false);
       self.currentStep = ko.observable(1);
       self.previousStepVisible = ko.pureComputed(function(){
@@ -1319,15 +1360,6 @@ ${ assist.assistPanel() }
 
       self.createWizard = new CreateWizard(self);
       self.isLoading = ko.observable(false);
-
-      self.collections = [];
-      self.collectionNameAvailable = function (name) {
-        var matchingCollections = self.collections.filter(function (collection) {
-          return collection.name == name;
-        });
-
-        return matchingCollections.length == 0;
-      }
     };
 
     var viewModel;
@@ -1353,7 +1385,6 @@ ${ assist.assistPanel() }
       });
 
       $('.form-actions').width($('.content-panel').width() - 50);
-
 
       $('.content-panel').droppable({
         accept: ".draggableText",
