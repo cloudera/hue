@@ -3327,7 +3327,6 @@
             editor.completers.push(langTools.keyWordCompleter);
             editor.completers.push(snippet.autocompleter);
           } else if (snippet.type() === 'hive' || snippet.type() === 'impala') {
-            editor.completers.push(snippet.autocompleter);
             editor.useHueAutocompleter = true;
           } else {
             editor.completers.push(snippet.autocompleter);
