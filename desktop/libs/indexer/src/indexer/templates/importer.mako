@@ -45,6 +45,8 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
 
 ${ assist.assistJSModels() }
 
@@ -53,6 +55,8 @@ ${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 ${ assist.assistPanel() }
+
+<link rel="stylesheet" href="${ static('desktop/ext/css/selectize.css') }">
 %endif
 
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
@@ -374,22 +378,22 @@ ${ assist.assistPanel() }
           </label>
 
           <label class="checkbox">
-            <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom delimiters')}
+            <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
           </label>
           <span data-bind="visible: useCustomDelimiters">
             <div class="control-group">
               <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
-                <select id="fieldDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
             <div class="control-group">
               <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
-                <select id="collectionDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
             <div class="control-group">
               <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
-                <select id="structDelimiter" data-bind="options: $root.createWizard.customDelimiters, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
             <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
