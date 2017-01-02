@@ -23,6 +23,7 @@
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
+<%namespace name="hueAceAutocompleter" file="hue_ace_autocompleter.mako" />
 
 <span id="notebookComponents" class="editorComponents notebook">
 ${ editorComponents.includes(is_embeddable=True) }
@@ -49,6 +50,7 @@ ${ editorComponents.topBar() }
 ${ configKoComponents.config() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
+${ hueAceAutocompleter.hueAceAutocompleter() }
 
 ${ editorComponents.commonJS(is_embeddable=True, bindableElement='notebookComponents') }
 
