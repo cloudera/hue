@@ -52,6 +52,11 @@ from desktop.views import _ko
       clear: both;
       background-color: #FFF;
       padding:3px;
+      cursor: pointer;
+    }
+
+    .autocompleter-list > div:hover {
+      background-color: #DBE8F1;
     }
 
     .autocompleter-list > div.selected {
@@ -62,7 +67,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-ace-autocompleter">
     <div class="autocompleter-header"><div class="pull-right">header</div></div>
     <div class="autocompleter-list" data-bind="foreach: filteredSuggestions">
-      <div data-bind="css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.prefixFilter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
+      <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); }, css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.prefixFilter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
     </div>
     <!-- /ko -->
   </script>
@@ -76,7 +81,7 @@ from desktop.views import _ko
         update: function (element, valueAccessor) {
           var options = valueAccessor();
           var $element = $(element);
-          $element.empty()
+          $element.empty();
           var suggestion = options.suggestion;
           if (options.filter() && suggestion.matchIndex > -1) {
             var before = suggestion.value.substring(0, suggestion.matchIndex);
@@ -94,13 +99,13 @@ from desktop.views import _ko
       function HueAceAutocompleter (params, element) {
         var self = this;
         var snippet = params.snippet;
-        var editor = params.editor;
+        self.editor = params.editor;
 
         var autocompleter = new SqlAutocompleter3({ snippet: snippet, timeout: AUTOCOMPLETE_TIMEOUT });
-        self.suggestions = autocompleter.autocomplete(editor.getTextBeforeCursor(), editor.getTextAfterCursor());
+        self.suggestions = autocompleter.autocomplete(self.editor.getTextBeforeCursor(), self.editor.getTextAfterCursor());
 
-        var session = editor.getSession();
-        var pos = editor.getCursorPosition();
+        var session = self.editor.getSession();
+        var pos = self.editor.getCursorPosition();
 
         var line = session.getLine(pos.row);
         var prefix = aceUtil.retrievePrecedingIdentifier(line, pos.column);
@@ -151,8 +156,9 @@ from desktop.views import _ko
               }
               return a.value.localeCompare(b.value);
             });
+
             if (self.selectedIndex() > result.length - 1) {
-              self.selectedIndex(result.length === 0 ? 0 : result.length - 1);
+              self.selectedIndex(result.length - 1);
             }
 
             return result;
@@ -160,21 +166,24 @@ from desktop.views import _ko
           return self.activeSuggestions();
         });
 
-        self.selectedIndex = ko.observable(0);
+        self.selectedIndex = ko.observable(-1);
 
         self.keyboardHandler = new HashHandler();
         self.keyboardHandler.bindKeys({
           "Up": function() {
-            if (self.selectedIndex() !== 0) {
+            if (self.selectedIndex() > 0) {
               self.selectedIndex(self.selectedIndex() - 1);
+              self.scrollSelectionIntoView();
+            } else if (self.selectedIndex() === -1) {
+              self.selectedIndex(0);
+              self.scrollSelectionIntoView();
             }
-            self.scrollSelectionIntoView();
           },
           "Down": function() {
-            if (self.selectedIndex() !== self.filteredSuggestions().length - 1) {
+            if (self.selectedIndex() < self.filteredSuggestions().length - 1) {
               self.selectedIndex(self.selectedIndex() + 1);
+              self.scrollSelectionIntoView();
             }
-            self.scrollSelectionIntoView();
           },
           "Ctrl-Up|Ctrl-Home": function() {
             self.selectedIndex(0);
@@ -184,32 +193,22 @@ from desktop.views import _ko
             self.selectedIndex(self.filteredSuggestions().length - 1);
             self.scrollSelectionIntoView();
           },
-          "Esc": function(editor) {
+          "Esc": function() {
             self.destroy();
           },
-          "Return": function(editor) {
-            if (self.prefixFilter()) {
-              var ranges = editor.selection.getAllRanges();
-              for (var i = 0, range; range = ranges[i]; i++) {
-                range.start.column -= self.prefixFilter().length;
-                editor.session.remove(range);
-              }
+          "Return": function() {
+            self.insertSuggestion();
+          },
+          "Shift-Return": function() {
+            // TODO: Delete suffix
+            self.insertSuggestion();
+          },
+          "Tab": function() {
+            if (self.selectedIndex() === -1) {
+              self.selectedIndex(0);
+            } else {
+              self.insertSuggestion();
             }
-            editor.execCommand("insertstring", self.filteredSuggestions()[self.selectedIndex()].value);
-            editor.renderer.scrollCursorIntoView();
-            self.destroy();
-          },
-          "Shift-Return": function(editor) {
-            console.log('insert deleteSuffix');
-          },
-          "Tab": function(editor) {
-            console.log('insert or down if nothing selected');
-          },
-          "PageUp": function(editor) {
-            console.log('page up');
-          },
-          "PageDown": function(editor) {
-            console.log('page down');
           }
         });
 
@@ -217,49 +216,71 @@ from desktop.views import _ko
 
         self.changeListener = function () {
           window.clearTimeout(changeTimeout);
-          var cursor = editor.selection.lead;
+          var cursor = self.editor.selection.lead;
           if (cursor.row != self.base.row || cursor.column < self.base.column) {
             self.destroy();
           } else {
             changeTimeout = window.setTimeout(function () {
-              self.prefixFilter(editor.session.getTextRange({ start: self.base, end: editor.getCursorPosition() }).toLowerCase())
+              self.prefixFilter(self.editor.session.getTextRange({ start: self.base, end: self.editor.getCursorPosition() }).toLowerCase())
             }, 200);
           }
         };
 
-        self.blurListener = function () {
-          console.log('blur');
-          //self.destroy();
-        };
-
         self.mousedownListener = function () {
-          console.log('mousedown');
+          self.destroy();
         };
 
         self.mousewheelListener = function () {
-          console.log('mousewheel');
+          self.destroy();
         };
 
-        this.destroy = function () {
+        var closeOnClickOutside = function (event) {
+          if ($.contains(document, event.target) && !$.contains(element, event.target)) {
+            self.destroy();
+          }
+        };
+
+        self.destroy = function () {
           self.base.detach();
           window.clearTimeout(changeTimeout);
-          editor.keyBinding.removeKeyboardHandler(self.keyboardHandler);
-          editor.off("changeSelection", self.changeListener);
-          editor.off("blur", self.blurListener);
-          editor.off("mousedown", self.mousedownListener);
-          editor.off("mousewheel", self.mousewheelListener);
+          $(document).off('click', closeOnClickOutside);
+          self.editor.keyBinding.removeKeyboardHandler(self.keyboardHandler);
+          self.editor.off("changeSelection", self.changeListener);
+          self.editor.off("mousedown", self.mousedownListener);
+          self.editor.off("mousewheel", self.mousewheelListener);
           $(element).remove();
         };
 
-        editor.keyBinding.addKeyboardHandler(self.keyboardHandler);
-        editor.on("changeSelection", self.changeListener);
-        editor.on("blur", self.blurListener);
-        editor.on("mousedown", self.mousedownListener);
-        editor.on("mousewheel", self.mousewheelListener);
+        $(document).on('click', closeOnClickOutside);
+        self.editor.keyBinding.addKeyboardHandler(self.keyboardHandler);
+        self.editor.on("changeSelection", self.changeListener);
+        self.editor.on("mousedown", self.mousedownListener);
+        self.editor.on("mousewheel", self.mousewheelListener);
       }
+
+      HueAceAutocompleter.prototype.insertSuggestion = function () {
+        var self = this;
+        if (self.selectedIndex() === -1 || self.filteredSuggestions().length === 0) {
+          self.destroy();
+          return;
+        }
+        if (self.prefixFilter()) {
+          var ranges = self.editor.selection.getAllRanges();
+          for (var i = 0, range; range = ranges[i]; i++) {
+            range.start.column -= self.prefixFilter().length;
+            self.editor.session.remove(range);
+          }
+        }
+        self.editor.execCommand("insertstring", self.filteredSuggestions()[self.selectedIndex()].value);
+        self.editor.renderer.scrollCursorIntoView();
+        self.destroy();
+      };
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
         var self = this;
+        if (self.selectedIndex() === -1) {
+          return;
+        }
         var $autocompleterList = $('.autocompleter-list');
         var selected = $autocompleterList.children().eq(self.selectedIndex());
         var selectedTop = selected.position().top;
