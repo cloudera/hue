@@ -97,7 +97,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
         databases: '${ _('Databases') }',
         popular: '${ _('Popular') }',
         meta: {
-          keyword: '${ _('keyword') }'
+          keyword: '${ _('keyword') }',
+          table: '${ _('table') }',
+          view: '${ _('view') }'
         }
       }
     };

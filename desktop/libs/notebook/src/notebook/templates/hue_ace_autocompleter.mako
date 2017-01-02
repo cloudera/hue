@@ -67,7 +67,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-ace-autocompleter">
     <div class="autocompleter-header"><div class="pull-right">header</div></div>
     <div class="autocompleter-list" data-bind="foreach: filteredSuggestions">
-      <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); }, css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.prefixFilter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
+      <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor.focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.prefixFilter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
     </div>
     <!-- /ko -->
   </script>
@@ -115,16 +115,20 @@ from desktop.views import _ko
         self.prefixFilter = ko.observable(prefix.toLowerCase());
 
         self.activeSuggestions = ko.pureComputed(function () {
+          var result = [];
           if (self.suggestions.keywords) {
-            return self.suggestions.keywords.suggestions();
+            result = result.concat(self.suggestions.keywords.suggestions());
           }
-
-          return [];
+          if (self.suggestions.tables) {
+            result = result.concat(self.suggestions.tables.suggestions());
+          }
+          return result;
         });
 
         self.filteredSuggestions = ko.pureComputed(function () {
+          var result = [];
           if (self.prefixFilter()) {
-            var result = self.activeSuggestions().filter(function (suggestion) {
+            result = self.activeSuggestions().filter(function (suggestion) {
               // TODO: Extend with fuzzy matches
               var foundIndex = suggestion.value.toLowerCase().indexOf(self.prefixFilter());
               if (foundIndex === 0) {
@@ -137,7 +141,15 @@ from desktop.views import _ko
               return suggestion.value.toLowerCase().indexOf(self.prefixFilter()) !== -1;
             });
 
-            result.sort(function (a, b) {
+            if (self.selectedIndex() > result.length - 1) {
+              self.selectedIndex(result.length - 1);
+            }
+          } else {
+            result = self.activeSuggestions();
+          }
+
+          result.sort(function (a, b) {
+            if (self.prefixFilter()) {
               if (typeof a.sortWeight !== 'undefined' && typeof b.sortWeight !== 'undefined' && b.sortWeight !== a.sortWeight) {
                 return b.sortWeight - a.sortWeight;
               }
@@ -147,25 +159,19 @@ from desktop.views import _ko
               if (typeof b.sortWeight !== 'undefined' && typeof a.sortWeight === 'undefined') {
                 return 1;
               }
-              if (typeof a.weight !== 'undefined' && typeof b.weight !== 'undefined' && b.weight !== a.weight) {
-                return b.weight - a.weight;
-              }
-              if (typeof a.weight !== 'undefined' && typeof b.weight === 'undefined') {
-                return -1;
-              }
-              if (typeof b.weight !== 'undefined' && typeof a.weight === 'undefined') {
-                return 1;
-              }
-              return a.value.localeCompare(b.value);
-            });
-
-            if (self.selectedIndex() > result.length - 1) {
-              self.selectedIndex(result.length - 1);
             }
-
-            return result;
-          }
-          return self.activeSuggestions();
+            if (typeof a.weight !== 'undefined' && typeof b.weight !== 'undefined' && b.weight !== a.weight) {
+              return b.weight - a.weight;
+            }
+            if (typeof a.weight !== 'undefined' && typeof b.weight === 'undefined') {
+              return -1;
+            }
+            if (typeof b.weight !== 'undefined' && typeof a.weight === 'undefined') {
+              return 1;
+            }
+            return a.value.localeCompare(b.value);
+          });
+          return result;
         });
 
         self.selectedIndex = ko.observable(0);
@@ -273,8 +279,7 @@ from desktop.views import _ko
             self.editor.session.remove(range);
           }
         }
-        var value = self.filteredSuggestions()[self.selectedIndex()].value;
-        self.editor.execCommand('insertstring', /\.$/.test(value) ? value : value + ' ');
+        self.editor.execCommand('insertstring', self.filteredSuggestions()[self.selectedIndex()].value);
         self.editor.renderer.scrollCursorIntoView();
         self.destroy();
       };
