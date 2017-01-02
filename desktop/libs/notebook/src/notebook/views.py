@@ -32,7 +32,7 @@ from desktop.models import Document2, Document
 from metadata.conf import has_optimizer, has_navigator
 
 from notebook.conf import get_ordered_interpreters
-from notebook.connectors.base import Notebook, get_api
+from notebook.connectors.base import Notebook, get_api, _get_snippet_name
 from notebook.connectors.spark_shell import SparkApi
 from notebook.decorators import check_document_access_permission, check_document_modify_permission
 from notebook.management.commands.notebook_setup import Command
@@ -90,9 +90,11 @@ def notebook(request, is_embeddable=False):
       'is_yarn_mode': is_yarn_mode,
   })
 
+
 @check_document_access_permission()
 def notebook_embeddable(request):
   return notebook(request, True)
+
 
 @check_document_access_permission()
 def editor(request, is_mobile=False, is_embeddable=False):
@@ -123,9 +125,11 @@ def editor(request, is_mobile=False, is_embeddable=False):
       })
   })
 
+
 @check_document_access_permission()
 def editor_embeddable(request):
   return editor(request, False, True)
+
 
 @check_document_access_permission()
 def editor_m(request):
@@ -174,12 +178,14 @@ def execute_and_watch(request):
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'index_query':
+    if not destination:
+      destination = _get_snippet_name(notebook)
     sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
 
     sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 
-    from indexer.api3 import _index # Will ve moved to the lib in next commit
+    from indexer.api3 import _index # Will ve moved to the lib
     from indexer.file_format import HiveFormat
     from indexer.fields import Field
 

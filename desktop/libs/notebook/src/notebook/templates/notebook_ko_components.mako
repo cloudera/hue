@@ -190,18 +190,18 @@ except ImportError, e:
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
-        <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
-            <i class="fa fa-fw fa-save"></i> ${ _('Export') }
-          </a>
-        </li>
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Explore the result in an analytic dashboard') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath(''); trySaveResults(); }" title="${ _('Explore the result in an analytic dashboard') }">
             <i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }
           </a>
         </li>
         % endif
+        <li>
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { $('#saveResultsModal').modal('show'); }" title="${ _('Save the result in a file, a new table...') }">
+            <i class="fa fa-fw fa-save"></i> ${ _('Save') }
+          </a>
+        </li>
       </ul>
     </div>
 
