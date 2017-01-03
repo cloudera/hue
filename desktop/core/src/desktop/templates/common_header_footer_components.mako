@@ -91,15 +91,11 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     AutocompleterGlobals = {
       i18n: {
-        keywords: '${ _('Keywords') }',
-        columns: '${ _('Columns') }',
-        tables: '${ _('Tables') }',
-        databases: '${ _('Databases') }',
-        popular: '${ _('Popular') }',
         meta: {
           keyword: '${ _('keyword') }',
           table: '${ _('table') }',
-          view: '${ _('view') }'
+          view: '${ _('view') }',
+          virtual: '${ _('virtual') }'
         }
       }
     };
