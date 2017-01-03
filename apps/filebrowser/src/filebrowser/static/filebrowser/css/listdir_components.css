@@ -27,13 +27,13 @@
   border-color: #B94A48 !important;
 }
 
-.form-inline {
+.filebrowser .form-inline {
   position: relative;
   right: 10px;
   top: -10px;
 }
 
-.pagination {
+.filebrowser .pagination {
   background-color: #f5f5f5;
   border-top: 1px solid #e3e3e3;
   bottom: 0;
@@ -48,28 +48,28 @@
   z-index: 1001;
 }
 
-.pagination p {
+.filebrowser .pagination p {
   padding-top: 10px;
   padding-left: 10px;
   margin: 0 .5em;
 }
 
-.pagination select {
+.filebrowser .pagination select {
   margin-top: 4px;
 }
 
-.pagination ul {
+.filebrowser .pagination ul {
   margin-top: 14px;
   margin-right: 20px;
 }
 
-.pagination-input-form {
+.filebrowser .pagination-input-form {
   position: relative;
   right: 1em;
   top: 5px;
 }
 
-.pagination-input {
+.filebrowser .pagination-input {
   text-align: center;
   width: 40px;
 }
@@ -300,15 +300,15 @@
   color: #b94a48;
 }
 
-.editable-breadcrumbs {
+.filebrowser .editable-breadcrumbs {
   cursor: text;
 }
 
-.editable-breadcrumbs:hover {
+.filebrowser .editable-breadcrumbs:hover {
   background-color: #F0F0F0;
 }
 
-#hueBreadcrumbText {
+.filebrowser #hueBreadcrumbText {
   font-size: 1.25em;
   margin-left: 25px;
   margin-top: 6px;
