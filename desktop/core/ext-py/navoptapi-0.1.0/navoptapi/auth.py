@@ -14,7 +14,10 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 from base64 import urlsafe_b64encode
-from collections import OrderedDict
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 from email.utils import formatdate
 import json
 import logging
