@@ -883,7 +883,7 @@ ${ assist.assistPanel() }
       self.inputFormats = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'table', 'name': 'Table'},
-          {'value': 'text', 'name': 'Copy paste text'},
+          {'value': 'text', 'name': 'Paste Text'},
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'dbms', 'name': 'DBMS'},
           {'value': 'manual', 'name': 'Manually'},

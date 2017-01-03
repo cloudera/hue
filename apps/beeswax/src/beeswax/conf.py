@@ -96,12 +96,24 @@ LIST_PARTITIONS_LIMIT = Config(
   type=int,
   help=_t('Limit the number of partitions that can be listed. A positive value will be set as the LIMIT.'))
 
+# Deprecated
 DOWNLOAD_CELL_LIMIT = Config(
   key='download_cell_limit',
   default=10000000,
   type=int,
   help=_t('A limit to the number of cells (rows * columns) that can be downloaded from a query '
           '(e.g. - 10K rows * 1K columns = 10M cells.) '
+          'A value of -1 means there will be no limit.'))
+
+def get_deprecated_download_cell_limit():
+  """Get the old default"""
+  return DOWNLOAD_CELL_LIMIT.get() / 100 if DOWNLOAD_CELL_LIMIT.get() > 0 else DOWNLOAD_CELL_LIMIT.get()
+
+DOWNLOAD_ROW_LIMIT = Config(
+  key='download_row_limit',
+  dynamic_default=get_deprecated_download_cell_limit,
+  type=int,
+  help=_t('A limit to the number of rows that can be downloaded from a query before it is truncated. '
           'A value of -1 means there will be no limit.'))
 
 APPLY_NATURAL_SORT_MAX = Config(

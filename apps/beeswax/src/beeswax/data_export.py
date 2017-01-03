@@ -41,9 +41,9 @@ def download(handle, format, db, id=None, file_name='query_result'):
     LOG.error('Unknown download format "%s"' % (format,))
     return
 
-  max_cells = conf.DOWNLOAD_CELL_LIMIT.get()
+  max_rows = conf.DOWNLOAD_ROW_LIMIT.get()
 
-  content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True)
   generator = export_csvxls.create_generator(content_generator, format)
 
   resp = export_csvxls.make_response(generator, format, file_name)
@@ -61,7 +61,7 @@ def download(handle, format, db, id=None, file_name='query_result'):
   return resp
 
 
-def upload(path, handle, user, db, fs, max_cells=-1):
+def upload(path, handle, user, db, fs, max_rows=-1):
   """
   upload(query_model, path, user, db, fs) -> None
 
@@ -72,7 +72,7 @@ def upload(path, handle, user, db, fs, max_cells=-1):
   else:
     fs.do_as_user(user.username, fs.create, path)
 
-  content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
+  content_generator = HS2DataAdapter(handle, db, max_rows=max_rows, start_over=True)
   for header, data in content_generator:
     dataset = export_csvxls.dataset(None, data)
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
@@ -80,13 +80,13 @@ def upload(path, handle, user, db, fs, max_cells=-1):
 
 class HS2DataAdapter:
 
-  def __init__(self, handle, db, max_cells=-1, start_over=True):
+  def __init__(self, handle, db, max_rows=-1, start_over=True):
     self.handle = handle
     self.db = db
-    self.max_cells = max_cells
+    self.max_rows = max_rows
     self.start_over = start_over
     self.fetch_size = FETCH_SIZE
-    self.limit_cells = max_cells > -1
+    self.limit_rows = max_rows > -1
 
     self.first_fetched = True
     self.headers = None
@@ -106,7 +106,7 @@ class HS2DataAdapter:
 
       # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
       if self.num_cols > 100:
-        LOG.warn('The query results contain %d columns and may take an extremely long time to download, will reduce fetch size to 100.' % self.num_cols)
+        LOG.warn('The query results contain %d columns and may take long time to download, reducing fetch size to 100.' % self.num_cols)
         self.fetch_size = 100
 
     if not self.is_truncated and (self.first_fetched or results.has_more):
@@ -116,8 +116,8 @@ class HS2DataAdapter:
 
       for row in results.rows():
         self.row_counter += 1
-        if self.limit_cells and (self.row_counter * self.num_cols) > self.max_cells:
-          LOG.warn('The query results exceeded the maximum cell limit of %d. Data has been truncated to first %d rows.' % (self.max_cells, self.row_counter))
+        if self.limit_rows and self.row_counter > self.max_rows:
+          LOG.warn('The query results exceeded the maximum row limit of %d and has been truncated to first %d rows.' % (self.max_rows, self.row_counter))
           self.is_truncated = True
           break
         data.append(row)

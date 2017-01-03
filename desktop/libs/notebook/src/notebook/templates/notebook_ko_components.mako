@@ -22,10 +22,10 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
 try:
-  from beeswax.conf import DOWNLOAD_CELL_LIMIT
+  from beeswax.conf import DOWNLOAD_ROW_LIMIT
 except ImportError, e:
   LOG.warn("Hive app is not enabled")
-  DOWNLOAD_CELL_LIMIT = None
+  DOWNLOAD_ROW_LIMIT = None
 
 try:
   from indexer.conf import ENABLE_NEW_INDEXER
@@ -181,12 +181,12 @@ except ImportError, e:
       </a>
       <ul class="dropdown-menu less-padding">
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s cells as CSV') % DOWNLOAD_CELL_LIMIT.get() }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadCsv, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as CSV') % DOWNLOAD_ROW_LIMIT.get() }">
             <i class="fa fa-fw fa-file-o"></i> ${ _('CSV') }
           </a>
         </li>
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s cells as XLS') % DOWNLOAD_CELL_LIMIT.get() }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: downloadXls, event: { mouseover: function(){ window.onbeforeunload = null; }, mouseout: function() { window.onbeforeunload = $(window).data('beforeunload'); } }" title="${ _('Download first %s rows as XLS') % DOWNLOAD_ROW_LIMIT.get() }">
             <i class="fa fa-fw fa-file-excel-o"></i> ${ _('Excel') }
           </a>
         </li>
@@ -223,30 +223,19 @@ except ImportError, e:
             <div class="control-group">
               <div class="controls">
                 <label class="radio">
-                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
-                  &nbsp;${ _('File (max %s cells)') % DOWNLOAD_CELL_LIMIT.get() }
-                </label>
-                <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
-                </div>
-                <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
-                  <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
-                  ${ _('Overwrite') }
-                </label>
-              </div>
-            </div>
-            <div class="control-group">
-              <div class="controls" data-bind="visible: snippet.type() == 'hive'">
-                <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('File (large result)') }
+                  &nbsp;${ _('File') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
-                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10">
-                  <div class="inline-block" data-bind="tooltip: { title: '${ _ko("Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory.") }', placement: 'top' }" style="padding: 8px">
-                    <i class="fa fa-fw fa-question-circle muted"></i>
-                  </div>
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
                 </div>
+                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save a large result as CSV") }', placement: 'top' }" style="padding: 8px">
+                  <i class="fa fa-fw fa-question-circle muted"></i>
+                </div>
+                ##<label class="radio" data-bind="visible: saveTarget() == 'hdfs-directory'">
+                ##  <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
+                ##  ${ _('Download') }
+                ##</label>
               </div>
             </div>
             <div class="control-group">
@@ -321,7 +310,7 @@ except ImportError, e:
         self.snippet = params.snippet;
         self.notebook = params.notebook;
 
-        self.saveTarget = ko.observable('hdfs-file');
+        self.saveTarget = ko.observable('hdfs-directory');
         self.savePath = ko.observable('');
         self.saveOverwrite = ko.observable(true);
 

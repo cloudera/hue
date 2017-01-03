@@ -45,7 +45,7 @@ LOG = logging.getLogger(__name__)
 try:
   from beeswax import conf as beeswax_conf, data_export
   from beeswax.api import _autocomplete, _get_sample_data
-  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_CELL_LIMIT
+  from beeswax.conf import CONFIG_WHITELIST as hive_settings, DOWNLOAD_ROW_LIMIT
   from beeswax.data_export import upload
   from beeswax.design import hql_query, strip_trailing_semicolon, split_statements
   from beeswax.models import QUERY_TYPES, HiveServerQueryHandle, HiveServerQueryHistory, QueryHistory, Session
@@ -444,9 +444,9 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
-    max_cells = DOWNLOAD_CELL_LIMIT.get()
+    max_rows = DOWNLOAD_ROW_LIMIT.get()
 
-    upload(target_file, handle, self.request.user, db, self.request.fs, max_cells=max_cells)
+    upload(target_file, handle, self.request.user, db, self.request.fs, max_rows=max_rows)
 
     return '/filebrowser/view=%s' % target_file
 
@@ -471,6 +471,24 @@ class HS2Api(Api):
 
     hql = 'CREATE %sTABLE `%s`.`%s` %sAS %s' % ('TEMPORARY ' if is_temporary else '', database, table, "LOCATION '%s' " % location if location else '', query.hql_query)
     success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table})
+
+    return hql, success_url
+
+
+  def export_large_data_to_hdfs1(self, notebook, snippet, destination):
+    db = self._get_db(snippet)
+
+    response = self._get_current_statement(db, snippet)
+    session = self._get_session(notebook, snippet['type'])
+    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
+
+    if 'select' not in query.hql_query.strip().lower():
+      raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
+
+    db.use(query.database)
+
+    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
+    success_url = '/filebrowser/view=%s' % destination
 
     return hql, success_url
 
