@@ -360,7 +360,7 @@
         // check if it's a relative path
         var pathAddition = "";
         if ($.trim(inputElement.val()) != "") {
-          var checkPath = "/filebrowser/chooser=${ workflow.deployment_dir }" + "/" + inputElement.val();
+          var checkPath = "/filebrowser/view=${ workflow.deployment_dir }" + "/" + inputElement.val();
           $.getJSON(checkPath, function (data) {
             pathAddition = "${ workflow.deployment_dir }/";
             callFileChooser();

@@ -174,7 +174,7 @@
   Plugin.prototype.navigateTo = function (path) {
     var _parent = this;
     $(_parent.element).find('.filechooser-tree').html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");
-    $.getJSON("/filebrowser/chooser=" + path, function (data) {
+    $.getJSON("/filebrowser/view=" + path, function (data) {
       $(_parent.element).find('.filechooser-tree').empty();
 
       path = data.current_dir_path; // use real path.

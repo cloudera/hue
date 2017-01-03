@@ -32,7 +32,6 @@ urlpatterns = patterns('filebrowser.views',
   url(r'^download=(?P<path>.*)$', 'download', name='download'),
   url(r'^status$', 'status', name='status'),
   url(r'^home_relative_view=(?P<path>.*)$', 'home_relative_view', name='home_relative_view'),
-  url(r'^chooser=(?P<path>.*)$', 'chooser', name='choose'),
   url(r'^edit=(?P<path>.*)$', 'edit', name='edit'),
 
   # POST operations

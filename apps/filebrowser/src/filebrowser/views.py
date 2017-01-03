@@ -319,7 +319,7 @@ def parse_breadcrumbs(path):
     return breadcrumbs
 
 
-def listdir(request, path, chooser):
+def listdir(request, path):
     """
     Implements directory listing (or index).
 
@@ -368,10 +368,7 @@ def listdir(request, path, chooser):
         stats.insert(0, parent_stat)
 
     data['files'] = [_massage_stats(request, stat) for stat in stats]
-    if chooser:
-        return render('chooser.mako', request, data)
-    else:
-        return render('listdir.mako', request, data)
+    return render('listdir.mako', request, data)
 
 def _massage_page(page):
     return {
@@ -491,25 +488,6 @@ def listdir_paged(request, path):
         'is_embeddable': request.GET.get('is_embeddable', False),
     }
     return render('listdir.mako', request, data)
-
-
-def chooser(request, path):
-    """
-    Returns the html to JFrame that will display a file prompt.
-
-    Dispatches viewing of a path to either index() or fileview(), depending on type.
-    """
-    # default_to_home is set in bootstrap.js
-    home_dir_path = request.user.get_home_directory()
-    if 'default_to_home' in request.GET and request.fs.isdir(home_dir_path):
-        return listdir(request, home_dir_path, True)
-
-    if request.fs.isdir(path):
-        return listdir(request, path, True)
-    elif request.fs.isfile(path):
-        return display(request, path)
-    else:
-        raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
 
 
 def _massage_stats(request, stats):

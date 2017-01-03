@@ -509,18 +509,6 @@ class TestFileBrowserWithHadoop(object):
     assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
 
 
-  def test_chooser(self):
-    prefix = self.cluster.fs_prefix + '/test_chooser'
-    self.cluster.fs.mkdir(prefix)
-
-    # Note that the trailing slash is important. We ask for the root dir.
-    resp = self.c.get('/filebrowser/chooser=/?format=json')
-    # We should get a json response
-    dic = json.loads(resp.content)
-    assert_equal('/', dic['current_dir_path'])
-    assert_equal('/', dic['path'])
-
-
   def test_view_snappy_compressed(self):
     if not snappy_installed():
       raise SkipTest
