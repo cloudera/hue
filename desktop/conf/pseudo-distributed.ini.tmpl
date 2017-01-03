@@ -902,16 +902,15 @@
   # The maximum number of partitions that will be included in the SELECT * LIMIT sample query for partitioned tables.
   ## query_partitions_limit=10
 
-  # A limit to the number of cells (rows * columns) that can be downloaded from a query
-  # (e.g. - 10K rows * 1K columns = 10M cells.)
+  # A limit to the number of rows that can be downloaded from a query before it is truncated.
   # A value of -1 means there will be no limit.
-  ## download_cell_limit=10000000
+  ## download_row_limit=100000
 
   # Hue will try to close the Hive query when the user leaves the editor page.
   # This will free all the query resources in HiveServer2, but also make its results inaccessible.
   ## close_queries=false
 
-  # Hue will use at most this many HiveServer2 sessions per user at a time
+  # Hue will use at most this many HiveServer2 sessions per user at a time.
   ## max_number_of_sessions=1
 
   # Thrift version to use when communicating with HiveServer2.
@@ -919,7 +918,7 @@
   ## thrift_version=7
 
   # A comma-separated list of white-listed Hive configuration properties that users are authorized to set.
-  # config_whitelist=hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename
+  ## config_whitelist=hive.map.aggr,hive.exec.compress.output,hive.exec.parallel,hive.execution.engine,mapreduce.job.queuename
 
   # Override the default desktop username and password of the hue user used for authentications with other services.
   # e.g. Used for LDAP/PAM pass-through authentication.
