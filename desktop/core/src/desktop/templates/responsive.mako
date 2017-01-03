@@ -341,7 +341,6 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
-<script src="${ static('desktop/ext/js/jquery/plugins/jquery.placeholder.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.form.js') }"></script>
 <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
