@@ -38,7 +38,6 @@ var SqlAutocompleter3 = (function () {
     JOIN: -1
   };
 
-
   var hiveReservedKeywords = {
     ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CASE: true, CAST: true,
     CHAR: true, COLUMN: true, CONF: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_TIMESTAMP: true, CURSOR: true,
@@ -100,84 +99,6 @@ var SqlAutocompleter3 = (function () {
   }
 
   /**
-   * Represents the keyword category of suggestions
-   *
-   * @param parent
-   * @param colRefDeferral
-   * @constructor
-   */
-  function KeywordsCategory (parent, colRefDeferral) {
-    var self = this;
-    self.label = AutocompleterGlobals.i18n.keywords;
-    self.suggestions = ko.observableArray([]);
-    self.loading = ko.observable(false);
-
-    if (parent.parseResult.suggestKeywords) {
-      var keywordSuggestions = $.map(parent.parseResult.suggestKeywords, function (keyword) {
-        return new Suggestion(parent.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value, AutocompleterGlobals.i18n.meta.keyword, keyword.weight);
-      });
-      self.suggestions(keywordSuggestions);
-    }
-
-    if (parent.parseResult.suggestColRefKeywords) {
-      self.loading(true);
-      // We have to wait for the column reference type to be resolved
-      colRefDeferral.done(function (colRef) {
-        if (colRef !== null) {
-          var keywordSuggestions = self.suggestions();
-          Object.keys(parent.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
-            if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [type.toUpperCase()])) {
-              parent.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
-                keywordSuggestions.push(new Suggestion(parent.parseResult.lowerCase ? keyword.toLowerCase() : keyword, AutocompleterGlobals.i18n.meta.keyword, DEFAULT_WEIGHTS.COLREF_KEYWORD));
-              })
-            }
-          });
-          self.suggestions(keywordSuggestions);
-        }
-        self.loading(false);
-      });
-    }
-  }
-
-  /**
-   * @param parent
-   * @constructor
-   */
-  function TablesCategory (parent) {
-    var self = this;
-    self.label = AutocompleterGlobals.i18n.keywords;
-    self.suggestions = ko.observableArray([]);
-    self.loading = ko.observable(true);
-
-    var prefix = parent.parseResult.suggestTables.prependQuestionMark ? '? ' : '';
-    if (parent.parseResult.suggestTables.prependFrom) {
-      prefix += parent.parseResult.lowerCase ? 'from ' : 'FROM ';
-    }
-
-    parent.apiHelper.fetchTables({
-      sourceType: parent.sourceType,
-      databaseName: parent.parseResult.suggestTables.identifierChain && parent.parseResult.suggestTables.identifierChain.length === 1 ? parent.parseResult.suggestTables.identifierChain[0].name : parent.defaultDatabase,
-      successCallback: function (data) {
-        var tables = [];
-        data.tables_meta.forEach(function (tablesMeta) {
-          if (parent.parseResult.suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
-              parent.parseResult.suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
-            return;
-          }
-          tables.push(new Suggestion(prefix + backTickIfNeeded(parent.sourceType, tablesMeta.name), AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()], DEFAULT_WEIGHTS.TABLE));
-        });
-        self.loading(false);
-        self.suggestions(tables);
-      },
-      silenceErrors: true,
-      errorCallback: function () {
-        self.loading(false);
-      },
-      timeout: parent.timeout
-    });
-  }
-
-  /**
    *
    * @param options
    * @constructor
@@ -185,28 +106,93 @@ var SqlAutocompleter3 = (function () {
   function Suggestions (options) {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
-    self.parseResult = options.parseResult;
-    self.sourceType = options.sourceType;
-    self.defaultDatabase = options.defaultDatabase;
-    self.timeout = options.timeout;
-    self.callback = options.callback;
+    self.snippet = options.snippet;
+
+    self.keywords = ko.observableArray();
+    self.loadingKeywords = ko.observable(false);
+
+    self.tables = ko.observableArray();
+    self.loadingTables = ko.observable(false);
+
+    self.columns = ko.observableArray();
+    self.loadingColumns = ko.observable(false);
+
+    self.filter = ko.observable();
+
+    self.filtered = ko.pureComputed(function () {
+      var result = self.keywords().concat(self.tables(), self.columns());
+
+      if (self.filter()) {
+        var lowerCaseFilter = self.filter().toLowerCase();
+        result = result.filter(function (suggestion) {
+          // TODO: Extend with fuzzy matches
+          var foundIndex = suggestion.value.toLowerCase().indexOf(lowerCaseFilter);
+          if (foundIndex === -1) {
+            return false;
+          }
+          if (foundIndex === 0) {
+            suggestion.sortWeight = 2;
+          } else if (foundIndex > 0) {
+            suggestion.sortWeight = 1;
+          }
+          suggestion.matchIndex = foundIndex;
+          suggestion.matchLength = self.filter().length;
+          return true;
+        });
+      }
+      result.sort(function (a, b) {
+        if (self.filter()) {
+          if (typeof a.sortWeight !== 'undefined' && typeof b.sortWeight !== 'undefined' && b.sortWeight !== a.sortWeight) {
+            return b.sortWeight - a.sortWeight;
+          }
+          if (typeof a.sortWeight !== 'undefined' && typeof b.sortWeight === 'undefined') {
+            return -1;
+          }
+          if (typeof a.sortWeight === 'undefined' && typeof b.sortWeight !== 'undefined') {
+            return 1;
+          }
+        }
+        if (typeof a.weight !== 'undefined' && typeof b.weight !== 'undefined' && b.weight !== a.weight) {
+          return b.weight - a.weight;
+        }
+        if (typeof a.weight !== 'undefined' && typeof b.weight === 'undefined') {
+          return -1;
+        }
+        if (typeof a.weight === 'undefined' && typeof b.weight !== 'undefined') {
+          return 1;
+        }
+        return a.value.localeCompare(b.value);
+      });
+      return result;
+    });
+  }
+
+  Suggestions.prototype.update = function (parseResult) {
+    var self = this;
+    self.defaultDatabase = parseResult.useDatabase || self.snippet.database();
+    self.parseResult = parseResult;
+    self.keywords([]);
+    self.tables([]);
+    self.columns([]);
+    self.loadingKeywords(false);
+    self.loadingTables(false);
+    self.loadingColumns(false);
+    self.filter('');
 
     var colRefDeferral = self.handleColumnReference();
-    var allDbsDeferral = self.loadAllDatabases();
+    var allDbsDeferral = self.loadDatabases();
 
     self.handleKeywords(colRefDeferral);
     self.handleTables(allDbsDeferral);
+  };
 
-    colRefDeferral.done(self.callback)
-  }
-
-  Suggestions.prototype.loadAllDatabases = function () {
+  Suggestions.prototype.loadDatabases = function () {
     var self = this;
     var dbsDeferral = $.Deferred();
     self.apiHelper.loadDatabases({
-      sourceType: self.sourceType,
+      sourceType: self.snippet.type(),
       successCallback: dbsDeferral.resolve,
-      timeout: self.timeout,
+      timeout: AUTOCOMPLETE_TIMEOUT,
       silenceErrors: true,
       errorCallback: function () {
         dbsDeferral.resolve([]);
@@ -217,31 +203,84 @@ var SqlAutocompleter3 = (function () {
 
   Suggestions.prototype.handleKeywords = function (colRefDeferral) {
     var self = this;
-    if (self.parseResult.suggestKeywords || self.parseResult.suggestColRefKeywords) {
-      self.keywords = new KeywordsCategory(self, colRefDeferral);
+    if (self.parseResult.suggestKeywords) {
+      var keywordSuggestions = $.map(self.parseResult.suggestKeywords, function (keyword) {
+        return new Suggestion(self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value, AutocompleterGlobals.i18n.meta.keyword, keyword.weight);
+      });
+      self.keywords(keywordSuggestions);
+    }
+
+    if (self.parseResult.suggestColRefKeywords) {
+      self.loadingKeywords(true);
+      // Wait for the column reference type to be resolved to pick the right keywords
+      colRefDeferral.done(function (colRef) {
+        if (colRef !== null) {
+          var keywordSuggestions = self.keywords();
+          Object.keys(self.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
+            if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [type.toUpperCase()])) {
+              self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
+                keywordSuggestions.push(new Suggestion(self.parseResult.lowerCase ? keyword.toLowerCase() : keyword, AutocompleterGlobals.i18n.meta.keyword, DEFAULT_WEIGHTS.COLREF_KEYWORD));
+              })
+            }
+          });
+          self.keywords(keywordSuggestions);
+        }
+        self.loadingKeywords(false);
+      });
     }
   };
 
   Suggestions.prototype.handleTables = function (allDbsDeferral, colRefDeferral) {
     var self = this;
     if (self.parseResult.suggestTables) {
-      if (self.sourceType == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length === 1) {
+      var suggestTables = self.parseResult.suggestTables;
+      var fetchTables = function () {
+        self.loadingTables(true);
+        var prefix = suggestTables.prependQuestionMark ? '? ' : '';
+        if (suggestTables.prependFrom) {
+          prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
+        }
+
+        self.apiHelper.fetchTables({
+          sourceType: self.snippet.type(),
+          databaseName: suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.defaultDatabase,
+          successCallback: function (data) {
+            var tableSuggestions = [];
+            data.tables_meta.forEach(function (tablesMeta) {
+              if (suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
+                  suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
+                return;
+              }
+              tableSuggestions.push(new Suggestion(prefix + backTickIfNeeded(self.snippet.type(), tablesMeta.name), AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()], DEFAULT_WEIGHTS.TABLE));
+            });
+            self.loadingTables(false);
+            self.tables(tableSuggestions);
+          },
+          silenceErrors: true,
+          errorCallback: function () {
+            self.loadingTables(false);
+          },
+          timeout: AUTOCOMPLETE_TIMEOUT
+        });
+      };
+
+      if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length === 1) {
         allDbsDeferral.done(function (databases) {
           var foundDb = databases.filter(function (db) {
             return db.toLowerCase() === self.parseResult.suggestTables.identifierChain[0].name.toLowerCase();
           });
           if (foundDb.length > 0) {
-            self.tables = new TablesCategory(self);
+            fetchTables();
           } else {
             self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
             self.handleColumns(colRefDeferral);
           }
         });
-      } else if (self.sourceType == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length > 1) {
+      } else if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length > 1) {
         self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
         self.handleColumns(colRefDeferral);
       } else {
-        self.tables = new TablesCategory(self);
+        fetchTables();
       }
     }
   };
@@ -282,7 +321,7 @@ var SqlAutocompleter3 = (function () {
         });
       }
     } else {
-      colRefDeferral.resolve();
+      colRefDeferral.resolve({ type: 'T' });
     }
     return colRefDeferral;
   };
@@ -316,13 +355,13 @@ var SqlAutocompleter3 = (function () {
       }
 
       self.apiHelper.fetchFields({
-        sourceType: self.sourceType,
+        sourceType: self.snippet.type(),
         databaseName: database,
         tableName: table,
         fields: fetchedFields,
-        timeout: self.timeout,
+        timeout: AUTOCOMPLETE_TIMEOUT,
         successCallback: function (data) {
-          if (self.sourceType === 'hive'
+          if (self.snippet.type() === 'hive'
               && typeof data.extended_columns !== 'undefined'
               && data.extended_columns.length === 1
               && data.extended_columns.length
@@ -356,11 +395,11 @@ var SqlAutocompleter3 = (function () {
 
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
-    if (self.sourceType === 'impala' || self.sourceType === 'hive') {
+    if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
       if (identifierChain.length > 1) {
         self.apiHelper.loadDatabases({
-          sourceType: self.sourceType,
-          timeout: self.timeout,
+          sourceType: self.snippet.type(),
+          timeout: AUTOCOMPLETE_TIMEOUT,
           successCallback: function (data) {
             var foundDb = data.filter(function (db) {
               return db.toLowerCase() === identifierChain[0].name.toLowerCase();
@@ -387,30 +426,24 @@ var SqlAutocompleter3 = (function () {
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
-   * @param {Number} options.timeout
    * @constructor
    */
   function SqlAutocompleter3(options) {
     var self = this;
     self.snippet = options.snippet;
-    self.timeout = options.timeout;
+    self.editor = options.editor;
+    self.suggestions = new Suggestions(options);
   }
 
-  SqlAutocompleter3.prototype.autocomplete = function (beforeCursor, afterCursor) {
+  SqlAutocompleter3.prototype.autocomplete = function () {
     var self = this;
-    var sourceType = self.snippet.type();
-    var parseResult = sql.parseSql(beforeCursor, afterCursor, sourceType, false);
+    var parseResult = sql.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
 
     if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
       console.log(parseResult);
     }
 
-    return new Suggestions({
-      parseResult: parseResult,
-      sourceType: sourceType,
-      defaultDatabase: parseResult.useDatabase || self.snippet.database(),
-      timeout: self.timeout
-    });
+    self.suggestions.update(parseResult);
   };
 
   return SqlAutocompleter3;
