@@ -66,38 +66,6 @@ var SqlAutocompleter3 = (function () {
     TABLES: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true,
   };
 
-  var backTickIfNeeded = function (sourceType, text) {
-    if (text.indexOf('`') === 0) {
-      return text;
-    }
-    var upperText = text.toUpperCase();
-    if (sourceType === 'hive' && (hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText])) {
-      return '`' + text + '`';
-    } else if (sourceType === 'impala' && impalaReservedKeywords[upperText]) {
-      return '`' + text + '`';
-    } else if (impalaReservedKeywords[upperText] || hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText]) {
-      return '`' + text + '`';
-    } else if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(text)) {
-      return '`' + text + '`';
-    }
-    return text;
-  };
-
-  /**
-   * Represents a single suggestion
-   *
-   * @param value
-   * @param meta
-   * @param weight
-   * @constructor
-   */
-  function Suggestion (value, meta, weight) {
-    var self = this;
-    self.value = value;
-    self.meta = meta;
-    self.weight = weight;
-  }
-
   /**
    *
    * @param options
@@ -107,6 +75,7 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
     self.snippet = options.snippet;
+    self.editor = options.editor;
 
     self.keywords = ko.observableArray();
     self.loadingKeywords = ko.observable(false);
@@ -131,9 +100,9 @@ var SqlAutocompleter3 = (function () {
             return false;
           }
           if (foundIndex === 0) {
-            suggestion.sortWeight = 2;
+            suggestion.filterWeight = 2;
           } else if (foundIndex > 0) {
-            suggestion.sortWeight = 1;
+            suggestion.filterWeight = 1;
           }
           suggestion.matchIndex = foundIndex;
           suggestion.matchLength = self.filter().length;
@@ -142,13 +111,13 @@ var SqlAutocompleter3 = (function () {
       }
       result.sort(function (a, b) {
         if (self.filter()) {
-          if (typeof a.sortWeight !== 'undefined' && typeof b.sortWeight !== 'undefined' && b.sortWeight !== a.sortWeight) {
-            return b.sortWeight - a.sortWeight;
+          if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight !== 'undefined' && b.filterWeight !== a.filterWeight) {
+            return b.filterWeight - a.filterWeight;
           }
-          if (typeof a.sortWeight !== 'undefined' && typeof b.sortWeight === 'undefined') {
+          if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight === 'undefined') {
             return -1;
           }
-          if (typeof a.sortWeight === 'undefined' && typeof b.sortWeight !== 'undefined') {
+          if (typeof a.filterWeight === 'undefined' && typeof b.filterWeight !== 'undefined') {
             return 1;
           }
         }
@@ -167,6 +136,24 @@ var SqlAutocompleter3 = (function () {
     });
   }
 
+  Suggestions.prototype.backTickIfNeeded = function (text) {
+    var self = this;
+    if (text.indexOf('`') === 0) {
+      return text;
+    }
+    var upperText = text.toUpperCase();
+    if (self.snippet.type() === 'hive' && (hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText])) {
+      return '`' + text + '`';
+    } else if (self.snippet.type() === 'impala' && impalaReservedKeywords[upperText]) {
+      return '`' + text + '`';
+    } else if (impalaReservedKeywords[upperText] || hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText]) {
+      return '`' + text + '`';
+    } else if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(text)) {
+      return '`' + text + '`';
+    }
+    return text;
+  };
+
   Suggestions.prototype.update = function (parseResult) {
     var self = this;
     self.defaultDatabase = parseResult.useDatabase || self.snippet.database();
@@ -184,6 +171,7 @@ var SqlAutocompleter3 = (function () {
 
     self.handleKeywords(colRefDeferral);
     self.handleTables(allDbsDeferral);
+    self.handleColumns(colRefDeferral);
   };
 
   Suggestions.prototype.loadDatabases = function () {
@@ -205,7 +193,7 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     if (self.parseResult.suggestKeywords) {
       var keywordSuggestions = $.map(self.parseResult.suggestKeywords, function (keyword) {
-        return new Suggestion(self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value, AutocompleterGlobals.i18n.meta.keyword, keyword.weight);
+        return { value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value, meta: AutocompleterGlobals.i18n.meta.keyword, weight: keyword.weight };
       });
       self.keywords(keywordSuggestions);
     }
@@ -214,17 +202,15 @@ var SqlAutocompleter3 = (function () {
       self.loadingKeywords(true);
       // Wait for the column reference type to be resolved to pick the right keywords
       colRefDeferral.done(function (colRef) {
-        if (colRef !== null) {
-          var keywordSuggestions = self.keywords();
-          Object.keys(self.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
-            if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [type.toUpperCase()])) {
-              self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
-                keywordSuggestions.push(new Suggestion(self.parseResult.lowerCase ? keyword.toLowerCase() : keyword, AutocompleterGlobals.i18n.meta.keyword, DEFAULT_WEIGHTS.COLREF_KEYWORD));
-              })
-            }
-          });
-          self.keywords(keywordSuggestions);
-        }
+        var keywordSuggestions = self.keywords();
+        Object.keys(self.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
+          if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [colRef.type.toUpperCase()])) {
+            self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
+              keywordSuggestions.push({ value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword, meta: AutocompleterGlobals.i18n.meta.keyword, weight: DEFAULT_WEIGHTS.COLREF_KEYWORD });
+            })
+          }
+        });
+        self.keywords(keywordSuggestions);
         self.loadingKeywords(false);
       });
     }
@@ -251,7 +237,7 @@ var SqlAutocompleter3 = (function () {
                   suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
                 return;
               }
-              tableSuggestions.push(new Suggestion(prefix + backTickIfNeeded(self.snippet.type(), tablesMeta.name), AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()], DEFAULT_WEIGHTS.TABLE));
+              tableSuggestions.push({ value: prefix + self.backTickIfNeeded(tablesMeta.name), meta: AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()], weight: DEFAULT_WEIGHTS.TABLE });
             });
             self.loadingTables(false);
             self.tables(tableSuggestions);
@@ -286,7 +272,173 @@ var SqlAutocompleter3 = (function () {
   };
 
   Suggestions.prototype.handleColumns = function (colRefDeferral) {
+    var self = this;
 
+    if (self.parseResult.suggestColumns) {
+      var suggestColumns = self.parseResult.suggestColumns;
+      var columnSuggestions = [];
+      // For multiple tables we need to merge and make sure identifiers are unique
+      var columnDeferrals = [];
+
+      if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
+        self.loadingColumns(true);
+        colRefDeferral.done(function (colRef) {
+          suggestColumns.tables.forEach(function (table) {
+            columnDeferrals.push(self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions));
+          });
+        });
+      } else {
+        self.loadingColumns(true);
+        suggestColumns.tables.forEach(function (table) {
+          columnDeferrals.push(self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions));
+        });
+      }
+
+      $.when.apply($, columnDeferrals).done(function () {
+        self.mergeColumns(columnSuggestions);
+        if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor())) {
+          columnSuggestions.push({ value: 'BLOCK__OFFSET__INSIDE__FILE', meta: AutocompleterGlobals.i18n.meta.virtual, weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN });
+          columnSuggestions.push({ value: 'INPUT__FILE__NAME', meta: AutocompleterGlobals.i18n.meta.virtual, weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN });
+        }
+        self.columns(columnSuggestions);
+        self.loadingColumns(false);
+      });
+    }
+  };
+
+  Suggestions.prototype.addColumns = function (table, types, columnSuggestions) {
+    var self = this;
+    var addColumnsDeferred = $.Deferred();
+
+    if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].subQuery !== 'undefined') {
+      var foundSubQuery = self.locateSubQuery(self.parseResult.subQueries, table.identifierChain[0].subQuery);
+
+      var addSubQueryColumns = function (subQueryColumns) {
+        subQueryColumns.forEach(function (column) {
+          if (column.alias || column.identifierChain) {
+            // TODO: Potentially fetch column types for sub-queries, possible performance hit.
+            var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
+            if (column.alias) {
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.alias), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.identifierChain && column.identifierChain.length > 0) {
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            }
+          } else if (column.subQuery && foundSubQuery.subQueries) {
+            var foundNestedSubQuery = self.locateSubQuery(foundSubQuery.subQueries, column.subQuery);
+            if (foundNestedSubQuery !== null) {
+              addSubQueryColumns(foundNestedSubQuery.columns);
+            }
+          }
+        });
+      };
+      if (foundSubQuery !== null && foundSubQuery.columns.length > 0) {
+        addSubQueryColumns(foundSubQuery.columns);
+      }
+      addColumnsDeferred.resolve();
+    } else {
+      var callback = function (data) {
+        if (data.extended_columns) {
+          data.extended_columns.forEach(function (column) {
+            if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.type.indexOf('map') === 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.type.indexOf('struct') === 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (column.type.indexOf('array') === 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN + 1, table: table })
+            } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
+                SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
+              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            }
+          });
+        } else if (data.columns) {
+          data.columns.forEach(function (column) {
+            columnSuggestions.push({value: self.backTickIfNeeded(column), meta: 'column', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+          });
+        }
+        if (data.type === 'map' && self.snippet.type() === 'impala') {
+          columnSuggestions.push({value: 'key', meta: 'key', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+          columnSuggestions.push({value: 'value', meta: 'value', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+        }
+        if (data.type === 'struct') {
+          data.fields.forEach(function (field) {
+            columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+          });
+        } else if (data.type === 'map' && (data.value && data.value.fields)) {
+          data.value.fields.forEach(function (field) {
+            if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
+              columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+            }
+          });
+        } else if (data.type === 'array' && data.item) {
+          if (data.item.fields) {
+            data.item.fields.forEach(function (field) {
+              if ((field.type === 'array' || field.type === 'map')) {
+                if (self.snippet.type() === 'hive') {
+                  columnSuggestions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                } else {
+                  columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                }
+              } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
+                  SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
+                columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+              }
+            });
+          } else if (typeof data.item.type !== 'undefined') {
+            if (SqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
+              columnSuggestions.push({value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+            }
+          }
+        }
+        addColumnsDeferred.resolve();
+      };
+
+      self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+    }
+    return addColumnsDeferred;
+  };
+
+  Suggestions.prototype.mergeColumns = function (columnSuggestions) {
+    columnSuggestions.sort(function (a, b) {
+      return a.value.localeCompare(b.value);
+    });
+
+    for (var i = 0; i < columnSuggestions.length; i++) {
+      var suggestion = columnSuggestions[i];
+      suggestion.isColumn = true;
+      var hasDuplicates = false;
+      for (i; i + 1 < columnSuggestions.length && columnSuggestions[i + 1].value === suggestion.value; i++) {
+        var nextTable = columnSuggestions[i + 1].table;
+        if (typeof nextTable.alias !== 'undefined') {
+          columnSuggestions[i + 1].value = nextTable.alias + '.' + columnSuggestions[i + 1].value
+        } else if (typeof nextTable.identifierChain !== 'undefined' && nextTable.identifierChain.length > 0) {
+          var lastIdentifier = nextTable.identifierChain[nextTable.identifierChain.length - 1];
+          if (typeof lastIdentifier.name !== 'undefined') {
+            columnSuggestions[i + 1].value = lastIdentifier.name + '.' + columnSuggestions[i + 1].value;
+          } else if (typeof lastIdentifier.subQuery !== 'undefined') {
+            columnSuggestions[i + 1].value = lastIdentifier.subQuery + '.' + columnSuggestions[i + 1].value;
+          }
+        }
+        hasDuplicates = true;
+      }
+      if (typeof suggestion.table.alias !== 'undefined') {
+        suggestion.value = suggestion.table.alias + '.' + suggestion.value;
+      } else if (hasDuplicates && typeof suggestion.table.identifierChain !== 'undefined' && suggestion.table.identifierChain.length > 0) {
+        var lastIdentifier = suggestion.table.identifierChain[suggestion.table.identifierChain.length - 1];
+        if (typeof lastIdentifier.name !== 'undefined') {
+          suggestion.value = lastIdentifier.name + '.' + suggestion.value;
+        } else if (typeof lastIdentifier.subQuery !== 'undefined') {
+          suggestion.value = lastIdentifier.subQuery + '.' + suggestion.value;
+        }
+      }
+      delete suggestion.table;
+    }
   };
 
   /**
@@ -306,6 +458,8 @@ var SqlAutocompleter3 = (function () {
           colRefDeferral.resolve(data);
         } else if (typeof data.extended_columns !== 'undefined' && data.extended_columns.length === 1) {
           colRefDeferral.resolve(data.extended_columns[0]);
+        } else {
+          colRefDeferral.resolve({ type: 'T' })
         }
       };
 
