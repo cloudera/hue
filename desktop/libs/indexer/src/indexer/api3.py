@@ -363,12 +363,9 @@ def _index(request, file_format, collection_name, query=None):
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
   elif file_format['inputFormat'] == 'hs2_handle':
-    data ='aaaa'
     searcher = CollectionManagerController(request.user)
-    columns = [field['name'] for field in collection.get('fields', [])]
-
-    searcher.update_data_from_hive(collection_name, columns, fetch_handle=file_format['fetch_handle'])
-    db.close(file_format['handle'])
+    columns = ['_uuid'] + [field['name'] for field in file_format['columns']]
+    return searcher.update_data_from_hive(collection_name, columns, fetch_handle=file_format['fetch_handle'])
   else:
     input_path = None
 

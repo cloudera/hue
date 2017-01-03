@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import base64
+import binascii
 import copy
 import logging
 import re
@@ -675,6 +676,8 @@ class HS2Api(Api):
       snippet['result']['handle']['secret'], snippet['result']['handle']['guid'] = HiveServerQueryHandle.get_decoded(snippet['result']['handle']['secret'], snippet['result']['handle']['guid'])
     except KeyError:
       raise Exception('Operation has no valid handle attached')
+    except binascii.Error:
+      LOG.warn('Handle already base 64 decoded')
 
     for key in snippet['result']['handle'].keys():
       if key not in ('log_context', 'secret', 'has_result_set', 'operation_type', 'modified_row_count', 'guid'):
