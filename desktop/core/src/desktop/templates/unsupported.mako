@@ -28,9 +28,7 @@
 
   <style type="text/css">
     body {
-      padding-top: 80px;
       margin: 0;
-      font-family: Arial, Helvetica, sans-serif;
       font-size: 13px;
       line-height: 20px;
       color: #444444;

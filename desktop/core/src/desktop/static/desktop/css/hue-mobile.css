@@ -17,7 +17,8 @@
 */
 
 body {
-  background: #FFF;
+  display: none;
+  visibility: hidden;
 }
 
 body.open {
@@ -36,46 +37,6 @@ body.open {
 
 .margin-top-30 {
   margin-top: 30px;
-}
-
-.navbar-inner {
-  background-color: #338BB8;
-}
-
-.navbar .btn-navbar {
-  background-color: #FFF;
-  background-image: -moz-linear-gradient(top,#FFF,#FFF);
-  background-image: -webkit-gradient(linear,0 0,0 100%,from(#FFF),to(#FFF));
-  background-image: -webkit-linear-gradient(top,#FFF,#FFF);
-  background-image: -o-linear-gradient(top,#FFF,#FFF);
-  background-image: linear-gradient(to bottom,#FFF,#FFF);
-  background-repeat: repeat-x;
-}
-
-.navbar .btn-navbar:hover,.navbar .btn-navbar:focus,.navbar .btn-navbar:active,.navbar .btn-navbar.active,.navbar .btn-navbar.disabled,.navbar .btn-navbar[disabled] {
-  color: #fff;
-  background-color: #FFF;
-}
-
-.navbar .brand {
-  float: none;
-  text-align: center;
-  text-shadow: none;
-  color: #FFF;
-}
-
-.navbar .brand img {
-  width: 60px;
-  height: 16px;
-  float: left;
-}
-
-.nav-collapse .nav>li>a {
-  color: #DBE8F1;
-}
-
-.navbar .nav>.active>a {
-  color: #FFF;
 }
 
 .ace_layer {

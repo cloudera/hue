@@ -15,6 +15,10 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+body {
+  display: none;
+  visibility: hidden;
+}
 
 .subnav {
   background-color: #EEEEEE;
@@ -439,7 +443,7 @@ ul.errorlist li {
   height: 88px;
   overflow: hidden;
   position: fixed;
-  top: 26px;
+  top: 0;
   right: -3px;
   z-index: 10001;
 }
@@ -1084,7 +1088,6 @@ div.locked {
   width: 400px;
   text-align: left;
   z-index: 11000;
-  padding-right: 10px;
 }
 
 .jHueNotify .message {
@@ -1106,11 +1109,6 @@ div.locked {
   max-height: 100%;
   width: auto;
   word-break: normal;
-}
-
-.jHueNotify .close {
-  right: 2px;
-  opacity: 1;
 }
 
 .jHueNotify.alert {
@@ -1431,21 +1429,6 @@ a#advanced-btn:hover {
   z-index: 1032;
 }
 
-.nav i {
-  line-height: 24px!important;
-}
-
-.navbar .nav > li > a {
-  margin-right: 0!important;
-  padding-right: 5px;
-  padding-left: 5px;
-}
-
-.brand {
-  padding: 10px 20px!important;
-  margin-top: 4px!important;
-}
-
 .card-home {
   padding-top: 4px;
 }
@@ -1549,28 +1532,14 @@ a#advanced-btn:hover {
     line-height: 28px;
 }
 
-.modal {
-  padding: 25px 20px!important;
-  margin-left: -290px!important;
-}
-
 #jHueTourVideoPlayer {
   margin-left: -320px!important;
   width: 640px;
 }
 
 .navigator {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #338BB8;
-  height: 28px;
   z-index: 1033;
   min-width: 740px;
-}
-
-.navigator .brand {
-  padding-top: 0 !important;
 }
 
 .hideMoreThan950, .hideMoreThan1180, .hideMoreThan1380 {
@@ -1578,10 +1547,6 @@ a#advanced-btn:hover {
 }
 
 @media (max-width: 1180px) {
-  .navigator .nav-tabs > li > a, .navigator .nav-pills > li > a {
-    padding-right: 6px;
-    padding-left: 6px;
-  }
   .hide1180 {
     display: none;
   }
@@ -1623,87 +1588,8 @@ a#advanced-btn:hover {
   }
 }
 
-.navbar-fixed-top {
-  top: 28px;
-}
-
-.navigator .dropdown-menu {
-  z-index: 20000;
-  box-shadow: none;
-  margin-top: -4px;
-  margin-left: -1px;
-  border-top: 2px solid #EEE;
-}
-
-.navigator .nav-pills > li > a {
-  color: #DBE8F1;
-  font-weight: bold;
-  margin-bottom: 2px;
-  margin-top: 2px;
-  padding-bottom: 4px !important;
-  padding-top: 6px;
-}
-
-.navigator .dropdown-menu > li > a > .fa {
-  color: #267CC3;
-  font-size: 19px;
-  padding-left: 5px;
-  padding-right: 8px;
-}
-
-.navigator .dropdown-menu > li > a {
-  padding-left: 5px;
-  padding-right: 30px;
-}
-
-.navigator .dropdown-menu > li > a > img {
-  padding-right: 6px;
-}
-
-.navigator .nav-pills > li.dropdown > a {
-  padding-bottom: 2px !important;
-}
-
-.navigator .nav-pills  > li > a:hover, .navigator .nav-pills  > li > a:focus {
-  color: #FFF;
-  border-color: #EEE !important;
-}
-
-.navigator .nav i {
-  line-height: 14px !important;
-}
-
-.navigator .nav-pills .open .dropdown-toggle, .navigator .nav > li.dropdown.open.active > a:hover, .navigator .nav > li.dropdown.open.active > a:focus {
-  color: #FFFFFF;
-}
-
-.currentApp {
-  font-size: 20px;
-  padding-top: 13px;
-  padding-left: 0;
-  color: #338BB8;
-  cursor: pointer;
-}
-
-.currentApp a {
-  font-size: 20px !important;
-  color: #338BB8 !important;
-  padding: 0 !important;
-  margin-top: -4px !important;
-  border: none !important;
-  max-width: none!important;
-}
-
-.currentApp a:focus, .currentApp a:hover {
-  color: #338BB8 !important;
-}
-
 .currentApp img {
   margin-top: -3px;
-}
-
-.navbar-fixed-top.nokids .navbar-inner {
-  height: 45px;
 }
 
 a, a:hover, a:active, a:focus {
@@ -1843,15 +1729,6 @@ html.modal-open {
 
 .demi-modal.fade.in {
   top: 0;
-}
-
-.demi-modal .modal-header {
-  padding: 9px 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.demi-modal .modal-header .close {
-  margin-top: 2px;
 }
 
 .demi-modal .modal-body {
@@ -2067,11 +1944,6 @@ input.no-margin, select.no-margin {
   font-weight: bold;
 }
 
-.modal-header .close {
-  position: inherit;
-  margin-top: -10px;
-}
-
 .margin-top-10 {
   margin-top: 10px;
 }
@@ -2152,14 +2024,6 @@ input.no-margin, select.no-margin {
 .badge-right {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-}
-
-div.navigator ul.dropdown-menu {
-  overflow-y: auto;
-}
-
-div.navigator > ul > li.oozie > ul.dropdown-menu {
-  overflow-y: visible;
 }
 
 .mega-popover {
@@ -2307,10 +2171,6 @@ pre, .like-pre {
   display: inline-block;
 }
 
-div.navigator .pull-right .nav {
-  margin-bottom: 0;
-}
-
 .jobs-overlay {
   background-color: #FFF;
   opacity: 0.8;
@@ -2406,18 +2266,9 @@ table.resultTable td {
 Transition to Hue 4
 */
 
-body {
-  background-color: #FFF;
-}
-
 .card, .sidebar-nav .nav-list {
   border-radius: 0;
   border: none;
-}
-
-.navbar-fixed-top .navbar-inner {
-  box-shadow: none;
-  border-bottom: 1px solid #DDD;
 }
 
 .hue-drop-down-input {
@@ -3472,4 +3323,73 @@ input[type='password']::-ms-reveal {
 
 .selectize-dropdown {
   z-index: 10000!important;
+}
+
+/* The following CSS styles are added, but likely will be removed in the near future. */
+.flex-space-between {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* This allow h1, nav-tabs, buttons all appear in one line. */
+.page-header h1 {
+  display: inline-block;
+}
+
+.page-header .nav-tabs {
+  display: inline-block;
+  position: relative;
+  top: 16px;
+  margin-bottom: 0;
+  margin-left: 16px;
+}
+
+/* This is the way to name the item. */
+.page-header .editor-nav {
+  display: inline-block;
+  vertical-align: text-bottom;
+  margin-left: 16px;
+}
+
+.page-header .editor-nav li {
+  float: left;
+  margin-left: 16px;
+}
+
+/* This is the custom banner at the top. */
+.banner {
+  padding-left: 24px;
+  line-height: 32px;
+  height: 32px;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* This is the special player mode that removes the navbar and page-header. */
+.main-content.player-mode {
+  top: 25px;
+}
+
+/**
+ * This is the special player mode that removes the navbar and page-header,
+ * but still has a banner.
+ */
+.banner ~ .main-content.player-mode {
+  top: 33px;
+}
+
+/**
+ * When there is a banner, these absolute positioned
+ * elements should be moved down by 32px.
+ */
+.banner ~ .main-content,
+.banner ~ .page-header-and-main-content .main-content,
+.banner ~ .page-header-and-main-content .context-panel,
+.banner ~ .page-header-and-main-content .show-assist {
+  top: 129px;
+}
+
+.banner ~ .page-header-and-main-content .context-panel {
+  height: calc(100% - 129px);
 }

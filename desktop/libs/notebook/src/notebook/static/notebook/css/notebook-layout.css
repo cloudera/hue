@@ -23,7 +23,6 @@ body {
   height:100%;
   margin: 0;
   padding: 0;
-  background-color: #FFF;
   overflow-y: hidden;
 }
 
@@ -36,9 +35,8 @@ body {
   height: auto;
   width: 100%;
   position: absolute;
-  top: 74px;
+  top: 97px;
   bottom: 0;
-  background-color: #FFF;
 }
 
 .panel-container {
@@ -56,7 +54,7 @@ body {
   position: fixed;
   background: #fff;
   height: calc(100% - 70px);
-  top: 70px;
+  top: 97px;
   transition: all;
   -webkit-transition-duration: .3s;
   transition-duration: .3s;

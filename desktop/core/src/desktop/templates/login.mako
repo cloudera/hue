@@ -28,11 +28,6 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
 <style type="text/css">
-  body {
-    background-color: #FAFAFA;
-    padding-top: 150px;
-  }
-
   .footer {
     position: fixed;
     bottom: 0;

@@ -16,10 +16,6 @@
  limitations under the License.
 */
 
-.dashboard .container-fluid {
-  padding: 6px;
-}
-
 .row-container {
   width: 100%;
   min-height: 70px;
@@ -88,8 +84,6 @@
   margin: 0;
   padding: 4px;
   padding-top: 0;
-  top: 70px;
-  position: fixed;
   width: 100%;
   z-index: 1001;
 }
@@ -227,11 +221,6 @@
   -moz-user-select: none;
   -ms-user-select: none;
   user-select: none;
-}
-
-.search-bar {
-  padding-top: 6px;
-  padding-bottom: 6px;
 }
 
 .widget-settings-section {

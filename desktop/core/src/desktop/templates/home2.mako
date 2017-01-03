@@ -39,7 +39,6 @@ ${ assist.assistPanel() }
     height:100%;
     margin: 0;
     padding: 0;
-    background-color: #FFF;
   }
 
   .vertical-full {
@@ -50,11 +49,7 @@ ${ assist.assistPanel() }
     height: auto;
     width: 100%;
     position: absolute;
-  % if conf.CUSTOM.BANNER_TOP_HTML.get():
-    top: 112px;
-  % else:
-    top: 82px;
-  % endif
+    top: 97px;
     bottom: 0;
   }
 

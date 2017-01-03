@@ -48,14 +48,6 @@ ${ assist.assistPanel() }
 
 <link rel="stylesheet" href="${ static('desktop/css/wizard.css') }">
 <style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-% endif
   .path {
     margin-bottom: 0!important;
     border-right: none!important;

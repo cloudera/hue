@@ -206,10 +206,6 @@ ${ commonshare() | n,unicode }
 
 
 <style type="text/css">
-  h1 {
-    margin-bottom: 5px;
-  }
-
   .panel-container {
     width: 100%;
     position: relative;
@@ -243,13 +239,8 @@ ${ commonshare() | n,unicode }
     overflow-y: auto;
   }
 
-  .control-group {
-    margin-bottom: 3px!important;
-  }
-
   .control-group label {
     float: left;
-    padding-top: 5px;
     text-align: left;
     width: 40px;
   }

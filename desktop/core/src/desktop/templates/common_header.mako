@@ -61,52 +61,6 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
 
-  <style type="text/css">
-    % if conf.CUSTOM.BANNER_TOP_HTML.get():
-      body {
-        display: none;
-        visibility: hidden;
-        padding-top: ${str(int(padding[:-2]) + 30) + 'px'};
-      }
-      .banner {
-        height: 40px;
-        width: 100%;
-        padding: 0;
-        position: fixed;
-        top: 0;
-        background-color: #F9F9F9;
-        z-index: 1033;
-      }
-      .navigator {
-        top: 30px!important;
-      }
-      .navbar-fixed-top {
-        top: 58px!important;
-      }
-      % if current_app == "sqoop":
-      .top-bar {
-        top: 58px!important;
-      }
-      % endif
-
-      % if current_app == "spark":
-      .search-bar {
-        top: 58px!important;
-      }
-      .show-assist {
-        top: 110px!important;
-      }
-      % endif
-
-    % else:
-      body {
-        display: none;
-        visibility: hidden;
-        padding-top: ${padding};
-      }
-    % endif
-  </style>
-
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 
   <script src="${ static('desktop/js/hue.utils.js') }"></script>

@@ -55,13 +55,6 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-mobile.css') }" rel="stylesheet">
 
-  <style type="text/css">
-    body {
-      display: none;
-      visibility: hidden;
-    }
-  </style>
-
   <script type="text/javascript" charset="utf-8">
 
     var LOGGED_USERNAME = '${ user.username }';

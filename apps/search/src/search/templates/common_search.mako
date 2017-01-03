@@ -2735,20 +2735,8 @@ ${ dashboard.import_charts() }
 
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .search-bar {
-    top: 58px!important;
-  }
-  .card-toolbar {
-    top: 100px!important;
-  }
   #emptyDashboardEditing {
     top: 190px!important;
-  }
-  .dashboard {
-    margin-top: 20px;
-  }
-  .dashboard.with-top-margin {
-    margin-top: 80px;
   }
 % endif
 </style>
@@ -3489,11 +3477,9 @@ $(document).ready(function () {
   viewModel.isPlayerMode.subscribe(function(value) {
     if (value){
       $(".navigator").hide();
-      $("body").css("paddingTop", "40px");
     }
     else {
       $(".navigator").show();
-      $("body").css("paddingTop", "80px");
     }
   });
 

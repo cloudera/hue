@@ -439,8 +439,7 @@
 
 .show-assist {
   position: fixed;
-  top: 80px;
-  background-color: #FFF;
+  top: 97px;
   width: 16px;
   height: 24px;
   line-height: 24px;
@@ -467,7 +466,7 @@
   position: absolute;
   top: 2px;
   right: 4px;
-  z-index: 1000;
+  z-index: 500;
   color: #aaa;
   font-size: 12px;
   -webkit-transition: margin-right 0.2s linear, color 0.5s ease;

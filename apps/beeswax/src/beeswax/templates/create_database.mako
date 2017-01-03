@@ -45,16 +45,6 @@ ${ assist.assistJSModels() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-<style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-% endif
-</style>
 
 ${ assist.assistPanel() }
 

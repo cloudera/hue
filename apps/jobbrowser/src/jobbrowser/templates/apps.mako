@@ -30,16 +30,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 % if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
-<style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-% endif
-</style>
 % endif
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>

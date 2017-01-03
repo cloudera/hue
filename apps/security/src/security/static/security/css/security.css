@@ -238,8 +238,6 @@ h1.emptyMessage {
 
 #createRoleModal, #bulkActionsModal, #grantPrivilegeModal {
   width: 800px;
-  left: 50%;
-  margin-left: -400px!important;
 }
 
 

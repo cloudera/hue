@@ -29,10 +29,10 @@
   width: 500px;
   display: block;
   margin: auto;
-  margin-bottom: 50px;
+  margin-top: 100px;
+  margin-bottom: 100px;
   background: #FFFFFF;
   border: 1px solid #E0E2E3;
-  border-radius: 4px;
 }
 
 .login-container a {
@@ -158,9 +158,6 @@
 }
 
 @media screen and (max-width: 800px) {
-  body {
-    padding-top: 40px!important;
-  }
   .login-box {
     width: 300px;
   }

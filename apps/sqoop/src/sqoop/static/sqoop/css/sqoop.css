@@ -44,7 +44,7 @@ ul.major-list li .pull-right {
   margin-top: 18px;
 }
 
-.main i, .top-bar h4 i {
+.main i {
   color: #999999;
 }
 
@@ -69,30 +69,6 @@ h1.emptyMessage {
 .sidebar-nav {
   padding: 9px 0;
   min-height: 150px !important;
-}
-
-.top-bar {
-  position: fixed;
-  top:28px;
-  width: 100%;
-  background-color: #FAFAFA;
-  border-bottom: 1px solid #E3E3E3;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.067);
-  margin: 0 0 20px;
-  padding: 10px 20px;
-  text-align: left;
-  height: 30px;
-}
-
-.top-bar h4 {
-  margin-top: 4px;
-  display: inline-block;
-  margin-right: 20px;
-}
-
-.top-bar .pull-right {
-  margin-top: 4px;
-  margin-right: 20px;
 }
 
 .form-actions {
