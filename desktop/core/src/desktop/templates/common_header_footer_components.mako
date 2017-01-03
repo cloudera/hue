@@ -311,7 +311,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 </%def>
 
-<%def name="footer()">
+<%def name="footer(messages)">
 <script type="text/javascript">
   $(document).ready(function () {
     $(document).on("info", function (e, msg) {

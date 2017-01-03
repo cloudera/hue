@@ -750,7 +750,7 @@ ${ assist.assistPanel() }
   });
 </script>
 
-${ commonHeaderFooterComponents.footer() }
+${ commonHeaderFooterComponents.footer(messages) }
 
 </body>
 </html>

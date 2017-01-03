@@ -29,7 +29,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-${ commonHeaderFooterComponents.footer() }
+${ commonHeaderFooterComponents.footer(messages) }
 
 % if tours_and_tutorials:
   <%include file="tours.mako"/>

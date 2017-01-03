@@ -76,6 +76,7 @@ def responsive(request):
     'interpreters': get_ordered_interpreters(request.user),
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
+    'messages': {},
     'leaflet': {
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
