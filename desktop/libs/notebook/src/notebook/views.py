@@ -202,6 +202,7 @@ def execute_and_watch(request):
     }
 
     file_format['inputFormat'] = 'hs2_handle'
+    file_format['handle'] = lambda a: get_api(request, snippet).fetch_result(notebook, snippet, 1000)
 
     job_handle = _index(request, file_format, destination, query=notebook['uuid'])
     return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))

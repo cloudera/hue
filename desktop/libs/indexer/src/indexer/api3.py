@@ -352,8 +352,6 @@ def _index(request, file_format, collection_name, query=None):
   if is_unique_generated:
     schema_fields += [{"name": unique_field, "type": "string"}]
 
-  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
-
   collection_manager = CollectionManagerController(request.user)
   if not collection_manager.collection_exists(collection_name):
     collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
@@ -364,7 +362,16 @@ def _index(request, file_format, collection_name, query=None):
     input_path = table_metadata.path_location
   elif file_format['inputFormat'] == 'file':
     input_path = '${nameNode}%s' % file_format["path"]
+  elif file_format['inputFormat'] == 'hs2_handle':
+    data ='aaaa'
+    searcher = CollectionManagerController(request.user)
+    columns = [field['name'] for field in collection.get('fields', [])]
+
+    searcher.update_data_from_hive(collection_name, columns, fetch_handle=file_format['fetch_handle'])
+    db.close(file_format['handle'])
   else:
     input_path = None
+
+  morphline = indexer.generate_morphline_config(collection_name, file_format, unique_field)
 
   return indexer.run_morphline(request, collection_name, morphline, input_path, query)

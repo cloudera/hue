@@ -22,6 +22,7 @@ import os
 import shutil
 
 from django.utils.translation import ugettext as _
+import tablib
 
 from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
@@ -266,37 +267,26 @@ class CollectionManagerController(object):
     else:
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
 
-  def update_data_from_hive(self, db, collection_or_core_name, database, table, columns, indexing_strategy='upload'):
-    """
-    Add hdfs path contents to index
-    """
-    # Run a custom hive query and post data to collection
-    from beeswax.server import dbms
-    import tablib
-
+  def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle):
+    MAX_FETCHES = 10 # 10k rows max
+    has_more = True
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
-    if indexing_strategy == 'upload':
-      table = db.get_table(database, table)
-      hql = "SELECT %s FROM `%s.%s` %s" % (','.join(columns), database, table.name, db._get_browse_limit_clause(table))
-      query = dbms.hql_query(hql)
 
-      try:
-        handle = db.execute_and_wait(query)
+    try:
+      while MAX_FETCHES > 0 and has_more:
+        result = fetch_handle()
+        has_more = result['has_more']
 
-        if handle:
-          result = db.fetch(handle, rows=100)
-          db.close(handle)
+        dataset = tablib.Dataset()
+        dataset.append(columns)
+        for row in result.rows():
+          dataset.append(row)
 
-          dataset = tablib.Dataset()
-          dataset.append(columns)
-          for row in result.rows():
-            dataset.append(row)
-
-          if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
-            raise PopupException(_('Could not update index. Check error logs for more info.'))
-        else:
-          raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
-      except Exception, e:
-        raise PopupException(_('Could not update index.'), detail=e)
-    else:
-      raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
+        if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
+          raise PopupException(_('Could not update index. Check error logs for more info.'))
+        
+        MAX_FETCHES -= 1
+      else:
+        raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+    except Exception, e:
+      raise PopupException(_('Could not update index.'), detail=e)
