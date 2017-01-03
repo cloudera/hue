@@ -185,7 +185,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
       resetIdleTimer();
       %endif
 
-      $("input, textarea").placeholder();
       $(".submitter").keydown(function (e) {
         if (e.keyCode == 13) {
           $(this).closest("form").submit();
