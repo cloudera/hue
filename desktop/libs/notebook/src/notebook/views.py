@@ -178,8 +178,11 @@ def execute_and_watch(request):
     sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'index_query':
-    if not destination:
-      destination = _get_snippet_name(notebook)
+    if destination == '__hue__':
+      destination = _get_snippet_name(notebook).replace('-', '_')
+      live_indexing = True
+    else:
+      live_indexing = False
 
     sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute')
@@ -201,11 +204,16 @@ def execute_and_watch(request):
         ]
     }
 
-    file_format['inputFormat'] = 'hs2_handle'
-    file_format['handle'] = lambda a: get_api(request, snippet).fetch_result(notebook, snippet, 1000)
+    if live_indexing:
+      file_format['inputFormat'] = 'hs2_handle'
+      file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
 
     job_handle = _index(request, file_format, destination, query=notebook['uuid'])
-    return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
+
+    if live_indexing:
+      return redirect(reverse('search:browse', kwargs={'name': destination}))
+    else:
+      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_handle['handle']['id']}))
   else:
     raise PopupException(_('Action %s is unknown') % action)
 

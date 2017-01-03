@@ -268,25 +268,28 @@ class CollectionManagerController(object):
       raise PopupException(_('Could not update index. Indexing strategy %s not supported.') % indexing_strategy)
 
   def update_data_from_hive(self, collection_or_core_name, columns, fetch_handle):
-    MAX_FETCHES = 10 # 10k rows max
+    MAX_ROWS = 10000
+    ROW_COUNT = 0
+    FETCH_BATCH = 1000
     has_more = True
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
     try:
-      while MAX_FETCHES > 0 and has_more:
-        result = fetch_handle()
+      while ROW_COUNT < MAX_ROWS and has_more:
+        result = fetch_handle(FETCH_BATCH, ROW_COUNT == 0)
         has_more = result['has_more']
 
-        dataset = tablib.Dataset()
-        dataset.append(columns)
-        for row in result.rows():
-          dataset.append(row)
+        if result['data']:
+          dataset = tablib.Dataset()
+          dataset.append(columns)
+          for i, row in enumerate(result['data']):
+            dataset.append([ROW_COUNT + i] + row)
 
-        if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
-          raise PopupException(_('Could not update index. Check error logs for more info.'))
-        
-        MAX_FETCHES -= 1
-      else:
-        raise PopupException(_('Could not update index. Could not fetch any data from Hive.'))
+          if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
+            raise PopupException(_('Could not update index. Check error logs for more info.'))
+
+        ROW_COUNT += len(dataset)
     except Exception, e:
       raise PopupException(_('Could not update index.'), detail=e)
+
+    return ROW_COUNT
