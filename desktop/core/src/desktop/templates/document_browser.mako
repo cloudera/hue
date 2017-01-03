@@ -630,7 +630,7 @@ from desktop.views import _ko
                 from notebook.conf import SHOW_NOTEBOOKS
                 %>
                 % if SHOW_NOTEBOOKS.get():
-                  <li><a title="${_('Notebook')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:index') }') }, click: ${ is_embeddable and 'openResponsiveLink' or 'openExternalLink' }"><i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #338BB8;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}</a></li>
+                  <li><a title="${_('Notebook')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:index') }') }, click: ${ is_embeddable and 'openResponsiveLink' or 'openExternalLink' }"><i class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                   <li><a title="${_('Oozie Workflow')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_workflow') }') }, click: ${ is_embeddable and 'openResponsiveLink' or 'openExternalLink' }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Oozie Workflow')}</a></li>

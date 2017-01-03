@@ -968,7 +968,7 @@ ${ assist.assistPanel() }
             }
           });
           notebook.snippets()[0].checkStatus();
-          
+
           // Add to history
           notebook.history.unshift(
             notebook._makeHistoryRecord(

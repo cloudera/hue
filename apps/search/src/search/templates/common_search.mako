@@ -49,8 +49,8 @@ from desktop.views import commonheader, commonfooter, _ko
     </div>
   </form>
 %else:
-<div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
-  <div class="pull-right" style="padding-right:50px">
+<div class="page-header search-bar" data-bind="visible: ! $root.isPlayerMode()">
+  <div class="pull-right">
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>

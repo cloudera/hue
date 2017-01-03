@@ -25,7 +25,7 @@
 <%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="hue_ace_autocompleter.mako" />
 
-<span id="notebookComponents" class="editorComponents notebook">
+<span id="notebookComponents" class="editorComponents notebook page-header-and-main-content">
 ${ editorComponents.includes(is_embeddable=True) }
 ${ editorComponents.topBar() }
 <%editorComponents:commonHTML with_assist='false'>

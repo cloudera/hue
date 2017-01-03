@@ -83,33 +83,21 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 </style>
 
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="${ url('desktop.views.home') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
-              ${ _('My documents') }
-            </a>
-           </li>
-        </ul>
-      </div>
+<div class="page-header">
+      <h1 class="currentApp">
+        <a href="${ url('desktop.views.home') }">
+          <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+          ${ _('My documents') }
+        </a>
+      </h1>
       % if use_new_home:
-      <div class="nav-collapse pull-right">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="${ url('desktop.views.home2') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
-              ${ _('New Home') }
-            </a>
-           </li>
-        </ul>
-      </div>
+        <h1 class="currentApp">
+          <a href="${ url('desktop.views.home2') }">
+            <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+            ${ _('New Home') }
+          </a>
+        </h1>
       % endif
-    </div>
-  </div>
 </div>
 
 <div id="homeComponents" class="container-fluid">
@@ -394,7 +382,7 @@ ${ commonshare() | n,unicode }
 
     $("#tagsNewBtn").on("click", function () {
       var tag_name = $("#tagsNew").val();
-  
+
     if ($.trim(tag_name) == "") {
       $("#saveProjectAlert span").text("${_('File name is required.')}");
       $("#saveProjectAlert").show();

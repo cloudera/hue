@@ -16,24 +16,18 @@
 <%! from django.utils.translation import ugettext as _ %>
 
 <%def name="navbar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li class="currentApp">
-              <a href="/rdbms">
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
-                ${ _('DB Query') }
-              </a>
-            </li>
-            <li class="active"><a href="${ url('rdbms:execute_query') }">${_('Query Editor')}</a></li>
-            <li><a href="${ url('rdbms:my_queries') }">${_('My Queries')}</a></li>
-            <li><a href="${ url('rdbms:list_designs') }">${_('Saved Queries')}</a></li>
-            <li><a href="${ url('rdbms:list_query_history') }">${_('History')}</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/rdbms">
+        <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+        ${ _('DB Query') }
+      </a>
+    </h1>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="${ url('rdbms:execute_query') }">${_('Query Editor')}</a></li>
+      <li><a href="${ url('rdbms:my_queries') }">${_('My Queries')}</a></li>
+      <li><a href="${ url('rdbms:list_designs') }">${_('Saved Queries')}</a></li>
+      <li><a href="${ url('rdbms:list_query_history') }">${_('History')}</a></li>
+    </ul>
   </div>
 </%def>

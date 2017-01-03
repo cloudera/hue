@@ -50,9 +50,9 @@ if USE_NEW_EDITOR.get():
   <meta name="author" content="">
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootplus-responsive.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-mobile.css') }" rel="stylesheet">
 
   <style type="text/css">
@@ -209,6 +209,11 @@ if USE_NEW_EDITOR.get():
         top.location = self.location;
       }
 
+      // 48 is the height of the navbar.
+      $('.page-header').affix({
+        offset: 48
+      });
+
       %if conf.AUTH.IDLE_SESSION_TIMEOUT.get() > -1 and not skip_idle_timeout:
       IDLE_SESSION_TIMEOUT = ${conf.AUTH.IDLE_SESSION_TIMEOUT.get()};
       var idleTimer;
@@ -274,16 +279,16 @@ if USE_NEW_EDITOR.get():
        count += 1
     return found_app, count
 %>
-<div class="navbar navbar-fixed-top">
+<div class="navbar navbar-default">
   <div class="navbar-inner">
-    <div class="container">
+    <div class="navbar-collapse">
       <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
         <span class="icon-bar"></span>
       </button>
       <a class="brand" href="#">
-        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
+        <img src="${ static('desktop/art/hue-logo-mini.png') }" />
         ${get_title(title)}
       </a>
       <div class="nav-collapse collapse">

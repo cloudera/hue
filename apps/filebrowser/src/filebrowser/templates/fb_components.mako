@@ -91,21 +91,13 @@ from aws import get_client
 
 
 <%def name="menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top nokids">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                  <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" />
-                  ${ _('File Browser') }
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" />
+        ${ _('File Browser') }
+      </a>
+    </h1>
   </div>
 </%def>
 

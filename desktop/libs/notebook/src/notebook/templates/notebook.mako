@@ -27,7 +27,7 @@
 
 ${ commonheader(_('Notebook'), app_name, user, request, "68px") | n,unicode }
 
-<span id="notebookComponents" class="notebook">
+<span id="notebookComponents" class="notebook page-header-and-main-content">
 ${ editorComponents.includes() }
 ${ editorComponents.topBar() }
 <%editorComponents:commonHTML>

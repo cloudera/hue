@@ -56,7 +56,6 @@ ${ assist.assistPanel() }
     top: 82px;
   % endif
     bottom: 0;
-    background-color: #FFF;
   }
 
   .panel-container {

@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_("Create table manually"), 'metastore', user, request) | n,unicode }
 
-<span class="notebook">
+<span class="notebook page-header-and-main-content">
 ${ layout.metastore_menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>

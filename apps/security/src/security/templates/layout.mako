@@ -52,30 +52,24 @@ def is_selected(section, matcher):
   <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                  <i class="fa fa-lock"></i>
-                  ${ _('Hadoop Security') }
-                </a>
-              </li>
-              % if HIVE_V1.get():
-              <li class="${is_selected(section, 'hive1')}"><a href="${ url('security:hive') }">${_('Hive Tables')}</a></li>
-              % endif
-              % if HIVE_V2.get():
-              <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive2') }">${_('Hive Tables v2')}</a></li>
-              % endif
-              % if SOLR_V2.get():
-              <li class="${is_selected(section, 'solr')}"><a href="${ url('security:solr') }">${_('Solr Collections')}</a></li>
-              % endif
-              <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('File ACLs')}</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <i class="fa fa-lock"></i>
+        ${ _('Hadoop Security') }
+      </a>
+    </h1>
+    <ul class="nav nav-tabs">
+      % if HIVE_V1.get():
+        <li class="${is_selected(section, 'hive1')}"><a href="${ url('security:hive') }">${_('Hive Tables')}</a></li>
+      % endif
+      % if HIVE_V2.get():
+        <li class="${is_selected(section, 'hive')}"><a href="${ url('security:hive2') }">${_('Hive Tables v2')}</a></li>
+      % endif
+      % if SOLR_V2.get():
+        <li class="${is_selected(section, 'solr')}"><a href="${ url('security:solr') }">${_('Solr Collections')}</a></li>
+      % endif
+      <li class="${is_selected(section, 'hdfs')}"><a href="${ url('security:hdfs') }">${_('File ACLs')}</a></li>
+    </ul>
   </div>
 </%def>

@@ -116,21 +116,13 @@ ${ assist.assistPanel() }
 </style>
 
 <span id="indexerComponents" class="notebook">
-<div class="navbar navbar-inverse navbar-fixed-top">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="/indexer/indexer">
-              <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<div class="page-header">
+  <h1 class="currentApp">
+    <a href="/indexer/indexer">
+      <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
+  </h1>
 </div>
+${ assist.assistPanel() }
 
 %if not is_embeddable:
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">

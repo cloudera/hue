@@ -23,22 +23,16 @@ def is_selected(section, matcher):
 ${'%>'}
 
 ${'<%'}def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top nokids">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li class="currentApp">
-              <a href="/${app_name}">
-                <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon" />
-                ${" ".join(word.capitalize() for word in app_name.split("_"))}
-              </a>
-             </li>
-             <li class="${'$'}{is_selected(section, 'mytab')}"><a href="#">Tab 1</a></li>
-             <li class="${'$'}{is_selected(section, 'mytab2')}"><a href="#">Tab 2</a></li>
-          </ul>
-        </div>
-      </div>
-    </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon" />
+        ${" ".join(word.capitalize() for word in app_name.split("_"))}
+      </a>
+    </h1>
+    <ul class="nav nav-tabs">
+      <li class="${'$'}{is_selected(section, 'mytab')}"><a href="#">Tab 1</a></li>
+      <li class="${'$'}{is_selected(section, 'mytab2')}"><a href="#">Tab 2</a></li>
+    </ul>
   </div>
 ${'</%'}def>

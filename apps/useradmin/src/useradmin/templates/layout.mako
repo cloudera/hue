@@ -49,29 +49,23 @@ def is_selected(section, matcher):
 
 
 <%def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                  <img src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon" />
-                  ${ _('User Admin') }
-                </a>
-              </li>
-              %if user.is_superuser:
-              <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
-              <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
-              <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
-              %if conf.USE_DEFAULT_CONFIGURATION.get():
-              <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
-              %endif
-              %endif
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <img src="${ static('useradmin/art/icon_useradmin_48.png') }" class="app-icon" />
+        ${ _('User Admin') }
+      </a>
+    </h1>
+    <ul class="nav nav-tabs">
+      %if user.is_superuser:
+        <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
+        <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
+        <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
+        %if conf.USE_DEFAULT_CONFIGURATION.get():
+          <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
+        %endif
+      %endif
+    </ul>
   </div>
 </%def>
 

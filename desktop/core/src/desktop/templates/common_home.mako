@@ -38,21 +38,13 @@
 
 
 <%def name="navbar()">
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="${ url('desktop.views.home2') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
-              ${ _('My documents') }
-            </a>
-           </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<div class="page-header">
+  <h1 class="currentApp">
+    <a href="${ url('desktop.views.home2') }">
+      <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+      ${ _('My documents') }
+    </a>
+  </h1>
 </div>
 </%def>
 

@@ -80,8 +80,8 @@
 </head>
 
 <body>
-<div class="header">
-  <img src="${ static('desktop/art/hue-logo-mini-white.png') }"/>
+<div class="page-header">
+  <img src="${ static('desktop/art/hue-logo-mini.png') }"/>
 </div>
 
 <div class="footer"></div>

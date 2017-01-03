@@ -24,21 +24,13 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
 <link href="${ static('hbase/css/hbase.css') }" rel="stylesheet" type="text/css" />
 
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
-    <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="nav-collapse">
-        <ul class="nav">
-          <li class="currentApp">
-            <a href="/${app_name}">
-              <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" />
-              ${ _('HBase Browser') }
-            </a>
-          </li>
-        </ul>
-      </div>
-    </div>
-  </div>
+<div class="page-header">
+  <h1 class="currentApp">
+    <a href="/${app_name}">
+      <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" />
+      ${ _('HBase Browser') }
+    </a>
+  </h1>
 </div>
 
 <%def name="datatable(datasource,rowTemplate = 'itemTemplate')">
@@ -139,7 +131,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       <span class="dropdown">
         <a class="dropdown-toggle btn" id="dLabel" data-toggle="dropdown">
           ${_('Switch Cluster')}
-          <b class="caret" style="margin-top: 0"></b>
+          <span class="caret"></span>
         </a>
         <ul id="cluster-menu" class="dropdown-menu" role="menu" aria-labelledby="dLabel" data-bind="foreach: app.clusters()">
           <li><a data-bind="text: $data.name, click: function(){ routie($data.name); }"></a></li>

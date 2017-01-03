@@ -18,23 +18,18 @@ from django.utils.translation import ugettext as _
 %>
 
 <%def name="menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}"><img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon" />
-                ${ _('About Hue') }</a>
-               </li>
-               % if user.is_superuser:
-                 <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick Start')}</a></li>
-                 <li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
-                 <li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
-               % endif
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}"><img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon" />
+        ${ _('About Hue') }</a>
+    </h1>
+
+    % if user.is_superuser:
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="${url("about:admin_wizard")}">${_('Quick Start')}</a></li>
+        <li><a href="${url("desktop.views.dump_config")}">${_('Configuration')}</a></li>
+        <li><a href="${url("desktop.views.log_view")}">${_('Server Logs')}</a></li>
+      </ul>
+    % endif
   </div>
 </%def>

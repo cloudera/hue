@@ -33,12 +33,8 @@ from django.utils.translation import ugettext as _
     <h3 class="modal-title">${_('Import Hue documents')}</h3>
   </div>
   <div class="modal-body form-inline">
-    <div class="pull-right">
-      <input type="button" class="btn" data-dismiss="modal" data-clear="fileupload" value="${ _('Cancel') }" />
-      <a class="btn btn-danger" data-bind="click: import_document"> ${ _('Import') } </a>
-    </div>
     <div class="fileupload fileupload-new" data-provides="fileupload">
-      <span class="btn btn-file" style="line-height: 29px">
+      <span class="btn btn-file">
         <span class="fileupload-new">${ _('Select json file') }</span>
         <span class="fileupload-exists">${ _('Change') }</span>
         <input type="file" accept=".json" id="fileData"/>
@@ -48,6 +44,10 @@ from django.utils.translation import ugettext as _
     </div>
     ${ csrf_token(request) | n,unicode }
     <input type="hidden" name="redirect" value="${ request.get_full_path() }"/>
+  </div>
+  <div class="modal-footer">
+    <input type="button" class="btn btn-link" data-dismiss="modal" data-clear="fileupload" value="${ _('Cancel') }" />
+    <a class="btn btn-danger" data-bind="click: import_document"> ${ _('Import') } </a>
   </div>
 </div>
 

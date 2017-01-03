@@ -63,7 +63,7 @@ ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 % endif
 
-<span class="notebook">
+<span class="notebook page-header-and-main-content">
 
 ${ components.menubar() }
 
@@ -1108,7 +1108,7 @@ ${ components.menubar() }
   </div>
 </script>
 
-<span id="metastoreComponents">
+<span id="metastoreComponents" class="page-header-and-main-content">
   % if not is_embeddable:
   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function () { $root.isLeftPanelVisible(true); }">
     <i class="fa fa-chevron-right"></i>

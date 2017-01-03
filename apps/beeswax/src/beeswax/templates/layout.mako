@@ -25,52 +25,39 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                % if app_name == 'impala':
-                  <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
-                  Impala
-                % elif app_name == 'rdbms':
-                  <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
-                  DB Query
-                % else:
-                  <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
-                  Hive Editor
-                % endif
-                </a>
-              </li>
-              <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
-              <li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
-              <li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
-              <li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        % if app_name == 'impala':
+          <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+          Impala
+        % elif app_name == 'rdbms':
+          <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+          DB Query
+        % else:
+          <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+          Hive Editor
+        % endif
+      </a>
+    </h1>
+
+    <ul class="nav nav-tabs">
+      <li class="${is_selected(section, 'query')}"><a href="${ url(app_name + ':execute_query') }">${_('Query Editor')}</a></li>
+      <li class="${is_selected(section, 'my queries')}"><a href="${ url(app_name + ':my_queries') }">${_('My Queries')}</a></li>
+      <li class="${is_selected(section, 'saved queries')}"><a href="${ url(app_name + ':list_designs') }">${_('Saved Queries')}</a></li>
+      <li class="${is_selected(section, 'history')}"><a href="${ url(app_name + ':list_query_history') }">${_('History')}</a></li>
+    </ul>
   </div>
 </%def>
 
 <%def name="metastore_menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/metastore">
-                  <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
-                  ${ _('Metastore Manager') }
-                </a>
-              </li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/metastore">
+        <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
+        ${ _('Metastore Manager') }
+      </a>
+    </h1>
   </div>
 </%def>
 

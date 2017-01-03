@@ -25,7 +25,7 @@ from django.utils.translation import ugettext as _
 
 ${ commonheader(_("Create database"), 'metastore', user, request) | n,unicode }
 
-<span class="notebook">
+<span class="notebook page-header-and-main-content">
 
 ${layout.metastore_menubar()}
 

@@ -23,7 +23,7 @@
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, request) | n,unicode }
-<span class="notebook">
+<span class="notebook page-header-and-main-content">
 ${ components.menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>

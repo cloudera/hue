@@ -23,24 +23,18 @@
 ${ commonheader(None, "pig", user, request) | n,unicode }
 
 <div id="pig-editor-app">
-  <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"/>
-                  ${ _('Pig Editor') }
-                </a>
-              </li>
-              <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
-              <li><a href="#scripts">${ _('Scripts') }</a></li>
-              <li><a href="#dashboard">${ _('Dashboard') }</a></li>
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header pig-editor-page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"/>
+        ${ _('Pig Editor') }
+      </a>
+    </h1>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#editor" data-bind="css: { unsaved: isDirty }">${ _('Editor') }</a></li>
+      <li><a href="#scripts">${ _('Scripts') }</a></li>
+      <li><a href="#dashboard">${ _('Dashboard') }</a></li>
+    </ul>
   </div>
 
   <div class="container-fluid">
@@ -190,7 +184,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           </div>
           <div class="row-fluid">
             <div id="queryColumn" class="span9">
-              <a id="navigatorShow" href="#" title="${_('Show the assist')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:30px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
+              <a id="navigatorShow" href="#" title="${_('Show the assist')}" style="position:absolute;z-index: 10000; margin-top:10px;display:none;right:56px" rel="tooltip" data-placement="left"><i class="fa fa-compass"></i></a>
               <form id="queryForm">
                 ${ csrf_token(request) | n,unicode }
                 <textarea id="scriptEditor" data-bind="text:currentScript().script"></textarea>
@@ -1298,7 +1292,7 @@ ${ commonshare() | n,unicode }
     }
 
     function highlightMainMenu(mainSection) {
-      $(".navbar-fixed-top .nav li").removeClass("active");
+      $(".pig-editor-page-header .nav li").removeClass("active");
       $("a[href='#" + mainSection + "']").parent().addClass("active");
     }
 

@@ -59,13 +59,13 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 </style>
 
 
-<div class="search-bar" style="height: 30px">
-  <div class="pull-right">
+<div class="search-bar page-header flex-space-between">
+  <h1><a href="#manage"><i class="fa fa-database"></i> ${_('Indexes')}</a></h1>
+  <div>
     <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i> ${ _('Dashboards') }
     </a>
   </div>
-  <h4><a href="#manage"><i class="fa fa-database"></i> ${_('Indexes')}</a></h4>
 </div>
 
 <div class="container-fluid">

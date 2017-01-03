@@ -24,42 +24,40 @@
 
 ${ commonheader(None, "sqoop", user, request) | n,unicode }
 <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
-  <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+  <div class="page-header top-bar flex-space-between" data-bind="visible:shownSection() == 'jobs-list'">
+    <div>
+      <h1>${_('Sqoop Jobs')}</h1>
+      <input id="filter-jobs" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
+    </div>
+    <div>
+      <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
       <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
     </div>
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
-    </div>
-    <h4>${_('Sqoop Jobs')}</h4>
-    <input id="filter-jobs" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
   </div>
 
-  <div class="top-bar" data-bind="visible:shownSection() == 'links-list'">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+  <div class="page-header top-bar flex-space-between" data-bind="visible:shownSection() == 'links-list'">
+    <div>
+      <h1>${_('Sqoop Links')}</h1>
+      <input id="filter-links" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
+    </div>
+    <div>
+      <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
       <a title="${_('Create a new link')}" href="#link/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New link')}</a>
     </div>
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
-    </div>
-    <h4>${_('Sqoop Links')}</h4>
-    <input id="filter-links" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
   </div>
 
   <!-- ko if: job -->
-  <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
-    </div>
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
+  <div class="page-header top-bar flex-space-between" data-bind="visible:shownSection() == 'job-editor', with: job">
+    <h1 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h1>
+    <h1 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h1>
+    <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
   </div>
   <!-- /ko -->
 
   <!-- ko if: link -->
-  <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: link">
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span data-bind="text: $root.link().name"></span></a></h4>
+  <div class="page-header top-bar flex-space-between" data-bind="visible:shownSection() == 'link-editor', with: link">
+    <h1 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h1>
+    <h1 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span data-bind="text: $root.link().name"></span></a></h1>
   </div>
   <!-- /ko -->
 </div>

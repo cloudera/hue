@@ -37,21 +37,13 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <script src="${ static('jobsub/js/jobsub.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
-    <div class="navbar-inner">
-      <div class="container-fluid">
-        <div class="nav-collapse">
-          <ul class="nav">
-            <li class="currentApp">
-              <a href="/${app_name}">
-                <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" />
-                ${ _('Job Designer') }
-              </a>
-            </li>
-          </ul>
-        </div>
-      </div>
-    </div>
+<div class="page-header">
+  <h1 class="currentApp">
+    <a href="/${app_name}">
+      <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" />
+      ${ _('Job Designer') }
+    </a>
+  </h1>
 </div>
 
 

@@ -421,10 +421,10 @@ def log_frontend_event(request):
   _LOG_FRONTEND_LOGGER.log(level, msg)
   return HttpResponse("")
 
-def commonheader_m(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False):
+def commonheader_m(title, section, user, request=None, padding="0px", skip_topbar=False, skip_idle_timeout=False):
   return commonheader(title, section, user, request, padding, skip_topbar, skip_idle_timeout, True)
 
-def commonheader(title, section, user, request=None, padding="90px", skip_topbar=False, skip_idle_timeout=False, is_mobile=False):
+def commonheader(title, section, user, request=None, padding="0px", skip_topbar=False, skip_idle_timeout=False, is_mobile=False):
   """
   Returns the rendered common header
   """

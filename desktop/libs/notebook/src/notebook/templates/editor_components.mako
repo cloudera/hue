@@ -190,33 +190,106 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </%def>
 
 <%def name="topBar()">
-<style type="text/css">
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .search-bar {
-    top: 58px!important;
-  }
-  .show-assist {
-    top: 110px!important;
-  }
-  .main-content {
-    top: 112px!important;
-  }
-  .context-panel {
-    height: calc(100% - 104px);
-    top: 104px;
-  }
-% endif
-</style>
 
 <div class="print-logo">
   <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
 </div>
 
-<div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
-  <div class="navbar-inner">
-    <div class="container-fluid">
-      <div class="pull-right">
+<div class="page-header flex-space-between" data-bind="visible: ! $root.isPlayerMode()">
+  <div>
+  <h1 class="currentApp">
+    <!-- ko if: editorMode -->
+    <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
+      <!-- ko if: editorType() == 'impala' -->
+      <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+      Impala
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'rdbms' -->
+      <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+      DB Query
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'pig' -->
+      <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+      Pig
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'java' -->
+      <i class="fa fa-file-code-o app-icon"></i>
+      Java
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'spark2' -->
+      <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" />
+      Spark
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'sqoop1' -->
+      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" />
+      Sqoop 1
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'distcp' -->
+      <i class="fa fa-files-o app-icon"></i>
+      DistCp
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'shell' -->
+      <i class="fa fa-terminal app-icon"></i>
+      Shell
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'mapreduce' -->
+      <i class="fa fa-file-archive-o app-icon"></i>
+      MapReduce
+      <!-- /ko -->
+      <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
+      <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+      Hive
+      <!-- /ko -->
+      <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
+      <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+      SQL
+      <!-- /ko -->
+    </a>
+    <!-- /ko -->
+    <!-- ko ifnot: editorMode -->
+    <i class="fa fa-file-text-o app-icon"></i>
+    Notebook
+    <!-- /ko -->
+  </h1>
+  <!-- ko with: selectedNotebook -->
+  <ul class="nav editor-nav">
+    <li data-bind="visible: isHistory" style="display: none" class="no-horiz-padding muted">
+    <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
+    </li>
+    <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
+    <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i></a>
+    </li>
+    <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
+    <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
+      <i class="fa fa-fw fa-file-o"></i>
+    </a>
+    </li>
+    <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
+    <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
+    </li>
+    <li class="query-name no-horiz-padding" style="margin-left: 6px">
+    <a href="javascript:void(0)">
+      <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
+    </a>
+    </li>
+    <li data-bind="tooltip: { placement: 'bottom', title: description }">
+    <a href="javascript:void(0)">
+      <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
+    </a>
+    </li>
+  </ul>
+  <!-- /ko -->
 
+  <div class="player-toolbar" data-bind="visible: $root.isPlayerMode() && $root.isFullscreenMode()" style="display: none;">
+    <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); $root.isFullscreenMode(false);  }"><i class="fa fa-times"></i></div>
+    <img src="${ static('desktop/art/icon_hue_48.png') }" />
+    <!-- ko if: $root.selectedNotebook() -->
+    <h4 data-bind="text: $root.selectedNotebook().name"></h4>
+    <!-- /ko -->
+  </div>
+  </div>
+
+  <div>
         <div class="btn-group">
           <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
 
@@ -291,106 +364,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <i class="fa fa-cogs"></i>
         </a>
       </div>
-
-      <div class="nav-collapse">
-        <ul class="nav editor-nav">
-          <li class="currentApp">
-            <!-- ko if: editorMode -->
-              <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
-              <!-- ko if: editorType() == 'impala' -->
-                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
-                Impala
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'rdbms' -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
-                DB Query
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'pig' -->
-                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
-                Pig
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'java' -->
-                <i class="fa fa-file-code-o app-icon" style="vertical-align: middle"></i>
-                Java
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'spark2' -->
-                <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" />
-                Spark
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'sqoop1' -->
-                <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" />
-                Sqoop 1
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'distcp' -->
-                <i class="fa fa-files-o app-icon" style="vertical-align: middle"></i>
-                DistCp
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'shell' -->
-                <i class="fa fa-terminal app-icon" style="vertical-align: middle"></i>
-                Shell
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'mapreduce' -->
-                <i class="fa fa-file-archive-o app-icon" style="vertical-align: middle"></i>
-                MapReduce
-              <!-- /ko -->
-              <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
-                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
-                Hive
-              <!-- /ko -->
-              <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
-                SQL
-              <!-- /ko -->
-              </a>
-            <!-- /ko -->
-            <!-- ko ifnot: editorMode -->
-              <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
-                Notebook
-            <!-- /ko -->
-          </li>
-
-          <!-- ko with: selectedNotebook -->
-          <li class="no-horiz-padding">
-            <a>&nbsp;</a>
-          </li>
-          <li data-bind="visible: isHistory" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
-          </li>
-          <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i></a>
-          </li>
-          <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
-              <i class="fa fa-fw fa-file-o"></i>
-            </a>
-          </li>
-          <li data-bind="visible: isSaved() && ! isHistory() && ! parentSavedQueryUuid()" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('This is a saved query') }"><i class="fa fa-fw fa-file-o"></i></a>
-          </li>
-          <li class="query-name no-horiz-padding" style="margin-left: 6px">
-            <a href="javascript:void(0)">
-              <div class="notebook-name-desc" data-bind="editable: name, editableOptions: { inputclass: 'notebook-name-input', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a name...')}', tpl: '<input type=\'text\' maxlength=\'255\'>' }"></div>
-            </a>
-          </li>
-          <li data-bind="tooltip: { placement: 'bottom', title: description }">
-            <a href="javascript:void(0)">
-              <div class="notebook-name-desc" data-bind="editable: description, editableOptions: { type: 'textarea', enabled: true, placement: 'bottom', emptytext: '${_ko('Add a description...')}' }"></div>
-            </a>
-          </li>
-          <!-- /ko -->
-        </ul>
-      </div>
-    </div>
   </div>
-</div>
+</div><!-- .page-header -->
 
- <div class="player-toolbar" data-bind="visible: $root.isPlayerMode() && $root.isFullscreenMode()" style="display: none;">
-    <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); $root.isFullscreenMode(false);  }"><i class="fa fa-times"></i></div>
-    <img src="${ static('desktop/art/icon_hue_48.png') }" />
-    <!-- ko if: $root.selectedNotebook() -->
-    <h4 data-bind="text: $root.selectedNotebook().name"></h4>
-    <!-- /ko -->
-  </div>
 </%def>
 
 
@@ -924,7 +900,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </div>
 
-<div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+<div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;">
   <div class="modal-header">
     <a href="javascript: void(0)" data-dismiss="modal" class="close"></a>
     <h3 class="modal-title">${_('All Notebook content')}</h3>
@@ -937,7 +913,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </div>
 
-<div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+<div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;">
   <div class="modal-header">
     <a href="javascript: void(0)" data-dismiss="modal" class="close"></a>
     <h3 class="modal-title">${_('Import from Github')}</h3>
@@ -945,7 +921,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="modal-body">
     <div class="input-prepend">
       <span class="add-on"><i class="fa fa-github"></i></span>
-      <input id="importGithubUrl" type="text" placeholder="ie: https://github.com/romainr/hadoop-tutorials-examples/blob/master/notebook/shared_rdd/hue-sharedrdd-notebook.json" style="width: 726px" />
+      <input class="input-xxlarge" id="importGithubUrl" type="text" placeholder="ie: https://github.com/romainr/hadoop-tutorials-examples/blob/master/notebook/shared_rdd/hue-sharedrdd-notebook.json"/>
     </div>
   </div>
   <div class="modal-footer">
@@ -3666,11 +3642,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           viewModel.isLeftPanelVisible(false);
           $(".navigator").hide();
           $(".add-snippet").hide();
-          if (viewModel.isFullscreenMode()){
-            $(".main-content").css("top", "50px");
-          } else {
-            $(".main-content").css("top", "1px");
-          }
+          $(".main-content").addClass("player-mode");
           redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
@@ -3678,11 +3650,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           viewModel.assistAvailable(isAssistAvailable);
           $(".navigator").show();
           $(".add-snippet").show();
-          % if conf.CUSTOM.BANNER_TOP_HTML.get():
-          $(".main-content").css("top", "112px");
-          % else:
-          $(".main-content").css("top", "74px");
-          % endif
+          $(".main-content").removeClass("player-mode");
           redrawFixedHeaders(200);
           $(window).unbind("keydown", exitPlayerMode);
         }

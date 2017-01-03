@@ -32,15 +32,15 @@
 
 <div id="collectionsComponents">
 %if not is_mobile:
-<div class="search-bar" style="height: 30px">
-  <div class="pull-right">
-    % if user.has_hue_permission(action="access", app='indexer'):
+<div class="page-header search-bar flex-space-between">
+  <h1><i class="fa fa-tags"></i> ${_('Dashboards')}</h1>
+  % if user.has_hue_permission(action="access", app='indexer'):
+  <div>
     <a class="btn importBtn" href="${ url('indexer:collections') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
-    % endif
   </div>
-  <h4><i class="fa fa-tags"></i> ${_('Dashboards')}</h4>
+  % endif
 </div>
 %endif
 

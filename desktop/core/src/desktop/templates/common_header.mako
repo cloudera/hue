@@ -56,8 +56,9 @@ if USE_NEW_EDITOR.get():
   <meta name="author" content="">
 
   <link href="${ static('desktop/css/roboto.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
 
   <style type="text/css">
@@ -169,11 +170,12 @@ ${ hueIcons.symbols() }
     return found_app, count
 %>
 % if not skip_topbar:
-<div class="navigator">
-  <div class="pull-right">
+<div class="navbar navbar-default navigator">
+<div class="navbar-inner">
+  <div class="navbar-collapse pull-right">
 
   % if user.is_authenticated() and section != 'login':
-  <ul class="nav nav-pills">
+  <ul class="nav">
     <li class="divider-vertical"></li>
     % if 'filebrowser' in apps:
       % if not is_s3_enabled:
@@ -255,20 +257,20 @@ ${ hueIcons.symbols() }
     <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
   </ul>
   % else:
-  <ul class="nav nav-pills" style="margin-right: 40px">
+  <ul class="nav" style="margin-right: 40px">
     <li id="jHueTourFlagPlaceholder"></li>
   </ul>
   % endif
 
   </div>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about">
+    <a class="brand nav-tooltip" title="${_('About Hue')}" rel="navigator-tooltip" href="/about">
       <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
         <use xlink:href="#hue-logo"></use>
       </svg>
     </a>
     % if user.is_authenticated() and section != 'login':
-     <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+     <ul class="nav">
+       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }"><i class="fa fa-home" style="font-size: 18px"></i></a></li>
        <%
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>
@@ -476,7 +478,7 @@ ${ hueIcons.symbols() }
        % endif
      </ul>
    % endif
-
+</div>
 </div>
 % endif
 
@@ -501,6 +503,6 @@ ${ hueIcons.symbols() }
 % endif
 
 <div id="jHueNotify" class="alert hide">
-    <button class="close">&times;</button>
+    <button class="close"></button>
     <div class="message"></div>
 </div>

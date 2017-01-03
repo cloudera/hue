@@ -94,7 +94,7 @@
   </div>
 
 
-  <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0, css:{'with-top-margin': isEditing()}">
+  <div data-bind="visible: isEditing() && previewColumns() != '' && columns().length == 0">
   <div class="container-fluid">
     <div class="row-fluid" data-bind="visible: previewColumns() == 'oneSixthLeft'">
       <div class="span2 preview-row"></div>
@@ -122,7 +122,7 @@
   </div>
 </div>
 
-<div data-bind="css: {'dashboard': true, 'with-top-margin': isEditing()}">
+<div class="dashboard">
   <div class="container-fluid">
     <!-- ko if: $root.selectedQDefinition() != null -->
     <div class="row-fluid">

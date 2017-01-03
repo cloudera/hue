@@ -23,15 +23,8 @@
 
 
 <%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          %if pullright:
-            ${pullright()}
-          %endif
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
+    <div class="page-header">
+            <h1 class="currentApp">
                 <%def name="getURL(section, dashboard, is_v2)">
                 <%
                   if dashboard:
@@ -67,7 +60,8 @@
                   <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Oozie Editor') }
                 % endif
                 </a>
-               </li>
+            </h1>
+            <ul class="nav nav-tabs">
               % if dashboard:
                 <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_oozie_workflows')}">${ _('Workflows') }</a></li>
                 <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_oozie_coordinators')}">${ _('Coordinators') }</a></li>
@@ -86,9 +80,6 @@
                 % endif
               % endif
             </ul>
-          </div>
-        </div>
-      </div>
   </div>
   % if not dashboard and not is_editor and ENABLE_V2.get():
     <div class="alert alert-warn" style="position: fixed; top: 28px; z-index: 1031; right: 0; height: 28px; line-height: 28px; border: none">

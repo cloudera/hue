@@ -19,21 +19,13 @@
 %>
 
 <%def name="menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top nokids">
-      <div class="navbar-inner">
-        <div class="container-fluid">
-          <div class="nav-collapse">
-            <ul class="nav">
-              <li class="currentApp">
-                <a href="/${app_name}">
-                  <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
-                  ${ _('Metastore Manager') }
-                </a>
-              </li>              
-            </ul>
-          </div>
-        </div>
-      </div>
+  <div class="page-header">
+    <h1 class="currentApp">
+      <a href="/${app_name}">
+        <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" />
+        ${ _('Metastore Manager') }
+      </a>
+    </h1>
   </div>
 </%def>
 

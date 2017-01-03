@@ -44,19 +44,17 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
 ${ hueIcons.symbols() }
 
-<div class="navigator">
-  <div class="pull-right">
-
-  <ul class="nav nav-pills">
-    <li><a href="http://gethue.com" target="_blank" title="${_('Go to gethue.com')}" rel="navigator-tooltip" data-placement="left"><i class="fa fa-globe"></i></a></li>
-  </ul>
-
+<div class="navbar">
+  <div class="navbar-inner">
+    <a class="brand" href="/">
+      <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
+        <use xlink:href="#hue-logo"></use>
+      </svg>
+    </a>
+    <ul class="nav pull-right">
+      <li><a href="http://gethue.com" target="_blank" title="${_('Go to gethue.com')}" rel="navigator-tooltip" data-placement="left"><i class="fa fa-globe"></i></a></li>
+    </ul>
   </div>
-  <a class="brand pull-left" href="/">
-    <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
-      <use xlink:href="#hue-logo"></use>
-    </svg>
-  </a>
 </div>
 
 
