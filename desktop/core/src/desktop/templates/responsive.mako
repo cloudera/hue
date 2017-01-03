@@ -483,6 +483,7 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('open.fb.file', function (path) {
           self.extraEmbeddableURLParams(path + '?is_embeddable=true');
+          hueUtils.changeURLParameter('path', path);
           self.currentApp('fileviewer');
         });
 
@@ -539,8 +540,6 @@ ${ assist.assistPanel() }
               dataType: 'html',
               success: function (response) {
                 self.extraEmbeddableURLParams('');
-                // TODO: remove the next lines
-                // hack to avoid css caching for development
                 var r = $(response);
                 r.find('link').each(function () {
                   $(this).attr('href', $(this).attr('href') + '?' + Math.random())
@@ -576,11 +575,27 @@ ${ assist.assistPanel() }
           $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
         });
 
-        if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]){
-          if (window.location.getParameter('type') !== '') {
-            self.changeEditorType(window.location.getParameter('type'));
+        if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
+          var app = window.location.getParameter('app');
+          switch (app) {
+            case 'fileviewer':
+              if (window.location.getParameter('path') !== '') {
+                self.extraEmbeddableURLParams(window.location.getParameter('path') + '?is_embeddable=true');
+                self.currentApp(app);
+              }
+              else {
+                self.currentApp('filebrowser');
+              }
+              break;
+            case 'editor':
+              if (window.location.getParameter('type') !== '') {
+                self.changeEditorType(window.location.getParameter('type'));
+              }
+              self.currentApp(app);
+              break;
+            default:
+              self.currentApp(app);
           }
-          self.currentApp(window.location.getParameter('app'));
         }
         else {
           self.currentApp('editor');
