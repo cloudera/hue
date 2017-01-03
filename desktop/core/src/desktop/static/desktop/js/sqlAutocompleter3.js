@@ -78,18 +78,21 @@ var SqlAutocompleter3 = (function () {
     self.editor = options.editor;
 
     self.keywords = ko.observableArray();
-    self.loadingKeywords = ko.observable(false);
-
+    self.identifiers = ko.observableArray();
+    self.commonTableExpressions = ko.observableArray();
+    self.functions = ko.observableArray();
     self.tables = ko.observableArray();
-    self.loadingTables = ko.observable(false);
-
     self.columns = ko.observableArray();
+
+    self.loadingKeywords = ko.observable(false);
+    self.loadingFunctions = ko.observable(false);
+    self.loadingTables = ko.observable(false);
     self.loadingColumns = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
-      var result = self.keywords().concat(self.tables(), self.columns());
+      var result = self.keywords().concat(self.identifiers(), self.commonTableExpressions(), self.functions(), self.tables(), self.columns());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -159,6 +162,9 @@ var SqlAutocompleter3 = (function () {
     self.defaultDatabase = parseResult.useDatabase || self.snippet.database();
     self.parseResult = parseResult;
     self.keywords([]);
+    self.identifiers([]);
+    self.commonTableExpressions([]);
+    self.functions([]);
     self.tables([]);
     self.columns([]);
     self.loadingKeywords(false);
@@ -170,6 +176,9 @@ var SqlAutocompleter3 = (function () {
     var allDbsDeferral = self.loadDatabases();
 
     self.handleKeywords(colRefDeferral);
+    self.handleIdentifiers();
+    self.handleCommonTableExpressions();
+    self.handleFunctions(colRefDeferral);
     self.handleTables(allDbsDeferral);
     self.handleColumns(colRefDeferral);
   };
@@ -213,6 +222,50 @@ var SqlAutocompleter3 = (function () {
         self.keywords(keywordSuggestions);
         self.loadingKeywords(false);
       });
+    }
+  };
+
+  Suggestions.prototype.handleIdentifiers = function () {
+    var self = this;
+    if (self.parseResult.suggestIdentifiers) {
+      var identifierSuggestions = [];
+      self.parseResult.suggestIdentifiers.forEach(function (identifier) {
+        identifierSuggestions.push({ value: identifier.name, meta: identifier.type, weight: DEFAULT_WEIGHTS.IDENTIFIER });
+      });
+      self.identifiers(identifierSuggestions);
+    }
+  };
+
+  Suggestions.prototype.handleCommonTableExpressions = function () {
+    var self = this;
+    if (self.parseResult.suggestCommonTableExpressions) {
+      var commonTableExpressionSuggestions = [];
+      self.parseResult.suggestCommonTableExpressions.forEach(function (expression) {
+        var prefix = expression.prependQuestionMark ? '? ' : '';
+        if (expression.prependFrom) {
+          prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
+        }
+        commonTableExpressionSuggestions.push({value: prefix + expression.name, meta: AutocompleterGlobals.i18n.meta.commonTableExpression, weight: DEFAULT_WEIGHTS.CTE });
+      });
+      self.commonTableExpressions(commonTableExpressionSuggestions);
+    }
+  };
+
+  Suggestions.prototype.handleFunctions = function (colRefDeferral) {
+    var self = this;
+    if (self.parseResult.suggestFunctions) {
+      var functionSuggestions = [];
+      if (self.parseResult.suggestFunctions.types && self.parseResult.suggestFunctions.types[0] === 'COLREF') {
+        self.loadingFunctions(true);
+        colRefDeferral.done(function (colRef) {
+          SqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false, functionSuggestions, DEFAULT_WEIGHTS.UDF);
+          self.functions(functionSuggestions);
+          self.loadingFunctions(false);
+        });
+      } else {
+        SqlFunctions.suggestFunctions(self.snippet.type(), self.parseResult.suggestFunctions.types || ['T'], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false, functionSuggestions, DEFAULT_WEIGHTS.UDF);
+        self.functions(functionSuggestions);
+      }
     }
   };
 
