@@ -95,7 +95,8 @@ from metadata.conf import has_optimizer, OPTIMIZER
           keyword: '${ _('keyword') }',
           table: '${ _('table') }',
           view: '${ _('view') }',
-          virtual: '${ _('virtual') }'
+          virtual: '${ _('virtual') }',
+          commonTableExpression:  '${ _('cte') }'
         }
       }
     };
