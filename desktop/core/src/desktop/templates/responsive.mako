@@ -170,7 +170,7 @@ ${ hueIcons.symbols() }
       </div>
     </div>
     <div class="top-nav-right">
-      % if user.is_authenticated() and section != 'login':        
+      % if user.is_authenticated() and section != 'login':
         <div class="compose-action btn-group">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
