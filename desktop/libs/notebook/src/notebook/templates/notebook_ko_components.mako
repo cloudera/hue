@@ -222,20 +222,31 @@ except ImportError, e:
           <fieldset>
             <div class="control-group">
               <div class="controls">
+                 <label class="radio">
+                  <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-file">
+                  &nbsp;${ _('File (first %s rows)') % DOWNLOAD_ROW_LIMIT.get() }
+                </label>
+                <div data-bind="visible: saveTarget() == 'hdfs-file'" class="inline">
+                  <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_file" placeholder="${_('Path to CSV file')}" class="pathChooser margin-left-10">
+                </div>
+                <label class="radio" data-bind="visible: saveTarget() == 'hdfs-file'">
+                  <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
+                  ${ _('Overwrite') }
+                </label>
+              </div>
+            </div>
+            <div class="control-group">
+              <div class="controls">
                 <label class="radio">
                   <input data-bind="checked: saveTarget" type="radio" name="save-results-type" value="hdfs-directory">
-                  &nbsp;${ _('File') }
+                  &nbsp;${ _('Directory') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hdfs-directory'" class="inline">
                   <input data-bind="value: savePath, valueUpdate:'afterkeydown', filechooser: { value: savePath, isNestedModal: true }, filechooserOptions: { uploadFile: false, skipInitialPathIfEmpty: true, displayOnlyFolders: true, linkMarkup: true }, hdfsAutocomplete: savePath" type="text" name="target_dir" placeholder="${_('Path to empty directory')}" class="pathChooser margin-left-10 input-xlarge">
                 </div>
-                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save a large result as CSV") }', placement: 'top' }" style="padding: 8px">
+                <div class="inline-block" data-bind="visible: saveTarget() == 'hdfs-directory', tooltip: { title: '${ _ko("Save a large result as TSV") }', placement: 'top' }" style="padding: 8px">
                   <i class="fa fa-fw fa-question-circle muted"></i>
                 </div>
-                ##<label class="radio" data-bind="visible: saveTarget() == 'hdfs-directory'">
-                ##  <input data-bind="checked: saveOverwrite" type="checkbox" name="overwrite">
-                ##  ${ _('Download') }
-                ##</label>
               </div>
             </div>
             <div class="control-group">
@@ -310,7 +321,7 @@ except ImportError, e:
         self.snippet = params.snippet;
         self.notebook = params.notebook;
 
-        self.saveTarget = ko.observable('hdfs-directory');
+        self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
         self.saveOverwrite = ko.observable(true);
 

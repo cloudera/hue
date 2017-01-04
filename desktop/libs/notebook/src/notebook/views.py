@@ -23,7 +23,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
@@ -175,11 +175,16 @@ def execute_and_watch(request):
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'insert_as_query':
-    sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
+    if IS_HUE_4.get():
+      # TODO: checks/workarounds in case of non impersonation or Sentry
+      # TODO: keep older simpler way in case of known not many rows?
+      sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
+    else:
+      sql, success_url = api.export_large_data_to_hdfs1(notebook, snippet, destination)
+    editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
   elif action == 'index_query':
     if destination == '__hue__':
-      destination = _get_snippet_name(notebook).replace('-', '_')
+      destination = _get_snippet_name(notebook)
       live_indexing = True
     else:
       live_indexing = False
