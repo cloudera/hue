@@ -175,12 +175,9 @@ def execute_and_watch(request):
     sql, success_url = api.export_data_as_table(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'])
   elif action == 'insert_as_query':
-    if IS_HUE_4.get():
-      # TODO: checks/workarounds in case of non impersonation or Sentry
-      # TODO: keep older simpler way in case of known not many rows?
-      sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
-    else:
-      sql, success_url = api.export_large_data_to_hdfs1(notebook, snippet, destination)
+    # TODO: checks/workarounds in case of non impersonation or Sentry
+    # TODO: keep older simpler way in case of known not many rows?
+    sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
   elif action == 'index_query':
     if destination == '__hue__':

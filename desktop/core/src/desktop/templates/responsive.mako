@@ -14,11 +14,13 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  from django.utils.translation import ugettext as _
+
   from desktop import conf
   from desktop.views import _ko
-  from django.utils.translation import ugettext as _
   from desktop.lib.i18n import smart_unicode
   from desktop.views import login_modal
+
   from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -45,7 +47,6 @@
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
-
 </head>
 
 <body>
@@ -202,7 +203,12 @@ ${ hueIcons.symbols() }
           <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">20</div></button>
         </div>
         <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
-          <span style="font-size: 15px; font-weight: 300">${_('Workflows')} (20)</span>
+          <div style="font-size: 15px; font-weight: 300">1hours ago <i class="fa fa-fighter-jet fa-fw"></i> Extracting hdfs://.../mini-earthquake.csv.zip to /user/romain/mini-earthquake.csv</div>
+          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Executing query 'SELECT * FROM web_logs limit 500' </div>
+          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Running Schedule 'Data log usage by day' </div>
+          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Exporting query result 'SELECT * FROM sample_07 where salary is not NULL' to /user/romain/escalation</div>
+          <div style="font-size: 15px; font-weight: 300">4hours ago <i class="fa fa-check fa-fw"></i> Exporting query result 'Top 25 Hue escalations' to /user/romain/escalation</div>
+          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-check fa-fw"></i> Indexing /user/romain/mini-earthquake.csv to mini-earthquake</div>
         </div>
 
         <div class="compose-action btn-group">
@@ -212,7 +218,7 @@ ${ hueIcons.symbols() }
           </button>
         </div>
         <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
-          <span style="font-size: 15px; font-weight: 300">${_('Workflows')} (20)</span>
+          <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
         </div>
       % endif
     </div>
@@ -232,11 +238,11 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }"><a href="javascript: void(0);">S3</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
       </ul>
