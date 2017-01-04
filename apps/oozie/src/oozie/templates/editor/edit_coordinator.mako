@@ -121,7 +121,7 @@ ${ layout.menubar(section='coordinators') }
             <div class="fieldWrapper">
               <div class="row-fluid">
                 <div class="alert alert-warning">
-                  ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+                  ${ _('UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to 6am the next day.') }
                 </div>
               </div>
             </div>

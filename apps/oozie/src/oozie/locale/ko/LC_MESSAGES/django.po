@@ -3404,8 +3404,8 @@ msgstr "예약"
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:31
 #: src/oozie/templates/editor/edit_bundle.mako:113
 #: src/oozie/templates/editor/edit_coordinator.mako:126
-msgid "UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day."
-msgstr "UTC 시간만 해당됩니다. 예를 들어 PST(UTC+8) 오후 10시인 경우 8시간을 더하여 다음 날 오전 6시로 설정합니다."
+msgid "UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to 6am the next day."
+msgstr "UTC 시간만 해당됩니다. 예를 들어 PST(UTC-8) 오후 10시인 경우 8시간을 더하여 다음 날 오전 6시로 설정합니다."
 
 #: src/oozie/templates/editor/create_coordinator.mako:211
 #: src/oozie/templates/editor/edit_bundle.mako:472

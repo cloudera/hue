@@ -109,7 +109,7 @@ ${ layout.menubar(section='bundles') }
                   </div>
                   <div class="span6">
                     <div class="alert alert-warning">
-                      ${ _('UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day.') }
+                      ${ _('UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to 6am the next day.') }
                     </div>
                   </div>
                 </div>

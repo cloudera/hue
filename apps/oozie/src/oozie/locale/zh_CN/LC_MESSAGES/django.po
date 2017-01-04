@@ -3404,8 +3404,8 @@ msgstr "计划"
 #: src/oozie/templates/editor/create_coordinator_dataset.mako:31
 #: src/oozie/templates/editor/edit_bundle.mako:113
 #: src/oozie/templates/editor/edit_coordinator.mako:126
-msgid "UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to 6am the next day."
-msgstr "仅限 UTC 时间。（例如，如果您需要 10pm PST (UTC+8)，则将其设置为比次日 6 am 晚 8 个小时。"
+msgid "UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to 6am the next day."
+msgstr "仅限 UTC 时间。（例如，如果您需要 10pm PST (UTC-8)，则将其设置为比次日 6 am 晚 8 个小时。"
 
 #: src/oozie/templates/editor/create_coordinator.mako:211
 #: src/oozie/templates/editor/edit_bundle.mako:472

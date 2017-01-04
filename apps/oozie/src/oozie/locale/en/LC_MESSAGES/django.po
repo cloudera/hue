@@ -2434,7 +2434,7 @@ msgstr ""
 #: src/oozie/templates/editor/edit_bundle.mako:115
 #: src/oozie/templates/editor/edit_coordinator.mako:135
 msgid ""
-"UTC time only. (e.g. if you want 10pm PST (UTC+8) set it 8 hours later to"
+"UTC time only. (e.g. if you want 10pm PST (UTC-8) set it 8 hours later to"
 " 6am the next day."
 msgstr ""
 
