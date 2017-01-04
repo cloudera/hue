@@ -18,6 +18,7 @@
 
 import json
 import logging
+import numbers
 import os
 import shutil
 
@@ -284,7 +285,7 @@ class CollectionManagerController(object):
           dataset = tablib.Dataset()
           dataset.append(columns)
           for i, row in enumerate(result['data']):
-            dataset.append([ROW_COUNT + i] + row)
+            dataset.append([ROW_COUNT + i] + [cell if cell else (0 if isinstance(cell, numbers.Number) else '') for cell in row])
 
           if not api.update(collection_or_core_name, dataset.csv, content_type='csv'):
             raise PopupException(_('Could not update index. Check error logs for more info.'))

@@ -47,7 +47,7 @@ DEFAULT_FIELD = {
   'type': 'text',
   'indexed': 'true',
   'stored': 'true',
-  'required': 'true',
+  'required': 'false',
   'multiValued': 'false'
 }
 
