@@ -1106,15 +1106,19 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.queryCompatibility = function () {
+    self.queryCompatibility = function (targetPlatform) {
       logGA('compatibility');
       self.suggestion(false);
+
+      if (! targetPlatform) {
+        targetPlatform = self.type();
+      }
 
       $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type(),
-        targetPlatform: 'impala'
+        targetPlatform: targetPlatform
       }, function(data) {
         if (data.status == 0) {
          self.suggestion(ko.mapping.fromJS(data.query_compatibility));
