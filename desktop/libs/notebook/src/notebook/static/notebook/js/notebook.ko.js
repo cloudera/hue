@@ -1283,7 +1283,7 @@ var EditorViewModel = (function() {
                   }
                 }
               }
-              if (vm.successUrl()) {
+              if (! self.result.handle().has_more_statements && vm.successUrl()) {
                 window.location.href = vm.successUrl();
               }
             }

@@ -289,4 +289,4 @@ class Api(object):
 
 
 def _get_snippet_name(notebook):
-  return ('%(name)s' if notebook.get('name') else '%(type)s-%(id)s') % notebook
+  return (('%(name)s' if notebook.get('name') else '%(type)s-%(id)s') % notebook).replace('-', '_')

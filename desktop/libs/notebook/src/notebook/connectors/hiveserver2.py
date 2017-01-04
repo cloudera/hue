@@ -475,24 +475,6 @@ class HS2Api(Api):
     return hql, success_url
 
 
-  def export_large_data_to_hdfs1(self, notebook, snippet, destination):
-    db = self._get_db(snippet)
-
-    response = self._get_current_statement(db, snippet)
-    session = self._get_session(notebook, snippet['type'])
-    query = self._prepare_hql_query(snippet, response.pop('statement'), session)
-
-    if 'select' not in query.hql_query.strip().lower():
-      raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
-
-    db.use(query.database)
-
-    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
-    success_url = '/filebrowser/view=%s' % destination
-
-    return hql, success_url
-
-
   def export_large_data_to_hdfs(self, notebook, snippet, destination):
     db = self._get_db(snippet)
 
@@ -503,9 +485,25 @@ class HS2Api(Api):
     if 'select' not in query.hql_query.strip().lower():
       raise PopupException(_('Only SELECT statements can be saved. Provided statement: %(query)s') % {'query': query.hql_query})
 
-    db.use(query.database)
+    hql = '''
+DROP TABLE IF EXISTS `%(table)s`;
 
-    hql = "INSERT OVERWRITE DIRECTORY '%s' %s" % (destination, query.hql_query)
+CREATE TABLE `%(table)s` ROW FORMAT DELIMITED
+     FIELDS TERMINATED BY '\\t'
+     ESCAPED BY '\\\\'
+     LINES TERMINATED BY '\\n'
+     STORED AS TEXTFILE LOCATION '%(location)s'
+     AS
+%(hql)s;
+
+ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
+
+DROP TABLE IF EXISTS `%(table)s`;
+    ''' % {
+      'table': _get_snippet_name(notebook),
+      'location': destination,
+      'hql': query.hql_query
+    }
     success_url = '/filebrowser/view=%s' % destination
 
     return hql, success_url
