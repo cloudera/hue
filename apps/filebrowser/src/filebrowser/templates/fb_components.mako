@@ -20,7 +20,7 @@ from django.utils.translation import ugettext as _
 from aws import get_client
 %>
 
-<%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
+<%def name="breadcrumbs(path, breadcrumbs, from_listdir=False, is_embeddable=False)">
     % if from_listdir:
       <ul class="nav nav-pills hueBreadcrumbBar">
         %if path.lower().find('s3a://') == 0:
@@ -56,25 +56,35 @@ from aws import get_client
       </ul>
     % else:
       <ul class="nav nav-pills hueBreadcrumbBar">
+        %if is_embeddable:
+        <li><a href="javascript:void(0)" onclick="huePubSub.publish('open.link', '${url('filebrowser.views.view', path=urlencode(path))}?default_to_home')" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
+        <li>
+          <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
+          % for breadcrumb_item in breadcrumbs:
+            <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
+            %if label[-1] == '/':
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('open.fb.folder', '${f_url}')"><span class="divider">${label}</span></a></li>
+            %else:
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('open.fb.folder', '${f_url}')">${label}</a><span class="divider">/</span></li>
+            %endif
+          % endfor
+          </ul>
+        </li>
+        %else:
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
-            <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
-                    % for breadcrumb_item in breadcrumbs:
-                    <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
-                    %if label[-1] == '/':
-                            <li>
-                              <a href="${url('filebrowser.views.view', path=f_url)}">
-                                <span class="divider">${label}</span>
-                              </a>
-                            </li>
-                    %else:
-                            <li>
-                              <a href="${url('filebrowser.views.view', path=f_url)}">${label}</a>
-                              <span class="divider">/</span></li>
-                    %endif
-                    % endfor
-            </ul>
+          <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
+          % for breadcrumb_item in breadcrumbs:
+            <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
+            %if label[-1] == '/':
+            <li><a href="${url('filebrowser.views.view', path=f_url)}"><span class="divider">${label}</span></a></li>
+            %else:
+            <li><a href="${url('filebrowser.views.view', path=f_url)}">${label}</a><span class="divider">/</span></li>
+            %endif
+          % endfor
+          </ul>
         </li>
+        %endif
       </ul>
     % endif
 </%def>

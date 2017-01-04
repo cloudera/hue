@@ -487,6 +487,12 @@ ${ assist.assistPanel() }
           self.currentApp('fileviewer');
         });
 
+        huePubSub.subscribe('open.fb.folder', function (path) {
+          hueUtils.removeURLParameter('path');
+          self.currentApp('filebrowser');
+          window.location.hash = path;
+        });
+
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/notebook/editor')){
             if (location.getParameter('type') !== ''){
@@ -522,6 +528,9 @@ ${ assist.assistPanel() }
           }
           else if (href.startsWith('/oozie/editor/bundle/new')){
             self.currentApp('oozie_bundle');
+          }
+          else if (href.startsWith('/filebrowser')){
+            self.currentApp('filebrowser');
           }
         });
 
@@ -586,6 +595,11 @@ ${ assist.assistPanel() }
               else {
                 self.currentApp('filebrowser');
               }
+              break;
+            case 'filebrowser':
+              var previousHash = window.location.hash;
+              self.currentApp(app);
+              window.location.hash = previousHash;
               break;
             case 'editor':
               if (window.location.getParameter('type') !== '') {
