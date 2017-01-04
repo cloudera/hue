@@ -1617,9 +1617,9 @@ from django.utils.translation import ugettext as _
           if (data.status == 0) {
             var jobId = '';
             if (data.handle) {
-              jobId = data.handle.id;
+              jobId = data.history_id;
             }
-            $.jHueNotify.info("${ _('Oozie job ') }" + jobId + "${_(' submitted for archive extraction.') }");
+            $.jHueNotify.info("${ _('Task ') }" + jobId + "${_(' submitted for archive extraction.') }");
           } else {
             $(document).trigger("error", data.message);
           }

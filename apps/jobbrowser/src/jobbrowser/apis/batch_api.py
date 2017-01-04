@@ -49,7 +49,7 @@ class BatchApi(Api):
         'progress': 100,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
-    } for app in wf_list.jobs if app.appName.startswith(OozieApi.BATCH_JOB_PREFIX)]
+    } for app in wf_list.jobs] # if app.appName.startswith(OozieApi.BATCH_JOB_PREFIX)]
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
