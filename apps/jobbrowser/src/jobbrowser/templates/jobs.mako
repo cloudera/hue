@@ -54,9 +54,16 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
         <a class="btn btn-status btn-inverse disable-feedback" data-value="killed">${ _('Killed') }</a>
       </span>
+      &nbsp;&nbsp;${_('in last')} <input id="timeValue" type="number" class="input-small" placeholder="7">
+      <select id="timeUnit" class="input-small">
+        <option value="days">${_('days')}</option>
+        <option value="hours">${_('hours')}</option>
+        <option value="minutes">${_('minutes')}</option>
+      </select>
     </%def>
   </%actionbar:render>
 
+  <div id ="JobCountBanner" class="pull-center alert alert-warning hide">${ _("Showing oldest 1000 jobs. Use days filter to get the recent ones.") }</div>
   <div id="noJobs" class="alert"><i class="fa fa-exclamation-triangle"></i>&nbsp; ${_('There are no jobs that match your search criteria.')}</div>
 
   <table id="jobsTable" class="datatables table table-condensed">
@@ -149,11 +156,16 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         $("#loading").addClass("hide");
         $("#noJobs").hide();
         $(".datatables").show();
-        if (data.length == 0) {
+        if (data.jobs.length == 0) {
           $("#noJobs").show();
           $(".datatables").hide();
         }
         else {
+          if (data.jobs.length == 1000) {
+            $("#JobCountBanner").removeClass('hide');
+          } else {
+            $("#JobCountBanner").addClass('hide');
+          }
           var rows = [];
           $(data.jobs).each(function (cnt, job) {
             rows.push(getJobRow(job));
@@ -313,6 +325,11 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         _url_params["text"] = $('#textFilter').val().trim();
       }
 
+      if ($("#timeValue").val().trim() != "") {
+        _url_params["time_value"] = $('#timeValue').val().trim();
+        _url_params["time_unit"] = $('#timeUnit :selected').text();
+      }
+
       if ($("#showRetired").is(":checked")) {
         _url_params["retired"] = "on";
       }
@@ -325,8 +342,17 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       callJsonData(populateTable);
     });
 
+    $("#timeValue").jHueDelayedInput(function(){
+      $("#loading").removeClass("hide");
+      callJsonData(populateTable);
+    });
+
     $("#showRetired").change(function () {
       $("#loading").removeClass("hide");
+      callJsonData(populateTable);
+    });
+
+    $('#timeUnit').change(function(){
       callJsonData(populateTable);
     });
 
