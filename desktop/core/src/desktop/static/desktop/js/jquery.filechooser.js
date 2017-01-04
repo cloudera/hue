@@ -357,10 +357,10 @@
 
         if (typeof $.nicescroll !== 'undefined') {
           $scrollingBreadcrumbs.niceScroll({
-            cursorcolor: "#7D7D7D",
-            cursorborder: "1px solid #7D7D7D",
+            cursorcolor: "#C1C1C1",
+            cursorborder: "1px solid #C1C1C1",
             cursoropacitymin: 0,
-            cursoropacitymax: 0.75,
+            cursoropacitymax: 1,
             scrollspeed: 100,
             mousescrollstep: 60,
             railhoffset: {
