@@ -18,6 +18,7 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
   from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="actionbar" file="../actionbar.mako" />
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />

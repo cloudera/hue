@@ -47,6 +47,7 @@ def utf_quoter(what):
 def search_enabled():
   return type(SECURITY_ENABLED) == BoundConfig
 
+
 class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
@@ -895,6 +896,7 @@ class SolrApi(object):
     params = self._get_params() + (
         ('wt', 'json'),
         ('overwrite', 'true'),
+        ('commit', 'true'),
     )
     if version is not None:
       params += (

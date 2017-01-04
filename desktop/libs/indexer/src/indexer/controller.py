@@ -272,6 +272,7 @@ class CollectionManagerController(object):
     ROW_COUNT = 0
     FETCH_BATCH = 1000
     has_more = True
+
     api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
 
     try:
