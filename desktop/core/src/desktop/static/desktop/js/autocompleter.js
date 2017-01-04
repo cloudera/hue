@@ -22,7 +22,6 @@ var Autocompleter = (function () {
    * @param options.user
    * @param options.optEnabled
    * @param {Number} options.timeout
-   * @param options.useNewSqlAutocompleter {boolean}
    * @constructor
    */
   function Autocompleter(options) {
@@ -33,7 +32,7 @@ var Autocompleter = (function () {
     self.topTables = {};
 
     var initializeAutocompleter = function () {
-      if (self.snippet.isSqlDialect() && options.useNewAutocompleter) {
+      if (self.snippet.isSqlDialect()) {
         self.autocompleter = new SqlAutocompleter2({
           snippet: self.snippet,
           timeout: self.timeout
