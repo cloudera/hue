@@ -15,9 +15,10 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter, _ko
-from desktop import conf
 from django.utils.translation import ugettext as _
+
+from desktop import conf
+from desktop.views import commonheader, commonfooter, _ko
 %>
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
@@ -3603,7 +3604,7 @@ $(document).ready(function () {
 });
 
 
-  function toggleGridFieldsSelection(widget) {console.log();
+  function toggleGridFieldsSelection(widget) {
     if (widget.widgetType() == 'resultset-widget') {
       viewModel.resultsHash = '';
     } else {

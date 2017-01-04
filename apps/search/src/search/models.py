@@ -838,7 +838,7 @@ def augment_solr_response(response, collection, query):
 
         # Number or Date range
         if collection_facet['properties']['canRange'] and not facet['properties'].get('type') == 'field':
-          dimension = 3
+          dimension = 3 if collection_facet['properties']['isDate'] else 1
           # Single dimension or dimension 2 with analytics
           if not collection_facet['properties']['facets'] or collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1:
             column = 'count'
@@ -856,7 +856,6 @@ def augment_solr_response(response, collection, query):
             counts = range_pair(facet['field'], name, selected_values.get(facet['id'], []), counts, 1, collection_facet)
           else:
             # Dimension 1 with counts and 2 with analytics
-
             agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
             agg_keys.sort(key=lambda a: a[4:])
 
@@ -925,6 +924,7 @@ def augment_solr_response(response, collection, query):
 
           counts = filter(lambda a: len(a['fq_fields']) == actual_dimension, counts)
 
+        num_bucket = response['facets'][name]['numBuckets'] if 'numBuckets' in response['facets'][name] else len(response['facets'][name])
         facet = {
           'id': collection_facet['id'],
           'field': facet['field'],
@@ -933,7 +933,7 @@ def augment_solr_response(response, collection, query):
           'counts': counts,
           'extraSeries': extraSeries,
           'dimension': dimension,
-          'response': {'response': {'start': 0, 'numFound': response['facets'][name]['numBuckets']}}, # Todo * nested buckets + offsets
+          'response': {'response': {'start': 0, 'numFound': num_bucket}}, # Todo * nested buckets + offsets
           'docs': [dict(zip(cols, row)) for row in rows],
           'fieldsAttributes': [Collection2._make_gridlayout_header_field({'name': col, 'type': 'aggr' if '(' in col else 'string'}) for col in cols]
         }
