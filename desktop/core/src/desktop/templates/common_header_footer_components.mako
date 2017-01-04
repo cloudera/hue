@@ -14,11 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.utils.translation import ugettext as _
+from django.template.defaultfilters import escape, escapejs
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from metadata.conf import has_optimizer, OPTIMIZER
-
 %>
 
 <%def name="header_i18n_redirection(user, is_s3_enabled, apps)">
