@@ -1199,11 +1199,11 @@ DJANGO_EMAIL_BACKEND = Config(
   default="django.core.mail.backends.smtp.EmailBackend"
 )
 
-USE_NEW_AUTOCOMPLETER = Config( # To remove when it's working properly, not supported by old editor
+USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdown
   key='use_new_autocompleter',
-  default=True,
+  default=False,
   type=coerce_bool,
-  help=_('Enable the new editor SQL autocompleter')
+  help=_('Enable the improved editor autocomplete dropdown')
 )
 
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(

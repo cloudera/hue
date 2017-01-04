@@ -1656,7 +1656,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           minLines: $root.editorMode() ? null : 3
         }
       }, style: {opacity: statementType() !== 'text' ? '0.75' : '1', 'top': $root.editorMode() && statementType() !== 'text' ? '60px' : '0'}"></div>
+      % if conf.USE_NEW_AUTOCOMPLETER.get():
       <!-- ko component: { name: 'hueAceAutocompleter', params: { editor: ace, snippet: $data } } --><!-- /ko -->
+      % endif
+
 
       <ul class="table-drop-menu hue-context-menu">
         <li class="editor-drop-value"><a href="javascript:void(0);">"<span class="editor-drop-identifier"></span>"</a></li>

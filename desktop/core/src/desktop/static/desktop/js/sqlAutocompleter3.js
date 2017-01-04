@@ -245,7 +245,7 @@ var SqlAutocompleter3 = (function () {
         if (expression.prependFrom) {
           prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
         }
-        commonTableExpressionSuggestions.push({value: prefix + expression.name, meta: AutocompleterGlobals.i18n.meta.commonTableExpression, weight: DEFAULT_WEIGHTS.CTE });
+        commonTableExpressionSuggestions.push({ value: prefix + expression.name, meta: AutocompleterGlobals.i18n.meta.commonTableExpression, weight: DEFAULT_WEIGHTS.CTE });
       });
       self.commonTableExpressions(commonTableExpressionSuggestions);
     }
@@ -393,40 +393,40 @@ var SqlAutocompleter3 = (function () {
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('map') === 0) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('struct') === 0) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (column.type.indexOf('array') === 0) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN + 1, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN + 1, table: table })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              columnSuggestions.push({value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
             }
           });
         } else if (data.columns) {
           data.columns.forEach(function (column) {
-            columnSuggestions.push({value: self.backTickIfNeeded(column), meta: 'column', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            columnSuggestions.push({ value: self.backTickIfNeeded(column), meta: 'column', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
           });
         }
         if (data.type === 'map' && self.snippet.type() === 'impala') {
-          columnSuggestions.push({value: 'key', meta: 'key', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
-          columnSuggestions.push({value: 'value', meta: 'value', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+          columnSuggestions.push({ value: 'key', meta: 'key', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+          columnSuggestions.push({ value: 'value', meta: 'value', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
         }
         if (data.type === 'struct') {
           data.fields.forEach(function (field) {
-            columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {
             if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
-              columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+              columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
           });
         } else if (data.type === 'array' && data.item) {
@@ -434,18 +434,18 @@ var SqlAutocompleter3 = (function () {
             data.item.fields.forEach(function (field) {
               if ((field.type === 'array' || field.type === 'map')) {
                 if (self.snippet.type() === 'hive') {
-                  columnSuggestions.push({value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                  columnSuggestions.push({ value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
                 } else {
-                  columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                  columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
                 }
               } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                   SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
-                columnSuggestions.push({value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
               }
             });
           } else if (typeof data.item.type !== 'undefined') {
             if (SqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
-              columnSuggestions.push({value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+              columnSuggestions.push({ value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
             }
           }
         }
