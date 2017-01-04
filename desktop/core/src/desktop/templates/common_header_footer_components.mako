@@ -95,6 +95,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         meta: {
           alias:  '${ _('alias') }',
           commonTableExpression:  '${ _('cte') }',
+          database:  '${ _('database') }',
           keyword: '${ _('keyword') }',
           table: '${ _('table') }',
           value: '${ _('value') }',
