@@ -2803,7 +2803,7 @@ body {
 }
 
 .dataTables_wrapper:hover > .hue-scrollbar-x-rail, .hue-scrollbar-x-rail:hover {
-  opacity: 0.75;
+  opacity: 1;
 }
 
 .hue-scrollbar-x-rail {
@@ -2823,7 +2823,7 @@ body {
 
 .hue-scrollbar-x-rail > .hue-scrollbar-x {
   position: absolute;
-  background-color: #7D7D7D;
+  background-color: #C1C1C1;
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
   border-radius: 5px;

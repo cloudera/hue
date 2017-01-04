@@ -4154,10 +4154,10 @@
 
         if ($.fn.niceScroll) {
           $container.niceScroll({
-            cursorcolor: "#7D7D7D",
-            cursorborder: "1px solid #7D7D7D",
+            cursorcolor: "#C1C1C1",
+            cursorborder: "1px solid #C1C1C1",
             cursoropacitymin: 0,
-            cursoropacitymax: 0.75,
+            cursoropacitymax: 1,
             scrollspeed: 1,
             mousescrollstep: 60,
             cursorminheight: options.cursorminheight || 20,
@@ -4543,10 +4543,10 @@
       var options = valueAccessor() || {};
       if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
         $(element).niceScroll({
-          cursorcolor: "#7D7D7D",
-          cursorborder: "1px solid #7D7D7D",
+          cursorcolor: "#C1C1C1",
+          cursorborder: "1px solid #C1C1C1",
           cursoropacitymin: 0,
-          cursoropacitymax: 0.75,
+          cursoropacitymax: 1,
           mousescrollstep: 60,
           scrollspeed: 1,
           cursorminheight: options.cursorminheight || 20,
