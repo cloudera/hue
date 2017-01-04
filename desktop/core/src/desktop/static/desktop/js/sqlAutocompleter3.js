@@ -82,12 +82,14 @@ var SqlAutocompleter3 = (function () {
     self.columnAliases = ko.observableArray();
     self.commonTableExpressions = ko.observableArray();
     self.functions = ko.observableArray();
+    self.databases = ko.observableArray();
     self.tables = ko.observableArray();
     self.columns = ko.observableArray();
     self.values = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
+    self.loadingDatabases = ko.observable(false);
     self.loadingTables = ko.observable(false);
     self.loadingColumns = ko.observable(false);
     self.loadingValues = ko.observable(false);
@@ -95,7 +97,8 @@ var SqlAutocompleter3 = (function () {
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
-      var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(), self.functions(), self.tables(), self.columns(), self.values());
+      var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(),
+          self.functions(), self.databases(), self.tables(), self.columns(), self.values());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -170,11 +173,14 @@ var SqlAutocompleter3 = (function () {
     self.columnAliases([]);
     self.commonTableExpressions([]);
     self.functions([]);
+    self.databases([]);
     self.tables([]);
     self.columns([]);
     self.values([]);
 
     self.loadingKeywords(false);
+    self.loadingFunctions(false);
+    self.loadingDatabases(false);
     self.loadingTables(false);
     self.loadingColumns(false);
     self.loadingValues(false);
@@ -189,6 +195,7 @@ var SqlAutocompleter3 = (function () {
     self.handleColumnAliases();
     self.handleCommonTableExpressions();
     self.handleFunctions(colRefDeferral);
+    self.handleDatabases(allDbsDeferral);
     self.handleTables(allDbsDeferral);
     self.handleColumns(colRefDeferral);
     self.handleValues(colRefDeferral);
@@ -332,6 +339,26 @@ var SqlAutocompleter3 = (function () {
         SqlFunctions.suggestFunctions(self.snippet.type(), self.parseResult.suggestFunctions.types || ['T'], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false, functionSuggestions, DEFAULT_WEIGHTS.UDF);
         self.functions(functionSuggestions);
       }
+    }
+  };
+
+  Suggestions.prototype.handleDatabases = function (allDbsDeferral) {
+    var self = this;
+    var suggestDatabases = self.parseResult.suggestDatabases;
+    if (suggestDatabases) {
+      var prefix = suggestDatabases.prependQuestionMark ? '? ' : '';
+      if (suggestDatabases.prependFrom) {
+        prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
+      }
+      var databaseSuggestions = [];
+      self.loadingDatabases(true);
+      allDbsDeferral.done(function (dbs) {
+        dbs.forEach(function (db) {
+          databaseSuggestions.push({ value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''), meta: AutocompleterGlobals.i18n.meta.database, weight: DEFAULT_WEIGHTS.DATABASE })
+        });
+        self.databases(databaseSuggestions);
+        self.loadingDatabases(false);
+      });
     }
   };
 
