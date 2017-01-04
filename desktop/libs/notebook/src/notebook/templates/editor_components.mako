@@ -1580,11 +1580,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <use xlink:href="#hi-warning"></use>
       </svg>
     </div>
-    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">
+    <div style="margin-left: 30px; line-height:20px; vertical-align: middle;">
       <!-- ko if: hasSuggestion -->
       <!-- ko with: suggestion() -->
-        <!-- ko if: queryError.encounteredString().length == 0 -->
+        <!-- ko if: queryError.encounteredString().length == 0 && ! parseError -->
           ${ _('The query is compatible!') } <a href="javascript:void(0)" data-bind="click: function() { $parent.type('impala') }">${ _('Execute with Impala?') }</a>
+        <!-- /ko -->
+        <!-- ko if: parseError -->
+          <span data-bind="text: parseError"></span>
         <!-- /ko -->
         <!-- ko if: queryError.encounteredString -->
           ${ _('Query is not compatible with Impala.') }
@@ -2206,13 +2209,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: queryCompatibility" title="${ _('Get Impala compatibility hints') }">
-            <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
+          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility(); }" title="${ _('Get syntax checks') }">
+            <i class="fa fa-fw fa-check"></i> ${_('Check syntax')}
           </a>
         </li>
         <li>
           <a href="javascript:void(0)" data-bind="click: checkComplexity" title="${ _('Get recommendations on query risks and optimizations') }">
-            <i class="fa fa-fw fa-check"></i> ${_('Check complexity')}
+            <i class="fa fa-fw fa-bolt"></i> ${_('Check complexity')}
+          </a>
+        </li>
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility('impala'); }, visible: type() == 'hive'" title="${ _('Get Impala compatibility hints') }">
+            <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
           </a>
         </li>
         <li>
