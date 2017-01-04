@@ -498,7 +498,7 @@ class Collection2(object):
         'type': 'rolling',
         'value': 'all',
         'from': '',
-        'to': 'NOW',
+        'to': '',
         'truncate': True
       }
     if 'suggest' not in props['collection']:
