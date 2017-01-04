@@ -79,20 +79,23 @@ var SqlAutocompleter3 = (function () {
 
     self.keywords = ko.observableArray();
     self.identifiers = ko.observableArray();
+    self.columnAliases = ko.observableArray();
     self.commonTableExpressions = ko.observableArray();
     self.functions = ko.observableArray();
     self.tables = ko.observableArray();
     self.columns = ko.observableArray();
+    self.values = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
     self.loadingTables = ko.observable(false);
     self.loadingColumns = ko.observable(false);
+    self.loadingValues = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
-      var result = self.keywords().concat(self.identifiers(), self.commonTableExpressions(), self.functions(), self.tables(), self.columns());
+      var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(), self.functions(), self.tables(), self.columns(), self.values());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -161,15 +164,21 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     self.defaultDatabase = parseResult.useDatabase || self.snippet.database();
     self.parseResult = parseResult;
+
     self.keywords([]);
     self.identifiers([]);
+    self.columnAliases([]);
     self.commonTableExpressions([]);
     self.functions([]);
     self.tables([]);
     self.columns([]);
+    self.values([]);
+
     self.loadingKeywords(false);
     self.loadingTables(false);
     self.loadingColumns(false);
+    self.loadingValues(false);
+
     self.filter('');
 
     var colRefDeferral = self.handleColumnReference();
@@ -177,10 +186,51 @@ var SqlAutocompleter3 = (function () {
 
     self.handleKeywords(colRefDeferral);
     self.handleIdentifiers();
+    self.handleColumnAliases();
     self.handleCommonTableExpressions();
     self.handleFunctions(colRefDeferral);
     self.handleTables(allDbsDeferral);
     self.handleColumns(colRefDeferral);
+    self.handleValues(colRefDeferral);
+  };
+
+  /**
+   * For some suggestions the column type is needed, for instance with functions we should only suggest
+   * columns that matches the argument type, cos(|) etc.
+   *
+   * The deferred will always resolve, and the default values is { type: 'T' }
+   *
+   * @returns {object} - jQuery Deferred
+   */
+  Suggestions.prototype.handleColumnReference = function () {
+    var self = this;
+    var colRefDeferral = $.Deferred();
+    if (self.parseResult.colRef) {
+      var colRefCallback = function (data) {
+        if (typeof data.type !== 'undefined') {
+          colRefDeferral.resolve(data);
+        } else if (typeof data.extended_columns !== 'undefined' && data.extended_columns.length === 1) {
+          colRefDeferral.resolve(data.extended_columns[0]);
+        } else {
+          colRefDeferral.resolve({ type: 'T' })
+        }
+      };
+
+      var foundVarRef = self.parseResult.colRef.identifierChain.filter(function (identifier) {
+        return typeof identifier.name !== 'undefined' && identifier.name.indexOf('${') === 0;
+      });
+
+      if (foundVarRef.length > 0) {
+        colRefDeferral.resolve({ type: 'T' });
+      } else {
+        self.fetchFieldsForIdentifiers(self.parseResult.colRef.identifierChain, colRefCallback, function () {
+          colRefDeferral.resolve({ type: 'T' });
+        });
+      }
+    } else {
+      colRefDeferral.resolve({ type: 'T' });
+    }
+    return colRefDeferral;
   };
 
   Suggestions.prototype.loadDatabases = function () {
@@ -233,6 +283,22 @@ var SqlAutocompleter3 = (function () {
         identifierSuggestions.push({ value: identifier.name, meta: identifier.type, weight: DEFAULT_WEIGHTS.IDENTIFIER });
       });
       self.identifiers(identifierSuggestions);
+    }
+  };
+
+  Suggestions.prototype.handleColumnAliases = function () {
+    var self = this;
+    if (self.parseResult.suggestColumnAliases) {
+      var columnAliasSuggestions = [];
+      self.parseResult.suggestColumnAliases.forEach(function (columnAlias) {
+        var type = columnAlias.types && columnAlias.types.length == 1 ? columnAlias.types[0] : 'T';
+        if (type === 'COLREF') {
+          columnAliasSuggestions.push({ value: columnAlias.name, meta: AutocompleterGlobals.i18n.meta.alias, weight: DEFAULT_WEIGHTS.COLUMN });
+        } else {
+          columnAliasSuggestions.push({ value: columnAlias.name, meta: type, weight: DEFAULT_WEIGHTS.COLUMN });
+        }
+      });
+      self.columnAliases(columnAliasSuggestions);
     }
   };
 
@@ -494,43 +560,26 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  /**
-   * For some suggestions the column type is needed, for instance with functions we should only suggest
-   * columns that matches the argument type, cos(|) etc.
-   *
-   * The deferred will always resolve, and the default values is { type: 'T' }
-   *
-   * @returns {object} - jQuery Deferred
-   */
-  Suggestions.prototype.handleColumnReference = function () {
+  Suggestions.prototype.handleValues = function (colRefDeferral) {
     var self = this;
-    var colRefDeferral = $.Deferred();
-    if (self.parseResult.colRef) {
-      var colRefCallback = function (data) {
-        if (typeof data.type !== 'undefined') {
-          colRefDeferral.resolve(data);
-        } else if (typeof data.extended_columns !== 'undefined' && data.extended_columns.length === 1) {
-          colRefDeferral.resolve(data.extended_columns[0]);
-        } else {
-          colRefDeferral.resolve({ type: 'T' })
-        }
-      };
-
-      var foundVarRef = self.parseResult.colRef.identifierChain.filter(function (identifier) {
-        return typeof identifier.name !== 'undefined' && identifier.name.indexOf('${') === 0;
-      });
-
-      if (foundVarRef.length > 0) {
-        colRefDeferral.resolve({ type: 'T' });
-      } else {
-        self.fetchFieldsForIdentifiers(self.parseResult.colRef.identifierChain, colRefCallback, function () {
-          colRefDeferral.resolve({ type: 'T' });
-        });
+    var suggestValues = self.parseResult.suggestValues;
+    if (suggestValues) {
+      var valueSuggestions = [];
+      if (self.parseResult.colRef && self.parseResult.colRef.identifierChain) {
+        valueSuggestions.push({ value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}', meta: AutocompleterGlobals.i18n.meta.variable, weight: DEFAULT_WEIGHTS.VARIABLE });
       }
-    } else {
-      colRefDeferral.resolve({ type: 'T' });
+      colRefDeferral.done(function (colRef) {
+        if (colRef.sample) {
+          var isString = colRef.type === "string";
+          var startQuote = suggestValues.partialQuote ? '' : '\'';
+          var endQuote = typeof suggestValues.missingEndQuote !== 'undefined' && suggestValues.missingEndQuote === false ? '' : suggestValues.partialQuote || '\'';
+          colRef.sample.forEach(function (sample) {
+            valueSuggestions.push({ value: isString ? startQuote + sample + endQuote : new String(sample), meta: AutocompleterGlobals.i18n.meta.value, weight: DEFAULT_WEIGHTS.SAMPLE })
+          });
+        }
+        self.values(valueSuggestions);
+      });
     }
-    return colRefDeferral;
   };
 
   /**

@@ -92,11 +92,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
     AutocompleterGlobals = {
       i18n: {
         meta: {
+          alias:  '${ _('alias') }',
+          commonTableExpression:  '${ _('cte') }',
           keyword: '${ _('keyword') }',
           table: '${ _('table') }',
+          value: '${ _('value') }',
+          variable: '${ _('variable') }',
           view: '${ _('view') }',
-          virtual: '${ _('virtual') }',
-          commonTableExpression:  '${ _('cte') }'
+          virtual: '${ _('virtual') }'
         }
       }
     };
