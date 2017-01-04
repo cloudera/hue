@@ -903,7 +903,7 @@ class TestDocument(object):
                                          description='',
                                          parent_directory=home_dir)
 
-    assert_equal(home_dir.children.count(), 3)
+    assert_equal(home_dir.children.exclude(name='.Trash').count(), 2)
 
     # Cannot create second home directory directly as it will fail in Document2.validate()
     second_home_dir = Document2.objects.create(owner=self.user, parent_directory=None, name='second_home_dir', type='directory')
@@ -918,10 +918,11 @@ class TestDocument(object):
     assert_equal(second_home_dir.children.count(), 1)
 
     merged_home_dir = Directory.objects.get_home_directory(self.user)
-    children = merged_home_dir.children.all().order_by('-last_modified')
-    assert_equal(children.count(), 4)
-    assert_equal(test_doc2.name, children[0].name)
-    assert_equal(test_doc1.name, children[1].name)
+    children = merged_home_dir.children.all()
+    assert_equal(children.exclude(name='.Trash').count(), 3)
+    children_names = [child.name for child in children]
+    assert_true(test_doc2.name in children_names)
+    assert_true(test_doc1.name in children_names)
 
   def test_multiple_trash_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)
@@ -952,10 +953,11 @@ class TestDocument(object):
     merged_trash_dir = Document2.objects.get(name=Document2.TRASH_DIR)
 
     test_doc2.trash()
-    children = merged_trash_dir.children.all().order_by('-last_modified')
+    children = merged_trash_dir.children.all()
     assert_equal(children.count(), 2)
-    assert_equal(test_doc2.name, children[0].name)
-    assert_equal(test_doc1.name, children[1].name)
+    children_names = [child.name for child in children]
+    assert_true(test_doc2.name in children_names)
+    assert_true(test_doc1.name in children_names)
 
 
   def test_document_copy(self):
