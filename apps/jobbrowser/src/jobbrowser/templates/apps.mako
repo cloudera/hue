@@ -132,6 +132,7 @@ ${ assist.assistPanel() }
               <input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" id="jobs"><label for="jobs">${ _('Jobs') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Workflows') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
             </span>
 
             <span class="btn-group">

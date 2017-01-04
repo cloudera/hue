@@ -765,8 +765,8 @@ class SolrApi(object):
         props['gap'] = GAPS.get(collection['timeFilter']['value'])
       elif collection['timeFilter']['type'] == 'fixed':
         props['field'] = collection['timeFilter']['field']
-        props['from'] = collection['timeFilter']['from']
-        props['to'] = collection['timeFilter']['to']
+        props['from'] = collection['timeFilter'].get('from', 'NOW-7DAYS')
+        props['to'] = collection['timeFilter'].get('to', 'NOW')
         props['fixed'] = True
 
     return props
