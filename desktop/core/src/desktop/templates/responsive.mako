@@ -584,36 +584,44 @@ ${ assist.assistPanel() }
           $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
         });
 
-        if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
-          var app = window.location.getParameter('app');
-          switch (app) {
-            case 'fileviewer':
-              if (window.location.getParameter('path') !== '') {
-                self.extraEmbeddableURLParams(window.location.getParameter('path') + '?is_embeddable=true');
+        self.loadAppState = function () {
+          if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
+            var app = window.location.getParameter('app');
+            switch (app) {
+              case 'fileviewer':
+                if (window.location.getParameter('path') !== '') {
+                  self.extraEmbeddableURLParams(window.location.getParameter('path') + '?is_embeddable=true');
+                  self.currentApp(app);
+                }
+                else {
+                  self.currentApp('filebrowser');
+                }
+                break;
+              case 'filebrowser':
+                var previousHash = window.location.hash;
                 self.currentApp(app);
-              }
-              else {
-                self.currentApp('filebrowser');
-              }
-              break;
-            case 'filebrowser':
-              var previousHash = window.location.hash;
-              self.currentApp(app);
-              window.location.hash = previousHash;
-              break;
-            case 'editor':
-              if (window.location.getParameter('type') !== '') {
-                self.changeEditorType(window.location.getParameter('type'));
-              }
-              self.currentApp(app);
-              break;
-            default:
-              self.currentApp(app);
+                window.location.hash = previousHash;
+                break;
+              case 'editor':
+                if (window.location.getParameter('type') !== '') {
+                  self.changeEditorType(window.location.getParameter('type'));
+                }
+                self.currentApp(app);
+                break;
+              default:
+                self.currentApp(app);
+            }
+          }
+          else {
+            self.currentApp('editor');
           }
         }
-        else {
-          self.currentApp('editor');
-        }
+
+        self.loadAppState();
+
+        window.onpopstate = function (event) {
+          self.loadAppState();
+        };
 
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
