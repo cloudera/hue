@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:248 src/pig/templates/app.mako:763
+#: src/pig/api.py:211 src/pig/templates/app.mako:761
 msgid "Unsaved script"
 msgstr "未保存のスクリプト"
 
@@ -87,7 +87,7 @@ msgstr "Pig Editor"
 
 #: src/pig/templates/app.mako:37 src/pig/templates/app.mako:115
 msgid "Editor"
-msgstr "エディタ"
+msgstr "エディター"
 
 #: src/pig/templates/app.mako:38
 msgid "Scripts"
@@ -135,7 +135,9 @@ msgid "New Script"
 msgstr "新しいスクリプト"
 
 #: src/pig/templates/app.mako:65
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "現在、スクリプトは定義されていません。［新しいスクリプト］をクリックして、新しいスクリプトを追加してください。"
 
 #: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
@@ -217,7 +219,9 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "CTRL キーを押したまま Space キーを押すと、オートコンプリート"
 
 #: src/pig/templates/app.mako:170
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "エディタで CTRL キーを押したまま ENTER キーを押すか、CTRL キーを押したまま「.」キーを押して、現在のスクリプトを実行できます"
 
 #: src/pig/templates/app.mako:180
@@ -290,7 +294,9 @@ msgid "Resources"
 msgstr "リソース"
 
 #: src/pig/templates/app.mako:463
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
 msgstr "実行中のスクリプトのワークスペースに追加する HDFS ファイルまたは zip ファイルのパス"
 
 #: src/pig/templates/app.mako:470
@@ -325,7 +331,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "利用可能なログがありません。"
 
-#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1126
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
 msgid "Running"
 msgstr "実行中"
 
@@ -412,7 +418,9 @@ msgid "Are you sure?"
 msgstr "よろしいですか？"
 
 #: src/pig/templates/app.mako:701
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr "現在のスクリプトには未保存の変更があります。変更を破棄してよろしいですか？"
 
 #: src/pig/templates/app.mako:713
@@ -427,47 +435,82 @@ msgstr "このスクリプトに意味のある名前を付けます。"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/pig/templates/app.mako:759
+#: src/pig/templates/app.mako:757
 msgid "The Pig job could not be killed."
 msgstr "Pig ジョブを強制終了できませんでした。"
 
-#: src/pig/templates/app.mako:760
+#: src/pig/templates/app.mako:758
 msgid "Run this Pig script."
 msgstr "この Pig スクリプトを実行します。"
 
-#: src/pig/templates/app.mako:761
+#: src/pig/templates/app.mako:759
 msgid "Stop execution."
 msgstr "実行を停止します。"
 
-#: src/pig/templates/app.mako:762
+#: src/pig/templates/app.mako:760
 msgid "Saved"
 msgstr "保存済み"
 
-#: src/pig/templates/app.mako:1119
+#: src/pig/templates/app.mako:1117
 msgid "Saving"
 msgstr "保存中"
 
-#: src/pig/templates/app.mako:1130
+#: src/pig/templates/app.mako:1128
 msgid "has been saved correctly."
 msgstr "が正しく保存されました。"
 
-#: src/pig/templates/app.mako:1395
+#: src/pig/templates/app.mako:1393
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/pig/templates/app.mako:1402
+#: src/pig/templates/app.mako:1400
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig パラメータおよびオプションの名前と値。例："
 
-#: src/pig/templates/app.mako:1409
+#: src/pig/templates/app.mako:1407
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop プロパティの名前と値。例："
 
-#: src/pig/templates/app.mako:1416
+#: src/pig/templates/app.mako:1414
 msgid "Include files or compressed files"
 msgstr "ファイルまたは圧縮ファイルを含める"
 
-#: src/pig/templates/app.mako:1425
+#: src/pig/templates/app.mako:1423
 msgid "You have unsaved changes in this pig script."
 msgstr "この Pig スクリプトには未保存の変更があります。"
 
+#~ msgid "Edit script"
+#~ msgstr ""
+
+#~ msgid "Edit properties"
+#~ msgstr ""
+
+#~ msgid "Actions"
+#~ msgstr ""
+
+#~ msgid "Current Logs"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Edit properties for"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Logs for"
+#~ msgstr ""
+
+#~ msgid "The pig job could not be killed."
+#~ msgstr ""
+
+#~ msgid "Run this pig script"
+#~ msgstr ""
+
+#~ msgid "Stop the execution"
+#~ msgstr ""
+
+#~ msgid "There was an error with your request!"
+#~ msgstr ""

@@ -1,15 +1,15 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 项目版本\n"
-"Report-Msgid-Bugs-To: 电子邮件地址\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:51-0700\n"
-"Last-Translator: 全名 <电子邮件地址>\n"
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
@@ -38,96 +38,105 @@ msgstr "禁止修改 metastore。"
 msgid "You have must have metastore:write permissions"
 msgstr "您必须具有 metastore:write 写入权限"
 
-#: src/metastore/views.py:104
+#: src/metastore/views.py:106
 #, python-format
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "无法删除 %(databases)s。错误：%(error)s"
 
-#: src/metastore/views.py:105 src/metastore/views.py:221
-#: src/metastore/views.py:223 src/metastore/views.py:346
-#: src/metastore/views.py:506
+#: src/metastore/views.py:107 src/metastore/views.py:250
+#: src/metastore/views.py:252 src/metastore/views.py:378
+#: src/metastore/views.py:539
 msgid "Hive Error"
 msgstr "Hive 错误"
 
-#: src/metastore/views.py:107 src/metastore/templates/metastore.mako:326
+#: src/metastore/views.py:109
 msgid "Do you really want to delete the database(s)?"
 msgstr "是否确实要删除数据库？"
 
-#: src/metastore/views.py:121
+#: src/metastore/views.py:122
+msgid "Alter database requires a properties value of key-value pairs."
+msgstr "更改数据库需要键值对的属性值。"
+
+#: src/metastore/views.py:133
+#, python-format
+msgid "Failed to alter database `%s`: %s"
+msgstr "无法更改数据库 `%s`：%s"
+
+#: src/metastore/views.py:148
 #, python-format
 msgid "Cannot get metadata for database %s: %s"
 msgstr "无法获取数据库 %s 的元数据：%s"
 
-#: src/metastore/views.py:137
+#: src/metastore/views.py:164
 #, python-format
 msgid "Cannot get queries related to table %s.%s: %s"
 msgstr "无法获取与表 %s.%s 相关的查询：%s"
 
-#: src/metastore/views.py:170
+#: src/metastore/views.py:197
 #, python-format
 msgid "Failed to retrieve tables for database: %s"
 msgstr "无法检索数据库的表：%s"
 
-#: src/metastore/views.py:206
+#: src/metastore/views.py:235
 #, python-format
 msgid "Cannot get metadata for table: `%s`.`%s`"
 msgstr "无法获取以下表的元数据：`%s`.`%s`"
 
-#: src/metastore/views.py:290
+#: src/metastore/views.py:321
 #, python-format
 msgid "Failed to alter table `%s`.`%s`: %s"
 msgstr "无法更改表 `%s`.`%s`：%s"
 
-#: src/metastore/views.py:304
+#: src/metastore/views.py:335
 msgid "alter_column requires a column parameter"
 msgstr "alter_column 需要一个列参数"
 
-#: src/metastore/views.py:322
+#: src/metastore/views.py:353
 #, python-format
 msgid "Column `%s`.`%s` `%s` not found"
 msgstr "未找到列 `%s`.`%s` `%s`"
 
-#: src/metastore/views.py:325
+#: src/metastore/views.py:356
 #, python-format
 msgid "Failed to alter column `%s`.`%s` `%s`: %s"
 msgstr "无法更改列 `%s`.`%s` `%s`：%s"
 
-#: src/metastore/views.py:345
+#: src/metastore/views.py:377
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "无法删除 %(tables)s。错误：%(error)s"
 
-#: src/metastore/views.py:348
+#: src/metastore/views.py:380
 msgid "Do you really want to delete the table(s)?"
 msgstr "是否确实要删除表？"
 
-#: src/metastore/views.py:362
+#: src/metastore/views.py:394
 msgid "Cannot read table"
 msgstr "无法读取表"
 
-#: src/metastore/views.py:384
+#: src/metastore/views.py:416
 msgid "Can't load the data: "
 msgstr "无法加载数据： "
 
-#: src/metastore/views.py:406
+#: src/metastore/views.py:438
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "表 '%(table)s' 未分区。"
 
-#: src/metastore/views.py:476
+#: src/metastore/views.py:509
 msgid "Cannot browse partition"
 msgstr "无法浏览分区"
 
-#: src/metastore/views.py:487
+#: src/metastore/views.py:520
 msgid "Cannot read partition"
 msgstr "无法读取分区"
 
-#: src/metastore/views.py:505
+#: src/metastore/views.py:538
 #, python-format
 msgid "Failed to remove %(partition)s.  Error: %(error)s"
 msgstr "无法删除 %(partition)s。错误：%(error)s"
 
-#: src/metastore/views.py:508
+#: src/metastore/views.py:541
 msgid "Do you really want to delete the partition(s)?"
 msgstr "是否确实要删除分区？"
 
@@ -135,692 +144,587 @@ msgstr "是否确实要删除分区？"
 msgid "Metastore Manager"
 msgstr "Metastore Manager"
 
-#: src/metastore/templates/components.mako:37
-msgid "Enhance"
-msgstr "增强"
-
-#: src/metastore/templates/components.mako:56
-#: src/metastore/templates/databases.mako:23
-#: src/metastore/templates/metastore.mako:67
+#: src/metastore/templates/components.mako:49
+#: src/metastore/templates/metastore.mako:72
 msgid "Databases"
 msgstr "数据库"
 
 #: src/metastore/templates/confirm.mako:25
-#: src/metastore/templates/databases.mako:88
-#: src/metastore/templates/describe_partitions.mako:164
-#: src/metastore/templates/tables.mako:101
+#: src/metastore/templates/describe_partitions.mako:168
 msgid "Confirm action"
 msgstr "确认操作"
 
 #: src/metastore/templates/confirm.mako:33
-#: src/metastore/templates/databases.mako:92
-#: src/metastore/templates/describe_partitions.mako:168
-#: src/metastore/templates/metastore.mako:330
-#: src/metastore/templates/metastore.mako:528
-#: src/metastore/templates/tables.mako:105
+#: src/metastore/templates/describe_partitions.mako:172
+#: src/metastore/templates/metastore.mako:324
+#: src/metastore/templates/metastore.mako:522
 msgid "Yes"
 msgstr "是"
 
 #: src/metastore/templates/confirm.mako:34
-#: src/metastore/templates/metastore.mako:329
-#: src/metastore/templates/metastore.mako:527
-#: src/metastore/templates/metastore.mako:1187
+#: src/metastore/templates/metastore.mako:323
+#: src/metastore/templates/metastore.mako:521
+#: src/metastore/templates/metastore.mako:1154
 msgid "No"
 msgstr "否"
 
-#: src/metastore/templates/databases.mako:32
-msgid "actions"
-msgstr "操作"
-
-#: src/metastore/templates/databases.mako:33
-#: src/metastore/templates/metastore.mako:573
-msgid "Create a new database"
-msgstr "创建新数据库"
-
-#: src/metastore/templates/databases.mako:45
-msgid "Search for database name"
-msgstr "搜索数据库名称"
-
-#: src/metastore/templates/databases.mako:50
-#: src/metastore/templates/metastore.mako:320
-msgid "Drop the selected databases"
-msgstr "拖放所选数据库"
-
-#: src/metastore/templates/databases.mako:50
-#: src/metastore/templates/describe_table.mako:75
-#: src/metastore/templates/metastore.mako:320
-#: src/metastore/templates/metastore.mako:434
-#: src/metastore/templates/tables.mako:62
-msgid "Drop"
-msgstr "丢弃"
-
-#: src/metastore/templates/databases.mako:59
-#: src/metastore/templates/metastore.mako:343
-msgid "Database Name"
-msgstr "数据库名称"
-
-#: src/metastore/templates/databases.mako:91
-#: src/metastore/templates/describe_partitions.mako:167
-#: src/metastore/templates/describe_table.mako:194
-#: src/metastore/templates/tables.mako:104
-#: src/metastore/templates/popups/load_data.mako:61
-msgid "Cancel"
-msgstr "取消"
-
-#: src/metastore/templates/databases.mako:124
-#: src/metastore/templates/describe_table.mako:216
-#: src/metastore/templates/describe_table.mako:258
-#: src/metastore/templates/metastore.mako:1267
-#: src/metastore/templates/sample.mako:71
-#: src/metastore/templates/tables.mako:137
-msgid "No data available"
-msgstr "没有可用数据"
-
-#: src/metastore/templates/databases.mako:125
-#: src/metastore/templates/describe_table.mako:217
-#: src/metastore/templates/describe_table.mako:259
-#: src/metastore/templates/metastore.mako:1268
-#: src/metastore/templates/sample.mako:72
-#: src/metastore/templates/tables.mako:138
-msgid "No matching records"
-msgstr "没有匹配记录"
-
-#: src/metastore/templates/describe_partitions.mako:28
+#: src/metastore/templates/describe_partitions.mako:25
 #, python-format
 msgid "Table Partitions: %(tableName)s"
 msgstr "表分区：%(tableName)s"
 
-#: src/metastore/templates/describe_partitions.mako:52
-#: src/metastore/templates/describe_partitions.mako:63
-#: src/metastore/templates/metastore.mako:312
-#: src/metastore/templates/metastore.mako:1131
+#: src/metastore/templates/describe_partitions.mako:56
+#: src/metastore/templates/describe_partitions.mako:67
+#: src/metastore/templates/metastore.mako:1087
+#: src/metastore/templates/metastore.mako:1097
 msgid "Toggle Assist"
 msgstr "切换帮助"
 
-#: src/metastore/templates/describe_partitions.mako:101
+#: src/metastore/templates/describe_partitions.mako:105
 msgid "Value to filter..."
 msgstr "要筛选的值..."
 
-#: src/metastore/templates/describe_partitions.mako:106
+#: src/metastore/templates/describe_partitions.mako:110
 msgid "Add"
 msgstr "添加"
 
-#: src/metastore/templates/describe_partitions.mako:108
+#: src/metastore/templates/describe_partitions.mako:112
 msgid "Sort Desc"
 msgstr "降序"
 
-#: src/metastore/templates/describe_partitions.mako:109
+#: src/metastore/templates/describe_partitions.mako:113
 msgid "Filter"
 msgstr "筛选器"
 
-#: src/metastore/templates/describe_partitions.mako:113
+#: src/metastore/templates/describe_partitions.mako:117
 msgid "Add a filter"
 msgstr "添加筛选器"
 
-#: src/metastore/templates/describe_partitions.mako:120
+#: src/metastore/templates/describe_partitions.mako:124
 msgid "Delete the selected partitions"
 msgstr "删除所选分区"
 
-#: src/metastore/templates/describe_partitions.mako:120
+#: src/metastore/templates/describe_partitions.mako:124
 msgid "Drop partition(s)"
 msgstr "拖放分区"
 
-#: src/metastore/templates/describe_partitions.mako:132
-#: src/metastore/templates/metastore.mako:288
-#: src/metastore/templates/metastore.mako:391
+#: src/metastore/templates/describe_partitions.mako:136
+#: src/metastore/templates/metastore.mako:276
+#: src/metastore/templates/metastore.mako:378
 msgid "Location"
 msgstr "位置"
 
-#: src/metastore/templates/describe_partitions.mako:144
+#: src/metastore/templates/describe_partitions.mako:148
 msgid "View Partition Files"
 msgstr "查看分区文件"
 
-#: src/metastore/templates/describe_partitions.mako:148
+#: src/metastore/templates/describe_partitions.mako:152
 #, python-format
 msgid "The table %s has no partitions."
 msgstr "表 %s 中无分区。"
 
-#: src/metastore/templates/describe_partitions.mako:274
+#: src/metastore/templates/describe_partitions.mako:171
+#: src/metastore/templates/popups/load_data.mako:61
+msgid "Cancel"
+msgstr "取消"
+
+#: src/metastore/templates/describe_partitions.mako:266
 msgid "There was a problem loading the databases"
 msgstr "加载数据库时出现问题"
 
-#: src/metastore/templates/describe_partitions.mako:275
+#: src/metastore/templates/describe_partitions.mako:267
 msgid "There was a problem loading the table preview."
 msgstr "加载表预览时出现问题。"
 
-#: src/metastore/templates/describe_table.mako:28
-#: src/metastore/templates/metastore.mako:251
-#: src/metastore/templates/metastore.mako:429
-#: src/metastore/templates/metastore.mako:498
-#: src/metastore/templates/tables.mako:59
-msgid "View"
-msgstr "查看"
-
-#: src/metastore/templates/describe_table.mako:30
-#: src/metastore/templates/metastore.mako:254
-#: src/metastore/templates/metastore.mako:495
-msgid "Table"
-msgstr "表"
-
-#: src/metastore/templates/describe_table.mako:33
-#, python-format
-msgid "%s : %s"
-msgstr "%s : %s"
-
-#: src/metastore/templates/describe_table.mako:44
-#: src/metastore/templates/describe_table.mako:157
-#: src/metastore/templates/metastore.mako:105
-#: src/metastore/templates/metastore.mako:168
-msgid "Name"
-msgstr "名称"
-
-#: src/metastore/templates/describe_table.mako:45
-#: src/metastore/templates/metastore.mako:106
-#: src/metastore/templates/metastore.mako:169
-#: src/metastore/templates/metastore.mako:249
-#: src/metastore/templates/metastore.mako:456
-msgid "Type"
-msgstr "类型"
-
-#: src/metastore/templates/describe_table.mako:46
-#: src/metastore/templates/describe_table.mako:159
-#: src/metastore/templates/metastore.mako:110
-#: src/metastore/templates/metastore.mako:374
-#: src/metastore/templates/metastore.mako:451
-msgid "Comment"
-msgstr "备注"
-
-#: src/metastore/templates/describe_table.mako:53
-#: src/metastore/templates/metastore.mako:132
-msgid "Scroll to the column"
-msgstr "滚动至列"
-
-#: src/metastore/templates/describe_table.mako:69
-#: src/metastore/templates/tables.mako:43
-msgid "Actions"
-msgstr "操作"
-
-#: src/metastore/templates/describe_table.mako:71
-#: src/metastore/templates/metastore.mako:598
-msgid "Import Data"
-msgstr "导入数据"
-
-#: src/metastore/templates/describe_table.mako:73
-#: src/metastore/templates/metastore.mako:431
-#: src/metastore/templates/metastore.mako:601
-#: src/metastore/templates/metastore.mako:603
-#: src/metastore/templates/tables.mako:60
-msgid "Browse Data"
-msgstr "浏览数据"
-
-#: src/metastore/templates/describe_table.mako:77
-#: src/metastore/templates/metastore.mako:609
-msgid "View File Location"
-msgstr "查看文件位置"
-
-#: src/metastore/templates/describe_table.mako:79
-#: src/metastore/templates/metastore.mako:611
-msgid "Show Partitions"
-msgstr "显示分区"
-
-#: src/metastore/templates/describe_table.mako:90
-msgid "Comment:"
-msgstr "备注："
-
-#: src/metastore/templates/describe_table.mako:94
-#: src/metastore/templates/metastore.mako:454
-#: src/metastore/templates/metastore.mako:649
-#: src/metastore/templates/metastore.mako:700
-#: src/metastore/templates/metastore.mako:794
-msgid "Columns"
-msgstr "列"
-
-#: src/metastore/templates/describe_table.mako:96
-msgid "Partition Columns"
-msgstr "分区列"
-
-#: src/metastore/templates/describe_table.mako:99
-#: src/metastore/templates/metastore.mako:660
-#: src/metastore/templates/metastore.mako:798
-msgid "Sample"
-msgstr "样本"
-
-#: src/metastore/templates/describe_table.mako:101
-#: src/metastore/templates/metastore.mako:247
-msgid "Properties"
-msgstr "属性"
-
-#: src/metastore/templates/describe_table.mako:119
-#: src/metastore/templates/sample.mako:24
-msgid "Error!"
-msgstr "错误！"
-
-#: src/metastore/templates/describe_table.mako:158
-msgid "Value"
-msgstr "值"
-
-#: src/metastore/templates/describe_table.mako:187
-#: src/metastore/templates/metastore.mako:606
-#: src/metastore/templates/metastore.mako:1180
-msgid "Drop Table"
-msgstr "删除表"
-
-#: src/metastore/templates/describe_table.mako:195
-#: src/metastore/templates/metastore.mako:1188
-msgid "Yes, drop this table"
-msgstr "是，拖放此表"
-
-#: src/metastore/templates/metastore.mako:32
+#: src/metastore/templates/metastore.mako:31
 msgid "Metastore"
 msgstr "元存储"
 
-#: src/metastore/templates/metastore.mako:80
+#: src/metastore/templates/metastore.mako:85
 msgid "Edit path"
 msgstr "编辑路径"
 
 #: src/metastore/templates/metastore.mako:108
-#: src/metastore/templates/metastore.mako:453
+#: src/metastore/templates/metastore.mako:156
+msgid "Name"
+msgstr "名称"
+
+#: src/metastore/templates/metastore.mako:109
+#: src/metastore/templates/metastore.mako:157
+#: src/metastore/templates/metastore.mako:237
+#: src/metastore/templates/metastore.mako:454
+msgid "Type"
+msgstr "类型"
+
+#: src/metastore/templates/metastore.mako:111
+#: src/metastore/templates/metastore.mako:405
+#: src/metastore/templates/metastore.mako:451
+#: src/metastore/templates/metastore.mako:699
+#: src/metastore/templates/metastore.mako:992
 msgid "Popularity"
 msgstr "热门程度"
 
-#: src/metastore/templates/metastore.mako:151
+#: src/metastore/templates/metastore.mako:113
+#: src/metastore/templates/metastore.mako:367
+#: src/metastore/templates/metastore.mako:449
+msgid "Comment"
+msgstr "备注"
+
+#: src/metastore/templates/metastore.mako:119
+#: src/metastore/templates/metastore.mako:462
+msgid "Show details"
+msgstr "显示详细信息"
+
+#: src/metastore/templates/metastore.mako:120
+msgid "Scroll to the column"
+msgstr "滚动至列"
+
+#: src/metastore/templates/metastore.mako:139
 msgid "Add a comment..."
 msgstr "添加备注..."
 
-#: src/metastore/templates/metastore.mako:191
+#: src/metastore/templates/metastore.mako:179
 msgid "Values"
 msgstr "值"
 
-#: src/metastore/templates/metastore.mako:192
+#: src/metastore/templates/metastore.mako:180
 msgid "Spec"
 msgstr "特定"
 
-#: src/metastore/templates/metastore.mako:193
+#: src/metastore/templates/metastore.mako:181
 msgid "Browse"
 msgstr "浏览"
 
-#: src/metastore/templates/metastore.mako:203
+#: src/metastore/templates/metastore.mako:191
 msgid "Data"
 msgstr "数据"
 
-#: src/metastore/templates/metastore.mako:204
+#: src/metastore/templates/metastore.mako:192
 msgid "Files"
 msgstr "文件"
 
-#: src/metastore/templates/metastore.mako:237
+#: src/metastore/templates/metastore.mako:225
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/metastore/templates/metastore.mako:239
-msgid "If the sample contains a large number of columns, click a row to select a column to jump to"
+#: src/metastore/templates/metastore.mako:227
+msgid ""
+"If the sample contains a large number of columns, click a row to select a"
+" column to jump to"
 msgstr "如果示例包含大量列，则单击行以选择要跳转至的列"
 
-#: src/metastore/templates/metastore.mako:257
-#: src/metastore/templates/metastore.mako:384
+#: src/metastore/templates/metastore.mako:235
+#: src/metastore/templates/metastore.mako:366
+msgid "Properties"
+msgstr "属性"
+
+#: src/metastore/templates/metastore.mako:239
+#: src/metastore/templates/metastore.mako:427
+#: src/metastore/templates/metastore.mako:488
+msgid "View"
+msgstr "查看"
+
+#: src/metastore/templates/metastore.mako:242
+#: src/metastore/templates/metastore.mako:485
+msgid "Table"
+msgstr "表"
+
+#: src/metastore/templates/metastore.mako:245
+#: src/metastore/templates/metastore.mako:374
 msgid "Owner"
 msgstr "所有者"
 
-#: src/metastore/templates/metastore.mako:260
+#: src/metastore/templates/metastore.mako:248
 msgid "Created"
 msgstr "已创建"
 
-#: src/metastore/templates/metastore.mako:261
+#: src/metastore/templates/metastore.mako:249
 msgid "Format"
 msgstr "格式"
 
-#: src/metastore/templates/metastore.mako:263
+#: src/metastore/templates/metastore.mako:251
 msgid "Compressed"
 msgstr "已压缩"
 
-#: src/metastore/templates/metastore.mako:264
+#: src/metastore/templates/metastore.mako:252
 msgid "Not compressed"
 msgstr "未压缩"
 
-#: src/metastore/templates/metastore.mako:273
-#: src/metastore/templates/metastore.mako:371
+#: src/metastore/templates/metastore.mako:261
 msgid "Stats"
 msgstr "统计数据"
 
-#: src/metastore/templates/metastore.mako:283
+#: src/metastore/templates/metastore.mako:271
 msgid "The column stats for this table are not accurate"
 msgstr "此表的列状态不准确"
 
-#: src/metastore/templates/metastore.mako:292
+#: src/metastore/templates/metastore.mako:280
 msgid "Last modified by"
 msgstr "上次修改者"
 
-#: src/metastore/templates/metastore.mako:295
+#: src/metastore/templates/metastore.mako:283
 msgid "Last modified time"
 msgstr "上次修改时间"
 
-#: src/metastore/templates/metastore.mako:298
+#: src/metastore/templates/metastore.mako:286
 msgid "Number of files"
 msgstr "文件数"
 
-#: src/metastore/templates/metastore.mako:298
+#: src/metastore/templates/metastore.mako:286
 msgid "files"
 msgstr "文件"
 
-#: src/metastore/templates/metastore.mako:301
+#: src/metastore/templates/metastore.mako:289
 msgid "Number of rows"
 msgstr "行数"
 
-#: src/metastore/templates/metastore.mako:301
+#: src/metastore/templates/metastore.mako:289
 msgid "rows"
 msgstr "行"
 
-#: src/metastore/templates/metastore.mako:304
+#: src/metastore/templates/metastore.mako:292
 msgid "Total size"
 msgstr "总大小"
 
-#: src/metastore/templates/metastore.mako:318
+#: src/metastore/templates/metastore.mako:302
 msgid "Search for a database..."
 msgstr "搜索数据库..."
 
-#: src/metastore/templates/metastore.mako:357
+#: src/metastore/templates/metastore.mako:304
+msgid "Drop the selected databases"
+msgstr "拖放所选数据库"
+
+#: src/metastore/templates/metastore.mako:304
+#: src/metastore/templates/metastore.mako:432
+msgid "Drop"
+msgstr "丢弃"
+
+#: src/metastore/templates/metastore.mako:310
+msgid "Warning: This will drop all tables and objects within the database."
+msgstr "警告：这将丢弃数据库中的所有表和对象。"
+
+#: src/metastore/templates/metastore.mako:312
+msgid "Do you really want to delete the following database(s)?"
+msgstr "是否确实要删除以下数据库？"
+
+#: src/metastore/templates/metastore.mako:337
+msgid "Database Name"
+msgstr "数据库名称"
+
+#: src/metastore/templates/metastore.mako:351
 msgid "No databases found"
 msgstr "未找到数据库"
 
-#: src/metastore/templates/metastore.mako:379
+#: src/metastore/templates/metastore.mako:372
 msgid "No comment."
 msgstr "无备注。"
 
-#: src/metastore/templates/metastore.mako:398
-msgid "Parameters"
-msgstr "参数"
-
-#: src/metastore/templates/metastore.mako:413
-msgid "Popular tables"
-msgstr "常用表"
-
-#: src/metastore/templates/metastore.mako:426
-#: src/metastore/templates/tables.mako:24
-msgid "Tables"
-msgstr "表"
-
-#: src/metastore/templates/metastore.mako:428
-msgid "Search for a table..."
-msgstr "搜索表..."
-
-#: src/metastore/templates/metastore.mako:429
-#: src/metastore/templates/metastore.mako:430
-#: src/metastore/templates/tables.mako:59
-#: src/metastore/templates/tables.mako:60
-msgid "Browse the selected table"
-msgstr "浏览所选表"
-
-#: src/metastore/templates/metastore.mako:434
-#: src/metastore/templates/tables.mako:62
-msgid "Delete the selected tables"
-msgstr "删除所选表"
-
-#: src/metastore/templates/metastore.mako:439
-msgid "View the selected table"
-msgstr "查看所选表"
-
-#: src/metastore/templates/metastore.mako:440
-#: src/metastore/templates/metastore.mako:594
-msgid "View in Optimizer"
-msgstr "在优化器中查看"
-
-#: src/metastore/templates/metastore.mako:450
-#: src/metastore/templates/metastore.mako:1035
-#: src/metastore/templates/tables.mako:71
-msgid "Table Name"
-msgstr "表名"
-
-#: src/metastore/templates/metastore.mako:503
-msgid "Fact table"
-msgstr "事实数据表"
-
-#: src/metastore/templates/metastore.mako:506
-msgid "Dimension table"
-msgstr "维度表"
-
-#: src/metastore/templates/metastore.mako:514
-msgid "No tables found."
-msgstr "未找到表。"
-
-#: src/metastore/templates/metastore.mako:524
-msgid "Do you really want to drop the selected table(s)?"
-msgstr "是否确定要拖放所选表？"
-
-#: src/metastore/templates/metastore.mako:550
-#: src/metastore/templates/metastore.mako:629
+#: src/metastore/templates/metastore.mako:384
+#: src/metastore/templates/metastore.mako:601
 msgid "Tagging"
 msgstr "标记"
 
-#: src/metastore/templates/metastore.mako:551
-#: src/metastore/templates/metastore.mako:630
-msgid "Tags"
-msgstr "标记"
+#: src/metastore/templates/metastore.mako:394
+msgid "Parameters"
+msgstr "参数"
 
-#: src/metastore/templates/metastore.mako:557
-#: src/metastore/templates/metastore.mako:636
-msgid "No tags"
-msgstr "无标记"
+#: src/metastore/templates/metastore.mako:424
+msgid "Tables"
+msgstr "表"
 
-#: src/metastore/templates/metastore.mako:561
-#: src/metastore/templates/metastore.mako:640
-msgid "Save tag"
-msgstr "保存标记"
+#: src/metastore/templates/metastore.mako:426
+msgid "Search for a table..."
+msgstr "搜索表..."
 
-#: src/metastore/templates/metastore.mako:563
-#: src/metastore/templates/metastore.mako:642
-msgid "Add a tag"
-msgstr "添加标记"
+#: src/metastore/templates/metastore.mako:427
+msgid "Browse the selected table"
+msgstr "浏览所选表"
 
+#: src/metastore/templates/metastore.mako:428
+msgid "Query the selected table"
+msgstr "查询所选表"
+
+#: src/metastore/templates/metastore.mako:429
+#: src/metastore/templates/metastore.mako:701
+msgid "Query"
+msgstr "查询"
+
+#: src/metastore/templates/metastore.mako:432
+msgid "Delete the selected tables"
+msgstr "删除所选表"
+
+#: src/metastore/templates/metastore.mako:437
+msgid "View the selected table"
+msgstr "查看所选表"
+
+#: src/metastore/templates/metastore.mako:438
 #: src/metastore/templates/metastore.mako:571
-#: src/metastore/templates/metastore.mako:580
-#: src/metastore/templates/metastore.mako:590
+msgid "View in Optimizer"
+msgstr "在优化器中查看"
+
+#: src/metastore/templates/metastore.mako:448
+#: src/metastore/templates/metastore.mako:993
+msgid "Table Name"
+msgstr "表名"
+
+#: src/metastore/templates/metastore.mako:452
+#: src/metastore/templates/metastore.mako:612
+#: src/metastore/templates/metastore.mako:663
+#: src/metastore/templates/metastore.mako:761
+msgid "Columns"
+msgstr "列"
+
+#: src/metastore/templates/metastore.mako:493
+msgid "Fact table"
+msgstr "事实数据表"
+
+#: src/metastore/templates/metastore.mako:496
+msgid "Dimension table"
+msgstr "维度表"
+
+#: src/metastore/templates/metastore.mako:503
+msgid "No tables found."
+msgstr "未找到表。"
+
+#: src/metastore/templates/metastore.mako:513
+msgid "Do you really want to drop the selected table(s)?"
+msgstr "是否确定要拖放所选表？"
+
+#: src/metastore/templates/metastore.mako:517
+msgid "Skip the trash"
+msgstr "跳过垃圾桶"
+
+#: src/metastore/templates/metastore.mako:543
+#: src/metastore/templates/metastore.mako:552
+#: src/metastore/templates/metastore.mako:569
 msgid "Refresh"
 msgstr "刷新"
 
-#: src/metastore/templates/metastore.mako:582
-#: src/metastore/templates/tables.mako:44
+#: src/metastore/templates/metastore.mako:545
+msgid "Create a new database"
+msgstr "创建新数据库"
+
+#: src/metastore/templates/metastore.mako:554
 msgid "Create a new table from a file"
 msgstr "从文件中创建一个新表"
 
-#: src/metastore/templates/metastore.mako:583
-#: src/metastore/templates/tables.mako:45
+#: src/metastore/templates/metastore.mako:555
 msgid "Create a new table manually"
 msgstr "手动创建一个新表"
 
-#: src/metastore/templates/metastore.mako:606
+#: src/metastore/templates/metastore.mako:565
+msgid "Query the table"
+msgstr "查询此表"
+
+#: src/metastore/templates/metastore.mako:567
+msgid "Browse Data"
+msgstr "浏览数据"
+
+#: src/metastore/templates/metastore.mako:575
+msgid "Import Data"
+msgstr "导入数据"
+
+#: src/metastore/templates/metastore.mako:578
 msgid "Drop View"
 msgstr "删除视图"
 
-#: src/metastore/templates/metastore.mako:655
-#: src/metastore/templates/metastore.mako:666
-#: src/metastore/templates/metastore.mako:682
+#: src/metastore/templates/metastore.mako:578
+#: src/metastore/templates/metastore.mako:1147
+msgid "Drop Table"
+msgstr "删除表"
+
+#: src/metastore/templates/metastore.mako:581
+msgid "View File Location"
+msgstr "查看文件位置"
+
+#: src/metastore/templates/metastore.mako:583
+msgid "Show Partitions"
+msgstr "显示分区"
+
+#: src/metastore/templates/metastore.mako:618
+#: src/metastore/templates/metastore.mako:629
+#: src/metastore/templates/metastore.mako:645
 msgid "View more..."
 msgstr "查看更多..."
 
-#: src/metastore/templates/metastore.mako:669
-#: src/metastore/templates/metastore.mako:723
+#: src/metastore/templates/metastore.mako:623
+#: src/metastore/templates/metastore.mako:765
+msgid "Sample"
+msgstr "样本"
+
+#: src/metastore/templates/metastore.mako:632
+#: src/metastore/templates/metastore.mako:686
 msgid "The view does not contain any data."
 msgstr "视图不含任何数据。"
 
-#: src/metastore/templates/metastore.mako:670
-#: src/metastore/templates/metastore.mako:724
+#: src/metastore/templates/metastore.mako:633
+#: src/metastore/templates/metastore.mako:687
 msgid "The table does not contain any data."
 msgstr "表不含任何数据。"
 
-#: src/metastore/templates/metastore.mako:677
-#: src/metastore/templates/metastore.mako:704
-#: src/metastore/templates/metastore.mako:796
+#: src/metastore/templates/metastore.mako:640
+#: src/metastore/templates/metastore.mako:667
+#: src/metastore/templates/metastore.mako:763
 msgid "Partitions"
 msgstr "分区"
 
-#: src/metastore/templates/metastore.mako:685
-#: src/metastore/templates/metastore.mako:707
+#: src/metastore/templates/metastore.mako:648
+#: src/metastore/templates/metastore.mako:670
 msgid "The partition does not contain any values"
 msgstr "分区不含任何值"
 
-#: src/metastore/templates/metastore.mako:711
+#: src/metastore/templates/metastore.mako:674
 msgid "View all"
 msgstr "查看全部"
 
-#: src/metastore/templates/metastore.mako:735
-#: src/metastore/templates/metastore.mako:1033
+#: src/metastore/templates/metastore.mako:698
+#: src/metastore/templates/metastore.mako:991
 msgid "Id"
 msgstr "Id"
 
-#: src/metastore/templates/metastore.mako:736
-msgid "Count"
-msgstr "计数"
-
-#: src/metastore/templates/metastore.mako:737
+#: src/metastore/templates/metastore.mako:700
 msgid "Character"
 msgstr "字符"
 
-#: src/metastore/templates/metastore.mako:738
+#: src/metastore/templates/metastore.mako:702
 msgid "Complexity"
 msgstr "复杂性"
 
-#: src/metastore/templates/metastore.mako:739
+#: src/metastore/templates/metastore.mako:703
 msgid "Hive Compatible"
 msgstr "与 Hive 兼容"
 
-#: src/metastore/templates/metastore.mako:740
+#: src/metastore/templates/metastore.mako:704
 msgid "Impala Compatible"
 msgstr "与 Impala 兼容"
 
-#: src/metastore/templates/metastore.mako:755
+#: src/metastore/templates/metastore.mako:722
 msgid "No queries found for the current table."
 msgstr "未找到当前表的查询。"
 
-#: src/metastore/templates/metastore.mako:785
+#: src/metastore/templates/metastore.mako:752
 msgid "Add a description..."
 msgstr "添加描述..."
 
-#: src/metastore/templates/metastore.mako:793
+#: src/metastore/templates/metastore.mako:760
 msgid "Overview"
 msgstr "概述"
 
-#: src/metastore/templates/metastore.mako:801
+#: src/metastore/templates/metastore.mako:768
 msgid "Permissions"
 msgstr "权限"
 
-#: src/metastore/templates/metastore.mako:802
+#: src/metastore/templates/metastore.mako:769
 msgid "Queries"
 msgstr "查询"
 
-#: src/metastore/templates/metastore.mako:803
+#: src/metastore/templates/metastore.mako:770
 msgid "Joins"
 msgstr "连接"
 
-#: src/metastore/templates/metastore.mako:806
+#: src/metastore/templates/metastore.mako:773
 msgid "Relationships"
 msgstr "关系"
 
-#: src/metastore/templates/metastore.mako:809
+#: src/metastore/templates/metastore.mako:776
 msgid "Details"
 msgstr "详细信息"
 
-#: src/metastore/templates/metastore.mako:812
-msgid "Open in editor"
-msgstr "在编辑器中打开"
-
-#: src/metastore/templates/metastore.mako:817
+#: src/metastore/templates/metastore.mako:788
 msgid "Search for a column..."
 msgstr "搜索列..."
 
-#: src/metastore/templates/metastore.mako:1034
-msgid "Join Percentage"
-msgstr "连接百分比"
-
-#: src/metastore/templates/metastore.mako:1036
+#: src/metastore/templates/metastore.mako:994
 msgid "Join Column"
 msgstr "连接列"
 
-#: src/metastore/templates/metastore.mako:1037
+#: src/metastore/templates/metastore.mako:995
 msgid "Join counts"
 msgstr "连接计数"
 
-#: src/metastore/templates/metastore.mako:1059
+#: src/metastore/templates/metastore.mako:1017
 msgid "Inputs"
 msgstr "输入"
 
-#: src/metastore/templates/metastore.mako:1065
+#: src/metastore/templates/metastore.mako:1023
 msgid "Not inputs"
 msgstr "无输入"
 
-#: src/metastore/templates/metastore.mako:1071
+#: src/metastore/templates/metastore.mako:1029
 msgid "Targets"
 msgstr "目标"
 
-#: src/metastore/templates/metastore.mako:1077
+#: src/metastore/templates/metastore.mako:1035
 msgid "Not targets"
 msgstr "无目标"
 
-#: src/metastore/templates/metastore.mako:1083
+#: src/metastore/templates/metastore.mako:1041
 msgid "Source query"
 msgstr "源查询"
 
-#: src/metastore/templates/metastore.mako:1089
+#: src/metastore/templates/metastore.mako:1047
 msgid "No source query"
 msgstr "无源查询"
 
-#: src/metastore/templates/metastore.mako:1095
+#: src/metastore/templates/metastore.mako:1053
 msgid "Target queries"
 msgstr "目标查询"
 
-#: src/metastore/templates/metastore.mako:1103
+#: src/metastore/templates/metastore.mako:1061
 msgid "Not target queries"
 msgstr "无目标查询"
 
-#: src/metastore/templates/metastore.mako:1109
+#: src/metastore/templates/metastore.mako:1067
 msgid "Lineage"
 msgstr "沿袭"
 
-#: src/metastore/templates/metastore.mako:1111
+#: src/metastore/templates/metastore.mako:1069
 msgid "Open in Navigator "
 msgstr "在 Navigator 中打开 "
 
-#: src/metastore/templates/metastore.mako:1112
+#: src/metastore/templates/metastore.mako:1070
 msgid "View in Navigator"
 msgstr "在 Navigator 中查看"
 
-#: src/metastore/templates/metastore.mako:1183
+#: src/metastore/templates/metastore.mako:1150
 msgid "Do you really want to drop the table"
 msgstr "是否确实要删除表"
 
-#: src/metastore/templates/metastore.mako:1233
+#: src/metastore/templates/metastore.mako:1155
+msgid "Yes, drop this table"
+msgstr "是，拖放此表"
+
+#: src/metastore/templates/metastore.mako:1189
 msgid "An error occurred fetching the table details. Please try again."
 msgstr "获取表详细信息时出错。请重试。"
 
-#: src/metastore/templates/metastore.mako:1234
+#: src/metastore/templates/metastore.mako:1190
 msgid "An error occurred fetching the table fields. Please try again."
 msgstr "获取表字段时出错。请重试。"
 
-#: src/metastore/templates/metastore.mako:1235
+#: src/metastore/templates/metastore.mako:1191
 msgid "An error occurred fetching the table sample. Please try again."
 msgstr "获取表样本时出错。请重试。"
 
-#: src/metastore/templates/metastore.mako:1236
+#: src/metastore/templates/metastore.mako:1192
 msgid "An error occurred refreshing the table stats. Please try again."
 msgstr "刷新表状态时出错。请重试。"
 
-#: src/metastore/templates/metastore.mako:1237
+#: src/metastore/templates/metastore.mako:1193
 msgid "There was a problem loading the databases. Please try again."
 msgstr "加载数据库时出现问题。请重试。"
 
-#: src/metastore/templates/metastore.mako:1238
+#: src/metastore/templates/metastore.mako:1194
 msgid "There was a problem loading the table preview. Please try again."
 msgstr "加载表预览时出现问题。请重试。"
 
-#: src/metastore/templates/tables.mako:35
-msgid "database"
-msgstr "数据库"
+#: src/metastore/templates/metastore.mako:1225
+msgid "No data available"
+msgstr "没有可用数据"
 
-#: src/metastore/templates/tables.mako:55
-msgid "Search for table name"
-msgstr "搜索表名"
-
-#: src/metastore/templates/tables.mako:151
-msgid "Oops, no database found!"
-msgstr "很抱歉，找不到数据库！"
+#: src/metastore/templates/metastore.mako:1226
+msgid "No matching records"
+msgstr "没有匹配记录"
 
 #: src/metastore/templates/util.mako:66
 msgid "Unsaved Query"
@@ -839,16 +743,41 @@ msgid "Overwrite existing data"
 msgstr "覆盖现有数据"
 
 #: src/metastore/templates/popups/load_data.mako:56
-msgid "Note that loading data will move data from its location into the table's storage location."
+msgid ""
+"Note that loading data will move data from its location into the table's "
+"storage location."
 msgstr "请注意，加载数据将数据从其位置移至表的存储位置。"
 
 #: src/metastore/templates/popups/load_data.mako:62
 msgid "Submit"
 msgstr "提交"
 
-#~ msgid "Column analysis not supportet yet"
-#~ msgstr "尚不支持列分析"
-#~ msgid "A POST request is required"
-#~ msgstr "需要 POST 请求"
+#~ msgid "Beeswax Error"
+#~ msgstr ""
+
+#~ msgid "Actions"
+#~ msgstr ""
+
 #~ msgid "Show Table"
-#~ msgstr "显示表"
+#~ msgstr ""
+
+#~ msgid "Table has no partitions."
+#~ msgstr ""
+
+#~ msgid "%s : %s"
+#~ msgstr ""
+
+#~ msgid "Comment:"
+#~ msgstr ""
+
+#~ msgid "Partition Columns"
+#~ msgstr ""
+
+#~ msgid "Error!"
+#~ msgstr ""
+
+#~ msgid "Database %s"
+#~ msgstr ""
+
+#~ msgid "database"
+#~ msgstr ""

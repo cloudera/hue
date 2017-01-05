@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:182 src/pig/templates/app.mako:455
+#: src/pig/api.py:211 src/pig/templates/app.mako:761
 msgid "Unsaved script"
 msgstr ""
 
@@ -54,329 +54,464 @@ msgstr ""
 msgid "Only superusers and %s are allowed to modify this document."
 msgstr ""
 
-#: src/pig/views.py:66 src/pig/views.py:90 src/pig/views.py:109
-#: src/pig/views.py:139 src/pig/views.py:163
+#: src/pig/views.py:71 src/pig/views.py:97 src/pig/views.py:116
+#: src/pig/views.py:147 src/pig/views.py:193
 msgid "POST request required."
 msgstr ""
 
-#: src/pig/views.py:101
+#: src/pig/views.py:108
 msgid "Error stopping Pig script."
 msgstr ""
 
-#: src/pig/views.py:145
+#: src/pig/views.py:160
 msgid " (Copy)"
 msgstr ""
 
-#: src/pig/views.py:211
+#: src/pig/views.py:244
 msgid "A POST request is required."
 msgstr ""
 
-#: src/pig/management/commands/pig_setup.py:46
+#: src/pig/management/commands/pig_setup.py:49
 #, python-format
 msgid "Copying examples %(local_dir)s to %(remote_data_dir)s\n"
 msgstr ""
 
-#: src/pig/management/commands/pig_setup.py:53
+#: src/pig/management/commands/pig_setup.py:56
 #, python-format
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
 msgstr ""
 
-#: src/pig/templates/app.mako:23
-msgid "Pig"
+#: src/pig/templates/app.mako:34
+msgid "Pig Editor"
 msgstr ""
 
-#: src/pig/templates/app.mako:28 src/pig/templates/app.mako:104
+#: src/pig/templates/app.mako:37 src/pig/templates/app.mako:115
 msgid "Editor"
 msgstr ""
 
-#: src/pig/templates/app.mako:29
+#: src/pig/templates/app.mako:38
 msgid "Scripts"
 msgstr ""
 
-#: src/pig/templates/app.mako:30
+#: src/pig/templates/app.mako:39
 msgid "Dashboard"
 msgstr ""
 
-#: src/pig/templates/app.mako:40
+#: src/pig/templates/app.mako:51
 msgid "Search for script name or content"
 msgstr ""
 
-#: src/pig/templates/app.mako:44
+#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:187
+#: src/pig/templates/app.mako:345
 msgid "Run this script"
 msgstr ""
 
-#: src/pig/templates/app.mako:44 src/pig/templates/app.mako:123
+#: src/pig/templates/app.mako:55 src/pig/templates/app.mako:137
 msgid "Run"
 msgstr ""
 
-#: src/pig/templates/app.mako:45
+#: src/pig/templates/app.mako:56
 msgid "Copy this script"
 msgstr ""
 
-#: src/pig/templates/app.mako:45 src/pig/templates/app.mako:138
+#: src/pig/templates/app.mako:56 src/pig/templates/app.mako:155
 msgid "Copy"
 msgstr ""
 
-#: src/pig/templates/app.mako:46
+#: src/pig/templates/app.mako:57
 msgid "Delete this script"
 msgstr ""
 
-#: src/pig/templates/app.mako:46 src/pig/templates/app.mako:143
+#: src/pig/templates/app.mako:57 src/pig/templates/app.mako:160
 msgid "Delete"
 msgstr ""
 
-#: src/pig/templates/app.mako:50
+#: src/pig/templates/app.mako:61
 msgid "Create a new script"
 msgstr ""
 
-#: src/pig/templates/app.mako:50 src/pig/templates/app.mako:109
-#: src/pig/templates/app.mako:110
-msgid "New script"
+#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:134
+msgid "New Script"
 msgstr ""
 
-#: src/pig/templates/app.mako:54
+#: src/pig/templates/app.mako:65
 msgid ""
 "There are currently no scripts defined. Please add a new script clicking "
 "on \"New script\""
 msgstr ""
 
-#: src/pig/templates/app.mako:61 src/pig/templates/app.mako:181
-#: src/pig/templates/app.mako:287 src/pig/templates/app.mako:314
+#: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
+#: src/pig/templates/app.mako:431 src/pig/templates/app.mako:554
+#: src/pig/templates/app.mako:578
 msgid "Name"
 msgstr ""
 
-#: src/pig/templates/app.mako:62
+#: src/pig/templates/app.mako:73
 msgid "Script"
 msgstr ""
 
-#: src/pig/templates/app.mako:77
+#: src/pig/templates/app.mako:88
 msgid "There are no scripts matching the search criteria."
 msgstr ""
 
-#: src/pig/templates/app.mako:106
-msgid "Edit script"
-msgstr ""
-
-#: src/pig/templates/app.mako:113
-msgid "Properties"
-msgstr ""
-
-#: src/pig/templates/app.mako:115
-msgid "Edit properties"
+#: src/pig/templates/app.mako:117
+msgid "Pig"
 msgstr ""
 
 #: src/pig/templates/app.mako:120
-msgid "Actions"
+msgid "Properties"
 msgstr ""
 
-#: src/pig/templates/app.mako:122 src/pig/templates/app.mako:127
-msgid "Run the script"
-msgstr ""
-
-#: src/pig/templates/app.mako:128
-msgid "Stop"
-msgstr ""
-
-#: src/pig/templates/app.mako:132
+#: src/pig/templates/app.mako:123
 msgid "Save the script"
 msgstr ""
 
-#: src/pig/templates/app.mako:133
+#: src/pig/templates/app.mako:124 src/pig/templates/app.mako:726
 msgid "Save"
 msgstr ""
 
-#: src/pig/templates/app.mako:137
-msgid "Copy the script"
+#: src/pig/templates/app.mako:129
+msgid "Share the script"
 msgstr ""
 
-#: src/pig/templates/app.mako:142
-msgid "Delete the script"
+#: src/pig/templates/app.mako:130
+msgid "Share"
 msgstr ""
 
-#: src/pig/templates/app.mako:146 src/pig/templates/app.mako:374
-msgid "Logs"
+#: src/pig/templates/app.mako:133
+msgid "New script"
 msgstr ""
 
-#: src/pig/templates/app.mako:148
+#: src/pig/templates/app.mako:139
+msgid "Run the script"
+msgstr ""
+
+#: src/pig/templates/app.mako:140
+msgid "Submit"
+msgstr ""
+
+#: src/pig/templates/app.mako:144
+msgid "Stop the script"
+msgstr ""
+
+#: src/pig/templates/app.mako:145
+msgid "Stop"
+msgstr ""
+
+#: src/pig/templates/app.mako:149
 msgid "Show Logs"
 msgstr ""
 
-#: src/pig/templates/app.mako:148
-msgid "Current Logs"
+#: src/pig/templates/app.mako:150 src/pig/templates/app.mako:639
+msgid "Logs"
 msgstr ""
 
-#: src/pig/templates/app.mako:157
-msgid "Edit"
+#: src/pig/templates/app.mako:154
+msgid "Copy the script"
 msgstr ""
 
-#: src/pig/templates/app.mako:164
-msgid "Edit properties for"
+#: src/pig/templates/app.mako:159
+msgid "Delete the script"
 msgstr ""
 
-#: src/pig/templates/app.mako:167
+#: src/pig/templates/app.mako:169
+msgid "Press CTRL + Space to autocomplete"
+msgstr ""
+
+#: src/pig/templates/app.mako:170
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
+msgstr ""
+
+#: src/pig/templates/app.mako:180
+msgid "Unsaved"
+msgstr ""
+
+#: src/pig/templates/app.mako:188 src/pig/templates/app.mako:346
+#: src/pig/templates/app.mako:520
+msgid "Stop this script"
+msgstr ""
+
+#: src/pig/templates/app.mako:193
+msgid "Show the assist"
+msgstr ""
+
+#: src/pig/templates/app.mako:200
+msgid "Hide the assist"
+msgstr ""
+
+#: src/pig/templates/app.mako:201
+msgid "Double click on function to insert it in the editor"
+msgstr ""
+
+#: src/pig/templates/app.mako:202
+msgid "Assist"
+msgstr ""
+
+#: src/pig/templates/app.mako:205
+msgid "Function name..."
+msgstr ""
+
+#: src/pig/templates/app.mako:352 src/pig/templates/app.mako:719
 msgid "Script name"
 msgstr ""
 
-#: src/pig/templates/app.mako:172
-msgid "Parameters"
+#: src/pig/templates/app.mako:359
+msgid "Pig parameters"
 msgstr ""
 
-#: src/pig/templates/app.mako:174 src/pig/templates/app.mako:196
-#: src/pig/templates/app.mako:205 src/pig/templates/app.mako:241
+#: src/pig/templates/app.mako:372
+msgid "There are currently no defined parameters."
+msgstr ""
+
+#: src/pig/templates/app.mako:374 src/pig/templates/app.mako:402
+#: src/pig/templates/app.mako:423 src/pig/templates/app.mako:451
+#: src/pig/templates/app.mako:472 src/pig/templates/app.mako:509
 msgid "Add"
 msgstr ""
 
-#: src/pig/templates/app.mako:182 src/pig/templates/app.mako:213
+#: src/pig/templates/app.mako:383 src/pig/templates/app.mako:432
+#: src/pig/templates/app.mako:481
 msgid "Value"
 msgstr ""
 
-#: src/pig/templates/app.mako:190 src/pig/templates/app.mako:234
+#: src/pig/templates/app.mako:396 src/pig/templates/app.mako:445
+#: src/pig/templates/app.mako:502
 msgid "Remove"
 msgstr ""
 
-#: src/pig/templates/app.mako:203
+#: src/pig/templates/app.mako:410
+msgid "Hadoop properties"
+msgstr ""
+
+#: src/pig/templates/app.mako:421
+msgid "There are currently no defined Hadoop properties."
+msgstr ""
+
+#: src/pig/templates/app.mako:460
 msgid "Resources"
 msgstr ""
 
-#: src/pig/templates/app.mako:212
+#: src/pig/templates/app.mako:463
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+
+#: src/pig/templates/app.mako:470
+msgid "There are currently no defined resources."
+msgstr ""
+
+#: src/pig/templates/app.mako:480
 msgid "Type"
 msgstr ""
 
-#: src/pig/templates/app.mako:222
+#: src/pig/templates/app.mako:490
 msgid "File"
 msgstr ""
 
-#: src/pig/templates/app.mako:223
+#: src/pig/templates/app.mako:491
 msgid "Archive"
 msgstr ""
 
-#: src/pig/templates/app.mako:251
-msgid "Logs for"
-msgstr ""
-
-#: src/pig/templates/app.mako:256
+#: src/pig/templates/app.mako:527
 msgid "Status:"
 msgstr ""
 
-#: src/pig/templates/app.mako:258
+#: src/pig/templates/app.mako:529
 msgid "Progress:"
 msgstr ""
 
-#: src/pig/templates/app.mako:258
+#: src/pig/templates/app.mako:529
 msgid "%"
 msgstr ""
 
-#: src/pig/templates/app.mako:264
+#: src/pig/templates/app.mako:535
 msgid "No available logs."
 msgstr ""
 
-#: src/pig/templates/app.mako:278 src/pig/templates/app.mako:640
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
 msgid "Running"
 msgstr ""
 
-#: src/pig/templates/app.mako:282
+#: src/pig/templates/app.mako:549
 msgid "There are currently no running scripts."
 msgstr ""
 
-#: src/pig/templates/app.mako:288
+#: src/pig/templates/app.mako:555
 msgid "Progress"
 msgstr ""
 
-#: src/pig/templates/app.mako:289 src/pig/templates/app.mako:316
+#: src/pig/templates/app.mako:556 src/pig/templates/app.mako:580
 msgid "Created on"
 msgstr ""
 
-#: src/pig/templates/app.mako:305
+#: src/pig/templates/app.mako:569
 msgid "Completed"
 msgstr ""
 
-#: src/pig/templates/app.mako:309
+#: src/pig/templates/app.mako:573
 msgid "There are currently no completed scripts."
 msgstr ""
 
-#: src/pig/templates/app.mako:315
+#: src/pig/templates/app.mako:579
 msgid "Status"
 msgstr ""
 
-#: src/pig/templates/app.mako:328
+#: src/pig/templates/app.mako:593
 msgid "Click to edit"
 msgstr ""
 
-#: src/pig/templates/app.mako:342
+#: src/pig/templates/app.mako:607
 msgid "Click to view"
 msgstr ""
 
-#: src/pig/templates/app.mako:359
+#: src/pig/templates/app.mako:624
 msgid "Confirm Delete"
 msgstr ""
 
-#: src/pig/templates/app.mako:362
+#: src/pig/templates/app.mako:627
 msgid "Are you sure you want to delete this script?"
 msgstr ""
 
-#: src/pig/templates/app.mako:363
+#: src/pig/templates/app.mako:628
 msgid "Are you sure you want to delete these scripts?"
 msgstr ""
 
-#: src/pig/templates/app.mako:366 src/pig/templates/app.mako:400
-#: src/pig/templates/app.mako:411
+#: src/pig/templates/app.mako:631 src/pig/templates/app.mako:665
+#: src/pig/templates/app.mako:676 src/pig/templates/app.mako:705
 msgid "No"
 msgstr ""
 
-#: src/pig/templates/app.mako:367 src/pig/templates/app.mako:401
-#: src/pig/templates/app.mako:412
+#: src/pig/templates/app.mako:632 src/pig/templates/app.mako:666
+#: src/pig/templates/app.mako:677 src/pig/templates/app.mako:706
 msgid "Yes"
 msgstr ""
 
-#: src/pig/templates/app.mako:381
+#: src/pig/templates/app.mako:646
 msgid "Close"
 msgstr ""
 
-#: src/pig/templates/app.mako:388
+#: src/pig/templates/app.mako:653
 msgid "Run Script"
 msgstr ""
 
-#: src/pig/templates/app.mako:388 src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:653 src/pig/templates/app.mako:673
 msgid "?"
 msgstr ""
 
-#: src/pig/templates/app.mako:391
+#: src/pig/templates/app.mako:656
 msgid "Script variables"
 msgstr ""
 
-#: src/pig/templates/app.mako:408
+#: src/pig/templates/app.mako:673
 msgid "Stop Script"
 msgstr ""
 
-#: src/pig/templates/app.mako:419
+#: src/pig/templates/app.mako:684
 msgid "Choose a file"
 msgstr ""
 
-#: src/pig/templates/app.mako:451
-msgid "The pig job could not be killed."
+#: src/pig/templates/app.mako:697
+msgid "Are you sure?"
 msgstr ""
 
-#: src/pig/templates/app.mako:452
-msgid "Run this pig script"
+#: src/pig/templates/app.mako:701
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr ""
 
-#: src/pig/templates/app.mako:453
-msgid "Stop the execution"
+#: src/pig/templates/app.mako:713
+msgid "Save script"
 msgstr ""
 
-#: src/pig/templates/app.mako:454
+#: src/pig/templates/app.mako:717
+msgid "Give a meaningful name to this script."
+msgstr ""
+
+#: src/pig/templates/app.mako:725
+msgid "Cancel"
+msgstr ""
+
+#: src/pig/templates/app.mako:757
+msgid "The Pig job could not be killed."
+msgstr ""
+
+#: src/pig/templates/app.mako:758
+msgid "Run this Pig script."
+msgstr ""
+
+#: src/pig/templates/app.mako:759
+msgid "Stop execution."
+msgstr ""
+
+#: src/pig/templates/app.mako:760
 msgid "Saved"
 msgstr ""
 
-#: src/pig/templates/app.mako:633
+#: src/pig/templates/app.mako:1117
 msgid "Saving"
 msgstr ""
 
-#: src/pig/templates/app.mako:644
+#: src/pig/templates/app.mako:1128
 msgid "has been saved correctly."
 msgstr ""
 
-#: src/pig/templates/app.mako:648
-msgid "There was an error with your request!"
+#: src/pig/templates/app.mako:1393
+msgid "Did you know?"
 msgstr ""
+
+#: src/pig/templates/app.mako:1400
+msgid "Names and values of Pig parameters and options, e.g."
+msgstr ""
+
+#: src/pig/templates/app.mako:1407
+msgid "Names and values of Hadoop properties, e.g."
+msgstr ""
+
+#: src/pig/templates/app.mako:1414
+msgid "Include files or compressed files"
+msgstr ""
+
+#: src/pig/templates/app.mako:1423
+msgid "You have unsaved changes in this pig script."
+msgstr ""
+
+#~ msgid "Edit script"
+#~ msgstr ""
+
+#~ msgid "Edit properties"
+#~ msgstr ""
+
+#~ msgid "Actions"
+#~ msgstr ""
+
+#~ msgid "Current Logs"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Edit properties for"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Logs for"
+#~ msgstr ""
+
+#~ msgid "The pig job could not be killed."
+#~ msgstr ""
+
+#~ msgid "Run this pig script"
+#~ msgstr ""
+
+#~ msgid "Stop the execution"
+#~ msgstr ""
+
+#~ msgid "There was an error with your request!"
+#~ msgstr ""
 

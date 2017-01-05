@@ -1,15 +1,15 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VERSIÓN DEL PROYECTO\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: NOMBRE COMPLETO <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -17,36 +17,63 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsolr/api.py:449 src/libsolr/api.py:461 src/libsolr/api.py:472
-#: src/libsolr/api.py:483 src/libsolr/api.py:495 src/libsolr/api.py:510
-#: src/libsolr/api.py:530 src/libsolr/api.py:552 src/libsolr/api.py:569
-#: src/libsolr/api.py:585 src/libsolr/api.py:603 src/libsolr/api.py:621
-#: src/libsolr/api.py:628 src/libsolr/api.py:637 src/libsolr/api.py:647
-#: src/libsolr/api.py:657 src/libsolr/api.py:670 src/libsolr/api.py:680
-#: src/libsolr/api.py:690 src/libsolr/api.py:712 src/libsolr/api.py:728
-#: src/libsolr/api.py:746 src/libsolr/api.py:757 src/libsolr/api.py:779
+#: src/libsolr/api.py:287 src/libsolr/api.py:299 src/libsolr/api.py:310
+#: src/libsolr/api.py:321 src/libsolr/api.py:333 src/libsolr/api.py:348
+#: src/libsolr/api.py:368 src/libsolr/api.py:390 src/libsolr/api.py:407
+#: src/libsolr/api.py:423 src/libsolr/api.py:441 src/libsolr/api.py:459
+#: src/libsolr/api.py:466 src/libsolr/api.py:475 src/libsolr/api.py:485
+#: src/libsolr/api.py:495 src/libsolr/api.py:508 src/libsolr/api.py:518
+#: src/libsolr/api.py:528 src/libsolr/api.py:550 src/libsolr/api.py:566
+#: src/libsolr/api.py:584 src/libsolr/api.py:595 src/libsolr/api.py:850
 msgid "Error while accessing Solr"
 msgstr "Error al acceder a Solr"
 
-#: src/libsolr/api.py:565
+#: src/libsolr/api.py:403
 #, python-format
-msgid "Could not create or edit alias. Check response:\n"
+msgid ""
+"Could not create or edit alias. Check response:\n"
 "%s"
-msgstr "No se ha podido crear ni editar el alias. Comprobar respuesta:\n"
+msgstr ""
+"No se puede crear o editar el alias. Compruebe la respuesta:\n"
 "%s"
 
-#: src/libsolr/api.py:581
+#: src/libsolr/api.py:419
 #, python-format
-msgid "Could not delete alias. Check response:\n"
+msgid ""
+"Could not delete alias. Check response:\n"
 "%s"
-msgstr "No se ha podido eliminar el alias. Comprobar respuesta:\n"
+msgstr ""
+"No se pudo eliminar el alias. Compruebe la respuesta:\n"
 "%s"
 
 #: src/libsolr/conf.py:26
-msgid "In secure mode (HTTPS), if Solr SSL certificates have to be verified against certificate authority"
-msgstr "En el modo seguro (HTTPS), si los certificados SSL de Solr se deben verificar con la autoridad certificadora"
+msgid ""
+"In secure mode (HTTPS), if Solr SSL certificates have to be verified "
+"against certificate authority"
+msgstr ""
+"En el modo seguro (HTTPS), si los certificados SSL de Solr se deben "
+"verificar con la autoridad certificadora"
 
 #: src/libsolr/conf.py:33
 msgid "Default path to Solr in ZooKeeper"
 msgstr "Ruta predeterminada a Solr en ZooKeeper"
 
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""

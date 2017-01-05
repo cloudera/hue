@@ -1,17 +1,17 @@
 # French translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -105,8 +105,13 @@ msgid "Check to enable the tours and tutorials"
 msgstr "Cocher pour activer les visites guidées et les didacticiels"
 
 #: src/about/templates/admin_wizard.mako:164
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
-msgstr "Afficher le point d'interrogation relatif aux \"Visites guidées disponibles\" lorsque des visites guidées sont disponibles pour une page spécifique."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
+msgstr ""
+"Afficher le point d'interrogation relatif aux \"Visites guidées "
+"disponibles\" lorsque des visites guidées sont disponibles pour une page "
+"spécifique."
 
 #: src/about/templates/admin_wizard.mako:170
 msgid "Anonymous usage analytics"
@@ -125,8 +130,12 @@ msgid "How does it work?"
 msgstr "Comment cela fonctionne-t-il ?"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
-msgstr "Nous utilisons Google Analytics pour connaître le nombre d'utilisations d'une application ou d'une section spécifique d'une application."
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
+msgstr ""
+"Nous utilisons Google Analytics pour connaître le nombre d'utilisations "
+"d'une application ou d'une section spécifique d'une application."
 
 #: src/about/templates/admin_wizard.mako:188
 msgid "Use the applications"
@@ -145,8 +154,12 @@ msgid "Check to skip this wizard next time."
 msgstr "Cochez pour ignorer cet assistant la prochaine fois."
 
 #: src/about/templates/admin_wizard.mako:203
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
-msgstr "Ignorez l'Assistant de démarrage rapide lors de la prochaine connexion et allez directement à la page d'accueil."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
+msgstr ""
+"Ignorez l'Assistant de démarrage rapide lors de la prochaine connexion et"
+" allez directement à la page d'accueil."
 
 #: src/about/templates/admin_wizard.mako:216
 msgid "Back"
@@ -198,9 +211,17 @@ msgstr "Configuration"
 msgid "Server Logs"
 msgstr "Journaux de serveur"
 
-#~ msgid "Install all the application examples"
-#~ msgstr "Installer tous les exemples d'application"
+#~ msgid "Go !"
+#~ msgstr ""
 
-#~ msgid "All"
-#~ msgstr "Tout"
+#~ msgid "Check your current configuration"
+#~ msgstr ""
 
+#~ msgid "Install or re-install the application examples"
+#~ msgstr ""
+
+#~ msgid "Go create or import users"
+#~ msgstr ""
+
+#~ msgid "Go use the apps"
+#~ msgstr ""

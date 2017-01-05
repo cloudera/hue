@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:48-0700\n"
-"PO-Revision-Date: 2012-11-07 13:06-0800\n"
+"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,20 +17,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/s3/s3fs.py:187
+#: src/aws/conf.py:65
+msgid "Execute this script to produce the AWS access key ID."
+msgstr "执行此脚本以生成 AWS 访问密钥 ID。"
+
+#: src/aws/conf.py:77
+msgid "Execute this script to produce the AWS secret access key."
+msgstr "执行此脚本以生成 AWS 机密访问密钥。"
+
+#: src/aws/s3/s3fs.py:59
+msgid ""
+"User is not authorized to perform the attempted operation. Check that the"
+" user has appropriate permissions."
+msgstr ""
+"用户无权执行尝试的操作。请检查"
+"用户是否具有相应的权限。"
+
+#: src/aws/s3/s3fs.py:61
+#, python-format
+msgid ""
+"User is not authorized to write or modify path: %s. Check that the user "
+"has write permissions."
+msgstr ""
+"用户无权写入或修改路径：%s。请检查用户"
+"是否具有写入权限。"
+
+#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#, python-format
+msgid ""
+"User is not authorized to access bucket named \"%s\". If you are "
+"attempting to create a bucket, this bucket name is already reserved."
+msgstr ""
+"用户无权访问名为“%s”的分段。如果您正"
+"在尝试创建分段，则此分段名称已保留。"
+
+#: src/aws/s3/s3fs.py:104
+#, python-format
+msgid "Failed to create bucket named \"%s\": %s"
+msgstr "无法创建名为“%s”的分段：%s"
+
+#: src/aws/s3/s3fs.py:134
+#, python-format
+msgid ""
+"Failed to access path: \"%s\" Check that you have access to read this "
+"bucket and that the region is correct."
+msgstr ""
+"无法访问路径：“%s”请检查您是否有权读取此"
+"分段，并且此区域是否正确。"
+
+#: src/aws/s3/s3fs.py:156
+#, python-format
+msgid "User is not authorized to access path: \"%s\""
+msgstr "用户无权访问路径：“%s”"
+
+#: src/aws/s3/s3fs.py:158
+#, python-format
+msgid "Failed to access path \"%s\": %s"
+msgstr "无法访问路径“%s”：%s"
+
+#: src/aws/s3/s3fs.py:253
 msgid "Option `glob` is not implemented"
 msgstr "未实施选项 `glob`"
 
-#: src/aws/s3/s3fs.py:212 src/aws/s3/s3fs.py:241 src/aws/s3/s3fs.py:246
+#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
 msgid "Moving to trash is not implemented for S3"
 msgstr "未对 S3 执行移动至垃圾桶"
 
-#: src/aws/s3/s3fs.py:216
-msgid "Deleting a bucket is not implemented for S3"
-msgstr "未对 S3 执行删除存储段"
+#: src/aws/s3/s3fs.py:324
+#, python-format
+msgid "Invalid bucket name: %s"
+msgstr "无效的分段名称：%s"
 
-#: src/aws/s3/s3fs.py:308
+#: src/aws/s3/s3fs.py:329
+#, python-format
+msgid "Failed to create S3 bucket \"%s\": %s"
+msgstr "无法创建 S3 分段“%s”：%s"
+
+#: src/aws/s3/s3fs.py:385
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "要转换的密钥无效：%s"
 
+#: src/aws/s3/upload.py:123
+msgid "No S3 filesystem found."
+msgstr "未找到 S3 文件系统。"
+
+#: src/aws/s3/upload.py:134
+#, python-format
+msgid "Insufficient permissions to write to S3 path \"%s\"."
+msgstr "没有足够的权限写入 S3 路径“%s”。"

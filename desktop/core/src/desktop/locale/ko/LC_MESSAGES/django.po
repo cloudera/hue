@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:48-0700\n"
-"PO-Revision-Date: 2012-08-10 13:58-0700\n"
+"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,55 +17,72 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/desktop/api.py:201
+#: src/desktop/api.py:206
+#, python-format
+msgid "get_document requires read priviledge or document does not exist for: %s"
+msgstr "get_document에 읽기 권한이 필요하거나 %s에 문서가 존재하지 않음"
+
+#: src/desktop/api.py:208
 #, python-format
 msgid "get_document requires an id integer parameter: %s"
 msgstr "get_document에 필요한 ID 정수 매개변수: %s"
 
-#: src/desktop/api.py:250 src/desktop/api.py:267 src/desktop/api.py:284
-#: src/desktop/api.py:300 src/desktop/api.py:321
+#: src/desktop/api.py:257 src/desktop/api.py:274 src/desktop/api.py:291
+#: src/desktop/api.py:307 src/desktop/api.py:328
 #, python-format
 msgid "Form is missing %s field"
 msgstr "양식에서 %s 필드가 누락됨"
 
-#: src/desktop/api.py:293 src/desktop/api.py:309
+#: src/desktop/api.py:300 src/desktop/api.py:316
 #: src/desktop/templates/error.mako:23
 msgid "Error"
 msgstr "오류"
 
-#: src/desktop/api.py:297
+#: src/desktop/api.py:304
 msgid "Project removed!"
 msgstr "프로젝트가 제거되었습니다!"
 
-#: src/desktop/api.py:317
+#: src/desktop/api.py:324
 msgid "Permissions updated!"
 msgstr "권한이 업데이트되었습니다."
 
-#: src/desktop/api2.py:95
+#: src/desktop/api2.py:99
 msgid "Invalid value for perms, acceptable values are: owned, shared, both."
 msgstr "권한 값이 올바르지 않습니다. 허용되는 값은 소유됨, 공유됨 또는 둘 다입니다."
 
-#: src/desktop/api2.py:220
+#: src/desktop/api2.py:266
 msgid "move_document requires source_doc_uuid and destination_doc_uuid"
 msgstr "move_document에 source_doc_uuid 및 destination_doc_uuid가 필요함"
 
-#: src/desktop/api2.py:240
+#: src/desktop/api2.py:286
 msgid "create_directory requires parent_uuid and name"
 msgstr "create_directory에 parent_uuid 및 이름이 필요함"
 
-#: src/desktop/api2.py:258
+#: src/desktop/api2.py:304
 msgid "update_document requires uuid"
 msgstr "update_document에 uuid가 필요함"
 
-#: src/desktop/api2.py:293
+#: src/desktop/api2.py:339
 msgid "delete_document requires uuid"
 msgstr "delete_document에 uuid가 필요함"
 
-#: src/desktop/api2.py:319
+#: src/desktop/api2.py:365
 msgid "share_document requires uuid and perms_dict"
 msgstr "share_document에 uuid 및 perms_dict가 필요함"
 
-#: src/desktop/api2.py:540
+#: src/desktop/api2.py:452
+msgid "Failed to import documents, the file does not contain valid JSON."
+msgstr "문서를 가져올 수 없습니다. 파일에 유효한 JSON이 없습니다."
+
+#: src/desktop/api2.py:456
+msgid ""
+"Failed to import documents, the file does not contain the expected JSON "
+"schema for Hue documents."
+msgstr ""
+"문서를 가져올 수 없습니다. Hue 문서에 대한 필요한 JSON 스키마가 "
+"파일에 포함되지 않았습니다."
+
+#: src/desktop/api2.py:686
 #, python-format
 msgid "Cannot import document, dependency with UUID: %s not found."
 msgstr "문서를 가져올 수 없습니다. UUID가 %s인 종속 항목을 찾을 수 없습니다."
@@ -74,660 +91,929 @@ msgstr "문서를 가져올 수 없습니다. UUID가 %s인 종속 항목을 찾
 msgid "load_apps has already been called."
 msgstr "load_apps가 이미 호출되었습니다."
 
-#: src/desktop/conf.py:79
+#: src/desktop/conf.py:97
 msgid "HTTP host to bind to."
 msgstr "바인딩하는 HTTP 호스트입니다."
 
-#: src/desktop/conf.py:85
+#: src/desktop/conf.py:103
 msgid "HTTP port to bind to."
 msgstr "바인딩하는 HTTP 포트입니다."
 
-#: src/desktop/conf.py:91
+#: src/desktop/conf.py:109
 msgid "HTTP methods the server will be allowed to service."
 msgstr "서버에서 서비스할 수 있는 HTTP 메소드입니다."
 
-#: src/desktop/conf.py:98
+#: src/desktop/conf.py:116
 msgid "X-Frame-Options HTTP header value."
 msgstr "X-Frame-Options HTTP 헤더 값입니다."
 
-#: src/desktop/conf.py:104
+#: src/desktop/conf.py:122
 msgid "Filename of SSL Certificate"
 msgstr "SSL 인증서 파일 이름"
 
-#: src/desktop/conf.py:110
+#: src/desktop/conf.py:128
 msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 개인 키 파일 이름"
 
-#: src/desktop/conf.py:116
+#: src/desktop/conf.py:134
 msgid "Filename of SSL Certificate Chain"
 msgstr "SSL 인증서 체인 파일 이름"
 
-#: src/desktop/conf.py:122
+#: src/desktop/conf.py:140
 msgid "List of allowed and disallowed ciphers"
 msgstr "허용 및 허용 안 된 암호 목록"
 
-#: src/desktop/conf.py:144
+#: src/desktop/conf.py:162
 msgid "SSL password of the certificate"
 msgstr "인증서의 SSL 암호"
 
-#: src/desktop/conf.py:149
-msgid "Execute this script to produce the SSL password. This will be used when `ssl_password` is not set."
+#: src/desktop/conf.py:167
+msgid ""
+"Execute this script to produce the SSL password. This will be used when "
+"`ssl_password` is not set."
 msgstr "SSL 암호를 생성하려면 이 스크립트를 실행합니다. `ssl_password`가 설정되지 않은 경우 사용합니다."
 
-#: src/desktop/conf.py:155
+#: src/desktop/conf.py:173
 msgid "Path to default Certificate Authority certificates."
 msgstr "기본 인증 기관 인증서에 대한 경로입니다."
 
-#: src/desktop/conf.py:161
+#: src/desktop/conf.py:179
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "서버에서 받은 인증서의 유효성을 Hue에서 검사할 것인지 선택합니다."
 
-#: src/desktop/conf.py:168
-msgid "LDAP password of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."
-msgstr "LDAP 인증에 사용된 Hue 사용자의 LDAP 암호입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+#: src/desktop/conf.py:185
+msgid ""
+"Strict-Transport-Security: max-age=31536000 This is a HTTP response "
+"header, Once a supported browser receives this header that browser will "
+"prevent any communications from being sent over HTTP to the specified "
+"domain and will instead send all communications over HTTPS."
+msgstr ""
+"Strict-Transport-Security: max-age=31536000 HTTP 응답 헤더입니다. "
+"지원되는 브라우저에서 이 헤더를 수신하면 해당 브라우저는 HTTP를 "
+"통해 지정된 도메인으로 전송되는 모든 통신을 막고 그 대신 HTTPS를 "
+"통해 모든 통신을 전송합니다."
 
-#: src/desktop/conf.py:175
-msgid "Execute this script to produce the LDAP password. This will be used when `ldap_password` is not set."
-msgstr "LDAP 암호를 생성하려면 이 스크립트를 실행합니다. `ldap_password`가 설정되지 않은 경우 사용합니다."
+#: src/desktop/conf.py:191
+msgid ""
+"Strict-Transport-Security: This is a HTTP response header, Once a "
+"supported browser receives this header that browser will prevent any "
+"communications from being sent over HTTP to the specified domain and will"
+" instead send all communications over HTTPS."
+msgstr ""
+"Strict-Transport-Security: HTTP 응답 헤더입니다. "
+"지원되는 브라우저에서 이 헤더를 수신하면 해당 브라우저가 HTTP를 "
+"통해 지정된 도메인으로 전송되는 모든 통신을 막고 그 대신 HTTPS를 "
+"통해 모든 통신을 전송합니다."
 
-#: src/desktop/conf.py:183
-msgid "LDAP username of the hue user used for LDAP authentications. For example for LDAP Authentication with HiveServer2/Impala."
-msgstr "LDAP 인증에 사용된 Hue 사용자의 LDAP 사용자 이름입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+#: src/desktop/conf.py:197 src/desktop/conf.py:209
+msgid ""
+"X-Content-Type-Options: nosniff This is a HTTP response header feature "
+"that helps prevent attacks based on MIME-type confusion."
+msgstr ""
+"X-Content-Type-Options: nosniff MIME 유형 혼동에 기반하는 "
+"공격으로부터 보호하도록 도와주는 HTTP 응답 헤더 기능입니다."
 
-#: src/desktop/conf.py:193
-msgid "Auth username of the hue user used for authentications. For example for LDAP Authentication with HiveServer2/Impala."
-msgstr "인증에 사용된 Hue 사용자의 인증 사용자 이름입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+#: src/desktop/conf.py:203
+msgid ""
+"X-Xss-Protection: \"1; mode=block\" This is a HTTP response header "
+"feature to force XSS protection."
+msgstr ""
+"X-Xss-Protection: \"1; mode=block\" XSS 보호를 강제 적용하는 "
+"HTTP 응답 헤더 기능입니다."
 
-#: src/desktop/conf.py:219
-msgid "LDAP/PAM/.. password of the hue user used for authentications. Inactive if empty. For example for LDAP Authentication with HiveServer2/Impala."
-msgstr "인증에 사용된 Hue 사용자의 LDAP/PAM/.. 암호입니다(예: HiveServer2/Impala를 사용한 LDAP 인증). 비어 있는 경우 비활성화됩니다."
+#: src/desktop/conf.py:220
+msgid "If all non-SSL requests should be permanently redirected to SSL."
+msgstr "모두 비SSL 요청인 경우 영구적으로 SSL로 리디렉션되어야 합니다."
 
-#: src/desktop/conf.py:225
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
-msgstr "인증 암호를 생성하려면 이 스크립트를 실행합니다. `auth_password`가 설정되지 않은 경우 사용합니다."
+#: src/desktop/conf.py:226
+msgid "If all non-SSL requests should be permanently redirected to this SSL host."
+msgstr "모두 비SSL 요청인 경우 영구적으로 이 SSL 호스트로 리디렉션되어야 합니다."
 
 #: src/desktop/conf.py:232
-msgid "If set to false, runcpserver will not actually start the web server.  Used if Apache is being used as a WSGI container."
-msgstr "FALSE로 설정되면 runcpserver가 실제로 웹 서버를 시작하지 않습니다. Apache가 WSGI 컨테이너로 사용되는 경우에만 사용됩니다."
+msgid ""
+"Comma separated list of strings representing the host/domain names that "
+"the Hue server can not serve https."
+msgstr ""
+"Hue Server가 https를 지원할 수 없는 호스트/도메인 이름을 나타내는 쉼표로 "
+"구분된 문자열 목록입니다."
 
-#: src/desktop/conf.py:238
+#: src/desktop/conf.py:239
+msgid ""
+"LDAP password of the hue user used for LDAP authentications. For example "
+"for LDAP Authentication with HiveServer2/Impala."
+msgstr "LDAP 인증에 사용된 Hue 사용자의 LDAP 암호입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+
+#: src/desktop/conf.py:246
+msgid ""
+"Execute this script to produce the LDAP password. This will be used when "
+"`ldap_password` is not set."
+msgstr "LDAP 암호를 생성하려면 이 스크립트를 실행합니다. `ldap_password`가 설정되지 않은 경우 사용합니다."
+
+#: src/desktop/conf.py:254
+msgid ""
+"LDAP username of the hue user used for LDAP authentications. For example "
+"for LDAP Authentication with HiveServer2/Impala."
+msgstr "LDAP 인증에 사용된 Hue 사용자의 LDAP 사용자 이름입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+
+#: src/desktop/conf.py:264
+msgid ""
+"Auth username of the hue user used for authentications. For example for "
+"LDAP Authentication with HiveServer2/Impala."
+msgstr "인증에 사용된 Hue 사용자의 인증 사용자 이름입니다(예: HiveServer2/Impala를 사용한 LDAP 인증)."
+
+#: src/desktop/conf.py:290
+msgid ""
+"LDAP/PAM/.. password of the hue user used for authentications. Inactive "
+"if empty. For example for LDAP Authentication with HiveServer2/Impala."
+msgstr ""
+"인증에 사용된 Hue 사용자의 LDAP/PAM/.. 암호입니다(예: HiveServer2/Impala를 사용한 LDAP 인증). "
+"비어 있는 경우 비활성화됩니다."
+
+#: src/desktop/conf.py:296
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr "인증 암호를 생성하려면 이 스크립트를 실행합니다. `auth_password`가 설정되지 않은 경우 사용합니다."
+
+#: src/desktop/conf.py:303
+msgid ""
+"If set to false, runcpserver will not actually start the web server.  "
+"Used if Apache is being used as a WSGI container."
+msgstr ""
+"FALSE로 설정되면 runcpserver가 실제로 웹 서버를 시작하지 않습니다. Apache가 WSGI 컨테이너로 사용되는 "
+"경우에만 사용됩니다."
+
+#: src/desktop/conf.py:309
 msgid "Number of threads used by the CherryPy web server."
 msgstr "CherryPy 웹 서버가 사용하는 스레드 수입니다."
 
-#: src/desktop/conf.py:244
+#: src/desktop/conf.py:315
 msgid "Used in hashing algorithms for sessions."
 msgstr "세션의 해싱 알고리즘에 사용됩니다."
 
-#: src/desktop/conf.py:249
-msgid "Execute this script to produce the Django secret key. This will be used when `secret_key` is not set."
+#: src/desktop/conf.py:320
+msgid ""
+"Execute this script to produce the Django secret key. This will be used "
+"when `secret_key` is not set."
 msgstr "Django 암호 키를 생성하려면 이 스크립트를 실행합니다. `secret_key`가 설정되지 않은 경우 사용합니다."
 
-#: src/desktop/conf.py:256
+#: src/desktop/conf.py:327
 msgid "Number of user access to remember per view per user."
 msgstr "사용자별 뷰당 기억해야 할 사용자 액세스 수입니다."
 
-#: src/desktop/conf.py:262
-msgid "Help improve Hue with anonymous usage analytics.Use Google Analytics to see how many times an application or specific section of an application is used, nothing more."
-msgstr "익명 사용 분석은 Hue를 개선시키는 데 도움이 됩니다. Google Analytics를 사용하여 애플리케이션이나 애플리케이션의 특정 섹션이 사용되는 빈도를 확인하십시오."
+#: src/desktop/conf.py:333
+msgid ""
+"Help improve Hue with anonymous usage analytics.Use Google Analytics to "
+"see how many times an application or specific section of an application "
+"is used, nothing more."
+msgstr ""
+"익명 사용 분석은 Hue를 개선시키는 데 도움이 됩니다. Google Analytics를 사용하여 애플리케이션이나 애플리케이션의 "
+"특정 섹션이 사용되는 빈도를 확인하십시오."
 
-#: src/desktop/conf.py:269
-msgid "Tile layer server URL for the Leaflet map charts. Read more on http://leafletjs.com/reference.html#tilelayer"
-msgstr "Leaflet Map 차트에 대한 타일 레이어 서버 URL입니다. 자세한 내용은 http://leafletjs.com/reference.html#tilelayer 페이지를 참조하십시오."
+#: src/desktop/conf.py:340
+msgid ""
+"Tile layer server URL for the Leaflet map charts. Read more on "
+"http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile"
+" domain to the img-src section of the 'secure_content_security_policy' "
+"configuration parameter as well."
+msgstr ""
+"Leaflet Map 차트에 대한 타일 레이어 서버 URL입니다. 자세한 내용은 "
+"http://leafletjs.com/reference.html#tilelayer를 참조하십시오."
+" 타일 도메인을 'secure_content_security_policy' "
+"구성 매개변수의 img-src 섹션에도 추가해야 합니다."
 
-#: src/desktop/conf.py:275
+#: src/desktop/conf.py:346
 msgid "The copyright message for the specified Leaflet maps Tile Layer"
 msgstr "지정된 Leaflet Map 타일 레이어에 대한 저작권 메시지"
 
-#: src/desktop/conf.py:281
+#: src/desktop/conf.py:351
 msgid "Use poll(2) in Hue thrift pool."
 msgstr "Hue thrift 풀에서 poll(2)를 사용합니다."
 
-#: src/desktop/conf.py:288
-msgid "Comma-separated list of Django middleware classes to use. See https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on middlewares in Django."
-msgstr "사용하려는 Django 미들웨어 클래스 목록(쉼표로 구분됨)입니다. Django의 미들웨어에 대한 자세한 내용은 https://docs.djangoproject.com/en/1.4/ref/middleware/를 참조하십시오."
+#: src/desktop/conf.py:358
+msgid ""
+"Comma-separated list of Django middleware classes to use. See "
+"https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on"
+" middlewares in Django."
+msgstr ""
+"사용하려는 Django 미들웨어 클래스 목록(쉼표로 구분됨)입니다. Django의 미들웨어에 대한 자세한 내용은 "
+"https://docs.djangoproject.com/en/1.4/ref/middleware/를 참조하십시오."
 
-#: src/desktop/conf.py:296
-msgid "Comma-separated list of regular expressions, which match the redirect URL.For example, to restrict to your local domain and FQDN, the following value can be used:  ^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
-msgstr "리디렉션 URL과 일치하는, 쉼표로 구분된 정규식 목록입니다. 예를 들어, 로컬 도메인과 FQDN으로 제한하려는 경우 다음 값을 사용할 수 있습니다. ^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
+#: src/desktop/conf.py:366
+msgid ""
+"Comma-separated list of regular expressions, which match the redirect "
+"URL.For example, to restrict to your local domain and FQDN, the following"
+" value can be used:  ^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
+msgstr ""
+"리디렉션 URL과 일치하는, 쉼표로 구분된 정규식 목록입니다. 예를 들어, 로컬 도메인과 FQDN으로 제한하려는 경우 다음 값을 "
+"사용할 수 있습니다. ^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
 
-#: src/desktop/conf.py:304
+#: src/desktop/conf.py:374
 msgid "Enable X-Forwarded-Host header if the load balancer requires it."
 msgstr "X-Forwarded-Host 헤더는 부하 분산 장치에 필요할 시 설정합니다."
 
-#: src/desktop/conf.py:310
-msgid "Support for HTTPS termination at the load-balancer level with SECURE_PROXY_SSL_HEADER."
+#: src/desktop/conf.py:380
+msgid ""
+"Support for HTTPS termination at the load-balancer level with "
+"SECURE_PROXY_SSL_HEADER."
 msgstr "SECURE_PROXY_SSL_HEADER가 포함된 load-balancer 레벨에서 HTTPS 중단을 지원합니다."
 
-#: src/desktop/conf.py:318
+#: src/desktop/conf.py:388
 msgid "Comma separated list of apps to not load at server startup."
 msgstr "서버 시작 시 로드하지 말아야 할 (쉼표로 구분된) 앱 목록입니다."
 
-#: src/desktop/conf.py:323
+#: src/desktop/conf.py:393
 msgid "To set to true in combination when using Hue demo backend."
 msgstr "Hue 데모 백엔드 사용 시 조합을 true로 설정합니다."
 
-#: src/desktop/conf.py:330
+#: src/desktop/conf.py:400
 msgid "Use this file to parse and redact log message."
 msgstr "이 파일을 사용하여 로그 메시지를 분석하고 수정하십시오."
 
-#: src/desktop/conf.py:338
-msgid "Comma separated list of strings representing the host/domain names that the Hue server can serve."
+#: src/desktop/conf.py:408
+msgid ""
+"Comma separated list of strings representing the host/domain names that "
+"the Hue server can serve."
 msgstr "Hue 서버가 지원할 수 있는 호스트/도메인 이름을 나타내는 쉼표로 구분된 문자열 목록입니다."
 
-#: src/desktop/conf.py:392
+#: src/desktop/conf.py:455
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "외부 SMTP 서버로 연결하는 구성 옵션입니다."
 
-#: src/desktop/conf.py:396
+#: src/desktop/conf.py:459
 msgid "The SMTP server for email notification delivery."
 msgstr "Email 알림 전송을 위한 SMTP 서버입니다."
 
-#: src/desktop/conf.py:403
+#: src/desktop/conf.py:466
 msgid "The SMTP server port."
 msgstr "SMTP 서버 포트입니다."
 
-#: src/desktop/conf.py:410
+#: src/desktop/conf.py:473
 msgid "The username for the SMTP host."
 msgstr "SMTP 호스트의 사용자 이름입니다."
 
-#: src/desktop/conf.py:417
+#: src/desktop/conf.py:480
 msgid "The password for the SMTP user."
 msgstr "SMTP 사용자의 암호입니다."
 
-#: src/desktop/conf.py:425
-msgid "Execute this script to produce the SMTP user password. This will be used when the SMTP `password` is not set."
+#: src/desktop/conf.py:488
+msgid ""
+"Execute this script to produce the SMTP user password. This will be used "
+"when the SMTP `password` is not set."
 msgstr "SMTP 사용자 암호를 생성하려면 이 스크립트를 실행합니다. SMTP `password`가 설정되지 않은 경우 사용합니다."
 
-#: src/desktop/conf.py:433
+#: src/desktop/conf.py:496
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr "SMTP 서버와 통신 시 TLS(보안) 연결 사용 여부입니다."
 
-#: src/desktop/conf.py:440
+#: src/desktop/conf.py:503
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr "Hue의 여러 자동 알림에 사용하는 기본 Email 주소입니다."
 
-#: src/desktop/conf.py:449
+#: src/desktop/conf.py:512
 msgid "Configuration options for metrics"
 msgstr "메트릭에 대한 구성 옵션"
 
-#: src/desktop/conf.py:453
+#: src/desktop/conf.py:516
 msgid "Enable metrics URL \"desktop/metrics\""
 msgstr "메트릭 URL \"desktop/metrics\" 설정"
 
-#: src/desktop/conf.py:458
+#: src/desktop/conf.py:521
 msgid "If specified, Hue will write metrics to this file"
 msgstr "지정한 경우 Hue는 이 파일에 메트릭을 씀"
 
-#: src/desktop/conf.py:462
+#: src/desktop/conf.py:525
 msgid "Time in milliseconds on how frequently to collect metrics"
 msgstr "메트릭을 수집하는 빈도 간격(밀리초)"
 
-#: src/desktop/conf.py:470
-msgid "Configuration options for specifying the Desktop Database.\n"
-"          For more info, see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
-msgstr "Desktop 데이터베이스를 지정하는 구성 옵션입니다.\n"
-"          자세한 내용은 https://docs.djangoproject.com/en/1.4/topics/http/sessions/를 참조하십시오."
+#: src/desktop/conf.py:533
+msgid ""
+"Configuration options for specifying the Desktop Database.\n"
+"          For more info, see "
+"http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
+msgstr ""
+"Desktop 데이터베이스를 지정하는 구성 옵션입니다.\n"
+"          자세한 내용은 "
+"http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine 사이트를 참조하십시오."
 
-#: src/desktop/conf.py:475
+#: src/desktop/conf.py:538
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "postgresql_psycopg2, mysql, sqlite3 같은 데이터베이스 엔진입니다."
 
-#: src/desktop/conf.py:481
+#: src/desktop/conf.py:544
 msgid "Database name, or path to DB if using sqlite3."
 msgstr "sqlite3를 사용할 경우 데이터베이스 이름 또는 경로입니다."
 
-#: src/desktop/conf.py:487
+#: src/desktop/conf.py:550
 msgid "Database username."
 msgstr "데이터베이스 사용자 이름입니다."
 
-#: src/desktop/conf.py:493
+#: src/desktop/conf.py:556
 msgid "Database password."
 msgstr "데이터베이스 암호입니다."
 
-#: src/desktop/conf.py:500
-msgid "Execute this script to produce the database password. This will be used when `password` is not set."
+#: src/desktop/conf.py:563
+msgid ""
+"Execute this script to produce the database password. This will be used "
+"when `password` is not set."
 msgstr "데이터베이스 암호를 생성하려면 이 스크립트를 실행합니다. `password`가 설정되지 않은 경우 사용합니다."
 
-#: src/desktop/conf.py:507
+#: src/desktop/conf.py:570
 msgid "Database host."
 msgstr "데이터베이스 호스트입니다."
 
-#: src/desktop/conf.py:513
+#: src/desktop/conf.py:576
 msgid "Database port."
 msgstr "데이터베이스 포트입니다."
 
-#: src/desktop/conf.py:519
+#: src/desktop/conf.py:582
 msgid "Database options to send to the server when connecting."
 msgstr "연결할 때 서버로 전송할 데이터베이스 옵션입니다."
 
-#: src/desktop/conf.py:528
-msgid "Configuration options for specifying the Desktop session.\n"
-"          For more info, see https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
-msgstr "Desktop 세션을 지정하는 구성 옵션입니다.\n"
-"          자세한 내용은 https://docs.djangoproject.com/en/1.4/topics/http/sessions/를 참조하십시오."
+#: src/desktop/conf.py:591
+msgid ""
+"Configuration options for specifying the Desktop session.\n"
+"          For more info, see "
+"https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
+msgstr ""
+"Desktop 세션을 지정하는 구성 옵션입니다.\n"
+"          자세한 내용은 "
+"https://docs.djangoproject.com/en/1.4/topics/http/sessions/ 사이트를 참조하십시오."
 
-#: src/desktop/conf.py:533
-msgid "The cookie containing the users' session ID will expire after this amount of time in seconds."
+#: src/desktop/conf.py:596
+msgid ""
+"The cookie containing the users' session ID will expire after this amount"
+" of time in seconds."
 msgstr "지정된 시간(초)이 경과한 후 사용자의 세션 ID가 포함된 쿠키가 만료됩니다."
 
-#: src/desktop/conf.py:539
-msgid "The cookie containing the users' session ID will be secure. This should only be enabled with HTTPS."
+#: src/desktop/conf.py:602
+msgid ""
+"The cookie containing the users' session ID will be secure. This should "
+"only be enabled with HTTPS."
 msgstr "사용자의 세션 ID가 포함된 쿠키는 보호됩니다. 이 기능은 HTTPS에서만 사용해야 합니다."
 
-#: src/desktop/conf.py:545
+#: src/desktop/conf.py:608
 msgid "The cookie containing the users' session ID will use the HTTP only flag."
 msgstr "사용자의 세션 ID가 포함된 쿠키는 HTTP 전용 플래그를 사용합니다."
 
-#: src/desktop/conf.py:551
-msgid "Use session-length cookies. Logs out the user when she closes the browser window."
+#: src/desktop/conf.py:614
+msgid ""
+"Use session-length cookies. Logs out the user when she closes the browser"
+" window."
 msgstr "세션 길이의 쿠키를 사용합니다. 브라우저 창을 닫으면 사용자가 로그아웃됩니다."
 
-#: src/desktop/conf.py:560
-msgid "Configuration options for specifying Hue's Kerberos integration for\n"
+#: src/desktop/conf.py:623
+msgid ""
+"Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
-msgstr "보안 Hadoop 클러스터에 대한 Hue의 Kerberos 통합을 지정하는\n"
+msgstr ""
+"보안 Hadoop 클러스터에 대한 Hue의 Kerberos 통합을 지정하는\n"
 "          구성 옵션입니다."
 
-#: src/desktop/conf.py:565
+#: src/desktop/conf.py:628
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr "Hue의 서비스 자격 증명이 포함된 Kerberos Keytab 파일의 경로입니다."
 
-#: src/desktop/conf.py:570
+#: src/desktop/conf.py:633
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr "Hue의 Kerberos 원칙 이름입니다. 일반적으로 'hue/hostname.foo.com'입니다."
 
-#: src/desktop/conf.py:575
+#: src/desktop/conf.py:638
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue가 해당 Keytab을 업데이트하는 주기(단위: 초)입니다."
 
-#: src/desktop/conf.py:580
+#: src/desktop/conf.py:643
 msgid "Path to keep Kerberos credentials cached."
 msgstr "캐시된 Kerberos 자격 증명 저장 경로입니다."
 
-#: src/desktop/conf.py:587
+#: src/desktop/conf.py:650
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Kerberos 'kinit' 명령에 대한 경로입니다."
 
-#: src/desktop/conf.py:597
+#: src/desktop/conf.py:659
+msgid ""
+"This property specifies the maximum size of the receive buffer in bytes "
+"in thrift sasl communication."
+msgstr ""
+"이 속성은 thrift sasl 통신에서 수신 버퍼의 최대 크기를 "
+"바이트 단위로 지정합니다."
+
+#: src/desktop/conf.py:667
 msgid "Time zone name."
 msgstr "시간대 이름입니다."
 
-#: src/desktop/conf.py:604
+#: src/desktop/conf.py:674
 msgid "Default system-wide unicode encoding."
 msgstr "기본 시스템 레벨 유니코드 인코딩입니다."
 
-#: src/desktop/conf.py:611
+#: src/desktop/conf.py:681
 msgid "Username to run servers as."
 msgstr "서버를 실행할 사용자 이름"
 
-#: src/desktop/conf.py:617
+#: src/desktop/conf.py:687
 msgid "Group to run servers as."
 msgstr "서버를 실행할 그룹"
 
-#: src/desktop/conf.py:623
+#: src/desktop/conf.py:693
 msgid "This should be the user running hue webserver"
 msgstr "Hue 웹 서버를 실행 중인 사용자여야 함"
 
-#: src/desktop/conf.py:629
+#: src/desktop/conf.py:699
 msgid "This should be the hdfs super user"
 msgstr "HDFS superuser여야 함"
 
-#: src/desktop/conf.py:635
+#: src/desktop/conf.py:705
 msgid "Customizations to the UI."
 msgstr "UI 사용자 지정."
 
-#: src/desktop/conf.py:639
-msgid "Top banner HTML code. This code will be placed in the navigation bar so that it will reside at the top of the page in a fixed position. One common value is `<img src=\"http://www.example.com/example.gif\" />`"
-msgstr "상단 배너 HTML 코드입니다. 이 코드는 페이지 상단, 고정된 위치에 있도록 탐색 모음에 배치됩니다. 공통적으로 사용되는 한 값은 '<img src=\"http://www.example.com/example.gif\" />'입니다."
+#: src/desktop/conf.py:709
+msgid ""
+"Top banner HTML code. This code will be placed in the navigation bar so "
+"that it will reside at the top of the page in a fixed position. One "
+"common value is `<img src=\"http://www.example.com/example.gif\" />`"
+msgstr ""
+"상단 배너 HTML 코드입니다. 이 코드는 페이지 상단, 고정된 위치에 있도록 탐색 모음에 배치됩니다. 공통적으로 사용되는 한 값은"
+" '<img src=\"http://www.example.com/example.gif\" />'입니다."
 
-#: src/desktop/conf.py:644
-msgid "The login splash HTML code. This code will be placed in the login page, useful for security warning messages."
+#: src/desktop/conf.py:714
+msgid ""
+"The login splash HTML code. This code will be placed in the login page, "
+"useful for security warning messages."
 msgstr "로그인 스플래시 HTML 코드입니다. 이 코드는 로그인 페이지에 배치되며, 보안 경고 메시지에 유용합니다."
 
-#: src/desktop/conf.py:649
-msgid "The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 it disables the cache."
+#: src/desktop/conf.py:719
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 it disables the cache."
 msgstr "지원, 자동 완성 등의 호출에 대한 캐시 TTL(밀리초)입니다. 캐시를 해제하려면 0으로 설정합니다."
 
-#: src/desktop/conf.py:654
+#: src/desktop/conf.py:724
 msgid "Configuration options for user authentication into the web application."
 msgstr "웹 애플리케이션에서 사용자 인증의 구성 옵션입니다."
 
-#: src/desktop/conf.py:659
-msgid "Authentication backend.  Common settings are django.contrib.auth.backends.ModelBackend (fully Django backend), desktop.auth.backend.AllowAllBackend (allows everyone), desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and user manager, after the first login). Multiple Authentication backends are supported by specifying a comma-separated list in order of priority."
-msgstr "인증 백엔드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django 백엔드), desktop.auth.backend.AllowAllBackend(모든 사람 허용), desktop.auth.backend.AllowFirstUserDjangoBackend(첫 로그인 이후 Django와 사용자 관리자에 의존)입니다. 우선 순위에 따라 쉼표로 구분된 목록을 지정하여 다중 인증 백엔드를 지원합니다."
+#: src/desktop/conf.py:729
+msgid ""
+"Authentication backend.  Common settings are "
+"django.contrib.auth.backends.ModelBackend (fully Django backend), "
+"desktop.auth.backend.AllowAllBackend (allows everyone), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend (relies on Django and "
+"user manager, after the first login). Multiple Authentication backends "
+"are supported by specifying a comma-separated list in order of priority."
+msgstr ""
+"인증 백엔드입니다. 일반적인 설정은 django.contrib.auth.backends.ModelBackend(완전 Django "
+"백엔드), desktop.auth.backend.AllowAllBackend(모든 사람 허용), "
+"desktop.auth.backend.AllowFirstUserDjangoBackend(첫 로그인 이후 Django와 사용자 "
+"관리자에 의존)입니다. 우선 순위에 따라 쉼표로 구분된 목록을 지정하여 다중 인증 백엔드를 지원합니다."
 
-#: src/desktop/conf.py:666
+#: src/desktop/conf.py:736
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "사용자 개체에 대한 추가 접근자 메소드를 정의하는 클래스입니다."
 
-#: src/desktop/conf.py:669
-msgid "The service to use when querying PAM. The service usually corresponds to a single filename in /etc/pam.d"
+#: src/desktop/conf.py:739
+msgid ""
+"The service to use when querying PAM. The service usually corresponds to "
+"a single filename in /etc/pam.d"
 msgstr "PAM 쿼리 시 사용할 서비스입니다. 이 서비스는 일반적으로 /etc/pam.d의 단일 파일 이름에 해당합니다."
 
-#: src/desktop/conf.py:673
-msgid "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets the normalized name of the header that contains the remote user. The HTTP header in the request is converted to a key by converting all characters to uppercase, replacing any hyphens with underscores and adding an HTTP_ prefix to the name. So, for example, if the header is called Remote-User that would be configured as HTTP_REMOTE_USER"
-msgstr "desktop.auth.backend.RemoteUserDjangoBackend를 사용할 때 원격 사용자를 포함하는 헤더의 정규화된 이름을 설정합니다. 요청의 HTTP 헤더는 모든 문자가 대문자로, 하이픈이 밑줄로 변환되고 이름에 HTTP_ 접두사가 추가되어 키로 변환됩니다. 예를 들어 헤더가 Remote-User인 경우 HTTP_REMOTE_USER로 구성됩니다."
+#: src/desktop/conf.py:743
+msgid ""
+"When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
+"the normalized name of the header that contains the remote user. The HTTP"
+" header in the request is converted to a key by converting all characters"
+" to uppercase, replacing any hyphens with underscores and adding an HTTP_"
+" prefix to the name. So, for example, if the header is called Remote-User"
+" that would be configured as HTTP_REMOTE_USER"
+msgstr ""
+"desktop.auth.backend.RemoteUserDjangoBackend를 사용할 때 원격 사용자를 포함하는 헤더의 정규화된"
+" 이름을 설정합니다. 요청의 HTTP 헤더는 모든 문자가 대문자로, 하이픈이 밑줄로 변환되고 이름에 HTTP_ 접두사가 추가되어 "
+"키로 변환됩니다. 예를 들어 헤더가 Remote-User인 경우 HTTP_REMOTE_USER로 구성됩니다."
 
-#: src/desktop/conf.py:680 src/desktop/conf.py:767
+#: src/desktop/conf.py:750 src/desktop/conf.py:849
 msgid "Ignore the case of usernames when searching for existing users in Hue."
 msgstr "Hue에서 기존 사용자를 검색할 때 사용자 이름의 대소문자를 무시합니다."
 
-#: src/desktop/conf.py:684
+#: src/desktop/conf.py:754
 msgid "Force usernames to lowercase when creating new users."
 msgstr "새 사용자를 만들 때 사용자 이름을 소문자로 지정합니다."
 
-#: src/desktop/conf.py:688
+#: src/desktop/conf.py:758
 msgid "Force usernames to uppercase when creating new users."
 msgstr "새 사용자를 만들 때 사용자 이름을 대문자로 지정합니다."
 
-#: src/desktop/conf.py:692
-msgid "Users will expire after they have not logged in for 'n' amount of seconds.A negative number means that users will never expire."
+#: src/desktop/conf.py:762
+msgid ""
+"Users will expire after they have not logged in for 'n' amount of "
+"seconds.A negative number means that users will never expire."
 msgstr "사용자가 'n'초 안에 로그인하지 않으면 만료됩니다. 음수는 사용자가 절대 만료되지 않는다는 의미입니다."
 
-#: src/desktop/conf.py:697
+#: src/desktop/conf.py:767
 msgid "Apply 'expires_after' to superusers."
 msgstr "수퍼 사용자에게 'expires_after'를 적용합니다."
 
-#: src/desktop/conf.py:701
-msgid "Users will automatically be logged out after 'n' seconds of inactivity.A negative number means that idle sessions will not be timed out."
+#: src/desktop/conf.py:771
+msgid ""
+"Users will automatically be logged out after 'n' seconds of inactivity.A "
+"negative number means that idle sessions will not be timed out."
 msgstr "'n'초 동안 활동이 없으면 사용자가 자동으로 로그아웃됩니다. 음수인 경우 유휴 세션은 만료되지 않습니다."
 
-#: src/desktop/conf.py:707
-msgid "When set to true this will allow you to specify a password for the user when you create the user and then force them to change their password upon first login.  The default is false."
-msgstr "true로 설정하면 사용자를 생성할 때 사용자에 대한 암호를 지정할 수 있으며, 처음에 로그인할 때 암호를 변경하도록 요청합니다. 기본값은 false입니다."
+#: src/desktop/conf.py:777
+msgid ""
+"When set to true this will allow you to specify a password for the user "
+"when you create the user and then force them to change their password "
+"upon first login.  The default is false."
+msgstr ""
+"true로 설정하면 사용자를 생성할 때 사용자에 대한 암호를 지정할 수 있으며, 처음에 로그인할 때 암호를 변경하도록 요청합니다. "
+"기본값은 false입니다."
 
-#: src/desktop/conf.py:715
-msgid "Number of login attempts allowed before a record is created for failed logins"
+#: src/desktop/conf.py:785
+msgid ""
+"Number of login attempts allowed before a record is created for failed "
+"logins"
 msgstr "실패한 로그인에 대한 레코드를 생성하기 전에 허용되는 로그인 시도 횟수"
 
-#: src/desktop/conf.py:721
-msgid "After number of allowed login attempts are exceeded, do we lock out this IP and optionally user agent?"
+#: src/desktop/conf.py:791
+msgid ""
+"After number of allowed login attempts are exceeded, do we lock out this "
+"IP and optionally user agent?"
 msgstr "허용된 로그인 시도 횟수를 초과한 후에 이 IP 및 사용자 에이전트(선택 사항)를 잠그시겠습니까?"
 
-#: src/desktop/conf.py:727
-msgid "If set, defines period of inactivity in seconds after which failed logins will be forgotten"
+#: src/desktop/conf.py:797
+msgid ""
+"If set, defines period of inactivity in seconds after which failed logins"
+" will be forgotten"
 msgstr "설정되면 지난 후 실패한 로그인이 무시될 비활동 기간(초) 정의"
 
-#: src/desktop/conf.py:734
+#: src/desktop/conf.py:804
 msgid "If True, lock out based on IP and browser user agent"
 msgstr "True인 경우 IP 및 브라우저 사용자 에이전트에 따라 잠금"
 
-#: src/desktop/conf.py:740
-msgid "If True, lock out based on an IP address AND a user agent.This means requests from different user agents but from the same IP are treated differently."
-msgstr "True인 경우 IP 주소 및 사용자 에이전트에 따라 잠급니다. 즉, 동일한 IP에서 다른 사용자 에이전트의 요청은 다르게 처리됩니다."
+#: src/desktop/conf.py:810
+msgid ""
+"If True, lock out based on an IP address AND a user agent.This means "
+"requests from different user agents but from the same IP are treated "
+"differently."
+msgstr ""
+"True인 경우 IP 주소 및 사용자 에이전트에 따라 잠급니다. 즉, 동일한 IP에서 다른 사용자 에이전트의 요청은 다르게 "
+"처리됩니다."
 
-#: src/desktop/conf.py:747
+#: src/desktop/conf.py:817
 msgid "If True, lock out based on IP and user"
 msgstr "True인 경우 IP 및 사용자에 따라 잠금"
 
-#: src/desktop/conf.py:756
+#: src/desktop/conf.py:823
+msgid ""
+"If True, it will look for the IP address from the header defined at "
+"reverse_proxy_header."
+msgstr ""
+"True인 경우 reverse_proxy_header에 정의된 헤더에서 "
+"IP 주소를 찾습니다."
+
+#: src/desktop/conf.py:829
+msgid ""
+"If behind_reverse_proxy is True, it will look for the IP address from "
+"this header. Default: HTTP_X_FORWARDED_FOR"
+msgstr ""
+"behind_reverse_proxy가 True인 경우 이 헤더에서 "
+"IP 주소를 찾습니다. 기본값: HTTP_X_FORWARDED_FOR"
+
+#: src/desktop/conf.py:838
 msgid "Configuration options for LDAP connectivity."
 msgstr "LDAP 연결의 구성 옵션입니다."
 
-#: src/desktop/conf.py:759
+#: src/desktop/conf.py:841
 msgid "Create users when they login with their LDAP credentials."
 msgstr "LDAP 자격 증명을 사용하여 로그인할 때 사용자를 생성합니다."
 
-#: src/desktop/conf.py:763
+#: src/desktop/conf.py:845
 msgid "Synchronize a users groups when they login."
 msgstr "로그인 시 사용자 그룹을 동기화합니다."
 
-#: src/desktop/conf.py:771
+#: src/desktop/conf.py:853
 msgid "Force usernames to lowercase when creating new users from LDAP."
 msgstr "LDAP에서 새 사용자를 만들 때 사용자 이름을 소문자로 지정합니다."
 
-#: src/desktop/conf.py:775
+#: src/desktop/conf.py:857
 msgid "Force usernames to uppercase when creating new users from LDAP."
 msgstr "LDAP에서 새 사용자를 만들 때 사용자 이름을 대문자로 지정합니다."
 
-#: src/desktop/conf.py:779
-msgid "Choose which kind of subgrouping to use: nested or suboordinate (deprecated)."
+#: src/desktop/conf.py:861
+msgid ""
+"Choose which kind of subgrouping to use: nested or suboordinate "
+"(deprecated)."
 msgstr "사용할 하위 그룹 종류 선택: 중첩됨 또는 종속됨(사용되지 않음)."
 
-#: src/desktop/conf.py:783
+#: src/desktop/conf.py:865
 msgid "Define the number of levels to search for nested members."
 msgstr "중첩된 구성원을 검색할 레벨 수를 정의합니다."
 
-#: src/desktop/conf.py:787 src/desktop/conf.py:846
+#: src/desktop/conf.py:869 src/desktop/conf.py:928
 msgid "Whether or not to follow referrals."
 msgstr "추천을 따를 것인지의 여부입니다."
 
-#: src/desktop/conf.py:794 src/desktop/conf.py:853
+#: src/desktop/conf.py:876 src/desktop/conf.py:935
 msgid "Set to a value to enable python-ldap debugging."
 msgstr "python-ldap 디버깅을 사용하려면 값을 설정합니다."
 
-#: src/desktop/conf.py:798 src/desktop/conf.py:857
+#: src/desktop/conf.py:880 src/desktop/conf.py:939
 msgid "Sets the debug level within the underlying LDAP C lib."
 msgstr "기본 LDAP C lib에서 디버그 레벨을 설정합니다."
 
-#: src/desktop/conf.py:802 src/desktop/conf.py:861
-msgid "Possible values for trace_level are 0 for no logging, 1 for only logging the method calls with arguments,2 for logging the method calls with arguments and the complete results and 9 for also logging the traceback of method calls."
-msgstr "trace_level에 대해 가능한 값은 로깅하지 않는 경우 0, 인수를 포함하는 메소드 호출만 로깅하는 경우 1, 전체 결과 및 인수를 포함하는 메소드 호출을 로깅하는 경우 2, 메소드 호출의 역추적도 로깅하는 경우 9입니다."
+#: src/desktop/conf.py:884 src/desktop/conf.py:943
+msgid ""
+"Possible values for trace_level are 0 for no logging, 1 for only logging "
+"the method calls with arguments,2 for logging the method calls with "
+"arguments and the complete results and 9 for also logging the traceback "
+"of method calls."
+msgstr ""
+"trace_level에 대해 가능한 값은 로깅하지 않는 경우 0, 인수를 포함하는 메소드 호출만 로깅하는 경우 1, 전체 결과 및 "
+"인수를 포함하는 메소드 호출을 로깅하는 경우 2, 메소드 호출의 역추적도 로깅하는 경우 9입니다."
 
-#: src/desktop/conf.py:807
+#: src/desktop/conf.py:889
 msgid "LDAP server record."
 msgstr "LDAP 서버 레코드입니다."
 
-#: src/desktop/conf.py:812 src/desktop/conf.py:899
+#: src/desktop/conf.py:894 src/desktop/conf.py:981
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "LDAP 검색에 사용하는 기본 LDAP 고유 이름입니다."
 
-#: src/desktop/conf.py:815 src/desktop/conf.py:902
+#: src/desktop/conf.py:897 src/desktop/conf.py:984
 msgid "The NT domain used for LDAP authentication."
 msgstr "LDAP 인증에 사용하는 NT 도메인입니다."
 
-#: src/desktop/conf.py:818 src/desktop/conf.py:905
+#: src/desktop/conf.py:900 src/desktop/conf.py:987
 msgid "The LDAP URL to connect to."
 msgstr "연결할 LDAP URL입니다."
 
-#: src/desktop/conf.py:822 src/desktop/conf.py:909
+#: src/desktop/conf.py:904 src/desktop/conf.py:991
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "LDAP 서버와 통신할 때 StartTLS를 사용합니다."
 
-#: src/desktop/conf.py:825 src/desktop/conf.py:912
-msgid "A PEM-format file containing certificates for the CA's that Hue will trust for authentication over TLS. The certificate for the CA that signed the LDAP server certificate must be included among these certificates. See more here http://www.openldap.org/doc/admin24/tls.html."
-msgstr "TLS를 통한 인증에서 Hue가 신뢰할 CA의 인증서를 포함하는 PEM 형식의 파일입니다. LDAP 서버 인증서에 서명한 CA의 인증서를 이러한 인증서에 포함해야 합니다. 자세한 내용은 http://www.openldap.org/doc/admin24/tls.html을 참조하십시오."
+#: src/desktop/conf.py:907 src/desktop/conf.py:994
+msgid ""
+"A PEM-format file containing certificates for the CA's that Hue will "
+"trust for authentication over TLS. The certificate for the CA that signed"
+" the LDAP server certificate must be included among these certificates. "
+"See more here http://www.openldap.org/doc/admin24/tls.html."
+msgstr ""
+"TLS를 통한 인증에서 Hue가 신뢰할 CA의 인증서를 포함하는 PEM 형식의 파일입니다. LDAP 서버 인증서에 서명한 CA의 "
+"인증서를 이러한 인증서에 포함해야 합니다. 자세한 내용은 "
+"http://www.openldap.org/doc/admin24/tls.html을 참조하십시오."
 
-#: src/desktop/conf.py:828 src/desktop/conf.py:915
+#: src/desktop/conf.py:910 src/desktop/conf.py:997
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "LDAP 사용자 이름 생성에 사용하는 패턴입니다."
 
-#: src/desktop/conf.py:831 src/desktop/conf.py:918
+#: src/desktop/conf.py:913 src/desktop/conf.py:1000
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "LDAP에서 가져올 때 바인딩할 고유 이름입니다."
 
-#: src/desktop/conf.py:835 src/desktop/conf.py:922
+#: src/desktop/conf.py:917 src/desktop/conf.py:1004
 msgid "The password for the bind user."
 msgstr "바인딩 사용자의 암호입니다."
 
-#: src/desktop/conf.py:840 src/desktop/conf.py:927
-msgid "Execute this script to produce the LDAP bind user password. This will be used when `bind_password` is not set."
+#: src/desktop/conf.py:922 src/desktop/conf.py:1009
+msgid ""
+"Execute this script to produce the LDAP bind user password. This will be "
+"used when `bind_password` is not set."
 msgstr "LDAP 바인딩 사용자 암호를 생성하려면 이 스크립트를 실행합니다. `bind_password`가 설정되지 않은 경우 사용합니다."
 
-#: src/desktop/conf.py:844 src/desktop/conf.py:931
+#: src/desktop/conf.py:926 src/desktop/conf.py:1013
 msgid "Use search bind authentication."
 msgstr "바인딩 인증 검색을 사용합니다."
 
-#: src/desktop/conf.py:866 src/desktop/conf.py:935
+#: src/desktop/conf.py:948 src/desktop/conf.py:1017
 msgid "Configuration for LDAP user schema and search."
 msgstr "LDAP 사용자 스키마 및 검색에 대한 구성입니다."
 
-#: src/desktop/conf.py:870 src/desktop/conf.py:939
+#: src/desktop/conf.py:952 src/desktop/conf.py:1021
 msgid "A base filter for use when searching for users."
 msgstr "사용자 검색 시 사용하는 기본 필터입니다."
 
-#: src/desktop/conf.py:873 src/desktop/conf.py:942
-msgid "The username attribute in the LDAP schema. Typically, this is 'sAMAccountName' for AD and 'uid' for other LDAP systems."
-msgstr "LDAP 스키마의 사용자 이름 특성입니다. 일반적으로 AD에는 'sAMAccountName'이, 기타 LDAP 시스템에는 'uid'가 사용됩니다."
+#: src/desktop/conf.py:955 src/desktop/conf.py:1024
+msgid ""
+"The username attribute in the LDAP schema. Typically, this is "
+"'sAMAccountName' for AD and 'uid' for other LDAP systems."
+msgstr ""
+"LDAP 스키마의 사용자 이름 특성입니다. 일반적으로 AD에는 'sAMAccountName'이, 기타 LDAP 시스템에는 "
+"'uid'가 사용됩니다."
 
-#: src/desktop/conf.py:881 src/desktop/conf.py:949
+#: src/desktop/conf.py:963 src/desktop/conf.py:1031
 msgid "Configuration for LDAP group schema and search."
 msgstr "LDAP 그룹 스키마 및 검색에 대한 구성입니다."
 
-#: src/desktop/conf.py:885 src/desktop/conf.py:953
+#: src/desktop/conf.py:967 src/desktop/conf.py:1035
 msgid "A base filter for use when searching for groups."
 msgstr "그룹 검색 시 사용하는 기본 필터입니다."
 
-#: src/desktop/conf.py:888 src/desktop/conf.py:956
+#: src/desktop/conf.py:970 src/desktop/conf.py:1038
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "LDAP 스키마의 그룹 이름 특성입니다. 일반적으로 'cn'입니다."
 
-#: src/desktop/conf.py:892 src/desktop/conf.py:960
+#: src/desktop/conf.py:974 src/desktop/conf.py:1042
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "그룹의 구성원을 지정하는 LDAP 특성입니다."
 
-#: src/desktop/conf.py:967
+#: src/desktop/conf.py:1049
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Oauth 1.0 인증의 구성 옵션"
 
-#: src/desktop/conf.py:971
+#: src/desktop/conf.py:1053
 msgid "The Consumer key of the application."
 msgstr "애플리케이션의 소비자 키입니다"
 
-#: src/desktop/conf.py:978
+#: src/desktop/conf.py:1060
 msgid "The Consumer secret of the application."
 msgstr "애플리케이션의 소비자 암호입니다."
 
-#: src/desktop/conf.py:985
+#: src/desktop/conf.py:1067
 msgid "The Request token URL."
 msgstr "요청 토큰 URL입니다."
 
-#: src/desktop/conf.py:992
+#: src/desktop/conf.py:1074
 msgid "The Access token URL."
 msgstr "액세스 토큰 URL입니다."
 
-#: src/desktop/conf.py:999
+#: src/desktop/conf.py:1081
 msgid "The Authorize URL."
 msgstr "인증 URL입니다."
 
-#: src/desktop/conf.py:1010
+#: src/desktop/conf.py:1092
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "사용자가 찾아볼 수 있는 로컬 파일 시스템의 경로입니다."
 
-#: src/desktop/conf.py:1015
+#: src/desktop/conf.py:1097
 msgid "The path on the local filesystem."
 msgstr "로컬 파일 시스템의 경로입니다."
 
-#: src/desktop/conf.py:1024
+#: src/desktop/conf.py:1106
 msgid "Link for 'feedback' tab."
 msgstr "'피드백' 탭의 링크입니다."
 
-#: src/desktop/conf.py:1031
+#: src/desktop/conf.py:1113
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "JavaScript에서 서버 로그로 디버그 메시지를 전송할지 여부입니다."
 
-#: src/desktop/conf.py:1038
+#: src/desktop/conf.py:1120
 msgid "Enable or disable database debug mode."
 msgstr "데이터베이스 디버그 모드를 설정 또는 해제합니다."
 
-#: src/desktop/conf.py:1045
+#: src/desktop/conf.py:1127
 msgid "Administrators that should receive error emails."
 msgstr "오류 Email을 수신하는 관리자입니다."
 
-#: src/desktop/conf.py:1050
+#: src/desktop/conf.py:1132
 msgid "The full name of the admin."
 msgstr "관리자의 전체 이름입니다."
 
-#: src/desktop/conf.py:1053
+#: src/desktop/conf.py:1135
 msgid "The email address of the admin."
 msgstr "관리자의 이메일 주소입니다."
 
-#: src/desktop/conf.py:1057
+#: src/desktop/conf.py:1139
 msgid "Enable or disable Django debug mode."
 msgstr "Django 디버그 모드를 설정 또는 해제합니다."
 
-#: src/desktop/conf.py:1064
-msgid "Enable or disable debugging information in the 500 internal server error response. Note that the debugging information may contain sensitive data. If django_debug_mode is True, this is automatically enabled."
-msgstr "500 내부 서버 오류 응답에서 디버깅 정보를 설정 또는 해제합니다. django_debug_mode가 TRUE이면 이 항목이 자동으로 설정됩니다."
+#: src/desktop/conf.py:1146
+msgid ""
+"Enable or disable debugging information in the 500 internal server error "
+"response. Note that the debugging information may contain sensitive data."
+" If django_debug_mode is True, this is automatically enabled."
+msgstr ""
+"500 내부 서버 오류 응답에서 디버깅 정보를 설정 또는 해제합니다. django_debug_mode가 TRUE이면 이 항목이 "
+"자동으로 설정됩니다."
 
-#: src/desktop/conf.py:1073
+#: src/desktop/conf.py:1155
 msgid "Enable or disable memory profiling."
 msgstr "메모리 프로파일링을 설정 또는 해제합니다."
 
-#: src/desktop/conf.py:1079
-msgid "The directory where to store the auditing logs. Auditing is disable if the value is empty."
+#: src/desktop/conf.py:1162
+msgid ""
+"The directory where to store the auditing logs. Auditing is disable if "
+"the value is empty."
 msgstr "감사 로그를 저장할 디렉토리입니다. 값이 비어있는 경우 감사 기능을 사용할 수 없습니다."
 
-#: src/desktop/conf.py:1086
+#: src/desktop/conf.py:1169
 msgid "Size in KB/MB/GB for audit log to rollover."
 msgstr "롤오버할 감사 로그 크기(KB/MB/GB)"
 
-#: src/desktop/conf.py:1093
+#: src/desktop/conf.py:1176
 msgid "Email address that internal error messages should send as."
 msgstr "내부 오류 메시지를 전송하는 이메일 주소입니다."
 
-#: src/desktop/conf.py:1099
+#: src/desktop/conf.py:1182
 msgid "The email backend to use."
 msgstr "사용할 이메일 백엔드입니다."
 
-#: src/desktop/conf.py:1108
+#: src/desktop/conf.py:1191
 msgid "Enable the new editor SQL autocompleter"
 msgstr "새 편집기 SQL autocompleter 사용"
 
-#: src/desktop/conf.py:1115
-msgid "Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled"
+#: src/desktop/conf.py:1198
+msgid ""
+"Timeout value in ms for autocomplete of columns, tables, values etc. 0 = "
+"disabled"
 msgstr "열, 테이블, 값 등의 자동 완성에 대한 제한 시간 값(밀리초), 0 = 해제"
 
-#: src/desktop/conf.py:1122
+#: src/desktop/conf.py:1205
 msgid "Choose whether to show the new SQL editor."
 msgstr "새 SQL 편집기의 표시 여부를 선택합니다."
 
-#: src/desktop/conf.py:1129
+#: src/desktop/conf.py:1212
+msgid "Choose whether to show extended left and right panels."
+msgstr "확장된 왼쪽 및 오른쪽 패널을 표시할지 선택합니다."
+
+#: src/desktop/conf.py:1219
 msgid "Enable saved default configurations for Hive, Impala, Spark, and Oozie."
 msgstr "Hive, Impala, Spark 및 Oozie에 대해 저장된 기본 구성을 사용합니다."
 
-#: src/desktop/conf.py:1143
+#: src/desktop/conf.py:1226
+msgid "Choose whether to enable the new interface."
+msgstr "새 인터페이스의 사용 여부를 선택합니다."
+
+#: src/desktop/conf.py:1241
 msgid "If you set bind_password, then you must set bind_dn."
 msgstr "bind_password를 설정한 경우 bind_dn을 설정해야 합니다."
 
-#: src/desktop/conf.py:1146
+#: src/desktop/conf.py:1244
 msgid "If you set bind_dn, then you must set bind_password."
 msgstr "bind_dn을 설정하는 경우 bind_password를 설정해야 합니다"
 
-#: src/desktop/conf.py:1152
+#: src/desktop/conf.py:1250
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP가 일부만 구성되었습니다. LDAP URL은 필수 입력 사항입니다."
 
-#: src/desktop/conf.py:1158
-msgid "LDAP is only partially configured. An NT Domain or username search pattern must be provided."
+#: src/desktop/conf.py:1256
+msgid ""
+"LDAP is only partially configured. An NT Domain or username search "
+"pattern must be provided."
 msgstr "LDAP가 일부만 구성되었습니다. NT 도메인 또는 사용자 이름 검색 패턴은 반드시 제공되어야 합니다."
 
-#: src/desktop/conf.py:1164
-msgid "The LDAP username pattern should contain the special<username> replacement string for authentication."
+#: src/desktop/conf.py:1262
+msgid ""
+"The LDAP username pattern should contain the special<username> "
+"replacement string for authentication."
 msgstr "LDAP 사용자 이름 패턴에는 인증을 위해 특별한 <username> 대치 문자열을 포함해야 합니다."
 
-#: src/desktop/conf.py:1192
-msgid "We recommend MySQL InnoDB engine over\n"
-"                                                        MyISAM which does not support transactions."
-msgstr "전환을 지원하지 않는 MyISAM보다\n"
-"                                                        MySQL InnoDB 엔진을 추천합니다."
+#: src/desktop/conf.py:1289
+msgid ""
+"We recommend MySQL InnoDB engine over\n"
+"                                                        MyISAM which does"
+" not support transactions."
+msgstr ""
+"전환을 지원하지 않는 MyISAM보다\n"
+"                                                        MySQL InnoDB "
+"엔진을 추천합니다."
 
-#: src/desktop/conf.py:1196
-msgid "All tables in the database must be of the same\n"
-"                                                        storage engine type (preferably InnoDB)."
-msgstr "데이터베이스에 있는 모든 테이블은 동일한 엔진 유형으로\n"
-"                                                       구성되어야 합니다(가급적 InnoDB)."
+#: src/desktop/conf.py:1293
+msgid ""
+"All tables in the database must be of the same\n"
+"                                                        storage engine "
+"type (preferably InnoDB)."
+msgstr ""
+"데이터베이스에 있는 모든 테이블은 동일한 엔진 유형으로\n"
+"                                                        구성되어야 합니다"
+"(가급적 InnoDB)."
 
-#: src/desktop/conf.py:1201
-msgid "SQLite is only recommended for development environments. It might cause the \"Database is locked\" error. Migrating to MySQL, Oracle or PostgreSQL is strongly recommended."
-msgstr "SQLite는 개발 환경에서만 권장됩니다. \"데이터베이스 잠김\" 오류가 발생할 수 있습니다. MySQL, Oracle 또는 PostgreSQL로 마이그레이션하는 것이 좋습니다."
+#: src/desktop/conf.py:1298
+msgid ""
+"SQLite is only recommended for development environments. It might cause "
+"the \"Database is locked\" error. Migrating to MySQL, Oracle or "
+"PostgreSQL is strongly recommended."
+msgstr ""
+"SQLite는 개발 환경에서만 권장됩니다. \"데이터베이스 잠김\" 오류가 발생할 수 있습니다. MySQL, Oracle 또는 "
+"PostgreSQL로 마이그레이션하는 것이 좋습니다."
 
-#: src/desktop/conf.py:1216
-msgid "Secret key should be configured as a random string. All sessions will be lost on restart"
+#: src/desktop/conf.py:1313
+msgid ""
+"Secret key should be configured as a random string. All sessions will be "
+"lost on restart"
 msgstr "암호 키는 임의의 문자열로 구성되어야 합니다. 재시작하면 모든 세션이 사라집니다."
 
-#: src/desktop/conf.py:1222
+#: src/desktop/conf.py:1319
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "SSL 개인 키 파일은 HTTPS를 사용하도록 설정되어야 합니다."
 
-#: src/desktop/conf.py:1228
+#: src/desktop/conf.py:1325
 msgid "Encoding not supported."
 msgstr "인코딩이 지원되지 않습니다."
 
-#: src/desktop/conf.py:1237
+#: src/desktop/conf.py:1334
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "Keytab에는 0600 권한(%o 보유)이 있어야 합니다."
+
+#: src/desktop/conf.py:1353
+msgid ""
+"Email notifications is disabled for Workflows and Jobs as SMTP server is "
+"localhost."
+msgstr ""
+"SMTP 서버가 localhost여서 Workflow 및 Job에 대한 Email 알림이 "
+"해제되었습니다."
+
+#: src/desktop/converters.py:236
+#, python-format
+msgid "Failed to convert Document object: %s"
+msgstr "문서 개체를 변환하지 못함: %s"
 
 #: src/desktop/decorators.py:46
 #, python-format
@@ -739,7 +1025,7 @@ msgid "You must be a superuser to perform this operation."
 msgstr "이 작업을 수행하려면 superuser여야 합니다."
 
 #: src/desktop/decorators.py:75
-#, fuzzy, python-format
+#, python-format
 msgid "Job %(id)s does not exist"
 msgstr "Job %(id)s이(가) 존재하지 않음"
 
@@ -760,139 +1046,155 @@ msgstr "미들웨어 모듈 \"%(module)s\"은(는) \"%(class)s\" 클래스를 �
 
 #: src/desktop/middleware.py:252
 #, python-format
-msgid "AppSpecificMiddleware module \"%(module)s\" has a process_request function which is impossible."
-msgstr "AppSpecificMiddleware 모듈 \"%(module)s\"에 process_request 함수가 있는데, 이는 허용되지 않습니다."
+msgid ""
+"AppSpecificMiddleware module \"%(module)s\" has a process_request "
+"function which is impossible."
+msgstr ""
+"AppSpecificMiddleware 모듈 \"%(module)s\"에 process_request 함수가 있는데, 이는 허용되지"
+" 않습니다."
 
 #: src/desktop/middleware.py:313
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "%(app_name)s 애플리케이션에 대한 액세스 권한이 없습니다."
 
-#: src/desktop/middleware.py:649
+#: src/desktop/middleware.py:677
 #, python-format
 msgid "Redirect to %s is not allowed."
 msgstr "%s(으)로 리디렉션할 수 없습니다."
 
-#: src/desktop/models.py:124
+#: src/desktop/models.py:127
 msgid "App that this configuration belongs to."
 msgstr "이 구성이 속한 앱입니다."
 
-#: src/desktop/models.py:125
+#: src/desktop/models.py:128
 msgid "JSON-formatted default properties values."
 msgstr "JSON 형식의 기본 속성 값입니다."
 
-#: src/desktop/models.py:176 src/desktop/models.py:204
+#: src/desktop/models.py:179 src/desktop/models.py:207
 #, python-format
 msgid "Can't add %s: it is a reserved tag."
 msgstr "%s은(는) 예약된 태그이므로 추가할 수 없습니다."
 
-#: src/desktop/models.py:217 src/desktop/models.py:227
+#: src/desktop/models.py:220 src/desktop/models.py:230
 #, python-format
 msgid "Can't remove %s: it is a reserved tag."
 msgstr "%s은(는) 예약된 태그이므로 제거할 수 없습니다."
 
-#: src/desktop/models.py:341
+#: src/desktop/models.py:344
 #, python-format
-msgid "Permission denied. %(username)s does not have the permissions required to access document %(id)s"
+msgid ""
+"Permission denied. %(username)s does not have the permissions required to"
+" access document %(id)s"
 msgstr "권한이 거부되었습니다. %(username)s(은)는 %(id)s 문서에 액세스하는 데 필요한 권한이 없습니다."
 
-#: src/desktop/models.py:346
+#: src/desktop/models.py:349
 #, python-format
 msgid "Document %(id)s does not exist"
 msgstr "%(id)s 문서가 존재하지 않음"
 
-#: src/desktop/models.py:573 src/desktop/models.py:1020
-#: src/desktop/templates/assist.mako:599
-#: src/desktop/templates/file_browser.mako:589
+#: src/desktop/models.py:579 src/desktop/models.py:1026
+#: src/desktop/templates/assist.mako:779
+#: src/desktop/templates/common_import_export.mako:75
+#: src/desktop/templates/document_browser.mako:483
+#: src/desktop/templates/document_browser.mako:676
+#: src/desktop/templates/sql_context_popover.mako:182
 msgid "Owner"
 msgstr "소유자"
 
-#: src/desktop/models.py:573
+#: src/desktop/models.py:579
 msgid "User who can own the job."
 msgstr "Job을 소유할 수 있는 사용자입니다."
 
-#: src/desktop/models.py:577
+#: src/desktop/models.py:583
 msgid "Last modified"
 msgstr "최종 수정 날짜"
 
-#: src/desktop/models.py:578
+#: src/desktop/models.py:584
 msgid "Schema version"
 msgstr "스키마 버전"
 
-#: src/desktop/models.py:645 src/desktop/models.py:651
-#: src/desktop/models.py:1228 src/desktop/models.py:1239
+#: src/desktop/models.py:651 src/desktop/models.py:657
+#: src/desktop/models.py:1239 src/desktop/models.py:1250
 msgid "Document does not exist or you don't have the permission to access it."
 msgstr "문서가 존재하지 않거나 액세스 권한이 없습니다."
 
-#: src/desktop/models.py:677
+#: src/desktop/models.py:683
 msgid "Document copy method requires a content_object argument."
 msgstr "문서 복사 메소드에 content_object 인수가 필요합니다."
 
-#: src/desktop/models.py:770
+#: src/desktop/models.py:776
 #, python-format
 msgid "Only %s permissions are supported, not %s."
 msgstr "%s 권한만 지원되고, %s 권한은 지원되지 않습니다."
 
-#: src/desktop/models.py:943
+#: src/desktop/models.py:949
 #, python-format
 msgid "Document with UUID %s not found."
 msgstr "UUID가 %s인 문서를 찾을 수 없습니다."
 
-#: src/desktop/models.py:976
+#: src/desktop/models.py:982
 #, python-format
 msgid "Requested invalid path for user %s: %s"
 msgstr "사용자 %s에 대해 요청된 경로가 올바르지 않음: %s"
 
-#: src/desktop/models.py:978
+#: src/desktop/models.py:984
 #, python-format
 msgid "Duplicate documents found for user %s at path: %s"
 msgstr "사용자 %s에 대한 중복 문서를 찾음(경로: %s)"
 
-#: src/desktop/models.py:1020
+#: src/desktop/models.py:1026
 msgid "Creator."
 msgstr "생성자."
 
-#: src/desktop/models.py:1024
+#: src/desktop/models.py:1030
 msgid "Type of document, e.g. Hive query, Oozie workflow, Search Dashboard..."
 msgstr "문서 유형(예: Hive 쿼리, Oozie workflow, 검색 대시보드 등)"
 
-#: src/desktop/models.py:1028
+#: src/desktop/models.py:1034
 msgid "Searchable text for the document."
 msgstr "문서에서 검색 가능한 텍스트입니다."
 
-#: src/desktop/models.py:1031
+#: src/desktop/models.py:1037
 msgid "Time last modified"
 msgstr "최종 수정 시간"
 
-#: src/desktop/models.py:1032
+#: src/desktop/models.py:1038
 msgid "Document version"
 msgstr "문서 버전"
 
-#: src/desktop/models.py:1034
+#: src/desktop/models.py:1040
 msgid "If managed under the cover by Hue and never by the user"
 msgstr "사용자가 아닌 Hue에서 관리하는 경우"
 
-#: src/desktop/models.py:1183
+#: src/desktop/models.py:1194
 #, python-format
-msgid "Document %s contains an invalid character."
-msgstr "%s 문서에 올바르지 않은 문자가 포함되었습니다."
+msgid "Document %s contains some special characters: %s"
+msgstr "%s 문서에 일부 특수 문자가 포함됨: %s"
 
-#: src/desktop/models.py:1188
+#: src/desktop/models.py:1199
 #, python-format
 msgid "Cannot create or modify directory with name: %s"
 msgstr "이름이 다음과 같은 디렉토리를 생성하거나 수정할 수 없음: %s"
 
-#: src/desktop/models.py:1192
+#: src/desktop/models.py:1203
 #, python-format
-msgid "Cannot save document %s under parent directory %s due to circular dependency"
+msgid ""
+"Cannot save document %s under parent directory %s due to circular "
+"dependency"
 msgstr "순환 종속을 이유로 %s 문서를 상위 디렉토리 %s 하에 저장할 수 없음"
 
-#: src/desktop/models.py:1205
+#: src/desktop/models.py:1216
 #, python-format
 msgid "Target with UUID %s is not a directory"
 msgstr "UUID가 %s인 대상이 디렉토리가 아님"
 
-#: src/desktop/models.py:1263
+#: src/desktop/models.py:1266
+#, python-format
+msgid "Failed to share document: %s"
+msgstr "문서를 공유하지 못함: %s"
+
+#: src/desktop/models.py:1277
 #, python-format
 msgid "Invalid permission type: %s"
 msgstr "올바르지 않은 권한 유형: %s"
@@ -933,27 +1235,29 @@ msgstr "포르투갈어(브라질)"
 msgid "Simplified Chinese"
 msgstr "중국어(간체)"
 
-#: src/desktop/settings.py:469
+#: src/desktop/settings.py:487
 #, python-format
 msgid "SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s"
 msgstr "REQUESTS_CA_BUNDLE에서 가리키는 SSL 인증서가 존재하지 않음: %s"
 
-#: src/desktop/views.py:103 src/desktop/views.py:119 src/desktop/views.py:229
-#: src/desktop/views.py:248 src/desktop/views.py:259 src/desktop/views.py:503
-#: src/desktop/views.py:538 src/desktop/views.py:548
+#: src/desktop/views.py:132 src/desktop/views.py:148 src/desktop/views.py:258
+#: src/desktop/views.py:277 src/desktop/views.py:288 src/desktop/views.py:551
+#: src/desktop/views.py:586 src/desktop/views.py:596
 msgid "You must be a superuser."
 msgstr "superuser여야 합니다."
 
-#: src/desktop/views.py:111
+#: src/desktop/views.py:140
 msgid "No logs found!"
 msgstr "로그를 찾을 수 없습니다!"
 
-#: src/desktop/views.py:152
+#: src/desktop/views.py:181
 msgid "No logs found."
 msgstr "로그를 찾을 수 없습니다."
 
-#: src/desktop/views.py:262
-msgid "You must enable the memory profiler via the memory_profiler config in the hue.ini."
+#: src/desktop/views.py:291
+msgid ""
+"You must enable the memory profiler via the memory_profiler config in the"
+" hue.ini."
 msgstr "hue.ini의 memory_profiler 구성을 통해 메모리 프로파일러를 설정해야 합니다."
 
 #: src/desktop/auth/forms.py:44
@@ -974,22 +1278,20 @@ msgstr "암호"
 
 #: src/desktop/auth/forms.py:74
 #, python-format
-msgid "Account deactivated. Please contact an <a href=\"mailto:%s\">administrator</a>."
+msgid ""
+"Account deactivated. Please contact an <a "
+"href=\"mailto:%s\">administrator</a>."
 msgstr "계정이 비활성화되었습니다. <a href=\"mailto:%s\">관리자</a>에게 문의하십시오."
 
-#: src/desktop/auth/views.py:132 src/desktop/auth/views.py:133
-msgid "Could not create home directory."
-msgstr "홈 디렉토리를 생성할 수 없습니다."
-
-#: src/desktop/auth/views.py:232 src/desktop/auth/views.py:249
+#: src/desktop/auth/views.py:233 src/desktop/auth/views.py:250
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "OAuth 제공자의 응답이 올바르지 않음: %s"
 
 #: src/desktop/configuration/api.py:79 src/desktop/configuration/api.py:125
-#, fuzzy, python-format
+#, python-format
 msgid "%s method is not supported"
-msgstr "%s 메소드가 지원되지 않음"
+msgstr "%s 메서드가 지원되지 않음"
 
 #: src/desktop/configuration/api.py:91
 msgid "app_configuration_for_user requires app and user_id"
@@ -1022,13 +1324,20 @@ msgstr "ID가 %d인 구성을 찾을 수 없음"
 msgid "Successfully deleted the default configuration."
 msgstr "기본 구성을 성공적으로 삭제했습니다."
 
-#: src/desktop/configuration/api.py:223
+#: src/desktop/configuration/api.py:224
 #, python-format
 msgid "Could not find one or more groups with IDs: %s"
 msgstr "ID가 %s인 하나 이상의 그룹을 찾을 수 없음"
 
-#: src/desktop/configuration/api.py:230
-msgid "_save_configuration requires app, properties, and is_default, groups or user_id"
+#: src/desktop/configuration/api.py:226
+#, python-format
+msgid "Failed to update configurations: %s"
+msgstr "구성을 업데이트하지 못함: %s"
+
+#: src/desktop/configuration/api.py:233
+msgid ""
+"_save_configuration requires app, properties, and is_default, groups or "
+"user_id"
 msgstr "_save_configuration에 앱, 속성 그리고 is_default, groups 또는 user_id가 필요함"
 
 #: src/desktop/lib/django_util.py:404
@@ -1111,6 +1420,10 @@ msgstr "\"error\" 메소드가 구현되지 않음"
 msgid "Can't replace %s pattern since host is null."
 msgstr "호스트가 null이므로 %s 패턴을 교체할 수 없습니다."
 
+#: src/desktop/lib/thrift_util.py:388
+msgid "Increase the sasl_max_buffer value in hue.ini"
+msgstr "hue.ini에서 sasl_max_buffer 값 늘리기"
+
 #: src/desktop/management/commands/config_dump.py:39
 msgid "Dumping configuration..."
 msgstr "구성을 덤프하는 중..."
@@ -1168,7 +1481,9 @@ msgstr "템플릿 경로 (%(path)r)가 존재하지 않습니다."
 #: src/desktop/management/commands/create_desktop_app.py:52
 #: src/desktop/management/commands/create_proxy_app.py:57
 #, python-format
-msgid "%(name)r is not a valid application name. Use only numbers, letters and underscores."
+msgid ""
+"%(name)r is not a valid application name. Use only numbers, letters and "
+"underscores."
 msgstr "%(name)r은(는) 올바른 애플리케이션 이름이 아닙니다. 숫자, 문자, 밑줄만 사용하십시오."
 
 #: src/desktop/management/commands/create_proxy_app.py:31
@@ -1185,7 +1500,9 @@ msgid "Created fs in: %(dir)s"
 msgstr "파일 시스템이 생성된 위치: %(dir)s"
 
 #: src/desktop/management/commands/create_user_directories.py:43
-msgid "Creates home and Trash directories for users as needed, or specific user if username is provided."
+msgid ""
+"Creates home and Trash directories for users as needed, or specific user "
+"if username is provided."
 msgstr "필요한 경우 사용자 또는 사용자 이름을 제공한 경우 해당 사용자에 대한 홈 및 휴지통 디렉토리를 생성합니다."
 
 #: src/desktop/management/commands/create_user_directories.py:46
@@ -1197,7 +1514,6 @@ msgid "CherryPy Server for Desktop."
 msgstr "Desktop용 CherryPy 서버입니다."
 
 #: src/desktop/management/commands/runcherrypyserver.py:121
-#, fuzzy, python-format
 msgid "starting server with options:"
 msgstr "다음 옵션을 사용하여 서버 시작:"
 
@@ -1206,32 +1522,38 @@ msgid "Web server for Hue."
 msgstr "Hue의 웹 서버입니다."
 
 #: src/desktop/management/commands/runpylint.py:28
-msgid "\n"
+msgid ""
+"\n"
 "  Runs pylint on desktop and app code.\n"
 "\n"
 "  With no arguments, or with \"all\", this will run pylint on all\n"
 "  installed apps.  Otherwise, specify modules to run, as well\n"
-"  as other parameters to pylint.  Note that you'll want to preface the section\n"
-"  of pylint arguments with \"--\" so Django's manage.py passes them along.\n"
+"  as other parameters to pylint.  Note that you'll want to preface the "
+"section\n"
+"  of pylint arguments with \"--\" so Django's manage.py passes them "
+"along.\n"
 "\n"
 "  Examples:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
 "  "
-msgstr "\n"
+msgstr ""
+"\n"
 "  pylint를 desktop 및 app 코드로 실행합니다.\n"
 "\n"
-"  인수를 사용하지 않거나 \"all\"을 사용하면 설치된 모든l\n"
-"  앱에서 pylint가 실행됩니다. 그렇게 하지 않으려면 실행할 모듈 및\n"
-"  다른 매개변수를 pylint에 지정하십시오. pylint 인수 영역 앞에 \"--\" 접두사를\n"
-"  사용하면 Django의 manage.py가 인수를 전달합니다.\n"
-"  \n"
+"  인수를 사용하지 않거나 \"all\"을 사용하면 설치된 모든\n"
+"  앱에서 pylint가 실행됩니다.  그렇게 하지 않으려면 실행할 모듈 및\n"
+"  다른 매개변수를 pylint에 지정하십시오.  pylint 인수 "
+"섹션\n"
+"  앞에 \"--\" 접두사를 사용하면 Django의 manage.py가 인수를 "
+"전달합니다.\n"
+"\n"
 "  예:\n"
 "    python core/manage.py runpylint all -- -f parseable\n"
 "    python core/manage.py runpylint filebrowser\n"
 "    python core/manage.py runpylint\n"
-"  "
+" "
 
 #: src/desktop/management/commands/runpylint.py:61
 #, python-format
@@ -1247,9 +1569,12 @@ msgid "Access forbidden."
 msgstr "액세스가 금지되었습니다."
 
 #: src/desktop/templates/403.mako:35
-#, fuzzy, python-format
-msgid "Sorry, you don't have permissions to access the page, or your session has expired."
-msgstr "죄송합니다. 페이지에 액세스할 권한이 없거나 세션이 만료되었습니다."
+msgid ""
+"Sorry, you don't have permissions to access the page, or your session has"
+" expired."
+msgstr ""
+"죄송합니다. 페이지에 액세스할 권한이 없거나 세션이 "
+"만료되었습니다."
 
 #: src/desktop/templates/403.mako:37 src/desktop/templates/404.mako:36
 msgid "Go to My documents"
@@ -1264,7 +1589,9 @@ msgid "CSRF error."
 msgstr "CSRF 오류입니다."
 
 #: src/desktop/templates/403_csrf.mako:35
-msgid "Sorry, your session is invalid or has expired. Please go back, refresh the page, and try your submission again."
+msgid ""
+"Sorry, your session is invalid or has expired. Please go back, refresh "
+"the page, and try your submission again."
 msgstr "죄송합니다. 세션이 올바르지 않거나 만료되었습니다. 다시 돌아가서 페이지를 새로 고침 한 후 다시 제출해 주십시오."
 
 #: src/desktop/templates/403_csrf.mako:37
@@ -1293,7 +1620,9 @@ msgid "Server error."
 msgstr "서버 오류입니다."
 
 #: src/desktop/templates/500.mako:44
-msgid "Sorry, there's been an error. An email was sent to your administrators. Thank you for your patience."
+msgid ""
+"Sorry, there's been an error. An email was sent to your administrators. "
+"Thank you for your patience."
 msgstr "죄송합니다. 오류가 발생했습니다. 관리자에게 이메일이 전송되었습니다. 기다려 주셔서 감사합니다."
 
 #: src/desktop/templates/500.mako:48
@@ -1325,7 +1654,8 @@ msgid "Function Name"
 msgstr "함수 이름"
 
 #: src/desktop/templates/about_layout.mako:36
-#: src/desktop/templates/common_header.mako:506
+#: src/desktop/templates/common_header.mako:543
+#: src/desktop/templates/responsive.mako:180
 msgid "About Hue"
 msgstr "Hue 정보"
 
@@ -1344,204 +1674,391 @@ msgid "Server Logs"
 msgstr "서버 로그"
 
 #: src/desktop/templates/actionbar.mako:31
+#: src/desktop/templates/assist.mako:1153
 msgid "Search..."
 msgstr "검색..."
 
-#: src/desktop/templates/assist.mako:393
+#: src/desktop/templates/assist.mako:435
 msgid "The database has no tables"
 msgstr "데이터베이스에 테이블이 없음"
 
-#: src/desktop/templates/assist.mako:401
+#: src/desktop/templates/assist.mako:443
 msgid "The table has no columns"
 msgstr "테이블에 열이 없음"
 
-#: src/desktop/templates/assist.mako:418 src/desktop/templates/assist.mako:426
-#: src/desktop/templates/file_browser.mako:621
+#: src/desktop/templates/assist.mako:450 src/desktop/templates/assist.mako:456
+#: src/desktop/templates/assist.mako:510 src/desktop/templates/assist.mako:525
+msgid "Show details"
+msgstr "세부 정보 표시"
+
+#: src/desktop/templates/assist.mako:451 src/desktop/templates/assist.mako:511
+#: src/desktop/templates/document_browser.mako:711
 msgid "Open"
 msgstr "열기"
 
-#: src/desktop/templates/assist.mako:437 src/desktop/templates/assist.mako:740
+#: src/desktop/templates/assist.mako:457
+msgid "Insert at cursor"
+msgstr "커서에서 삽입"
+
+#: src/desktop/templates/assist.mako:468 src/desktop/templates/home.mako:193
+msgid "Project"
+msgstr "프로젝트"
+
+#: src/desktop/templates/assist.mako:470
+msgid "Select"
+msgstr "선택"
+
+#: src/desktop/templates/assist.mako:471
+msgid "Select distinct"
+msgstr "별도 선택"
+
+#: src/desktop/templates/assist.mako:476
+msgid "Aggregate"
+msgstr "집계"
+
+#: src/desktop/templates/assist.mako:478
+#, fuzzy
+msgid "Count"
+msgstr "개수"
+
+#: src/desktop/templates/assist.mako:479
+msgid "Count distinct"
+msgstr "별도 개수"
+
+#: src/desktop/templates/assist.mako:480
+msgid "Sum"
+msgstr "합계"
+
+#: src/desktop/templates/assist.mako:481
+#, fuzzy
+msgid "Minimum"
+msgstr "최소"
+
+#: src/desktop/templates/assist.mako:482
+msgid "Maximum"
+msgstr "최대"
+
+#: src/desktop/templates/assist.mako:483
+msgid "Average"
+msgstr "평균"
+
+#: src/desktop/templates/assist.mako:488 src/desktop/templates/assist.mako:790
+#: src/desktop/templates/assist.mako:869 src/desktop/templates/assist.mako:1023
+#: src/desktop/templates/assist.mako:2045
+msgid "Filter"
+msgstr "필터"
+
+#: src/desktop/templates/assist.mako:490
+msgid "Is null"
+msgstr "null임"
+
+#: src/desktop/templates/assist.mako:491
+msgid "Is not null"
+msgstr "null이 아님"
+
+#: src/desktop/templates/assist.mako:492
+msgid "Equal to"
+msgstr "다음 값과 같음"
+
+#: src/desktop/templates/assist.mako:493
+msgid "Not equal to"
+msgstr "다음 값과 같지 않음"
+
+#: src/desktop/templates/assist.mako:494
+msgid "Greater than"
+msgstr "다음 값보다 큼"
+
+#: src/desktop/templates/assist.mako:495
+msgid "Less than"
+msgstr "다음 값보다 작음"
+
+#: src/desktop/templates/assist.mako:499
+msgid "Order"
+msgstr "순서"
+
+#: src/desktop/templates/assist.mako:501
+msgid "Ascending"
+msgstr "오름차순"
+
+#: src/desktop/templates/assist.mako:502
+msgid "Descending"
+msgstr "내림차순"
+
+#: src/desktop/templates/assist.mako:545 src/desktop/templates/assist.mako:1051
 msgid "No results found"
 msgstr "결과를 찾을 수 없음"
 
-#: src/desktop/templates/assist.mako:466
+#: src/desktop/templates/assist.mako:559
 msgid "Error loading columns."
 msgstr "열 로드 중 오류가 발생했습니다."
 
-#: src/desktop/templates/assist.mako:516
+#: src/desktop/templates/assist.mako:562
+msgid "Error loading fields."
+msgstr "필드 로드 중 오류가 발생했습니다."
+
+#: src/desktop/templates/assist.mako:612 src/desktop/templates/assist.mako:692
 msgid "Size"
 msgstr "크기"
 
-#: src/desktop/templates/assist.mako:518
+#: src/desktop/templates/assist.mako:613 src/desktop/templates/assist.mako:697
+msgid "Permissions"
+msgstr "권한"
+
+#: src/desktop/templates/assist.mako:624 src/desktop/templates/assist.mako:709
+#: src/desktop/templates/assist.mako:791 src/desktop/templates/assist.mako:870
+#: src/desktop/templates/assist.mako:919
+msgid "Manual refresh"
+msgstr "수동 새로 고침"
+
+#: src/desktop/templates/assist.mako:655 src/desktop/templates/assist.mako:740
+#: src/desktop/templates/assist.mako:826
+#: src/desktop/templates/sql_context_popover.mako:564
+#: src/desktop/templates/sql_context_popover.mako:574
+#: src/desktop/templates/sql_context_popover.mako:592
+#: src/desktop/templates/sql_context_popover.mako:901
+#: src/desktop/templates/sql_context_popover.mako:929
+#: src/desktop/templates/sql_context_popover.mako:943
+msgid "Details"
+msgstr "세부 정보"
+
+#: src/desktop/templates/assist.mako:672 src/desktop/templates/assist.mako:757
+#: src/desktop/templates/assist.mako:842
+msgid "Empty directory"
+msgstr "빈 디렉토리"
+
+#: src/desktop/templates/assist.mako:678 src/desktop/templates/assist.mako:763
+#: src/desktop/templates/assist.mako:849 src/desktop/templates/assist.mako:906
+#: src/desktop/templates/assist.mako:971
+msgid "Error loading contents."
+msgstr "콘텐츠 로드 중 오류가 발생했습니다."
+
+#: src/desktop/templates/assist.mako:694
 msgid "User"
 msgstr "사용자"
 
-#: src/desktop/templates/assist.mako:519
+#: src/desktop/templates/assist.mako:695
 #: src/desktop/templates/common_share.mako:35
 #: src/desktop/templates/common_share.mako:46
 #: src/desktop/templates/common_share2.mako:35
 #: src/desktop/templates/common_share2.mako:46
-#: src/desktop/templates/file_browser.mako:366
-#: src/desktop/templates/file_browser.mako:381
+#: src/desktop/templates/document_browser.mako:372
+#: src/desktop/templates/document_browser.mako:387
 msgid "Group"
 msgstr "그룹"
 
-#: src/desktop/templates/assist.mako:521
-msgid "Permissions"
-msgstr "권한"
-
-#: src/desktop/templates/assist.mako:522
+#: src/desktop/templates/assist.mako:698
 msgid "Date"
 msgstr "날짜"
 
-#: src/desktop/templates/assist.mako:533
-msgid "Manual refresh"
-msgstr "수동 새로 고침"
-
-#: src/desktop/templates/assist.mako:563 src/desktop/templates/assist.mako:634
-msgid "Details"
-msgstr "세부 정보"
-
-#: src/desktop/templates/assist.mako:580 src/desktop/templates/assist.mako:650
-msgid "Empty directory"
-msgstr "빈 디렉토리"
-
-#: src/desktop/templates/assist.mako:586 src/desktop/templates/assist.mako:657
-msgid "Error loading contents."
-msgstr "콘텐츠 로드 중 오류가 발생했습니다."
-
-#: src/desktop/templates/assist.mako:597 src/desktop/templates/home.mako:191
+#: src/desktop/templates/assist.mako:777 src/desktop/templates/home.mako:191
 msgid "Description"
 msgstr "설명"
 
-#: src/desktop/templates/assist.mako:598
+#: src/desktop/templates/assist.mako:778
 msgid "Modified"
 msgstr "수정됨"
 
-#: src/desktop/templates/assist.mako:674
+#: src/desktop/templates/assist.mako:879 src/desktop/templates/assist.mako:1781
+msgid "Collections"
+msgstr "컬렉션"
+
+#: src/desktop/templates/assist.mako:884
+msgid "Show cores"
+msgstr "코어 표시"
+
+#: src/desktop/templates/assist.mako:886
+msgid "Collection name..."
+msgstr "컬렉션 이름..."
+
+#: src/desktop/templates/assist.mako:900
+msgid "No collections available."
+msgstr "컬렉션을 사용할 수 없습니다."
+
+#: src/desktop/templates/assist.mako:936
+msgid "Clusters"
+msgstr "클러스터"
+
+#: src/desktop/templates/assist.mako:960
+msgid "No clusters available."
+msgstr "클러스터를 사용할 수 없습니다."
+
+#: src/desktop/templates/assist.mako:963
+msgid "No tables available."
+msgstr "테이블을 사용할 수 없습니다."
+
+#: src/desktop/templates/assist.mako:985
 msgid "Sources"
 msgstr "소스"
 
-#: src/desktop/templates/assist.mako:693
+#: src/desktop/templates/assist.mako:1004
 msgid "Clear cache"
 msgstr "캐시 지우기"
 
-#: src/desktop/templates/assist.mako:697
+#: src/desktop/templates/assist.mako:1008
 msgid "Perform incremental metadata update"
 msgstr "메타데이터 증분 업데이트 수행"
 
-#: src/desktop/templates/assist.mako:699
+#: src/desktop/templates/assist.mako:1010
 msgid "This will sync missing tables in Hive."
 msgstr "Hive에서 누락된 테이블을 동기화합니다."
 
-#: src/desktop/templates/assist.mako:702
+#: src/desktop/templates/assist.mako:1013
 msgid "Invalidate all metadata and rebuild index"
 msgstr "모든 메타데이터를 무효화하고 인덱스 재생성"
 
-#: src/desktop/templates/assist.mako:704
+#: src/desktop/templates/assist.mako:1015
 msgid "WARNING: This can be both resource and time-intensive."
 msgstr "경고: 리소스 및 시간이 많이 소요될 수 있습니다."
 
-#: src/desktop/templates/assist.mako:705
+#: src/desktop/templates/assist.mako:1016
 msgid "Refresh"
 msgstr "새로 고침"
 
-#: src/desktop/templates/assist.mako:712 src/desktop/templates/assist.mako:721
-#: src/desktop/templates/common_header.mako:652
-#: src/desktop/templates/common_header.mako:657
-#: src/desktop/templates/config_ko_components.mako:119
-#: src/desktop/templates/file_browser.mako:529
-msgid "Search"
-msgstr "검색"
-
-#: src/desktop/templates/assist.mako:714 src/desktop/templates/assist.mako:717
-#: src/desktop/templates/assist.mako:722
+#: src/desktop/templates/assist.mako:1025
+#: src/desktop/templates/assist.mako:1028
+#: src/desktop/templates/assist.mako:1033
 msgid "Manually refresh the table list"
 msgstr "테이블 목록을 수동으로 새로 고침"
 
-#: src/desktop/templates/assist.mako:730
+#: src/desktop/templates/assist.mako:1032
+msgid "Filter tables"
+msgstr "필터 테이블"
+
+#: src/desktop/templates/assist.mako:1041
 msgid "Databases"
 msgstr "데이터베이스"
 
-#: src/desktop/templates/assist.mako:735
+#: src/desktop/templates/assist.mako:1046
 msgid "Database name..."
 msgstr "데이터베이스 이름..."
 
-#: src/desktop/templates/assist.mako:754
+#: src/desktop/templates/assist.mako:1065
 msgid "Error loading databases."
 msgstr "데이터베이스 로드 중 오류가 발생했습니다."
 
-#: src/desktop/templates/assist.mako:757
+#: src/desktop/templates/assist.mako:1068
 msgid "No databases found."
 msgstr "데이터베이스를 찾을 수 없습니다."
 
-#: src/desktop/templates/assist.mako:764
+#: src/desktop/templates/assist.mako:1075
+#: src/desktop/templates/assist.mako:1081
 msgid "Tables"
 msgstr "테이블"
 
-#: src/desktop/templates/assist.mako:770
+#: src/desktop/templates/assist.mako:1082
+msgid "Views"
+msgstr "보기"
+
+#: src/desktop/templates/assist.mako:1083
+msgid "Active"
+msgstr "활성"
+
+#: src/desktop/templates/assist.mako:1085
 msgid "Table name..."
 msgstr "테이블 이름..."
 
-#: src/desktop/templates/assist.mako:779
+#: src/desktop/templates/assist.mako:1094
 msgid "Error loading tables."
 msgstr "테이블 로드 중 오류가 발생했습니다."
 
-#: src/desktop/templates/assist.mako:786
-msgid "Hide"
-msgstr "숨기기"
+#: src/desktop/templates/assist.mako:1146
+msgid "No recent match found"
+msgstr "최근 일치를 찾을 수 없습니다."
 
-#: src/desktop/templates/assist.mako:786
-msgid "Show"
-msgstr "표시"
+#: src/desktop/templates/assist.mako:1166
+#, fuzzy
+msgid "Search "
+msgstr "검색 "
 
-#: src/desktop/templates/assist.mako:796
-msgid "Search everywhere..."
-msgstr "모든 위치에서 검색..."
+#: src/desktop/templates/assist.mako:1166
+msgid " tables"
+msgstr " 테이블"
 
-#: src/desktop/templates/assist.mako:815
-msgid "Select your assist contents above."
-msgstr "위에서 지원 콘텐츠를 선택합니다."
+#: src/desktop/templates/assist.mako:1166
+msgid " files"
+msgstr " 파일"
 
-#: src/desktop/templates/assist.mako:1172
+#: src/desktop/templates/assist.mako:1203
+msgid "Search result"
+msgstr "검색 결과"
+
+#: src/desktop/templates/assist.mako:1206
+#: src/desktop/templates/common_import_export.mako:90
+#: src/desktop/templates/document_browser.mako:414
+#: src/desktop/templates/document_browser.mako:441
+#: src/desktop/templates/document_browser.mako:498
+#: src/desktop/templates/document_browser.mako:573
+msgid "Close"
+msgstr "닫기"
+
+#: src/desktop/templates/assist.mako:1212
+msgid "No result found."
+msgstr "결과를 찾을 수 없습니다."
+
+#: src/desktop/templates/assist.mako:1710
+#: src/desktop/templates/assist_m.mako:119
+#: src/desktop/templates/common_header.mako:161
+#: src/desktop/templates/common_header_m.mako:118
+#: src/desktop/templates/responsive.mako:74
+#: src/desktop/templates/responsive.mako:351
 msgid "There was a problem loading the databases"
-msgstr "데이터베이스를 로드하는 중 문제 발생"
+msgstr "데이터베이스를 로드하는 중에 문제 발생"
 
-#: src/desktop/templates/assist.mako:1173
+#: src/desktop/templates/assist.mako:1711
+#: src/desktop/templates/assist_m.mako:120
 msgid "There was a problem loading the table preview."
 msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
 
-#: src/desktop/templates/assist.mako:1175
-#: src/desktop/templates/file_browser.mako:536
-#: src/desktop/templates/file_browser.mako:668
+#: src/desktop/templates/assist.mako:1713
+#: src/desktop/templates/document_browser.mako:621
+#: src/desktop/templates/document_browser.mako:758
 #: src/desktop/templates/home.mako:125
 msgid "Hive Query"
 msgstr "Hive 쿼리"
 
-#: src/desktop/templates/assist.mako:1176
+#: src/desktop/templates/assist.mako:1714
 msgid "Query"
 msgstr "쿼리"
 
-#: src/desktop/templates/assist.mako:1177
-#: src/desktop/templates/common_header.mako:562
-#: src/desktop/templates/common_header.mako:566
-#: src/desktop/templates/common_header.mako:570
-#: src/desktop/templates/file_browser.mako:548
-#: src/desktop/templates/file_browser.mako:664
+#: src/desktop/templates/assist.mako:1715
+#: src/desktop/templates/common_header.mako:599
+#: src/desktop/templates/common_header.mako:603
+#: src/desktop/templates/common_header.mako:607
+#: src/desktop/templates/document_browser.mako:633
+#: src/desktop/templates/document_browser.mako:754
 msgid "Notebook"
 msgstr "노트북"
 
-#: src/desktop/templates/assist.mako:1253
+#: src/desktop/templates/assist.mako:1743
 msgid "SQL"
 msgstr "SQL"
 
-#: src/desktop/templates/assist.mako:1267
+#: src/desktop/templates/assist.mako:1756
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/desktop/templates/assist.mako:1284
+#: src/desktop/templates/assist.mako:1768
+msgid "S3"
+msgstr "S3"
+
+#: src/desktop/templates/assist.mako:1793
+#: src/desktop/templates/common_header.mako:633
+msgid "HBase"
+msgstr "HBase"
+
+#: src/desktop/templates/assist.mako:1807
 msgid "Documents"
 msgstr "문서"
+
+#: src/desktop/templates/assist.mako:1908
+msgid "Cluster"
+msgstr "클러스터"
+
+#: src/desktop/templates/assist_m.mako:24
+#: src/desktop/templates/common_header_m.mako:291
+#: src/desktop/templates/sql_context_popover.mako:152
+msgid "Assist"
+msgstr "지원"
 
 #: src/desktop/templates/check_config.mako:19
 #: src/desktop/templates/dump_config.mako:40
@@ -1560,51 +2077,55 @@ msgstr "현재 값:"
 msgid "All OK. Configuration check passed."
 msgstr "모두 정상입니다. 구성 검사를 통과했습니다."
 
-#: src/desktop/templates/common_dashboard.mako:47
+#: src/desktop/templates/common_dashboard.mako:45
 msgid "LAYOUT"
 msgstr "레이아웃"
 
-#: src/desktop/templates/common_dashboard.mako:68
+#: src/desktop/templates/common_dashboard.mako:66
 msgid "RESULTS"
 msgstr "결과"
 
-#: src/desktop/templates/common_dashboard.mako:77
+#: src/desktop/templates/common_dashboard.mako:75
 msgid "WIDGETS"
 msgstr "위젯"
 
-#: src/desktop/templates/common_dashboard.mako:89
+#: src/desktop/templates/common_dashboard.mako:87
 msgid "Click on the pencil to get started with your dashboard!"
 msgstr "대시보드를 시작하려면 연필을 클릭하십시오!"
 
-#: src/desktop/templates/common_dashboard.mako:94
+#: src/desktop/templates/common_dashboard.mako:92
 msgid "Pick an index and Click on a layout to start your dashboard!"
 msgstr "대시보드를 시작하려면 인덱스를 선택하고 레이아웃을 클릭하십시오!"
 
-#: src/desktop/templates/common_dashboard.mako:104
+#: src/desktop/templates/common_dashboard.mako:102
 msgid "Two columns layout"
 msgstr "2개 열 레이아웃"
 
-#: src/desktop/templates/common_dashboard.mako:109
+#: src/desktop/templates/common_dashboard.mako:107
 msgid "One column layout"
 msgstr "1개 열 레이아웃"
 
-#: src/desktop/templates/common_dashboard.mako:120
+#: src/desktop/templates/common_dashboard.mako:118
 msgid "Grid results"
 msgstr "눈금선 결과"
 
-#: src/desktop/templates/common_dashboard.mako:136
+#: src/desktop/templates/common_dashboard.mako:133
 msgid "Reload this definition"
 msgstr "이 정의 다시 로드"
 
-#: src/desktop/templates/common_dashboard.mako:136
+#: src/desktop/templates/common_dashboard.mako:133
 msgid "Update the definition"
 msgstr "정의 업데이트"
 
-#: src/desktop/templates/common_dashboard.mako:163
+#: src/desktop/templates/common_dashboard.mako:136
+msgid "Close this definition"
+msgstr "이 정의 닫기"
+
+#: src/desktop/templates/common_dashboard.mako:162
 msgid "Drag any of the widgets inside your empty row"
 msgstr "빈 행에 있는 아무 위젯이나 드래그"
 
-#: src/desktop/templates/common_dashboard.mako:168
+#: src/desktop/templates/common_dashboard.mako:167
 msgid "Row"
 msgstr "행"
 
@@ -1615,6 +2136,7 @@ msgstr "시작"
 
 #: src/desktop/templates/common_dashboard.mako:243
 #: src/desktop/templates/common_dashboard.mako:248
+#, fuzzy
 msgid "End"
 msgstr "종료"
 
@@ -1624,12 +2146,12 @@ msgid "Interval"
 msgstr "간격"
 
 #: src/desktop/templates/common_dashboard.mako:245
-msgid "Custom Format"
-msgstr "사용자 지정 형식"
+msgid "Switch to custom format"
+msgstr "사용자 지정 형식으로 전환"
 
 #: src/desktop/templates/common_dashboard.mako:246
-msgid "Date Pickers"
-msgstr "날짜 선택기"
+msgid "Switch to date pickers"
+msgstr "날짜 선택으로 전환"
 
 #: src/desktop/templates/common_dashboard.mako:247
 msgid "e.g."
@@ -1639,293 +2161,395 @@ msgstr "예:"
 msgid "Read more..."
 msgstr "더 읽기..."
 
-#: src/desktop/templates/common_footer.mako:86
+#: src/desktop/templates/common_footer.mako:94
+#: src/desktop/templates/responsive.mako:719
 msgid "You have signed in successfully!"
 msgstr "성공적으로 로그인했습니다!"
 
-#: src/desktop/templates/common_header.mako:117
+#: src/desktop/templates/common_header.mako:116
+#: src/desktop/templates/common_header_m.mako:73
 #: src/desktop/templates/error.mako:40
 msgid "Back"
 msgstr "뒤로"
 
-#: src/desktop/templates/common_header.mako:118
+#: src/desktop/templates/common_header.mako:117
+#: src/desktop/templates/common_header_m.mako:74
 msgid "Select this folder"
 msgstr "이 폴더 선택"
 
-#: src/desktop/templates/common_header.mako:119
-#: src/desktop/templates/common_header.mako:131
+#: src/desktop/templates/common_header.mako:118
+#: src/desktop/templates/common_header.mako:130
+#: src/desktop/templates/common_header_m.mako:75
+#: src/desktop/templates/common_header_m.mako:87
 msgid "Create folder"
 msgstr "폴더 생성"
 
-#: src/desktop/templates/common_header.mako:120
-#: src/desktop/templates/common_header.mako:132
+#: src/desktop/templates/common_header.mako:119
+#: src/desktop/templates/common_header.mako:131
+#: src/desktop/templates/common_header_m.mako:76
+#: src/desktop/templates/common_header_m.mako:88
 msgid "Folder name"
 msgstr "폴더 이름"
 
-#: src/desktop/templates/common_header.mako:121
-#: src/desktop/templates/common_header.mako:133
-#: src/desktop/templates/common_import_export.mako:38
-#: src/desktop/templates/file_browser.mako:442
-#: src/desktop/templates/file_browser.mako:465
-#: src/desktop/templates/file_browser.mako:491
+#: src/desktop/templates/common_header.mako:120
+#: src/desktop/templates/common_header.mako:132
+#: src/desktop/templates/common_header_m.mako:77
+#: src/desktop/templates/common_header_m.mako:89
+#: src/desktop/templates/common_import_export.mako:37
+#: src/desktop/templates/document_browser.mako:437
+#: src/desktop/templates/document_browser.mako:514
+#: src/desktop/templates/document_browser.mako:532
+#: src/desktop/templates/document_browser.mako:576
 #: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
 msgid "Cancel"
 msgstr "취소"
 
-#: src/desktop/templates/common_header.mako:122
+#: src/desktop/templates/common_header.mako:121
+#: src/desktop/templates/common_header_m.mako:78
 msgid "The file has not been found"
 msgstr "파일을 찾을 수 없음"
 
-#: src/desktop/templates/common_header.mako:123
+#: src/desktop/templates/common_header.mako:122
+#: src/desktop/templates/common_header_m.mako:79
 msgid "Upload a file"
 msgstr "파일 업로드"
 
-#: src/desktop/templates/common_header.mako:124
+#: src/desktop/templates/common_header.mako:123
+#: src/desktop/templates/common_header_m.mako:80
 msgid "Failed"
 msgstr "실패함"
 
-#: src/desktop/templates/common_header.mako:139
+#: src/desktop/templates/common_header.mako:138
+#: src/desktop/templates/common_header_m.mako:95
 msgid "Go to column:"
 msgstr "다음 열로 이동:"
 
-#: src/desktop/templates/common_header.mako:140
+#: src/desktop/templates/common_header.mako:139
+#: src/desktop/templates/common_header_m.mako:96
 msgid "column name..."
 msgstr "열 이름..."
 
-#: src/desktop/templates/common_header.mako:141
+#: src/desktop/templates/common_header.mako:140
+#: src/desktop/templates/common_header_m.mako:97
 msgid "Click to lock this row"
 msgstr "이 행을 잠그려면 클릭"
 
-#: src/desktop/templates/common_header.mako:142
+#: src/desktop/templates/common_header.mako:141
+#: src/desktop/templates/common_header_m.mako:98
 msgid "Click to unlock this row"
 msgstr "이 행의 잠금을 해제하려면 클릭"
 
-#: src/desktop/templates/common_header.mako:148
+#: src/desktop/templates/common_header.mako:147
+#: src/desktop/templates/common_header_m.mako:104
 msgid "Available tours"
 msgstr "사용 가능한 둘러보기"
 
-#: src/desktop/templates/common_header.mako:149
+#: src/desktop/templates/common_header.mako:148
+#: src/desktop/templates/common_header_m.mako:105
 msgid "None for this page."
 msgstr "이 페이지에는 없습니다."
 
-#: src/desktop/templates/common_header.mako:150
+#: src/desktop/templates/common_header.mako:149
+#: src/desktop/templates/common_header_m.mako:106
 msgid "Read more about it..."
 msgstr "자세한 정보..."
 
-#: src/desktop/templates/common_header.mako:151
+#: src/desktop/templates/common_header.mako:150
+#: src/desktop/templates/common_header_m.mako:107
 msgid "Demo tutorials"
 msgstr "데모 자습서"
 
-#: src/desktop/templates/common_header.mako:430
+#: src/desktop/templates/common_header.mako:162
+#: src/desktop/templates/common_header_m.mako:119
+#: src/desktop/templates/responsive.mako:75
+msgid "There was a problem loading the preview"
+msgstr "미리 보기를 로드하는 중에 문제 발생"
+
+#: src/desktop/templates/common_header.mako:460
 msgid "Manage HDFS"
 msgstr "HDFS 관리"
 
-#: src/desktop/templates/common_header.mako:431
+#: src/desktop/templates/common_header.mako:461
+#: src/desktop/templates/sql_context_popover.mako:155
 msgid "File Browser"
 msgstr "파일 브라우저"
 
-#: src/desktop/templates/common_header.mako:436
-#: src/desktop/templates/common_header.mako:437
+#: src/desktop/templates/common_header.mako:466
+#: src/desktop/templates/common_header.mako:467
 msgid "File Browsers"
 msgstr "파일 브라우저"
 
-#: src/desktop/templates/common_header.mako:441
-#: src/desktop/templates/common_header.mako:450
+#: src/desktop/templates/common_header.mako:471
+#: src/desktop/templates/common_header.mako:480
 msgid "HDFS Browser"
 msgstr "HDFS 브라우저"
 
-#: src/desktop/templates/common_header.mako:444
-#: src/desktop/templates/common_header.mako:456
+#: src/desktop/templates/common_header.mako:474
+#: src/desktop/templates/common_header.mako:486
 msgid "S3 Browser"
 msgstr "S3 브라우저"
 
-#: src/desktop/templates/common_header.mako:463
+#: src/desktop/templates/common_header.mako:493
+#: src/desktop/templates/common_header.mako:497
 msgid "Manage jobs"
 msgstr "Job 관리"
 
-#: src/desktop/templates/common_header.mako:463
-#: src/desktop/templates/common_header.mako:464
+#: src/desktop/templates/common_header.mako:493
+#: src/desktop/templates/common_header.mako:494
 msgid "Job Browser"
 msgstr "Job Browser"
 
-#: src/desktop/templates/common_header.mako:470
+#: src/desktop/templates/common_header.mako:498
+#: src/desktop/templates/common_header.mako:500
+msgid "Job Browser 2"
+msgstr "Job Browser 2"
+
+#: src/desktop/templates/common_header.mako:507
 msgid "Administration"
 msgstr "관리"
 
-#: src/desktop/templates/common_header.mako:481
+#: src/desktop/templates/common_header.mako:518
 msgid "View Profile"
 msgstr "프로파일 보기"
 
-#: src/desktop/templates/common_header.mako:483
+#: src/desktop/templates/common_header.mako:520
 msgid "Edit Profile"
 msgstr "프로파일 편집"
 
-#: src/desktop/templates/common_header.mako:488
+#: src/desktop/templates/common_header.mako:525
+#: src/desktop/templates/responsive.mako:177
 msgid "Manage Users"
 msgstr "사용자 관리"
 
-#: src/desktop/templates/common_header.mako:494
+#: src/desktop/templates/common_header.mako:531
 msgid "Documentation"
 msgstr "문서"
 
-#: src/desktop/templates/common_header.mako:497
+#: src/desktop/templates/common_header.mako:534
+#: src/desktop/templates/common_header_m.mako:305
+#: src/desktop/templates/responsive.mako:182
 msgid "Sign out"
 msgstr "로그아웃"
 
-#: src/desktop/templates/common_header.mako:509
-#: src/desktop/templates/file_browser.mako:504
-#: src/desktop/templates/file_browser.mako:512
-#: src/desktop/templates/home.mako:94 src/desktop/templates/home2.mako:164
+#: src/desktop/templates/common_header.mako:546
+#: src/desktop/templates/document_browser.mako:589
+#: src/desktop/templates/document_browser.mako:597
+#: src/desktop/templates/home.mako:94 src/desktop/templates/home2.mako:178
 msgid "My documents"
 msgstr "내 문서"
 
-#: src/desktop/templates/common_header.mako:515
-#: src/desktop/templates/home.mako:564 src/desktop/templates/home2.mako:322
+#: src/desktop/templates/common_header.mako:552
+#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
 msgid "Query data"
 msgstr "쿼리 데이터"
 
-#: src/desktop/templates/common_header.mako:519
-#: src/desktop/templates/common_header.mako:521
+#: src/desktop/templates/common_header.mako:556
+#: src/desktop/templates/common_header.mako:558
+#: src/desktop/templates/common_header_m.mako:294
+#: src/desktop/templates/responsive.mako:107
 msgid "Hive"
 msgstr "Hive"
 
-#: src/desktop/templates/common_header.mako:526
-#: src/desktop/templates/common_header.mako:528
+#: src/desktop/templates/common_header.mako:563
+#: src/desktop/templates/common_header.mako:565
+#: src/desktop/templates/common_header_m.mako:299
+#: src/desktop/templates/responsive.mako:110
 msgid "Impala"
 msgstr "Impala"
 
-#: src/desktop/templates/common_header.mako:533
-#: src/desktop/templates/common_header.mako:535
+#: src/desktop/templates/common_header.mako:570
+#: src/desktop/templates/common_header.mako:572
 msgid "DB Query"
 msgstr "DB 쿼리"
 
-#: src/desktop/templates/common_header.mako:540
-#: src/desktop/templates/common_header.mako:542
+#: src/desktop/templates/common_header.mako:577
+#: src/desktop/templates/common_header.mako:579
 msgid "Pig"
 msgstr "Pig"
 
-#: src/desktop/templates/common_header.mako:546
+#: src/desktop/templates/common_header.mako:583
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/desktop/templates/common_header.mako:562
-#: src/desktop/templates/common_header.mako:567
-#: src/desktop/templates/common_header.mako:571
+#: src/desktop/templates/common_header.mako:599
+#: src/desktop/templates/common_header.mako:604
+#: src/desktop/templates/common_header.mako:608
 msgid "Notebooks"
 msgstr "노트북"
 
-#: src/desktop/templates/common_header.mako:590
+#: src/desktop/templates/common_header.mako:627
 msgid "Manage data"
 msgstr "데이터 관리"
 
-#: src/desktop/templates/common_header.mako:593
+#: src/desktop/templates/common_header.mako:630
 msgid "Metastore Tables"
 msgstr "Metastore 테이블"
 
-#: src/desktop/templates/common_header.mako:596
-msgid "HBase"
-msgstr "HBase"
-
-#: src/desktop/templates/common_header.mako:599
+#: src/desktop/templates/common_header.mako:636
 msgid "Sqoop Transfer"
 msgstr "Sqoop 전송"
 
-#: src/desktop/templates/common_header.mako:602
+#: src/desktop/templates/common_header.mako:639
 msgid "ZooKeeper"
 msgstr "ZooKeeper"
 
-#: src/desktop/templates/common_header.mako:611
+#: src/desktop/templates/common_header.mako:648
+#: src/desktop/templates/responsive.mako:118
 msgid "Schedule with Oozie"
 msgstr "Oozie 일정"
 
-#: src/desktop/templates/common_header.mako:614
-#: src/desktop/templates/common_header.mako:663
+#: src/desktop/templates/common_header.mako:651
+#: src/desktop/templates/common_header.mako:700
 msgid "Dashboards"
 msgstr "대시보드"
 
-#: src/desktop/templates/common_header.mako:616
-#: src/desktop/templates/common_header.mako:627
-#: src/desktop/templates/common_header.mako:636
+#: src/desktop/templates/common_header.mako:653
+#: src/desktop/templates/common_header.mako:664
+#: src/desktop/templates/common_header.mako:673
+#: src/desktop/templates/responsive.mako:118
+#: src/desktop/templates/responsive.mako:120
+#: src/desktop/templates/responsive.mako:194
 msgid "Workflows"
 msgstr "Workflow"
 
-#: src/desktop/templates/common_header.mako:617
-#: src/desktop/templates/common_header.mako:628
-#: src/desktop/templates/common_header.mako:637
+#: src/desktop/templates/common_header.mako:654
+#: src/desktop/templates/common_header.mako:665
+#: src/desktop/templates/common_header.mako:674
+#: src/desktop/templates/responsive.mako:121
 msgid "Coordinators"
 msgstr "Coordinator"
 
-#: src/desktop/templates/common_header.mako:618
-#: src/desktop/templates/common_header.mako:629
-#: src/desktop/templates/common_header.mako:638
+#: src/desktop/templates/common_header.mako:655
+#: src/desktop/templates/common_header.mako:666
+#: src/desktop/templates/common_header.mako:675
+#: src/desktop/templates/responsive.mako:122
 msgid "Bundles"
 msgstr "Bundle"
 
-#: src/desktop/templates/common_header.mako:625
-#: src/desktop/templates/common_header.mako:634
+#: src/desktop/templates/common_header.mako:662
+#: src/desktop/templates/common_header.mako:671
 msgid "Editors"
 msgstr "편집기"
 
-#: src/desktop/templates/common_header.mako:652
-#: src/desktop/templates/common_header.mako:656
-#: src/desktop/templates/file_browser.mako:556
+#: src/desktop/templates/common_header.mako:689
+#: src/desktop/templates/common_header.mako:693
+#: src/desktop/templates/document_browser.mako:641
 msgid "Solr Search"
 msgstr "Solr 검색"
 
-#: src/desktop/templates/common_header.mako:662
+#: src/desktop/templates/common_header.mako:689
+#: src/desktop/templates/common_header.mako:694
+#: src/desktop/templates/common_header_m.mako:303
+#: src/desktop/templates/config_ko_components.mako:108
+#: src/desktop/templates/document_browser.mako:614
+#, fuzzy
+msgid "Search"
+msgstr "검색"
+
+#: src/desktop/templates/common_header.mako:699
+#: src/desktop/templates/responsive.mako:113
 msgid "Dashboard"
 msgstr "대시보드"
 
-#: src/desktop/templates/common_header.mako:666
+#: src/desktop/templates/common_header.mako:703
 msgid "Indexes"
 msgstr "인덱스"
 
-#: src/desktop/templates/common_header.mako:684
+#: src/desktop/templates/common_header.mako:708
+msgid "Index"
+msgstr "인덱스"
+
+#: src/desktop/templates/common_header.mako:727
 msgid "Hadoop Security"
 msgstr "Hadoop 보안"
 
-#: src/desktop/templates/common_header.mako:687
+#: src/desktop/templates/common_header.mako:730
 msgid "Hive Tables"
 msgstr "Hive 테이블"
 
-#: src/desktop/templates/common_header.mako:690
+#: src/desktop/templates/common_header.mako:733
 msgid "Hive Tables v2"
 msgstr "Hive 테이블 v2"
 
-#: src/desktop/templates/common_header.mako:693
+#: src/desktop/templates/common_header.mako:736
 msgid "Solr Collections"
 msgstr "Solr 컬렉션"
 
-#: src/desktop/templates/common_header.mako:695
+#: src/desktop/templates/common_header.mako:738
 msgid "File ACLs"
 msgstr "파일 ACL"
 
-#: src/desktop/templates/common_header.mako:701
+#: src/desktop/templates/common_header.mako:744
 msgid "Other apps"
 msgstr "기타 앱"
 
-#: src/desktop/templates/common_header.mako:717
+#: src/desktop/templates/common_header.mako:760
 msgid "Feedback"
 msgstr "피드백"
 
 #: src/desktop/templates/common_import_export.mako:33
-#: src/desktop/templates/file_browser.mako:424
+#: src/desktop/templates/document_browser.mako:425
 msgid "Import Hue documents"
 msgstr "Hue 문서 가져오기"
 
-#: src/desktop/templates/common_import_export.mako:39
-#: src/desktop/templates/file_browser.mako:443
+#: src/desktop/templates/common_import_export.mako:38
+#: src/desktop/templates/document_browser.mako:438
 msgid "Import"
 msgstr "가져오기"
 
-#: src/desktop/templates/common_import_export.mako:43
-#: src/desktop/templates/file_browser.mako:429
+#: src/desktop/templates/common_import_export.mako:42
+#: src/desktop/templates/document_browser.mako:447
 msgid "Select json file"
 msgstr "json 파일 선택"
 
-#: src/desktop/templates/common_import_export.mako:44
+#: src/desktop/templates/common_import_export.mako:43
+#: src/desktop/templates/document_browser.mako:448
 msgid "Change"
 msgstr "변경"
+
+#: src/desktop/templates/common_import_export.mako:60
+#: src/desktop/templates/document_browser.mako:468
+msgid "Document Summary"
+msgstr "문서 요약"
+
+#: src/desktop/templates/common_import_export.mako:62
+#: src/desktop/templates/document_browser.mako:470
+msgid "Imported: "
+msgstr "가져옴: "
+
+#: src/desktop/templates/common_import_export.mako:63
+#: src/desktop/templates/document_browser.mako:471
+msgid "Created: "
+msgstr "생성됨: "
+
+#: src/desktop/templates/common_import_export.mako:64
+#: src/desktop/templates/document_browser.mako:472
+msgid "Updated: "
+msgstr "업데이트됨: "
+
+#: src/desktop/templates/common_import_export.mako:67
+#: src/desktop/templates/document_browser.mako:475
+msgid "Show Details"
+msgstr "세부 정보 표시"
+
+#: src/desktop/templates/common_import_export.mako:73
+#: src/desktop/templates/config_ko_components.mako:492
+#: src/desktop/templates/config_ko_components.mako:497
+#: src/desktop/templates/document_browser.mako:481
+#: src/desktop/templates/document_browser.mako:673
+#: src/desktop/templates/home.mako:190
+#: src/desktop/templates/sql_context_popover.mako:335
+#: src/desktop/templates/sql_context_popover.mako:1319
+#: src/desktop/templates/sql_context_popover.mako:1322
+msgid "Name"
+msgstr "이름"
+
+#: src/desktop/templates/common_import_export.mako:74
+#: src/desktop/templates/document_browser.mako:482
+#: src/desktop/templates/document_browser.mako:675
+#: src/desktop/templates/sql_context_popover.mako:1325
+msgid "Type"
+msgstr "유형"
 
 #: src/desktop/templates/common_share.mako:24
 #: src/desktop/templates/common_share2.mako:24
@@ -1936,15 +2560,15 @@ msgstr "공유 설정"
 #: src/desktop/templates/common_share.mako:61
 #: src/desktop/templates/common_share2.mako:29
 #: src/desktop/templates/common_share2.mako:61
-#: src/desktop/templates/file_browser.mako:357
-#: src/desktop/templates/file_browser.mako:397
-#: src/desktop/templates/file_browser.mako:400
+#: src/desktop/templates/document_browser.mako:363
+#: src/desktop/templates/document_browser.mako:403
+#: src/desktop/templates/document_browser.mako:406
 msgid "Read"
 msgstr "읽기"
 
 #: src/desktop/templates/common_share.mako:30
 #: src/desktop/templates/common_share2.mako:30
-#: src/desktop/templates/file_browser.mako:358
+#: src/desktop/templates/document_browser.mako:364
 msgid "The document is not shared for read."
 msgstr "문서가 읽기용으로 공유되지 않았습니다."
 
@@ -1962,7 +2586,7 @@ msgstr "문서가 읽기 및 수정용으로 공유되지 않았습니다."
 
 #: src/desktop/templates/common_share.mako:54
 #: src/desktop/templates/common_share2.mako:54
-#: src/desktop/templates/file_browser.mako:395
+#: src/desktop/templates/document_browser.mako:401
 msgid "Type a username or a group name"
 msgstr "사용자 이름 또는 그룹 이름 입력"
 
@@ -1979,51 +2603,258 @@ msgstr "더 표시..."
 msgid "Misconfiguration detected"
 msgstr "구성 오류 감지됨"
 
-#: src/desktop/templates/config_ko_components.mako:100
+#: src/desktop/templates/config_ko_components.mako:78
 msgid "Remove"
 msgstr "제거"
 
-#: src/desktop/templates/config_ko_components.mako:120
+#: src/desktop/templates/config_ko_components.mako:109
 msgid "Select all"
 msgstr "모두 선택"
 
-#: src/desktop/templates/config_ko_components.mako:347
-#: src/desktop/templates/config_ko_components.mako:455
-#: src/desktop/templates/config_ko_components.mako:460
+#: src/desktop/templates/config_ko_components.mako:319
+#: src/desktop/templates/config_ko_components.mako:419
+#: src/desktop/templates/config_ko_components.mako:424
 msgid "Key"
 msgstr "키"
 
-#: src/desktop/templates/config_ko_components.mako:382
+#: src/desktop/templates/config_ko_components.mako:354
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/desktop/templates/config_ko_components.mako:394
+#: src/desktop/templates/config_ko_components.mako:366
 msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue"
 msgstr "파일에 대한 경로(예: hdfs://localhost:8020/user/hue)"
 
-#: src/desktop/templates/config_ko_components.mako:462
-#: src/desktop/templates/config_ko_components.mako:542
+#: src/desktop/templates/config_ko_components.mako:426
+#: src/desktop/templates/config_ko_components.mako:499
 msgid "Value"
 msgstr "값"
 
-#: src/desktop/templates/config_ko_components.mako:535
-#: src/desktop/templates/config_ko_components.mako:540
-#: src/desktop/templates/file_browser.mako:586
-#: src/desktop/templates/home.mako:190
-msgid "Name"
-msgstr "이름"
-
-#: src/desktop/templates/config_ko_components.mako:614
+#: src/desktop/templates/config_ko_components.mako:563
 msgid "Name, e.g. foo"
 msgstr "이름(예: foo)"
 
-#: src/desktop/templates/config_ko_components.mako:615
+#: src/desktop/templates/config_ko_components.mako:564
 msgid "Class, e.g. org.hue.Bar"
 msgstr "클래스(예: org.hue.Bar)"
 
-#: src/desktop/templates/config_ko_components.mako:676
+#: src/desktop/templates/config_ko_components.mako:617
 msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
 msgstr "파일에 대한 경로(예: hdfs://localhost:8020/user/hue/file.hue)"
+
+#: src/desktop/templates/document_browser.mako:357
+#: src/desktop/templates/home.mako:194
+msgid "Sharing"
+msgstr "공유"
+
+#: src/desktop/templates/document_browser.mako:378
+#: src/desktop/templates/document_browser.mako:403
+#: src/desktop/templates/document_browser.mako:407
+msgid "Modify"
+msgstr "수정"
+
+#: src/desktop/templates/document_browser.mako:379
+msgid "The document is not shared for modify."
+msgstr "문서가 수정용으로 공유되지 않았습니다."
+
+#: src/desktop/templates/document_browser.mako:397
+msgid "There was an error loading the document."
+msgstr "문서를 로드하는 중 오류가 발생했습니다."
+
+#: src/desktop/templates/document_browser.mako:430
+msgid "Importing..."
+msgstr "가져오는 중..."
+
+#: src/desktop/templates/document_browser.mako:431
+msgid "Import complete!"
+msgstr "가져오기가 완료되었습니다!"
+
+#: src/desktop/templates/document_browser.mako:432
+msgid "Import failed!"
+msgstr "가져오기에 실패하였습니다!"
+
+#: src/desktop/templates/document_browser.mako:508
+msgid "Create Directory"
+msgstr "디렉토리 생성"
+
+#: src/desktop/templates/document_browser.mako:511
+#: src/desktop/templates/document_browser.mako:529
+msgid "Directory name"
+msgstr "디렉토리 이름"
+
+#: src/desktop/templates/document_browser.mako:515
+msgid "Create"
+msgstr "생성"
+
+#: src/desktop/templates/document_browser.mako:526
+msgid "Rename Directory"
+msgstr "디렉토리 이름 변경"
+
+#: src/desktop/templates/document_browser.mako:533
+#: src/desktop/templates/document_browser.mako:709
+msgid "Rename"
+msgstr "이름 변경"
+
+#: src/desktop/templates/document_browser.mako:544
+#: src/desktop/templates/document_browser.mako:686
+msgid "The trash is empty"
+msgstr "휴지통이 비어 있음"
+
+#: src/desktop/templates/document_browser.mako:547
+msgid "Do you really want to delete the following document(s)?"
+msgstr "다음 문서를 삭제하시겠습니까?"
+
+#: src/desktop/templates/document_browser.mako:558
+msgid "used by"
+msgstr "사용된 곳"
+
+#: src/desktop/templates/document_browser.mako:561
+#: src/desktop/templates/document_browser.mako:563
+#: src/desktop/templates/home.mako:586 src/desktop/templates/home2.mako:349
+msgid "and"
+msgstr "및"
+
+#: src/desktop/templates/document_browser.mako:563
+#, fuzzy
+msgid "other"
+msgstr "기타"
+
+#: src/desktop/templates/document_browser.mako:577
+#: src/desktop/templates/home.mako:333
+msgid "Yes"
+msgstr "예"
+
+#: src/desktop/templates/document_browser.mako:593
+msgid "Result for"
+msgstr "다음에 대한 결과"
+
+#: src/desktop/templates/document_browser.mako:597
+#: src/desktop/templates/document_browser.mako:601
+msgid "Trash"
+msgstr "휴지통"
+
+#: src/desktop/templates/document_browser.mako:609
+msgid "Search for name, description, etc..."
+msgstr "이름, 설명 등을 검색합니다."
+
+#: src/desktop/templates/document_browser.mako:618
+#: src/desktop/templates/home.mako:122
+msgid "New document"
+msgstr "새 문서"
+
+#: src/desktop/templates/document_browser.mako:624
+#: src/desktop/templates/document_browser.mako:759
+#: src/desktop/templates/home.mako:128
+msgid "Impala Query"
+msgstr "Impala 쿼리"
+
+#: src/desktop/templates/document_browser.mako:627
+#: src/desktop/templates/document_browser.mako:752
+#: src/desktop/templates/home.mako:131
+msgid "Pig Script"
+msgstr "Pig 스크립트"
+
+#: src/desktop/templates/document_browser.mako:636
+#: src/desktop/templates/document_browser.mako:757
+msgid "Oozie Workflow"
+msgstr "Oozie Workflow"
+
+#: src/desktop/templates/document_browser.mako:637
+#: src/desktop/templates/document_browser.mako:756
+msgid "Oozie Coordinator"
+msgstr "Oozie Coordinator"
+
+#: src/desktop/templates/document_browser.mako:638
+#: src/desktop/templates/document_browser.mako:755
+msgid "Oozie Bundle"
+msgstr "Oozie Bundle"
+
+#: src/desktop/templates/document_browser.mako:641
+#: src/desktop/templates/document_browser.mako:760
+msgid "Search Dashboard"
+msgstr "검색 대시보드"
+
+#: src/desktop/templates/document_browser.mako:647
+msgid "New folder"
+msgstr "새 폴더"
+
+#: src/desktop/templates/document_browser.mako:648
+msgid "Rename folder"
+msgstr "폴더 이름 변경"
+
+#: src/desktop/templates/document_browser.mako:650
+#: src/desktop/templates/document_browser.mako:714
+msgid "Delete forever"
+msgstr "영구적으로 삭제"
+
+#: src/desktop/templates/document_browser.mako:650
+#: src/desktop/templates/document_browser.mako:713
+msgid "Move to trash"
+msgstr "휴지통으로 이동"
+
+#: src/desktop/templates/document_browser.mako:652
+#: src/desktop/templates/document_browser.mako:715
+msgid "Share"
+msgstr "공유"
+
+#: src/desktop/templates/document_browser.mako:654
+#: src/desktop/templates/document_browser.mako:712
+msgid "Download"
+msgstr "다운로드"
+
+#: src/desktop/templates/document_browser.mako:655
+msgid "Upload"
+msgstr "업로드"
+
+#: src/desktop/templates/document_browser.mako:658
+msgid "Show trash"
+msgstr "휴지통 표시"
+
+#: src/desktop/templates/document_browser.mako:662
+msgid "Empty trash"
+msgstr "휴지통 비우기"
+
+#: src/desktop/templates/document_browser.mako:677
+#: src/desktop/templates/home.mako:192
+msgid "Last Modified"
+msgstr "최종 수정 날짜"
+
+#: src/desktop/templates/document_browser.mako:683
+msgid ""
+"The current folder is empty, you can add a new document or folder form "
+"the top right menu"
+msgstr ""
+"현재 폴더가 비어 있습니다. 오른쪽 상단의 메뉴에서 새 파일 또는 "
+"폴더를 추가할 수 있습니다."
+
+#: src/desktop/templates/document_browser.mako:689
+msgid "No documents found matching your query"
+msgstr "쿼리와 일치하는 문서를 찾을 수 없음"
+
+#: src/desktop/templates/document_browser.mako:692
+msgid "There was an error loading the documents"
+msgstr "문서를 로드하는 중 오류 발생"
+
+#: src/desktop/templates/document_browser.mako:705
+msgid "Delete"
+msgstr "삭제"
+
+#: src/desktop/templates/document_browser.mako:751
+msgid "Directory"
+msgstr "디렉토리"
+
+#: src/desktop/templates/document_browser.mako:753
+msgid "Job Design"
+msgstr "Job 디자인"
+
+#: src/desktop/templates/document_browser.mako:904
+#: src/desktop/templates/document_browser.mako:907
+msgid "selected"
+msgstr "선택됨"
+
+#: src/desktop/templates/document_browser.mako:904
+msgid "shared ignored"
+msgstr "공유 무시"
 
 #: src/desktop/templates/dump_config.mako:42
 msgid "Configuration Sections and Variables"
@@ -2050,199 +2881,7 @@ msgstr "오류!"
 msgid "Home"
 msgstr "홈"
 
-#: src/desktop/templates/file_browser.mako:351
-#: src/desktop/templates/home.mako:194
-msgid "Sharing"
-msgstr "공유"
-
-#: src/desktop/templates/file_browser.mako:372
-#: src/desktop/templates/file_browser.mako:397
-#: src/desktop/templates/file_browser.mako:401
-msgid "Modify"
-msgstr "수정"
-
-#: src/desktop/templates/file_browser.mako:373
-msgid "The document is not shared for modify."
-msgstr "문서가 수정용으로 공유되지 않았습니다."
-
-#: src/desktop/templates/file_browser.mako:391
-msgid "There was an error loading the document."
-msgstr "문서를 로드하는 중 오류가 발생했습니다."
-
-#: src/desktop/templates/file_browser.mako:409
-#: src/desktop/templates/home.mako:318
-msgid "Add"
-msgstr "추가"
-
-#: src/desktop/templates/file_browser.mako:412
-#: src/desktop/templates/file_browser.mako:446
-#: src/desktop/templates/file_browser.mako:488
-msgid "Close"
-msgstr "닫기"
-
-#: src/desktop/templates/file_browser.mako:434
-msgid "Import complete!"
-msgstr "가져오기가 완료되었습니다!"
-
-#: src/desktop/templates/file_browser.mako:435
-msgid "Import failed!"
-msgstr "가져오기에 실패하였습니다!"
-
-#: src/desktop/templates/file_browser.mako:459
-msgid "Create Directory"
-msgstr "디렉토리 생성"
-
-#: src/desktop/templates/file_browser.mako:462
-msgid "Directory name"
-msgstr "디렉토리 이름"
-
-#: src/desktop/templates/file_browser.mako:466
-msgid "Create"
-msgstr "생성"
-
-#: src/desktop/templates/file_browser.mako:477
-#: src/desktop/templates/file_browser.mako:599
-msgid "The trash is empty"
-msgstr "휴지통이 비어 있음"
-
-#: src/desktop/templates/file_browser.mako:480
-msgid "Do you really want to delete"
-msgstr "다음을 삭제하시겠습니까?"
-
-#: src/desktop/templates/file_browser.mako:482
-msgid "entries"
-msgstr "항목"
-
-#: src/desktop/templates/file_browser.mako:492
-#: src/desktop/templates/home.mako:333
-msgid "Yes"
-msgstr "예"
-
-#: src/desktop/templates/file_browser.mako:508
-msgid "Result for"
-msgstr "다음에 대한 결과"
-
-#: src/desktop/templates/file_browser.mako:512
-#: src/desktop/templates/file_browser.mako:516
-msgid "Trash"
-msgstr "휴지통"
-
-#: src/desktop/templates/file_browser.mako:533
-#: src/desktop/templates/home.mako:122
-msgid "New document"
-msgstr "새 문서"
-
-#: src/desktop/templates/file_browser.mako:539
-#: src/desktop/templates/file_browser.mako:669
-#: src/desktop/templates/home.mako:128
-msgid "Impala Query"
-msgstr "Impala 쿼리"
-
-#: src/desktop/templates/file_browser.mako:542
-#: src/desktop/templates/file_browser.mako:662
-#: src/desktop/templates/home.mako:131
-msgid "Pig Script"
-msgstr "Pig 스크립트"
-
-#: src/desktop/templates/file_browser.mako:551
-#: src/desktop/templates/file_browser.mako:667
-msgid "Oozie Workflow"
-msgstr "Oozie Workflow"
-
-#: src/desktop/templates/file_browser.mako:552
-#: src/desktop/templates/file_browser.mako:666
-msgid "Oozie Coordinator"
-msgstr "Oozie Coordinator"
-
-#: src/desktop/templates/file_browser.mako:553
-#: src/desktop/templates/file_browser.mako:665
-msgid "Oozie Bundle"
-msgstr "Oozie Bundle"
-
-#: src/desktop/templates/file_browser.mako:556
-#: src/desktop/templates/file_browser.mako:670
-msgid "Search Dashboard"
-msgstr "검색 대시보드"
-
-#: src/desktop/templates/file_browser.mako:562
-msgid "New folder"
-msgstr "새 폴더"
-
-#: src/desktop/templates/file_browser.mako:563
-#: src/desktop/templates/file_browser.mako:624
-msgid "Delete forever"
-msgstr "영구적으로 삭제"
-
-#: src/desktop/templates/file_browser.mako:563
-#: src/desktop/templates/file_browser.mako:623
-msgid "Move to trash"
-msgstr "휴지통으로 이동"
-
-#: src/desktop/templates/file_browser.mako:565
-#: src/desktop/templates/file_browser.mako:625
-msgid "Share"
-msgstr "공유"
-
-#: src/desktop/templates/file_browser.mako:567
-#: src/desktop/templates/file_browser.mako:622
-msgid "Download"
-msgstr "다운로드"
-
-#: src/desktop/templates/file_browser.mako:568
-msgid "Upload"
-msgstr "업로드"
-
-#: src/desktop/templates/file_browser.mako:571
-msgid "Show trash"
-msgstr "휴지통 표시"
-
-#: src/desktop/templates/file_browser.mako:575
-msgid "Empty trash"
-msgstr "휴지통 비우기"
-
-#: src/desktop/templates/file_browser.mako:588
-msgid "Type"
-msgstr "유형"
-
-#: src/desktop/templates/file_browser.mako:590
-#: src/desktop/templates/home.mako:192
-msgid "Last Modified"
-msgstr "최종 수정 날짜"
-
-#: src/desktop/templates/file_browser.mako:596
-msgid "The current folder is empty, you can add a new file or folder form the top right menu"
-msgstr "현재 폴더가 비어 있음, 오른쪽 상단의 메뉴에서 새 파일 또는 폴더를 추가할 수 있음"
-
-#: src/desktop/templates/file_browser.mako:602
-msgid "No documents found matching your query"
-msgstr "쿼리와 일치하는 문서를 찾을 수 없음"
-
-#: src/desktop/templates/file_browser.mako:605
-msgid "There was an error loading the documents"
-msgstr "문서를 로드하는 중 오류 발생"
-
-#: src/desktop/templates/file_browser.mako:618
-msgid "Delete"
-msgstr "삭제"
-
-#: src/desktop/templates/file_browser.mako:661
-msgid "Directory"
-msgstr "디렉토리"
-
-#: src/desktop/templates/file_browser.mako:663
-msgid "Job Design"
-msgstr "Job 디자인"
-
-#: src/desktop/templates/file_browser.mako:824
-#: src/desktop/templates/file_browser.mako:827
-msgid "selected"
-msgstr "선택됨"
-
-#: src/desktop/templates/file_browser.mako:824
-msgid "shared ignored"
-msgstr "공유 무시"
-
-#: src/desktop/templates/home.mako:24 src/desktop/templates/home2.mako:26
+#: src/desktop/templates/home.mako:24 src/desktop/templates/home2.mako:25
 msgid "Welcome Home"
 msgstr "환영합니다"
 
@@ -2298,15 +2937,12 @@ msgstr "나에게 공유됨"
 msgid "There are currently no projects shared with you."
 msgstr "현재 나에게 공유된 프로젝트가 없습니다."
 
-#: src/desktop/templates/home.mako:193
-msgid "Project"
-msgstr "프로젝트"
-
 #: src/desktop/templates/home.mako:203
 msgid "Page"
 msgstr "페이지"
 
 #: src/desktop/templates/home.mako:203
+#: src/desktop/templates/sql_context_popover.mako:741
 msgid "of"
 msgstr "/"
 
@@ -2334,6 +2970,10 @@ msgstr "이 문서를 이동할 프로젝트 선택"
 msgid "Project name"
 msgstr "프로젝트 이름"
 
+#: src/desktop/templates/home.mako:318
+msgid "Add"
+msgstr "추가"
+
 #: src/desktop/templates/home.mako:326
 msgid "Confirm Delete"
 msgstr "삭제 확인"
@@ -2350,183 +2990,195 @@ msgstr "모든 문서가 기본 태그로 이동됩니다."
 msgid "No"
 msgstr "아니요"
 
-#: src/desktop/templates/home.mako:401
-#, fuzzy, python-format
+#: src/desktop/templates/home.mako:399
 msgid "File name is required."
 msgstr "파일 이름을 입력해야 합니다."
 
-#: src/desktop/templates/home.mako:412
+#: src/desktop/templates/home.mako:410
 msgid "project name already exists"
 msgstr "프로젝트 이름이 이미 존재함"
 
-#: src/desktop/templates/home.mako:420
+#: src/desktop/templates/home.mako:418
 msgid "Project created"
 msgstr "프로젝트가 생성됨"
 
-#: src/desktop/templates/home.mako:424 src/desktop/templates/home.mako:460
-#: src/desktop/templates/home.mako:464 src/desktop/templates/home.mako:487
-#: src/desktop/templates/home.mako:496
+#: src/desktop/templates/home.mako:422 src/desktop/templates/home.mako:458
+#: src/desktop/templates/home.mako:462 src/desktop/templates/home.mako:485
+#: src/desktop/templates/home.mako:494
 msgid "There was an error processing your action: "
 msgstr "작업 처리 중 오류 발생: "
 
-#: src/desktop/templates/home.mako:490
+#: src/desktop/templates/home.mako:488
 msgid "Project updated successfully."
 msgstr "프로젝트를 업데이트했습니다."
 
-#: src/desktop/templates/home.mako:557 src/desktop/templates/home2.mako:317
+#: src/desktop/templates/home.mako:555 src/desktop/templates/home2.mako:321
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:321
+#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
 msgid "Step 1:"
 msgstr "1단계:"
 
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:321
+#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
 msgid "Add data"
 msgstr "데이터 추가"
 
-#: src/desktop/templates/home.mako:564 src/desktop/templates/home2.mako:322
+#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
 msgid "Step 2:"
 msgstr "2단계:"
 
-#: src/desktop/templates/home.mako:565 src/desktop/templates/home2.mako:323
+#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
 msgid "Step 3:"
 msgstr "3단계:"
 
-#: src/desktop/templates/home.mako:565 src/desktop/templates/home2.mako:323
+#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
 msgid "Do more!"
 msgstr "추가 실행!"
 
-#: src/desktop/templates/home.mako:574 src/desktop/templates/home2.mako:331
+#: src/desktop/templates/home.mako:572 src/desktop/templates/home2.mako:335
 msgid "With"
 msgstr "다음"
 
-#: src/desktop/templates/home.mako:575 src/desktop/templates/home2.mako:332
+#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
 msgid "and the apps in the"
 msgstr "그리고 앱이 있는"
 
-#: src/desktop/templates/home.mako:575 src/desktop/templates/home2.mako:332
+#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
 msgid "section, upload, view your data and create tables."
 msgstr "섹션으로 업로드하고 데이터를 보고 테이블을 생성합니다."
 
-#: src/desktop/templates/home.mako:578 src/desktop/templates/home2.mako:335
+#: src/desktop/templates/home.mako:576 src/desktop/templates/home2.mako:339
 msgid "Pre-installed samples are also already there."
 msgstr "사전 설치된 샘플이 이미 있습니다."
 
-#: src/desktop/templates/home.mako:587 src/desktop/templates/home2.mako:344
+#: src/desktop/templates/home.mako:585 src/desktop/templates/home2.mako:348
 msgid "Then query and visualize the data with the"
 msgstr "그 후 다음으로 쿼리 및 시각화"
 
-#: src/desktop/templates/home.mako:588 src/desktop/templates/home2.mako:345
-msgid "and"
-msgstr "및"
-
-#: src/desktop/templates/home.mako:598 src/desktop/templates/home2.mako:355
+#: src/desktop/templates/home.mako:596 src/desktop/templates/home2.mako:359
 msgid "Tours were created to guide you around."
 msgstr "사용자를 안내하기 위한 둘러보기가 생성되었습니다."
 
-#: src/desktop/templates/home.mako:599 src/desktop/templates/home2.mako:356
+#: src/desktop/templates/home.mako:597 src/desktop/templates/home2.mako:360
 msgid "You can see the list of tours by clicking on the checkered flag icon"
 msgstr "체크 무늬 플래그 아이콘을 클릭하면 둘러보기 목록을 볼 수 있습니다."
 
-#: src/desktop/templates/home.mako:604 src/desktop/templates/home2.mako:361
+#: src/desktop/templates/home.mako:602 src/desktop/templates/home2.mako:365
 msgid "Additional documentation is available at"
 msgstr "추가 문서는 다음에서 확인 가능"
 
-#: src/desktop/templates/home.mako:611 src/desktop/templates/home2.mako:368
+#: src/desktop/templates/home.mako:609 src/desktop/templates/home2.mako:372
 msgid "Do not show this dialog again"
 msgstr "이 대화 상자를 다시 표시 안 함"
 
-#: src/desktop/templates/home.mako:612
+#: src/desktop/templates/home.mako:610
 msgid "Got it, prof!"
 msgstr "확인!"
 
-#: src/desktop/templates/home2.mako:182
+#: src/desktop/templates/home2.mako:196
 msgid "Toggle Assist"
 msgstr "지원 전환"
 
-#: src/desktop/templates/home2.mako:249
+#: src/desktop/templates/home2.mako:253
 msgid "An error occurred fetching the table details. Please try again."
 msgstr "테이블 세부 정보를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:250
+#: src/desktop/templates/home2.mako:254
 msgid "An error occurred fetching the table fields. Please try again."
 msgstr "테이블 필드를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:251
+#: src/desktop/templates/home2.mako:255
 msgid "An error occurred fetching the table sample. Please try again."
 msgstr "테이블 샘플을 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:252
+#: src/desktop/templates/home2.mako:256
 msgid "An error occurred refreshing the table stats. Please try again."
 msgstr "테이블 상태를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:253
+#: src/desktop/templates/home2.mako:257
 msgid "There was a problem loading the databases. Please try again."
 msgstr "데이터베이스를 로드하는 중 문제가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:254
+#: src/desktop/templates/home2.mako:258
 msgid "There was a problem loading the table preview. Please try again."
 msgstr "테이블 미리 보기를 로드하는 중 문제가 발생했습니다. 다시 시도하십시오."
 
-#: src/desktop/templates/home2.mako:369
+#: src/desktop/templates/home2.mako:373
 msgid "Got it!"
 msgstr "확인!"
+
+#: src/desktop/templates/ko_components.mako:61
+msgid "Selected entry"
+msgstr "선택된 항목"
+
+#: src/desktop/templates/ko_editor.mako:24
+msgid "I'm an editor"
+msgstr "편집기입니다."
+
+#: src/desktop/templates/ko_metastore.mako:24
+msgid "I'm a metastore"
+msgstr "metastore입니다."
 
 #: src/desktop/templates/login.mako:24
 msgid "Welcome to Hue"
 msgstr "Hue 시작 페이지"
 
-#: src/desktop/templates/login.mako:39
+#: src/desktop/templates/login.mako:47
 msgid "Go to gethue.com"
 msgstr "gethue.com으로 이동"
 
-#: src/desktop/templates/login.mako:56
-msgid "Since this is your first time logging in, pick any username and password. Be sure to remember these, as"
+#: src/desktop/templates/login.mako:64
+msgid ""
+"Since this is your first time logging in, pick any username and password."
+" Be sure to remember these, as"
 msgstr "첫 번째 로그인이므로 사용자 이름 및 암호를 선택하십시오. 사용자 이름 및 암호는 기억해두십시오."
 
-#: src/desktop/templates/login.mako:57
+#: src/desktop/templates/login.mako:65
 msgid "they will become your Hue superuser credentials."
 msgstr "해당 정보는 Hue superuser의 자격 증명이 됩니다."
 
-#: src/desktop/templates/login.mako:105
+#: src/desktop/templates/login.mako:113
 msgid "Create Account"
 msgstr "계정 생성"
 
-#: src/desktop/templates/login.mako:107
-#: src/desktop/templates/login_modal.mako:75
+#: src/desktop/templates/login.mako:115
 msgid "Sign In"
 msgstr "로그인"
 
-#: src/desktop/templates/login.mako:122
+#: src/desktop/templates/login.mako:130
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue 및 Hue 로고는 Cloudera, Inc.의 상표입니다."
 
-#: src/desktop/templates/login_modal.mako:33
-msgid "You have been logged out, please sign in again"
-msgstr "로그아웃 되었습니다. 다시 로그인하십시오."
+#: src/desktop/templates/login_modal.mako:32
+msgid "Your session has expired."
+msgstr "세션이 만료되었습니다."
 
-#: src/desktop/templates/login_modal.mako:72
-msgid "Sign in failed. Please try again."
-msgstr "로그인할 수 없습니다. 다시 시도하십시오."
+#: src/desktop/templates/login_modal.mako:36
+msgid "Reload this page to sign in again"
+msgstr "다시 로그인하려면 페이지를 다시 로드하십시오."
+
+#: src/desktop/templates/login_modal.mako:39
+msgid "Please reload this page"
+msgstr "이 페이지를 다시 로드하십시오."
 
 #: src/desktop/templates/logs.mako:68
 msgid "Search in the logs"
 msgstr "로그에서 검색"
 
-#: src/desktop/templates/logs.mako:71
+#: src/desktop/templates/logs.mako:73
 msgid "Host"
 msgstr "호스트"
 
-#: src/desktop/templates/logs.mako:73
+#: src/desktop/templates/logs.mako:77
 msgid "Force DEBUG level"
 msgstr "DEBUG 레벨 적용"
 
-#: src/desktop/templates/logs.mako:76
+#: src/desktop/templates/logs.mako:81
 msgid "Wrap logs"
 msgstr "로그 줄 바꿈"
 
-#: src/desktop/templates/logs.mako:79
+#: src/desktop/templates/logs.mako:83
 msgid "Download entire log as zip"
 msgstr "전체 로그를 zip 파일로 다운로드"
 
@@ -2539,77 +3191,240 @@ msgstr "자세한 정보"
 msgid "View Logs"
 msgstr "로그 보기"
 
-#: src/desktop/templates/table_stats.mako:55
-msgid "Prefix filter..."
-msgstr "접두사 필터..."
+#: src/desktop/templates/responsive.mako:94
+msgid "Homepage"
+msgstr "홈페이지"
 
-#: src/desktop/templates/table_stats.mako:59
-msgid "Column stats are currently not supported for columns of type:"
-msgstr "현재 다음 열 유형에 대해 열 상태가 지원되지 않음:"
+#: src/desktop/templates/responsive.mako:100
+msgid "Compose"
+msgstr "구성"
 
-#: src/desktop/templates/table_stats.mako:70
-msgid "There are no terms to be shown"
-msgstr "표시할 용어가 없습니다."
+#: src/desktop/templates/responsive.mako:130
+msgid "More..."
+msgstr "더..."
 
-#: src/desktop/templates/table_stats.mako:92
-msgid " table"
-msgstr " 테이블"
+#: src/desktop/templates/responsive.mako:130
+msgid "More"
+msgstr "더"
 
-#: src/desktop/templates/table_stats.mako:95
-msgid " column"
-msgstr " 열"
+#: src/desktop/templates/responsive.mako:139
+msgid "Add more..."
+msgstr "더 추가..."
 
-#: src/desktop/templates/table_stats.mako:101
-msgid "Sample"
-msgstr "샘플"
+#: src/desktop/templates/responsive.mako:149
+msgid "Search all data and saved documents..."
+msgstr "모든 데이터 및 저장된 문서 검색..."
 
-#: src/desktop/templates/table_stats.mako:104
-msgid "The column stats for this table are not accurate"
-msgstr "이 테이블의 열 상태가 정확하지 않음"
+#: src/desktop/templates/responsive.mako:178
+msgid "Set Permissions"
+msgstr "권한 설정"
 
-#: src/desktop/templates/table_stats.mako:104
-msgid "Analysis"
-msgstr "분석"
+#: src/desktop/templates/responsive.mako:179
+msgid "Help"
+msgstr "도움말"
 
-#: src/desktop/templates/table_stats.mako:109
-msgid "View more..."
-msgstr "더 보기..."
+#: src/desktop/templates/responsive.mako:188
+msgid "Running jobs and workflows"
+msgstr "Job 및 Workflow 실행 중"
 
-#: src/desktop/templates/table_stats.mako:121
+#: src/desktop/templates/responsive.mako:188
+msgid "Jobs"
+msgstr "Job"
+
+#: src/desktop/templates/responsive.mako:203
+msgid "Applications"
+msgstr "애플리케이션"
+
+#: src/desktop/templates/responsive.mako:213
+#: src/desktop/templates/sql_context_popover.mako:355
+msgid "Browse"
+msgstr "찾아보기"
+
+#: src/desktop/templates/responsive.mako:222
+msgid "Drop files here"
+msgstr "여기에 파일 놓기"
+
+#: src/desktop/templates/responsive.mako:227
+#: src/desktop/templates/responsive.mako:277
+msgid "Show Assist"
+msgstr "지원 표시"
+
+#: src/desktop/templates/responsive.mako:228
+#: src/desktop/templates/responsive.mako:278
+msgid "Hide Assist"
+msgstr "지원 숨기기"
+
+#: src/desktop/templates/responsive.mako:282
+msgid "Assistant"
+msgstr "도우미"
+
+#: src/desktop/templates/responsive.mako:283
+msgid "Functions"
+msgstr "함수"
+
+#: src/desktop/templates/responsive.mako:284
+msgid "Schedules"
+msgstr "일정"
+
+#: src/desktop/templates/sql_context_popover.mako:152
+msgid "Show in Assist..."
+msgstr "지원에 표시..."
+
+#: src/desktop/templates/sql_context_popover.mako:153
+msgid "Open in Metastore..."
+msgstr "Metastore에서 열기..."
+
+#: src/desktop/templates/sql_context_popover.mako:153
+msgid "Metastore"
+msgstr "Metastore"
+
+#: src/desktop/templates/sql_context_popover.mako:154
+msgid "Replace the editor content..."
+msgstr "편집기 콘텐츠 교체..."
+
+#: src/desktop/templates/sql_context_popover.mako:154
+msgid "Insert in the editor"
+msgstr "편집기에 삽입"
+
+#: src/desktop/templates/sql_context_popover.mako:155
+msgid "Open in File Browser..."
+msgstr "파일 브라우저에서 열기..."
+
+#: src/desktop/templates/sql_context_popover.mako:159
+msgid "Expand to selected columns"
+msgstr "선택된 열로 확장"
+
+#: src/desktop/templates/sql_context_popover.mako:162
+msgid "Expand to all columns"
+msgstr "모든 열로 확장"
+
+#: src/desktop/templates/sql_context_popover.mako:180
+msgid "Properties"
+msgstr "속성"
+
+#: src/desktop/templates/sql_context_popover.mako:185
+msgid "Created"
+msgstr "생성됨"
+
+#: src/desktop/templates/sql_context_popover.mako:188
+#: src/desktop/templates/sql_context_popover.mako:191
+msgid "Format"
+msgstr "형식"
+
+#: src/desktop/templates/sql_context_popover.mako:192
+msgid "Compressed"
+msgstr "압축됨"
+
+#: src/desktop/templates/sql_context_popover.mako:192
+msgid "Not compressed"
+msgstr "압축되지 않음"
+
+#: src/desktop/templates/sql_context_popover.mako:197
+#: src/desktop/templates/sql_context_popover.mako:213
+msgid "Comment"
+msgstr "설명"
+
+#: src/desktop/templates/sql_context_popover.mako:201
+#: src/desktop/templates/sql_context_popover.mako:217
+#: src/desktop/templates/sql_context_popover.mako:290
+#: src/desktop/templates/sql_context_popover.mako:796
+msgid "Tags"
+msgstr "태그"
+
+#: src/desktop/templates/sql_context_popover.mako:237
 msgid "The selected table has no data."
 msgstr "선택한 테이블에 데이터가 없습니다."
 
-#: src/desktop/templates/table_stats.mako:154
-msgid "There is no analysis available"
-msgstr "사용 가능한 분석이 없습니다."
+#: src/desktop/templates/sql_context_popover.mako:328
+#: src/desktop/templates/sql_context_popover.mako:584
+#: src/desktop/templates/sql_context_popover.mako:1308
+msgid "Columns"
+msgstr "열"
 
-#: src/desktop/templates/table_stats.mako:156
-msgid "Column analysis is currently not supported for columns of type:"
-msgstr "현재 다음 열 유형에 대해 열 분석이 지원되지 않음:"
+#: src/desktop/templates/sql_context_popover.mako:347
+#: src/desktop/templates/sql_context_popover.mako:637
+msgid "Partitions"
+msgstr "파티션"
 
-#: src/desktop/templates/table_stats.mako:168
-msgid "View statistics"
-msgstr "통계 보기"
+#: src/desktop/templates/sql_context_popover.mako:353
+msgid "Values"
+msgstr "값"
 
-#: src/desktop/templates/table_stats.mako:191
-msgid "There was a problem loading the stats."
-msgstr "상태를 로드하는 중 문제가 발생했습니다."
+#: src/desktop/templates/sql_context_popover.mako:354
+#, fuzzy
+msgid "Spec"
+msgstr "사양"
 
-#: src/desktop/templates/table_stats.mako:192
-msgid "There was a problem refreshing the stats."
-msgstr "상태를 새로 고침 하는 중 문제가 발생했습니다."
+#: src/desktop/templates/sql_context_popover.mako:364
+msgid "Data"
+msgstr "데이터"
 
-#: src/desktop/templates/table_stats.mako:193
-msgid "There was a problem loading the terms."
-msgstr "용어를 로드하는 중 문제가 발생했습니다."
+#: src/desktop/templates/sql_context_popover.mako:364
+msgid "Files"
+msgstr "파일"
 
-#: src/desktop/templates/table_stats.mako:289
-msgid "No data available"
-msgstr "데이터를 이용할 수 없음"
+#: src/desktop/templates/sql_context_popover.mako:548
+#: src/desktop/templates/sql_context_popover.mako:604
+msgid "Sample"
+msgstr "샘플"
 
-#: src/desktop/templates/table_stats.mako:290
-msgid "No matching records"
-msgstr "일치하는 레코드가 없음"
+#: src/desktop/templates/sql_context_popover.mako:551
+#: src/desktop/templates/sql_context_popover.mako:607
+msgid "There was a problem loading the samples."
+msgstr "샘플을 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:567
+msgid "There was a problem loading the column details."
+msgstr "열 세부 정보를 로드하는 중 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:577
+msgid "There was a problem loading the details."
+msgstr "세부 정보를 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:587
+msgid "There was a problem loading the columns."
+msgstr "열을 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:595
+msgid "There was a problem loading the table details."
+msgstr "테이블 세부 정보를 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:616
+#: src/desktop/templates/sql_context_popover.mako:628
+msgid "Analysis"
+msgstr "분석"
+
+#: src/desktop/templates/sql_context_popover.mako:619
+msgid "There was a problem loading the column analysis."
+msgstr "열 분석을 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:631
+msgid "There was a problem loading the table analysis."
+msgstr "테이블 분석을 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:640
+msgid "There was a problem loading the table partitions."
+msgstr "테이블 파티션을 로드하는 중에 문제가 발생했습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:740
+msgid "No results found."
+msgstr "결과를 찾을 수 없습니다."
+
+#: src/desktop/templates/sql_context_popover.mako:1310
+msgid "Filter columns..."
+msgstr "열 필터링..."
+
+#: src/desktop/templates/sql_context_popover.mako:1323
+msgid "Table"
+msgstr "테이블"
+
+#: src/desktop/templates/sql_context_popover.mako:1342
+msgid "Show sample"
+msgstr "샘플 표시"
+
+#: src/desktop/templates/sql_context_popover.mako:1356
+msgid "No columns found"
+msgstr "열을 찾을 수 없음"
 
 #: src/desktop/templates/tours.mako:23
 msgid "Get started!"
@@ -2620,15 +3435,22 @@ msgid "Your new home."
 msgstr "새 홈입니다."
 
 #: src/desktop/templates/tours.mako:24
-msgid "This is where you can access all your documents and you can tag them per project. Your home is always reachable from any part of Hue, just click on the house icon on the top navigator bar."
-msgstr "여기에서 모든 문서에 액세스하고 프로젝트별로 태그를 지정할 수 있습니다. 홈은 맨 위 탐색 표시줄에서 집 아이콘을 클릭하면 항상 Hue 어디서든 액세스할 수 있습니다."
+msgid ""
+"This is where you can access all your documents and you can tag them per "
+"project. Your home is always reachable from any part of Hue, just click "
+"on the house icon on the top navigator bar."
+msgstr ""
+"여기에서 모든 문서에 액세스하고 프로젝트별로 태그를 지정할 수 있습니다. 홈은 맨 위 탐색 표시줄에서 집 아이콘을 클릭하면 항상 "
+"Hue 어디서든 액세스할 수 있습니다."
 
 #: src/desktop/templates/tours.mako:25
 msgid "Actions and projects"
 msgstr "작업 및 프로젝트"
 
 #: src/desktop/templates/tours.mako:25
-msgid "From here you can create new documents or see a specific project or any trashed document for instance."
+msgid ""
+"From here you can create new documents or see a specific project or any "
+"trashed document for instance."
 msgstr "여기에서 새 문서를 생성하거나 특정 프로젝트 또는 휴지통으로 이동한 문서 등을 볼 수 있습니다."
 
 #: src/desktop/templates/tours.mako:26
@@ -2636,23 +3458,35 @@ msgid "Organize!"
 msgstr "구성!"
 
 #: src/desktop/templates/tours.mako:26
-msgid "You can organize your documents in projects and filter them out in this area. It's a smart and fast way to focus on a specific project you are currently tackling."
-msgstr "프로젝트별로 문서를 구성하고 이 영역에서 필터링할 수 있습니다. 이 방법은 현재 작업 중인 특정 프로젝트에 포커스를 두는 편리하고 빠른 방법입니다."
+msgid ""
+"You can organize your documents in projects and filter them out in this "
+"area. It's a smart and fast way to focus on a specific project you are "
+"currently tackling."
+msgstr ""
+"프로젝트별로 문서를 구성하고 이 영역에서 필터링할 수 있습니다. 이 방법은 현재 작업 중인 특정 프로젝트에 포커스를 두는 편리하고 "
+"빠른 방법입니다."
 
 #: src/desktop/templates/tours.mako:27
 msgid "Your documents"
 msgstr "문서"
 
 #: src/desktop/templates/tours.mako:27
-msgid "You can always have a glance at your hard work. This is the list of all your documents, The first column tells you the kind of document that is, then you can find its name, a description and some other fields."
-msgstr "수행한 작업을 항상 둘러볼 수 있습니다. 이 목록은 모든 문서 목록으로, 첫 번째 열이 문서 종류를 알려주며 문서 이름, 설명 및 다른 필드도 확인할 수 있습니다."
+msgid ""
+"You can always have a glance at your hard work. This is the list of all "
+"your documents, The first column tells you the kind of document that is, "
+"then you can find its name, a description and some other fields."
+msgstr ""
+"수행한 작업을 항상 둘러볼 수 있습니다. 이 목록은 모든 문서 목록으로, 첫 번째 열이 문서 종류를 알려주며 문서 이름, 설명 및 "
+"다른 필드도 확인할 수 있습니다."
 
 #: src/desktop/templates/tours.mako:28
 msgid "Projects"
 msgstr "프로젝트"
 
 #: src/desktop/templates/tours.mako:28
-msgid "You can assign one or more projects to a document just by clicking in this cell."
+msgid ""
+"You can assign one or more projects to a document just by clicking in "
+"this cell."
 msgstr "이 셀을 클릭하여 한 개 이상의 프로젝트를 문서에 할당할 수 있습니다."
 
 #: src/desktop/templates/tours.mako:29
@@ -2660,15 +3494,22 @@ msgid "Share your documents"
 msgstr "문서 공유"
 
 #: src/desktop/templates/tours.mako:29
-msgid "You can also share a document you have worked on with a specific user or a group of users. Just click on the icon in this column on every document you want to share and choose users and groups from the popup."
-msgstr "특정 사용자 또는 사용자 그룹과 함께 작업한 문서를 공유할 수도 있습니다. 공유하려는 모든 문서에서 이 열에 있는 아이콘을 클릭하고 팝업에서 사용자 및 그룹을 선택하면 됩니다."
+msgid ""
+"You can also share a document you have worked on with a specific user or "
+"a group of users. Just click on the icon in this column on every document"
+" you want to share and choose users and groups from the popup."
+msgstr ""
+"특정 사용자 또는 사용자 그룹과 함께 작업한 문서를 공유할 수도 있습니다. 공유하려는 모든 문서에서 이 열에 있는 아이콘을 클릭하고"
+" 팝업에서 사용자 및 그룹을 선택하면 됩니다."
 
 #: src/desktop/templates/tours.mako:30
 msgid "Search your documents"
 msgstr "문서 검색"
 
 #: src/desktop/templates/tours.mako:30
-msgid "You can always filter out the documents by name, description or even owner. Enjoy your new home!"
+msgid ""
+"You can always filter out the documents by name, description or even "
+"owner. Enjoy your new home!"
 msgstr "이름, 설명 또는 소유자별로 문서를 항상 필터링할 수 있습니다. 새 홈을 이용해 보십시오!"
 
 #: src/desktop/templates/tours.mako:35
@@ -2732,171 +3573,96 @@ msgid "Hue - Unsupported browser"
 msgstr "Hue - 지원되지 않는 브라우저"
 
 #: src/desktop/templates/unsupported.mako:91
-msgid "It looks like you are running an older browser. What about upgrading to the latest"
+msgid ""
+"It looks like you are running an older browser. What about upgrading to "
+"the latest"
 msgstr "이전 브라우저를 실행 중인 것 같습니다. 최신 버전으로 업그레이드 하시겠습니까?"
 
-#~ msgid "POST request only"
-#~ msgstr "POST 요청만"
+#~ msgid ""
+#~ "If set to true, CherryPy will be"
+#~ " used. Otherwise, Spawning will be "
+#~ "used as the webserver."
+#~ msgstr ""
 
-#~ msgid "Use this string to parse and redact log message."
-#~ msgstr "이 문자열을 사용하여 로그 메시지를 분석하고 수정하십시오."
+#~ msgid ""
+#~ "Configuration options for specifying the Desktop Database.\n"
+#~ "          For more info, see "
+#~ "http://docs.djangoproject.com/en/1.1/ref/settings/#database-"
+#~ "engine"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Authentication backend.  Common settings are"
+#~ " django.contrib.auth.backends.ModelBackend (fully "
+#~ "Django backend), desktop.auth.backend.AllowAllBackend "
+#~ "(allows everyone), "
+#~ "desktop.auth.backend.AllowFirstUserDjangoBackend (relies "
+#~ "on Django and user manager, after "
+#~ "the first login). "
+#~ msgstr ""
 
 #~ msgid "If true, log all database requests."
-#~ msgstr "TRUE이면 모든 데이터베이스 요청을 로깅합니다."
+#~ msgstr ""
+
+#~ msgid "Secret key should be configured as a random string."
+#~ msgstr ""
 
 #~ msgid "Cannot find HDFS called \"%(fs_ref)s\"."
-#~ msgstr "\"%(fs_ref)s\" HDFS를 찾을 수 없습니다."
+#~ msgstr ""
 
-#~ msgid "Only superusers and %s are allowed to read this document."
-#~ msgstr "superuser 및 %s만 이 문서를 읽을 수 있습니다."
+#~ msgid "Could not create home directory."
+#~ msgstr ""
 
-#~ msgid "Only superusers and %s are allowed to write this document."
-#~ msgstr "superuser 및 %s만 이 문서를 쓸 수 있습니다."
+#~ msgid "starting server with options %(options)s"
+#~ msgstr ""
+
+#~ msgid "Spawning Server for Hue."
+#~ msgstr ""
 
 #~ msgid "Not Found"
-#~ msgstr "찾을 수 없음"
+#~ msgstr ""
+
+#~ msgid "Page not found"
+#~ msgstr ""
 
 #~ msgid "Server Error (500)"
-#~ msgstr "서버 오류(500)"
+#~ msgstr ""
 
-#~ msgid "Query Editors"
-#~ msgstr "쿼리 편집기"
+#~ msgid "Profile"
+#~ msgstr ""
 
-#~ msgid "Spark"
-#~ msgstr "Spark"
+#~ msgid "Sign Out"
+#~ msgstr ""
 
-#~ msgid "Data Browsers"
-#~ msgstr "데이터 브라우저"
+#~ msgid "Welcome Home."
+#~ msgstr ""
 
-#~ msgid "Security"
-#~ msgstr "보안"
+#~ msgid "Hue is a Web UI for Apache Hadoop. Please select an application below."
+#~ msgstr ""
 
-#~ msgid "Change project for"
-#~ msgstr "다음에 대한 프로젝트 변경"
+#~ msgid "Shell"
+#~ msgstr ""
 
-#~ msgid "Create your Hue account"
-#~ msgstr "Hue 계정 생성"
+#~ msgid "Hadoop"
+#~ msgstr ""
 
-#~ msgid "Sign in to continue to Hue"
-#~ msgstr "계속하려면 Hue에 로그인"
+#~ msgid "Designs"
+#~ msgstr ""
 
-#~ msgid "The Hue Blog"
-#~ msgstr "Hue 블로그"
+#~ msgid "Editor"
+#~ msgstr ""
 
-#~ msgid "Create Hive tables and load quoted"
-#~ msgstr "Hive 테이블 생성 및 따옴표 처리 후 로드"
+#~ msgid "Hue - Sign up"
+#~ msgstr ""
 
-#~ msgid "CSV data"
-#~ msgstr "CSV 데이터"
+#~ msgid "Hue - Sign in"
+#~ msgstr ""
 
-#~ msgid "Submit any Oozie jobs directly"
-#~ msgstr "모든 Oozie 작업 직접 제출"
+#~ msgid "Invalid username or password."
+#~ msgstr ""
 
-#~ msgid "from HDFS"
-#~ msgstr "HDFS에서"
+#~ msgid "Sign up"
+#~ msgstr ""
 
-#~ msgid "ZooKeeper Browser"
-#~ msgstr "ZooKeeper 브라우저"
-
-#~ msgid "Query your Databases"
-#~ msgstr "데이터베이스 쿼리"
-
-#~ msgid "Graphical facets"
-#~ msgstr "그래픽 패싯"
-
-#~ msgid "Use Impala with Sentry"
-#~ msgstr "Sentry를 통해 Impala 사용"
-
-#~ msgid "Submit Oozie jobs directly from HDFS"
-#~ msgstr "HDFS에서 Oozie 작업 직접 제출"
-
-#~ msgid "A Job Browser for Yarn"
-#~ msgstr "Yarn용 Job Browser"
-
-#~ msgid "Security with Yarn"
-#~ msgstr "Yarn 보안"
-
-#~ msgid "Hive Query editor with HiveServer2"
-#~ msgstr "HiveServer2 및 Sentry를 사용한 Hive 쿼리 편집기"
-
-#~ msgid "and Sentry"
-#~ msgstr "및 Sentry"
-
-#~ msgid "Integrate external Web applications in"
-#~ msgstr "외부 웹 애플리케이션을"
-
-#~ msgid "any language"
-#~ msgstr "모든 언어로 통합"
-
-#~ msgid "Season 2 of Hadoop Video Tutorials"
-#~ msgstr "Hadoop 비디오 자습서 시즌 2"
-
-#~ msgid "Analyze Twitter data"
-#~ msgstr "Twitter 데이터 분석"
-
-#~ msgid "Preparing Yelp data for analysis with"
-#~ msgstr "Yelp 데이터 분석 준비"
-
-#~ msgid "Pig and Python UDF"
-#~ msgstr "Pig 및 Python UDF"
-
-#~ msgid "What's new in Hue 3.5"
-#~ msgstr "Hue 3.5의 새 기능"
-
-#~ msgid "SSO with SAML"
-#~ msgstr "SAML과 함께 SSO"
-
-#~ msgid "Integrating your company with LDAP: How To"
-#~ msgstr "사용자의 회사를 LDAP로 통합: 방법"
-
-#~ msgid "A new Spark UI"
-#~ msgstr "새로운 Spark UI"
-
-#~ msgid "Fast SQL with Impala"
-#~ msgstr "Impala를 이용한 빠른 SQL"
-
-#~ msgid "The Pig Editor"
-#~ msgstr "Pig 편집기"
-
-#~ msgid "Build and use Hive UDF in 1 minute!"
-#~ msgstr "1분 이내에 Hive UDF 만들기 및 사용!"
-
-#~ msgid "How to use HCatalog in Hue with Pig"
-#~ msgstr "Pig에서 Hue의 HCatalog 사용"
-
-#~ msgid "Create HBase tables"
-#~ msgstr "HBase 테이블 생성"
-
-#~ msgid "The search app with Solr"
-#~ msgstr "Solr로 앱 검색"
-
-#~ msgid "HDFS File Operations Made Easy"
-#~ msgstr "HDFS 파일 작업 용이"
-
-#~ msgid "High availability in Hue"
-#~ msgstr "Hue의 고가용성"
-
-#~ msgid "What's new in Hue 2.5"
-#~ msgstr "Hue 2.5의 새 기능"
-
-#~ msgid "Manage users and group permissions"
-#~ msgstr "사용자 및 그룹 권한 관리"
-
-#~ msgid "Transfering data with Sqoop"
-#~ msgstr "Sqoop을 통해 데이터 전송 중"
-
-#~ msgid "New Impala and Hive Editors"
-#~ msgstr "새 Impala 및 Hive 편집기"
-
-#~ msgid "Oozie SLAs"
-#~ msgstr "Oozie SLA"
-
-#~ msgid "The new Oozie Crontab"
-#~ msgstr "새 Oozie Crontab"
-
-#~ msgid "Secure your YARN cluster"
-#~ msgstr "YARN 클러스터 보안"
-
-#~ msgid "MR2 and YARN alternative Job Browser"
-#~ msgstr "MR2 및 YARN 대체 Job 브라우저"
-
+#~ msgid "Sign in"
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/libsaml/conf.py:58
-msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgid ""
+"Xmlsec1 binary path. This program should be executable by the user "
+"running Hue."
 msgstr "Xmlsec1 二进制路径。此程序应由运行 Hue 的用户执行。"
 
 #: src/libsaml/conf.py:64
@@ -26,7 +28,9 @@ msgid "Optional base url the SAML IdP should use for responses."
 msgstr "SAML IdP 应使用进行响应的可选基本 URL。"
 
 #: src/libsaml/conf.py:70
-msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
+msgid ""
+"Entity ID for Hue acting as service provider. Can also accept a pattern "
+"where '<base_url>' will be replaced with server URL base."
 msgstr "用作服务提供商的 Hue 的实体 ID。也可接受 '<base_url>' 将被替换为服务器 URL 基的模式。"
 
 #: src/libsaml/conf.py:76
@@ -34,7 +38,9 @@ msgid "Create users from IdP on login."
 msgstr "登录时从 IdP 创建用户。"
 
 #: src/libsaml/conf.py:83
-msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgid ""
+"Attribute map directory contains files that map SAML attributes to "
+"pysaml2 attributes."
 msgstr "属性映射目录包含将 SAML 属性映射到 pysaml2 属性的文件。"
 
 #: src/libsaml/conf.py:90
@@ -50,11 +56,16 @@ msgid "Optional attributes to ask for from IdP."
 msgstr "从 IdP 请求的可选属性。"
 
 #: src/libsaml/conf.py:108
-msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgid ""
+"IdP metadata in the form of a file. This is generally an XML file "
+"containing metadata that the Identity Provider generates."
 msgstr "文件格式的 IdP 元数据。这通常是包含 Identity Provider 所生成的元数据的 XML 文件。"
 
 #: src/libsaml/conf.py:114
-msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
+msgid ""
+"key_file is the name of a PEM formatted file that contains the private "
+"key of the Hue service. This is presently used both to encrypt/sign "
+"assertions and as client key in a HTTPS session."
 msgstr "key_file 是包含 Hue 服务私钥的 PEM 格式文件的名称。这目前用于加密/签署声明以及用作 HTTPS 会话中的客户端密钥。"
 
 #: src/libsaml/conf.py:118
@@ -62,15 +73,21 @@ msgid "key_file_password password of the private key"
 msgstr "私钥的 key_file_password 密码"
 
 #: src/libsaml/conf.py:123
-msgid "Execute this script to produce the private key password. This will be used when `key_file_password` is not set."
+msgid ""
+"Execute this script to produce the private key password. This will be "
+"used when `key_file_password` is not set."
 msgstr "执行此脚本以生成私钥密码。这将用于未设置 `key_file_password` 的情况。"
 
 #: src/libsaml/conf.py:131
-msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgid ""
+"This is the public part of the service private/public key pair. cert_file"
+" must be a PEM formatted certificate chain file."
 msgstr "这是服务私钥/公钥对的公共部分。cert_file 必须是 PEM 格式的证书链文件。"
 
 #: src/libsaml/conf.py:137
-msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgid ""
+"A mapping from attributes in the response from the IdP to django user "
+"attributes."
 msgstr "从来自 IdP 响应的属性到 django 用户属性的映射。"
 
 #: src/libsaml/conf.py:143
@@ -96,4 +113,3 @@ msgstr "来自服务器的此 NameID 格式的请求"
 #: src/libsaml/conf.py:183
 msgid "username_source not configured properly. SAML integration may not work."
 msgstr "username_source 未正确配置。SAML 集成可能无法正常工作。"
-

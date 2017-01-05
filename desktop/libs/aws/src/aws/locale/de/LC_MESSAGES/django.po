@@ -1,14 +1,14 @@
 # German translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:48-0700\n"
-"PO-Revision-Date: 2012-11-07 13:06-0800\n"
+"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,20 +17,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/s3/s3fs.py:187
+#: src/aws/conf.py:65
+msgid "Execute this script to produce the AWS access key ID."
+msgstr "Führen Sie dieses Skript aus, um die AWS-Zugriffsschlüssel-ID zu generieren."
+
+#: src/aws/conf.py:77
+msgid "Execute this script to produce the AWS secret access key."
+msgstr "Führen Sie dieses Skript aus, um den geheimen AWS-Zugriffsschlüssel zu generieren."
+
+#: src/aws/s3/s3fs.py:59
+msgid ""
+"User is not authorized to perform the attempted operation. Check that the"
+" user has appropriate permissions."
+msgstr ""
+"Der Benutzer ist nicht berechtigt, diesen Vorgang auszuführen. Sorgen Sie dafür, dass "
+"der Benutzer über ausreichende Berechtigungen verfügt."
+
+#: src/aws/s3/s3fs.py:61
+#, python-format
+msgid ""
+"User is not authorized to write or modify path: %s. Check that the user "
+"has write permissions."
+msgstr ""
+"Der Benutzer ist nicht berechtigt, den Pfad festzulegen oder zu ändern: %s. Sorgen Sie dafür, dass der Benutzer "
+"über Schreibberechtigungen verfügt."
+
+#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#, python-format
+msgid ""
+"User is not authorized to access bucket named \"%s\". If you are "
+"attempting to create a bucket, this bucket name is already reserved."
+msgstr ""
+"Der Benutzer ist nicht berechtigt, auf das Bucket mit dem Namen \"%s\" zuzugreifen. Wenn Sie versuchen, "
+"einen Bucket zu erstellen, ist dieser Bucket-Name bereits reserviert."
+
+#: src/aws/s3/s3fs.py:104
+#, python-format
+msgid "Failed to create bucket named \"%s\": %s"
+msgstr "Bucket mit dem Namen \"%s\" konnte nicht erstellt werden: %s"
+
+#: src/aws/s3/s3fs.py:134
+#, python-format
+msgid ""
+"Failed to access path: \"%s\" Check that you have access to read this "
+"bucket and that the region is correct."
+msgstr ""
+"Auf den Pfad \"%s\" konnte nicht zugegriffen werden. Sorgen Sie dafür, dass Sie Zugriff zum "
+"Lesen dieses Buckets haben und dass die Region stimmt."
+
+#: src/aws/s3/s3fs.py:156
+#, python-format
+msgid "User is not authorized to access path: \"%s\""
+msgstr "Der Benutzer ist nicht berechtigt, auf den Pfad \"%s\" zuzugreifen"
+
+#: src/aws/s3/s3fs.py:158
+#, python-format
+msgid "Failed to access path \"%s\": %s"
+msgstr "Auf den Pfad \"%s\" konnte nicht zugegriffen werden: %s"
+
+#: src/aws/s3/s3fs.py:253
 msgid "Option `glob` is not implemented"
 msgstr "Option \"glob\" ist nicht implementiert"
 
-#: src/aws/s3/s3fs.py:212 src/aws/s3/s3fs.py:241 src/aws/s3/s3fs.py:246
+#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
 msgid "Moving to trash is not implemented for S3"
 msgstr "Verschieben des Papierkorbs ist für S3 nicht implementiert"
 
-#: src/aws/s3/s3fs.py:216
-msgid "Deleting a bucket is not implemented for S3"
-msgstr "Löschen eines Buckets ist für S3 nicht implementiert"
+#: src/aws/s3/s3fs.py:324
+#, python-format
+msgid "Invalid bucket name: %s"
+msgstr "Ungültiger Bucket-Name: %s"
 
-#: src/aws/s3/s3fs.py:308
+#: src/aws/s3/s3fs.py:329
+#, python-format
+msgid "Failed to create S3 bucket \"%s\": %s"
+msgstr "S3-Bucket \"%s\" konnte nicht erstellt werden: %s"
+
+#: src/aws/s3/s3fs.py:385
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "Ungültiger Schlüssel für die Umwandlung: %s"
 
+#: src/aws/s3/upload.py:123
+msgid "No S3 filesystem found."
+msgstr "Kein S3-Dateisystem gefunden."
+
+#: src/aws/s3/upload.py:134
+#, python-format
+msgid "Insufficient permissions to write to S3 path \"%s\"."
+msgstr "Berechtigungen reichen nicht zum Schreiben in den S3-Pfad \"%s\" aus."

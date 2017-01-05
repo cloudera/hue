@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:31
-msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgid ""
+"URL of Oozie server. This is required for job submission. Empty value "
+"disables the config check."
 msgstr "Oozie サーバーの URL です。これはジョブのサブミットに必要です。空白の値を指定すると、設定チェックが無効になります。"
 
 #: src/liboozie/conf.py:37
@@ -26,18 +28,33 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
 
 #: src/liboozie/conf.py:44
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
-msgstr "非所有者によるサブミット時に Workflow／Coordinator が配置される HDFS 上の場所です。パラメータは、$TIME、$USER、および$JOBIDです（たとえば、/user/$USER/hue/deployments/$JOBID-$TIMEのようになります）"
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. "
+"/user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr ""
+"非所有者によるサブミット時に Workflow／Coordinator が配置される HDFS "
+"上の場所です。パラメータは、$TIME、$USER、および$JOBIDです（たとえば、/user/$USER/hue/deployments/$JOBID-$TIMEのようになります）"
 
-#: src/liboozie/conf.py:83
+#: src/liboozie/conf.py:55
+msgid ""
+"Whether Hue append jar paths to the oozie.libpath instead of copying them"
+" into the workspace. This makes submissions faster and less prone to HDFS"
+" permission errors"
+msgstr ""
+"jar のパスをワークスペースにコピーする代わりに、Hue で oozie.libpath に追加するかどうかの"
+"指定です。これにより、サブミッションが高速になり、HDFS のパーミッションのエラーも"
+"少なくなります"
+
+#: src/liboozie/conf.py:90
 msgid "The Oozie server is not available"
 msgstr "Oozie サーバーが利用できません"
 
-#: src/liboozie/conf.py:99
+#: src/liboozie/conf.py:106
 msgid "Oozie Share Lib path is not available"
 msgstr "Oozie 共有ライブラリパスは利用できません"
 
-#: src/liboozie/conf.py:108
+#: src/liboozie/conf.py:115
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie 共有ライブラリがデフォルトの場所にインストールされていません。"
 
@@ -46,17 +63,17 @@ msgstr "Oozie 共有ライブラリがデフォルトの場所にインストー
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "サブミット済みのサブミッションです（Oozie ジョブ ID %s）"
 
-#: src/liboozie/submission2.py:177 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:181 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "配置ディレクトリを作成できませんでした：%s"
 
-#: src/liboozie/submission2.py:288 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:336 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "パスはディレクトリ %s ではありません。"
 
-#: src/liboozie/submission2.py:293 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:341 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "ディレクトリ  '%s ': %s へのアクセス時にエラーが発生しました。"
@@ -70,3 +87,14 @@ msgstr "パーミッションが不十分です。"
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "パーミッションが拒否されました。ユーザー %(username)s はユーザー %(user)s のジョブを変更できません。"
 
+#~ msgid "URL of Oozie server. This is required for job submission."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Location on HDFS where the "
+#~ "workflows/coordinators are deployed when "
+#~ "submitted by a non-owner."
+#~ msgstr ""
+
+#~ msgid "Failed to access deployment directory."
+#~ msgstr ""

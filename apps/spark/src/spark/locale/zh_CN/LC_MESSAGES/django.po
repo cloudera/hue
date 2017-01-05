@@ -1,15 +1,15 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  项目版本\n"
-"Report-Msgid-Bugs-To: 电子邮件地址\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: 全名 <电子邮件地址>\n"
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
@@ -17,465 +17,257 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/spark/api.py:159 src/spark/api.py:173
-msgid "Notebook saved !"
-msgstr "笔记本已保存！"
-
-#: src/spark/api.py:191
-msgid "Notebook closed !"
-msgstr "笔记本已关闭！"
-
-#: src/spark/conf.py:33
-msgid "Path to livy-assembly.jar"
-msgstr "到 livy-assembly.jar 的路径"
-
-#: src/spark/conf.py:39
+#: src/spark/conf.py:34
 msgid "Host address of the Livy Server."
 msgstr "Livy 服务器的主机地址。"
 
-#: src/spark/conf.py:44
+#: src/spark/conf.py:39
 msgid "Port of the Livy Server."
 msgstr "Livy 服务器的端口。"
 
-#: src/spark/conf.py:49
+#: src/spark/conf.py:44
 msgid "Configure livy to start in local 'process' mode, or 'yarn' workers."
 msgstr "配置 livy 以在本地“流程”模式或“yarn”进程中启动。"
 
-#: src/spark/conf.py:54
-msgid "Path to livy-assembly.jar inside HDFS"
-msgstr "到 HDFS 内 livy-assembly.jar 的路径"
-
-#: src/spark/conf.py:59
-msgid "Use impersonation when submitting livy jobs"
-msgstr "提交 livy 作业时，使用模拟"
-
-#: src/spark/conf.py:65
-msgid "Experimental option to launch livy"
-msgstr "启动 livy 的实验选项"
-
-#: src/spark/conf.py:73
+#: src/spark/conf.py:50
 msgid "Host where SparkSQL server is running."
 msgstr "SparkSQL 服务器运行所在的主机。"
 
-#: src/spark/conf.py:78
+#: src/spark/conf.py:55
 msgid "Port the SparkSQL server runs on."
 msgstr "SparkSQL 服务器在其上运行的端口。"
 
-#: src/spark/conf.py:106
+#: src/spark/conf.py:83
 msgid "The app won't work without a running Livy Spark Server"
 msgstr "Livy Spark 服务器不运行的情况下应用程序不工作"
 
-#: src/spark/decorators.py:48
-#, python-format
-msgid "Document %(id)s does not exist"
-msgstr "文档 %(id)s 不存在"
+#~ msgid "Requires a POST"
+#~ msgstr ""
 
-#: src/spark/decorators.py:65
-#, python-format
-msgid "Job %(id)s does not exist"
-msgstr "作业 %(id)s 不存在"
+#~ msgid "Requires a DELETE"
+#~ msgstr ""
 
-#: src/spark/templates/editor.mako:23
-msgid "Query"
-msgstr "查询"
+#~ msgid "A POST request is required."
+#~ msgstr ""
 
-#: src/spark/templates/editor.mako:134
-msgid "Execute all snippets"
-msgstr "执行所有代码段"
+#~ msgid "There was an error with your query: %s"
+#~ msgstr ""
 
-#: src/spark/templates/editor.mako:139
-msgid "Clear all results"
-msgstr "清除所有结果"
+#~ msgid "A GET request is required."
+#~ msgstr ""
 
-#: src/spark/templates/editor.mako:147
-msgid "Edit"
-msgstr "编辑"
-
-#: src/spark/templates/editor.mako:153
-msgid "Save"
-msgstr "保存"
-
-#: src/spark/templates/editor.mako:153
-msgid "Saving..."
-msgstr "正在保存..."
-
-#: src/spark/templates/editor.mako:160
-msgid "Brand New"
-msgstr "全新"
-
-#: src/spark/templates/editor.mako:164 src/spark/templates/notebooks.mako:23
-msgid "Notebooks"
-msgstr "笔记本"
-
-#: src/spark/templates/editor.mako:184
-msgid "Add a description..."
-msgstr "添加描述..."
-
-#: src/spark/templates/editor.mako:195 src/spark/templates/editor.mako:233
-msgid "Toggle Assist"
-msgstr "切换帮助"
-
-#: src/spark/templates/editor.mako:214
-msgid "Data sample for"
-msgstr "数据示例"
-
-#: src/spark/templates/editor.mako:224
-msgid "Ok"
-msgstr "确定"
-
-#: src/spark/templates/editor.mako:236
-msgid "Manually refresh the table list"
-msgstr "手动刷新表列表"
-
-#: src/spark/templates/editor.mako:240
-msgid "database"
-msgstr "数据库"
-
-#: src/spark/templates/editor.mako:243
-msgid "Choose a database..."
-msgstr "选择数据库..."
-
-#: src/spark/templates/editor.mako:244
-msgid "Table name..."
-msgstr "表名..."
-
-#: src/spark/templates/editor.mako:245
-msgid "The selected database has no tables."
-msgstr "所选数据库没有表。"
-
-#: src/spark/templates/editor.mako:266
-msgid "The database list cannot be loaded."
-msgstr "无法加载数据库列表。"
-
-#: src/spark/templates/editor.mako:279
-msgid "Add a snippet to start your new notebook"
-msgstr "添加代码段以启动您的新笔记本"
-
-#: src/spark/templates/editor.mako:285
-msgid "Add a new snippet"
-msgstr "添加新代码段"
-
-#: src/spark/templates/editor.mako:297
-msgid "Text"
-msgstr "文本"
-
-#: src/spark/templates/editor.mako:379
-msgid "Creating session"
-msgstr "创建会话"
-
-#: src/spark/templates/editor.mako:382
-msgid "CTRL + ENTER"
-msgstr "CTRL + ENTER"
-
-#: src/spark/templates/editor.mako:385
-msgid "Cancel"
-msgstr "取消"
-
-#: src/spark/templates/editor.mako:394
-msgid "Grid"
-msgstr "网格"
-
-#: src/spark/templates/editor.mako:412
-msgid "Bars"
-msgstr "条"
-
-#: src/spark/templates/editor.mako:417
-msgid "Lines"
-msgstr "线"
-
-#: src/spark/templates/editor.mako:422
-msgid "Pie"
-msgstr "圆形"
-
-#: src/spark/templates/editor.mako:427
-msgid "Scatter"
-msgstr "散点图"
-
-#: src/spark/templates/editor.mako:432
-msgid "Marker Map"
-msgstr "Marker Map"
-
-#: src/spark/templates/editor.mako:437
-msgid "Gradient Map"
-msgstr "Gradient Map"
-
-#: src/spark/templates/editor.mako:448
-msgid "Show Logs"
-msgstr "显示日志"
-
-#: src/spark/templates/editor.mako:467
-msgid "Download first rows as CSV"
-msgstr "以 CSV 格式下载第一行"
-
-#: src/spark/templates/editor.mako:468
-msgid "CSV"
-msgstr "CSV"
-
-#: src/spark/templates/editor.mako:472
-msgid "Download first rows as XLS"
-msgstr "以 XLS 格式下载第一行"
-
-#: src/spark/templates/editor.mako:473
-msgid "Excel"
-msgstr "Excel"
-
-#: src/spark/templates/editor.mako:484 src/spark/templates/editor.mako:501
-msgid "Loading..."
-msgstr "正在加载..."
-
-#: src/spark/templates/editor.mako:493
-msgid "Success."
-msgstr "成功。"
-
-#: src/spark/templates/editor.mako:497
-msgid "Success but empty results."
-msgstr "成功但结果为空。"
-
-#: src/spark/templates/editor.mako:514
-msgid "Hide columns"
-msgstr "隐藏列"
-
-#: src/spark/templates/editor.mako:514
-msgid "columns"
-msgstr "列"
-
-#: src/spark/templates/editor.mako:526
-msgid "Show columns"
-msgstr "显示列"
-
-#: src/spark/templates/editor.mako:529
-msgid "Hide"
-msgstr "隐藏"
-
-#: src/spark/templates/editor.mako:550
-msgid "Hide settings"
-msgstr "隐藏设置"
-
-#: src/spark/templates/editor.mako:556
-msgid "x-axis"
-msgstr "X 轴"
-
-#: src/spark/templates/editor.mako:557
-msgid "region"
-msgstr "区域"
-
-#: src/spark/templates/editor.mako:558
-msgid "latitude"
-msgstr "纬度"
-
-#: src/spark/templates/editor.mako:559
-msgid "legend"
-msgstr "图例"
-
-#: src/spark/templates/editor.mako:562 src/spark/templates/editor.mako:578
-#: src/spark/templates/editor.mako:585 src/spark/templates/editor.mako:592
-#: src/spark/templates/editor.mako:599
-msgid "Choose a column..."
-msgstr "选择列..."
-
-#: src/spark/templates/editor.mako:566
-msgid "y-axis"
-msgstr "Y 轴"
-
-#: src/spark/templates/editor.mako:567 src/spark/templates/editor.mako:569
-msgid "value"
-msgstr "值"
-
-#: src/spark/templates/editor.mako:568
-msgid "longitude"
-msgstr "经度"
-
-#: src/spark/templates/editor.mako:582
-msgid "label"
-msgstr "标签"
-
-#: src/spark/templates/editor.mako:589
-msgid "scatter group"
-msgstr "散点图组"
-
-#: src/spark/templates/editor.mako:596
-msgid "scatter size"
-msgstr "散点图大小"
-
-#: src/spark/templates/editor.mako:603
-msgid "sorting"
-msgstr "排序"
-
-#: src/spark/templates/editor.mako:606
-msgid "No sorting"
-msgstr "不排序"
-
-#: src/spark/templates/editor.mako:607
-msgid "Sort ascending"
-msgstr "升序"
-
-#: src/spark/templates/editor.mako:608
-msgid "Sort descending"
-msgstr "降序"
-
-#: src/spark/templates/editor.mako:615
-msgid "Show settings"
-msgstr "显示设置"
-
-#: src/spark/templates/editor.mako:650 src/spark/templates/editor.mako:654
-msgid "Path"
-msgstr "路径"
-
-#: src/spark/templates/editor.mako:651
-msgid "Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar"
-msgstr "应用程序 jar 的路径，例如 hdfs://localhost:8020/user/hue/oozie-examples.jar"
-
-#: src/spark/templates/editor.mako:655
-msgid "Path to python file, e.g. script.py"
-msgstr "python 文件的路径，例如 script.py"
-
-#: src/spark/templates/editor.mako:658
-msgid "Class"
-msgstr "类"
-
-#: src/spark/templates/editor.mako:659
-msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
-msgstr "应用程序的类名，例如 org.apache.oozie.example.SparkFileCopy"
-
-#: src/spark/templates/editor.mako:662
-msgid "Arguments"
-msgstr "参数"
-
-#: src/spark/templates/editor.mako:666
-msgid "e.g. 1000, market"
-msgstr "例如，1000, market"
-
-#: src/spark/templates/editor.mako:673
-msgid "Add argument"
-msgstr "添加自变量"
-
-#: src/spark/templates/editor.mako:680
-msgid "Submit"
-msgstr "提交"
-
-#: src/spark/templates/editor.mako:692
-msgid "Choose a file"
-msgstr "选择文件"
-
-#: src/spark/templates/editor.mako:746
-msgid "Paste or type a link"
-msgstr "粘贴或键入链接"
-
-#: src/spark/templates/editor.mako:747
-msgid "Open in new window"
-msgstr "在新窗口中打开"
-
-#: src/spark/templates/editor.mako:1275 src/spark/templates/notebooks.mako:217
-msgid "No data available"
-msgstr "没有可用数据"
-
-#: src/spark/templates/editor.mako:1276 src/spark/templates/notebooks.mako:221
-msgid "No matching records"
-msgstr "没有匹配记录"
-
-#: src/spark/templates/editor.mako:1591
-msgid "Distribution"
-msgstr "贡献"
-
-#: src/spark/templates/editor.mako:1618
-msgid "There was a problem loading the table preview."
-msgstr "加载表预览时出现问题。"
-
-#: src/spark/templates/notebooks.mako:29
-msgid "Spark Editor"
-msgstr "Spark 编辑器"
-
-#: src/spark/templates/notebooks.mako:33
-msgid "Search for name, description, etc..."
-msgstr "搜索名称、描述等..."
-
-#: src/spark/templates/notebooks.mako:39 src/spark/templates/notebooks.mako:41
-msgid "Share"
-msgstr "共享"
-
-#: src/spark/templates/notebooks.mako:45
-msgid "Copy"
-msgstr "复制"
-
-#: src/spark/templates/notebooks.mako:49
-msgid "Delete"
-msgstr "删除"
-
-#: src/spark/templates/notebooks.mako:56
-msgid "Create"
-msgstr "创建"
-
-#: src/spark/templates/notebooks.mako:65
-msgid "Name"
-msgstr "名称"
-
-#: src/spark/templates/notebooks.mako:66
-msgid "Description"
-msgstr "描述"
-
-#: src/spark/templates/notebooks.mako:67
-msgid "Owner"
-msgstr "所有者"
-
-#: src/spark/templates/notebooks.mako:68
-msgid "Last Modified"
-msgstr "上次修改"
-
-#: src/spark/templates/notebooks.mako:105
-msgid "Delete the selected notebook(s)?"
-msgstr "删除所选笔记本？"
-
-#: src/spark/templates/notebooks.mako:108
-msgid "No"
-msgstr "否"
-
-#: src/spark/templates/notebooks.mako:109
-msgid "Yes"
-msgstr "是"
-
-#: src/spark/templates/notebooks.mako:218
-msgid "Showing _START_ to _END_ of _TOTAL_ entries"
-msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
-
-#: src/spark/templates/notebooks.mako:219
-msgid "Showing 0 to 0 of 0 entries"
-msgstr "显示 0 - 0，共 0 个条目"
-
-#: src/spark/templates/notebooks.mako:220
-msgid "(filtered from _MAX_ total entries)"
-msgstr "（已从 _MAX_ 个总条目中筛选）"
-
-#: src/spark/templates/notebooks.mako:223
-msgid "First"
-msgstr "第一个"
-
-#: src/spark/templates/notebooks.mako:224
-msgid "Last"
-msgstr "最后一个"
-
-#: src/spark/templates/notebooks.mako:225
-msgid "Next"
-msgstr "下一个"
-
-#: src/spark/templates/notebooks.mako:226
-msgid "Previous"
-msgstr "上一个"
+#~ msgid "Missing application jar list."
+#~ msgstr ""
 
 #~ msgid "URL of the Spark Job Server."
-#~ msgstr "Spark 作业服务器的 URL。"
+#~ msgstr ""
 
-#~ msgid "List of available types of snippets."
-#~ msgstr "可用代码段类型列表"
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr ""
 
-#~ msgid "Example: 1 + 1, or press CTRL + space"
-#~ msgstr "示例：1 + 1 或按 CTRL + 空格"
+#~ msgid "An error happened with the Spark Server"
+#~ msgstr ""
 
-#~ msgid "Example: SELECT * FROM tablename, or press CTRL + space"
-#~ msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
+#~ msgid "Script parameters"
+#~ msgstr ""
 
-#~ msgid "<h2>This is a text snippet</h2>Type your text here"
-#~ msgstr "<h2>这是文本代码段</h2>在此处键入您的文本"
+#~ msgid "Class path"
+#~ msgstr ""
 
-#~ msgid "Add a new notebook"
-#~ msgstr "添加新笔记本"
+#~ msgid "Delete context(s)?"
+#~ msgstr ""
 
+#~ msgid "Spark Igniter"
+#~ msgstr ""
+
+#~ msgid "Editor"
+#~ msgstr ""
+
+#~ msgid "Applications"
+#~ msgstr ""
+
+#~ msgid "Dashboard"
+#~ msgstr ""
+
+#~ msgid "Contexts"
+#~ msgstr ""
+
+#~ msgid "Uploads"
+#~ msgstr ""
+
+#~ msgid "Create context"
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr ""
+
+#~ msgid "Num cpu cores"
+#~ msgstr ""
+
+#~ msgid "Memory per node"
+#~ msgstr ""
+
+#~ msgid "Cancel"
+#~ msgstr ""
+
+#~ msgid "Create"
+#~ msgstr ""
+
+#~ msgid "Upload application"
+#~ msgstr ""
+
+#~ msgid "One class of the jar should implement SparkJob."
+#~ msgstr ""
+
+#~ msgid "Local jar file"
+#~ msgstr ""
+
+#~ msgid "App name"
+#~ msgstr ""
+
+#~ msgid "Upload"
+#~ msgstr ""
+
+#~ msgid "Query"
+#~ msgstr ""
+
+#~ msgid "Application name"
+#~ msgstr ""
+
+#~ msgid "Application description"
+#~ msgstr ""
+
+#~ msgid "Upload app"
+#~ msgstr ""
+
+#~ msgid "Missing, add one?"
+#~ msgstr ""
+
+#~ msgid "Context"
+#~ msgstr ""
+
+#~ msgid "Automatic"
+#~ msgstr ""
+
+#~ msgid "Create one?"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Your application has the following error(s):"
+#~ msgstr ""
+
+#~ msgid "No parameters defined yet."
+#~ msgstr ""
+
+#~ msgid "Value"
+#~ msgstr ""
+
+#~ msgid "Delete"
+#~ msgstr ""
+
+#~ msgid "Add"
+#~ msgstr ""
+
+#~ msgid "Executing..."
+#~ msgstr ""
+
+#~ msgid "Execute"
+#~ msgstr ""
+
+#~ msgid "Save"
+#~ msgstr ""
+
+#~ msgid "Save as..."
+#~ msgstr ""
+
+#~ msgid "or create a"
+#~ msgstr ""
+
+#~ msgid "New application"
+#~ msgstr ""
+
+#~ msgid "Download"
+#~ msgstr ""
+
+#~ msgid "Key"
+#~ msgstr ""
+
+#~ msgid "The server returned no results."
+#~ msgstr ""
+
+#~ msgid "Save your query"
+#~ msgstr ""
+
+#~ msgid "Description"
+#~ msgstr ""
+
+#~ msgid "Choose a file"
+#~ msgstr ""
+
+#~ msgid "Did you know?"
+#~ msgstr ""
+
+#~ msgid "This field is required."
+#~ msgstr ""
+
+#~ msgid "Empty description"
+#~ msgstr ""
+
+#~ msgid "Application saved successfully!"
+#~ msgstr ""
+
+#~ msgid "No data available"
+#~ msgstr ""
+
+#~ msgid "No matching records"
+#~ msgstr ""
+
+#~ msgid "Server error occured: "
+#~ msgstr ""
+
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr ""
+
+#~ msgid "Search for name"
+#~ msgstr ""
+
+#~ msgid "Upload time"
+#~ msgstr ""
+
+#~ msgid "Click to open and execute"
+#~ msgstr ""
+
+#~ msgid "Delete forever"
+#~ msgstr ""
+
+#~ msgid "Delete selected"
+#~ msgstr ""
+
+#~ msgid "Confirm action"
+#~ msgstr ""
+
+#~ msgid "Yes"
+#~ msgstr ""
+
+#~ msgid "Delete the selected contexts?"
+#~ msgstr ""
+
+#~ msgid "Jobs"
+#~ msgstr ""
+
+#~ msgid "Status"
+#~ msgstr ""
+
+#~ msgid "Job id"
+#~ msgstr ""
+
+#~ msgid "Start time"
+#~ msgstr ""
+
+#~ msgid "Duration"
+#~ msgstr ""
+
+#~ msgid "Click to open"
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -30,8 +30,12 @@ msgid "Nice name of server."
 msgstr "Nombre del servidor en inglés o con etiqueta."
 
 #: src/librdbms/conf.py:39
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
-msgstr "Nombre de la base de datos o ruta del archivo de la base de datos. Si se indica, no se permitirá elegir otras bases de datos."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
+msgstr ""
+"Nombre de la base de datos o ruta del archivo de la base de datos. Si se "
+"indica, no se permitirá elegir otras bases de datos."
 
 #: src/librdbms/conf.py:45
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
@@ -46,8 +50,12 @@ msgid "Database password."
 msgstr "Contraseña de la base de datos."
 
 #: src/librdbms/conf.py:63
-msgid "Execute this script to produce the database password. This will be used when `password` is not set."
-msgstr "Ejecute esta secuencia de comandos para generar la contraseña de la base de datos. Se utilizará cuando `password` no esté definido."
+msgid ""
+"Execute this script to produce the database password. This will be used "
+"when `password` is not set."
+msgstr ""
+"Ejecute esta secuencia de comandos para generar la contraseña de la base "
+"de datos. Se utilizará cuando `password` no esté definido."
 
 #: src/librdbms/conf.py:69
 msgid "Database host."
@@ -63,15 +71,23 @@ msgstr "Opciones de base de datos que enviar al servidor al conectar."
 
 #: src/librdbms/conf.py:97
 msgid "Database name should not be empty for the SQLite backend."
-msgstr "El nombre de la base de datos no debe estar vacío en el back-end de SQLite."
+msgstr ""
+"El nombre de la base de datos no debe estar vacío en el back-end de "
+"SQLite."
 
 #: src/librdbms/conf.py:99
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
-msgstr "El nombre de la base de datos no debe estar vacío en el back-end de Oracle. Debe ser el SID de su base de datos."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
+msgstr ""
+"El nombre de la base de datos no debe estar vacío en el back-end de "
+"Oracle. Debe ser el SID de su base de datos."
 
 #: src/librdbms/conf.py:101
 msgid "Database name should not be empty for the PostgreSQL backend."
-msgstr "El nombre de la base de datos no debe estar vacío en el back-end de PostgreSQL."
+msgstr ""
+"El nombre de la base de datos no debe estar vacío en el back-end de "
+"PostgreSQL."
 
 #: src/librdbms/design.py:110
 msgid "No server!"
@@ -89,5 +105,26 @@ msgstr "La base de datos '%s' no está permitida. Utilice la base de datos '%s'.
 #: src/librdbms/server/mysql_lib.py:107
 #, python-format
 msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
-msgstr "No se puede localizar la base de datos %s. ¿Está seguro de que la configuración es correcta?"
+msgstr ""
+"No se puede localizar la base de datos %s. ¿Está seguro de que la "
+"configuración es correcta?"
 
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""

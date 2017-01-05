@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -51,7 +51,10 @@ msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "与 Impala 对话时打开/关闭模拟机制。"
 
 #: src/impala/conf.py:58
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
 msgstr "要求 Impala 缓存的结果集初始行数，用于支持重新获取这些结果并进行下载。设置为 0 将禁用选项和向后兼容性。"
 
 #: src/impala/conf.py:68
@@ -59,19 +62,35 @@ msgid "Timeout in seconds for Thrift calls."
 msgstr "Thrift 调用的超时时间（以秒为单位）。"
 
 #: src/impala/conf.py:72
-msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
 msgstr "当用户离开编辑器页面时，Hue 将尝试关闭 Impala 查询。这将释放 Impala 中的所有查询资源，但也会让其结果变得无法访问。"
 
 #: src/impala/conf.py:80
-msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
-msgstr "如果 QUERY_TIMEOUT_S > 0，则当 Impala 在 QUERY_TIMEOUT_S 秒内没有对查询执行任何操作（计算或发回结果）时，该查询将超时（例如，取消）。"
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"如果 QUERY_TIMEOUT_S > 0，则当 Impala 在 QUERY_TIMEOUT_S "
+"秒内没有对查询执行任何操作（计算或发回结果）时，该查询将超时（例如，取消）。"
 
 #: src/impala/conf.py:88
-msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
-msgstr "如果 SESSION_TIMEOUT_S > 0，则当 Impala 在 QUERY_TIMEOUT_S 秒内没有对该会话执行任何操作（计算或发回结果）时，该会话将超时（例如，取消）。"
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+msgstr ""
+"如果 SESSION_TIMEOUT_S > 0，"
+"则当 Impala 在 QUERY_TIMEOUT_S 秒内没有对该"
+"会话执行任何操作（计算或发回结果）时，该会话将超时（例如，取消）。默认值：1 小时。"
 
 #: src/impala/conf.py:98
-msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
 msgstr "授权用户设置的空白页 Impala 配置属性的逗号分隔列表。"
 
 #: src/impala/conf.py:103
@@ -96,7 +115,7 @@ msgstr "公用证书文件的路径，例如 /etc/hue/cert.pem"
 
 #: src/impala/conf.py:135
 msgid "Choose whether Hue should validate certificates received from the server."
-msgstr "选择 Hue 是否应验证从服务器收到的证书."
+msgstr "选择 Hue 是否应验证从服务器收到的证书。"
 
 #: src/impala/conf.py:148
 msgid "Auth username of the hue user used for authentications."
@@ -107,7 +126,9 @@ msgid "LDAP/PAM/.. password of the hue user used for authentications."
 msgstr "Hue 用户用于身份验证的 LDAP/PAM/.. 密码。"
 
 #: src/impala/conf.py:168
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
 msgstr "执行此脚本以生成身份验证密码。这将用于未设置 `auth_password` 的情况。"
 
 #: src/impala/dashboards.py:213
@@ -231,6 +252,11 @@ msgstr "很抱歉，找不到数据库！"
 msgid "Oops, no table found!"
 msgstr "很抱歉，找不到表！"
 
-#~ msgid "No available Impalad to send queries to."
-#~ msgstr "没有可向其发送请求的 Impalad。"
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
 
+#~ msgid "A POST request is required."
+#~ msgstr ""

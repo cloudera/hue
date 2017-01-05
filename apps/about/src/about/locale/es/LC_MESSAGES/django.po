@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -105,8 +105,12 @@ msgid "Check to enable the tours and tutorials"
 msgstr "Marcar para activar los recorridos y tutoriales"
 
 #: src/about/templates/admin_wizard.mako:164
-msgid "Display the \"Available Tours\" question mark when tours are available for a specific page."
-msgstr "Mostrar el signo de interrogación de \"Recorridos disponibles\" cuando haya recorridos disponibles para una página específica."
+msgid ""
+"Display the \"Available Tours\" question mark when tours are available "
+"for a specific page."
+msgstr ""
+"Mostrar el signo de interrogación de \"Recorridos disponibles\" cuando "
+"haya recorridos disponibles para una página específica."
 
 #: src/about/templates/admin_wizard.mako:170
 msgid "Anonymous usage analytics"
@@ -125,8 +129,12 @@ msgid "How does it work?"
 msgstr "¿Cómo funciona?"
 
 #: src/about/templates/admin_wizard.mako:178
-msgid "We are using Google Analytics to see how many times an application or specific section of an application is used, nothing more."
-msgstr "Usamos Google Analytics para ver cuántas veces se utiliza una aplicación o una sección específica, así de fácil."
+msgid ""
+"We are using Google Analytics to see how many times an application or "
+"specific section of an application is used, nothing more."
+msgstr ""
+"Usamos Google Analytics para ver cuántas veces se utiliza una aplicación "
+"o una sección específica, así de fácil."
 
 #: src/about/templates/admin_wizard.mako:188
 msgid "Use the applications"
@@ -145,8 +153,12 @@ msgid "Check to skip this wizard next time."
 msgstr "Marque para omitir este asistente la próxima vez."
 
 #: src/about/templates/admin_wizard.mako:203
-msgid "Skip the Quick Start Wizard at next login and land directly on the home page."
-msgstr "Omita el Asistente de Inicio rápido la próxima vez que inicie sesión y vaya directamente a la página de inicio."
+msgid ""
+"Skip the Quick Start Wizard at next login and land directly on the home "
+"page."
+msgstr ""
+"Omita el Asistente de Inicio rápido la próxima vez que inicie sesión y "
+"vaya directamente a la página de inicio."
 
 #: src/about/templates/admin_wizard.mako:216
 msgid "Back"
@@ -198,9 +210,17 @@ msgstr "Configuración"
 msgid "Server Logs"
 msgstr "Registros del servidor"
 
-#~ msgid "Install all the application examples"
-#~ msgstr "Instalar todos los ejemplos de aplicaciones"
+#~ msgid "Go !"
+#~ msgstr ""
 
-#~ msgid "All"
-#~ msgstr "Todos"
+#~ msgid "Check your current configuration"
+#~ msgstr ""
 
+#~ msgid "Install or re-install the application examples"
+#~ msgstr ""
+
+#~ msgid "Go create or import users"
+#~ msgstr ""
+
+#~ msgid "Go use the apps"
+#~ msgstr ""

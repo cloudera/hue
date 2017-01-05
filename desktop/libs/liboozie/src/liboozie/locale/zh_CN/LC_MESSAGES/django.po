@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:31
-msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgid ""
+"URL of Oozie server. This is required for job submission. Empty value "
+"disables the config check."
 msgstr "Oozie 服务器的 URL。提交作业时需要此 URL。空值将禁用配置检查。"
 
 #: src/liboozie/conf.py:37
@@ -26,18 +28,33 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie 是否需要客户端执行 Kerberos 身份验证。"
 
 #: src/liboozie/conf.py:44
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
-msgstr "由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。参数是 $TIME、$USER 和 $JOBID，例如 /user/$USER/hue/deployments/$JOBID-$TIME"
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. "
+"/user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr ""
+"由非所有者提交时，workflow/coordinator 在 HDFS 上部署的位置。参数是 $TIME、$USER 和 $JOBID，例如 "
+"/user/$USER/hue/deployments/$JOBID-$TIME"
 
-#: src/liboozie/conf.py:83
+#: src/liboozie/conf.py:55
+msgid ""
+"Whether Hue append jar paths to the oozie.libpath instead of copying them"
+" into the workspace. This makes submissions faster and less prone to HDFS"
+" permission errors"
+msgstr ""
+"Hue 是否将 jar 路径附加到 oozie.libpath，而不是将其复制"
+"到工作区。此操作将加快提交速度，并且不容易发生 HDFS"
+" 权限错误"
+
+#: src/liboozie/conf.py:90
 msgid "The Oozie server is not available"
 msgstr "Oozie Server 不适用"
 
-#: src/liboozie/conf.py:99
+#: src/liboozie/conf.py:106
 msgid "Oozie Share Lib path is not available"
 msgstr "Oozie Share Lib 路径不可用"
 
-#: src/liboozie/conf.py:108
+#: src/liboozie/conf.py:115
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie Share Lib 未安装在默认位置。"
 
@@ -46,17 +63,17 @@ msgstr "Oozie Share Lib 未安装在默认位置。"
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "已提交提交（Oozie 作业 ID %s）"
 
-#: src/liboozie/submission2.py:177 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:181 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "无法创建部署目录：%s"
 
-#: src/liboozie/submission2.py:288 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:336 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "路径不是目录：%s。"
 
-#: src/liboozie/submission2.py:293 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:341 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "访问目录 '%s' 时出错：%s。"
@@ -70,3 +87,14 @@ msgstr "无足够权限。"
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "权限被拒绝。用户 %(username)s 无法修改用户 %(user)s 的作业。"
 
+#~ msgid "URL of Oozie server. This is required for job submission."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Location on HDFS where the "
+#~ "workflows/coordinators are deployed when "
+#~ "submitted by a non-owner."
+#~ msgstr ""
+
+#~ msgid "Failed to access deployment directory."
+#~ msgstr ""
