@@ -235,7 +235,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           <!-- /ko -->
         </div>
-        <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.ouputFormat"></span></div>
+        <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.outputFormat"></span></div>
       </li>
     </ol>
 
@@ -333,25 +333,25 @@ ${ assist.assistPanel() }
       <!-- ko with: createWizard.destination -->
       <div class="control-group">
         <label for="collectionType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
-          <select id="collectionType" data-bind="options: ouputFormats, value: ouputFormat, optionsValue: 'value', optionsText: 'name'"></select>
+          <select id="collectionType" data-bind="options: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
         </label>
 
         <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <!-- ko if: ouputFormat() != 'table' && ouputFormat() != 'database' -->
+          <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
             <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
           <!-- /ko -->
 
-          <!-- ko if: ouputFormat() == 'table' || ouputFormat() == 'database' -->
+          <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
             <label for="path" class="control-label">
               <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
             </label>
           <!-- /ko -->
 
           <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
-            ${ _('Create a new ') } <span data-bind="text: ouputFormat"></span>
+            ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
           </span>
           <span class="help-inline muted" data-bind="visible: isTargetExisting()">
-            ${ _('Adding data to the existing ') } <span data-bind="text: ouputFormat"></span>
+            ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
             <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
           </span>
         </label>
@@ -362,7 +362,7 @@ ${ assist.assistPanel() }
         ##  <i class="fa fa-spinner fa-spin"></i>
         ##<!-- /ko -->
 
-        <!-- ko if: ouputFormat() == 'table' -->
+        <!-- ko if: outputFormat() == 'table' -->
         <h3 class="card-heading simple">${_('Properties')}</h3>
           <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
@@ -482,24 +482,24 @@ ${ assist.assistPanel() }
           </label>
         <!-- /ko -->
 
-        <!-- ko if: ouputFormat() == 'table' || ouputFormat() == 'index' -->
+        <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
         <h3 class="card-heading simple">${_('Fields')}</h3>
         <form class="form-inline" data-bind="foreach: columns">
-          <!-- ko if: $parent.ouputFormat() == 'table' -->
+          <!-- ko if: $parent.outputFormat() == 'table' -->
             <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
 
-          <!-- ko if: $parent.ouputFormat() == 'index' -->
+          <!-- ko if: $parent.outputFormat() == 'index' -->
             <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
           <!-- /ko -->
         </form>
 
-        <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && ouputFormat() == 'table' -->
-          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+        <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
+          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
         <!-- /ko -->
         <!-- /ko -->
 
-        <!-- ko if: ouputFormat() == 'database' -->
+        <!-- ko if: outputFormat() == 'database' -->
           <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
           <label class="checkbox">
@@ -1007,16 +1007,16 @@ ${ assist.assistPanel() }
         if (name.length == 0) {
           self.isTargetExisting(false);
         }
-        else if (self.ouputFormat() == 'file') {
+        else if (self.outputFormat() == 'file') {
           // Todo
           // self.path()
         }
-        else if (self.ouputFormat() == 'table') {
+        else if (self.outputFormat() == 'table') {
           $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
             self.isTargetExisting(data.code != 500);
           }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
         }
-        else if (self.ouputFormat() == 'index') {
+        else if (self.outputFormat() == 'index') {
           $.post("/search/get_collection", {
               name: self.name()
           }, function (data) {
@@ -1026,15 +1026,15 @@ ${ assist.assistPanel() }
       });
 
       self.description = ko.observable('');
-      self.ouputFormat = ko.observable('table');
-      self.ouputFormatsList = ko.observableArray([
+      self.outputFormat = ko.observable('table');
+      self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
           {'name': 'Solr index', 'value': 'index'},
           {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
       ]);
-      self.ouputFormats = ko.computed(function() {
-        return $.grep(self.ouputFormatsList(), function(format) {
+      self.outputFormats = ko.computed(function() {
+        return $.grep(self.outputFormatsList(), function(format) {
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
@@ -1045,7 +1045,7 @@ ${ assist.assistPanel() }
         })
       });
       if (wizard.prefill.target_type) {
-        self.ouputFormat(wizard.prefill.target_type());
+        self.outputFormat(wizard.prefill.target_type());
         if (wizard.prefill.target_type() == 'database') {
           vm.currentStep(2);
         };
@@ -1057,14 +1057,14 @@ ${ assist.assistPanel() }
       self.isTargetExisting = ko.observable();
       self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
         if (self.isTargetExisting()) {
-          if (self.ouputFormat() == 'file') {
+          if (self.outputFormat() == 'file') {
             // Todo
             return '';
           }
-          else if (self.ouputFormat() == 'table') {
+          else if (self.outputFormat() == 'table') {
             return '/metastore/table/' + self.databaseName() + '/' + self.tableName();
           }
-          else if (self.ouputFormat() == 'index') {
+          else if (self.outputFormat() == 'index') {
             return '${ url("indexer:collections") }#edit/' + self.name();
           }
         }
@@ -1073,10 +1073,10 @@ ${ assist.assistPanel() }
 
       // Table
       self.tableName = ko.computed(function() {
-        return self.ouputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
+        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
       });
       self.databaseName = ko.computed(function() {
-        return self.ouputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default';
+        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default';
       });
       self.tableFormat = ko.observable('text');
       self.tableFormats = ko.observableArray([
@@ -1152,7 +1152,7 @@ ${ assist.assistPanel() }
       self.indexingStarted = ko.observable(false);
 
       self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length || self.destination.ouputFormat() == 'database';
+        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
         return self.destination.name().length > 0 && validFields;
       });
 
