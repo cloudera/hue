@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -204,9 +204,17 @@ msgstr "구성"
 msgid "Server Logs"
 msgstr "서버 로그"
 
-#~ msgid "Install all the application examples"
-#~ msgstr "애플리케이션 예제 모두 설치"
+#~ msgid "Go !"
+#~ msgstr ""
 
-#~ msgid "All"
-#~ msgstr "모두"
+#~ msgid "Check your current configuration"
+#~ msgstr ""
 
+#~ msgid "Install or re-install the application examples"
+#~ msgstr ""
+
+#~ msgid "Go create or import users"
+#~ msgstr ""
+
+#~ msgid "Go use the apps"
+#~ msgstr ""

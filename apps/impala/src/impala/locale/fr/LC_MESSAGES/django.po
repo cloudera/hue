@@ -1,17 +1,17 @@
 # French translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -48,31 +48,63 @@ msgstr "Nom Kerberos principal pour Impala. En général 'impala/nomhôte.foo.co
 
 #: src/impala/conf.py:52
 msgid "Turn on/off impersonation mechanism when talking to Impala."
-msgstr "Activez/désactivez le mécanisme d'emprunt d'identité lorsqu'il s'agit d'Impala."
+msgstr ""
+"Activez/désactivez le mécanisme d'emprunt d'identité lorsqu'il s'agit "
+"d'Impala."
 
 #: src/impala/conf.py:58
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
-msgstr "Nombre de lignes initiales d'un jeu de résultats devant être mises en cache par Impala pour permettre la prise en charge d'une nouvelle extraction afin de les télécharger. Définissez-le sur la valeur 0 pour désactiver l'option et la compatibilité descendante."
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"Nombre de lignes initiales d'un jeu de résultats devant être mises en "
+"cache par Impala pour permettre la prise en charge d'une nouvelle "
+"extraction afin de les télécharger. Définissez-le sur la valeur 0 pour "
+"désactiver l'option et la compatibilité descendante."
 
 #: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
-msgstr "Temporisation, en secondes, pour les appels Thrift."
+msgstr "Temporisation en secondes pour les appels Thrift."
 
 #: src/impala/conf.py:72
-msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
-msgstr "Hue tente de fermer la requête Impala lorsque l'utilisateur quitte la page de l'éditeur. Toutes les ressources de requête sont ainsi libérées dans Impala, mais les résultats deviennent inaccessibles."
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"Hue tente de fermer la requête Impala lorsque l'utilisateur quitte la "
+"page de l'éditeur. Toutes les ressources de requête sont ainsi libérées "
+"dans Impala, mais les résultats deviennent inaccessibles."
 
 #: src/impala/conf.py:80
-msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
-msgstr "Si QUERY_TIMEOUT_S > 0, la requête expire (est annulée) lorsqu'Impala n'effectue aucune tâche (traitement ou renvoi de résultats) pour cette requête dans un délai de QUERY_TIMEOUT_S secondes."
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"Si QUERY_TIMEOUT_S > 0, la requête expire (est annulée) lorsqu'Impala "
+"n'effectue aucune tâche (traitement ou renvoi de résultats) pour cette "
+"requête dans un délai de QUERY_TIMEOUT_S secondes."
 
 #: src/impala/conf.py:88
-msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
-msgstr "Si SESSION_TIMEOUT_S > 0, la requête expire (est annulée) lorsqu'Impala n'effectue aucune tâche (traitement ou renvoi de résultats) pour cette requête dans un délai de QUERY_TIMEOUT_S secondes."
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+msgstr ""
+"Si SESSION_TIMEOUT_S > 0, la session expire (est annulée) "
+"si Impala n'effectue aucune tâche (calcul ou renvoi de résultats) pour cette "
+"session dans un délai de QUERY_TIMEOUT_S secondes. Valeur par défaut : 1 heure."
 
 #: src/impala/conf.py:98
-msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
-msgstr "Liste de valeurs séparées par des virgules des propriétés de configuration d'Impala en liste blanche, que les utilisateurs sont autorisés à définir."
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
+msgstr ""
+"Liste de valeurs séparées par des virgules des propriétés de "
+"configuration d'Impala en liste blanche, que les utilisateurs sont "
+"autorisés à définir."
 
 #: src/impala/conf.py:103
 msgid "SSL configuration for the server."
@@ -104,11 +136,17 @@ msgstr "Nom de l'utilisateur Hue utilisé pour les authentifications."
 
 #: src/impala/conf.py:162
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
-msgstr "Mot de passe LDAP/PAM.. de l'utilisateur Hue utilisé pour les authentifications."
+msgstr ""
+"Mot de passe LDAP/PAM.. de l'utilisateur Hue utilisé pour les "
+"authentifications."
 
 #: src/impala/conf.py:168
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
-msgstr "Exécutez ce script pour générer le mot de passe d'authentification. Il sera utilisé si 'auth_password' n'est pas défini."
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+"Exécutez ce script pour générer le mot de passe d'authentification. Il "
+"sera utilisé si 'auth_password' n'est pas défini."
 
 #: src/impala/dashboards.py:213
 msgid "Page saved !"
@@ -231,6 +269,11 @@ msgstr "Désolé, aucune base de données n'a été trouvée."
 msgid "Oops, no table found!"
 msgstr "Désolé, aucune table n'a été trouvée."
 
-#~ msgid "No available Impalad to send queries to."
-#~ msgstr "Aucun Impalad auquel envoyer des requêtes n'est disponible."
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
 
+#~ msgid "A POST request is required."
+#~ msgstr ""

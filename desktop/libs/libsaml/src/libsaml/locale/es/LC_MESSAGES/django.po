@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -18,24 +18,39 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/libsaml/conf.py:58
-msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
-msgstr "Ruta binaria Xmlsec1. Este programa debe ejecutarlo el usuario que ejecute Hue."
+msgid ""
+"Xmlsec1 binary path. This program should be executable by the user "
+"running Hue."
+msgstr ""
+"Ruta binaria Xmlsec1. Este programa debe ejecutarlo el usuario que "
+"ejecute Hue."
 
 #: src/libsaml/conf.py:64
 msgid "Optional base url the SAML IdP should use for responses."
-msgstr "La URL de base opciones que el IDP de SAML deberá utilizar para las respuestas."
+msgstr ""
+"La URL de base opciones que el IDP de SAML deberá utilizar para las "
+"respuestas."
 
 #: src/libsaml/conf.py:70
-msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
-msgstr "ID de la entidad de Hue que actúa como proveedor de servicios. También puede aceptar un patrón en el que '<base_url>' se sustituirá con la base de la URL del servidor."
+msgid ""
+"Entity ID for Hue acting as service provider. Can also accept a pattern "
+"where '<base_url>' will be replaced with server URL base."
+msgstr ""
+"ID de la entidad de Hue que actúa como proveedor de servicios. También "
+"puede aceptar un patrón en el que '<base_url>' se sustituirá con la base "
+"de la URL del servidor."
 
 #: src/libsaml/conf.py:76
 msgid "Create users from IdP on login."
 msgstr "Crear usuarios de IdP al inicio de sesión."
 
 #: src/libsaml/conf.py:83
-msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
-msgstr "El directorio de asignación de atributos contiene archivos que asignan atributos SAML a atributos pysaml2."
+msgid ""
+"Attribute map directory contains files that map SAML attributes to "
+"pysaml2 attributes."
+msgstr ""
+"El directorio de asignación de atributos contiene archivos que asignan "
+"atributos SAML a atributos pysaml2."
 
 #: src/libsaml/conf.py:90
 msgid "Allow responses that are initiated by the IdP."
@@ -50,36 +65,62 @@ msgid "Optional attributes to ask for from IdP."
 msgstr "Atributos opcionales que solicitar de IdP."
 
 #: src/libsaml/conf.py:108
-msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
-msgstr "Metadatos de IdP en forma de archivo. Normalmente se trata de un archivo XML que contiene los metadatos generados por Identity Provider."
+msgid ""
+"IdP metadata in the form of a file. This is generally an XML file "
+"containing metadata that the Identity Provider generates."
+msgstr ""
+"Metadatos de IdP en forma de archivo. Normalmente se trata de un archivo "
+"XML que contiene los metadatos generados por Identity Provider."
 
 #: src/libsaml/conf.py:114
-msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
-msgstr "key_file es el nombre de un archivo con formato PEM que contiene la clave privada del servicio Hue. Actualmente se utiliza para cifrar/firmar aserciones y como clave de cliente en una sesión HTTPS."
+msgid ""
+"key_file is the name of a PEM formatted file that contains the private "
+"key of the Hue service. This is presently used both to encrypt/sign "
+"assertions and as client key in a HTTPS session."
+msgstr ""
+"key_file es el nombre de un archivo con formato PEM que contiene la clave"
+" privada del servicio Hue. Actualmente se utiliza para cifrar/firmar "
+"aserciones y como clave de cliente en una sesión HTTPS."
 
 #: src/libsaml/conf.py:118
 msgid "key_file_password password of the private key"
 msgstr "Contraseña de key_file_password de la clave privada"
 
 #: src/libsaml/conf.py:123
-msgid "Execute this script to produce the private key password. This will be used when `key_file_password` is not set."
-msgstr "Ejecute esta secuencia de comandos para generar la contraseña de la clave privada. Se utilizará cuando `key_file_password` no esté definido."
+msgid ""
+"Execute this script to produce the private key password. This will be "
+"used when `key_file_password` is not set."
+msgstr ""
+"Ejecute esta secuencia de comandos para generar la contraseña de la clave"
+" privada. Se utilizará cuando `key_file_password` no esté definido."
 
 #: src/libsaml/conf.py:131
-msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
-msgstr "Es la parte pública del par de clave privada/pública del servicio. El archivo cert_file debe ser un archivo de cadena con formato PEM."
+msgid ""
+"This is the public part of the service private/public key pair. cert_file"
+" must be a PEM formatted certificate chain file."
+msgstr ""
+"Es la parte pública del par de clave privada/pública del servicio. El "
+"archivo cert_file debe ser un archivo de cadena con formato PEM."
 
 #: src/libsaml/conf.py:137
-msgid "A mapping from attributes in the response from the IdP to django user attributes."
-msgstr "Mapping de los atributos de la respuesta del IdP a los atributos de usuario de django."
+msgid ""
+"A mapping from attributes in the response from the IdP to django user "
+"attributes."
+msgstr ""
+"Mapping de los atributos de la respuesta del IdP a los atributos de "
+"usuario de django."
 
 #: src/libsaml/conf.py:143
 msgid "Have Hue initiated authn requests be signed and provide a certificate."
-msgstr "Pida que se firmen las solicitudes de autorización iniciadas por Hue y facilite un certificado."
+msgstr ""
+"Pida que se firmen las solicitudes de autorización iniciadas por Hue y "
+"facilite un certificado."
 
 #: src/libsaml/conf.py:149
 msgid "Have Hue initiated logout requests be signed and provide a certificate."
-msgstr "Pida que se firmen las solicitudes de cierre de sesión iniciadas por Hue y facilite un certificado."
+msgstr ""
+"Pida que se firmen las solicitudes de cierre de sesión iniciadas por Hue "
+"y facilite un certificado."
 
 #: src/libsaml/conf.py:155
 msgid "Username can be sourced from 'attributes' or 'nameid'"
@@ -95,5 +136,6 @@ msgstr "Solicitar este formato de NameID del servidor"
 
 #: src/libsaml/conf.py:183
 msgid "username_source not configured properly. SAML integration may not work."
-msgstr "username_source no está configurado correctamente. Puede que no funcione la integración de SAML."
-
+msgstr ""
+"username_source no está configurado correctamente. Puede que no funcione "
+"la integración de SAML."

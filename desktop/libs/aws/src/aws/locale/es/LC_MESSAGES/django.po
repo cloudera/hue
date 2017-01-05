@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:48-0700\n"
-"PO-Revision-Date: 2012-11-07 13:05-0800\n"
+"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,20 +17,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/s3/s3fs.py:187
+#: src/aws/conf.py:65
+msgid "Execute this script to produce the AWS access key ID."
+msgstr "Ejecute esta secuencia de comandos para generar el ID de clave de acceso de AWS."
+
+#: src/aws/conf.py:77
+msgid "Execute this script to produce the AWS secret access key."
+msgstr "Ejecute esta secuencia de comandos para generar la clave de acceso secreta de AWS."
+
+#: src/aws/s3/s3fs.py:59
+msgid ""
+"User is not authorized to perform the attempted operation. Check that the"
+" user has appropriate permissions."
+msgstr ""
+"El usuario no está autorizado para realizar esta operación. Compruebe que el"
+" usuario cuenta con los permisos adecuados."
+
+#: src/aws/s3/s3fs.py:61
+#, python-format
+msgid ""
+"User is not authorized to write or modify path: %s. Check that the user "
+"has write permissions."
+msgstr ""
+"El usuario no está autorizado para escribir o modificar la ruta: %s. Compruebe que el"
+" usuario cuenta con permisos de escritura."
+
+#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#, python-format
+msgid ""
+"User is not authorized to access bucket named \"%s\". If you are "
+"attempting to create a bucket, this bucket name is already reserved."
+msgstr ""
+"El usuario no está autorizado para acceder al contenedor llamado \"%s\". Si está "
+"intentando crear un contenedor, este nombre de contenedor ya está reservado."
+
+#: src/aws/s3/s3fs.py:104
+#, python-format
+msgid "Failed to create bucket named \"%s\": %s"
+msgstr "Error al crear el contenedor llamado \"%s\": %s"
+
+#: src/aws/s3/s3fs.py:134
+#, python-format
+msgid ""
+"Failed to access path: \"%s\" Check that you have access to read this "
+"bucket and that the region is correct."
+msgstr ""
+"Error al acceder a la ruta: \"%s\" Compruebe que tiene acceso para leer este "
+"contenedor y que la región es correcta."
+
+#: src/aws/s3/s3fs.py:156
+#, python-format
+msgid "User is not authorized to access path: \"%s\""
+msgstr "El usuario no está autorizado para acceder a la ruta: \"%s\""
+
+#: src/aws/s3/s3fs.py:158
+#, python-format
+msgid "Failed to access path \"%s\": %s"
+msgstr "Error al acceder a la ruta \"%s\": %s"
+
+#: src/aws/s3/s3fs.py:253
 msgid "Option `glob` is not implemented"
 msgstr "La opción `glob` no está implementada"
 
-#: src/aws/s3/s3fs.py:212 src/aws/s3/s3fs.py:241 src/aws/s3/s3fs.py:246
+#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
 msgid "Moving to trash is not implemented for S3"
 msgstr "El desplazamiento a la basura no está implementado en S3"
 
-#: src/aws/s3/s3fs.py:216
-msgid "Deleting a bucket is not implemented for S3"
-msgstr "La eliminación de un depósito no está implementada en S3"
+#: src/aws/s3/s3fs.py:324
+#, python-format
+msgid "Invalid bucket name: %s"
+msgstr "Nombre de contenedor no válido: %s"
 
-#: src/aws/s3/s3fs.py:308
+#: src/aws/s3/s3fs.py:329
+#, python-format
+msgid "Failed to create S3 bucket \"%s\": %s"
+msgstr "Error al crear el contenedor S3 \"%s\": %s"
+
+#: src/aws/s3/s3fs.py:385
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "Clave para transformar no válida: %s"
 
+#: src/aws/s3/upload.py:123
+msgid "No S3 filesystem found."
+msgstr "No se encontró ningún sistema de archivos S3."
+
+#: src/aws/s3/upload.py:134
+#, python-format
+msgid "Insufficient permissions to write to S3 path \"%s\"."
+msgstr "Permisos insuficientes para escribir en la ruta S3 \"%s\"."

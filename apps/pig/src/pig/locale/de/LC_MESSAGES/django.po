@@ -1,15 +1,15 @@
 # German translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version:  0PROJEKTVERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADRESSE\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: VOLLSTÄNDIGER NAME <EMAIL@ADRESSE>\n"
+"Project-Id-Version: Hue VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:248 src/pig/templates/app.mako:763
+#: src/pig/api.py:211 src/pig/templates/app.mako:761
 msgid "Unsaved script"
 msgstr "Nicht gespeichertes Skript"
 
@@ -47,7 +47,9 @@ msgstr "Ist ein Benutzerdokument, keine Dokumentübermittlung."
 
 #: src/pig/models.py:35
 msgid "If the document is not a submitted job but a real query, script, workflow."
-msgstr "Wenn das Dokument kein übermittelter Job, sondern ein/e reale/r/s Anfrage, Skript oder Workflow ist"
+msgstr ""
+"Wenn das Dokument kein übermittelter Job, sondern ein/e reale/r/s "
+"Anfrage, Skript oder Workflow ist"
 
 #: src/pig/models.py:44
 #, python-format
@@ -135,8 +137,12 @@ msgid "New Script"
 msgstr "Neues Skript"
 
 #: src/pig/templates/app.mako:65
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
-msgstr "Es sind derzeit keine Skripte definiert. Fügen Sie ein neues Skript ein, indem Sie auf \"Neues Skript\" klicken."
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
+msgstr ""
+"Es sind derzeit keine Skripte definiert. Fügen Sie ein neues Skript ein, "
+"indem Sie auf \"Neues Skript\" klicken."
 
 #: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
 #: src/pig/templates/app.mako:431 src/pig/templates/app.mako:554
@@ -217,8 +223,12 @@ msgid "Press CTRL + Space to autocomplete"
 msgstr "STRG + Leertaste drücken, um automatisch abzuschließen"
 
 #: src/pig/templates/app.mako:170
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
-msgstr "Sie können das aktuelle Skript ausführen, indem Sie im Editor STRG + EINGABETASTE oder STRG + . drücken."
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
+msgstr ""
+"Sie können das aktuelle Skript ausführen, indem Sie im Editor STRG + "
+"EINGABETASTE oder STRG + . drücken."
 
 #: src/pig/templates/app.mako:180
 msgid "Unsaved"
@@ -290,8 +300,12 @@ msgid "Resources"
 msgstr "Ressourcen"
 
 #: src/pig/templates/app.mako:463
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
-msgstr "Pfad zu einer HDFS-Datei oder Zip-Datei, die in den Workspace des aktiven Skripts eingefügt werden soll"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
+msgstr ""
+"Pfad zu einer HDFS-Datei oder Zip-Datei, die in den Workspace des aktiven"
+" Skripts eingefügt werden soll"
 
 #: src/pig/templates/app.mako:470
 msgid "There are currently no defined resources."
@@ -325,7 +339,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "Keine verfügbaren Protokolle."
 
-#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1126
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
 msgid "Running"
 msgstr "Aktiv"
 
@@ -412,8 +426,12 @@ msgid "Are you sure?"
 msgstr "Sind Sie sicher?"
 
 #: src/pig/templates/app.mako:701
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
-msgstr "Das aktuelle Skript enthält nicht gespeicherte Änderungen. Möchten Sie die Änderungen wirklich verwerfen?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
+msgstr ""
+"Das aktuelle Skript enthält nicht gespeicherte Änderungen. Möchten Sie "
+"die Änderungen wirklich verwerfen?"
 
 #: src/pig/templates/app.mako:713
 msgid "Save script"
@@ -427,47 +445,82 @@ msgstr "Geben Sie diesem Skript einen eindeutigen Namen."
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/pig/templates/app.mako:759
+#: src/pig/templates/app.mako:757
 msgid "The Pig job could not be killed."
 msgstr "Der Pig-Job konnte nicht abgebrochen werden."
 
-#: src/pig/templates/app.mako:760
+#: src/pig/templates/app.mako:758
 msgid "Run this Pig script."
 msgstr "Dieses Pig-Skript ausführen."
 
-#: src/pig/templates/app.mako:761
+#: src/pig/templates/app.mako:759
 msgid "Stop execution."
 msgstr "Ausführung stoppen."
 
-#: src/pig/templates/app.mako:762
+#: src/pig/templates/app.mako:760
 msgid "Saved"
 msgstr "Gespeichert"
 
-#: src/pig/templates/app.mako:1119
+#: src/pig/templates/app.mako:1117
 msgid "Saving"
 msgstr "Es wird gespeichert"
 
-#: src/pig/templates/app.mako:1130
+#: src/pig/templates/app.mako:1128
 msgid "has been saved correctly."
 msgstr "wurde korrekt gespeichert."
 
-#: src/pig/templates/app.mako:1395
+#: src/pig/templates/app.mako:1393
 msgid "Did you know?"
 msgstr "Wussten Sie schon?"
 
-#: src/pig/templates/app.mako:1402
+#: src/pig/templates/app.mako:1400
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Namen und Werte von Pig-Parametern und -Optionen, z. B."
 
-#: src/pig/templates/app.mako:1409
+#: src/pig/templates/app.mako:1407
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Namen und Werte von Hadoop-Eigenschaften, z. B."
 
-#: src/pig/templates/app.mako:1416
+#: src/pig/templates/app.mako:1414
 msgid "Include files or compressed files"
 msgstr "Dateien oder komprimierte Dateien einfügen"
 
-#: src/pig/templates/app.mako:1425
+#: src/pig/templates/app.mako:1423
 msgid "You have unsaved changes in this pig script."
 msgstr "Sie haben nicht gespeicherte Änderungen in diesem Pig-Skript."
 
+#~ msgid "Edit script"
+#~ msgstr ""
+
+#~ msgid "Edit properties"
+#~ msgstr ""
+
+#~ msgid "Actions"
+#~ msgstr ""
+
+#~ msgid "Current Logs"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Edit properties for"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Logs for"
+#~ msgstr ""
+
+#~ msgid "The pig job could not be killed."
+#~ msgstr ""
+
+#~ msgid "Run this pig script"
+#~ msgstr ""
+
+#~ msgid "Stop the execution"
+#~ msgstr ""
+
+#~ msgid "There was an error with your request!"
+#~ msgstr ""

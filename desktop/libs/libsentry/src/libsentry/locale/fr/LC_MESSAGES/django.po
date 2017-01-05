@@ -1,17 +1,17 @@
 # French translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: VERSION DU PROJET\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n > 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,7 +23,9 @@ msgstr "Aucun serveur Sentry n'est disponible."
 
 #: src/libsentry/api.py:268 src/libsentry/api2.py:267
 msgid "Error in retrieving Sentry server properties from Zookeeper."
-msgstr "Erreur de récupération des propriétés du serveur Sentry à partir de Zookeeper."
+msgstr ""
+"Erreur de récupération des propriétés du serveur Sentry à partir de "
+"Zookeeper."
 
 #: src/libsentry/conf.py:29
 msgid "Hostname or IP of server."
@@ -35,5 +37,26 @@ msgstr "Port sur lequel le service Sentry est en cours d'exécution."
 
 #: src/libsentry/conf.py:43
 msgid "Sentry configuration directory, where sentry-site.xml is located."
-msgstr "Répertoire de configuration de Sentry, où se trouve le fichier sentry-site.xml."
+msgstr ""
+"Répertoire de configuration de Sentry, où se trouve le fichier sentry-"
+"site.xml."
 
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""

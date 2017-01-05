@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2014 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2014.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2014-01-03 20:09+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -19,7 +19,7 @@ msgstr ""
 
 #: src/liboauth/backend.py:109 src/liboauth/backend.py:155
 #: src/liboauth/backend.py:163 src/liboauth/backend.py:176
-#: src/liboauth/backend.py:185 src/liboauth/backend.py:269
+#: src/liboauth/backend.py:185 src/liboauth/backend.py:259
 #, python-format
 msgid "Invalid response from OAuth provider: %s"
 msgstr "来自 OAuth 提供程序的响应无效：%s"
@@ -109,8 +109,14 @@ msgid "Comma-separated list of whitelisted domains."
 msgstr "白名单域的逗号分隔列表。"
 
 #: src/liboauth/conf.py:161
-msgid "JSON formatted hash of username simplifications. Example: {\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} converts \"email@sub1.domain.com\" to \"email_S1\""
-msgstr "用户名简化的 JSON 格式化号。例如：{\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} 将 \"email@sub1.domain.com\" 转化为 \"email_S1\""
+msgid ""
+"JSON formatted hash of username simplifications. Example: "
+"{\"@sub1.domain.com\":\"_S1\", \"@sub2.domain.com\":\"_S2\"} converts "
+"\"email@sub1.domain.com\" to \"email_S1\""
+msgstr ""
+"用户名简化的 JSON 格式化号。例如：{\"@sub1.domain.com\":\"_S1\", "
+"\"@sub2.domain.com\":\"_S2\"} 将 \"email@sub1.domain.com\" 转化为 "
+"\"email_S1\""
 
 #: src/liboauth/views.py:72
 #, python-format
@@ -160,4 +166,3 @@ msgstr "通过以下项注册"
 #: src/liboauth/templates/oauth-login.mako:214
 msgid "The oauth app is not configured with any provider."
 msgstr "未通过提供程序配置 oauth 应用程序。"
-

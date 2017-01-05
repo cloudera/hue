@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -30,7 +30,9 @@ msgid "Nice name of server."
 msgstr "サーバーの適切な名前です。"
 
 #: src/librdbms/conf.py:39
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
 msgstr "データベース名、またはデータベースファイルへのパスです。指定されている場合、その他のデータベースを選択することは許可されません。"
 
 #: src/librdbms/conf.py:45
@@ -46,7 +48,9 @@ msgid "Database password."
 msgstr "データベースのパスワードです。"
 
 #: src/librdbms/conf.py:63
-msgid "Execute this script to produce the database password. This will be used when `password` is not set."
+msgid ""
+"Execute this script to produce the database password. This will be used "
+"when `password` is not set."
 msgstr "このスクリプトを実行してデータベースパスワードを作成します。これは password が設定されていない場合に利用されます。"
 
 #: src/librdbms/conf.py:69
@@ -66,7 +70,9 @@ msgid "Database name should not be empty for the SQLite backend."
 msgstr "SQLite バックエンドのデータベース名は空にできません。"
 
 #: src/librdbms/conf.py:99
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
 msgstr "Oracle バックエンドのデータベース名は空にできません。データベースの SID にする必要があります。"
 
 #: src/librdbms/conf.py:101
@@ -91,3 +97,22 @@ msgstr "データベース %s は使用できません。データベース %s �
 msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
 msgstr "%s データベースが見つかりません。設定は正しいですか？"
 
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""

@@ -1,15 +1,15 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: 프로젝트 버전\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
-"Last-Translator: 전체 이름 <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
 "MIME-Version: 1.0\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:248 src/pig/templates/app.mako:763
+#: src/pig/api.py:211 src/pig/templates/app.mako:761
 msgid "Unsaved script"
 msgstr "저장 안 된 스크립트"
 
@@ -135,7 +135,9 @@ msgid "New Script"
 msgstr "새 스크립트"
 
 #: src/pig/templates/app.mako:65
-msgid "There are currently no scripts defined. Please add a new script clicking on \"New script\""
+msgid ""
+"There are currently no scripts defined. Please add a new script clicking "
+"on \"New script\""
 msgstr "현재 정의된 스크립트가 없습니다. \"새 스크립트\"를 클릭하여 새 스크립트를 추가하십시오."
 
 #: src/pig/templates/app.mako:72 src/pig/templates/app.mako:382
@@ -214,10 +216,12 @@ msgstr "스크립트 삭제"
 
 #: src/pig/templates/app.mako:169
 msgid "Press CTRL + Space to autocomplete"
-msgstr "자동 완성하려면 Ctrl + Space 누르기"
+msgstr "자동 완성하려면 CTRL + Space 누르기"
 
 #: src/pig/templates/app.mako:170
-msgid "You can execute the current script by pressing CTRL + ENTER or CTRL + . in the editor"
+msgid ""
+"You can execute the current script by pressing CTRL + ENTER or CTRL + . "
+"in the editor"
 msgstr "편집기에서 Ctrl + Enter 또는 Ctrl + .를 눌러 현재 스크립트를 실행할 수 있습니다."
 
 #: src/pig/templates/app.mako:180
@@ -290,7 +294,9 @@ msgid "Resources"
 msgstr "리소스"
 
 #: src/pig/templates/app.mako:463
-msgid "Path to a HDFS file or zip file to add to the workspace of the running script"
+msgid ""
+"Path to a HDFS file or zip file to add to the workspace of the running "
+"script"
 msgstr "실행 중인 스크립트의 작업 영역에 추가할 HDFS 파일 또는 zip 파일에 대한 경로"
 
 #: src/pig/templates/app.mako:470
@@ -325,7 +331,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "사용할 수 있는 로그가 없습니다."
 
-#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1126
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
 msgid "Running"
 msgstr "실행 중"
 
@@ -412,7 +418,9 @@ msgid "Are you sure?"
 msgstr "계속하시겠습니까?"
 
 #: src/pig/templates/app.mako:701
-msgid "The current script has unsaved changes. Are you sure you want to discard the changes?"
+msgid ""
+"The current script has unsaved changes. Are you sure you want to discard "
+"the changes?"
 msgstr "현재 스크립트에 저장되지 않은 변경 내용이 있습니다. 변경 내용을 무시하시겠습니까?"
 
 #: src/pig/templates/app.mako:713
@@ -427,47 +435,82 @@ msgstr "이 스크립트에 의미 있는 이름을 지정하십시오."
 msgid "Cancel"
 msgstr "취소"
 
-#: src/pig/templates/app.mako:759
+#: src/pig/templates/app.mako:757
 msgid "The Pig job could not be killed."
 msgstr "Pig 작업을 중지할 수 없습니다."
 
-#: src/pig/templates/app.mako:760
+#: src/pig/templates/app.mako:758
 msgid "Run this Pig script."
 msgstr "이 Pig 스크립트를 실행합니다."
 
-#: src/pig/templates/app.mako:761
+#: src/pig/templates/app.mako:759
 msgid "Stop execution."
 msgstr "실행을 중지합니다."
 
-#: src/pig/templates/app.mako:762
+#: src/pig/templates/app.mako:760
 msgid "Saved"
 msgstr "저장됨"
 
-#: src/pig/templates/app.mako:1119
+#: src/pig/templates/app.mako:1117
 msgid "Saving"
 msgstr "저장하는 중"
 
-#: src/pig/templates/app.mako:1130
+#: src/pig/templates/app.mako:1128
 msgid "has been saved correctly."
 msgstr "저장되었습니다."
 
-#: src/pig/templates/app.mako:1395
+#: src/pig/templates/app.mako:1393
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/pig/templates/app.mako:1402
+#: src/pig/templates/app.mako:1400
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Pig 매개변수와 옵션 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1409
+#: src/pig/templates/app.mako:1407
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Hadoop 속성 이름 및 값(예:"
 
-#: src/pig/templates/app.mako:1416
+#: src/pig/templates/app.mako:1414
 msgid "Include files or compressed files"
 msgstr "파일 또는 압축 파일 포함"
 
-#: src/pig/templates/app.mako:1425
+#: src/pig/templates/app.mako:1423
 msgid "You have unsaved changes in this pig script."
 msgstr "이 pig 스크립트에 저장되지 않은 변경 내용이 있습니다."
 
+#~ msgid "Edit script"
+#~ msgstr ""
+
+#~ msgid "Edit properties"
+#~ msgstr ""
+
+#~ msgid "Actions"
+#~ msgstr ""
+
+#~ msgid "Current Logs"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Edit properties for"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Logs for"
+#~ msgstr ""
+
+#~ msgid "The pig job could not be killed."
+#~ msgstr ""
+
+#~ msgid "Run this pig script"
+#~ msgstr ""
+
+#~ msgid "Stop the execution"
+#~ msgstr ""
+
+#~ msgid "There was an error with your request!"
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:54-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -26,47 +26,49 @@ msgid "Location on local filesystem where sample data is stored."
 msgstr "샘플 데이터가 저장되는 로컬 파일 시스템상의 위치입니다."
 
 #: src/jobsub/forms.py:39 src/jobsub/forms.py:58 src/jobsub/forms.py:77
-#: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:162
-#: src/jobsub/templates/designs.mako:329 src/jobsub/templates/designs.mako:358
+#: src/jobsub/forms.py:95 src/jobsub/templates/designs.mako:158
+#: src/jobsub/templates/designs.mako:325 src/jobsub/templates/designs.mako:354
 msgid "Name"
 msgstr "이름"
 
 #: src/jobsub/forms.py:43
-msgid "Allows letters, digits, '_', and '-'. The first character must be a letter or '_'."
+msgid ""
+"Allows letters, digits, '_', and '-'. The first character must be a "
+"letter or '_'."
 msgstr "문자, 숫자, '_', '-'이 허용됩니다. 문자 또는 '_'이 맨 앞에 와야 합니다."
 
 #: src/jobsub/forms.py:59 src/jobsub/forms.py:78 src/jobsub/forms.py:96
-#: src/jobsub/templates/designs.mako:163 src/jobsub/templates/designs.mako:336
+#: src/jobsub/templates/designs.mako:159 src/jobsub/templates/designs.mako:332
 msgid "Description"
 msgstr "설명"
 
-#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:395
-#: src/jobsub/templates/designs.mako:396
+#: src/jobsub/forms.py:60 src/jobsub/templates/designs.mako:391
+#: src/jobsub/templates/designs.mako:392
 msgid "Main class"
 msgstr "주 클래스"
 
 #: src/jobsub/forms.py:61 src/jobsub/forms.py:79
-#: src/jobsub/templates/designs.mako:391
+#: src/jobsub/templates/designs.mako:387
 msgid "Jar path"
 msgstr "Jar 경로"
 
-#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:399
-#: src/jobsub/templates/designs.mako:400
+#: src/jobsub/forms.py:62 src/jobsub/templates/designs.mako:395
+#: src/jobsub/templates/designs.mako:396
 msgid "Args"
 msgstr "인수"
 
-#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:403
-#: src/jobsub/templates/designs.mako:404
+#: src/jobsub/forms.py:63 src/jobsub/templates/designs.mako:399
+#: src/jobsub/templates/designs.mako:400
 msgid "Java opts"
 msgstr "Java 옵션"
 
-#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:407
-#: src/jobsub/templates/designs.mako:408
+#: src/jobsub/forms.py:80 src/jobsub/templates/designs.mako:403
+#: src/jobsub/templates/designs.mako:404
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:411
-#: src/jobsub/templates/designs.mako:412
+#: src/jobsub/forms.py:81 src/jobsub/templates/designs.mako:407
+#: src/jobsub/templates/designs.mako:408
 msgid "Reducer"
 msgstr "Reducer"
 
@@ -82,7 +84,7 @@ msgstr "분산 캐시에 추가할 파일의 경로 목록입니다."
 msgid "List of paths to archives to be added to the distributed cache."
 msgstr "분산 캐시에 추가할 아카이브의 경로 목록입니다."
 
-#: src/jobsub/models.py:200 src/jobsub/templates/designs.mako:392
+#: src/jobsub/models.py:200 src/jobsub/templates/designs.mako:388
 msgid "Path to jar files on HDFS."
 msgstr "HDFS의 jar 파일에 대한 경로입니다."
 
@@ -131,475 +133,532 @@ msgstr "%s 디자인을 Oozie 작업으로 변활할 수 없습니다."
 msgid "Cannot backwards migrate this change."
 msgstr "이 변경을 역으로 마이그레이션할 수 없습니다."
 
-#: src/jobsub/templates/designs.mako:50
+#: src/jobsub/templates/designs.mako:48
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/jobsub/templates/designs.mako:62
+#: src/jobsub/templates/designs.mako:60
 msgid "Designs"
 msgstr "디자인"
 
-#: src/jobsub/templates/designs.mako:66
+#: src/jobsub/templates/designs.mako:64
 msgid "Search for design name"
 msgstr "디자인 이름 검색"
 
-#: src/jobsub/templates/designs.mako:72
+#: src/jobsub/templates/designs.mako:70
 msgid "Submit"
 msgstr "제출"
 
-#: src/jobsub/templates/designs.mako:73
+#: src/jobsub/templates/designs.mako:71
 msgid "Edit"
 msgstr "편집"
 
-#: src/jobsub/templates/designs.mako:74
+#: src/jobsub/templates/designs.mako:72
 msgid "Copy"
 msgstr "복사"
 
-#: src/jobsub/templates/designs.mako:76
+#: src/jobsub/templates/designs.mako:74
 msgid "Move to trash"
 msgstr "휴지통으로 이동"
 
-#: src/jobsub/templates/designs.mako:81 src/jobsub/templates/designs.mako:87
+#: src/jobsub/templates/designs.mako:79 src/jobsub/templates/designs.mako:85
 msgid "Delete forever"
 msgstr "영구적으로 삭제"
 
-#: src/jobsub/templates/designs.mako:86
+#: src/jobsub/templates/designs.mako:84
 msgid "Restore"
 msgstr "복구"
 
-#: src/jobsub/templates/designs.mako:95
+#: src/jobsub/templates/designs.mako:93
 msgid "Delete all the designs"
 msgstr "모든 디자인 삭제"
 
-#: src/jobsub/templates/designs.mako:95
+#: src/jobsub/templates/designs.mako:93
 msgid "Empty trash"
 msgstr "휴지통 비우기"
 
-#: src/jobsub/templates/designs.mako:98
+#: src/jobsub/templates/designs.mako:96
 msgid "Home"
 msgstr "홈"
 
-#: src/jobsub/templates/designs.mako:98
+#: src/jobsub/templates/designs.mako:96
 msgid "View designs"
 msgstr "디자인 보기"
 
-#: src/jobsub/templates/designs.mako:101 src/jobsub/templates/designs.mako:102
+#: src/jobsub/templates/designs.mako:99 src/jobsub/templates/designs.mako:100
 msgid "New action"
 msgstr "새 작업"
 
-#: src/jobsub/templates/designs.mako:107
+#: src/jobsub/templates/designs.mako:105
 msgid "Create MapReduce design"
 msgstr "MapReduce 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:110
+#: src/jobsub/templates/designs.mako:108
 msgid "Create Java design"
 msgstr "Java 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:113
+#: src/jobsub/templates/designs.mako:111
 msgid "Create Streaming design"
 msgstr "스트리밍 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:116
+#: src/jobsub/templates/designs.mako:114
 msgid "Create Hive design"
 msgstr "Hive 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:120
+#: src/jobsub/templates/designs.mako:118
 msgid "Create Pig design"
 msgstr "Pig 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:125
+#: src/jobsub/templates/designs.mako:122
 msgid "Create Sqoop design"
 msgstr "Sqoop 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:129
+#: src/jobsub/templates/designs.mako:125
 msgid "Create Fs design"
 msgstr "Fs 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:132
+#: src/jobsub/templates/designs.mako:128
 msgid "Create SSH design"
 msgstr "SSH 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:135
+#: src/jobsub/templates/designs.mako:131
 msgid "Create Shell design"
 msgstr "Shell 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:138
+#: src/jobsub/templates/designs.mako:134
 msgid "Create Email design"
 msgstr "Email 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:141
+#: src/jobsub/templates/designs.mako:137
 msgid "Create DistCp design"
 msgstr "DistCp 디자인 생성"
 
-#: src/jobsub/templates/designs.mako:146
+#: src/jobsub/templates/designs.mako:142
 msgid "View trash"
 msgstr "휴지통 보기"
 
-#: src/jobsub/templates/designs.mako:164
+#: src/jobsub/templates/designs.mako:160
 msgid "Owner"
 msgstr "소유자"
 
-#: src/jobsub/templates/designs.mako:165 src/jobsub/templates/designs.mako:450
-#: src/jobsub/templates/designs.mako:474 src/jobsub/templates/designs.mako:541
-#: src/jobsub/templates/designs.mako:569 src/jobsub/templates/designs.mako:673
-#: src/jobsub/templates/designs.mako:694 src/jobsub/templates/designs.mako:721
+#: src/jobsub/templates/designs.mako:161 src/jobsub/templates/designs.mako:446
+#: src/jobsub/templates/designs.mako:470 src/jobsub/templates/designs.mako:537
+#: src/jobsub/templates/designs.mako:565 src/jobsub/templates/designs.mako:669
+#: src/jobsub/templates/designs.mako:690 src/jobsub/templates/designs.mako:717
 msgid "Type"
 msgstr "유형"
 
-#: src/jobsub/templates/designs.mako:166
+#: src/jobsub/templates/designs.mako:162
 msgid "Status"
 msgstr "상태"
 
-#: src/jobsub/templates/designs.mako:167
+#: src/jobsub/templates/designs.mako:163
 msgid "Last modified"
 msgstr "최종 수정 날짜"
 
-#: src/jobsub/templates/designs.mako:168
+#: src/jobsub/templates/designs.mako:164
 msgid "Trashed"
 msgstr "휴지통으로 이동됨"
 
-#: src/jobsub/templates/designs.mako:219
+#: src/jobsub/templates/designs.mako:215
 msgid "Move the selected designs to trash?"
 msgstr "선택한 디자인을 휴지통으로 이동하시겠습니까?"
 
-#: src/jobsub/templates/designs.mako:222 src/jobsub/templates/designs.mako:236
-#: src/jobsub/templates/designs.mako:250 src/jobsub/templates/designs.mako:264
+#: src/jobsub/templates/designs.mako:218 src/jobsub/templates/designs.mako:232
+#: src/jobsub/templates/designs.mako:246 src/jobsub/templates/designs.mako:260
 msgid "No"
 msgstr "아니요"
 
-#: src/jobsub/templates/designs.mako:223 src/jobsub/templates/designs.mako:237
-#: src/jobsub/templates/designs.mako:251 src/jobsub/templates/designs.mako:265
+#: src/jobsub/templates/designs.mako:219 src/jobsub/templates/designs.mako:233
+#: src/jobsub/templates/designs.mako:247 src/jobsub/templates/designs.mako:261
 msgid "Yes"
 msgstr "예"
 
-#: src/jobsub/templates/designs.mako:233
+#: src/jobsub/templates/designs.mako:229
 msgid "Delete selected designs?"
 msgstr "선택한 디자인을 삭제하시겠습니까?"
 
-#: src/jobsub/templates/designs.mako:247
+#: src/jobsub/templates/designs.mako:243
 msgid "Delete all trashed designs?"
 msgstr "휴지통으로 이동된 모든 디자인을 삭제하시겠습니까?"
 
-#: src/jobsub/templates/designs.mako:261
+#: src/jobsub/templates/designs.mako:257
 msgid "Restore selected designs?"
 msgstr "선택한 디자인을 복구하시겠습니까?"
 
-#: src/jobsub/templates/designs.mako:273
+#: src/jobsub/templates/designs.mako:269
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/jobsub/templates/designs.mako:286
+#: src/jobsub/templates/designs.mako:282
 msgid "Choose a directory"
 msgstr "디렉토리 선택"
 
-#: src/jobsub/templates/designs.mako:299
+#: src/jobsub/templates/designs.mako:295
 msgid "Choose a path"
 msgstr "경로 선택"
 
-#: src/jobsub/templates/designs.mako:316
+#: src/jobsub/templates/designs.mako:312
 msgid "You can parameterize the values, using"
 msgstr "다음을 사용하여 값을 매개변수화할 수 있습니다."
 
-#: src/jobsub/templates/designs.mako:316
+#: src/jobsub/templates/designs.mako:312
 msgid "or"
 msgstr "또는"
 
-#: src/jobsub/templates/designs.mako:316
-msgid "When the design is submitted, you will be prompted for the actual value of "
+#: src/jobsub/templates/designs.mako:312
+msgid ""
+"When the design is submitted, you will be prompted for the actual value "
+"of "
 msgstr "디자인을 제출할 때 다음의 실제 값을 입력하라는 메시지가 나타납니다. "
 
-#: src/jobsub/templates/designs.mako:317
-msgid "All the paths are relative to the deployment directory. They can be absolute but this is not recommended."
+#: src/jobsub/templates/designs.mako:313
+msgid ""
+"All the paths are relative to the deployment directory. They can be "
+"absolute but this is not recommended."
 msgstr "모든 경로는 배포 디렉토리를 기준으로 한 상대 경로입니다. 절대 경로를 사용할 수도 있지만 이는 권장하지 않습니다."
 
-#: src/jobsub/templates/designs.mako:318
+#: src/jobsub/templates/designs.mako:314
 msgid "Requires some SMTP server configuration to be present (in oozie-site.xml)."
 msgstr "SMTP 서버 구성이 존재해야 합니다(oozie-site.xml 형식)."
 
-#: src/jobsub/templates/designs.mako:319
+#: src/jobsub/templates/designs.mako:315
 msgid "The ssh server requires passwordless login."
 msgstr "ssh 서버에는 암호 없이 로그인해야 합니다."
 
-#: src/jobsub/templates/designs.mako:321
+#: src/jobsub/templates/designs.mako:317
 msgid "Save"
 msgstr "저장"
 
-#: src/jobsub/templates/designs.mako:325
+#: src/jobsub/templates/designs.mako:321
 msgid "Cancel"
 msgstr "취소"
 
-#: src/jobsub/templates/designs.mako:330
+#: src/jobsub/templates/designs.mako:326
 msgid "Name of the design."
 msgstr "디자인 이름입니다."
 
-#: src/jobsub/templates/designs.mako:337
+#: src/jobsub/templates/designs.mako:333
 msgid "Description of the design."
 msgstr "디자인 설명입니다."
 
-#: src/jobsub/templates/designs.mako:343
+#: src/jobsub/templates/designs.mako:339
 msgid "Is shared"
 msgstr "공유됨"
 
-#: src/jobsub/templates/designs.mako:344
+#: src/jobsub/templates/designs.mako:340
 msgid "Enable other users to have access to this job."
 msgstr "다른 사용자가 이 Job에 액세스할 수 있도록 설정합니다."
 
-#: src/jobsub/templates/designs.mako:350
+#: src/jobsub/templates/designs.mako:346
 msgid "Capture output"
 msgstr "출력 캡처"
 
-#: src/jobsub/templates/designs.mako:351
+#: src/jobsub/templates/designs.mako:347
 msgid "Capture the output of this job."
 msgstr "이 Job의 출력을 캡처합니다."
 
-#: src/jobsub/templates/designs.mako:357
+#: src/jobsub/templates/designs.mako:353
 msgid "Oozie parameters"
 msgstr "Oozie 매개변수"
 
-#: src/jobsub/templates/designs.mako:359 src/jobsub/templates/designs.mako:433
-#: src/jobsub/templates/designs.mako:451 src/jobsub/templates/designs.mako:475
-#: src/jobsub/templates/designs.mako:542 src/jobsub/templates/designs.mako:570
-#: src/jobsub/templates/designs.mako:674 src/jobsub/templates/designs.mako:695
-#: src/jobsub/templates/designs.mako:722
+#: src/jobsub/templates/designs.mako:355 src/jobsub/templates/designs.mako:429
+#: src/jobsub/templates/designs.mako:447 src/jobsub/templates/designs.mako:471
+#: src/jobsub/templates/designs.mako:538 src/jobsub/templates/designs.mako:566
+#: src/jobsub/templates/designs.mako:670 src/jobsub/templates/designs.mako:691
+#: src/jobsub/templates/designs.mako:718
 msgid "Value"
 msgstr "값"
 
-#: src/jobsub/templates/designs.mako:361 src/jobsub/templates/designs.mako:435
-#: src/jobsub/templates/designs.mako:453 src/jobsub/templates/designs.mako:477
-#: src/jobsub/templates/designs.mako:493 src/jobsub/templates/designs.mako:509
-#: src/jobsub/templates/designs.mako:544 src/jobsub/templates/designs.mako:572
-#: src/jobsub/templates/designs.mako:591 src/jobsub/templates/designs.mako:607
-#: src/jobsub/templates/designs.mako:623 src/jobsub/templates/designs.mako:639
-#: src/jobsub/templates/designs.mako:655 src/jobsub/templates/designs.mako:676
-#: src/jobsub/templates/designs.mako:697 src/jobsub/templates/designs.mako:724
+#: src/jobsub/templates/designs.mako:357 src/jobsub/templates/designs.mako:431
+#: src/jobsub/templates/designs.mako:449 src/jobsub/templates/designs.mako:473
+#: src/jobsub/templates/designs.mako:489 src/jobsub/templates/designs.mako:505
+#: src/jobsub/templates/designs.mako:540 src/jobsub/templates/designs.mako:568
+#: src/jobsub/templates/designs.mako:587 src/jobsub/templates/designs.mako:603
+#: src/jobsub/templates/designs.mako:619 src/jobsub/templates/designs.mako:635
+#: src/jobsub/templates/designs.mako:651 src/jobsub/templates/designs.mako:672
+#: src/jobsub/templates/designs.mako:693 src/jobsub/templates/designs.mako:720
 msgid "Delete"
 msgstr "삭제"
 
-#: src/jobsub/templates/designs.mako:365
+#: src/jobsub/templates/designs.mako:361
 msgid "Add"
 msgstr "추가"
 
-#: src/jobsub/templates/designs.mako:375
+#: src/jobsub/templates/designs.mako:371
 msgid "User"
 msgstr "사용자"
 
-#: src/jobsub/templates/designs.mako:376
+#: src/jobsub/templates/designs.mako:372
 msgid "User to authenticate with."
 msgstr "인증할 사용자입니다."
 
-#: src/jobsub/templates/designs.mako:379
+#: src/jobsub/templates/designs.mako:375
 msgid "Host"
 msgstr "호스트"
 
-#: src/jobsub/templates/designs.mako:380
+#: src/jobsub/templates/designs.mako:376
 msgid "Host to execute command on."
 msgstr "명령을 실행할 호스트입니다."
 
-#: src/jobsub/templates/designs.mako:383 src/jobsub/templates/designs.mako:564
+#: src/jobsub/templates/designs.mako:379 src/jobsub/templates/designs.mako:560
 msgid "Command"
 msgstr "명령"
 
-#: src/jobsub/templates/designs.mako:384 src/jobsub/templates/designs.mako:565
+#: src/jobsub/templates/designs.mako:380 src/jobsub/templates/designs.mako:561
 msgid "Command to execute."
 msgstr "실행할 명령입니다."
 
-#: src/jobsub/templates/designs.mako:387
+#: src/jobsub/templates/designs.mako:383
 msgid "Script name"
 msgstr "스크립트 이름"
 
-#: src/jobsub/templates/designs.mako:388
+#: src/jobsub/templates/designs.mako:384
 msgid "Path to the script to execute."
 msgstr "실행할 스크립트의 경로입니다."
 
-#: src/jobsub/templates/designs.mako:415 src/jobsub/templates/designs.mako:416
+#: src/jobsub/templates/designs.mako:411 src/jobsub/templates/designs.mako:412
 msgid "TO addresses"
 msgstr "받는 사람 주소"
 
-#: src/jobsub/templates/designs.mako:419 src/jobsub/templates/designs.mako:420
+#: src/jobsub/templates/designs.mako:415 src/jobsub/templates/designs.mako:416
 msgid "CC addresses (optional)"
 msgstr "참조 주소(선택 사항)"
 
-#: src/jobsub/templates/designs.mako:423 src/jobsub/templates/designs.mako:424
+#: src/jobsub/templates/designs.mako:419 src/jobsub/templates/designs.mako:420
 msgid "Subject"
 msgstr "제목"
 
-#: src/jobsub/templates/designs.mako:427 src/jobsub/templates/designs.mako:428
+#: src/jobsub/templates/designs.mako:423 src/jobsub/templates/designs.mako:424
 msgid "Body"
 msgstr "본문"
 
-#: src/jobsub/templates/designs.mako:431
+#: src/jobsub/templates/designs.mako:427
 msgid "Hadoop job properties"
 msgstr "Hadoop Job 속성"
 
-#: src/jobsub/templates/designs.mako:432
+#: src/jobsub/templates/designs.mako:428
 msgid "Property name"
 msgstr "속성 이름"
 
-#: src/jobsub/templates/designs.mako:439
+#: src/jobsub/templates/designs.mako:435
 msgid "Add property"
 msgstr "속성 추가"
 
-#: src/jobsub/templates/designs.mako:449
+#: src/jobsub/templates/designs.mako:445
 msgid "Prepare"
 msgstr "준비"
 
-#: src/jobsub/templates/designs.mako:458
+#: src/jobsub/templates/designs.mako:454
 msgid "Add delete"
 msgstr "삭제 추가"
 
-#: src/jobsub/templates/designs.mako:462
+#: src/jobsub/templates/designs.mako:458
 msgid "Add mkdir"
 msgstr "mkdir 추가"
 
-#: src/jobsub/templates/designs.mako:473 src/jobsub/templates/designs.mako:540
-#: src/jobsub/templates/designs.mako:568 src/jobsub/templates/designs.mako:672
-#: src/jobsub/templates/designs.mako:693 src/jobsub/templates/designs.mako:720
+#: src/jobsub/templates/designs.mako:469 src/jobsub/templates/designs.mako:536
+#: src/jobsub/templates/designs.mako:564 src/jobsub/templates/designs.mako:668
+#: src/jobsub/templates/designs.mako:689 src/jobsub/templates/designs.mako:716
 msgid "Params"
 msgstr "매개변수"
 
-#: src/jobsub/templates/designs.mako:481 src/jobsub/templates/designs.mako:548
+#: src/jobsub/templates/designs.mako:477 src/jobsub/templates/designs.mako:544
 msgid "Add param"
 msgstr "매개변수 추가"
 
-#: src/jobsub/templates/designs.mako:491
+#: src/jobsub/templates/designs.mako:487
 msgid "Files"
 msgstr "파일"
 
-#: src/jobsub/templates/designs.mako:497
+#: src/jobsub/templates/designs.mako:493
 msgid "Add file"
 msgstr "파일 추가"
 
-#: src/jobsub/templates/designs.mako:507
+#: src/jobsub/templates/designs.mako:503
 msgid "Archives"
 msgstr "아카이브"
 
-#: src/jobsub/templates/designs.mako:513
+#: src/jobsub/templates/designs.mako:509
 msgid "Add archive"
 msgstr "아카이브 추가"
 
-#: src/jobsub/templates/designs.mako:526
+#: src/jobsub/templates/designs.mako:522
 msgid "Job Design (mapreduce type)"
 msgstr "Job 디자인(mapreduce 유형)"
 
-#: src/jobsub/templates/designs.mako:529
+#: src/jobsub/templates/designs.mako:525
 msgid "Job Design (java type)"
 msgstr "Job 디자인(Java 유형)"
 
-#: src/jobsub/templates/designs.mako:532
+#: src/jobsub/templates/designs.mako:528
 msgid "Job Design (streaming type)"
 msgstr "Job 디자인(스트리밍 유형)"
 
-#: src/jobsub/templates/designs.mako:535
+#: src/jobsub/templates/designs.mako:531
 msgid "Job Design (hive type)"
 msgstr "Job 디자인(hive 유형)"
 
-#: src/jobsub/templates/designs.mako:538
+#: src/jobsub/templates/designs.mako:534
 msgid "Job Design (pig type)"
 msgstr "Job 디자인(pig 유형)"
 
-#: src/jobsub/templates/designs.mako:551 src/jobsub/templates/designs.mako:701
-#: src/jobsub/templates/designs.mako:728
+#: src/jobsub/templates/designs.mako:547 src/jobsub/templates/designs.mako:697
+#: src/jobsub/templates/designs.mako:724
 msgid "Add argument"
 msgstr "인수 추가"
 
-#: src/jobsub/templates/designs.mako:562
+#: src/jobsub/templates/designs.mako:558
 msgid "Job Design (sqoop type)"
 msgstr "Job 디자인(sqoop 유형)"
 
-#: src/jobsub/templates/designs.mako:576 src/jobsub/templates/designs.mako:680
+#: src/jobsub/templates/designs.mako:572 src/jobsub/templates/designs.mako:676
 msgid "Add arg"
 msgstr "인수 추가"
 
-#: src/jobsub/templates/designs.mako:587
+#: src/jobsub/templates/designs.mako:583
 msgid "Job Design (fs type)"
 msgstr "Job 디자인(fs 유형)"
 
-#: src/jobsub/templates/designs.mako:589
+#: src/jobsub/templates/designs.mako:585
 msgid "Delete path"
 msgstr "경로 삭제"
 
-#: src/jobsub/templates/designs.mako:595 src/jobsub/templates/designs.mako:611
-#: src/jobsub/templates/designs.mako:627
+#: src/jobsub/templates/designs.mako:591 src/jobsub/templates/designs.mako:607
+#: src/jobsub/templates/designs.mako:623
 msgid "Add path"
 msgstr "경로 추가"
 
-#: src/jobsub/templates/designs.mako:605
+#: src/jobsub/templates/designs.mako:601
 msgid "Create directory"
 msgstr "디렉토리 생성"
 
-#: src/jobsub/templates/designs.mako:621
+#: src/jobsub/templates/designs.mako:617
 msgid "Create or touch file"
 msgstr "파일 생성 또는 파일 날짜 변경"
 
-#: src/jobsub/templates/designs.mako:637
+#: src/jobsub/templates/designs.mako:633
 msgid "Change permissions"
 msgstr "권한 변경"
 
-#: src/jobsub/templates/designs.mako:643
+#: src/jobsub/templates/designs.mako:639
 msgid "Add chmod"
 msgstr "chmod 추가"
 
-#: src/jobsub/templates/designs.mako:653
+#: src/jobsub/templates/designs.mako:649
 msgid "Move file"
 msgstr "파일 이동"
 
-#: src/jobsub/templates/designs.mako:659
+#: src/jobsub/templates/designs.mako:655
 msgid "Add move"
 msgstr "이동 추가"
 
-#: src/jobsub/templates/designs.mako:670
+#: src/jobsub/templates/designs.mako:666
 msgid "Job Design (ssh type)"
 msgstr "Job 디자인(ssh 유형)"
 
-#: src/jobsub/templates/designs.mako:691
+#: src/jobsub/templates/designs.mako:687
 msgid "Job Design (shell type)"
 msgstr "Job 디자인(shell 유형)"
 
-#: src/jobsub/templates/designs.mako:704
+#: src/jobsub/templates/designs.mako:700
 msgid "Add env-var"
 msgstr "env-var 추가"
 
-#: src/jobsub/templates/designs.mako:715
+#: src/jobsub/templates/designs.mako:711
 msgid "Job Design (email type)"
 msgstr "Job 디자인(email 유형)"
 
-#: src/jobsub/templates/designs.mako:718
+#: src/jobsub/templates/designs.mako:714
 msgid "Job Design (distcp type)"
 msgstr "Job 디자인(distcp 유형)"
 
-#: src/jobsub/templates/designs.mako:764
+#: src/jobsub/templates/designs.mako:760
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/jobsub/templates/designs.mako:765
+#: src/jobsub/templates/designs.mako:761
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
 
-#: src/jobsub/templates/designs.mako:766
+#: src/jobsub/templates/designs.mako:762
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "0~0개(전체 0개 중) 항목 표시"
 
-#: src/jobsub/templates/designs.mako:767
+#: src/jobsub/templates/designs.mako:763
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
-#: src/jobsub/templates/designs.mako:768
+#: src/jobsub/templates/designs.mako:764
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
-#: src/jobsub/templates/designs.mako:770
+#: src/jobsub/templates/designs.mako:766
 msgid "First"
 msgstr "처음"
 
-#: src/jobsub/templates/designs.mako:771
+#: src/jobsub/templates/designs.mako:767
 msgid "Last"
 msgstr "마지막"
 
-#: src/jobsub/templates/designs.mako:772
+#: src/jobsub/templates/designs.mako:768
 msgid "Next"
 msgstr "다음"
 
-#: src/jobsub/templates/designs.mako:773
+#: src/jobsub/templates/designs.mako:769
 msgid "Previous"
 msgstr "이전"
 
+#~ msgid "Location on HDFS where the jobsub examples and templates are stored."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Deprecated, use liboozie.conf.OOZIE_URL instead. "
+#~ "URL of Oozie server. This is "
+#~ "required for job submission."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Deprecated, use liboozie.conf.SECURITY_ENABLED "
+#~ "instead. Whether Oozie requires client "
+#~ "to do perform Kerberos authentication"
+#~ msgstr ""
+
+#~ msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
+#~ msgstr ""
+
+#~ msgid "Job design already submitted (Oozie job id %(id)s)."
+#~ msgstr ""
+
+#~ msgid "Failed to access deployment directory."
+#~ msgstr ""
+
+#~ msgid "Failed to obtain HDFS reference. Check your configuration."
+#~ msgstr ""
+
+#~ msgid "Unexpected fixture type."
+#~ msgstr ""
+
+#~ msgid "Expected sample user fixture."
+#~ msgstr ""
+
+#~ msgid "Job Designs"
+#~ msgstr ""
+
+#~ msgid "Create Ssh design"
+#~ msgstr ""
+
+#~ msgid "Trash"
+#~ msgstr ""
+
+#~ msgid "Empty"
+#~ msgstr ""
+
+#~ msgid "Delete the selected designs?"
+#~ msgstr ""
+
+#~ msgid "Restore the selected designs?"
+#~ msgstr ""
+
+#~ msgid "Job properties"
+#~ msgstr ""

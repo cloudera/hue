@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -38,27 +38,42 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "%s という名前のクラスタが設定に存在しません。"
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
 msgstr "Kerberos プリンシパル名が  hbase-site.xml 設定ファイルに見つかりません。"
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "クラスターを構成する HBase Thrift サーバーを、(name|host:port) の形式で指定したカンマ区切りリストです。セキュリティで保護される完全なホスト名を使用します。つまり、権限の借用で SSL と http モードを使用する場合、ホスト名の前に https:// を指定します。"
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"クラスターを構成する HBase Thrift サーバーを、(name|host:port) "
+"の形式で指定したカンマ区切りリストです。セキュリティで保護される完全なホスト名を使用します。つまり、権限の借用で SSL と http "
+"モードを使用する場合、ホスト名の前に https:// を指定します。"
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "切り詰めの実行前に取得された行または行ごとの列のハード制限です。"
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "HBase Thrift サーバーのデフォルトである 'buffered' はセキュリティをサポートします。'framed' を使用する応答を集めることができます。これは、 Thrift でノンブロッキングサーバーと組み合わせて使用する場合に役に立ちます。"
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"HBase Thrift サーバーのデフォルトである 'buffered' はセキュリティをサポートします。'framed' "
+"を使用する応答を集めることができます。これは、 Thrift でノンブロッキングサーバーと組み合わせて使用する場合に役に立ちます。"
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "hbase-site.xml を保存する HBase 設定ディレクトリ。"
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
 msgstr "hbase-site.xml プロパティにかかわらず、権限の借用と同様に、Http Thrift モードの使用を Hue に強制します。"
 
 #: src/hbase/views.py:135
@@ -172,8 +187,12 @@ msgid "Add a column property"
 msgstr "列のプロパティを追加"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -383,9 +402,14 @@ msgstr "整数"
 msgid "Column Range"
 msgstr "列の範囲"
 
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "検索条件に一致するグループが存在しません。"
+#~ msgid "About Hue"
+#~ msgstr ""
 
-#~ msgid "OK"
-#~ msgstr "OK"
+#~ msgid "Configuration"
+#~ msgstr ""
 
+#~ msgid "Check for misconfiguration"
+#~ msgstr ""
+
+#~ msgid "Server Logs"
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/liboozie/conf.py:31
-msgid "URL of Oozie server. This is required for job submission. Empty value disables the config check."
+msgid ""
+"URL of Oozie server. This is required for job submission. Empty value "
+"disables the config check."
 msgstr "Oozie 서버의 URL입니다. 작업 제출 시 필요합니다. 빈 값은 구성 확인을 해제합니다."
 
 #: src/liboozie/conf.py:37
@@ -26,18 +28,33 @@ msgid "Whether Oozie requires client to perform Kerberos authentication."
 msgstr "Oozie에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
 #: src/liboozie/conf.py:44
-msgid "Location on HDFS where the workflows/coordinators are deployed when submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. /user/$USER/hue/deployments/$JOBID-$TIME"
-msgstr "비소유자가 제출했을 경우 Workflow/Coordinator가 배포되는 HDFS상의 위치입니다. 매개변수는 $TIME, $USER 및 $JOBID(예: /user/$USER/hue/deployments/$JOBID-$TIME)입니다."
+msgid ""
+"Location on HDFS where the workflows/coordinators are deployed when "
+"submitted by a non-owner. Parameters are $TIME, $USER and $JOBID, e.g. "
+"/user/$USER/hue/deployments/$JOBID-$TIME"
+msgstr ""
+"비소유자가 제출했을 경우 Workflow/Coordinator가 배포되는 HDFS상의 위치입니다. 매개변수는 $TIME, $USER"
+" 및 $JOBID(예: /user/$USER/hue/deployments/$JOBID-$TIME)입니다."
 
-#: src/liboozie/conf.py:83
+#: src/liboozie/conf.py:55
+msgid ""
+"Whether Hue append jar paths to the oozie.libpath instead of copying them"
+" into the workspace. This makes submissions faster and less prone to HDFS"
+" permission errors"
+msgstr ""
+"Hue가 jar 경로를 작업 영역에 복사하는 대신 oozie.libpath에"
+" 추가할지 여부. 제출 속도가 빨라지고 HDFS"
+" 권한 오류가 줄어듭니다."
+
+#: src/liboozie/conf.py:90
 msgid "The Oozie server is not available"
 msgstr "Oozie Server를 사용할 수 없습니다."
 
-#: src/liboozie/conf.py:99
+#: src/liboozie/conf.py:106
 msgid "Oozie Share Lib path is not available"
 msgstr "Oozie Share Lib 경로를 사용할 수 없음"
 
-#: src/liboozie/conf.py:108
+#: src/liboozie/conf.py:115
 msgid "Oozie Share Lib not installed in default location."
 msgstr "Oozie Share Lib가 기본 위치에 설치되어 있지 않습니다."
 
@@ -46,17 +63,17 @@ msgstr "Oozie Share Lib가 기본 위치에 설치되어 있지 않습니다."
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "이미 제출됨(Oozie Job ID %s)"
 
-#: src/liboozie/submission2.py:177 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:181 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "배포 디렉토리 %s을(를) 생성하지 못했습니다."
 
-#: src/liboozie/submission2.py:288 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:336 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "경로가 디렉토리가 아닙니다: %s."
 
-#: src/liboozie/submission2.py:293 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:341 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"
@@ -70,3 +87,14 @@ msgstr "권한 부족."
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."
 
+#~ msgid "URL of Oozie server. This is required for job submission."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Location on HDFS where the "
+#~ "workflows/coordinators are deployed when "
+#~ "submitted by a non-owner."
+#~ msgstr ""
+
+#~ msgid "Failed to access deployment directory."
+#~ msgstr ""

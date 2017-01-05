@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:56-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -104,7 +104,7 @@ msgstr "ジョブを削除できませんでした。"
 msgid "Could not start job."
 msgstr "ジョブを開始できませんでした。"
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:848
 msgid "Could not stop job."
 msgstr "ジョブを停止できませんでした。"
 
@@ -284,7 +284,7 @@ msgstr "戻る"
 
 #: src/sqoop/templates/app.mako:211
 msgid "Next"
-msgstr "次へ"
+msgstr "次ヘ"
 
 #: src/sqoop/templates/app.mako:214 src/sqoop/templates/app.mako:276
 msgid "Save"
@@ -374,110 +374,154 @@ msgstr "True"
 msgid "False"
 msgstr "False"
 
-#: src/sqoop/templates/app.mako:725
+#: src/sqoop/templates/app.mako:722
 msgid "Step 1: From"
 msgstr "手順 1：元"
 
-#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
+#: src/sqoop/templates/app.mako:723 src/sqoop/templates/app.mako:745
 msgid "Database"
 msgstr "データベース"
 
-#: src/sqoop/templates/app.mako:732
+#: src/sqoop/templates/app.mako:729
 msgid "Step 2: To"
 msgstr "手順 2：先"
 
-#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
+#: src/sqoop/templates/app.mako:730 src/sqoop/templates/app.mako:752
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:740
+#: src/sqoop/templates/app.mako:737
 msgid "Step 1: Information"
 msgstr "手順 1：情報"
 
-#: src/sqoop/templates/app.mako:741
+#: src/sqoop/templates/app.mako:738
 msgid "Connection"
 msgstr "接続"
 
-#: src/sqoop/templates/app.mako:747
+#: src/sqoop/templates/app.mako:744
 msgid "Step 2: From"
 msgstr "手順 2：元"
 
-#: src/sqoop/templates/app.mako:754
+#: src/sqoop/templates/app.mako:751
 msgid "Step 3: To"
 msgstr "手順 3：先"
 
-#: src/sqoop/templates/app.mako:821
+#: src/sqoop/templates/app.mako:818
 msgid "Please specify a link."
 msgstr "リンクを指定してください。"
 
-#: src/sqoop/templates/app.mako:830
+#: src/sqoop/templates/app.mako:827
 msgid "Cannot connect to sqoop server."
 msgstr "Sqoop サーバーに接続できません。"
 
-#: src/sqoop/templates/app.mako:835
+#: src/sqoop/templates/app.mako:832
 msgid "The job is starting..."
 msgstr "ジョブを開始しています..."
 
-#: src/sqoop/templates/app.mako:839
+#: src/sqoop/templates/app.mako:836
 msgid "Started job."
 msgstr "ジョブを開始しました。"
 
-#: src/sqoop/templates/app.mako:843
+#: src/sqoop/templates/app.mako:840
 msgid "Error: "
 msgstr "エラー： "
 
-#: src/sqoop/templates/app.mako:847
+#: src/sqoop/templates/app.mako:844
 msgid "Stopped job."
 msgstr "ジョブを停止しました。"
 
-#: src/sqoop/templates/app.mako:855
+#: src/sqoop/templates/app.mako:852
 msgid "Could not load node."
 msgstr "ノードをロードできませんでした。"
 
-#: src/sqoop/templates/app.mako:904
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "ご存知ですか？ Tab キーを使用するか、CTRL キーを押しながら Space キーを押して、ファイル名やフォルダ名のオートコンプリートが可能です"
+#: src/sqoop/templates/app.mako:901
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"ご存知ですか？ Tab キーを使用するか、CTRL キーを押しながら Space "
+"キーを押して、ファイル名やフォルダー名のオートコンプリートが可能です"
 
-#: src/sqoop/templates/app.mako:971
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
+#: src/sqoop/templates/app.mako:968
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
 msgstr "サーバーで問題が発生しました。Sqoop2 サーバーログで詳細を確認してください。"
 
-#: src/sqoop/templates/app.mako:974
+#: src/sqoop/templates/app.mako:971
 msgid "Unknown error."
 msgstr "不明なエラーです。"
 
-#: src/sqoop/templates/app.mako:1079
+#: src/sqoop/templates/app.mako:1076
 msgid "Watch out! This path currently does not exist."
 msgstr "注意してください。このパスは現在存在しません。"
 
-#: src/sqoop/templates/app.mako:1160
+#: src/sqoop/templates/app.mako:1157
 msgid "Untitled Job"
 msgstr "無題のジョブ"
 
-#~ msgid "Last run: "
-#~ msgstr "前回の実行： "
+#~ msgid "Could not get connections."
+#~ msgstr ""
 
-#~ msgid "Job type"
-#~ msgstr "ジョブタイプ"
+#~ msgid "Error saving connection"
+#~ msgstr ""
 
-#~ msgid "Import from a Database to Hadoop"
-#~ msgstr "データベースから Hadoop にインポート"
+#~ msgid "Could not create connection."
+#~ msgstr ""
 
-#~ msgid "Import"
-#~ msgstr "インポート"
+#~ msgid "Could not update connection."
+#~ msgstr ""
 
-#~ msgid "Import from Hadoop to a Database"
-#~ msgstr "Hadoop からデータベースにインポート"
+#~ msgid "Could not clone connection."
+#~ msgstr ""
 
-#~ msgid "Export"
-#~ msgstr "エクスポート"
+#~ msgid "Could not delete connection."
+#~ msgstr ""
 
-#~ msgid "Choose..."
-#~ msgstr "選択..."
+#~ msgid "Could not get connection."
+#~ msgstr ""
 
-#~ msgid "Step 1: To"
-#~ msgstr "手順 1：先"
+#~ msgid "Could not get framework."
+#~ msgstr ""
 
-#~ msgid "Step 1: Type"
-#~ msgstr "手順 1：タイプ"
+#~ msgid "Please click on \"New Job\" to add one."
+#~ msgstr ""
 
+#~ msgid "Create a job"
+#~ msgstr ""
+
+#~ msgid "Previous"
+#~ msgstr ""
+
+#~ msgid "Back to job"
+#~ msgstr ""
+
+#~ msgid "Create a connection"
+#~ msgstr ""
+
+#~ msgid "Back to editing a job"
+#~ msgstr ""
+
+#~ msgid "Select job type"
+#~ msgstr ""
+
+#~ msgid "Select connection"
+#~ msgstr ""
+
+#~ msgid "Step 1: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 2: Sqoop specific"
+#~ msgstr ""
+
+#~ msgid "Step 1: Manage connections"
+#~ msgstr ""
+
+#~ msgid "Step 2: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 3: Sqoop specific job info"
+#~ msgstr ""
+
+#~ msgid "Could not start job: "
+#~ msgstr ""

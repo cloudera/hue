@@ -1,14 +1,14 @@
 # German translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -38,28 +38,52 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "Cluster mit Namen %s ist in der Konfiguration nicht vorhanden."
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
-msgstr "Der Kerberos-Principal-Name fehlt in der Konfigurationsdatei hbase-site.xml."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
+msgstr ""
+"Der Kerberos-Principal-Name fehlt in der Konfigurationsdatei hbase-"
+"site.xml."
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "Durch Kommas abgetrennte Liste von HBase Thrift-Servern für Cluster im Format \"(name|host:port)\". Verwenden Sie den vollständigen Hostnamen mit Sicherheit. Stellen Sie dem Hostnamen https:// voran, wenn Sie SSL und den HTTP-Modus mit Identitätswechsel verwenden."
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"Durch Kommas abgetrennte Liste von HBase Thrift-Servern für Cluster im "
+"Format \"(name|host:port)\". Verwenden Sie den vollständigen Hostnamen "
+"mit Sicherheit. Stellen Sie dem Hostnamen https:// voran, wenn Sie SSL "
+"und den HTTP-Modus mit Identitätswechsel verwenden."
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
-msgstr "Feste Begrenzung der Zeilen oder Spalten pro vor der Kürzung abgerufener Zeile."
+msgstr ""
+"Feste Begrenzung der Zeilen oder Spalten pro vor der Kürzung abgerufener "
+"Zeile."
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "\"buffered\" ist der Standard des HBase Thrift Server und unterstützt Sicherheit. \"framed\" kann verwendet werden, um Antworten zu teilen, was in Verbindung mit dem nicht sperrenden Server in Thrift zu empfehlen ist."
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"\"buffered\" ist der Standard des HBase Thrift Server und unterstützt "
+"Sicherheit. \"framed\" kann verwendet werden, um Antworten zu teilen, was"
+" in Verbindung mit dem nicht sperrenden Server in Thrift zu empfehlen "
+"ist."
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "Verzeichnis der Hive-Konfiguration, in dem sich hive-site.xml befindet."
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
-msgstr "Zwingt Hue, ungeachtet der Eigenschaften in hbase-site.xml den HTTP-Thrift-Modus mit doAs-Identitätswechsel zu verwenden."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
+msgstr ""
+"Zwingt Hue, ungeachtet der Eigenschaften in hbase-site.xml den HTTP-"
+"Thrift-Modus mit doAs-Identitätswechsel zu verwenden."
 
 #: src/hbase/views.py:135
 msgid "A POST request is required."
@@ -172,8 +196,12 @@ msgid "Add a column property"
 msgstr "Spalteneigenschaft hinzufügen"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -383,9 +411,14 @@ msgstr "Ganzzahl"
 msgid "Column Range"
 msgstr "Spaltenbereich"
 
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "Es gibt keine Tabellen, die den Suchkriterien entsprechen."
+#~ msgid "About Hue"
+#~ msgstr ""
 
-#~ msgid "OK"
-#~ msgstr "OK"
+#~ msgid "Configuration"
+#~ msgstr ""
 
+#~ msgid "Check for misconfiguration"
+#~ msgstr ""
+
+#~ msgid "Server Logs"
+#~ msgstr ""

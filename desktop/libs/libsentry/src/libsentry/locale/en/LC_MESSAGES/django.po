@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2013-05-10 11:59-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,25 +17,43 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/conf.py:26
-msgid "Host of the Impala Server."
+#: src/libsentry/api.py:239 src/libsentry/api2.py:238
+msgid "No Sentry servers are available."
 msgstr ""
 
-#: src/impala/conf.py:31
-msgid "Port of the Impala Server."
+#: src/libsentry/api.py:268 src/libsentry/api2.py:267
+msgid "Error in retrieving Sentry server properties from Zookeeper."
 msgstr ""
 
-#: src/impala/conf.py:37
-msgid ""
-"Beeswax or Hive Server 2 Thrift API used. Choices are: 'beeswax' or "
-"'hiveserver2'."
+#: src/libsentry/conf.py:29
+msgid "Hostname or IP of server."
 msgstr ""
 
-#: src/impala/conf.py:42
-msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
+#: src/libsentry/conf.py:36
+msgid "Port the sentry service is running on."
 msgstr ""
 
-#: src/impala/views.py:35
-msgid "A POST request is required."
+#: src/libsentry/conf.py:43
+msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr ""
+
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""
 
