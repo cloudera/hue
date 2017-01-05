@@ -280,7 +280,7 @@ ${ assist.assistPanel() }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Format')}</h3>
       <div class="card-body">
-        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileType, optionsText: 'description'"></select></label>
+        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select></label>
         <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
         </span>
@@ -1135,6 +1135,16 @@ ${ assist.assistPanel() }
         }
       });
 
+      self.fileTypeName = ko.observable();
+      self.fileTypeName.subscribe(function (newType) {
+        for (var i = 0; i < self.fileTypes.length; i++) {
+          if (self.fileTypes[i].name == newType) {
+            self.fileType(self.fileTypes[i]);
+            break;
+          }
+        }
+      });
+
       self.operationTypes = ${operators_json | n};
 
       self.fieldTypes = ${fields_json | n}.solr;
@@ -1171,20 +1181,26 @@ ${ assist.assistPanel() }
         return self.destination.name().length > 0 && validFields;
       });
 
-      self.source.format.subscribe(function () {
+      self.formatTypeSubscribed = false;
+
+      self.source.format.subscribe(function (newVal) {
         for (var i = 0; i < self.fileTypes.length; i++) {
           if (self.fileTypes[i].name == self.source.format().type()) {
             self.fileType(self.fileTypes[i]);
+            self.fileTypeName(self.fileTypes[i].name);
             break;
           }
         }
 
         if (self.source.format().type) {
-          self.source.format().type.subscribe(function (newType) {
-            self.source.format(new FileType(newType));
-            self.destination.columns.removeAll();
-            self.guessFieldTypes();
-          });
+          if (!self.formatTypeSubscribed) {
+            self.formatTypeSubscribed = true;
+            self.source.format().type.subscribe(function (newType) {
+              self.source.format(new FileType(newType));
+              self.destination.columns.removeAll();
+              self.guessFieldTypes();
+            });
+          }
         }
       });
 
