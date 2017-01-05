@@ -17,8 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD, \
-                         AUTH_PASSWORD_SCRIPT, default_ssl_validate
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, default_ssl_validate
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root
 
@@ -28,14 +27,6 @@ from metadata.settings import DJANGO_APPS
 def get_auth_username():
   """Get from top level default from desktop"""
   return DEFAULT_AUTH_USERNAME.get()
-
-
-def get_auth_password():
-  """Get from script or backward compatibility"""
-  password = AUTH_PASSWORD_SCRIPT.get()
-  if password:
-    return password
-  return DEFAULT_AUTH_PASSWORD.get()
 
 
 def default_navigator_config_dir():
@@ -84,7 +75,7 @@ OPTIMIZER = ConfigSection(
       key="product_secret",
       help=_t("A secret passphrase associated with the productName."),
       private=True,
-      dynamic_default=get_auth_password),
+      default=None),
     PRODUCT_SECRET_SCRIPT=Config(
       key="product_secret_script",
       help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
@@ -95,7 +86,7 @@ OPTIMIZER = ConfigSection(
       key="product_auth_secret",
       help=_t("A secret passphrase associated with the productName."),
       private=True,
-      dynamic_default=get_auth_password),
+      default=None),
     PRODUCT_AUTH_SECRET_SCRIPT=Config(
       key="product_auth_secret_script",
       help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
@@ -112,7 +103,7 @@ OPTIMIZER = ConfigSection(
       key="email_password",
       help=_t("The password associated with the Optimizer account you to associate with the Product."),
       private=True,
-      dynamic_default=get_auth_password),
+      default=None),
     EMAIL_PASSWORD_SCRIPT=Config(
       key="password_script",
       help=_t("Execute this script to produce the email password. This will be used when `email_password` is not set."),
@@ -128,6 +119,11 @@ OPTIMIZER = ConfigSection(
     ),
   )
 )
+
+
+def get_navigator_auth_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_PASSWORD_SCRIPT.get()
 
 
 NAVIGATOR = ConfigSection(
@@ -146,7 +142,7 @@ NAVIGATOR = ConfigSection(
       key="auth_password",
       help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
       private=True,
-      dynamic_default=get_auth_password),
+      dynamic_default=get_navigator_auth_password),
     AUTH_PASSWORD_SCRIPT=Config(
       key="auth_password_script",
       help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
