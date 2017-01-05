@@ -89,6 +89,7 @@ var SqlAutocompleter3 = (function () {
     self.paths = ko.observableArray();
 
     self.joins = ko.observableArray();
+    self.joinConditions = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
@@ -99,12 +100,14 @@ var SqlAutocompleter3 = (function () {
     self.loadingPaths = ko.observable(false);
 
     self.loadingJoins = ko.observable(false);
+    self.loadingJoinConditions = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
       var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(),
-          self.functions(), self.databases(), self.tables(), self.columns(), self.values(), self.paths(), self.joins());
+          self.functions(), self.databases(), self.tables(), self.columns(), self.values(), self.paths(), self.joins(),
+          self.joinConditions());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -186,6 +189,7 @@ var SqlAutocompleter3 = (function () {
     self.paths([]);
 
     self.joins([]);
+    self.joinConditions([]);
 
     self.loadingKeywords(false);
     self.loadingFunctions(false);
@@ -196,6 +200,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingPaths(false);
 
     self.loadingJoins(false);
+    self.loadingJoinConditions(false);
 
     self.filter('');
 
@@ -214,8 +219,10 @@ var SqlAutocompleter3 = (function () {
     var pathsDeferred = self.handlePaths();
 
     var joinsDeferred = self.handleJoins();
+    var joinConditionsDeferred = self.handleJoinConditions();
 
-    $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred).done(function () {
+    $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
+        joinConditionsDeferred).done(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -689,7 +696,7 @@ var SqlAutocompleter3 = (function () {
     var suggestJoins = self.parseResult.suggestJoins;
     if (HAS_OPTIMIZER && suggestJoins) {
       self.loadingJoins(true);
-      self.snippet.getApiHelper().fetchNavOptPopularJoins({
+      self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
         defaultDatabase: self.activeDatabase,
@@ -758,6 +765,59 @@ var SqlAutocompleter3 = (function () {
       joinsDeferred.resolve([]);
     }
     return joinsDeferred;
+  };
+
+  Suggestions.prototype.handleJoinConditions = function () {
+    var self = this;
+    var joinConditionsDeferred = $.Deferred();
+    var suggestJoinConditions = self.parseResult.suggestJoinConditions;
+    if (HAS_OPTIMIZER && suggestJoinConditions) {
+      self.loadingJoinConditions(true);
+      self.apiHelper.fetchNavOptPopularJoins({
+        sourceType: self.snippet.type(),
+        timeout: AUTOCOMPLETE_TIMEOUT,
+        defaultDatabase: self.activeDatabase,
+        silenceErrors: true,
+        tables: suggestJoinConditions.tables,
+        successCallback: function (data) {
+          var joinConditionSuggestions = [];
+          data.values.forEach(function (value) {
+            if (value.joinCols.length > 0) {
+              var suggestionString = suggestJoinConditions.prependOn ? (self.parseResult.lowerCase ? 'on ' : 'ON ') : '';
+              var first = true;
+              value.joinCols.forEach(function (joinColPair) {
+                if (!first) {
+                  suggestionString += self.parseResult.lowerCase ? ' and ' : ' AND ';
+                }
+                suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoinConditions.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoinConditions.tables);
+                first = false;
+              });
+              joinConditionSuggestions.push({
+                value: suggestionString,
+                meta: AutocompleterGlobals.i18n.meta.joinCondition,
+                weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
+                detailsTemplate: 'join-condition',
+                details: {
+                  // TODO: Add more details about the join conditions
+                  completeValue: suggestionString
+                }
+              });
+            }
+          });
+          self.joinConditions(joinConditionSuggestions);
+          joinConditionsDeferred.resolve();
+          self.loadingJoinConditions(false);
+        },
+        errorCallback: function () {
+          self.loadingJoinConditions(false);
+          joinConditionsDeferred.resolve([]);
+        }
+      });
+    } else {
+      joinConditionsDeferred.resolve([]);
+    }
+
+    return joinConditionsDeferred;
   };
 
   Suggestions.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {
