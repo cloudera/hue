@@ -1569,6 +1569,7 @@ var EditorViewModel = (function() {
     self.historyFilter.subscribe(function(val){
       self.fetchHistory();
     });
+    self.loadingHistory = ko.observable(self.history().length == 0);
 
     self.schedulerViewModel = null;
     self.schedulerViewModelIsLoaded = ko.observable(false);
@@ -1585,8 +1586,6 @@ var EditorViewModel = (function() {
 
     self.avoidClosing = false;
 
-    self.loadingHistory = ko.observable(self.history().length == 0);
-    // TODO: Move fetchHistory and clearHistory into the Snippet and drop self.selectedSnippet. Actually, history should go in the assist in Hue 4.
     self.getSession = function (session_type) {
       var _s = null;
       $.each(self.sessions(), function (index, s) {
@@ -1920,7 +1919,8 @@ var EditorViewModel = (function() {
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
         limit: 50,
-        doc_text: self.historyFilter()
+        doc_text: self.historyFilter(),
+        is_history: vm.isHistory()
       }, function(data) {
         var parsedHistory = [];
         if (data && data.history){
@@ -2170,6 +2170,7 @@ var EditorViewModel = (function() {
     self.userId = options.userId;
     self.isMobile = ko.observable(options.mobile);
     self.isResponsive = ko.observable(options.responsive);
+    self.isHistory = ko.observable(options.is_history || false);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
       self.editorMode(newVal != 'notebook');

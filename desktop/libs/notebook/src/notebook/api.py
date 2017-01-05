@@ -420,8 +420,12 @@ def get_history(request):
   doc_type = request.GET.get('doc_type')
   doc_text = request.GET.get('doc_text')
   limit = min(request.GET.get('len', 50), 100)
+  is_history = request.GET.get('is_history', 'false') == 'true'
 
-  docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+  if is_history:
+    docs = Document2.objects.get_tasks_history(user=request.user)
+  else:
+    docs = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
 
   if doc_text:
     docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text) | Q(search__icontains=doc_text))
