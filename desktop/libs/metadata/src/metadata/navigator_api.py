@@ -244,7 +244,7 @@ def _augment_highlighting(query_s, records):
   for record in records:
     name = record.get('originalName', '')
     record['hue_description'] = ''
-    record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.')
+    record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.') if record.get('parentPath') else ''
 
     for term in ts:
       name = _highlight(term, name)
