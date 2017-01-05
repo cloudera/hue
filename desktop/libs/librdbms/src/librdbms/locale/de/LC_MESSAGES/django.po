@@ -1,14 +1,14 @@
 # German translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -30,8 +30,12 @@ msgid "Nice name of server."
 msgstr "Servername."
 
 #: src/librdbms/conf.py:39
-msgid "Database name or path to database file. If provided, then choosing other databases will not be permitted."
-msgstr "Datenbankname oder Pfad zur Datenbankdatei. Wenn dies angegeben wird, ist das Auswählen anderer Datenbanken nicht zulässig."
+msgid ""
+"Database name or path to database file. If provided, then choosing other "
+"databases will not be permitted."
+msgstr ""
+"Datenbankname oder Pfad zur Datenbankdatei. Wenn dies angegeben wird, ist"
+" das Auswählen anderer Datenbanken nicht zulässig."
 
 #: src/librdbms/conf.py:45
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
@@ -46,8 +50,12 @@ msgid "Database password."
 msgstr "Datenbank-Kennwort."
 
 #: src/librdbms/conf.py:63
-msgid "Execute this script to produce the database password. This will be used when `password` is not set."
-msgstr "Führen Sie dieses Skript aus, um das Datenbankkennwort zu generieren. Dieses wird verwendet, wenn \"password\" nicht festgelegt ist."
+msgid ""
+"Execute this script to produce the database password. This will be used "
+"when `password` is not set."
+msgstr ""
+"Führen Sie dieses Skript aus, um das Datenbankkennwort zu generieren. "
+"Dieses wird verwendet, wenn \"password\" nicht festgelegt ist."
 
 #: src/librdbms/conf.py:69
 msgid "Database host."
@@ -59,15 +67,21 @@ msgstr "Datenbank-Port."
 
 #: src/librdbms/conf.py:81
 msgid "Database options to send to the server when connecting."
-msgstr "Datenbankoptionen, die beim Verbindungsaufbau an den Server gesendet werden."
+msgstr ""
+"Datenbankoptionen, die beim Verbindungsaufbau an den Server gesendet "
+"werden."
 
 #: src/librdbms/conf.py:97
 msgid "Database name should not be empty for the SQLite backend."
 msgstr "Datenbankname darf für das SQLite-Backend nicht leer sein."
 
 #: src/librdbms/conf.py:99
-msgid "Database name should not be empty for the Oracle backend. It should be the SID of your database."
-msgstr "Datenbankname darf für das Oracle-Backend nicht leer sein. Es muss die SID Ihrer Datenbank sein."
+msgid ""
+"Database name should not be empty for the Oracle backend. It should be "
+"the SID of your database."
+msgstr ""
+"Datenbankname darf für das Oracle-Backend nicht leer sein. Es muss die "
+"SID Ihrer Datenbank sein."
 
 #: src/librdbms/conf.py:101
 msgid "Database name should not be empty for the PostgreSQL backend."
@@ -89,5 +103,26 @@ msgstr "Datenbank \"%s\" ist nicht zulässig. Verwenden Sie Datenbank \"%s\"."
 #: src/librdbms/server/mysql_lib.py:107
 #, python-format
 msgid "Cannot locate the %s database. Are you sure your configuration is correct?"
-msgstr "Datenbank %s nicht gefunden. Sind Sie sicher, dass Ihre Konfiguration korrekt ist?"
+msgstr ""
+"Datenbank %s nicht gefunden. Sind Sie sicher, dass Ihre Konfiguration "
+"korrekt ist?"
 
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
+
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""
+
+#~ msgid "A POST request is required."
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:56-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -104,7 +104,7 @@ msgstr "No se ha podido eliminar el job."
 msgid "Could not start job."
 msgstr "No se ha podido iniciar el job."
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:848
 msgid "Could not stop job."
 msgstr "No se ha podido detener el job."
 
@@ -374,110 +374,156 @@ msgstr "True"
 msgid "False"
 msgstr "False"
 
-#: src/sqoop/templates/app.mako:725
+#: src/sqoop/templates/app.mako:722
 msgid "Step 1: From"
 msgstr "Paso 1: de"
 
-#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
+#: src/sqoop/templates/app.mako:723 src/sqoop/templates/app.mako:745
 msgid "Database"
 msgstr "Base de datos"
 
-#: src/sqoop/templates/app.mako:732
+#: src/sqoop/templates/app.mako:729
 msgid "Step 2: To"
 msgstr "Paso 2: a"
 
-#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
+#: src/sqoop/templates/app.mako:730 src/sqoop/templates/app.mako:752
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:740
+#: src/sqoop/templates/app.mako:737
 msgid "Step 1: Information"
 msgstr "Paso 1: información"
 
-#: src/sqoop/templates/app.mako:741
+#: src/sqoop/templates/app.mako:738
 msgid "Connection"
 msgstr "Conexión"
 
-#: src/sqoop/templates/app.mako:747
+#: src/sqoop/templates/app.mako:744
 msgid "Step 2: From"
 msgstr "Paso 2: de"
 
-#: src/sqoop/templates/app.mako:754
+#: src/sqoop/templates/app.mako:751
 msgid "Step 3: To"
 msgstr "Paso 3: a"
 
-#: src/sqoop/templates/app.mako:821
+#: src/sqoop/templates/app.mako:818
 msgid "Please specify a link."
 msgstr "Especifique un enlace."
 
-#: src/sqoop/templates/app.mako:830
+#: src/sqoop/templates/app.mako:827
 msgid "Cannot connect to sqoop server."
 msgstr "No se puede acceder a Sqoop Server."
 
-#: src/sqoop/templates/app.mako:835
+#: src/sqoop/templates/app.mako:832
 msgid "The job is starting..."
 msgstr "El job se está iniciando..."
 
-#: src/sqoop/templates/app.mako:839
+#: src/sqoop/templates/app.mako:836
 msgid "Started job."
 msgstr "Job iniciado."
 
-#: src/sqoop/templates/app.mako:843
+#: src/sqoop/templates/app.mako:840
 msgid "Error: "
 msgstr "Error: "
 
-#: src/sqoop/templates/app.mako:847
+#: src/sqoop/templates/app.mako:844
 msgid "Stopped job."
 msgstr "Job detenido."
 
-#: src/sqoop/templates/app.mako:855
+#: src/sqoop/templates/app.mako:852
 msgid "Could not load node."
 msgstr "No se ha podido cargar el nodo."
 
-#: src/sqoop/templates/app.mako:904
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
-msgstr "¿Sabía que puede usar el tabulador o CTRL + Espacio para autocompletar los nombres de archivo y de carpeta?"
+#: src/sqoop/templates/app.mako:901
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
+msgstr ""
+"¿Sabía que puede usar el tabulador o CTRL + Espacio para autocompletar "
+"los nombres de archivo y de carpeta?"
+
+#: src/sqoop/templates/app.mako:968
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
+msgstr ""
+"Se ha producido un problema con el servidor. Consulte los registros del "
+"servidor Sqoop2 para obtener más información."
 
 #: src/sqoop/templates/app.mako:971
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
-msgstr "Se ha producido un problema con el servidor. Consulte los registros del servidor Sqoop2 para obtener más información."
-
-#: src/sqoop/templates/app.mako:974
 msgid "Unknown error."
 msgstr "Error desconocido."
 
-#: src/sqoop/templates/app.mako:1079
+#: src/sqoop/templates/app.mako:1076
 msgid "Watch out! This path currently does not exist."
 msgstr "Atención. Esta ruta no existe actualmente."
 
-#: src/sqoop/templates/app.mako:1160
+#: src/sqoop/templates/app.mako:1157
 msgid "Untitled Job"
 msgstr "Job sin título"
 
-#~ msgid "Last run: "
-#~ msgstr "Última ejecución: "
+#~ msgid "Could not get connections."
+#~ msgstr ""
 
-#~ msgid "Job type"
-#~ msgstr "Tipo de job"
+#~ msgid "Error saving connection"
+#~ msgstr ""
 
-#~ msgid "Import from a Database to Hadoop"
-#~ msgstr "Importar desde una base de datos a Hadoop"
+#~ msgid "Could not create connection."
+#~ msgstr ""
 
-#~ msgid "Import"
-#~ msgstr "Importar"
+#~ msgid "Could not update connection."
+#~ msgstr ""
 
-#~ msgid "Import from Hadoop to a Database"
-#~ msgstr "Importar desde Hadoop a una base de datos"
+#~ msgid "Could not clone connection."
+#~ msgstr ""
 
-#~ msgid "Export"
-#~ msgstr "Exportar"
+#~ msgid "Could not delete connection."
+#~ msgstr ""
 
-#~ msgid "Choose..."
-#~ msgstr "Elegir..."
+#~ msgid "Could not get connection."
+#~ msgstr ""
 
-#~ msgid "Step 1: To"
-#~ msgstr "Paso 1: a"
+#~ msgid "Could not get framework."
+#~ msgstr ""
 
-#~ msgid "Step 1: Type"
-#~ msgstr "Paso 1: tipo"
+#~ msgid "Please click on \"New Job\" to add one."
+#~ msgstr ""
 
+#~ msgid "Create a job"
+#~ msgstr ""
+
+#~ msgid "Previous"
+#~ msgstr ""
+
+#~ msgid "Back to job"
+#~ msgstr ""
+
+#~ msgid "Create a connection"
+#~ msgstr ""
+
+#~ msgid "Back to editing a job"
+#~ msgstr ""
+
+#~ msgid "Select job type"
+#~ msgstr ""
+
+#~ msgid "Select connection"
+#~ msgstr ""
+
+#~ msgid "Step 1: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 2: Sqoop specific"
+#~ msgstr ""
+
+#~ msgid "Step 1: Manage connections"
+#~ msgstr ""
+
+#~ msgid "Step 2: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 3: Sqoop specific job info"
+#~ msgstr ""
+
+#~ msgid "Could not start job: "
+#~ msgstr ""

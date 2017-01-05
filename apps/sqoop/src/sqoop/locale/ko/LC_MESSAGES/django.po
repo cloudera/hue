@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:56-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -104,7 +104,7 @@ msgstr "Job을 삭제할 수 없습니다."
 msgid "Could not start job."
 msgstr "Job을 시작할 수 없습니다."
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:848
 msgid "Could not stop job."
 msgstr "Job을 중지할 수 없습니다."
 
@@ -336,7 +336,7 @@ msgstr "다음에 있는 서버 "
 
 #: src/sqoop/templates/app.mako:344 src/sqoop/templates/app.mako:350
 msgid " to "
-msgstr " ~ "
+msgstr " -> "
 
 #: src/sqoop/templates/app.mako:415
 msgid "From link"
@@ -374,110 +374,152 @@ msgstr "True"
 msgid "False"
 msgstr "False"
 
-#: src/sqoop/templates/app.mako:725
+#: src/sqoop/templates/app.mako:722
 msgid "Step 1: From"
 msgstr "1단계: 원본"
 
-#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
+#: src/sqoop/templates/app.mako:723 src/sqoop/templates/app.mako:745
 msgid "Database"
 msgstr "데이터베이스"
 
-#: src/sqoop/templates/app.mako:732
+#: src/sqoop/templates/app.mako:729
 msgid "Step 2: To"
 msgstr "2단계: 대상"
 
-#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
+#: src/sqoop/templates/app.mako:730 src/sqoop/templates/app.mako:752
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:740
+#: src/sqoop/templates/app.mako:737
 msgid "Step 1: Information"
 msgstr "1단계: 정보"
 
-#: src/sqoop/templates/app.mako:741
+#: src/sqoop/templates/app.mako:738
 msgid "Connection"
 msgstr "연결"
 
-#: src/sqoop/templates/app.mako:747
+#: src/sqoop/templates/app.mako:744
 msgid "Step 2: From"
 msgstr "2단계: 원본"
 
-#: src/sqoop/templates/app.mako:754
+#: src/sqoop/templates/app.mako:751
 msgid "Step 3: To"
 msgstr "3단계: 대상"
 
-#: src/sqoop/templates/app.mako:821
+#: src/sqoop/templates/app.mako:818
 msgid "Please specify a link."
 msgstr "링크를 지정하십시오."
 
-#: src/sqoop/templates/app.mako:830
+#: src/sqoop/templates/app.mako:827
 msgid "Cannot connect to sqoop server."
 msgstr "Sqoop Server에 연결할 수 없습니다."
 
-#: src/sqoop/templates/app.mako:835
+#: src/sqoop/templates/app.mako:832
 msgid "The job is starting..."
 msgstr "Job을 시작하는 중..."
 
-#: src/sqoop/templates/app.mako:839
+#: src/sqoop/templates/app.mako:836
 msgid "Started job."
 msgstr "Job을 시작했습니다."
 
-#: src/sqoop/templates/app.mako:843
+#: src/sqoop/templates/app.mako:840
 msgid "Error: "
 msgstr "오류: "
 
-#: src/sqoop/templates/app.mako:847
+#: src/sqoop/templates/app.mako:844
 msgid "Stopped job."
 msgstr "Job을 중지했습니다."
 
-#: src/sqoop/templates/app.mako:855
+#: src/sqoop/templates/app.mako:852
 msgid "Could not load node."
 msgstr "노드를 로드할 수 없습니다."
 
-#: src/sqoop/templates/app.mako:904
-msgid "Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names"
+#: src/sqoop/templates/app.mako:901
+msgid ""
+"Did you know? You can use the tab key or CTRL + Space to autocomplete "
+"file and folder names"
 msgstr "유용한 정보: tab 키 또는 Ctrl + Space를 사용하여 파일 및 폴더 이름을 자동 완성할 수 있습니다."
 
-#: src/sqoop/templates/app.mako:971
-msgid "There was a problem with the server. Look at the Sqoop2 server logs for more details."
+#: src/sqoop/templates/app.mako:968
+msgid ""
+"There was a problem with the server. Look at the Sqoop2 server logs for "
+"more details."
 msgstr "서버에 문제가 발생했습니다. 자세한 내용을 Sqoop2 server 로그를 참조하십시오."
 
-#: src/sqoop/templates/app.mako:974
+#: src/sqoop/templates/app.mako:971
 msgid "Unknown error."
 msgstr "알 수 없는 오류입니다."
 
-#: src/sqoop/templates/app.mako:1079
+#: src/sqoop/templates/app.mako:1076
 msgid "Watch out! This path currently does not exist."
 msgstr "주의하십시오! 이 경로가 현재 존재하지 않습니다."
 
-#: src/sqoop/templates/app.mako:1160
+#: src/sqoop/templates/app.mako:1157
 msgid "Untitled Job"
 msgstr "제목 없는 Job"
 
-#~ msgid "Last run: "
-#~ msgstr "마지막 실행: "
+#~ msgid "Could not get connections."
+#~ msgstr ""
 
-#~ msgid "Job type"
-#~ msgstr "Job 유형"
+#~ msgid "Error saving connection"
+#~ msgstr ""
 
-#~ msgid "Import from a Database to Hadoop"
-#~ msgstr "데이터베이스에서 Hadoop으로 가져오기"
+#~ msgid "Could not create connection."
+#~ msgstr ""
 
-#~ msgid "Import"
-#~ msgstr "가져오기"
+#~ msgid "Could not update connection."
+#~ msgstr ""
 
-#~ msgid "Import from Hadoop to a Database"
-#~ msgstr "Hadoop에서 데이터베이스로 가져오기"
+#~ msgid "Could not clone connection."
+#~ msgstr ""
 
-#~ msgid "Export"
-#~ msgstr "내보내기"
+#~ msgid "Could not delete connection."
+#~ msgstr ""
 
-#~ msgid "Choose..."
-#~ msgstr "선택..."
+#~ msgid "Could not get connection."
+#~ msgstr ""
 
-#~ msgid "Step 1: To"
-#~ msgstr "1단계: 대상"
+#~ msgid "Could not get framework."
+#~ msgstr ""
 
-#~ msgid "Step 1: Type"
-#~ msgstr "1단계: 유형"
+#~ msgid "Please click on \"New Job\" to add one."
+#~ msgstr ""
 
+#~ msgid "Create a job"
+#~ msgstr ""
+
+#~ msgid "Previous"
+#~ msgstr ""
+
+#~ msgid "Back to job"
+#~ msgstr ""
+
+#~ msgid "Create a connection"
+#~ msgstr ""
+
+#~ msgid "Back to editing a job"
+#~ msgstr ""
+
+#~ msgid "Select job type"
+#~ msgstr ""
+
+#~ msgid "Select connection"
+#~ msgstr ""
+
+#~ msgid "Step 1: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 2: Sqoop specific"
+#~ msgstr ""
+
+#~ msgid "Step 1: Manage connections"
+#~ msgstr ""
+
+#~ msgid "Step 2: Job info"
+#~ msgstr ""
+
+#~ msgid "Step 3: Sqoop specific job info"
+#~ msgstr ""
+
+#~ msgid "Could not start job: "
+#~ msgstr ""

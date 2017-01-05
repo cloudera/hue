@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:48-0700\n"
-"PO-Revision-Date: 2012-11-07 13:06-0800\n"
+"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,20 +17,92 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/s3/s3fs.py:187
+#: src/aws/conf.py:65
+msgid "Execute this script to produce the AWS access key ID."
+msgstr "このスクリプトを実行して AWS アクセスキー ID を作成します。"
+
+#: src/aws/conf.py:77
+msgid "Execute this script to produce the AWS secret access key."
+msgstr "このスクリプトを実行して AWS シークレットアクセスキーを作成します。"
+
+#: src/aws/s3/s3fs.py:59
+msgid ""
+"User is not authorized to perform the attempted operation. Check that the"
+" user has appropriate permissions."
+msgstr ""
+"試行した操作の実行はユーザーに許可されていません。ユーザーに適切なパーミッションがあることを"
+"確認してください。"
+
+#: src/aws/s3/s3fs.py:61
+#, python-format
+msgid ""
+"User is not authorized to write or modify path: %s. Check that the user "
+"has write permissions."
+msgstr ""
+"パスの書き込みまたは変更はユーザーに許可されていません：%s。ユーザーに書き込みパーミッションがあることを"
+"確認してください。"
+
+#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#, python-format
+msgid ""
+"User is not authorized to access bucket named \"%s\". If you are "
+"attempting to create a bucket, this bucket name is already reserved."
+msgstr ""
+"\"%s\" という名前のバケットへのアクセスはユーザーに許可されていません。バケットの作成を"
+"試行している場合、このバケット名はすでに予約されています。"
+
+#: src/aws/s3/s3fs.py:104
+#, python-format
+msgid "Failed to create bucket named \"%s\": %s"
+msgstr "\"%s\" という名前のバケットを作成できませんでした：%s"
+
+#: src/aws/s3/s3fs.py:134
+#, python-format
+msgid ""
+"Failed to access path: \"%s\" Check that you have access to read this "
+"bucket and that the region is correct."
+msgstr ""
+"パスにアクセスできませんでした：\"%s\"。このバケットを読み取る権限があること、"
+"および領域が正しいことを確認してください。"
+
+#: src/aws/s3/s3fs.py:156
+#, python-format
+msgid "User is not authorized to access path: \"%s\""
+msgstr "パスへのアクセスを許可されていません：\"%s\""
+
+#: src/aws/s3/s3fs.py:158
+#, python-format
+msgid "Failed to access path \"%s\": %s"
+msgstr "パス \"%s\" にアクセスできませんでした：%s"
+
+#: src/aws/s3/s3fs.py:253
 msgid "Option `glob` is not implemented"
 msgstr "オプション `glob` は実装されません"
 
-#: src/aws/s3/s3fs.py:212 src/aws/s3/s3fs.py:241 src/aws/s3/s3fs.py:246
+#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
 msgid "Moving to trash is not implemented for S3"
 msgstr "ゴミ箱への移動機能は S3 では実装されません"
 
-#: src/aws/s3/s3fs.py:216
-msgid "Deleting a bucket is not implemented for S3"
-msgstr "バケットの削除機能は S3 では実装されません"
+#: src/aws/s3/s3fs.py:324
+#, python-format
+msgid "Invalid bucket name: %s"
+msgstr "バケット名が無効です：%s"
 
-#: src/aws/s3/s3fs.py:308
+#: src/aws/s3/s3fs.py:329
+#, python-format
+msgid "Failed to create S3 bucket \"%s\": %s"
+msgstr "S3 バケット \"%s\" を作成できませんでした：%s"
+
+#: src/aws/s3/s3fs.py:385
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "変換に対して無効なキー：%s"
 
+#: src/aws/s3/upload.py:123
+msgid "No S3 filesystem found."
+msgstr "S3 ファイルシステムが見つかりません。"
+
+#: src/aws/s3/upload.py:134
+#, python-format
+msgid "Insufficient permissions to write to S3 path \"%s\"."
+msgstr "S3 パス \"%s\" への書き込みに必要なパーミッションがありません。"

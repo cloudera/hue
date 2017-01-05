@@ -1,14 +1,14 @@
 # Korean translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -51,27 +51,50 @@ msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Impala와 통신할 때 가장 메커니즘을 켭니다/끕니다."
 
 #: src/impala/conf.py:58
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
-msgstr "첫 행 다운로드를 위한 다시 가져오기를 지원하기 위해 Impala에 캐시하도록 요청하는 resultset의 첫 행 수입니다. 이 옵션 및 이전 버전과의 호환성을 사용하지 않으려면 0으로 설정합니다."
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"첫 행 다운로드를 위한 다시 가져오기를 지원하기 위해 Impala에 캐시하도록 요청하는 resultset의 첫 행 수입니다. 이 "
+"옵션 및 이전 버전과의 호환성을 사용하지 않으려면 0으로 설정합니다."
 
 #: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
 msgstr "Thrift 호출의 제한 시간(단위: 초)입니다."
 
 #: src/impala/conf.py:72
-msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
-msgstr "사용자가 편집기 페이지를 나가면 Hue가 Impala 쿼리를 닫습니다. 이렇게 하면 Impala의 모든 쿼리 리소스가 비워지지만 해당 결과에 액세스할 수 없게 됩니다."
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"사용자가 편집기 페이지를 나가면 Hue가 Impala 쿼리를 닫습니다. 이렇게 하면 Impala의 모든 쿼리 리소스가 비워지지만 "
+"해당 결과에 액세스할 수 없게 됩니다."
 
 #: src/impala/conf.py:80
-msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
-msgstr "QUERY_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 해당 쿼리에 대해 아무 작업(계산 또는 결과 다시 전송)도 하지 않으면 시간이 초과됩니다(예: 취소됨)."
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"QUERY_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 해당 쿼리에 대해 아무 작업(계산 "
+"또는 결과 다시 전송)도 하지 않으면 시간이 초과됩니다(예: 취소됨)."
 
 #: src/impala/conf.py:88
-msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
-msgstr "SESSION_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 해당 세션에 대해 아무 작업(계산 또는 결과 다시 전송)도 하지 않으면 세션 시간이 초과됩니다(예: 취소됨)."
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+msgstr ""
+"SESSION_TIMEOUT_S > 0일 경우 Impala가 QUERY_TIMEOUT_S초 이내에 "
+"해당 세션에 대해 아무 작업(계산 또는 결과 다시 전송)도 하지 않으면 "
+"세션 시간이 초과됩니다(예: 취소됨). 기본값: 1시간."
 
 #: src/impala/conf.py:98
-msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
 msgstr "사용자에게 설정 권한이 있는 쉼표로 구분된 화이트리스트 포함 Impala 구성 속성 목록입니다."
 
 #: src/impala/conf.py:103
@@ -100,14 +123,16 @@ msgstr "서버에서 받은 인증서의 유효성을 Hue에서 검사할 것인
 
 #: src/impala/conf.py:148
 msgid "Auth username of the hue user used for authentications."
-msgstr "인증에 사용한 Hue 사용자의 인증 사용자 이름입니다."
+msgstr "인증에 사용된 Hue 사용자의 인증 사용자 이름입니다."
 
 #: src/impala/conf.py:162
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
-msgstr "인증에 사용한 Hue 사용자의 LDAP/PAM/.. 암호입니다."
+msgstr "인증에 사용된 Hue 사용자의 LDAP/PAM/.. 암호입니다."
 
 #: src/impala/conf.py:168
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
 msgstr "인증 암호를 생성하려면 이 스크립트를 실행합니다. `auth_password`가 설정되지 않은 경우 사용합니다."
 
 #: src/impala/dashboards.py:213
@@ -231,6 +256,11 @@ msgstr "데이터베이스가 없습니다!"
 msgid "Oops, no table found!"
 msgstr "테이블을 찾을 수 없습니다!"
 
-#~ msgid "No available Impalad to send queries to."
-#~ msgstr "쿼리를 보낼 사용 가능한 Impalad가 없습니다."
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
 
+#~ msgid "A POST request is required."
+#~ msgstr ""

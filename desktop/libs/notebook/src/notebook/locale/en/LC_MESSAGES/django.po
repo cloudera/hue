@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2014-01-16 13:47-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,330 +17,1960 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/spark/api.py:61 src/spark/views.py:109
-msgid "Requires a POST"
+#: src/notebook/api.py:363
+msgid "Query saved successfully"
 msgstr ""
 
-#: src/spark/api.py:84
-msgid "Requires a DELETE"
+#: src/notebook/api.py:363
+msgid "Notebook saved successfully"
 msgstr ""
 
-#: src/spark/api.py:120 src/spark/api.py:175
+#: src/notebook/api.py:450
+msgid "History fetched"
+msgstr ""
+
+#: src/notebook/api.py:468
+msgid "History cleared !"
+msgstr ""
+
+#: src/notebook/api.py:485
+msgid "Notebook loaded successfully"
+msgstr ""
+
+#: src/notebook/api.py:515
+msgid "Notebook closed successfully"
+msgstr ""
+
+#: src/notebook/api.py:535
+msgid "Statement closed !"
+msgstr ""
+
+#: src/notebook/api.py:623
+msgid "url param is required"
+msgstr ""
+
+#: src/notebook/api.py:634
+msgid "User is already authenticated to GitHub."
+msgstr ""
+
+#: src/notebook/api.py:666
+msgid "Exporting result failed."
+msgstr ""
+
+#: src/notebook/conf.py:51
+msgid "Show the notebook menu or not"
+msgstr ""
+
+#: src/notebook/conf.py:60
+msgid "Define the name and how to connect and execute the language."
+msgstr ""
+
+#: src/notebook/conf.py:64
+msgid "The name of the snippet."
+msgstr ""
+
+#: src/notebook/conf.py:76
+msgid "Specific options for connecting to the server."
+msgstr ""
+
+#: src/notebook/conf.py:86
+msgid "Main flag to override the automatic starting of the DBProxy server."
+msgstr ""
+
+#: src/notebook/conf.py:93
+msgid "Flag to enable the SQL query builder of the table assist."
+msgstr ""
+
+#: src/notebook/conf.py:100
+msgid "Flag to enable the creation of a coordinator for the current SQL query."
+msgstr ""
+
+#: src/notebook/conf.py:107
+msgid ""
+"Flag to enable the bulk submission of queries as a background task "
+"through Oozie."
+msgstr ""
+
+#: src/notebook/conf.py:115
+msgid "Base URL to GitHub Remote Server"
+msgstr ""
+
+#: src/notebook/conf.py:122
+msgid "Base URL to GitHub API"
+msgstr ""
+
+#: src/notebook/conf.py:129
+msgid "The Client ID of the GitHub application."
+msgstr ""
+
+#: src/notebook/conf.py:136
+msgid "The Client Secret of the GitHub application."
+msgstr ""
+
+#: src/notebook/decorators.py:53 src/notebook/decorators.py:70
+#, python-format
+msgid "Document %(id)s does not exist"
+msgstr ""
+
+#: src/notebook/views.py:194
+#, python-format
+msgid "Action %s is unknown"
+msgstr ""
+
+#: src/notebook/views.py:220
+#, python-format
+msgid "Trashed %d notebook(s)"
+msgstr ""
+
+#: src/notebook/views.py:259
 msgid "A POST request is required."
 msgstr ""
 
-#: src/spark/api.py:162
+#: src/notebook/connectors/base.py:51
+msgid "No error message, please check the logs."
+msgstr ""
+
+#: src/notebook/connectors/base.py:202
 #, python-format
-msgid "There was an error with your query: %s"
+msgid "Snippet type %(type)s is not configured in hue.ini"
 msgstr ""
 
-#: src/spark/api.py:205
-msgid "A GET request is required."
+#: src/notebook/connectors/base.py:225
+#, python-format
+msgid "Notebook connector interface not recognized: %s"
 msgstr ""
 
-#: src/spark/api.py:234
-msgid "Missing application jar list."
+#: src/notebook/connectors/hiveserver2.py:111
+#: src/notebook/connectors/spark_shell.py:60
+msgid "Files"
 msgstr ""
 
-#: src/spark/conf.py:28
-msgid "URL of the Spark Job Server."
+#: src/notebook/connectors/hiveserver2.py:113
+msgid "Add one or more files, jars, or archives to the list of resources."
 msgstr ""
 
-#: src/spark/conf.py:56
-msgid "The app won't work without a running Job Server"
+#: src/notebook/connectors/hiveserver2.py:119
+msgid "Functions"
 msgstr ""
 
-#: src/spark/decorators.py:34
-msgid "An error happened with the Spark Server"
+#: src/notebook/connectors/hiveserver2.py:121
+msgid ""
+"Add one or more registered UDFs (requires function name and fully-"
+"qualified class name)."
 msgstr ""
 
-#: src/spark/forms.py:25
-msgid "Script parameters"
+#: src/notebook/connectors/hiveserver2.py:127
+#: src/notebook/connectors/hiveserver2.py:144
+#: src/notebook/templates/editor_components.mako:442
+#: src/notebook/templates/editor_components.mako:1536
+msgid "Settings"
 msgstr ""
 
-#: src/spark/forms.py:27 src/spark/templates/editor.mako:79
-#: src/spark/templates/list_jobs.mako:36
-msgid "Class path"
+#: src/notebook/connectors/hiveserver2.py:129
+msgid "Hive and Hadoop configuration properties."
 msgstr ""
 
-#: src/spark/views.py:94
-msgid "Delete context(s)?"
+#: src/notebook/connectors/hiveserver2.py:146
+msgid "Impala configuration properties."
 msgstr ""
 
-#: src/spark/templates/common.mako:38
-msgid "Spark Igniter"
+#: src/notebook/connectors/hiveserver2.py:209
+msgid ""
+"Session does not exist or you do not have permissions to close the "
+"session."
 msgstr ""
 
-#: src/spark/templates/common.mako:41
+#: src/notebook/connectors/hiveserver2.py:214
+msgid "Session successfully closed."
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:301
+msgid "Result status is not available"
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:304
+#, python-format
+msgid "Cannot fetch result metadata for snippet type: %s"
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:366
+msgid "Increase the sasl_max_buffer value in hue.ini"
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:465
+#: src/notebook/connectors/hiveserver2.py:489
+#, python-format
+msgid "Only SELECT statements can be saved. Provided statement: %(query)s"
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:692
+msgid "Failed to get job details or job does not contain counters data."
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:725
+msgid "Hive query did not execute any jobs."
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:791
+#, python-format
+msgid "Failed to get query profile from Impala Daemon server: %s"
+msgstr ""
+
+#: src/notebook/connectors/hiveserver2.py:794
+msgid ""
+"Could not find profile in query profile response from Impala Daemon "
+"Server."
+msgstr ""
+
+#: src/notebook/connectors/jdbc.py:45
+#, python-format
+msgid "%s: is the DB Proxy server running?"
+msgstr ""
+
+#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:152
+#: src/notebook/connectors/solr.py:176 src/notebook/connectors/solr.py:214
+msgid "Failed to get sample data."
+msgstr ""
+
+#: src/notebook/connectors/oozie_batch.py:65
+msgid ""
+"Notebook is missing a uuid, please save the notebook before executing as "
+"a batch job."
+msgstr ""
+
+#: src/notebook/connectors/oozie_batch.py:69
+#, python-format
+msgid "%s for %s"
+msgstr ""
+
+#: src/notebook/connectors/oozie_batch.py:74
+#, python-format
+msgid "Batch job for %s"
+msgstr ""
+
+#: src/notebook/connectors/oozie_batch.py:95
+#, python-format
+msgid "Job was %s"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:51
+msgid "Jars"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:52
+msgid "Add one or more JAR files to the list of resources."
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:61
+msgid "Files to be placed in the working directory of each executor."
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:69
+msgid "pyFiles"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:70
+msgid "Python files to be placed in the working directory of each executor."
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:78
+msgid "Driver Memory"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:79
+msgid "Amount of memory to use for the driver process in GB. (Default: 1). "
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:89
+msgid "Driver Cores"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:90
+#: src/notebook/connectors/spark_shell.py:108
+msgid "Number of cores used by the driver, only in cluster mode (Default: 1)"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:98
+msgid "Executor Memory"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:99
+msgid "Amount of memory to use per executor process in GB. (Default: 1)"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:107
+msgid "Executor Cores"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:116
+msgid "Queue"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:117
+msgid "The YARN queue to submit to, only in cluster mode (Default: default)"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:125
+msgid "Archives"
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:126
+msgid ""
+"Archives to be extracted into the working directory of each executor, "
+"only in cluster mode."
+msgstr ""
+
+#: src/notebook/connectors/spark_shell.py:206
+#, python-format
+msgid "The Spark session could not be created in the cluster: %s"
+msgstr ""
+
+#: src/notebook/templates/editor.mako:27
 msgid "Editor"
 msgstr ""
 
-#: src/spark/templates/common.mako:43
-#: src/spark/templates/list_applications.mako:23
-#: src/spark/templates/list_applications.mako:29
-msgid "Applications"
+#: src/notebook/templates/editor_components.mako:232
+msgid "Saving..."
 msgstr ""
 
-#: src/spark/templates/common.mako:45
-msgid "Dashboard"
-msgstr ""
-
-#: src/spark/templates/common.mako:46 src/spark/templates/list_contexts.mako:29
-msgid "Contexts"
-msgstr ""
-
-#: src/spark/templates/common.mako:47
-msgid "Uploads"
-msgstr ""
-
-#: src/spark/templates/common.mako:59 src/spark/templates/editor.mako:59
-#: src/spark/templates/list_contexts.mako:41
-msgid "Create context"
-msgstr ""
-
-#: src/spark/templates/common.mako:64 src/spark/templates/editor.mako:132
-#: src/spark/templates/editor.mako:220
-#: src/spark/templates/list_applications.mako:45
-#: src/spark/templates/list_contexts.mako:48
-msgid "Name"
-msgstr ""
-
-#: src/spark/templates/common.mako:70
-msgid "Num cpu cores"
-msgstr ""
-
-#: src/spark/templates/common.mako:76
-msgid "Memory per node"
-msgstr ""
-
-#: src/spark/templates/common.mako:84 src/spark/templates/common.mako:114
-#: src/spark/templates/editor.mako:234
-#: src/spark/templates/list_contexts.mako:85
-msgid "Cancel"
-msgstr ""
-
-#: src/spark/templates/common.mako:85
-msgid "Create"
-msgstr ""
-
-#: src/spark/templates/common.mako:96
-msgid "Upload application"
-msgstr ""
-
-#: src/spark/templates/common.mako:99
-msgid "One class of the jar should implement SparkJob."
-msgstr ""
-
-#: src/spark/templates/common.mako:101
-msgid "Local jar file"
-msgstr ""
-
-#: src/spark/templates/common.mako:107 src/spark/templates/editor.mako:63
-msgid "App name"
-msgstr ""
-
-#: src/spark/templates/common.mako:115
-msgid "Upload"
-msgstr ""
-
-#: src/spark/templates/editor.mako:23
-msgid "Query"
-msgstr ""
-
-#: src/spark/templates/editor.mako:39 src/spark/templates/editor.mako:486
-msgid "Application name"
-msgstr ""
-
-#: src/spark/templates/editor.mako:48
-msgid "Application description"
-msgstr ""
-
-#: src/spark/templates/editor.mako:58
-#: src/spark/templates/list_applications.mako:36
-msgid "Upload app"
-msgstr ""
-
-#: src/spark/templates/editor.mako:66
-msgid "Missing, add one?"
-msgstr ""
-
-#: src/spark/templates/editor.mako:83 src/spark/templates/list_contexts.mako:23
-#: src/spark/templates/list_jobs.mako:37
-msgid "Context"
-msgstr ""
-
-#: src/spark/templates/editor.mako:86
-msgid "Automatic"
-msgstr ""
-
-#: src/spark/templates/editor.mako:92
-msgid "Create one?"
-msgstr ""
-
-#: src/spark/templates/editor.mako:115
-msgid "Parameters"
-msgstr ""
-
-#: src/spark/templates/editor.mako:121
-msgid "Your application has the following error(s):"
-msgstr ""
-
-#: src/spark/templates/editor.mako:127
-msgid "No parameters defined yet."
-msgstr ""
-
-#: src/spark/templates/editor.mako:133 src/spark/templates/editor.mako:176
-msgid "Value"
-msgstr ""
-
-#: src/spark/templates/editor.mako:147
-msgid "Delete"
-msgstr ""
-
-#: src/spark/templates/editor.mako:153
-msgid "Add"
-msgstr ""
-
-#: src/spark/templates/editor.mako:159
-msgid "Executing..."
-msgstr ""
-
-#: src/spark/templates/editor.mako:160
-msgid "Execute"
-msgstr ""
-
-#: src/spark/templates/editor.mako:162 src/spark/templates/editor.mako:235
-msgid "Save"
-msgstr ""
-
-#: src/spark/templates/editor.mako:163
+#: src/notebook/templates/editor_components.mako:239
 msgid "Save as..."
 msgstr ""
 
-#: src/spark/templates/editor.mako:164
-msgid "or create a"
+#: src/notebook/templates/editor_components.mako:254
+msgid "Player mode"
 msgstr ""
 
-#: src/spark/templates/editor.mako:164
-msgid "New application"
+#: src/notebook/templates/editor_components.mako:259
+msgid "Execute all snippets"
 msgstr ""
 
-#: src/spark/templates/editor.mako:166
-msgid "Download"
+#: src/notebook/templates/editor_components.mako:264
+msgid "Clear all results"
 msgstr ""
 
-#: src/spark/templates/editor.mako:175
-msgid "Key"
+#: src/notebook/templates/editor_components.mako:269
+msgid "Display all Notebook content"
 msgstr ""
 
-#: src/spark/templates/editor.mako:188
-msgid "The server returned no results."
+#: src/notebook/templates/editor_components.mako:274
+#: src/notebook/templates/editor_components.mako:958
+msgid "Import from Github"
 msgstr ""
 
-#: src/spark/templates/editor.mako:215
-msgid "Save your query"
+#: src/notebook/templates/editor_components.mako:279
+msgid "Export to Jupyter"
 msgstr ""
 
-#: src/spark/templates/editor.mako:226
+#: src/notebook/templates/editor_components.mako:289
+msgid "New "
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:289
+msgid "Query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:294
+msgid "New Notebook"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:299
+msgid "Queries"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:299
+#: src/notebook/templates/notebooks.mako:23
+#: src/notebook/templates/notebooks.mako:47
+msgid "Notebooks"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:305
+msgid "Context"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:314
+msgid " Editor"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:372
+msgid "This is a history query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:375
+msgid "Open directory of this query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:378
+msgid "Click to open original saved query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:383
+msgid "This is a saved query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:417
+msgid "Row details"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:430
+msgid "Editor keyboard shortcuts"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:435
+msgid "Line Operations"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:436
+msgid "Selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:437
+msgid "Multicursor"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:438
+msgid "Go to"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:439
+msgid "Find/Replace"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:440
+msgid "Folding"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:441
+msgid "Other"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:452
+#: src/notebook/templates/editor_components.mako:515
+#: src/notebook/templates/editor_components.mako:613
+#: src/notebook/templates/editor_components.mako:671
+#: src/notebook/templates/editor_components.mako:774
+#: src/notebook/templates/editor_components.mako:807
+#: src/notebook/templates/editor_components.mako:840
+#: src/notebook/templates/editor_components.mako:923
+msgid "Action"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:459
+msgid "Remove line"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:464
+msgid "Copy lines down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:469
+msgid "Copy lines up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:474
+msgid "Move lines down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:479
+msgid "Move lines up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:484
+msgid "Remove to line end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:489
+msgid "Remove to line start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:494
+msgid "Remove word left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:499
+msgid "Remove word right"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:504
+msgid "Split line"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:522
+msgid "Select all"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:527
+msgid "Select left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:532
+msgid "Select right"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:537
+msgid "Select word left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:542
+msgid "Select word right"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:547
+msgid "Select line start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:552
+msgid "Select line end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:557
+msgid "Select to line end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:562
+msgid "Select to line start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:567
+msgid "Select up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:572
+msgid "Select down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:577
+msgid "Select page up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:582
+msgid "Select page down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:587
+msgid "Select to start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:592
+msgid "Select to end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:597
+msgid "Duplicate selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:602
+msgid "Select to matching bracket"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:620
+msgid "Add multi-cursor above"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:625
+msgid "Add multi-cursor below"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:630
+msgid "Add next occurrence to multi-selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:635
+msgid "Add previous occurrence to multi-selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:640
+msgid "Move multicursor from current line to the line above"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:645
+msgid "Move multicursor from current line to the line below"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:650
+msgid "Remove current occurrence from multi-selection and move to next"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:655
+msgid "Remove current occurrence from multi-selection and move to previous"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:660
+msgid "Select all from multi-selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:678
+msgid "Go to left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:683
+msgid "Go to right"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:688
+msgid "Go to word left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:693
+msgid "Go to word right"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:698
+msgid "Go line up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:703
+msgid "Go line down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:708
+msgid "Go to line start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:713
+msgid "Go to line end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:718
+msgid "Go to page up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:723
+msgid "Go to page down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:728
+msgid "Go to start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:733
+msgid "Go to end"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:738
+msgid "Go to line"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:743
+msgid "Scroll line down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:748
+msgid "Scroll line up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:753
+msgid "Go to matching bracket"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:758
+msgid "Scroll page down"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:763
+msgid "Scroll page up"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:781
+msgid "Find"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:786
+msgid "Replace"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:791
+msgid "Find next"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:796
+msgid "Find previous"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:814
+msgid "Fold selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:819
+msgid "Unfold"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:824
+msgid "Fold all"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:829
+msgid "Unfold all"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:847
+msgid "Autocomplete when Live Autocompletion is off"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:852
+msgid "Indent"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:857
+msgid "Outdent"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:862
+msgid "Undo"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:867
+msgid "Redo"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:872
+msgid "Toggle comment"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:877
+msgid "Transpose letters"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:882
+msgid "Change to lower case"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:887
+msgid "Change to upper case"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:892
+#: src/notebook/templates/notebook_ko_components.mako:227
+msgid "Overwrite"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:897
+msgid "Macros replay"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:902
+msgid "Macros recording"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:907
+#: src/notebook/templates/notebooks.mako:74
+msgid "Delete"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:912
+msgid "Center selection"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:930
+msgid "Show the settings menu"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:938
+#: src/notebook/templates/editor_components.mako:951
+#: src/notebook/templates/editor_components.mako:967
+#: src/notebook/templates/editor_components.mako:982
+#: src/notebook/templates/editor_components.mako:1143
+#: src/notebook/templates/notebook_ko_components.mako:74
+#: src/notebook/templates/notebook_ko_components.mako:302
+msgid "Close"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:945
+msgid "All Notebook content"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:968
+#: src/notebook/templates/notebooks.mako:98
+msgid "Import"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:976
+msgid "Invalid Query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:979
+msgid "Query requires a select or an aggregate."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:988
+#: src/notebook/templates/editor_components.mako:1006
+msgid "Toggle Assist"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1087
+msgid "Assistant"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1089
+msgid "Sessions"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1092
+msgid "Schedule"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1104
+msgid "Active tables"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1113
+msgid "Suggestions"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1137
+msgid "There are currently no active sessions, please reload the page."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1142
+msgid "Recreate session"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1142
+msgid "Recreate"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1143
+msgid "Close session"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1145
+msgid "Save session settings as default"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1145
+msgid "Set as default settings"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1185
+msgid "Changes not saved"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1188
+msgid "Start"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1197
+msgid "Query needs to be saved first."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1231
+msgid "No logs available at this moment."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1240
+msgid "Success."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1244
+msgid "Done. 0 results."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1248
+#: src/notebook/templates/editor_components.mako:1918
+#: src/notebook/templates/editor_m.mako:115
+msgid "Results have expired, rerun the query if needed."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1252
+msgid "Loading..."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1262
+msgid "Query History"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1263
+msgid "Search the query history"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1264
+#: src/notebook/templates/editor_components.mako:1271
+msgid "Search..."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1265
+msgid "Clear the query history"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1269
+msgid "Saved Queries"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1270
+msgid "Search the saved queries"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1275
+msgid "Query Builder"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1279
+msgid "Results"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1281
+msgid "Number of rows"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1283
+msgid "Search the results"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1284
+msgid "Expand results"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1285
+#: src/notebook/templates/editor_components.mako:1477
+msgid "Collapse results"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1290
+#: src/notebook/templates/editor_components.mako:2193
+msgid "Explain"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1312
+msgid "No queries to be shown."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1315
+#: src/notebook/templates/editor_components.mako:1364
+msgid "No queries found for"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1358
+msgid "Error loading my queries"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1361
+msgid "You don't have any saved query."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1370
+#: src/notebook/templates/editor_components.mako:2364
+#: src/notebook/templates/notebooks.mako:108
+msgid "Name"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1371
+#: src/notebook/templates/editor_components.mako:2370
+#: src/notebook/templates/notebooks.mako:109
 msgid "Description"
 msgstr ""
 
-#: src/spark/templates/editor.mako:242
+#: src/notebook/templates/editor_components.mako:1372
+#: src/notebook/templates/notebooks.mako:110
+msgid "Owner"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1373
+#: src/notebook/templates/notebooks.mako:111
+msgid "Last Modified"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1388
+msgid "Prev"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1390
+#: src/notebook/templates/notebooks.mako:280
+msgid "Next"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1397
+msgid ""
+"There are currently no rules defined. To get started, right click on any "
+"table column in the SQL Assist panel."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1401
+msgid "Table"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1402
+msgid "Column"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1403
+msgid "Operation"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1409
+msgid "Build query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1443
+msgid "The operation in the server is taking longer than expected"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1452
+#: src/notebook/templates/editor_components.mako:1473
+msgid "Show Logs"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1453
+#: src/notebook/templates/editor_components.mako:1466
+msgid "Execution time"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1458
+#: src/notebook/templates/editor_components.mako:1474
+msgid "Settings and properties"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1475
+msgid "Show editor shortcuts"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1568
+msgid "The current query has been redacted to hide sensitive information."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1581
+msgid "No risks were detected in this query."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1601
+msgid "The query is compatible!"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1601
+msgid "Execute with Impala?"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1604
+msgid "Query is not compatible with Impala."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1624
+msgid "Query File"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1625
+msgid "Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1628
+#: src/notebook/templates/editor_components.mako:1648
+msgid "Open in new tab"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1642
+msgid "Document"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1644
+msgid "Search your documents..."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1688
+msgid "Variable value"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1700
+#: src/notebook/templates/editor_components.mako:1760
+msgid "type"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1704
+#: src/notebook/templates/editor_components.mako:2237
+#: src/notebook/templates/editor_components.mako:2252
+msgid "Bars"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1705
+#: src/notebook/templates/editor_components.mako:2238
+#: src/notebook/templates/editor_components.mako:2257
+msgid "Lines"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1712
+#: src/notebook/templates/editor_components.mako:1737
+msgid "value"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1718
+msgid "legend"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1727
+msgid "x-axis"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1728
+msgid "region"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1729
+msgid "latitude"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1736
+msgid "y-axis"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1738
+msgid "longitude"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1752
+msgid "group"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1764
+msgid "Markers"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1765
+msgid "Heatmap"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1771
+msgid "label"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1780
+msgid "intensity"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1789
+msgid "scatter size"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1796
+msgid "scatter group"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1804
+msgid "scope"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1808
+msgid "World"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1809
+msgid "Europe"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1810
+msgid "Australia"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1811
+msgid "Brazil"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1812
+msgid "Canada"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1813
+msgid "China"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1814
+msgid "France"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1815
+msgid "Germany"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1816
+msgid "Italy"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1817
+msgid "Japan"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1818
+msgid "UK"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1819
+msgid "USA"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1825
+msgid "sorting"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1828
+msgid "No sorting"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1829
+msgid "Sort ascending"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1830
+msgid "Sort descending"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1844
+msgid "columns"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1846
+msgid "Search"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1850
+msgid "Filter columns..."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1850
+msgid "Type column:xxx or type:yyy for specific filters."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1864
+msgid "No results found"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1888
+msgid "Done."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1923
+msgid "Select the chart parameters on the left"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:1971
+msgid "Type your text here, select some text to format it"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2000
+msgid "Source"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2002
+msgid "Source path to copy, e.g. ${nameNode1}/path/to/input.txt"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2006
+msgid "Destination"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2008
+msgid "Destination path, e.g. ${nameNode2}/path/to/output.txt"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2014
+msgid "Script path"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2016
+msgid "Source path to the command"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2020
+msgid "Environment variables"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2028
+msgid "Jar path"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2030
+msgid "Source path to the main MapReduce jar"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2034
+msgid "Hadoop properties"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2042
+#: src/notebook/templates/editor_components.mako:2056
+msgid "Path"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2044
+msgid ""
+"Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-"
+"examples.jar"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2048
+#: src/notebook/templates/editor_components.mako:2069
+msgid "Class"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2050
+#: src/notebook/templates/editor_components.mako:2072
+msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2058
+msgid "Path to python file, e.g. script.py"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2102
+msgid "The statement was canceled."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2131
+msgid "Creating session"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2134
+msgid "Restart from the first statement"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2141
+#: src/notebook/templates/editor_m.mako:95
+msgid "Cancel operation"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2146
+msgid "Canceling operation..."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2152
+#: src/notebook/templates/editor_components.mako:2173
+msgid "Submit all the queries as a background batch job."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2168
+msgid "Execute interactively the current statement"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2169
+#: src/notebook/templates/editor_m.mako:92
+msgid "Execute"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2174
+msgid "Batch"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2184
+#: src/notebook/templates/editor_components.mako:2192
+msgid "Explain the current SQL query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2198
+msgid "Format the current SQL query"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2199
+msgid "Format"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2204
+msgid "Clear the current editor"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2205
+msgid "Clear"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2211
+msgid "Get Impala compatibility hints"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2212
+msgid "Check Impala compatibility"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2216
+msgid "Get recommendations on query risks and optimizations"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2217
+msgid "Check complexity"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2230
+msgid "Grid"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2239
+#: src/notebook/templates/editor_components.mako:2262
+msgid "Time"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2240
+#: src/notebook/templates/editor_components.mako:2267
+msgid "Pie"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2241
+#: src/notebook/templates/editor_components.mako:2272
+msgid "Scatter"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2242
+#: src/notebook/templates/editor_components.mako:2277
+msgid "Marker Map"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2243
+#: src/notebook/templates/editor_components.mako:2282
+msgid "Gradient Map"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2289
+msgid "Columns"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2306
 msgid "Choose a file"
 msgstr ""
 
-#: src/spark/templates/editor.mako:378
-msgid "Did you know?"
+#: src/notebook/templates/editor_components.mako:2327
+msgid "Confirm Remove"
 msgstr ""
 
-#: src/spark/templates/editor.mako:480
-msgid "This field is required."
+#: src/notebook/templates/editor_components.mako:2330
+msgid "Are you sure you want to remove this snippet?"
 msgstr ""
 
-#: src/spark/templates/editor.mako:493
-msgid "Empty description"
+#: src/notebook/templates/editor_components.mako:2333
+#: src/notebook/templates/editor_components.mako:2422
+#: src/notebook/templates/editor_components.mako:2437
+#: src/notebook/templates/notebooks.mako:162
+msgid "No"
 msgstr ""
 
-#: src/spark/templates/editor.mako:499
-msgid "Application saved successfully!"
-msgstr ""
-
-#: src/spark/templates/editor.mako:527
-#: src/spark/templates/list_applications.mako:93
-#: src/spark/templates/list_contexts.mako:131
-#: src/spark/templates/list_jobs.mako:96
-msgid "No data available"
-msgstr ""
-
-#: src/spark/templates/editor.mako:528
-#: src/spark/templates/list_applications.mako:94
-#: src/spark/templates/list_contexts.mako:132
-#: src/spark/templates/list_jobs.mako:97
-msgid "No matching records"
-msgstr ""
-
-#: src/spark/templates/editor.mako:579
-msgid "Server error occured: "
-msgstr ""
-
-#: src/spark/templates/editor.mako:582
-msgid "Unmanageable server error occured: "
-msgstr ""
-
-#: src/spark/templates/list_applications.mako:33
-#: src/spark/templates/list_contexts.mako:33
-msgid "Search for name"
-msgstr ""
-
-#: src/spark/templates/list_applications.mako:46
-msgid "Upload time"
-msgstr ""
-
-#: src/spark/templates/list_applications.mako:53
-msgid "Click to open and execute"
-msgstr ""
-
-#: src/spark/templates/list_contexts.mako:36
-msgid "Delete forever"
-msgstr ""
-
-#: src/spark/templates/list_contexts.mako:37
-msgid "Delete selected"
-msgstr ""
-
-#: src/spark/templates/list_contexts.mako:82
-msgid "Confirm action"
-msgstr ""
-
-#: src/spark/templates/list_contexts.mako:86
+#: src/notebook/templates/editor_components.mako:2334
+#: src/notebook/templates/editor_components.mako:2423
+#: src/notebook/templates/notebooks.mako:163
 msgid "Yes"
 msgstr ""
 
-#: src/spark/templates/list_contexts.mako:208
-msgid "Delete the selected contexts?"
+#: src/notebook/templates/editor_components.mako:2341
+#: src/notebook/templates/editor_components.mako:2498
+msgid "Drop a SQL file here"
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:23 src/spark/templates/list_jobs.mako:29
-msgid "Jobs"
+#: src/notebook/templates/editor_components.mako:2344
+#: src/notebook/templates/editor_components.mako:2500
+msgid "Drop iPython/Zeppelin notebooks here"
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:34
-msgid "Status"
+#: src/notebook/templates/editor_components.mako:2353
+msgid "Save query as..."
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:35
-msgid "Job id"
+#: src/notebook/templates/editor_components.mako:2356
+msgid "Save notebook as..."
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:38
-msgid "Start time"
+#: src/notebook/templates/editor_components.mako:2372
+msgid "(optional)"
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:39
-msgid "Duration"
+#: src/notebook/templates/editor_components.mako:2378
+#: src/notebook/templates/editor_components.mako:2407
+#: src/notebook/templates/editor_m.mako:96
+#: src/notebook/templates/notebook_ko_components.mako:273
+msgid "Cancel"
 msgstr ""
 
-#: src/spark/templates/list_jobs.mako:51
-msgid "Click to open"
+#: src/notebook/templates/editor_components.mako:2379
+#: src/notebook/templates/notebook_ko_components.mako:274
+msgid "Save"
 msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2388
+msgid "Connect to the data source"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2395
+msgid "Username"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2401
+msgid "Password"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2408
+msgid "Connect"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2416
+msgid "Confirm History Clear"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2419
+msgid "Are you sure you want to clear the query history?"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2431
+msgid "Operation timed out"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2434
+msgid "The operation timed out. Do you want to retry?"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2438
+msgid "Yes, retry"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2487
+msgid "Failed to load"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2552
+msgid "No results found."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:2553
+msgid "of"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3099
+msgid "Distribution"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3133
+#: src/notebook/templates/editor_components.mako:3143
+#: src/notebook/templates/editor_components.mako:3149
+#: src/notebook/templates/editor_components.mako:3158
+#: src/notebook/templates/editor_components.mako:3164
+#: src/notebook/templates/editor_components.mako:3170
+#: src/notebook/templates/editor_components.mako:3181
+#: src/notebook/templates/editor_components.mako:3234
+#: src/notebook/templates/editor_m.mako:201
+#: src/notebook/templates/editor_m.mako:211
+#: src/notebook/templates/editor_m.mako:217
+#: src/notebook/templates/editor_m.mako:226
+#: src/notebook/templates/editor_m.mako:232
+#: src/notebook/templates/editor_m.mako:238
+#: src/notebook/templates/editor_m.mako:249
+#: src/notebook/templates/editor_m.mako:287
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3139
+#: src/notebook/templates/editor_components.mako:3176
+#: src/notebook/templates/editor_components.mako:3199
+#: src/notebook/templates/editor_components.mako:3204
+#: src/notebook/templates/editor_components.mako:3209
+#: src/notebook/templates/editor_components.mako:3214
+#: src/notebook/templates/editor_m.mako:207
+#: src/notebook/templates/editor_m.mako:244
+#: src/notebook/templates/editor_m.mako:267
+#: src/notebook/templates/editor_m.mako:272
+#: src/notebook/templates/editor_m.mako:277
+#: src/notebook/templates/editor_m.mako:282
+msgid "Example: 1 + 1, or press CTRL + space"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3187
+#: src/notebook/templates/editor_m.mako:255
+msgid "Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3240
+#: src/notebook/templates/editor_m.mako:293
+msgid "Type your text here"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3245
+#: src/notebook/templates/editor_m.mako:298
+msgid "Type your markdown here"
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3576
+msgid "User successfully authenticated to GitHub."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3580
+msgid "Could not decode Github file content to JSON."
+msgstr ""
+
+#: src/notebook/templates/editor_components.mako:3949
+msgid "Coordinator submitted."
+msgstr ""
+
+#: src/notebook/templates/notebook.mako:27
+msgid "Notebook"
+msgstr ""
+
+#: src/notebook/templates/notebook.mako:33
+msgid "There are no snippets configured."
+msgstr ""
+
+#: src/notebook/templates/notebook.mako:36
+msgid "Add a snippet to start your new notebook"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:40
+msgid "Add a new snippet"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:41
+msgid "Select snippet"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:56
+msgid "Add Snippet"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:173
+msgid "Get results"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:184
+#, python-format
+msgid "Download first %s cells as CSV"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:185
+msgid "CSV"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:189
+#, python-format
+msgid "Download first %s cells as XLS"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:190
+msgid "Excel"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:194
+msgid "Save the results to a large file or a new table"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:195
+#: src/notebook/templates/notebooks.mako:84
+msgid "Export"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:210
+msgid "Save query result in"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:220
+#, python-format
+msgid "A file (max %s cells)"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:223
+msgid "Path to CSV file"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:235
+msgid "A file (large result)"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:238
+msgid "Path to empty directory"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:249
+msgid "A new table"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:252
+msgid "Table name or <database>.<table>"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:261
+msgid "A search dashboard"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:264
+msgid "Index name"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:281
+msgid "Your download is being prepared"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:284
+msgid "Your downloaded results have been truncated"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:289
+msgid "Please wait, it might take a while..."
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:292
+msgid ""
+"The number of resulting rows was too big to be downloaded and the "
+"resulting file has been truncated to"
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:294
+msgid "rows."
+msgstr ""
+
+#: src/notebook/templates/notebook_ko_components.mako:299
+msgid "Cancel Download"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:32
+#, python-format
+msgid "%s Editor"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:35
+msgid "Impala Queries"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:38
+msgid "SQL Queries"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:41
+msgid "Pig Scripts"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:44
+msgid "Hive Queries"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:64
+msgid "Search for name, description, etc..."
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:70
+msgid "Copy"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:80
+msgid "Share"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:95
+msgid "Create"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:149
+msgid "Delete the selected script(s)?"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:152
+msgid "Delete the selected query?"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:155
+msgid "Delete the selected queries?"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:158
+msgid "Delete the selected notebook(s)?"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:272
+msgid "No data available"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:273
+msgid "Showing _START_ to _END_ of _TOTAL_ entries"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:274
+msgid "Showing 0 to 0 of 0 entries"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:275
+msgid "(filtered from _MAX_ total entries)"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:276
+msgid "No matching records"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:278
+msgid "First"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:279
+msgid "Last"
+msgstr ""
+
+#: src/notebook/templates/notebooks.mako:281
+msgid "Previous"
+msgstr ""
+
+#~ msgid "Requires a POST"
+#~ msgstr ""
+
+#~ msgid "Requires a DELETE"
+#~ msgstr ""
+
+#~ msgid "There was an error with your query: %s"
+#~ msgstr ""
+
+#~ msgid "A GET request is required."
+#~ msgstr ""
+
+#~ msgid "Missing application jar list."
+#~ msgstr ""
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr ""
+
+#~ msgid "The app won't work without a running Job Server"
+#~ msgstr ""
+
+#~ msgid "An error happened with the Spark Server"
+#~ msgstr ""
+
+#~ msgid "Script parameters"
+#~ msgstr ""
+
+#~ msgid "Class path"
+#~ msgstr ""
+
+#~ msgid "Delete context(s)?"
+#~ msgstr ""
+
+#~ msgid "Spark Igniter"
+#~ msgstr ""
+
+#~ msgid "Applications"
+#~ msgstr ""
+
+#~ msgid "Dashboard"
+#~ msgstr ""
+
+#~ msgid "Contexts"
+#~ msgstr ""
+
+#~ msgid "Uploads"
+#~ msgstr ""
+
+#~ msgid "Create context"
+#~ msgstr ""
+
+#~ msgid "Num cpu cores"
+#~ msgstr ""
+
+#~ msgid "Memory per node"
+#~ msgstr ""
+
+#~ msgid "Upload application"
+#~ msgstr ""
+
+#~ msgid "One class of the jar should implement SparkJob."
+#~ msgstr ""
+
+#~ msgid "Local jar file"
+#~ msgstr ""
+
+#~ msgid "App name"
+#~ msgstr ""
+
+#~ msgid "Upload"
+#~ msgstr ""
+
+#~ msgid "Application name"
+#~ msgstr ""
+
+#~ msgid "Application description"
+#~ msgstr ""
+
+#~ msgid "Upload app"
+#~ msgstr ""
+
+#~ msgid "Missing, add one?"
+#~ msgstr ""
+
+#~ msgid "Automatic"
+#~ msgstr ""
+
+#~ msgid "Create one?"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Your application has the following error(s):"
+#~ msgstr ""
+
+#~ msgid "No parameters defined yet."
+#~ msgstr ""
+
+#~ msgid "Value"
+#~ msgstr ""
+
+#~ msgid "Add"
+#~ msgstr ""
+
+#~ msgid "Executing..."
+#~ msgstr ""
+
+#~ msgid "or create a"
+#~ msgstr ""
+
+#~ msgid "New application"
+#~ msgstr ""
+
+#~ msgid "Download"
+#~ msgstr ""
+
+#~ msgid "Key"
+#~ msgstr ""
+
+#~ msgid "The server returned no results."
+#~ msgstr ""
+
+#~ msgid "Save your query"
+#~ msgstr ""
+
+#~ msgid "Did you know?"
+#~ msgstr ""
+
+#~ msgid "This field is required."
+#~ msgstr ""
+
+#~ msgid "Empty description"
+#~ msgstr ""
+
+#~ msgid "Application saved successfully!"
+#~ msgstr ""
+
+#~ msgid "Server error occured: "
+#~ msgstr ""
+
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr ""
+
+#~ msgid "Search for name"
+#~ msgstr ""
+
+#~ msgid "Upload time"
+#~ msgstr ""
+
+#~ msgid "Click to open and execute"
+#~ msgstr ""
+
+#~ msgid "Delete forever"
+#~ msgstr ""
+
+#~ msgid "Delete selected"
+#~ msgstr ""
+
+#~ msgid "Confirm action"
+#~ msgstr ""
+
+#~ msgid "Delete the selected contexts?"
+#~ msgstr ""
+
+#~ msgid "Jobs"
+#~ msgstr ""
+
+#~ msgid "Status"
+#~ msgstr ""
+
+#~ msgid "Job id"
+#~ msgstr ""
+
+#~ msgid "Start time"
+#~ msgstr ""
+
+#~ msgid "Duration"
+#~ msgstr ""
+
+#~ msgid "Click to open"
+#~ msgstr ""
 

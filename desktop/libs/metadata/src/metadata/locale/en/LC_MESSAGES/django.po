@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-12-22 08:50-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,256 +17,108 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metadata/conf.py:40
+#: src/metadata/conf.py:71
+msgid "Configuration options for Optimizer API"
+msgstr ""
+
+#: src/metadata/conf.py:75
+msgid "Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)"
+msgstr ""
+
+#: src/metadata/conf.py:80
+msgid ""
+"The name of the product or group which will have API access to the emails"
+" associated with it."
+msgstr ""
+
+#: src/metadata/conf.py:85 src/metadata/conf.py:96
+msgid "A secret passphrase associated with the productName."
+msgstr ""
+
+#: src/metadata/conf.py:90 src/metadata/conf.py:101
+msgid ""
+"Execute this script to produce the product secret. This will be used when"
+" `product_secret` is not set."
+msgstr ""
+
+#: src/metadata/conf.py:108
+msgid "The email of the Optimizer account you want to associate with the Product."
+msgstr ""
+
+#: src/metadata/conf.py:113
+msgid ""
+"The password associated with the Optimizer account you to associate with "
+"the Product."
+msgstr ""
+
+#: src/metadata/conf.py:118
+msgid ""
+"Execute this script to produce the email password. This will be used when"
+" `email_password` is not set."
+msgstr ""
+
+#: src/metadata/conf.py:125
+msgid ""
+"In secure mode (HTTPS), if Optimizer SSL certificates have to be verified"
+" against certificate authority"
+msgstr ""
+
+#: src/metadata/conf.py:135
 msgid "Configuration options for Navigator API"
 msgstr ""
 
-#: src/metadata/conf.py:44
-msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+#: src/metadata/conf.py:139
+msgid "Base URL to Navigator API."
 msgstr ""
 
-#: src/metadata/conf.py:48
+#: src/metadata/conf.py:143
 msgid "Auth username of the hue user used for authentications."
 msgstr ""
 
-#: src/metadata/conf.py:53
+#: src/metadata/conf.py:147
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
 msgstr ""
 
-#: src/metadata/conf.py:58
+#: src/metadata/conf.py:152
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr ""
 
-#~ msgid "Requires a POST"
-#~ msgstr ""
-
-#~ msgid "Requires a DELETE"
-#~ msgstr ""
-
-#~ msgid "A POST request is required."
-#~ msgstr ""
-
-#~ msgid "There was an error with your query: %s"
-#~ msgstr ""
-
-#~ msgid "A GET request is required."
-#~ msgstr ""
-
-#~ msgid "Missing application jar list."
-#~ msgstr ""
-
-#~ msgid "URL of the Spark Job Server."
-#~ msgstr ""
-
-#~ msgid "The app won't work without a running Job Server"
-#~ msgstr ""
-
-#~ msgid "An error happened with the Spark Server"
-#~ msgstr ""
-
-#~ msgid "Script parameters"
-#~ msgstr ""
-
-#~ msgid "Class path"
-#~ msgstr ""
-
-#~ msgid "Delete context(s)?"
-#~ msgstr ""
-
-#~ msgid "Spark Igniter"
-#~ msgstr ""
-
-#~ msgid "Editor"
-#~ msgstr ""
-
-#~ msgid "Applications"
-#~ msgstr ""
-
-#~ msgid "Dashboard"
-#~ msgstr ""
-
-#~ msgid "Contexts"
-#~ msgstr ""
-
-#~ msgid "Uploads"
-#~ msgstr ""
-
-#~ msgid "Create context"
-#~ msgstr ""
-
-#~ msgid "Name"
-#~ msgstr ""
-
-#~ msgid "Num cpu cores"
-#~ msgstr ""
-
-#~ msgid "Memory per node"
-#~ msgstr ""
-
-#~ msgid "Cancel"
-#~ msgstr ""
-
-#~ msgid "Create"
-#~ msgstr ""
-
-#~ msgid "Upload application"
-#~ msgstr ""
-
-#~ msgid "One class of the jar should implement SparkJob."
-#~ msgstr ""
-
-#~ msgid "Local jar file"
-#~ msgstr ""
-
-#~ msgid "App name"
-#~ msgstr ""
-
-#~ msgid "Upload"
-#~ msgstr ""
-
-#~ msgid "Query"
-#~ msgstr ""
-
-#~ msgid "Application name"
-#~ msgstr ""
-
-#~ msgid "Application description"
-#~ msgstr ""
-
-#~ msgid "Upload app"
-#~ msgstr ""
-
-#~ msgid "Missing, add one?"
-#~ msgstr ""
-
-#~ msgid "Context"
-#~ msgstr ""
-
-#~ msgid "Automatic"
-#~ msgstr ""
-
-#~ msgid "Create one?"
-#~ msgstr ""
-
-#~ msgid "Parameters"
-#~ msgstr ""
-
-#~ msgid "Your application has the following error(s):"
-#~ msgstr ""
-
-#~ msgid "No parameters defined yet."
-#~ msgstr ""
-
-#~ msgid "Value"
-#~ msgstr ""
-
-#~ msgid "Delete"
-#~ msgstr ""
-
-#~ msgid "Add"
-#~ msgstr ""
-
-#~ msgid "Executing..."
-#~ msgstr ""
-
-#~ msgid "Execute"
-#~ msgstr ""
-
-#~ msgid "Save"
-#~ msgstr ""
-
-#~ msgid "Save as..."
-#~ msgstr ""
-
-#~ msgid "or create a"
-#~ msgstr ""
-
-#~ msgid "New application"
-#~ msgstr ""
-
-#~ msgid "Download"
-#~ msgstr ""
-
-#~ msgid "Key"
-#~ msgstr ""
-
-#~ msgid "The server returned no results."
-#~ msgstr ""
-
-#~ msgid "Save your query"
-#~ msgstr ""
-
-#~ msgid "Description"
-#~ msgstr ""
-
-#~ msgid "Choose a file"
-#~ msgstr ""
-
-#~ msgid "Did you know?"
-#~ msgstr ""
-
-#~ msgid "This field is required."
-#~ msgstr ""
-
-#~ msgid "Empty description"
-#~ msgstr ""
-
-#~ msgid "Application saved successfully!"
-#~ msgstr ""
-
-#~ msgid "No data available"
-#~ msgstr ""
-
-#~ msgid "No matching records"
-#~ msgstr ""
-
-#~ msgid "Server error occured: "
-#~ msgstr ""
-
-#~ msgid "Unmanageable server error occured: "
-#~ msgstr ""
-
-#~ msgid "Search for name"
-#~ msgstr ""
-
-#~ msgid "Upload time"
-#~ msgstr ""
-
-#~ msgid "Click to open and execute"
-#~ msgstr ""
-
-#~ msgid "Delete forever"
-#~ msgstr ""
-
-#~ msgid "Delete selected"
-#~ msgstr ""
-
-#~ msgid "Confirm action"
-#~ msgstr ""
-
-#~ msgid "Yes"
-#~ msgstr ""
-
-#~ msgid "Delete the selected contexts?"
-#~ msgstr ""
-
-#~ msgid "Jobs"
-#~ msgstr ""
-
-#~ msgid "Status"
-#~ msgstr ""
-
-#~ msgid "Job id"
-#~ msgstr ""
-
-#~ msgid "Start time"
-#~ msgstr ""
-
-#~ msgid "Duration"
-#~ msgstr ""
-
-#~ msgid "Click to open"
+#: src/metadata/conf.py:158
+msgid ""
+"Navigator configuration directory, where navigator.client.properties is "
+"located."
+msgstr ""
+
+#: src/metadata/conf.py:163
+msgid "Perform Sentry privilege filtering."
+msgstr ""
+
+#: src/metadata/navigator_api.py:388 src/metadata/navigator_api.py:406
+msgid ""
+"add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
+"empty list of tags"
+msgstr ""
+
+#: src/metadata/navigator_api.py:424
+msgid ""
+"update_properties requires an 'id' parameter and 'properties' parameter "
+"that is a non-empty dict"
+msgstr ""
+
+#: src/metadata/navigator_api.py:442
+msgid ""
+"update_properties requires an 'id' parameter and 'keys' parameter that is"
+" a non-empty list"
+msgstr ""
+
+#: src/metadata/optimizer_client.py:96 src/metadata/optimizer_client.py:120
+#: src/metadata/optimizer_client.py:131 src/metadata/optimizer_client.py:142
+#: src/metadata/optimizer_client.py:174
+msgid "Error while accessing Optimizer"
+msgstr ""
+
+#~ msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
 #~ msgstr ""
 

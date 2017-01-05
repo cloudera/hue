@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -44,35 +44,67 @@ msgstr "Puerto del servidor Impala."
 
 #: src/impala/conf.py:46
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
-msgstr "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente 'hue/hostname.foo.com'."
+msgstr ""
+"Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente "
+"'hue/hostname.foo.com'."
 
 #: src/impala/conf.py:52
 msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Activar/desactivar mecanismo de suplantación al hablar con Impala."
 
 #: src/impala/conf.py:58
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
-msgstr "Número de filas iniciales de un conjunto de resultados que se le solicitará a Impala que almacene en caché para poder volver a capturarlos y descargarlos. Se establece en 0 para desactivar la opción y tener compatibilidad con versiones anteriores."
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
+msgstr ""
+"Número de filas iniciales de un conjunto de resultados que se le "
+"solicitará a Impala que almacene en caché para poder volver a capturarlos"
+" y descargarlos. Se establece en 0 para desactivar la opción y tener "
+"compatibilidad con versiones anteriores."
 
 #: src/impala/conf.py:68
 msgid "Timeout in seconds for Thrift calls."
 msgstr "Tiempo de espera en segundos para llamadas de Thrift."
 
 #: src/impala/conf.py:72
-msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
-msgstr "Hue tratará de cerrar la consulta de Impala cuando el usuario abandone la página de editor. Así liberará todos los recursos de consulta de Impala, pero no se podrá acceder a sus resultados."
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"Hue tratará de cerrar la consulta de Impala cuando el usuario abandone la"
+" página de editor. Así liberará todos los recursos de consulta de Impala,"
+" pero no se podrá acceder a sus resultados."
 
 #: src/impala/conf.py:80
-msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
-msgstr "Si QUERY_TIMEOUT_S > 0, se superará el tiempo de espera de la consulta (es decir, se cancelará) si Impala no realiza ninguna acción (calcula o devuelve resultados) para esa consulta en el plazo de QUERY_TIMEOUT_S segundos."
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"Si QUERY_TIMEOUT_S > 0, se superará el tiempo de espera de la consulta "
+"(es decir, se cancelará) si Impala no realiza ninguna acción (calcula o "
+"devuelve resultados) para esa consulta en el plazo de QUERY_TIMEOUT_S "
+"segundos."
 
 #: src/impala/conf.py:88
-msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
-msgstr "Si SESSION_TIMEOUT_S > 0, se superará el tiempo de espera de la sesión (es decir, se cancelará) si Impala no realiza ninguna acción (calcula o devuelve resultados) para esa sesión en el plazo de QUERY_TIMEOUT_S segundos."
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+msgstr ""
+"Si SESSION_TIMEOUT_S > 0, se superará el tiempo de espera de la sesión (es decir, se cancelará) "
+"si Impala no realiza ninguna acción (calcula o devuelve resultados) para esa "
+"sesión en el plazo de QUERY_TIMEOUT_S segundos. Predeterminado: 1 hora."
 
 #: src/impala/conf.py:98
-msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
-msgstr "Una lista separada por comas de propiedades de configuración de lista blanca de Impala que los usuarios están autorizados a establecer."
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
+msgstr ""
+"Una lista separada por comas de propiedades de configuración de lista "
+"blanca de Impala que los usuarios están autorizados a establecer."
 
 #: src/impala/conf.py:103
 msgid "SSL configuration for the server."
@@ -100,15 +132,23 @@ msgstr "Elija si Hue debe validar los certificados que reciba del servidor."
 
 #: src/impala/conf.py:148
 msgid "Auth username of the hue user used for authentications."
-msgstr "Nombre de usuario de autenticación del usuario de Hue que se utiliza para las autenticaciones."
+msgstr ""
+"Nombre de usuario de autenticación del usuario de Hue que se utiliza para"
+" las autenticaciones."
 
 #: src/impala/conf.py:162
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
-msgstr "Contraseña de LDAP/PAM del usuario de Hue que se utiliza para las autenticaciones."
+msgstr ""
+"Contraseña de LDAP/PAM del usuario de Hue que se utiliza para las "
+"autenticaciones."
 
 #: src/impala/conf.py:168
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
-msgstr "Ejecute esta secuencia de comandos para generar la contraseña de autenticación. Se utilizará cuando `auth_password` no esté definido."
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
+msgstr ""
+"Ejecute esta secuencia de comandos para generar la contraseña de "
+"autenticación. Se utilizará cuando `auth_password` no esté definido."
 
 #: src/impala/dashboards.py:213
 msgid "Page saved !"
@@ -231,6 +271,11 @@ msgstr "No se ha encontrado ninguna base de datos."
 msgid "Oops, no table found!"
 msgstr "No se ha encontrado ninguna tabla."
 
-#~ msgid "No available Impalad to send queries to."
-#~ msgstr "No hay ningún Impalad disponible al que enviar las consultas."
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
 
+#~ msgid "A POST request is required."
+#~ msgstr ""

@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/rdbms/api.py:138 src/rdbms/api.py:183 src/rdbms/api.py:266
+#: src/rdbms/api.py:139 src/rdbms/api.py:184 src/rdbms/api.py:267
 msgid "A POST request is required."
 msgstr "Se necesita una solicitud POST."
 
-#: src/rdbms/api.py:170 src/rdbms/api.py:208
+#: src/rdbms/api.py:171 src/rdbms/api.py:209
 msgid "There was an error with your query."
 msgstr "Se ha producido un error en la consulta."
 
-#: src/rdbms/api.py:293
+#: src/rdbms/api.py:294
 msgid "A GET request is required."
 msgstr "Se necesita una solicitud GET."
 
-#: src/rdbms/api.py:334
+#: src/rdbms/api.py:335
 msgid "Server specified doesn't exist."
 msgstr "El servidor especificado no existe."
 
-#: src/rdbms/api.py:340
+#: src/rdbms/api.py:341
 msgid "No databases are available. Permissions could be missing."
 msgstr "No hay bases de datos disponibles. Puede que falten los permisos."
 
@@ -112,7 +112,7 @@ msgstr "Nombre de tabla..."
 msgid "The selected database has no tables."
 msgstr "La base de datos seleccionada no tiene tablas."
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:818
 msgid "Query name"
 msgstr "Nombre de consulta"
 
@@ -168,54 +168,67 @@ msgstr "Descripción"
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/rdbms/templates/execute.mako:395
+#: src/rdbms/templates/execute.mako:392
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "Ejemplo: SELECT * FROM nombre de tabla o pulse CTRL + espacio"
 
-#: src/rdbms/templates/execute.mako:584
+#: src/rdbms/templates/execute.mako:581
 msgid "Did you know?"
 msgstr "¿Lo sabía?"
 
-#: src/rdbms/templates/execute.mako:670
+#: src/rdbms/templates/execute.mako:667
 msgid "No query provided to save."
 msgstr "No se ha indicado ninguna consulta que guardar."
 
-#: src/rdbms/templates/execute.mako:692
+#: src/rdbms/templates/execute.mako:689
 msgid "Oops, no server found!"
 msgstr "No se encontró ningún servidor."
 
-#: src/rdbms/templates/execute.mako:698
+#: src/rdbms/templates/execute.mako:695
 msgid "Oops, no database found!"
 msgstr "No se ha encontrado ninguna base de datos."
 
-#: src/rdbms/templates/execute.mako:815
+#: src/rdbms/templates/execute.mako:812
 msgid "This field is required."
 msgstr "Este campo es obligatorio."
 
-#: src/rdbms/templates/execute.mako:828
+#: src/rdbms/templates/execute.mako:825
 msgid "Empty description"
 msgstr "Descripción vacía"
 
-#: src/rdbms/templates/execute.mako:834
+#: src/rdbms/templates/execute.mako:831
 msgid "Query saved successfully!"
 msgstr "Consulta guardada correctamente."
 
-#: src/rdbms/templates/execute.mako:880
+#: src/rdbms/templates/execute.mako:877
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/rdbms/templates/execute.mako:881
+#: src/rdbms/templates/execute.mako:878
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:916
 msgid "Server error occured: "
 msgstr "Se ha producido un error del servidor: "
 
-#: src/rdbms/templates/execute.mako:922
+#: src/rdbms/templates/execute.mako:919
 msgid "Unmanageable server error occured: "
 msgstr "Se ha producido un error de servidor que no se puede gestionar: "
 
-#~ msgid "Share"
-#~ msgstr "Compartir"
+#~ msgid "Host of the Impala Server."
+#~ msgstr ""
 
+#~ msgid "Port of the Impala Server."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Beeswax or Hive Server 2 Thrift "
+#~ "API used. Choices are: 'beeswax' or "
+#~ "'hiveserver2'."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Kerberos principal name for Impala. "
+#~ "Typically 'impala/hostname.foo.com'."
+#~ msgstr ""

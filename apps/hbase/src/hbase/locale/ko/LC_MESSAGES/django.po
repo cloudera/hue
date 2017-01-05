@@ -5,10 +5,10 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -38,27 +38,42 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "이름이 %s인 클러스터가 구성에 없습니다."
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
 msgstr "hbase-site.xml 구성 파일에 kerberos 원칙 이름이 누락되었습니다."
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "'(name|host:port)' 형식의 클러스터에 대한 쉼표로 구분된 HBase Thrift Server 목록입니다. 안전하게 전체 호스트 이름을 사용하십시오. 가장과 함께 SSL 및 http 모드를 사용하는 경우 호스트 이름에 접두사로 https://를 지정하십시오."
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"'(name|host:port)' 형식의 클러스터에 대한 쉼표로 구분된 HBase Thrift Server 목록입니다. 안전하게 "
+"전체 호스트 이름을 사용하십시오. 가장과 함께 SSL 및 http 모드를 사용하는 경우 호스트 이름에 접두사로 https://를 "
+"지정하십시오."
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "자르기 전에 가져온 행당 행 또는 열 하드 제한입니다."
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "'buffered'은 HBase Thrift Server의 기본값이며 보안을 지원합니다. 'framed'를 사용하여 응답을 생성할 수 있으며 Thrift의 비차단 서버와 함께 사용할 때 유용합니다."
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"'buffered'은 HBase Thrift Server의 기본값이며 보안을 지원합니다. 'framed'를 사용하여 응답을 생성할 "
+"수 있으며 Thrift의 비차단 서버와 함께 사용할 때 유용합니다."
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "hive-site.xml이 위치한 HBase 구성 디렉토리입니다."
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
 msgstr "hbase-site.xml 속성에 상관없이 Hue에서 doas 가장과 함께 Http Thrift 모드를 사용합니다."
 
 #: src/hbase/views.py:135
@@ -172,8 +187,12 @@ msgid "Add a column property"
 msgstr "열 속성 추가"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -383,9 +402,14 @@ msgstr "정수"
 msgid "Column Range"
 msgstr "열 범위"
 
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "검색 기준과 일치하는 테이블이 없습니다."
+#~ msgid "About Hue"
+#~ msgstr ""
 
-#~ msgid "OK"
-#~ msgstr "확인"
+#~ msgid "Configuration"
+#~ msgstr ""
 
+#~ msgid "Check for misconfiguration"
+#~ msgstr ""
+
+#~ msgid "Server Logs"
+#~ msgstr ""

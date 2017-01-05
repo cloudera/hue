@@ -1,14 +1,14 @@
 # Spanish translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:47-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1)\n"
@@ -22,8 +22,13 @@ msgid "New user home directory is created with these permissions"
 msgstr "Un nuevo directorio de inicio se crea con estos permisos"
 
 #: src/useradmin/conf.py:32
-msgid "The name of a default group for users at creation time, or at first login if the server is configured to authenticate against an external source."
-msgstr "El nombre de un grupo predeterminado para usuarios en el momento de su creación o en el primer inicio de sesión si el servidor está configurado para autenticar con un origen externo."
+msgid ""
+"The name of a default group for users at creation time, or at first login"
+" if the server is configured to authenticate against an external source."
+msgstr ""
+"El nombre de un grupo predeterminado para usuarios en el momento de su "
+"creación o en el primer inicio de sesión si el servidor está configurado "
+"para autenticar con un origen externo."
 
 #: src/useradmin/conf.py:39
 msgid "Configuration options for user password policy"
@@ -34,16 +39,28 @@ msgid "Enable user password policy."
 msgstr "Active la política de contraseñas de usuario."
 
 #: src/useradmin/conf.py:49
-msgid "The regular expression of password rule. The default rule requires that a password  must be at least 8 characters long, and must contain both uppercase and lowercase letters, at least one number, and at least one special character."
-msgstr "La expresión regular de la regla de contraseñas. La regla predeterminada requiere que la contraseña tenga al menos 8 caracteres y que incluya letras mayúsculas y minúsculas, un número y un carácter especial como mínimo."
+msgid ""
+"The regular expression of password rule. The default rule requires that a"
+" password  must be at least 8 characters long, and must contain both "
+"uppercase and lowercase letters, at least one number, and at least one "
+"special character."
+msgstr ""
+"La expresión regular de la regla de contraseñas. La regla predeterminada "
+"requiere que la contraseña tenga al menos 8 caracteres y que incluya "
+"letras mayúsculas y minúsculas, un número y un carácter especial como "
+"mínimo."
 
 #: src/useradmin/conf.py:58
 msgid "Message about the password rule defined in pwd_regex"
 msgstr "El mensaje sobre la regla de contraseñas definido en pwd_regex"
 
 #: src/useradmin/conf.py:66
-msgid "The error message displayed if the provided password does not meet the enhanced password rule"
-msgstr "El mensaje de error que aparece si la contraseña facilitada no cumple la regla de contraseñas mejoradas"
+msgid ""
+"The error message displayed if the provided password does not meet the "
+"enhanced password rule"
+msgstr ""
+"El mensaje de error que aparece si la contraseña facilitada no cumple la "
+"regla de contraseñas mejoradas"
 
 #: src/useradmin/forms.py:49
 msgid "Full Distinguished Name required."
@@ -71,7 +88,9 @@ msgstr "El nombre de grupo debe tener 80 caracteres o menos."
 
 #: src/useradmin/forms.py:69
 msgid "Group name can be any character as long as it's 80 characters or fewer."
-msgstr "El nombre de grupo puede contener cualquier carácter siempre y cuando no supere el límite de 80 caracteres."
+msgstr ""
+"El nombre de grupo puede contener cualquier carácter siempre y cuando no "
+"supere el límite de 80 caracteres."
 
 #: src/useradmin/forms.py:73
 msgid "first_name must be fewer than 30 characters."
@@ -140,8 +159,12 @@ msgid "You must specify a password when creating a new user."
 msgstr "Debe especificar una contraseña al crear un nuevo usuario."
 
 #: src/useradmin/forms.py:226
-msgid "Required. 30 characters or fewer with username. 64 characters or fewer with DN. No whitespaces or colons."
-msgstr "Obligatorio. Nombre de usuario de 30 caracteres o menos. Nombre de dominio de 64 caracteres o menos. Sin espacios en blanco ni dos puntos."
+msgid ""
+"Required. 30 characters or fewer with username. 64 characters or fewer "
+"with DN. No whitespaces or colons."
+msgstr ""
+"Obligatorio. Nombre de usuario de 30 caracteres o menos. Nombre de "
+"dominio de 64 caracteres o menos. Sin espacios en blanco ni dos puntos."
 
 #: src/useradmin/forms.py:228 src/useradmin/forms.py:267
 msgid "Distinguished name"
@@ -186,8 +209,12 @@ msgid "Create home directories"
 msgstr "Crear directorios de inicio"
 
 #: src/useradmin/forms.py:277
-msgid "Create home directories for every member imported, if members are being imported."
-msgstr "Crear directorios de inicio para todos los miembros importados, si se están importando miembros."
+msgid ""
+"Create home directories for every member imported, if members are being "
+"imported."
+msgstr ""
+"Crear directorios de inicio para todos los miembros importados, si se "
+"están importando miembros."
 
 #: src/useradmin/forms.py:280
 msgid "Import new members from all subgroups"
@@ -234,166 +261,172 @@ msgstr "Si se trata del primer inicio de sesión del usuario."
 msgid "You do not have permissions to %(description)s."
 msgstr "No tiene permisos para %(description)s."
 
-#: src/useradmin/views.py:148
+#: src/useradmin/views.py:153
 msgid "You must be a superuser to delete users."
 msgstr "Debe ser un superusuario para eliminar usuarios."
 
-#: src/useradmin/views.py:151
+#: src/useradmin/views.py:156
 msgid "A POST request is required."
 msgstr "Se necesita una solicitud POST."
 
-#: src/useradmin/views.py:158
+#: src/useradmin/views.py:163
 msgid "You cannot remove yourself."
 msgstr "No puede quitarse a sí mismo."
 
-#: src/useradmin/views.py:171
+#: src/useradmin/views.py:176
 msgid "The users were deleted."
 msgstr "Los usuarios se han eliminado."
 
-#: src/useradmin/views.py:182
+#: src/useradmin/views.py:187
 msgid "You must be a superuser to delete groups."
 msgstr "Debe ser un superusuario para eliminar grupos."
 
-#: src/useradmin/views.py:191
+#: src/useradmin/views.py:196
 msgid "The default user group may not be deleted."
 msgstr "No se puede eliminar el grupo de usuarios predeterminado."
 
-#: src/useradmin/views.py:194
+#: src/useradmin/views.py:199
 msgid "The groups were deleted."
 msgstr "Los grupos se han eliminado."
 
-#: src/useradmin/views.py:201
+#: src/useradmin/views.py:206
 msgid "Group not found."
 msgstr "Grupo no encontrado."
 
-#: src/useradmin/views.py:230
+#: src/useradmin/views.py:235
 msgid "You must be a superuser to add or edit another user."
 msgstr "Debe ser un superusuario para agregar o editar otro usuario."
 
-#: src/useradmin/views.py:256
+#: src/useradmin/views.py:261
 msgid "You cannot change a username."
 msgstr "No puede cambiar un nombre de usuario."
 
-#: src/useradmin/views.py:258
+#: src/useradmin/views.py:263
 msgid "You cannot make yourself inactive."
 msgstr "No puede desactivarse a sí mismo."
 
-#: src/useradmin/views.py:270
+#: src/useradmin/views.py:275
 msgid "You cannot make yourself a superuser."
 msgstr "No puede convertirse a sí mismo en superusuario."
 
-#: src/useradmin/views.py:274
+#: src/useradmin/views.py:279
 msgid "User information updated"
 msgstr "Información de usuario actualizada"
 
-#: src/useradmin/views.py:279
+#: src/useradmin/views.py:284
 msgid "You must be a superuser to reset users."
 msgstr "Debe ser un superusuario para restablecer usuarios."
 
-#: src/useradmin/views.py:283
+#: src/useradmin/views.py:288
 #, python-format
 msgid "Successfully unlocked account for user: %s"
 msgstr "Se ha desbloqueado correctamente la cuenta para el usuario: %s"
 
-#: src/useradmin/views.py:285
+#: src/useradmin/views.py:290
 #, python-format
 msgid "Failed to reset login attempts for %s: %s"
 msgstr "Error al restablecer los intentos de inicio de sesión de %s: %s"
 
-#: src/useradmin/views.py:294 src/useradmin/views.py:483
+#: src/useradmin/views.py:299 src/useradmin/views.py:488
 #, python-format
 msgid "Cannot make home directory for user %s."
 msgstr "No puede ser directorio de inicio para el usuario %s."
 
-#: src/useradmin/views.py:370
+#: src/useradmin/views.py:375
 msgid "You must be a superuser to add or edit a group."
 msgstr "Debe ser un superusuario para agregar o editar un grupo."
 
-#: src/useradmin/views.py:381
+#: src/useradmin/views.py:386
 msgid "Group information updated"
 msgstr "Información de grupo actualizada"
 
-#: src/useradmin/views.py:424
+#: src/useradmin/views.py:429
 msgid "You must be a superuser to change permissions."
 msgstr "Debe ser un superusuario para cambiar permisos."
 
-#: src/useradmin/views.py:432
+#: src/useradmin/views.py:437
 msgid "Permission information updated"
 msgstr "Información de permiso actualizada"
 
-#: src/useradmin/views.py:460
+#: src/useradmin/views.py:465
 msgid "You must be a superuser to add another user."
 msgstr "Debe ser un superusuario para agregar otro usuario."
 
-#: src/useradmin/views.py:474 src/useradmin/views.py:541
-#: src/useradmin/views.py:627
+#: src/useradmin/views.py:479 src/useradmin/views.py:546
+#: src/useradmin/views.py:632
 msgid "There was an error when communicating with LDAP"
 msgstr "Error al comunicar con LDAP"
 
-#: src/useradmin/views.py:476 src/useradmin/views.py:543
+#: src/useradmin/views.py:481 src/useradmin/views.py:548
 msgid "There was a problem with some of the LDAP information"
 msgstr "Se ha producido un problema con parte de la información de LDAP"
 
-#: src/useradmin/views.py:487
+#: src/useradmin/views.py:492
 #, python-format
 msgid "Could not get LDAP details for users in pattern %s."
 msgstr "No se pueden obtener los detalles de LDAP de los usuarios en el patrón %s."
 
-#: src/useradmin/views.py:496 src/useradmin/views.py:564
-#: src/useradmin/views.py:612
+#: src/useradmin/views.py:501 src/useradmin/views.py:569
+#: src/useradmin/views.py:617
 #, python-format
 msgid "Failed to import following users: %s"
 msgstr "Error al importar los siguientes usuarios: %s"
 
-#: src/useradmin/views.py:521
+#: src/useradmin/views.py:526
 msgid "You must be a superuser to add another group."
 msgstr "Debe ser un superusuario para agregar otro grupo."
 
-#: src/useradmin/views.py:540
+#: src/useradmin/views.py:545
 #, python-format
 msgid "LDAP Exception: %s"
 msgstr "Excepción LDAP: %s"
 
-#: src/useradmin/views.py:554
+#: src/useradmin/views.py:559
 #, python-format
 msgid "Exception creating home directory for LDAP user %s in group %s."
-msgstr "Se ha producido una excepción al crear el directorio de inicio del usuario LDAP %s en el grupo %s."
+msgstr ""
+"Se ha producido una excepción al crear el directorio de inicio del "
+"usuario LDAP %s en el grupo %s."
 
-#: src/useradmin/views.py:569
+#: src/useradmin/views.py:574
 #, python-format
 msgid "Could not get LDAP details for groups in pattern %s"
 msgstr "No se pueden obtener los detalles de LDAP de los grupos en el patrón %s"
 
-#: src/useradmin/views.py:591
+#: src/useradmin/views.py:596
 msgid "You must be a superuser to sync the LDAP users/groups."
 msgstr "Para sincronizar los usuarios/grupos LDAP, debe ser un superusuario."
 
-#: src/useradmin/views.py:635
+#: src/useradmin/views.py:640
 msgid "The import may not be complete, sync again."
 msgstr "No se puede completar la importación. Vuelva a sincronizar."
 
-#: src/useradmin/views.py:740
+#: src/useradmin/views.py:749
 #, python-format
 msgid "Synced user %s from Unix"
 msgstr "Usuario %s sincronizado desde Unix"
 
-#: src/useradmin/views.py:756
+#: src/useradmin/views.py:765
 msgid "No active superuser configured."
 msgstr "Ningún superusuario activo configurado."
 
-#: src/useradmin/views.py:758
+#: src/useradmin/views.py:767
 msgid "You cannot remove the last active superuser from the configuration."
 msgstr "No puede quitar el último superusuario activo de la configuración."
 
-#: src/useradmin/views.py:794
+#: src/useradmin/views.py:803
 #, python-format
 msgid "There was a naming conflict while importing user %(username)s"
 msgstr "Se ha producido un conflicto de nombre al importar el usuario %(username)s"
 
-#: src/useradmin/views.py:995 src/useradmin/views.py:1050
+#: src/useradmin/views.py:1004 src/useradmin/views.py:1059
 #, python-format
-msgid "There was a naming conflict while importing group %(groupname)s in pattern %(groupname_pattern)s"
-msgstr "Se ha producido un conflicto de nombre al importar el grupo %(groupname)s en el patrón %(groupname_pattern)s"
+msgid ""
+"There was a naming conflict while importing group %(groupname)s in "
+"pattern %(groupname_pattern)s"
+msgstr ""
+"Se ha producido un conflicto de nombre al importar el grupo %(groupname)s"
+" en el patrón %(groupname_pattern)s"
 
 #: src/useradmin/management/commands/import_ldap_group.py:42
 msgid "Import users from the group."
@@ -470,7 +503,7 @@ msgstr "Agregar/sincronizar usuario"
 #: src/useradmin/templates/add_ldap_users.mako:52
 #: src/useradmin/templates/edit_group.mako:78
 #: src/useradmin/templates/edit_permissions.mako:58
-#: src/useradmin/templates/list_configurations.mako:111
+#: src/useradmin/templates/list_configurations.mako:118
 #: src/useradmin/templates/sync_ldap_users_groups.mako:52
 msgid "Cancel"
 msgstr "Cancelar"
@@ -641,8 +674,8 @@ msgid "Users"
 msgstr "Usuarios"
 
 #: src/useradmin/templates/layout.mako:65
-#: src/useradmin/templates/list_configurations.mako:41
-#: src/useradmin/templates/list_configurations.mako:80
+#: src/useradmin/templates/list_configurations.mako:48
+#: src/useradmin/templates/list_configurations.mako:87
 #: src/useradmin/templates/list_permissions.mako:43
 #: src/useradmin/templates/list_users.mako:76
 msgid "Groups"
@@ -654,45 +687,45 @@ msgid "Permissions"
 msgstr "Permisos"
 
 #: src/useradmin/templates/layout.mako:68
-#: src/useradmin/templates/list_configurations.mako:29
-#: src/useradmin/templates/list_configurations.mako:35
+#: src/useradmin/templates/list_configurations.mako:28
+#: src/useradmin/templates/list_configurations.mako:42
 msgid "Configurations"
 msgstr "Configuraciones"
 
-#: src/useradmin/templates/list_configurations.mako:40
+#: src/useradmin/templates/list_configurations.mako:47
 #: src/useradmin/templates/list_permissions.mako:41
 msgid "Application"
 msgstr "Aplicación"
 
-#: src/useradmin/templates/list_configurations.mako:59
+#: src/useradmin/templates/list_configurations.mako:66
 msgid "There are no configurations matching the search criteria."
 msgstr "No hay ninguna configuración que coincida con los criterios de búsqueda."
 
-#: src/useradmin/templates/list_configurations.mako:71
+#: src/useradmin/templates/list_configurations.mako:78
 msgid "configuration"
 msgstr "configuración"
 
-#: src/useradmin/templates/list_configurations.mako:74
+#: src/useradmin/templates/list_configurations.mako:81
 msgid "Role"
 msgstr "Rol"
 
-#: src/useradmin/templates/list_configurations.mako:76
+#: src/useradmin/templates/list_configurations.mako:83
 msgid "Remove"
 msgstr "Quitar"
 
-#: src/useradmin/templates/list_configurations.mako:95
+#: src/useradmin/templates/list_configurations.mako:102
 msgid "Properties"
 msgstr "Propiedades"
 
-#: src/useradmin/templates/list_configurations.mako:104
+#: src/useradmin/templates/list_configurations.mako:111
 msgid "Add role"
 msgstr "Añadir rol"
 
-#: src/useradmin/templates/list_configurations.mako:110
+#: src/useradmin/templates/list_configurations.mako:117
 msgid "Update configuration"
 msgstr "Actualizar configuración"
 
-#: src/useradmin/templates/list_configurations.mako:117
+#: src/useradmin/templates/list_configurations.mako:124
 msgid "There was an error loading the configurations"
 msgstr "Se ha producido un error al cargar las configuraciones"
 
@@ -737,15 +770,15 @@ msgstr "¿Está seguro de que desea eliminar los grupos seleccionados?"
 msgid "No"
 msgstr "No"
 
-#: src/useradmin/templates/list_groups.mako:153
-#: src/useradmin/templates/list_permissions.mako:90
-#: src/useradmin/templates/list_users.mako:169
+#: src/useradmin/templates/list_groups.mako:156
+#: src/useradmin/templates/list_permissions.mako:91
+#: src/useradmin/templates/list_users.mako:172
 msgid "No data available"
 msgstr "No hay datos disponibles"
 
-#: src/useradmin/templates/list_groups.mako:154
-#: src/useradmin/templates/list_permissions.mako:91
-#: src/useradmin/templates/list_users.mako:170
+#: src/useradmin/templates/list_groups.mako:157
+#: src/useradmin/templates/list_permissions.mako:92
+#: src/useradmin/templates/list_users.mako:173
 msgid "No matching records"
 msgstr "No hay registros coincidentes"
 
@@ -811,12 +844,21 @@ msgid "Sync LDAP users and groups"
 msgstr "Sincronizar usuarios y grupos LDAP"
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:44
-msgid "This will not import any users or groups that don't already exist in Hue. Only users and groups imported from LDAP can be synced."
-msgstr "De esta forma, no se importará ningún usuario o grupo que no exista ya en Hue. Solo se pueden sincronizar los usuarios y grupos importados de LDAP."
+msgid ""
+"This will not import any users or groups that don't already exist in Hue."
+" Only users and groups imported from LDAP can be synced."
+msgstr ""
+"De esta forma, no se importará ningún usuario o grupo que no exista ya en"
+" Hue. Solo se pueden sincronizar los usuarios y grupos importados de "
+"LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:45
-msgid "All user information and group memberships will be updated based on the LDAP server's current state."
-msgstr "Toda la información del usuario y la pertenencia a grupos se actualizará según el estado actual del servidor LDAP."
+msgid ""
+"All user information and group memberships will be updated based on the "
+"LDAP server's current state."
+msgstr ""
+"Toda la información del usuario y la pertenencia a grupos se actualizará "
+"según el estado actual del servidor LDAP."
 
 #: src/useradmin/templates/sync_ldap_users_groups.mako:53
 msgid "Sync"
@@ -839,9 +881,41 @@ msgstr "Apellido"
 msgid "Email"
 msgstr "Email"
 
-#~ msgid "The old password does not match the current password."
-#~ msgstr "La contraseña antigua no coincide con la actual."
+#~ msgid "Password"
+#~ msgstr ""
 
-#~ msgid "Step 2: Names"
-#~ msgstr "Paso 2: nombres"
+#~ msgid "Too long: 30 characters or fewer and not %s"
+#~ msgstr ""
 
+#~ msgid "Required. 80 characters or fewer."
+#~ msgstr ""
+
+#~ msgid "80 characters or fewer."
+#~ msgstr ""
+
+#~ msgid "The group was deleted."
+#~ msgstr ""
+
+#~ msgid "Could not get LDAP details for users with pattern %s"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "There was a naming conflict while "
+#~ "importing user %(username)s in pattern "
+#~ "%(username_pattern)s"
+#~ msgstr ""
+
+#~ msgid "Could not get LDAP details for group pattern %s"
+#~ msgstr ""
+
+#~ msgid "Are you sure you want to delete"
+#~ msgstr ""
+
+#~ msgid "?"
+#~ msgstr ""
+
+#~ msgid "Step 1: Credentials (required)"
+#~ msgstr ""
+
+#~ msgid "Step 2: Names and Groups"
+#~ msgstr ""

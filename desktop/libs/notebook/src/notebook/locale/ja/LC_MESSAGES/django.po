@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,208 +17,245 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/notebook/api.py:325
+#: src/notebook/api.py:363
 msgid "Query saved successfully"
 msgstr "クエリが正常に保存されました"
 
-#: src/notebook/api.py:325
+#: src/notebook/api.py:363
 msgid "Notebook saved successfully"
 msgstr "ノートブックは正常に保存されました"
 
-#: src/notebook/api.py:418
+#: src/notebook/api.py:450
 msgid "History fetched"
 msgstr "履歴をフェッチしました"
 
-#: src/notebook/api.py:436
+#: src/notebook/api.py:468
 msgid "History cleared !"
 msgstr "履歴がクリアされました。"
 
-#: src/notebook/api.py:453
+#: src/notebook/api.py:485
 msgid "Notebook loaded successfully"
 msgstr "ノートブックは正常にロードされました"
 
-#: src/notebook/api.py:483
+#: src/notebook/api.py:515
 msgid "Notebook closed successfully"
 msgstr "ノートブックは正常に終了されました"
 
-#: src/notebook/api.py:503
+#: src/notebook/api.py:535
 msgid "Statement closed !"
 msgstr "ステートメントを終了しました。"
 
-#: src/notebook/api.py:580
+#: src/notebook/api.py:623
 msgid "url param is required"
 msgstr "url パラメーターは必須です"
 
-#: src/notebook/api.py:591
+#: src/notebook/api.py:634
 msgid "User is already authenticated to GitHub."
 msgstr "ユーザーはすでに GitHub に認証されています。"
 
-#: src/notebook/api.py:623
+#: src/notebook/api.py:666
 msgid "Exporting result failed."
 msgstr "結果のエクスポートに失敗しました。"
 
-#: src/notebook/api.py:639
-msgid "The target path is a directory"
-msgstr "ターゲットパスはディレクトリです"
-
-#: src/notebook/conf.py:46
+#: src/notebook/conf.py:51
 msgid "Show the notebook menu or not"
 msgstr "ノートブックのメニューを表示／非表示"
 
-#: src/notebook/conf.py:55
+#: src/notebook/conf.py:60
 msgid "Define the name and how to connect and execute the language."
 msgstr "名前と接続方法を定義して、言語を実行します。"
 
-#: src/notebook/conf.py:59
+#: src/notebook/conf.py:64
 msgid "The name of the snippet."
 msgstr "スニペットの名前です。"
 
-#: src/notebook/conf.py:71
+#: src/notebook/conf.py:76
 msgid "Specific options for connecting to the server."
 msgstr "サーバーに接続するための特定オプションです。"
 
-#: src/notebook/conf.py:81
+#: src/notebook/conf.py:86
 msgid "Main flag to override the automatic starting of the DBProxy server."
 msgstr "DBProxy サーバーの自動起動を上書きするメインフラグです。"
 
-#: src/notebook/conf.py:88
+#: src/notebook/conf.py:93
 msgid "Flag to enable the SQL query builder of the table assist."
 msgstr "Table Assist の SQL Query Builder を有効にするフラグです。"
 
-#: src/notebook/conf.py:95
+#: src/notebook/conf.py:100
 msgid "Flag to enable the creation of a coordinator for the current SQL query."
 msgstr "現在の SQL クエリのために Coordinator の作成を有効化するフラグです。"
 
-#: src/notebook/conf.py:102
+#: src/notebook/conf.py:107
+msgid ""
+"Flag to enable the bulk submission of queries as a background task "
+"through Oozie."
+msgstr ""
+"Oozie を使用したバックグラウンドタスクによるクエリの一括サブミッションを有効にする"
+"フラグです。"
+
+#: src/notebook/conf.py:115
 msgid "Base URL to GitHub Remote Server"
 msgstr "GitHub Remote Server へのベース URL"
 
-#: src/notebook/conf.py:109
+#: src/notebook/conf.py:122
 msgid "Base URL to GitHub API"
 msgstr "GitHub API へのベース URL"
 
-#: src/notebook/conf.py:116
+#: src/notebook/conf.py:129
 msgid "The Client ID of the GitHub application."
 msgstr "GitHub アプリケーションのクライアント ID です。"
 
-#: src/notebook/conf.py:123
+#: src/notebook/conf.py:136
 msgid "The Client Secret of the GitHub application."
 msgstr "GitHub アプリケーションのクライアントシークレットです。"
 
-#: src/notebook/decorators.py:52 src/notebook/decorators.py:69
+#: src/notebook/decorators.py:53 src/notebook/decorators.py:70
 #, python-format
 msgid "Document %(id)s does not exist"
 msgstr "ドキュメント %(id)s が存在しません"
 
-#: src/notebook/views.py:150
+#: src/notebook/views.py:194
 #, python-format
 msgid "Action %s is unknown"
 msgstr "アクション %s が不明です"
 
-#: src/notebook/views.py:214
+#: src/notebook/views.py:220
+#, python-format
+msgid "Trashed %d notebook(s)"
+msgstr "%d 個のノートブックをゴミ箱に移動しました"
+
+#: src/notebook/views.py:259
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/notebook/connectors/base.py:47
+#: src/notebook/connectors/base.py:51
 msgid "No error message, please check the logs."
 msgstr "エラーメッセージがありません。ログを確認してください。"
 
-#: src/notebook/connectors/base.py:105
+#: src/notebook/connectors/base.py:202
 #, python-format
 msgid "Snippet type %(type)s is not configured in hue.ini"
 msgstr "スニペットタイプ %(type)s が hue.ini で設定されていません"
 
-#: src/notebook/connectors/base.py:128
+#: src/notebook/connectors/base.py:225
 #, python-format
 msgid "Notebook connector interface not recognized: %s"
 msgstr "ノートブックコネクタインターフェイスは認識されていません：%s"
 
-#: src/notebook/connectors/hiveserver2.py:96
+#: src/notebook/connectors/hiveserver2.py:111
 #: src/notebook/connectors/spark_shell.py:60
 msgid "Files"
 msgstr "ファイル"
 
-#: src/notebook/connectors/hiveserver2.py:98
+#: src/notebook/connectors/hiveserver2.py:113
 msgid "Add one or more files, jars, or archives to the list of resources."
 msgstr "1 つ以上のファイル、jar、またはアーカイブをリソースのリストに追加します。"
 
-#: src/notebook/connectors/hiveserver2.py:104
+#: src/notebook/connectors/hiveserver2.py:119
 msgid "Functions"
 msgstr "関数"
 
-#: src/notebook/connectors/hiveserver2.py:106
-msgid "Add one or more registered UDFs (requires function name and fully-qualified class name)."
+#: src/notebook/connectors/hiveserver2.py:121
+msgid ""
+"Add one or more registered UDFs (requires function name and fully-"
+"qualified class name)."
 msgstr "1 つ以上の登録済み UDF を追加します（機能名と完全修飾のクラス名が必要です）。"
 
-#: src/notebook/connectors/hiveserver2.py:112
-#: src/notebook/connectors/hiveserver2.py:130
-#: src/notebook/templates/editor_components.mako:1407
+#: src/notebook/connectors/hiveserver2.py:127
+#: src/notebook/connectors/hiveserver2.py:144
+#: src/notebook/templates/editor_components.mako:442
+#: src/notebook/templates/editor_components.mako:1536
 msgid "Settings"
 msgstr "設定"
 
-#: src/notebook/connectors/hiveserver2.py:114
+#: src/notebook/connectors/hiveserver2.py:129
 msgid "Hive and Hadoop configuration properties."
 msgstr "Hive および Hadoop の設定プロパティです。"
 
-#: src/notebook/connectors/hiveserver2.py:132
+#: src/notebook/connectors/hiveserver2.py:146
 msgid "Impala configuration properties."
 msgstr "Impala の設定プロパティです。"
 
-#: src/notebook/connectors/hiveserver2.py:196
-msgid "Session does not exist or you do not have permissions to close the session."
+#: src/notebook/connectors/hiveserver2.py:209
+msgid ""
+"Session does not exist or you do not have permissions to close the "
+"session."
 msgstr "セッションが存在しないか、セッションを閉じるパーミッションがありません。"
 
-#: src/notebook/connectors/hiveserver2.py:201
+#: src/notebook/connectors/hiveserver2.py:214
 msgid "Session successfully closed."
 msgstr "セッションが正常に閉じられました。"
 
-#: src/notebook/connectors/hiveserver2.py:419
-#: src/notebook/connectors/hiveserver2.py:443
+#: src/notebook/connectors/hiveserver2.py:301
+msgid "Result status is not available"
+msgstr "結果のステータスが不明です"
+
+#: src/notebook/connectors/hiveserver2.py:304
+#, python-format
+msgid "Cannot fetch result metadata for snippet type: %s"
+msgstr "スニペットタイプに対する結果のメタデータをフェッチできません：%s"
+
+#: src/notebook/connectors/hiveserver2.py:366
+msgid "Increase the sasl_max_buffer value in hue.ini"
+msgstr "hue.ini の sasl_max_buffer の値を大きくしてください"
+
+#: src/notebook/connectors/hiveserver2.py:465
+#: src/notebook/connectors/hiveserver2.py:489
 #, python-format
 msgid "Only SELECT statements can be saved. Provided statement: %(query)s"
 msgstr "SELECT ステートメントのみを保存できます。入力されたステートメント：%(query)s"
 
-#: src/notebook/connectors/hiveserver2.py:490
+#: src/notebook/connectors/hiveserver2.py:692
+msgid "Failed to get job details or job does not contain counters data."
+msgstr "ジョブの詳細の取得に失敗したか、ジョブにカウンタのデータがありません。"
+
+#: src/notebook/connectors/hiveserver2.py:725
+msgid "Hive query did not execute any jobs."
+msgstr "Hive クエリでいずれのジョブも実行されませんでした。"
+
+#: src/notebook/connectors/hiveserver2.py:791
 #, python-format
-msgid "Cannot get jobs, failed to find active HS2 session for user: %s"
-msgstr "ジョブを取得できません。ユーザー %s に対して、アクティブな HS2 セッションの検出に失敗しました"
+msgid "Failed to get query profile from Impala Daemon server: %s"
+msgstr "Impala Daemon サーバーからクエリプロファイルを取得できませんでした：%s"
+
+#: src/notebook/connectors/hiveserver2.py:794
+msgid ""
+"Could not find profile in query profile response from Impala Daemon "
+"Server."
+msgstr ""
+"Impala Daemon サーバーからのクエリプロファイル応答でプロファイルが"
+"見つかりません。"
 
 #: src/notebook/connectors/jdbc.py:45
 #, python-format
 msgid "%s: is the DB Proxy server running?"
 msgstr "%s：DB プロキシサーバーは実行中ですか？"
 
-#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:151
+#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:152
 #: src/notebook/connectors/solr.py:176 src/notebook/connectors/solr.py:214
 msgid "Failed to get sample data."
 msgstr "サンプルデータの取得に失敗しました。"
 
-#: src/notebook/connectors/oozie_batch.py:50
-msgid "Notebook is missing a uuid, please save the notebook before executing as a batch job."
+#: src/notebook/connectors/oozie_batch.py:65
+msgid ""
+"Notebook is missing a uuid, please save the notebook before executing as "
+"a batch job."
 msgstr "ノートブックで uuid が見つかりません。一括ジョブとして実行する前にノートブックを保存してください。"
 
-#: src/notebook/connectors/oozie_batch.py:56
-msgid "Oozie batch submission only accepts Hive queries at this time."
-msgstr "この時点で、Oozie 一括サブミッションは Hive クエリのみを受信します。"
+#: src/notebook/connectors/oozie_batch.py:69
+#, python-format
+msgid "%s for %s"
+msgstr "%s（%s）"
 
-#: src/notebook/connectors/oozie_batch.py:59
+#: src/notebook/connectors/oozie_batch.py:74
 #, python-format
 msgid "Batch job for %s"
 msgstr "%s の一括ジョブ"
 
-#: src/notebook/connectors/oozie_batch.py:76
+#: src/notebook/connectors/oozie_batch.py:95
 #, python-format
 msgid "Job was %s"
 msgstr "Job は %s でした"
-
-#: src/notebook/connectors/pig_batch.py:76
-msgid "The script failed to run and was stopped"
-msgstr "スクリプトは、実行に失敗して停止されました"
-
-#: src/notebook/connectors/pig_batch.py:105
-#: src/notebook/connectors/pig_batch.py:130
-msgid "No result"
-msgstr "結果なし"
 
 #: src/notebook/connectors/spark_shell.py:51
 msgid "Jars"
@@ -282,1238 +319,1398 @@ msgid "Archives"
 msgstr "アーカイブ"
 
 #: src/notebook/connectors/spark_shell.py:126
-msgid "Archives to be extracted into the working directory of each executor, only in cluster mode."
+msgid ""
+"Archives to be extracted into the working directory of each executor, "
+"only in cluster mode."
 msgstr "各エグゼキューターの作業ディレクトリに抽出するアーカイブです。クラスターモードの場合に限られます。"
 
-#: src/notebook/connectors/spark_shell.py:175
+#: src/notebook/connectors/spark_shell.py:206
 #, python-format
 msgid "The Spark session could not be created in the cluster: %s"
 msgstr "クラスター %s で Spark セッションを作成できませんでした"
 
-#: src/notebook/templates/editor.mako:28
+#: src/notebook/templates/editor.mako:27
 msgid "Editor"
 msgstr "エディター"
 
-#: src/notebook/templates/editor_components.mako:202
+#: src/notebook/templates/editor_components.mako:232
 msgid "Saving..."
 msgstr "保存中..."
 
-#: src/notebook/templates/editor_components.mako:209
+#: src/notebook/templates/editor_components.mako:239
 msgid "Save as..."
 msgstr "名前を付けて保存..."
 
-#: src/notebook/templates/editor_components.mako:224
+#: src/notebook/templates/editor_components.mako:254
 msgid "Player mode"
 msgstr "プレーヤーモード"
 
-#: src/notebook/templates/editor_components.mako:229
+#: src/notebook/templates/editor_components.mako:259
 msgid "Execute all snippets"
 msgstr "すべてのスニペットを実行"
 
-#: src/notebook/templates/editor_components.mako:234
+#: src/notebook/templates/editor_components.mako:264
 msgid "Clear all results"
 msgstr "すべての結果をクリア"
 
-#: src/notebook/templates/editor_components.mako:239
+#: src/notebook/templates/editor_components.mako:269
 msgid "Display all Notebook content"
 msgstr "すべてのノートブックコンテンツを表示"
 
-#: src/notebook/templates/editor_components.mako:244
-#: src/notebook/templates/editor_components.mako:872
+#: src/notebook/templates/editor_components.mako:274
+#: src/notebook/templates/editor_components.mako:958
 msgid "Import from Github"
 msgstr "Github からインポート"
 
-#: src/notebook/templates/editor_components.mako:249
+#: src/notebook/templates/editor_components.mako:279
 msgid "Export to Jupyter"
 msgstr "Jupyter にエクスポート"
 
-#: src/notebook/templates/editor_components.mako:259
+#: src/notebook/templates/editor_components.mako:289
 msgid "New "
 msgstr "新規 "
 
-#: src/notebook/templates/editor_components.mako:259
+#: src/notebook/templates/editor_components.mako:289
 msgid "Query"
 msgstr "クエリ"
 
-#: src/notebook/templates/editor_components.mako:264
+#: src/notebook/templates/editor_components.mako:294
 msgid "New Notebook"
 msgstr "新しいノートブック"
 
-#: src/notebook/templates/editor_components.mako:269
+#: src/notebook/templates/editor_components.mako:299
 msgid "Queries"
 msgstr "クエリ"
 
-#: src/notebook/templates/editor_components.mako:269
+#: src/notebook/templates/editor_components.mako:299
 #: src/notebook/templates/notebooks.mako:23
 #: src/notebook/templates/notebooks.mako:47
 msgid "Notebooks"
 msgstr "ノートブック"
 
-#: src/notebook/templates/editor_components.mako:275
+#: src/notebook/templates/editor_components.mako:305
 msgid "Context"
 msgstr "コンテキスト"
 
-#: src/notebook/templates/editor_components.mako:284
+#: src/notebook/templates/editor_components.mako:314
 msgid " Editor"
 msgstr " エディター"
 
-#: src/notebook/templates/editor_components.mako:318
+#: src/notebook/templates/editor_components.mako:372
 msgid "This is a history query"
 msgstr "これは履歴のクエリです"
 
-#: src/notebook/templates/editor_components.mako:321
+#: src/notebook/templates/editor_components.mako:375
 msgid "Open directory of this query"
 msgstr "このクエリのディレクトリを開く"
 
-#: src/notebook/templates/editor_components.mako:324
+#: src/notebook/templates/editor_components.mako:378
 msgid "Click to open original saved query"
 msgstr "クリックして元の保存済みクエリを開きます"
 
-#: src/notebook/templates/editor_components.mako:329
+#: src/notebook/templates/editor_components.mako:383
 msgid "This is a saved query"
 msgstr "これは保存済みクエリです"
 
-#: src/notebook/templates/editor_components.mako:363
+#: src/notebook/templates/editor_components.mako:417
+msgid "Row details"
+msgstr "行の詳細"
+
+#: src/notebook/templates/editor_components.mako:430
 msgid "Editor keyboard shortcuts"
 msgstr "エディターのキーボードショートカット"
 
-#: src/notebook/templates/editor_components.mako:368
+#: src/notebook/templates/editor_components.mako:435
 msgid "Line Operations"
 msgstr "行操作"
 
-#: src/notebook/templates/editor_components.mako:369
+#: src/notebook/templates/editor_components.mako:436
 msgid "Selection"
 msgstr "選択"
 
-#: src/notebook/templates/editor_components.mako:370
+#: src/notebook/templates/editor_components.mako:437
 msgid "Multicursor"
 msgstr "マルチカーソル"
 
-#: src/notebook/templates/editor_components.mako:371
+#: src/notebook/templates/editor_components.mako:438
 msgid "Go to"
 msgstr "移動先"
 
-#: src/notebook/templates/editor_components.mako:372
+#: src/notebook/templates/editor_components.mako:439
 msgid "Find/Replace"
 msgstr "検索／置換"
 
-#: src/notebook/templates/editor_components.mako:373
+#: src/notebook/templates/editor_components.mako:440
 msgid "Folding"
 msgstr "折りたたみ"
 
-#: src/notebook/templates/editor_components.mako:374
+#: src/notebook/templates/editor_components.mako:441
 msgid "Other"
 msgstr "その他"
 
-#: src/notebook/templates/editor_components.mako:384
-#: src/notebook/templates/editor_components.mako:447
-#: src/notebook/templates/editor_components.mako:545
-#: src/notebook/templates/editor_components.mako:603
-#: src/notebook/templates/editor_components.mako:706
-#: src/notebook/templates/editor_components.mako:739
-#: src/notebook/templates/editor_components.mako:772
+#: src/notebook/templates/editor_components.mako:452
+#: src/notebook/templates/editor_components.mako:515
+#: src/notebook/templates/editor_components.mako:613
+#: src/notebook/templates/editor_components.mako:671
+#: src/notebook/templates/editor_components.mako:774
+#: src/notebook/templates/editor_components.mako:807
+#: src/notebook/templates/editor_components.mako:840
+#: src/notebook/templates/editor_components.mako:923
 msgid "Action"
 msgstr "アクション"
 
-#: src/notebook/templates/editor_components.mako:391
+#: src/notebook/templates/editor_components.mako:459
 msgid "Remove line"
 msgstr "行を削除"
 
-#: src/notebook/templates/editor_components.mako:396
+#: src/notebook/templates/editor_components.mako:464
 msgid "Copy lines down"
 msgstr "行を下にコピー"
 
-#: src/notebook/templates/editor_components.mako:401
+#: src/notebook/templates/editor_components.mako:469
 msgid "Copy lines up"
 msgstr "行を上にコピー"
 
-#: src/notebook/templates/editor_components.mako:406
+#: src/notebook/templates/editor_components.mako:474
 msgid "Move lines down"
 msgstr "行を下へ移動"
 
-#: src/notebook/templates/editor_components.mako:411
+#: src/notebook/templates/editor_components.mako:479
 msgid "Move lines up"
 msgstr "行を上へ移動"
 
-#: src/notebook/templates/editor_components.mako:416
+#: src/notebook/templates/editor_components.mako:484
 msgid "Remove to line end"
 msgstr "行の末尾まで削除"
 
-#: src/notebook/templates/editor_components.mako:421
+#: src/notebook/templates/editor_components.mako:489
 msgid "Remove to line start"
 msgstr "行の先頭まで削除"
 
-#: src/notebook/templates/editor_components.mako:426
+#: src/notebook/templates/editor_components.mako:494
 msgid "Remove word left"
 msgstr "左の単語を削除"
 
-#: src/notebook/templates/editor_components.mako:431
+#: src/notebook/templates/editor_components.mako:499
 msgid "Remove word right"
 msgstr "右の単語を削除"
 
-#: src/notebook/templates/editor_components.mako:436
+#: src/notebook/templates/editor_components.mako:504
 msgid "Split line"
 msgstr "行を分割"
 
-#: src/notebook/templates/editor_components.mako:454
+#: src/notebook/templates/editor_components.mako:522
 msgid "Select all"
 msgstr "すべて選択"
 
-#: src/notebook/templates/editor_components.mako:459
+#: src/notebook/templates/editor_components.mako:527
 msgid "Select left"
 msgstr "左を選択"
 
-#: src/notebook/templates/editor_components.mako:464
+#: src/notebook/templates/editor_components.mako:532
 msgid "Select right"
 msgstr "右を選択"
 
-#: src/notebook/templates/editor_components.mako:469
+#: src/notebook/templates/editor_components.mako:537
 msgid "Select word left"
 msgstr "左の単語を選択"
 
-#: src/notebook/templates/editor_components.mako:474
+#: src/notebook/templates/editor_components.mako:542
 msgid "Select word right"
 msgstr "右の単語を選択"
 
-#: src/notebook/templates/editor_components.mako:479
+#: src/notebook/templates/editor_components.mako:547
 msgid "Select line start"
 msgstr "行の先頭を選択"
 
-#: src/notebook/templates/editor_components.mako:484
+#: src/notebook/templates/editor_components.mako:552
 msgid "Select line end"
 msgstr "行の末尾を選択"
 
-#: src/notebook/templates/editor_components.mako:489
+#: src/notebook/templates/editor_components.mako:557
 msgid "Select to line end"
 msgstr "行の末尾まで選択"
 
-#: src/notebook/templates/editor_components.mako:494
+#: src/notebook/templates/editor_components.mako:562
 msgid "Select to line start"
 msgstr "行の先頭まで選択"
 
-#: src/notebook/templates/editor_components.mako:499
+#: src/notebook/templates/editor_components.mako:567
 msgid "Select up"
 msgstr "選択"
 
-#: src/notebook/templates/editor_components.mako:504
+#: src/notebook/templates/editor_components.mako:572
 msgid "Select down"
 msgstr "下に選択"
 
-#: src/notebook/templates/editor_components.mako:509
+#: src/notebook/templates/editor_components.mako:577
 msgid "Select page up"
 msgstr "ページを上に選択"
 
-#: src/notebook/templates/editor_components.mako:514
+#: src/notebook/templates/editor_components.mako:582
 msgid "Select page down"
 msgstr "ページを下に選択"
 
-#: src/notebook/templates/editor_components.mako:519
+#: src/notebook/templates/editor_components.mako:587
 msgid "Select to start"
 msgstr "先頭まで選択"
 
-#: src/notebook/templates/editor_components.mako:524
+#: src/notebook/templates/editor_components.mako:592
 msgid "Select to end"
 msgstr "末尾まで選択"
 
-#: src/notebook/templates/editor_components.mako:529
+#: src/notebook/templates/editor_components.mako:597
 msgid "Duplicate selection"
 msgstr "選択を複製"
 
-#: src/notebook/templates/editor_components.mako:534
+#: src/notebook/templates/editor_components.mako:602
 msgid "Select to matching bracket"
 msgstr "一致するかっこまで選択"
 
-#: src/notebook/templates/editor_components.mako:552
+#: src/notebook/templates/editor_components.mako:620
 msgid "Add multi-cursor above"
 msgstr "マルチカーソルを上に追加"
 
-#: src/notebook/templates/editor_components.mako:557
+#: src/notebook/templates/editor_components.mako:625
 msgid "Add multi-cursor below"
 msgstr "マルチカーソルを下に追加"
 
-#: src/notebook/templates/editor_components.mako:562
+#: src/notebook/templates/editor_components.mako:630
 msgid "Add next occurrence to multi-selection"
 msgstr "複数の選択に次のオカレンスを追加"
 
-#: src/notebook/templates/editor_components.mako:567
+#: src/notebook/templates/editor_components.mako:635
 msgid "Add previous occurrence to multi-selection"
 msgstr "複数の選択に前のオカレンスを追加"
 
-#: src/notebook/templates/editor_components.mako:572
+#: src/notebook/templates/editor_components.mako:640
 msgid "Move multicursor from current line to the line above"
 msgstr "現在の行から上の行へマルチカーソルを移動"
 
-#: src/notebook/templates/editor_components.mako:577
+#: src/notebook/templates/editor_components.mako:645
 msgid "Move multicursor from current line to the line below"
 msgstr "現在の行から下の行へマルチカーソルを移動"
 
-#: src/notebook/templates/editor_components.mako:582
+#: src/notebook/templates/editor_components.mako:650
 msgid "Remove current occurrence from multi-selection and move to next"
 msgstr "複数の選択から現在のオカレンスを削除し、次へ移動"
 
-#: src/notebook/templates/editor_components.mako:587
+#: src/notebook/templates/editor_components.mako:655
 msgid "Remove current occurrence from multi-selection and move to previous"
 msgstr "複数の選択から現在のオカレンスを削除し、前へ移動"
 
-#: src/notebook/templates/editor_components.mako:592
+#: src/notebook/templates/editor_components.mako:660
 msgid "Select all from multi-selection"
 msgstr "複数の選択からすべてを選択"
 
-#: src/notebook/templates/editor_components.mako:610
+#: src/notebook/templates/editor_components.mako:678
 msgid "Go to left"
 msgstr "左に移動"
 
-#: src/notebook/templates/editor_components.mako:615
+#: src/notebook/templates/editor_components.mako:683
 msgid "Go to right"
 msgstr "右へ移動"
 
-#: src/notebook/templates/editor_components.mako:620
+#: src/notebook/templates/editor_components.mako:688
 msgid "Go to word left"
 msgstr "左の単語に移動"
 
-#: src/notebook/templates/editor_components.mako:625
+#: src/notebook/templates/editor_components.mako:693
 msgid "Go to word right"
 msgstr "右の単語へ移動"
 
-#: src/notebook/templates/editor_components.mako:630
+#: src/notebook/templates/editor_components.mako:698
 msgid "Go line up"
 msgstr "上の行へ移動"
 
-#: src/notebook/templates/editor_components.mako:635
+#: src/notebook/templates/editor_components.mako:703
 msgid "Go line down"
 msgstr "下の行へ移動"
 
-#: src/notebook/templates/editor_components.mako:640
+#: src/notebook/templates/editor_components.mako:708
 msgid "Go to line start"
 msgstr "行の先頭まで移動"
 
-#: src/notebook/templates/editor_components.mako:645
+#: src/notebook/templates/editor_components.mako:713
 msgid "Go to line end"
 msgstr "行の末尾まで移動"
 
-#: src/notebook/templates/editor_components.mako:650
+#: src/notebook/templates/editor_components.mako:718
 msgid "Go to page up"
 msgstr "ページの上へ移動"
 
-#: src/notebook/templates/editor_components.mako:655
+#: src/notebook/templates/editor_components.mako:723
 msgid "Go to page down"
 msgstr "ページの下へ移動"
 
-#: src/notebook/templates/editor_components.mako:660
+#: src/notebook/templates/editor_components.mako:728
 msgid "Go to start"
 msgstr "先頭まで移動"
 
-#: src/notebook/templates/editor_components.mako:665
+#: src/notebook/templates/editor_components.mako:733
 msgid "Go to end"
 msgstr "末尾まで移動"
 
-#: src/notebook/templates/editor_components.mako:670
+#: src/notebook/templates/editor_components.mako:738
 msgid "Go to line"
 msgstr "行に移動"
 
-#: src/notebook/templates/editor_components.mako:675
+#: src/notebook/templates/editor_components.mako:743
 msgid "Scroll line down"
 msgstr "下の行へスクロール"
 
-#: src/notebook/templates/editor_components.mako:680
+#: src/notebook/templates/editor_components.mako:748
 msgid "Scroll line up"
 msgstr "上の行へスクロール"
 
-#: src/notebook/templates/editor_components.mako:685
+#: src/notebook/templates/editor_components.mako:753
 msgid "Go to matching bracket"
 msgstr "一致するかっこまで移動"
 
-#: src/notebook/templates/editor_components.mako:690
+#: src/notebook/templates/editor_components.mako:758
 msgid "Scroll page down"
 msgstr "下のページへスクロール"
 
-#: src/notebook/templates/editor_components.mako:695
+#: src/notebook/templates/editor_components.mako:763
 msgid "Scroll page up"
 msgstr "上のページへスクロール"
 
-#: src/notebook/templates/editor_components.mako:713
+#: src/notebook/templates/editor_components.mako:781
 msgid "Find"
 msgstr "検索"
 
-#: src/notebook/templates/editor_components.mako:718
+#: src/notebook/templates/editor_components.mako:786
 msgid "Replace"
 msgstr "置換"
 
-#: src/notebook/templates/editor_components.mako:723
+#: src/notebook/templates/editor_components.mako:791
 msgid "Find next"
 msgstr "次を検索"
 
-#: src/notebook/templates/editor_components.mako:728
+#: src/notebook/templates/editor_components.mako:796
 msgid "Find previous"
 msgstr "前を検索"
 
-#: src/notebook/templates/editor_components.mako:746
+#: src/notebook/templates/editor_components.mako:814
 msgid "Fold selection"
 msgstr "選択を折りたたみ"
 
-#: src/notebook/templates/editor_components.mako:751
+#: src/notebook/templates/editor_components.mako:819
 msgid "Unfold"
 msgstr "Unfold"
 
-#: src/notebook/templates/editor_components.mako:756
+#: src/notebook/templates/editor_components.mako:824
 msgid "Fold all"
 msgstr "すべてを折りたたむ"
 
-#: src/notebook/templates/editor_components.mako:761
+#: src/notebook/templates/editor_components.mako:829
 msgid "Unfold all"
 msgstr "すべてを展開"
 
-#: src/notebook/templates/editor_components.mako:779
+#: src/notebook/templates/editor_components.mako:847
+msgid "Autocomplete when Live Autocompletion is off"
+msgstr "Live Autocompletion がオフの場合にオートコンプリートを使用"
+
+#: src/notebook/templates/editor_components.mako:852
 msgid "Indent"
 msgstr "インデント"
 
-#: src/notebook/templates/editor_components.mako:784
+#: src/notebook/templates/editor_components.mako:857
 msgid "Outdent"
 msgstr "インデントを戻す"
 
-#: src/notebook/templates/editor_components.mako:789
+#: src/notebook/templates/editor_components.mako:862
 msgid "Undo"
 msgstr "取り消し"
 
-#: src/notebook/templates/editor_components.mako:794
+#: src/notebook/templates/editor_components.mako:867
 msgid "Redo"
 msgstr "再実行"
 
-#: src/notebook/templates/editor_components.mako:799
-msgid "Show the settings menu"
-msgstr "設定メニューを表示"
-
-#: src/notebook/templates/editor_components.mako:804
+#: src/notebook/templates/editor_components.mako:872
 msgid "Toggle comment"
 msgstr "コメントを切り替え"
 
-#: src/notebook/templates/editor_components.mako:809
+#: src/notebook/templates/editor_components.mako:877
 msgid "Transpose letters"
 msgstr "変換文字"
 
-#: src/notebook/templates/editor_components.mako:814
+#: src/notebook/templates/editor_components.mako:882
 msgid "Change to lower case"
 msgstr "小文字に変更"
 
-#: src/notebook/templates/editor_components.mako:819
+#: src/notebook/templates/editor_components.mako:887
 msgid "Change to upper case"
 msgstr "大文字に変更"
 
-#: src/notebook/templates/editor_components.mako:824
-#: src/notebook/templates/notebook_ko_components.mako:371
+#: src/notebook/templates/editor_components.mako:892
+#: src/notebook/templates/notebook_ko_components.mako:227
 msgid "Overwrite"
 msgstr "上書き"
 
-#: src/notebook/templates/editor_components.mako:829
+#: src/notebook/templates/editor_components.mako:897
 msgid "Macros replay"
 msgstr "マクロの再実行"
 
-#: src/notebook/templates/editor_components.mako:834
+#: src/notebook/templates/editor_components.mako:902
 msgid "Macros recording"
 msgstr "マクロの再記録"
 
-#: src/notebook/templates/editor_components.mako:839
+#: src/notebook/templates/editor_components.mako:907
 #: src/notebook/templates/notebooks.mako:74
 msgid "Delete"
 msgstr "削除"
 
-#: src/notebook/templates/editor_components.mako:844
+#: src/notebook/templates/editor_components.mako:912
 msgid "Center selection"
 msgstr "選択を中央揃え"
 
-#: src/notebook/templates/editor_components.mako:852
-#: src/notebook/templates/editor_components.mako:865
-#: src/notebook/templates/editor_components.mako:881
-#: src/notebook/templates/editor_components.mako:896
-#: src/notebook/templates/editor_components.mako:1015
-#: src/notebook/templates/notebook_ko_components.mako:216
+#: src/notebook/templates/editor_components.mako:930
+msgid "Show the settings menu"
+msgstr "設定メニューを表示"
+
+#: src/notebook/templates/editor_components.mako:938
+#: src/notebook/templates/editor_components.mako:951
+#: src/notebook/templates/editor_components.mako:967
+#: src/notebook/templates/editor_components.mako:982
+#: src/notebook/templates/editor_components.mako:1143
+#: src/notebook/templates/notebook_ko_components.mako:74
+#: src/notebook/templates/notebook_ko_components.mako:302
 msgid "Close"
 msgstr "閉じる"
 
-#: src/notebook/templates/editor_components.mako:859
+#: src/notebook/templates/editor_components.mako:945
 msgid "All Notebook content"
 msgstr "すべてのノートブックコンテンツ"
 
-#: src/notebook/templates/editor_components.mako:882
+#: src/notebook/templates/editor_components.mako:968
 #: src/notebook/templates/notebooks.mako:98
 msgid "Import"
 msgstr "インポート"
 
-#: src/notebook/templates/editor_components.mako:890
+#: src/notebook/templates/editor_components.mako:976
 msgid "Invalid Query"
 msgstr "無効なクエリ"
 
-#: src/notebook/templates/editor_components.mako:893
+#: src/notebook/templates/editor_components.mako:979
 msgid "Query requires a select or an aggregate."
 msgstr "クエリでは、選択または集計が必要です。"
 
-#: src/notebook/templates/editor_components.mako:901
-#: src/notebook/templates/editor_components.mako:917
+#: src/notebook/templates/editor_components.mako:988
+#: src/notebook/templates/editor_components.mako:1006
 msgid "Toggle Assist"
 msgstr "アシストを切り替え"
 
-#: src/notebook/templates/editor_components.mako:994
+#: src/notebook/templates/editor_components.mako:1087
+msgid "Assistant"
+msgstr "アシスト"
+
+#: src/notebook/templates/editor_components.mako:1089
 msgid "Sessions"
 msgstr "セッション"
 
-#: src/notebook/templates/editor_components.mako:996
+#: src/notebook/templates/editor_components.mako:1092
 msgid "Schedule"
 msgstr "スケジュール"
 
-#: src/notebook/templates/editor_components.mako:997
-msgid "Jobs"
-msgstr "ジョブ"
+#: src/notebook/templates/editor_components.mako:1104
+msgid "Active tables"
+msgstr "アクティブなテーブル"
 
-#: src/notebook/templates/editor_components.mako:1009
-msgid "There are currently no active sessions."
-msgstr "現在、アクティブなセッションがありません。"
+#: src/notebook/templates/editor_components.mako:1113
+msgid "Suggestions"
+msgstr "提案"
 
-#: src/notebook/templates/editor_components.mako:1014
+#: src/notebook/templates/editor_components.mako:1137
+msgid "There are currently no active sessions, please reload the page."
+msgstr "現在、アクティブなセッションはありません。ページを再ロードしてください。"
+
+#: src/notebook/templates/editor_components.mako:1142
 msgid "Recreate session"
 msgstr "セッションを再作成"
 
-#: src/notebook/templates/editor_components.mako:1014
+#: src/notebook/templates/editor_components.mako:1142
 msgid "Recreate"
 msgstr "再作成"
 
-#: src/notebook/templates/editor_components.mako:1015
+#: src/notebook/templates/editor_components.mako:1143
 msgid "Close session"
 msgstr "セッションを閉じる"
 
-#: src/notebook/templates/editor_components.mako:1017
+#: src/notebook/templates/editor_components.mako:1145
 msgid "Save session settings as default"
 msgstr "セッション設定をデフォルト値として保存"
 
-#: src/notebook/templates/editor_components.mako:1017
+#: src/notebook/templates/editor_components.mako:1145
 msgid "Set as default settings"
 msgstr "デフォルトの設定として設定"
 
-#: src/notebook/templates/editor_components.mako:1059
-msgid "View"
-msgstr "表示"
+#: src/notebook/templates/editor_components.mako:1185
+msgid "Changes not saved"
+msgstr "変更が保存されていません"
 
-#: src/notebook/templates/editor_components.mako:1066
-msgid "Document needs to be saved first."
-msgstr "ドキュメントは最初に保存する必要があります。"
+#: src/notebook/templates/editor_components.mako:1188
+msgid "Start"
+msgstr "開始"
 
-#: src/notebook/templates/editor_components.mako:1103
-msgid "There are no actions to be shown."
-msgstr "表示するアクションはありません。"
+#: src/notebook/templates/editor_components.mako:1197
+msgid "Query needs to be saved first."
+msgstr "先にクエリを保存する必要があります。"
 
-#: src/notebook/templates/editor_components.mako:1143
+#: src/notebook/templates/editor_components.mako:1231
 msgid "No logs available at this moment."
 msgstr "現時点ではログが利用できません。"
 
-#: src/notebook/templates/editor_components.mako:1152
+#: src/notebook/templates/editor_components.mako:1240
 msgid "Success."
 msgstr "成功しました。"
 
-#: src/notebook/templates/editor_components.mako:1156
+#: src/notebook/templates/editor_components.mako:1244
 msgid "Done. 0 results."
 msgstr "完了しました。結果は 0 です。"
 
-#: src/notebook/templates/editor_components.mako:1160
-#: src/notebook/templates/editor_components.mako:1676
+#: src/notebook/templates/editor_components.mako:1248
+#: src/notebook/templates/editor_components.mako:1918
+#: src/notebook/templates/editor_m.mako:115
 msgid "Results have expired, rerun the query if needed."
 msgstr "結果が期限切れになりました。必要に応じてクエリを再実行します。"
 
-#: src/notebook/templates/editor_components.mako:1164
+#: src/notebook/templates/editor_components.mako:1252
 msgid "Loading..."
 msgstr "読み込み中..."
 
-#: src/notebook/templates/editor_components.mako:1174
+#: src/notebook/templates/editor_components.mako:1262
 msgid "Query History"
 msgstr "クエリの履歴"
 
-#: src/notebook/templates/editor_components.mako:1175
+#: src/notebook/templates/editor_components.mako:1263
 msgid "Search the query history"
 msgstr "クエリ履歴を検索"
 
-#: src/notebook/templates/editor_components.mako:1176
-#: src/notebook/templates/editor_components.mako:1183
+#: src/notebook/templates/editor_components.mako:1264
+#: src/notebook/templates/editor_components.mako:1271
 msgid "Search..."
 msgstr "検索..."
 
-#: src/notebook/templates/editor_components.mako:1177
+#: src/notebook/templates/editor_components.mako:1265
 msgid "Clear the query history"
 msgstr "クエリ履歴をクリア"
 
-#: src/notebook/templates/editor_components.mako:1181
+#: src/notebook/templates/editor_components.mako:1269
 msgid "Saved Queries"
 msgstr "保存したクエリ"
 
-#: src/notebook/templates/editor_components.mako:1182
+#: src/notebook/templates/editor_components.mako:1270
 msgid "Search the saved queries"
 msgstr "保存済みクエリを検索"
 
-#: src/notebook/templates/editor_components.mako:1187
+#: src/notebook/templates/editor_components.mako:1275
 msgid "Query Builder"
 msgstr "Query Builder"
 
-#: src/notebook/templates/editor_components.mako:1191
+#: src/notebook/templates/editor_components.mako:1279
 msgid "Results"
 msgstr "結果"
 
-#: src/notebook/templates/editor_components.mako:1192
+#: src/notebook/templates/editor_components.mako:1281
+msgid "Number of rows"
+msgstr "行数"
+
+#: src/notebook/templates/editor_components.mako:1283
+msgid "Search the results"
+msgstr "結果を検索"
+
+#: src/notebook/templates/editor_components.mako:1284
 msgid "Expand results"
 msgstr "結果を展開"
 
-#: src/notebook/templates/editor_components.mako:1193
-#: src/notebook/templates/editor_components.mako:1357
+#: src/notebook/templates/editor_components.mako:1285
+#: src/notebook/templates/editor_components.mako:1477
 msgid "Collapse results"
 msgstr "結果を折りたたむ"
 
-#: src/notebook/templates/editor_components.mako:1198
-#: src/notebook/templates/editor_components.mako:1867
+#: src/notebook/templates/editor_components.mako:1290
+#: src/notebook/templates/editor_components.mako:2193
 msgid "Explain"
-msgstr "説明"
+msgstr "新しい"
 
-#: src/notebook/templates/editor_components.mako:1212
+#: src/notebook/templates/editor_components.mako:1312
 msgid "No queries to be shown."
 msgstr "表示するクエリがありません。"
 
-#: src/notebook/templates/editor_components.mako:1215
-#: src/notebook/templates/editor_components.mako:1264
+#: src/notebook/templates/editor_components.mako:1315
+#: src/notebook/templates/editor_components.mako:1364
 msgid "No queries found for"
 msgstr "クエリが見つからなかった場所"
 
-#: src/notebook/templates/editor_components.mako:1258
+#: src/notebook/templates/editor_components.mako:1358
 msgid "Error loading my queries"
 msgstr "クエリのロード中にエラーが発生しました"
 
-#: src/notebook/templates/editor_components.mako:1261
+#: src/notebook/templates/editor_components.mako:1361
 msgid "You don't have any saved query."
 msgstr "保存済みクエリがありません。"
 
-#: src/notebook/templates/editor_components.mako:1270
-#: src/notebook/templates/editor_components.mako:2022
+#: src/notebook/templates/editor_components.mako:1370
+#: src/notebook/templates/editor_components.mako:2364
 #: src/notebook/templates/notebooks.mako:108
 msgid "Name"
 msgstr "名前"
 
-#: src/notebook/templates/editor_components.mako:1271
-#: src/notebook/templates/editor_components.mako:2028
+#: src/notebook/templates/editor_components.mako:1371
+#: src/notebook/templates/editor_components.mako:2370
 #: src/notebook/templates/notebooks.mako:109
 msgid "Description"
 msgstr "説明"
 
-#: src/notebook/templates/editor_components.mako:1272
+#: src/notebook/templates/editor_components.mako:1372
 #: src/notebook/templates/notebooks.mako:110
 msgid "Owner"
 msgstr "所有者"
 
-#: src/notebook/templates/editor_components.mako:1273
+#: src/notebook/templates/editor_components.mako:1373
 #: src/notebook/templates/notebooks.mako:111
 msgid "Last Modified"
 msgstr "前回の変更"
 
-#: src/notebook/templates/editor_components.mako:1288
+#: src/notebook/templates/editor_components.mako:1388
 msgid "Prev"
 msgstr "前へ"
 
-#: src/notebook/templates/editor_components.mako:1290
-#: src/notebook/templates/notebooks.mako:286
+#: src/notebook/templates/editor_components.mako:1390
+#: src/notebook/templates/notebooks.mako:280
 msgid "Next"
-msgstr "次"
+msgstr "次ヘ"
 
-#: src/notebook/templates/editor_components.mako:1297
-msgid "There are currently no rules defined. To get started, right click on any table column in the SQL Assist panel."
+#: src/notebook/templates/editor_components.mako:1397
+msgid ""
+"There are currently no rules defined. To get started, right click on any "
+"table column in the SQL Assist panel."
 msgstr "現在、定義されているルールはありません。利用を開始するには、SQL Assist パネルでテーブルの列を右クリックします。"
 
-#: src/notebook/templates/editor_components.mako:1301
+#: src/notebook/templates/editor_components.mako:1401
 msgid "Table"
 msgstr "テーブル"
 
-#: src/notebook/templates/editor_components.mako:1302
+#: src/notebook/templates/editor_components.mako:1402
 msgid "Column"
 msgstr "列"
 
-#: src/notebook/templates/editor_components.mako:1303
+#: src/notebook/templates/editor_components.mako:1403
 msgid "Operation"
 msgstr "操作"
 
-#: src/notebook/templates/editor_components.mako:1309
+#: src/notebook/templates/editor_components.mako:1409
 msgid "Build query"
 msgstr "クエリを作成"
 
-#: src/notebook/templates/editor_components.mako:1329
+#: src/notebook/templates/editor_components.mako:1443
 msgid "The operation in the server is taking longer than expected"
 msgstr "サーバーの操作に予想よりも時間がかかっています"
 
-#: src/notebook/templates/editor_components.mako:1338
-#: src/notebook/templates/editor_components.mako:1353
+#: src/notebook/templates/editor_components.mako:1452
+#: src/notebook/templates/editor_components.mako:1473
 msgid "Show Logs"
 msgstr "ログを表示"
 
-#: src/notebook/templates/editor_components.mako:1339
-#: src/notebook/templates/editor_components.mako:1349
+#: src/notebook/templates/editor_components.mako:1453
+#: src/notebook/templates/editor_components.mako:1466
 msgid "Execution time"
 msgstr "実行時間"
 
-#: src/notebook/templates/editor_components.mako:1341
-#: src/notebook/templates/editor_components.mako:1354
+#: src/notebook/templates/editor_components.mako:1458
+#: src/notebook/templates/editor_components.mako:1474
 msgid "Settings and properties"
 msgstr "設定とプロパティ"
 
-#: src/notebook/templates/editor_components.mako:1355
+#: src/notebook/templates/editor_components.mako:1475
 msgid "Show editor shortcuts"
 msgstr "エディターのショートカットを表示"
 
-#: src/notebook/templates/editor_components.mako:1437
+#: src/notebook/templates/editor_components.mako:1568
 msgid "The current query has been redacted to hide sensitive information."
 msgstr "機密情報を非表示にするために、現在のクエリが変更されました。"
 
-#: src/notebook/templates/editor_components.mako:1459
-msgid "The query is compatible! Click to"
-msgstr "クエリに互換性があります。クリックして次を実行"
+#: src/notebook/templates/editor_components.mako:1581
+msgid "No risks were detected in this query."
+msgstr "このクエリからリスクは検出されませんでした。"
 
-#: src/notebook/templates/editor_components.mako:1459
-msgid "execute"
-msgstr "実行"
+#: src/notebook/templates/editor_components.mako:1601
+msgid "The query is compatible!"
+msgstr "このクエリには互換性があります。"
 
-#: src/notebook/templates/editor_components.mako:1459
-msgid "with Impala"
-msgstr "Impala を使用"
+#: src/notebook/templates/editor_components.mako:1601
+msgid "Execute with Impala?"
+msgstr "Impala で実行"
 
-#: src/notebook/templates/editor_components.mako:1462
-msgid "Query is not compatible with Impala"
-msgstr "クエリは Impala と互換性がありません"
+#: src/notebook/templates/editor_components.mako:1604
+msgid "Query is not compatible with Impala."
+msgstr "このクエリは Impala に対応していません。"
 
-#: src/notebook/templates/editor_components.mako:1498
-msgid "SELECT FROM "
-msgstr "選択対象 "
+#: src/notebook/templates/editor_components.mako:1624
+msgid "Query File"
+msgstr "クエリファイル"
 
-#: src/notebook/templates/editor_components.mako:1499
-msgid "INSERT INTO"
-msgstr "INSERT INTO"
+#: src/notebook/templates/editor_components.mako:1625
+msgid "Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql"
+msgstr "ファイルへのパス。/user/hue/sample.sql、s3a://hue/sample.sql など"
 
-#: src/notebook/templates/editor_components.mako:1500
-msgid "UPDATE"
-msgstr "更新"
+#: src/notebook/templates/editor_components.mako:1628
+#: src/notebook/templates/editor_components.mako:1648
+msgid "Open in new tab"
+msgstr "新しいタブで開く"
 
-#: src/notebook/templates/editor_components.mako:1501
-msgid "DELETE FROM"
-msgstr "次から削除"
+#: src/notebook/templates/editor_components.mako:1642
+msgid "Document"
+msgstr "ドキュメント"
 
-#: src/notebook/templates/editor_components.mako:1509
+#: src/notebook/templates/editor_components.mako:1644
+msgid "Search your documents..."
+msgstr "ドキュメントを検索..."
+
+#: src/notebook/templates/editor_components.mako:1688
 msgid "Variable value"
 msgstr "変数値"
 
-#: src/notebook/templates/editor_components.mako:1521
-msgid "x-axis"
-msgstr "X 軸"
+#: src/notebook/templates/editor_components.mako:1700
+#: src/notebook/templates/editor_components.mako:1760
+msgid "type"
+msgstr "タイプ"
 
-#: src/notebook/templates/editor_components.mako:1522
-msgid "region"
-msgstr "地域"
-
-#: src/notebook/templates/editor_components.mako:1523
-msgid "latitude"
-msgstr "緯度"
-
-#: src/notebook/templates/editor_components.mako:1524
-msgid "legend"
-msgstr "凡例"
-
-#: src/notebook/templates/editor_components.mako:1531
-msgid "y-axis"
-msgstr "Y 軸"
-
-#: src/notebook/templates/editor_components.mako:1532
-#: src/notebook/templates/editor_components.mako:1534
-msgid "value"
-msgstr "値"
-
-#: src/notebook/templates/editor_components.mako:1533
-msgid "longitude"
-msgstr "経度"
-
-#: src/notebook/templates/editor_components.mako:1547
-msgid "label"
-msgstr "ラベル"
-
-#: src/notebook/templates/editor_components.mako:1554
-msgid "scatter size"
-msgstr "散布図サイズ"
-
-#: src/notebook/templates/editor_components.mako:1561
-msgid "scatter group"
-msgstr "散布図グループ"
-
-#: src/notebook/templates/editor_components.mako:1569
-msgid "scope"
-msgstr "有効範囲"
-
-#: src/notebook/templates/editor_components.mako:1573
-msgid "World"
-msgstr "世界"
-
-#: src/notebook/templates/editor_components.mako:1574
-msgid "Europe"
-msgstr "欧州"
-
-#: src/notebook/templates/editor_components.mako:1575
-msgid "Australia"
-msgstr "オーストラリア"
-
-#: src/notebook/templates/editor_components.mako:1576
-msgid "Brazil"
-msgstr "ブラジル"
-
-#: src/notebook/templates/editor_components.mako:1577
-msgid "Canada"
-msgstr "カナダ"
-
-#: src/notebook/templates/editor_components.mako:1578
-msgid "China"
-msgstr "中国"
-
-#: src/notebook/templates/editor_components.mako:1579
-msgid "France"
-msgstr "フランス"
-
-#: src/notebook/templates/editor_components.mako:1580
-msgid "Germany"
-msgstr "ドイツ"
-
-#: src/notebook/templates/editor_components.mako:1581
-msgid "Italy"
-msgstr "イタリア"
-
-#: src/notebook/templates/editor_components.mako:1582
-msgid "Japan"
-msgstr "日本"
-
-#: src/notebook/templates/editor_components.mako:1583
-msgid "UK"
-msgstr "英国"
-
-#: src/notebook/templates/editor_components.mako:1584
-msgid "USA"
-msgstr "USA"
-
-#: src/notebook/templates/editor_components.mako:1590
-msgid "sorting"
-msgstr "ソート"
-
-#: src/notebook/templates/editor_components.mako:1593
-msgid "No sorting"
-msgstr "ソートなし"
-
-#: src/notebook/templates/editor_components.mako:1594
-msgid "Sort ascending"
-msgstr "昇順でソート"
-
-#: src/notebook/templates/editor_components.mako:1595
-msgid "Sort descending"
-msgstr "降順でソート"
-
-#: src/notebook/templates/editor_components.mako:1603
-msgid "Hide columns"
-msgstr "列を非表示"
-
-#: src/notebook/templates/editor_components.mako:1604
-msgid "Search"
-msgstr "検索"
-
-#: src/notebook/templates/editor_components.mako:1606
-msgid "columns"
-msgstr "列"
-
-#: src/notebook/templates/editor_components.mako:1610
-msgid "Filter columns..."
-msgstr "列をフィルター処理..."
-
-#: src/notebook/templates/editor_components.mako:1612
-msgid "No results found"
-msgstr "結果が見つかりません"
-
-#: src/notebook/templates/editor_components.mako:1617
-msgid "Click to scroll to data"
-msgstr "クリックしてデータまでスクロール"
-
-#: src/notebook/templates/editor_components.mako:1625
-msgid "Hide settings"
-msgstr "設定を非表示"
-
-#: src/notebook/templates/editor_components.mako:1646
-msgid "Done."
-msgstr "完了。"
-
-#: src/notebook/templates/editor_components.mako:1681
-msgid "Select the chart parameters on the left"
-msgstr "左側でチャートパラメーターを選択します"
-
-#: src/notebook/templates/editor_components.mako:1712
-msgid "Type your text here, select some text to format it"
-msgstr "ここにテキストを入力して、書式を設定するテキストを選択します"
-
-#: src/notebook/templates/editor_components.mako:1741
-#: src/notebook/templates/editor_components.mako:1755
-msgid "Path"
-msgstr "パス"
-
-#: src/notebook/templates/editor_components.mako:1743
-msgid "Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-examples.jar"
-msgstr "アプリケーション jar へのログ（hdfs://localhost:8020/user/hue/oozie-examples.jar など）"
-
-#: src/notebook/templates/editor_components.mako:1747
-msgid "Class"
-msgstr "クラス"
-
-#: src/notebook/templates/editor_components.mako:1749
-msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
-msgstr "アプリケーションのクラス名（org.apache.oozie.example.SparkFileCopy など）"
-
-#: src/notebook/templates/editor_components.mako:1757
-msgid "Path to python file, e.g. script.py"
-msgstr "python ファイル（script.py など）へのパス"
-
-#: src/notebook/templates/editor_components.mako:1784
-msgid "The statement was canceled."
-msgstr "ステートメントがキャンセルされました。"
-
-#: src/notebook/templates/editor_components.mako:1813
-msgid "Creating session"
-msgstr "セッションの作成"
-
-#: src/notebook/templates/editor_components.mako:1816
-msgid "Restart from the first statement"
-msgstr "最初のステートメントから再開します"
-
-#: src/notebook/templates/editor_components.mako:1822
-msgid "Stop the currently running statement"
-msgstr "現在実行中のステートメントを停止します"
-
-#: src/notebook/templates/editor_components.mako:1828
-#: src/notebook/templates/editor_components.mako:1848
-msgid "Submit all the queries as a background batch job."
-msgstr "バックグラウンドの一括ジョブとしてすべてのクエリをサブミットします。"
-
-#: src/notebook/templates/editor_components.mako:1843
-msgid "Execute interactively the current statement"
-msgstr "現在のステートメントを対話的に実行"
-
-#: src/notebook/templates/editor_components.mako:1844
-msgid "Execute"
-msgstr "実行"
-
-#: src/notebook/templates/editor_components.mako:1849
-msgid "Batch"
-msgstr "一括処理"
-
-#: src/notebook/templates/editor_components.mako:1858
-#: src/notebook/templates/editor_components.mako:1866
-msgid "Explain the current SQL query"
-msgstr "現在の SQL クエリについて説明します"
-
-#: src/notebook/templates/editor_components.mako:1872
-msgid "Format the current SQL query"
-msgstr "現在の SQL クエリの書式を設定します"
-
-#: src/notebook/templates/editor_components.mako:1873
-msgid "Format"
-msgstr "フォーマット"
-
-#: src/notebook/templates/editor_components.mako:1878
-msgid "Clear the current editor"
-msgstr "現在のエディターをクリア"
-
-#: src/notebook/templates/editor_components.mako:1879
-msgid "Clear"
-msgstr "クリア"
-
-#: src/notebook/templates/editor_components.mako:1883
-msgid "Open a new query"
-msgstr "新しいクエリを開く"
-
-#: src/notebook/templates/editor_components.mako:1884
-msgid "New query"
-msgstr "新規クエリ"
-
-#: src/notebook/templates/editor_components.mako:1888
-msgid "Get Impala compatibility hints"
-msgstr "Impala との互換性のヒントを取得"
-
-#: src/notebook/templates/editor_components.mako:1889
-msgid "Check Impala compatibility"
-msgstr "Impala との互換性を確認"
-
-#: src/notebook/templates/editor_components.mako:1901
-msgid "Grid"
-msgstr "グリッド"
-
-#: src/notebook/templates/editor_components.mako:1922
+#: src/notebook/templates/editor_components.mako:1704
+#: src/notebook/templates/editor_components.mako:2237
+#: src/notebook/templates/editor_components.mako:2252
 msgid "Bars"
 msgstr "棒"
 
-#: src/notebook/templates/editor_components.mako:1927
+#: src/notebook/templates/editor_components.mako:1705
+#: src/notebook/templates/editor_components.mako:2238
+#: src/notebook/templates/editor_components.mako:2257
 msgid "Lines"
 msgstr "折れ線"
 
-#: src/notebook/templates/editor_components.mako:1932
+#: src/notebook/templates/editor_components.mako:1712
+#: src/notebook/templates/editor_components.mako:1737
+msgid "value"
+msgstr "値"
+
+#: src/notebook/templates/editor_components.mako:1718
+msgid "legend"
+msgstr "凡例"
+
+#: src/notebook/templates/editor_components.mako:1727
+msgid "x-axis"
+msgstr "X 軸"
+
+#: src/notebook/templates/editor_components.mako:1728
+msgid "region"
+msgstr "地域"
+
+#: src/notebook/templates/editor_components.mako:1729
+msgid "latitude"
+msgstr "緯度"
+
+#: src/notebook/templates/editor_components.mako:1736
+msgid "y-axis"
+msgstr "Y 軸"
+
+#: src/notebook/templates/editor_components.mako:1738
+msgid "longitude"
+msgstr "経度"
+
+#: src/notebook/templates/editor_components.mako:1752
+msgid "group"
+msgstr "グループ"
+
+#: src/notebook/templates/editor_components.mako:1764
+msgid "Markers"
+msgstr "マーカー"
+
+#: src/notebook/templates/editor_components.mako:1765
+msgid "Heatmap"
+msgstr "heatmap"
+
+#: src/notebook/templates/editor_components.mako:1771
+msgid "label"
+msgstr "ラベル"
+
+#: src/notebook/templates/editor_components.mako:1780
+msgid "intensity"
+msgstr "分布図"
+
+#: src/notebook/templates/editor_components.mako:1789
+msgid "scatter size"
+msgstr "散布図サイズ"
+
+#: src/notebook/templates/editor_components.mako:1796
+msgid "scatter group"
+msgstr "散布図グループ"
+
+#: src/notebook/templates/editor_components.mako:1804
+msgid "scope"
+msgstr "有効範囲"
+
+#: src/notebook/templates/editor_components.mako:1808
+msgid "World"
+msgstr "世界"
+
+#: src/notebook/templates/editor_components.mako:1809
+msgid "Europe"
+msgstr "欧州"
+
+#: src/notebook/templates/editor_components.mako:1810
+msgid "Australia"
+msgstr "オーストラリア"
+
+#: src/notebook/templates/editor_components.mako:1811
+msgid "Brazil"
+msgstr "ブラジル"
+
+#: src/notebook/templates/editor_components.mako:1812
+msgid "Canada"
+msgstr "カナダ"
+
+#: src/notebook/templates/editor_components.mako:1813
+msgid "China"
+msgstr "中国"
+
+#: src/notebook/templates/editor_components.mako:1814
+msgid "France"
+msgstr "フランス"
+
+#: src/notebook/templates/editor_components.mako:1815
+msgid "Germany"
+msgstr "ドイツ"
+
+#: src/notebook/templates/editor_components.mako:1816
+msgid "Italy"
+msgstr "イタリア"
+
+#: src/notebook/templates/editor_components.mako:1817
+msgid "Japan"
+msgstr "日本"
+
+#: src/notebook/templates/editor_components.mako:1818
+msgid "UK"
+msgstr "英国"
+
+#: src/notebook/templates/editor_components.mako:1819
+msgid "USA"
+msgstr "USA"
+
+#: src/notebook/templates/editor_components.mako:1825
+msgid "sorting"
+msgstr "ソート"
+
+#: src/notebook/templates/editor_components.mako:1828
+msgid "No sorting"
+msgstr "ソートなし"
+
+#: src/notebook/templates/editor_components.mako:1829
+msgid "Sort ascending"
+msgstr "昇順でソート"
+
+#: src/notebook/templates/editor_components.mako:1830
+msgid "Sort descending"
+msgstr "降順でソート"
+
+#: src/notebook/templates/editor_components.mako:1844
+msgid "columns"
+msgstr "列"
+
+#: src/notebook/templates/editor_components.mako:1846
+msgid "Search"
+msgstr "検索"
+
+#: src/notebook/templates/editor_components.mako:1850
+msgid "Filter columns..."
+msgstr "列をフィルター処理..."
+
+#: src/notebook/templates/editor_components.mako:1850
+msgid "Type column:xxx or type:yyy for specific filters."
+msgstr "column:xxx や type:yyy の形式でフィルターを入力します。"
+
+#: src/notebook/templates/editor_components.mako:1864
+msgid "No results found"
+msgstr "結果が見つかりません"
+
+#: src/notebook/templates/editor_components.mako:1888
+msgid "Done."
+msgstr "完了。"
+
+#: src/notebook/templates/editor_components.mako:1923
+msgid "Select the chart parameters on the left"
+msgstr "左側でチャートパラメーターを選択します"
+
+#: src/notebook/templates/editor_components.mako:1971
+msgid "Type your text here, select some text to format it"
+msgstr "ここにテキストを入力して、書式を設定するテキストを選択します"
+
+#: src/notebook/templates/editor_components.mako:2000
+msgid "Source"
+msgstr "ソース"
+
+#: src/notebook/templates/editor_components.mako:2002
+msgid "Source path to copy, e.g. ${nameNode1}/path/to/input.txt"
+msgstr "コピーするソースパス（例：${nameNode1}/path/to/input.txt）"
+
+#: src/notebook/templates/editor_components.mako:2006
+msgid "Destination"
+msgstr "宛先"
+
+#: src/notebook/templates/editor_components.mako:2008
+msgid "Destination path, e.g. ${nameNode2}/path/to/output.txt"
+msgstr "コピー先のパス（例：${nameNode2}/path/to/output.txt）"
+
+#: src/notebook/templates/editor_components.mako:2014
+msgid "Script path"
+msgstr "スクリプトのパス"
+
+#: src/notebook/templates/editor_components.mako:2016
+msgid "Source path to the command"
+msgstr "コマンドのソースパス"
+
+#: src/notebook/templates/editor_components.mako:2020
+msgid "Environment variables"
+msgstr "環境変数"
+
+#: src/notebook/templates/editor_components.mako:2028
+msgid "Jar path"
+msgstr "Jar パス"
+
+#: src/notebook/templates/editor_components.mako:2030
+msgid "Source path to the main MapReduce jar"
+msgstr "メインの MapReduce jar のソースパス"
+
+#: src/notebook/templates/editor_components.mako:2034
+msgid "Hadoop properties"
+msgstr "Hadoop プロパティ"
+
+#: src/notebook/templates/editor_components.mako:2042
+#: src/notebook/templates/editor_components.mako:2056
+msgid "Path"
+msgstr "パス"
+
+#: src/notebook/templates/editor_components.mako:2044
+msgid ""
+"Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-"
+"examples.jar"
+msgstr "アプリケーション jar へのログ（hdfs://localhost:8020/user/hue/oozie-examples.jar など）"
+
+#: src/notebook/templates/editor_components.mako:2048
+#: src/notebook/templates/editor_components.mako:2069
+msgid "Class"
+msgstr "クラス"
+
+#: src/notebook/templates/editor_components.mako:2050
+#: src/notebook/templates/editor_components.mako:2072
+msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
+msgstr "アプリケーションのクラス名（org.apache.oozie.example.SparkFileCopy など）"
+
+#: src/notebook/templates/editor_components.mako:2058
+msgid "Path to python file, e.g. script.py"
+msgstr "python ファイル（script.py など）へのパス"
+
+#: src/notebook/templates/editor_components.mako:2102
+msgid "The statement was canceled."
+msgstr "ステートメントがキャンセルされました。"
+
+#: src/notebook/templates/editor_components.mako:2131
+msgid "Creating session"
+msgstr "セッションの作成"
+
+#: src/notebook/templates/editor_components.mako:2134
+msgid "Restart from the first statement"
+msgstr "最初のステートメントから再開します"
+
+#: src/notebook/templates/editor_components.mako:2141
+#: src/notebook/templates/editor_m.mako:95
+msgid "Cancel operation"
+msgstr "操作をキャンセル"
+
+#: src/notebook/templates/editor_components.mako:2146
+msgid "Canceling operation..."
+msgstr "操作をキャンセルしています..."
+
+#: src/notebook/templates/editor_components.mako:2152
+#: src/notebook/templates/editor_components.mako:2173
+msgid "Submit all the queries as a background batch job."
+msgstr "バックグラウンドの一括ジョブとしてすべてのクエリをサブミットします。"
+
+#: src/notebook/templates/editor_components.mako:2168
+msgid "Execute interactively the current statement"
+msgstr "現在のステートメントを対話的に実行"
+
+#: src/notebook/templates/editor_components.mako:2169
+#: src/notebook/templates/editor_m.mako:92
+msgid "Execute"
+msgstr "実行"
+
+#: src/notebook/templates/editor_components.mako:2174
+msgid "Batch"
+msgstr "一括処理"
+
+#: src/notebook/templates/editor_components.mako:2184
+#: src/notebook/templates/editor_components.mako:2192
+msgid "Explain the current SQL query"
+msgstr "現在の SQL クエリについて説明します"
+
+#: src/notebook/templates/editor_components.mako:2198
+msgid "Format the current SQL query"
+msgstr "現在の SQL クエリの書式を設定します"
+
+#: src/notebook/templates/editor_components.mako:2199
+msgid "Format"
+msgstr "フォーマット"
+
+#: src/notebook/templates/editor_components.mako:2204
+msgid "Clear the current editor"
+msgstr "現在のエディターをクリア"
+
+#: src/notebook/templates/editor_components.mako:2205
+msgid "Clear"
+msgstr "クリア"
+
+#: src/notebook/templates/editor_components.mako:2211
+msgid "Get Impala compatibility hints"
+msgstr "Impala との互換性のヒントを取得"
+
+#: src/notebook/templates/editor_components.mako:2212
+msgid "Check Impala compatibility"
+msgstr "Impala との互換性を確認"
+
+#: src/notebook/templates/editor_components.mako:2216
+msgid "Get recommendations on query risks and optimizations"
+msgstr "クエリのリスクと最適化に関する推奨事項を取得"
+
+#: src/notebook/templates/editor_components.mako:2217
+msgid "Check complexity"
+msgstr "複雑さを確認"
+
+#: src/notebook/templates/editor_components.mako:2230
+msgid "Grid"
+msgstr "グリッド"
+
+#: src/notebook/templates/editor_components.mako:2239
+#: src/notebook/templates/editor_components.mako:2262
+msgid "Time"
+msgstr "時間"
+
+#: src/notebook/templates/editor_components.mako:2240
+#: src/notebook/templates/editor_components.mako:2267
 msgid "Pie"
 msgstr "円グラフ"
 
-#: src/notebook/templates/editor_components.mako:1937
+#: src/notebook/templates/editor_components.mako:2241
+#: src/notebook/templates/editor_components.mako:2272
 msgid "Scatter"
 msgstr "散布図"
 
-#: src/notebook/templates/editor_components.mako:1942
+#: src/notebook/templates/editor_components.mako:2242
+#: src/notebook/templates/editor_components.mako:2277
 msgid "Marker Map"
 msgstr "Marker Map"
 
-#: src/notebook/templates/editor_components.mako:1947
+#: src/notebook/templates/editor_components.mako:2243
+#: src/notebook/templates/editor_components.mako:2282
 msgid "Gradient Map"
 msgstr "Gradient Map"
 
-#: src/notebook/templates/editor_components.mako:1964
+#: src/notebook/templates/editor_components.mako:2289
+msgid "Columns"
+msgstr "列"
+
+#: src/notebook/templates/editor_components.mako:2306
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
-#: src/notebook/templates/editor_components.mako:1985
+#: src/notebook/templates/editor_components.mako:2327
 msgid "Confirm Remove"
 msgstr "削除を確認"
 
-#: src/notebook/templates/editor_components.mako:1988
+#: src/notebook/templates/editor_components.mako:2330
 msgid "Are you sure you want to remove this snippet?"
 msgstr "このスニペットを削除してもよろしいですか？"
 
-#: src/notebook/templates/editor_components.mako:1991
-#: src/notebook/templates/editor_components.mako:2080
-#: src/notebook/templates/editor_components.mako:2095
+#: src/notebook/templates/editor_components.mako:2333
+#: src/notebook/templates/editor_components.mako:2422
+#: src/notebook/templates/editor_components.mako:2437
 #: src/notebook/templates/notebooks.mako:162
 msgid "No"
 msgstr "いいえ"
 
-#: src/notebook/templates/editor_components.mako:1992
-#: src/notebook/templates/editor_components.mako:2081
+#: src/notebook/templates/editor_components.mako:2334
+#: src/notebook/templates/editor_components.mako:2423
 #: src/notebook/templates/notebooks.mako:163
 msgid "Yes"
 msgstr "はい"
 
-#: src/notebook/templates/editor_components.mako:1999
-#: src/notebook/templates/editor_components.mako:2151
+#: src/notebook/templates/editor_components.mako:2341
+#: src/notebook/templates/editor_components.mako:2498
 msgid "Drop a SQL file here"
 msgstr "ここに SQL ファイルをドロップします"
 
-#: src/notebook/templates/editor_components.mako:2002
-#: src/notebook/templates/editor_components.mako:2153
+#: src/notebook/templates/editor_components.mako:2344
+#: src/notebook/templates/editor_components.mako:2500
 msgid "Drop iPython/Zeppelin notebooks here"
 msgstr "ここに iPython/Zeppelin ノートブックをドロップします"
 
-#: src/notebook/templates/editor_components.mako:2011
+#: src/notebook/templates/editor_components.mako:2353
 msgid "Save query as..."
 msgstr "クエリに名前を付けて保存..."
 
-#: src/notebook/templates/editor_components.mako:2014
+#: src/notebook/templates/editor_components.mako:2356
 msgid "Save notebook as..."
 msgstr "ノートブックに名前を付けて保存..."
 
-#: src/notebook/templates/editor_components.mako:2030
+#: src/notebook/templates/editor_components.mako:2372
 msgid "(optional)"
 msgstr "（オプション）"
 
-#: src/notebook/templates/editor_components.mako:2036
-#: src/notebook/templates/editor_components.mako:2065
-#: src/notebook/templates/notebook_ko_components.mako:402
+#: src/notebook/templates/editor_components.mako:2378
+#: src/notebook/templates/editor_components.mako:2407
+#: src/notebook/templates/editor_m.mako:96
+#: src/notebook/templates/notebook_ko_components.mako:273
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/notebook/templates/editor_components.mako:2037
-#: src/notebook/templates/notebook_ko_components.mako:403
+#: src/notebook/templates/editor_components.mako:2379
+#: src/notebook/templates/notebook_ko_components.mako:274
 msgid "Save"
 msgstr "保存"
 
-#: src/notebook/templates/editor_components.mako:2046
+#: src/notebook/templates/editor_components.mako:2388
 msgid "Connect to the data source"
 msgstr "データソースに接続"
 
-#: src/notebook/templates/editor_components.mako:2053
+#: src/notebook/templates/editor_components.mako:2395
 msgid "Username"
 msgstr "ユーザー名"
 
-#: src/notebook/templates/editor_components.mako:2059
+#: src/notebook/templates/editor_components.mako:2401
 msgid "Password"
 msgstr "パスワード"
 
-#: src/notebook/templates/editor_components.mako:2066
+#: src/notebook/templates/editor_components.mako:2408
 msgid "Connect"
 msgstr "接続"
 
-#: src/notebook/templates/editor_components.mako:2074
+#: src/notebook/templates/editor_components.mako:2416
 msgid "Confirm History Clear"
 msgstr "履歴のクリアを確認"
 
-#: src/notebook/templates/editor_components.mako:2077
+#: src/notebook/templates/editor_components.mako:2419
 msgid "Are you sure you want to clear the query history?"
 msgstr "クエリの履歴をクリアしてもよろしいですか？"
 
-#: src/notebook/templates/editor_components.mako:2089
+#: src/notebook/templates/editor_components.mako:2431
 msgid "Operation timed out"
 msgstr "操作がタイムアウトになりました"
 
-#: src/notebook/templates/editor_components.mako:2092
+#: src/notebook/templates/editor_components.mako:2434
 msgid "The operation timed out. Do you want to retry?"
 msgstr "操作がタイムアウトになりました。再試行しますか？"
 
-#: src/notebook/templates/editor_components.mako:2096
+#: src/notebook/templates/editor_components.mako:2438
 msgid "Yes, retry"
 msgstr "はい。再試行してください"
 
-#: src/notebook/templates/editor_components.mako:2140
+#: src/notebook/templates/editor_components.mako:2487
 msgid "Failed to load"
 msgstr "ロードに失敗しました"
 
-#: src/notebook/templates/editor_components.mako:2205
-#: src/notebook/templates/notebooks.mako:278
-msgid "No data available"
-msgstr "利用可能なデータがありません"
+#: src/notebook/templates/editor_components.mako:2552
+msgid "No results found."
+msgstr "結果が見つかりません。"
 
-#: src/notebook/templates/editor_components.mako:2206
-#: src/notebook/templates/notebooks.mako:282
-msgid "No matching records"
-msgstr "一致するレコードがありません"
+#: src/notebook/templates/editor_components.mako:2553
+msgid "of"
+msgstr "／"
 
-#: src/notebook/templates/editor_components.mako:2567
+#: src/notebook/templates/editor_components.mako:3099
 msgid "Distribution"
 msgstr "配布"
 
-#: src/notebook/templates/editor_components.mako:2610
-#: src/notebook/templates/editor_components.mako:2620
-#: src/notebook/templates/editor_components.mako:2626
-#: src/notebook/templates/editor_components.mako:2635
-#: src/notebook/templates/editor_components.mako:2641
-#: src/notebook/templates/editor_components.mako:2647
-#: src/notebook/templates/editor_components.mako:2658
-#: src/notebook/templates/editor_components.mako:2693
+#: src/notebook/templates/editor_components.mako:3133
+#: src/notebook/templates/editor_components.mako:3143
+#: src/notebook/templates/editor_components.mako:3149
+#: src/notebook/templates/editor_components.mako:3158
+#: src/notebook/templates/editor_components.mako:3164
+#: src/notebook/templates/editor_components.mako:3170
+#: src/notebook/templates/editor_components.mako:3181
+#: src/notebook/templates/editor_components.mako:3234
+#: src/notebook/templates/editor_m.mako:201
+#: src/notebook/templates/editor_m.mako:211
+#: src/notebook/templates/editor_m.mako:217
+#: src/notebook/templates/editor_m.mako:226
+#: src/notebook/templates/editor_m.mako:232
+#: src/notebook/templates/editor_m.mako:238
+#: src/notebook/templates/editor_m.mako:249
+#: src/notebook/templates/editor_m.mako:287
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
-msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押します"
+msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
 
-#: src/notebook/templates/editor_components.mako:2616
-#: src/notebook/templates/editor_components.mako:2653
-#: src/notebook/templates/editor_components.mako:2673
-#: src/notebook/templates/editor_components.mako:2678
-#: src/notebook/templates/editor_components.mako:2683
-#: src/notebook/templates/editor_components.mako:2688
+#: src/notebook/templates/editor_components.mako:3139
+#: src/notebook/templates/editor_components.mako:3176
+#: src/notebook/templates/editor_components.mako:3199
+#: src/notebook/templates/editor_components.mako:3204
+#: src/notebook/templates/editor_components.mako:3209
+#: src/notebook/templates/editor_components.mako:3214
+#: src/notebook/templates/editor_m.mako:207
+#: src/notebook/templates/editor_m.mako:244
+#: src/notebook/templates/editor_m.mako:267
+#: src/notebook/templates/editor_m.mako:272
+#: src/notebook/templates/editor_m.mako:277
+#: src/notebook/templates/editor_m.mako:282
 msgid "Example: 1 + 1, or press CTRL + space"
 msgstr "例：1 + 1、または CTRL キーを押したまま Space キーを押します"
 
-#: src/notebook/templates/editor_components.mako:2664
+#: src/notebook/templates/editor_components.mako:3187
+#: src/notebook/templates/editor_m.mako:255
 msgid "Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space"
 msgstr "例：コレクション名から fieldA、FieldB を選択します。または CTRL キーを押したまま Space キーを押します"
 
-#: src/notebook/templates/editor_components.mako:2699
+#: src/notebook/templates/editor_components.mako:3240
+#: src/notebook/templates/editor_m.mako:293
 msgid "Type your text here"
 msgstr "ここにテキストを入力してください"
 
-#: src/notebook/templates/editor_components.mako:2704
+#: src/notebook/templates/editor_components.mako:3245
+#: src/notebook/templates/editor_m.mako:298
 msgid "Type your markdown here"
 msgstr "ここにマークダウンを入力してください"
 
-#: src/notebook/templates/editor_components.mako:2982
-msgid "There was a problem loading the databases"
-msgstr "データベースのロード中に問題が発生しました"
-
-#: src/notebook/templates/editor_components.mako:2990
+#: src/notebook/templates/editor_components.mako:3576
 msgid "User successfully authenticated to GitHub."
 msgstr "ユーザーは通常、GitHub に認証されます。"
 
-#: src/notebook/templates/editor_components.mako:2994
+#: src/notebook/templates/editor_components.mako:3580
 msgid "Could not decode Github file content to JSON."
 msgstr "Github ファイルコンテンツを JSON にデコードできませんでした。"
 
-#: src/notebook/templates/editor_components.mako:3264
+#: src/notebook/templates/editor_components.mako:3949
 msgid "Coordinator submitted."
 msgstr "Coordinator がサブミットされました。"
 
-#: src/notebook/templates/notebook.mako:28
+#: src/notebook/templates/notebook.mako:27
 msgid "Notebook"
 msgstr "ノートブック"
 
-#: src/notebook/templates/notebook.mako:34
+#: src/notebook/templates/notebook.mako:33
 msgid "There are no snippets configured."
 msgstr "スニペットが設定されていません。"
 
-#: src/notebook/templates/notebook.mako:37
+#: src/notebook/templates/notebook.mako:36
 msgid "Add a snippet to start your new notebook"
 msgstr "スニペットを追加して、新しいノートブックを開始します"
 
-#: src/notebook/templates/notebook_ko_components.mako:47
-msgid "Selected database"
-msgstr "選択されたデータベース"
-
-#: src/notebook/templates/notebook_ko_components.mako:182
+#: src/notebook/templates/notebook_ko_components.mako:40
 msgid "Add a new snippet"
 msgstr "新しいスニペットを追加"
 
-#: src/notebook/templates/notebook_ko_components.mako:183
+#: src/notebook/templates/notebook_ko_components.mako:41
 msgid "Select snippet"
 msgstr "スニペットを選択"
 
-#: src/notebook/templates/notebook_ko_components.mako:198
+#: src/notebook/templates/notebook_ko_components.mako:56
 msgid "Add Snippet"
 msgstr "スニペットを追加"
 
-#: src/notebook/templates/notebook_ko_components.mako:328
+#: src/notebook/templates/notebook_ko_components.mako:173
+msgid "Get results"
+msgstr "結果を取得"
+
+#: src/notebook/templates/notebook_ko_components.mako:184
 #, python-format
 msgid "Download first %s cells as CSV"
 msgstr "最初の %s セルを CSV としてダウンロード"
 
-#: src/notebook/templates/notebook_ko_components.mako:329
+#: src/notebook/templates/notebook_ko_components.mako:185
 msgid "CSV"
 msgstr "CSV"
 
-#: src/notebook/templates/notebook_ko_components.mako:333
+#: src/notebook/templates/notebook_ko_components.mako:189
 #, python-format
 msgid "Download first %s cells as XLS"
 msgstr "最初の %s セルを XLS としてダウンロード"
 
-#: src/notebook/templates/notebook_ko_components.mako:334
+#: src/notebook/templates/notebook_ko_components.mako:190
 msgid "Excel"
 msgstr "Excel"
 
-#: src/notebook/templates/notebook_ko_components.mako:338
-msgid "Save the results to HDFS or a new table"
-msgstr "結果を HDFS または新しいテーブルに保存"
+#: src/notebook/templates/notebook_ko_components.mako:194
+msgid "Save the results to a large file or a new table"
+msgstr "結果を大きなファイルまたは新しいテーブルに保存"
 
-#: src/notebook/templates/notebook_ko_components.mako:339
+#: src/notebook/templates/notebook_ko_components.mako:195
 #: src/notebook/templates/notebooks.mako:84
 msgid "Export"
 msgstr "エクスポート"
 
-#: src/notebook/templates/notebook_ko_components.mako:354
+#: src/notebook/templates/notebook_ko_components.mako:210
 msgid "Save query result in"
 msgstr "クエリ結果の保存先"
 
-#: src/notebook/templates/notebook_ko_components.mako:364
+#: src/notebook/templates/notebook_ko_components.mako:220
 #, python-format
-msgid "In HDFS (max %s cells)"
-msgstr "HDFS の場合（最大 %s セル）"
+msgid "A file (max %s cells)"
+msgstr "ファイル（最大 %s セル）"
 
-#: src/notebook/templates/notebook_ko_components.mako:367
+#: src/notebook/templates/notebook_ko_components.mako:223
 msgid "Path to CSV file"
 msgstr "CSV ファイルへのパス"
 
-#: src/notebook/templates/notebook_ko_components.mako:379
-msgid "In HDFS (large file)"
-msgstr "HDFS の場合（大きいファイル）"
+#: src/notebook/templates/notebook_ko_components.mako:235
+msgid "A file (large result)"
+msgstr "ファイル（大量の結果）"
 
-#: src/notebook/templates/notebook_ko_components.mako:382
-msgid "Path to directory"
-msgstr "ディレクトリへのパス"
+#: src/notebook/templates/notebook_ko_components.mako:238
+msgid "Path to empty directory"
+msgstr "空のディレクトリへのパス"
 
-#: src/notebook/templates/notebook_ko_components.mako:383
-msgid "Use this option if you have a large result. It will rerun the entire query and save the results to the chosen HDFS directory."
-msgstr "結果が多い場合は、このオプションを使用します。クエリ全体が再実行され、結果は選択した HDFS ディレクトリに保存されます。"
-
-#: src/notebook/templates/notebook_ko_components.mako:391
+#: src/notebook/templates/notebook_ko_components.mako:249
 msgid "A new table"
 msgstr "新しいテーブル"
 
-#: src/notebook/templates/notebook_ko_components.mako:394
+#: src/notebook/templates/notebook_ko_components.mako:252
 msgid "Table name or <database>.<table>"
 msgstr "テーブル名または <database>.<table>"
+
+#: src/notebook/templates/notebook_ko_components.mako:261
+msgid "A search dashboard"
+msgstr "検索ダッシュボード"
+
+#: src/notebook/templates/notebook_ko_components.mako:264
+msgid "Index name"
+msgstr "インデックス名"
+
+#: src/notebook/templates/notebook_ko_components.mako:281
+msgid "Your download is being prepared"
+msgstr "ダウンロードの準備をしています"
+
+#: src/notebook/templates/notebook_ko_components.mako:284
+msgid "Your downloaded results have been truncated"
+msgstr "ダウンロードした結果は一部切り捨てられています"
+
+#: src/notebook/templates/notebook_ko_components.mako:289
+msgid "Please wait, it might take a while..."
+msgstr "しばらくお待ちください..."
+
+#: src/notebook/templates/notebook_ko_components.mako:292
+msgid ""
+"The number of resulting rows was too big to be downloaded and the "
+"resulting file has been truncated to"
+msgstr ""
+"行数が多すぎて、すべての結果をダウンロードできません。ダウンロードしたファイルは"
+""
+
+#: src/notebook/templates/notebook_ko_components.mako:294
+msgid "rows."
+msgstr "行までで切り捨てられています。"
+
+#: src/notebook/templates/notebook_ko_components.mako:299
+msgid "Cancel Download"
+msgstr "ダウンロードをキャンセル"
 
 #: src/notebook/templates/notebooks.mako:32
 #, python-format
@@ -1568,84 +1765,217 @@ msgstr "選択したクエリを削除しますか？"
 msgid "Delete the selected notebook(s)?"
 msgstr "選択したノートブックを削除しますか？"
 
-#: src/notebook/templates/notebooks.mako:279
+#: src/notebook/templates/notebooks.mako:272
+msgid "No data available"
+msgstr "利用可能なデータがありません"
+
+#: src/notebook/templates/notebooks.mako:273
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "_TOTAL_ 件のエントリの _START_ から _END_ までを表示"
 
-#: src/notebook/templates/notebooks.mako:280
+#: src/notebook/templates/notebooks.mako:274
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "0 件のエントリの 0 から 0 までを表示"
 
-#: src/notebook/templates/notebooks.mako:281
+#: src/notebook/templates/notebooks.mako:275
 msgid "(filtered from _MAX_ total entries)"
-msgstr "（合計 _MAX_ 件のエントリからフィルター処理）"
+msgstr "（合計 _MAX_ 件のエントリからフィルタ処理）"
 
-#: src/notebook/templates/notebooks.mako:284
+#: src/notebook/templates/notebooks.mako:276
+msgid "No matching records"
+msgstr "一致するレコードがありません"
+
+#: src/notebook/templates/notebooks.mako:278
 msgid "First"
 msgstr "先頭"
 
-#: src/notebook/templates/notebooks.mako:285
+#: src/notebook/templates/notebooks.mako:279
 msgid "Last"
 msgstr "末尾"
 
-#: src/notebook/templates/notebooks.mako:287
+#: src/notebook/templates/notebooks.mako:281
 msgid "Previous"
 msgstr "前"
 
-#~ msgid "URL of the Spark Job Server."
-#~ msgstr "Spark Job Server の URL です。"
+#~ msgid "Requires a POST"
+#~ msgstr ""
 
-#~ msgid "List of available types of snippets."
-#~ msgstr "使用可能なスニペットのタイプのリストです。"
+#~ msgid "Requires a DELETE"
+#~ msgstr ""
+
+#~ msgid "There was an error with your query: %s"
+#~ msgstr ""
+
+#~ msgid "A GET request is required."
+#~ msgstr ""
+
+#~ msgid "Missing application jar list."
+#~ msgstr ""
+
+#~ msgid "URL of the Spark Job Server."
+#~ msgstr ""
 
 #~ msgid "The app won't work without a running Job Server"
-#~ msgstr "実行中の Job Server が存在しない場合、アプリが機能しません"
+#~ msgstr ""
 
-#~ msgid "<h2>This is a text snippet</h2>Type your text here"
-#~ msgstr "<h2>これはテキストスニペットです</h2>ここにテキストを入力してください"
+#~ msgid "An error happened with the Spark Server"
+#~ msgstr ""
 
-#~ msgid "Brand New"
-#~ msgstr "新規"
+#~ msgid "Script parameters"
+#~ msgstr ""
 
-#~ msgid "Data sample for"
-#~ msgstr "データサンプルの対象"
+#~ msgid "Class path"
+#~ msgstr ""
 
-#~ msgid "Ok"
-#~ msgstr "OK"
+#~ msgid "Delete context(s)?"
+#~ msgstr ""
 
-#~ msgid "Manually refresh the table list"
-#~ msgstr "テーブルリストを手動で更新"
+#~ msgid "Spark Igniter"
+#~ msgstr ""
 
-#~ msgid "Choose a database..."
-#~ msgstr "データベースを選択..."
+#~ msgid "Applications"
+#~ msgstr ""
 
-#~ msgid "The database list cannot be loaded."
-#~ msgstr "データベースリストをロードできません。"
+#~ msgid "Dashboard"
+#~ msgstr ""
 
-#~ msgid "CTRL + ENTER"
-#~ msgstr "CTRL + ENTER"
+#~ msgid "Contexts"
+#~ msgstr ""
 
-#~ msgid "Download first rows as CSV"
-#~ msgstr "最初の行を CSV としてダウンロード"
+#~ msgid "Uploads"
+#~ msgstr ""
 
-#~ msgid "Success but empty results."
-#~ msgstr "成功しましたが結果が空です。"
+#~ msgid "Create context"
+#~ msgstr ""
 
-#~ msgid "Show columns"
-#~ msgstr "列を表示"
+#~ msgid "Num cpu cores"
+#~ msgstr ""
 
-#~ msgid "Choose a column..."
-#~ msgstr "列を選択..."
+#~ msgid "Memory per node"
+#~ msgstr ""
 
-#~ msgid "Paste or type a link"
-#~ msgstr "リンクを貼り付けるか入力してください"
+#~ msgid "Upload application"
+#~ msgstr ""
 
-#~ msgid "Open in new window"
-#~ msgstr "新しいウィンドウで開く"
+#~ msgid "One class of the jar should implement SparkJob."
+#~ msgstr ""
 
-#~ msgid "Spark Editor"
-#~ msgstr "Spark エディタ"
+#~ msgid "Local jar file"
+#~ msgstr ""
 
-#~ msgid "Submit"
-#~ msgstr "サブミット"
+#~ msgid "App name"
+#~ msgstr ""
 
+#~ msgid "Upload"
+#~ msgstr ""
+
+#~ msgid "Application name"
+#~ msgstr ""
+
+#~ msgid "Application description"
+#~ msgstr ""
+
+#~ msgid "Upload app"
+#~ msgstr ""
+
+#~ msgid "Missing, add one?"
+#~ msgstr ""
+
+#~ msgid "Automatic"
+#~ msgstr ""
+
+#~ msgid "Create one?"
+#~ msgstr ""
+
+#~ msgid "Parameters"
+#~ msgstr ""
+
+#~ msgid "Your application has the following error(s):"
+#~ msgstr ""
+
+#~ msgid "No parameters defined yet."
+#~ msgstr ""
+
+#~ msgid "Value"
+#~ msgstr ""
+
+#~ msgid "Add"
+#~ msgstr ""
+
+#~ msgid "Executing..."
+#~ msgstr ""
+
+#~ msgid "or create a"
+#~ msgstr ""
+
+#~ msgid "New application"
+#~ msgstr ""
+
+#~ msgid "Download"
+#~ msgstr ""
+
+#~ msgid "Key"
+#~ msgstr ""
+
+#~ msgid "The server returned no results."
+#~ msgstr ""
+
+#~ msgid "Save your query"
+#~ msgstr ""
+
+#~ msgid "Did you know?"
+#~ msgstr ""
+
+#~ msgid "This field is required."
+#~ msgstr ""
+
+#~ msgid "Empty description"
+#~ msgstr ""
+
+#~ msgid "Application saved successfully!"
+#~ msgstr ""
+
+#~ msgid "Server error occured: "
+#~ msgstr ""
+
+#~ msgid "Unmanageable server error occured: "
+#~ msgstr ""
+
+#~ msgid "Search for name"
+#~ msgstr ""
+
+#~ msgid "Upload time"
+#~ msgstr ""
+
+#~ msgid "Click to open and execute"
+#~ msgstr ""
+
+#~ msgid "Delete forever"
+#~ msgstr ""
+
+#~ msgid "Delete selected"
+#~ msgstr ""
+
+#~ msgid "Confirm action"
+#~ msgstr ""
+
+#~ msgid "Delete the selected contexts?"
+#~ msgstr ""
+
+#~ msgid "Jobs"
+#~ msgstr ""
+
+#~ msgid "Status"
+#~ msgstr ""
+
+#~ msgid "Job id"
+#~ msgstr ""
+
+#~ msgid "Start time"
+#~ msgstr ""
+
+#~ msgid "Duration"
+#~ msgstr ""
+
+#~ msgid "Click to open"
+#~ msgstr ""

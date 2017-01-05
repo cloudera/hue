@@ -1,14 +1,14 @@
 # Chinese (China) translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2012 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2013-07-13 20:35-0700\n"
+"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -38,27 +38,41 @@ msgid "Cluster by the name of %s does not exist in configuration."
 msgstr "配置中不存在名为 %s 的集群。"
 
 #: src/hbase/api.py:118
-msgid "The kerberos principal name is missing from the hbase-site.xml configuration file."
+msgid ""
+"The kerberos principal name is missing from the hbase-site.xml "
+"configuration file."
 msgstr "hbase-site.xml 配置文件中缺少 kerberos 主体名称。"
 
 #: src/hbase/conf.py:33
-msgid "Comma-separated list of HBase Thrift servers for clusters in the format of '(name|host:port)'. Use full hostname with security.Prefix hostname with https:// if using SSL and http mode with impersonation."
-msgstr "用于群集的 HBase Thrift server 的逗号分隔列表，使用“(name|host:port) ”的格式。使用带有加密的完整主机名。如果使用 SSL 和带模拟的 http 模式，则主机名带前缀 https://。"
+msgid ""
+"Comma-separated list of HBase Thrift servers for clusters in the format "
+"of '(name|host:port)'. Use full hostname with security.Prefix hostname "
+"with https:// if using SSL and http mode with impersonation."
+msgstr ""
+"用于群集的 HBase Thrift server 的逗号分隔列表，使用“(name|host:port) "
+"”的格式。使用带有加密的完整主机名。如果使用 SSL 和带模拟的 http 模式，则主机名带前缀 https://。"
 
 #: src/hbase/conf.py:41
 msgid "Hard limit of rows or columns per row fetched before truncating."
 msgstr "截断前对于提取的行数或每行列数的硬限制。"
 
 #: src/hbase/conf.py:48
-msgid "'buffered' is the default of the HBase Thrift Server and supports security. 'framed' can be used to chunk up responses, which is useful when used in conjunction with the nonblocking server in Thrift."
-msgstr "“buffered”是 HBase Thrift Server 的默认值，支持加密。“framed”可用于停止响应，这在配合 Thrift 中的 nonblocking server 使用时非常有效。"
+msgid ""
+"'buffered' is the default of the HBase Thrift Server and supports "
+"security. 'framed' can be used to chunk up responses, which is useful "
+"when used in conjunction with the nonblocking server in Thrift."
+msgstr ""
+"“buffered”是 HBase Thrift Server 的默认值，支持加密。“framed”可用于停止响应，这在配合 Thrift 中的 "
+"nonblocking server 使用时非常有效。"
 
 #: src/hbase/conf.py:56
 msgid "HBase configuration directory, where hbase-site.xml is located."
 msgstr "HBase 配置目录，即 hive-site.xml 的所在位置。"
 
 #: src/hbase/conf.py:63
-msgid "Force Hue to use Http Thrift mode with doas impersonation, regarless of hbase-site.xml properties."
+msgid ""
+"Force Hue to use Http Thrift mode with doas impersonation, regarless of "
+"hbase-site.xml properties."
 msgstr "Hue 必须使用带 doas 模拟的 Http Thrift 模式，无论 hbase-site.xml 属性如何。"
 
 #: src/hbase/views.py:135
@@ -172,8 +186,12 @@ msgid "Add a column property"
 msgstr "添加列属性"
 
 #: src/hbase/templates/app.mako:246
-msgid "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
-msgstr "row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}"
+msgid ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
+msgstr ""
+"row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3,"
+" fam: col2 to col3] {Filter1() AND Filter2()}"
 
 #: src/hbase/templates/app.mako:256
 msgid "Autocomplete Suggestions:"
@@ -383,9 +401,14 @@ msgstr "整数"
 msgid "Column Range"
 msgstr "列范围"
 
-#~ msgid "There are no tables matching the search criteria."
-#~ msgstr "没有符合搜索条件的表。"
+#~ msgid "About Hue"
+#~ msgstr ""
 
-#~ msgid "OK"
-#~ msgstr "确定"
+#~ msgid "Configuration"
+#~ msgstr ""
 
+#~ msgid "Check for misconfiguration"
+#~ msgstr ""
+
+#~ msgid "Server Logs"
+#~ msgstr ""

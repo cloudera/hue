@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera, Inc
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:49-0700\n"
-"PO-Revision-Date: 2012-11-07 13:08-0800\n"
+"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -18,7 +18,9 @@ msgstr ""
 "Generated-By: Babel 0.9.6\n"
 
 #: src/libsaml/conf.py:58
-msgid "Xmlsec1 binary path. This program should be executable by the user running Hue."
+msgid ""
+"Xmlsec1 binary path. This program should be executable by the user "
+"running Hue."
 msgstr "Xmlsec1 バイナリパスです。このプログラムは、Hue を実行しているユーザーによって実行可能であることが必要です。"
 
 #: src/libsaml/conf.py:64
@@ -26,15 +28,21 @@ msgid "Optional base url the SAML IdP should use for responses."
 msgstr "SAML IdP が応答に使用するオプションのベース url です。"
 
 #: src/libsaml/conf.py:70
-msgid "Entity ID for Hue acting as service provider. Can also accept a pattern where '<base_url>' will be replaced with server URL base."
-msgstr "サービスプロバイダとして動作している Hue のエンティティ ID です。'<base_url>' をサーバーの URL ベースに置き換えるパターンも受け入れられます。"
+msgid ""
+"Entity ID for Hue acting as service provider. Can also accept a pattern "
+"where '<base_url>' will be replaced with server URL base."
+msgstr ""
+"サービスプロバイダとして動作している Hue のエンティティ ID です。'<base_url>' をサーバーの URL "
+"ベースに置き換えるパターンも受け入れられます。"
 
 #: src/libsaml/conf.py:76
 msgid "Create users from IdP on login."
 msgstr "ログイン時に IdP からユーザーを作成します。"
 
 #: src/libsaml/conf.py:83
-msgid "Attribute map directory contains files that map SAML attributes to pysaml2 attributes."
+msgid ""
+"Attribute map directory contains files that map SAML attributes to "
+"pysaml2 attributes."
 msgstr "属性マップディレクトリに、SAML 属性を pysaml2 属性にマップするファイルが含まれています。"
 
 #: src/libsaml/conf.py:90
@@ -50,27 +58,40 @@ msgid "Optional attributes to ask for from IdP."
 msgstr "IdP に要求するオプションの属性です。"
 
 #: src/libsaml/conf.py:108
-msgid "IdP metadata in the form of a file. This is generally an XML file containing metadata that the Identity Provider generates."
+msgid ""
+"IdP metadata in the form of a file. This is generally an XML file "
+"containing metadata that the Identity Provider generates."
 msgstr "ファイル形式の IdP メタデータです。これは通常、Identity Provider が生成するメタデータを含む XML ファイルです。"
 
 #: src/libsaml/conf.py:114
-msgid "key_file is the name of a PEM formatted file that contains the private key of the Hue service. This is presently used both to encrypt/sign assertions and as client key in a HTTPS session."
-msgstr "key_file は、Hue サービスの秘密鍵を含む PEM 形式のファイルの名前です。これは現在、アサーションの暗号化／署名、および HTTPS セッションのクライアントキーとして使用されます。"
+msgid ""
+"key_file is the name of a PEM formatted file that contains the private "
+"key of the Hue service. This is presently used both to encrypt/sign "
+"assertions and as client key in a HTTPS session."
+msgstr ""
+"key_file は、Hue サービスの秘密鍵を含む PEM 形式のファイルの名前です。これは現在、アサーションの暗号化／署名、および HTTPS"
+" セッションのクライアントキーとして使用されます。"
 
 #: src/libsaml/conf.py:118
 msgid "key_file_password password of the private key"
 msgstr "秘密鍵の key_file_password パスワード"
 
 #: src/libsaml/conf.py:123
-msgid "Execute this script to produce the private key password. This will be used when `key_file_password` is not set."
+msgid ""
+"Execute this script to produce the private key password. This will be "
+"used when `key_file_password` is not set."
 msgstr "このスクリプトを実行して秘密鍵のパスワードを作成します。これは key_file_password が設定されていない場合に利用されます。"
 
 #: src/libsaml/conf.py:131
-msgid "This is the public part of the service private/public key pair. cert_file must be a PEM formatted certificate chain file."
+msgid ""
+"This is the public part of the service private/public key pair. cert_file"
+" must be a PEM formatted certificate chain file."
 msgstr "これは、サービスの秘密鍵／公開鍵ペアの公開部分です。cert_file は、PEM 形式の証明書チェーンファイルであることが必要です。"
 
 #: src/libsaml/conf.py:137
-msgid "A mapping from attributes in the response from the IdP to django user attributes."
+msgid ""
+"A mapping from attributes in the response from the IdP to django user "
+"attributes."
 msgstr "IdP からの応答の属性から、django ユーザー属性へのマッピングです。"
 
 #: src/libsaml/conf.py:143
@@ -96,4 +117,3 @@ msgstr "サーバーからこの NameID 形式を要求します"
 #: src/libsaml/conf.py:183
 msgid "username_source not configured properly. SAML integration may not work."
 msgstr "username_source が適切に設定されていません。SAML 統合は動作しない可能性があります。"
-
