@@ -91,15 +91,15 @@ ${ commonheader(None, "impala", user, request) | n,unicode }
       <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></a>
       &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}"><i class="fa fa-save"></i></button>
-      <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>      
+      <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
     % endif
   </div>
 
   <form class="form-search" style="margin: 0" data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a database and a table') }
     <!-- ko if: columns().length == 0 -->
-    <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium chosen-select chosen-server" data-placeholder="${_('Choose a database...')}"></select>
-    <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium chosen-select chosen-table" data-placeholder="${_('Choose a table...')}"></select>
+    <select data-bind="options: $root.dashboard.dropdownDbs, value: $root.dashboard.selectedDropdownDb" class="input-medium" data-placeholder="${_('Choose a database...')}"></select>
+    <select data-bind="options: $root.dashboard.dropdownTables, value: $root.dashboard.selectedDropdownTable" class="input-medium" data-placeholder="${_('Choose a table...')}"></select>
 
     <a title="${_('Manually refresh the dropdowns')}" rel="tooltip" data-placement="bottom" class="pointer" data-bind="click: resetDropdownsCache"><i class="fa fa-refresh"></i></a>
     <!-- /ko -->
@@ -205,7 +205,7 @@ ${ dashboard.layout_skeleton() }
     <a href="javascript:void(0)" data-bind="click: function(){ $root.getWidgetById(id()).isLoading(true); $root.dashboard.addFacet($data);}">
       <i class="fa fa-plus"></i>
     </a>
-  <!-- /ko -->  
+  <!-- /ko -->
 </script>
 
 
@@ -221,7 +221,7 @@ ${ dashboard.layout_skeleton() }
       <input type="text" data-bind="value: properties.limit" />
       <input type="text" data-bind="value: $data.type" />
     </div>
-  
+
     <!-- ko if: type() == 'field' -->
       <span data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }}">
         <div>
@@ -232,8 +232,8 @@ ${ dashboard.layout_skeleton() }
           </a>
         </div>
       </span>
-    <!-- /ko --> 
-    
+    <!-- /ko -->
+
     <!-- ko if: type() == 'range' -->
       <div data-bind="foreach: {data: data(), afterRender: function(){ $root.getWidgetById($parent.id()).isLoading(false); }}">
         <div class="trigger-exclude">
@@ -251,11 +251,11 @@ ${ dashboard.layout_skeleton() }
           <!-- /ko -->
         </div>
       </div>
-    <!-- /ko -->    
-    
+    <!-- /ko -->
+
   </div>
   <!-- /ko -->
-  
+
   <span data-bind="template: { name: 'select-field' }, visible: ! isLoading()"></span>
 </script>
 
@@ -273,7 +273,7 @@ ${ dashboard.layout_skeleton() }
       <input type="text" data-bind="value: field" />
       <input type="text" data-bind="value: properties.limit" />
     </div>
-  
+
     <div data-bind="pieChart: {data: {counts: data, widget_id: id()}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
@@ -613,7 +613,7 @@ ${ dashboard.import_charts() }
         $(".chosen-select").trigger("chosen:updated");
       }, 200)
     });
-    
+
     hac_getDatabases(function (dbs) {
       viewModel.dashboard.updateDropdownDatabases(dbs);
       if (typeof callback != "undefined"){
@@ -624,19 +624,15 @@ ${ dashboard.import_charts() }
   }
 
   function getTables(callback) {
-    hac_getTables(viewModel.dashboard.selectedDropdownDb(), function (data) {
-      viewModel.dashboard.dropdownTables(data.split(" "));
-      window.setTimeout(function(){
-        $(".chosen-table").chosen({
-          disable_search_threshold: 5,
-          width: "130px",
-          no_results_text: "${_('Oops, no table found!')}"
-        });
-        $(".chosen-select").trigger("chosen:updated");
-      }, 200);
-      if (typeof callback != "undefined"){
-        callback(data);
-      }
+    $.get("/impala/api/autocomplete/" + viewModel.dashboard.selectedDropdownDb(), function (data) {
+      var tables = [];
+      $.each(data.tables_meta, function(i, table) {
+        tables.push(table.name);
+      });
+      viewModel.dashboard.dropdownTables(tables);
+      viewModel.dashboard.dropdownTables.valueHasMutated();
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
     });
   }
 
