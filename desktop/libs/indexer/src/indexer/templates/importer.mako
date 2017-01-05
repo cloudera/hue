@@ -75,10 +75,10 @@ ${ assist.assistPanel() }
     border-right: none!important;
   }
 
-  .step1 label div {
-    width: 50px;
-    display: inline-block;
-  }
+##   .step1 label > div:first-child {
+##     width: 50px;
+##     display: inline-block;
+##   }
 
   .step2.form-inline input[type='text'], .step2.form-inline select {
     margin-right: 10px;
@@ -207,7 +207,7 @@ ${ assist.assistPanel() }
   <div data-bind="visible: createWizard.show">
 
     <ol class="list-inline text-center step-indicator">
-      <li data-bind="css: { 'active': currentStep() == 1, 'active': currentStep() > 1 }, click: function() { currentStep(1) }">
+      <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
         <div class="step" title="${ _('Go to Step 1') }">
           <!-- ko if: currentStep() == 1 -->
             <!-- ko if: createWizard.isGuessingFormat -->
@@ -244,79 +244,87 @@ ${ assist.assistPanel() }
     <div class="card step1">
       <h3 class="card-heading simple">${_('Source')}</h3>
       <div class="card-body">
-
-        <form class="form-inline">
-          <div>
-            <div class="control-group">
-              <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
-                <select id="collectionType" data-bind="options: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
-              </label>
-            </div>
-
-            <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">
-              <label for="path" class="control-label"><div>${ _('Path') }</div>
-                <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }" placeholder="${ _('Click or drag & drop') }">
-              </label>
-            </div>
-
-            <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
-              <label for="path" class="control-label"><div>${ _('Table') }</div>
-                <input type="text" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
-              </label>
-            </div>
-
-            <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
-              <label for="path" class="control-label"><div>${ _('Query') }</div>
-                <select data-bind="options: createWizard.source.queries, value: createWizard.source.query, optionsText: 'name', optionsAfterRender: createWizard.source.selectQuery"></select>
-              </label>
-            </div>
+        <div>
+          <div class="control-group">
+            <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
+              <select id="collectionType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
+            </label>
           </div>
 
-          <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-          <h3 class="card-heading simple">${_('Format')}</h3>
-          <div class="card-body">
-            <label data-bind="visible: ! createWizard.prefill.source_type">${_('File Type')} <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
-
-            <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
-              <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
-            </span>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">
+            <label for="path" class="control-label"><div>${ _('Path') }</div>
+              <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }" placeholder="${ _('Click or drag & drop') }">
+            </label>
           </div>
 
-          <h3 class="card-heading simple">${_('Preview')}</h3>
-          <div class="card-body">
-            <!-- ko if: createWizard.isGuessingFieldTypes -->
-            <i class="fa fa-spinner fa-spin"></i>
-            <!-- /ko -->
-            <div style="overflow: auto">
-              <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
-                <thead>
-                <tr data-bind="foreach: createWizard.source.sampleCols">
-                  ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-                  <th data-bind="text: name" style="padding-right:60px"></th>
-                  ## TODO nested
-                </tr>
-                </thead>
-                <tbody data-bind="foreach: createWizard.source.sample">
-                <tr data-bind="foreach: $data">
-                  ##<!-- ko if: $index() < $root.createWizard.source.columns().length -->
-                  ##<td data-bind="visible: $root.createWizard.source.columns()[$index()].keep, text: $data"></td>
-                  <td data-bind="text: $data"></td>
-
-                  ##<!-- ko with: $root.createWizard.source.columns()[$index()] -->
-                  ##  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
-                  ##<!-- /ko -->
-                  ##<!-- /ko -->
-                </tr>
-                </tbody>
-              </table>
-            </div>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
+            <label for="path" class="control-label"><div>${ _('Table') }</div>
+              <input type="text" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+            </label>
           </div>
-          <!-- /ko -->
 
-        </form>
+          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
+            <label for="path" class="control-label"><div>${ _('Query') }</div>
+              <select data-bind="selectize: createWizard.source.queries, value: createWizard.source.query, optionsText: 'name', optionsAfterRender: createWizard.source.selectQuery"></select>
+            </label>
+          </div>
+        </div>
       </div>
-
     </div>
+
+    <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
+    <div class="card step1">
+      <!-- ko if: createWizard.isGuessingFormat -->
+      <h3 class="card-heading simple">${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <!-- /ko -->
+      <!-- ko ifnot: createWizard.isGuessingFormat -->
+      <h3 class="card-heading simple">${_('Format')}</h3>
+      <div class="card-body">
+        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
+        <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
+          <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
+        </span>
+      </div>
+      <!-- /ko -->
+    </div>
+
+    <div class="card step1">
+      <!-- ko ifnot: createWizard.isGuessingFormat -->
+      <!-- ko if: createWizard.isGuessingFieldTypes -->
+      <h3 class="card-heading simple">${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h3>
+      <!-- /ko -->
+      <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
+      <h3 class="card-heading simple">${_('Preview')}</h3>
+      <div class="card-body">
+        <div style="overflow: auto">
+          <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
+            <thead>
+            <tr data-bind="foreach: createWizard.source.sampleCols">
+              ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
+              <th data-bind="text: name" style="padding-right:60px"></th>
+              ## TODO nested
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: createWizard.source.sample">
+            <tr data-bind="foreach: $data">
+              ##<!-- ko if: $index() < $root.createWizard.source.columns().length -->
+              ##<td data-bind="visible: $root.createWizard.source.columns()[$index()].keep, text: $data"></td>
+              <td data-bind="text: $data"></td>
+
+              ##<!-- ko with: $root.createWizard.source.columns()[$index()] -->
+              ##  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
+              ##<!-- /ko -->
+              ##<!-- /ko -->
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+    </div>
+    <!-- /ko -->
+
     <!-- /ko -->
 
     <!-- ko if: currentStep() == 2 -->
@@ -645,14 +653,14 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="arg-text">
   <label>
-    <span data-bind="text: description"></span>
+    <div data-bind="text: description"></div>
     <input type="text" class="input-small" data-bind="attr: {placeholder: description}, value: value">
   </label>
 </script>
 
 <script type="text/html" id="arg-text-delimiter">
   <label>
-    <span data-bind="text: description"></span>
+    <div data-bind="text: description"></div>
     <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
   </label>
 </script>
@@ -660,7 +668,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-checkbox">
   <label>
     <input type="checkbox" data-bind="checked: value">
-    <span data-bind="text: description"></span>
+    <div data-bind="text: description"></div>
   </label>
 </script>
 
