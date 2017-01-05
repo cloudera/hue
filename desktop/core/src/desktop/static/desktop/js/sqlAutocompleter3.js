@@ -86,6 +86,7 @@ var SqlAutocompleter3 = (function () {
     self.tables = ko.observableArray();
     self.columns = ko.observableArray();
     self.values = ko.observableArray();
+    self.paths = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
@@ -93,12 +94,13 @@ var SqlAutocompleter3 = (function () {
     self.loadingTables = ko.observable(false);
     self.loadingColumns = ko.observable(false);
     self.loadingValues = ko.observable(false);
+    self.loadingPaths = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
       var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(),
-          self.functions(), self.databases(), self.tables(), self.columns(), self.values());
+          self.functions(), self.databases(), self.tables(), self.columns(), self.values(), self.paths());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -177,6 +179,7 @@ var SqlAutocompleter3 = (function () {
     self.tables([]);
     self.columns([]);
     self.values([]);
+    self.paths([]);
 
     self.loadingKeywords(false);
     self.loadingFunctions(false);
@@ -184,6 +187,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingTables(false);
     self.loadingColumns(false);
     self.loadingValues(false);
+    self.loadingPaths(false);
 
     self.filter('');
 
@@ -199,6 +203,7 @@ var SqlAutocompleter3 = (function () {
     self.handleTables(allDbsDeferral);
     self.handleColumns(colRefDeferral);
     self.handleValues(colRefDeferral);
+    self.handlePaths();
   };
 
   /**
@@ -605,6 +610,44 @@ var SqlAutocompleter3 = (function () {
           });
         }
         self.values(valueSuggestions);
+      });
+    }
+  };
+
+  Suggestions.prototype.handlePaths = function () {
+    var self = this;
+    var suggestHdfs = self.parseResult.suggestHdfs;
+    if (suggestHdfs) {
+      var parts = suggestHdfs.path.split('/');
+      // Drop the first " or '
+      parts.shift();
+      // Last one is either partial name or empty
+      parts.pop();
+
+      self.loadingPaths(true);
+      self.apiHelper.fetchHdfsPath({
+        pathParts: parts,
+        successCallback: function (data) {
+          if (!data.error) {
+            var pathSuggestions = [];
+            data.files.forEach(function (file) {
+              if (file.name !== '..' && file.name !== '.') {
+                pathSuggestions.push({
+                  value: suggestHdfs.path === '' ? '/' + file.name : file.name,
+                  meta: file.type,
+                  weight: DEFAULT_WEIGHTS.HDFS
+                });
+              }
+            });
+            self.paths(pathSuggestions);
+          }
+          self.loadingPaths(false);
+        },
+        silenceErrors: true,
+        errorCallback: function () {
+          self.loadingPaths(false);
+        },
+        timeout: AUTOCOMPLETE_TIMEOUT
       });
     }
   };
