@@ -70,7 +70,7 @@ var AssistDbSource = (function () {
 
     self.invalidateOnRefresh = ko.observable('cache');
 
-    self.activeSort = ko.observable('alpha');
+    self.activeSort = ko.observable('creation');
 
     self.activeSort.subscribe(function (newSort) {
       if (newSort === 'popular') {
