@@ -1347,7 +1347,7 @@ def extract_archive_using_batch_job(request):
       try:
         response = extract_archive_in_hdfs(request, upload_path, archive_name)
       except Exception, e:
-        response['message'] = _('Exception occurred while extracting the archive: %s' % e)
+        response['message'] = _('Exception occurred while compressing: %s' % e)
   else:
     response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
                             'has to be enabled before calling this method.')
