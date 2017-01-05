@@ -203,12 +203,15 @@ ${ hueIcons.symbols() }
           <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">20</div></button>
         </div>
         <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
-          <div style="font-size: 15px; font-weight: 300">1hours ago <i class="fa fa-fighter-jet fa-fw"></i> Extracting hdfs://.../mini-earthquake.csv.zip to /user/romain/mini-earthquake.csv</div>
-          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Executing query 'SELECT * FROM web_logs limit 500' </div>
-          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Running Schedule 'Data log usage by day' </div>
-          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-fighter-jet fa-fw"></i> Exporting query result 'SELECT * FROM sample_07 where salary is not NULL' to /user/romain/escalation</div>
-          <div style="font-size: 15px; font-weight: 300">4hours ago <i class="fa fa-check fa-fw"></i> Exporting query result 'Top 25 Hue escalations' to /user/romain/escalation</div>
-          <div style="font-size: 15px; font-weight: 300">3hours ago <i class="fa fa-check fa-fw"></i> Indexing /user/romain/mini-earthquake.csv to mini-earthquake</div>
+          <!-- ko if: editorVM.selectedNotebook() -->
+            <ul>
+              <!-- ko foreach: editorVM.selectedNotebook().history -->
+                <li style="font-size: 15px; font-weight: 300">
+                  1hours ago <i class="fa fa-fighter-jet fa-fw"></i> <span data-bind="text: $data.name"> <span data-bind="text: $data.query"></span>
+                </li>
+              <!-- /ko -->
+            </ul>
+          <!-- /ko -->
         </div>
 
         <div class="compose-action btn-group">
@@ -386,6 +389,15 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+
+# Task History
+<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
+<script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
+<script src="${ static('desktop/js/autocompleter.js') }"></script>
+<script src="${ static('desktop/js/hue.json.js') }"></script>
+<script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
 <script type="text/javascript" charset="utf-8">
 (function () {
@@ -780,6 +792,62 @@ ${ assist.assistPanel() }
 
       TopNavViewModel.prototype.performSearch = function () {
       };
+
+
+      self.editorVM = new EditorViewModel(null, '', {
+        user: '${ user.username }',
+        userId: ${ user.id },
+        languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
+        is_history: true,
+        snippetViewSettings: {
+          java : {
+            snippetIcon: 'fa-file-archive-o '
+          },
+          hive: {
+            placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+            aceMode: 'ace/mode/hive',
+            snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+            sqlDialect: true
+          },
+          impala: {
+            placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+            aceMode: 'ace/mode/impala',
+            snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+            sqlDialect: true
+          }
+        }
+      });
+      self.editorVM.editorMode(true);
+      self.editorVM.newNotebook();
+
+/**
+          topNavViewModel.editorVM.openNotebook(resp.history_uuid, null, true, function(){
+          topNavViewModel.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
+              if (val == 100){
+                //self.indexingStarted(false);
+                //self.isIndexing(false);
+                //self.indexingSuccess(true);
+              }
+            });
+            self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
+              if (val == 'failed'){
+                self.isIndexing(false);
+                self.indexingStarted(false);
+                self.indexingError(true);
+              } else if (val == 'available') {
+                var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
+                if (! snippet.result.handle().has_more_statements) {
+                  if (self.editorVM.selectedNotebook().onSuccessUrl()) {
+                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                  }
+                } else { // Perform last DROP statement execute
+                  snippet.execute();
+                }
+              }
+            });
+            topNavViewModel.editorVM.selectedNotebook().snippets()[0].checkStatus();
+          });
+*/
 
       var topNavViewModel = new TopNavViewModel();
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);

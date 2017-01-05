@@ -960,6 +960,9 @@ class Document2Manager(models.Manager, Document2QueryMixin):
   def get_history(self, user, doc_type, include_trashed=False):
     return self.documents(user, perms='owned', include_history=True, include_trashed=include_trashed).filter(type=doc_type, is_history=True)
 
+  def get_tasks_history(self, user):
+    return self.documents(user, perms='owned', include_history=True, include_trashed=False, include_managed=True).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script')
+
   def get_home_directory(self, user):
     try:
       return self.get(owner=user, parent_directory=None, name=Document2.HOME_DIR, type='directory')
