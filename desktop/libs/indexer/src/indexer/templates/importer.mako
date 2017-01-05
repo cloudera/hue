@@ -423,7 +423,7 @@ ${ assist.assistPanel() }
               <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
               <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
             </div>
-            <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+            <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
             <!-- /ko -->
 
             <!-- ko if: tableFormat() == 'kudu' -->
@@ -487,7 +487,7 @@ ${ assist.assistPanel() }
         </form>
 
         <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && ouputFormat() == 'table' -->
-          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
         <!-- /ko -->
         <!-- /ko -->
 
