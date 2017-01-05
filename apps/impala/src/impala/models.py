@@ -16,13 +16,17 @@
 # limitations under the License.
 
 import json
+import logging
 
-from beeswax.server.dbms import get_query_server_config
+from beeswax.server.dbms import get_query_server_config, QueryServerException
 from beeswax.server import dbms
 
 
+LOG = logging.getLogger(__name__)
+
+
 class Dashboard():
-  
+
   def __init__(self, data=None, document=None):
     self.document = document
 
@@ -41,7 +45,7 @@ class Dashboard():
                   "drops":["temp"],"klass":"card card-home card-column span10"}
           ],
           'dashboard': {
-            'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Total Employees', 'type': 'field', 'field': 'total_emp', 'widget_type': 'facet-widget', 
+            'facets': [{'id': '52f07188-f30f-1296-2450-f77e02e1a5c1', 'label': 'Total Employees', 'type': 'field', 'field': 'total_emp', 'widget_type': 'facet-widget',
                         'properties': {'limit': 10}}],
             'properties': [{'database': 'default', 'table': 'sample_07', 'fields': []}]
           }
@@ -53,24 +57,25 @@ class Dashboard():
     _data['dashboard']['properties'][0]['fields'] = Controller(user).get_fields(_data['dashboard']['properties'][0]['database'], _data['dashboard']['properties'][0]['table'])
 
     if self.document is not None:
-      _data['dashboard']['id'] = self.document.id  
+      _data['dashboard']['id'] = self.document.id
 
     return json.dumps(_data)
- 
+
   def get_data(self):
     return json.loads(self.data)
 
-    
+
 class Controller():
-  
+
   def __init__(self, user):
     query_server = get_query_server_config(name='impala')
-    self.db = dbms.get(user, query_server=query_server)      
-      
+    self.db = dbms.get(user, query_server=query_server)
+
   def get_fields(self, database, table):
-        
-    _table = self.db.get_table(database, table)
-    return [dict([('name', col.name), ('type', col.type), ('comment', col.comment)]) for col in _table.cols]    
-        
-        
-        
+
+    try:
+      _table = self.db.get_table(database, table)
+      return [dict([('name', col.name), ('type', col.type), ('comment', col.comment)]) for col in _table.cols]
+    except QueryServerException, e:
+      LOG.exception('Error fetching %s.%s' % (database, table))
+      return []

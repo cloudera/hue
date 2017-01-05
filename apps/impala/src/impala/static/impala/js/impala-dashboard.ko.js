@@ -138,6 +138,7 @@ var Dashboard = function (vm, dashboard) {
 	self.properties()[0].database(self.selectedDropdownDb());
 	if (self.selectedDropdownDb() && self.selectedDropdownTable()) {
 	  self.updateFields(); 
+	  getTables();
 	}
   });  
 
