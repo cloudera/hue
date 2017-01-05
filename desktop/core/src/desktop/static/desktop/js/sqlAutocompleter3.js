@@ -90,6 +90,7 @@ var SqlAutocompleter3 = (function () {
 
     self.joins = ko.observableArray();
     self.joinConditions = ko.observableArray();
+    self.aggregateFunctions = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
@@ -101,13 +102,14 @@ var SqlAutocompleter3 = (function () {
 
     self.loadingJoins = ko.observable(false);
     self.loadingJoinConditions = ko.observable(false);
+    self.loadingAggregateFunctions = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
       var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(),
           self.functions(), self.databases(), self.tables(), self.columns(), self.values(), self.paths(), self.joins(),
-          self.joinConditions());
+          self.joinConditions(), self.aggregateFunctions());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -190,6 +192,7 @@ var SqlAutocompleter3 = (function () {
 
     self.joins([]);
     self.joinConditions([]);
+    self.aggregateFunctions([]);
 
     self.loadingKeywords(false);
     self.loadingFunctions(false);
@@ -201,6 +204,7 @@ var SqlAutocompleter3 = (function () {
 
     self.loadingJoins(false);
     self.loadingJoinConditions(false);
+    self.loadingAggregateFunctions(false);
 
     self.filter('');
 
@@ -220,9 +224,10 @@ var SqlAutocompleter3 = (function () {
 
     var joinsDeferred = self.handleJoins();
     var joinConditionsDeferred = self.handleJoinConditions();
+    var aggregateFunctionsDeferred = self.handleAggregateFunctions();
 
     $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
-        joinConditionsDeferred).done(function () {
+        joinConditionsDeferred, aggregateFunctionsDeferred).done(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -745,10 +750,7 @@ var SqlAutocompleter3 = (function () {
                 meta: AutocompleterGlobals.i18n.meta.join,
                 weight: suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.POPULAR_ACTIVE_JOIN,
                 detailsTemplate: 'join',
-                details: {
-                  // TODO: Add more details about the join
-                  completeValue: suggestionString
-                }
+                details: value
               });
             }
           });
@@ -797,10 +799,7 @@ var SqlAutocompleter3 = (function () {
                 meta: AutocompleterGlobals.i18n.meta.joinCondition,
                 weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
                 detailsTemplate: 'join-condition',
-                details: {
-                  // TODO: Add more details about the join conditions
-                  completeValue: suggestionString
-                }
+                details: value
               });
             }
           });
@@ -818,6 +817,73 @@ var SqlAutocompleter3 = (function () {
     }
 
     return joinConditionsDeferred;
+  };
+
+  Suggestions.prototype.handleAggregateFunctions = function () {
+    var self = this;
+    var aggregateFunctionsDeferred = $.Deferred();
+    var suggestAggregateFunctions = self.parseResult.suggestAggregateFunctions;
+    if (HAS_OPTIMIZER && suggestAggregateFunctions && suggestAggregateFunctions.tables.length > 0) {
+      self.loadingAggregateFunctions(true);
+      self.apiHelper.fetchNavOptTopAggs({
+        sourceType: self.snippet.type(),
+        timeout: AUTOCOMPLETE_TIMEOUT,
+        defaultDatabase: self.activeDatabase,
+        silenceErrors: true,
+        tables: suggestAggregateFunctions.tables,
+        successCallback: function (data) {
+          if (data.values.length > 0) {
+            // TODO: Handle column conflicts with multiple tables
+
+            // Substitute qualified table identifiers with either alias or empty string
+            var substitutions = [];
+            suggestAggregateFunctions.tables.forEach(function (table) {
+              var replaceWith = table.alias ? table.alias + '.' : '';
+              if (table.identifierChain.length > 1) {
+                substitutions.push({
+                  replace: new RegExp($.map(table.identifierChain, function (identifier) {
+                        return identifier.name
+                      }).join('\.') + '\.', 'gi'),
+                  with: replaceWith
+                })
+              } else if (table.identifierChain.length === 1) {
+                substitutions.push({
+                  replace: new RegExp(database + '\.' + table.identifierChain[0].name + '\.', 'gi'),
+                  with: replaceWith
+                });
+                substitutions.push({
+                  replace: new RegExp(table.identifierChain[0].name + '\.', 'gi'),
+                  with: replaceWith
+                })
+              }
+            });
+
+            var aggregateFunctionsSuggestions = [];
+            data.values.forEach(function (value) {
+              var clean = value.aggregateClause;
+              substitutions.forEach(function (substitution) {
+                clean = clean.replace(substitution.replace, substitution.with);
+              });
+              aggregateFunctionsSuggestions.push({
+                value: clean,
+                meta: AutocompleterGlobals.i18n.meta.aggregateFunction,
+                weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + value.totalQueryCount,
+                detailsTemplate: 'aggregate-function',
+                details: value
+              });
+            })
+          }
+          self.aggregateFunctions(aggregateFunctionsSuggestions);
+          aggregateFunctionsDeferred.resolve();
+          self.loadingAggregateFunctions(false);
+        },
+        errorCallback: function () {
+          self.loadingAggregateFunctions(false);
+          aggregateFunctionsDeferred.resolve();
+        }
+      });
+    }
+    return aggregateFunctionsDeferred;
   };
 
   Suggestions.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {

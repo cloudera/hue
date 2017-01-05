@@ -93,6 +93,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     AutocompleterGlobals = {
       i18n: {
         meta: {
+          aggregateFunction: '${ _('aggregate') }',
           alias:  '${ _('alias') }',
           commonTableExpression:  '${ _('cte') }',
           database:  '${ _('database') }',
