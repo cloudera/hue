@@ -191,6 +191,9 @@ from desktop.views import _ko
         };
 
         self.detach = function () {
+          if (!self.active()) {
+            return;
+          }
           self.active(false);
           self.base.detach();
           self.base = null;
