@@ -2880,6 +2880,14 @@
       }
 
       self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal, allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.linkMarkup));
+
+      if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.openOnFocus) {
+        self.on('focus', function () {
+          if (self.val() === '') {
+            self.siblings('.filechooser-clickable').click();
+          }
+        });
+      }
     }
   };
 
@@ -2887,13 +2895,13 @@
   function getFileBrowseButton(inputElement, selectFolder, valueAccessor, stripHdfsPrefix, allBindingsAccessor, isAddon, isNestedModal, linkMarkup) {
     var _btn;
     if (isAddon) {
-      _btn = $("<span>").addClass("add-on muted pointer").text("..");
+      _btn = $("<span>").addClass("add-on muted pointer filechooser-clickable").text("..");
     }
     else if (linkMarkup) {
-      _btn = $("<a>").addClass("btn").addClass("fileChooserBtn").text("..");
+      _btn = $("<a>").addClass("btn").addClass("fileChooserBtn filechooser-clickable").text("..");
     }
     else {
-      _btn = $("<button>").addClass("btn").addClass("fileChooserBtn").text("..");
+      _btn = $("<button>").addClass("btn").addClass("fileChooserBtn filechooser-clickable").text("..");
     }
     _btn.click(function (e) {
       e.preventDefault();
