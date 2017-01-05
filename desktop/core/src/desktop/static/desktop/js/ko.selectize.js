@@ -38,10 +38,14 @@ ko.bindingHandlers.selectize = {
 
     ko.bindingHandlers.options.update(element, valueAccessor, allBindingsAccessor, viewModel, bindingContext);
 
-    var options = {
-      valueField: allBindingsAccessor.get('optionsValue'),
-      labelField: allBindingsAccessor.get('optionsText'),
-      searchField: allBindingsAccessor.get('optionsText')
+    var options = {};
+    if (allBindingsAccessor.get('optionsValue')) {
+      options.valueField = allBindingsAccessor.get('optionsValue');
+    }
+
+    if (allBindingsAccessor.get('optionsText')) {
+      options.labelField = allBindingsAccessor.get('optionsText'),
+      options.searchField = allBindingsAccessor.get('optionsText')
     }
 
     if (allBindingsAccessor.has('selectizeOptions')) {
@@ -123,7 +127,7 @@ ko.bindingHandlers.selectize = {
   update: function (element, valueAccessor, allBindingsAccessor) {
 
     if (allBindingsAccessor.has('object')) {
-      var optionsValue = allBindingsAccessor.get('optionsValue') || 'id';
+      var optionsValue = allBindingsAccessor.get('optionsValue') || 'value';
       var value_accessor = valueAccessor();
       var selected_obj = $.grep(value_accessor(), function (i) {
         if (typeof i[optionsValue] == 'function')
