@@ -246,8 +246,8 @@ ${ assist.assistPanel() }
       <div class="card-body">
         <div>
           <div class="control-group">
-            <label for="collectionType" class="control-label"><div>${ _('Type') }</div>
-              <select id="collectionType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
+            <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
+              <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
 
@@ -335,8 +335,8 @@ ${ assist.assistPanel() }
         <h3 class="card-heading simple">${_('Destination')}</h3>
         <div class="card-body">
           <div class="control-group">
-            <label for="collectionType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
-              <select id="collectionType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
+            <label for="destinationType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
+              <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
 
             <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
@@ -370,8 +370,8 @@ ${ assist.assistPanel() }
             <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
             <div class="control-group">
-              <label for="collectionType" class="control-label"><div>${ _('Format') }</div>
-                <select id="collectionType" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
+              <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
+                <select id="destinationFormat" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
 
@@ -676,7 +676,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-text-delimiter">
   <label>
     <div data-bind="text: description"></div>
-    <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
+    <select data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
   </label>
 </script>
 
