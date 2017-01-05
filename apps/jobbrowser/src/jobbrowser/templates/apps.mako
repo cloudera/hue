@@ -52,16 +52,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 
 % if not is_embeddable:
+  ${ assist.assistJSModels() }
+  ${ assist.assistPanel() }
 
-${ assist.assistJSModels() }
-${ assist.assistPanel() }
-
-<a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
-  <i class="fa fa-chevron-right"></i>
-</a>
-
+  <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); }">
+    <i class="fa fa-chevron-right"></i>
+  </a>
 % endif
 
+<div id="jobbrowserComponents">
 <div class="navbar navbar-inverse navbar-fixed-top nokids">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -74,6 +73,12 @@ ${ assist.assistPanel() }
               </a>
             </li>
           </ul>
+            <span class="form-inline">
+              <input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" id="jobs"><label for="jobs">${ _('Apps') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Workflows') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="bundles" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
+            </span>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right alert alert-warning" style="margin-top: 4px">${ _("Hive jobs are running as the 'hive' user") }</div>
           % endif
@@ -81,7 +86,7 @@ ${ assist.assistPanel() }
       </div>
     </div>
 </div>
-<div id="jobbrowserComponents">
+
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full">
@@ -125,16 +130,8 @@ ${ assist.assistPanel() }
 
             <!-- ko if: $root.section() == 'apps' -->
             <h2>${ _('Apps') }</h2>
-            ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
-            &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for id, name, status...')}" value="${ text_filter or '' }">
 
-            <span class="form-inline">
-              <input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" id="jobs"><label for="jobs">${ _('Jobs') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Workflows') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
-            </span>
-
+            ${_('Filter')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
             <span class="btn-group">
               <class="btn-group">
                 <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
@@ -143,32 +140,39 @@ ${ assist.assistPanel() }
               </span>
             </span>
 
+            <i class="fa fa-calendar"></i>
+
+            <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+              <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+              <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span></button>
+              <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span></button>
+              <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span></button>
+            </div>
+
             <div class="card card-small">
               <table id="jobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
-                  <th>${_('Logs')}</th>
+                  <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+                  <th>${_('Duration')}</th>
+                  <th>${_('Status')}</th>
+                  <th>${_('Progress')}</th>
                   <th>${_('Id')}</th>
                   <th>${_('Name')}</th>
                   <th>${_('Type')}</th>
-                  <th>${_('Status')}</th>
                   <th>${_('User')}</th>
-                  <th>${_('Progress')}</th>
-                  <th>${_('Duration')}</th>
-                  <th>${_('Submitted')}</th>
                 </tr>
                 </thead>
                 <tbody data-bind="foreach: jobs.apps">
                   <tr data-bind="click: fetchJob">
-                    <td></td>
+                    <td><div class="hueCheckbox fa"></div></td>
+                    <td data-bind="text: duration"></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: progress"></td>
                     <td data-bind="text: id"></td>
                     <td data-bind="text: name"></td>
                     <td data-bind="text: type"></td>
-                    <td data-bind="text: status"></td>
                     <td data-bind="text: user"></td>
-                    <td data-bind="text: progress"></td>
-                    <td data-bind="text: duration"></td>
-                    <td data-bind="text: submitted"></td>
                   </tr>
                 </tbody>
               </table>

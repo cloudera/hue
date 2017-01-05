@@ -235,7 +235,6 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
         <li><a href="javascript: void(0);">Custom App 2</a></li>
-        <li><a href="javascript: void(0);">Custom App 3</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
@@ -245,6 +244,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
+        <li><a href="javascript: void(0);">SLAs</a></li>
       </ul>
       <div class="left-nav-drop">
         <div data-bind="click: function () { onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">
