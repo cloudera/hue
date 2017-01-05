@@ -2727,7 +2727,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
+<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }

@@ -46,7 +46,7 @@ ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-selectize.js') }"></script>
+<script src="${ static('desktop/js/ko.selectize.js') }"></script>
 
 ${ assist.assistJSModels() }
 
@@ -226,7 +226,7 @@ ${ assist.assistPanel() }
 
       <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
         <div class="step" title="${ _('Go to Step 2') }">
-          <!-- ko if: currentStep() < 2 -->
+          <!-- ko if: currentStep() < 3 -->
             <!-- ko if: createWizard.isGuessingFieldTypes -->
               <span class="fa fa-spinner fa-spin"></span>
             <!-- /ko -->
@@ -280,7 +280,7 @@ ${ assist.assistPanel() }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Format')}</h3>
       <div class="card-body">
-        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="options: $root.createWizard.fileTypes, optionsText: 'description', value: $root.createWizard.fileType"></select></label>
+        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileType, optionsText: 'description'"></select></label>
         <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
         </span>
@@ -328,192 +328,207 @@ ${ assist.assistPanel() }
     <!-- /ko -->
 
     <!-- ko if: currentStep() == 2 -->
-    <div class="card step2">
 
       <!-- ko with: createWizard.destination -->
-      <div class="control-group">
-        <label for="collectionType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
-          <select id="collectionType" data-bind="options: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
-        </label>
 
-        <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-          <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
-            <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
-          <!-- /ko -->
-
-          <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-            <label for="path" class="control-label">
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
+      <div class="card step2">
+        <h3 class="card-heading simple">${_('Destination')}</h3>
+        <div class="card-body">
+          <div class="control-group">
+            <label for="collectionType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
+              <select id="collectionType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
-          <!-- /ko -->
 
-          <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
-            ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
-          </span>
-          <span class="help-inline muted" data-bind="visible: isTargetExisting()">
-            ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
-            <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
-          </span>
-        </label>
+            <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
+              <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
+                <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+              <!-- /ko -->
+
+              <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
+                <label for="path" class="control-label">
+                  <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
+                </label>
+              <!-- /ko -->
+
+              <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
+                ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
+              </span>
+              <span class="help-inline muted" data-bind="visible: isTargetExisting()">
+                ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
+                <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
+              </span>
+            </label>
+          </div>
+        </div>
       </div>
 
-      <div class="card-body">
-        ##<!-- ko if: createWizard.isGuessingFieldTypes -->
-        ##  <i class="fa fa-spinner fa-spin"></i>
-        ##<!-- /ko -->
 
         <!-- ko if: outputFormat() == 'table' -->
-        <h3 class="card-heading simple">${_('Properties')}</h3>
-          <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+        <div class="card step2">
+          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <div class="card-body">
+            <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
-          <div class="control-group">
-            <label for="collectionType" class="control-label"><div>${ _('Format') }</div>
-              <select id="collectionType" data-bind="options: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
-            </label>
-          </div>
-
-          <label class="checkbox">
-            <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
-          </label>
-          <span data-bind="visible: ! useDefaultLocation()">
-            <label for="path" class="control-label"><div>${ _('External location') }</div>
-              <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
-            </label>
-          </span>
-
-          <label class="checkbox">
-            <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
-          </label>
-
-          <label class="checkbox">
-            <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
-          </label>
-          <span data-bind="visible: useCustomDelimiters">
             <div class="control-group">
-              <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
-                <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              <label for="collectionType" class="control-label"><div>${ _('Format') }</div>
+                <select id="collectionType" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
-            <div class="control-group">
-              <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
-                <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
-              </label>
-            </div>
-            <div class="control-group">
-              <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
-                <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
-              </label>
-            </div>
-            <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
-          </span>
 
-          <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
-            <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
-              ## At least one selected
-              <select id="kuduPks" data-bind="options: columns, selectedOptions: primaryKeys, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
             </label>
-          </div>
+            <span data-bind="visible: ! useDefaultLocation()">
+              <label for="path" class="control-label"><div>${ _('External location') }</div>
+                <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+              </label>
+            </span>
 
-          <div class="row" style="margin-left: 8px">
-            <div class="span3">
-              <input type="checkbox" data-bind="checked: hasHeader">
-              ${_('Use first row as column names')} <a class="btn disable-feedback"><i class="fa fa-outdent"></i></a>
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+            </label>
+
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
+            </label>
+            <span data-bind="visible: useCustomDelimiters">
+              <div class="control-group">
+                <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
+                  <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                </label>
+              </div>
+              <div class="control-group">
+                <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
+                  <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                </label>
+              </div>
+              <div class="control-group">
+                <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
+                  <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                </label>
+              </div>
+              <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
+            </span>
+
+            <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
+              <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
+                ## At least one selected
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
+              </label>
             </div>
-            <div class="span3" data-bind="click: function() { alert('Hello'); }">
-              ${ _('Bulk edit column names') }<a class="btn"><i class="fa fa-edit"></i></a>
+
+            <div class="row" style="margin-left: 8px">
+              <div class="span3">
+                <input type="checkbox" data-bind="checked: hasHeader">
+                ${_('Use first row as column names')} <a class="btn disable-feedback"><i class="fa fa-outdent"></i></a>
+              </div>
+              <div class="span3" data-bind="click: function() { alert('Hello'); }">
+                ${ _('Bulk edit column names') }<a class="btn"><i class="fa fa-edit"></i></a>
+              </div>
             </div>
-          </div>
 
-          <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
+            <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
 
-            <!-- ko if: tableFormat() != 'kudu' -->
-            <div class="form-inline" data-bind="foreach: partitionColumns">
-              <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
-              <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
-            </div>
-            <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
-            <!-- /ko -->
-
-            <!-- ko if: tableFormat() == 'kudu' -->
-            <div class="form-inline" data-bind="foreach: kuduPartitionColumns">
-              ${ _('Columns') }
-              <select id="kuduPks" data-bind="options: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
-              <select data-bind="options: ['RANGE BY', 'HASH'], value: name"></select>
-
-              <!-- ko if: name() == 'HASH' -->
-                <input type="number" data-bind="value: int_val">
+              <!-- ko if: tableFormat() != 'kudu' -->
+              <div class="form-inline" data-bind="foreach: partitionColumns">
+                <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+                <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+              </div>
+              <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               <!-- /ko -->
 
-              <!-- ko if: name() == 'RANGE BY' -->
-                <div class="form-inline" data-bind="foreach: range_partitions">
-                  <!-- ko if: name() == 'VALUES' -->
-                    <input type="input" data-bind="value: lower_val">
-                    <input type="checkbox" data-bind="checked: include_lower_val">
-                    <
-                    <span data-bind="text: '=', visible: include_lower_val"></span>
-                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
-                    <
-                    <span data-bind="text: '=', visible: include_upper_val"></span>
-                    <input type="input" data-bind="value: upper_val">
-                    <input type="checkbox" data-bind="checked: include_upper_val">
-                  <!-- /ko -->
+              <!-- ko if: tableFormat() == 'kudu' -->
+              <div class="form-inline" data-bind="foreach: kuduPartitionColumns">
+                ${ _('Columns') }
+                <select id="kuduPks" data-bind="selectize: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
+                <select data-bind="selectize: ['RANGE BY', 'HASH'], value: name"></select>
 
-                  <!-- ko if: name() == 'VALUE' -->
-                    <select data-bind="options: ['VALUES', 'VALUE'], value: name"></select>
-                    <div class="form-inline" data-bind="foreach: values">
-                      <input type="text" data-bind="value: $data">
-                      <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
-                    </div>
-                    <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
-                  <!-- /ko -->
-                  <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
-                </div>
+                <!-- ko if: name() == 'HASH' -->
+                  <input type="number" data-bind="value: int_val">
+                <!-- /ko -->
 
-                <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+                <!-- ko if: name() == 'RANGE BY' -->
+                  <div class="form-inline" data-bind="foreach: range_partitions">
+                    <!-- ko if: name() == 'VALUES' -->
+                      <input type="input" data-bind="value: lower_val">
+                      <input type="checkbox" data-bind="checked: include_lower_val">
+                      <
+                      <span data-bind="text: '=', visible: include_lower_val"></span>
+                      <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
+                      <
+                      <span data-bind="text: '=', visible: include_upper_val"></span>
+                      <input type="input" data-bind="value: upper_val">
+                      <input type="checkbox" data-bind="checked: include_upper_val">
+                    <!-- /ko -->
+
+                    <!-- ko if: name() == 'VALUE' -->
+                      <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
+                      <div class="form-inline" data-bind="foreach: values">
+                        <input type="text" data-bind="value: $data">
+                        <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
+                      </div>
+                      <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
+                    <!-- /ko -->
+                    <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
+                  </div>
+
+                  <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+                <!-- /ko -->
+
+                <a data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+                <a data-bind="click: function() { $parent.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               <!-- /ko -->
-
-              <a data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
-              <a data-bind="click: function() { $parent.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+            </div>
+            <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
             <!-- /ko -->
-          </div>
-          <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
-          <!-- /ko -->
 
-          </label>
+            </label>
+          </div>
+        </div>
         <!-- /ko -->
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
-        <h3 class="card-heading simple">${_('Fields')}</h3>
-        <form class="form-inline" data-bind="foreach: columns">
-          <!-- ko if: $parent.outputFormat() == 'table' -->
-            <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
-          <!-- /ko -->
+          <div class="card step2">
+            <h3 class="card-heading simple">${_('Fields')}</h3>
+            <div class="card-body">
+              <form class="form-inline" data-bind="foreach: columns">
+                <!-- ko if: $parent.outputFormat() == 'table' -->
+                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+                <!-- /ko -->
 
-          <!-- ko if: $parent.outputFormat() == 'index' -->
-            <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
-          <!-- /ko -->
-        </form>
+                <!-- ko if: $parent.outputFormat() == 'index' -->
+                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
+                <!-- /ko -->
+              </form>
 
-        <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
-          <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
-        <!-- /ko -->
+              <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
+                <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+              <!-- /ko -->
+            </div>
+          </div>
         <!-- /ko -->
 
         <!-- ko if: outputFormat() == 'database' -->
-          <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+          <div class="card step2">
+            <h3 class="card-heading simple">${_('Properties')}</h3>
+            <div class="card-body">
+              <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
 
-          <label class="checkbox">
-            <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
-          </label>
-          <span data-bind="visible: ! useDefaultLocation()">
-            <label for="path" class="control-label"><div>${ _('External location') }</div>
-              <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
-            </label>
-          </span>
+              <label class="checkbox">
+                <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
+              </label>
+              <span data-bind="visible: ! useDefaultLocation()">
+                <label for="path" class="control-label"><div>${ _('External location') }</div>
+                  <input type="text" class="form-control path input-xxlarge" data-bind="value: nonDefaultLocation, filechooser: nonDefaultLocation, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                </label>
+              </span>
+              </div>
+          </div>
         <!-- /ko -->
-      </div>
-      <!-- /ko -->
-    </div>
+
+
+    <!-- /ko -->
+
     <!-- /ko -->
 
 
@@ -562,11 +577,11 @@ ${ assist.assistPanel() }
 
   <label>${ _('Type') }
   <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
-    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+    <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
   <!-- /ko -->
   <!-- ko if: level() > 0 && $parent.type() == 'map' -->
-    <select class="input-small" data-bind="options: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
-    <select class="input-small" data-bind="options: $root.createWizard.hiveFieldTypes, value: type"></select>
+    <select class="input-small" data-bind="selectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
+    <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
 
   <!-- /ko -->
   <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
@@ -598,7 +613,7 @@ ${ assist.assistPanel() }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
   <label>${ _('Type') }
-    <select class="input-small" data-bind="options: $root.createWizard.fieldTypes, value: type"></select>
+    <select class="input-small" data-bind="selectize: $root.createWizard.fieldTypes, value: type"></select>
   </label>
   <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
     <i class="fa fa-sliders"></i>
@@ -631,7 +646,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="operation-template">
   <div class="operation">
-    <select data-bind="options: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
+    <select data-bind="selectize: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <label> ${ _('Number of expected fields') }
