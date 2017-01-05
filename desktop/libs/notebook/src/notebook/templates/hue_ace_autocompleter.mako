@@ -108,7 +108,7 @@ from desktop.views import _ko
         self.autocompleter = new SqlAutocompleter3(params);
         self.suggestions = self.autocompleter.suggestions;
 
-        self.active = ko.observable(false);
+        self.active = ko.observable(false).extend({ rateLimit: 10 }); // to prevent flickering on empty result
         self.top = ko.observable(1);
         self.left = ko.observable(1);
 
@@ -117,9 +117,6 @@ from desktop.views import _ko
         self.suggestions.filtered.subscribe(function (newValue) {
           if (self.selectedIndex() > newValue.length - 1) {
             self.selectedIndex(Math.max(0, newValue.length -1));
-          }
-          if (newValue.length === 0) {
-            self.detach();
           }
         });
 
@@ -212,6 +209,14 @@ from desktop.views import _ko
           self.editor().on('mousedown', self.mousedownListener);
           self.editor().on('mousewheel', self.mousewheelListener);
         };
+
+        huePubSub.subscribe('hue.ace.autocompleter.done', function () {
+          window.setTimeout(function () {
+            if (self.active() && self.suggestions.filtered().length === 0) {
+              self.detach();
+            }
+          }, 0);
+        });
 
         huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
           var session = self.editor().getSession();

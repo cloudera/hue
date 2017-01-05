@@ -192,18 +192,22 @@ var SqlAutocompleter3 = (function () {
     self.filter('');
 
     var colRefDeferral = self.handleColumnReference();
-    var allDbsDeferral = self.loadDatabases();
+    var databasesDeferral = self.loadDatabases();
 
     self.handleKeywords(colRefDeferral);
     self.handleIdentifiers();
     self.handleColumnAliases();
     self.handleCommonTableExpressions();
     self.handleFunctions(colRefDeferral);
-    self.handleDatabases(allDbsDeferral);
-    self.handleTables(allDbsDeferral);
-    self.handleColumns(colRefDeferral);
-    self.handleValues(colRefDeferral);
-    self.handlePaths();
+    self.handleDatabases(databasesDeferral);
+    var tablesDeferral = self.handleTables(databasesDeferral);
+    var columnsDeferral = self.handleColumns(colRefDeferral);
+    var valuesDeferral = self.handleValues(colRefDeferral);
+    var pathsDeferral = self.handlePaths();
+
+    $.when(colRefDeferral, databasesDeferral, tablesDeferral, columnsDeferral, valuesDeferral, pathsDeferral).done(function () {
+      huePubSub.publish('hue.ace.autocompleter.done');
+    });
   };
 
   /**
@@ -369,6 +373,7 @@ var SqlAutocompleter3 = (function () {
 
   Suggestions.prototype.handleTables = function (allDbsDeferral, colRefDeferral) {
     var self = this;
+    var tablesDeferred = $.Deferred();
     if (self.parseResult.suggestTables) {
       var suggestTables = self.parseResult.suggestTables;
       var fetchTables = function () {
@@ -392,10 +397,12 @@ var SqlAutocompleter3 = (function () {
             });
             self.loadingTables(false);
             self.tables(tableSuggestions);
+            tablesDeferred.resolve(tableSuggestions);
           },
           silenceErrors: true,
           errorCallback: function () {
             self.loadingTables(false);
+            tablesDeferred.resolve([]);
           },
           timeout: AUTOCOMPLETE_TIMEOUT
         });
@@ -410,21 +417,25 @@ var SqlAutocompleter3 = (function () {
             fetchTables();
           } else {
             self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-            self.handleColumns(colRefDeferral);
+            return self.handleColumns(colRefDeferral);
           }
         });
       } else if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length > 1) {
         self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-        self.handleColumns(colRefDeferral);
+        return self.handleColumns(colRefDeferral);
       } else {
         fetchTables();
       }
+    } else {
+      tablesDeferred.resolve([]);
     }
+
+    return tablesDeferred;
   };
 
   Suggestions.prototype.handleColumns = function (colRefDeferral) {
     var self = this;
-
+    var columnsDeferred = $.Deferred();
     if (self.parseResult.suggestColumns) {
       var suggestColumns = self.parseResult.suggestColumns;
       var columnSuggestions = [];
@@ -452,9 +463,13 @@ var SqlAutocompleter3 = (function () {
           columnSuggestions.push({ value: 'INPUT__FILE__NAME', meta: AutocompleterGlobals.i18n.meta.virtual, weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN });
         }
         self.columns(columnSuggestions);
+        columnsDeferred.resolve(columnSuggestions);
         self.loadingColumns(false);
       });
+    } else {
+      columnsDeferred.resolve([]);
     }
+    return columnsDeferred;
   };
 
   Suggestions.prototype.addColumns = function (table, types, columnSuggestions) {
