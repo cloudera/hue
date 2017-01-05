@@ -309,7 +309,7 @@ ${ assist.assistPanel() }
             <tr data-bind="foreach: $data">
               ##<!-- ko if: $index() < $root.createWizard.source.columns().length -->
               ##<td data-bind="visible: $root.createWizard.source.columns()[$index()].keep, text: $data"></td>
-              <td data-bind="text: $data"></td>
+              <td data-bind="truncatedText: $data"></td>
 
               ##<!-- ko with: $root.createWizard.source.columns()[$index()] -->
               ##  <!-- ko template: 'output-generated-field-data-template' --> <!-- /ko -->
