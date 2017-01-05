@@ -4954,7 +4954,7 @@
 
   ko.bindingHandlers.truncatedText = {
     update: function (element, valueAccessor, allBindingsAccessor) {
-      var text = ko.utils.unwrapObservable(valueAccessor()),
+      var text = ko.isObservable(valueAccessor()) ? ko.utils.unwrapObservable(valueAccessor()) : valueAccessor(),
         length = ko.utils.unwrapObservable(allBindingsAccessor().maxLength) || 20,
         truncated = text.length > length ? text.substring(0, length) + '...' : text;
       ko.bindingHandlers.text.update(element, function () {

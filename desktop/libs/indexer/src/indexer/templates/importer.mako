@@ -75,19 +75,29 @@ ${ assist.assistPanel() }
     border-right: none!important;
   }
 
-##   .step1 label > div:first-child {
-##     width: 50px;
-##     display: inline-block;
-##   }
-
-  .step2.form-inline input[type='text'], .step2.form-inline select {
-    margin-right: 10px;
-    margin-left: 3px;
+  .step label > div:first-child {
+    width: 120px;
+    text-align: right;
+    padding-right: 8px;
+    display: inline-block;
   }
 
-  .step2.form-inline input[type='checkbox'] {
-    margin-left: 10px!important;
-    margin-right: 4px!important;
+  .step label.checkbox {
+    margin-left: 130px;
+  }
+
+  .step input[type='text'] {
+    margin-bottom: 0;
+  }
+
+  .step .selectize-control {
+    display: inline-block;
+    vertical-align: middle;
+    width: 578px !important;
+  }
+
+  .step .form-inline .selectize-control {
+    width: 120px !important;
   }
 
   .field {
@@ -120,6 +130,7 @@ ${ assist.assistPanel() }
     position: fixed;
     bottom: 0;
     margin: 0;
+    z-index: 1000;
   }
 
   #importerNotebook {
@@ -241,7 +252,7 @@ ${ assist.assistPanel() }
 
 
     <!-- ko if: currentStep() == 1 -->
-    <div class="card step1">
+    <div class="card step">
       <h3 class="card-heading simple">${_('Source')}</h3>
       <div class="card-body">
         <div>
@@ -273,7 +284,7 @@ ${ assist.assistPanel() }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step1">
+    <div class="card step">
       <!-- ko if: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h3>
       <!-- /ko -->
@@ -288,7 +299,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
-    <div class="card step1">
+    <div class="card step">
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <!-- ko if: createWizard.isGuessingFieldTypes -->
       <h3 class="card-heading simple">${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h3>
@@ -331,7 +342,7 @@ ${ assist.assistPanel() }
 
       <!-- ko with: createWizard.destination -->
 
-      <div class="card step2">
+      <div class="card step">
         <h3 class="card-heading simple">${_('Destination')}</h3>
         <div class="card-body">
           <div class="control-group">
@@ -345,9 +356,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-                <label for="path" class="control-label">
-                  <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
-                </label>
+                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
               <!-- /ko -->
 
               <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
@@ -364,10 +373,14 @@ ${ assist.assistPanel() }
 
 
         <!-- ko if: outputFormat() == 'table' -->
-        <div class="card step2">
+        <div class="card step">
           <h3 class="card-heading simple">${_('Properties')}</h3>
           <div class="card-body">
-            <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+            <div class="control-group">
+              <label><div>${ _('Description') }</div>
+                <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+              </label>
+            </div>
 
             <div class="control-group">
               <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
@@ -452,10 +465,10 @@ ${ assist.assistPanel() }
                     <!-- ko if: name() == 'VALUES' -->
                       <input type="input" data-bind="value: lower_val">
                       <input type="checkbox" data-bind="checked: include_lower_val">
-                      <
+                      &lt;
                       <span data-bind="text: '=', visible: include_lower_val"></span>
                       <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
-                      <
+                      &lt;
                       <span data-bind="text: '=', visible: include_upper_val"></span>
                       <input type="input" data-bind="value: upper_val">
                       <input type="checkbox" data-bind="checked: include_upper_val">
@@ -488,7 +501,7 @@ ${ assist.assistPanel() }
         <!-- /ko -->
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
-          <div class="card step2">
+          <div class="card step">
             <h3 class="card-heading simple">${_('Fields')}</h3>
             <div class="card-body">
               <form class="form-inline" data-bind="foreach: columns">
@@ -509,10 +522,12 @@ ${ assist.assistPanel() }
         <!-- /ko -->
 
         <!-- ko if: outputFormat() == 'database' -->
-          <div class="card step2">
+          <div class="card step">
             <h3 class="card-heading simple">${_('Properties')}</h3>
             <div class="card-body">
+              <label><div>${ _('Description') }</div>
               <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+              </label>
 
               <label class="checkbox">
                 <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
@@ -602,8 +617,8 @@ ${ assist.assistPanel() }
   <!-- /ko -->
 
   <!-- ko if: level() == 0 && typeof isPartition === 'undefined'-->
-    <label data-bind="text: $root.createWizard.source.sample()[0][$index()]"></label>
-    <label data-bind="text: $root.createWizard.source.sample()[1][$index()]"></label>
+    <label data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]" class="muted"></label> &nbsp;&nbsp;
+    <label data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]" class="muted"></label>
   <!-- /ko -->
 </script>
 
@@ -681,7 +696,7 @@ ${ assist.assistPanel() }
 </script>
 
 <script type="text/html" id="arg-checkbox">
-  <label>
+  <label class="checkbox">
     <input type="checkbox" data-bind="checked: value">
     <div data-bind="text: description"></div>
   </label>
