@@ -151,7 +151,9 @@ def index_file(request):
 
 def importer_submit(request):
   source = json.loads(request.POST.get('source', '{}'))
+  outputFormat = json.loads(request.POST.get('destination', '{}'))['outputFormat']
   destination = json.loads(request.POST.get('destination', '{}'))
+  destination['ouputFormat'] = outputFormat # Workaround a very weird bug
 
   if destination['ouputFormat'] == 'index':
     _convert_format(source["format"], inverse=True)
