@@ -420,7 +420,11 @@ ${ assist.assistPanel() }
                   <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
               </div>
-              <input type="text" data-bind="value: customRegexp"> ${_('Regexp')}
+              <div class="control-group">
+                <label for="customRegexp" class="control-label"><div>${ _('Regexp') }</div>
+                  <input id="customRegexp"  type="text" data-bind="value: customRegexp">
+                </label>
+              </div>
             </span>
 
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
@@ -430,15 +434,9 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <div class="row" style="margin-left: 8px">
-              <div class="span3">
-                <input type="checkbox" data-bind="checked: hasHeader">
-                ${_('Use first row as column names')} <a class="btn disable-feedback"><i class="fa fa-outdent"></i></a>
-              </div>
-              <div class="span3" data-bind="click: function() { alert('Hello'); }">
-                ${ _('Bulk edit column names') }<a class="btn"><i class="fa fa-edit"></i></a>
-              </div>
-            </div>
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as column names')}
+            </label>
 
             <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
 
