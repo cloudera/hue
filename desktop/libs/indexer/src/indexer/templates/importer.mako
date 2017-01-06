@@ -507,6 +507,9 @@ ${ assist.assistPanel() }
               <form class="form-inline" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
+                  <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
+                    <a data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i> </a>
+                  <!-- /ko -->
                 <!-- /ko -->
 
                 <!-- ko if: $parent.outputFormat() == 'index' -->
@@ -514,8 +517,8 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
               </form>
 
-              <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
-                <a data-bind="click: function() { columns.push($root.loadDefaultField({isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+              <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
+                <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer margin-left-20" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
               <!-- /ko -->
             </div>
           </div>
