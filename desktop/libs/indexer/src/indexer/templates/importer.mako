@@ -438,59 +438,64 @@ ${ assist.assistPanel() }
               <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as column names')}
             </label>
 
-            <label for="tablePartitions" class="control-label"><div>${ _('Partitions') }</div>
+            <label class="control-label"><div>${ _('Partitions') }</div>
 
               <!-- ko if: tableFormat() != 'kudu' -->
-              <div class="form-inline" data-bind="foreach: partitionColumns">
-                <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
-                <a data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+              <div style="display: inline-table">
+                <div class="form-inline" data-bind="foreach: partitionColumns">
+                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                  <a class="pointer inline-block" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+                  <div class="clearfix"></div>
+                </div>
+                <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               </div>
-              <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               <!-- /ko -->
 
               <!-- ko if: tableFormat() == 'kudu' -->
-              <div class="form-inline" data-bind="foreach: kuduPartitionColumns">
-                ${ _('Columns') }
-                <select id="kuduPks" data-bind="selectize: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
-                <select data-bind="selectize: ['RANGE BY', 'HASH'], value: name"></select>
+              <div style="display: inline-table">
+                <div class="form-inline" data-bind="foreach: kuduPartitionColumns">
+                  ${ _('Columns') }
+                  <select id="kuduPks" data-bind="selectize: $parent.primaryKeys, selectedOptions: columns" size="3" multiple="true"></select>
+                  <select data-bind="selectize: ['RANGE BY', 'HASH'], value: name"></select>
 
-                <!-- ko if: name() == 'HASH' -->
-                  <input type="number" data-bind="value: int_val">
-                <!-- /ko -->
+                  <!-- ko if: name() == 'HASH' -->
+                    <input type="number" data-bind="value: int_val">
+                  <!-- /ko -->
 
-                <!-- ko if: name() == 'RANGE BY' -->
-                  <div class="form-inline" data-bind="foreach: range_partitions">
-                    <!-- ko if: name() == 'VALUES' -->
-                      <input type="input" data-bind="value: lower_val">
-                      <input type="checkbox" data-bind="checked: include_lower_val">
-                      &lt;
-                      <span data-bind="text: '=', visible: include_lower_val"></span>
-                      <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
-                      &lt;
-                      <span data-bind="text: '=', visible: include_upper_val"></span>
-                      <input type="input" data-bind="value: upper_val">
-                      <input type="checkbox" data-bind="checked: include_upper_val">
-                    <!-- /ko -->
+                  <!-- ko if: name() == 'RANGE BY' -->
+                    <div class="form-inline" data-bind="foreach: range_partitions" style="display: inline-table">
+                      <!-- ko if: name() == 'VALUES' -->
+                        <input type="input" data-bind="value: lower_val">
+                        <input type="checkbox" data-bind="checked: include_lower_val">
+                        &lt;
+                        <span data-bind="text: '=', visible: include_lower_val"></span>
+                        <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
+                        &lt;
+                        <span data-bind="text: '=', visible: include_upper_val"></span>
+                        <input type="input" data-bind="value: upper_val">
+                        <input type="checkbox" data-bind="checked: include_upper_val">
+                      <!-- /ko -->
 
-                    <!-- ko if: name() == 'VALUE' -->
-                      <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
-                      <div class="form-inline" data-bind="foreach: values">
-                        <input type="text" data-bind="value: $data">
-                        <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
-                      </div>
-                      <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
-                    <!-- /ko -->
-                    <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
-                  </div>
+                      <!-- ko if: name() == 'VALUE' -->
+                        <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
+                        <div class="form-inline" data-bind="foreach: values">
+                          <input type="text" data-bind="value: $data">
+                          <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
+                        </div>
+                        <a data-bind="click: function() { values.push(''); }"><i class="fa fa-plus"></i></a>
+                      <!-- /ko -->
+                      <a data-bind="click: function() { $parent.range_partitions.remove($data); }"><i class="fa fa-minus"></i></a>
+                    </div>
 
-                  <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
-                <!-- /ko -->
+                    <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: true, upper_val: 1, include_upper_val: true})); }"><i class="fa fa-plus"></i></a>
+                  <!-- /ko -->
 
-                <a data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
-                <a data-bind="click: function() { $parent.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
-              <!-- /ko -->
-            </div>
-            <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+                    <a data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <a data-bind="click: function() { $parent.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+                  <!-- /ko -->
+                </div>
+                <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+              </div>
             <!-- /ko -->
 
             </label>
