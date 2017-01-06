@@ -210,16 +210,16 @@ ${ hueIcons.symbols() }
               <span data-bind="text: uuid"></span>
               <a href="javascript:void(0)" data-bind="attr: { href: onSuccessUrl() }, text: onSuccessUrl" target="_blank"></a>
               <!-- ko if: selectedSnippet() -->
-              <div>
-                Progress
-                <span data-bind="text: selectedSnippet().progress"></span>
-              </div>
-              <!-- ko if: selectedSnippet().result -->
-              <div>
-                Logs
-                <span data-bind="text: selectedSnippet().result.logs"></span>
-              </div>
-              <!-- /ko -->
+                <div>
+                  Progress
+                  <span data-bind="text: selectedSnippet().progress"></span>
+                </div>
+                <!-- ko if: selectedSnippet().result -->
+                <div>
+                  Logs
+                  <span data-bind="text: selectedSnippet().result.logs"></span>
+                </div>
+                <!-- /ko -->
               <!-- /ko -->
             </div>
             <hr>
@@ -872,7 +872,8 @@ ${ assist.assistPanel() }
               var snippet = notebook.snippets()[0];
               if (! snippet.result.handle().has_more_statements) {
                 if (notebook.onSuccessUrl()) {
-                  window.location.href = notebook.onSuccessUrl(); // Show notification. If still on initial spinner redirect automatically
+                  // TODO: If we are in FB directory, also refresh FB dir
+                  window.location.href = notebook.onSuccessUrl(); // TODO: Show finish notification or if still on initial spinner redirect automatically
                 }
               } else { // Perform last DROP statement execute
                 snippet.execute();
@@ -880,20 +881,19 @@ ${ assist.assistPanel() }
             }
           });
           notebook.snippets()[0].checkStatus();
+          
+          // Add to history
+          notebook.history.unshift(
+            notebook._makeHistoryRecord(
+              notebook.onSuccessUrl(),
+              notebook.snippets()[0].result.handle().statement || '',
+              notebook.snippets()[0].lastExecuted(),
+              notebook.snippets()[0].status(),
+              notebook.name(),
+              notebook.uuid()
+            )
+          );
         });
-
-        // Add to history
-        var notebook = self.editorVM.selectedNotebook();
-        notebook.history.unshift(
-          notebook._makeHistoryRecord(
-            notebook.onSuccessUrl(),
-            notebook.snippets()[0].result.handle().statement || '',
-            notebook.snippets()[0].lastExecuted(),
-            notebook.snippets()[0].status(),
-            notebook.name(),
-            notebook.uuid()
-          )
-        );
 
         topNavViewModel.historyPanelVisible(true);
       });
