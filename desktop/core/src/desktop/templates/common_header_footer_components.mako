@@ -94,12 +94,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
       i18n: {
         meta: {
           aggregateFunction: '${ _('aggregate') }',
-          alias:  '${ _('alias') }',
-          commonTableExpression:  '${ _('cte') }',
-          database:  '${ _('database') }',
+          alias: '${ _('alias') }',
+          commonTableExpression: '${ _('cte') }',
+          database: '${ _('database') }',
+          groupBy: '${ _('group by') }',
           join: '${ _('join') }',
           joinCondition: '${ _('condition') }',
           keyword: '${ _('keyword') }',
+          orderBy: '${ _('order by') }',
           table: '${ _('table') }',
           value: '${ _('value') }',
           variable: '${ _('variable') }',
