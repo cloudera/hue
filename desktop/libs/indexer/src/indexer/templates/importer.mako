@@ -515,7 +515,7 @@ ${ assist.assistPanel() }
               </form>
 
               <!-- ko if: $parent.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
-                <a data-bind="click: function() { columns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+                <a data-bind="click: function() { columns.push($root.loadDefaultField({isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
               <!-- /ko -->
             </div>
           </div>
@@ -604,7 +604,7 @@ ${ assist.assistPanel() }
   <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
     <div data-bind="template: { name: 'table-field-template', foreach: nested }">
     </div>
-    <a data-bind="click: function() { nested.push($root.loadField({operations: [], nested: [], name: '', type: '', 'keyType': '', level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
+    <a data-bind="click: function() { nested.push($root.loadDefaultField({level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
   <!-- /ko -->
   </label>
 
@@ -1373,6 +1373,10 @@ ${ assist.assistPanel() }
       }
     };
 
+    var loadDefaultField = function (options) {
+      return loadField($.extend({}, ${default_field_type | n}, options));
+    }
+
     var loadField = function (currField) {
       var koField = ko.mapping.fromJS(currField);
 
@@ -1387,7 +1391,7 @@ ${ assist.assistPanel() }
 
       var autoExpand = function(newVal) {
         if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
-          koField.nested.push(loadField({operations: [], nested: [], name: '', type: '', keyType: '', level: koField.level() + 1}));
+          koField.nested.push(loadDefaultField({level: koField.level() + 1}));
         }
       };
       koField.type.subscribe(autoExpand);
@@ -1403,7 +1407,7 @@ ${ assist.assistPanel() }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
-      self.loadField = loadField;
+      self.loadDefaultField = loadDefaultField;
 
       // Wizard related
       self.wizardEnabled = ko.observable(false);
