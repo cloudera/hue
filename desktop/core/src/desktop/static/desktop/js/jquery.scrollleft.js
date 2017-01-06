@@ -14,11 +14,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 /*
- * jHue scroll to top plugin
+ * jHue scroll to left plugin
  * Can be used globally with
- *   $.jHueScrollUp()
- * or with a target for the scroll up
- *   $(element).jHueScrollUp()
+ *   $.jHueScrollLeft()
+ * or with a target for the scroll left
+ *   $(element).jHueScrollLeft()
  *
  *   options:
  *    - threshold: (default 100) value in pixels, scroll amount before the link appears
@@ -26,10 +26,9 @@
 
 (function ($, window, document, undefined) {
 
-  var pluginName = "jHueScrollUp",
+  var pluginName = "jHueScrollLeft",
       defaults = {
-        threshold: 100, // it displays it after 100 px of scroll
-        scrollLeft: false
+        threshold: 100 // it displays it after 100 px of scroll
       };
 
   function Plugin(element, options) {
@@ -37,29 +36,24 @@
     this.options = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
-    this.setupScrollUp();
-    if (this.options.scrollLeft) {
-      $(element).jHueScrollLeft(this.options.threshold);
-    }
+    this.setupScrollLeft();
   }
 
   Plugin.prototype.setOptions = function (options) {
     this.options = $.extend({}, defaults, options);
   };
 
-  Plugin.prototype.setupScrollUp = function () {
+  Plugin.prototype.setupScrollLeft = function () {
     var _this = this,
       link = null;
 
-    if ($("#jHueScrollUpAnchor").length > 0) { // just one scroll up per page
-      link = $("#jHueScrollUpAnchor");
-      $(document).off("click", "#jHueScrollUpAnchor");
+    if ($("#jHueScrollLeftAnchor").length > 0) { // just one scroll up per page
+      link = $("#jHueScrollLeftAnchor");
+      $(document).off("click", "#jHueScrollLeftAnchor");
     }
     else {
-      link = $("<a/>").attr("id", "jHueScrollUpAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-up'></i>").appendTo("body");
+      link = $("<a/>").attr("id", "jHueScrollLeftAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-left'></i>").appendTo("body");
     }
-
-    $(_this.element).attr("jHueScrollified", "true");
 
     if ($(_this.element).is("body")) {
       setScrollBehavior($(window), $("body, html"));
@@ -82,17 +76,18 @@
       $('.hue-datatable-search').css('right', (right + 50) + 'px');
     }
 
+
     function setScrollBehavior(scrolled, scrollable) {
       scrolled.scroll(function () {
-        if (scrolled.scrollTop() > _this.options.threshold) {
+        if (scrolled.scrollLeft() > _this.options.threshold) {
           if (link.is(":hidden")) {
             positionOtherAnchors();
             link.fadeIn(200, positionOtherAnchors);
           }
-          if ($(_this.element).data("lastScrollTop") == null || $(_this.element).data("lastScrollTop") < scrolled.scrollTop()) {
-            $("#jHueScrollUpAnchor").data("caller", scrollable);
+          if ($(_this.element).data("lastScrollLeft") == null || $(_this.element).data("lastScrollLeft") < scrolled.scrollLeft()) {
+            $("#jHueScrollLeftAnchor").data("caller", scrollable);
           }
-          $(_this.element).data("lastScrollTop", scrolled.scrollTop());
+          $(_this.element).data("lastScrollLeft", scrolled.scrollTop());
         }
         else {
           checkForAllScrolls();
@@ -104,29 +99,29 @@
       var _allOk = true;
       $(document).find("[jHueScrollified='true']").each(function (cnt, item) {
         if ($(item).is("body")) {
-          if ($(window).scrollTop() > _this.options.threshold) {
+          if ($(window).scrollLeft() > _this.options.threshold) {
             _allOk = false;
-            $("#jHueScrollUpAnchor").data("caller", $("body, html"));
+            $("#jHueScrollLeftAnchor").data("caller", $("body, html"));
           }
         }
         else {
-          if ($(item).scrollTop() > _this.options.threshold) {
+          if ($(item).scrollLeft() > _this.options.threshold) {
             _allOk = false;
-            $("#jHueScrollUpAnchor").data("caller", $(item));
+            $("#jHueScrollLeftAnchor").data("caller", $(item));
           }
         }
       });
       if (_allOk) {
         link.fadeOut(200, positionOtherAnchors);
-        $("#jHueScrollUpAnchor").data("caller", null);
+        $("#jHueScrollLeftAnchor").data("caller", null);
       }
     }
 
-    $(document).on("click", "#jHueScrollUpAnchor", function (event) {
-      if ($("#jHueScrollUpAnchor").data("caller") != null) {
-        $("#jHueScrollUpAnchor").data("caller").animate({scrollTop: 0}, 300, function () {
-          if ($(document).find("[jHueScrollified='true']").not($("#jHueScrollUpAnchor").data("caller")).is("body") && $(window).scrollTop() > _this.options.threshold) {
-            $("#jHueScrollUpAnchor").data("caller", $("body, html"));
+    $(document).on("click", "#jHueScrollLeftAnchor", function (event) {
+      if ($("#jHueScrollLeftAnchor").data("caller") != null) {
+        $("#jHueScrollLeftAnchor").data("caller").animate({scrollLeft: 0}, 300, function () {
+          if ($(document).find("[jHueScrollified='true']").not($("#jHueScrollLeftAnchor").data("caller")).is("body") && $(window).scrollLeft() > _this.options.threshold) {
+            $("#jHueScrollLeftAnchor").data("caller", $("body, html"));
           }
           else {
             checkForAllScrolls();

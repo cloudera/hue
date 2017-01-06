@@ -2579,6 +2579,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
           $(el).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
           $(el).jHueHorizontalScrollbar();
+          $(el).parents('.dataTables_wrapper').jHueScrollLeft();
         }
         else {
           if ($(el).data('fnDraws') === 1) {
