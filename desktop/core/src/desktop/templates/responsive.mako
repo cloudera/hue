@@ -117,7 +117,7 @@ ${ hueIcons.symbols() }
           % if 'search' in apps:
             <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('search') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
           % endif
-          <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Report') }</a></li>
+          <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Presentation') }</a></li>
           % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
             <li class="dropdown-submenu">
