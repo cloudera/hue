@@ -111,6 +111,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingGroupBys = ko.observable(false);
     self.loadingOrderBys = ko.observable(false);
     self.loadingFilters = ko.observable(false);
+    self.loadingPopularTables = ko.observable(false);
     self.loadingPopularColumns = ko.observable(false);
 
     self.filter = ko.observable();
@@ -220,6 +221,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingGroupBys(false);
     self.loadingOrderBys(false);
     self.loadingFilters(false);
+    self.loadingPopularTables(false);
     self.loadingPopularColumns(false);
 
     self.filter('');
@@ -244,11 +246,12 @@ var SqlAutocompleter3 = (function () {
     var groupBysDeferred = self.handleGroupBys();
     var orderBysDeferred = self.handleOrderBys();
     var filtersDeferred = self.handleFilters();
+    var popularTablesDeferred = self.handlePopularTables(tablesDeferred);
     var popularColumnsDeferred = self.handlePopularColumns(columnsDeferred);
 
     $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
         joinConditionsDeferred, aggregateFunctionsDeferred, groupBysDeferred, orderBysDeferred, filtersDeferred,
-        popularColumnsDeferred).done(function () {
+        popularColumnsDeferred, popularColumnsDeferred).done(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -1043,6 +1046,45 @@ var SqlAutocompleter3 = (function () {
       filtersDeferred.resolve([]);
     }
     return filtersDeferred;
+  };
+
+  Suggestions.prototype.handlePopularTables = function (tablesDeferred) {
+    var self = this;
+    var popularTablesDeferred = $.Deferred();
+    if (HAS_OPTIMIZER && self.parseResult.suggestTables) {
+      self.loadingPopularTables(true);
+      self.apiHelper.fetchNavOptTopTables({
+        database: self.activeDatabase,
+        sourceType: self.snippet.type(),
+        successCallback: function (data) {
+          var popularityIndex = {};
+          data.top_tables.forEach(function (topTable) {
+            popularityIndex[topTable.name] = topTable.popularity;
+          });
+
+          $.when(tablesDeferred).done(function (tableSuggestions) {
+            tableSuggestions.forEach(function (suggestion) {
+              if (typeof popularityIndex[suggestion.name] !== 'undefined') {
+                suggestion.weight += Math.min(popularityIndex[suggestion.name], 99);
+                suggestion.popular = true;
+                if (!suggestion.details) {
+                  suggestions.details = {};
+                }
+                suggestion.details.popularity = popularityIndex[suggestion.name];
+              }
+            });
+            self.loadingPopularTables(false);
+            popularTablesDeferred.resolve(data.top_tables);
+          });
+        },
+        errorCallback: function () {
+          self.loadingPopularTables(false);
+          popularTablesDeferred.resolve([]);
+        }
+      });
+    } else {
+      popularTablesDeferred.resolve([]);
+    }
   };
 
   Suggestions.prototype.handlePopularColumns = function (columnsDeferred) {
