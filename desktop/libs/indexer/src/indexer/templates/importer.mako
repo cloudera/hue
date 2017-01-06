@@ -1283,6 +1283,7 @@ ${ assist.assistPanel() }
           return;
         }
 
+%if not is_embeddable:
         self.indexingStarted(true);
         viewModel.isLoading(true);
         self.isIndexing(true);
@@ -1356,6 +1357,21 @@ ${ assist.assistPanel() }
           self.indexingStarted(false);
           self.isIndexing(false);
         });
+% else:
+        $.post("${ url('indexer:importer_submit') }", {
+          "source": ko.mapping.toJSON(self.source),
+          "destination": ko.mapping.toJSON(self.destination)
+        }, function (resp) {
+          if (resp.history_uuid) {
+            $.jHueNotify.info("${ _('Task ') }" + resp.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).fail(function (xhr, textStatus, errorThrown) {
+          $(document).trigger("error", xhr.responseText);
+        });
+% endif
       }
 
       self.removeOperation = function (operation, operationList) {
