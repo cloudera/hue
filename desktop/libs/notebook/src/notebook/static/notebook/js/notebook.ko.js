@@ -971,7 +971,7 @@ var EditorViewModel = (function() {
         self.statusForButtons('executed');
         stopLongOperationTimeout();
 
-        if (vm.editorMode() && data.history_id && window.location.pathname != '/indexer/importer/') {
+        if (vm.editorMode() && data.history_id && ! vm.isHistory()) {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
           if (vm.isResponsive()){
             url = vm.URLS.responsive + '&editor=' + data.history_id;

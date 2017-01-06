@@ -207,7 +207,12 @@ ${ hueIcons.symbols() }
             <ul>
               <!-- ko foreach: editorVM.selectedNotebook().history -->
                 <li style="font-size: 15px; font-weight: 300">
-                  1hours ago <i class="fa fa-fighter-jet fa-fw"></i> <span data-bind="text: $data.name"> <span data-bind="text: $data.query"></span>
+                  <span data-bind="text: lastExecuted"></span>
+                  <i class="fa fa-fighter-jet fa-fw"></i>
+                  <span data-bind="text: status"></span>
+                  <span data-bind="text: name"></span>
+                  <span data-bind="text: 'statement'"></span>
+                  <span data-bind="text: uuid"></span>
                 </li>
               <!-- /ko -->
             </ul>
@@ -794,12 +799,11 @@ ${ assist.assistPanel() }
       TopNavViewModel.prototype.performSearch = function () {
       };
 
-
       self.editorVM = new EditorViewModel(null, '', {
         user: '${ user.username }',
         userId: ${ user.id },
         languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
-        is_history: true,
+        is_history: true, // Important
         snippetViewSettings: {
           java : {
             snippetIcon: 'fa-file-archive-o '
@@ -861,8 +865,8 @@ ${ assist.assistPanel() }
         var notebook = self.editorVM.selectedNotebook();
         notebook.history.unshift(
           notebook._makeHistoryRecord(
-            'url',
-            'data.handle.statement',
+            notebook.onSuccessUrl(),
+            notebook.snippets()[0].result.handle().statement || '',
             notebook.snippets()[0].lastExecuted(),
             notebook.snippets()[0].status(),
             notebook.name(),
@@ -870,7 +874,7 @@ ${ assist.assistPanel() }
           )
         );
 
-        self.historyPanelVisible(true);
+        topNavViewModel.historyPanelVisible(true);
       });
 
 

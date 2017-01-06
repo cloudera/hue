@@ -144,6 +144,7 @@ class Notebook(object):
           u'arguments': arguments,
           u'archives': archives,
           u'env_var': env_var,
+          'command_path': shell_command,
         }
     }))
     self._add_session(_data, 'shell')

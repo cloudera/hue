@@ -1319,6 +1319,7 @@ ${ assist.assistPanel() }
             }
           });
           self.editorVM.editorMode(true);
+          self.editorVM.isHistory(true);
           ko.cleanNode($("#importerNotebook")[0]);
           ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
 
