@@ -22,13 +22,14 @@ def compress_files_in_hdfs(request, file_names, upload_path):
 
   _upload_compress_files_script_to_hdfs(request.fs)
 
+  output_path = upload_path
   files = [{"value": upload_path + '/' + file_name} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
 
   shell_notebook = Notebook()
   shell_notebook.add_shell_snippet(
       shell_command='compress_files_in_hdfs.sh',
-      arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}],
+      arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-o=' + output_path}],
       archives=[],
       files=files,
       env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}])

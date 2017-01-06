@@ -17,6 +17,7 @@
 
 UPLOAD_PATH=
 FILE_NAMES=
+OUTPUT_PATH=
 
 function usage()
 {
@@ -25,6 +26,7 @@ function usage()
     echo "\t-h --help"
     echo "\t[-u | --upload-path]=<PATH_IN_HDFS>"
     echo "\t[-f | --file-names]=<FILE_NAMES>"
+    echo "\t[-o | --output-path]=<PATH_IN_HDFS>"
     echo ""
 }
 
@@ -42,6 +44,9 @@ while [ "$1" != "" ]; do
         -f | --file-names)
             FILE_NAMES=$VALUE
             ;;
+        -o | --output-path)
+            OUTPUT_PATH=$VALUE
+            ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
             usage
@@ -51,7 +56,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ -z $UPLOAD_PATH ] || [ -z $FILE_NAMES ]
+if [ -z $UPLOAD_PATH ] || [ -z $FILE_NAMES ] || [ -z $OUTPUT_PATH ]
 then
 	echo "ERROR: Missing Arguments"
 	usage
@@ -60,9 +65,6 @@ fi
 
 FILE_NAMES=(${FILE_NAMES//,/ })
 exit_status=0
-
-# output directory inside HDFS upload dir
-filename_without_extension=$(echo $FILE_NAME | cut -f 1 -d '.')
 
 temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
@@ -74,14 +76,14 @@ exit_status=$(echo $?)
 set +x
 if [ $exit_status == 0 ]
 then
-	echo "Copying hue_compressed.zip to '$UPLOAD_PATH' in HDFS"
-	hadoop fs -put -f $temp_output_dir/hue_compressed.zip $UPLOAD_PATH
+	echo "Copying hue_compressed.zip to '$OUTPUT_PATH' in HDFS"
+	hadoop fs -put -f $temp_output_dir/hue_compressed.zip $OUTPUT_PATH
 	exit_status=$(echo $?)
 	if [ $exit_status == 0 ]
 	then
-	    echo "Copy to HDFS directory '$UPLOAD_PATH' complete!!!"
+	    echo "Copy to HDFS directory '$OUTPUT_PATH' complete!!!"
 	else
-	    echo "ERROR: Copy to HDFS directory '$UPLOAD_PATH' FAILED!!!"
+	    echo "ERROR: Copy to HDFS directory '$OUTPUT_PATH' FAILED!!!"
 	fi
 else
 	exit_status=1

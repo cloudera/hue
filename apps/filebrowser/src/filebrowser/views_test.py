@@ -925,6 +925,30 @@ alert("XSS")
     finally:
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
+  def test_compress_hdfs_files(self):
+    ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(True)
+    prefix = self.cluster.fs_prefix + '/test_compress_files'
+    self.cluster.fs.mkdir(prefix)
+
+    test_dir1 = prefix + '/test_dir1'
+    self.cluster.fs.mkdir(test_dir1)
+    self.cluster.fs.chown(test_dir1, 'test')
+    self.cluster.fs.chmod(test_dir1, 0700)
+
+    test_dir2 = prefix + '/test_dir2'
+    self.cluster.fs.mkdir(test_dir2)
+    self.cluster.fs.chown(test_dir2, 'test')
+    self.cluster.fs.chmod(test_dir2, 0700)
+
+    try:
+      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2']})
+      response = json.loads(resp.content)
+      assert_equal(0, response['status'], response)
+      assert_true('handle' in response and response['handle']['id'], response)
+    finally:
+      ENABLE_EXTRACT_UPLOADED_ARCHIVE.set_for_testing(False)
+      cleanup_tree(self.cluster, prefix)
+
   def test_upload_zip(self):
     prefix = self.cluster.fs_prefix + '/test_upload_zip'
     self.cluster.fs.mkdir(prefix)

@@ -94,6 +94,11 @@ ${ fb_components.menubar() }
                   <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
               </li>
+              % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0">
+                  <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+                </li>
+              % endif
             </ul>
           </div>
           
@@ -125,10 +130,6 @@ ${ fb_components.menubar() }
                 <i class="fa fa-play"></i> ${_('Extract')}
               </button>
             % endif
-             <button class="btn compressFilesBtn" title="${_('Compress')}"
-               data-bind="visible: selectedFiles().length > 0, click: confirmCompressFiles">
-               <i class="fa fa-play"></i> ${_('Compress')}
-             </button>
           % endif
         </div>
       </%def>
