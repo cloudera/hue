@@ -814,40 +814,64 @@ ${ assist.assistPanel() }
             aceMode: 'ace/mode/impala',
             snippetImage: '${ static("impala/art/icon_impala_48.png") }',
             sqlDialect: true
+          },
+          java : {
+            snippetIcon: 'fa-file-code-o'
+          },
+          shell: {
+            snippetIcon: 'fa-terminal'
           }
         }
       });
       self.editorVM.editorMode(true);
       self.editorVM.newNotebook();
 
-/**
-          topNavViewModel.editorVM.openNotebook(resp.history_uuid, null, true, function(){
-          topNavViewModel.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
-              if (val == 100){
-                //self.indexingStarted(false);
-                //self.isIndexing(false);
-                //self.indexingSuccess(true);
-              }
-            });
-            self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
-              if (val == 'failed'){
-                self.isIndexing(false);
-                self.indexingStarted(false);
-                self.indexingError(true);
-              } else if (val == 'available') {
-                var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
-                if (! snippet.result.handle().has_more_statements) {
-                  if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
-                  }
-                } else { // Perform last DROP statement execute
-                  snippet.execute();
-                }
-              }
-            });
-            topNavViewModel.editorVM.selectedNotebook().snippets()[0].checkStatus();
+      huePubSub.subscribe("notebook.task.submitted", function (history_id) {
+        // Load
+        self.editorVM.openNotebook(history_id, null, true, function(){
+          var notebook = self.editorVM.selectedNotebook();
+          notebook.snippets()[0].progress.subscribe(function(val){
+            if (val == 100){
+              //self.indexingStarted(false);
+              //self.isIndexing(false);
+              //self.indexingSuccess(true);
+            }
           });
-*/
+          notebook.snippets()[0].status.subscribe(function(val){
+            if (val == 'failed'){
+              //self.isIndexing(false);
+              //self.indexingStarted(false);
+              //self.indexingError(true);
+            } else if (val == 'available') {
+              var snippet = notebook.snippets()[0];
+              if (! snippet.result.handle().has_more_statements) {
+                if (notebook.onSuccessUrl()) {
+                  window.location.href = notebook.onSuccessUrl(); // Show notification. If still on initial spinner redirect automatically
+                }
+              } else { // Perform last DROP statement execute
+                snippet.execute();
+              }
+            }
+          });
+          notebook.snippets()[0].checkStatus();
+        });
+
+        // Add to history
+        var notebook = self.editorVM.selectedNotebook();
+        notebook.history.unshift(
+          notebook._makeHistoryRecord(
+            'url',
+            'data.handle.statement',
+            notebook.snippets()[0].lastExecuted(),
+            notebook.snippets()[0].status(),
+            notebook.name(),
+            notebook.uuid()
+          )
+        );
+
+        self.historyPanelVisible(true);
+      });
+
 
       var topNavViewModel = new TopNavViewModel();
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);

@@ -1615,11 +1615,8 @@ from django.utils.translation import ugettext as _
           "upload_path": self.currentPath(),
         }, function (data) {
           if (data.status == 0) {
-            var jobId = '';
-            if (data.handle) {
-              jobId = data.history_id;
-            }
-            $.jHueNotify.info("${ _('Task ') }" + jobId + "${_(' submitted for archive extraction.') }");
+            $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
+            huePubSub.publish('notebook.task.submitted', data.history_uuid);
           } else {
             $(document).trigger("error", data.message);
           }
