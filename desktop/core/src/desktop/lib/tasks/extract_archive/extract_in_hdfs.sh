@@ -17,6 +17,7 @@
 
 UPLOAD_PATH=
 FILE_NAME=
+OUTPUT_PATH=
 
 function usage()
 {
@@ -42,6 +43,9 @@ while [ "$1" != "" ]; do
         -f | --file-name)
             FILE_NAME=$VALUE
             ;;
+        -o | --output-path)
+            OUTPUT_PATH=$VALUE
+            ;;
         *)
             echo "ERROR: unknown parameter \"$PARAM\""
             usage
@@ -51,7 +55,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ -z $UPLOAD_PATH ] || [ -z $FILE_NAME ]
+if [ -z $UPLOAD_PATH ] || [ -z $FILE_NAME ] || [ -z OUTPUT_PATH ]
 then
 	echo "ERROR: Missing Arguments"
 	usage
@@ -59,9 +63,6 @@ then
 fi
 
 exit_status=0
-
-# output directory inside HDFS upload dir
-filename_without_extension=$(echo $FILE_NAME | cut -f 1 -d '.')
 
 temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
@@ -77,6 +78,7 @@ then
 	exit_status=$(echo $?)
 elif [[ $FILE_NAME =~ \.bz2$ ]] || [[ $FILE_NAME =~ \.bzip2$ ]]
 then
+	filename_without_extension=$(echo $FILE_NAME | cut -f 1 -d '.')
 	bzip2 -dc $FILE_NAME > $temp_output_dir/$filename_without_extension
 	exit_status=$(echo $?)
 else
@@ -88,10 +90,10 @@ set +x
 extracted_file_count=$(($(find $temp_output_dir/* -type d -maxdepth 0 | wc -l) + $(find $temp_output_dir/* -type f -maxdepth 0 | wc -l)))
 if [ $extracted_file_count != 0 ] && [ $exit_status == 0 ]
 then
-	echo 'Copying extracted files to '$UPLOAD_PATH/$filename_without_extension' in HDFS'
-	hadoop fs -put $temp_output_dir $UPLOAD_PATH/$filename_without_extension
+	echo "Copying extracted files to '$OUTPUT_PATH' in HDFS"
+	hadoop fs -put $temp_output_dir $OUTPUT_PATH
 	exit_status=$(echo $?)
-	echo 'Copy to HDFS directory '$UPLOAD_PATH/$filename_without_extension' complete!!!'
+	echo "Copy to HDFS directory '$OUTPUT_PATH' complete!!!"
 else
 	exit_status=1
 fi
