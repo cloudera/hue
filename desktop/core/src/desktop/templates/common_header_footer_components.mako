@@ -97,6 +97,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
           alias: '${ _('alias') }',
           commonTableExpression: '${ _('cte') }',
           database: '${ _('database') }',
+          filter: '${ _('filter') }',
           groupBy: '${ _('group by') }',
           join: '${ _('join') }',
           joinCondition: '${ _('condition') }',
