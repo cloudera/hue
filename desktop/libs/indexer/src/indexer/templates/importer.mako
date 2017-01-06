@@ -1319,7 +1319,7 @@ ${ assist.assistPanel() }
             }
           });
           self.editorVM.editorMode(true);
-          self.editorVM.isHistory(true);
+          self.editorVM.isNotificationManager(true);
           ko.cleanNode($("#importerNotebook")[0]);
           ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
 

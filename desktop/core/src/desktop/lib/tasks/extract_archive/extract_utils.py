@@ -29,7 +29,8 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
   output_path = upload_path + '/' + file_name.split('.')[0]
   shell_notebook = Notebook(
       description=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
-      isManaged=True
+      isManaged=True,
+      onSuccessUrl=upload_path
   )
 
   shell_notebook.add_shell_snippet(

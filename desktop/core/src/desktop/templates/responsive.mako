@@ -204,9 +204,29 @@ ${ hueIcons.symbols() }
         </div>
         <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
           <!-- ko if: editorVM.selectedNotebook() -->
+          <!-- ko with: editorVM.selectedNotebook() -->
+            <div>
+              Showing
+              <span data-bind="text: uuid"></span>
+              <a href="javascript:void(0)" data-bind="attr: { href: onSuccessUrl() }, text: onSuccessUrl" target="_blank"></a>
+              <!-- ko if: selectedSnippet() -->
+              <div>
+                Progress
+                <span data-bind="text: selectedSnippet().progress"></span>
+              </div>
+              <!-- ko if: selectedSnippet().result -->
+              <div>
+                Logs
+                <span data-bind="text: selectedSnippet().result.logs"></span>
+              </div>
+              <!-- /ko -->
+              <!-- /ko -->
+            </div>
+            <hr>
+            X Clear History
             <ul>
-              <!-- ko foreach: editorVM.selectedNotebook().history -->
-                <li style="font-size: 15px; font-weight: 300">
+              <!-- ko foreach: history -->
+                <li style="font-size: 15px; font-weight: 300" data-bind="click: function() { editorVM.openNotebook(uuid()); }">
                   <span data-bind="text: lastExecuted"></span>
                   <i class="fa fa-fighter-jet fa-fw"></i>
                   <span data-bind="text: status"></span>
@@ -216,6 +236,7 @@ ${ hueIcons.symbols() }
                 </li>
               <!-- /ko -->
             </ul>
+          <!-- /ko -->
           <!-- /ko -->
         </div>
 
@@ -803,7 +824,6 @@ ${ assist.assistPanel() }
         user: '${ user.username }',
         userId: ${ user.id },
         languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
-        is_history: true, // Important
         snippetViewSettings: {
           java : {
             snippetIcon: 'fa-file-archive-o '
@@ -829,6 +849,7 @@ ${ assist.assistPanel() }
         }
       });
       self.editorVM.editorMode(true);
+      self.editorVM.isNotificationManager(true);
       self.editorVM.newNotebook();
 
       huePubSub.subscribe("notebook.task.submitted", function (history_id) {
