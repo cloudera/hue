@@ -447,7 +447,7 @@ ${ assist.assistPanel() }
                   <a class="pointer inline-block" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
                   <div class="clearfix"></div>
                 </div>
-                <a data-bind="click: function() { partitionColumns.push($root.loadField({operations: [], nested: [], name: '', level: 0, type: '', keyType: '', showProperties: false, isPartition: true})); }" class="pointer margin-left-20" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+                <a data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               </div>
               <!-- /ko -->
 
