@@ -588,7 +588,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="table-field-template">
   <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
+    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="textInput: name">
   </label>
 
   <label>${ _('Type') }
@@ -1256,7 +1256,7 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
           resp.columns.forEach(function (entry, i, arr) {
-            arr[i] = loadField(entry);
+            arr[i] = loadField(entry, self.destination.columns, i);
           });
           self.source.sampleCols(resp.sample_cols);
           self.source.sample(resp.sample);
@@ -1368,9 +1368,11 @@ ${ assist.assistPanel() }
           var koFormat = ko.mapping.fromJS(new FileType(state.format.type, state.format));
           self.source.format(koFormat);
         }
-        if (state.columns) state.columns.forEach(function (currCol) {
-          self.destination.columns.push(loadField(currCol));
-        });
+        if (state.columns){
+          state.columns.forEach(function (currCol) {
+            self.destination.columns.push(loadField(currCol));
+          });
+        }
       }
     };
 
@@ -1378,8 +1380,20 @@ ${ assist.assistPanel() }
       return loadField($.extend({}, ${default_field_type | n}, options));
     }
 
-    var loadField = function (currField) {
+    var loadField = function (currField, parent, idx) {
       var koField = ko.mapping.fromJS(currField);
+      if (koField.name && parent) {
+        koField.name.subscribe(function (newVal) {
+          if (newVal.indexOf(',') > -1) {
+            var fields = newVal.split(',');
+            fields.forEach(function (val, i) {
+              if (parent.length <= i + idx && parent()[i + idx]) {
+                parent()[i + idx].name(val);
+              }
+            });
+          }
+        });
+      }
 
       koField.operations.removeAll();
 
@@ -1390,7 +1404,7 @@ ${ assist.assistPanel() }
         koField.operations.push(operation);
       });
 
-      var autoExpand = function(newVal) {
+      var autoExpand = function (newVal) {
         if ((newVal == 'array' || newVal == 'map' || newVal == 'struct') && koField.nested().length == 0) {
           koField.nested.push(loadDefaultField({level: koField.level() + 1}));
         }
