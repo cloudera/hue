@@ -54,7 +54,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
         <a class="btn btn-status btn-inverse disable-feedback" data-value="killed">${ _('Killed') }</a>
       </span>
-      &nbsp;&nbsp;${_('in last')} <input id="timeValue" type="number" class="input-small" placeholder="7">
+      &nbsp;&nbsp;${_('in last')} <input id="timeValue" class="input-mini" type="number" value="7" min="1" max="3650">
       <select id="timeUnit" class="input-small">
         <option value="days">${_('days')}</option>
         <option value="hours">${_('hours')}</option>
@@ -343,6 +343,11 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     });
 
     $("#timeValue").jHueDelayedInput(function(){
+      $("#loading").removeClass("hide");
+      callJsonData(populateTable);
+    });
+
+    $("#timeValue").change(function(){
       $("#loading").removeClass("hide");
       callJsonData(populateTable);
     });
