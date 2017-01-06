@@ -356,7 +356,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" placeholder="${ _('Table name or <database>.<table>') }">
+                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
               <!-- /ko -->
 
               <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
@@ -546,7 +546,6 @@ ${ assist.assistPanel() }
               </div>
           </div>
         <!-- /ko -->
-
 
     <!-- /ko -->
 
@@ -1199,7 +1198,9 @@ ${ assist.assistPanel() }
 
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
-        return self.destination.name().length > 0 && validFields;
+        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^[a-zA-Z0-9_]*$/.test(self.destination.name()));
+
+        return validDestination && validFields;
       });
 
       self.formatTypeSubscribed = false;
