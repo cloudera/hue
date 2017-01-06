@@ -141,7 +141,6 @@
         var search = $('<div>').css({
           'position': 'fixed',
           'bottom': '20px',
-          'right': '70px',
           'opacity': 0.85
         }).addClass('hueAnchor hue-datatable-search').appendTo($('body'));
         search.html('<input type="text"> <i class="fa fa-chevron-up pointer muted"></i> <i class="fa fa-chevron-down pointer muted"></i> &nbsp; <span></span> &nbsp; <i class="fa fa-times pointer inactive-action"></i>');
@@ -190,6 +189,14 @@
         $('.hue-datatable-search').show();
         $('.hue-datatable-search').find('input').focus();
       }
+      var right = -30;
+      $('.hueAnchorScroller:visible').each(function () {
+        var visibleRight = $(this).css('right').replace(/px/gi, '') * 1;
+        if (!isNaN(visibleRight) && visibleRight > right) {
+          right = visibleRight;
+        }
+      });
+      $('.hue-datatable-search').css('right', (right + 50) + 'px');
     }
 
     self.fnSearch = function (what, avoidScroll) {
