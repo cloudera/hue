@@ -77,6 +77,8 @@ var SqlAutocompleter3 = (function () {
     self.snippet = options.snippet;
     self.editor = options.editor;
 
+    // TODO: Have one array with all and add categories to each entry instead.
+    // It's probably more likely that the user will be happy with all categories instead of filtering.
     self.keywords = ko.observableArray();
     self.identifiers = ko.observableArray();
     self.columnAliases = ko.observableArray();
@@ -91,6 +93,8 @@ var SqlAutocompleter3 = (function () {
     self.joins = ko.observableArray();
     self.joinConditions = ko.observableArray();
     self.aggregateFunctions = ko.observableArray();
+    self.groupBys = ko.observableArray();
+    self.orderBys = ko.observableArray();
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
@@ -103,13 +107,15 @@ var SqlAutocompleter3 = (function () {
     self.loadingJoins = ko.observable(false);
     self.loadingJoinConditions = ko.observable(false);
     self.loadingAggregateFunctions = ko.observable(false);
+    self.loadingGroupBys = ko.observable(false);
+    self.loadingOrderBys = ko.observable(false);
 
     self.filter = ko.observable();
 
     self.filtered = ko.pureComputed(function () {
       var result = self.keywords().concat(self.identifiers(), self.columnAliases(), self.commonTableExpressions(),
           self.functions(), self.databases(), self.tables(), self.columns(), self.values(), self.paths(), self.joins(),
-          self.joinConditions(), self.aggregateFunctions());
+          self.joinConditions(), self.aggregateFunctions(), self.groupBys(), self.orderBys());
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -193,6 +199,8 @@ var SqlAutocompleter3 = (function () {
     self.joins([]);
     self.joinConditions([]);
     self.aggregateFunctions([]);
+    self.groupBys([]);
+    self.orderBys([]);
 
     self.loadingKeywords(false);
     self.loadingFunctions(false);
@@ -205,6 +213,8 @@ var SqlAutocompleter3 = (function () {
     self.loadingJoins(false);
     self.loadingJoinConditions(false);
     self.loadingAggregateFunctions(false);
+    self.loadingGroupBys(false);
+    self.loadingOrderBys(false);
 
     self.filter('');
 
@@ -225,9 +235,11 @@ var SqlAutocompleter3 = (function () {
     var joinsDeferred = self.handleJoins();
     var joinConditionsDeferred = self.handleJoinConditions();
     var aggregateFunctionsDeferred = self.handleAggregateFunctions();
+    var groupBysDeferred = self.handleGroupBys();
+    var orderBysDeferred = self.handleOrderBys();
 
     $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
-        joinConditionsDeferred, aggregateFunctionsDeferred).done(function () {
+        joinConditionsDeferred, aggregateFunctionsDeferred, groupBysDeferred, orderBysDeferred).done(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -867,7 +879,7 @@ var SqlAutocompleter3 = (function () {
               aggregateFunctionsSuggestions.push({
                 value: clean,
                 meta: AutocompleterGlobals.i18n.meta.aggregateFunction,
-                weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + value.totalQueryCount,
+                weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + Math.min(value.totalQueryCount, 99),
                 detailsTemplate: 'aggregate-function',
                 details: value
               });
@@ -884,6 +896,108 @@ var SqlAutocompleter3 = (function () {
       });
     }
     return aggregateFunctionsDeferred;
+  };
+
+  Suggestions.prototype.handleGroupBys = function () {
+    var self = this;
+    var groupBysDeferred = $.Deferred();
+    var suggestGroupBys = self.parseResult.suggestGroupBys;
+    if (HAS_OPTIMIZER && suggestGroupBys) {
+      self.loadingGroupBys(true);
+      self.apiHelper.fetchNavOptTopColumns({
+        sourceType: self.snippet.type(),
+        timeout: AUTOCOMPLETE_TIMEOUT,
+        defaultDatabase: self.activeDatabase,
+        silenceErrors: true,
+        tables: suggestGroupBys.tables,
+        successCallback: function (data) {
+          var groupBySuggestions = [];
+          if (typeof data.values.groupbyColumns !== 'undefined') {
+            var prefix = suggestGroupBys.prefix ? (self.parseResult.lowerCase ? suggestGroupBys.prefix.toLowerCase() : suggestGroupBys.prefix) + ' ' : '';
+            data.values.groupbyColumns.forEach(function (value) {
+              groupBySuggestions.push({
+                value: prefix + self.createNavOptIdentifierForColumn(value, suggestGroupBys.tables),
+                meta: AutocompleterGlobals.i18n.meta.groupBy,
+                weight: DEFAULT_WEIGHTS.POPULAR_GROUP_BY + Math.min(value.columnCount, 99),
+                detailsTemplate: 'group-by',
+                details: value
+              });
+            });
+          }
+          self.groupBys(groupBySuggestions);
+          self.loadingGroupBys(false);
+          groupBysDeferred.resolve(groupBySuggestions);
+        },
+        errorCallback: function () {
+          self.loadingGroupBys(false);
+          groupBysDeferred.resolve([])
+        }
+      });
+    } else {
+      groupBysDeferred.resolve([]);
+    }
+
+    return groupBysDeferred;
+  };
+
+  Suggestions.prototype.handleOrderBys = function () {
+    var self = this;
+    var orderBysDeferred = $.Deferred();
+    var suggestOrderBys = self.parseResult.suggestOrderBys;
+    if (HAS_OPTIMIZER && suggestOrderBys) {
+      self.apiHelper.fetchNavOptTopColumns({
+        sourceType: self.snippet.type(),
+        timeout: AUTOCOMPLETE_TIMEOUT,
+        defaultDatabase: self.activeDatabase,
+        silenceErrors: true,
+        tables: suggestOrderBys.tables,
+        successCallback: function (data) {
+          var orderBySuggestions = [];
+          if (typeof data.values.orderbyColumns !== 'undefined') {
+            var prefix = suggestOrderBys.prefix ? (self.parseResult.lowerCase ? suggestOrderBys.prefix.toLowerCase() : suggestOrderBys.prefix) + ' ' : '';
+            data.values.orderbyColumns.forEach(function (value) {
+              orderBySuggestions.push({
+                value: prefix + self.createNavOptIdentifierForColumn(value, suggestOrderBys.tables),
+                meta: AutocompleterGlobals.i18n.meta.orderBy,
+                weight: DEFAULT_WEIGHTS.POPULAR_ORDER_BY + Math.min(value.columnCount, 99),
+                detailsTemplate: 'order-by',
+                details: value
+              });
+            });
+          }
+          self.orderBys(orderBySuggestions);
+          self.loadingOrderBys(false);
+          orderBysDeferred.resolve(orderBySuggestions);
+        },
+        errorCallback: function () {
+          self.loadingOrderBys(false);
+          orderBysDeferred.resolve([]);
+        }
+      });
+    } else {
+      orderBysDeferred.resolve([]);
+    }
+    return orderBysDeferred;
+  };
+
+  Suggestions.prototype.createNavOptIdentifierForColumn = function (navOptColumn, tables) {
+    var self = this;
+    for (var i = 0; i < tables.length; i++) {
+      if (navOptColumn.dbName && (navOptColumn.dbName !== self.activeDatabase || navOptColumn.dbName !== tables[i].identifierChain[0].name)) {
+        continue;
+      }
+      if (navOptColumn.tableName && navOptColumn.tableName === tables[i].identifierChain[tables[i].identifierChain.length - 1].name && tables[i].alias) {
+        return tables[i].alias + '.' + navOptColumn.columnName;
+      }
+    }
+
+    if (navOptColumn.dbName && navOptColumn.dbName !== self.activeDatabase) {
+      return navOptColumn.dbName + '.' + navOptColumn.tableName + '.' + navOptColumn.columnName;
+    }
+    if (tables.length > 1) {
+      return navOptColumn.tableName + '.' + navOptColumn.columnName;
+    }
+    return navOptColumn.columnName;
   };
 
   Suggestions.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {
