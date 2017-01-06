@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
 from desktop.conf import DEFAULT_USER
@@ -27,10 +28,11 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
   _upload_extract_archive_script_to_hdfs(request.fs)
 
   output_path = upload_path + '/' + file_name.split('.')[0]
+
   shell_notebook = Notebook(
       description=_('HDFS Extraction of %(upload_path)s/%(file_name)s') % {'upload_path': upload_path, 'file_name': file_name},
       isManaged=True,
-      onSuccessUrl=upload_path
+      onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': output_path})
   )
 
   shell_notebook.add_shell_snippet(
