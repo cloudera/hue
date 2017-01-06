@@ -111,6 +111,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingGroupBys = ko.observable(false);
     self.loadingOrderBys = ko.observable(false);
     self.loadingFilters = ko.observable(false);
+    self.loadingPopularColumns = ko.observable(false);
 
     self.filter = ko.observable();
 
@@ -219,6 +220,7 @@ var SqlAutocompleter3 = (function () {
     self.loadingGroupBys(false);
     self.loadingOrderBys(false);
     self.loadingFilters(false);
+    self.loadingPopularColumns(false);
 
     self.filter('');
 
@@ -242,9 +244,11 @@ var SqlAutocompleter3 = (function () {
     var groupBysDeferred = self.handleGroupBys();
     var orderBysDeferred = self.handleOrderBys();
     var filtersDeferred = self.handleFilters();
+    var popularColumnsDeferred = self.handlePopularColumns(columnsDeferred);
 
     $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
-        joinConditionsDeferred, aggregateFunctionsDeferred, groupBysDeferred, orderBysDeferred, filtersDeferred).done(function () {
+        joinConditionsDeferred, aggregateFunctionsDeferred, groupBysDeferred, orderBysDeferred, filtersDeferred,
+        popularColumnsDeferred).done(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -1041,7 +1045,76 @@ var SqlAutocompleter3 = (function () {
     return filtersDeferred;
   };
 
-  Suggestions.prototype.createNavOptIdentifier = function(navOptTableName, navOptColumnName, tables) {
+  Suggestions.prototype.handlePopularColumns = function (columnsDeferred) {
+    var self = this;
+    var popularColumnsDeferred = $.Deferred();
+    var suggestColumns = self.parseResult.suggestColumns;
+    if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
+      self.loadingPopularColumns(true);
+      self.apiHelper.fetchNavOptTopColumns({
+        sourceType: self.snippet.type(),
+        timeout: AUTOCOMPLETE_TIMEOUT,
+        defaultDatabase: self.activeDatabase,
+        silenceErrors: true,
+        tables: suggestColumns.tables,
+        successCallback: function (data) {
+          var popularColumns = [];
+          switch (suggestColumns.source) {
+            case 'select':
+              popularColumns = data.values.selectColumns;
+              break;
+            case 'group by':
+              popularColumns = data.values.groupbyColumns;
+              break;
+            case 'order by':
+              popularColumns = data.values.orderbyColumns;
+              break;
+            default:
+              popularColumns = [];
+          }
+          popularColumns.forEach(function (col) {
+            col.path = col.tableName.split('.').concat(col.columnName.split('.').slice(1)).join('.');
+          });
+
+          $.when(columnsDeferred).done(function (columns) {
+            if (popularColumns.length > 0) {
+              columns.forEach(function (suggestion) {
+                var path = '';
+                if (!self.apiHelper.isDatabase(suggestion.table.identifierChain[0].name, self.snippet.type())) {
+                  path = self.activeDatabase + '.';
+                }
+                path += $.map(suggestion.table.identifierChain, function (identifier) { return identifier.name }).join('.') + '.' + suggestion.value.replace(/[\[\]]/g, '');
+                for (var i = 0; i < popularColumns.length; i++) {
+                  // TODO: Switch to map once nav opt API is stable
+                  if (path.toLowerCase().indexOf(popularColumns[i].path.toLowerCase()) !== -1) {
+                    suggestion.weight += Math.min(popularColumns[i].columnCount, 99);
+                    suggestion.popular = true;
+                    if (!suggestion.details) {
+                      suggestions.details = {};
+                    }
+                    suggestion.details.popularity = popularColumns[i];
+                    break;
+                  }
+                }
+              });
+              self.columns.notifySubscribers();
+            }
+            self.loadingPopularColumns(false);
+            popularColumnsDeferred.resolve(popularColumns);
+          });
+        },
+        errorCallback: function () {
+          self.loadingPopularColumns(false);
+          popularColumnsDeferred.resolve([]);
+        }
+      });
+    } else {
+      popularColumnsDeferred.resolve([]);
+    }
+    return popularColumnsDeferred;
+  };
+
+  Suggestions.prototype.createNavOptIdentifier = function (navOptTableName, navOptColumnName, tables) {
     var self = this;
     var path = navOptTableName + '.' + navOptColumnName.split('.').pop();
     for (var i = 0; i < tables.length; i++) {
