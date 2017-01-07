@@ -93,7 +93,7 @@ class Command(NoArgsCommand):
             type='link-pigscript',
             description=doc.description,
             data=data)
+          LOG.info('Successfully installed sample link to pig script: %s' % (doc2.name,))
 
       # Share with default group
       examples_dir.share(sample_user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
-      LOG.info('Successfully installed sample link to pig script: %s' % (doc2.name,))
