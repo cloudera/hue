@@ -57,7 +57,7 @@ class YarnApi(Api):
     jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
     return [{
         'id': app.jobId,
-        'name': 'name',
+        'name': app.name,
         'type': app.applicationType,
         'status': app.status,
         'user': self.user.username,
@@ -70,7 +70,7 @@ class YarnApi(Api):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
     return {
         'id': app.jobId,
-        'name': 'name',
+        'name': app.name,
         'type': app.applicationType,
         'status': app.status,
         'user': self.user.username,
