@@ -916,7 +916,7 @@ class TestDocument(object):
     # Cannot create second trash directory directly as it will fail in Document2.validate()
     Document2.objects.create(owner=self.user, parent_directory=home_dir, name='second_trash_dir', type='directory')
     Document2.objects.filter(name='second_trash_dir').update(name=Document2.TRASH_DIR)
-    assert_equal(Document2.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
+    assert_equal(Directory.objects.filter(owner=self.user, name=Document2.TRASH_DIR).count(), 2)
 
 
     test_doc2 = Document2.objects.create(name='test-doc2',
@@ -925,11 +925,11 @@ class TestDocument(object):
                                               description='',
                                               parent_directory=home_dir)
     assert_equal(home_dir.children.count(), 5) # Including the second trash
-    assert_raises(Document2.MultipleObjectsReturned, Document2.objects.get, name=Document2.TRASH_DIR)
+    assert_raises(Document2.MultipleObjectsReturned, Directory.objects.get, name=Document2.TRASH_DIR)
 
     test_doc1.trash()
     assert_equal(home_dir.children.count(), 3) # As trash documents are merged count is back to 3
-    merged_trash_dir = Document2.objects.get(name=Document2.TRASH_DIR)
+    merged_trash_dir = Directory.objects.get(name=Document2.TRASH_DIR, owner=self.user)
 
     test_doc2.trash()
     children = merged_trash_dir.children.all()
