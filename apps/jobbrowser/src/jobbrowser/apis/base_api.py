@@ -34,7 +34,7 @@ def get_api(user, interface):
     return BatchApi(user)
   elif interface == 'schedules':
     return ScheduleApi(user)
-  elif interface == 'jobs':
+  elif interface == 'apps':
     return YarnApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)

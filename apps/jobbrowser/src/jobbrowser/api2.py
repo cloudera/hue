@@ -73,6 +73,7 @@ def job(request):
 @api_error_handler
 def kill(request): return {}
 
+
 @api_error_handler
 def progress(request): return {'progress': 0}
 

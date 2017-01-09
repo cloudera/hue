@@ -41,6 +41,7 @@ class JobApi(Api):
   def apps(self):
     jobs = self.self.yarn_api.apps()
     # += Impala
+    # += Sqoop2
     return jobs
 
   def app(self, appid):
@@ -68,6 +69,7 @@ class YarnApi(Api):
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
+    print app.finishedMaps
     return {
         'id': app.jobId,
         'name': app.name,
