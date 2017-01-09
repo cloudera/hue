@@ -4686,7 +4686,7 @@
 
           var Tokenizer = tokenizer.Tokenizer;
           var Rules;
-          if (options.flavor() == 'impala') {
+          if (options.flavor && options.flavor() == 'impala') {
             Rules = impalaRules.ImpalaHighlightRules;
           } else {
             Rules = hiveRules.HiveHighlightRules;

@@ -203,39 +203,72 @@ ${ hueIcons.symbols() }
           <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">20</div></button>
         </div>
         <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
+          <a class="pointer pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-times"></i></a>
           <!-- ko if: editorVM.selectedNotebook() -->
           <!-- ko with: editorVM.selectedNotebook() -->
             <div>
               Showing
               <span data-bind="text: uuid"></span>
               <a href="javascript:void(0)" data-bind="attr: { href: onSuccessUrl() }, text: onSuccessUrl" target="_blank"></a>
-              <!-- ko if: selectedSnippet() -->
-                <div>
-                  Progress
-                  <span data-bind="text: selectedSnippet().progress"></span>
+              <!-- ko if: selectedSnippet -->
+                <!-- ko if: selectedSnippet().progress -->
+                <div class="snippet-progress-container">
+                  <div class="progress-snippet progress active" data-bind="css: {
+                    'progress-starting': progress() == 0 && status() == 'running',
+                    'progress-warning': progress() > 0 && progress() < 100,
+                    'progress-success': progress() == 100,
+                    'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
+                    <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
+                  </div>
                 </div>
+                <!-- /ko -->
                 <!-- ko if: selectedSnippet().result -->
-                <div>
-                  Logs
-                  <span data-bind="text: selectedSnippet().result.logs"></span>
-                </div>
+                <pre data-bind="visible: selectedSnippet().result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+                <pre data-bind="visible: selectedSnippet().result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
                 <!-- /ko -->
               <!-- /ko -->
             </div>
+            <!-- ko if: history -->
             <hr>
-            X Clear History
-            <ul>
-              <!-- ko foreach: history -->
-                <li style="font-size: 15px; font-weight: 300" data-bind="click: function() { editorVM.openNotebook(uuid()); }">
-                  <span data-bind="text: lastExecuted"></span>
-                  <i class="fa fa-fighter-jet fa-fw"></i>
-                  <span data-bind="text: status"></span>
-                  <span data-bind="text: name"></span>
-                  <span data-bind="text: 'statement'"></span>
-                  <span data-bind="text: uuid"></span>
-                </li>
+            <div class="notification-history margin-bottom-10" data-bind="niceScroll">
+              <!-- ko if: history().length == 0 -->
+              <span style="font-style: italic">${ _('No history to be shown.') }</span>
               <!-- /ko -->
-            </ul>
+              <!-- ko if: history().length > 0 -->
+              <div class="notification-history-title">
+                <strong>${ _('History') }</strong>
+                <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip"><i class="fa fa-calendar-times-o"></i></div>
+                <div class="clearfix"></div>
+              </div>
+              <ul class="unstyled notification-history-list">
+                <!-- ko foreach: history -->
+                  <li data-bind="click: function() { editorVM.openNotebook(uuid()); }">
+                    <div class="muted pull-left" data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></div>
+                    <div class="pull-right muted">
+                      <!-- ko switch: status -->
+                      <!-- ko case: 'running' -->
+                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
+                      <!-- /ko -->
+                      <!-- ko case: 'failed' -->
+                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
+                      <!-- /ko -->
+                      <!-- ko case: 'available' -->
+                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
+                      <!-- /ko -->
+                      <!-- ko case: 'expired' -->
+                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
+                      <!-- /ko -->
+                      <!-- /ko -->
+                    </div>
+                    <div class="clearfix"></div>
+                    <strong data-bind="text: name, attr: { title: uuid }"></strong>
+                    <div data-bind="highlight: 'statement'" class="history-item"></div>
+                  </li>
+                <!-- /ko -->
+              </ul>
+              <!-- /ko -->
+            </div>
+          <!-- /ko -->
           <!-- /ko -->
           <!-- /ko -->
         </div>
@@ -372,6 +405,21 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
+<div id="clearNotificationHistoryModal" class="modal hide fade">
+  <div class="modal-header">
+    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <h3>${_('Confirm History Clear')}</h3>
+  </div>
+  <div class="modal-body">
+    <p>${_('Are you sure you want to clear the query history?')}</p>
+  </div>
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('No')}</a>
+    <a class="btn btn-danger disable-feedback" onclick="editorVM.selectedNotebook().clearHistory()">${_('Yes')}</a>
+  </div>
+</div>
+
+
 <script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
@@ -411,11 +459,21 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
+<script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+
+<script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
+<script src="${ static('desktop/js/ko.selectize.js') }"></script>
+
+<script src="${ static('desktop/js/ace/ace.js') }"></script>
+<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
+<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
+<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
+<script src="${ static('desktop/js/ace.extended.js') }"></script>
 
 # Task History
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -467,6 +525,10 @@ ${ assist.assistPanel() }
         errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
       }
     };
+
+    $(document).on('hideHistoryModal', function (e) {
+      $('#clearNotificationHistoryModal').modal('hide');
+    });
 
     var onePageViewModel = (function () {
       var LOADED_JS = [];
