@@ -74,7 +74,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </li>
           </ul>
             <span class="form-inline">
-              <input class="btn btn-status" type="radio" name="interface" value="jobs" data-bind="checked: interface" id="jobs"><label for="jobs">${ _('Apps') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="apps" data-bind="checked: interface" id="apps"><label for="apps">${ _('Apps') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Workflows') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="bundles" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
@@ -119,18 +119,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="content-panel">
 
           <div class="container-fluid">
-            <!-- ko if: $root.section() == 'app' -->
-            <a href="javascript:void(0)" data-bind="click: function() { $root.section('apps'); }">
-              <h2>${ _('Apps') } >
-              <!-- ko if: $root.job() -->
-              <!-- /ko -->
-              </h2>
-            </a>
-            <!-- /ko -->
+            <div data-bind="template: { name: 'breadcrumbs' }"></div>
 
-            <!-- ko if: $root.section() == 'apps' -->
-            <h2>${ _('Apps') }</h2>
-
+            <!-- ko if: ! $root.job() -->
             ${_('Filter')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
             <span class="btn-group">
               <class="btn-group">
@@ -140,7 +131,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </span>
             </span>
 
-            <div class="btn-toolbar" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+            <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
               <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
               <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span></button>
               <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span></button>
@@ -178,26 +169,47 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- /ko -->
           </div>
 
-          <!-- ko if: $root.section() == 'app' && $root.job() -->
-            <!-- ko if: $root.job().mainType() == 'jobs' && $root.interface() == 'jobs' -->
+          <!-- ko if: $root.job() -->
+            <!-- ko if: $root.job().mainType() == 'apps' -->
               <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'batches' && $root.interface() == 'batches' -->
+            <!-- ko if: $root.job().mainType() == 'batches' -->
               <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'schedules' && $root.interface() == 'schedules' -->
+            <!-- ko if: $root.job().mainType() == 'schedules' -->
               <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
             <!-- /ko -->
           <!-- /ko -->
 
-          <div data-bind="template: { name: 'pagination' }"></div>
+          <div data-bind="template: { name: 'pagination' }, visible: ! $root.job()"></div>
       </div>
     </div>
   </div>
 </div>
 </div>
+
+
+<script type="text/html" id="breadcrumbs">
+  
+  <h2 data-bind="foreach: breadcrumbs">
+    <!-- ko if: $index() > 0 -->
+      &gt;
+    <!-- /ko -->
+    
+    ## TODO: no link on last item
+
+    <!-- ko if: id.length == 0 -->
+      <span data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }"></span>
+    <!-- /ko -->
+    <!-- ko if: id.length != 0 -->
+      <span data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().fetchJob(id); }"></span>
+      :
+      <span data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().fetchJob(id); }"></span>
+    <!-- /ko -->
+  </h2> 
+</script>
 
 
 <script type="text/html" id="pagination">
@@ -248,9 +260,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="job-mapreduce-page">
-  <h2>MapReduce</h2>
-  <br/>
-
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -270,16 +279,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
+  Stop
+
   </br>
 
   <ul class="nav nav-tabs">
     <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#job-mapreduce-page-attempts" data-toggle="tab">${ _('Attempts') }</a></li>
     <li><a href="#job-mapreduce-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
     <li><a href="#job-mapreduce-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
     <li><a href="#job-mapreduce-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
   </ul>
 
   <div class="tab-content" id="job-mapreduce-page-logs">
+    <table class="table table-condensed">
+    </table>
+  </div>
+
+  <div class="tab-content" id="job-mapreduce-page-attempts">
     <table class="table table-condensed">
     </table>
   </div>
@@ -331,9 +348,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 <script type="text/html" id="job-spark-page">
-  <h2>Spark</h2>
-  <br/>
-
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -430,8 +444,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchJob = function () {
         self.loadingJob(true);
-        hueUtils.changeURL('#!' + self.id());
-        vm.section('app');
+        hueUtils.changeURL('#!' + self.id()); // TODO build breacrumbs hash
+        vm.breadcrumbs.push({'id': self.id(), 'name': self.name(), 'type': self.type()});
+
         $.post("/jobbrowser/api/job", {
           appid: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
@@ -460,7 +475,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchJobs = function () {
         self.loadingJobs(true);
-        vm.section('apps');
+        vm.job(null);
         $.post("/jobbrowser/api/jobs", {
           username: ko.mapping.toJSON(self.username),
           interface: ko.mapping.toJSON(vm.interface)
@@ -493,13 +508,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
 
-      self.section = ko.observable('apps');
-      self.interface = ko.observable('jobs');
+      //self.section = ko.observable('apps');
+      self.interface = ko.observable('apps');
       self.interface.subscribe(function (val) {
         hueUtils.changeURL('#!' + val);
+        self.breadcrumbs([{'id': '', 'name': val, 'type': val}]);
         self.jobs.fetchJobs();
       });
-                                                                           
+      self.breadcrumbs = ko.observableArray([]);
+      self.breadcrumbs.push({'id': '', 'name': 'apps', 'type': 'apps'});
+
       self.paginationOffset = ko.observable(0);
       self.paginationResultPage = ko.observable(100);
       self.paginationPage = ko.observable(1);
@@ -526,7 +544,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         switch (h) {
           case 'schedules':
-          case 'jobs':
+          case 'apps':
           case 'batches':
             viewModel.interface(h);
             break;
