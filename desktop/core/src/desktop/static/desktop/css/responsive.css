@@ -96,10 +96,10 @@ body {
 
 .jobs-panel {
   position: fixed;
-  z-index: 999999;
+  z-index: 2999;
   top: 45px;
   padding: 10px;
-  height: 300px;
+  max-height: 350px;
   width: 400px;
   right: 10px;
   font-size: 13px;
@@ -107,6 +107,20 @@ body {
   background-color: #FFF;
   -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, .18);
   box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+}
+
+.notification-history {
+  overflow-y: auto;
+  max-height: 270px;
+}
+
+.notification-history-title {
+  background-color: #F1F1F1;
+  padding: 4px;
+}
+
+.notification-history-list li {
+  padding: 4px;
 }
 
 .compose-action {
@@ -1035,4 +1049,8 @@ h6 {
 /* oozie workflow */
 #oozie_workflowComponents .card-toolbar {
   position: static;
+}
+
+.tooltip {
+  z-index: 3000 !important;
 }

@@ -976,7 +976,7 @@ var EditorViewModel = (function() {
           if (vm.isResponsive()){
             url = vm.URLS.responsive + '&editor=' + data.history_id;
           }
-          hueUtils.changeURL(url);
+          vm.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
@@ -1822,18 +1822,18 @@ var EditorViewModel = (function() {
             }
 
             if (vm.isResponsive()){
-              hueUtils.changeURL(vm.URLS.responsive + '&editor=' + data.id);
+              vm.changeURL(vm.URLS.responsive + '&editor=' + data.id);
             }
             else {
-              hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
+              vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
             }
           }
           else {
             if (vm.isResponsive()){
-              hueUtils.changeURL(vm.URLS.responsive_notebook + '&notebook=' + data.id);
+              vm.changeURL(vm.URLS.responsive_notebook + '&notebook=' + data.id);
             }
             else {
-              hueUtils.changeURL('/notebook/notebook?notebook=' + data.id);
+              vm.changeURL('/notebook/notebook?notebook=' + data.id);
             }
           }
         }
@@ -2012,10 +2012,10 @@ var EditorViewModel = (function() {
           self.id(null);
           self.uuid(UUID());
           if (vm.isResponsive()) {
-            hueUtils.changeURL(vm.URLS.responsive + '&type=' + vm.editorType());
+            vm.changeURL(vm.URLS.responsive + '&type=' + vm.editorType());
           }
           else {
-            hueUtils.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
+            vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
           }
         }
       }).fail(function (xhr) {
@@ -2323,6 +2323,12 @@ var EditorViewModel = (function() {
       return '';
     };
 
+    self.changeURL = function (url) {
+      if (!self.isNotificationManager()) {
+        hueUtils.changeURL(url);
+      }
+    };
+
     self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
@@ -2410,18 +2416,18 @@ var EditorViewModel = (function() {
           if (typeof skipUrlChange === 'undefined' && ! self.isNotificationManager()){
             if (self.editorMode()) {
               if (self.isResponsive()){
-                hueUtils.changeURL(self.URLS.responsive + '&editor=' + data.document.id);
+                self.changeURL(self.URLS.responsive + '&editor=' + data.document.id);
               }
               else {
-                hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
+                self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
               }
             }
             else {
               if (self.isResponsive()){
-                hueUtils.changeURL(self.URLS.responsive_notebook + '&notebook=' + data.document.id);
+                self.changeURL(self.URLS.responsive_notebook + '&notebook=' + data.document.id);
               }
               else {
-                hueUtils.changeURL(self.URLS.notebook + '&notebook=' + data.document.id);
+                self.changeURL(self.URLS.notebook + '&notebook=' + data.document.id);
               }
             }
           }
@@ -2452,25 +2458,25 @@ var EditorViewModel = (function() {
           }
           if (window.location.getParameter('type')) {
             if (self.isResponsive()){
-              hueUtils.changeURL(self.URLS.responsive + '&type=' + window.location.getParameter('type'));
+              self.changeURL(self.URLS.responsive + '&type=' + window.location.getParameter('type'));
             }
             else {
-              hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + window.location.getParameter('type'));
+              self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + window.location.getParameter('type'));
             }
           } else {
             if (self.isResponsive()){
-              hueUtils.changeURL(self.URLS.responsive + '&type=' + self.editorType());
+              self.changeURL(self.URLS.responsive + '&type=' + self.editorType());
             }
             else {
-              hueUtils.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + self.editorType());
+              self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + self.editorType());
             }
           }
         } else {
           if (self.isResponsive()){
-            hueUtils.changeURL(self.URLS.responsive_notebook);
+            self.changeURL(self.URLS.responsive_notebook);
           }
           else {
-            hueUtils.changeURL('/notebook/notebook');
+            self.changeURL('/notebook/notebook');
           }
         }
       });
