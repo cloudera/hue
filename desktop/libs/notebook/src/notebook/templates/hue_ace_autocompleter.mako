@@ -24,7 +24,6 @@ from desktop.views import _ko
     .hue-ace-autocompleter {
       position: fixed;
       z-index: 100000;
-      width: 500px;
       height: 250px;
       border: 1px solid #DDD;
       display: flex;
@@ -42,9 +41,11 @@ from desktop.views import _ko
     }
 
     .autocompleter-list {
+      display: inline-block;
       position: relative;
-      flex: 1 1 100%;
       overflow-y: auto;
+      width: 300px;
+      height: 100%;
     }
 
     .autocompleter-list > div {
@@ -70,17 +71,88 @@ from desktop.views import _ko
       margin-top: 1px;
     }
 
+    .autocompleter-entries {
+      position: relative;
+      flex: 1 1 100%;
+      overflow: hidden;
+    }
+
+    .autocompleter-details {
+      vertical-align: top;
+      display: inline-block;
+      width: 300px;
+      overflow-y: auto;
+    }
+
   </style>
+
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
       <div class="autocompleter-header"><div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div></div>
-      <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
-        <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
+      <div class="autocompleter-entries">
+        <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
+          <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }">
+            <div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
+            <div class="pull-right" data-bind="text: meta"></div>
+          </div>
+        </div>
+        <!-- ko if: selectedEntry() && selectedEntry().details -->
+        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + selectedEntry().detailsTemplate, data: selectedEntry }"></div>
+        <!-- /ko -->
       </div>
     </div>
     <!-- /ko -->
   </script>
+
+  <script type="text/html" id="autocomplete-details-keyword">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-column-alias">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-udf">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-table">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-column">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-hdfs">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-join">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-join-condition">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-aggregate-function">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-group-by">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-order-by">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-filter">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
 
   <script type="text/javascript" charset="utf-8">
     (function () {
@@ -120,6 +192,13 @@ from desktop.views import _ko
         self.left = ko.observable(1);
 
         self.selectedIndex = ko.observable(0);
+
+        self.selectedEntry = ko.pureComputed(function () {
+          if (self.suggestions.filtered().length > 0) {
+            return self.suggestions.filtered()[self.selectedIndex()];
+          }
+          return null;
+        });
 
         self.suggestions.filtered.subscribe(function (newValue) {
           if (self.selectedIndex() > newValue.length - 1) {
