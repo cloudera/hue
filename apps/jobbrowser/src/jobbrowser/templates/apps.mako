@@ -227,7 +227,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="job-page">
-  <!-- ko if: type() == 'MR2' -->
+  <!-- ko if: type() == 'MAPREDUCE' -->
     <div data-bind="template: { name: 'job-mapreduce-page', data: $root.job() }"></div>
   <!-- /ko -->
 
@@ -270,11 +270,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
   </br></br>
-  <span>
-  Map 100 Reduce 50</br>
-  Duration 8s</br>
-  </br></br>
   
+  <!-- ko with: properties -->
+  Map <span data-bind="text: maps_percent_complete"></span> <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span>
+  Reduce <span data-bind="text: reduces_percent_complete"></span> <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span><br/>
+  Duration <span data-bind="text: $parent.duration"></span><br/>  
+  <!-- /ko -->
+  </br></br>
+
   <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
@@ -292,7 +295,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </ul>
 
   <div class="tab-content" id="job-mapreduce-page-logs">
-    <pre data-bind="text: logs['default']">
+    %for name in ['stdout', 'stderr', 'syslog']:
+      <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+    % endfor
+    </br>
+
+    <pre data-bind="html: logs['default']">
     </pre>
   </div>
 
@@ -496,6 +504,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
             vm.job(new Job(vm, data.app));
+            vm.job().fetchLogs();
             if (self.mainType() == 'schedules') {
               vm.job().coordVM.setActions(data.app.actions);
             }
@@ -507,10 +516,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.fetchLogs = function () {
+      self.fetchLogs = function (name) {
         $.post("/jobbrowser/api/job/logs", {
           appid: ko.mapping.toJSON(self.id),
-          interface: ko.mapping.toJSON(vm.interface)
+          interface: ko.mapping.toJSON(vm.interface),
+          name: name ? name : 'default'
         }, function (data) {
           if (data.status == 0) {
             self.logs['default'](data.logs.logs['default'])

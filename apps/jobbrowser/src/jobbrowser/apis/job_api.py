@@ -58,6 +58,7 @@ class JobApi(Api):
 
 
 class YarnApi(Api):
+  """YARN, MR, Spark"""
 
   def apps(self):
     jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
@@ -75,7 +76,7 @@ class YarnApi(Api):
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
 
-    return {
+    common = {
         'id': app.jobId,
         'name': app.name,
         'type': app.applicationType,
@@ -85,6 +86,21 @@ class YarnApi(Api):
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     }
+    
+    if app.applicationType == 'MR2':
+      common['type'] = 'MAPREDUCE'
+      common['duration'] = app.duration
+      common['durationFormatted'] = app.durationFormatted
+
+      common['properties'] = {
+          'maps_percent_complete': app.maps_percent_complete,
+          'reduces_percent_complete': app.reduces_percent_complete,
+          'finishedMaps': app.finishedMaps,
+          'finishedReduces': app.finishedReduces,
+          'desiredMaps': app.desiredMaps,
+          'desiredReduces': app.desiredReduces,
+      }
+    return common
 
   def logs(self, appid):
     # name = 'stdout'
