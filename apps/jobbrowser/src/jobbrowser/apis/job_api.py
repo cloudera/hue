@@ -20,7 +20,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api
+from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from jobbrowser.views import job_attempt_logs_json
 
 
@@ -106,14 +106,8 @@ class YarnApi(Api):
     # name = 'stdout'
     # attempt_index
     # offset=log_offset
-    data = job_attempt_logs_json(YarnRequest(self.user), job=appid)
+    data = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
     return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
-
-
-class YarnRequest():
-  def __init__(self, user):
-    self.user = user
-    self.jt = None
 
 
 class YarnAtsApi(Api):

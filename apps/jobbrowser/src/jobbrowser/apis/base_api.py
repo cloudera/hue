@@ -54,3 +54,10 @@ class Api():
   def logs(self, appid): return {'progress': 0, 'logs': {'default': ''}}
 
   def profile(self, appid): return {} # Tasks, XML, counters...
+
+
+class MockDjangoRequest():
+  def __init__(self, user):
+    self.user = user
+    self.jt = None
+    self.GET = {}
