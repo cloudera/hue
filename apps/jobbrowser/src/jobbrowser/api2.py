@@ -75,15 +75,20 @@ def kill(request): return {}
 
 
 @api_error_handler
-def progress(request): return {'progress': 0}
+def logs(request):
+  response = {'status': -1}
+
+  interface = json.loads(request.POST.get('interface'))
+  appid = json.loads(request.POST.get('appid'))
+
+  response['logs'] = get_api(request.user, interface).logs(appid)
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler
 def tasks(request): return []
-
-
-@api_error_handler
-def logs(request): return {'stderr': '', 'stdout': ''}
 
 
 @api_error_handler

@@ -26,16 +26,16 @@ LOG = logging.getLogger(__name__)
 
 
 def get_api(user, interface):
-  from jobbrowser.apis.batch_api import BatchApi
+  from jobbrowser.apis.workflow_api import WorkflowApi
   from jobbrowser.apis.job_api import YarnApi
   from jobbrowser.apis.schedule_api import ScheduleApi
 
-  if interface == 'batches':
-    return BatchApi(user)
+  if interface == 'apps':
+    return YarnApi(user)
+  elif interface == 'workflows':
+    return WorkflowApi(user)
   elif interface == 'schedules':
     return ScheduleApi(user)
-  elif interface == 'apps':
-    return YarnApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
@@ -49,12 +49,8 @@ class Api():
 
   def app(self, appid): return {}
 
-  def kill(self): return {}
+  def action(self, appid): return {} # Kill, suspend...
 
-  def progress(self): return {'progress': 0}
+  def logs(self, appid): return {'progress': 0, 'logs': {'default': ''}}
 
-  def tasks(self): return []
-
-  def logs(self): return {'stderr': '', 'stdout': ''}
-
-  def profile(self): return {}
+  def profile(self, appid): return {} # Tasks, XML, counters...

@@ -75,7 +75,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </ul>
             <span class="form-inline">
               <input class="btn btn-status" type="radio" name="interface" value="apps" data-bind="checked: interface" id="apps"><label for="apps">${ _('Apps') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="batches" data-bind="checked: interface" id="batches"><label for="batches">${ _('Workflows') }</label>
+              <input class="btn btn-status" type="radio" name="interface" value="workflows" data-bind="checked: interface" id="workflows"><label for="workflows">${ _('Workflows') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
               <input class="btn btn-status" type="radio" name="interface" value="bundles" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
             </span>
@@ -174,8 +174,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'batches' -->
-              <div data-bind="template: { name: 'batch-page', data: $root.job() }"></div>
+            <!-- ko if: $root.job().mainType() == 'workflows' -->
+              <div data-bind="template: { name: 'workflow-page', data: $root.job() }"></div>
             <!-- /ko -->
 
             <!-- ko if: $root.job().mainType() == 'schedules' -->
@@ -292,8 +292,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </ul>
 
   <div class="tab-content" id="job-mapreduce-page-logs">
-    <table class="table table-condensed">
-    </table>
+    <pre data-bind="text: logs['default']">
+    </pre>
   </div>
 
   <div class="tab-content" id="job-mapreduce-page-attempts">
@@ -359,10 +359,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="batch-page">
-  <h2>Workflow</h2>
-  <br/>
-
+<script type="text/html" id="workflow-page">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -371,12 +368,56 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+  
+  </br></br>
+  <span>
+  Variables</br>
+  Duration 8s</br>
+  </br></br>
+  
+  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+  </div>
+
+  Stop | Resume
+
+  </br>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Graph') }</a></li>
+    <li><a href="#job-mapreduce-page-attempts" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#job-mapreduce-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
+    <li><a href="#job-mapreduce-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
+  </ul>
+
+  <div class="tab-content" id="job-mapreduce-page-logs">
+    <table class="table table-condensed">
+    </table>
+  </div>
+
+  <div class="tab-content" id="job-mapreduce-page-attempts">
+    <table class="table table-condensed">
+    </table>
+  </div>
+
+  <div class="tab-content" id="job-mapreduce-page-tasks">
+    <table class="table table-condensed">
+    </table>
+  </div>
+  
+  <div class="tab-content" id="job-mapreduce-page-metadata">
+    <table class="table table-condensed">
+    </table>
+  </div>
+  
+  <div class="tab-content" id="job-mapreduce-page-counters">
+    <table class="table table-condensed">
+    </table>
+  </div>
+
 </script>
 
 <script type="text/html" id="schedule-page">
-  <h2>Schedule</h2>
-  <br/>
-
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -435,6 +476,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);
 
+      self.logs = ko.mapping.fromJS({'default': ''});
+
       self.coordVM = new RunningCoordinatorModel([]);
 
       self.properties = ko.observableDefault(job.properties, {});
@@ -461,6 +504,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         }).always(function () {
           self.loadingJob(false);
+        });
+      };
+
+      self.fetchLogs = function () {
+        $.post("/jobbrowser/api/job/logs", {
+          appid: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(vm.interface)
+        }, function (data) {
+          if (data.status == 0) {
+            self.logs['default'](data.logs.logs['default'])
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).always(function () {
         });
       };
     };
@@ -545,7 +602,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         switch (h) {
           case 'schedules':
           case 'apps':
-          case 'batches':
+          case 'workflows':
             viewModel.interface(h);
             break;
           default:
