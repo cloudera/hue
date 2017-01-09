@@ -15,11 +15,13 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api
+from jobbrowser.views import job_attempt_logs_json
 
 
 LOG = logging.getLogger(__name__)
@@ -47,6 +49,9 @@ class JobApi(Api):
   def app(self, appid):
     return self._get_api(appid).app(appid)
 
+  def logs(self, appid):
+    return self._get_api(appid).logs(appid)
+
   def _get_api(self, appid):
     return self.impala_api if not appid.startswith('application_') else self.yarn_api
 
@@ -69,7 +74,7 @@ class YarnApi(Api):
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
-    print app.finishedMaps
+
     return {
         'id': app.jobId,
         'name': app.name,
@@ -80,6 +85,19 @@ class YarnApi(Api):
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     }
+
+  def logs(self, appid):
+    # name = 'stdout'
+    # attempt_index
+    # offset=log_offset
+    data = job_attempt_logs_json(YarnRequest(self.user), job=appid)
+    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+
+
+class YarnRequest():
+  def __init__(self, user):
+    self.user = user
+    self.jt = None
 
 
 class YarnAtsApi(Api):

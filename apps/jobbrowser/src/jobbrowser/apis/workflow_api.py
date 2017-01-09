@@ -32,7 +32,7 @@ except Exception, e:
   LOG.exception('Some application are not enabled for Job Browser v2: %s' % e)
 
 
-class BatchApi(Api):
+class WorkflowApi(Api):
 
   def apps(self):
     oozie_api = get_oozie(self.user)
@@ -55,3 +55,6 @@ class BatchApi(Api):
     workflow = oozie_api.get_job(jobid=appid)
 
     return {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status}
+
+  def progress(self, appid):
+    pass
