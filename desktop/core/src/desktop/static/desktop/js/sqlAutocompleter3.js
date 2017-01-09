@@ -206,7 +206,7 @@ var SqlAutocompleter3 = (function () {
     self.handleFunctions(colRefDeferred);
     self.handleDatabases(databasesDeferred);
     var tablesDeferred = self.handleTables(databasesDeferred);
-    var columnsDeferred = self.handleColumns(colRefDeferred);
+    var columnsDeferred = self.handleColumns(colRefDeferred, tablesDeferred);
     self.handleValues(colRefDeferred);
     var pathsDeferred = self.handlePaths();
 
@@ -284,7 +284,13 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     if (self.parseResult.suggestKeywords) {
       var keywordSuggestions = $.map(self.parseResult.suggestKeywords, function (keyword) {
-        return { value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value, meta: AutocompleterGlobals.i18n.meta.keyword, weight: keyword.weight };
+        return {
+          value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
+          meta: AutocompleterGlobals.i18n.meta.keyword,
+          weight: keyword.weight,
+          detailsTemplate: 'keyword',
+          details: null
+        };
       });
       self.entries(self.entries().concat(keywordSuggestions));
     }
@@ -297,7 +303,15 @@ var SqlAutocompleter3 = (function () {
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
           if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [colRef.type.toUpperCase()])) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
-              colRefKeywordSuggestions.push({ value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword, meta: AutocompleterGlobals.i18n.meta.keyword, weight: DEFAULT_WEIGHTS.COLREF_KEYWORD });
+              colRefKeywordSuggestions.push({
+                value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
+                meta: AutocompleterGlobals.i18n.meta.keyword,
+                weight: DEFAULT_WEIGHTS.COLREF_KEYWORD,
+                detailsTemplate: 'keyword',
+                details: {
+                  type: colRef.type
+                }
+              });
             })
           }
         });
@@ -312,7 +326,13 @@ var SqlAutocompleter3 = (function () {
     if (self.parseResult.suggestIdentifiers) {
       var identifierSuggestions = [];
       self.parseResult.suggestIdentifiers.forEach(function (identifier) {
-        identifierSuggestions.push({ value: identifier.name, meta: identifier.type, weight: DEFAULT_WEIGHTS.IDENTIFIER });
+        identifierSuggestions.push({
+          value: identifier.name,
+          meta: identifier.type,
+          weight: DEFAULT_WEIGHTS.IDENTIFIER,
+          detailsTemplate: 'identifier',
+          details: null
+        });
       });
       self.entries(self.entries().concat(identifierSuggestions));
     }
@@ -325,9 +345,21 @@ var SqlAutocompleter3 = (function () {
       self.parseResult.suggestColumnAliases.forEach(function (columnAlias) {
         var type = columnAlias.types && columnAlias.types.length == 1 ? columnAlias.types[0] : 'T';
         if (type === 'COLREF') {
-          columnAliasSuggestions.push({ value: columnAlias.name, meta: AutocompleterGlobals.i18n.meta.alias, weight: DEFAULT_WEIGHTS.COLUMN });
+          columnAliasSuggestions.push({
+            value: columnAlias.name,
+            meta: AutocompleterGlobals.i18n.meta.alias,
+            weight: DEFAULT_WEIGHTS.COLUMN,
+            detailsTemplate: 'column-alias',
+            details: columnAlias
+          });
         } else {
-          columnAliasSuggestions.push({ value: columnAlias.name, meta: type, weight: DEFAULT_WEIGHTS.COLUMN });
+          columnAliasSuggestions.push({
+            value: columnAlias.name,
+            meta: type,
+            weight: DEFAULT_WEIGHTS.COLUMN,
+            detailsTemplate: 'column-alias',
+            details: columnAlias
+          });
         }
       });
       self.entries(self.entries().concat(columnAliasSuggestions));
@@ -343,7 +375,13 @@ var SqlAutocompleter3 = (function () {
         if (expression.prependFrom) {
           prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
         }
-        commonTableExpressionSuggestions.push({ value: prefix + expression.name, meta: AutocompleterGlobals.i18n.meta.commonTableExpression, weight: DEFAULT_WEIGHTS.CTE });
+        commonTableExpressionSuggestions.push({
+          value: prefix + expression.name,
+          meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
+          weight: DEFAULT_WEIGHTS.CTE,
+          detailsTemplate: 'cte',
+          details: null
+        });
       });
       self.entries(self.entries().concat(commonTableExpressionSuggestions));
     }
@@ -356,12 +394,38 @@ var SqlAutocompleter3 = (function () {
       if (self.parseResult.suggestFunctions.types && self.parseResult.suggestFunctions.types[0] === 'COLREF') {
         self.loadingFunctions(true);
         colRefDeferred.done(function (colRef) {
-          SqlFunctions.suggestFunctions(self.snippet.type(), [colRef.type.toUpperCase()], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false, functionSuggestions, DEFAULT_WEIGHTS.UDF);
+          var functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(self.snippet.type(), [colRef.type.toUpperCase()], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false);
+
+          Object.keys(functionsToSuggest).forEach(function (name) {
+            functionSuggestions.push({
+              value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
+              meta: functionsToSuggest[name].returnTypes.join('|'),
+              weight: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+                  return otherType === colRef.type.toUpperCase();
+              }).length > 0 ? DEFAULT_WEIGHTS.UDF + 1 : DEFAULT_WEIGHTS.UDF,
+              detailsTemplate: 'udf',
+              details: functionsToSuggest[name]
+            })
+          });
+
           self.entries(self.entries().concat(functionSuggestions));
           self.loadingFunctions(false);
         });
       } else {
-        SqlFunctions.suggestFunctions(self.snippet.type(), self.parseResult.suggestFunctions.types || ['T'], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false, functionSuggestions, DEFAULT_WEIGHTS.UDF);
+        var types = self.parseResult.suggestFunctions.types || ['T'];
+        var functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(self.snippet.type(), types, self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false);
+
+        Object.keys(functionsToSuggest).forEach(function (name) {
+          functionSuggestions.push({
+            value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
+            meta: functionsToSuggest[name].returnTypes.join('|'),
+            weight: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+              return otherType === types[0].toUpperCase();
+            }).length > 0 ? DEFAULT_WEIGHTS.UDF + 1 : DEFAULT_WEIGHTS.UDF,
+            detailsTemplate: 'udf',
+            details: functionsToSuggest[name]
+          })
+        });
         self.entries(self.entries().concat(functionSuggestions));
       }
     }
@@ -379,7 +443,13 @@ var SqlAutocompleter3 = (function () {
       self.loadingDatabases(true);
       databasesDeferred.done(function (dbs) {
         dbs.forEach(function (db) {
-          databaseSuggestions.push({ value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''), meta: AutocompleterGlobals.i18n.meta.database, weight: DEFAULT_WEIGHTS.DATABASE })
+          databaseSuggestions.push({
+            value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''),
+            meta: AutocompleterGlobals.i18n.meta.database,
+            weight: DEFAULT_WEIGHTS.DATABASE,
+            detailsTemplate: 'database',
+            details: null
+          })
         });
         self.entries(self.entries().concat(databaseSuggestions));
         self.loadingDatabases(false);
@@ -409,7 +479,13 @@ var SqlAutocompleter3 = (function () {
                   suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
                 return;
               }
-              tableSuggestions.push({ value: prefix + self.backTickIfNeeded(tablesMeta.name), meta: AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()], weight: DEFAULT_WEIGHTS.TABLE });
+              tableSuggestions.push({
+                value: prefix + self.backTickIfNeeded(tablesMeta.name),
+                meta: AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()],
+                weight: DEFAULT_WEIGHTS.TABLE,
+                detailsTemplate: 'table',
+                details: tablesMeta
+              });
             });
             self.loadingTables(false);
             self.entries(self.entries().concat(tableSuggestions));
@@ -433,12 +509,12 @@ var SqlAutocompleter3 = (function () {
             fetchTables();
           } else {
             self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-            return self.handleColumns(colRefDeferred);
+            tablesDeferred.resolve([]);
           }
         });
       } else if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length > 1) {
         self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-        return self.handleColumns(colRefDeferred);
+        tablesDeferred.resolve([]);
       } else {
         fetchTables();
       }
@@ -449,42 +525,57 @@ var SqlAutocompleter3 = (function () {
     return tablesDeferred;
   };
 
-  Suggestions.prototype.handleColumns = function (colRefDeferred) {
+  Suggestions.prototype.handleColumns = function (colRefDeferred, tablesDeferred) {
     var self = this;
     var columnsDeferred = $.Deferred();
-    if (self.parseResult.suggestColumns) {
-      var suggestColumns = self.parseResult.suggestColumns;
-      var columnSuggestions = [];
-      // For multiple tables we need to merge and make sure identifiers are unique
-      var columnDeferrals = [];
+    $.when(tablesDeferred).done(function () {
+      if (self.parseResult.suggestColumns) {
+        var suggestColumns = self.parseResult.suggestColumns;
+        var columnSuggestions = [];
+        // For multiple tables we need to merge and make sure identifiers are unique
+        var columnDeferrals = [];
 
-      if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
-        self.loadingColumns(true);
-        colRefDeferred.done(function (colRef) {
-          suggestColumns.tables.forEach(function (table) {
-            columnDeferrals.push(self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions));
+        if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
+          self.loadingColumns(true);
+          colRefDeferred.done(function (colRef) {
+            suggestColumns.tables.forEach(function (table) {
+              columnDeferrals.push(self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions));
+            });
           });
+        } else {
+          self.loadingColumns(true);
+          suggestColumns.tables.forEach(function (table) {
+            columnDeferrals.push(self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions));
+          });
+        }
+
+        $.when.apply($, columnDeferrals).done(function () {
+          self.mergeColumns(columnSuggestions);
+          if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
+            columnSuggestions.push({
+              value: 'BLOCK__OFFSET__INSIDE__FILE',
+              meta: AutocompleterGlobals.i18n.meta.virtual,
+              weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN,
+              detailsTemplate: 'column',
+              details: null
+            });
+            columnSuggestions.push({
+              value: 'INPUT__FILE__NAME',
+              meta: AutocompleterGlobals.i18n.meta.virtual,
+              weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN,
+              detailsTemplate: 'column',
+              details: null
+            });
+          }
+          self.entries(self.entries().concat(columnSuggestions));
+          columnsDeferred.resolve(columnSuggestions);
+          self.loadingColumns(false);
         });
       } else {
-        self.loadingColumns(true);
-        suggestColumns.tables.forEach(function (table) {
-          columnDeferrals.push(self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions));
-        });
+        columnsDeferred.resolve([]);
       }
+    });
 
-      $.when.apply($, columnDeferrals).done(function () {
-        self.mergeColumns(columnSuggestions);
-        if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
-          columnSuggestions.push({ value: 'BLOCK__OFFSET__INSIDE__FILE', meta: AutocompleterGlobals.i18n.meta.virtual, weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN });
-          columnSuggestions.push({ value: 'INPUT__FILE__NAME', meta: AutocompleterGlobals.i18n.meta.virtual, weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN });
-        }
-        self.entries(self.entries().concat(columnSuggestions));
-        columnsDeferred.resolve(columnSuggestions);
-        self.loadingColumns(false);
-      });
-    } else {
-      columnsDeferred.resolve([]);
-    }
     return columnsDeferred;
   };
 
@@ -501,9 +592,23 @@ var SqlAutocompleter3 = (function () {
             // TODO: Potentially fetch column types for sub-queries, possible performance hit.
             var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.alias), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.alias),
+                meta: type,
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (column.identifierChain && column.identifierChain.length > 0) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name), meta: type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
+                meta: type,
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             }
           } else if (column.subQuery && foundSubQuery.subQueries) {
             var foundNestedSubQuery = self.locateSubQuery(foundSubQuery.subQueries, column.subQuery);
@@ -522,40 +627,124 @@ var SqlAutocompleter3 = (function () {
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name) + '[]', meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name) + '[]',
+                meta: 'map',
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (column.type.indexOf('map') === 0) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'map', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name),
+                meta: 'map',
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (column.type.indexOf('struct') === 0) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'struct', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name),
+                meta: 'struct',
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name) + '[]', meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name) + '[]',
+                meta: 'array',
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (column.type.indexOf('array') === 0) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: 'array', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name),
+                meta: 'array',
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN + 1, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name),
+                meta: column.type,
+                weight: DEFAULT_WEIGHTS.COLUMN + 1,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(column.name), meta: column.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(column.name),
+                meta: column.type,
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              })
             }
           });
         } else if (data.columns) {
           data.columns.forEach(function (column) {
-            columnSuggestions.push({ value: self.backTickIfNeeded(column), meta: 'column', weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            columnSuggestions.push({
+              value: self.backTickIfNeeded(column),
+              meta: 'column',
+              weight: DEFAULT_WEIGHTS.COLUMN,
+              table: table,
+              detailsTemplate: 'column',
+              details: column
+            })
           });
         }
         if (data.type === 'map' && self.snippet.type() === 'impala') {
-          columnSuggestions.push({ value: 'key', meta: 'key', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
-          columnSuggestions.push({ value: 'value', meta: 'value', weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+          columnSuggestions.push({
+            value: 'key',
+            meta: 'key',
+            weight: DEFAULT_WEIGHTS.COLUMN,
+            table: table,
+            detailsTemplate: 'column',
+            details: column
+          });
+          columnSuggestions.push({
+            value: 'value',
+            meta: 'value',
+            weight: DEFAULT_WEIGHTS.COLUMN,
+            table: table,
+            detailsTemplate: 'column',
+            details: column
+          });
         }
         if (data.type === 'struct') {
           data.fields.forEach(function (field) {
-            columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table })
+            columnSuggestions.push({
+              value: self.backTickIfNeeded(field.name),
+              meta: field.type,
+              weight: DEFAULT_WEIGHTS.COLUMN,
+              table: table,
+              detailsTemplate: 'column',
+              details: column
+            });
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {
             if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
-              columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+              columnSuggestions.push({
+                value: self.backTickIfNeeded(field.name),
+                meta: field.type,
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              });
             }
           });
         } else if (data.type === 'array' && data.item) {
@@ -563,18 +752,46 @@ var SqlAutocompleter3 = (function () {
             data.item.fields.forEach(function (field) {
               if ((field.type === 'array' || field.type === 'map')) {
                 if (self.snippet.type() === 'hive') {
-                  columnSuggestions.push({ value: self.backTickIfNeeded(field.name) + '[]', meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                  columnSuggestions.push({
+                    value: self.backTickIfNeeded(field.name) + '[]',
+                    meta: field.type,
+                    weight: DEFAULT_WEIGHTS.COLUMN,
+                    table: table,
+                    detailsTemplate: 'column',
+                    details: column
+                  });
                 } else {
-                  columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                  columnSuggestions.push({
+                    value: self.backTickIfNeeded(field.name),
+                    meta: field.type,
+                    weight: DEFAULT_WEIGHTS.COLUMN,
+                    table: table,
+                    detailsTemplate: 'column',
+                    details: column
+                  });
                 }
               } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                   SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
-                columnSuggestions.push({ value: self.backTickIfNeeded(field.name), meta: field.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+                columnSuggestions.push({
+                  value: self.backTickIfNeeded(field.name),
+                  meta: field.type,
+                  weight: DEFAULT_WEIGHTS.COLUMN,
+                  table: table,
+                  detailsTemplate: 'column',
+                  details: column
+                });
               }
             });
           } else if (typeof data.item.type !== 'undefined') {
             if (SqlFunctions.matchesType(self.snippet.type(), types, [data.item.type.toUpperCase()])) {
-              columnSuggestions.push({ value: 'item', meta: data.item.type, weight: DEFAULT_WEIGHTS.COLUMN, table: table });
+              columnSuggestions.push({
+                value: 'item',
+                meta: data.item.type,
+                weight: DEFAULT_WEIGHTS.COLUMN,
+                table: table,
+                detailsTemplate: 'column',
+                details: column
+              });
             }
           }
         }
@@ -629,7 +846,13 @@ var SqlAutocompleter3 = (function () {
     if (suggestValues) {
       var valueSuggestions = [];
       if (self.parseResult.colRef && self.parseResult.colRef.identifierChain) {
-        valueSuggestions.push({ value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}', meta: AutocompleterGlobals.i18n.meta.variable, weight: DEFAULT_WEIGHTS.VARIABLE });
+        valueSuggestions.push({
+          value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}',
+          meta: AutocompleterGlobals.i18n.meta.variable,
+          weight: DEFAULT_WEIGHTS.VARIABLE,
+          detailsTemplate: 'variable',
+          details: null
+        });
       }
       colRefDeferred.done(function (colRef) {
         if (colRef.sample) {
@@ -637,7 +860,13 @@ var SqlAutocompleter3 = (function () {
           var startQuote = suggestValues.partialQuote ? '' : '\'';
           var endQuote = typeof suggestValues.missingEndQuote !== 'undefined' && suggestValues.missingEndQuote === false ? '' : suggestValues.partialQuote || '\'';
           colRef.sample.forEach(function (sample) {
-            valueSuggestions.push({ value: isString ? startQuote + sample + endQuote : new String(sample), meta: AutocompleterGlobals.i18n.meta.value, weight: DEFAULT_WEIGHTS.SAMPLE })
+            valueSuggestions.push({
+              value: isString ? startQuote + sample + endQuote : new String(sample),
+              meta: AutocompleterGlobals.i18n.meta.value,
+              weight: DEFAULT_WEIGHTS.SAMPLE,
+              detailsTemplate: 'value',
+              details: null
+            })
           });
         }
         self.entries(self.entries().concat(valueSuggestions));
@@ -667,7 +896,9 @@ var SqlAutocompleter3 = (function () {
                 pathSuggestions.push({
                   value: suggestHdfs.path === '' ? '/' + file.name : file.name,
                   meta: file.type,
-                  weight: DEFAULT_WEIGHTS.HDFS
+                  weight: DEFAULT_WEIGHTS.HDFS,
+                  detailsTemplate: 'hdfs',
+                  details: file
                 });
               }
             });
