@@ -1512,6 +1512,7 @@ var ApiHelper = (function () {
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
+   * @param {number} options.timeout
    * @param {Object[]} options.tables
    * @param {Object[]} options.tables.identifierChain
    * @param {string} options.tables.identifierChain.name
