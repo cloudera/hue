@@ -37,7 +37,7 @@ from desktop.views import _ko
     }
 
     .autocompleter-header {
-      flex: 1 1 30px;
+      flex: 1 1 22px;
       padding: 5px;
     }
 
@@ -63,11 +63,18 @@ from desktop.views import _ko
       background-color: #DBE8F1;
     }
 
+    .autocompleter-spinner {
+      position: relative;
+      float: right;
+      width: 15px;
+      margin-top: 1px;
+    }
+
   </style>
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
-      <div class="autocompleter-header"><div class="pull-right">header</div></div>
+      <div class="autocompleter-header"><div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div></div>
       <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
         <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }"><div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div><div class="pull-right" data-bind="text: meta"></div></div>
       </div>
