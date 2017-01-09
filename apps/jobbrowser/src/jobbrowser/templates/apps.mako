@@ -294,14 +294,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <li><a href="#job-mapreduce-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
   </ul>
 
-  <div class="tab-content" id="job-mapreduce-page-logs">
-    %for name in ['stdout', 'stderr', 'syslog']:
+  <div class="tab-content active" id="job-mapreduce-page-logs">
+    % for name in ['stdout', 'stderr', 'syslog']:
       <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
     % endfor
     </br>
 
-    <pre data-bind="html: logs['default']">
-    </pre>
+    <pre data-bind="html: logs['default']"></pre>
   </div>
 
   <div class="tab-content" id="job-mapreduce-page-attempts">
@@ -378,7 +377,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
   
   </br></br>
-  <span>
   Variables</br>
   Duration 8s</br>
   </br></br>
@@ -389,36 +387,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   Stop | Resume
 
-  </br>
+  <br/>
 
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Graph') }</a></li>
-    <li><a href="#job-mapreduce-page-attempts" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#job-mapreduce-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#job-mapreduce-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
+    <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
+    <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
+    <li><a href="#workflow-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
   </ul>
 
-  <div class="tab-content" id="job-mapreduce-page-logs">
-    <table class="table table-condensed">
-    </table>
+  <div class="tab-content active" id="workflow-page-graph">
+    Graph
   </div>
 
-  <div class="tab-content" id="job-mapreduce-page-attempts">
-    <table class="table table-condensed">
-    </table>
+  <div class="tab-content" id="workflow-page-logs">
+    <pre data-bind="html: logs['default']"></pre>
   </div>
 
-  <div class="tab-content" id="job-mapreduce-page-tasks">
+  <div class="tab-content" id="workflow-page-tasks">
     <table class="table table-condensed">
     </table>
   </div>
   
-  <div class="tab-content" id="job-mapreduce-page-metadata">
-    <table class="table table-condensed">
-    </table>
-  </div>
-  
-  <div class="tab-content" id="job-mapreduce-page-counters">
+  <div class="tab-content" id="workflow-page-metadata">
     <table class="table table-condensed">
     </table>
   </div>

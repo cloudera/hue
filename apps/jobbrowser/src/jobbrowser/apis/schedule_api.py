@@ -23,6 +23,7 @@ from liboozie.oozie_api import get_oozie
 from notebook.connectors.oozie_batch import OozieApi
 
 from jobbrowser.apis.base_api import Api
+from oozie.views.dashboard import get_oozie_job_log
 
 
 LOG = logging.getLogger(__name__)

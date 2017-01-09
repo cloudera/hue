@@ -16,10 +16,11 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api
+from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from liboozie.oozie_api import get_oozie
 from notebook.connectors.oozie_batch import OozieApi
 
@@ -28,6 +29,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
+  from oozie.views.dashboard import get_oozie_job_log
 except Exception, e:
   LOG.exception('Some application are not enabled for Job Browser v2: %s' % e)
 
@@ -56,5 +58,7 @@ class WorkflowApi(Api):
 
     return {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status}
 
-  def progress(self, appid):
-    pass
+  def logs(self, appid):
+    data = get_oozie_job_log(MockDjangoRequest(self.user), job_id=appid)
+
+    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
