@@ -84,17 +84,45 @@ from desktop.views import _ko
       overflow-y: auto;
     }
 
+    .autocompleter-categories {
+      display: inline-block;
+    }
+
+    .autocompleter-categories > div {
+      display: inline-block;
+      line-height: 14px;
+      border-bottom: 1px solid transparent;
+      cursor: pointer;
+      padding: 0 3px;
+    }
+
+    .autocompleter-categories > div.active {
+      display: inline-block;
+      border-bottom: 1px solid #338BB8;
+      cursor: default;
+    }
+
+    .autocompleter-suggestion {
+      font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
+    }
   </style>
 
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
-      <div class="autocompleter-header"><div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div></div>
+      <div class="autocompleter-header">
+        <!-- ko if: suggestions.availableCategories().length > 1 -->
+        <div class="autocompleter-categories" data-bind="foreach: suggestions.availableCategories()">
+          <div data-bind="text: label, css: { 'active': $parent.suggestions.activeCategory() === $data }, click: function (data, event) { $parent.suggestions.activeCategory($data); event.stopPropagation(); }"></div>
+        </div>
+        <!-- /ko -->
+        <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
+      </div>
       <div class="autocompleter-entries">
         <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
           <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }">
-            <div class="pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
-            <div class="pull-right" data-bind="text: meta"></div>
+            <div class="autocompleter-suggestion pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
+            <div class="autocompleter-suggestion pull-right" data-bind="text: meta"></div>
           </div>
         </div>
         <!-- ko if: selectedEntry() && selectedEntry().details -->
