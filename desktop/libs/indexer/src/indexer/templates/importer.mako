@@ -528,7 +528,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
-            <h3 class="card-heading simple">${_('Fields')}</h3>
+            <h3 class="card-heading simple">${_('Fields')} <a class="inactive-action pointer" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body">
               <form class="form-inline" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
@@ -603,6 +603,22 @@ ${ assist.assistPanel() }
       <div id="importerNotebook"></div>
     </div>
   </div>
+
+  <div id="fieldsBulkEditor" class="modal hide fade">
+    <div class="modal-header">
+      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <h3>${ _('Write or paste comma separated field names') }</h3>
+    </div>
+    <div class="modal-body">
+      <input type="text" class="input-xxlarge" placeholder="${ _('e.g. id, name, salary') }" data-bind="textInput: createWizard.destination.bulkColumnNames">
+    </div>
+    <div class="modal-footer">
+      <button class="btn" data-dismiss="modal" aria-hidden="true">${ _('Cancel') }</button>
+      <button class="btn btn-primary" data-bind="click: createWizard.destination.processBulkColumnNames">${ _('Change field names') }</button>
+    </div>
+  </div>
+
+
 </script>
 
 
@@ -1126,6 +1142,34 @@ ${ assist.assistPanel() }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
+      self.bulkColumnNames = ko.observable('');
+
+      self.columns.subscribe(function (newVal) {
+        self.bulkColumnNames(newVal.map(function (item) {
+          return item.name()
+        }).join(','));
+      });
+
+      self.processBulkColumnNames = function () {
+        var val = self.bulkColumnNames();
+        try {
+          if (val.indexOf("\"") == -1 && val.indexOf("'") == -1) {
+            val = '"' + val.replace(/,/gi, '","') + '"';
+          }
+          if (val.indexOf("[") == -1) {
+            val = "[" + val + "]";
+          }
+          var parsed = JSON.parse(val);
+          self.columns().forEach(function (item, cnt) {
+            if ($.trim(parsed[cnt]) !== '') {
+              item.name($.trim(parsed[cnt]));
+            }
+          });
+        }
+        catch (err) {
+        }
+        $('#fieldsBulkEditor').modal('hide');
+      }
 
       self.isTargetExisting = ko.observable();
       self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
