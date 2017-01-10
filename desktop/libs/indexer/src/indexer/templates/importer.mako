@@ -779,6 +779,18 @@ ${ assist.assistPanel() }
   (function () {
     ko.options.deferUpdates = true;
 
+    var MAPPINGS = {
+      SOLR_TO_HIVE: {
+        "string": "string",
+        "long": "bigint",
+        "double": "double",
+        "date": "date"
+      },
+      get: function(type, key, defaultValue) {
+        return type[key] || defaultValue
+      }
+    }
+
     var fieldNum = 0;
 
     var getNewFieldName = function () {
@@ -1085,6 +1097,9 @@ ${ assist.assistPanel() }
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable('table');
+      self.outputFormat.subscribe(function () {
+        wizard.guessFieldTypes();
+      });
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
           {'name': 'Solr index', 'value': 'index'},
@@ -1251,9 +1266,6 @@ ${ assist.assistPanel() }
 
       self.isGuessingFormat = ko.observable(false);
       self.guessFormat = function () {
-        self._guessIndexFormat();
-      }
-      self._guessIndexFormat = function () {
         self.isGuessingFormat(true);
         self.destination.columns.removeAll();
         $.post("${ url('indexer:guess_format') }", {
@@ -1272,11 +1284,8 @@ ${ assist.assistPanel() }
       };
 
       self.isGuessingFieldTypes = ko.observable(false);
-      self.guessFieldTypes = function () {
-        self._guessIndexFieldTypes();
-      }
 
-      self._guessIndexFieldTypes = function () {
+      self.guessFieldTypes = function () {
         if (guessFieldTypesXhr) {
           guessFieldTypesXhr.abort();
         }
@@ -1285,6 +1294,9 @@ ${ assist.assistPanel() }
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
           resp.columns.forEach(function (entry, i, arr) {
+            if (self.destination.outputFormat() === 'table'){
+              entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
+            }
             arr[i] = loadField(entry, self.destination.columns, i);
           });
           self.source.sampleCols(resp.sample_cols);

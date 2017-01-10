@@ -493,7 +493,7 @@ class HiveFormat(CSVFormat):
     "DATE_TYPE": "date",
     "boolean": "string",
     "tinyint": "long",
-    "samllint": "long",
+    "smallint": "long",
     "int": "long",
     "bigint": "long",
     "float": "double",
