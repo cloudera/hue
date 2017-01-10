@@ -668,7 +668,7 @@ ${ assist.assistPanel() }
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
       <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
     <!-- /ko -->
-    <!-- ko if: level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
+    <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
       <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
       <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
     <!-- /ko -->
