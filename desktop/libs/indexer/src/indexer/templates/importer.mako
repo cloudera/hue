@@ -466,8 +466,8 @@ ${ assist.assistPanel() }
               <!-- ko if: tableFormat() != 'kudu' -->
               <div style="display: inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
+                  <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
-                  <a class="pointer inline-block" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
                   <div class="clearfix"></div>
                 </div>
                 <a data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
@@ -630,6 +630,7 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="table-field-template">
+  <div>
   <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="textInput: name">
   </label>
@@ -641,19 +642,13 @@ ${ assist.assistPanel() }
   <!-- ko if: level() > 0 && $parent.type() == 'map' -->
     <select class="input-small" data-bind="selectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
     <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
-
   <!-- /ko -->
-  <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
 
-  <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
-    <div data-bind="template: { name: 'table-field-template', foreach: nested }">
-    </div>
-    <a data-bind="click: function() { nested.push($root.loadDefaultField({level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
-  <!-- /ko -->
+    <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
   </label>
 
   <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-    ${_('Comment')}
+##     ${_('Comment')}
   </span>
 
   <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
@@ -664,6 +659,12 @@ ${ assist.assistPanel() }
     <label data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]" class="muted"></label> &nbsp;&nbsp;
     <label data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]" class="muted"></label>
   <!-- /ko -->
+
+  <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
+    <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
+    <a data-bind="click: function() { nested.push($root.loadDefaultField({level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
+  <!-- /ko -->
+  </div>
 </script>
 
 
