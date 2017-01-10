@@ -177,7 +177,10 @@ var SqlAutocompleter3 = (function () {
           }
         }
       });
-      var result = Object.values(newCategories);
+      var result = [];
+      Object.keys(newCategories).forEach(function (key) {
+        result.push(newCategories[key]);
+      });
       result.sort(function (a, b) { return a.label.localeCompare(b.label)});
       result.unshift(CATEGORIES.ALL);
       return result;
