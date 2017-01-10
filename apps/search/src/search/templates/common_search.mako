@@ -41,7 +41,7 @@ from desktop.views import commonheader, commonfooter, _ko
         <!-- /ko -->
       <!-- /ko -->
 
-      <button type="submit" id="search-btn" class="btn btn-inverse add-on">
+      <button type="submit" id="search-btn" class="btn add-on">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i>
       </button>
@@ -49,39 +49,7 @@ from desktop.views import commonheader, commonfooter, _ko
     </div>
   </form>
 %else:
-<div class="page-header search-bar" data-bind="visible: ! $root.isPlayerMode()">
-  <div class="pull-right">
-    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
-      <i class="fa fa-pencil"></i>
-    </a>
-    % if is_owner:
-    <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-save"></i>
-    </a>
-    % endif
-    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
-      <i class="fa fa-expand"></i>
-    </a>
-    &nbsp;&nbsp;&nbsp;
-    <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
-        data-bind="css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-cog"></i>
-    </a>
-    <a class="btn pointer" title="${ _('Query Definitions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#qdefinitionsDemiModal"
-        data-bind="css: {'btn': true}, visible: columns().length != 0">
-      <i class="fa fa-bookmark-o"></i>
-    </a>
-
-    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
-
-    <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-file-o"></i>
-    </a>
-    <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i>
-    </a>
-  </div>
-
+<div class="page-header search-bar flex-space-between" data-bind="visible: ! $root.isPlayerMode()">
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select a search index') }
     <!-- ko if: columns().length == 0 -->
@@ -119,7 +87,7 @@ from desktop.views import commonheader, commonfooter, _ko
 
       <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
 
-      <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
+      <button type="submit" id="search-btn" class="btn" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
@@ -131,6 +99,39 @@ from desktop.views import commonheader, commonfooter, _ko
 
     <span data-bind="template: {name: 'nested-document-filter'}"></span>
   </form>
+
+  <div>
+    <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'active': isEditing}">
+      <i class="fa fa-pencil"></i>
+    </a>
+    % if is_owner:
+    <a class="btn pointer" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: save, css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-save"></i>
+    </a>
+    % endif
+    <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
+      <i class="fa fa-expand"></i>
+    </a>
+    &nbsp;&nbsp;&nbsp;
+    <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
+        data-bind="css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-cog"></i>
+    </a>
+    <a class="btn pointer" title="${ _('Query Definitions') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#qdefinitionsDemiModal"
+        data-bind="css: {'btn': true}, visible: columns().length != 0">
+      <i class="fa fa-bookmark-o"></i>
+    </a>
+
+    <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
+
+    <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-file-o"></i>
+    </a>
+    <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-tags"></i>
+    </a>
+  </div>
+
 </div>
 %endif
 
@@ -1495,7 +1496,7 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
           <a href="javascript: void(0)" class="btn btn-mini"
-            data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': template.fields().length > 0 }"
+            data-bind="click: toggleGridFieldsSelection, css: { 'active': template.fields().length > 0 }"
             style="margin-right: 2px;">
             <i class="fa fa-square-o"></i>
           </a>

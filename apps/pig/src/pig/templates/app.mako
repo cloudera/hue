@@ -387,7 +387,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                         <button class="btn fileChooserBtn" data-bind="click: $root.showFileChooser">..</button>
                       </div>
                     </td>
-                    <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i> ${ _('Remove') }</button></td>
+                    <td><button data-bind="click: viewModel.currentScript().removeParameter" class="btn"><i class="fa fa-trash-o"></i></button></td>
                   </tr>
                 </tbody>
                 <tfoot data-bind="visible: currentScript().parameters().length > 0">

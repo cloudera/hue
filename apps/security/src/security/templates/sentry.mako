@@ -212,12 +212,12 @@ ${ layout.menubar(section=component) }
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
                   <!-- ko if: $root.component() == 'solr' -->
-                  <a data-bind="attr: { href: $root.assist.indexerPath() }" target="_blank" title="${ _('Open in Indexer') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: $root.assist.indexerPath() }" target="_blank" title="${ _('Open in Indexer') }" class="btn">
                     <i class="fa fa-external-link"></i>
                   </a>
                   <!-- /ko -->
                   <!-- ko ifnot: $root.component() == 'solr' -->
-                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn">
                     <i class="fa fa-external-link"></i>
                   </a>
                   <!-- /ko -->

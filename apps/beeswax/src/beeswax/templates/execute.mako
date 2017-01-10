@@ -688,7 +688,7 @@ ${ layout.menubar(section='query') }
       <a href="#" class="close" data-dismiss="modal"></a>
       <h3 class="modal-title">${_('Save Query Results')}</h3>
     </div>
-    <div class="modal-body" style="padding: 4px">
+    <div class="modal-body">
       <!-- ko if: $root.design.results.save.saveTargetError() -->
         <h4 data-bind="text: $root.design.results.save.saveTargetError()"></h4>
       <!-- /ko -->

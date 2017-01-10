@@ -306,7 +306,7 @@ from django.utils.translation import ugettext as _
           </tbody>
         </table>
       </div>
-      <div class="modal-footer" style="padding-top: 10px;">
+      <div class="modal-footer">
         <a class="btn btn-link" onclick="$('#changePermissionModal').modal('hide');">${_('Cancel')}</a>
         <input class="btn btn-primary" type="submit" value="${_('Submit')}"/>
       </div>

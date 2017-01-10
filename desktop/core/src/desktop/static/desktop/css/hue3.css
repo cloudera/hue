@@ -3338,10 +3338,6 @@ input[type='password']::-ms-reveal {
 }
 
 .page-header .nav-tabs {
-  display: inline-block;
-  position: relative;
-  top: 16px;
-  margin-bottom: 0;
   margin-left: 16px;
 }
 

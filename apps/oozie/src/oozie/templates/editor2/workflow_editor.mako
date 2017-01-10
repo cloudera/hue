@@ -40,7 +40,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       ${ _('Unsaved') }
     </div>
 
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'active': isEditing}, visible: canEdit">
       <i class="fa fa-fw fa-pencil"></i>
     </a>
 
@@ -376,7 +376,7 @@ ${ workflow.render() }
 </div>
 
 <div id="settingsModal" class="modal fade hide">
-  <div class="modal-header" style="padding-bottom: 2px">
+  <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
     <h3 class="modal-title">${ _('Workflow Settings') }</h3>
   </div>
@@ -432,7 +432,7 @@ ${ workflow.render() }
 
 
 <div id="historyModal" class="modal fade hide">
-  <div class="modal-header" style="padding-bottom: 2px">
+  <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
     <h3 class="modal-title">${ _('Submission History') }</h3>
   </div>

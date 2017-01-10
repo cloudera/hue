@@ -52,7 +52,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
         <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-        <a class="btn btn-status btn-inverse disable-feedback" data-value="killed">${ _('Killed') }</a>
+        <a class="btn btn-status btn-info danger disable-feedback" data-value="killed">${ _('Killed') }</a>
       </span>
       &nbsp;&nbsp;${_('in the last')} <input id="timeValue" class="input-mini no-margin" type="number" value="7" min="1" max="3650">
       <select id="timeUnit" class="input-small no-margin">
@@ -236,7 +236,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     function getJobRow(job) {
       var _killCell = "";
       if (job.canKill) {
-        _killCell = '<a class="btn btn-small btn-inverse kill" ' +
+        _killCell = '<a class="btn btn-small btn-danger kill" ' +
                 'href="javascript:void(0)" ' +
                 'data-url="' + job.url + '" ' +
                 'data-killUrl="' + job.killUrl + '" ' +
@@ -270,7 +270,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       jobTable.fnUpdate('<span title="' + emptyStringIfNull(job.durationMs) + '">' + emptyStringIfNull(job.durationFormatted) + '</span>', row, 10, false);
       var _killCell = "";
       if (job.canKill) {
-        _killCell = '<a class="btn btn-small btn-inverse kill" ' +
+        _killCell = '<a class="btn btn-small btn-danger kill" ' +
                 'href="javascript:void(0)" ' +
                 'data-url="' + job.url + '" ' +
                 'data-killurl="' + job.killUrl + '" ' +

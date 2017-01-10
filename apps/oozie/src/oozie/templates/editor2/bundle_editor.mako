@@ -38,7 +38,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-play"></i>
     </a>
 
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'active': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
 
@@ -175,7 +175,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 
 <div id="settingsModal" class="modal hide fade">
-  <div class="modal-header" style="padding-bottom: 2px">
+  <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-hidden="true"></button>
     <h3 class="modal-title" id="myModalLabel">${ _('Settings') }</h3>
   </div>

@@ -216,7 +216,7 @@ except ImportError, e:
         <a href="#" class="close" data-dismiss="modal"></a>
         <h3 class="modal-title">${_('Save query result in a')}</h3>
       </div>
-      <div class="modal-body" style="padding: 4px">
+      <div class="modal-body">
         <form id="saveResultsForm" method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>

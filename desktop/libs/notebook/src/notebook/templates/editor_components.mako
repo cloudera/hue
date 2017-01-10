@@ -1112,7 +1112,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                <div style="width:100%;">
                  <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
                </div>
-               <div style="clear:both; padding-left: 120px;">
+               <div style="clear:both;">
                  <!-- ko if: availableNewProperties().length -->
                  <select data-bind="options: availableNewProperties,
                           optionsText: 'nice_name',

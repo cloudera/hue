@@ -41,7 +41,7 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
       <i class="fa fa-play"></i>
     </a>
 
-    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}, visible: canEdit">
+    <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'active': isEditing}, visible: canEdit">
       <i class="fa fa-pencil"></i>
     </a>
 

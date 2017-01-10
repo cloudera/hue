@@ -97,7 +97,7 @@ ${ layout.menubar(section='hdfs') }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" data-bind="value: $root.assist.path" autocomplete="off" />
-                  <a data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn btn-inverse">
+                  <a data-bind="attr: { href: '/filebrowser/view=' + $root.assist.path() }" target="_blank" title="${ _('Open in File Browser') }" class="btn">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>

@@ -88,7 +88,7 @@ ${ commonheader(None, "impala", user, request) | n,unicode }
 <div class="search-bar">
   <div class="pull-right" style="padding-right:50px">
     % if user.is_superuser:
-      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}"><i class="fa fa-pencil"></i></a>
+      <a title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'active': isEditing}"><i class="fa fa-pencil"></i></a>
       &nbsp;&nbsp;&nbsp;
       <button type="button" title="${ _('Save') }" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: $root.save, css: {'btn': true}"><i class="fa fa-save"></i></button>
       <a class="btn" href="${ url('impala:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}"><i class="fa fa-file-o"></i></a>
@@ -113,7 +113,7 @@ ${ commonheader(None, "impala", user, request) | n,unicode }
     <div class="input-append">
       <span data-bind="foreach: query.qs">
         <input data-bind="clearable: q" maxlength="4096" type="text" class="search-query input-xlarge">
-        <button type="submit" id="search-btn" class="btn btn-inverse"><i class="fa fa-search"></i></button>
+        <button type="submit" id="search-btn" class="btn active"><i class="fa fa-search"></i></button>
       </span>
     </div>
   </form>
@@ -140,7 +140,7 @@ ${ dashboard.layout_skeleton() }
     </div>
     <div style="border-bottom: 1px solid #CCC; padding-bottom: 4px;">
       <a href="javascript: void(0)" class="btn btn-mini"
-        data-bind="click: toggleGridFieldsSelection, css: { 'btn-inverse': $root.dashboard.resultsetSelectedFields().length == $root.dashboard.fields().length }"
+        data-bind="click: toggleGridFieldsSelection, css: { 'active': $root.dashboard.resultsetSelectedFields().length == $root.dashboard.fields().length }"
         style="margin-right: 2px;">
         <i class="fa fa-square-o"></i>
       </a>
