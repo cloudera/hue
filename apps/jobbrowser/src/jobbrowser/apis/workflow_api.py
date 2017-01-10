@@ -64,7 +64,7 @@ class WorkflowApi(Api):
 
     return common
 
-  def logs(self, appid):
+  def logs(self, appid, app_type):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 

@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
-from jobbrowser.views import job_attempt_logs_json
+from jobbrowser.views import job_attempt_logs_json, tasks
 
 
 LOG = logging.getLogger(__name__)
@@ -51,6 +51,9 @@ class JobApi(Api):
 
   def logs(self, appid):
     return self._get_api(appid).logs(appid)
+
+  def profile(self, appid, app_type, property):
+    return self._get_api(appid).logs(appid, app_type, property)
 
   def _get_api(self, appid):
     return self.impala_api if not appid.startswith('application_') else self.yarn_api
@@ -86,7 +89,7 @@ class YarnApi(Api):
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     }
-    
+
     if app.applicationType == 'MR2':
       common['type'] = 'MAPREDUCE'
       common['duration'] = app.duration
@@ -102,12 +105,22 @@ class YarnApi(Api):
       }
     return common
 
-  def logs(self, appid):
-    # name = 'stdout'
-    # attempt_index
-    # offset=log_offset
-    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
-    return {'progress': 0, 'logs': {'default': json.loads(response.content)['log']}}
+  def logs(self, appid, app_type):
+    if app_type == 'MAPREDUCE':
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
+      logs = json.loads(response.content)['log']
+    else:
+      logs = None
+    return {'progress': 0, 'logs': {'default': logs}}
+
+
+  def profile(self, appid, app_type, property):
+    if app_type == 'MAPREDUCE':
+      if property == 'tasks':
+        response = tasks(MockDjangoRequest(self.user), job=appid)
+        print response.context['task_list']
+
+    return {}
 
 
 class YarnAtsApi(Api):

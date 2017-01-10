@@ -381,7 +381,7 @@ def list_oozie_workflow(request, job_id):
 
 
   if request.GET.get('format') == 'json':
-    if not workflow_graph and request.GET.get('is_jb2'):      
+    if not workflow_graph and request.GET.get('is_jb2'):
       workflow_graph = django_mako.render_to_string('dashboard/list_oozie_workflow_graph.mako', {})
     return_obj = {
       'id': oozie_workflow.id,

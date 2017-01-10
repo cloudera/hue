@@ -192,12 +192,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="breadcrumbs">
-  
+
   <h2 data-bind="foreach: breadcrumbs">
     <!-- ko if: $index() > 0 -->
       &gt;
     <!-- /ko -->
-    
+
     ## TODO: no link on last item
 
     <!-- ko if: id.length == 0 -->
@@ -208,7 +208,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       :
       <span data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().fetchJob(id); }"></span>
     <!-- /ko -->
-  </h2> 
+  </h2>
 </script>
 
 
@@ -219,7 +219,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <span data-bind="text: paginationOffset() * paginationResultPage()"></span>
   of
   <span data-bind="text: paginationResultCounts"></span>
-  
+
   Show
   <span data-bind="text: paginationOffset"></span>
   results by page.
@@ -270,11 +270,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
   </br></br>
-  
+
   <!-- ko with: properties -->
   Map <span data-bind="text: maps_percent_complete"></span> <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span>
   Reduce <span data-bind="text: reduces_percent_complete"></span> <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span><br/>
-  Duration <span data-bind="text: $parent.duration"></span><br/>  
+  Duration <span data-bind="text: $parent.duration"></span><br/>
   <!-- /ko -->
   </br></br>
 
@@ -288,39 +288,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   <ul class="nav nav-tabs">
     <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#job-mapreduce-page-attempts" data-toggle="tab">${ _('Attempts') }</a></li>
     <li><a href="#job-mapreduce-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
     <li><a href="#job-mapreduce-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
     <li><a href="#job-mapreduce-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
   </ul>
 
-  <div class="tab-content active" id="job-mapreduce-page-logs">
-    % for name in ['stdout', 'stderr', 'syslog']:
-      <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
-    % endfor
-    </br>
+  <div class="tab-content">
+    <div class="tab-pane active" id="job-mapreduce-page-logs">
+      % for name in ['stdout', 'stderr', 'syslog']:
+        <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+      % endfor
+      </br>
 
-    <pre data-bind="html: logs['default']"></pre>
-  </div>
+      <pre data-bind="html: logs['default']"></pre>
+    </div>
 
-  <div class="tab-content" id="job-mapreduce-page-attempts">
-    <table class="table table-condensed">
-    </table>
-  </div>
+    <div class="tab-pane" id="job-mapreduce-page-tasks">
+      <table class="table table-condensed">
+      </table>
+    </div>
 
-  <div class="tab-content" id="job-mapreduce-page-tasks">
-    <table class="table table-condensed">
-    </table>
-  </div>
-  
-  <div class="tab-content" id="job-mapreduce-page-metadata">
-    <table class="table table-condensed">
-    </table>
-  </div>
-  
-  <div class="tab-content" id="job-mapreduce-page-counters">
-    <table class="table table-condensed">
-    </table>
+    <div class="tab-pane" id="job-mapreduce-page-metadata">
+      <table class="table table-condensed">
+      </table>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-page-counters">
+      <table class="table table-condensed">
+      </table>
+    </div>
   </div>
 
 </script>
@@ -328,14 +324,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="job-mapreduce-task-page">
   <h2>MapReduce Task</h2>
   <br/>
-  
+
   Task Attemps | Metadata | Counters
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
   <h2>MapReduce Task attempt</h2>
   <br/>
-  
+
   Container | Metadata | Counters
 </script>
 
@@ -375,12 +371,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
-  
+
   </br></br>
   Variables</br>
   Duration 8s</br>
   </br></br>
-  
+
   <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
@@ -396,22 +392,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <li><a href="#workflow-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
   </ul>
 
-  <div class="tab-content active" id="workflow-page-graph">
-    <span data-bind="html: properties().graph"></span>
-  </div>
+  <div class="tab-content">
+    <div class="tab-pane active" id="workflow-page-graph">
+      <span data-bind="html: properties().graph"></span>
+    </div>
 
-  <div class="tab-content" id="workflow-page-logs">
-    <pre data-bind="html: logs['default']"></pre>
-  </div>
+    <div class="tab-pane" id="workflow-page-logs">
+      <pre data-bind="html: logs['default']"></pre>
+    </div>
 
-  <div class="tab-content" id="workflow-page-tasks">
-    <table class="table table-condensed">
-    </table>
-  </div>
-  
-  <div class="tab-content" id="workflow-page-metadata">
-    <table class="table table-condensed">
-    </table>
+    <div class="tab-pane" id="workflow-page-tasks">
+      <table class="table table-condensed">
+      </table>
+    </div>
+
+    <div class="tab-pane" id="workflow-page-metadata">
+      <table class="table table-condensed">
+      </table>
+    </div>
   </div>
 
 </script>
@@ -511,10 +509,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         $.post("/jobbrowser/api/job/logs", {
           appid: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
+          type: ko.mapping.toJSON(self.type),
           name: name ? name : 'default'
         }, function (data) {
           if (data.status == 0) {
             self.logs['default'](data.logs.logs['default'])
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).always(function () {
+        });
+      };
+
+      self.fetchProfile = function (name) {
+        $.post("/jobbrowser/api/job/profile", {
+          appid: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(vm.interface),
+          type: ko.mapping.toJSON(self.type),
+          name: name
+        }, function (data) {
+          if (data.status == 0) {
+            self.properties['default'](data.logs.logs['default']);
           } else {
             $(document).trigger("error", data.message);
           }
