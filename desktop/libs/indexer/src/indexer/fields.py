@@ -64,7 +64,7 @@ class Field(object):
       'nested': [],
       'level': 0,
       'length': 100,
-      'keyType': '',
+      'keyType': 'string',
       'isPartition': False
     }
 

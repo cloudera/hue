@@ -438,14 +438,14 @@ ${ assist.assistPanel() }
               <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
             </label>
 
-            <label class="checkbox">
+            <label class="checkbox" data-bind="visible: $parent.createWizard.source.inputFormat() == 'table'">
               <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
             </label>
 
-            <label class="checkbox">
+            <label class="checkbox" data-bind="visible: tableFormat() == 'text'">
               <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
             </label>
-            <span data-bind="visible: useCustomDelimiters">
+            <span data-bind="visible: useCustomDelimiters" data-bind="visible: tableFormat() == 'text'">
               <div class="control-group">
                 <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
                   <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
@@ -662,7 +662,7 @@ ${ assist.assistPanel() }
     </label>
 
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-  ##     ${_('Comment')}
+       ${_('Comment')}
     </span>
 
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
@@ -986,6 +986,7 @@ ${ assist.assistPanel() }
 
       self.inputFormat = ko.observable('file');
       self.inputFormat.subscribe(function(val) {
+        wizard.destination.columns.removeAll();
         if (val == 'query') {
           self.getDocuments();
         }
