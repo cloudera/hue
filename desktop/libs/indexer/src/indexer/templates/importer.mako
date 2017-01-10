@@ -439,6 +439,10 @@ ${ assist.assistPanel() }
             </label>
 
             <label class="checkbox">
+              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
+            </label>
+
+            <label class="checkbox">
               <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
             </label>
             <span data-bind="visible: useCustomDelimiters">
@@ -470,10 +474,6 @@ ${ assist.assistPanel() }
                 <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
               </label>
             </div>
-
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
-            </label>
 
             <label class="control-label"><div>${ _('Partitions') }</div>
 
@@ -1217,6 +1217,11 @@ ${ assist.assistPanel() }
         return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default';
       });
       self.tableFormat = ko.observable('text');
+      self.tableFormat.subscribe(function(newVal) {
+        if (newVal == 'kudu' && self.kuduPartitionColumns().length == 0) {
+          self.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16}));
+        }
+      });
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
