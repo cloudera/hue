@@ -259,7 +259,6 @@
   <link rel="stylesheet" href="${ static('desktop/css/nv.d3.css') }">
 
   <script src="${ static('desktop/js/hue.geo.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/js/hue.colors.js') }" type="text/javascript" charset="utf-8"></script>
 
   <script src="${ static('desktop/ext/js/leaflet/leaflet.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>

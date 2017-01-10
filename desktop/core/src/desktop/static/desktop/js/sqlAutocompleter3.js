@@ -16,29 +16,30 @@
 
 var SqlAutocompleter3 = (function () {
 
-  // Keyword weights come from the parser
+  var colors = HueColors.getCUIChartColors();
+
   var CATEGORIES = {
-    ALL: { label: AutocompleterGlobals.i18n.category.all },
-    POPULAR: { label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_AGGREGATE: { weight: 1500, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_GROUP_BY: { weight: 1400, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_ORDER_BY: { weight: 1300, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_FILTER: { weight: 1200, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_ACTIVE_JOIN: { weight: 1200, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_JOIN_CONDITION: { weight: 1100, label: AutocompleterGlobals.i18n.category.popular },
-    COLUMN: { weight: 1000, label: AutocompleterGlobals.i18n.category.column },
-    SAMPLE: { weight: 900, label: AutocompleterGlobals.i18n.category.sample },
-    IDENTIFIER: { weight: 800, label: AutocompleterGlobals.i18n.category.identifier },
-    CTE: { weight: 700, label: AutocompleterGlobals.i18n.category.cte },
-    TABLE: { weight: 600, label: AutocompleterGlobals.i18n.category.table },
-    DATABASE: { weight: 500, label: AutocompleterGlobals.i18n.category.database },
-    UDF: { weight: 400, label: AutocompleterGlobals.i18n.category.udf },
-    HDFS: { weight: 300, label: AutocompleterGlobals.i18n.category.hdfs },
-    VIRTUAL_COLUMN: { weight: 200, label: AutocompleterGlobals.i18n.category.column },
-    COLREF_KEYWORD: { weight: 100, label: AutocompleterGlobals.i18n.category.keyword },
-    VARIABLE: { weight: 50, label: AutocompleterGlobals.i18n.category.variable },
-    KEYWORD: { weight: 0, label: AutocompleterGlobals.i18n.category.keyword },
-    POPULAR_JOIN: { weight: -1, label: AutocompleterGlobals.i18n.category.popular }
+    ALL: { color: HueColors.BLUE, label: AutocompleterGlobals.i18n.category.all },
+    POPULAR: { color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_AGGREGATE: { weight: 1500, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_GROUP_BY: { weight: 1400, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_ORDER_BY: { weight: 1300, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_FILTER: { weight: 1200, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_ACTIVE_JOIN: { weight: 1200, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_JOIN_CONDITION: { weight: 1100, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
+    COLUMN: { weight: 1000, color: colors[20].color, label: AutocompleterGlobals.i18n.category.column },
+    SAMPLE: { weight: 900, color: colors[5].color, label: AutocompleterGlobals.i18n.category.sample },
+    IDENTIFIER: { weight: 800, color: colors[8].color, label: AutocompleterGlobals.i18n.category.identifier },
+    CTE: { weight: 700, color: colors[7].color, label: AutocompleterGlobals.i18n.category.cte },
+    TABLE: { weight: 600, color: colors[1].color, label: AutocompleterGlobals.i18n.category.table },
+    DATABASE: { weight: 500, color: colors[0].color, label: AutocompleterGlobals.i18n.category.database },
+    UDF: { weight: 400, color: colors[4].color, label: AutocompleterGlobals.i18n.category.udf },
+    HDFS: { weight: 300, color: colors[9].color, label: AutocompleterGlobals.i18n.category.hdfs },
+    VIRTUAL_COLUMN: { weight: 200, color: colors[2].color, label: AutocompleterGlobals.i18n.category.column },
+    COLREF_KEYWORD: { weight: 100, color: colors[3].color, label: AutocompleterGlobals.i18n.category.keyword },
+    VARIABLE: { weight: 50, color: colors[6].color, label: AutocompleterGlobals.i18n.category.variable },
+    KEYWORD: { weight: 0, color: colors[11].color, label: AutocompleterGlobals.i18n.category.keyword },
+    POPULAR_JOIN: { weight: -1, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular }
   };
 
   var hiveReservedKeywords = {
