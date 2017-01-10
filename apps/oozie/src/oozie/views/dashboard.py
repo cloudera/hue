@@ -51,6 +51,7 @@ from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bund
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
 from oozie.utils import convert_to_server_timezone
+from desktop.lib import django_mako
 
 
 def get_history():
@@ -380,6 +381,8 @@ def list_oozie_workflow(request, job_id):
 
 
   if request.GET.get('format') == 'json':
+    if not workflow_graph and request.GET.get('is_jb2'):      
+      workflow_graph = django_mako.render_to_string('dashboard/list_oozie_workflow_graph.mako', {})
     return_obj = {
       'id': oozie_workflow.id,
       'status':  oozie_workflow.status,

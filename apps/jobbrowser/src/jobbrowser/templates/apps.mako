@@ -397,7 +397,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </ul>
 
   <div class="tab-content active" id="workflow-page-graph">
-    Graph
+    <span data-bind="html: properties().graph"></span>
   </div>
 
   <div class="tab-content" id="workflow-page-logs">

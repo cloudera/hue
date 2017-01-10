@@ -106,8 +106,8 @@ class YarnApi(Api):
     # name = 'stdout'
     # attempt_index
     # offset=log_offset
-    data = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
-    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
+    return {'progress': 0, 'logs': {'default': json.loads(response.content)['log']}}
 
 
 class YarnAtsApi(Api):

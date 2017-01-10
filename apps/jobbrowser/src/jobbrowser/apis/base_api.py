@@ -51,6 +51,8 @@ class Api():
 
   def action(self, appid): return {} # Kill, suspend...
 
+  def status(self, appid): return {'status': 'RUNNING'}
+
   def logs(self, appid): return {'progress': 0, 'logs': {'default': ''}}
 
   def profile(self, appid): return {} # Tasks, XML, counters...
@@ -60,4 +62,4 @@ class MockDjangoRequest():
   def __init__(self, user):
     self.user = user
     self.jt = None
-    self.GET = {}
+    self.GET = {'format': 'json', 'is_jb2': True}
