@@ -80,8 +80,9 @@ def logs(request):
 
   interface = json.loads(request.POST.get('interface'))
   appid = json.loads(request.POST.get('appid'))
+  app_type = json.loads(request.POST.get('type'))
 
-  response['logs'] = get_api(request.user, interface).logs(appid)
+  response['logs'] = get_api(request.user, interface).logs(appid, app_type)
   response['status'] = 0
 
   return JsonResponse(response)
@@ -92,5 +93,4 @@ def tasks(request): return []
 
 
 @api_error_handler
-def profile(request): return {}
-
+def profile(self, appid, app_type, property): return {}
