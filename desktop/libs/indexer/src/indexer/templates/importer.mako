@@ -414,14 +414,14 @@ ${ assist.assistPanel() }
           <h3 class="card-heading simple">${_('Properties')}</h3>
           <div class="card-body">
             <div class="control-group">
-              <label><div>${ _('Description') }</div>
-                <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+              <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
+                <select id="destinationFormat" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
               </label>
             </div>
 
             <div class="control-group">
-              <label for="destinationFormat" class="control-label"><div>${ _('Format') }</div>
-                <select id="destinationFormat" data-bind="selectize: tableFormats, value: tableFormat, optionsValue: 'value', optionsText: 'name'"></select>
+              <label><div>${ _('Description') }</div>
+                <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
               </label>
             </div>
 
@@ -471,12 +471,9 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <!-- ko if: $root.createWizard.source && $root.createWizard.source.format && typeof $root.createWizard.source.format().hasHeader !== 'undefined' -->
-              <label class="checkbox">
-                <input type="checkbox" data-bind="checked: $root.createWizard.source.format().hasHeader"> ${_('Use first row as column names')}
-              </label>
-            <!-- /ko -->
-
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
+            </label>
 
             <label class="control-label"><div>${ _('Partitions') }</div>
 
@@ -649,7 +646,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="table-field-template">
   <div>
     <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
-      <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="textInput: name">
+      <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name">
     </label>
 
     <label>${ _('Type') }
@@ -954,7 +951,9 @@ ${ assist.assistPanel() }
           self[type.args[i].name] = ko.observable();
         }
 
-        if (args) loadFromObj(args);
+        if (args) {
+          loadFromObj(args);
+        }
 
         for (var i = 0; i < type.args.length; i++) {
           self[type.args[i].name].subscribe(viewModel.createWizard.guessFieldTypes);
@@ -1061,6 +1060,11 @@ ${ assist.assistPanel() }
       }
 
       self.format = ko.observable();
+      self.format.subscribe(function(newVal) {
+        if (newVal.hasHeader !== 'undefined') {
+          vm.createWizard.destination.hasHeader(newVal.hasHeader);
+        }
+      });
 
       self.show = ko.computed(function() {
         if (self.inputFormat() == 'file') {
@@ -1231,6 +1235,8 @@ ${ assist.assistPanel() }
       self.importData = ko.observable(true);
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
+
+      self.hasHeader = ko.observable(true);
 
       self.useCustomDelimiters = ko.observable(false);
       self.customFieldDelimiter = ko.observable(',');
@@ -1494,6 +1500,9 @@ ${ assist.assistPanel() }
     };
 
     var loadDefaultField = function (options) {
+      if (! options.name) {
+        options.name = getNewFieldName();
+      }
       return loadField($.extend({}, ${default_field_type | n}, options));
     }
 
