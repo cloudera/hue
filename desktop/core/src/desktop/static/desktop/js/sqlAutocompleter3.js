@@ -17,25 +17,28 @@
 var SqlAutocompleter3 = (function () {
 
   // Keyword weights come from the parser
-  var DEFAULT_WEIGHTS = {
-    POPULAR_AGGREGATE: 1500,
-    POPULAR_GROUP_BY: 1400,
-    POPULAR_ORDER_BY: 1300,
-    POPULAR_FILTER: 1200,
-    POPULAR_ACTIVE_JOIN: 1200,
-    POPULAR_JOIN_CONDITION: 1100,
-    COLUMN: 1000,
-    SAMPLE: 900,
-    IDENTIFIER: 800,
-    CTE: 700,
-    TABLE: 600,
-    DATABASE: 500,
-    UDF: 400,
-    HDFS: 300,
-    VIRTUAL_COLUMN: 200,
-    COLREF_KEYWORD: 100,
-    VARIABLE: 50,
-    JOIN: -1
+  var CATEGORIES = {
+    ALL: { label: AutocompleterGlobals.i18n.category.all },
+    POPULAR: { label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_AGGREGATE: { weight: 1500, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_GROUP_BY: { weight: 1400, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_ORDER_BY: { weight: 1300, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_FILTER: { weight: 1200, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_ACTIVE_JOIN: { weight: 1200, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_JOIN_CONDITION: { weight: 1100, label: AutocompleterGlobals.i18n.category.popular },
+    COLUMN: { weight: 1000, label: AutocompleterGlobals.i18n.category.column },
+    SAMPLE: { weight: 900, label: AutocompleterGlobals.i18n.category.sample },
+    IDENTIFIER: { weight: 800, label: AutocompleterGlobals.i18n.category.identifier },
+    CTE: { weight: 700, label: AutocompleterGlobals.i18n.category.cte },
+    TABLE: { weight: 600, label: AutocompleterGlobals.i18n.category.table },
+    DATABASE: { weight: 500, label: AutocompleterGlobals.i18n.category.database },
+    UDF: { weight: 400, label: AutocompleterGlobals.i18n.category.udf },
+    HDFS: { weight: 300, label: AutocompleterGlobals.i18n.category.hdfs },
+    VIRTUAL_COLUMN: { weight: 200, label: AutocompleterGlobals.i18n.category.column },
+    COLREF_KEYWORD: { weight: 100, label: AutocompleterGlobals.i18n.category.keyword },
+    VARIABLE: { weight: 50, label: AutocompleterGlobals.i18n.category.variable },
+    KEYWORD: { weight: 0, label: AutocompleterGlobals.i18n.category.keyword },
+    POPULAR_JOIN: { weight: -1, label: AutocompleterGlobals.i18n.category.popular }
   };
 
   var hiveReservedKeywords = {
@@ -104,9 +107,17 @@ var SqlAutocompleter3 = (function () {
     }).extend({ rateLimit: 200 });
 
     self.filter = ko.observable();
+    self.activeCategory = ko.observable(CATEGORIES.ALL);
 
     self.filtered = ko.pureComputed(function () {
       var result = self.entries();
+
+      var activeCategory = self.activeCategory();
+      if (activeCategory !== CATEGORIES.ALL) {
+        result = result.filter(function (suggestion) {
+          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular);
+        });
+      }
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -138,19 +149,44 @@ var SqlAutocompleter3 = (function () {
             return 1;
           }
         }
-        if (typeof a.weight !== 'undefined' && typeof b.weight !== 'undefined' && b.weight !== a.weight) {
-          return b.weight - a.weight;
+        var aWeight = a.category.weight + (a.weightAdjust || 0);
+        var bWeight = b.category.weight + (b.weightAdjust || 0);
+        if (typeof aWeight !== 'undefined' && typeof bWeight !== 'undefined' && bWeight !== aWeight) {
+          return bWeight - aWeight;
         }
-        if (typeof a.weight !== 'undefined' && typeof b.weight === 'undefined') {
+        if (typeof aWeight !== 'undefined' && typeof bWeight === 'undefined') {
           return -1;
         }
-        if (typeof a.weight === 'undefined' && typeof b.weight !== 'undefined') {
+        if (typeof aWeight === 'undefined' && typeof bWeight !== 'undefined') {
           return 1;
         }
         return a.value.localeCompare(b.value);
       });
       return result;
     }).extend({ rateLimit: 200 });
+
+    self.availableCategories = ko.pureComputed(function () {
+      var newCategories =  {};
+      self.entries().forEach(function (suggestion) {
+        if (suggestion.popular && ! newCategories[CATEGORIES.POPULAR.label]) {
+          newCategories[CATEGORIES.POPULAR.label] = CATEGORIES.POPULAR;
+        } else if (suggestion.category === CATEGORIES.TABLE || suggestion.category === CATEGORIES.COLUMN || suggestion.category === CATEGORIES.UDF) {
+          if (!newCategories[suggestion.category.label]) {
+            newCategories[suggestion.category.label] = suggestion.category;
+          }
+        }
+      });
+      var result = Object.values(newCategories);
+      result.sort(function (a, b) { return a.label.localeCompare(b.label)});
+      result.unshift(CATEGORIES.ALL);
+      return result;
+    }).extend({ rateLimit: 200 });
+
+    self.availableCategories.subscribe(function (newCategories) {
+      if (newCategories.indexOf(self.activeCategory()) === -1) {
+        self.activeCategory(CATEGORIES.ALL)
+      }
+    });
   }
 
   Suggestions.prototype.backTickIfNeeded = function (text) {
@@ -287,7 +323,8 @@ var SqlAutocompleter3 = (function () {
         return {
           value: self.parseResult.lowerCase ? keyword.value.toLowerCase() : keyword.value,
           meta: AutocompleterGlobals.i18n.meta.keyword,
-          weight: keyword.weight,
+          category: CATEGORIES.KEYWORD,
+          weightAdjust: keyword.weight,
           detailsTemplate: 'keyword',
           details: null
         };
@@ -306,7 +343,7 @@ var SqlAutocompleter3 = (function () {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
                 meta: AutocompleterGlobals.i18n.meta.keyword,
-                weight: DEFAULT_WEIGHTS.COLREF_KEYWORD,
+                category: CATEGORIES.COLREF_KEYWORD,
                 detailsTemplate: 'keyword',
                 details: {
                   type: colRef.type
@@ -329,7 +366,7 @@ var SqlAutocompleter3 = (function () {
         identifierSuggestions.push({
           value: identifier.name,
           meta: identifier.type,
-          weight: DEFAULT_WEIGHTS.IDENTIFIER,
+          category: CATEGORIES.IDENTIFIER,
           detailsTemplate: 'identifier',
           details: null
         });
@@ -348,7 +385,7 @@ var SqlAutocompleter3 = (function () {
           columnAliasSuggestions.push({
             value: columnAlias.name,
             meta: AutocompleterGlobals.i18n.meta.alias,
-            weight: DEFAULT_WEIGHTS.COLUMN,
+            category: CATEGORIES.COLUMN,
             detailsTemplate: 'column-alias',
             details: columnAlias
           });
@@ -356,7 +393,7 @@ var SqlAutocompleter3 = (function () {
           columnAliasSuggestions.push({
             value: columnAlias.name,
             meta: type,
-            weight: DEFAULT_WEIGHTS.COLUMN,
+            category: CATEGORIES.COLUMN,
             detailsTemplate: 'column-alias',
             details: columnAlias
           });
@@ -378,7 +415,7 @@ var SqlAutocompleter3 = (function () {
         commonTableExpressionSuggestions.push({
           value: prefix + expression.name,
           meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
-          weight: DEFAULT_WEIGHTS.CTE,
+          category: CATEGORIES.CTE,
           detailsTemplate: 'cte',
           details: null
         });
@@ -398,11 +435,12 @@ var SqlAutocompleter3 = (function () {
 
           Object.keys(functionsToSuggest).forEach(function (name) {
             functionSuggestions.push({
+              category: CATEGORIES.UDF,
               value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
               meta: functionsToSuggest[name].returnTypes.join('|'),
-              weight: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+              weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
                   return otherType === colRef.type.toUpperCase();
-              }).length > 0 ? DEFAULT_WEIGHTS.UDF + 1 : DEFAULT_WEIGHTS.UDF,
+              }).length > 0 ? 1 : 0,
               detailsTemplate: 'udf',
               details: functionsToSuggest[name]
             })
@@ -417,11 +455,12 @@ var SqlAutocompleter3 = (function () {
 
         Object.keys(functionsToSuggest).forEach(function (name) {
           functionSuggestions.push({
+            category: CATEGORIES.UDF,
             value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
             meta: functionsToSuggest[name].returnTypes.join('|'),
-            weight: functionsToSuggest[name].returnTypes.filter(function (otherType) {
+            weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
               return otherType === types[0].toUpperCase();
-            }).length > 0 ? DEFAULT_WEIGHTS.UDF + 1 : DEFAULT_WEIGHTS.UDF,
+            }).length > 0 ? 1 : 0,
             detailsTemplate: 'udf',
             details: functionsToSuggest[name]
           })
@@ -446,7 +485,7 @@ var SqlAutocompleter3 = (function () {
           databaseSuggestions.push({
             value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''),
             meta: AutocompleterGlobals.i18n.meta.database,
-            weight: DEFAULT_WEIGHTS.DATABASE,
+            category: CATEGORIES.DATABASE,
             detailsTemplate: 'database',
             details: null
           })
@@ -482,7 +521,7 @@ var SqlAutocompleter3 = (function () {
               tableSuggestions.push({
                 value: prefix + self.backTickIfNeeded(tablesMeta.name),
                 meta: AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()],
-                weight: DEFAULT_WEIGHTS.TABLE,
+                category: CATEGORIES.TABLE,
                 detailsTemplate: 'table',
                 details: tablesMeta
               });
@@ -555,14 +594,14 @@ var SqlAutocompleter3 = (function () {
             columnSuggestions.push({
               value: 'BLOCK__OFFSET__INSIDE__FILE',
               meta: AutocompleterGlobals.i18n.meta.virtual,
-              weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN,
+              category: CATEGORIES.VIRTUAL_COLUMN,
               detailsTemplate: 'column',
               details: null
             });
             columnSuggestions.push({
               value: 'INPUT__FILE__NAME',
               meta: AutocompleterGlobals.i18n.meta.virtual,
-              weight: DEFAULT_WEIGHTS.VIRTUAL_COLUMN,
+              category: CATEGORIES.VIRTUAL_COLUMN,
               detailsTemplate: 'column',
               details: null
             });
@@ -595,7 +634,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.alias),
                 meta: type,
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -604,7 +643,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
                 meta: type,
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -630,7 +669,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
                 meta: 'map',
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -639,7 +678,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
                 meta: 'map',
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -648,7 +687,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
                 meta: 'struct',
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -657,7 +696,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
                 meta: 'array',
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -666,7 +705,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
                 meta: 'array',
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -675,7 +714,8 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
                 meta: column.type,
-                weight: DEFAULT_WEIGHTS.COLUMN + 1,
+                category: CATEGORIES.COLUMN,
+                weightAdjust: 1,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -685,7 +725,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
                 meta: column.type,
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -697,7 +737,7 @@ var SqlAutocompleter3 = (function () {
             columnSuggestions.push({
               value: self.backTickIfNeeded(column),
               meta: 'column',
-              weight: DEFAULT_WEIGHTS.COLUMN,
+              category: CATEGORIES.COLUMN,
               table: table,
               detailsTemplate: 'column',
               details: column
@@ -708,7 +748,7 @@ var SqlAutocompleter3 = (function () {
           columnSuggestions.push({
             value: 'key',
             meta: 'key',
-            weight: DEFAULT_WEIGHTS.COLUMN,
+            category: CATEGORIES.COLUMN,
             table: table,
             detailsTemplate: 'column',
             details: column
@@ -716,7 +756,7 @@ var SqlAutocompleter3 = (function () {
           columnSuggestions.push({
             value: 'value',
             meta: 'value',
-            weight: DEFAULT_WEIGHTS.COLUMN,
+            category: CATEGORIES.COLUMN,
             table: table,
             detailsTemplate: 'column',
             details: column
@@ -727,7 +767,7 @@ var SqlAutocompleter3 = (function () {
             columnSuggestions.push({
               value: self.backTickIfNeeded(field.name),
               meta: field.type,
-              weight: DEFAULT_WEIGHTS.COLUMN,
+              category: CATEGORIES.COLUMN,
               table: table,
               detailsTemplate: 'column',
               details: column
@@ -740,7 +780,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(field.name),
                 meta: field.type,
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -755,7 +795,7 @@ var SqlAutocompleter3 = (function () {
                   columnSuggestions.push({
                     value: self.backTickIfNeeded(field.name) + '[]',
                     meta: field.type,
-                    weight: DEFAULT_WEIGHTS.COLUMN,
+                    category: CATEGORIES.COLUMN,
                     table: table,
                     detailsTemplate: 'column',
                     details: column
@@ -764,7 +804,7 @@ var SqlAutocompleter3 = (function () {
                   columnSuggestions.push({
                     value: self.backTickIfNeeded(field.name),
                     meta: field.type,
-                    weight: DEFAULT_WEIGHTS.COLUMN,
+                    category: CATEGORIES.COLUMN,
                     table: table,
                     detailsTemplate: 'column',
                     details: column
@@ -775,7 +815,7 @@ var SqlAutocompleter3 = (function () {
                 columnSuggestions.push({
                   value: self.backTickIfNeeded(field.name),
                   meta: field.type,
-                  weight: DEFAULT_WEIGHTS.COLUMN,
+                  category: CATEGORIES.COLUMN,
                   table: table,
                   detailsTemplate: 'column',
                   details: column
@@ -787,7 +827,7 @@ var SqlAutocompleter3 = (function () {
               columnSuggestions.push({
                 value: 'item',
                 meta: data.item.type,
-                weight: DEFAULT_WEIGHTS.COLUMN,
+                category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
                 details: column
@@ -849,7 +889,7 @@ var SqlAutocompleter3 = (function () {
         valueSuggestions.push({
           value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}',
           meta: AutocompleterGlobals.i18n.meta.variable,
-          weight: DEFAULT_WEIGHTS.VARIABLE,
+          category: CATEGORIES.VARIABLE,
           detailsTemplate: 'variable',
           details: null
         });
@@ -863,7 +903,7 @@ var SqlAutocompleter3 = (function () {
             valueSuggestions.push({
               value: isString ? startQuote + sample + endQuote : new String(sample),
               meta: AutocompleterGlobals.i18n.meta.value,
-              weight: DEFAULT_WEIGHTS.SAMPLE,
+              category: CATEGORIES.SAMPLE,
               detailsTemplate: 'value',
               details: null
             })
@@ -896,7 +936,7 @@ var SqlAutocompleter3 = (function () {
                 pathSuggestions.push({
                   value: suggestHdfs.path === '' ? '/' + file.name : file.name,
                   meta: file.type,
-                  weight: DEFAULT_WEIGHTS.HDFS,
+                  category: CATEGORIES.HDFS,
                   detailsTemplate: 'hdfs',
                   details: file
                 });
@@ -973,7 +1013,8 @@ var SqlAutocompleter3 = (function () {
               joinSuggestions.push({
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.join,
-                weight: suggestJoins.prependJoin ? DEFAULT_WEIGHTS.JOIN : DEFAULT_WEIGHTS.POPULAR_ACTIVE_JOIN,
+                category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
+                popular: true,
                 detailsTemplate: 'join',
                 details: value
               });
@@ -1022,7 +1063,8 @@ var SqlAutocompleter3 = (function () {
               joinConditionSuggestions.push({
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.joinCondition,
-                weight: DEFAULT_WEIGHTS.POPULAR_JOIN_CONDITION,
+                category: CATEGORIES.POPULAR_JOIN_CONDITION,
+                popular: true,
                 detailsTemplate: 'join-condition',
                 details: value
               });
@@ -1092,7 +1134,9 @@ var SqlAutocompleter3 = (function () {
               aggregateFunctionsSuggestions.push({
                 value: clean,
                 meta: AutocompleterGlobals.i18n.meta.aggregateFunction,
-                weight: DEFAULT_WEIGHTS.POPULAR_AGGREGATE + Math.min(value.totalQueryCount, 99),
+                category: CATEGORIES.POPULAR_AGGREGATE,
+                popular: true,
+                weightAdjust: Math.min(value.totalQueryCount, 99),
                 detailsTemplate: 'aggregate-function',
                 details: value
               });
@@ -1131,7 +1175,9 @@ var SqlAutocompleter3 = (function () {
               groupBySuggestions.push({
                 value: prefix + self.createNavOptIdentifierForColumn(value, suggestGroupBys.tables),
                 meta: AutocompleterGlobals.i18n.meta.groupBy,
-                weight: DEFAULT_WEIGHTS.POPULAR_GROUP_BY + Math.min(value.columnCount, 99),
+                category: CATEGORIES.POPULAR_GROUP_BY,
+                popular: true,
+                weightAdjust: Math.min(value.columnCount, 99),
                 detailsTemplate: 'group-by',
                 details: value
               });
@@ -1172,7 +1218,9 @@ var SqlAutocompleter3 = (function () {
               orderBySuggestions.push({
                 value: prefix + self.createNavOptIdentifierForColumn(value, suggestOrderBys.tables),
                 meta: AutocompleterGlobals.i18n.meta.orderBy,
-                weight: DEFAULT_WEIGHTS.POPULAR_ORDER_BY + Math.min(value.columnCount, 99),
+                category: CATEGORIES.POPULAR_ORDER_BY,
+                popular: true,
+                weightAdjust: Math.min(value.columnCount, 99),
                 detailsTemplate: 'order-by',
                 details: value
               });
@@ -1225,7 +1273,8 @@ var SqlAutocompleter3 = (function () {
                     filterSuggestions.push({
                       value: compVal,
                       meta: AutocompleterGlobals.i18n.meta.filter,
-                      weight: DEFAULT_WEIGHTS.POPULAR_FILTER,
+                      category: CATEGORIES.POPULAR_FILTER,
+                      popular: true,
                       detailsTemplate: 'filter',
                       details: popularValue
                     });
@@ -1266,7 +1315,7 @@ var SqlAutocompleter3 = (function () {
           $.when(tablesDeferred).done(function (tableSuggestions) {
             tableSuggestions.forEach(function (suggestion) {
               if (typeof popularityIndex[suggestion.name] !== 'undefined') {
-                suggestion.weight += Math.min(popularityIndex[suggestion.name], 99);
+                suggestion.weightAdjust = Math.min(popularityIndex[suggestion.name], 99);
                 suggestion.popular = true;
                 if (!suggestion.details) {
                   suggestions.details = {};
@@ -1330,7 +1379,7 @@ var SqlAutocompleter3 = (function () {
                 for (var i = 0; i < popularColumns.length; i++) {
                   // TODO: Switch to map once nav opt API is stable
                   if (path.toLowerCase().indexOf(popularColumns[i].path.toLowerCase()) !== -1) {
-                    suggestion.weight += Math.min(popularColumns[i].columnCount, 99);
+                    suggestion.weightAdjust = Math.min(popularColumns[i].columnCount, 99);
                     suggestion.popular = true;
                     if (!suggestion.details) {
                       suggestions.details = {};

@@ -92,6 +92,19 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     AutocompleterGlobals = {
       i18n: {
+        category: {
+          all: '${ _('All') }',
+          column: '${ _('Columns') }',
+          cte: '${ _('CTEs') }',
+          database: '${ _('Databases') }',
+          identifier: '${ _('Identifiers') }',
+          keyword: '${ _('Keywords') }',
+          popular: '${ _('Popular') }',
+          sample: '${ _('Samples') }',
+          table: '${ _('Tables') }',
+          udf: '${ _('UDFs') }',
+          variable: '${ _('Variables') }'
+        },
         meta: {
           aggregateFunction: '${ _('aggregate') }',
           alias: '${ _('alias') }',
