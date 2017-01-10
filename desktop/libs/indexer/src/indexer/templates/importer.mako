@@ -137,6 +137,20 @@ ${ assist.assistPanel() }
     margin-left: 10px;
   }
 
+  .field-content-preview {
+    width: 180px;
+    margin-left: 20px;
+  }
+
+  .table-preview {
+    margin:auto;
+    text-align:left;
+  }
+
+  .table-preview td, .table-preview th {
+    white-space: nowrap;
+  }
+
   .content-panel {
     overflow-x: hidden;
   }
@@ -322,7 +336,7 @@ ${ assist.assistPanel() }
       <!-- /ko -->
     </div>
 
-    <div class="card step">
+    <div class="card step" style="min-height: 310px;">
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <!-- ko if: createWizard.isGuessingFieldTypes -->
       <h3 class="card-heading simple">${_('Generating preview...')} <i class="fa fa-spinner fa-spin"></i></h3>
@@ -331,11 +345,11 @@ ${ assist.assistPanel() }
       <h3 class="card-heading simple">${_('Preview')}</h3>
       <div class="card-body">
         <div style="overflow: auto">
-          <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
+          <table class="table table-striped table-condensed table-preview">
             <thead>
             <tr data-bind="foreach: createWizard.source.sampleCols">
               ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->
-              <th data-bind="text: name" style="padding-right:60px"></th>
+              <th data-bind="truncatedText: name" style="padding-right:60px"></th>
               ## TODO nested
             </tr>
             </thead>
@@ -457,9 +471,12 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as column names')}
-            </label>
+            <!-- ko if: $root.createWizard.source && $root.createWizard.source.format && typeof $root.createWizard.source.format().hasHeader !== 'undefined' -->
+              <label class="checkbox">
+                <input type="checkbox" data-bind="checked: $root.createWizard.source.format().hasHeader"> ${_('Use first row as column names')}
+              </label>
+            <!-- /ko -->
+
 
             <label class="control-label"><div>${ _('Partitions') }</div>
 
@@ -631,39 +648,38 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="table-field-template">
   <div>
-  <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
-    <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="textInput: name">
-  </label>
+    <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
+      <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="textInput: name">
+    </label>
 
-  <label>${ _('Type') }
-  <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
-    <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
-  <!-- /ko -->
-  <!-- ko if: level() > 0 && $parent.type() == 'map' -->
-    <select class="input-small" data-bind="selectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
-    <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
-  <!-- /ko -->
+    <label>${ _('Type') }
+    <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
+      <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
+    <!-- /ko -->
+    <!-- ko if: level() > 0 && $parent.type() == 'map' -->
+      <select class="input-small" data-bind="selectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
+      <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
+    <!-- /ko -->
 
-    <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
-  </label>
+      <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
+    </label>
 
-  <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-##     ${_('Comment')}
-  </span>
+    <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
+  ##     ${_('Comment')}
+    </span>
 
-  <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
-    <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
-  <!-- /ko -->
+    <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
+      <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
+    <!-- /ko -->
+    <!-- ko if: level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
+      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
+    <!-- /ko -->
 
-  <!-- ko if: level() == 0 && typeof isPartition === 'undefined'-->
-    <label data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]" class="muted"></label> &nbsp;&nbsp;
-    <label data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]" class="muted"></label>
-  <!-- /ko -->
-
-  <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
-    <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
-    <a data-bind="click: function() { nested.push($root.loadDefaultField({level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
-  <!-- /ko -->
+    <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
+      <div class="operation" data-bind="template: { name: 'table-field-template', foreach: nested }"></div>
+      <a data-bind="click: function() { nested.push($root.loadDefaultField({level: level() + 1})); }, visible: type() == 'struct'"><i class="fa fa-plus"></i></a>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -1216,8 +1232,6 @@ ${ assist.assistPanel() }
       self.useDefaultLocation = ko.observable(true);
       self.nonDefaultLocation = ko.observable('');
 
-      self.hasHeader = ko.observable(true);
-
       self.useCustomDelimiters = ko.observable(false);
       self.customFieldDelimiter = ko.observable(',');
       self.customCollectionDelimiter = ko.observable('\\002');
@@ -1344,7 +1358,7 @@ ${ assist.assistPanel() }
             }
             arr[i] = loadField(entry, self.destination.columns, i);
           });
-          self.source.sampleCols(resp.sample_cols);
+          self.source.sampleCols(resp.sample_cols ? resp.sample_cols : resp.columns);
           self.source.sample(resp.sample);
           self.destination.columns(resp.columns);
           self.isGuessingFieldTypes(false);
