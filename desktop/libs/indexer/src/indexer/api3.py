@@ -217,7 +217,6 @@ def _create_table_from_a_file(request, source, destination):
   columns = destination['columns']
   partition_columns = destination['partitionColumns']
   kudu_partition_columns = destination['kuduPartitionColumns']
-  print kudu_partition_columns
   comment = destination['description']
 
   source_path = source['path']
