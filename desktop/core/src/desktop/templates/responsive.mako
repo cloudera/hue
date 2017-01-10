@@ -453,6 +453,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+<script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
