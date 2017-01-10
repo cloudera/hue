@@ -405,7 +405,11 @@ def export_documents(request):
   # Get PKs of documents to export
   doc_ids = [doc.pk for doc in export_doc_set]
   num_docs = len(doc_ids)
-  filename = 'hue-documents-%s-(%s)' % (datetime.today().strftime('%Y-%m-%d'), num_docs)
+
+  if len(selection) == 1:
+    filename = docs[0].name
+  else:
+    filename = 'hue-documents-%s-(%s)' % (datetime.today().strftime('%Y-%m-%d'), num_docs)
 
   f = StringIO.StringIO()
 
