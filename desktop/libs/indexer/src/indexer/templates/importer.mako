@@ -1473,6 +1473,9 @@ ${ assist.assistPanel() }
       // Wizard related
       self.wizardEnabled = ko.observable(false);
       self.currentStep = ko.observable(1);
+      self.currentStep.subscribe(function () {
+        $('.content-panel').scrollTop(0);
+      });
       self.previousStepVisible = ko.pureComputed(function(){
         return self.currentStep() > 1;
       });
