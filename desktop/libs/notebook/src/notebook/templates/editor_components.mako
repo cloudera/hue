@@ -3749,8 +3749,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       huePubSub.subscribe('editor.save', saveKeyHandler);
 
       $(document).bind('keyup', function (e) {
-        if (e.keyCode == 191 && !$(e.target).is('input') && !$(e.target).is('textarea')) {
+        if (e.keyCode == 191 && e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
           $('#helpModal').modal('show');
+        }
+
+        if (e.keyCode == 191 && !e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
+          if (viewModel.editorMode() && viewModel.selectedNotebook().snippets()[0].currentQueryTab() == 'queryResults') {
+            e.preventDefault();
+            var $t = $("#snippet_" + viewModel.selectedNotebook().snippets()[0].id()).find(".resultTable");
+            $t.hueDataTable().fnShowSearch();
+            return false;
+          }
         }
       });
 
@@ -3767,15 +3776,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         e.preventDefault();
         newKeyHandler();
         return false;
-      });
-
-      $(window).bind("keydown", "ctrl+f alt+f meta+f", function (e) {
-        if (viewModel.editorMode() && viewModel.selectedNotebook().snippets()[0].currentQueryTab() == 'queryResults') {
-          e.preventDefault();
-          var $t = $("#snippet_" + viewModel.selectedNotebook().snippets()[0].id()).find(".resultTable");
-          $t.hueDataTable().fnShowSearch();
-          return false;
-        }
       });
 
       huePubSub.subscribe('editor.create.new', newKeyHandler);
