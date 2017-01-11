@@ -240,6 +240,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-mapreduce-task-page', data: $root.job() }"></div>
   <!-- /ko -->
 
+  <!-- ko if: type() == 'MAP_ATTEMPT' || type() == 'REDUCE_ATTEMPT' -->
+    <div data-bind="template: { name: 'job-mapreduce-task-attempt-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
   <!-- ko if: type() == 'YARN' -->
     <div data-bind="template: { name: 'job-yarn-page', data: $root.job() }"></div>
   <!-- /ko -->
@@ -429,12 +433,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <tbody data-bind="foreach: properties['attempts']()['task_list']">
           <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
             <td><div class="hueCheckbox fa"></div></td>
-            <td data-bind="text: assignedContainerId"></td>            
+            <td data-bind="text: assignedContainerId"></td>
             <td data-bind="text: progress"></td>
-            <td data-bind="text: elapsedTime"></td>            
+            <td data-bind="text: elapsedTime"></td>
             <td data-bind="text: state"></td>
             <td data-bind="text: rack"></td>
             <td data-bind="text: nodeHttpAddress"></td>
+            <td data-bind="text: type"></td>
             <td data-bind="text: startTime"></td>
             <td data-bind="text: id"></td>
             <td data-bind="text: finishTime"></td>
@@ -457,9 +462,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
-  <h2>MapReduce Task attempt</h2>
-  <br/>
-
   Logs | Metadata | Counters
 
   <br/><br/>
