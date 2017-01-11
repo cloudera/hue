@@ -87,6 +87,10 @@ ${ assist.assistPanel() }
     margin-left: 130px;
   }
 
+  .step label:not(.checkbox) {
+    display: inline-block;
+  }
+
   .step input[type='text'] {
     margin-bottom: 0;
   }
@@ -662,7 +666,7 @@ ${ assist.assistPanel() }
     </label>
 
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-       <input type="text" class="input-mini" placeholder="${ _('Field comment') }" data-bind="value: comment">
+       <input type="text" class="input-small" placeholder="${ _('Field comment') }" data-bind="value: comment">
     </span>
 
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
