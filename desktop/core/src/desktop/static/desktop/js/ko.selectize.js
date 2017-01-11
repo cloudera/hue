@@ -13,7 +13,8 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
-// From: https://gist.githubusercontent.com/xtranophilist/8001624/raw/ko_selectize.js
+
+// Based on https://gist.githubusercontent.com/xtranophilist/8001624/raw/ko_selectize.js
 
 var inject_binding = function (allBindings, key, value) {
   //https://github.com/knockout/knockout/pull/932#issuecomment-26547528
@@ -45,7 +46,7 @@ ko.bindingHandlers.selectize = {
 
     if (allBindingsAccessor.get('optionsText')) {
       options.labelField = allBindingsAccessor.get('optionsText'),
-      options.searchField = allBindingsAccessor.get('optionsText')
+        options.searchField = allBindingsAccessor.get('optionsText')
     }
 
     if (allBindingsAccessor.has('selectizeOptions')) {
@@ -113,11 +114,30 @@ ko.bindingHandlers.selectize = {
               break;
             case 'deleted':
               var itemId = change.value[options.valueField];
-              if (itemId != null) $select.removeOption(itemId);
+              if (typeof itemId === 'function') {
+                itemId = itemId();
+              }
+              if (itemId != null) {
+                $select.removeOption(itemId);
+              }
           }
         });
         addedItems.forEach(function (item) {
-          $select.addOption(item);
+          var optionValue = item[options.valueField];
+          if (typeof optionValue === 'function') {
+            optionValue = optionValue();
+          }
+
+          var optionLabel = item[options.labelField];
+          if (typeof optionLabel === 'function') {
+            optionLabel = optionLabel();
+          }
+
+          var newOption = {};
+          newOption[options.valueField] = optionValue;
+          newOption[options.labelField] = optionLabel;
+
+          $select.addOption(newOption);
         });
 
       }, null, "arrayChange");
@@ -125,21 +145,27 @@ ko.bindingHandlers.selectize = {
 
   },
   update: function (element, valueAccessor, allBindingsAccessor) {
+    var optionsValue = allBindingsAccessor.get('optionsValue') || 'value';
+    var value_accessor = valueAccessor();
+
+    if (allBindingsAccessor.has('selectedObjects')) {
+      allBindingsAccessor.get('selectedObjects')($.grep(value_accessor(), function (i) {
+        var id = i[optionsValue];
+        if (typeof i[optionsValue] == 'function') {
+          id = i[optionsValue]()
+        }
+        return allBindingsAccessor.get('selectedOptions')().indexOf(id) > -1;
+      }));
+    }
 
     if (allBindingsAccessor.has('object')) {
-      var optionsValue = allBindingsAccessor.get('optionsValue') || 'value';
-      var value_accessor = valueAccessor();
-      var selected_obj = $.grep(value_accessor(), function (i) {
-        if (typeof i[optionsValue] == 'function')
-          var id = i[optionsValue]
-        else
-          var id = i[optionsValue]
+      allBindingsAccessor.get('object')($.grep(value_accessor(), function (i) {
+        var id = i[optionsValue];
+        if (typeof i[optionsValue] == 'function') {
+          id = i[optionsValue]()
+        }
         return id == allBindingsAccessor.get('value')();
-      })[0];
-
-      if (selected_obj) {
-        allBindingsAccessor.get('object')(selected_obj);
-      }
+      })[0]);
     }
   }
 }

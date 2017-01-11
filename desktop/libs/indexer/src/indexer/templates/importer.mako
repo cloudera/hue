@@ -475,7 +475,7 @@ ${ assist.assistPanel() }
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
               <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
               </label>
             </div>
 
@@ -498,7 +498,7 @@ ${ assist.assistPanel() }
                   <li>
                   <a class="pointer pull-right" data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
 
-                  <select id="kuduPks" data-bind="selectize: $parent.primaryKeys, selectedOptions: columns, selectizeOptions: { placeholder: '${ _ko('Columns...') }' }" size="3" multiple="true"></select>
+                  <select data-bind="selectize: $parent.primaryKeyObjects, selectedOptions: columns, optionsValue: 'name', optionsText: 'name', selectizeOptions: { placeholder: '${ _ko('Columns...') }' }" size="3" multiple="true"></select>
                   <select data-bind="selectize: ['RANGE BY', 'HASH'], value: name"></select>
 
                   <!-- ko if: name() == 'HASH' -->
@@ -1212,6 +1212,7 @@ ${ assist.assistPanel() }
       self.partitionColumns = ko.observableArray();
       self.kuduPartitionColumns = ko.observableArray();
       self.primaryKeys = ko.observableArray();
+      self.primaryKeyObjects = ko.observableArray();
 
       self.importData = ko.observable(true);
       self.useDefaultLocation = ko.observable(true);
