@@ -296,6 +296,9 @@ from desktop.views import _ko
           } else {
             changeTimeout = window.setTimeout(function () {
               self.suggestions.filter(self.editor().session.getTextRange({ start: self.base, end: self.editor().getCursorPosition() }));
+              if (self.suggestions.filtered().length === 0) {
+                self.detach();
+              }
             }, 200);
           }
         };
@@ -353,12 +356,7 @@ from desktop.views import _ko
           var newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
           self.top(data.position.top + data.lineHeight + 3);
           self.left(data.position.left);
-          if (self.active()) {
-            if (!self.base || newBase.column !== self.base.column || newBase.row !== self.base.row) {
-              self.autocompleter.autocomplete();
-            }
-            self.detach();
-          } else {
+          if (!self.active() || (!self.base || newBase.column !== self.base.column || newBase.row !== self.base.row)) {
             self.autocompleter.autocomplete();
           }
           newBase.$insertRight = true;
