@@ -143,11 +143,13 @@ class YarnMapReduceTaskApi(Api):
   def apps(self):
     return [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(jobid=self.app_id, pagenum=1)]
 
+
   def app(self, appid):
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
 
     common = self._massage_task(task)
     common['properties'] = {
+      'attempts': []
     }
 
     return common
@@ -163,9 +165,10 @@ class YarnMapReduceTaskApi(Api):
 
 
   def profile(self, appid, app_type, app_property):
-    if app_property == 'task_attemps':
-      response = tasks(self.request, job=appid)
-      return json.loads(response.content)
+    if app_property == 'attempts':
+      return {
+          'task_list': YarnMapReduceTaskAttemptApi(self.user, appid).apps(),
+      }
 
     return {}
 
@@ -179,6 +182,64 @@ class YarnMapReduceTaskApi(Api):
         'startTime': task.startTime,
         'successfulAttempt': task.successfulAttempt,
         'finishTime': task.finishTime
+    }
+
+
+class YarnMapReduceTaskAttemptApi(Api):
+
+  def __init__(self, user, app_id):
+    Api.__init__(self, user)
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').split('_')[:3])
+    self.task_id = app_id
+
+  def apps(self):
+    return [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts]
+
+
+  def app(self, appid):
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
+
+    common = self._massage_task(task)
+    common['properties'] = {
+      'attempts': []
+    }
+
+    return common
+
+
+  def logs(self, appid, app_type):
+    if app_type == 'MAPREDUCE':
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
+      logs = json.loads(response.content)['log']
+    else:
+      logs = None
+    return {'progress': 0, 'logs': {'default': logs}}
+
+
+  def profile(self, appid, app_type, app_property):
+    if app_property == 'attempts':
+      task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
+      return task.attempts
+
+    return {}
+
+  def _massage_task(self, task):
+    return {
+#         "elapsedMergeTime" : task.elapsedMergeTime,
+#         "shuffleFinishTime" : task.shuffleFinishTime,
+        "assignedContainerId" : task.assignedContainerId,
+        "progress" : task.progress,
+        "elapsedTime" : task.elapsedTime,
+        "state" : task.state,
+#         "elapsedShuffleTime" : task.elapsedShuffleTime,
+#         "mergeFinishTime" : task.mergeFinishTime,
+        "rack" : task.rack,
+#         "elapsedReduceTime" : task.elapsedReduceTime,
+        "nodeHttpAddress" : task.nodeHttpAddress,
+        "type" : task.type,
+        "startTime" : task.startTime,
+        "id" : task.id,
+        "finishTime" : task.finishTime
     }
 
 
