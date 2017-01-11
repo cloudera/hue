@@ -23,7 +23,7 @@ from desktop.views import _ko
   <style>
     .hue-ace-autocompleter {
       position: fixed;
-      z-index: 100000;
+      z-index: 1000;
       max-height: 250px;
       border: 1px solid #DDD;
       display: flex;
@@ -335,6 +335,8 @@ from desktop.views import _ko
           }
         };
 
+        var positionInterval = -1;
+
         self.detach = function () {
           if (!self.active()) {
             return;
@@ -343,6 +345,7 @@ from desktop.views import _ko
           self.base.detach();
           self.base = null;
           window.clearTimeout(changeTimeout);
+          window.clearInterval(positionInterval);
           $(document).off('click', closeOnClickOutside);
           self.editor().keyBinding.removeKeyboardHandler(self.keyboardHandler);
           self.editor().off('changeSelection', self.changeListener);
@@ -356,6 +359,14 @@ from desktop.views import _ko
           self.editor().on('changeSelection', self.changeListener);
           self.editor().on('mousedown', self.mousedownListener);
           self.editor().on('mousewheel', self.mousewheelListener);
+          var $container = $(self.editor().container);
+          var initialOffset = $(self.editor().container).offset();
+          positionInterval = window.setInterval(function () {
+            var newOffset = $container.offset();
+            if (newOffset.top !== initialOffset.top || newOffset.left !== initialOffset.left) {
+              self.detach();
+            }
+          }, 300);
         };
 
         huePubSub.subscribe('hue.ace.autocompleter.done', function () {
