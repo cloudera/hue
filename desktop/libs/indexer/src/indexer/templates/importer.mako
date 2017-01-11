@@ -438,7 +438,7 @@ ${ assist.assistPanel() }
               <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
             </label>
 
-            <label class="checkbox" data-bind="visible: $parent.createWizard.source.inputFormat() == 'table'">
+            <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
               <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
             </label>
 
@@ -525,13 +525,13 @@ ${ assist.assistPanel() }
                       </div>
                     </div>
 
-                    <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS({values: [''], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='})); }" title="${_('Add column')}"><i class="fa fa-plus"></i></a>
+                    <a data-bind="click: function() { range_partitions.push(ko.mapping.fromJS($parent.KUDU_DEFAULT_RANGE_PARTITION_COLUMN)); }" title="${_('Add column')}"><i class="fa fa-plus"></i></a>
                   <!-- /ko -->
 
                   <!-- /ko -->
                   </li>
                 </ul>
-                <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16})); }" class="pointer" title="${_('Add partition')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+                <a data-bind="click: function() { kuduPartitionColumns.push(ko.mapping.fromJS(KUDU_DEFAULT_PARTITION_COLUMN)); }" class="pointer" title="${_('Add partition')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
               </div>
             <!-- /ko -->
 
@@ -1220,9 +1220,12 @@ ${ assist.assistPanel() }
       self.tableFormat = ko.observable('text');
       self.tableFormat.subscribe(function(newVal) {
         if (newVal == 'kudu' && self.kuduPartitionColumns().length == 0) {
-          self.kuduPartitionColumns.push(ko.mapping.fromJS({columns: [], range_partitions: [], name: 'HASH', int_val: 16}));
+          self.kuduPartitionColumns.push(ko.mapping.fromJS(self.KUDU_DEFAULT_PARTITION_COLUMN));
         }
       });
+      self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [''], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
+      self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
+
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
