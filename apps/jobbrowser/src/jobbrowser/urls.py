@@ -58,5 +58,6 @@ urlpatterns += patterns('jobbrowser.api2',
   url(r'api/jobs', 'jobs', name='jobs'),
   url(r'api/job/logs', 'logs', name='logs'),
   url(r'api/job/profile', 'profile', name='profile'),
+  url(r'api/job/action', 'action', name='action'),
   url(r'api/job', 'job', name='job'),
 )
