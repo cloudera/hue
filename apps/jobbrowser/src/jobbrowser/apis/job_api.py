@@ -158,11 +158,9 @@ class YarnMapReduceTaskApi(Api):
 
 
   def logs(self, appid, app_type):
-    if app_type == 'MAPREDUCE':
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
-      logs = json.loads(response.content)['log']
-    else:
-      logs = None
+    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id)
+    logs = json.loads(response.content)['log']
+
     return {'progress': 0, 'logs': {'default': logs}}
 
 
@@ -210,18 +208,13 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def logs(self, appid, app_type):
-    if app_type == 'MAPREDUCE':
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
-      logs = json.loads(response.content)['log']
-    else:
-      logs = None
-    return {'progress': 0, 'logs': {'default': logs}}
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
+    stdout, stderr, syslog = task.get_task_log()
+
+    return {'progress': 0, 'logs': {'default': stdout, 'stdout': stdout, 'stderr': stderr, 'syslog': syslog}}
 
 
   def profile(self, appid, app_type, app_property):
-    if app_property == 'attempts':
-      task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
-      return task.attempts
 
     return {}
 
