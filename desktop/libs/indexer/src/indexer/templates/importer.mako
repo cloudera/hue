@@ -317,7 +317,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'query'">
             <label for="path" class="control-label"><div>${ _('Query') }</div>
-              <select data-bind="selectize: createWizard.source.queries, value: createWizard.source.query, optionsText: 'name', optionsAfterRender: createWizard.source.selectQuery"></select>
+              <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { dependentValue: createWizard.source.draggedQuery, mappedDocument: createWizard.source.query }"></select>
             </label>
           </div>
         </div>
@@ -991,9 +991,6 @@ ${ assist.assistPanel() }
       self.inputFormat = ko.observable('file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
-        if (val == 'query') {
-          self.getDocuments();
-        }
       });
       self.inputFormats = ko.observableArray([
           {'value': 'file', 'name': 'File'},
@@ -1033,36 +1030,7 @@ ${ assist.assistPanel() }
 
       // Queries
       self.query = ko.observable('');
-      self.queries = ko.observableArray([]);
       self.draggedQuery = ko.observable();
-      self.getDocuments = function() {
-        $.get('/desktop/api2/docs/', {
-          type: 'query-hive',
-          include_trashed: false,
-          sort: '-last_modified',
-          limit: 100
-        }, function(data) {
-          if (data && data.documents) {
-            var queries = [];
-            $.each(data.documents, function(index, query) {
-              queries.push(ko.mapping.fromJS(query));
-            });
-            self.queries(queries);
-          }
-        });
-      };
-
-      var waitForRendered = -1;
-      self.selectQuery = function () {
-        window.clearTimeout(waitForRendered);
-        waitForRendered = window.setTimeout(function(){
-          if (self.draggedQuery()){
-            self.query(ko.utils.arrayFilter(self.queries(), function(q) {
-              return q.id() === self.draggedQuery();
-            })[0]);
-          }
-        }, 50);
-      }
 
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
@@ -1096,7 +1064,7 @@ ${ assist.assistPanel() }
           }
         } else if (self.inputFormat() == 'query') {
           if (self.query()) {
-            name = val.name();
+            name = self.name();
           }
         } else if (self.inputFormat() == 'manual') {
           name = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
@@ -1636,17 +1604,12 @@ ${ assist.assistPanel() }
               if (draggableMeta.definition.type === 'query-hive'){
                 generatedName += draggableMeta.definition.name;
                 viewModel.createWizard.source.inputFormat('query');
-                viewModel.createWizard.source.draggedQuery(draggableMeta.definition.id);
+                viewModel.createWizard.source.draggedQuery(draggableMeta.definition.uuid);
               }
               break;
           }
           if (generatedName !== 'idx' && viewModel.createWizard.source.name() === ''){
             viewModel.createWizard.source.name(generatedName);
-          }
-          else {
-            if (draggableMeta.table !== ''){
-              viewModel.createWizard.source.selectQuery();
-            }
           }
         }
       });

@@ -4919,6 +4919,9 @@
           if (options.document) {
             options.document(this.options[val]);
           }
+          if (options.mappedDocument) {
+            options.mappedDocument(ko.mapping.fromJS(this.options[val]));
+          }
         },
         onLoad: function () {
           if (options.value) {
@@ -4935,6 +4938,10 @@
       var options = valueAccessor();
       if (options.value) {
         element.selectize.setValue(options.value());
+      }
+      if (options.dependentValue && options.dependentValue() !== '') {
+        element.selectize.setValue(options.dependentValue());
+        options.dependentValue('');
       }
     }
   };
