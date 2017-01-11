@@ -372,8 +372,88 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 </script>
 
+
 <script type="text/html" id="job-mapreduce-task-page">
-  Attempts | Metadata | Counters
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#job-mapreduce-task-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#job-mapreduce-task-page-attempts" data-toggle="tab">${ _('Attempts') }</a></li>
+    <li><a href="#job-mapreduce-task-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
+    <li><a href="#job-mapreduce-task-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="job-mapreduce-task-page-logs">
+      % for name in ['stdout', 'stderr', 'syslog']:
+        <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+      % endfor
+      </br>
+
+      <pre data-bind="html: logs['default']"></pre>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-task-page-attempts">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('attempts'); }">Load</a>
+      </br>
+
+      ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
+      <span class="btn-group">
+        <class="btn-group">
+          <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+          <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+          <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+        </span>
+      </span>
+
+      <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+        <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span></button>
+      </div>
+
+      <table class="table table-condensed">
+        <thead>
+        <tr>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th>${_('assignedContainerId')}</th>
+          <th>${_('progress')}</th>
+          <th>${_('elapsedTime')}</th>
+          <th>${_('state')}</th>
+          <th>${_('rack')}</th>
+          <th>${_('nodeHttpAddress')}</th>
+          <th>${_('type')}</th>
+          <th>${_('startTime')}</th>
+          <th>${_('id')}</th>
+          <th>${_('finishTime')}</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: properties['attempts']()['task_list']">
+          <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
+            <td><div class="hueCheckbox fa"></div></td>
+            <td data-bind="text: assignedContainerId"></td>            
+            <td data-bind="text: progress"></td>
+            <td data-bind="text: elapsedTime"></td>            
+            <td data-bind="text: state"></td>
+            <td data-bind="text: rack"></td>
+            <td data-bind="text: nodeHttpAddress"></td>
+            <td data-bind="text: startTime"></td>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: finishTime"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-task-page-metadata">
+      <table class="table table-condensed">
+      </table>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-task-page-counters">
+      <table class="table table-condensed">
+      </table>
+    </div>
+  </div>
+
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
