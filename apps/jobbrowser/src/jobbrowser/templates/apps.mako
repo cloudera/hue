@@ -193,21 +193,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="breadcrumbs">
-
   <h2 data-bind="foreach: breadcrumbs">
     <!-- ko if: $index() > 0 -->
       &gt;
     <!-- /ko -->
 
-    ## TODO: no link on last item
-
-    <!-- ko if: id.length == 0 -->
-      <span data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }"></span>
+    <!-- ko if: $index() == 0 -->
+      <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }"></a>
     <!-- /ko -->
-    <!-- ko if: id.length != 0 -->
-      <span data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().fetchJob(id); }"></span>
-      :
-      <span data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().fetchJob(id); }"></span>
+    <!-- ko if: $index() != 0 -->
+      <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
+        <a href="javascript:void(0)" data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+        :
+        <a href="javascript:void(0)" data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+      <!-- /ko -->
+      <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
+        <span data-bind="text: type"></span>
+        :
+        <span data-bind="text: id"></span>
+      <!-- /ko -->
     <!-- /ko -->
   </h2>
 </script>
@@ -369,9 +373,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 <script type="text/html" id="job-mapreduce-task-page">
-  <h2>MapReduce Task</h2>
-  <br/>
-
   Attempts | Metadata | Counters
 </script>
 
@@ -535,8 +536,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchJob = function () {
         self.loadingJob(true);
-        hueUtils.changeURL('#!' + self.id()); // TODO build breacrumbs hash
-        vm.breadcrumbs.push({'id': self.id(), 'name': self.name(), 'type': self.type()});
 
         $.post("/jobbrowser/api/job", {
           app_id: ko.mapping.toJSON(self.id),
@@ -544,6 +543,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
             vm.job(new Job(vm, data.app));
+            hueUtils.changeURL('#!' + vm.job().id());
+            vm.breadcrumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+
             vm.job().fetchLogs();
             if (self.mainType() == 'schedules') {
               vm.job().coordVM.setActions(data.app.actions);
