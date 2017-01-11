@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
-from jobbrowser.views import job_attempt_logs_json, tasks
+from jobbrowser.views import job_attempt_logs_json
 
 
 LOG = logging.getLogger(__name__)
@@ -59,6 +59,8 @@ class JobApi(Api):
   def _get_api(self, appid):
     if appid.startswith('task_'):
       return YarnMapReduceTaskApi(self.user, appid)
+    elif appid.startswith('attempt_'):
+      return YarnMapReduceTaskAttemptApi(self.user, appid)
     else:
       return self.yarn_api # application_
 
@@ -189,19 +191,19 @@ class YarnMapReduceTaskAttemptApi(Api):
 
   def __init__(self, user, app_id):
     Api.__init__(self, user)
-    self.app_id = '_'.join(app_id.replace('task_', 'application_').split('_')[:3])
-    self.task_id = app_id
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').replace('attempt_', 'application_').split('_')[:3])
+    self.task_id = '_'.join(app_id.replace('attempt_', 'task_').split('_')[:5])
+    self.attempt_id = app_id
 
   def apps(self):
     return [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts]
 
 
   def app(self, appid):
-    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
 
     common = self._massage_task(task)
     common['properties'] = {
-      'attempts': []
     }
 
     return common
@@ -225,18 +227,18 @@ class YarnMapReduceTaskAttemptApi(Api):
 
   def _massage_task(self, task):
     return {
-#         "elapsedMergeTime" : task.elapsedMergeTime,
-#         "shuffleFinishTime" : task.shuffleFinishTime,
+        #"elapsedMergeTime" : task.elapsedMergeTime,
+        #"shuffleFinishTime" : task.shuffleFinishTime,
         "assignedContainerId" : task.assignedContainerId,
         "progress" : task.progress,
         "elapsedTime" : task.elapsedTime,
         "state" : task.state,
-#         "elapsedShuffleTime" : task.elapsedShuffleTime,
-#         "mergeFinishTime" : task.mergeFinishTime,
+        #"elapsedShuffleTime" : task.elapsedShuffleTime,
+        #"mergeFinishTime" : task.mergeFinishTime,
         "rack" : task.rack,
-#         "elapsedReduceTime" : task.elapsedReduceTime,
+        #"elapsedReduceTime" : task.elapsedReduceTime,
         "nodeHttpAddress" : task.nodeHttpAddress,
-        "type" : task.type,
+        "type" : task.type + '_ATTEMPT',
         "startTime" : task.startTime,
         "id" : task.id,
         "finishTime" : task.finishTime
