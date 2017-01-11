@@ -24,7 +24,7 @@ from desktop.views import _ko
     .hue-ace-autocompleter {
       position: fixed;
       z-index: 100000;
-      height: 250px;
+      max-height: 250px;
       border: 1px solid #DDD;
       display: flex;
       flex-direction: column;
@@ -42,7 +42,7 @@ from desktop.views import _ko
     }
 
     .autocompleter-list {
-      display: inline-block;
+      float: left;
       position: relative;
       overflow-y: auto;
       width: 300px;
@@ -80,7 +80,7 @@ from desktop.views import _ko
 
     .autocompleter-details {
       vertical-align: top;
-      display: inline-block;
+      float: right;
       width: 300px;
       overflow-y: auto;
     }
@@ -112,7 +112,12 @@ from desktop.views import _ko
       text-shadow: 0 0 0.01em;
     }
 
+    .autocompleter-suggestion.pull-right {
+      margin-right: 3px;
+    }
+
     .autocompleter-dot {
+      margin-left: 2px;
       margin-top: 5px;
       margin-right: 5px;
       width: 8px;
