@@ -462,10 +462,49 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
-  Logs | Metadata | Counters
 
-  <br/><br/>
-  Attempt | Container
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#job-mapreduce-task-attempt-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
+    <li><a href="#job-mapreduce-task-attempt-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs">
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#job-mapreduce-task-attempt-page-logs-attempts" data-toggle="tab">${ _('Attempts') }</a></li>
+        <li><a href="#job-mapreduce-task-attempt-page-logs-container" data-toggle="tab">${ _('Container') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs-attempts">
+          % for name in ['stdout', 'stderr', 'syslog']:
+            <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+          % endfor
+          </br>
+          <pre data-bind="html: logs['default']"></pre>
+        </div>
+
+        <div class="tab-pane" id="job-mapreduce-task-attempt-page-logs-container">
+          % for name in ['container-stdout', 'container-stderr', 'container-syslog']:
+            <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+          % endfor
+          </br>
+          <pre data-bind="html: logs['default']"></pre>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-task-attempt-page-metadata">
+      <table class="table table-condensed">
+      </table>
+    </div>
+
+    <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
+      <table class="table table-condensed">
+      </table>
+    </div>
+  </div>
 
 </script>
 
