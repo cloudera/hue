@@ -27,11 +27,11 @@ LOG = logging.getLogger(__name__)
 
 def get_api(user, interface):
   from jobbrowser.apis.workflow_api import WorkflowApi
-  from jobbrowser.apis.job_api import YarnApi
+  from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
 
   if interface == 'apps':
-    return YarnApi(user)
+    return JobApi(user)
   elif interface == 'workflows':
     return WorkflowApi(user)
   elif interface == 'schedules':

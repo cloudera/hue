@@ -36,13 +36,13 @@ except Exception, e:
 class JobApi(Api):
 
   def __init__(self, user):
-    self.user =  user
+    self.user = user
     self.yarn_api = YarnApi(user) # TODO: actually long term move job aggregations to the frontend instead probably
     self.impala_api = ImpalaApi(user)
     self.request = None
 
   def apps(self):
-    jobs = self.self.yarn_api.apps()
+    jobs = self.yarn_api.apps()
     # += Impala
     # += Sqoop2
     return jobs
@@ -50,14 +50,20 @@ class JobApi(Api):
   def app(self, appid):
     return self._get_api(appid).app(appid)
 
-  def logs(self, appid):
-    return self._get_api(appid).logs(appid)
+  def logs(self, appid, app_type):
+    return self._get_api(appid).logs(appid, app_type)
 
   def profile(self, appid, app_type, app_property):
     return self._get_api(appid).profile(appid, app_type, app_property)
 
   def _get_api(self, appid):
-    return self.impala_api if not appid.startswith('application_') else self.yarn_api
+    if appid.startswith('task_'):
+      return YarnMapReduceTaskApi(self.user, appid)
+    else:
+      return self.yarn_api # application_
+
+  def _set_request(self, request):
+    self.request = request
 
 
 class YarnApi(Api):
@@ -120,14 +126,60 @@ class YarnApi(Api):
   def profile(self, appid, app_type, app_property):
     if app_type == 'MAPREDUCE':
       if app_property == 'tasks':
-        response = tasks(self.request, job=appid)
-        return json.loads(response.content)
+        return {
+          'task_list': YarnMapReduceTaskApi(self.user, appid).apps(),
+        }
 
     return {}
 
 
-  def _set_request(self, request):
-    self.request = request
+class YarnMapReduceTaskApi(Api):
+
+  def __init__(self, user, app_id):
+    Api.__init__(self, user)
+    self.app_id = '_'.join(app_id.replace('task_', 'application_').split('_')[:3])
+
+
+  def apps(self):
+    return [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(jobid=self.app_id, pagenum=1)]
+
+  def app(self, appid):
+    task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid)
+
+    common = self._massage_task(task)
+    common['properties'] = {
+    }
+
+    return common
+
+
+  def logs(self, appid, app_type):
+    if app_type == 'MAPREDUCE':
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
+      logs = json.loads(response.content)['log']
+    else:
+      logs = None
+    return {'progress': 0, 'logs': {'default': logs}}
+
+
+  def profile(self, appid, app_type, app_property):
+    if app_property == 'task_attemps':
+      response = tasks(self.request, job=appid)
+      return json.loads(response.content)
+
+    return {}
+
+  def _massage_task(self, task):
+    return {
+        'id': task.id,
+        'type': task.type,
+        'elapsedTime': task.elapsedTime,
+        'progress': task.progress,
+        'state': task.state,
+        'startTime': task.startTime,
+        'successfulAttempt': task.successfulAttempt,
+        'finishTime': task.finishTime
+    }
 
 
 class YarnAtsApi(Api):
