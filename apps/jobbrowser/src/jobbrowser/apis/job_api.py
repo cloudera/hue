@@ -111,7 +111,10 @@ class YarnApi(Api):
           'finishedReduces': app.finishedReduces,
           'desiredMaps': app.desiredMaps,
           'desiredReduces': app.desiredReduces,
-          'tasks': []
+
+          'tasks': [],
+          'metadata': [],
+          'counters': []
       }
     return common
 
@@ -131,6 +134,10 @@ class YarnApi(Api):
         return {
           'task_list': YarnMapReduceTaskApi(self.user, appid).apps(),
         }
+      elif app_property == 'metadata':
+        return NativeYarnApi(self.user).get_job(jobid=appid).full_job_conf
+      elif app_property == 'counters':
+        return NativeYarnApi(self.user).get_job(jobid=appid).counters
 
     return {}
 
@@ -151,8 +158,11 @@ class YarnMapReduceTaskApi(Api):
 
     common = self._massage_task(task)
     common['properties'] = {
-      'attempts': []
+      'attempts': [],
+      'metadata': [],
+      'counters': []
     }
+    common['properties'].update(self._massage_task(task))
 
     return common
 
@@ -169,6 +179,8 @@ class YarnMapReduceTaskApi(Api):
       return {
           'task_list': YarnMapReduceTaskAttemptApi(self.user, appid).apps(),
       }
+    elif app_property == 'counters':
+      return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid).counters
 
     return {}
 
@@ -202,7 +214,10 @@ class YarnMapReduceTaskAttemptApi(Api):
 
     common = self._massage_task(task)
     common['properties'] = {
+        'metadata': [],
+        'counters': []
     }
+    common['properties'].update(self._massage_task(task))
 
     return common
 
@@ -215,6 +230,8 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def profile(self, appid, app_type, app_property):
+    if app_property == 'counters':
+      return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
 
     return {}
 

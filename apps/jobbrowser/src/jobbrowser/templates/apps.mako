@@ -199,7 +199,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- /ko -->
 
     <!-- ko if: $index() == 0 -->
-      <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }"></a>
+      <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }" style="text-transform: capitalize"></a>
     <!-- /ko -->
     <!-- ko if: $index() != 0 -->
       <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
@@ -364,13 +364,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-metadata">
-      <table class="table table-condensed">
-      </table>
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('metadata'); }">Load</a>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['metadata'])"></span>
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-counters">
-      <table class="table table-condensed">
-      </table>
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('counters'); }">Load</a>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['counters'])"></span>
     </div>
   </div>
 
@@ -379,10 +381,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-mapreduce-task-page">
 
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('progress') } <span data-bind="text: progress"></span>
+
+  <br/><br/>
+
+  <!-- ko with: properties -->
+  ${ _('state') } <span data-bind="text: state"></span>
+  ${ _('startTime') } <span data-bind="text: startTime"></span>
+  ${ _('successfulAttempt') } <span data-bind="text: successfulAttempt"></span>
+  ${ _('finishTime') } <span data-bind="text: finishTime"></span>
+  ${ _('elapsedTime') } <span data-bind="text: elapsedTime"></span>
+  <!-- /ko -->
+
+  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+  </div>
+
   <ul class="nav nav-tabs">
     <li class="active"><a href="#job-mapreduce-task-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
     <li><a href="#job-mapreduce-task-page-attempts" data-toggle="tab">${ _('Attempts') }</a></li>
-    <li><a href="#job-mapreduce-task-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
     <li><a href="#job-mapreduce-task-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
   </ul>
 
@@ -448,24 +467,40 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </table>
     </div>
 
-    <div class="tab-pane" id="job-mapreduce-task-page-metadata">
-      <table class="table table-condensed">
-      </table>
-    </div>
-
     <div class="tab-pane" id="job-mapreduce-task-page-counters">
-      <table class="table table-condensed">
-      </table>
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('counters'); }">Load</a>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['counters'])"></span>
     </div>
   </div>
 
 </script>
 
+
 <script type="text/html" id="job-mapreduce-task-attempt-page">
+
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('progress') } <span data-bind="text: progress"></span>
+  ${ _('type') } <span data-bind="text: type"></span>
+
+  <br/><br/>
+
+  <!-- ko with: properties -->
+  ${ _('assignedContainerId') } <span data-bind="text: assignedContainerId"></span>
+  ${ _('elapsedTime') } <span data-bind="text: elapsedTime"></span>
+  ${ _('rack') } <span data-bind="text: rack"></span>
+  ${ _('nodeHttpAddress') } <span data-bind="text: nodeHttpAddress"></span>
+  ${ _('state') } <span data-bind="text: state"></span>
+  ${ _('startTime') } <span data-bind="text: startTime"></span>
+  ${ _('finishTime') } <span data-bind="text: finishTime"></span>
+  <!-- /ko -->
+
+  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+  </div>
 
   <ul class="nav nav-tabs">
     <li class="active"><a href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#job-mapreduce-task-attempt-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
     <li><a href="#job-mapreduce-task-attempt-page-counters" data-toggle="tab">${ _('Counters') }</a></li>
   </ul>
 
@@ -495,14 +530,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 
-    <div class="tab-pane" id="job-mapreduce-task-attempt-page-metadata">
-      <table class="table table-condensed">
-      </table>
-    </div>
-
     <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
-      <table class="table table-condensed">
-      </table>
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('counters'); }">Load</a>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['counters'])"></span>
     </div>
   </div>
 
