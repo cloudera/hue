@@ -108,6 +108,10 @@ from desktop.views import _ko
       line-height: 18px;
     }
 
+    .autocompleter-suggestion > b {
+      text-shadow: 0 0 0.01em;
+    }
+
     .autocompleter-dot {
       margin-top: 5px;
       margin-right: 5px;
@@ -202,21 +206,30 @@ from desktop.views import _ko
       var HashHandler = ace.require('ace/keyboard/hash_handler').HashHandler;
 
       ko.bindingHandlers.matchedText = {
-        update: function (element, valueAccessor) {
+        init: function (element, valueAccessor) {
           var options = valueAccessor();
           var $element = $(element);
-          $element.empty();
-          var suggestion = options.suggestion;
-          if (options.filter() && suggestion.matchIndex > -1) {
-            var before = suggestion.value.substring(0, suggestion.matchIndex);
-            var match = suggestion.value.substring(suggestion.matchIndex, suggestion.matchIndex + suggestion.matchLength);
-            var after = suggestion.value.substring(suggestion.matchIndex + suggestion.matchLength);
-            $element.append(document.createTextNode(before));
-            $('<b>').text(match).appendTo($element);
-            $element.append(document.createTextNode(after));
-          } else {
-            $element.text(suggestion.value);
-          }
+
+          var refresh = function () {
+            $element.empty();
+            var suggestion = options.suggestion;
+            if (options.filter() && suggestion.matchIndex > -1) {
+              var before = suggestion.value.substring(0, suggestion.matchIndex);
+              var match = suggestion.value.substring(suggestion.matchIndex, suggestion.matchIndex + suggestion.matchLength);
+              var after = suggestion.value.substring(suggestion.matchIndex + suggestion.matchLength);
+              $element.append(document.createTextNode(before));
+              $('<b>').text(match).appendTo($element);
+              $element.append(document.createTextNode(after));
+            } else {
+              $element.text(suggestion.value);
+            }
+          };
+
+          refresh();
+
+          // matchIndex and matchLength are not observable, hence the pubsub to update
+          var updatePubSub = huePubSub.subscribe('hue.ace.autocompleter.match.updated', refresh);
+          ko.utils.domNodeDisposal.addDisposeCallback(element, updatePubSub.remove)
         }
       };
 

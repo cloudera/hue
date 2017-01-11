@@ -137,6 +137,7 @@ var SqlAutocompleter3 = (function () {
           suggestion.matchLength = self.filter().length;
           return true;
         });
+        huePubSub.publish('hue.ace.autocompleter.match.updated');
       }
       result.sort(function (a, b) {
         if (self.filter()) {
