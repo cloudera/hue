@@ -228,8 +228,8 @@ class YarnApi(JobBrowserApi):
     else:
       start_date = datetime.utcnow() - timedelta(days=time_value)
 
-    epoch = datetime.utcfromtimestamp(0)
-    return int((start_date - epoch).total_seconds()) * 1000
+    elapsed_time = start_date - datetime.utcfromtimestamp(0)
+    return int(elapsed_time.days * 86400 + elapsed_time.seconds) * 1000
 
   def filter_jobs(self, user, jobs, **kwargs):
     check_permission = not SHARE_JOBS.get() and not user.is_superuser
