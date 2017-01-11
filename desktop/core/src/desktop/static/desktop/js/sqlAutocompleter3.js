@@ -1311,6 +1311,7 @@ var SqlAutocompleter3 = (function () {
       self.apiHelper.fetchNavOptTopTables({
         database: self.activeDatabase,
         sourceType: self.snippet.type(),
+        silenceErrors: true,
         successCallback: function (data) {
           var popularityIndex = {};
           data.top_tables.forEach(function (topTable) {
