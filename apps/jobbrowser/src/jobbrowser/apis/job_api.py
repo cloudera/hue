@@ -37,8 +37,9 @@ class JobApi(Api):
 
   def __init__(self, user):
     self.user =  user
-    self.yarn_api = YarnApi(user)
+    self.yarn_api = YarnApi(user) # TODO: actually long term move job aggregations to the frontend instead probably
     self.impala_api = ImpalaApi(user)
+    self.request = None
 
   def apps(self):
     jobs = self.self.yarn_api.apps()
@@ -52,12 +53,11 @@ class JobApi(Api):
   def logs(self, appid):
     return self._get_api(appid).logs(appid)
 
-  def profile(self, appid, app_type, property):
-    return self._get_api(appid).logs(appid, app_type, property)
+  def profile(self, appid, app_type, app_property):
+    return self._get_api(appid).profile(appid, app_type, app_property)
 
   def _get_api(self, appid):
     return self.impala_api if not appid.startswith('application_') else self.yarn_api
-
 
 
 class YarnApi(Api):
@@ -75,6 +75,7 @@ class YarnApi(Api):
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in jobs]
+
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
@@ -102,8 +103,10 @@ class YarnApi(Api):
           'finishedReduces': app.finishedReduces,
           'desiredMaps': app.desiredMaps,
           'desiredReduces': app.desiredReduces,
+          'tasks': []
       }
     return common
+
 
   def logs(self, appid, app_type):
     if app_type == 'MAPREDUCE':
@@ -114,13 +117,17 @@ class YarnApi(Api):
     return {'progress': 0, 'logs': {'default': logs}}
 
 
-  def profile(self, appid, app_type, property):
+  def profile(self, appid, app_type, app_property):
     if app_type == 'MAPREDUCE':
-      if property == 'tasks':
-        response = tasks(MockDjangoRequest(self.user), job=appid)
-        print response.context['task_list']
+      if app_property == 'tasks':
+        response = tasks(self.request, job=appid)
+        return json.loads(response.content)
 
     return {}
+
+
+  def _set_request(self, request):
+    self.request = request
 
 
 class YarnAtsApi(Api):

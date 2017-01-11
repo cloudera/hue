@@ -40,10 +40,11 @@ def get_api(user, interface):
     raise PopupException(_('Interface %s is unknown') % interface)
 
 
-class Api():
+class Api(object):
 
   def __init__(self, user):
     self.user = user
+    self.request = None
 
   def apps(self): return []
 
@@ -55,7 +56,10 @@ class Api():
 
   def logs(self, appid, app_type): return {'progress': 0, 'logs': {'default': ''}}
 
-  def profile(self, appid, app_type, property): return {} # Tasks, XML, counters...
+  def profile(self, appid, app_type, app_property): return {} # Tasks, XML, counters...
+
+  def _set_request(self, request):
+    self.request = request
 
 
 class MockDjangoRequest():

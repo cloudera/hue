@@ -304,7 +304,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('tasks'); }">Load</a>
+
       <table class="table table-condensed">
+        <thead>
+        <tr>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th>${_('Type')}</th>
+          <th>${_('Id')}</th>
+          <th>${_('Logs')}</th>
+          <th>${_('Url')}</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: properties['tasks']()['task_list']">
+          <tr data-bind="click: function() { $root.job().fetchJob(id); }">
+            <td><div class="hueCheckbox fa"></div></td>
+            <td data-bind="text: type"></td>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: logs"></td>
+            <td data-bind="text: url"></td>
+          </tr>
+        </tbody>
       </table>
     </div>
 
@@ -394,7 +414,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   <div class="tab-content">
     <div class="tab-pane active" id="workflow-page-graph">
-      <span data-bind="html: properties().graph"></span>
+      <span data-bind="html: properties['graph']"></span>
     </div>
 
     <div class="tab-pane" id="workflow-page-logs">
@@ -477,7 +497,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.coordVM = new RunningCoordinatorModel([]);
 
-      self.properties = ko.observableDefault(job.properties, {});
+      self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
       self.loadingJob = ko.observable(false);
@@ -488,7 +508,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         vm.breadcrumbs.push({'id': self.id(), 'name': self.name(), 'type': self.type()});
 
         $.post("/jobbrowser/api/job", {
-          appid: ko.mapping.toJSON(self.id),
+          app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface)
         }, function (data) {
           if (data.status == 0) {
@@ -507,7 +527,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchLogs = function (name) {
         $.post("/jobbrowser/api/job/logs", {
-          appid: ko.mapping.toJSON(self.id),
+          app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           type: ko.mapping.toJSON(self.type),
           name: name ? name : 'default'
@@ -523,13 +543,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.fetchProfile = function (name) {
         $.post("/jobbrowser/api/job/profile", {
-          appid: ko.mapping.toJSON(self.id),
+          app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
-          type: ko.mapping.toJSON(self.type),
-          name: name
+          app_type: ko.mapping.toJSON(self.type),
+          app_property: ko.mapping.toJSON(name)
         }, function (data) {
           if (data.status == 0) {
-            self.properties['default'](data.logs.logs['default']);
+            self.properties[name](data[name]);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -581,7 +601,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.jobs = new Jobs(self, options);
       self.job = ko.observable();
 
-      //self.section = ko.observable('apps');
       self.interface = ko.observable('apps');
       self.interface.subscribe(function (val) {
         hueUtils.changeURL('#!' + val);
@@ -616,9 +635,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           h = h.substr(2);
         }
         switch (h) {
-          case 'schedules':
           case 'apps':
           case 'workflows':
+          case 'schedules':
             viewModel.interface(h);
             break;
           default:
@@ -635,6 +654,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   })();
 </script>
 </span>
+
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 % endif
