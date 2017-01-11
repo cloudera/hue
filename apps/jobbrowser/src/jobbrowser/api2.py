@@ -71,7 +71,18 @@ def job(request):
 
 
 @api_error_handler
-def action(request): return {}
+def action(request):
+  response = {'status': -1}
+
+  interface = json.loads(request.POST.get('interface'))
+  app_id = json.loads(request.POST.get('app_id'))
+  action = json.loads(request.POST.get('action'))
+
+  response['action'] = action
+  response['action_status'] = get_api(request.user, interface).action(app_id, action)
+  response['status'] = 0
+
+  return JsonResponse(response)
 
 
 @api_error_handler

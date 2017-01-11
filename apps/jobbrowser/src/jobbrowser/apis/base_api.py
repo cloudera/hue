@@ -50,7 +50,7 @@ class Api(object):
 
   def app(self, appid): return {}
 
-  def action(self, appid): return {} # Kill, suspend...
+  def action(self, appid, action): return {} # Kill, suspend...
 
   def status(self, appid): return {'status': 'RUNNING'}
 
@@ -67,4 +67,4 @@ class MockDjangoRequest():
   def __init__(self, user):
     self.user = user
     self.jt = None
-    self.GET = {'format': 'json', 'is_jb2': True}
+    self.method = "POST"

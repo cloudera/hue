@@ -21,7 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
-from jobbrowser.views import job_attempt_logs_json
+from jobbrowser.views import job_attempt_logs_json, kill_job
 
 
 LOG = logging.getLogger(__name__)
@@ -49,6 +49,8 @@ class JobApi(Api):
 
   def app(self, appid):
     return self._get_api(appid).app(appid)
+
+  def action(self, appid, action): self._get_api(appid).action(action, appid)
 
   def logs(self, appid, app_type):
     return self._get_api(appid).logs(appid, app_type)
@@ -117,6 +119,13 @@ class YarnApi(Api):
           'counters': []
       }
     return common
+
+
+  def action(self, action, appid):
+    if action == 'kill':
+      return kill_job(MockDjangoRequest(self.user), job=appid)
+    else:
+      return {}
 
 
   def logs(self, appid, app_type):
