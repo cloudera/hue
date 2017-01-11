@@ -268,10 +268,6 @@ def kill_job(request, job):
   if request.method != "POST":
     raise Exception(_("kill_job may only be invoked with a POST (got a %(method)s).") % {'method': request.method})
 
-  if job.user != request.user.username and not request.user.is_superuser:
-    access_warn(request, _('Insufficient permission'))
-    raise MessageException(_("Permission denied.  User %(username)s cannot delete user %(user)s's job.") % {'username': request.user.username, 'user': job.user})
-
   try:
     job.kill()
   except Exception, e:
