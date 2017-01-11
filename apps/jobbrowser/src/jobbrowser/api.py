@@ -304,7 +304,7 @@ class YarnApi(JobBrowserApi):
     return self.get_job(jobid).filter_tasks(**filters)
 
   def get_task(self, jobid, task_id):
-    return self.get_job(jobid).task(task_id)
+    return self.get_job(jobid).get_task(task_id)
 
   def get_tracker(self, node_manager_http_address, container_id):
     api = node_manager_api.get_node_manager_api('http://' + node_manager_http_address)

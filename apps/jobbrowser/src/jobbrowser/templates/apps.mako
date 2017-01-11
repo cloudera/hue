@@ -116,13 +116,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         % endif
+
         <div class="content-panel">
 
           <div class="container-fluid">
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
 
             <!-- ko if: ! $root.job() -->
-            ${_('Filter')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
+            ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
             <span class="btn-group">
               <class="btn-group">
                 <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
@@ -231,6 +232,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-mapreduce-page', data: $root.job() }"></div>
   <!-- /ko -->
 
+  <!-- ko if: type() == 'MAP' || type() == 'REDUCE' -->
+    <div data-bind="template: { name: 'job-mapreduce-task-page', data: $root.job() }"></div>
+  <!-- /ko -->
+
   <!-- ko if: type() == 'YARN' -->
     <div data-bind="template: { name: 'job-yarn-page', data: $root.job() }"></div>
   <!-- /ko -->
@@ -305,6 +310,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
       <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('tasks'); }">Load</a>
+      </br>
+
+      ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
+      <span class="btn-group">
+        <class="btn-group">
+          <a class="btn btn-status btn-success" data-value="completed">${ _('MAP') }</a>
+          <a class="btn btn-status btn-warning" data-value="running">${ _('REDUCE') }</a>
+        </span>
+      </span>
+
+      <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
+        <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
+        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span></button>
+      </div>
 
       <table class="table table-condensed">
         <thead>
@@ -312,17 +331,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
           <th>${_('Type')}</th>
           <th>${_('Id')}</th>
-          <th>${_('Logs')}</th>
-          <th>${_('Url')}</th>
+          <th>${_('elapsedTime')}</th>
+          <th>${_('progress')}</th>
+          <th>${_('state')}</th>
+          <th>${_('startTime')}</th>
+          <th>${_('successfulAttempt')}</th>
+          <th>${_('finishTime')}</th>
         </tr>
         </thead>
         <tbody data-bind="foreach: properties['tasks']()['task_list']">
-          <tr data-bind="click: function() { $root.job().fetchJob(id); }">
+          <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
             <td><div class="hueCheckbox fa"></div></td>
             <td data-bind="text: type"></td>
             <td data-bind="text: id"></td>
-            <td data-bind="text: logs"></td>
-            <td data-bind="text: url"></td>
+            <td data-bind="text: elapsedTime"></td>
+            <td data-bind="text: progress"></td>
+            <td data-bind="text: state"></td>
+            <td data-bind="text: startTime"></td>
+            <td data-bind="text: successfulAttempt"></td>
+            <td data-bind="text: finishTime"></td>
           </tr>
         </tbody>
       </table>
@@ -345,14 +372,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <h2>MapReduce Task</h2>
   <br/>
 
-  Task Attemps | Metadata | Counters
+  Attempts | Metadata | Counters
 </script>
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
   <h2>MapReduce Task attempt</h2>
   <br/>
 
-  Container | Metadata | Counters
+  Logs | Metadata | Counters
+
+  <br/><br/>
+  Attempt | Container
+
 </script>
 
 

@@ -425,15 +425,6 @@ def tasks(request, job):
 
   filter_params = copy_query_dict(request.GET, ('tasktype', 'taskstate', 'tasktext')).urlencode()
 
-  if request.is_ajax():
-    return JsonResponse({
-      'filter_params': filter_params,
-      'task_list': [massage_task_for_json(task) for task in task_list],
-      'tasktype': ttypes,
-      'taskstate': tstates,
-      'tasktext': ttext
-    })
-
   return render("tasks.mako", request, {
     'request': request,
     'filter_params': filter_params,
