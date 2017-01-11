@@ -295,7 +295,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  Stop
+  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('kill'); }">Stop</a>
+    
 
   </br>
 
@@ -735,6 +736,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
             self.properties[name](data[name]);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).always(function () {
+        });
+      };
+
+      self.changeStatus = function (name) {
+        $.post("/jobbrowser/api/job/action", {
+          app_id: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(vm.interface),
+          app_type: ko.mapping.toJSON(self.type),
+          action: ko.mapping.toJSON(name)
+        }, function (data) {
+          if (data.status == 0) {
+            
           } else {
             $(document).trigger("error", data.message);
           }
