@@ -29,7 +29,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow
+  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs
 except Exception, e:
   LOG.exception('Some application are not enabled for Job Browser v2: %s' % e)
 
@@ -63,6 +63,17 @@ class WorkflowApi(Api):
     common['properties'] = json.loads(response.content)
 
     return common
+
+
+  def action(self, appid, action):
+    request = MockDjangoRequest(self.user)
+    manage_oozie_jobs(request, action)
+
+    if action == 'change' or action == 'ignore' or ',' not in appid:
+      return manage_oozie_jobs(request, action)
+    else:
+      return bulk_manage_oozie_jobs(request)
+
 
   def logs(self, appid, app_type):
     request = MockDjangoRequest(self.user)

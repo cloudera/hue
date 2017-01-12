@@ -50,7 +50,8 @@ class JobApi(Api):
   def app(self, appid):
     return self._get_api(appid).app(appid)
 
-  def action(self, appid, action): self._get_api(appid).action(action, appid)
+  def action(self, appid, operation):
+    return self._get_api(appid).action(operation, appid)
 
   def logs(self, appid, app_type):
     return self._get_api(appid).logs(appid, app_type)
@@ -121,8 +122,8 @@ class YarnApi(Api):
     return common
 
 
-  def action(self, action, appid):
-    if action == 'kill':
+  def action(self, operation, appid):
+    if operation['action'] == 'kill':
       return kill_job(MockDjangoRequest(self.user), job=appid)
     else:
       return {}
