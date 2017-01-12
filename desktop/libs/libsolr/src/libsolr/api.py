@@ -146,7 +146,6 @@ class SolrApi(object):
               'mincount': int(facet['properties']['mincount']),
               'sort': {'count': facet['properties']['sort']},
           }
-          print facet
 
           if facet['properties']['domain'].get('blockParent') or facet['properties']['domain'].get('blockChildren'):
             _f['domain'] = {}
@@ -172,7 +171,7 @@ class SolrApi(object):
                 'offset': 0,
                 'numBuckets': True,
                 'allBuckets': True,
-                'prefix': ''
+                #'prefix': '' # Forbidden on numeric fields
             })
             if facet['properties']['canRange'] and not facet['properties']['isDate']:
               del _f['mincount'] # Numeric fields do not support
@@ -276,7 +275,7 @@ class SolrApi(object):
           'mincount': int(facet['mincount']),
           'numBuckets': True,
           'allBuckets': True,
-          'prefix': ''
+          #'prefix': '' # Forbidden on numeric fields
       }
       if widget['widgetType'] == 'tree2-widget' and facets[-1]['aggregate']['function'] != 'count':
         _f['subcount'] = self._get_aggregate_function(facets[-1])
