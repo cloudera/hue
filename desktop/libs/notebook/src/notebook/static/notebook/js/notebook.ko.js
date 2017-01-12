@@ -276,6 +276,18 @@ var EditorViewModel = (function() {
     self.availableSnippets = vm.availableSnippets();
     self.inFocus = ko.observable(false);
 
+    self.inFocus.subscribe(function (newValue) {
+      if (newValue) {
+        huePubSub.publish('active.snippet.type', self.type());
+      }
+    });
+
+    huePubSub.subscribe('get.active.snippet.type', function () {
+      if (self.inFocus() || notebook.snippets().length === 1) {
+        huePubSub.publish('active.snippet.type', self.type());
+      }
+    });
+
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
     };

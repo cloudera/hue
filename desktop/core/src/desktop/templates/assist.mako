@@ -2146,6 +2146,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         });
 
         self.activeType(self.availableTypes()[0]);
+
+        huePubSub.subscribe('active.snippet.type', function (type) {
+          self.availableTypes().every(function (availableType) {
+            if (availableType.toLowerCase() === type) {
+              if (self.activeType() !== availableType) {
+                self.activeType(availableType);
+              }
+              return false;
+            }
+            return true;
+          });
+        });
+
+        huePubSub.publish('get.active.snippet.type');
       }
 
       FunctionsPanel.prototype.initFunctions = function (dialect) {
