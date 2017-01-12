@@ -298,6 +298,13 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       });
     }
 
+    function validTimeValue() {
+      var numberValue = parseInt($("#timeValue").val().trim());
+      return $("#timeValue").val().trim() != "" && !isNaN(numberValue) && 1 <= numberValue <= 3650;
+    }
+
+    var lastTimeValue = null;
+
     function callJsonData(callback, justRunning) {
       var _url_params = {"format": "json"};
 
@@ -325,8 +332,9 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
         _url_params["text"] = $('#textFilter').val().trim();
       }
 
-      if ($("#timeValue").val().trim() != "") {
-        _url_params["time_value"] = $('#timeValue').val().trim();
+      if (validTimeValue()) {
+        _url_params["time_value"] = parseInt($('#timeValue').val().trim());
+        lastTimeValue = $('#timeValue').val();
         _url_params["time_unit"] = $('#timeUnit :selected').text();
       }
 
@@ -342,14 +350,20 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
       callJsonData(populateTable);
     });
 
+
+
     $("#timeValue").jHueDelayedInput(function(){
-      $("#loading").removeClass("hide");
-      callJsonData(populateTable);
+      if (validTimeValue() && lastTimeValue !== $('#timeValue').val()) {
+        $("#loading").removeClass("hide");
+        callJsonData(populateTable);
+      }
     });
 
     $("#timeValue").change(function(){
-      $("#loading").removeClass("hide");
-      callJsonData(populateTable);
+      if (validTimeValue() && lastTimeValue !== $('#timeValue').val()) {
+        $("#loading").removeClass("hide");
+        callJsonData(populateTable);
+      }
     });
 
     $("#showRetired").change(function () {
