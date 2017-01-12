@@ -666,7 +666,11 @@ ${ assist.assistPanel() }
     </label>
 
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
-       <input type="text" class="input-small" placeholder="${ _('Field comment') }" data-bind="value: comment">
+      <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
+
+      <span data-bind="visible: showProperties">
+        <input type="text" class="input-medium margin-left-5" placeholder="${ _('Field comment') }" data-bind="value: comment">
+      </span>
     </span>
 
     <!-- ko if: level() > 0 && $parent.type() == 'struct' && $parent.nested().length > 1 -->
