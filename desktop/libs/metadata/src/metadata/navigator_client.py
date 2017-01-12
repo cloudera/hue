@@ -20,11 +20,14 @@ import json
 import logging
 import re
 
+from itertools import islice
+
 from desktop.lib.rest import resource
 from desktop.lib.rest.http_client import HttpClient, RestException
 
 from hadoop.conf import HDFS_CLUSTERS
 from libsentry.privilege_checker import PrivilegeChecker
+from libsentry.sentry_site import get_hive_sentry_provider
 
 from metadata.conf import NAVIGATOR
 
@@ -138,7 +141,7 @@ class NavigatorApi(object):
       LOG.info(params)
       response = self._root.get('entities', headers=self.__headers, params=params)
 
-      self._secure_results(response)
+      response = list(islice(self._secure_results(response), limit)) # Apply Sentry perms
 
       return response
     except RestException, e:
@@ -204,7 +207,7 @@ class NavigatorApi(object):
       LOG.info(data)
       response = self._root.post('interactive/entities?limit=%(limit)s&offset=%(offset)s' % pagination, data=data, contenttype=_JSON_CONTENT_TYPE, clear_cookies=True)
 
-      self._secure_results(response)
+      response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
 
       return response
     except RestException:
@@ -213,18 +216,20 @@ class NavigatorApi(object):
       raise NavigatorApiException(msg)
 
 
-  def _secure_results(self, response):
+  def _secure_results(self, results):
     if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
       checker = PrivilegeChecker(user=self.user)
       action = 'SELECT'
 
       def getkey(result):
         if result['type'] == 'TABLE':
-          return {u'column': None, u'table': result['originalName'], u'db': result['parentPath'].strip('/')} #, 'server': 'server1'}
+          return {u'column': None, u'table': result.get('originalName', ''), u'db': result.get('parentPath', '') and result.get('parentPath', '').strip('/'), 'server': get_hive_sentry_provider()}
         else:
           return {u'column': None, u'table': None, u'db': None, u'server': None}
 
-      response['results'] = checker.filter_objects(response['results'], action, key=getkey)
+      return checker.filter_objects(results, action, key=getkey)
+    else:
+      return results
 
 
   def suggest(self, prefix=None):

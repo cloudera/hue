@@ -80,7 +80,7 @@ def search_entities(request):
   query_s = smart_str(query_s)
 
   offset = request.POST.get('offset', 0)
-  limit = request.POST.get('limit', 100)
+  limit = int(request.POST.get('limit', 100))
   sources = json.loads(request.POST.get('sources')) or []
 
   query_s = query_s.strip() or '*'
@@ -111,7 +111,7 @@ def search_entities_interactive(request):
   query_s = json.loads(request.POST.get('query_s', ''))
   prefix = request.POST.get('prefix')
   offset = request.POST.get('offset', 0)
-  limit = request.POST.get('limit', 25)
+  limit = int(request.POST.get('limit', 25))
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
 
@@ -242,7 +242,7 @@ def _augment_highlighting(query_s, records):
         ts.append(term.strip('*'))
 
   for record in records:
-    name = record.get('originalName', '')
+    name = record.get('originalName', '') or ''
     record['hue_description'] = ''
     record['hue_name'] = record.get('parentPath', '') if record.get('parentPath') else ''
 

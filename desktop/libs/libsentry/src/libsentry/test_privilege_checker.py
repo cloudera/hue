@@ -144,7 +144,7 @@ class TestPrivilegeChecker(object):
           return None
 
       filtered_set = self.checker.filter_objects(objects=objectSet, action=action, key=test_key_fn)
-      assert_equal(expectedSet, filtered_set, filtered_set)
+      assert_equal(expectedSet, list(filtered_set), list(filtered_set))
 
 
   def test_columns_select(self):

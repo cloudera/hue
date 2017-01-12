@@ -46,8 +46,7 @@ SENTRY_CONF_DIR = Config(
 
 
 def is_enabled():
-  try:
-    from search.conf import SECURITY_ENABLED
-    return SECURITY_ENABLED.get()
-  except ImportError, e:
-    LOG.warn("Search app is not enabled")
+  from hadoop import cluster # Avoid dependencies conflicts
+  cluster = cluster.get_cluster_conf_for_job_submission()
+
+  return HOSTNAME.get() != 'localhost' and cluster.SECURITY_ENABLED.get()

@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, default_ssl_validate
@@ -22,6 +24,9 @@ from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password
 from desktop.lib.paths import get_config_root
 
 from metadata.settings import DJANGO_APPS
+
+
+LOG = logging.getLogger(__name__)
 
 
 def get_auth_username():
@@ -131,6 +136,13 @@ def get_navigator_auth_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_PASSWORD_SCRIPT.get()
 
+def get_security_default():
+  '''Get default security value from Hadoop'''
+  from hadoop import cluster # Avoid dependencies conflicts
+  cluster = cluster.get_cluster_conf_for_job_submission()
+
+  return cluster.SECURITY_ENABLED.get()
+
 
 NAVIGATOR = ConfigSection(
   key='navigator',
@@ -163,8 +175,19 @@ NAVIGATOR = ConfigSection(
     APPLY_SENTRY_PERMISSIONS = Config(
       key="apply_sentry_permissions",
       help=_t("Perform Sentry privilege filtering."),
-      default=False,
+      dynamic_default=get_security_default,
       type=coerce_bool
     ),
   )
 )
+
+
+def test_metadata_configurations(user):
+  from libsentry.conf import is_enabled
+
+  result = []
+
+  if not is_enabled() and NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+    result.append(("metadata", "Please enable Sentry when using metadata with Security."))
+
+  return result

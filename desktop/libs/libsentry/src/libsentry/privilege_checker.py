@@ -72,7 +72,6 @@ class PrivilegeChecker(object):
     :param key: a function that will be applied to each object in the objects iterable to convert it to a Sentry format
     """
     action = action.upper()
-    filtered_objects = []
 
     # Apply Sentry formatting key function
     object_authorizables = self._to_sentry_authorizables(objects=objects, key=key)
@@ -87,7 +86,7 @@ class PrivilegeChecker(object):
 
       for (object, authorizable) in v1_authorizables:
         if self._is_object_action_authorized_v1(hierarchy=privilege_hierarchy, object=authorizable, action=action):
-          filtered_objects.append(object)
+          yield object
 
     if v2_authorizables:
       privileges = self._get_privileges_for_user(self.api_v2)
@@ -95,9 +94,7 @@ class PrivilegeChecker(object):
 
       for (object, authorizable) in v2_authorizables:
         if self._is_object_action_authorized_v2(hierarchy=privilege_hierarchy, object=authorizable, action=action):
-          filtered_objects.append(object)
-
-    return filtered_objects
+          yield object
 
 
   def _to_sentry_authorizables(self, objects, key):
