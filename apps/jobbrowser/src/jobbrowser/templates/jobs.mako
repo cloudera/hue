@@ -300,7 +300,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
 
     function validTimeValue() {
       var numberValue = parseInt($("#timeValue").val().trim());
-      return $("#timeValue").val().trim() != "" && !isNaN(numberValue) && 1 <= numberValue <= 3650;
+      return $("#timeValue").val().trim() != "" && !isNaN(numberValue) && 1 <= numberValue && numberValue <= 3650;
     }
 
     var lastTimeValue = null;
