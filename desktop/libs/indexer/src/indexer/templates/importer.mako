@@ -81,10 +81,15 @@ ${ assist.assistPanel() }
     text-align: right;
     padding-right: 8px;
     display: inline-block;
+    vertical-align: middle;
   }
 
   .step label.checkbox {
     margin-left: 130px;
+  }
+
+  .step .field-properties label.checkbox {
+    margin-left: 10px;
   }
 
   .step label:not(.checkbox) {
@@ -696,10 +701,8 @@ ${ assist.assistPanel() }
   <label>${ _('Type') }
     <select class="input-small" data-bind="selectize: $root.createWizard.fieldTypes, value: type"></select>
   </label>
-  <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="click: function() {showProperties(! showProperties()) }">
-    <i class="fa fa-sliders"></i>
-  </a>
-  <span data-bind="visible: showProperties">
+  <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
+  <span data-bind="visible: showProperties" class="field-properties">
     <label class="checkbox">
       <input type="checkbox" data-bind="checked: unique"> ${_('Unique')}
     </label>
