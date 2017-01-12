@@ -182,6 +182,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: $root.job().mainType() == 'schedules' -->
               <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
             <!-- /ko -->
+
+            <!-- ko if: $root.job().mainType() == 'bundles' -->
+              <div data-bind="template: { name: 'bundle-page', data: $root.job() }"></div>
+            <!-- /ko -->
           <!-- /ko -->
 
           <div data-bind="template: { name: 'pagination' }, visible: ! $root.job()"></div>
@@ -620,6 +624,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 </script>
 
+
 <script type="text/html" id="schedule-page">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
@@ -657,8 +662,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </table>
   </div>
   <!-- /ko -->
-</div>
+</script>
 
+
+<script type="text/html" id="bundle-page">
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 </script>
 
 
@@ -856,6 +871,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'apps':
           case 'workflows':
           case 'schedules':
+          case 'bundles':
             viewModel.interface(h);
             break;
           default:
