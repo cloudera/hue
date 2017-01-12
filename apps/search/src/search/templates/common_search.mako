@@ -1145,7 +1145,7 @@ ${ dashboard.layout_skeleton() }
       <!-- ko if: doc.childDocuments != undefined -->
         <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
           <thead>
-            <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+            <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting', data: $root.collection}">
             </tr>
             <tr data-bind="visible: $root.collection.template.fieldsSelected().length == 0">
               <th style="width: 18px">&nbsp;</th>
