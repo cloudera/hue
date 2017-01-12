@@ -163,7 +163,7 @@ NAVIGATOR = ConfigSection(
     APPLY_SENTRY_PERMISSIONS = Config(
       key="apply_sentry_permissions",
       help=_t("Perform Sentry privilege filtering."),
-      default=True,
+      default=False,
       type=coerce_bool
     ),
   )

@@ -244,7 +244,10 @@ def _augment_highlighting(query_s, records):
   for record in records:
     name = record.get('originalName', '')
     record['hue_description'] = ''
-    record['hue_name'] = (record.get('parentPath', '').replace('/', '.') + '.').lstrip('.') if record.get('parentPath') else ''
+    record['hue_name'] = record.get('parentPath', '') if record.get('parentPath') else ''
+
+    if record['hue_name'] and record.get('sourceType', '') != 'S3':
+      record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
 
     for term in ts:
       name = _highlight(term, name)

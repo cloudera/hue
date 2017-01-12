@@ -1248,7 +1248,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             <!-- ko if: typeof click !== 'undefined' -->
             <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
             <!-- /ko -->
-            <!-- ko if: typeof click === 'undefined' -->
+            <!-- ko if: typeof click === 'undefined' && typeof link !== 'undefined'-->
             <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
             <!-- /ko -->
             <div class="doc-desc" data-bind="html: hue_description"></div>
@@ -1711,6 +1711,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         'OPERATION_EXECUTION': 'fa-cog',
         'DIRECTORY': 'fa-folder-o',
         'FILE': 'fa-file-o',
+        'S3BUCKET': 'fa-cubes',
         'SUB_OPERATION': 'fa-code-fork',
         'COLLECTION': 'fa-search',
         'HBASE': 'fa-th-large',
@@ -1796,8 +1797,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
               name: '${ _("S3") }',
               type: 's3',
               icon: 'fa-cubes',
-              minHeight: 50,
-              showNavSearch: false
+              minHeight: 50
             }));
           }
 
@@ -1943,12 +1943,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                 }
                 case 'DIRECTORY': {
                   entity.originalDescription = entity.parentPath;
-                  entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  if (entity.sourceType == 'S3') {
+                    entity.link = '/filebrowser/view=S3A://#s3a://' + entity.bucketName + '/' + entity.fileSystemPath;
+                  } else {
+                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  }
                   break;
                 }
                 case 'FILE': {
                   entity.originalDescription = entity.parentPath;
-                  entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  if (entity.sourceType == 'S3') {
+                    entity.link = '/filebrowser/view=S3A://#s3a://' + entity.bucketName + '/' + entity.fileSystemPath;
+                  } else {
+                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
+                  }
+                  break;
+                }
+                case 'S3BUCKET': {
+                  entity.originalDescription = '${ _("Region") }: ' + entity.region;
+                  entity.link = '/filebrowser/view=S3A://#s3a://' + entity.originalName;
                   break;
                 }
                 case 'SUB_OPERATION': {

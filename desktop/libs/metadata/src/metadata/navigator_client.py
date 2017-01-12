@@ -67,14 +67,17 @@ class NavigatorApi(object):
 
 
   def _get_types_from_sources(self, sources):
-    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'OPERATION', 'DIRECTORY')
+    default_entity_types = entity_types = ('DATABASE', 'TABLE', 'PARTITION', 'FIELD', 'FILE', 'VIEW', 'S3BUCKET', 'OPERATION', 'DIRECTORY')
 
     if 'sql' in sources or 'hive' in sources or 'impala' in sources:
-      default_entity_types = ('TABLE', 'VIEW')
       entity_types = ('TABLE', 'VIEW', 'DATABASE', 'PARTITION', 'FIELD')
+      default_entity_types = ('TABLE', 'VIEW')
     elif 'hdfs' in sources:
       entity_types = ('FILE', 'DIRECTORY')
       default_entity_types  = ('FILE', 'DIRECTORY')
+    elif 's3' in sources:
+      entity_types = ('FILE', 'DIRECTORY', 'S3BUCKET')
+      default_entity_types  = ('DIRECTORY', 'S3BUCKET')
 
     return default_entity_types, entity_types
 
@@ -99,6 +102,8 @@ class NavigatorApi(object):
 
       query_clauses = []
       user_filters = []
+      source_type_filter = []
+
       for term in search_terms:
         if ':' not in term:
           query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
@@ -117,8 +122,12 @@ class NavigatorApi(object):
 
       user_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters]) or '*'
       source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
+      if 's3' in sources:
+        source_type_filter.append('sourceType:s3')
 
       filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
+      if source_type_filter:
+        filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
 
       params += (
         ('query', filter_query),
@@ -157,6 +166,9 @@ class NavigatorApi(object):
           fq_type = default_entity_types
         elif 'hdfs' in sources:
           fq_type = entity_types
+        elif 's3' in sources:
+          fq_type = default_entity_types
+          filterQueries.append('sourceType:s3')
 
         if query_s.strip().endswith('type:*'): # To list all available types
           fq_type = entity_types
