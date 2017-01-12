@@ -33,7 +33,7 @@ from desktop.views import _ko
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': value }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div data-bind="css: { 'open' : dropDownVisible }" style="position: absolute;">
+    <div data-bind="css: { 'open' : dropDownVisible }" style="position: fixed; z-index: 1">
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="overflow-y: scroll; width: 190px; margin-left: 10px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
