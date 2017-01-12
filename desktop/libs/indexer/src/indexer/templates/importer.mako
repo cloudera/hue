@@ -520,10 +520,10 @@ ${ assist.assistPanel() }
                         <!-- ko if: name() == 'VALUE' -->
                           <select data-bind="selectize: ['VALUES', 'VALUE'], value: name"></select>
                           <div class="inline-block" data-bind="foreach: values" style="max-width: 370px">
-                            <input class="input-small" type="text" data-bind="value: $data" style="margin-bottom: 5px">
+                            <input class="input-small" type="text" data-bind="textInput: value" style="margin-bottom: 5px">
                             <a data-bind="click: function() { $parent.values.remove($data); }"><i class="fa fa-minus"></i></a>
                           </div>
-                          <a class="inline-block" data-bind="click: function() { values.push(''); }" title="${_('Add value')}"><i class="fa fa-plus"></i></a>
+                          <a class="inline-block" data-bind="click: function() { values.push(ko.mapping.fromJS({value: ''})); }" title="${_('Add value')}"><i class="fa fa-plus"></i></a>
                           <div class="clearfix"></div>
                         <!-- /ko -->
                       </div>
@@ -1195,7 +1195,7 @@ ${ assist.assistPanel() }
           self.kuduPartitionColumns.push(ko.mapping.fromJS(self.KUDU_DEFAULT_PARTITION_COLUMN));
         }
       });
-      self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [''], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
+      self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN = {values: [{value: ''}], name: 'VALUES', lower_val: 0, include_lower_val: '<=', upper_val: 1, include_upper_val: '<='};
       self.KUDU_DEFAULT_PARTITION_COLUMN = {columns: [], range_partitions: [self.KUDU_DEFAULT_RANGE_PARTITION_COLUMN], name: 'HASH', int_val: 16};
 
       self.tableFormats = ko.observableArray([
