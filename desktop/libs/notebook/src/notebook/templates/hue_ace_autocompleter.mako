@@ -42,11 +42,9 @@ from desktop.views import _ko
     }
 
     .autocompleter-list {
-      float: left;
-      position: relative;
-      overflow-y: auto;
+      flex: 0 0 300px;
       width: 300px;
-      height: 100%;
+      overflow-y: auto;
     }
 
     .autocompleter-list > div {
@@ -73,14 +71,14 @@ from desktop.views import _ko
     }
 
     .autocompleter-entries {
+      display: flex;
       position: relative;
       flex: 1 1 100%;
       overflow: hidden;
     }
 
     .autocompleter-details {
-      vertical-align: top;
-      float: right;
+      flex: 0 0 300px;
       width: 300px;
       overflow-y: auto;
     }
@@ -141,14 +139,16 @@ from desktop.views import _ko
       <!-- /ko -->
       <div class="autocompleter-entries">
         <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
-          <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); }, css: { 'selected': $index() === $parent.selectedIndex() }">
+          <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
+              css: { 'selected': $index() === $parent.selectedIndex() },
+              event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
             <div class="pull-left autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div>
             <div class="autocompleter-suggestion pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
             <div class="autocompleter-suggestion pull-right" data-bind="text: meta"></div>
           </div>
         </div>
-        <!-- ko if: selectedEntry() && selectedEntry().details -->
-        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + selectedEntry().detailsTemplate, data: selectedEntry }"></div>
+        <!-- ko if: focusedEntry() && focusedEntry().details -->
+        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + focusedEntry().detailsTemplate, data: focusedEntry }"></div>
         <!-- /ko -->
       </div>
     </div>
@@ -251,10 +251,12 @@ from desktop.views import _ko
         self.left = ko.observable(1);
 
         self.selectedIndex = ko.observable(0);
+        self.hoveredIndex = ko.observable(null);
 
-        self.selectedEntry = ko.pureComputed(function () {
+        self.focusedEntry = ko.pureComputed(function () {
           if (self.suggestions.filtered().length > 0) {
-            return self.suggestions.filtered()[self.selectedIndex()];
+
+            return self.suggestions.filtered()[self.hoveredIndex() || self.selectedIndex()];
           }
           return null;
         });
