@@ -296,7 +296,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 
   <a href="javascript:void(0)" data-bind="click: function() { changeStatus('kill'); }">Stop</a>
-    
 
   </br>
 
@@ -578,7 +577,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
   </br></br>
-  Variables</br>
+  Variables, Workspace</br>
   Duration 8s</br>
   </br></br>
 
@@ -586,7 +585,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  Stop | Resume
+  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('kill'); }">Stop</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('resume'); }">Resume</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('rerun'); }">Rerun</a>
 
   <br/>
 
@@ -594,7 +595,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
     <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
     <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#workflow-page-metadata" data-toggle="tab">${ _('Metadata') }</a></li>
+    <li><a href="#workflow-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
+    <li><a href="#workflow-page-xml" data-toggle="tab">${ _('XML') }</a></li>
   </ul>
 
   <div class="tab-content">
@@ -607,13 +609,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="workflow-page-tasks">
-      <table class="table table-condensed">
-      </table>
     </div>
 
     <div class="tab-pane" id="workflow-page-metadata">
-      <table class="table table-condensed">
-      </table>
+    </div>
+    
+    <div class="tab-pane" id="workflow-page-xml">
     </div>
   </div>
 
@@ -748,10 +749,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           app_type: ko.mapping.toJSON(self.type),
-          action: ko.mapping.toJSON(name)
+          operation: ko.mapping.toJSON({action: name})
         }, function (data) {
           if (data.status == 0) {
-            
+
           } else {
             $(document).trigger("error", data.message);
           }
@@ -788,6 +789,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         }).always(function () {
           self.loadingJobs(false);
+        });
+      };
+
+      self.changeStatuses = function (name) {
+        $.post("/jobbrowser/api/job/action", {
+          app_id: ko.mapping.toJSON(self.id), // CSV list
+          interface: ko.mapping.toJSON(vm.interface),
+          operation: ko.mapping.toJSON({action: name})
+        }, function (data) {
+          if (data.status == 0) {
+
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        }).always(function () {
         });
       };
     };
