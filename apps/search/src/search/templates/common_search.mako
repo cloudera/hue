@@ -537,7 +537,7 @@ ${ dashboard.layout_skeleton() }
     <!-- /ko -->
 
 
-    <div class="facet-field-cnt">
+    <div class="facet-field-cnt hide">
       <span class="spinedit-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">
           ${ _('Limit') }
@@ -546,7 +546,7 @@ ${ dashboard.layout_skeleton() }
       </span>
     </div>
 
-    <div class="facet-field-cnt">
+    <div class="facet-field-cnt hide">
       <span class="spinedit-cnt">
         <span class="facet-field-label facet-field-label-fixed-width">
           ${ _('Min Count') }
@@ -591,7 +591,7 @@ ${ dashboard.layout_skeleton() }
           </span>
         </div>
 
-        <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+        <div class="facet-field-cnt hide">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Limit') }
@@ -600,7 +600,7 @@ ${ dashboard.layout_skeleton() }
           </span>
         </div>
 
-        <div class="facet-field-cnt" data-bind="visible: $root.isEditing()">
+        <div class="facet-field-cnt hide"">
           <span class="spinedit-cnt">
             <span class="facet-field-label">
               ${ _('Min Count') }
@@ -675,7 +675,7 @@ ${ dashboard.layout_skeleton() }
         </span>
       </div>
 
-      <div class="facet-field-cnt">
+      <div class="facet-field-cnt hide">
         <span class="spinedit-cnt">
           <span class="facet-field-label">
             ${ _('Limit') }
@@ -684,7 +684,7 @@ ${ dashboard.layout_skeleton() }
         </span>
       </div>
 
-      <div class="facet-field-cnt">
+      <div class="facet-field-cnt hide">
         <span class="spinedit-cnt">
           <span class="facet-field-label">
             ${ _('Min Count') }
