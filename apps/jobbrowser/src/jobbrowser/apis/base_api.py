@@ -26,9 +26,10 @@ LOG = logging.getLogger(__name__)
 
 
 def get_api(user, interface):
-  from jobbrowser.apis.workflow_api import WorkflowApi
+  from jobbrowser.apis.bundle_api import BundleApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
+  from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'apps':
     return JobApi(user)
@@ -36,6 +37,8 @@ def get_api(user, interface):
     return WorkflowApi(user)
   elif interface == 'schedules':
     return ScheduleApi(user)
+  elif interface == 'bundles':
+    return BundleApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
