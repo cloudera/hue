@@ -678,11 +678,20 @@ def _create_or_update_document_with_owner(doc, owner, uuids_map):
       doc['fields']['parent_directory'] = [home_dir.uuid, home_dir.version, home_dir.is_history]
 
   # Verify that dependencies exist, raise critical error if any dependency not found
+  # Ignore history dependencies
   if doc['fields']['dependencies']:
-    for uuid, version, is_history in doc['fields']['dependencies']:
-      if not uuid in uuids_map.keys() and \
-              not Document2.objects.filter(uuid=uuid, version=version, is_history=is_history).exists():
-        raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+    history_deps_list = []
+    for index, (uuid, version, is_history) in enumerate(doc['fields']['dependencies']):
+      if not uuid in uuids_map.keys() and not is_history and \
+              not Document2.objects.filter(uuid=uuid, version=version).exists():
+          raise PopupException(_('Cannot import document, dependency with UUID: %s not found.') % uuid)
+      elif is_history:
+        history_deps_list.insert(0, index) # Insert in decreasing order to facilitate delete
+        LOG.warn('History dependency with UUID: %s ignored while importing document %s' % (uuid, doc['fields']['name']))
+
+    # Delete history dependencies not found in the DB
+    for index in history_deps_list:
+      del doc['fields']['dependencies'][index]
 
   return doc
 
