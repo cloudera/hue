@@ -81,6 +81,8 @@ from desktop.views import _ko
       flex: 0 0 300px;
       width: 300px;
       overflow-y: auto;
+      padding: 10px;
+      border-left: 1px solid #F9F9F9;
     }
 
     .autocompleter-categories {
@@ -121,6 +123,12 @@ from desktop.views import _ko
       width: 8px;
       height: 8px;
       border-radius: 4px;
+    }
+
+    .details-header {
+      margin-bottom: 10px;
+      font-size: 15px;
+      font-weight: 300;
     }
   </style>
 
@@ -168,7 +176,8 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="details-header">${ _('Comment') }</div>
+    <div data-bind="text: details.comment"></div>
   </script>
 
   <script type="text/html" id="autocomplete-details-column">

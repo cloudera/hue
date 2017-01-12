@@ -518,17 +518,17 @@ var SqlAutocompleter3 = (function () {
           databaseName: suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase,
           successCallback: function (data) {
             var tableSuggestions = [];
-            data.tables_meta.forEach(function (tablesMeta) {
-              if (suggestTables.onlyTables && tablesMeta.type.toLowerCase() !== 'table' ||
-                  suggestTables.onlyViews && tablesMeta.type.toLowerCase() !== 'view') {
+            data.tables_meta.forEach(function (tableMeta) {
+              if (suggestTables.onlyTables && tableMeta.type.toLowerCase() !== 'table' ||
+                  suggestTables.onlyViews && tableMeta.type.toLowerCase() !== 'view') {
                 return;
               }
               tableSuggestions.push({
-                value: prefix + self.backTickIfNeeded(tablesMeta.name),
-                meta: AutocompleterGlobals.i18n.meta[tablesMeta.type.toLowerCase()],
+                value: prefix + self.backTickIfNeeded(tableMeta.name),
+                meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
                 detailsTemplate: 'table',
-                details: tablesMeta
+                details: tableMeta.comment ? tableMeta : null
               });
             });
             self.loadingTables(false);
