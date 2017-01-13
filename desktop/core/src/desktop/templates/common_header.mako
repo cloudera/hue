@@ -224,30 +224,30 @@ ${ hueIcons.symbols() }
     <%
       view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
     %>
-    <li class="dropdown">
-      <a title="${ _('Administration') if view_profile else '' }" href="#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
-        <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
-        % if view_profile:
+    % if view_profile:
+      <li class="dropdown">
+        <a title="${ _('Administration') }" href="#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+          <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
           <b class="caret"></b>
-        % endif
-      </a>
-      % if view_profile:
-      <ul class="dropdown-menu pull-right">
-        <li>
-          <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
-            % if is_ldap_setup:
-              ${_('View Profile')}
-            % else:
-              ${_('Edit Profile')}
-            % endif
-          </a>
-        </li>
-        % if user.is_superuser:
-          <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
-        % endif
-      </ul>
+        </a>
+        <ul class="dropdown-menu pull-right">
+          <li>
+            <a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i>&nbsp;&nbsp;
+              % if is_ldap_setup:
+                ${_('View Profile')}
+              % else:
+                ${_('Edit Profile')}
+              % endif
+            </a>
+          </li>
+          % if user.is_superuser:
+            <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
+          % endif
+        </ul>
+      </li>
+    % else:
+      <li><a title="" rel="navigator-tooltip" href="#"><i class="fa fa-user"></i>&nbsp;${user.username}</a></li>
     % endif
-    </li>
     % if 'help' in apps:
     <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
     % endif
