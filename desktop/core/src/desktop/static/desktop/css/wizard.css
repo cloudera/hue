@@ -16,6 +16,18 @@
  limitations under the License.
 */
 
+.step-indicator-fixed {
+  position: fixed;
+  background-color: #FFF;
+  margin-top: -10px;
+  z-index: 100;
+  padding-top: 10px;
+}
+
+.vertical-spacer {
+  height: 80px;
+}
+
 .step-indicator {
   border-collapse: separate;
   display: table;
