@@ -622,6 +622,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="workflow-page-metadata">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('properties'); }">Load</a>
+      <br/>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['properties'])"></span>
     </div>
 
     <div class="tab-pane" id="workflow-page-xml">
