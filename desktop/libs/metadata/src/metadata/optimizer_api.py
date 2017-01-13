@@ -108,7 +108,7 @@ def top_tables(request):
     for table in tables:
       paths = _get_table_name(table['name'])
       table.update({u'db': paths['database'], u'table': paths['table'], u'column': None, u'server': u'server1'})
-    tables = checker.filter_objects(tables, action) #, getkey=getkey)
+    tables = list(checker.filter_objects(tables, action)) #, getkey=getkey)
 
   response['top_tables'] = tables
   response['status'] = 0
