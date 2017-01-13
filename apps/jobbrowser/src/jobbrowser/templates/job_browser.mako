@@ -134,9 +134,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
             <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
               <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-              <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span></button>
-              <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button"><i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span></button>
-              <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button"><i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span></button>
+              <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
+                <i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span>
+              </button>
+              <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button">
+                <i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span>
+              </button>
+              <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button">
+                <i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span>
+              </button>
             </div>
 
             <div class="card card-small">
@@ -299,7 +305,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('kill'); }">Stop</a>
+  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">Stop</a>
 
   </br>
 
@@ -589,9 +595,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('kill'); }">Stop</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('resume'); }">Resume</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { changeStatus('rerun'); }">Rerun</a>
+  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">Stop</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">Resume</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">Rerun</a>
 
   <br/>
 
@@ -759,15 +765,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.changeStatus = function (name) {
+      self.control = function (action) {
         $.post("/jobbrowser/api/job/action", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           app_type: ko.mapping.toJSON(self.type),
-          operation: ko.mapping.toJSON({action: name})
+          operation: ko.mapping.toJSON({action: action})
         }, function (data) {
           if (data.status == 0) {
-
+             $(document).trigger("info", data.message);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -807,14 +813,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.changeStatuses = function (name) {
+      self.control = function (action) {
         $.post("/jobbrowser/api/job/action", {
           app_id: ko.mapping.toJSON(self.id), // CSV list
           interface: ko.mapping.toJSON(vm.interface),
-          operation: ko.mapping.toJSON({action: name})
+          operation: ko.mapping.toJSON({action: action})
         }, function (data) {
           if (data.status == 0) {
-
+            $(document).trigger("info", data.message);
           } else {
             $(document).trigger("error", data.message);
           }

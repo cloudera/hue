@@ -67,8 +67,9 @@ class Api(object):
 
 class MockDjangoRequest():
 
-  def __init__(self, user):
+  def __init__(self, user, get=None, post=None):
     self.user = user
     self.jt = None
-    self.GET = {'format': 'json'}
+    self.GET = get if get is not None else {'format': 'json'}
+    self.POST = post if post is not None else {}
     self.method = "POST"

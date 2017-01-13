@@ -31,7 +31,7 @@ try:
   from oozie.conf import OOZIE_JOBS_COUNT
   from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs
 except Exception, e:
-  LOG.exception('Some application are not enabled for Job Browser v2: %s' % e)
+  LOG.exception('Some applications are not enabled for Job Browser v2: %s' % e)
 
 
 class WorkflowApi(Api):
@@ -52,6 +52,7 @@ class WorkflowApi(Api):
         'submitted': 10 * 3600
     } for app in wf_list.jobs]
 
+
   def app(self, appid):
     oozie_api = get_oozie(self.user)
     workflow = oozie_api.get_job(jobid=appid)
@@ -65,14 +66,15 @@ class WorkflowApi(Api):
     return common
 
 
-  def action(self, appid, action):
-    request = MockDjangoRequest(self.user)
-    manage_oozie_jobs(request, action)
-
+  def action(self, appid, action):    
     if action == 'change' or action == 'ignore' or ',' not in appid:
-      return manage_oozie_jobs(request, action)
+      request = MockDjangoRequest(self.user)
+      response = manage_oozie_jobs(request, appid, action['action'])
     else:
-      return bulk_manage_oozie_jobs(request)
+      request = MockDjangoRequest(self.user, post={'job_ids': appid, 'action': action['action']})
+      response = bulk_manage_oozie_jobs(request)
+
+    return json.loads(response.content)
 
 
   def logs(self, appid, app_type):
