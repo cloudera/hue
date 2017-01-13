@@ -1249,7 +1249,10 @@ class Document2(models.Model):
 
       self.move(parent_trash_dir, self.owner)
 
-  # TODO: restore
+  def restore(self):
+   # Currently restoring any doucment to /home
+   home_dir = Document2.objects.get_home_directory(self.owner)
+   self.move(home_dir, self.owner)
 
   def can_read(self, user):
     perm = self.get_permission('read')

@@ -513,6 +513,13 @@ var HueFileEntry = (function () {
     huePubSub.publish('open.link', $(event.target).attr('href'));
   };
 
+  HueFileEntry.prototype.showRestoreConfirmation = function () {
+    var self = this;
+    if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
+      $('#restoreFromTrashModal').modal('show');
+    }
+  };
+
   HueFileEntry.prototype.showDeleteConfirmation = function () {
     var self = this;
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
@@ -649,6 +656,33 @@ var HueFileEntry = (function () {
         self.downloadThis();
       }
     };
+  };
+
+  HueFileEntry.prototype.restoreFromTrash = function () {
+    var self = this;
+    if (self.app === 'documents') {
+      if (self.selectedEntries().indexOf(self) !== -1) {
+        self.activeEntry(self.parent);
+      }
+
+      if (self.selectedEntries().length > 0) {
+        var uuids = self.selectedEntries().map(function(entry) {
+          return entry.definition().uuid;
+        }).join(',');
+        self.apiHelper.restoreDocument({
+          uuids: uuids,
+          successCallback: function () {
+            self.activeEntry().load();
+          },
+          errorCallback: function () {
+            self.activeEntry().load();
+          }
+        });
+      } else {
+        self.activeEntry().load();
+      }
+      $('#restoreFromTrashModal').modal('hide');
+    }
   };
 
   HueFileEntry.prototype.createDirectory = function (name) {
