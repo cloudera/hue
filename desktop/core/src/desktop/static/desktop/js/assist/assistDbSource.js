@@ -180,9 +180,10 @@ var AssistDbSource = (function () {
       activeEditorTables: ko.observableArray([])
     };
 
-    huePubSub.subscribe('editor.active.locations', function (locations) {
+    huePubSub.subscribe('editor.active.locations', function (activeLocations) {
       var activeTables = [];
-      locations.forEach(function (location) {
+      // TODO: Test multiple snippets
+      activeLocations.locations.forEach(function (location) {
         if (location.type === 'table') {
           activeTables.push(location.identifierChain.length == 2 ? { table: location.identifierChain[1].name, db: location.identifierChain[0].name} : { table: location.identifierChain[0].name });
         }

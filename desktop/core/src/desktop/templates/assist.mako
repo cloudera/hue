@@ -2237,4 +2237,43 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       });
     })();
   </script>
+
+  <script type="text/html" id="assistant-panel-template">
+    <pre data-bind="text: ko.mapping.toJSON(activeLocations)"></pre>
+  </script>
+
+  <script type="text/javascript" charset="utf-8">
+    (function () {
+      function AssistantPanel(params) {
+        var self = this;
+
+        self.activeType = ko.observable();
+
+        self.lastLocationsPerType = ko.observable({});
+
+        self.activeLocations = ko.pureComputed(function () {
+          return self.lastLocationsPerType()[self.activeType()];
+        });
+
+        huePubSub.subscribe('active.snippet.type', function (type) {
+          if (self.activeType() !== type) {
+            self.activeType(type);
+          }
+        });
+
+        huePubSub.publish('get.active.snippet.type');
+
+        huePubSub.subscribe('editor.active.locations', function (activeLocations) {
+          var locationsIndex = self.lastLocationsPerType();
+          locationsIndex[activeLocations.type] = activeLocations.locations;
+          self.lastLocationsPerType(locationsIndex);
+        });
+      }
+
+      ko.components.register('assistant-panel', {
+        viewModel: AssistantPanel,
+        template: { element: 'assistant-panel-template' }
+      });
+    })();
+  </script>
 </%def>
