@@ -619,6 +619,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="workflow-page-tasks">
+      <table id="jobsTable" class="datatables table table-condensed">
+        <thead>
+        <tr>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th>${_('log')}</th>
+          <th>${_('status')}</th>
+          <th>${_('errorMessage')}</th>
+          <th>${_('errorCode')}</th>
+          <th>${_('externalId')}</th>
+          <th>${_('id')}</th>
+          <th>${_('startTime')}</th>
+          <th>${_('endTime')}</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: properties['actions']">
+          <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }">
+            <td><div class="hueCheckbox fa"></div></td>
+            <td data-bind="text: 'logs'"></td>
+            <td data-bind="text: status"></td>
+            <td data-bind="text: errorMessage"></td>
+            <td data-bind="text: errorCode"></td>
+            <td data-bind="text: externalId"></td>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: startTime"></td>
+            <td data-bind="text: endTime"></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
 
     <div class="tab-pane" id="workflow-page-metadata">
@@ -636,6 +664,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
   </div>
 
+</script>
+
+
+<script type="text/html" id="workflow-action-page">
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 </script>
 
 
