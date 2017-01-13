@@ -371,6 +371,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       outline: none !important;
     }
 
+    .assist-flex-half {
+      position: relative;
+      -ms-flex: 1 1 50%;
+      flex: 1 1 50%;
+      white-space: nowrap;
+      overflow-x: hidden;
+      overflow-y: auto;
+      outline: none !important;
+    }
+
     .database-tree ul {
       margin: 0 !important;
     }
@@ -455,6 +465,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       border-radius: 4px;
       border: 1px solid #DDD;
       box-shadow: none;
+    }
+
+    .assist-function-details {
+      border-top: 2px solid #F1F1F1;
+      margin-top: 5px;
+      margin-right:10px;
+      padding: 10px;
+      white-space: normal;
+    }
+
+    .assist-function-signature {
+      font: 14px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+      direction: ltr;
+      line-height: 18px;
+      margin-bottom: 10px;
     }
   </style>
 
@@ -2093,24 +2118,26 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             <input class="clearable" type="text" placeholder="Search..." data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
           </div>
         </div>
-        <div class="assist-flex-fill">
+        <div data-bind="css: { 'assist-flex-fill': !selectedFunction(), 'assist-flex-half': selectedFunction() }">
           <ul class="assist-function-categories" data-bind="foreach: filteredCategories">
             <li>
               <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
               <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
-                <li data-bind="tooltip: { title: description, placement: 'left', delay: 400 }">
-                  <!-- ko if: typeof description !== 'undefined' && description !== '' -->
-                  <a class="assist-field-link" href="javascript: void(0);" data-bind="toggle: open, text: signature"></a>
-                  <div data-bind="slideVisible: open, text: description"></div>
-                  <!-- /ko -->
-                  <!-- ko if: typeof description === 'undefined' || description === '' -->
-                  <span class="assist-field-link" data-bind="text: signature"></span>
-                  <!-- /ko -->
+                <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
+                  <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parents[1].selectedFunction() === $data }, click: function () { $parents[1].selectedFunction($data); }, text: signature"></a>
                 </li>
               </ul>
             </li>
           </ul>
         </div>
+        <!-- ko if: selectedFunction -->
+        <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
+          <div class="assist-function-signature blue" data-bind="text: signature"></div>
+          <!-- ko if: description -->
+          <div data-bind="text: description"></div>
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -2124,10 +2151,23 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
         self.query = ko.observable();
-        self.searchVisible = ko.observable(false);
+        self.searchVisible = ko.observable(true);
+        self.selectedFunction = ko.observable();
 
         self.availableTypes().forEach(function (type) {
           self.initFunctions(type);
+        });
+
+        var selectedFunctionPerType = { 'Hive': null, 'Impala': null, 'Pig': null };
+        self.selectedFunction.subscribe(function (newFunction) {
+          if (newFunction) {
+            selectedFunctionPerType[self.activeType()] = newFunction;
+          }
+        });
+
+        self.activeType.subscribe(function (newType) {
+          console.log(newType);
+          self.selectedFunction(selectedFunctionPerType[newType]);
         });
 
         self.activeCategories = ko.observable();
@@ -2174,7 +2214,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             functions: $.map(category.functions, function(fn) {
               return {
                 signature: fn.signature,
-                open: ko.observable(false),
                 description: fn.description
               }
             }),
