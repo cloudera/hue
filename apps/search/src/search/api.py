@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -- coding: utf-8 --
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -16,189 +15,483 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
-import numbers
-import urllib
-import re
 
-from datetime import datetime, timedelta
-from math import log
-from time import mktime
-
+from django.utils.encoding import force_unicode
 from django.utils.translation import ugettext as _
+
+from desktop.lib.django_util import JsonResponse
+from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib.rest.http_client import RestException
+
+from libsolr.api import SolrApi
+
+from search.conf import SOLR_URL
+from search.decorators import allow_viewer_only
+from search.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
+from search.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception
+from search.search_controller import SearchController, can_edit_index
+
 
 LOG = logging.getLogger(__name__)
 
 
-def utf_quoter(what):
-  return urllib.quote(unicode(what).encode('utf-8'), safe='~@#$&()*!+=:;,.?/\'')
+@allow_viewer_only
+def search(request):
+  response = {}
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = json.loads(request.POST.get('query', '{}'))
+  query['download'] = 'download' in request.POST
+
+  if collection:
+    try:
+      response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
+      response = augment_solr_response(response, collection, query)
+    except RestException, e:
+      try:
+        message = json.loads(e.message)
+        response['error'] = message['error'].get('msg', message['error']['trace'])
+      except Exception, e2:
+        LOG.exception('failed to extract json message: %s' % force_unicode(e2))
+        LOG.exception('failed to parse json response: %s' % force_unicode(e))
+        response['error'] = force_unicode(e)
+    except Exception, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+      response['error'] = force_unicode(e)
+  else:
+    response['error'] = _('There is no collection to search.')
+
+  if 'error' in response:
+    augment_solr_exception(response, collection)
+
+  return JsonResponse(response)
 
 
-def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
+def query_suggest(request):
+  if request.method != 'POST':
+    raise PopupException(_('POST request required.'))
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = request.POST.get('query', '')
+
+  result = {'status': -1, 'message': ''}
+
+  solr_query = {}
+  solr_query['q'] = query
+  solr_query['dictionary'] = collection['suggest']['dictionary']
+
   try:
-    stats_json = solr_api.stats(collection['name'], [facet_field])
-    stat_facet = stats_json['stats']['stats_fields'][facet_field]
-
-    _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)
+    response = SolrApi(SOLR_URL.get(), request.user).suggest(collection['name'], solr_query)
+    result['response'] = response
+    result['status'] = 0
   except Exception, e:
-    print e
-    # stats not supported on all the fields, like text
-    pass
-  
-def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None):
+    result['message'] = force_unicode(e)
 
-    if widget_type == 'pie-widget' or widget_type == 'pie2-widget':
-      SLOTS = 5
-    elif widget_type == 'facet-widget' or widget_type == 'text-facet-widget':
-      SLOTS = 10
+  return JsonResponse(result)
+
+
+def index_fields_dynamic(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    name = request.POST['name']
+
+    dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(name)
+
+    result['message'] = ''
+    result['fields'] = [
+        Collection2._make_field(name, properties)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
+    result['gridlayout_header_fields'] = [
+        Collection2._make_gridlayout_header_field({'name': name, 'type': properties.get('type')}, True)
+        for name, properties in dynamic_fields['fields'].iteritems() if 'dynamicBase' in properties
+    ]
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+def nested_documents(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  response = {}
+
+  collection = json.loads(request.POST.get('collection', '{}'))
+  query = {'qs': [{'q': '_root_:*'}], 'fqs': [], 'start': 0, 'limit': 0}
+
+  try:
+    response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
+    result['has_nested_documents'] = response['response']['numFound'] > 0
+    result['status'] = 0
+  except Exception, e:
+    LOG.exception('Failed to list nested documents')
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def get_document(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    doc_id = request.POST.get('id')
+
+    if doc_id:
+      result['doc'] = SolrApi(SOLR_URL.get(), request.user).get(collection['name'], doc_id)
+      if result['doc']['doc']:
+        result['status'] = 0
+        result['message'] = ''
+      else:
+        result['status'] = 1
+        result['message'] = _('No document was returned by Solr.')
     else:
-      SLOTS = 100
+      result['message'] = _('This document does not have any index id.')
+      result['status'] = 1
 
-    is_date = False
+  except Exception, e:
+    result['message'] = force_unicode(e)
 
-    if isinstance(stat_facet['min'], numbers.Number):
-      stats_min = int(stat_facet['min']) # Cast floats to int currently
-      stats_max = int(stat_facet['max'])
-      if start is None:
-        if widget_type == 'line-widget':
-          start, _ = _round_thousand_range(stats_min)
-        else:
-          start, _ = _round_number_range(stats_min)
-      else:
-        start = int(start)
-      if end is None:
-        if widget_type == 'line-widget':
-          _, end = _round_thousand_range(stats_max)
-        else:
-          _, end = _round_number_range(stats_max)
-      else:
-        end = int(end)
-
-      if gap is None:
-        gap = int((end - start) / SLOTS)
-      if gap < 1:
-        gap = 1
-
-      end = max(end, stats_max)
-    elif re.match('\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d\d?\d?)?Z', stat_facet['min']):
-      is_date = True
-      stats_min = stat_facet['min']
-      stats_max = stat_facet['max']
-      if start is None:
-        start = stats_min
-      start = re.sub('\.\d\d?\d?Z$', 'Z', start)
-      try:
-        start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
-        start_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
-      except Exception, e:
-        LOG.error('Bad date: %s' % e)
-        start_ts = datetime.strptime('1970-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-      start_ts, _ = _round_date_range(start_ts)
-      start = start_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
-      stats_min = min(stats_min, start)
-      if end is None:
-        end = stats_max
-      end = re.sub('\.\d\d?\d?Z$', 'Z', end)
-      try:
-        end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
-        end_ts.strftime('%Y-%m-%dT%H:%M:%SZ') # Check for dates before 1900
-      except Exception, e:
-        LOG.error('Bad date: %s' % e)
-        end_ts = datetime.strptime('2050-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ')
-      _, end_ts = _round_date_range(end_ts)
-      end = end_ts.strftime('%Y-%m-%dT%H:%M:%SZ')
-      stats_max = max(stats_max, end)
-      difference = (
-          mktime(end_ts.timetuple()) -
-          mktime(start_ts.timetuple())
-      ) / SLOTS
-
-      if difference < 2:
-        gap = '+1SECONDS'
-      elif difference < 5:
-        gap = '+5SECONDS'
-      elif difference < 30:
-        gap = '+30SECONDS'
-      elif difference < 100:
-        gap = '+1MINUTES'
-      elif difference < 60 * 5:
-        gap = '+5MINUTES'
-      elif difference < 60 * 10:
-        gap = '+10MINUTES'
-      elif difference < 60 * 30:
-        gap = '+30MINUTES'
-      elif difference < 3600:
-        gap = '+1HOURS'
-      elif difference < 3600 * 3:
-        gap = '+3HOURS'
-      elif difference < 3600 * 6:
-        gap = '+6HOURS'
-      elif difference < 3600 * 12:
-        gap = '+12HOURS'
-      elif difference < 3600 * 24:
-        gap = '+1DAYS'
-      elif difference < 3600 * 24 * 7:
-        gap = '+7DAYS'
-      elif difference < 3600 * 24 * 40:
-        gap = '+1MONTHS'
-      elif difference < 3600 * 24 * 40 * 12:
-        gap = '+1YEARS'
-      else:
-        gap = '+10YEARS'
-
-    properties.update({
-      'min': stats_min,
-      'max': stats_max,
-      'start': start,
-      'end': end,
-      'gap': gap,
-      'canRange': True,
-      'isDate': is_date,
-    })
-
-    if widget_type == 'histogram-widget':
-      properties.update({
-        'timelineChartType': 'bar',
-        'enableSelection': True
-      })
+  return JsonResponse(result)
 
 
-def _round_date_range(tm):
-  start = tm - timedelta(seconds=tm.second, microseconds=tm.microsecond)
-  end = start + timedelta(seconds=60)
-  return start, end
+@allow_viewer_only
+def update_document(request):
+  result = {'status': -1, 'message': 'Error'}
 
-def _round_number_range(n):
-  if n <= 10:
-    return n, n + 1
+  if not can_edit_index(request.user):
+    result['message'] = _('Permission to edit the document denied')
+    return JsonResponse(result)
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    document = json.loads(request.POST.get('document', '{}'))
+    doc_id = request.POST.get('id')
+
+    if document['hasChanged']:
+      edits = {
+          "id": doc_id,
+      }
+      version = None # If there is a version, use it to avoid potential concurrent update conflicts
+
+      for field in document['details']:
+        if field['hasChanged'] and field['key'] != '_version_':
+          edits[field['key']] = {"set": field['value']}
+        if field['key'] == '_version_':
+          version = field['value']
+
+      result['update'] = SolrApi(SOLR_URL.get(), request.user).update(collection['name'], json.dumps([edits]), content_type='json', version=version)
+      result['message'] = _('Document successfully updated.')
+      result['status'] = 0
+    else:
+      result['status'] = 0
+      result['message'] = _('Document has no modifications to change.')
+  except RestException, e:
+    try:
+      result['message'] = json.loads(e.message)['error']['msg']
+    except:
+      LOG.exception('Failed to parse json response')
+      result['message'] = force_unicode(e)
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def get_stats(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    query = json.loads(request.POST.get('query', '{}'))
+    analysis = json.loads(request.POST.get('analysis', '{}'))
+
+    field = analysis['name']
+    facet = analysis['stats']['facet']
+
+    result['stats'] = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [field], query, facet)
+    result['status'] = 0
+    result['message'] = ''
+
+  except Exception, e:
+    LOG.exception('Failed to get stats for field')
+    result['message'] = force_unicode(e)
+    if 'not currently supported' in result['message']:
+      result['status'] = 1
+      result['message'] = _('This field type does not support stats')
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def get_terms(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    analysis = json.loads(request.POST.get('analysis', '{}'))
+
+    field = analysis['name']
+    properties = {
+      'terms.limit': 25,
+      'terms.prefix': analysis['terms']['prefix']
+      # lower
+      # limit
+      # mincount
+      # maxcount
+    }
+
+    result['terms'] = SolrApi(SOLR_URL.get(), request.user).terms(collection['name'], field, properties)
+    result['terms'] = pairwise2(field, [], result['terms']['terms'][field])
+    result['status'] = 0
+    result['message'] = ''
+
+  except Exception, e:
+    result['message'] = force_unicode(e)
+    if 'not currently supported' in result['message']:
+      result['status'] = 1
+      result['message'] = _('This field does not support stats')
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def get_timeline(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    query = json.loads(request.POST.get('query', '{}'))
+    facet = json.loads(request.POST.get('facet', '{}'))
+    qdata = json.loads(request.POST.get('qdata', '{}'))
+    multiQ = request.POST.get('multiQ', 'query')
+
+    if multiQ == 'query':
+      label = qdata['q']
+      query['qs'] = [qdata]
+    elif facet['type'] == 'range':
+      _prop = filter(lambda prop: prop['from'] == qdata, facet['properties'])[0]
+      label = '%(from)s - %(to)s ' % _prop
+      facet_id = facet['id']
+      # Only care about our current field:value filter
+      for fq in query['fqs']:
+        if fq['id'] == facet_id:
+          fq['properties'] = [_prop]
+    else:
+      label = qdata
+      facet_id = facet['id']
+      # Only care about our current field:value filter
+      for fq in query['fqs']:
+        if fq['id'] == facet_id:
+          fq['filter'] = [{'value': qdata, 'exclude': False}]
+
+    # Remove other facets from collection for speed
+    collection['facets'] = filter(lambda f: f['widgetType'] == 'histogram-widget', collection['facets'])
+
+    response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
+    response = augment_solr_response(response, collection, query)
+
+    label += ' (%s) ' % response['response']['numFound']
+
+    result['series'] = {'label': label, 'counts': response['normalized_facets'][0]['counts']}
+    result['status'] = 0
+    result['message'] = ''
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+@allow_viewer_only
+def new_facet(request):
+  result = {'status': -1, 'message': 'Error'}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+
+    facet_id = request.POST['id']
+    facet_label = request.POST['label']
+    facet_field = request.POST['field']
+    widget_type = request.POST['widget_type']
+
+    result['message'] = ''
+    result['facet'] = _create_facet(collection, request.user, facet_id, facet_label, facet_field, widget_type)
+    result['status'] = 0
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_type):
+  properties = {
+    'sort': 'desc',
+    'canRange': False,
+    'stacked': False,
+    'limit': 10,
+    'mincount': 0,
+    'isDate': False,
+    'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}
+  }
+
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
+    facet_type = 'pivot'
+  elif widget_type == 'gradient-map-widget':
+    facet_type = 'nested'
+    properties['facets'] = []
+    properties['domain'] = {'blockParent': [], 'blockChildren': []}
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}}
+    properties['scope'] = 'world'
+    properties['limit'] = 100
   else:
-    i = int(log(n, 10))
-    end = round(n, -i)
-    start = end - 10 ** i
-    return start, end
+    solr_api = SolrApi(SOLR_URL.get(), user)
+    range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
 
-def _round_thousand_range(n):
-  if n <= 10:
-    return 0, 0
-  else:
-    i = int(log(n, 10))
-    start = 10 ** i
-    end = 10 ** (i + 1)
-    return start, end
+    if range_properties:
+      facet_type = 'range'
+      properties.update(range_properties)
+      properties['initial_gap'] = properties['gap']
+      properties['initial_start'] = properties['start']
+      properties['initial_end'] = properties['end']
+    else:
+      facet_type = 'field'
 
-def _guess_gap(solr_api, collection, facet, start=None, end=None):
-  properties = {}
-  _guess_range_facet(facet['widgetType'], solr_api, collection, facet['field'], properties, start=start, end=end)
-  return properties
+    if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget'):
+      if widget_type == 'text-facet-widget':
+        properties['type'] = facet_type
+      if widget_type == 'hit-widget':
+        facet_type = 'function'
+      else:
+        facet_type = 'nested'
+      properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}}
+      properties['facets'] = []
+      properties['domain'] = {'blockParent': [], 'blockChildren': []}
+
+      if widget_type == 'pie2-widget':
+        properties['scope'] = 'stack'
+        properties['timelineChartType'] = 'bar'
+      elif widget_type == 'tree2-widget':
+        properties['scope'] = 'tree'
+        properties['facets_form']['limit'] = 5
+        properties['isOldPivot'] = True
+      else:
+        properties['scope'] = 'stack'
+        properties['timelineChartType'] = 'bar'
+
+  if widget_type in ('tree-widget', 'heatmap-widget', 'map-widget'):
+    properties['mincount'] = 1
+    properties['facets'] = []
+    properties['stacked'] = True
+    properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 5}
+
+    if widget_type == 'map-widget':
+      properties['scope'] = 'world'
+      properties['limit'] = 100
+    else:
+      properties['scope'] = 'stack' if widget_type == 'heatmap-widget' else 'tree'
+
+  return {
+    'id': facet_id,
+    'label': facet_label,
+    'field': facet_field,
+    'type': facet_type,
+    'widgetType': widget_type,
+    'properties': properties,
+    # Hue 4+
+    'template': {
+        "showFieldList": True,
+        "showGrid": False,
+        "showChart": True,
+        "chartSettings" : {
+          'chartType': 'pie' if widget_type == 'pie2-widget' else ('timeline' if widget_type == 'timeline-widget' else ('gradientmap' if widget_type == 'gradient-map-widget' else 'bars')),
+          'chartSorting': 'none',
+          'chartScatterGroup': None,
+          'chartScatterSize': None,
+          'chartScope': 'world',
+          'chartX': None,
+          'chartYSingle': None,
+          'chartYMulti': [],
+          'chartData': [],
+          'chartMapLabel': None,
+        },
+        "fieldsAttributes": [],
+        "fieldsAttributesFilter": "",
+        "filteredAttributeFieldsAll": True,
+        "fields": [],
+        "fieldsSelected": [],
+        "leafletmap": {'latitudeField': None, 'longitudeField': None, 'labelField': None}, # Use own?
+        'leafletmapOn': False,
+        'isGridLayout': False,
+        "hasDataForChart": True,
+        "rows": 25,
+    }
+  }
 
 
-def _new_range_facet(solr_api, collection, facet_field, widget_type):
-  properties = {}
-  _guess_range_facet(widget_type, solr_api, collection, facet_field, properties)
-  return properties
+@allow_viewer_only
+def get_range_facet(request):
+  result = {'status': -1, 'message': ''}
+
+  try:
+    collection = json.loads(request.POST.get('collection', '{}'))
+    facet = json.loads(request.POST.get('facet', '{}'))
+    action = request.POST.get('action', 'select')
+
+    solr_api = SolrApi(SOLR_URL.get(), request.user)
+
+    if action == 'select':
+      properties = _guess_gap(solr_api, collection, facet, facet['properties']['start'], facet['properties']['end'])
+    else:
+      properties = _zoom_range_facet(solr_api, collection, facet) # Zoom out
+
+    result['properties'] = properties
+    result['status'] = 0
+
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
 
 
-def _zoom_range_facet(solr_api, collection, facet, direction='out'):
-  properties = {}
-  _guess_range_facet(facet['widgetType'], solr_api, collection, facet['field'], properties)
-  return properties
+def get_collection(request):
+  result = {'status': -1, 'message': ''}
+
+  try:
+    name = request.POST['name']
+
+    collection = Collection2(request.user, name=name)
+    collection_json = collection.get_json(request.user)
+
+    result['collection'] = json.loads(collection_json)
+    result['status'] = 0
+
+  except Exception, e:
+    result['message'] = force_unicode(e)
+
+  return JsonResponse(result)
+
+
+def get_collections(request):
+  result = {'status': -1, 'message': ''}
+
+  try:
+    show_all = json.loads(request.POST.get('show_all'))
+    result['collection'] = SearchController(request.user).get_all_indexes(show_all=show_all)
+    result['status'] = 0
+
+  except Exception, e:
+    if 'does not have privileges' in str(e):
+      result['status'] = 0
+      result['collection'] = [json.loads(request.POST.get('collection'))['name']]
+    else:
+      result['message'] = force_unicode(e)
+
+  return JsonResponse(result)

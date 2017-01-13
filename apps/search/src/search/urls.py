@@ -21,7 +21,6 @@ urlpatterns = patterns('search.views',
   url(r'^$', 'index', name='index'),
   url(r'^m$', 'index_m', name='index_m'),
   url(r'^embeddable$', 'index_embeddable', name='index_embeddable'),
-  url(r'^search$', 'search', name='search'),
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),
   url(r'^embeddable/new_search', 'new_search_embeddable', name='new_search_embeddable'),
@@ -29,10 +28,17 @@ urlpatterns = patterns('search.views',
   url(r'^browse_m/(?P<name>.+)', 'browse_m', name='browse_m'),
   url(r'^download$', 'download', name='download'),
 
+  # Admin
   url(r'^admin/collections$', 'admin_collections', name='admin_collections'),
+  url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
+  url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
 
-  # Ajax
-  # Search
+  url(r'^install_examples$', 'install_examples', name='install_examples'),
+)
+
+
+urlpatterns += patterns('search.api',
+  url(r'^search$', 'search', name='search'),
   url(r'^suggest/$', 'query_suggest', name='query_suggest'),
   url(r'^index/fields/dynamic$', 'index_fields_dynamic', name='index_fields_dynamic'),
   url(r'^index/fields/nested_documents', 'nested_documents', name='nested_documents'),
@@ -45,10 +51,4 @@ urlpatterns = patterns('search.views',
   url(r'^get_collections$', 'get_collections', name='get_collections'),
   url(r'^get_stats$', 'get_stats', name='get_stats'),
   url(r'^get_terms$', 'get_terms', name='get_terms'),
-
-  # Admin
-  url(r'^admin/collection_delete$', 'admin_collection_delete', name='admin_collection_delete'),
-  url(r'^admin/collection_copy$', 'admin_collection_copy', name='admin_collection_copy'),
-
-  url(r'^install_examples$', 'install_examples', name='install_examples'),
 )
