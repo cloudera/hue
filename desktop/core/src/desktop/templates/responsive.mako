@@ -382,7 +382,7 @@ ${ hueIcons.symbols() }
 
       <div data-bind="visible: rightAssistVisible" style="display: none; height: 100%; width: 100%; position: relative;">
         <ul class="right-panel-tabs nav nav-pills">
-          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }"><a href="#functions" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="#functions" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
           <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="#functions" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
           <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="#functions" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedules') }</a></li>
         </ul>
@@ -754,7 +754,31 @@ ${ assist.assistPanel() }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.rightAssistVisible = ko.observable();
-        self.activeRightTab = ko.observable('assistant');
+        self.assistantAvailable = ko.observable(false);
+        self.activeRightTab = ko.observable();
+
+        huePubSub.subscribe('active.snippet.type.changed', function (type) {
+          if (type === 'hive' || type === 'impala') {
+            if (!self.assistantAvailable() && self.activeRightTab() !== 'assistant') {
+              self.activeRightTab('assistant');
+            }
+            self.assistantAvailable(true);
+          } else {
+            if (self.activeRightTab() === 'assistant') {
+              self.activeRightTab('functions');
+            }
+            self.assistantAvailable(false);
+          }
+        });
+
+        if (!self.activeRightTab()) {
+          self.activeRightTab('functions');
+        }
+
+        if (self.assistantAvailable()) {
+          self.activeRightTab = ko.observable('functions');
+        }
+
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
         self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }
