@@ -262,40 +262,42 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="create-index-wizard">
   <div data-bind="visible: createWizard.show">
+    <div class="step-indicator-fixed">
+      <ol class="list-inline text-center step-indicator">
+        <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
+          <div class="step" title="${ _('Go to Step 1') }">
+            <!-- ko if: currentStep() == 1 -->
+              <!-- ko if: createWizard.isGuessingFormat -->
+                <span class="fa fa-spinner fa-spin"></span>
+              <!-- /ko -->
+              <!-- ko ifnot: createWizard.isGuessingFormat -->
+                1
+              <!-- /ko -->
+            <!-- /ko -->
+            <!-- ko ifnot: currentStep() == 1 -->
+            <span class="fa fa-check"></span>
+            <!-- /ko -->
+          </div>
+          <div class="caption">${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span></div>
+        </li>
 
-    <ol class="list-inline text-center step-indicator">
-      <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
-        <div class="step" title="${ _('Go to Step 1') }">
-          <!-- ko if: currentStep() == 1 -->
-            <!-- ko if: createWizard.isGuessingFormat -->
-              <span class="fa fa-spinner fa-spin"></span>
+        <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
+          <div class="step" title="${ _('Go to Step 2') }">
+            <!-- ko if: currentStep() < 3 -->
+              <!-- ko if: createWizard.isGuessingFieldTypes -->
+                <span class="fa fa-spinner fa-spin"></span>
+              <!-- /ko -->
+              <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
+                2
+              <!-- /ko -->
             <!-- /ko -->
-            <!-- ko ifnot: createWizard.isGuessingFormat -->
-              1
-            <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko ifnot: currentStep() == 1 -->
-          <span class="fa fa-check"></span>
-          <!-- /ko -->
-        </div>
-        <div class="caption">${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span></div>
-      </li>
+          </div>
+          <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.outputFormat"></span> <span data-bind="text: createWizard.destination.name"></span></div>
+        </li>
+      </ol>
+    </div>
 
-      <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
-        <div class="step" title="${ _('Go to Step 2') }">
-          <!-- ko if: currentStep() < 3 -->
-            <!-- ko if: createWizard.isGuessingFieldTypes -->
-              <span class="fa fa-spinner fa-spin"></span>
-            <!-- /ko -->
-            <!-- ko ifnot: createWizard.isGuessingFieldTypes -->
-              2
-            <!-- /ko -->
-          <!-- /ko -->
-        </div>
-        <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.outputFormat"></span></div>
-      </li>
-    </ol>
-
+    <div class="vertical-spacer"></div>
 
     <!-- ko if: currentStep() == 1 -->
     <div class="card step">
