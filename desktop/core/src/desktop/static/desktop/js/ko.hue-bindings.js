@@ -3239,7 +3239,9 @@
               }
             });
           }
-          huePubSub.publish('editor.active.locations', e.data.locations);
+
+          huePubSub.publish('editor.active.locations', { type: snippet.type(), locations: e.data.locations });
+
           e.data.locations.forEach(function (location) {
             if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
               var clonedChain = location.identifierChain.concat();

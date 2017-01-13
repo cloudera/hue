@@ -389,11 +389,11 @@ ${ hueIcons.symbols() }
 
         <div class="right-panel-tab-content tab-content">
           <!-- ko if: activeRightTab() === 'assistant' -->
-          <div>Assistant</div>
+          <div data-bind="component: { name: 'assistant-panel' }"></div>
           <!-- /ko -->
 
           <!-- ko if: activeRightTab() === 'functions' -->
-          <div style="" data-bind="component: { name: 'functions-panel' }"></div>
+          <div data-bind="component: { name: 'functions-panel' }"></div>
           <!-- /ko -->
 
           <!-- ko if: activeRightTab() === 'schedules' -->
@@ -754,7 +754,7 @@ ${ assist.assistPanel() }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.rightAssistVisible = ko.observable();
-        self.activeRightTab = ko.observable('functions');
+        self.activeRightTab = ko.observable('assistant');
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
         self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }
