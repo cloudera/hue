@@ -79,8 +79,7 @@ def action(request):
   operation = json.loads(request.POST.get('operation'))
 
   response['operation'] = operation
-  response['action_status'] = get_api(request.user, interface).action(app_id, operation)
-  response['status'] = 0
+  response.update(get_api(request.user, interface).action(app_id, operation))
 
   return JsonResponse(response)
 
