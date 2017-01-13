@@ -451,6 +451,7 @@ var Collection = function (vm, collection) {
   self.label = ko.mapping.fromJS(collection.label);
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
+  self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
     function flatten(values) {
@@ -1099,7 +1100,8 @@ var Collection = function (vm, collection) {
 
   self.switchCollection = function() {
     $.post("/search/get_collection", {
-        name: self.name()
+        name: self.name(),
+        engine: self.engine()
     }, function (data) {
       if (data.status == 0) {
         self.idField(data.collection.collection.idField);
@@ -1159,7 +1161,8 @@ var Collection = function (vm, collection) {
 
   self.syncFields = function() {
     $.post("/search/get_collection", {
-        name: self.name()
+        name: self.name(),
+        engine: self.engine()
       }, function (data) {
         if (data.status == 0) {
           self.idField(data.collection.collection.idField);
@@ -1173,7 +1176,8 @@ var Collection = function (vm, collection) {
 
   self.syncDynamicFields = function () {
     $.post("/search/index/fields/dynamic", {
-        name: self.name()
+        name: self.name(),
+        engine: self.engine()
       }, function (data) {
         if (data.status == 0) {
           syncArray(self.template.fieldsAttributes, data.gridlayout_header_fields, true);
@@ -1189,6 +1193,7 @@ var Collection = function (vm, collection) {
   self.getNestedDocuments = function () {
     $.post("/search/index/fields/nested_documents", {
         collection: ko.mapping.toJSON(self),
+        engine: self.engine()
       }, function (data) {
         if (data.status == 0) {
           self.nested.enabled(data.has_nested_documents);
