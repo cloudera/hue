@@ -278,13 +278,14 @@ var EditorViewModel = (function() {
 
     self.inFocus.subscribe(function (newValue) {
       if (newValue) {
-        huePubSub.publish('active.snippet.type', self.type());
+        huePubSub.publish('active.snippet.type.changed', self.type());
       }
     });
 
+    // TODO: It should only publish if this belongs to the currently active app in responsive
     huePubSub.subscribe('get.active.snippet.type', function () {
       if (self.inFocus() || notebook.snippets().length === 1) {
-        huePubSub.publish('active.snippet.type', self.type());
+        huePubSub.publish('set.active.snippet.type', self.type());
       }
     });
 

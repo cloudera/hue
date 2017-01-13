@@ -2147,6 +2147,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       function FunctionsPanel(params) {
         var self = this;
         self.categories = {};
+        self.disposals = [];
 
         self.activeType = ko.observable();
         self.availableTypes = ko.observableArray(['Hive', 'Impala', 'Pig']);
@@ -2187,7 +2188,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         self.activeType(self.availableTypes()[0]);
 
-        huePubSub.subscribe('active.snippet.type', function (type) {
+        var updateType = function (type) {
           self.availableTypes().every(function (availableType) {
             if (availableType.toLowerCase() === type) {
               if (self.activeType() !== availableType) {
@@ -2197,10 +2198,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             }
             return true;
           });
-        });
+        };
 
+        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', updateType).remove);
+
+        huePubSub.subscribeOnce('set.active.snippet.type', updateType);
         huePubSub.publish('get.active.snippet.type');
       }
+
+      FunctionsPanel.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
+      };
 
       FunctionsPanel.prototype.initFunctions = function (dialect) {
         var self = this;
@@ -2247,6 +2258,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       function AssistantPanel(params) {
         var self = this;
 
+        self.disposals = [];
+
         self.activeType = ko.observable();
 
         self.lastLocationsPerType = ko.observable({});
@@ -2255,20 +2268,24 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           return self.lastLocationsPerType()[self.activeType()];
         });
 
-        huePubSub.subscribe('active.snippet.type', function (type) {
-          if (self.activeType() !== type) {
-            self.activeType(type);
-          }
-        });
+        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeType).remove);
 
+        huePubSub.subscribeOnce('set.active.snippet.type', self.activeType);
         huePubSub.publish('get.active.snippet.type');
 
-        huePubSub.subscribe('editor.active.locations', function (activeLocations) {
+        self.disposals.push(huePubSub.subscribe('editor.active.locations', function (activeLocations) {
           var locationsIndex = self.lastLocationsPerType();
           locationsIndex[activeLocations.type] = activeLocations.locations;
           self.lastLocationsPerType(locationsIndex);
-        });
+        }).remove);
       }
+
+      AssistantPanel.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
+      };
 
       ko.components.register('assistant-panel', {
         viewModel: AssistantPanel,
