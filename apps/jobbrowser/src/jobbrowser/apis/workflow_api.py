@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from liboozie.oozie_api import get_oozie
+from oozie.views.dashboard import list_oozie_workflow_action
 
 
 LOG = logging.getLogger(__name__)
@@ -54,10 +55,13 @@ class WorkflowApi(Api):
 
 
   def app(self, appid):
+    if '@' in appid:
+      return WorkflowActionApi(self.user).app(appid)
+
     oozie_api = get_oozie(self.user)
     workflow = oozie_api.get_job(jobid=appid)
 
-    common = {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status}
+    common = {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status, 'type': 'workflow'}
 
     request = MockDjangoRequest(self.user)
     response = list_oozie_workflow(request, job_id=appid)
@@ -80,12 +84,19 @@ class WorkflowApi(Api):
 
 
   def logs(self, appid, app_type):
+    if '@' in appid:
+      return WorkflowActionApi(self.user).logs(appid, app_type)
+
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
     return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
 
+
   def profile(self, appid, app_type, app_property):
+    if '@' in appid:
+      return WorkflowActionApi(self.self.user).profile(appid, app_type, app_property)
+
     if app_property == 'xml':
       oozie_api = get_oozie(self.user)
       workflow = oozie_api.get_job(jobid=appid)
@@ -100,3 +111,21 @@ class WorkflowApi(Api):
       }
 
     return {}
+
+
+class WorkflowActionApi(Api):
+
+  def app(self, appid):
+    oozie_api = get_oozie(self.user)
+    action = oozie_api.get_action(action_id=appid)
+
+    common = action.to_json()
+    
+    common['action_type'] = common['type']
+    common['type'] = 'workflow-action'
+
+    return common
+
+
+  def logs(self, appid, app_type):
+    return {'progress': 0, 'logs': {'default': ''}}

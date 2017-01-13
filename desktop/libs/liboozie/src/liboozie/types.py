@@ -40,9 +40,12 @@ from django.core.urlresolvers import reverse
 
 LOG = logging.getLogger(__name__)
 
+
 class Action(object):
 
   def __init__(self, json_dict):
+    self.json_dict = json_dict
+
     for attr in self._ATTRS:
       setattr(self, attr, json_dict.get(attr))
     self._fixup()
@@ -61,6 +64,9 @@ class Action(object):
 
   def __str__(self):
     return '%s - %s' % (self.type, self.name)
+
+  def to_json(self):
+    return self.json_dict.copy()
 
 
 class ControlFlowAction(Action):

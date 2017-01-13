@@ -177,21 +177,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </div>
 
           <!-- ko if: $root.job() -->
-            <!-- ko if: $root.job().mainType() == 'apps' -->
-              <div data-bind="template: { name: 'job-page', data: $root.job() }"></div>
+          <!-- ko with: $root.job() -->
+            <!-- ko if: mainType() == 'apps' -->
+              <div data-bind="template: { name: 'job-page' }"></div>
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'workflows' -->
-              <div data-bind="template: { name: 'workflow-page', data: $root.job() }"></div>
+            <!-- ko if: mainType() == 'workflows' -->
+              <!-- ko if: type() == 'workflow' -->
+                <div data-bind="template: { name: 'workflow-page' }"></div>
+              <!-- /ko -->
+
+              <!-- ko if: type() == 'workflow-action' -->
+                <div data-bind="template: { name: 'workflow-action-page' }"></div>
+              <!-- /ko -->
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'schedules' -->
-              <div data-bind="template: { name: 'schedule-page', data: $root.job() }"></div>
+            <!-- ko if: mainType() == 'schedules' -->
+              <div data-bind="template: { name: 'schedule-page' }"></div>
             <!-- /ko -->
 
-            <!-- ko if: $root.job().mainType() == 'bundles' -->
-              <div data-bind="template: { name: 'bundle-page', data: $root.job() }"></div>
+            <!-- ko if: mainType() == 'bundles' -->
+              <div data-bind="template: { name: 'bundle-page' }"></div>
             <!-- /ko -->
+          <!-- /ko -->
           <!-- /ko -->
 
           <div data-bind="template: { name: 'pagination' }, visible: ! $root.job()"></div>
@@ -676,6 +684,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+
+  </br></br>
+  Job ID ....</br>
+  Duration 8s</br>
+  </br></br>
+
+  Log (if external id) | Child jobs
+
 </script>
 
 
