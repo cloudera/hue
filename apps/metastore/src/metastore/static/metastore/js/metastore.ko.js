@@ -144,7 +144,7 @@ var MetastoreViewModel = (function () {
             if (data && data.status == 0) {
               self.navigatorStats(ko.mapping.fromJS(data.entity));
             } else {
-              $(document).trigger("info", data.message);
+              //$(document).trigger("info", data.message);
             }
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
@@ -478,7 +478,7 @@ var MetastoreViewModel = (function () {
                   self.navigatorStats(ko.mapping.fromJS(data.entity));
                   self.getRelationships();
                 } else {
-                  $(document).trigger("info", data.message);
+                  //$(document).trigger("info", data.message);
                 }
               }).fail(function (xhr, textStatus, errorThrown) {
                 $(document).trigger("error", xhr.responseText);
