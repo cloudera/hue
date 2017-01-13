@@ -623,8 +623,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div class="tab-pane" id="workflow-page-metadata">
     </div>
-    
+
     <div class="tab-pane" id="workflow-page-xml">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('xml'); }">Load</a>
+      <br/>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['xml'])"></span>
     </div>
   </div>
 

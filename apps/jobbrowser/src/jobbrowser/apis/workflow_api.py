@@ -62,11 +62,12 @@ class WorkflowApi(Api):
     request = MockDjangoRequest(self.user)
     response = list_oozie_workflow(request, job_id=appid)
     common['properties'] = json.loads(response.content)
+    common['properties']['xml'] = ''
 
     return common
 
 
-  def action(self, appid, action):    
+  def action(self, appid, action):
     if action == 'change' or action == 'ignore' or ',' not in appid:
       request = MockDjangoRequest(self.user)
       response = manage_oozie_jobs(request, appid, action['action'])
@@ -82,3 +83,13 @@ class WorkflowApi(Api):
     data = get_oozie_job_log(request, job_id=appid)
 
     return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+
+  def profile(self, appid, app_type, app_property):
+    if app_property == 'xml':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_job(jobid=appid)
+      return {
+        'xml': workflow.definition,
+      }
+
+    return {}
