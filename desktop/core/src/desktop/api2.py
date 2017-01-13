@@ -348,6 +348,27 @@ def delete_document(request):
       'status': 0,
   })
 
+@api_error_handler
+@require_POST
+def restore_document(request):
+  """
+  Accepts a uuid
+
+  Restores the document to /home
+  """
+  uuids = json.loads(request.POST.get('uuids'))
+
+  if not uuids:
+    raise PopupException(_('restore_document requires comma separated uuids'))
+
+  for uuid in uuids.split(','):
+    document = Document2.objects.get_by_uuid(user=request.user, uuid=uuid, perm_type='write')
+    document.restore()
+
+  return JsonResponse({
+      'status': 0,
+  })
+
 
 @api_error_handler
 @require_POST

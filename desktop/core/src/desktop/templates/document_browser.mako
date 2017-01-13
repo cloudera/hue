@@ -537,6 +537,25 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
+    <div id="restoreFromTrashModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
+      <!-- ko with: activeEntry -->
+      <div class="modal-header">
+        <!-- ko if: selectedEntries().length > 0 -->
+        <h3> ${ _('Restore these document(s) to Home directory?') } </h3>
+        <!-- /ko -->
+      </div>
+      <div class="modal-body">
+        <ul data-bind="foreach: selectedEntries()">
+          <li> <span data-bind="text: $data.definition().name"></span> </li>
+        </ul>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="${ _('Cancel') }">
+        <input type="submit" data-bind="click: function() { restoreFromTrash() }" class="btn btn-danger" value="${_('Yes')}"/>
+      </div>
+      <!-- /ko -->
+    </div>
+
     <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
@@ -704,6 +723,7 @@ from desktop.views import _ko
               <ul class="hue-context-menu">
                 <!-- ko if: isTrashed -->
                 <li><a href="javascript:void(0);" data-bind="click: function() { $parent.getSelectedDocsWithDependents(); $parent.showDeleteConfirmation(); }"><i class="fa fa-fw fa-times"></i> ${ _('Delete') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
+                <li><a href="javascript:void(0);" data-bind="click: function() { $parent.showRestoreConfirmation(); }"><i class="fa fa-fw fa-undo"></i> ${ _('Restore to Home') } <span data-bind="visible: $parent.selectedEntries().length > 1, text: '(' + $parent.selectedEntries().length + ')'"></span></a></li>
                 <!-- /ko -->
                 <!-- ko ifnot: isTrashed -->
                 <!-- ko if: isDirectory -->

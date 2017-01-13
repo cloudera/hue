@@ -764,6 +764,21 @@ var ApiHelper = (function () {
   };
 
   /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   *
+   * @param {string} options.uuid
+   */
+  ApiHelper.prototype.restoreDocument = function (options) {
+    var self = this;
+    self.simplePost("/desktop/api2/doc/restore", {
+      uuids: ko.mapping.toJSON(options.uuids),
+    }, options);
+  };
+
+  /**
    *
    * @param {Object} options
    * @param {string} options.sourceType
