@@ -395,7 +395,8 @@ ${ assist.assistPanel() }
             <label for="destinationType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
-
+          </div>
+          <div class="control-group">
             <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
               <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
                 <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
