@@ -447,7 +447,7 @@ class Collection(models.Model):
 
 class Collection2(object):
 
-  def __init__(self, user, name='Default', data=None, document=None):
+  def __init__(self, user, name='Default', data=None, document=None, engine='solr'):
     self.document = document
 
     if document is not None:
@@ -456,7 +456,7 @@ class Collection2(object):
       self.data = json.loads(data)
     else:
       self.data = {
-          'collection': self.get_default(user, name),
+          'collection': self.get_default(user, name, engine),
           'layout': []
       }
 
@@ -490,6 +490,8 @@ class Collection2(object):
       }
     if 'enabled' not in props['collection']:
       props['collection']['enabled'] = True
+    if 'engine' not in props['collection']:
+      props['collection']['engine'] = 'solr'
     if 'leafletmap' not in props['collection']['template']:
       props['collection']['template']['leafletmap'] = {'latitudeField': None, 'longitudeField': None, 'labelField': None}
     if 'timeFilter' not in props['collection']:
@@ -541,8 +543,8 @@ class Collection2(object):
 
     return json.dumps(props)
 
-  def get_default(self, user, name):
-    fields = self.fields_data(user, name)
+  def get_default(self, user, name, engine='solr'):
+    fields = self.fields_data(user, name, engine)
     id_field = [field['name'] for field in fields if field.get('isId')]
 
     if id_field:
@@ -588,6 +590,7 @@ class Collection2(object):
     return {
       'id': None,
       'name': name,
+      'engine': engine,
       'label': name,
       'enabled': False,
       'template': TEMPLATE,
@@ -628,8 +631,9 @@ class Collection2(object):
   def fields(self, user):
     return sorted([str(field.get('name', '')) for field in self.fields_data(user)])
 
-  def fields_data(self, user, name):
-    api = SolrApi(SOLR_URL.get(), user)
+  def fields_data(self, user, name, engine='solr'):
+    from search.api_engines import get_engine
+    api = get_engine(user, engine)
     try:
       schema_fields = api.fields(name)
       schema_fields = schema_fields['schema']['fields']
@@ -888,11 +892,8 @@ def augment_solr_response(response, collection, query):
           if len(agg_keys) == 1 and agg_keys[0].lower().startswith('dim_'):
             agg_keys.insert(0, 'count')
           counts = _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
-#             _augment_stats_2d(name, facet, counts, selected_values, agg_keys, rows)
-          
-          print counts
-#           count = response['facets'][name]
-#           _convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
+
+          #_convert_nested_to_augmented_pivot_nd(facet_fields, facet['id'], count, selected_values, dimension=2)
           dimension = len(facet_fields)
         elif not collection_facet['properties']['facets'] or (collection_facet['properties']['facets'][0]['aggregate']['function'] != 'count' and len(collection_facet['properties']['facets']) == 1):
           # Dimension 1 with 1 count or agg

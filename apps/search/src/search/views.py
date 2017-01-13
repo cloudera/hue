@@ -28,6 +28,7 @@ from desktop.models import Document2, Document
 
 from indexer.management.commands import indexer_setup
 
+from search.api_engines import get_engine
 from search.conf import LATEST
 from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
@@ -88,11 +89,12 @@ def index_embeddable(request):
   return index(request, False, True)
 
 def new_search(request, is_embeddable=False):
-  collections = SearchController(request.user).get_all_indexes()
+  engine = request.GET.get('engine', 'solr')
+  collections = get_engine(request.user, engine).datasets()
   if not collections:
     return no_collections(request)
 
-  collection = Collection2(user=request.user, name=collections[0])
+  collection = Collection2(user=request.user, name=collections[0], engine=engine)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
 
   template = 'search.mako'

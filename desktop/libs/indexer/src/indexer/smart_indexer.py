@@ -22,10 +22,8 @@ from collections import deque
 from django.contrib.auth.models import User
 from django.utils.translation import ugettext as _
 from mako.lookup import TemplateLookup
-from mako.template import Template
 
 from desktop.models import Document2
-from notebook.api import _execute_notebook
 from notebook.connectors.base import get_api
 from notebook.models import Notebook
 

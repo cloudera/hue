@@ -21,14 +21,19 @@ from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
 from search.models import augment_solr_response
+from search.search_controller import SearchController
 
 
 LOG = logging.getLogger(__name__)
 
 
-def get_engine(user, name='solr'):
-  if name == 'db':
-    return DBApi(user)
+def get_engine(user, engine='solr'):
+  if isinstance(engine, dict):
+    engine = engine.get('engine', 'solr')
+
+  if engine == 'db':
+    from impala.dashboard_api import SQLApi
+    return SQLApi(user)
   else:
     return SearchApi(user)
 
@@ -37,6 +42,8 @@ class DashboardApi(object):
 
   def __init__(self, user):
     self.user = user
+
+  def datasets(self): pass
 
   def query(self, collection, query): pass
 
@@ -59,10 +66,24 @@ class DashboardApi(object):
 
 class SearchApi(DashboardApi):
 
+  def __init__(self, user):
+    DashboardApi.__init__(self, user)
+    self.api = SolrApi(SOLR_URL.get(), self.user)
+
   def query(self, collection, query):
-    response = SolrApi(SOLR_URL.get(), self.user).query(collection, query)
+    response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
+  
+  def datasets(self):
+    return SearchController(self.user).get_all_indexes()
 
+  def fields(self, collection):
+    return self.api.fields(collection)
 
-class DBApi(DashboardApi):
-  pass
+  def schema_fields(self, collection):
+    return self.api.fields(collection)
+  
+  def luke(self, collection):
+    return self.api.luke(collection)
+
+  

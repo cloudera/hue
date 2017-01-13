@@ -48,7 +48,7 @@ def search(request):
 
   if collection:
     try:
-      response = get_engine(request.user).query(collection, query)
+      response = get_engine(request.user, collection).query(collection, query)
     except RestException, e:
       try:
         message = json.loads(e.message)
@@ -98,8 +98,9 @@ def index_fields_dynamic(request):
 
   try:
     name = request.POST['name']
+    engine = request.POST['engine']
 
-    dynamic_fields = SolrApi(SOLR_URL.get(), request.user).luke(name)
+    dynamic_fields = get_engine(request.user, engine).luke(name)
 
     result['message'] = ''
     result['fields'] = [
@@ -126,7 +127,7 @@ def nested_documents(request):
   query = {'qs': [{'q': '_root_:*'}], 'fqs': [], 'start': 0, 'limit': 0}
 
   try:
-    response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
+    response = get_engine(request.user, collection).query(collection, query)
     result['has_nested_documents'] = response['response']['numFound'] > 0
     result['status'] = 0
   except Exception, e:
@@ -466,8 +467,9 @@ def get_collection(request):
 
   try:
     name = request.POST['name']
+    engine = request.POST['engine']
 
-    collection = Collection2(request.user, name=name)
+    collection = Collection2(request.user, name=name, engine=engine)
     collection_json = collection.get_json(request.user)
 
     result['collection'] = json.loads(collection_json)
