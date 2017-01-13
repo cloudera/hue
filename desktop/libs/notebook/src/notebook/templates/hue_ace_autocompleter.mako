@@ -144,7 +144,7 @@ from desktop.views import _ko
       <div class="autocompleter-header">
         <!-- ko if: suggestions.availableCategories().length > 1 -->
         <div class="autocompleter-categories" data-bind="foreach: suggestions.availableCategories()">
-          <div data-bind="text: label, css: { 'active': $parent.suggestions.activeCategory() === $data }, style: { 'border-color': $parent.suggestions.activeCategory() === $data ? color : 'transparent' }, click: function (data, event) { $parent.suggestions.activeCategory($data); event.stopPropagation(); }"></div>
+          <div data-bind="text: label, css: { 'active': $parent.suggestions.activeCategory() === $data }, style: { 'border-color': $parent.suggestions.activeCategory() === $data ? color : 'transparent' }, click: function (data, event) { $parent.suggestions.activeCategory($data); event.stopPropagation(); $parent.editor().focus(); }"></div>
         </div>
         <!-- /ko -->
         <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
