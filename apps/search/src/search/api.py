@@ -27,6 +27,7 @@ from desktop.lib.rest.http_client import RestException
 
 from libsolr.api import SolrApi
 
+from search.api_engines import get_engine
 from search.conf import SOLR_URL
 from search.decorators import allow_viewer_only
 from search.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
@@ -47,8 +48,7 @@ def search(request):
 
   if collection:
     try:
-      response = SolrApi(SOLR_URL.get(), request.user).query(collection, query)
-      response = augment_solr_response(response, collection, query)
+      response = get_engine(request.user).query(collection, query)
     except RestException, e:
       try:
         message = json.loads(e.message)
