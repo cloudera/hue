@@ -120,7 +120,7 @@ class WorkflowActionApi(Api):
     action = oozie_api.get_action(action_id=appid)
 
     common = action.to_json()
-    
+
     common['action_type'] = common['type']
     common['type'] = 'workflow-action'
 
