@@ -33,7 +33,7 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
-from search.api import _compute_range_facet
+from search.facet_builder import _compute_range_facet
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
