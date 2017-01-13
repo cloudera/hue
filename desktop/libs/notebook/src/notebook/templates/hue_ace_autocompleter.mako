@@ -130,6 +130,11 @@ from desktop.views import _ko
       font-size: 15px;
       font-weight: 300;
     }
+
+    .details-code {
+      margin-bottom: 10px;
+      font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
+    }
   </style>
 
   <script type="text/html" id="hue-ace-autocompleter">
@@ -172,7 +177,8 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-udf">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="details-code" data-bind="text: details.signature"></div>
+    <div data-bind="text: details.description"></div>
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
