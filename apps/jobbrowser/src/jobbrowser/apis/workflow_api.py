@@ -63,6 +63,7 @@ class WorkflowApi(Api):
     response = list_oozie_workflow(request, job_id=appid)
     common['properties'] = json.loads(response.content)
     common['properties']['xml'] = ''
+    common['properties']['properties'] = ''
 
     return common
 
@@ -90,6 +91,12 @@ class WorkflowApi(Api):
       workflow = oozie_api.get_job(jobid=appid)
       return {
         'xml': workflow.definition,
+      }
+    elif app_property == 'properties':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_job(jobid=appid)
+      return {
+        'properties': workflow.conf_dict,
       }
 
     return {}
