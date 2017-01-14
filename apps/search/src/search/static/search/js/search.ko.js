@@ -1629,6 +1629,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     }
 
+    if (self.collection.engine() == 'db') {
+      multiQs = $.map(self.collection.facets(), function(facet) {
+        return $.post("/search/search", {
+            collection: ko.mapping.toJSON(self.collection),
+            query: ko.mapping.toJSON(self.query),
+            layout: ko.mapping.toJSON(self.columns),
+            facet: ko.mapping.toJSON(facet),
+        }, function (data) {
+            $.each(data.normalized_facets, function (index, new_facet) {
+              self._make_result_facet(new_facet);
+            });
+        	return data;
+        });
+      });  
+    }
+    
     $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
       analyse.stats.data.removeAll();
     });
@@ -1652,36 +1668,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
               }
 
               $.each(data.normalized_facets, function (index, new_facet) {
-                var facet = self.getFacetFromQuery(new_facet.id);
-                var _hash = ko.mapping.toJSON(new_facet);
-
-                if (!facet.has_data() || facet.resultHash() != _hash) {
-                  facet.counts(new_facet.counts);
-
-                  if (typeof new_facet.docs != 'undefined') {
-                    var _docs = [];
-
-                    // Update template
-                    var _facet_model = self.collection.getFacetById(new_facet.id);
-                    var _fields = []
-                    $.each(new_facet.fieldsAttributes, function(index, item) {
-                      _fields.push(ko.mapping.fromJS(item));
-                    });
-                    _facet_model.template.fieldsAttributes(_fields);
-
-                    $.each(new_facet.docs, function (index, item) {
-                      _docs.push(self._make_result_doc(item, "", _facet_model.template));
-                    });
-                    facet.results(_docs);
-                    facet.response(new_facet.response);
-                  }
-                  facet.label(new_facet.label);
-                  facet.field(new_facet.field);
-                  facet.dimension(new_facet.dimension);
-                  facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
-                  facet.resultHash(_hash);
-                  facet.has_data(true);
-                }
+                self._make_result_facet(new_facet);
               });
 
               // Delete norm_facets that were deleted
@@ -1712,18 +1699,19 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       ].concat(multiQs)
     )
       .done(function () {
-        if (arguments[0] instanceof Array) { // If multi queries
-          var histograms = self.collection.getHistogramFacets();
-          for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
-            var histoFacetId = histograms[h].id();
-            var histoFacet = self.getFacetFromQuery(histoFacetId);
-            var _series = [];
-            for (var i = 1; i < arguments.length; i++) {
-              _series.push(arguments[i][0]['series']);
-            }
-            histoFacet.extraSeries(_series);
+        if (arguments[0] instanceof Array) {
+          if (self.collection.engine() != 'db') { // If multi queries
+	          var histograms = self.collection.getHistogramFacets();
+	          for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
+	            var histoFacetId = histograms[h].id();
+	            var histoFacet = self.getFacetFromQuery(histoFacetId);
+	            var _series = [];
+	            for (var i = 1; i < arguments.length; i++) {
+	              _series.push(arguments[i][0]['series']);
+	            }
+	            histoFacet.extraSeries(_series);
+	          }
           }
-          ;
           self.response.valueHasMutated();
         }
       })
@@ -1737,6 +1725,39 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
   };
 
+  self._make_result_facet = function(new_facet) {
+      var facet = self.getFacetFromQuery(new_facet.id);
+      var _hash = ko.mapping.toJSON(new_facet);
+
+      if (!facet.has_data() || facet.resultHash() != _hash) {
+        facet.counts(new_facet.counts);
+
+        if (typeof new_facet.docs != 'undefined') {
+          var _docs = [];
+
+          // Update template
+          var _facet_model = self.collection.getFacetById(new_facet.id);
+          var _fields = []
+          $.each(new_facet.fieldsAttributes, function(index, item) {
+            _fields.push(ko.mapping.fromJS(item));
+          });
+          _facet_model.template.fieldsAttributes(_fields);
+
+          $.each(new_facet.docs, function (index, item) {
+            _docs.push(self._make_result_doc(item, "", _facet_model.template));
+          });
+          facet.results(_docs);
+          facet.response(new_facet.response);
+        }
+        facet.label(new_facet.label);
+        facet.field(new_facet.field);
+        facet.dimension(new_facet.dimension);
+        facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
+        facet.resultHash(_hash);
+        facet.has_data(true);
+      }
+  }
+  
   self._make_result_doc = function(item, _mustacheTmpl, template) {
       var row = [];
       var leafletmap = {};

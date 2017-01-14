@@ -44,11 +44,12 @@ def search(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
+  facet = json.loads(request.POST.get('facet', '{}'))  
   query['download'] = 'download' in request.POST
 
   if collection:
     try:
-      response = get_engine(request.user, collection).query(collection, query)
+      response = get_engine(request.user, collection).query(collection, query, facet)
     except RestException, e:
       try:
         message = json.loads(e.message)
@@ -353,8 +354,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     properties['scope'] = 'world'
     properties['limit'] = 100
   else:
-    solr_api = SolrApi(SOLR_URL.get(), user)
-    range_properties = _new_range_facet(solr_api, collection, facet_field, widget_type)
+    api = get_engine(user, collection)
+    range_properties = _new_range_facet(api, collection, facet_field, widget_type)
 
     if range_properties:
       facet_type = 'range'
