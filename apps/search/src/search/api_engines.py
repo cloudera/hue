@@ -45,7 +45,7 @@ class DashboardApi(object):
 
   def datasets(self): pass
 
-  def query(self, collection, query): pass
+  def query(self, collection, query, facet): pass
 
   def suggest(self, collection, query): pass
 
@@ -70,7 +70,7 @@ class SearchApi(DashboardApi):
     DashboardApi.__init__(self, user)
     self.api = SolrApi(SOLR_URL.get(), self.user)
 
-  def query(self, collection, query):
+  def query(self, collection, query, facet=None):
     response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
   

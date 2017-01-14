@@ -36,19 +36,28 @@ class SQLApi():
   def __init__(self, user):
     self.user = user
 
-  def query(self, dashboard, query):
+  def query(self, dashboard, query, facet):
     database, table = self._get_database_table_names(dashboard['name'])
     filters = []
 
-    fields =  '*'
-    hql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
-        'database': database,
-        'table': table,
-        'fields': fields
-    }
-    if filters:
-      hql += ' WHERE ' + filters
-    hql += ' LIMIT 100'
+    if facet:
+      hql = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s" % {
+          'database': database,
+          'table': table,
+          'field': facet['field'],
+          'filters': '',
+          'limit': 100
+      }
+    else:
+      fields =  '*'
+      hql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
+          'database': database,
+          'table': table,
+          'fields': fields
+      }
+      if filters:
+        hql += ' WHERE ' + filters
+      hql += ' LIMIT 100'
 
 #     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
 #     db = dbms.get(request.user)
@@ -72,7 +81,10 @@ class SQLApi():
       result = db.fetch(handle, rows=100)
       db.close(handle)
 
-    return self._convert_impala_results(result, dashboard, query)
+    if facet:
+      return self._convert_impala_facet(result, facet)
+    else:
+      return self._convert_impala_results(result, dashboard, query)
 
   def datasets(self):
     return ['sample_07', 'web_logs']
@@ -108,6 +120,99 @@ class SQLApi():
       table_name = name
 
     return database, table_name
+
+  def _convert_impala_facet(self, result, facet):
+    response = json.loads('''{
+   "field":"cat",
+   "fieldsAttributes":[
+      {
+         "sort":{
+            "direction":null
+         },
+         "isDynamic":false,
+         "type":"string",
+         "name":"cat"
+      },
+      {
+         "sort":{
+            "direction":null
+         },
+         "isDynamic":false,
+         "type":"aggr",
+         "name":"count(cat)"
+      }
+   ],
+   "response":{
+      "response":{
+         "start":0,
+         "numFound":16
+      }
+   },
+   "docs":[
+      {
+         "count(cat)":12,
+         "cat":"electronics"
+      },
+      {
+         "count(cat)":4,
+         "cat":"currency"
+      },
+      {
+         "count(cat)":3,
+         "cat":"memory"
+      },
+      {
+         "count(cat)":2,
+         "cat":"connector"
+      },
+      {
+         "count(cat)":2,
+         "cat":"graphics card"
+      },
+      {
+         "count(cat)":2,
+         "cat":"hard drive"
+      },
+      {
+         "count(cat)":2,
+         "cat":"search"
+      },
+      {
+         "count(cat)":2,
+         "cat":"software"
+      },
+      {
+         "count(cat)":1,
+         "cat":"camera"
+      },
+      {
+         "count(cat)":1,
+         "cat":"copier"
+      }
+   ],
+   "counts":[],
+   "dimension":1,
+   "type":"nested",
+   "id":"6ff1f8a2-3c83-637a-0c3d-7217c39dcd9e",
+   "extraSeries":[
+
+   ],
+   "label":"cat"
+}''')
+
+    response['id'] = facet['id']
+
+    docs = []
+    for row in result.rows():
+      docs.append({
+         "count": row[1],
+         "exclude": True,
+         "selected":False,
+         "value": row[0]
+      })
+    response['counts'] = docs
+
+    return {'normalized_facets': [response]}
 
   def _convert_impala_results(self, result, dashboard, query):
     cols = list(result.cols())
