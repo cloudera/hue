@@ -44,7 +44,7 @@ class SQLApi():
       return {'response': {'numFound': 0}}
 
     if facet:
-      hql = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s" % {
+      hql = "SELECT %(field)s, COUNT(*) FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY COUNT(*) DESC LIMIT %(limit)s" % {
           'database': database,
           'table': table,
           'field': facet['field'],
@@ -127,93 +127,48 @@ class SQLApi():
   def _convert_impala_facet(self, result, facet):
     response = json.loads('''{
    "field":"cat",
-   "fieldsAttributes":[
-      {
-         "sort":{
-            "direction":null
-         },
-         "isDynamic":false,
-         "type":"string",
-         "name":"cat"
-      },
-      {
-         "sort":{
-            "direction":null
-         },
-         "isDynamic":false,
-         "type":"aggr",
-         "name":"count(cat)"
-      }
-   ],
+   "fieldsAttributes":[],
    "response":{
       "response":{
          "start":0,
          "numFound":16
       }
    },
-   "docs":[
-      {
-         "count(cat)":12,
-         "cat":"electronics"
-      },
-      {
-         "count(cat)":4,
-         "cat":"currency"
-      },
-      {
-         "count(cat)":3,
-         "cat":"memory"
-      },
-      {
-         "count(cat)":2,
-         "cat":"connector"
-      },
-      {
-         "count(cat)":2,
-         "cat":"graphics card"
-      },
-      {
-         "count(cat)":2,
-         "cat":"hard drive"
-      },
-      {
-         "count(cat)":2,
-         "cat":"search"
-      },
-      {
-         "count(cat)":2,
-         "cat":"software"
-      },
-      {
-         "count(cat)":1,
-         "cat":"camera"
-      },
-      {
-         "count(cat)":1,
-         "cat":"copier"
-      }
-   ],
+   "docs":[],
    "counts":[],
    "dimension":1,
    "type":"nested",
-   "id":"6ff1f8a2-3c83-637a-0c3d-7217c39dcd9e",
    "extraSeries":[
-
    ],
    "label":"cat"
 }''')
 
     response['id'] = facet['id']
 
-    docs = []
-    for row in result.rows():
-      docs.append({
+    cols = list(result.cols())
+    rows = list(result.rows())
+
+    response['fieldsAttributes'] = [{
+         "sort":{
+            "direction": None
+         },
+         "isDynamic": False,
+         "type": column.type,
+         "name": column.name
+      } for column in result.data_table.cols()]
+
+
+    response['docs'] = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
+
+    counts = []
+    for row in rows:
+      counts.append({
          "count": row[1],
          "exclude": True,
-         "selected":False,
+         "selected": False,
          "value": row[0]
       })
-    response['counts'] = docs
+    response['counts'] = counts
 
     return {'normalized_facets': [response]}
 
