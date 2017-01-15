@@ -43,9 +43,9 @@ class DashboardApi(object):
   def __init__(self, user):
     self.user = user
 
-  def datasets(self): pass
+  def datasets(self, show_all=False): pass
 
-  def query(self, collection, query, facet): pass
+  def query(self, collection, query, facet=None): pass
 
   def suggest(self, collection, query): pass
 
@@ -74,8 +74,8 @@ class SearchApi(DashboardApi):
     response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
   
-  def datasets(self):
-    return SearchController(self.user).get_all_indexes()
+  def datasets(self, show_all=False):
+    return SearchController(self.user).get_all_indexes(show_all=show_all)
 
   def fields(self, collection):
     return self.api.fields(collection)
