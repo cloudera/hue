@@ -36,9 +36,12 @@ class SQLApi():
   def __init__(self, user):
     self.user = user
 
-  def query(self, dashboard, query, facet):
+  def query(self, dashboard, query, facet=None):
     database, table = self._get_database_table_names(dashboard['name'])
     filters = []
+
+    if query and query['qs'] == [{'q': '_root_:*'}]:
+      return {'response': {'numFound': 0}}
 
     if facet:
       hql = "SELECT %(field)s, COUNT(*) AS top FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY top DESC LIMIT %(limit)s" % {
@@ -86,7 +89,7 @@ class SQLApi():
     else:
       return self._convert_impala_results(result, dashboard, query)
 
-  def datasets(self):
+  def datasets(self,  show_all=False):
     return ['sample_07', 'web_logs']
 
   def fields(self, dashboard):
