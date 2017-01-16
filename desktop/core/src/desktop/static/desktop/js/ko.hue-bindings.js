@@ -140,8 +140,17 @@
       if (options.closeOnEnter || options.onEnter || options.blurOnEnter) {
         $element.on('keyup', function (e) {
           if(e.which === 13) {
+            if (options.reopenPattern && options.reopenPattern.test($element.val())) {
+              window.setTimeout(function () {
+                $element.hueAutocomplete('search', $element.val());
+              }, 0);
+              return;
+            }
             if (options.closeOnEnter) {
               $element.hueAutocomplete('close');
+            }
+            if (options.valueObservable) {
+              options.valueObservable($element.val());
             }
             if (options.onEnter) {
               options.onEnter();
@@ -183,16 +192,23 @@
         closeSubscription.remove();
       });
 
-      if (options.reopenPattern) {
+      if (options.reopenPattern || options.valueObservable || options.onSelect) {
         var oldSelect = options.select;
         options.select = function (event, ui) {
-          if (oldSelect) {
-            oldSelect(event, ui);
-          }
-          if (options.reopenPattern.test(ui.item.value)) {
+          if (options.reopenPattern && options.reopenPattern.test(ui.item.value)) {
             window.setTimeout(function () {
               $element.hueAutocomplete('search', $element.val());
             }, 0);
+            return;
+          }
+          if (options.valueObservable) {
+            options.valueObservable(ui.item.value);
+          }
+          if (options.onSelect) {
+            options.onSelect();
+          }
+          if (oldSelect) {
+            oldSelect(event, ui);
           }
         };
       }
