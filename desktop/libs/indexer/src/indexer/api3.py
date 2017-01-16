@@ -235,8 +235,8 @@ def _create_table_from_a_file(request, source, destination):
     regexp_delimiter = destination['customRegexp']
   else:
     field_delimiter = ','
-    collection_delimiter = r'\\002'
-    map_delimiter = r'\\003'
+    collection_delimiter = r'\002'
+    map_delimiter = r'\003'
     regexp_delimiter = '.*'
 
   file_format = 'TextFile'
@@ -287,8 +287,8 @@ def _create_table_from_a_file(request, source, destination):
           'comment': comment,
           'row_format': row_format,
           'field_terminator': field_delimiter,
-          'collection_terminator': collection_delimiter,
-          'map_key_terminator': map_delimiter,
+          'collection_terminator': collection_delimiter, # Only if Hive
+          'map_key_terminator': map_delimiter, # Only if Hive # [LINES TERMINATED BY char]
           'serde_name': serde_name,
           'serde_properties': serde_properties,
           'file_format': file_format,
@@ -310,9 +310,9 @@ def _create_table_from_a_file(request, source, destination):
   if load_data and table_format in ('parquet', 'kudu'):
     file_format = table_format
     if table_format == 'kudu':
-      columns_list = ['`%s`' % col for col in primary_keys] + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]
+      columns_list = ['`%s`' % col for col in [primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]]
       extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
-      DISTRIBUTE BY HASH INTO 16 BUCKETS
+      PARTITION BY HASH PARTITIONS 16
       STORED AS %(file_format)s
       TBLPROPERTIES(
       'kudu.num_tablet_replicas' = '1'

@@ -1045,7 +1045,7 @@ ${ assist.assistPanel() }
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
         if (newVal.hasHeader !== 'undefined') {
-          vm.createWizard.destination.hasHeader(newVal.hasHeader);
+         // vm.createWizard.destination.hasHeader(newVal.hasHeader);
         }
       });
 
