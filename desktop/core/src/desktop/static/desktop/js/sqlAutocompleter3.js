@@ -525,6 +525,7 @@ var SqlAutocompleter3 = (function () {
               }
               tableSuggestions.push({
                 value: prefix + self.backTickIfNeeded(tableMeta.name),
+                tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
                 detailsTemplate: 'table',
@@ -881,7 +882,6 @@ var SqlAutocompleter3 = (function () {
           suggestion.value = lastIdentifier.subQuery + '.' + suggestion.value;
         }
       }
-      delete suggestion.table;
     }
   };
 
@@ -1104,6 +1104,7 @@ var SqlAutocompleter3 = (function () {
         silenceErrors: true,
         tables: suggestAggregateFunctions.tables,
         successCallback: function (data) {
+          var aggregateFunctionsSuggestions = [];
           if (data.values.length > 0) {
             // TODO: Handle column conflicts with multiple tables
 
@@ -1130,7 +1131,6 @@ var SqlAutocompleter3 = (function () {
               }
             });
 
-            var aggregateFunctionsSuggestions = [];
             data.values.forEach(function (value) {
               var clean = value.aggregateClause;
               substitutions.forEach(function (substitution) {
@@ -1314,23 +1314,34 @@ var SqlAutocompleter3 = (function () {
         silenceErrors: true,
         successCallback: function (data) {
           var popularityIndex = {};
+          if (data.top_tables.length == 0) {
+            self.loadingPopularTables(false);
+            popularTablesDeferred.resolve([]);
+            return;
+          }
           data.top_tables.forEach(function (topTable) {
-            popularityIndex[topTable.name] = topTable.popularity;
+            popularityIndex[topTable.name] = topTable;
           });
 
           $.when(tablesDeferred).done(function (tableSuggestions) {
+            var notify = false;
             tableSuggestions.forEach(function (suggestion) {
-              if (typeof popularityIndex[suggestion.name] !== 'undefined') {
-                suggestion.weightAdjust = Math.min(popularityIndex[suggestion.name], 99);
+              var popularity = popularityIndex[suggestion.tableName];
+              if (typeof popularity !== 'undefined') {
+                suggestion.weightAdjust = Math.min(popularity.popularity, 99); // TODO: Normalize popularity
                 suggestion.popular = true;
                 if (!suggestion.details) {
-                  suggestions.details = {};
+                  suggestion.details = {};
                 }
-                suggestion.details.popularity = popularityIndex[suggestion.name];
+                suggestion.details.popularity = popularity;
+                notify = true;
               }
             });
             self.loadingPopularTables(false);
             popularTablesDeferred.resolve(data.top_tables);
+            if (notify) {
+              self.entries.notifySubscribers();
+            }
           });
         },
         errorCallback: function () {
@@ -1347,6 +1358,7 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     var popularColumnsDeferred = $.Deferred();
     var suggestColumns = self.parseResult.suggestColumns;
+    // TODO: Handle tables from different databases
     if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
       self.loadingPopularColumns(true);
       self.apiHelper.fetchNavOptTopColumns({
@@ -1370,35 +1382,40 @@ var SqlAutocompleter3 = (function () {
             default:
               popularColumns = [];
           }
-          popularColumns.forEach(function (col) {
-            col.path = col.tableName.split('.').concat(col.columnName.split('.').slice(1)).join('.');
+
+          if (popularColumns.length === 0) {
+            self.loadingPopularColumns(false);
+            popularColumnsDeferred.resolve([]);
+            return;
+          }
+
+          var popularityIndex = {};
+          popularColumns.forEach(function (popularColumn) {
+            popularityIndex[popularColumn.columnName.toLowerCase()] = popularColumn;
           });
 
           $.when(columnsDeferred).done(function (columns) {
-            if (popularColumns.length > 0) {
-              columns.forEach(function (suggestion) {
-                var path = '';
-                if (!self.apiHelper.isDatabase(suggestion.table.identifierChain[0].name, self.snippet.type())) {
-                  path = self.activeDatabase + '.';
+            var notify = false;
+            columns.forEach(function (suggestion) {
+              if (typeof suggestion.table === 'undefined') {
+                return;
+              }
+              var popularity = popularityIndex[suggestion.value.toLowerCase()];
+              if (typeof popularity !== 'undefined') {
+                suggestion.weightAdjust = Math.min(popularity.columnCount, 99); // TODO: Normalize popularity
+                suggestion.popular = true;
+                if (!suggestion.details) {
+                  suggestions.details = {};
                 }
-                path += $.map(suggestion.table.identifierChain, function (identifier) { return identifier.name }).join('.') + '.' + suggestion.value.replace(/[\[\]]/g, '');
-                for (var i = 0; i < popularColumns.length; i++) {
-                  // TODO: Switch to map once nav opt API is stable
-                  if (path.toLowerCase().indexOf(popularColumns[i].path.toLowerCase()) !== -1) {
-                    suggestion.weightAdjust = Math.min(popularColumns[i].columnCount, 99);
-                    suggestion.popular = true;
-                    if (!suggestion.details) {
-                      suggestions.details = {};
-                    }
-                    suggestion.details.popularity = popularColumns[i];
-                    break;
-                  }
-                }
-              });
-              self.columns.notifySubscribers();
-            }
+                suggestion.details.popularity = popularity;
+                notify = true;
+              }
+            });
             self.loadingPopularColumns(false);
             popularColumnsDeferred.resolve(popularColumns);
+            if (notify) {
+              self.entries.notifySubscribers();
+            }
           });
         },
         errorCallback: function () {
