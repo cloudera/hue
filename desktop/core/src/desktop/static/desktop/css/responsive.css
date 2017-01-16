@@ -1051,6 +1051,6 @@ h6 {
   position: static;
 }
 
-.tooltip {
+.tooltip, .ui-autocomplete {
   z-index: 3000 !important;
 }
