@@ -44,11 +44,19 @@ class SQLApi():
       return {'response': {'numFound': 0}}
 
     if facet:
-      hql = "SELECT %(field)s, COUNT(*) FROM %(database)s.%(table)s WHERE %(field)s IS NOT NULL %(filters)s GROUP BY %(field)s ORDER BY COUNT(*) DESC LIMIT %(limit)s" % {
+      fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
+      fields = ['`%s`' % f for f in fields]
+
+      hql = '''SELECT %(fields)s, COUNT(*)
+      FROM %(database)s.%(table)s
+      WHERE %(filters)s
+      GROUP BY %(fields)s
+      ORDER BY COUNT(*) DESC
+      LIMIT %(limit)s''' % {
           'database': database,
           'table': table,
-          'field': facet['field'],
-          'filters': '',
+          'fields': ', '.join(fields),
+          'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields]),
           'limit': 100
       }
     else:
