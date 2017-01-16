@@ -1210,6 +1210,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           classPrefix: 'nav-',
           showOnFocus: true,
           onEnter: performSearch,
+          valueObservable: searchInput,
+          onSelect: performSearch,
           reopenPattern: /.*:$/
         },
         hasFocus: searchHasFocus,
