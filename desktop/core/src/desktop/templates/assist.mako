@@ -1387,6 +1387,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         });
 
         huePubSub.subscribe('assist.db.highlight', function (location) {
+          huePubSub.publish('assist.hide.search');
           var foundSource;
           $.each(self.sources(), function (idx, source) {
             if (source.sourceType === location.sourceType) {
@@ -1786,6 +1787,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
         self.searchActive = ko.observable(false);
+
+        huePubSub.subscribe('assist.hide.search', function () {
+          self.searchActive(false);
+        });
 
         var lastQuery = -1;
 
