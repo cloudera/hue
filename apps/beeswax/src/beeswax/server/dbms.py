@@ -239,7 +239,7 @@ class HiveServer2Dbms(object):
 
 
   def get_column(self, database, table_name, column_name):
-    table = self.client.get_table(database, table_name)
+    table = self.get_table(database, table_name)
     for col in table.cols:
       if col.name == column_name:
         return col
