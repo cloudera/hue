@@ -123,6 +123,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
         for col_props in cols_extended:
           col_props.update(extra_col_options.get(col_props['name'], {}))
 
+      response['support_updates'] = table.is_impala_only
       response['columns'] = [column.name for column in table.cols]
       response['extended_columns'] = cols_extended
       response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
