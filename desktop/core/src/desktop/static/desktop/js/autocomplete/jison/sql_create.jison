@@ -219,6 +219,9 @@ TableDefinitionRightPart_EDIT
        }
        if (!$3 && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
          keywords.push({ value: 'PARTITIONED BY', weight: 9 });
+         if (isImpala()) {
+           keywords.push({ value: 'PARTITION BY', weight: 9 });
+         }
        }
        if (isImpala() && !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10) {
          keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 8 });
@@ -298,14 +301,22 @@ ParenthesizedColumnSpecificationList_EDIT
 
 ColumnSpecificationList
  : ColumnSpecification
- | ColumnSpecificationList ',' ColumnSpecification  -> $3
+ | ColumnSpecificationList ',' ImpalaPrimaryKeySpecification                              -> $3
+ | ColumnSpecificationList ',' ColumnSpecification                                        -> $3
  ;
 
 ColumnSpecificationList_EDIT
  : ColumnSpecification_EDIT
  | ColumnSpecification_EDIT ',' ColumnSpecificationList
+ | ColumnSpecificationList ',' ImpalaPrimaryKeySpecification_EDIT
  | ColumnSpecificationList ',' ColumnSpecification_EDIT
  | ColumnSpecificationList ',' ColumnSpecification_EDIT ',' ColumnSpecificationList
+ | ColumnSpecificationList ',' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['PRIMARY KEY']);
+     }
+   }
  | ColumnSpecification 'CURSOR'
    {
      checkForKeywords($1);
@@ -325,20 +336,91 @@ ColumnSpecificationList_EDIT
  ;
 
 ColumnSpecification
- : ColumnIdentifier ColumnDataType OptionalComment
+ : ColumnIdentifier ColumnDataType OptionalColumnOptions
    {
-     if (!$3) {
-       $$ = { suggestKeywords: ['COMMENT'] };
+     var keywords = [];
+     if (isImpala()) {
+       if (!$3['primary']) {
+         keywords.push('PRIMARY KEY');
+       }
+       if (!$3['encoding']) {
+         keywords.push('ENCODING');
+       }
+       if (!$3['compression']) {
+         keywords.push('COMPRESSION');
+       }
+       if (!$3['default']) {
+         keywords.push('DEFAULT');
+       }
+       if (!$3['block_size']) {
+         keywords.push('BLOCK_SIZE');
+       }
+       if (!$3['null']) {
+         keywords.push('NOT NULL');
+         keywords.push('NULL');
+       }
+     }
+     if (!$3['comment']) {
+       keywords.push('COMMENT');
+     }
+     if (keywords.length > 0) {
+       $$ = { suggestKeywords: keywords };
      }
    }
  ;
 
 ColumnSpecification_EDIT
- : ColumnIdentifier 'CURSOR' OptionalComment
+ : ColumnIdentifier 'CURSOR' OptionalColumnOptions
    {
      suggestKeywords(getColumnDataTypeKeywords());
    }
- | ColumnIdentifier ColumnDataType_EDIT OptionalComment
+ | ColumnIdentifier ColumnDataType_EDIT OptionalColumnOptions
+ | ColumnIdentifier ColumnDataType ColumnOptions_EDIT
+ ;
+
+OptionalColumnOptions
+ :                      -> {}
+ | ColumnOptions
+ ;
+
+ColumnOptions
+ : ColumnOption
+   {
+     $$ = {};
+     $$[$1] = true;
+   }
+ | ColumnOptions ColumnOption
+   {
+     $1[$2] = true;
+   }
+ ;
+
+ColumnOptions_EDIT
+ : ColumnOption_EDIT
+ | ColumnOption_EDIT ColumnOptions
+ | ColumnOptions ColumnOption_EDIT
+ | ColumnOptions ColumnOption_EDIT ColumnOptions
+ ;
+
+ColumnOption
+ : ImpalaPrimaryKey                                          -> 'primary'
+ | '<impala>ENCODING' RegularIdentifier                      -> 'encoding'
+ | '<impala>COMPRESSION' RegularIdentifier                   -> 'compression'
+ | '<impala>DEFAULT' NonParenthesizedValueExpressionPrimary  -> 'default'
+ | '<impala>BLOCK_SIZE' UnsignedNumericLiteral               -> 'block_size'
+ | 'NOT' 'NULL'                                              -> 'null'
+ | 'NULL'                                                    -> 'null'
+ | Comment                                                   -> 'comment'
+ ;
+
+ColumnOption_EDIT
+ : ImpalaPrimaryKey_EDIT
+ | 'NOT' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['NULL']);
+     }
+   }
  ;
 
 ColumnDataType
@@ -493,6 +575,27 @@ GreaterThanOrError
  | error
  ;
 
+ImpalaPrimaryKeySpecification
+ : ImpalaPrimaryKey ParenthesizedColumnList
+ ;
+
+ImpalaPrimaryKeySpecification_EDIT
+ : ImpalaPrimaryKey_EDIT
+ | ImpalaPrimaryKey_EDIT ParenthesizedColumnList
+ | ImpalaPrimaryKey ParenthesizedColumnList_EDIT
+ ;
+
+ImpalaPrimaryKey
+ : '<impala>PRIMARY' '<impala>KEY'
+ ;
+
+ImpalaPrimaryKey_EDIT
+ : '<impala>PRIMARY' 'CURSOR'
+   {
+     suggestKeywords(['KEY']);
+   }
+ ;
+
 OptionalPartitionedBy
  :
  | PartitionedBy
@@ -500,6 +603,8 @@ OptionalPartitionedBy
 
 PartitionedBy
  : HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList
+ | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList
+ | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList '<impala>PARTITIONS' UnsignedNumericLiteral
  ;
 
 PartitionedBy_EDIT
@@ -513,6 +618,133 @@ PartitionedBy_EDIT
    }
  | HiveOrImpalaPartitioned 'BY' ParenthesizedColumnSpecificationList_EDIT
  | HiveOrImpalaPartitioned ParenthesizedColumnSpecificationList_EDIT
+ | 'PARTITION' 'CURSOR'
+   {
+     suggestKeywords(['BY']);
+   }
+ | 'PARTITION' 'BY' 'CURSOR'
+   {
+     suggestKeywords(['HASH', 'RANGE']);
+   }
+ | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList_EDIT
+ | 'PARTITION' 'BY' 'RANGE' ParenthesizedColumnList ParenthesizedPartitionValuesList_EDIT
+ | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList_EDIT
+ | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList 'CURSOR'
+   {
+     suggestKeywords(['PARTITIONS']);
+   }
+ | 'PARTITION' 'BY' '<impala>HASH' ParenthesizedColumnList_EDIT '<impala>PARTITIONS' UnsignedNumericLiteral
+ ;
+
+ParenthesizedPartitionValuesList
+ : '(' PartitionValueList ')'
+ ;
+
+ParenthesizedPartitionValuesList_EDIT
+ : '(' 'CURSOR' RightParenthesisOrError
+   {
+     if (isImpala()) {
+       suggestKeywords(['PARTITION']);
+     }
+   }
+ |'(' PartitionValueList_EDIT RightParenthesisOrError
+ ;
+
+PartitionValueList
+ : PartitionValue
+ | PartitionValueList ',' PartitionValue
+ ;
+
+PartitionValueList_EDIT
+ : PartitionValue_EDIT
+ | PartitionValueList ',' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['PARTITION']);
+     }
+   }
+ | PartitionValueList ',' 'CURSOR' ',' PartitionValueList
+   {
+     if (isImpala()) {
+       suggestKeywords(['PARTITION']);
+     }
+   }
+ | PartitionValueList ',' PartitionValue_EDIT
+ | PartitionValueList ',' PartitionValue_EDIT ',' PartitionValueList
+ ;
+
+PartitionValue
+ : 'PARTITION' ValueExpression LessThanOrEqualTo 'VALUES' LessThanOrEqualTo ValueExpression
+ | 'PARTITION' 'VALUES' LessThanOrEqualTo ValueExpression
+ | 'PARTITION' ValueExpression LessThanOrEqualTo 'VALUES'
+ | '<impala>PARTITION_VALUE' '=' ValueExpression
+ ;
+
+PartitionValue_EDIT
+ : 'PARTITION' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['VALUE', 'VALUES']);
+     }
+   }
+ | '<impala>PARTITION_VALUE' 'CURSOR'
+   {
+     suggestKeywords(['=']);
+   }
+ | '<impala>PARTITION_VALUE' '=' 'CURSOR'
+   {
+     suggestFunctions();
+   }
+ | 'PARTITION' ValueExpression_EDIT
+   {
+     if ($2.endsWithLessThanOrEqual && isImpala()) {
+      suggestKeywords(['VALUES']);
+     }
+   }
+ | 'PARTITION' ValueExpression 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['<', '<=']);
+     }
+   }
+ | 'PARTITION' ValueExpression LessThanOrEqualTo 'CURSOR'
+   {
+    if (isImpala()) {
+      suggestKeywords(['VALUES']);
+    }
+   }
+ | 'PARTITION' ValueExpression_EDIT LessThanOrEqualTo 'VALUES'
+ | 'PARTITION' ValueExpression LessThanOrEqualTo 'VALUES' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['<', '<=']);
+     }
+   }
+ | 'PARTITION' ValueExpression LessThanOrEqualTo 'VALUES' LessThanOrEqualTo 'CURSOR'
+   {
+     if (isImpala()) {
+      suggestFunctions();
+     }
+   }
+ | 'PARTITION' ValueExpression LessThanOrEqualTo 'VALUES' LessThanOrEqualTo ValueExpression_EDIT
+ | 'PARTITION' 'VALUES' 'CURSOR'
+   {
+     if (isImpala()) {
+       suggestKeywords(['<', '<=']);
+     }
+   }
+ | 'PARTITION' 'VALUES' LessThanOrEqualTo 'CURSOR'
+   {
+     if (isImpala()) {
+      suggestFunctions();
+     }
+   }
+ | 'PARTITION' 'VALUES' LessThanOrEqualTo ValueExpression_EDIT
+ ;
+
+LessThanOrEqualTo
+ : '<'
+ | 'COMPARISON_OPERATOR' // This is fine for autocompletion
  ;
 
 OptionalClusteredBy
@@ -701,6 +933,7 @@ FileFormat
  | '<hive>SEQUENCEFILE'
  | '<hive>TEXTFILE'
  | '<impala>AVRO'
+ | '<impala>KUDU'
  | '<impala>PARQUET'
  | '<impala>RCFILE'
  | '<impala>SEQUENCEFILE'

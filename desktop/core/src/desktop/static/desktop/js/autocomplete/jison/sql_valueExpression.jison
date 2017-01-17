@@ -188,7 +188,7 @@ ValueExpression_EDIT
    {
      valueExpressionSuggest($1, $2);
      applyTypeToSuggestions($1.types);
-     $$ = { types: [ 'BOOLEAN' ] , typeSet: true };
+     $$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
    }
  | ValueExpression '>' PartialBacktickedOrAnyCursor
    {
@@ -200,7 +200,7 @@ ValueExpression_EDIT
    {
      valueExpressionSuggest($1, $2);
      applyTypeToSuggestions($1.types);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $2 === '<='  };
    }
  | ValueExpression '=' ValueExpression_EDIT
    {
