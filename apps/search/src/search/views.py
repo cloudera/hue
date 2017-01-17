@@ -33,7 +33,7 @@ from search.conf import LATEST
 from search.data_export import download as export_download
 from search.decorators import allow_owner_only, allow_viewer_only
 from search.management.commands import search_setup
-from search.models import Collection2
+from search.models import Collection2, get_engines
 from search.search_controller import SearchController, can_edit_index
 
 from django.core.urlresolvers import reverse
@@ -76,10 +76,12 @@ def index(request, is_mobile=False, is_embeddable=False):
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
-    'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get()}),
+    'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get(),
+        'engines': get_engines(request.user)
+    }),
     'is_owner': collection_doc.doc.get().can_write(request.user),
     'can_edit_index': can_edit_index(request.user),
-    'mobile': is_mobile
+    'mobile': is_mobile,
   })
 
 def index_m(request):
@@ -117,6 +119,7 @@ def new_search(request, is_embeddable=False):
                  "drops":["temp"],"klass":"card card-home card-column span10"},
          ],
          'is_latest': LATEST.get(),
+         'engines': get_engines(request.user)
      }),
     'is_owner': True,
     'can_edit_index': can_edit_index(request.user)

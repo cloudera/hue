@@ -32,6 +32,7 @@ from desktop.lib.i18n import smart_unicode, smart_str
 from desktop.models import get_data_link
 
 from libsolr.api import SolrApi
+from notebook.conf import get_ordered_interpreters
 
 from search.conf import SOLR_URL, LATEST
 
@@ -1138,6 +1139,16 @@ def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, select
     c['exclude'] = False
     c['fq_fields'] = fq_fields
     c['fq_values'] = fq_values
+
+
+def get_engines(user):
+  return [
+      {'name': _('index (Solr)'), 'type': 'solr'}] + [{
+        'name': _('table (%s)') % interpreter['name'],
+        'type': interpreter['type']
+      }
+      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] == 'hiveserver2'
+  ]
 
 
 def augment_solr_exception(response, collection):
