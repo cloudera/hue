@@ -108,11 +108,24 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
       tables_meta = db.get_tables_meta(database=database)
       response['tables_meta'] = tables_meta
     elif column is None:
-      t = db.get_table(database, table)
-      response['hdfs_link'] = t.hdfs_link
-      response['columns'] = [column.name for column in t.cols]
-      response['extended_columns'] = massage_columns_for_json(t.cols)
-      response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in t.partition_keys]
+      table = db.get_table(database, table)
+      response['hdfs_link'] = table.hdfs_link
+
+      cols_extended = massage_columns_for_json(table.cols)
+
+      if table.is_impala_only: # Expand Kudu columns information
+        query_server = get_query_server_config('impala')
+        db = dbms.get(db.client.user, query_server)
+
+        col_options = db.get_table_describe(database, table.name)
+        extra_col_options = dict([(col[0], dict(zip(col_options.cols(), col))) for col in col_options.rows()])
+
+        for col_props in cols_extended:
+          col_props.update(extra_col_options.get(col_props['name'], {}))
+
+      response['columns'] = [column.name for column in table.cols]
+      response['extended_columns'] = cols_extended
+      response['partition_keys'] = [{'name': part.name, 'type': part.type} for part in table.partition_keys]
     else:
       col = db.get_column(database, table, column)
       if col:

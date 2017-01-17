@@ -124,7 +124,7 @@ ${ components.menubar() }
           <td title="${ _("Scroll to the column") }">
             <!-- ko if: $root.database().table().samples.loading() -->
             <span data-bind="text: name"></span>
-            <!-- ko if: typeof primary_key !== 'undefined' -->
+            <!-- ko if: typeof primary_key !== 'undefined' && primary_key() == 'true' -->
               <i class="fa fa-key"></i>
             <!-- /ko -->
             <!-- /ko -->
