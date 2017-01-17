@@ -209,12 +209,15 @@
 <impala>'FUNCTION'                         { return '<impala>FUNCTION'; }
 <impala>'FUNCTIONS'                        { return '<impala>FUNCTIONS'; }
 <impala>'GROUP'                            { return '<impala>GROUP'; }
+<impala>'HASH'                             { return '<impala>HASH'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
 <impala>'INSERT'                           { determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
 <impala>'INVALIDATE'                       { determineCase(yytext); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
+<impala>'KEY'                              { return '<impala>KEY'; }
+<impala>'KUDU'                             { return '<impala>KUDU'; }
 <impala>'LAST'                             { return '<impala>LAST'; }
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
 <impala>'LIMIT'                            { return '<impala>LIMIT'; }
@@ -230,6 +233,7 @@
 <impala>'PARTITIONED'                      { return '<impala>PARTITIONED'; }
 <impala>'PARTITIONS'                       { return '<impala>PARTITIONS'; }
 <impala>'PREPARE_FN'                       { return '<impala>PREPARE_FN'; }
+<impala>'PRIMARY'                          { return '<impala>PRIMARY'; }
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
 <impala>'REFRESH'                          { determineCase(yytext); return '<impala>REFRESH'; }
@@ -255,11 +259,16 @@
 <impala>'UPDATE_FN'                        { return '<impala>UPDATE_FN'; }
 <impala>'URI'                              { return '<impala>URI'; }
 <impala>'USING'                            { return '<impala>USING'; }
+<impala>PARTITION\s+VALUE\s                { return '<impala>PARTITION_VALUE'; }
 
 // Non-reserved Keywords
 <impala>'ANALYTIC'                         { return '<impala>ANALYTIC'; }
 <impala>'ANTI'                             { return '<impala>ANTI'; }
+<impala>'BLOCK_SIZE'                       { return '<impala>BLOCK_SIZE'; }
+<impala>'COMPRESSION'                      { return '<impala>COMPRESSION'; }
 <impala>'CURRENT'                          { return '<impala>CURRENT'; }
+<impala>'DEFAULT'                          { return '<impala>DEFAULT'; }
+<impala>'ENCODING'                         { return '<impala>ENCODING'; }
 <impala>'GRANT'                            { return '<impala>GRANT'; }
 <impala>'ROLE'                             { return '<impala>ROLE'; }
 <impala>'ROLES'                            { return '<impala>ROLES'; }

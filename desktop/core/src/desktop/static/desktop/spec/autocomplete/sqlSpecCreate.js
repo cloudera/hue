@@ -1258,9 +1258,9 @@
             afterCursor: ', boo INT) AS SELECT * FROM baa;',
             dialect: 'impala',
             hasLocations: true,
+            containsKeywords: ['COMMENT'],
             expectedResult: {
-              lowerCase: false,
-              suggestKeywords: ['COMMENT']
+              lowerCase: false
             }
           });
         });
@@ -1277,14 +1277,14 @@
           });
         });
 
-        it('should suggest keywords for "CREATE TABLE foo (id int) STORED |"', function () {
+        it('should suggest keywords for "CREATE TABLE foo (id int) STORED AS |"', function () {
           assertAutoComplete({
             beforeCursor: 'CREATE TABLE foo (id int) STORED AS ',
             afterCursor: '',
             dialect: 'impala',
             expectedResult: {
               lowerCase: false,
-              suggestKeywords: ['AVRO', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
+              suggestKeywords: ['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']
             }
           });
         });
@@ -1505,6 +1505,353 @@
             noErrors: true,
             expectedResult: {
               lowerCase: true
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a, b) (PARTITION 1 <= VALUES < 2) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT PRIMARY KEY, b INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY RANGE (a) (PARTITION VALUE = 50, PARTITION 50 < VALUES <= 100) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE IF NOT EXISTS tbl (i INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE IF NOT EXISTS tbl (i INT ENCODING bla COMPRESSION zip DEFAULT 10 BLOCK_SIZE 4 NOT NULL,' +
+            ' PRIMARY KEY (b)) PARTITION BY HASH (a, b) PARTITIONS 10 STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT, j INT, PRIMARY KEY (i, j)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, j INT, PRIMARY KEY (i, j)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY, PRIMARY KEY(i)) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, PRIMARY KEY(i)) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should handle "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS KUDU;|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS KUDU;',
+            afterCursor: '',
+            dialect: 'impala',
+            containsKeywords: ['SELECT'],
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BLOCK_SIZE', 'COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING', 'NOT NULL', 'NULL', 'PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['COMMENT', 'COMPRESSION', 'DEFAULT', 'ENCODING', 'PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT BLOCK_SIZE 10 NOT NULL PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT, "', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PRIMARY KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT, PRIMARY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT, PRIMARY ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['KEY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) STORED AS ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['KUDU'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            containsKeywords: ['PARTITION BY', 'PARTITIONED BY', 'STORED AS'],
+            expectedResult: {
+              lowerCase: false
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['BY']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY ',
+            afterCursor: '',
+            dialect: 'impala',
+            noErrors: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['HASH', 'RANGE']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (|"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITION']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUE', 'VALUES']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 < |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION 1 < ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['VALUES'],
+              suggestFunctions: { types: ['NUMBER']}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE = |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION VALUE = ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestFunctions: {}
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION cos(10) < VALUES, PARTITION VALUES |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION cos(10) < VALUES, PARTITION VALUES ',
+            afterCursor: '',
+            dialect: 'impala',
+            hasLocations: true,
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['<', '<=']
+            }
+          });
+        });
+
+        it('should suggest keywords for "CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY HASH (i) |"', function () {
+          assertAutoComplete({
+            beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY  HASH (i) ',
+            afterCursor: '',
+            dialect: 'impala',
+            expectedResult: {
+              lowerCase: false,
+              suggestKeywords: ['PARTITIONS']
             }
           });
         });

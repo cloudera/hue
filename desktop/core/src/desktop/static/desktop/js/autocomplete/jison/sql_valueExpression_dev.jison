@@ -334,9 +334,10 @@ HiveOrImpalaRightSquareBracket
  | '<impala>]'
  ;
 
-HiveOrImpalaPartitioned
+HiveOrImpalaPartitionedOrPartition
  : '<hive>PARTITIONED'
  | '<impala>PARTITIONED'
+ | '<impala>PARTITION'
  ;
 
 HiveOrImpalaStored
