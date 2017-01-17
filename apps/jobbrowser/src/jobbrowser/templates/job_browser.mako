@@ -938,6 +938,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           h = h.substr(2);
         }
         switch (h) {
+          case '':
+           break;
           case 'apps':
           case 'workflows':
           case 'schedules':
