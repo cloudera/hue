@@ -452,6 +452,9 @@ var Collection = function (vm, collection) {
   self.description = ko.observable(typeof collection.description != "undefined" && collection.description != null ? collection.description : "");
   self.suggest = ko.mapping.fromJS(collection.suggest);
   self.engine = ko.observable(typeof collection.engine != "undefined" && collection.engine != null ? collection.engine : "solr");
+  self.engine.subscribe(function() {
+    self.name(null);
+  });
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
     function flatten(values) {
@@ -1353,6 +1356,7 @@ var NewTemplate = function (vm, initial) {
   var self = this;
 
   self.collections = ko.mapping.fromJS(initial.collections);
+  self.engines = ko.mapping.fromJS(initial.engines);
   self.layout = initial.layout;
   self.inited = ko.observable(self.collections().length > 0); // No collection if not a new dashboard
 
@@ -1360,9 +1364,11 @@ var NewTemplate = function (vm, initial) {
     if (self.inited()) {
       // If new dashboard
       vm.collection.name.subscribe(function(newValue) {
-        vm.collection.label(newValue);
-        vm.collection.switchCollection();
-        vm.search();
+        if (newValue) {
+          vm.collection.label(newValue);        
+          vm.collection.switchCollection();
+          vm.search();
+        }
       });
     } else {
       self.syncCollections();
@@ -1629,7 +1635,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     }
 
-    if (self.collection.engine() == 'db') {
+    if (self.collection.engine() == 'impala') {
       multiQs = $.map(self.collection.facets(), function(facet) {
         return $.post("/search/search", {
             collection: ko.mapping.toJSON(self.collection),
@@ -1700,7 +1706,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     )
       .done(function () {
         if (arguments[0] instanceof Array) {
-          if (self.collection.engine() != 'db') { // If multi queries
+          if (self.collection.engine() != 'impala') { // If multi queries
 	          var histograms = self.collection.getHistogramFacets();
 	          for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
 	            var histoFacetId = histograms[h].id();

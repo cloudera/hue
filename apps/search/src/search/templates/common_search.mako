@@ -83,22 +83,31 @@ from desktop.views import commonheader, commonfooter, _ko
   </div>
 
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
-    ${ _('Select a search index') }
-    <!-- ko if: columns().length == 0 -->
-      <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections">
-      </select>
+    ${ _('Select one') }
+    <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
 
-      <label class="checkbox" style="display:inline-block; margin-left: 10px">
-        <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
-        <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
-      </label>
+    <!-- ko if: $root.collection.engine() == 'solr' -->
+      <!-- ko if: columns().length == 0 -->      
+      <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
+
+        <label class="checkbox" style="display:inline-block; margin-left: 10px">
+          <input type="checkbox" data-bind="checked: showCores" />${ _('Show cores') }
+          <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
+        </label>
+      <!-- /ko -->
+
+      <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
+      <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+      <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+  
+      <span data-bind="template: {name: 'nested-document-filter'}"></span>
     <!-- /ko -->
-
-    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
-    <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
-    <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
-
-    <span data-bind="template: {name: 'nested-document-filter'}"></span>
+    
+    <!-- ko if: $root.collection.engine() != 'solr' -->
+      <!-- ko if: columns().length == 0 -->      
+        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+      <!-- /ko -->
+    <!-- /ko -->
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
@@ -1478,6 +1487,11 @@ ${ dashboard.layout_skeleton() }
                   <i class="hfo hfo-file-json"></i> JSON
                 </a>
               </li>
+              <li>
+                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
+                  <i class="fa fa-w fa-save"></i> ${_('Save')}
+                </a>
+              </li>
             </ul>
           </div>
         </form>
@@ -2455,6 +2469,7 @@ ${ dashboard.layout_skeleton() }
           <fieldset>
             <legend><i class="fa fa-cogs"></i> ${ _('General settings') }</legend>
             <!-- ko if: $root.initial.inited() -->
+            <!-- ko if: $root.collection.engine() == 'solr' -->
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
               <div class="controls">
@@ -2492,6 +2507,7 @@ ${ dashboard.layout_skeleton() }
                 </label>
               </div>
             </div>
+            <!-- /ko -->
             <!-- /ko -->
           </fieldset>
         </form>

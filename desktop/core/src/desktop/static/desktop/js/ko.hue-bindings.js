@@ -2736,7 +2736,7 @@
         self.val(options());
       }
       else {
-        if (options.data){
+        if (options && options.data){
           self.val(options.data);
           complexConfiguration = true;
         }
