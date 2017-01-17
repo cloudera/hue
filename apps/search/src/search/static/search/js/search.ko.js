@@ -602,7 +602,7 @@ var Collection = function (vm, collection) {
   };
 
   self.widgetType = ko.computed(function() {
-     return self.template.isGridLayout() ? 'resultset-widget' : 'html-resultset-widget'; 
+     return self.template.isGridLayout() ? 'resultset-widget' : 'html-resultset-widget';
   });
 
   if (collection.facets.length > 0) {
@@ -669,7 +669,7 @@ var Collection = function (vm, collection) {
         vm.getFacetFromQuery(facet.id()).resultHash('');
         vm.search();
       });
-      
+
       facet.template.chartSettings.chartType.subscribe(function(newValue) {
         facet.widgetType(
             newValue == ko.HUE_CHARTS.TYPES.PIECHART ? 'pie2-widget' :
@@ -1365,7 +1365,7 @@ var NewTemplate = function (vm, initial) {
       // If new dashboard
       vm.collection.name.subscribe(function(newValue) {
         if (newValue) {
-          vm.collection.label(newValue);        
+          vm.collection.label(newValue);
           vm.collection.switchCollection();
           vm.search();
         }
@@ -1646,11 +1646,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             $.each(data.normalized_facets, function (index, new_facet) {
               self._make_result_facet(new_facet);
             });
-        	return data;
+          return data;
         });
-      });  
+      });
     }
-    
+
     $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
       analyse.stats.data.removeAll();
     });
@@ -1707,16 +1707,16 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       .done(function () {
         if (arguments[0] instanceof Array) {
           if (self.collection.engine() != 'impala') { // If multi queries
-	          var histograms = self.collection.getHistogramFacets();
-	          for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
-	            var histoFacetId = histograms[h].id();
-	            var histoFacet = self.getFacetFromQuery(histoFacetId);
-	            var _series = [];
-	            for (var i = 1; i < arguments.length; i++) {
-	              _series.push(arguments[i][0]['series']);
-	            }
-	            histoFacet.extraSeries(_series);
-	          }
+            var histograms = self.collection.getHistogramFacets();
+            for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
+              var histoFacetId = histograms[h].id();
+              var histoFacet = self.getFacetFromQuery(histoFacetId);
+              var _series = [];
+              for (var i = 1; i < arguments.length; i++) {
+                _series.push(arguments[i][0]['series']);
+              }
+              histoFacet.extraSeries(_series);
+            }
           }
           self.response.valueHasMutated();
         }
@@ -1763,7 +1763,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         facet.has_data(true);
       }
   }
-  
+
   self._make_result_doc = function(item, _mustacheTmpl, template) {
       var row = [];
       var leafletmap = {};

@@ -84,10 +84,15 @@ from desktop.views import commonheader, commonfooter, _ko
 
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
     ${ _('Select one') }
-    <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
+    <!-- ko if: $root.initial.engines().length > 1 -->
+      <select class="input-medium" data-bind="options: $root.initial.engines, value: $root.collection.engine, optionsText: 'name',  optionsValue: 'type', disable: isSyncingCollections"></select>
+    <!-- /ko -->
+    <!-- ko ifnot: $root.initial.engines().length > 1 -->
+      ${_('index')}
+    <!-- /ko -->
 
     <!-- ko if: $root.collection.engine() == 'solr' -->
-      <!-- ko if: columns().length == 0 -->      
+      <!-- ko if: columns().length == 0 -->
       <select data-bind="options: $root.initial.collections, value: $root.collection.name, disable: isSyncingCollections"></select>
 
         <label class="checkbox" style="display:inline-block; margin-left: 10px">
@@ -99,12 +104,12 @@ from desktop.views import commonheader, commonfooter, _ko
       <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
       <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
       <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
-  
+
       <span data-bind="template: {name: 'nested-document-filter'}"></span>
     <!-- /ko -->
-    
+
     <!-- ko if: $root.collection.engine() != 'solr' -->
-      <!-- ko if: columns().length == 0 -->      
+      <!-- ko if: columns().length == 0 -->
         <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
       <!-- /ko -->
     <!-- /ko -->

@@ -41,3 +41,10 @@ LATEST = Config(
   help=_("Use latest Solr 5.2+ features."),
   default=False,
   type=coerce_bool)
+
+ENABLE_SQL = Config(
+  key="enable_sql",
+  help=_("Offer to use SQL engines to compute the dashboards."),
+  default=False,
+  private=True,
+  type=coerce_bool)
