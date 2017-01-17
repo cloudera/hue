@@ -34,7 +34,7 @@ from desktop.models import get_data_link
 from libsolr.api import SolrApi
 from notebook.conf import get_ordered_interpreters
 
-from search.conf import SOLR_URL, LATEST
+from search.conf import SOLR_URL, LATEST, ENABLE_SQL
 
 
 LOG = logging.getLogger(__name__)
@@ -885,7 +885,7 @@ def augment_solr_response(response, collection, query):
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
           facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
- 
+
           column = 'count'
           agg_keys = [key for key, value in counts[0].items() if key.lower().startswith('agg_') or key.lower().startswith('dim_')]
           agg_keys.sort(key=lambda a: a[4:])
@@ -1142,13 +1142,17 @@ def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, select
 
 
 def get_engines(user):
-  return [
-      {'name': _('index (Solr)'), 'type': 'solr'}] + [{
-        'name': _('table (%s)') % interpreter['name'],
-        'type': interpreter['type']
-      }
-      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] == 'hiveserver2'
-  ]
+  engines = [{'name': _('index (Solr)'), 'type': 'solr'}]
+
+  if ENABLE_SQL.get():
+    engines += [{
+          'name': _('table (%s)') % interpreter['name'],
+          'type': interpreter['type']
+        }
+        for interpreter in get_ordered_interpreters(user) if interpreter['interface'] == 'hiveserver2'
+    ]
+
+  return engines
 
 
 def augment_solr_exception(response, collection):
