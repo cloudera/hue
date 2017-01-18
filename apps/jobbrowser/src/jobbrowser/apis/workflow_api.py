@@ -22,7 +22,6 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from liboozie.oozie_api import get_oozie
-from oozie.views.dashboard import list_oozie_workflow_action
 
 
 LOG = logging.getLogger(__name__)
