@@ -757,7 +757,7 @@ var SqlAutocompleter3 = (function () {
             category: CATEGORIES.COLUMN,
             table: table,
             detailsTemplate: 'column',
-            details: column
+            details: data
           });
           columnSuggestions.push({
             value: 'value',
@@ -765,7 +765,7 @@ var SqlAutocompleter3 = (function () {
             category: CATEGORIES.COLUMN,
             table: table,
             detailsTemplate: 'column',
-            details: column
+            details: data
           });
         }
         if (data.type === 'struct') {
@@ -776,7 +776,7 @@ var SqlAutocompleter3 = (function () {
               category: CATEGORIES.COLUMN,
               table: table,
               detailsTemplate: 'column',
-              details: column
+              details: field
             });
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
@@ -789,7 +789,7 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
-                details: column
+                details: field
               });
             }
           });
@@ -804,7 +804,7 @@ var SqlAutocompleter3 = (function () {
                     category: CATEGORIES.COLUMN,
                     table: table,
                     detailsTemplate: 'column',
-                    details: column
+                    details: field
                   });
                 } else {
                   columnSuggestions.push({
@@ -813,7 +813,7 @@ var SqlAutocompleter3 = (function () {
                     category: CATEGORIES.COLUMN,
                     table: table,
                     detailsTemplate: 'column',
-                    details: column
+                    details: field
                   });
                 }
               } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
@@ -824,7 +824,7 @@ var SqlAutocompleter3 = (function () {
                   category: CATEGORIES.COLUMN,
                   table: table,
                   detailsTemplate: 'column',
-                  details: column
+                  details: field
                 });
               }
             });
@@ -836,7 +836,7 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.COLUMN,
                 table: table,
                 detailsTemplate: 'column',
-                details: column
+                details: data.item
               });
             }
           }
