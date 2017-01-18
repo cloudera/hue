@@ -161,7 +161,7 @@ from desktop.views import _ko
           </div>
         </div>
         <!-- ko if: focusedEntry() && focusedEntry().details -->
-        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + focusedEntry().detailsTemplate, data: focusedEntry }"></div>
+        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry }"></div>
         <!-- /ko -->
       </div>
     </div>
@@ -172,13 +172,13 @@ from desktop.views import _ko
     <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
   </script>
 
-  <script type="text/html" id="autocomplete-details-column-alias">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-  </script>
-
   <script type="text/html" id="autocomplete-details-udf">
     <div class="details-code" data-bind="text: details.signature"></div>
     <div data-bind="text: details.description"></div>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-database">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
@@ -187,6 +187,10 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-variable">
     <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
   </script>
 
@@ -202,7 +206,19 @@ from desktop.views import _ko
     <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
   </script>
 
-  <script type="text/html" id="autocomplete-details-aggregate-function">
+  <script type="text/html" id="autocomplete-details-agg-udf">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-value">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-identifier">
+    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+  </script>
+
+  <script type="text/html" id="autocomplete-details-cte">
     <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
   </script>
 

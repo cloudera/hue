@@ -109,12 +109,18 @@ var HueColors = {
     return _bands;
   },
 
-
-  getCUIChartColors: function () {
-    var normalizedColors = {}, i;
+  getNormalizedColors: function () {
+    var normalizedColors = {};
     this.CUIScaleColors.forEach(function (scaleDef) {
       normalizedColors[scaleDef.name] = scaleDef.colors;
     });
+    return normalizedColors;
+  },
+
+  getCUIChartColors: function () {
+    var i;
+
+    var normalizedColors = this.getNormalizedColors();
 
     // optimal visual sequence by contrasting colors
     var sequence = ['blue', 'lime', 'blue-gray', 'pink', 'steel', 'purple', 'teal', 'red', 'orange', 'green'],

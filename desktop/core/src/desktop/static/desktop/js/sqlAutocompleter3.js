@@ -16,30 +16,42 @@
 
 var SqlAutocompleter3 = (function () {
 
-  var colors = HueColors.getCUIChartColors();
+  var normalizedColors = HueColors.getNormalizedColors();
+
+  var COLORS = {
+    POPULAR: normalizedColors['blue'][7],
+    KEYWORD: normalizedColors['blue'][4],
+    COLUMN: normalizedColors['green'][2],
+    TABLE: normalizedColors['pink'][3],
+    DATABASE: normalizedColors['teal'][5],
+    SAMPLE: normalizedColors['purple'][5],
+    IDENT_CTE_VAR: normalizedColors['orange'][3],
+    UDF: normalizedColors['purple-gray'][3],
+    HDFS: normalizedColors['red'][2]
+  };
 
   var CATEGORIES = {
     ALL: { color: HueColors.BLUE, label: AutocompleterGlobals.i18n.category.all },
-    POPULAR: { color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_AGGREGATE: { weight: 1500, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_GROUP_BY: { weight: 1400, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_ORDER_BY: { weight: 1300, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_FILTER: { weight: 1200, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_ACTIVE_JOIN: { weight: 1200, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_JOIN_CONDITION: { weight: 1100, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular },
-    COLUMN: { weight: 1000, color: colors[20].color, label: AutocompleterGlobals.i18n.category.column },
-    SAMPLE: { weight: 900, color: colors[5].color, label: AutocompleterGlobals.i18n.category.sample },
-    IDENTIFIER: { weight: 800, color: colors[8].color, label: AutocompleterGlobals.i18n.category.identifier },
-    CTE: { weight: 700, color: colors[7].color, label: AutocompleterGlobals.i18n.category.cte },
-    TABLE: { weight: 600, color: colors[1].color, label: AutocompleterGlobals.i18n.category.table },
-    DATABASE: { weight: 500, color: colors[0].color, label: AutocompleterGlobals.i18n.category.database },
-    UDF: { weight: 400, color: colors[4].color, label: AutocompleterGlobals.i18n.category.udf },
-    HDFS: { weight: 300, color: colors[9].color, label: AutocompleterGlobals.i18n.category.hdfs },
-    VIRTUAL_COLUMN: { weight: 200, color: colors[2].color, label: AutocompleterGlobals.i18n.category.column },
-    COLREF_KEYWORD: { weight: 100, color: colors[3].color, label: AutocompleterGlobals.i18n.category.keyword },
-    VARIABLE: { weight: 50, color: colors[6].color, label: AutocompleterGlobals.i18n.category.variable },
-    KEYWORD: { weight: 0, color: colors[11].color, label: AutocompleterGlobals.i18n.category.keyword },
-    POPULAR_JOIN: { weight: -1, color: colors[10].color, label: AutocompleterGlobals.i18n.category.popular }
+    POPULAR: { color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_AGGREGATE: { weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'agg-udf' },
+    POPULAR_GROUP_BY: { weight: 1400, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'group-by' },
+    POPULAR_ORDER_BY: { weight: 1300, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'order-by' },
+    POPULAR_FILTER: { weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'filter' },
+    POPULAR_ACTIVE_JOIN: { weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' },
+    POPULAR_JOIN_CONDITION: { weight: 1100, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join-condition' },
+    COLUMN: { weight: 1000, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
+    SAMPLE: { weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' },
+    IDENTIFIER: { weight: 800, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.identifier, detailsTemplate: 'identifier' },
+    CTE: { weight: 700, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.cte, detailsTemplate: 'cte' },
+    TABLE: { weight: 600, color: COLORS.TABLE, label: AutocompleterGlobals.i18n.category.table, detailsTemplate: 'table' },
+    DATABASE: { weight: 500, color: COLORS.DATABASE, label: AutocompleterGlobals.i18n.category.database, detailsTemplate: 'database' },
+    UDF: { weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.udf, detailsTemplate: 'udf' },
+    HDFS: { weight: 300, color: COLORS.HDFS, label: AutocompleterGlobals.i18n.category.hdfs, detailsTemplate: 'hdfs' },
+    VIRTUAL_COLUMN: { weight: 200, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
+    COLREF_KEYWORD: { weight: 100, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
+    VARIABLE: { weight: 50, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.variable, detailsTemplate: 'variable' },
+    KEYWORD: { weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
+    POPULAR_JOIN: { weight: -1, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' }
   };
 
   var hiveReservedKeywords = {
@@ -330,7 +342,6 @@ var SqlAutocompleter3 = (function () {
           meta: AutocompleterGlobals.i18n.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: keyword.weight,
-          detailsTemplate: 'keyword',
           details: null
         };
       });
@@ -349,7 +360,6 @@ var SqlAutocompleter3 = (function () {
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
                 meta: AutocompleterGlobals.i18n.meta.keyword,
                 category: CATEGORIES.COLREF_KEYWORD,
-                detailsTemplate: 'keyword',
                 details: {
                   type: colRef.type
                 }
@@ -372,7 +382,6 @@ var SqlAutocompleter3 = (function () {
           value: identifier.name,
           meta: identifier.type,
           category: CATEGORIES.IDENTIFIER,
-          detailsTemplate: 'identifier',
           details: null
         });
       });
@@ -391,7 +400,6 @@ var SqlAutocompleter3 = (function () {
             value: columnAlias.name,
             meta: AutocompleterGlobals.i18n.meta.alias,
             category: CATEGORIES.COLUMN,
-            detailsTemplate: 'column-alias',
             details: columnAlias
           });
         } else {
@@ -399,7 +407,6 @@ var SqlAutocompleter3 = (function () {
             value: columnAlias.name,
             meta: type,
             category: CATEGORIES.COLUMN,
-            detailsTemplate: 'column-alias',
             details: columnAlias
           });
         }
@@ -421,7 +428,6 @@ var SqlAutocompleter3 = (function () {
           value: prefix + expression.name,
           meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
           category: CATEGORIES.CTE,
-          detailsTemplate: 'cte',
           details: null
         });
       });
@@ -446,7 +452,6 @@ var SqlAutocompleter3 = (function () {
               weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
                   return otherType === colRef.type.toUpperCase();
               }).length > 0 ? 1 : 0,
-              detailsTemplate: 'udf',
               details: functionsToSuggest[name]
             })
           });
@@ -466,7 +471,6 @@ var SqlAutocompleter3 = (function () {
             weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
               return otherType === types[0].toUpperCase();
             }).length > 0 ? 1 : 0,
-            detailsTemplate: 'udf',
             details: functionsToSuggest[name]
           })
         });
@@ -491,7 +495,6 @@ var SqlAutocompleter3 = (function () {
             value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''),
             meta: AutocompleterGlobals.i18n.meta.database,
             category: CATEGORIES.DATABASE,
-            detailsTemplate: 'database',
             details: null
           })
         });
@@ -528,7 +531,6 @@ var SqlAutocompleter3 = (function () {
                 tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
-                detailsTemplate: 'table',
                 details: tableMeta.comment ? tableMeta : null
               });
             });
@@ -601,14 +603,12 @@ var SqlAutocompleter3 = (function () {
               value: 'BLOCK__OFFSET__INSIDE__FILE',
               meta: AutocompleterGlobals.i18n.meta.virtual,
               category: CATEGORIES.VIRTUAL_COLUMN,
-              detailsTemplate: 'column',
               details: null
             });
             columnSuggestions.push({
               value: 'INPUT__FILE__NAME',
               meta: AutocompleterGlobals.i18n.meta.virtual,
               category: CATEGORIES.VIRTUAL_COLUMN,
-              detailsTemplate: 'column',
               details: null
             });
           }
@@ -642,7 +642,6 @@ var SqlAutocompleter3 = (function () {
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (column.identifierChain && column.identifierChain.length > 0) {
@@ -651,7 +650,6 @@ var SqlAutocompleter3 = (function () {
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             }
@@ -677,7 +675,6 @@ var SqlAutocompleter3 = (function () {
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (column.type.indexOf('map') === 0) {
@@ -686,7 +683,6 @@ var SqlAutocompleter3 = (function () {
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (column.type.indexOf('struct') === 0) {
@@ -695,7 +691,6 @@ var SqlAutocompleter3 = (function () {
                 meta: 'struct',
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
@@ -704,7 +699,6 @@ var SqlAutocompleter3 = (function () {
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (column.type.indexOf('array') === 0) {
@@ -713,7 +707,6 @@ var SqlAutocompleter3 = (function () {
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
@@ -723,7 +716,6 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.COLUMN,
                 weightAdjust: 1,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
@@ -733,7 +725,6 @@ var SqlAutocompleter3 = (function () {
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: column
               })
             }
@@ -745,7 +736,6 @@ var SqlAutocompleter3 = (function () {
               meta: 'column',
               category: CATEGORIES.COLUMN,
               table: table,
-              detailsTemplate: 'column',
               details: column
             })
           });
@@ -756,7 +746,6 @@ var SqlAutocompleter3 = (function () {
             meta: 'key',
             category: CATEGORIES.COLUMN,
             table: table,
-            detailsTemplate: 'column',
             details: data
           });
           columnSuggestions.push({
@@ -764,7 +753,6 @@ var SqlAutocompleter3 = (function () {
             meta: 'value',
             category: CATEGORIES.COLUMN,
             table: table,
-            detailsTemplate: 'column',
             details: data
           });
         }
@@ -775,7 +763,6 @@ var SqlAutocompleter3 = (function () {
               meta: field.type,
               category: CATEGORIES.COLUMN,
               table: table,
-              detailsTemplate: 'column',
               details: field
             });
           });
@@ -788,7 +775,6 @@ var SqlAutocompleter3 = (function () {
                 meta: field.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: field
               });
             }
@@ -803,7 +789,6 @@ var SqlAutocompleter3 = (function () {
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
-                    detailsTemplate: 'column',
                     details: field
                   });
                 } else {
@@ -812,7 +797,6 @@ var SqlAutocompleter3 = (function () {
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
-                    detailsTemplate: 'column',
                     details: field
                   });
                 }
@@ -823,7 +807,6 @@ var SqlAutocompleter3 = (function () {
                   meta: field.type,
                   category: CATEGORIES.COLUMN,
                   table: table,
-                  detailsTemplate: 'column',
                   details: field
                 });
               }
@@ -835,7 +818,6 @@ var SqlAutocompleter3 = (function () {
                 meta: data.item.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
-                detailsTemplate: 'column',
                 details: data.item
               });
             }
@@ -895,7 +877,6 @@ var SqlAutocompleter3 = (function () {
           value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}',
           meta: AutocompleterGlobals.i18n.meta.variable,
           category: CATEGORIES.VARIABLE,
-          detailsTemplate: 'variable',
           details: null
         });
       }
@@ -909,7 +890,6 @@ var SqlAutocompleter3 = (function () {
               value: isString ? startQuote + sample + endQuote : new String(sample),
               meta: AutocompleterGlobals.i18n.meta.value,
               category: CATEGORIES.SAMPLE,
-              detailsTemplate: 'value',
               details: null
             })
           });
@@ -942,7 +922,6 @@ var SqlAutocompleter3 = (function () {
                   value: suggestHdfs.path === '' ? '/' + file.name : file.name,
                   meta: file.type,
                   category: CATEGORIES.HDFS,
-                  detailsTemplate: 'hdfs',
                   details: file
                 });
               }
@@ -1020,7 +999,6 @@ var SqlAutocompleter3 = (function () {
                 meta: AutocompleterGlobals.i18n.meta.join,
                 category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
                 popular: true,
-                detailsTemplate: 'join',
                 details: value
               });
             }
@@ -1070,7 +1048,6 @@ var SqlAutocompleter3 = (function () {
                 meta: AutocompleterGlobals.i18n.meta.joinCondition,
                 category: CATEGORIES.POPULAR_JOIN_CONDITION,
                 popular: true,
-                detailsTemplate: 'join-condition',
                 details: value
               });
             }
@@ -1142,7 +1119,6 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.POPULAR_AGGREGATE,
                 popular: true,
                 weightAdjust: Math.min(value.totalQueryCount, 99),
-                detailsTemplate: 'aggregate-function',
                 details: value
               });
             })
@@ -1185,7 +1161,6 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.POPULAR_GROUP_BY,
                 popular: true,
                 weightAdjust: Math.min(value.columnCount, 99),
-                detailsTemplate: 'group-by',
                 details: value
               });
             });
@@ -1228,7 +1203,6 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.POPULAR_ORDER_BY,
                 popular: true,
                 weightAdjust: Math.min(value.columnCount, 99),
-                detailsTemplate: 'order-by',
                 details: value
               });
             });
@@ -1282,7 +1256,6 @@ var SqlAutocompleter3 = (function () {
                       meta: AutocompleterGlobals.i18n.meta.filter,
                       category: CATEGORIES.POPULAR_FILTER,
                       popular: true,
-                      detailsTemplate: 'filter',
                       details: popularValue
                     });
                   });
