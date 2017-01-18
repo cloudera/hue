@@ -135,6 +135,31 @@ from desktop.views import _ko
       margin-bottom: 10px;
       font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
     }
+
+    .popular-icon {
+      color: #EDB233;
+    }
+
+    .autocomplete-details-table .details-popularity {
+      display: inline-block;
+    }
+
+    .autocomplete-details-table .details-popularity .progress {
+      display: inline-block;
+      border-radius: 2px;
+      height: 10px;
+      width: 80px;
+    }
+
+    .autocomplete-details-table .details-popularity .progress .bar {
+      background-color: #338bb8;
+    }
+
+    .autocomplete-details-table .details-comment {
+      margin-top: 5px;
+      color: #737373;
+      font-style: italic;
+    }
   </style>
 
   <script type="text/html" id="hue-ace-autocompleter">
@@ -157,11 +182,11 @@ from desktop.views import _ko
               event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
             <div class="pull-left autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div>
             <div class="autocompleter-suggestion pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
-            <div class="autocompleter-suggestion pull-right" data-bind="text: meta"></div>
+            <div class="autocompleter-suggestion pull-right"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
         <!-- ko if: focusedEntry() && focusedEntry().details -->
-        <div class="autocompleter-details" data-bind="template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry }"></div>
+        <!-- ko template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
         <!-- /ko -->
       </div>
     </div>
@@ -169,69 +194,114 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-keyword">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-udf">
-    <div class="details-code" data-bind="text: details.signature"></div>
-    <div data-bind="text: details.description"></div>
+    <div class="autocompleter-details">
+      <div class="details-code" data-bind="text: details.signature"></div>
+      <div data-bind="text: details.description"></div>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-database">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
-    <div class="details-header">${ _('Comment') }</div>
-    <div data-bind="text: details.comment"></div>
+    <!-- ko if: details.comment || details.popularity -->
+    <div class="autocompleter-details">
+      <div class="autocomplete-details-table">
+        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type !== 'table', 'fa-table': details.type !== 'table' }"></i> <span data-bind="text: details.database + '.' + details.name"></span></div>
+        <!-- ko if: typeof details.popularity !== 'undefined' -->
+        <div class="details-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
+        <div class="details-comment" data-bind="text: details.comment"></div>
+        <!-- /ko -->
+      </div>
+    </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-hdfs">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-join">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-join-condition">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-agg-udf">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-value">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-identifier">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-cte">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-group-by">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-order-by">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-filter">
-    <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    <div class="autocompleter-details">
+      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+    </div>
   </script>
 
 
