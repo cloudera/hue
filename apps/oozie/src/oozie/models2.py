@@ -24,6 +24,7 @@ import uuid
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse
+from sets import Set
 from string import Template
 from xml.sax.saxutils import escape
 
@@ -263,14 +264,16 @@ class Workflow(Job):
 
     _update_adj_list(adj_list)
 
-    wf_rows = _create_workflow_layout(node_hierarchy, adj_list)
+    nodes_uuid_set = Set()
+    wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
 
     data = {'layout': [{}], 'workflow': {}}
     if wf_rows:
       data['layout'][0]['rows'] = wf_rows
 
     wf_nodes = []
-    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes)
+    nodes_uuid_set = Set()
+    _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
     data['workflow']['nodes'] = wf_nodes
     data['workflow']['id'] = '123'
     data['workflow']['properties'] = cls.get_workflow_properties_for_user(user, workflow=None)
@@ -565,86 +568,90 @@ def _update_adj_list(adj_list):
     id += 1
   return adj_list
 
-def _dig_nodes(nodes, adj_list, user, wf_nodes):
+def _dig_nodes(nodes, adj_list, user, wf_nodes, nodes_uuid_set):
   for node in nodes:
     if type(node) != list:
       node = adj_list[node]
-      properties = {}
-      if '%s-widget' % node['node_type'] in NODES:
-        properties = dict(NODES['%s-widget' % node['node_type']].get_fields())
+      if node['uuid'] not in nodes_uuid_set:
+        properties = {}
+        if '%s-widget' % node['node_type'] in NODES:
+          properties = dict(NODES['%s-widget' % node['node_type']].get_fields())
 
-      if node['node_type'] == 'pig':
-        properties['script_path'] = node.get('pig').get('script_path')
-      elif node['node_type'] == 'spark':
-        properties['class'] = node.get('spark').get('class')
-        properties['jars'] = node.get('spark').get('jar')
-      elif node['node_type'] == 'hive' or node['node_type'] == 'hive2':
-        properties['script_path'] = node.get('hive').get('script')
-      elif node['node_type'] == 'java':
-        properties['main_class'] = node.get('java').get('main-class')
-      elif node['node_type'] == 'sqoop':
-        properties['command'] = node.get('sqoop').get('command')
-      elif node['node_type'] == 'mapreduce':
-        properties['job_properties'] = node.get('job_properties')
-      elif node['node_type'] == 'shell':
-        properties['shell_command'] = node.get('shell').get('command')
-      elif node['node_type'] == 'ssh':
-        properties['user'] = '%s@%s' % (node.get('ssh').get('user'), node.get('ssh').get('host'))
-        properties['ssh_command'] = node.get('ssh').get('command')
-      elif node['node_type'] == 'fs':
-        properties['touchzs'] = node.get('fs').get('touchzs')
-        properties['mkdirs'] = node.get('fs').get('mkdirs')
-        properties['moves'] = node.get('fs').get('moves')
-        properties['deletes'] = node.get('fs').get('deletes')
-      elif node['node_type'] == 'email':
-        properties['to'] = node.get('email').get('to')
-        properties['subject'] = node.get('email').get('subject')
-        #TBD: body doesn't show up
-        properties['body'] = node.get('email').get('body')
-      elif node['node_type'] == 'streaming':
-        properties['mapper'] = node.get('streaming').get('mapper')
-        properties['reducer'] = node.get('streaming').get('reducer')
-      elif node['node_type'] == 'distcp':
-        properties['distcp_parameters'] = node.get('params')
-      elif node['node_type'] == 'subworkflow':
-        properties['app-path'] = node.get('subworkflow').get('app-path')
-        properties['workflow'] = node.get('uuid')
-        properties['job_properties'] = []
-        properties['sla'] = ''
+        if node['node_type'] == 'pig':
+          properties['script_path'] = node.get('pig').get('script_path')
+        elif node['node_type'] == 'spark':
+          properties['class'] = node.get('spark').get('class')
+          properties['jars'] = node.get('spark').get('jar')
+        elif node['node_type'] == 'hive' or node['node_type'] == 'hive2':
+          properties['script_path'] = node.get('hive').get('script')
+        elif node['node_type'] == 'java':
+          properties['main_class'] = node.get('java').get('main-class')
+        elif node['node_type'] == 'sqoop':
+          properties['command'] = node.get('sqoop').get('command')
+        elif node['node_type'] == 'mapreduce':
+          properties['job_properties'] = node.get('job_properties')
+        elif node['node_type'] == 'shell':
+          properties['shell_command'] = node.get('shell').get('command')
+        elif node['node_type'] == 'ssh':
+          properties['user'] = '%s@%s' % (node.get('ssh').get('user'), node.get('ssh').get('host'))
+          properties['ssh_command'] = node.get('ssh').get('command')
+        elif node['node_type'] == 'fs':
+          properties['touchzs'] = node.get('fs').get('touchzs')
+          properties['mkdirs'] = node.get('fs').get('mkdirs')
+          properties['moves'] = node.get('fs').get('moves')
+          properties['deletes'] = node.get('fs').get('deletes')
+        elif node['node_type'] == 'email':
+          properties['to'] = node.get('email').get('to')
+          properties['subject'] = node.get('email').get('subject')
+          #TBD: body doesn't show up
+          properties['body'] = node.get('email').get('body')
+        elif node['node_type'] == 'streaming':
+          properties['mapper'] = node.get('streaming').get('mapper')
+          properties['reducer'] = node.get('streaming').get('reducer')
+        elif node['node_type'] == 'distcp':
+          properties['distcp_parameters'] = node.get('params')
+        elif node['node_type'] == 'subworkflow':
+          properties['app-path'] = node.get('subworkflow').get('app-path')
+          properties['workflow'] = node.get('uuid')
+          properties['job_properties'] = []
+          properties['sla'] = ''
 
-      children = []
-      if node['node_type'] in ('fork', 'decision'):
-        for key in node.keys():
-          if key.startswith('path'):
-            children.append({'to': adj_list[node[key]]['uuid'], 'condition': '${ 1 gt 0 }'})
-        if node['node_type'] == 'decision':
-          children.append({'to': adj_list[node['default']]['uuid'], 'condition': '${ 1 gt 0 }'})
-      else:
-        if node.get('ok_to'):
-          children.append({'to': adj_list[node['ok_to']]['uuid']})
-        if node.get('error_to'):
-          children.append({'error': adj_list[node['error_to']]['uuid']})
+        children = []
+        if node['node_type'] in ('fork', 'decision'):
+          for key in node.keys():
+            if key.startswith('path'):
+              children.append({'to': adj_list[node[key]]['uuid'], 'condition': '${ 1 gt 0 }'})
+          if node['node_type'] == 'decision':
+            children.append({'to': adj_list[node['default']]['uuid'], 'condition': '${ 1 gt 0 }'})
+        else:
+          if node.get('ok_to'):
+            children.append({'to': adj_list[node['ok_to']]['uuid']})
+          if node.get('error_to'):
+            children.append({'error': adj_list[node['error_to']]['uuid']})
 
-      wf_nodes.append({
-          "id": node['uuid'],
-          "name": '%s-%s' % (node['node_type'].split('-')[0], node['uuid'][:4]),
-          "type": "%s-widget" % node['node_type'],
-          "properties": properties,
-          "children": children
-      })
+        nodes_uuid_set.add(node['uuid'])
+        wf_nodes.append({
+            "id": node['uuid'],
+            "name": '%s-%s' % (node['node_type'].split('-')[0], node['uuid'][:4]),
+            "type": "%s-widget" % node['node_type'],
+            "properties": properties,
+            "children": children
+        })
     else:
-      _dig_nodes(node, adj_list, user, wf_nodes)
+      _dig_nodes(node, adj_list, user, wf_nodes, nodes_uuid_set)
 
-def _create_workflow_layout(nodes, adj_list, size=12):
+def _create_workflow_layout(nodes, adj_list, nodes_uuid_set, size=12):
   wf_rows = []
   for node in nodes:
     if type(node) == list and len(node) == 1:
       node = node[0]
     if type(node) != list:
-      wf_rows.append({"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+      _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node]['uuid'],
+        row={"widgets":[{"size":size, "name": adj_list[node]['node_type'], "id":  adj_list[node]['uuid'], "widgetType": "%s-widget" % adj_list[node]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
     else:
       if adj_list[node[0]]['node_type'] in ('fork', 'decision'):
-        wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
+        _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id=adj_list[node[0]]['uuid'],
+          row={"widgets":[{"size":size, "name": adj_list[node[0]]['name'], "id":  adj_list[node[0]]['uuid'], "widgetType": "%s-widget" % adj_list[node[0]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
 
         wf_rows.append({
           "id": str(uuid.uuid4()),
@@ -663,14 +670,20 @@ def _create_workflow_layout(nodes, adj_list, size=12):
                     } for c in col],
                 "klass":"card card-home card-column span%s" % (size / len(node[1]))
              }
-             for col in [_create_workflow_layout(item, adj_list, size) for item in node[1]]
+             for col in [_create_workflow_layout(item, adj_list, nodes_uuid_set, size) for item in node[1]]
           ]
         })
         if adj_list[node[0]]['node_type'] == 'fork':
           wf_rows.append({"widgets":[{"size":size, "name": adj_list[node[2]]['name'], "id":  adj_list[node[2]]['uuid'], "widgetType": "%s-widget" % adj_list[node[2]]['node_type'], "properties":{}, "offset":0, "isLoading":False, "klass":"card card-widget span%s" % size, "columns":[]}]})
       else:
-        wf_rows.append(_create_workflow_layout(node, adj_list, size))
+        wf_rows.append(_create_workflow_layout(node, adj_list, nodes_uuid_set, size))
   return wf_rows
+
+# Prevent duplicate nodes in graph layout
+def _append_to_wf_rows(wf_rows, nodes_uuid_set, row_id, row):
+  if row['widgets'][0]['id'] not in nodes_uuid_set:
+    nodes_uuid_set.add(row['widgets'][0]['id'])
+    wf_rows.append(row)
 
 def _get_hierarchy_from_adj_list(adj_list, curr_node, node_hierarchy):
 
