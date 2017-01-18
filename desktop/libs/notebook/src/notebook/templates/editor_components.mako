@@ -2228,13 +2228,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </a>
         </li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { loadQueryHistory(null); }" title="${ _('Load past query history in order to improve recommendations') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
-          </a>
-        </li>
-        <li>
           <a href="javascript:void(0)" data-bind="click: function() { loadQueryHistory(10); }" title="${ _('Load past query history in order to improve recommendations') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload last 10 history')}
+            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
           </a>
         </li>
         <!-- /ko -->

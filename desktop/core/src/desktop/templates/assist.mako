@@ -2257,7 +2257,28 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assistant-panel-template">
-    <pre data-bind="text: ko.mapping.toJSON(activeLocations)"></pre>
+    ${ _('Tables') }
+    <br/>
+    <ul data-bind="foreach: activeTables">
+      <li><span data-bind="text: $data"></span> <i class="fa fa-info"></i>
+    </ul>
+
+    <form class="form-horizontal">
+      <fieldset>
+        ${ _('Suggestions') }<br/>
+        <ul>
+          <li>Popular fields for the tables are: [code, salary, amount]</li>
+          <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
+          <li>Parameterize the query?</li>
+        </ul>
+      </fieldset>
+    </form>
+
+    <!-- ko if: HAS_OPTIMIZER -->
+      <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+        <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
+      </a>
+    <!-- /ko -->
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -2272,7 +2293,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.lastLocationsPerType = ko.observable({});
 
         self.activeLocations = ko.pureComputed(function () {
-          return self.lastLocationsPerType()[self.activeType()];
+          return self.lastLocationsPerType()[self.activeType()] ? self.lastLocationsPerType()[self.activeType()] : [];
+        });
+        self.activeTables = ko.pureComputed(function () {
+          var allTables = $.grep(self.activeLocations(), function(item) { return item.type == 'table'; });
+          var tables = [];
+          $.each(allTables, function(i, item) {
+            var tableName = item.identifierChain[item.identifierChain.length - 1].name;
+            if (tables.indexOf(tableName) == -1) {
+              tables.push(tableName);
+            }
+          });
+          return tables;
         });
 
         self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeType).remove);

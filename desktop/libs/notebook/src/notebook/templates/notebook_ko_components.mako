@@ -192,7 +192,7 @@ except ImportError, e:
         </li>
         % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
         <li>
-          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore the result in an analytic dashboard') }">
+          <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function() { saveTarget('search-index'); savePath('__hue__'); trySaveResults(); }" title="${ _('Explore result in a dashboard') }">
             <i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }
           </a>
         </li>

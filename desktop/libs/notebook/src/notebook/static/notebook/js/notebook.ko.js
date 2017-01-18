@@ -1444,6 +1444,10 @@ var EditorViewModel = (function() {
       });
     };
 
+    huePubSub.subscribe("editor.workload.upload", function () {
+      self.loadQueryHistory(10);
+    });
+
     self.loadQueryHistory = function (n) {
       logGA('load_query_history');
 
@@ -1452,7 +1456,7 @@ var EditorViewModel = (function() {
         sourcePlatform: self.type()
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", "Queries uploaded successfully. Preparing them...");
+          $(document).trigger("info", "Queries uploaded successfully. Processing them...");
           self.watchUploadStatus(data.upload_history.status.workloadId);
         } else {
           $(document).trigger("error", data.message);
