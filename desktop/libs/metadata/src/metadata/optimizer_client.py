@@ -53,15 +53,10 @@ class OptimizerApi(object):
     self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
     self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
     self._product_auth_secret = product_auth_secret if product_auth_secret else (OPTIMIZER.PRODUCT_AUTH_SECRET.get() and OPTIMIZER.PRODUCT_AUTH_SECRET.get().replace('\\n', '\n'))
-    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "workload"
-
-#     self._client = HttpClient(self._api_url, logger=LOG)
-#     self._client.set_verify(ssl_cert_ca_verify)
-#
-#     self._root = resource.Resource(self._client)
-#     self._token = None
 
     self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._product_secret, self._product_auth_secret)
+
+    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "workload"
 
   def _authenticate(self, force=False):
     if self._token is None or force:
@@ -130,7 +125,9 @@ class OptimizerApi(object):
           'rowDelim': '\n',
           'headerFields': OptimizerApi.UPLOAD[data_type]['headerFields']
       })
-      return json.loads(response)
+      status = json.loads(response)
+      status['count'] = len(data)
+      return status
 
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Optimizer'))
