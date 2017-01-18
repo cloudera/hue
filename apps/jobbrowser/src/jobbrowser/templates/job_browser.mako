@@ -603,9 +603,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">Stop</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">Resume</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">Rerun</a>
+  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">${ _('Stop') }</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">${ _('Resume')}</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">${ _('Rerun') }</a>
 
   <br/>
 
@@ -705,33 +705,91 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <!-- ko with: coordVM -->
-  <div>
-    <table class="table table-striped table-condensed margin-top-10">
-    <tbody data-bind="foreach: filteredActions">
-      <tr data-bind="css: { disabled: url == '' }">
-        <td data-bind="css: { disabled: url == '' }">
-          <a data-bind="attr: {href: url != '' ? url : 'javascript:void(0)', title: url ? '' : '${ _ko('Workflow not available or instantiated yet') }' }, css: { disabled: url == '' }" target="_blank">
-            <span data-bind="text: title, attr: {'class': statusClass, 'id': 'date-' + $index()}"></span>
-          </a>
-          <span class="pull-right">
-          <i class="fa fa-exclamation-triangle" data-bind="visible: (errorMessage == null || errorMessage == '') && (missingDependencies == null || missingDependencies == '') && url == '', attr: {title: '${ _ko('Workflow not available or instantiated yet') }'}"></i><i class="fa fa-exclamation-triangle" data-bind="visible: errorMessage != null && errorMessage != '', attr: {title: errorMessage}"></i> <i class="fa fa-exclamation-triangle" data-bind="visible:missingDependencies !='' && missingDependencies != null, attr: { title: '${ _ko('Missing')} ' + missingDependencies }"></i>
-          </span>
-        </td>
-      </tr>
-    </tbody>
-    <tfoot>
-      <tr data-bind="visible: filteredActions().length == 0">
-        <td>
-          <div class="alert">
-            ${ _('There are no actions to be shown.') }
-          </div>
-        </td>
-      </tr>
-    </tfoot>
-  </table>
+
+  </br></br>
+  Variables, Workspace</br>
+  Duration 8s</br>
+  nextTime<span data-bind="text: properties['nextTime']"></span><br/>
+  total_actions<span data-bind="text: properties['total_actions']"></span><br/>
+  endTime<span data-bind="text: properties['endTime']"></span><br/>
+  </br></br>
+
+  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
-  <!-- /ko -->
+
+  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">${ _('Stop') }</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">${ _('Resume')}</a> |
+  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">${ _('Rerun') }</a>
+
+  <br/>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#schedule-page-calendar" data-toggle="tab">${ _('Calendar') }</a></li>
+    <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#schedule-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
+    <li><a href="#schedule-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
+    <li><a href="#schedule-page-xml" data-toggle="tab">${ _('XML') }</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="schedule-page-calendar">
+      <span data-bind="text: ko.mapping.toJSON(properties['actions'])"></span>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-logs">
+      <pre data-bind="html: logs['default']"></pre>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-tasks">
+      <table id="jobsTable" class="datatables table table-condensed">
+        <thead>
+        <tr>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th>${_('Status')}</th>
+          <th>${_('Title')}</th>
+          <th>${_('type')}</th>
+          <th>${_('errorMessage')}</th>
+          <th>${_('missingDependencies')}</th>
+          <th>${_('number')}</th>
+          <th>${_('errorCode')}</th>
+          <th>${_('externalId')}</th>
+          <th>${_('id')}</th>
+          <th>${_('lastModifiedTime')}</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: properties['actions']">
+          <tr data-bind="click: function() {  if (externalId()) { $root.job().id(externalId()); $root.job().fetchJob();} }">
+            <td><div class="hueCheckbox fa"></div></td>
+            <td data-bind="text: status"></td>
+            <td data-bind="text: title"></td>
+            <td data-bind="text: type"></td>
+            <td data-bind="text: errorMessage"></td>
+            <td data-bind="text: missingDependencies"></td>
+            <td data-bind="text: number"></td>
+            <td data-bind="text: errorCode"></td>
+            <td data-bind="text: externalId"></td>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: lastModifiedTime"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-metadata">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('properties'); }">Load</a>
+      <br/>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['properties'])"></span>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-xml">
+      <a href="javascript:void(0)" data-bind="click: function() { return fetchProfile('xml'); }">Load</a>
+      <br/>
+
+      <span data-bind="text: ko.mapping.toJSON(properties['xml'])"></span>
+    </div>
+  </div>
 </script>
 
 
@@ -766,7 +824,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.logs = ko.mapping.fromJS({'default': ''});
 
-      self.coordVM = new RunningCoordinatorModel([]);
+      //self.coordVM = new RunningCoordinatorModel([]);
 
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
@@ -776,18 +834,23 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.fetchJob = function () {
         self.loadingJob(true);
 
+        var interface = vm.interface();
+        if (/oozie-oozi-W/.test(self.id())) { interface = 'workflows'; };
+
         $.post("/jobbrowser/api/job", {
           app_id: ko.mapping.toJSON(self.id),
-          interface: ko.mapping.toJSON(vm.interface)
+          interface: ko.mapping.toJSON(interface)
         }, function (data) {
           if (data.status == 0) {
+            vm.interface(interface);
             vm.job(new Job(vm, data.app));
+
             hueUtils.changeURL('#!' + vm.job().id());
             vm.breadcrumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
 
             vm.job().fetchLogs();
             if (self.mainType() == 'schedules') {
-              vm.job().coordVM.setActions(data.app.actions);
+              //vm.job().coordVM.setActions(data.app.actions);
             }
           } else {
             $(document).trigger("error", data.message);

@@ -16,13 +16,14 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 
 from liboozie.oozie_api import get_oozie
-from notebook.connectors.oozie_batch import OozieApi
 
-from jobbrowser.apis.base_api import Api
+from jobbrowser.apis.base_api import Api, MockDjangoRequest
+from liboozie.utils import format_time
 from oozie.views.dashboard import get_oozie_job_log
 
 
@@ -31,7 +32,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import massaged_coordinator_actions_for_json
+  from oozie.views.dashboard import list_oozie_coordinator
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -47,20 +48,66 @@ class ScheduleApi(Api):
         'id': app.id,
         'name': app.appName,
         'status': app.status,
-        'type': 'coordinator',
+        'type': 'schedule',
         'user': app.user,
         'progress': 100,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in wf_list.jobs]
 
+
   def app(self, appid):
     oozie_api = get_oozie(self.user)
     coordinator = oozie_api.get_coordinator(jobid=appid)
 
-    return {
+    request = MockDjangoRequest(self.user, get=MockGet())
+    response = list_oozie_coordinator(request, job_id=appid)
+
+    common = {
         'id': coordinator.coordJobId,
         'name': coordinator.coordJobName,
         'status': coordinator.status,
-        'actions': massaged_coordinator_actions_for_json(coordinator, None)
+        'type': 'schedule',
+        'startTime': format_time(coordinator.startTime),
     }
+    common['properties'] = json.loads(response.content)
+    common['properties']['xml'] = ''
+    common['properties']['properties'] = ''
+
+    return common
+
+  def logs(self, appid, app_type):
+    request = MockDjangoRequest(self.user)
+    data = get_oozie_job_log(request, job_id=appid)
+
+    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+
+
+  def profile(self, appid, app_type, app_property):
+    if app_property == 'xml':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_coordinator(jobid=appid)
+      return {
+        'xml': workflow.definition,
+      }
+    elif app_property == 'properties':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_coordinator(jobid=appid)
+      return {
+        'properties': workflow.conf_dict,
+      }
+
+
+
+class MockGet():
+  def __ini__(self, statuses):
+    self.statuses = []
+
+  def get(self, prop, default=None):
+    if prop == 'format':
+      return 'json'
+    else:
+      return default
+
+  def getlist(self, prop):
+    return []
