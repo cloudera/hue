@@ -504,7 +504,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleTables = function (databasesDeferred, colRefDeferred) {
+  Suggestions.prototype.handleTables = function (databasesDeferred) {
     var self = this;
     var tablesDeferred = $.Deferred();
     if (self.parseResult.suggestTables) {
@@ -516,9 +516,10 @@ var SqlAutocompleter3 = (function () {
           prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
         }
 
+        var database = suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase;
         self.apiHelper.fetchTables({
           sourceType: self.snippet.type(),
-          databaseName: suggestTables.identifierChain && suggestTables.identifierChain.length === 1 ? suggestTables.identifierChain[0].name : self.activeDatabase,
+          databaseName: database,
           successCallback: function (data) {
             var tableSuggestions = [];
             data.tables_meta.forEach(function (tableMeta) {
@@ -526,12 +527,14 @@ var SqlAutocompleter3 = (function () {
                   suggestTables.onlyViews && tableMeta.type.toLowerCase() !== 'view') {
                 return;
               }
+              var details = tableMeta;
+              details.database = database;
               tableSuggestions.push({
                 value: prefix + self.backTickIfNeeded(tableMeta.name),
                 tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
-                details: tableMeta.comment ? tableMeta : null
+                details: details
               });
             });
             self.loadingTables(false);
@@ -1278,6 +1281,13 @@ var SqlAutocompleter3 = (function () {
     return filtersDeferred;
   };
 
+  var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
+    suggestions.forEach(function (suggestion) {
+      suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
+      suggestion.weightAdjust = suggestion.details.popularity.relativePopularity;
+    });
+  };
+
   Suggestions.prototype.handlePopularTables = function (tablesDeferred) {
     var self = this;
     var popularTablesDeferred = $.Deferred();
@@ -1299,22 +1309,24 @@ var SqlAutocompleter3 = (function () {
           });
 
           $.when(tablesDeferred).done(function (tableSuggestions) {
-            var notify = false;
+            var totalMatchedPopularity = 0;
+            var matchedSuggestions = [];
             tableSuggestions.forEach(function (suggestion) {
-              var popularity = popularityIndex[suggestion.tableName];
-              if (typeof popularity !== 'undefined') {
-                suggestion.weightAdjust = Math.min(popularity.popularity, 99); // TODO: Normalize popularity
+              var topTable = popularityIndex[suggestion.tableName];
+              if (typeof topTable !== 'undefined') {
                 suggestion.popular = true;
                 if (!suggestion.details) {
                   suggestion.details = {};
                 }
-                suggestion.details.popularity = popularity;
-                notify = true;
+                suggestion.details.popularity = topTable;
+                totalMatchedPopularity += topTable.popularity;
+                matchedSuggestions.push(suggestion);
               }
             });
             self.loadingPopularTables(false);
             popularTablesDeferred.resolve(data.top_tables);
-            if (notify) {
+            if (matchedSuggestions.length > 0) {
+              adjustWeightsBasedOnPopularity(matchedSuggestions, totalMatchedPopularity);
               self.entries.notifySubscribers();
             }
           });
@@ -1371,25 +1383,28 @@ var SqlAutocompleter3 = (function () {
           });
 
           $.when(columnsDeferred).done(function (columns) {
-            var notify = false;
+            var totalMatchedPopularity = 0;
+            var matchedSuggestions = [];
             columns.forEach(function (suggestion) {
               if (typeof suggestion.table === 'undefined') {
                 return;
               }
-              var popularity = popularityIndex[suggestion.value.toLowerCase()];
-              if (typeof popularity !== 'undefined') {
-                suggestion.weightAdjust = Math.min(popularity.columnCount, 99); // TODO: Normalize popularity
+              var topColumn = popularityIndex[suggestion.value.toLowerCase()];
+              if (typeof topColumn !== 'undefined') {
                 suggestion.popular = true;
                 if (!suggestion.details) {
                   suggestions.details = {};
                 }
-                suggestion.details.popularity = popularity;
-                notify = true;
+                topColumn.popularity = topColumn.columnCount; // No popularity for columns in response
+                suggestion.details.popularity = topColumn;
+                totalMatchedPopularity += topColumn.columnCount;
+                matchedSuggestions.push(suggestion);
               }
             });
             self.loadingPopularColumns(false);
             popularColumnsDeferred.resolve(popularColumns);
-            if (notify) {
+            if (matchedSuggestions.length > 0) {
+              adjustWeightsBasedOnPopularity(matchedSuggestions, totalMatchedPopularity);
               self.entries.notifySubscribers();
             }
           });
