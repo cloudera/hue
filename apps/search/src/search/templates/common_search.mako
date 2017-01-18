@@ -1492,11 +1492,11 @@ ${ dashboard.layout_skeleton() }
                   <i class="hfo hfo-file-json"></i> JSON
                 </a>
               </li>
-              <li>
-                <a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Download first rows as JSON') }">
-                  <i class="fa fa-w fa-save"></i> ${_('Save')}
-                </a>
-              </li>
+              ##<li>
+                ##<a class="inactive-action download" href="javascript:void(0)" data-bind="click: function(widget, event){ var $f = $(event.currentTarget).parents('form'); $f.find('[name=\'type\']').val('json'); $f.submit()}" title="${ _('Export results to a dataset') }">
+                ##  <i class="fa fa-w fa-save"></i> ${_('Export')}
+                ##</a>
+              ##</li>
             </ul>
           </div>
         </form>

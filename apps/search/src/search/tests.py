@@ -28,7 +28,7 @@ from desktop.lib.test_utils import grant_access
 from desktop.lib.rest import resource
 from desktop.models import Document2
 
-from search.api import _round_number_range
+from search.facet_builder import _round_number_range
 from search.models import Collection2
 from search.search_controller import SearchController
 

@@ -29,10 +29,11 @@ from libsolr.api import SolrApi
 
 from search.api_engines import get_engine
 from search.conf import SOLR_URL
+from search.data_export import download as export_download
 from search.decorators import allow_viewer_only
 from search.facet_builder import _guess_gap, _zoom_range_facet, _new_range_facet
 from search.models import Collection2, augment_solr_response, pairwise2, augment_solr_exception
-from search.search_controller import SearchController, can_edit_index
+from search.search_controller import can_edit_index
 
 
 LOG = logging.getLogger(__name__)
@@ -263,6 +264,24 @@ def get_terms(request):
       result['message'] = _('This field does not support stats')
 
   return JsonResponse(result)
+
+
+@allow_viewer_only
+def download(request):
+  try:
+    file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
+    response = search(request)
+
+    if file_format == 'json':
+      docs = json.loads(response.content)['response']['docs']
+      resp = JsonResponse(docs, safe=False)
+      resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
+      return resp
+    else:
+      collection = json.loads(request.POST.get('collection', '{}'))
+      return export_download(json.loads(response.content), file_format, collection)
+  except Exception, e:
+    raise PopupException(_("Could not download search results: %s") % e)
 
 
 @allow_viewer_only
