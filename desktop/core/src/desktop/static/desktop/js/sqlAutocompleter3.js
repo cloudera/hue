@@ -1156,6 +1156,8 @@ var SqlAutocompleter3 = (function () {
           aggregateFunctionsDeferred.resolve();
         }
       });
+    } else {
+      aggregateFunctionsDeferred.resolve();
     }
     return aggregateFunctionsDeferred;
   };
@@ -1352,6 +1354,7 @@ var SqlAutocompleter3 = (function () {
     } else {
       popularTablesDeferred.resolve([]);
     }
+    return popularTablesDeferred
   };
 
   Suggestions.prototype.handlePopularColumns = function (columnsDeferred) {
