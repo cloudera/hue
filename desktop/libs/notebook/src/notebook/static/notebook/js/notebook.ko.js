@@ -1456,7 +1456,7 @@ var EditorViewModel = (function() {
         sourcePlatform: self.type()
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", "Queries uploaded successfully. Processing them...");
+          $(document).trigger("info", data.upload_history.count + " queries uploaded successfully. Processing them...");
           self.watchUploadStatus(data.upload_history.status.workloadId);
         } else {
           $(document).trigger("error", data.message);
