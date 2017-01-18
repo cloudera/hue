@@ -30,8 +30,7 @@ from indexer.management.commands import indexer_setup
 
 from search.api_engines import get_engine
 from search.conf import LATEST
-from search.data_export import download as export_download
-from search.decorators import allow_owner_only, allow_viewer_only
+from search.decorators import allow_owner_only
 from search.management.commands import search_setup
 from search.models import Collection2, get_engines
 from search.search_controller import SearchController, can_edit_index
@@ -197,24 +196,6 @@ def save(request):
     response['message'] = _('There is no collection to search.')
 
   return JsonResponse(response)
-
-
-@allow_viewer_only
-def download(request):
-  try:
-    file_format = 'csv' if 'csv' == request.POST.get('type') else 'xls' if 'xls' == request.POST.get('type') else 'json'
-    response = search(request)
-
-    if file_format == 'json':
-      docs = json.loads(response.content)['response']['docs']
-      resp = JsonResponse(docs, safe=False)
-      resp['Content-Disposition'] = 'attachment; filename=%s.%s' % ('query_result', file_format)
-      return resp
-    else:
-      collection = json.loads(request.POST.get('collection', '{}'))
-      return export_download(json.loads(response.content), file_format, collection)
-  except Exception, e:
-    raise PopupException(_("Could not download search results: %s") % e)
 
 
 def no_collections(request):
