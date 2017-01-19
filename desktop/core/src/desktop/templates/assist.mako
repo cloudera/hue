@@ -2265,6 +2265,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
     <form class="form-horizontal">
       <fieldset>
+        ${ _('Fields') }<br/>
+        <ul>
+          <li>F1</li>
+          <li>F2</li>
+          <li>F3</li>
+        </ul>
+      </fieldset>
+    </form>
+
+    <form class="form-horizontal">
+      <fieldset>
         ${ _('Suggestions') }<br/>
         <ul>
           <li>Popular fields for the tables are: [code, salary, amount]</li>

@@ -99,7 +99,7 @@ LIST_PARTITIONS_LIMIT = Config(
 # Deprecated
 DOWNLOAD_CELL_LIMIT = Config(
   key='download_cell_limit',
-  default=5000000,
+  default=10000000,
   type=int,
   help=_t('A limit to the number of cells (rows * columns) that can be downloaded from a query '
           '(e.g. - 10K rows * 1K columns = 10M cells.) '
