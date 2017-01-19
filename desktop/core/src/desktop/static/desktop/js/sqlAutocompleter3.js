@@ -140,7 +140,7 @@ var SqlAutocompleter3 = (function () {
           if (foundIndex === -1) {
             return false;
           }
-          if (foundIndex === 0) {
+          if (foundIndex === 0 || (suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)) {
             suggestion.filterWeight = 2;
           } else if (foundIndex > 0) {
             suggestion.filterWeight = 1;
@@ -426,6 +426,7 @@ var SqlAutocompleter3 = (function () {
         }
         commonTableExpressionSuggestions.push({
           value: prefix + expression.name,
+          filterValue: expression.name,
           meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
           category: CATEGORIES.CTE,
           details: null
@@ -493,6 +494,7 @@ var SqlAutocompleter3 = (function () {
         dbs.forEach(function (db) {
           databaseSuggestions.push({
             value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''),
+            filterValue: db,
             meta: AutocompleterGlobals.i18n.meta.database,
             category: CATEGORIES.DATABASE,
             details: null
@@ -531,6 +533,7 @@ var SqlAutocompleter3 = (function () {
               details.database = database;
               tableSuggestions.push({
                 value: prefix + self.backTickIfNeeded(tableMeta.name),
+                filterValue: tableMeta.name,
                 tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
@@ -642,6 +645,7 @@ var SqlAutocompleter3 = (function () {
             if (column.alias) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.alias),
+                filterValue: column.alias,
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -650,6 +654,7 @@ var SqlAutocompleter3 = (function () {
             } else if (column.identifierChain && column.identifierChain.length > 0) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
+                filterValue: column.identifierChain[column.identifierChain.length - 1].name,
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -678,6 +683,7 @@ var SqlAutocompleter3 = (function () {
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
+                filterValue: column.name,
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -686,6 +692,7 @@ var SqlAutocompleter3 = (function () {
             } else if (column.type.indexOf('map') === 0) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
+                filterValue: column.name,
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -694,6 +701,7 @@ var SqlAutocompleter3 = (function () {
             } else if (column.type.indexOf('struct') === 0) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
+                filterValue: column.name,
                 meta: 'struct',
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -702,6 +710,8 @@ var SqlAutocompleter3 = (function () {
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
+                filterValue: column.name,
+                filterValue: column.name,
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -710,6 +720,7 @@ var SqlAutocompleter3 = (function () {
             } else if (column.type.indexOf('array') === 0) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
+                filterValue: column.name,
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -718,6 +729,7 @@ var SqlAutocompleter3 = (function () {
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
+                filterValue: column.name,
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
                 weightAdjust: 1,
@@ -728,6 +740,7 @@ var SqlAutocompleter3 = (function () {
                 SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name),
+                filterValue: column.name,
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -742,6 +755,7 @@ var SqlAutocompleter3 = (function () {
             column.identifierChain = data.identifierChain;
             columnSuggestions.push({
               value: self.backTickIfNeeded(column),
+              filterValue: column,
               meta: 'column',
               category: CATEGORIES.COLUMN,
               table: table,
@@ -773,6 +787,7 @@ var SqlAutocompleter3 = (function () {
 
             columnSuggestions.push({
               value: self.backTickIfNeeded(field.name),
+              filterValue: field.name,
               meta: field.type,
               category: CATEGORIES.COLUMN,
               table: table,
@@ -789,6 +804,7 @@ var SqlAutocompleter3 = (function () {
                 SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(field.name),
+                filterValue: field.name,
                 meta: field.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
@@ -807,6 +823,7 @@ var SqlAutocompleter3 = (function () {
                 if (self.snippet.type() === 'hive') {
                   columnSuggestions.push({
                     value: self.backTickIfNeeded(field.name) + '[]',
+                    filterValue: field.name,
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
@@ -815,6 +832,7 @@ var SqlAutocompleter3 = (function () {
                 } else {
                   columnSuggestions.push({
                     value: self.backTickIfNeeded(field.name),
+                    filterValue: field.name,
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
@@ -825,6 +843,7 @@ var SqlAutocompleter3 = (function () {
                   SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
                 columnSuggestions.push({
                   value: self.backTickIfNeeded(field.name),
+                  filterValue: field.name,
                   meta: field.type,
                   category: CATEGORIES.COLUMN,
                   table: table,
@@ -1176,8 +1195,10 @@ var SqlAutocompleter3 = (function () {
           if (typeof data.values.groupbyColumns !== 'undefined') {
             var prefix = suggestGroupBys.prefix ? (self.parseResult.lowerCase ? suggestGroupBys.prefix.toLowerCase() : suggestGroupBys.prefix) + ' ' : '';
             data.values.groupbyColumns.forEach(function (value) {
+              var filterValue = self.createNavOptIdentifierForColumn(value, suggestGroupBys.tables);
               groupBySuggestions.push({
-                value: prefix + self.createNavOptIdentifierForColumn(value, suggestGroupBys.tables),
+                value: prefix + filterValue,
+                filterValue: filterValue,
                 meta: AutocompleterGlobals.i18n.meta.groupBy,
                 category: CATEGORIES.POPULAR_GROUP_BY,
                 popular: true,
@@ -1218,8 +1239,10 @@ var SqlAutocompleter3 = (function () {
           if (typeof data.values.orderbyColumns !== 'undefined') {
             var prefix = suggestOrderBys.prefix ? (self.parseResult.lowerCase ? suggestOrderBys.prefix.toLowerCase() : suggestOrderBys.prefix) + ' ' : '';
             data.values.orderbyColumns.forEach(function (value) {
+              var filterValue = self.createNavOptIdentifierForColumn(value, suggestOrderBys.tables);
               orderBySuggestions.push({
-                value: prefix + self.createNavOptIdentifierForColumn(value, suggestOrderBys.tables),
+                value: prefix + filterValue,
+                filterValue: filterValue,
                 meta: AutocompleterGlobals.i18n.meta.orderBy,
                 category: CATEGORIES.POPULAR_ORDER_BY,
                 popular: true,
