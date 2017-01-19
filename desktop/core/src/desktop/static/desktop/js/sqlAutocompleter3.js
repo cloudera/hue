@@ -120,17 +120,39 @@ var SqlAutocompleter3 = (function () {
     }).extend({ rateLimit: 200 });
 
     self.filter = ko.observable();
+
+    self.availableCategories = ko.observableArray([CATEGORIES.ALL]);
+
+    self.availableCategories.subscribe(function (newCategories) {
+      if (newCategories.indexOf(self.activeCategory()) === -1) {
+        self.activeCategory(CATEGORIES.ALL)
+      }
+    });
+
     self.activeCategory = ko.observable(CATEGORIES.ALL);
+
+    var updateCategories = function (suggestions) {
+      var newCategories =  {};
+      suggestions.forEach(function (suggestion) {
+        if (suggestion.popular && ! newCategories[CATEGORIES.POPULAR.label]) {
+          newCategories[CATEGORIES.POPULAR.label] = CATEGORIES.POPULAR;
+        } else if (suggestion.category === CATEGORIES.TABLE || suggestion.category === CATEGORIES.COLUMN || suggestion.category === CATEGORIES.UDF) {
+          if (!newCategories[suggestion.category.label]) {
+            newCategories[suggestion.category.label] = suggestion.category;
+          }
+        }
+      });
+      var result = [];
+      Object.keys(newCategories).forEach(function (key) {
+        result.push(newCategories[key]);
+      });
+      result.sort(function (a, b) { return a.label.localeCompare(b.label)});
+      result.unshift(CATEGORIES.ALL);
+      self.availableCategories(result);
+    };
 
     self.filtered = ko.pureComputed(function () {
       var result = self.entries();
-
-      var activeCategory = self.activeCategory();
-      if (activeCategory !== CATEGORIES.ALL) {
-        result = result.filter(function (suggestion) {
-          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular);
-        });
-      }
 
       if (self.filter()) {
         var lowerCaseFilter = self.filter().toLowerCase();
@@ -151,6 +173,15 @@ var SqlAutocompleter3 = (function () {
         });
         huePubSub.publish('hue.ace.autocompleter.match.updated');
       }
+      updateCategories(result);
+
+      var activeCategory = self.activeCategory();
+      if (activeCategory !== CATEGORIES.ALL) {
+        result = result.filter(function (suggestion) {
+          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular);
+        });
+      }
+
       result.sort(function (a, b) {
         if (self.filter()) {
           if (typeof a.filterWeight !== 'undefined' && typeof b.filterWeight !== 'undefined' && b.filterWeight !== a.filterWeight) {
@@ -178,32 +209,6 @@ var SqlAutocompleter3 = (function () {
       });
       return result;
     }).extend({ rateLimit: 200 });
-
-    self.availableCategories = ko.pureComputed(function () {
-      var newCategories =  {};
-      self.entries().forEach(function (suggestion) {
-        if (suggestion.popular && ! newCategories[CATEGORIES.POPULAR.label]) {
-          newCategories[CATEGORIES.POPULAR.label] = CATEGORIES.POPULAR;
-        } else if (suggestion.category === CATEGORIES.TABLE || suggestion.category === CATEGORIES.COLUMN || suggestion.category === CATEGORIES.UDF) {
-          if (!newCategories[suggestion.category.label]) {
-            newCategories[suggestion.category.label] = suggestion.category;
-          }
-        }
-      });
-      var result = [];
-      Object.keys(newCategories).forEach(function (key) {
-        result.push(newCategories[key]);
-      });
-      result.sort(function (a, b) { return a.label.localeCompare(b.label)});
-      result.unshift(CATEGORIES.ALL);
-      return result;
-    }).extend({ rateLimit: 200 });
-
-    self.availableCategories.subscribe(function (newCategories) {
-      if (newCategories.indexOf(self.activeCategory()) === -1) {
-        self.activeCategory(CATEGORIES.ALL)
-      }
-    });
   }
 
   Suggestions.prototype.backTickIfNeeded = function (text) {

@@ -137,7 +137,7 @@ from desktop.views import _ko
       white-space: nowrap;
     }
 
-    .autocompleter-suggestion-value > b {
+    .autocompleter-suggestion-value b {
       text-shadow: 0 0 0.01em;
     }
 
@@ -218,7 +218,7 @@ from desktop.views import _ko
                 css: { 'selected': $index() === $parent.selectedIndex() },
                 event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
               <div class="autocompleter-suggestion-value">
-                <div class="autocompleter-dot " data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
+                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
               </div>
               <div class="autocompleter-suggestion-meta"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
@@ -416,7 +416,6 @@ from desktop.views import _ko
 
         self.focusedEntry = ko.pureComputed(function () {
           if (self.suggestions.filtered().length > 0) {
-
             return self.suggestions.filtered()[self.hoveredIndex() || self.selectedIndex()];
           }
           return null;
