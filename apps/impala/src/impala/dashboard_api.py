@@ -18,15 +18,21 @@
 import logging
 import json
 
+from itertools import groupby
+
 from django.utils.html import escape
 
 from beeswax.server.dbms import get_query_server_config
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from search.models import Collection2
+from desktop.lib.i18n import force_unicode
 
 
 LOG = logging.getLogger(__name__)
+
+
+LIMIT = 100
 
 
 # To Split in Impala, DBMS..
@@ -38,10 +44,11 @@ class SQLApi():
 
   def query(self, dashboard, query, facet=None):
     database, table = self._get_database_table_names(dashboard['name'])
-    filters = []
 
     if query and query['qs'] == [{'q': '_root_:*'}]:
       return {'response': {'numFound': 0}}
+
+    filters = '\n'.join(self._get_fq(dashboard, query, facet))
 
     if facet:
       fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
@@ -57,7 +64,7 @@ class SQLApi():
           'table': table,
           'fields': ', '.join(fields),
           'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields]),
-          'limit': 100
+          'limit': LIMIT
       }
     else:
       fields =  '*'
@@ -68,7 +75,7 @@ class SQLApi():
       }
       if filters:
         hql += ' WHERE ' + filters
-      hql += ' LIMIT 100'
+      hql += ' LIMIT %s' % LIMIT
 
 #     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
 #     db = dbms.get(request.user)
@@ -85,15 +92,16 @@ class SQLApi():
     query_server = get_query_server_config(name='impala') # To move to notebook API
     db = dbms.get(self.user, query_server=query_server)
 
-    query = hql_query(hql)
-    handle = db.execute_and_wait(query, timeout_sec=35.0)
+    sql_query = hql_query(hql)
+    handle = db.execute_and_wait(sql_query, timeout_sec=35.0)
 
     if handle:
-      result = db.fetch(handle, rows=100)
+      result = db.fetch(handle, rows=dashboard['template']['rows'])
       db.close(handle)
 
+    # TODO: add query id to allow closing
     if facet:
-      return self._convert_impala_facet(result, facet)
+      return self._convert_impala_facet(result, facet, query)
     else:
       return self._convert_impala_results(result, dashboard, query)
 
@@ -116,12 +124,43 @@ class SQLApi():
       } for col in table_metadata.cols
     ]
 
+
   def schema_fields(self, collection):
     return {'fields': self.fields(collection)}
+
 
   def luke(self, collection):
     fields = self.schema_fields(collection)
     return {'fields': Collection2._make_luke_from_schema_fields(fields)}
+
+
+  def close_query(self, collection, query, facet=None): pass
+
+  def _get_fq(self, collection, query, facet=None):
+    clauses = []
+
+    # Merge facets queries on same fields
+    grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
+    merged_fqs = []
+    for key, group in grouped_fqs:
+      field_fq = next(group)
+      for fq in group:
+        if facet and facet['id'] != fq['id']: # Facets should not filter themselves
+          for f in fq['filter']:
+            field_fq['filter'].append(f)
+      merged_fqs.append(field_fq)
+
+    for fq in merged_fqs:
+      if fq['type'] == 'field':
+        f = []
+        for _filter in fq['filter']:
+          exclude = '!=' if _filter['exclude'] else '='
+          value = _filter['value']
+          if value is not None:
+            f.append("%s %s '%s'" % (fq['field'], exclude, value))
+        clauses.append(' OR '.join(f))
+
+    return clauses
 
   def _get_database_table_names(self, name):
     if '.' in name:
@@ -132,14 +171,13 @@ class SQLApi():
 
     return database, table_name
 
-  def _convert_impala_facet(self, result, facet):
+  def _convert_impala_facet(self, result, facet, query):
     response = json.loads('''{
-   "field":"cat",
    "fieldsAttributes":[],
    "response":{
       "response":{
          "start":0,
-         "numFound":16
+         "numFound":0
       }
    },
    "docs":[],
@@ -147,11 +185,12 @@ class SQLApi():
    "dimension":1,
    "type":"nested",
    "extraSeries":[
-   ],
-   "label":"cat"
+   ]
 }''')
 
     response['id'] = facet['id']
+    response['field'] = facet['field']
+    response['label'] = facet['field']
 
     cols = list(result.cols())
     rows = list(result.rows())
@@ -165,18 +204,21 @@ class SQLApi():
          "name": column.name
       } for column in result.data_table.cols()]
 
-
     response['docs'] = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
+
+    fq_fields = [_f['value'] for fq in query['fqs'] for _f in fq['filter']] # type == 'field
 
     counts = []
     for row in rows:
       counts.append({
+         "cat": facet['field'],
          "count": row[1],
          "exclude": True,
-         "selected": False,
+         "selected": row[0] in fq_fields,
          "value": row[0]
       })
     response['counts'] = counts
+    response['response']['response']['numFound'] = len(counts)
 
     return {'normalized_facets': [response]}
 

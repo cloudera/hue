@@ -816,7 +816,7 @@ var Collection = function (vm, collection) {
     logGA('add_facet/' + facet_json.widgetType);
 
     $.post("/search/template/new_facet", {
-      "collection": ko.mapping.toJSON(self),
+        "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
         "field": facet_json.name,
@@ -1732,36 +1732,36 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self._make_result_facet = function(new_facet) {
-      var facet = self.getFacetFromQuery(new_facet.id);
-      var _hash = ko.mapping.toJSON(new_facet);
+    var facet = self.getFacetFromQuery(new_facet.id);
+    var _hash = ko.mapping.toJSON(new_facet);
 
-      if (!facet.has_data() || facet.resultHash() != _hash) {
-        facet.counts(new_facet.counts);
+    if (!facet.has_data() || facet.resultHash() != _hash) {
+      facet.counts(new_facet.counts);
 
-        if (typeof new_facet.docs != 'undefined') {
-          var _docs = [];
+      if (typeof new_facet.docs != 'undefined') {
+        var _docs = [];
 
-          // Update template
-          var _facet_model = self.collection.getFacetById(new_facet.id);
-          var _fields = []
-          $.each(new_facet.fieldsAttributes, function(index, item) {
-            _fields.push(ko.mapping.fromJS(item));
-          });
-          _facet_model.template.fieldsAttributes(_fields);
+        // Update template
+        var _facet_model = self.collection.getFacetById(new_facet.id);
+        var _fields = []
+        $.each(new_facet.fieldsAttributes, function(index, item) {
+          _fields.push(ko.mapping.fromJS(item));
+        });
+        _facet_model.template.fieldsAttributes(_fields);
 
-          $.each(new_facet.docs, function (index, item) {
-            _docs.push(self._make_result_doc(item, "", _facet_model.template));
-          });
-          facet.results(_docs);
-          facet.response(new_facet.response);
-        }
-        facet.label(new_facet.label);
-        facet.field(new_facet.field);
-        facet.dimension(new_facet.dimension);
-        facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
-        facet.resultHash(_hash);
-        facet.has_data(true);
+        $.each(new_facet.docs, function (index, item) {
+          _docs.push(self._make_result_doc(item, "", _facet_model.template));
+        });
+        facet.results(_docs);
+        facet.response(new_facet.response);
       }
+      facet.label(new_facet.label);
+      facet.field(new_facet.field);
+      facet.dimension(new_facet.dimension);
+      facet.extraSeries(typeof new_facet.extraSeries != 'undefined' ? new_facet.extraSeries : []);
+      facet.resultHash(_hash);
+      facet.has_data(true);
+    }
   }
 
   self._make_result_doc = function(item, _mustacheTmpl, template) {
