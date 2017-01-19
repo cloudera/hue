@@ -51,21 +51,31 @@ class SQLApi():
     filters = self._get_fq(dashboard, query, facet)
 
     if facet:
-      fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
-      fields = ['`%s`' % f for f in fields]
+      if facet['type'] == 'field':
+        fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
+        fields = ['`%s`' % f for f in fields]
 
-      hql = '''SELECT %(fields)s, COUNT(*)
-      FROM %(database)s.%(table)s
-      WHERE %(filters)s
-      GROUP BY %(fields)s
-      ORDER BY COUNT(*) DESC
-      LIMIT %(limit)s''' % {
-          'database': database,
-          'table': table,
-          'fields': ', '.join(fields),
-          'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields] + filters),
-          'limit': LIMIT
-      }
+        hql = '''SELECT %(fields)s, COUNT(*)
+        FROM %(database)s.%(table)s
+        WHERE %(filters)s
+        GROUP BY %(fields)s
+        ORDER BY COUNT(*) DESC
+        LIMIT %(limit)s''' % {
+            'database': database,
+            'table': table,
+            'fields': ', '.join(fields),
+            'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields] + filters),
+            'limit': LIMIT
+        }
+      elif facet['type'] == 'function': # 1 dim only now
+        hql = '''SELECT %(fields)s
+        FROM %(database)s.%(table)s
+        %(filters)s''' % {
+            'database': database,
+            'table': table,
+            'fields': self._get_aggregate_function(facet),
+            'filters': ('WHERE' + ' AND '.join(filters)) if filters else '',
+        }
     else:
       fields =  '*'
       hql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
@@ -101,7 +111,10 @@ class SQLApi():
 
     # TODO: add query id to allow closing
     if facet:
-      return self._convert_impala_facet(result, facet, query)
+      if facet['type'] == 'function':
+        return self._convert_impala_function_facet(result, facet, query)
+      else:
+        return self._convert_impala_facet(result, facet, query)
     else:
       return self._convert_impala_results(result, dashboard, query)
 
@@ -138,7 +151,7 @@ class SQLApi():
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
- 
+
     # Facets should not filter themselves
     fqs = [fq for fq in query['fqs'] if not facet or facet['id'] != fq['id']]
 
@@ -164,6 +177,35 @@ class SQLApi():
         clauses.append(' OR '.join(f))
 
     return clauses
+
+  @classmethod
+  def _get_aggregate_function(cls, facet):
+    if 'properties' in facet:
+      f = facet['properties']['aggregate'] # Level 1 facet
+    else:
+      f = facet['aggregate']
+
+    if not f['ops']:
+      f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
+
+    return cls.__get_aggregate_function(f)
+
+  @classmethod
+  def __get_aggregate_function(cls, f):
+    if f['function'] == 'field':
+      return f['value']
+    else:
+      fields = []
+      for _f in f['ops']:
+        fields.append(cls.__get_aggregate_function(_f))
+      if f['function'] == 'median':
+        f['function'] = 'percentile'
+        fields.append('50')
+      elif f['function'] == 'unique':
+        f['function'] = 'distinct'
+      elif f['function'] == 'percentiles':
+        fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
+      return '%s(%s)' % (f['function'], ','.join(fields))
 
   def _get_database_table_names(self, name):
     if '.' in name:
@@ -224,6 +266,15 @@ class SQLApi():
     response['response']['response']['numFound'] = len(counts)
 
     return {'normalized_facets': [response]}
+
+
+  def _convert_impala_function_facet(self, result, facet, query):
+    rows = list(result.rows())
+
+    response = {"query": facet['id'], "counts": rows[0][0], "type": "function", "id": facet['id'], "label": facet['id']}
+
+    return {'normalized_facets': [response]}
+
 
   def _convert_impala_results(self, result, dashboard, query):
     cols = list(result.cols())
