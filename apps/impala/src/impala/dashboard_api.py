@@ -48,7 +48,7 @@ class SQLApi():
     if query and query['qs'] == [{'q': '_root_:*'}]:
       return {'response': {'numFound': 0}}
 
-    filters = '\n'.join(self._get_fq(dashboard, query, facet))
+    filters = self._get_fq(dashboard, query, facet)
 
     if facet:
       fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
@@ -63,7 +63,7 @@ class SQLApi():
           'database': database,
           'table': table,
           'fields': ', '.join(fields),
-          'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields]),
+          'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields] + filters),
           'limit': LIMIT
       }
     else:
@@ -74,7 +74,7 @@ class SQLApi():
           'fields': fields
       }
       if filters:
-        hql += ' WHERE ' + filters
+        hql += ' WHERE ' + ' AND '.join(filters)
       hql += ' LIMIT %s' % LIMIT
 
 #     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
@@ -138,19 +138,22 @@ class SQLApi():
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
+ 
+    # Facets should not filter themselves
+    fqs = [fq for fq in query['fqs'] if not facet or facet['id'] != fq['id']]
 
     # Merge facets queries on same fields
-    grouped_fqs = groupby(query['fqs'], lambda x: (x['type'], x['field']))
+    grouped_fqs = groupby(fqs, lambda x: (x['type'], x['field']))
     merged_fqs = []
     for key, group in grouped_fqs:
       field_fq = next(group)
       for fq in group:
-        if facet and facet['id'] != fq['id']: # Facets should not filter themselves
-          for f in fq['filter']:
+        for f in fq['filter']:
             field_fq['filter'].append(f)
       merged_fqs.append(field_fq)
 
     for fq in merged_fqs:
+      print fq
       if fq['type'] == 'field':
         f = []
         for _filter in fq['filter']:
@@ -213,7 +216,7 @@ class SQLApi():
       counts.append({
          "cat": facet['field'],
          "count": row[1],
-         "exclude": True,
+         "exclude": False,
          "selected": row[0] in fq_fields,
          "value": row[0]
       })
