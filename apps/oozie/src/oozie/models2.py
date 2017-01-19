@@ -24,7 +24,6 @@ import uuid
 
 from datetime import datetime, timedelta
 from dateutil.parser import parse
-from sets import Set
 from string import Template
 from xml.sax.saxutils import escape
 
@@ -264,7 +263,7 @@ class Workflow(Job):
 
     _update_adj_list(adj_list)
 
-    nodes_uuid_set = Set()
+    nodes_uuid_set = set()
     wf_rows = _create_workflow_layout(node_hierarchy, adj_list, nodes_uuid_set)
 
     data = {'layout': [{}], 'workflow': {}}
@@ -272,7 +271,7 @@ class Workflow(Job):
       data['layout'][0]['rows'] = wf_rows
 
     wf_nodes = []
-    nodes_uuid_set = Set()
+    nodes_uuid_set = set()
     _dig_nodes(node_hierarchy, adj_list, user, wf_nodes, nodes_uuid_set)
     data['workflow']['nodes'] = wf_nodes
     data['workflow']['id'] = '123'
