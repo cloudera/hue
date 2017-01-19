@@ -196,6 +196,7 @@ def check_status(request):
       status = 'expired'
     else:
       status = 'failed'
+
     if notebook['type'].startswith('query'):
       nb_doc = Document2.objects.get(id=notebook['id'])
       if nb_doc.can_write(request.user):
