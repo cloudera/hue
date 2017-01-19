@@ -28,6 +28,7 @@ _SITE_DICT = None
 _CONF_NAVIGATOR_SERVER_URL = 'navigator.server.url'
 _CONF_NAVIGATOR_AUDIT_LOG_DIR = 'audit_event_log_dir'
 _CONF_NAVIGATOR_AUDIT_MAX_FILE_SIZE = 'navigator.audit_log_max_file_size'
+_CONF_NAVIGATOR_HUE_SERVER_NAME = 'navigator.client.clusterName'
 
 
 def reset():
@@ -55,6 +56,10 @@ def get_navigator_audit_max_file_size():
   """Returns navigator.audit_log_max_file_size in MB"""
   size = get_conf().get(_CONF_NAVIGATOR_AUDIT_MAX_FILE_SIZE, '100')
   return '%sMB' % size.strip() if size else "100MB"
+
+
+def get_navigator_hue_server_name():
+  return get_conf().get(_CONF_NAVIGATOR_HUE_SERVER_NAME, '')
 
 
 def _parse_sites():

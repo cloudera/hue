@@ -30,6 +30,7 @@ from libsentry.privilege_checker import PrivilegeChecker
 from libsentry.sentry_site import get_hive_sentry_provider
 
 from metadata.conf import NAVIGATOR
+from metadata.metadata_sites import get_navigator_hue_server_name
 
 
 _JSON_CONTENT_TYPE = 'application/json'
@@ -131,6 +132,8 @@ class NavigatorApi(object):
       filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
       if source_type_filter:
         filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
+      if get_navigator_hue_server_name():
+        filter_query += 'AND clusterName:%s' % get_navigator_hue_server_name()
 
       params += (
         ('query', filter_query),
@@ -192,6 +195,9 @@ class NavigatorApi(object):
       body = {'query': ' '.join(query) or '*'}
       if fq_type:
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
+
+      if get_navigator_hue_server_name():
+        filterQueries.append('clusterName:%s' % get_navigator_hue_server_name())
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
@@ -255,6 +261,9 @@ class NavigatorApi(object):
         'originalName': name,
         'deleted': 'false'
       }
+      if get_navigator_hue_server_name():
+        query_filters['clusterName'] = get_navigator_hue_server_name()
+
       for key, value in filters.items():
         query_filters[key] = value
 
