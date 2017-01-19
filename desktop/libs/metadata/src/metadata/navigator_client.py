@@ -138,7 +138,7 @@ class NavigatorApi(object):
       params += (
         ('query', filter_query),
         ('offset', offset),
-        ('limit', limit),
+        ('limit', NAVIGATOR.FETCH_SIZE_SEARCH.get()),
       )
 
       LOG.info(params)
@@ -157,7 +157,7 @@ class NavigatorApi(object):
     try:
       pagination = {
         'offset': offset,
-        'limit': limit,
+        'limit': NAVIGATOR.FETCH_SIZE_SEARCH_INTERACTIVE.get(),
       }
 
       entity_types = []
