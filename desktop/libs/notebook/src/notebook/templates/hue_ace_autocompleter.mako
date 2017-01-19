@@ -23,12 +23,37 @@ from desktop.views import _ko
   <style>
     .hue-ace-autocompleter {
       position: fixed;
+      display: flex;
       z-index: 1000;
       max-height: 250px;
-      border: 1px solid #DDD;
+      align-items: flex-start;
+    }
+
+    .autocompleter-suggestions {
+      flex: 0 0 300px;
+      z-index: 1002;
       display: flex;
       flex-direction: column;
+      width: 300px;
+      max-height: 250px;
 
+      border: 1px solid #DDD;
+      border-radius: 2px;
+      background-color: #FFF;
+      -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
+      box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+    }
+
+    .autocompleter-details {
+      flex: 0 0 300px;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+      margin-left: 5px;
+      max-height: 250px;
+
+      border: 1px solid #DDD;
       border-radius: 2px;
       background-color: #FFF;
       -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
@@ -36,9 +61,11 @@ from desktop.views import _ko
     }
 
     .autocompleter-header {
-      flex: 1 1 22px;
+      flex: 0 0 20px;
       padding: 5px;
       background-color: #F9F9F9;
+      line-height: 20px;
+      font-size: 14px;
     }
 
     .autocompleter-list {
@@ -77,24 +104,15 @@ from desktop.views import _ko
       overflow: hidden;
     }
 
-    .autocompleter-details {
-      flex: 0 0 300px;
-      width: 300px;
-      overflow-y: auto;
-      padding: 10px;
-      border-left: 1px solid #F9F9F9;
-    }
-
     .autocompleter-categories {
       display: inline-block;
     }
 
     .autocompleter-categories > div {
       display: inline-block;
-      line-height: 14px;
       border-bottom: 2px solid transparent;
       cursor: pointer;
-      padding: 0 3px;
+      padding: 0 5px;
     }
 
     .autocompleter-categories > div.active {
@@ -138,73 +156,78 @@ from desktop.views import _ko
       border-radius: 4px;
     }
 
-    .details-header {
-      margin-bottom: 10px;
-      font-size: 15px;
-      font-weight: 300;
-    }
-
-    .details-code {
-      margin-bottom: 10px;
-      font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
-    }
-
     .popular-icon {
       color: #EDB233;
     }
 
-    .autocomplete-details-table .details-attribute,
-    .autocomplete-details-table .details-popularity {
+    .autocompleter-details-contents {
+      flex: 1 1 100%;
+      overflow-y: auto;
+      padding: 7px;
+    }
+
+    .autocompleter-details-contents .details-attribute,
+    .autocompleter-details-contents .details-popularity {
       color: #737373;
       display: inline-block;
     }
 
-    .autocomplete-details-table .details-popularity .progress {
+    .autocompleter-details-contents .details-popularity .progress {
       display: inline-block;
       border-radius: 2px;
       height: 10px;
       width: 80px;
     }
 
-    .autocomplete-details-table .details-popularity .progress .bar {
+    .autocompleter-details-contents .details-popularity .progress .bar {
       background-color: #338bb8;
     }
 
-    .autocomplete-details-table .details-comment {
+    .autocompleter-details-contents .details-comment {
       margin-top: 5px;
       color: #737373;
       font-style: italic;
     }
+
+    .autocompleter-details-contents .details-code {
+      background-color: #F9F9F9;
+      padding:3px;
+      color: #737373;
+      font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
+    }
+
   </style>
 
   <script type="text/html" id="hue-ace-autocompleter">
     <!-- ko if: active -->
     <div class="hue-ace-autocompleter" data-bind="style: { top: top() + 'px', left: left() + 'px' }">
-      <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
-      <div class="autocompleter-header">
-        <!-- ko if: suggestions.availableCategories().length > 1 -->
-        <div class="autocompleter-categories" data-bind="foreach: suggestions.availableCategories()">
-          <div data-bind="text: label, css: { 'active': $parent.suggestions.activeCategory() === $data }, style: { 'border-color': $parent.suggestions.activeCategory() === $data ? color : 'transparent' }, click: function (data, event) { $parent.suggestions.activeCategory($data); event.stopPropagation(); $parent.editor().focus(); }"></div>
+      <div class="autocompleter-suggestions">
+        <!-- ko if: suggestions.availableCategories().length > 1 || suggestions.loading() -->
+        <div class="autocompleter-header">
+          <!-- ko if: suggestions.availableCategories().length > 1 -->
+          <div class="autocompleter-categories" data-bind="foreach: suggestions.availableCategories()">
+            <div data-bind="text: label, css: { 'active': $parent.suggestions.activeCategory() === $data }, style: { 'border-color': $parent.suggestions.activeCategory() === $data ? color : 'transparent' }, click: function (data, event) { $parent.suggestions.activeCategory($data); event.stopPropagation(); $parent.editor().focus(); }"></div>
+          </div>
+          <!-- /ko -->
+          <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
         </div>
         <!-- /ko -->
-        <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
-      </div>
-      <!-- /ko -->
-      <div class="autocompleter-entries">
-        <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
-          <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
-              css: { 'selected': $index() === $parent.selectedIndex() },
-              event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
-            <div class="autocompleter-suggestion-value">
-              <div class="autocompleter-dot " data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
+        <div class="autocompleter-entries">
+          <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
+            <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
+                css: { 'selected': $index() === $parent.selectedIndex() },
+                event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
+              <div class="autocompleter-suggestion-value">
+                <div class="autocompleter-dot " data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
+              </div>
+              <div class="autocompleter-suggestion-meta"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
-            <div class="autocompleter-suggestion-meta"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
-        <!-- ko if: focusedEntry() && focusedEntry().details -->
-        <!-- ko template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
-        <!-- /ko -->
       </div>
+      <!-- ko if: focusedEntry() && focusedEntry().details -->
+      <!-- ko template: { name: 'autocomplete-details-' + focusedEntry().category.detailsTemplate, data: focusedEntry } --><!-- /ko -->
+      <!-- /ko -->
     </div>
     <!-- /ko -->
   </script>
@@ -217,8 +240,11 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-udf">
     <div class="autocompleter-details">
-      <div class="details-code" data-bind="text: details.signature"></div>
-      <div data-bind="text: details.description"></div>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> <span data-bind="text: details.signature.substring(0, details.signature.indexOf('('));"></span></div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: details.signature"></div>
+        <div class="details-comment" data-bind="text: details.description"></div>
+      </div>
     </div>
   </script>
 
@@ -231,8 +257,8 @@ from desktop.views import _ko
   <script type="text/html" id="autocomplete-details-table">
     <!-- ko if: details -->
     <div class="autocompleter-details">
-      <div class="autocomplete-details-table">
-        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-details-contents">
         <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <!-- ko if: typeof details.popularity !== 'undefined' -->
         <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
@@ -252,8 +278,8 @@ from desktop.views import _ko
   <script type="text/html" id="autocomplete-details-column">
     <!-- ko if: details -->
     <div class="autocompleter-details">
-      <div class="autocomplete-details-table">
-        <div class="details-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-details-contents">
         <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
         <!-- ko if: typeof details.popularity !== 'undefined' -->
