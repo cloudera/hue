@@ -140,7 +140,9 @@ from desktop.views import _ko
       color: #EDB233;
     }
 
+    .autocomplete-details-table .details-attribute,
     .autocomplete-details-table .details-popularity {
+      color: #737373;
       display: inline-block;
     }
 
@@ -213,12 +215,13 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
-    <!-- ko if: details.comment || details.popularity -->
+    <!-- ko if: details -->
     <div class="autocompleter-details">
       <div class="autocomplete-details-table">
-        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type !== 'table', 'fa-table': details.type !== 'table' }"></i> <span data-bind="text: details.database + '.' + details.name"></span></div>
+        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type !== 'table', 'fa-table': details.type !== 'table' }"></i> <span data-bind="text: details.name"></span></div>
+        <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <!-- ko if: typeof details.popularity !== 'undefined' -->
-        <div class="details-popularity" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
           </div>
@@ -233,9 +236,26 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
+    <!-- ko if: details -->
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocomplete-details-table">
+        <div class="details-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
+        <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
+        <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
+        <!-- ko if: typeof details.popularity !== 'undefined' -->
+        <br/>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+        <!-- /ko -->
+        <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
+        <div class="details-comment" data-bind="text: details.comment"></div>
+        <!-- /ko -->
+      </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
