@@ -23,9 +23,9 @@ def col_type(col):
   elif col["type"] == "map":
     return "map <%s, %s>" % (col["nested"][0]["keyType"], '%s' % col_type(col["nested"][0]) if col["type"] in ('array', 'struct', 'map') else col["type"])
   elif col["type"] == "char":
-    return "char(%d)" % col["length"]
+    return "char(%s)" % col["length"]
   elif col["type"] == "varchar":
-    return "varchar(%d)" % col["length"]
+    return "varchar(%s)" % col["length"]
   return col["type"]
 
 %>
