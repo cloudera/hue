@@ -33,7 +33,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
-from metadata.conf import has_navigator
+from metadata.conf import has_navigator, NAVIGATOR
 from metadata.navigator_client import NavigatorApi
 
 
@@ -217,10 +217,14 @@ def search_entities_interactive(request):
 
   if response.get('facets'): # Remove empty facets
     for fname, fvalues in response['facets'].items():
-      fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
+      if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
+        fvalues = []
+      else:
+        fvalues = sorted([(k, v) for k, v in fvalues.items() if v > 0], key=lambda n: n[1], reverse=True)
       response['facets'][fname] = OrderedDict(fvalues)
       if ':' in query_s and not response['facets'][fname]:
         del response['facets'][fname]
+
 
   _augment_highlighting(query_s, response.get('results'))
 
