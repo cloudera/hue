@@ -174,9 +174,21 @@ NAVIGATOR = ConfigSection(
     ),
     APPLY_SENTRY_PERMISSIONS = Config(
       key="apply_sentry_permissions",
-      help=_t("Perform Sentry privilege filtering."),
+      help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
       dynamic_default=get_security_default,
       type=coerce_bool
+    ),
+    FETCH_SIZE_SEARCH = Config(
+      key="fetch_size_search",
+      help=_t("Max number of items to fetch in one call in object search."),
+      default=450,
+      type=int
+    ),
+    FETCH_SIZE_SEARCH_INTERACTIVE = Config(
+      key="fetch_size_search_interactive",
+      help=_t("Max number of items to fetch in one call in object search autocomplete."),
+      default=450,
+      type=int
     ),
   )
 )
