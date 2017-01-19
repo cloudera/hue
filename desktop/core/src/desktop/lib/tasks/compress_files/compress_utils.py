@@ -15,24 +15,37 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from notebook.connectors.base import Notebook
+from django.core.urlresolvers import reverse
+from django.utils.translation import ugettext as _
+
 from desktop.conf import DEFAULT_USER
+from desktop.lib.paths import get_desktop_root
+
+from notebook.connectors.base import Notebook
 
 def compress_files_in_hdfs(request, file_names, upload_path):
 
   _upload_compress_files_script_to_hdfs(request.fs)
 
   output_path = upload_path
+
   files = [{"value": upload_path + '/' + file_name} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
 
-  shell_notebook = Notebook()
+  shell_notebook = Notebook(
+    description=_('HDFS Compression to %(upload_path)s/hue_compressed.zip') % {'upload_path': upload_path},
+    isManaged=True,
+    onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': output_path})
+  )
+
   shell_notebook.add_shell_snippet(
       shell_command='compress_files_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-o=' + output_path}],
       archives=[],
       files=files,
-      env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}])
+      env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}]
+  )
+
   return shell_notebook.execute(request, batch=True)
 
 def _upload_compress_files_script_to_hdfs(fs):
@@ -41,6 +54,6 @@ def _upload_compress_files_script_to_hdfs(fs):
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
 
   if not fs.do_as_user(DEFAULT_USER.get(), fs.exists, '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'):
-    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, 'desktop/core/src/desktop/lib/tasks/compress_files/compress_in_hdfs.sh',
+    fs.do_as_user(DEFAULT_USER.get(), fs.copyFromLocal, get_desktop_root() + '/core/src/desktop/lib/tasks/compress_files/compress_in_hdfs.sh',
                           '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh')
     fs.do_as_user(DEFAULT_USER.get(), fs.chmod, '/user/' + DEFAULT_USER.get() + '/common/', 0755)
