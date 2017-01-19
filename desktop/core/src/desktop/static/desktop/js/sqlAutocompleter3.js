@@ -672,6 +672,9 @@ var SqlAutocompleter3 = (function () {
       var callback = function (data) {
         if (data.extended_columns) {
           data.extended_columns.forEach(function (column) {
+            column.database = data.database;
+            column.table = data.table;
+            column.identifierChain = data.identifierChain;
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
@@ -734,6 +737,9 @@ var SqlAutocompleter3 = (function () {
           });
         } else if (data.columns) {
           data.columns.forEach(function (column) {
+            column.database = data.database;
+            column.table = data.table;
+            column.identifierChain = data.identifierChain;
             columnSuggestions.push({
               value: self.backTickIfNeeded(column),
               meta: 'column',
@@ -761,6 +767,10 @@ var SqlAutocompleter3 = (function () {
         }
         if (data.type === 'struct') {
           data.fields.forEach(function (field) {
+            field.database = data.database;
+            field.table = data.table;
+            field.identifierChain = data.identifierChain;
+
             columnSuggestions.push({
               value: self.backTickIfNeeded(field.name),
               meta: field.type,
@@ -771,6 +781,10 @@ var SqlAutocompleter3 = (function () {
           });
         } else if (data.type === 'map' && (data.value && data.value.fields)) {
           data.value.fields.forEach(function (field) {
+            field.database = data.database;
+            field.table = data.table;
+            field.identifierChain = data.identifierChain;
+
             if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
               columnSuggestions.push({
@@ -785,6 +799,10 @@ var SqlAutocompleter3 = (function () {
         } else if (data.type === 'array' && data.item) {
           if (data.item.fields) {
             data.item.fields.forEach(function (field) {
+              field.database = data.database;
+              field.table = data.table;
+              field.identifierChain = data.identifierChain;
+
               if ((field.type === 'array' || field.type === 'map')) {
                 if (self.snippet.type() === 'hive') {
                   columnSuggestions.push({
@@ -1539,6 +1557,9 @@ var SqlAutocompleter3 = (function () {
             }
             fetchFieldsInternal(table, database, identifierChain, callback, errorCallback, fetchedFields)
           } else {
+            data.database = database;
+            data.table = table;
+            data.identifierChain = originalIdentifierChain;
             callback(data);
           }
         },
