@@ -355,6 +355,9 @@ def list_oozie_workflow(request, job_id):
       if not workflow_data.get('layout') or oozie_workflow.conf_dict.get('submit_single_action'):
         try:
           workflow_data = Workflow.gen_workflow_data_from_xml(request.user, oozie_workflow)
+          # Hide graph tab when node count > 30
+          if workflow_data.get('workflow') and len(workflow_data.get('workflow')['nodes']) > 30:
+            workflow_data = {}
         except Exception, e:
           LOG.exception('Graph data could not be generated from Workflow %s: %s' % (oozie_workflow.id, e))
   else:
