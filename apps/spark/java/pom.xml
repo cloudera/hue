@@ -24,12 +24,12 @@
         <groupId>com.cloudera.hue</groupId>
         <artifactId>hue-parent</artifactId>
         <relativePath>../../../maven/pom.xml</relativePath>
-        <version>3.9.0-cdh5.8.4-SNAPSHOT</version>
+        <version>3.9.0-cdh5.8.5-SNAPSHOT</version>
     </parent>
 
     <groupId>com.cloudera.hue.livy</groupId>
     <artifactId>livy-main</artifactId>
-    <version>3.9.0-cdh5.8.4-SNAPSHOT</version>
+    <version>3.9.0-cdh5.8.5-SNAPSHOT</version>
     <packaging>pom</packaging>
 
     <name>livy-main</name>
