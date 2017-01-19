@@ -104,22 +104,35 @@ from desktop.views import _ko
     }
 
     .autocompleter-suggestion {
+      display: flex;
+      flex-direction: row;
       font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
       line-height: 18px;
     }
 
-    .autocompleter-suggestion > b {
+    .autocompleter-suggestion-value {
+      flex: 1 1 100%;
+      margin-left: 3px;
+      margin-right: 6px;
+      overflow-x: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .autocompleter-suggestion-value > b {
       text-shadow: 0 0 0.01em;
     }
 
-    .autocompleter-suggestion.pull-right {
+    .autocompleter-suggestion-meta {
+      flex: 1;
+      color: #737373;
+      white-space: nowrap;
       margin-right: 3px;
     }
 
     .autocompleter-dot {
-      margin-left: 2px;
+      display: inline-block;
       margin-top: 5px;
-      margin-right: 5px;
       width: 8px;
       height: 8px;
       border-radius: 4px;
@@ -179,12 +192,13 @@ from desktop.views import _ko
       <!-- /ko -->
       <div class="autocompleter-entries">
         <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
-          <div data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
+          <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
               css: { 'selected': $index() === $parent.selectedIndex() },
               event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
-            <div class="pull-left autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div>
-            <div class="autocompleter-suggestion pull-left" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></div>
-            <div class="autocompleter-suggestion pull-right"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
+            <div class="autocompleter-suggestion-value">
+              <div class="autocompleter-dot " data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
+            </div>
+            <div class="autocompleter-suggestion-meta"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
         <!-- ko if: focusedEntry() && focusedEntry().details -->
@@ -218,7 +232,7 @@ from desktop.views import _ko
     <!-- ko if: details -->
     <div class="autocompleter-details">
       <div class="autocomplete-details-table">
-        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type !== 'table', 'fa-table': details.type !== 'table' }"></i> <span data-bind="text: details.name"></span></div>
+        <div class="details-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
         <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <!-- ko if: typeof details.popularity !== 'undefined' -->
         <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
