@@ -308,13 +308,29 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-join">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-join-condition">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join condition')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </script>
 

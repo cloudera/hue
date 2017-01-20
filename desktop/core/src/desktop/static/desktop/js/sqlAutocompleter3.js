@@ -1003,6 +1003,7 @@ var SqlAutocompleter3 = (function () {
         tables: suggestJoins.tables,
         successCallback: function (data) {
           var joinSuggestions = [];
+          var totalCount = 0;
           data.values.forEach(function (value) {
             var suggestionString = suggestJoins.prependJoin ? (self.parseResult.lowerCase ? 'join ' : 'JOIN ') : '';
             var first = true;
@@ -1039,6 +1040,7 @@ var SqlAutocompleter3 = (function () {
                 suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoins.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoins.tables);
                 first = false;
               });
+              totalCount += value.totalQueryCount;
               joinSuggestions.push({
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.join,
@@ -1047,6 +1049,10 @@ var SqlAutocompleter3 = (function () {
                 details: value
               });
             }
+          });
+          joinSuggestions.forEach(function (suggestion) {
+            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
           });
           self.entries(self.entries().concat(joinSuggestions));
           self.loadingJoins(false);
@@ -1077,6 +1083,7 @@ var SqlAutocompleter3 = (function () {
         tables: suggestJoinConditions.tables,
         successCallback: function (data) {
           var joinConditionSuggestions = [];
+          var totalCount = 0;
           data.values.forEach(function (value) {
             if (value.joinCols.length > 0) {
               var suggestionString = suggestJoinConditions.prependOn ? (self.parseResult.lowerCase ? 'on ' : 'ON ') : '';
@@ -1088,6 +1095,7 @@ var SqlAutocompleter3 = (function () {
                 suggestionString += self.convertNavOptQualifiedIdentifier(joinColPair.columns[0], suggestJoinConditions.tables) + ' = ' + self.convertNavOptQualifiedIdentifier(joinColPair.columns[1], suggestJoinConditions.tables);
                 first = false;
               });
+              totalCount += value.totalQueryCount;
               joinConditionSuggestions.push({
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.joinCondition,
@@ -1097,6 +1105,11 @@ var SqlAutocompleter3 = (function () {
               });
             }
           });
+          joinConditionSuggestions.forEach(function (suggestion) {
+            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+          });
+
           self.entries(self.entries().concat(joinConditionSuggestions));
           joinConditionsDeferred.resolve();
           self.loadingJoinConditions(false);
