@@ -59,10 +59,16 @@ def zkensemble():
     LOG.exception('failed to get solr url')
 
 
+ENABLE_NEW_IMPORTER = Config(
+  key="enable_new_importer",
+  help=_t("Flag to turn on the new metadata importer."),
+  type=bool,
+  default=False
+)
 
 ENABLE_NEW_INDEXER = Config(
   key="enable_new_indexer",
-  help=_t("Flag to turn on the morphline based Solr indexer."),
+  help=_t("Flag to turn on the new Solr indexer."),
   type=bool,
   default=False
 )
