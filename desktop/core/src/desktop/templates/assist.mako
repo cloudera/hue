@@ -15,12 +15,15 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
-from django.utils.translation import ugettext as _
+
 from metadata.conf import has_navigator
+from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
@@ -1073,7 +1076,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       </ul>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
-      ## <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='file', target_type='table') }' + 'default' }"><i class="pointer fa fa-plus" title="${_('Create table')}"></i></a>
+      % if ENABLE_NEW_CREATE_TABLE.get():
+        <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + 'default' }"><i class="pointer fa fa-plus" title="${_('Create table')}"></i></a>
+        ## For DB --> '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'
+      % endif
       <!-- ko if: sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
       <!-- /ko -->

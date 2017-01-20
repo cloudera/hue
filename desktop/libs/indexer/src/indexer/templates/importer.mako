@@ -15,10 +15,12 @@
 ## limitations under the License.
 
 <%!
-  from desktop import conf
-  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
-  from desktop.views import _ko
+
+  from desktop import conf
+  from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
+
+  from indexer.conf import ENABLE_NEW_INDEXER
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />
@@ -278,7 +280,14 @@ ${ assist.assistPanel() }
             <span class="fa fa-check"></span>
             <!-- /ko -->
           </div>
-          <div class="caption">${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span></div>
+          <div class="caption">
+            <!-- ko if: createWizard.source.inputFormat() != 'manual' -->
+            ${ _('Pick data from ') }<span data-bind="text: createWizard.source.inputFormat"></span> <span data-bind="text: createWizard.source.path"></span>
+            <!-- /ko -->
+            <!-- ko if: createWizard.source.inputFormat() == 'manual' -->
+            ${ _('No source data') }
+          <!-- /ko -->
+          </div>
         </li>
 
         <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
@@ -304,7 +313,7 @@ ${ assist.assistPanel() }
       <h3 class="card-heading simple">${_('Source')}</h3>
       <div class="card-body">
         <div>
-          <div class="control-group" data-bind="visible: ! createWizard.prefill.target_type">
+          <div class="control-group" data-bind="visible: ! createWizard.prefill.target_type || createWizard.prefill.source_type() == 'all'">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
@@ -314,6 +323,11 @@ ${ assist.assistPanel() }
             <label for="path" class="control-label"><div>${ _('Path') }</div>
               <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true }" placeholder="${ _('Click or drag & drop') }">
             </label>
+            <!-- ko if: createWizard.source.path().length > 0 -->
+              <a data-bind="attr: {href: '/filebrowser/view=' + createWizard.source.path() }" target="_blank" title="${ _('Open') }">
+                <i class="fa fa-external-link-square"></i>
+              </a>
+            <!-- /ko -->
           </div>
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
@@ -339,7 +353,10 @@ ${ assist.assistPanel() }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Format')}</h3>
       <div class="card-body">
-        <label data-bind="visible: ! createWizard.prefill.source_type"><div>${_('File Type')}</div> <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select></label>
+        <label data-bind="visible: (! createWizard.prefill.source_type) && createWizard.source.inputFormat() != 'table'">
+          <div>${_('File Type')}</div>
+          <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
+        </label>
         <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
         </span>
@@ -451,7 +468,7 @@ ${ assist.assistPanel() }
             </label>
 
             <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
-              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row has header')}
+              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
             </label>
 
             <label class="checkbox" data-bind="visible: tableFormat() == 'text'">
@@ -1004,11 +1021,13 @@ ${ assist.assistPanel() }
       });
       self.inputFormats = ko.observableArray([
           {'value': 'file', 'name': 'File'},
-          {'value': 'table', 'name': 'Table'},
-          {'value': 'text', 'name': 'Paste Text'},
-          {'value': 'query', 'name': 'SQL Query'},
-          {'value': 'dbms', 'name': 'DBMS'},
           {'value': 'manual', 'name': 'Manually'},
+          % if ENABLE_NEW_INDEXER.get():
+          {'value': 'query', 'name': 'SQL Query'},
+          {'value': 'table', 'name': 'Table'},
+          % endif
+          ##{'value': 'dbms', 'name': 'DBMS'},
+          ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       if (wizard.prefill.source_type) {
         self.inputFormats([
@@ -1213,9 +1232,9 @@ ${ assist.assistPanel() }
           {'value': 'parquet', 'name': 'Parquet'},
           {'value': 'json', 'name': 'Json'},
           {'value': 'kudu', 'name': 'Kudu'},
-          {'value': 'orc', 'name': 'ORC'},
           {'value': 'avro', 'name': 'Avro'},
           {'value': 'rcfile', 'name': 'RCFile'},
+          {'value': 'orc', 'name': 'ORC'},
           {'value': 'sequencefile', 'name': 'SequenceFile'}
       ]);
 
