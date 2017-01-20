@@ -81,8 +81,9 @@ class YarnApi(Api):
         'name': app.name,
         'type': app.applicationType,
         'status': app.status,
+        'apiStatus': self._api_status(app.status),
         'user': self.user.username,
-        'progress': 100,
+        'progress': app.progress,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in jobs]
@@ -96,8 +97,9 @@ class YarnApi(Api):
         'name': app.name,
         'type': app.applicationType,
         'status': app.status,
+        'apiStatus': self._api_status(app.status),
         'user': self.user.username,
-        'progress': 100,
+        'progress': app.progress,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     }
@@ -135,7 +137,7 @@ class YarnApi(Api):
       logs = json.loads(response.content)['log']
     else:
       logs = None
-    return {'progress': 0, 'logs': {'default': logs}}
+    return {'logs': {'default': logs}}
 
 
   def profile(self, appid, app_type, app_property):
@@ -150,6 +152,12 @@ class YarnApi(Api):
         return NativeYarnApi(self.user).get_job(jobid=appid).counters
 
     return {}
+
+  def _api_status(self, status):
+    if status in ['NEW', 'NEW_SAVING', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
+      return 'RUNNING'
+    else:
+      return 'FINISHED' # FINISHED, FAILED, KILLED
 
 
 class YarnMapReduceTaskApi(Api):

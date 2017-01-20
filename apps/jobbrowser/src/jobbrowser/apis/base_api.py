@@ -51,11 +51,9 @@ class Api(object):
 
   def apps(self): return []
 
-  def app(self, appid): return {}
+  def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, FINISHED, PAUSED]
 
   def action(self, appid, operation): return {}
-
-  def status(self, appid): return {'status': 'RUNNING'}
 
   def logs(self, appid, app_type): return {'progress': 0, 'logs': {'default': ''}}
 
