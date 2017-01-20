@@ -1086,26 +1086,51 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <div class="span12">
             <form class="form-horizontal">
               <fieldset>
-               ${ _('Active tables') }<br/> <i class="fa fa-object-group"></i>
+               ${ _('Active tables') }<br/>
                <ul>
                  <li>sample_07 <i class="fa fa-info"></i> <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li>
                  <li>sample_08 <i class="fa fa-info"></i> </li>
                </ul>
-               Outline?<br/>
              </fieldset>
+
             <form class="form-horizontal">
               <fieldset>
-               ${ _('Suggestions') }<br/>
+                ${ _('Fields') }<br/>
+                <ul>
+                  <li>'country-code' is a popular field <a href="javascript:void(0)">add</a></li>
+                  <li>'gender' would be a good dimension with low cardinality (2) <a href="javascript:void(0)">add</a></li>
+                  <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
+                  <li>'f1'</li>
+                  <li>'f2'</li>
+                  <li>'f3'</li>
+                  <li>'f4'</li>
+                  <li>'f5'</li>
+                </ul>
+              </fieldset>
+            </form>
+        
+            <form class="form-horizontal">
+              <fieldset>
+                ${ _('Suggestions') }<br/>
+                <ul>
+                  <li>Popular fields for the tables are: [code, salary, amount]</li>
+                  <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
+                  <li>Parameterize the query?</li>
+                  <li>Could be automated with integrated scheduler</li>
+                  <li>Data has not been refreshed since last run 3 days ago  <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li></li>
+                  <li>A schema change happened last week, a new column 'salary_med' was added</li>
+                  <li>Data statistics are not accurate, click to refresh them</li>
+                  <li>Query ran 17 times last week</li>
+                  <li>The datasets are sometimes joined with table [Population]</li>
+                  <li>Query would be a good candidate to run interactively with Impala</li>
+                </ul>
+              </fieldset>
+            </form>
+        
+              <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+                <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
+              </a>
 
-               Risk<br/>
-               <br/>
-
-               Did you know?<br/>
-               Ran 100 times last week<br/>
-               Could be automated with integrated scheduler<br/>
-               Share results?<br/>
-               Parameterize the query?<br/>
-             </fieldset>
            </form>
          </div>
        </div>
