@@ -19,17 +19,22 @@ import logging
 
 from django.contrib.auth.models import User
 from nose.plugins.attrib import attr
-from nose.tools import assert_equal, assert_true, assert_not_equal
+from nose.tools import assert_equal, assert_true, assert_not_equal, assert_raises
+
+import beeswax
 
 from hadoop import cluster, pseudo_hdfs4
 from hadoop.conf import HDFS_CLUSTERS, MR_CLUSTERS, YARN_CLUSTERS
 
 from desktop.lib.test_utils import clear_sys_caches
 from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.exceptions_renderable import PopupException
 from oozie.models2 import Node
 from oozie.tests import OozieMockBase
 
 from liboozie.conf import USE_LIBPATH_FOR_JARS
+from liboozie.credentials import Credentials
+from liboozie.credentials_tests import TestCredentials
 from liboozie.submission2 import Submission
 
 
@@ -313,3 +318,54 @@ oozie.wf.application.path=${nameNode}/user/${user.name}/${examplesRoot}/apps/pig
                    'queueName': 'default'
                   },
                  parameters)
+
+  def test_update_credentials_from_hive_action(self):
+
+    class TestJob():
+      XML_FILE_NAME = 'workflow.xml'
+
+      def __init__(self):
+        self.deployment_dir = '/tmp/test'
+        self.nodes = [
+            Node({'id': '1', 'type': 'hive-document', 'properties': {'jdbc_url': u'jdbc:hive2://test-replace-url:12345/default', 'password': u'test'}})
+        ]
+
+    user = User.objects.get(username='test')
+    submission = Submission(user, job=TestJob(), fs=MockFs(logical_name='fsname'), jt=MockJt(logical_name='jtname'))
+
+    finish = (
+      beeswax.conf.HIVE_SERVER_HOST.set_for_testing('hue-koh-chang'),
+      beeswax.conf.HIVE_SERVER_PORT.set_for_testing(12345),
+    )
+
+    try:
+      creds = Credentials(credentials=TestCredentials.CREDENTIALS.copy())
+      hive_properties = {
+        'thrift_uri': 'thrift://first-url:9999',
+        'kerberos_principal': 'hive',
+        'hive2.server.principal': 'hive/hive2_host@test-realm.com',
+      }
+
+      submission.properties['credentials'] = creds.get_properties(hive_properties)
+      submission._update_credentials_from_hive_action(creds)
+
+      assert_equal(submission.properties['credentials'][creds.hiveserver2_name]['properties'], [
+            ('hive2.jdbc.url', u'jdbc:hive2://test-replace-url:12345/default'),
+            ('hive2.server.principal', u'hive/test-replace-url@test-realm.com')
+          ]
+      )
+
+      # Test parsing failure
+      hive_properties = {
+        'thrift_uri': 'thrift://first-url:9999',
+        'kerberos_principal': 'hive',
+        'hive2.server.principal': 'hive',
+      }
+
+      submission.properties['credentials'] = creds.get_properties(hive_properties)
+
+      assert_raises(PopupException,  submission._update_credentials_from_hive_action, creds)
+
+    finally:
+      for f in finish:
+        f()

@@ -302,6 +302,37 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
       credentials.fetch(self.api)
       self.properties['credentials'] = credentials.get_properties()
 
+      self._update_credentials_from_hive_action(credentials)
+
+
+  def _update_credentials_from_hive_action(self, credentials):
+    """
+    Hive JDBC url from conf should be replaced when URL is set in hive action. Use _HOST from
+    this URL to update the hive2_host in hive principal hive/hive2_host@YOUR-REALM.COM
+    """
+    if hasattr(self.job, 'nodes'):
+      for action in self.job.nodes:
+        if action.data['type'] in ('hive2', 'hive-document') and \
+                        credentials.hiveserver2_name in self.properties['credentials'] and \
+                        action.data['properties']['jdbc_url']:
+          try:
+            hive_jdbc_url = action.data['properties']['jdbc_url']
+            hive_host_from_action = hive_jdbc_url.split('//')[1].split(':')[0]
+
+            hive_principal_from_conf = self.properties['credentials'][credentials.hiveserver2_name]['properties'][1][1]
+            updated_hive_principal = hive_principal_from_conf.split('/')[0] + '/' + hive_host_from_action + '@' + hive_principal_from_conf.split('@')[1]
+
+            self.properties['credentials'][credentials.hiveserver2_name]['properties'] = [
+              ('hive2.jdbc.url', hive_jdbc_url),
+              ('hive2.server.principal', updated_hive_principal)
+            ]
+          except Exception, ex:
+            msg = 'Failed to update the Hive JDBC URL from %s action properties: %s' % (action.data['type'], str(ex))
+            LOG.error(msg)
+            raise PopupException(message=_(msg), detail=str(ex))
+
+
+
   def _create_deployment_dir(self):
     """
     Return the job deployment directory in HDFS, creating it if necessary.
