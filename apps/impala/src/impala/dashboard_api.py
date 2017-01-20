@@ -26,7 +26,8 @@ from beeswax.server.dbms import get_query_server_config
 from beeswax.design import hql_query
 from beeswax.server import dbms
 from search.models import Collection2
-from desktop.lib.i18n import force_unicode
+from notebook.models import make_notebook
+from notebook.connectors.base import get_api
 
 
 LOG = logging.getLogger(__name__)
@@ -34,6 +35,9 @@ LOG = logging.getLogger(__name__)
 
 LIMIT = 100
 
+class MockRequest():
+  def __init__(self, user):
+    self.user = user
 
 # To Split in Impala, DBMS..
 # To inherit from DashboardApi
@@ -51,11 +55,11 @@ class SQLApi():
     filters = self._get_fq(dashboard, query, facet)
 
     if facet:
-      if facet['type'] == 'field':
+      if facet['type'] == 'nested':
         fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
         fields = ['`%s`' % f for f in fields]
 
-        hql = '''SELECT %(fields)s, COUNT(*)
+        sql = '''SELECT %(fields)s, COUNT(*)
         FROM %(database)s.%(table)s
         WHERE %(filters)s
         GROUP BY %(fields)s
@@ -68,7 +72,7 @@ class SQLApi():
             'limit': LIMIT
         }
       elif facet['type'] == 'function': # 1 dim only now
-        hql = '''SELECT %(fields)s
+        sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
         %(filters)s''' % {
             'database': database,
@@ -78,14 +82,14 @@ class SQLApi():
         }
     else:
       fields =  '*'
-      hql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
+      sql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
           'database': database,
           'table': table,
           'fields': fields
       }
       if filters:
-        hql += ' WHERE ' + ' AND '.join(filters)
-      hql += ' LIMIT %s' % LIMIT
+        sql += ' WHERE ' + ' AND '.join(filters)
+      sql += ' LIMIT %s' % LIMIT
 
 #     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
 #     db = dbms.get(request.user)
@@ -99,15 +103,42 @@ class SQLApi():
 #         ]
 #     }
 
-    query_server = get_query_server_config(name='impala') # To move to notebook API
-    db = dbms.get(self.user, query_server=query_server)
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type='impala',
+        statement=sql,
+        database=database,
+        status='ready-execute'
+    )
+    return editor.execute(MockRequest(self.user))
+  
+  def fetch_result(self, dashboard, query, facet=None):
+#     query_server = get_query_server_config(name='impala') # To move to notebook API
+#     db = dbms.get(self.user, query_server=query_server)
 
-    sql_query = hql_query(hql)
-    handle = db.execute_and_wait(sql_query, timeout_sec=35.0)
+    notebook = {}
 
-    if handle:
-      result = db.fetch(handle, rows=dashboard['template']['rows'])
-      db.close(handle)
+    if facet:
+      snippet = facet['snippet']
+    else:
+      snippet = dashboard['snippet']
+
+    start_over = True
+    
+
+    result = get_api(MockRequest(self.user), snippet).fetch_result(
+        notebook,
+        snippet,
+        dashboard['template']['rows'],
+        start_over=start_over
+    )
+    
+    result['has_more']
+
+
+#     if handle:
+#       result = db.fetch(handle, rows=dashboard['template']['rows'])
+#       db.close(handle)
 
     # TODO: add query id to allow closing
     if facet:
@@ -118,7 +149,9 @@ class SQLApi():
     else:
       return self._convert_impala_results(result, dashboard, query)
 
-  def datasets(self,  show_all=False):
+  def datasets(self, show_all=False):
+#     database, table = self._get_database_table_names(dashboard['name'])
+#     autocomplete_data = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table, column, nested)
     return ['sample_07', 'web_logs']
 
   def fields(self, dashboard):
@@ -237,17 +270,17 @@ class SQLApi():
     response['field'] = facet['field']
     response['label'] = facet['field']
 
-    cols = list(result.cols())
-    rows = list(result.rows())
+    cols = [col['name'] for col in result['meta']]
+    rows = list(result['data']) # escape_rows
 
     response['fieldsAttributes'] = [{
          "sort":{
             "direction": None
          },
          "isDynamic": False,
-         "type": column.type,
-         "name": column.name
-      } for column in result.data_table.cols()]
+         "type": column['type'],
+         "name": column['name']
+      } for column in result['meta']]
 
     response['docs'] = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
 
@@ -269,7 +302,7 @@ class SQLApi():
 
 
   def _convert_impala_function_facet(self, result, facet, query):
-    rows = list(result.rows())
+    rows = list(result['data'])
 
     response = {"query": facet['id'], "counts": rows[0][0], "type": "function", "id": facet['id'], "label": facet['id']}
 
@@ -277,10 +310,10 @@ class SQLApi():
 
 
   def _convert_impala_results(self, result, dashboard, query):
-    cols = list(result.cols())
+    cols = [col['name'] for col in result['meta']]
 
     docs = []
-    for row in result.rows():
+    for row in result['data']:
       docs.append(dict((header, cell) for header, cell in zip(cols, row)))
 
     response = json.loads('''{
