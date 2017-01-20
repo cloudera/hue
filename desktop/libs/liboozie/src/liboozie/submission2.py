@@ -88,6 +88,9 @@ class Submission(object):
       if 'end_date' in self.properties:
         properties['end_date'] = convert_to_server_timezone(self.properties['end_date'], local_tz)
 
+    if 'nominal_time' in self.properties:
+      properties['nominal_time'] = convert_to_server_timezone(self.properties['nominal_time'], local_tz)
+
     self.properties['security_enabled'] = self.api.security_enabled
 
   def __str__(self):
