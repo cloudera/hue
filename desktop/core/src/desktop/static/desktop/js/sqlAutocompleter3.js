@@ -1156,7 +1156,7 @@ var SqlAutocompleter3 = (function () {
                 })
               } else if (table.identifierChain.length === 1) {
                 substitutions.push({
-                  replace: new RegExp(database + '\.' + table.identifierChain[0].name + '\.', 'gi'),
+                  replace: new RegExp(self.activeDatabase + '\.' + table.identifierChain[0].name + '\.', 'gi'),
                   with: replaceWith
                 });
                 substitutions.push({
@@ -1166,22 +1166,31 @@ var SqlAutocompleter3 = (function () {
               }
             });
 
+            var totalCount = 0;
             data.values.forEach(function (value) {
               var clean = value.aggregateClause;
               substitutions.forEach(function (substitution) {
                 clean = clean.replace(substitution.replace, substitution.with);
               });
+              totalCount += value.totalQueryCount;
+              value.function = SqlFunctions.findFunction(self.snippet.type(), value.aggregateFunction);
               aggregateFunctionsSuggestions.push({
                 value: clean,
-                meta: AutocompleterGlobals.i18n.meta.aggregateFunction,
+                meta: value.function.returnTypes.join('|'),
                 category: CATEGORIES.POPULAR_AGGREGATE,
                 popular: true,
                 weightAdjust: Math.min(value.totalQueryCount, 99),
                 details: value
               });
-            })
+            });
+
+            aggregateFunctionsSuggestions.forEach(function (suggestion) {
+              suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
+              suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+            });
+
+            self.entries(self.entries().concat(aggregateFunctionsSuggestions));
           }
-          self.entries(self.entries().concat(aggregateFunctionsSuggestions));
           aggregateFunctionsDeferred.resolve();
           self.loadingAggregateFunctions(false);
         },
