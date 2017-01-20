@@ -159,17 +159,27 @@ var SqlAutocompleter3 = (function () {
         result = result.filter(function (suggestion) {
           // TODO: Extend with fuzzy matches
           var foundIndex = suggestion.value.toLowerCase().indexOf(lowerCaseFilter);
-          if (foundIndex === -1) {
-            return false;
+          if (foundIndex !== -1) {
+            if (foundIndex === 0 || (suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)) {
+              suggestion.filterWeight = 3;
+            } else  {
+              suggestion.filterWeight = 2;
+            }
+          } else {
+            if (suggestion.details && suggestion.details.comment) {
+              foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
+              if (foundIndex !== -1) {
+                suggestion.filterWeight = 1;
+                suggestion.matchComment = true;
+              }
+            }
           }
-          if (foundIndex === 0 || (suggestion.filterValue && suggestion.filterValue.toLowerCase().indexOf(lowerCaseFilter) === 0)) {
-            suggestion.filterWeight = 2;
-          } else if (foundIndex > 0) {
-            suggestion.filterWeight = 1;
+          if (foundIndex !== -1) {
+            suggestion.matchIndex = foundIndex;
+            suggestion.matchLength = self.filter().length;
+            return true;
           }
-          suggestion.matchIndex = foundIndex;
-          suggestion.matchLength = self.filter().length;
-          return true;
+          return false;
         });
         huePubSub.publish('hue.ace.autocompleter.match.updated');
       }
