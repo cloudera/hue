@@ -302,7 +302,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-hdfs">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
+      <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"><div>
     </div>
   </script>
 
