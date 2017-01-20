@@ -859,7 +859,7 @@ var SqlFunctions = (function () {
       },
       avg: {
         returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'T'}]],
+        arguments: [[{type: 'NUMBER'}]],
         signature: 'avg([DISTINCT|ALL] col)',
         description: 'An aggregate function that returns the average value from a set of numbers. Its single argument can be numeric column, or the numeric result of a function or expression applied to the column value. Rows with a NULL value for the specified column are ignored. If the table is empty, or all the values supplied to AVG are NULL, AVG returns NULL.'
       },

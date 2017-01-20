@@ -1767,7 +1767,7 @@
           { name: 'APPX_MEDIAN', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
           { name: 'AVG', dialect: 'generic', containsKeywords: ['DISTINCT'] },
           { name: 'AVG', dialect: 'hive', containsKeywords: ['DISTINCT'] },
-          { name: 'AVG', dialect: 'impala', containsKeywords: ['ALL', 'DISTINCT'] },
+          { name: 'AVG', dialect: 'impala', types: ['NUMBER'], containsKeywords: ['ALL', 'DISTINCT'] },
           { name: 'collect_set', dialect: 'hive', containsKeywords: ['DISTINCT'] },
           { name: 'COLLECT_LIST', dialect: 'hive', containsKeywords: ['DISTINCT'] },
           { name: 'COUNT', dialect: 'generic', containsKeywords: ['*', 'DISTINCT'] },
