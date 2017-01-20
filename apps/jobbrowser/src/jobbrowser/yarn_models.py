@@ -191,6 +191,8 @@ class Job(object):
 
     self._fixup()
 
+    self.progress = None
+
     # Set MAPS/REDUCES completion percentage
     if hasattr(self, 'mapsTotal'):
       self.desiredMaps = self.mapsTotal
@@ -198,6 +200,7 @@ class Job(object):
         self.maps_percent_complete = 0
       else:
         self.maps_percent_complete = int(round(float(self.finishedMaps) / self.desiredMaps * 100))
+      self.progress = self.maps_percent_complete
 
     if hasattr(self, 'reducesTotal'):
       self.desiredReduces = self.reducesTotal
@@ -205,6 +208,10 @@ class Job(object):
         self.reduces_percent_complete = 0
       else:
         self.reduces_percent_complete = int(round(float(self.finishedReduces) / self.desiredReduces * 100))
+      if self.progress is not None:
+        self.progress = int((self.progress + self.reduces_percent_complete) / 2)
+      else:
+        self.progress = self.reduces_percent_complete
 
 
   def _fixup(self):
@@ -287,6 +294,7 @@ class KilledJob(Job):
       setattr(self, 'finishTime', self.finishedTime)
     if not hasattr(self, 'startTime'):
       setattr(self, 'startTime', self.startedTime)
+    self.progress = 100
 
     super(KilledJob, self)._fixup()
 

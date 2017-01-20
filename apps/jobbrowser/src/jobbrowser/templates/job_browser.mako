@@ -815,10 +815,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.id = ko.observableDefault(job.id);
       self.name = ko.observableDefault(job.name);
       self.type = ko.observableDefault(job.type);
+
       self.status = ko.observableDefault(job.status);
+      self.apiStatus = ko.observableDefault(job.apiStatus);
+      self.progress = ko.observableDefault(job.progress);
+      self.checkStatusTimeout = null;
+
       self.user = ko.observableDefault(job.user);
       self.cluster = ko.observableDefault(job.cluster);
-      self.progress = ko.observableDefault(job.progress);
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);
 
@@ -831,8 +835,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.loadingJob = ko.observable(false);
 
+
       self.fetchJob = function () {
         self.loadingJob(true);
+
+        if (self.checkStatusTimeout != null) {
+          clearTimeout(self.checkStatusTimeout);
+          self.checkStatusTimeout = null;
+        }
 
         var interface = vm.interface();
         if (/oozie-oozi-W/.test(self.id())) { interface = 'workflows'; };
@@ -849,6 +859,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.breadcrumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
 
             vm.job().fetchLogs();
+            vm.job().fetchStatus();
+
             if (self.mainType() == 'schedules') {
               //vm.job().coordVM.setActions(data.app.actions);
             }
@@ -892,6 +904,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
+      self.fetchStatus = function () {
+        if (self.apiStatus() != 'RUNNING') {
+          return;
+        }
+
+        $.post("/jobbrowser/api/job", {
+          app_id: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(self.mainType)
+        }, function (data) {
+          if (data.status == 0) {
+            self.status(data.app.status);
+            self.apiStatus(data.app.apiStatus);
+            self.progress(data.app.progress);
+
+            if (self.apiStatus() == 'RUNNING') {
+              self.checkStatusTimeout = setTimeout(self.fetchStatus, 2000);
+            }
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        });
+      };
+
       self.control = function (action) {
         $.post("/jobbrowser/api/job/action", {
           app_id: ko.mapping.toJSON(self.id),
@@ -927,7 +962,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {
-              data.apps.forEach(function (job) { // TODO: update and merge
+              data.apps.forEach(function (job) { // TODO: update and merge with status and progress
                 apps.push(new Job(vm, job));
               });
             }

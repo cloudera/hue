@@ -48,9 +48,10 @@ class ScheduleApi(Api):
         'id': app.id,
         'name': app.appName,
         'status': app.status,
+        'apiStatus': self._api_status(app.status),
         'type': 'schedule',
         'user': app.user,
-        'progress': 100,
+        'progress': app.get_progress(),
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in wf_list.jobs]
@@ -67,6 +68,8 @@ class ScheduleApi(Api):
         'id': coordinator.coordJobId,
         'name': coordinator.coordJobName,
         'status': coordinator.status,
+        'apiStatus': self._api_status(coordinator.status),
+        'progress': coordinator.get_progress(),
         'type': 'schedule',
         'startTime': format_time(coordinator.startTime),
     }
@@ -80,7 +83,7 @@ class ScheduleApi(Api):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
-    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+    return {'logs': {'default': json.loads(data.content)['log']}}
 
 
   def profile(self, appid, app_type, app_property):
@@ -97,6 +100,13 @@ class ScheduleApi(Api):
         'properties': workflow.conf_dict,
       }
 
+  def _api_status(self, status):
+    if status in ['PREP', 'RUNNING', 'RUNNINGWITHERROR']:
+      return 'RUNNING'
+    elif status in ['PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']:
+      return 'PAUSED'
+    else:
+      return 'FINISHED' # SUCCEEDED, DONEWITHERROR, KILLED, FAILED
 
 
 class MockGet():

@@ -45,9 +45,10 @@ class WorkflowApi(Api):
         'id': app.id,
         'name': app.appName,
         'status': app.status,
+        'apiStatus': self._api_status(app.status),
         'type': 'workflow',
         'user': app.user,
-        'progress': 100,
+        'progress': app.get_progress(),
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in wf_list.jobs]
@@ -60,7 +61,14 @@ class WorkflowApi(Api):
     oozie_api = get_oozie(self.user)
     workflow = oozie_api.get_job(jobid=appid)
 
-    common = {'id': workflow.id, 'name': workflow.appName, 'status': workflow.status, 'type': 'workflow'}
+    common = {
+        'id': workflow.id,
+        'name': workflow.appName,
+        'status': workflow.status,
+        'apiStatus': self._api_status(workflow.status),
+        'progress': workflow.get_progress(),
+        'type': 'workflow'
+    }
 
     request = MockDjangoRequest(self.user)
     response = list_oozie_workflow(request, job_id=appid)
@@ -89,7 +97,7 @@ class WorkflowApi(Api):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
-    return {'progress': 0, 'logs': {'default': json.loads(data.content)['log']}}
+    return {'logs': {'default': json.loads(data.content)['log']}}
 
 
   def profile(self, appid, app_type, app_property):
@@ -110,6 +118,14 @@ class WorkflowApi(Api):
       }
 
     return {}
+
+  def _api_status(self, status):
+    if status in ['PREP', 'RUNNING']:
+      return 'RUNNING'
+    elif status == 'SUSPENDED':
+      return 'PAUSED'
+    else:
+      return 'FINISHED' # SUCCEEDED , KILLED and FAILED
 
 
 class WorkflowActionApi(Api):
