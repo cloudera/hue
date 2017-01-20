@@ -267,7 +267,7 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
         <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
-        <div class="details-comment" data-bind="text: details.comment"></div>
+        <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
         <!-- /ko -->
       </div>
     </div>
@@ -288,7 +288,7 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
         <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
-        <div class="details-comment" data-bind="text: details.comment"></div>
+        <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
         <!-- /ko -->
       </div>
     </div>
@@ -425,15 +425,17 @@ from desktop.views import _ko
           var refresh = function () {
             $element.empty();
             var suggestion = options.suggestion;
-            if (options.filter() && suggestion.matchIndex > -1) {
-              var before = suggestion.value.substring(0, suggestion.matchIndex);
-              var match = suggestion.value.substring(suggestion.matchIndex, suggestion.matchIndex + suggestion.matchLength);
-              var after = suggestion.value.substring(suggestion.matchIndex + suggestion.matchLength);
+            var value = options.isComment ? suggestion.details.comment : suggestion.value;
+
+            if (options.filter() && suggestion.matchIndex > -1 && ((!options.isComment && !suggestion.matchComment) || (options.isComment && suggestion.matchComment))) {
+              var before = value.substring(0, suggestion.matchIndex);
+              var match = value.substring(suggestion.matchIndex, suggestion.matchIndex + suggestion.matchLength);
+              var after = value.substring(suggestion.matchIndex + suggestion.matchLength);
               $element.append(document.createTextNode(before));
               $('<b>').text(match).appendTo($element);
               $element.append(document.createTextNode(after));
             } else {
-              $element.text(suggestion.value);
+              $element.text(value);
             }
           };
 
