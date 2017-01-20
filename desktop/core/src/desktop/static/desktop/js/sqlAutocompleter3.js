@@ -1285,6 +1285,7 @@ var SqlAutocompleter3 = (function () {
         tables: suggestFilters.tables,
         successCallback: function (data) {
           var filterSuggestions = [];
+          var totalCount = 0;
           data.values.forEach(function (value) {
             if (typeof value.popularValues !== 'undefined' && value.popularValues.length > 0) {
               value.popularValues.forEach(function (popularValue) {
@@ -1300,6 +1301,7 @@ var SqlAutocompleter3 = (function () {
                       compVal += ' ';
                     }
                     compVal += grp.literal;
+                    totalCount += popularValue.count;
                     filterSuggestions.push({
                       value: compVal,
                       meta: AutocompleterGlobals.i18n.meta.filter,
@@ -1312,6 +1314,11 @@ var SqlAutocompleter3 = (function () {
               });
             }
           });
+          filterSuggestions.forEach(function (suggestion) {
+            suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.count : Math.round(100 * suggestion.details.count / totalCount);
+            suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
+          });
+
           self.entries(self.entries().concat(filterSuggestions));
           self.loadingFilters(false);
           filtersDeferred.resolve(filterSuggestions);

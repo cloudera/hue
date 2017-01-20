@@ -255,7 +255,6 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
-    <!-- ko if: details -->
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
@@ -272,11 +271,9 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
     </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
-    <!-- ko if: details -->
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
@@ -295,7 +292,6 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
     </div>
-    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
@@ -348,19 +344,43 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-group-by">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular group by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-order-by">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-filter">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular filter')}</div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+      </div>
     </div>
   </script>
 
