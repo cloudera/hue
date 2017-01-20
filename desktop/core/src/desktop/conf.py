@@ -208,7 +208,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = Config(
   key="secure_content_type_nosniff",
   help=_('X-Content-Type-Options: nosniff This is a HTTP response header feature that helps prevent attacks based on MIME-type confusion.'),
   type=coerce_bool,
-  default=True)
+  default=False)
 
 SECURE_BROWSER_XSS_FILTER = Config(
   key="secure_browser_xss_filter",
