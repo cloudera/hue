@@ -336,7 +336,16 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-agg-udf">
     <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
+      <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> ${ _('Popular aggregate')} - <span data-bind="text: details.aggregateFunction"></span></div>
+      <div class="autocompleter-details-contents">
+        <div class="details-code" data-bind="text: value"></div>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+          <div class="progress">
+            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+          </div>
+        </div>
+        <div class="details-comment" data-bind="text: details.function.description"></div>
+      </div>
     </div>
   </script>
 
