@@ -108,3 +108,5 @@ dependency-reduced-pom.xml
 node_modules/
 
 junitresults*
+
+desktop/core/src/desktop/static/desktop/css/responsive.css
