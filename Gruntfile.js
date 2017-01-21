@@ -3,6 +3,7 @@ module.exports = function(grunt) {
 
   var config = {};
   grunt.loadNpmTasks('grunt-contrib-less');
+  grunt.loadNpmTasks('grunt-contrib-watch');
 
   // Project configuration.
   grunt.initConfig({
@@ -16,6 +17,15 @@ module.exports = function(grunt) {
         files: {
           'desktop/core/src/desktop/static/desktop/css/responsive.css': 'desktop/core/src/desktop/static/desktop/less/responsive.less'
         }
+      }
+    },
+    watch: {
+      less: {
+        files: [
+          'desktop/core/src/desktop/static/desktop/less/*.less',
+          'desktop/core/src/desktop/static/desktop/less/**/*.less'
+        ],
+        tasks: ['less']
       }
     }
   });
