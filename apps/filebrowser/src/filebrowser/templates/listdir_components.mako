@@ -949,13 +949,9 @@ from django.utils.translation import ugettext as _
     var FileBrowserModel = function (files, page, breadcrumbs, currentDirPath) {
       var self = this;
 
-      if (! $.cookie("hueFilebrowserRecordsPerPage")){
-        $.cookie("hueFilebrowserRecordsPerPage", "45");
-      }
-
       self.page = ko.observable(new Page(page));
       self.recordsPerPageChoices = ["15", "30", "45", "60", "100", "200", "1000"],
-      self.recordsPerPage = ko.observable($.cookie("hueFilebrowserRecordsPerPage"));
+      self.recordsPerPage = ko.observable(apiHelper.getFromTotalStorage('fb', 'records_per_page', 45));
       self.targetPageNum = ko.observable(1);
       self.targetPath = ko.observable("${current_request_path | n,unicode }");
       self.sortBy = ko.observable("name");
@@ -1208,7 +1204,7 @@ from django.utils.translation import ugettext as _
       };
 
       self.recordsPerPage.subscribe(function (newValue) {
-        $.cookie("hueFilebrowserRecordsPerPage", newValue);
+        apiHelper.setInTotalStorage('fb', 'records_per_page', newValue)
         self.retrieveData();
       });
 
