@@ -23,11 +23,13 @@
   "devDependencies": {
     "grunt": "0.4.5",
     "grunt-contrib-less": "1.3.0",
+    "grunt-contrib-watch": "0.6.1",
     "load-grunt-tasks": "3.1.0"
   },
   "scripts": {
     "devinstall": "npm cache clean && npm install && npm prune",
-    "less": "./node_modules/.bin/grunt less"
+    "less": "./node_modules/.bin/grunt less",
+    "watch": "./node_modules/.bin/grunt watch"
   },
   "files": []
 }
