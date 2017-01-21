@@ -129,10 +129,10 @@ var ApiHelper = (function () {
     var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
     if (typeof value !== 'undefined' && value !== null) {
       cachedData[id] = value;
-      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData);
+      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
     } else if (cachedData[id]) {
       delete cachedData[id];
-      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData);
+      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
     }
   };
 
