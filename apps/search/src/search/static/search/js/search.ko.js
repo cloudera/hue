@@ -1619,16 +1619,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             }
             else if (facet.queryResult.status() == 'available') {
               self.fetchResult(facet);
-
               facet.queryResult.progress(100);
-
-              if (facet.queryResult.result['handle'].has_result_set()) {
-                //self.fetchResultSize();
-            	console.log('fetch result size()');
-              }
             }
             else if (facet.queryResult.status() == 'success') {
-            	facet.queryResult.progress(99);
+              facet.queryResult.progress(99);
             }
           } else if (data.status == -3) {
         	  facet.queryResult.status('expired');
@@ -1643,22 +1637,45 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     };
 
-   self.fetchResult = function(facet) { // If coll grid or real facet
-	   $.post("/search/search", {
-           collection: ko.mapping.toJSON(self.collection),
-           query: ko.mapping.toJSON(self.query),
-           facet: ko.mapping.toJSON(facet),
-           fetch_result: true
-       }, function (data) {
-       	 if (facet.type) {
-           $.each(data.normalized_facets, function (index, facet) {
-             self._make_result_facet(facet);
-           });
-       	 } else {
-       	   facet._make_grid_result(data);
-       	 }
-       });
+   self.fetchResult = function(facet) {
+     $.post("/search/search", {
+         collection: ko.mapping.toJSON(self.collection),
+         query: ko.mapping.toJSON(self.query),
+         facet: ko.mapping.toJSON(facet),
+         fetch_result: true
+     }, function (data) {
+       if (facet.type) {
+         $.each(data.normalized_facets, function (index, facet) {
+           self._make_result_facet(facet);
+         });
+       } else {
+         facet._make_grid_result(data);
+       }
+//       if (facet.queryResult.result['handle'].has_result_set()) {
+//         self.fetchResultSize(facet);
+//       }
+     });
    }
+   
+   self.fetchResultSize = function(facet) {
+	  $.post("/notebook/api/fetch_result_size", {
+        notebook: ko.mapping.toJSON({type: facet.queryResult.type()}),
+        snippet: ko.mapping.toJSON(facet.queryResult)
+	  }, function (data) {
+	    if (data.status == 0) {
+	      if (data.result.rows != null) {
+	    	facet.response().response.numFound(data.result.rows);
+	      }
+	    } else if (data.status == 5) {
+	      // No supported yet for this snippet
+	    } else {
+	      $(document).trigger("error", data.message);
+	    }
+	  }).fail(function (xhr, textStatus, errorThrown) {
+	    $(document).trigger("error", xhr.responseText);
+	  });
+	};
+
   // self.searchAsync
 
   self.search = function (callback) {
@@ -1749,16 +1766,15 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             if (self.collection.engine() != 'impala') {
               self._make_grid_result(data, callback);
             } else {
-                var query = new QueryResult(self, {
-                    type: self.collection.engine(),
-                    result: data,
-                    status: 'running',
-                    progress: 0,
-                  });
+              var query = new QueryResult(self, {
+                  type: self.collection.engine(),
+                  result: data,
+                  status: 'running',
+                  progress: 0,
+               });
 
-                self.queryResult = query; // Todo add to model
-
-              	self.checkStatus(self);
+              self.queryResult = query;
+           	  self.checkStatus(self);
             }
           }
           catch (e) {
@@ -1796,33 +1812,34 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self._make_grid_result = function(data, callback) {
-      if (typeof callback === "function") {
-        callback(data);
+    if (typeof callback === "function") {
+      callback(data);
+    }
+
+    $.each(data.normalized_facets, function (index, new_facet) {
+      self._make_result_facet(new_facet);
+    });
+
+    // Delete norm_facets that were deleted
+    //data.response.numFound = ko.observable(data.response.numFound);
+    self.response(data);
+
+    if (data.error) {
+      $(document).trigger("error", data.error);
+    }
+    else {
+      var _resultsHash = ko.mapping.toJSON(data.response.docs);
+
+      if (self.resultsHash != _resultsHash) {
+        var _docs = [];
+        var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
+        $.each(data.response.docs, function (index, item) {
+          _docs.push(self._make_result_doc(item, _mustacheTmpl, self.collection.template));
+        });
+        self.results(_docs);
       }
-
-      $.each(data.normalized_facets, function (index, new_facet) {
-        self._make_result_facet(new_facet);
-      });
-
-      // Delete norm_facets that were deleted
-      self.response(data);
-
-      if (data.error) {
-        $(document).trigger("error", data.error);
-      }
-      else {
-        var _resultsHash = ko.mapping.toJSON(data.response.docs);
-
-        if (self.resultsHash != _resultsHash) {
-          var _docs = [];
-          var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
-          $.each(data.response.docs, function (index, item) {
-            _docs.push(self._make_result_doc(item, _mustacheTmpl, self.collection.template));
-          });
-          self.results(_docs);
-        }
-        self.resultsHash = _resultsHash;
-      }
+      self.resultsHash = _resultsHash;
+    }
   };
 
   self._make_result_facet = function(new_facet) {
