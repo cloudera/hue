@@ -303,4 +303,10 @@ test-slow: java-test
 
 start-dev:
 	DESKTOP_DEBUG=1 $(ENV_PYTHON) $(BLD_DIR_BIN)/hue runserver_plus
+
+devinstall:
+	npm run devinstall
+
+css:
+	npm run less
 # END DEV ONLY >>>>
