@@ -1601,16 +1601,21 @@ ${ assist.assistPanel() }
       viewModel = new IndexerViewModel(options);
       ko.applyBindings(viewModel, $('#importerComponents')[0]);
 
+
       var draggableMeta = {};
       huePubSub.subscribe('draggable.text.meta', function (meta) {
         draggableMeta = meta;
       });
 
+      var $contentPanel = $('#importerComponents').find('.content-panel');
+
       huePubSub.subscribe('split.panel.resized', function () {
-        $('.form-actions').width($('.content-panel').width() - 50);
+        $('.form-actions').width($contentPanel.width() - 50);
+        $('.step-indicator-fixed').width($contentPanel.width() - 50)
       });
 
-      $('.form-actions').width($('.content-panel').width() - 50);
+      $('.form-actions').width($contentPanel.width() - 50);
+      $('.step-indicator-fixed').width($contentPanel.width() - 50)
 
       $('.content-panel').droppable({
         accept: ".draggableText",
