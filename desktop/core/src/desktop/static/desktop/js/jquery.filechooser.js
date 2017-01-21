@@ -174,7 +174,11 @@
   Plugin.prototype.navigateTo = function (path) {
     var _parent = this;
     $(_parent.element).find('.filechooser-tree').html("<i style=\"font-size: 24px; color: #DDD\" class=\"fa fa-spinner fa-spin\"></i>");
-    $.getJSON("/filebrowser/view=" + path, function (data) {
+    var pageSize = '?pagesize=1000';
+    if (path.indexOf('?') > -1) {
+      pageSize = pageSize.replace(/\?/, '&');
+    }
+    $.getJSON("/filebrowser/view=" + path + pageSize, function (data) {
       $(_parent.element).find('.filechooser-tree').empty();
 
       path = data.current_dir_path; // use real path.
