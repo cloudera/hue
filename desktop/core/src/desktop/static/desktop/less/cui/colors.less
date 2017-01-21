@@ -1,0 +1,311 @@
+/**
+ * Licensed to Cloudera, Inc. under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  Cloudera, Inc. licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+@cui-base-color-list:
+  gray, ~"blue-gray", blue, steel, teal, green, lime, yellow, orange, red, pink, purple,
+  ~"purple-gray", ~"green-gray";
+
+@cui-service-color-list:
+  ~"hive-color", ~"hdfs-color", ~"hbase-color", ~"hue-color", ~"mapreduce-color", ~"zookeeper-color", ~"oozie-color",
+  ~"flume-color", ~"impala-color", ~"sqoop-color", ~"solr-color", ~"spark-color", ~"pig-color", ~"yarn-color";
+
+
+// Base colors ----------------------------------------------
+
+@cui-black:                       #000000;
+@cui-white:                       #FFFFFF;
+@cui-gray:                        @cui-gray-500;
+@cui-blue-gray:                   @cui-blue-gray-500;
+@cui-blue:                        @cui-blue-500;
+@cui-steel:                       @cui-steel-500;
+@cui-teal:                        @cui-teal-500;
+@cui-green:                       @cui-green-500;
+@cui-lime:                        @cui-lime-500;
+@cui-yellow:                      @cui-yellow-500;
+@cui-orange:                      @cui-orange-500;
+@cui-red:                         @cui-red-500;
+@cui-pink:                        @cui-pink-500;
+@cui-purple:                      @cui-purple-500;
+@cui-purple-gray:                 @cui-purple-gray-500;
+@cui-green-gray:                  @cui-green-gray-500;
+
+
+// All standard colors --------------------------------------
+
+@cui-gray-050:                    #F8F8F8;
+@cui-gray-100:                    #E7E7E7;
+@cui-gray-200:                    #E0E0E0;
+@cui-gray-300:                    #DCDCDC;
+@cui-gray-400:                    #C8C8C8;
+@cui-gray-500:                    #B4B4B4;
+@cui-gray-600:                    #A0A0A0;
+@cui-gray-700:                    #787878;
+@cui-gray-800:                    #424242;
+@cui-gray-900:                    #212121;
+
+@cui-blue-gray-050:               #ECEFF1;
+@cui-blue-gray-100:               #CFD8DC;
+@cui-blue-gray-200:               #B0BEC5;
+@cui-blue-gray-300:               #90A4AE;
+@cui-blue-gray-400:               #78909C;
+@cui-blue-gray-500:               #607D8B;
+@cui-blue-gray-600:               #546E7A;
+@cui-blue-gray-700:               #455A64;
+@cui-blue-gray-800:               #36454F;
+@cui-blue-gray-900:               #232C34;
+
+@cui-blue-010:                    #F3F9FC;
+@cui-blue-050:                    #E9F6FB;
+@cui-blue-100:                    #BEE4F5;
+@cui-blue-200:                    #A9DBF1;
+@cui-blue-300:                    #7ECAEB;
+@cui-blue-400:                    #53B8E4;
+@cui-blue-500:                    #29A7DE;
+@cui-blue-600:                    #2496C7;
+@cui-blue-700:                    #0B7FAD;
+@cui-blue-800:                    #1C749B;
+@cui-blue-900:                    #186485;
+
+
+@cui-steel-050:                   #E8EEEE;
+@cui-steel-100:                   #C6D6D6;
+@cui-steel-200:                   #A0BABA;
+@cui-steel-300:                   #7A9F9F;
+@cui-steel-400:                   #5D8A8A;
+@cui-steel-500:                   #417575;
+@cui-steel-600:                   #3C6C6C;
+@cui-steel-700:                   #345E5E;
+@cui-steel-800:                   #2D5252;
+@cui-steel-900:                   #274646;
+
+@cui-teal-050:                    #E0F6F5;
+@cui-teal-100:                    #B3EAE6;
+@cui-teal-200:                    #80DCD5;
+@cui-teal-300:                    #4DCEC4;
+@cui-teal-400:                    #26C3B7;
+@cui-teal-500:                    #00B9AA;
+@cui-teal-600:                    #00AA9D;
+@cui-teal-700:                    #009488;
+@cui-teal-800:                    #008177;
+@cui-teal-900:                    #006F66;
+
+@cui-green-050:                   #E2F3EA;
+@cui-green-100:                   #B7E2CD;
+@cui-green-200:                   #87CEAB;
+@cui-green-300:                   #57BB89;
+@cui-green-400:                   #33AC6F;
+@cui-green-500:                   #0F9D56;
+@cui-green-600:                   #0E914F;
+@cui-green-700:                   #0C7E45;
+@cui-green-800:                   #0A6E3C;
+@cui-green-900:                   #095E34;
+
+@cui-lime-010:                    #F4F9ED;
+@cui-lime-050:                    #EDF5E2;
+@cui-lime-100:                    #D2E6B9;
+@cui-lime-200:                    #B4D689;
+@cui-lime-300:                    #96C55A;
+@cui-lime-400:                    #7FB836;
+@cui-lime-500:                    #69AC13;
+@cui-lime-600:                    #619F12;
+@cui-lime-700:                    #548A0F;
+@cui-lime-800:                    #49780D;
+@cui-lime-900:                    #3F670B;
+
+@cui-yellow-010:                  #FFF5DF;
+@cui-yellow-050:                  #FFFCE6;
+@cui-yellow-100:                  #FFFACC;
+@cui-yellow-200:                  #FFF599;
+@cui-yellow-300:                  #FFF066;
+@cui-yellow-400:                  #FFEB3B;
+@cui-yellow-500:                  #FFE600;
+@cui-yellow-600:                  #E6CF00;
+@cui-yellow-700:                  #B3A100;
+@cui-yellow-800:                  #807300;
+@cui-yellow-900:                  #4D4500;
+
+@cui-orange-050:                  #FBF1E1;
+@cui-orange-100:                  #FFE8AF;
+@cui-orange-200:                  #FFD466;
+@cui-orange-300:                  #EDB233;
+@cui-orange-400:                  #EBA81A;
+@cui-orange-500:                  #E99F01;
+@cui-orange-600:                  #D18F00;
+@cui-orange-700:                  #BA7F00;
+@cui-orange-800:                  #A36F00;
+@cui-orange-900:                  #8B572A;
+
+@cui-red-050:                     #FFE5E5;
+@cui-red-100:                     #FFCCCC;
+@cui-red-200:                     #FFB2B2;
+@cui-red-300:                     #E7808D;
+@cui-red-400:                     #DE4D5F;
+@cui-red-500:                     #D0021B;
+@cui-red-600:                     #BB0118;
+@cui-red-700:                     #A60115;
+@cui-red-800:                     #910112;
+@cui-red-900:                     #7C0110;
+
+@cui-pink-010:                    #FBF5F5;
+@cui-pink-050:                    #F2DEDE;
+@cui-pink-100:                    #F3BFD4;
+@cui-pink-200:                    #EC93B7;
+@cui-pink-300:                    #E4689A;
+@cui-pink-400:                    #DE4784;
+@cui-pink-500:                    #D8276F;
+@cui-pink-600:                    #C72466;
+@cui-pink-700:                    #AD1F59;
+@cui-pink-800:                    #971B4D;
+@cui-pink-900:                    #821743;
+
+@cui-purple-050:                  #EFE9F5;
+@cui-purple-100:                  #D8C8E7;
+@cui-purple-200:                  #BDA3D6;
+@cui-purple-300:                  #A37EC6;
+@cui-purple-400:                  #8F62B9;
+@cui-purple-500:                  #7B46AD;
+@cui-purple-600:                  #71419F;
+@cui-purple-700:                  #62388A;
+@cui-purple-800:                  #563179;
+@cui-purple-900:                  #4A2A68;
+
+@cui-purple-gray-050:             #F1EFEF;
+@cui-purple-gray-100:             #D5CFD1;
+@cui-purple-gray-200:             #BAB0B3;
+@cui-purple-gray-300:             #ACA0A4;
+@cui-purple-gray-400:             #9F9095;
+@cui-purple-gray-500:             #977F86;
+@cui-purple-gray-600:             #837077;
+@cui-purple-gray-700:             #766168;
+@cui-purple-gray-800:             #6A575D;
+@cui-purple-gray-900:             #5E4D53;
+
+@cui-green-gray-050:              #E9E8E3;
+@cui-green-gray-100:              #C8C6BA;
+@cui-green-gray-200:              #B2AF9F;
+@cui-green-gray-300:              #A7A391;
+@cui-green-gray-400:              #9C9883;
+@cui-green-gray-500:              #918D76;
+@cui-green-gray-600:              #827E6A;
+@cui-green-gray-700:              #74705E;
+@cui-green-gray-800:              #656252;
+@cui-green-gray-900:              #575446;
+
+
+// Service colors -------------------------------------------
+
+@cui-hive-color:                  @cui-yellow-700;
+@cui-hdfs-color:                  @cui-teal-600;
+@cui-hbase-color:                 @cui-pink-600;
+@cui-hue-color:                   @cui-purple-300;
+@cui-mapreduce-color:             @cui-steel-400;
+@cui-zookeeper-color:             @cui-lime-600;
+@cui-oozie-color:                 @cui-blue-500;
+@cui-flume-color:                 @cui-orange-600;
+@cui-impala-color:                @cui-blue-900;
+@cui-sqoop-color:                 @cui-green-600;
+@cui-solr-color:                  @cui-pink-900;
+@cui-spark-color:                 @cui-orange-900;
+@cui-pig-color:                   @cui-purple-900;
+@cui-yarn-color:                  @cui-yellow-900;
+
+
+
+/*
+  -- Color Class Generator -------------------------------------
+  Can be used to generate color classes for all shades and tints.
+  Takes two parameters, the first is the name of the color and should
+  be a defined cui-color, the second parameter is optional and is for
+  adding a prefi to the class name.
+
+  .cui-generate-color-classes(@color, @class-prefix) {}
+
+  Example usage:
+
+  .generate-color-classes(gray, demo-colors__square--);
+
+  will produce:
+
+    .demo-colors__square--gray {
+      background-color: #B4B4B4;
+    }
+    .demo-colors__square--gray-050 {
+      background-color: #F8F8F8;
+    }
+    .demo-colors__square--gray-100 {
+      background-color: #E7E7E7;
+    }
+    .demo-colors__square--gray-200 {
+      background-color: #E0E0E0;
+    }
+    .demo-colors__square--gray-300 {
+      background-color: #DCDCDC;
+    }
+    .demo-colors__square--gray-400 {
+      background-color: #C8C8C8;
+    }
+    .demo-colors__square--gray-500 {
+      background-color: #B4B4B4;
+    }
+    .demo-colors__square--gray-600 {
+      background-color: #A0A0A0;
+    }
+    .demo-colors__square--gray-700 {
+      background-color: #787878;
+    }
+    .demo-colors__square--gray-800 {
+      background-color: #424242;
+    }
+    .demo-colors__square--gray-900 {
+      background-color: #212121;
+    }
+
+    Note: For color names with dash (-) e.g. blue-gray use ~"blue-gray"
+ */
+
+.generate-color-scales-classes-recursive(@color, @i: 1) when (@i =< 9) {
+  @scale-number: @i*100;
+  @color-var-name: ~"cui-@{color}-@{scale-number}";
+
+  .@{class-prefix}@{color}-@{scale-number} {
+    background-color: @@color-var-name;
+  }
+  .generate-color-scales-classes-recursive(@color, (@i + 1));
+}
+
+.cui-generate-color-base-class(@color, @class-prefix) {
+  @base-color: ~"cui-@{color}";
+
+  .@{class-prefix}@{color} {
+    background-color: @@base-color;
+  }
+}
+
+.cui-generate-color-classes(@color, @class-prefix) {
+  @color-050: ~"cui-@{color}-050";
+
+  // Generate base color class
+  .cui-generate-color-base-class(@color, @class-prefix);
+
+  // Generate tint 050 color class
+  .@{class-prefix}@{color}-050 {
+    background-color: @@color-050;
+  }
+
+  // Generate the tints 100-900 classes
+  .generate-color-scales-classes-recursive(@color);
+};
