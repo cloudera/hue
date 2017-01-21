@@ -677,6 +677,8 @@ var Collection = function (vm, collection) {
             (newValue == ko.HUE_CHARTS.TYPES.GRADIENTMAP ? 'gradient-map-widget' : 'bucket-widget'))
         );
       });
+
+      // TODO queryResult reload QueryResult
     }
   }
 
@@ -1415,6 +1417,17 @@ var NewTemplate = function (vm, initial) {
 };
 
 
+var QueryResult = function (vm, initial) {
+  var self = this;
+
+  self.type = ko.mapping.fromJS(initial.type);
+  self.status = ko.mapping.fromJS(initial.status || 'running');
+  self.progress = ko.mapping.fromJS(initial.progress || 0);
+
+  self.result = ko.mapping.fromJS(initial.result);
+};
+
+
 var DATE_TYPES = ['date', 'tdate'];
 var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble', 'currency'];
 var FLOAT_TYPES = ['float', 'tfloat', 'double', 'tdouble'];
@@ -1588,6 +1601,66 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.search();
   };
 
+  self.checkStatus = function (facet) { // common?
+      $.post("/notebook/api/check_status", {
+        notebook: ko.mapping.toJSON({type: facet.queryResult.type()}),
+        snippet: ko.mapping.toJSON(facet.queryResult)
+      }, function (data) {
+        if (facet.queryResult.status() == 'canceled') {
+          // Query was canceled in the meantime, do nothing
+        } else {
+
+          if (data.status == 0) {
+        	  facet.queryResult.status(data.query_status.status);
+
+            if (facet.queryResult.status() == 'running' || facet.queryResult.status() == 'starting') {
+              // if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
+              setTimeout(function() { self.checkStatus(facet); }, 1000);
+            }
+            else if (facet.queryResult.status() == 'available') {
+              self.fetchResult(facet);
+
+              facet.queryResult.progress(100);
+
+              if (facet.queryResult.result['handle'].has_result_set()) {
+                //self.fetchResultSize();
+            	console.log('fetch result size()');
+              }
+            }
+            else if (facet.queryResult.status() == 'success') {
+            	facet.queryResult.progress(99);
+            }
+          } else if (data.status == -3) {
+        	  facet.queryResult.status('expired');
+          } else {
+            //self._ajaxError(data); // common?
+        	$(document).trigger("error", data.message);
+          }
+        }
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText || textStatus);
+        facet.queryResult.status('failed');
+      });
+    };
+
+   self.fetchResult = function(facet) { // If coll grid or real facet
+	   $.post("/search/search", {
+           collection: ko.mapping.toJSON(self.collection),
+           query: ko.mapping.toJSON(self.query),
+           facet: ko.mapping.toJSON(facet),
+           fetch_result: true
+       }, function (data) {
+       	 if (facet.type) {
+           $.each(data.normalized_facets, function (index, facet) {
+             self._make_result_facet(facet);
+           });
+       	 } else {
+       	   facet._make_grid_result(data);
+       	 }
+       });
+   }
+  // self.searchAsync
+
   self.search = function (callback) {
     $(".jHueNotify").hide();
     logGA('search');
@@ -1640,15 +1713,20 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         return $.post("/search/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
-            layout: ko.mapping.toJSON(self.columns),
             facet: ko.mapping.toJSON(facet),
         }, function (data) {
-            $.each(data.normalized_facets, function (index, new_facet) {
-              self._make_result_facet(new_facet);
-            });
-          return data;
+        	
+            var queryResult = new QueryResult(self, {
+                type: self.collection.engine(),
+                result: data,
+                status: 'running',
+                progress: 0,
+              });
+            facet.queryResult = queryResult;
+
+          	self.checkStatus(facet);
         });
-      });
+      }); // Join save dashboard history
     }
 
     $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
@@ -1666,35 +1744,21 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           query: ko.mapping.toJSON(self.query),
           layout: ko.mapping.toJSON(self.columns)
         }, function (data) {
+          data = JSON.bigdataParse(data);
           try {
-            data = JSON.bigdataParse(data);
+            if (self.collection.engine() != 'impala') {
+              self._make_grid_result(data, callback);
+            } else {
+                var query = new QueryResult(self, {
+                    type: self.collection.engine(),
+                    result: data,
+                    status: 'running',
+                    progress: 0,
+                  });
 
-            if (typeof callback === "function") {
-              callback(data);
-            }
+                self.queryResult = query; // Todo add to model
 
-            $.each(data.normalized_facets, function (index, new_facet) {
-              self._make_result_facet(new_facet);
-            });
-
-            // Delete norm_facets that were deleted
-            self.response(data);
-
-            if (data.error) {
-              $(document).trigger("error", data.error);
-            }
-            else {
-              var _resultsHash = ko.mapping.toJSON(data.response.docs);
-
-              if (self.resultsHash != _resultsHash) {
-                var _docs = [];
-                var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
-                $.each(data.response.docs, function (index, item) {
-                  _docs.push(self._make_result_doc(item, _mustacheTmpl, self.collection.template));
-                });
-                self.results(_docs);
-              }
-              self.resultsHash = _resultsHash;
+              	self.checkStatus(self);
             }
           }
           catch (e) {
@@ -1731,11 +1795,41 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
+  self._make_grid_result = function(data, callback) {
+      if (typeof callback === "function") {
+        callback(data);
+      }
+
+      $.each(data.normalized_facets, function (index, new_facet) {
+        self._make_result_facet(new_facet);
+      });
+
+      // Delete norm_facets that were deleted
+      self.response(data);
+
+      if (data.error) {
+        $(document).trigger("error", data.error);
+      }
+      else {
+        var _resultsHash = ko.mapping.toJSON(data.response.docs);
+
+        if (self.resultsHash != _resultsHash) {
+          var _docs = [];
+          var _mustacheTmpl = self.collection.template.isGridLayout() ? "" : fixTemplateDotsAndFunctionNames(self.collection.template.template());
+          $.each(data.response.docs, function (index, item) {
+            _docs.push(self._make_result_doc(item, _mustacheTmpl, self.collection.template));
+          });
+          self.results(_docs);
+        }
+        self.resultsHash = _resultsHash;
+      }
+  };
+
   self._make_result_facet = function(new_facet) {
     var facet = self.getFacetFromQuery(new_facet.id);
     var _hash = ko.mapping.toJSON(new_facet);
 
-    if (!facet.has_data() || facet.resultHash() != _hash) {
+    if (! facet.has_data() || facet.resultHash() != _hash) {
       facet.counts(new_facet.counts);
 
       if (typeof new_facet.docs != 'undefined') {

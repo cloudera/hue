@@ -91,17 +91,6 @@ class SQLApi():
         sql += ' WHERE ' + ' AND '.join(filters)
       sql += ' LIMIT %s' % LIMIT
 
-#     sample = get_api(request, {'type': 'hive'}).get_sample_data({'type': 'hive'}, database=file_format['databaseName'], table=file_format['tableName'])
-#     db = dbms.get(request.user)
-#     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])
-#
-#     format_ = {
-#         "sample": sample['rows'][:4],
-#         "columns": [
-#             Field(col.name, HiveFormat.FIELD_TYPE_TRANSLATE.get(col.type, 'string')).to_dict()
-#             for col in table_metadata.cols
-#         ]
-#     }
 
     editor = make_notebook(
         name='Execute and watch',
@@ -111,20 +100,13 @@ class SQLApi():
         status='ready-execute'
     )
     return editor.execute(MockRequest(self.user))
-  
-  def fetch_result(self, dashboard, query, facet=None):
-#     query_server = get_query_server_config(name='impala') # To move to notebook API
-#     db = dbms.get(self.user, query_server=query_server)
 
+
+  def fetch_result(self, dashboard, query, facet):
     notebook = {}
+    snippet = facet['queryResult']
 
-    if facet:
-      snippet = facet['snippet']
-    else:
-      snippet = dashboard['snippet']
-
-    start_over = True
-    
+    start_over = True # TODO
 
     result = get_api(MockRequest(self.user), snippet).fetch_result(
         notebook,
@@ -132,22 +114,18 @@ class SQLApi():
         dashboard['template']['rows'],
         start_over=start_over
     )
-    
-    result['has_more']
 
-
-#     if handle:
-#       result = db.fetch(handle, rows=dashboard['template']['rows'])
-#       db.close(handle)
+    result['has_more'] # TODO
 
     # TODO: add query id to allow closing
-    if facet:
-      if facet['type'] == 'function':
-        return self._convert_impala_function_facet(result, facet, query)
-      else:
-        return self._convert_impala_facet(result, facet, query)
-    else:
+
+    if not facet.get('type'):
       return self._convert_impala_results(result, dashboard, query)
+    elif facet['type'] == 'function':
+      return self._convert_impala_function_facet(result, facet, query)
+    else:
+      return self._convert_impala_facet(result, facet, query) # query needed
+
 
   def datasets(self, show_all=False):
 #     database, table = self._get_database_table_names(dashboard['name'])
