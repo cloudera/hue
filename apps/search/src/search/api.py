@@ -45,12 +45,17 @@ def search(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
-  facet = json.loads(request.POST.get('facet', '{}'))  
+  facet = json.loads(request.POST.get('facet', '{}')) 
+
   query['download'] = 'download' in request.POST
+  fetch_result = 'fetch_result' in request.POST
 
   if collection:
     try:
-      response = get_engine(request.user, collection).query(collection, query, facet)
+      if fetch_result:
+        response = get_engine(request.user, collection).fetch_result(collection, query, facet)
+      else:
+        response = get_engine(request.user, collection).query(collection, query, facet)
     except RestException, e:
       try:
         message = json.loads(e.message)
@@ -453,7 +458,8 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
         'isGridLayout': False,
         "hasDataForChart": True,
         "rows": 25,
-    }
+    },
+    'queryResult': {}
   }
 
 
