@@ -393,7 +393,10 @@ $(document).ready(function(){
   $("#updateSkipWizard").prop('checked', $.cookie("hueLandingPage", {path: "/"}) == "home");
 
   $("#updateSkipWizard").change(function () {
-    $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {path: "/"});
+    $.cookie("hueLandingPage", this.checked ? "home" : "wizard", {
+      path: "/",
+      secure: window.location.protocol.indexOf('https') > -1
+    });
   });
 
 });
