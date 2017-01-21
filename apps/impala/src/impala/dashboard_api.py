@@ -78,7 +78,7 @@ class SQLApi():
             'database': database,
             'table': table,
             'fields': self._get_aggregate_function(facet),
-            'filters': ('WHERE' + ' AND '.join(filters)) if filters else '',
+            'filters': ('WHERE ' + ' AND '.join(filters)) if filters else '',
         }
     else:
       fields =  '*'
@@ -213,7 +213,8 @@ class SQLApi():
         f['function'] = 'percentile'
         fields.append('50')
       elif f['function'] == 'unique':
-        f['function'] = 'distinct'
+        f['function'] = 'count'
+        fields[0] = 'distinct %s' % fields[0]
       elif f['function'] == 'percentiles':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
