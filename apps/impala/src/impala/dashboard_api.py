@@ -55,20 +55,22 @@ class SQLApi():
     filters = self._get_fq(dashboard, query, facet)
 
     if facet:
-      if facet['type'] == 'nested':
-        fields = [facet['field']] + [f['field'] for f in facet['properties']['facets']]
-        fields = ['`%s`' % f for f in fields]
+      if facet['type'] == 'nested':        
+        fields_dimensions = [facet['field']] + [f['field'] for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
+        fields_dimensions = ['`%s`' % f for f in fields_dimensions]
+        fields_aggregates = ['COUNT(*)'] + [self._get_aggregate_function(f) for f in facet['properties']['facets'] if f['aggregate']['function'] != 'count']
 
-        sql = '''SELECT %(fields)s, COUNT(*)
+        sql = '''SELECT %(fields_dimensions)s, %(fields_aggregates)s
         FROM %(database)s.%(table)s
-        WHERE %(filters)s
-        GROUP BY %(fields)s
+        %(filters)s
+        GROUP BY %(fields_dimensions)s
         ORDER BY COUNT(*) DESC
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
-            'fields': ', '.join(fields),
-            'filters': ' AND '.join(['%s IS NOT NULL' % f for f in fields] + filters),
+            'fields_aggregates': ', '.join(fields_aggregates),            
+            'fields_dimensions': ', '.join(fields_dimensions),
+            'filters': ('WHERE ' + ' AND '.join(filters)) if filters else '',
             'limit': LIMIT
         }
       elif facet['type'] == 'function': # 1 dim only now
@@ -128,9 +130,9 @@ class SQLApi():
 
 
   def datasets(self, show_all=False):
-#     database, table = self._get_database_table_names(dashboard['name'])
-#     autocomplete_data = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table, column, nested)
-    return ['sample_07', 'web_logs']
+    # Implemented via Hive chooser
+    return []
+
 
   def fields(self, dashboard):
     database, table = self._get_database_table_names(dashboard)
@@ -159,6 +161,7 @@ class SQLApi():
 
 
   def close_query(self, collection, query, facet=None): pass
+
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
@@ -214,7 +217,7 @@ class SQLApi():
         fields.append('50')
       elif f['function'] == 'unique':
         f['function'] = 'count'
-        fields[0] = 'distinct %s' % fields[0]
+        fields[0] = 'distinct `%s`' % fields[0]
       elif f['function'] == 'percentiles':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
@@ -269,7 +272,7 @@ class SQLApi():
     for row in rows:
       counts.append({
          "cat": facet['field'],
-         "count": row[1],
+         "count": row[-1],
          "exclude": False,
          "selected": row[0] in fq_fields,
          "value": row[0]
@@ -297,15 +300,6 @@ class SQLApi():
 
     response = json.loads('''{
    "highlighting":{
-      "F8V7067-APL-KIT":{
-
-      },
-      "USD":{
-
-      },
-      "NOK":{
-
-      },
       "GBP":{
 
       },
