@@ -56,9 +56,23 @@ class SQLApi():
     if facet:
       if facet['type'] == 'nested':
         fields_dimensions = ['`%(field)s`' % f for f in self._get_dimension_fields(facet)]
-        fields_aggregates = ['COUNT(*)'] + [self._get_aggregate_function(f) for f in facet['properties']['facets'] if f['aggregate']['function'] != 'count']
+        last_dimension_seen = False
+        fields = []
+        for f in reversed(facet['properties']['facets']):
+          if f['aggregate']['function'] == 'count':
+            if not last_dimension_seen:
+              fields.insert(0, 'COUNT(*)')
+              last_dimension_seen = True
+            fields.insert(0, '`%(field)s`' % f)
+          else:
+            if not last_dimension_seen:
+              fields.insert(0, self._get_aggregate_function(f))
 
-        sql = '''SELECT %(fields_dimensions)s, %(fields_aggregates)s
+        if not last_dimension_seen:
+          fields.insert(0, 'COUNT(*)')
+        fields.insert(0, '`%(field)s`' % facet)
+
+        sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
@@ -66,7 +80,7 @@ class SQLApi():
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
-            'fields_aggregates': ', '.join(fields_aggregates),
+            'fields': ', '.join(fields),
             'fields_dimensions': ', '.join(fields_dimensions),
             'filters': self._convert_filters_to_where(filters),
             'limit': LIMIT
