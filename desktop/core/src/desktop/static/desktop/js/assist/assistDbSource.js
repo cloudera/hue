@@ -146,6 +146,10 @@ var AssistDbSource = (function () {
       }
     });
 
+    huePubSub.subscribe('assist.database.get', function (callback) {
+      callback(self.selectedDatabase());
+    });
+
     self.reloading = ko.observable(false);
 
     self.loadingTables = ko.pureComputed(function() {

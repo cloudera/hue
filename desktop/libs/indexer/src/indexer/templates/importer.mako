@@ -1054,6 +1054,12 @@ ${ assist.assistPanel() }
       self.inputFormat = ko.observable('file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
+        if (val === 'table'){
+          huePubSub.publish('assist.database.get', function (activeDBEntry) {
+            self.table(activeDBEntry.databaseName + '.');
+          });
+        }
+        resizeElements();
       });
       self.inputFormats = ko.observableArray([
           {'value': 'file', 'name': 'File'},
@@ -1082,6 +1088,7 @@ ${ assist.assistPanel() }
           vm.createWizard.guessFormat();
           vm.createWizard.destination.nonDefaultLocation(val);
         }
+        resizeElements();
       });
 
       // Table
@@ -1091,6 +1098,9 @@ ${ assist.assistPanel() }
       });
       self.databaseName = ko.computed(function() {
         return self.table().indexOf('.') > 0 ? self.table().split('.', 2)[0] : 'default';
+      });
+      self.table.subscribe(function(val) {
+        resizeElements();
       });
 
       // Queries
@@ -1168,12 +1178,14 @@ ${ assist.assistPanel() }
             self.isTargetExisting(data.status == 0);
           }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
         }
+        resizeElements();
       });
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable('table');
       self.outputFormat.subscribe(function () {
         wizard.guessFieldTypes();
+        resizeElements();
       });
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
@@ -1626,6 +1638,13 @@ ${ assist.assistPanel() }
 
     var viewModel;
 
+    function resizeElements () {
+      var $contentPanel = $('#importerComponents').find('.content-panel');
+      $('.form-actions').width($contentPanel.width() - 50);
+      $('.step-indicator-fixed').width($contentPanel.width());
+      document.styleSheets[0].addRule('.step-indicator li::before','max-width: ' + ($contentPanel.width()/2) + 'px');
+    }
+
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',
@@ -1643,13 +1662,6 @@ ${ assist.assistPanel() }
         draggableMeta = meta;
       });
 
-      var $contentPanel = $('#importerComponents').find('.content-panel');
-
-      function resizeElements () {
-        $('.form-actions').width($contentPanel.width() - 50);
-        $('.step-indicator-fixed').width($contentPanel.width());
-        document.styleSheets[0].addRule('.step-indicator li::before','max-width: ' + ($contentPanel.width()/2) + 'px');
-      }
 
       huePubSub.subscribe('split.panel.resized', resizeElements);
       resizeElements();
