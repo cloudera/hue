@@ -23,6 +23,7 @@ from desktop.views import commonheader, commonfooter, _ko
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
+
 <%def name="page_structure(is_mobile=False, is_embeddable=False)">
 
 <script type="text/javascript">
@@ -1466,6 +1467,12 @@ ${ dashboard.layout_skeleton() }
             <!-- /ko -->
           </a>
         </div>
+        
+        <!-- ko if: $root.collection.engine() != 'solr' -->
+          <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data.queryResult(), notebook: {getContext: function() { return {type: $data.queryResult().type(), id: 1}; }} } }" style="display:inline-block;"></div>        
+        <!-- /ko -->
+        
+        <!-- ko if: $root.collection.engine() == 'solr' -->
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
           <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
@@ -1500,6 +1507,7 @@ ${ dashboard.layout_skeleton() }
             </ul>
           </div>
         </form>
+        <!-- /ko -->
 
       </div>
     </div>
