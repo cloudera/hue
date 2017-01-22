@@ -112,6 +112,15 @@ ${ assist.assistPanel() }
     width: 120px !important;
   }
 
+  .step .inline-labels {
+    display: table;
+  }
+
+  .step .inline-labels .selectize-control {
+    width: 120px !important;
+    vertical-align: -12px;
+  }
+
   .kudu-partitions li {
     width: 578px !important;
     padding: 5px;
@@ -357,7 +366,7 @@ ${ assist.assistPanel() }
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
         </label>
-        <span data-bind="with: createWizard.source.format, visible: createWizard.source.show">
+        <span class="inline-labels" data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
         </span>
       </div>
