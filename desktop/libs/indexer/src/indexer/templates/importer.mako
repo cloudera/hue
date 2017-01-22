@@ -78,6 +78,15 @@ ${ assist.assistPanel() }
     border-right: none!important;
   }
 
+  .step .card-heading.simple {
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 17px;
+  }
+
+  .step .card-body {
+    margin-top: 14px;
+  }
+
   .step label > div:first-child {
     width: 120px;
     text-align: right;
