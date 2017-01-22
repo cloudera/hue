@@ -130,6 +130,24 @@ ${ assist.assistPanel() }
     vertical-align: -12px;
   }
 
+  .step .show-edit-on-hover i {
+    opacity: 0;
+    -webkit-transition: opacity 0.2s linear;
+    -moz-transition: opacity 0.2s linear;
+    -ms-transition: opacity 0.2s linear;
+    -o-transition: opacity 0.2s linear;
+    transition: opacity 0.2s linear;
+  }
+
+  .step .show-edit-on-hover:hover i {
+    opacity: 1;
+  }
+
+  .step .show-edit-on-hover .inactive-action {
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+
   .kudu-partitions li {
     width: 578px !important;
     padding: 5px;
@@ -589,7 +607,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
-            <h3 class="card-heading simple">${_('Fields')} <a class="inactive-action pointer" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
+            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <a class="inactive-action pointer" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body">
               <form class="form-inline" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
