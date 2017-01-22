@@ -15,14 +15,18 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop.views import commonheader, commonfooter, _ko
 from desktop import conf
-from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="common_search" file="common_search.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 
 ${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
+
+${ notebookKoComponents.downloadSnippetResults() }
 
 <div id="searchComponents">
 ${ common_search.page_structure() }

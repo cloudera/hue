@@ -112,6 +112,7 @@ class SQLApi():
         statement=sql,
         database=database,
         status='ready-execute'
+        # historify=False
     )
     return editor.execute(MockRequest(self.user))
 

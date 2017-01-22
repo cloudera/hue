@@ -16,7 +16,7 @@
 # limitations under the License.
 
 DJANGO_APPS = [ "indexer" ]
-NICE_NAME = "Solr Indexer"
+NICE_NAME = "Data Importer"
 REQUIRES_HADOOP = False
 MENU_INDEX = 43
 ICON = "search/art/icon_search_48.png"

@@ -22,7 +22,7 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="editorComponents" file="editor_components.mako" />
-<%namespace name="notebookKoComponents" file="notebook_ko_components.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="hue_ace_autocompleter.mako" />
 
 ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
