@@ -22,8 +22,6 @@ from itertools import groupby
 
 from django.utils.html import escape
 
-from beeswax.server.dbms import get_query_server_config
-from beeswax.design import hql_query
 from beeswax.server import dbms
 from search.models import Collection2
 from notebook.models import make_notebook
@@ -32,12 +30,13 @@ from notebook.connectors.base import get_api
 
 LOG = logging.getLogger(__name__)
 
-
 LIMIT = 100
+
 
 class MockRequest():
   def __init__(self, user):
     self.user = user
+
 
 # To Split in Impala, DBMS..
 # To inherit from DashboardApi
@@ -55,9 +54,8 @@ class SQLApi():
     filters = self._get_fq(dashboard, query, facet)
 
     if facet:
-      if facet['type'] == 'nested':        
-        fields_dimensions = [facet['field']] + [f['field'] for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
-        fields_dimensions = ['`%s`' % f for f in fields_dimensions]
+      if facet['type'] == 'nested':
+        fields_dimensions = ['`%(field)s`' % f for f in self._get_dimension_fields(facet)]
         fields_aggregates = ['COUNT(*)'] + [self._get_aggregate_function(f) for f in facet['properties']['facets'] if f['aggregate']['function'] != 'count']
 
         sql = '''SELECT %(fields_dimensions)s, %(fields_aggregates)s
@@ -68,9 +66,9 @@ class SQLApi():
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
-            'fields_aggregates': ', '.join(fields_aggregates),            
+            'fields_aggregates': ', '.join(fields_aggregates),
             'fields_dimensions': ', '.join(fields_dimensions),
-            'filters': ('WHERE ' + ' AND '.join(filters)) if filters else '',
+            'filters': self._convert_filters_to_where(filters),
             'limit': LIMIT
         }
       elif facet['type'] == 'function': # 1 dim only now
@@ -80,7 +78,7 @@ class SQLApi():
             'database': database,
             'table': table,
             'fields': self._get_aggregate_function(facet),
-            'filters': ('WHERE ' + ' AND '.join(filters)) if filters else '',
+            'filters': self._convert_filters_to_where(filters),
         }
     else:
       fields =  '*'
@@ -90,7 +88,7 @@ class SQLApi():
           'fields': fields
       }
       if filters:
-        sql += ' WHERE ' + ' AND '.join(filters)
+        sql += self._convert_filters_to_where(filters)
       sql += ' LIMIT %s' % LIMIT
 
 
@@ -163,6 +161,12 @@ class SQLApi():
   def close_query(self, collection, query, facet=None): pass
 
 
+  def _get_dimension_fields(self, facet):
+    return [facet] + [f for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
+
+  def _convert_filters_to_where(self, filters):
+    return ('WHERE ' + ' AND '.join(filters)) if filters else ''
+
   def _get_fq(self, collection, query, facet=None):
     clauses = []
 
@@ -180,14 +184,16 @@ class SQLApi():
       merged_fqs.append(field_fq)
 
     for fq in merged_fqs:
-      print fq
       if fq['type'] == 'field':
         f = []
         for _filter in fq['filter']:
           exclude = '!=' if _filter['exclude'] else '='
           value = _filter['value']
           if value is not None:
-            f.append("%s %s '%s'" % (fq['field'], exclude, value))
+            if isinstance(value, list):
+              f.append(' AND '.join(["`%s` %s '%s'" % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
+            else:
+              f.append("%s %s '%s'" % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
 
     return clauses
@@ -264,19 +270,43 @@ class SQLApi():
          "name": column['name']
       } for column in result['meta']]
 
+    # Grid
     response['docs'] = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
 
     fq_fields = [_f['value'] for fq in query['fqs'] for _f in fq['filter']] # type == 'field
 
+    dimension_fields = self._get_dimension_fields(facet)
+    dimension = len(dimension_fields)
+
+    # Charts
     counts = []
-    for row in rows:
-      counts.append({
-         "cat": facet['field'],
-         "count": row[-1],
-         "exclude": False,
-         "selected": row[0] in fq_fields,
-         "value": row[0]
-      })
+    if dimension == 1:
+      for row in rows:
+        counts.append({
+           "cat": facet['field'],
+           "count": row[-1],
+           "exclude": False,
+           "selected": row[0] in fq_fields,
+           "value": row[0]
+        })
+    elif dimension == 2:
+      for row in rows:
+        value_fields = [f['field'] for f in dimension_fields]
+        fq_values = [row[0], row[1]]
+        # SELECT `job`, `gender`, COUNT(*), avg(salary)
+        # -->
+        # SELECT `job`, avg(salary), `gender`, COUNT(*)
+        counts.append({
+            "count": row[-1],
+            "fq_values": fq_values,
+            "selected": fq_values in fq_fields,
+            "fq_fields": value_fields,
+            "value": row[1],
+            "cat": row[0],
+            "exclude": False
+        })
+
+    response['dimension'] = dimension
     response['counts'] = counts
     response['response']['response']['numFound'] = len(counts)
 
