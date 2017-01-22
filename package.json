@@ -1,14 +1,15 @@
 {
   "name": "hue",
   "version": "4.0.0",
-  "description": "...",
-  "homepage": "...",
+  "description": "Hue is an open source Web interface for analyzing data with Hadoop and Spark",
+  "homepage": "http://gethue.com",
   "repository": {
     "type": "git",
-    "url": "..."
+    "url": "https://github.com/cloudera/hue"
   },
-  "author": "Hue, Inc.",
+  "author": "Cloudera, Inc.",
   "contributors": [
+    "Andrew Yao <andyao@cloudera.com>",
     "Enrico Berti <enrico.berti@cloudera.com>",
     "Johan Ahlen <johan.ahlen@cloudera.com>"
   ],
