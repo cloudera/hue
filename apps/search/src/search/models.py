@@ -1147,9 +1147,10 @@ def get_engines(user):
   if ENABLE_SQL.get():
     engines += [{
           'name': _('table (%s)') % interpreter['name'],
-          'type': interpreter['type']
+          'type': interpreter['type'],
+          'async': interpreter['interface'] == 'hiveserver2'
         }
-        for interpreter in get_ordered_interpreters(user) if interpreter['interface'] == 'hiveserver2'
+        for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
     ]
 
   return engines

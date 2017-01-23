@@ -42,8 +42,10 @@ class MockRequest():
 # To inherit from DashboardApi
 class SQLApi():
 
-  def __init__(self, user):
+  def __init__(self, user, engine):
     self.user = user
+    self.engine = engine
+    self.async = engine == 'hive' or engine == 'impala'
 
   def query(self, dashboard, query, facet=None):
     database, table = self._get_database_table_names(dashboard['name'])
@@ -114,6 +116,8 @@ class SQLApi():
         status='ready-execute'
         # historify=False
     )
+    
+    # TODO: sync
     return editor.execute(MockRequest(self.user))
 
 
