@@ -26,12 +26,12 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
 from notebook.connectors.base import get_api, Notebook
+from notebook.models import make_notebook
 
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.smart_indexer import Indexer
-from notebook.models import make_notebook
 
 
 LOG = logging.getLogger(__name__)
@@ -232,12 +232,11 @@ def _create_table_from_a_file(request, source, destination):
     field_delimiter = destination['customFieldDelimiter']
     collection_delimiter = destination['customCollectionDelimiter']
     map_delimiter = destination['customMapDelimiter']
-    regexp_delimiter = destination['customRegexp']
   else:
     field_delimiter = ','
     collection_delimiter = r'\002'
     map_delimiter = r'\003'
-    regexp_delimiter = '.*'
+  regexp_delimiter = destination['customRegexp']
 
   file_format = 'TextFile'
   row_format = 'Delimited'
@@ -256,6 +255,11 @@ def _create_table_from_a_file(request, source, destination):
    "quoteChar"     = "'",
    "escapeChar"    = "\\\\"
    '''
+  elif table_format == 'regexp':
+    row_format = 'serde'
+    serde_name = 'org.apache.hadoop.hive.serde2.RegexSerDe'
+    serde_properties = '"input.regex" = "%s"' % regexp_delimiter
+
 
   if table_format in ('parquet', 'kudu'):
     if load_data:
@@ -340,7 +344,7 @@ def _create_table_from_a_file(request, source, destination):
   editor_type = 'impala' if table_format == 'kudu' else 'hive'
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', database=database, on_success_url=on_success_url)
+  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql.strip(), status='ready', database=database, on_success_url=on_success_url)
 
 
 def _index(request, file_format, collection_name, query=None):

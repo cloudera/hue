@@ -79,7 +79,6 @@ ${ assist.assistPanel() }
   }
 
   .step .card-heading.simple {
-    border-bottom: 1px solid #e5e5e5;
     font-size: 17px;
   }
 
@@ -470,7 +469,12 @@ ${ assist.assistPanel() }
                 ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
               </span>
               <span class="help-inline muted" data-bind="visible: isTargetExisting()">
-                ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
+                <!-- ko if: outputFormat() == 'index' -->
+                  ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
+                <!-- /ko -->
+                <!-- ko if: outputFormat() != 'index' -->
+                  <span data-bind="text: outputFormat"></span> ${ _('alredy exists.') } 
+                <!-- /ko -->
                 <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
               </span>
             </label>
@@ -531,12 +535,13 @@ ${ assist.assistPanel() }
                   <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
               </div>
-              <div class="control-group">
-                <label for="customRegexp" class="control-label"><div>${ _('Regexp') }</div>
-                  <input id="customRegexp"  type="text" data-bind="value: customRegexp">
-                </label>
-              </div>
             </span>
+
+            <div class="control-group" data-bind="visible: tableFormat() == 'regexp'">
+              <label for="customRegexp" class="control-label"><div>${ _('Regexp') }</div>
+                <input id="customRegexp" class="input-xxlarge" type="text" data-bind="value: customRegexp" placeholder='([^]*) ([^]*) ([^]*) (-|\\[^\\]*\\]) ([^ \"]*|\"[^\"]*\") (-|[0-9]*) (-|[0-9]*)(?: ([^ \"]*|\".*\") ([^ \"]*|\".*\"))?'>
+              </label>
+            </div>
 
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
               <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
@@ -1286,6 +1291,7 @@ ${ assist.assistPanel() }
           {'value': 'json', 'name': 'Json'},
           {'value': 'kudu', 'name': 'Kudu'},
           {'value': 'avro', 'name': 'Avro'},
+          {'value': 'regexp', 'name': 'Regexp'},
           {'value': 'rcfile', 'name': 'RCFile'},
           {'value': 'orc', 'name': 'ORC'},
           {'value': 'sequencefile', 'name': 'SequenceFile'}
@@ -1366,8 +1372,9 @@ ${ assist.assistPanel() }
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
         var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^[a-zA-Z0-9_]*$/.test(self.destination.name()));
+        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
 
-        return validDestination && validFields;
+        return validDestination && validFields && isTargetAlreadyExisting;
       });
 
       self.formatTypeSubscribed = false;
