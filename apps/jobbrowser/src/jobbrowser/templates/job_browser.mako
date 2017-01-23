@@ -52,6 +52,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 
+<div id="jobbrowserComponents">
 
 % if not is_embeddable:
   ${ assist.assistJSModels() }
@@ -96,7 +97,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   }
 </style>
 
-<div id="jobbrowserComponents">
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
