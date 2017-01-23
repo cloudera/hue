@@ -473,9 +473,10 @@ ${ assist.assistPanel() }
                   ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
                 <!-- /ko -->
                 <!-- ko if: outputFormat() != 'index' -->
-                  <span data-bind="text: outputFormat"></span> ${ _('alredy exists.') } 
+                  <span class="alert">${ _('Already existing') } <span data-bind="text: outputFormat"></span></span> 
                 <!-- /ko -->
                 <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
+                .
               </span>
             </label>
           </div>
