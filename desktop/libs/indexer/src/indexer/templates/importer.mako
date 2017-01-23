@@ -1110,6 +1110,12 @@ ${ assist.assistPanel() }
         }
         resizeElements();
       });
+      self.isObjectStore = ko.computed(function() {
+        return self.inputFormat() == 'file' && /^s3a:\/\/.*$/.test(self.path());
+      });
+      self.isObjectStore.subscribe(function(newVal) {console.log(newVal);
+        vm.createWizard.destination.useDefaultLocation(! newVal);
+      });
 
       // Table
       self.table = ko.observable('');
