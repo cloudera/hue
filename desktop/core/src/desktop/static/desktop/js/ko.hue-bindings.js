@@ -4734,13 +4734,9 @@
           var res = [];
 
           var Tokenizer = tokenizer.Tokenizer;
-          var Rules = xmlRules.XmlHighlightRules;
-          if (options.flavor) {
-            if (options.flavor() == 'impala') {
-              Rules = impalaRules.ImpalaHighlightRules;
-            } else {
-              Rules = hiveRules.HiveHighlightRules;
-            }
+          var Rules = hiveRules.HiveHighlightRules;
+          if (options.flavor && options.flavor() == 'impala') {
+            Rules = impalaRules.ImpalaHighlightRules;
           }
 
           var Text = text.Text;
@@ -4784,7 +4780,7 @@
               renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
             }
 
-            res.push('<div class="ace_line "' + additionalClass + '>' + renderedTokens.join('') + '&nbsp;</div>');
+            res.push('<div class="ace_line ' + additionalClass + '">' + renderedTokens.join('') + '&nbsp;</div>');
           })
 
           element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
