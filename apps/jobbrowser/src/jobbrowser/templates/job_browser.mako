@@ -64,12 +64,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <style type="text/css">
-  .content-panel-inner {
+  #jobbrowserComponents .content-panel-inner {
     padding: 10px;
   }
-  .tab-content {
+  #jobbrowserComponents .tab-content {
     padding: 10px;
     border: none!important;
+  }
+
+  #jobbrowserComponents .hueBreadcrumbBar {
+    padding: 0;
+  }
+
+  #jobbrowserComponents .hueBreadcrumbBar li {
+    padding: 12px;
+  }
+
+  #jobbrowserComponents .hueBreadcrumbBar li:first-child {
+    padding-left: 0;
+    padding-right: 0;
+  }
+
+  #jobbrowserComponents .hueBreadcrumbBar a {
+    color: #338BB8 !important;
+    display: inline !important;
+  }
+
+  #jobbrowserComponents .divider {
+    color: #CCC;
+    padding-right: 12px;
   }
 </style>
 
@@ -220,29 +243,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 </div>
 
+  nav nav-pills hueBreadcrumbBar
 
 <script type="text/html" id="breadcrumbs">
-  <h2 data-bind="foreach: breadcrumbs">
-    <!-- ko if: $index() > 0 -->
-      &gt;
-    <!-- /ko -->
+  <h3>
+    <ul class="nav nav-pills hueBreadcrumbBar" data-bind="foreach: breadcrumbs">
+      <li>
+      <!-- ko if: $index() > 0 -->
+        <span class="divider">&gt;</span>
+      <!-- /ko -->
 
-    <!-- ko if: $index() == 0 -->
-      <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }" style="text-transform: capitalize"></a>
-    <!-- /ko -->
-    <!-- ko if: $index() != 0 -->
-      <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
-        <a href="javascript:void(0)" data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
-        :
-        <a href="javascript:void(0)" data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+      <!-- ko if: $index() == 0 -->
+        <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }" style="text-transform: capitalize"></a>
       <!-- /ko -->
-      <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
-        <span data-bind="text: type"></span>
-        :
-        <span data-bind="text: id"></span>
+      <!-- ko if: $index() != 0 -->
+        <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
+          <a href="javascript:void(0)" data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+          :
+          <a href="javascript:void(0)" data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+        <!-- /ko -->
+        <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
+          <span data-bind="text: type"></span>
+          :
+          <span data-bind="text: id"></span>
+        <!-- /ko -->
       <!-- /ko -->
-    <!-- /ko -->
-  </h2>
+      </li>
+    </ul>
+  </h3>
 </script>
 
 
