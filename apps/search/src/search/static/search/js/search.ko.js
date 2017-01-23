@@ -455,6 +455,9 @@ var Collection = function (vm, collection) {
   self.engine.subscribe(function() {
     self.name(null);
   });
+  self.async = ko.computed(function() {
+    return ['impala', 'hive'].indexOf(self.engine()) != -1;
+  });
   self.queryResult = ko.observable(new QueryResult(self, {
     type: self.engine(),
   }));
@@ -681,9 +684,9 @@ var Collection = function (vm, collection) {
         );
       });
 
-      // TODO queryResult reload QueryResult
+      // TODO Reload QueryResult
       facet.queryResult = ko.observable(new QueryResult(self, {
-    	    type: self.engine(),
+         type: self.engine(),
       }));
     }
   }
@@ -1742,7 +1745,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
     }
 
-    if (self.collection.engine() == 'impala') {
+    if (self.collection.async()) {
       multiQs = $.map(self.collection.facets(), function(facet) {
         return $.post("/search/search", {
             collection: ko.mapping.toJSON(self.collection),
@@ -1778,7 +1781,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         }, function (data) {
           data = JSON.bigdataParse(data);
           try {
-            if (self.collection.engine() != 'impala') {
+            if (! self.collection.async()) {
               self._make_grid_result(data, callback);
             } else {
               self.collection.queryResult(new QueryResult(self, {
@@ -1799,7 +1802,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     )
     .done(function () {
       if (arguments[0] instanceof Array) {
-        if (self.collection.engine() != 'impala') { // If multi queries
+        if (! self.collection.async()) { // If multi queries
           var histograms = self.collection.getHistogramFacets();
           for (var h = 0; h < histograms.length; h++) { // Do not use $.each here
             var histoFacetId = histograms[h].id();

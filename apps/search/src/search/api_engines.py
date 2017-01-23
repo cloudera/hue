@@ -31,9 +31,9 @@ def get_engine(user, engine='solr'):
   if isinstance(engine, dict):
     engine = engine.get('engine', 'solr')
 
-  if engine == 'impala':
+  if engine != 'solr':
     from impala.dashboard_api import SQLApi
-    return SQLApi(user)
+    return SQLApi(user, engine)
   else:
     return SearchApi(user)
 
