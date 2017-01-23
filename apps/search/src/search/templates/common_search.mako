@@ -137,6 +137,9 @@ from desktop.views import commonheader, commonfooter, _ko
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
         <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
+        <!-- ko if: $root.collection.async() -->
+          <i class="fa fa-stop" clas="red" data-bind="click: cancelAsync, visible: isRetrievingResults()"></i>
+        <!-- /ko -->
         <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
 
@@ -1467,11 +1470,11 @@ ${ dashboard.layout_skeleton() }
             <!-- /ko -->
           </a>
         </div>
-        
+
         <!-- ko if: $root.collection.engine() != 'solr' -->
-          <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data.queryResult(), notebook: {getContext: function() { return {type: $data.queryResult().type(), id: 1}; }} } }" style="display:inline-block;"></div>        
+          <div data-bind="component: { name: 'downloadSnippetResults', params: { snippet: $data.queryResult(), notebook: {getContext: function() { return {type: $data.queryResult().type(), id: 1}; }} } }" style="display:inline-block;"></div>
         <!-- /ko -->
-        
+
         <!-- ko if: $root.collection.engine() == 'solr' -->
         <form method="POST" action="${ url('search:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
