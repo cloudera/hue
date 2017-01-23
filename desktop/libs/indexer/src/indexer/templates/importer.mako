@@ -202,6 +202,11 @@ ${ assist.assistPanel() }
     overflow-x: hidden;
   }
 
+  .content-panel-inner {
+    margin: 10px;
+    margin-bottom: 100px;
+  }
+
   .fileChooserBtn {
     height: 29px;
   }
@@ -278,7 +283,7 @@ ${ assist.assistPanel() }
         <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
         %endif
         <div class="content-panel">
-          <div style="margin: 10px; margin-bottom: 100px">
+          <div class="content-panel-inner">
           <!-- ko template: 'create-index-wizard' --><!-- /ko -->
           </div>
         </div>
@@ -1639,10 +1644,14 @@ ${ assist.assistPanel() }
     var viewModel;
 
     function resizeElements () {
-      var $contentPanel = $('#importerComponents').find('.content-panel');
+      var $contentPanel = $('#importerComponents').find('.content-panel-inner');
       $('.form-actions').width($contentPanel.width() - 50);
       $('.step-indicator-fixed').width($contentPanel.width());
-      document.styleSheets[0].addRule('.step-indicator li::before','max-width: ' + ($contentPanel.width()/2) + 'px');
+      document.styleSheets[0].addRule('.step-indicator li:first-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()) + 'px');
+      document.styleSheets[0].addRule('.step-indicator li:first-child:before','left: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()/2) + 'px');
+      document.styleSheets[0].addRule('.step-indicator li:last-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()) + 'px');
+      document.styleSheets[0].addRule('.step-indicator li:last-child:before','right: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()/2) + 'px');
+      //document.styleSheets[0].addRule('.step-indicator li::before','max-width: ' + (($contentPanel.width()/2) + ($contentPanel.find('.step-indicator .step').width()/2)) + 'px');
     }
 
     $(document).ready(function () {

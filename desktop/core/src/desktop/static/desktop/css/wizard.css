@@ -54,11 +54,11 @@
 }
 
 .step-indicator li:first-child:before {
-  left: 50%;
+  /*left: 50%;*/
 }
 
 .step-indicator li:last-child:before {
-  right: 50%;
+  /*right: 50%;*/
 }
 
 .step-indicator .active .step {

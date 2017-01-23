@@ -59,7 +59,7 @@
     }
 
     _el.wrap('<div class="inline">');
-    _el.parent().append('<i class="fa fa-spinner fa-spin muted" style="position: absolute; margin-top: 8px; margin-left: -24px; display:none"></i>');
+    _el.parent().append('<i class="fa fa-spinner fa-spin muted" style="margin-top: 8px; margin-left: -24px; display:none"></i>');
 
     function setHueBreadcrumbCaretAtEnd(element) {
       var elemLength = element.value.length;
