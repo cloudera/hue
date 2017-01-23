@@ -15,6 +15,133 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+.assist-panel {
+  -ms-flex: 0 0 200px;
+  flex: 0 0 200px;
+  position: relative;
+  overflow-x: hidden;
+  white-space: nowrap;
+  -webkit-transition: 0.4s flex;
+  -moz-transition: 0.4s flex;
+  -ms-transition: 0.4s flex;
+  transition: 0.4s flex;
+}
+.assist-hidden {
+  -ms-flex: 0;
+  flex: 0;
+}
+.assist-panel .assist {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+}
+.right-panel-tabs {
+  margin-top: 8px;
+  border-bottom: 1px solid #F1F1F1;
+  padding-left: 14px;
+}
+.right-panel-tabs > li > a {
+  font-size: 13px;
+  padding: 6px 5px 8px 5px;
+  margin-bottom: 0;
+}
+.right-panel-tabs > li.active > a {
+  padding: 6px 5px 8px 5px;
+}
+.right-panel-tab-content {
+  position: absolute;
+  top: 40px;
+  bottom: 0;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  border: none !important;
+}
+.assist-function-categories,
+.assist-functions {
+  list-style: none;
+  overflow-x: hidden;
+}
+.assist-function-categories {
+  margin: 5px;
+}
+.assist-function-categories li {
+  line-height: 23px;
+}
+.assist-function-categories li a i {
+  font-size: 12px;
+}
+.assist-function-categories li a span {
+  font-size: 14px;
+}
+.assist-functions {
+  margin: 0;
+}
+.assist-functions > li {
+  margin: 0 0 0 10px;
+  padding: 0 0 0 10px;
+}
+.assist-functions li {
+  font-size: 13px;
+  line-height: 20px;
+}
+.assist-functions li div {
+  margin: 0 0 0 10px;
+  font-style: italic;
+}
+.assist-function-type-switch {
+  padding: 8px 10px;
+  font-size: 15px;
+}
+.side-panel-toggle {
+  position: absolute;
+  top: 2px;
+  margin: 0;
+  z-index: 1000;
+  color: #D1D1D1;
+  font-size: 14px;
+  -webkit-transition: margin 0.2s linear, color 0.5s ease;
+  -moz-transition: margin 0.2s linear, color 0.5s ease;
+  -ms-transition: margin 0.2s linear, color 0.5s ease;
+  transition: margin 0.2s linear, color 0.5s ease;
+}
+.show-right-side-panel,
+.hide-left-side-panel {
+  right: 4px;
+}
+.show-right-side-panel:hover,
+.hide-left-side-panel:hover {
+  margin-right: 2px;
+  color: #338bb8;
+}
+.hide-right-side-panel,
+.show-left-side-panel {
+  left: 4px;
+}
+.hide-right-side-panel:hover,
+.show-left-side-panel:hover {
+  margin-left: 2px;
+  color: #338bb8;
+}
 html {
   height: 100%;
   width: 100%;
@@ -361,17 +488,6 @@ body {
   width: 200px;
   position: fixed;
 }
-.assist-panel {
-  -ms-flex: 0 0 200px;
-  flex: 0 0 200px;
-  position: relative;
-  overflow-x: hidden;
-  white-space: nowrap;
-  -webkit-transition: 0.4s flex;
-  -moz-transition: 0.4s flex;
-  -ms-transition: 0.4s flex;
-  transition: 0.4s flex;
-}
 .inactive-action,
 .inactive-action a {
   -webkit-transition: color 0.2s ease;
@@ -397,50 +513,6 @@ body {
 .blue {
   color: #338BB8 !important;
 }
-.assist-hidden {
-  -ms-flex: 0;
-  flex: 0;
-}
-.assist-panel .assist {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-}
-.right-panel-tabs {
-  margin-top: 8px;
-  border-bottom: 1px solid #F1F1F1;
-  padding-left: 14px;
-}
-.right-panel-tabs > li > a {
-  font-size: 13px;
-  padding: 6px 5px 8px 5px;
-  margin-bottom: 0;
-}
-.right-panel-tabs > li.active > a {
-  padding: 6px 5px 8px 5px;
-}
-.right-panel-tab-content {
-  position: absolute;
-  top: 40px;
-  bottom: 0;
-  width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: none !important;
-}
-.assist-function-categories,
-.assist-functions {
-  list-style: none;
-  overflow-x: hidden;
-}
-a:hover,
-a:active,
-a:focus,
-a:visited {
-  text-decoration: none;
-}
 .black-link {
   color: #444;
   -webkit-transition: color 0.2s ease;
@@ -455,67 +527,6 @@ a:visited {
 }
 .black-link:hover {
   color: #338BB8;
-}
-.assist-function-categories {
-  margin: 5px;
-}
-.assist-function-categories li {
-  line-height: 23px;
-}
-.assist-function-categories li a i {
-  font-size: 12px;
-}
-.assist-function-categories li a span {
-  font-size: 14px;
-}
-.assist-functions {
-  margin: 0;
-}
-.assist-functions > li {
-  margin: 0 0 0 10px;
-  padding: 0 0 0 10px;
-}
-.assist-functions li {
-  font-size: 13px;
-  line-height: 20px;
-}
-.assist-functions li div {
-  margin: 0 0 0 10px;
-  font-style: italic;
-}
-.assist-function-type-switch {
-  padding: 8px 10px;
-  font-size: 15px;
-}
-.side-panel-toggle {
-  position: absolute;
-  top: 2px;
-  margin: 0;
-  z-index: 1000;
-  color: #D1D1D1;
-  font-size: 14px;
-  -webkit-transition: margin 0.2s linear, color 0.5s ease;
-  -moz-transition: margin 0.2s linear, color 0.5s ease;
-  -ms-transition: margin 0.2s linear, color 0.5s ease;
-  transition: margin 0.2s linear, color 0.5s ease;
-}
-.show-right-side-panel,
-.hide-left-side-panel {
-  right: 4px;
-}
-.show-right-side-panel:hover,
-.hide-left-side-panel:hover {
-  margin-right: 2px;
-  color: #338bb8;
-}
-.hide-right-side-panel,
-.show-left-side-panel {
-  left: 4px;
-}
-.hide-right-side-panel:hover,
-.show-left-side-panel:hover {
-  margin-left: 2px;
-  color: #338bb8;
 }
 h1 {
   font-size: 3rem;
@@ -534,6 +545,12 @@ h5 {
 }
 h6 {
   font-size: 1rem;
+}
+a:hover,
+a:active,
+a:focus,
+a:visited {
+  text-decoration: none;
 }
 /*!
  * Hamburgers

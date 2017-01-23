@@ -16,6 +16,7 @@
  limitations under the License.
 */
 @import (reference) "cui/colors.less";
+@import "hue-assist.less";
 
 html {
   height: 100%;
@@ -420,18 +421,6 @@ body {
   position: fixed;
 }
 
-.assist-panel {
-  -ms-flex: 0 0 200px;
-  flex: 0 0 200px;
-  position: relative;
-  overflow-x: hidden;
-  white-space: nowrap;
-  -webkit-transition: 0.4s flex;
-  -moz-transition: 0.4s flex;
-  -ms-transition: 0.4s flex;
-  transition: 0.4s flex;
-}
-
 .inactive-action,
 .inactive-action a {
   -webkit-transition: color 0.2s ease;
@@ -463,57 +452,6 @@ body {
   color: #338BB8 !important;
 }
 
-.assist-hidden {
-  -ms-flex: 0;
-  flex: 0;
-}
-
-.assist-panel .assist {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
-}
-
-.right-panel-tabs {
-  margin-top: 8px;
-  border-bottom: 1px solid #F1F1F1;
-  padding-left: 14px;
-}
-
-.right-panel-tabs > li > a {
-  font-size: 13px;
-  padding: 6px 5px 8px 5px;
-  margin-bottom: 0;
-}
-
-.right-panel-tabs > li.active > a {
-  padding: 6px 5px 8px 5px;
-}
-.right-panel-tab-content {
-  position: absolute;
-  top: 40px;
-  bottom: 0;
-  width: 100%;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border: none !important;
-}
-
-.assist-function-categories,
-.assist-functions {
-  list-style: none;
-  overflow-x: hidden;
-}
-
-a:hover,
-a:active,
-a:focus,
-a:visited {
-  text-decoration: none;
-}
-
 .black-link {
   color: #444;
   -webkit-transition: color 0.2s ease;
@@ -530,81 +468,6 @@ a:visited {
 
 .black-link:hover {
   color: #338BB8;
-}
-
-.assist-function-categories {
-  margin: 5px;
-}
-
-.assist-function-categories li {
-  line-height: 23px;
-}
-
-.assist-function-categories li a i {
-  font-size: 12px;
-}
-
-.assist-function-categories li a span {
-  font-size: 14px;
-}
-
-.assist-functions {
-  margin: 0;
-}
-
-.assist-functions > li {
-  margin: 0 0 0 10px;
-  padding: 0 0 0 10px;
-}
-
-.assist-functions li {
-  font-size: 13px;
-  line-height: 20px;
-}
-
-.assist-functions li div {
-  margin: 0 0 0 10px;
-  font-style: italic;
-}
-
-.assist-function-type-switch {
-  padding: 8px 10px;
-  font-size: 15px;
-}
-
-.side-panel-toggle {
-  position: absolute;
-  top: 2px;
-  margin: 0;
-  z-index: 1000;
-  color: #D1D1D1;
-  font-size: 14px;
-  -webkit-transition: margin 0.2s linear, color 0.5s ease;
-  -moz-transition: margin 0.2s linear, color 0.5s ease;
-  -ms-transition: margin 0.2s linear, color 0.5s ease;
-  transition: margin 0.2s linear, color 0.5s ease;
-}
-
-.show-right-side-panel,
-.hide-left-side-panel {
-  right: 4px;
-}
-
-.show-right-side-panel:hover,
-.hide-left-side-panel:hover {
-  margin-right: 2px;
-  color: #338bb8;
-}
-
-.hide-right-side-panel,
-.show-left-side-panel {
-  left: 4px;
-}
-
-.hide-right-side-panel:hover,
-.show-left-side-panel:hover {
-  margin-left: 2px;
-  color: #338bb8;
 }
 
 h1 {
@@ -629,6 +492,13 @@ h5 {
 
 h6 {
   font-size: 1rem;
+}
+
+a:hover,
+a:active,
+a:focus,
+a:visited {
+  text-decoration: none;
 }
 
 /*!
