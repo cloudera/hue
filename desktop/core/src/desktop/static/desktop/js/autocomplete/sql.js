@@ -647,6 +647,13 @@ case 822:
          keywords = keywords.concat(createWeightedKeywords($$[$0-3].tableReferenceList.suggestKeywords, 3));
        }
 
+       // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
+       keywords.forEach(function (keyword) {
+         if (keyword.value === 'TABLESAMPLE' || keyword.value === 'LATERAL VIEW') {
+           keyword.weight = 1.1;
+         }
+       });
+
        if (!$$[$0-3].hasLateralViews && $$[$0-3].tableReferenceList.types) {
          var veKeywords = getValueExpressionKeywords($$[$0-3].tableReferenceList);
          keywords = keywords.concat(veKeywords.suggestKeywords);
