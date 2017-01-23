@@ -503,7 +503,7 @@ ${ assist.assistPanel() }
               </label>
             </span>
 
-            <label class="checkbox">
+            <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
               <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
             </label>
 
@@ -627,7 +627,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
-            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <a class="inactive-action pointer" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
+            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body">
               <form class="form-inline" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
@@ -1133,6 +1133,14 @@ ${ assist.assistPanel() }
           vm.createWizard.destination.hasHeader(newVal.hasHeader());
           newVal.hasHeader.subscribe(function(newVal) {
             vm.createWizard.destination.hasHeader(newVal);
+          });
+        }
+
+        if (typeof newVal.fieldSeparator !== 'undefined') {
+          vm.createWizard.destination.useCustomDelimiters(true);
+          vm.createWizard.destination.customFieldDelimiter(newVal.fieldSeparator());
+          newVal.fieldSeparator.subscribe(function(newVal) {
+            vm.createWizard.destination.customFieldDelimiter(newVal);
           });
         }
       });
