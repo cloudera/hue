@@ -9,7 +9,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     config: config,
     less: {
-      responsive: {
+      hue: {
         options: {
           paths: ['desktop/core/src/desktop/static/desktop/less'],
           compress: false
