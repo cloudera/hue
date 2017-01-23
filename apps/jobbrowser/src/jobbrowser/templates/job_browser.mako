@@ -74,7 +74,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </style>
 
 <div id="jobbrowserComponents">
-<div class="navbar navbar-inverse navbar-fixed-top nokids">
+<div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">
@@ -85,13 +85,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-          </ul>
-            <span class="form-inline">
-              <input class="btn btn-status" type="radio" name="interface" value="apps" data-bind="checked: interface" id="apps"><label for="apps">${ _('Apps') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="workflows" data-bind="checked: interface" id="workflows"><label for="workflows">${ _('Workflows') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="schedules" data-bind="checked: interface" id="schedules"><label for="schedules">${ _('Schedules') }</label>
-              <input class="btn btn-status" type="radio" name="interface" value="bundles" data-bind="checked: interface" id="bundles"><label for="bundles">${ _('Bundles') }</label>
-            </span>
+            <li data-bind="css: {'active': interface() === 'apps'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Apps') }</a></li>
+            <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ interface('workflows') }">${ _('Workflows') }</a></li>
+            <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ interface('schedules') }">${ _('Schedules') }</a></li>
+            <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ interface('bundles') }">${ _('Bundles') }</a></li>
+            </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right alert alert-warning" style="margin-top: 4px">${ _("Hive jobs are running as the 'hive' user") }</div>
           % endif
