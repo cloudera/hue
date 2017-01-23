@@ -15,7 +15,7 @@ module.exports = function(grunt) {
           compress: false
         },
         files: {
-          'desktop/core/src/desktop/static/desktop/css/responsive.css': 'desktop/core/src/desktop/static/desktop/less/responsive.less'
+          'desktop/core/src/desktop/static/desktop/css/hue.css': 'desktop/core/src/desktop/static/desktop/less/hue.less'
         }
       }
     },

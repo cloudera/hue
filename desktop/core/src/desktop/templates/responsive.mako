@@ -40,10 +40,12 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
+##   TODO: Get rid of bootplus and hue3.css
   <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
+
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/responsive.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
