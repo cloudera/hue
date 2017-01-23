@@ -134,7 +134,7 @@ var SqlAutocompleter3 = (function () {
     var updateCategories = function (suggestions) {
       var newCategories =  {};
       suggestions.forEach(function (suggestion) {
-        if (suggestion.popular && ! newCategories[CATEGORIES.POPULAR.label]) {
+        if (suggestion.popular() && ! newCategories[CATEGORIES.POPULAR.label]) {
           newCategories[CATEGORIES.POPULAR.label] = CATEGORIES.POPULAR;
         } else if (suggestion.category === CATEGORIES.TABLE || suggestion.category === CATEGORIES.COLUMN || suggestion.category === CATEGORIES.UDF) {
           if (!newCategories[suggestion.category.label]) {
@@ -188,7 +188,7 @@ var SqlAutocompleter3 = (function () {
       var activeCategory = self.activeCategory();
       if (activeCategory !== CATEGORIES.ALL) {
         result = result.filter(function (suggestion) {
-          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular);
+          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular());
         });
       }
 
@@ -357,6 +357,7 @@ var SqlAutocompleter3 = (function () {
           meta: AutocompleterGlobals.i18n.meta.keyword,
           category: CATEGORIES.KEYWORD,
           weightAdjust: keyword.weight,
+          popular: ko.observable(false),
           details: null
         };
       });
@@ -375,6 +376,7 @@ var SqlAutocompleter3 = (function () {
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
                 meta: AutocompleterGlobals.i18n.meta.keyword,
                 category: CATEGORIES.COLREF_KEYWORD,
+                popular: ko.observable(false),
                 details: {
                   type: colRef.type
                 }
@@ -397,6 +399,7 @@ var SqlAutocompleter3 = (function () {
           value: identifier.name,
           meta: identifier.type,
           category: CATEGORIES.IDENTIFIER,
+          popular: ko.observable(false),
           details: null
         });
       });
@@ -415,6 +418,7 @@ var SqlAutocompleter3 = (function () {
             value: columnAlias.name,
             meta: AutocompleterGlobals.i18n.meta.alias,
             category: CATEGORIES.COLUMN,
+            popular: ko.observable(false),
             details: columnAlias
           });
         } else {
@@ -422,6 +426,7 @@ var SqlAutocompleter3 = (function () {
             value: columnAlias.name,
             meta: type,
             category: CATEGORIES.COLUMN,
+            popular: ko.observable(false),
             details: columnAlias
           });
         }
@@ -444,6 +449,7 @@ var SqlAutocompleter3 = (function () {
           filterValue: expression.name,
           meta: AutocompleterGlobals.i18n.meta.commonTableExpression,
           category: CATEGORIES.CTE,
+          popular: ko.observable(false),
           details: null
         });
       });
@@ -468,6 +474,7 @@ var SqlAutocompleter3 = (function () {
               weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
                   return otherType === colRef.type.toUpperCase();
               }).length > 0 ? 1 : 0,
+              popular: ko.observable(false),
               details: functionsToSuggest[name]
             })
           });
@@ -487,6 +494,7 @@ var SqlAutocompleter3 = (function () {
             weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
               return otherType === types[0].toUpperCase();
             }).length > 0 ? 1 : 0,
+            popular: ko.observable(false),
             details: functionsToSuggest[name]
           })
         });
@@ -512,6 +520,7 @@ var SqlAutocompleter3 = (function () {
             filterValue: db,
             meta: AutocompleterGlobals.i18n.meta.database,
             category: CATEGORIES.DATABASE,
+            popular: ko.observable(false),
             details: null
           })
         });
@@ -552,6 +561,7 @@ var SqlAutocompleter3 = (function () {
                 tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
                 category: CATEGORIES.TABLE,
+                popular: ko.observable(false),
                 details: details
               });
             });
@@ -624,12 +634,14 @@ var SqlAutocompleter3 = (function () {
               value: 'BLOCK__OFFSET__INSIDE__FILE',
               meta: AutocompleterGlobals.i18n.meta.virtual,
               category: CATEGORIES.VIRTUAL_COLUMN,
+              popular: ko.observable(false),
               details: null
             });
             columnSuggestions.push({
               value: 'INPUT__FILE__NAME',
               meta: AutocompleterGlobals.i18n.meta.virtual,
               category: CATEGORIES.VIRTUAL_COLUMN,
+              popular: ko.observable(false),
               details: null
             });
           }
@@ -664,6 +676,7 @@ var SqlAutocompleter3 = (function () {
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (column.identifierChain && column.identifierChain.length > 0) {
@@ -673,6 +686,7 @@ var SqlAutocompleter3 = (function () {
                 meta: type,
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             }
@@ -702,6 +716,7 @@ var SqlAutocompleter3 = (function () {
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (column.type.indexOf('map') === 0) {
@@ -711,6 +726,7 @@ var SqlAutocompleter3 = (function () {
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (column.type.indexOf('struct') === 0) {
@@ -720,6 +736,7 @@ var SqlAutocompleter3 = (function () {
                 meta: 'struct',
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
@@ -730,6 +747,7 @@ var SqlAutocompleter3 = (function () {
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (column.type.indexOf('array') === 0) {
@@ -739,6 +757,7 @@ var SqlAutocompleter3 = (function () {
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
@@ -749,6 +768,7 @@ var SqlAutocompleter3 = (function () {
                 category: CATEGORIES.COLUMN,
                 weightAdjust: 1,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
@@ -759,6 +779,7 @@ var SqlAutocompleter3 = (function () {
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: column
               })
             }
@@ -774,6 +795,7 @@ var SqlAutocompleter3 = (function () {
               meta: 'column',
               category: CATEGORIES.COLUMN,
               table: table,
+              popular: ko.observable(false),
               details: column
             })
           });
@@ -784,6 +806,7 @@ var SqlAutocompleter3 = (function () {
             meta: 'key',
             category: CATEGORIES.COLUMN,
             table: table,
+            popular: ko.observable(false),
             details: data
           });
           columnSuggestions.push({
@@ -791,6 +814,7 @@ var SqlAutocompleter3 = (function () {
             meta: 'value',
             category: CATEGORIES.COLUMN,
             table: table,
+            popular: ko.observable(false),
             details: data
           });
         }
@@ -806,6 +830,7 @@ var SqlAutocompleter3 = (function () {
               meta: field.type,
               category: CATEGORIES.COLUMN,
               table: table,
+              popular: ko.observable(false),
               details: field
             });
           });
@@ -823,6 +848,7 @@ var SqlAutocompleter3 = (function () {
                 meta: field.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: field
               });
             }
@@ -842,6 +868,7 @@ var SqlAutocompleter3 = (function () {
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
+                    popular: ko.observable(false),
                     details: field
                   });
                 } else {
@@ -851,6 +878,7 @@ var SqlAutocompleter3 = (function () {
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
                     table: table,
+                    popular: ko.observable(false),
                     details: field
                   });
                 }
@@ -862,6 +890,7 @@ var SqlAutocompleter3 = (function () {
                   meta: field.type,
                   category: CATEGORIES.COLUMN,
                   table: table,
+                  popular: ko.observable(false),
                   details: field
                 });
               }
@@ -873,6 +902,7 @@ var SqlAutocompleter3 = (function () {
                 meta: data.item.type,
                 category: CATEGORIES.COLUMN,
                 table: table,
+                popular: ko.observable(false),
                 details: data.item
               });
             }
@@ -932,6 +962,7 @@ var SqlAutocompleter3 = (function () {
           value: '${' + self.parseResult.colRef.identifierChain[self.parseResult.colRef.identifierChain.length - 1].name + '}',
           meta: AutocompleterGlobals.i18n.meta.variable,
           category: CATEGORIES.VARIABLE,
+          popular: ko.observable(false),
           details: null
         });
       }
@@ -945,6 +976,7 @@ var SqlAutocompleter3 = (function () {
               value: isString ? startQuote + sample + endQuote : new String(sample),
               meta: AutocompleterGlobals.i18n.meta.value,
               category: CATEGORIES.SAMPLE,
+              popular: ko.observable(false),
               details: null
             })
           });
@@ -977,6 +1009,7 @@ var SqlAutocompleter3 = (function () {
                   value: suggestHdfs.path === '' ? '/' + file.name : file.name,
                   meta: file.type,
                   category: CATEGORIES.HDFS,
+                  popular: ko.observable(false),
                   details: file
                 });
               }
@@ -1055,7 +1088,7 @@ var SqlAutocompleter3 = (function () {
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.join,
                 category: suggestJoins.prependJoin ? CATEGORIES.POPULAR_JOIN : CATEGORIES.POPULAR_ACTIVE_JOIN,
-                popular: true,
+                popular: ko.observable(true),
                 details: value
               });
             }
@@ -1110,7 +1143,7 @@ var SqlAutocompleter3 = (function () {
                 value: suggestionString,
                 meta: AutocompleterGlobals.i18n.meta.joinCondition,
                 category: CATEGORIES.POPULAR_JOIN_CONDITION,
-                popular: true,
+                popular: ko.observable(true),
                 details: value
               });
             }
@@ -1188,8 +1221,8 @@ var SqlAutocompleter3 = (function () {
                 value: clean,
                 meta: value.function.returnTypes.join('|'),
                 category: CATEGORIES.POPULAR_AGGREGATE,
-                popular: true,
                 weightAdjust: Math.min(value.totalQueryCount, 99),
+                popular: ko.observable(true),
                 details: value
               });
             });
@@ -1238,8 +1271,8 @@ var SqlAutocompleter3 = (function () {
                 filterValue: filterValue,
                 meta: AutocompleterGlobals.i18n.meta.groupBy,
                 category: CATEGORIES.POPULAR_GROUP_BY,
-                popular: true,
                 weightAdjust: Math.min(value.columnCount, 99),
+                popular: ko.observable(true),
                 details: value
               });
             });
@@ -1282,8 +1315,8 @@ var SqlAutocompleter3 = (function () {
                 filterValue: filterValue,
                 meta: AutocompleterGlobals.i18n.meta.orderBy,
                 category: CATEGORIES.POPULAR_ORDER_BY,
-                popular: true,
                 weightAdjust: Math.min(value.columnCount, 99),
+                popular: ko.observable(true),
                 details: value
               });
             });
@@ -1338,7 +1371,7 @@ var SqlAutocompleter3 = (function () {
                       value: compVal,
                       meta: AutocompleterGlobals.i18n.meta.filter,
                       category: CATEGORIES.POPULAR_FILTER,
-                      popular: true,
+                      popular: ko.observable(true),
                       details: popularValue
                     });
                   });
@@ -1399,7 +1432,7 @@ var SqlAutocompleter3 = (function () {
             tableSuggestions.forEach(function (suggestion) {
               var topTable = popularityIndex[suggestion.tableName];
               if (typeof topTable !== 'undefined') {
-                suggestion.popular = true;
+                suggestion.popular(true);
                 if (!suggestion.details) {
                   suggestion.details = {};
                 }
@@ -1476,7 +1509,7 @@ var SqlAutocompleter3 = (function () {
               }
               var topColumn = popularityIndex[suggestion.value.toLowerCase()];
               if (typeof topColumn !== 'undefined') {
-                suggestion.popular = true;
+                suggestion.popular(true);
                 if (!suggestion.details) {
                   suggestions.details = {};
                 }

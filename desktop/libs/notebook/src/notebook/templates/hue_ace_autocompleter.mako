@@ -220,7 +220,7 @@ from desktop.views import _ko
               <div class="autocompleter-suggestion-value">
                 <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
               </div>
-              <div class="autocompleter-suggestion-meta"><!-- ko if: typeof popular !== 'undefined' && popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
+              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
           </div>
         </div>
