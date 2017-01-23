@@ -515,8 +515,9 @@ ${ assist.assistPanel() }
               </label>
 
               <span  data-bind="visible: showProperties">
+                <br>
                 <label><div>${ _('Description') }</div>
-                   <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
+                   <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
                 </label>
 
                 <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
@@ -1128,8 +1129,11 @@ ${ assist.assistPanel() }
 
       self.format = ko.observable();
       self.format.subscribe(function(newVal) {
-        if (newVal.hasHeader !== 'undefined') {
-         // vm.createWizard.destination.hasHeader(newVal.hasHeader);
+        if (typeof newVal.hasHeader !== 'undefined') {
+          vm.createWizard.destination.hasHeader(newVal.hasHeader());
+          newVal.hasHeader.subscribe(function(newVal) {
+            vm.createWizard.destination.hasHeader(newVal);
+          });
         }
       });
 
