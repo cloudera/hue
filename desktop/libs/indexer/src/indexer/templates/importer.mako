@@ -1118,7 +1118,7 @@ ${ assist.assistPanel() }
         if (self.inputFormat() == 'file') {
           return self.path().length > 0;
         } else if (self.inputFormat() == 'table') {
-          return self.table().length > 0;
+          return self.tableName().length > 0;
         } else if (self.inputFormat() == 'query') {
           return self.query();
         } else if (self.inputFormat() == 'manual') {
