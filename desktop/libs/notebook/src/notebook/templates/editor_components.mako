@@ -1108,7 +1108,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 </ul>
               </fieldset>
             </form>
-        
+
             <form class="form-horizontal">
               <fieldset>
                 ${ _('Suggestions') }<br/>
@@ -1126,7 +1126,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 </ul>
               </fieldset>
             </form>
-        
+
               <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
                 <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
               </a>

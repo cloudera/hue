@@ -45,7 +45,7 @@ def search(request):
 
   collection = json.loads(request.POST.get('collection', '{}'))
   query = json.loads(request.POST.get('query', '{}'))
-  facet = json.loads(request.POST.get('facet', '{}')) 
+  facet = json.loads(request.POST.get('facet', '{}'))
 
   query['download'] = 'download' in request.POST
   fetch_result = 'fetch_result' in request.POST
