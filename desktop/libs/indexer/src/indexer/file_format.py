@@ -353,7 +353,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _get_sample(cls, file_stream):
     file_stream.seek(0)
-    sample = '\n'.join(file_stream.read(1024 * 1024 * 5).splitlines())
+    sample = '\n'.join(file_stream.read(1024 * 1024 * 5).splitlines()[:20])
     file_stream.seek(0)
 
     return sample
