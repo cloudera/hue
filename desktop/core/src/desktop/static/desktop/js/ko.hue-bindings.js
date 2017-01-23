@@ -4688,27 +4688,61 @@
     }
   };
 
+  ko.bindingHandlers.readonlyXML = {
+    init: function (element, valueAccessor, allBindingsAccessor) {
+      $(element).css({
+        'min-height': '250px'
+      });
+      var editor = ace.edit(element);
+      editor.setOptions({
+        readOnly: true,
+        maxLines: Infinity
+      });
+      editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
+      editor.getSession().setMode("ace/mode/xml");
+      $(element).data('aceEditor', editor);
+    },
+    update: function (element, valueAccessor, allBindingsAccessor) {
+      var value = ko.unwrap(valueAccessor());
+      var options = ko.unwrap(allBindingsAccessor());
+      if (typeof value !== 'undefined' && value !== '') { // allows highlighting static code
+        if (options.path) {
+          value = value[options.path];
+        }
+        $(element).data('aceEditor').setValue(value, -1)
+      }
+    }
+  }
+
+
   ko.bindingHandlers.highlight = {
     update: function (element, valueAccessor, allBindingsAccessor) {
       var value = ko.unwrap(valueAccessor());
       var options = ko.unwrap(allBindingsAccessor());
 
-      if (typeof value !== 'undefined') { // allows highlighting static code
+      if (typeof value !== 'undefined' && value !== '') { // allows highlighting static code
+        if (options.path) {
+          value = value[options.path];
+        }
         ace.require([
           'ace/mode/impala_highlight_rules',
           'ace/mode/hive_highlight_rules',
+          'ace/mode/xml_highlight_rules',
           'ace/tokenizer',
           'ace/layer/text'
-        ], function (impalaRules, hiveRules, tokenizer, text) {
+        ], function (impalaRules, hiveRules, xmlRules, tokenizer, text) {
           var res = [];
 
           var Tokenizer = tokenizer.Tokenizer;
-          var Rules;
-          if (options.flavor && options.flavor() == 'impala') {
-            Rules = impalaRules.ImpalaHighlightRules;
-          } else {
-            Rules = hiveRules.HiveHighlightRules;
+          var Rules = xmlRules.XmlHighlightRules;
+          if (options.flavor) {
+            if (options.flavor() == 'impala') {
+              Rules = impalaRules.ImpalaHighlightRules;
+            } else {
+              Rules = hiveRules.HiveHighlightRules;
+            }
           }
+
           var Text = text.Text;
 
           var tok = new Tokenizer(new Rules().getRules());
@@ -4737,6 +4771,11 @@
             }
           };
 
+          var additionalClass = 'pull-left';
+          if (options.splitLines) {
+            additionalClass = '';
+          }
+
           lines.forEach(function (line) {
             var renderedTokens = [];
             var tokens = tok.getLineTokens(line);
@@ -4745,7 +4784,7 @@
               renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
             }
 
-            res.push('<div class="ace_line pull-left">' + renderedTokens.join('') + '&nbsp;</div>');
+            res.push('<div class="ace_line "' + additionalClass + '>' + renderedTokens.join('') + '&nbsp;</div>');
           })
 
           element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
