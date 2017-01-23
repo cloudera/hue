@@ -332,7 +332,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _guess_from_file_stream(cls, file_stream):
     sample = cls._get_sample(file_stream)
-
+    
     try:
       dialect, has_header = cls._guess_dialect(sample)
       delimiter = dialect.delimiter
@@ -343,7 +343,7 @@ class CSVFormat(FileFormat):
       return cls()
 
     return cls(**{
-      "delimiter":delimiter,
+      "delimiter": delimiter,
       "line_terminator": line_terminator,
       "quote_char": quote_char,
       "has_header": has_header,
@@ -353,7 +353,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _get_sample(cls, file_stream):
     file_stream.seek(0)
-    sample = '\n'.join(file_stream.read(1024*1024*5).splitlines())
+    sample = '\n'.join(file_stream.read(1024 * 1024 * 5).splitlines())
     file_stream.seek(0)
 
     return sample
