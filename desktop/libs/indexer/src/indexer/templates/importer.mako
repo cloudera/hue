@@ -473,7 +473,7 @@ ${ assist.assistPanel() }
                   ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
                 <!-- /ko -->
                 <!-- ko if: outputFormat() != 'index' -->
-                  <span class="alert">${ _('Already existing') } <span data-bind="text: outputFormat"></span></span> 
+                  <span class="alert">${ _('Already existing') } <span data-bind="text: outputFormat"></span></span>
                 <!-- /ko -->
                 <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
                 .
@@ -494,14 +494,8 @@ ${ assist.assistPanel() }
               </label>
             </div>
 
-            <div class="control-group">
-              <label><div>${ _('Description') }</div>
-                <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
-              </label>
-            </div>
-
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Default location')}
+            <label class="checkbox" data-bind="visible: tableFormat() != 'kudu'">
+              <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
             </label>
             <span data-bind="visible: ! useDefaultLocation()">
               <label for="path" class="control-label"><div>${ _('External location') }</div>
@@ -513,30 +507,44 @@ ${ assist.assistPanel() }
               <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
             </label>
 
-            <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
-              <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
-            </label>
+            <div class="control-group">
+              <label class="control-label"><div>${ _('Extra') }</div>
+                <a href="javascript:void(0)" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                  <i class="fa fa-sliders"></i>
+                </a>
+              </label>
 
-            <label class="checkbox" data-bind="visible: tableFormat() == 'text'">
-              <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
-            </label>
-            <span data-bind="visible: useCustomDelimiters" data-bind="visible: tableFormat() == 'text'">
-              <div class="control-group">
-                <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
-                  <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+              <span  data-bind="visible: showProperties">
+                <label><div>${ _('Description') }</div>
+                   <input type="text" class="form-control input-xlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
                 </label>
-              </div>
-              <div class="control-group">
-                <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
-                  <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+
+                <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
+                  <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
                 </label>
-              </div>
-              <div class="control-group">
-                <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
-                  <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+
+                <label class="checkbox" data-bind="visible: tableFormat() == 'text'">
+                  <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
                 </label>
-              </div>
-            </span>
+                <span data-bind="visible: useCustomDelimiters" data-bind="visible: tableFormat() == 'text'">
+                  <div class="control-group">
+                    <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
+                      <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                    </label>
+                  </div>
+                  <div class="control-group">
+                    <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
+                      <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                    </label>
+                  </div>
+                  <div class="control-group">
+                    <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
+                      <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                    </label>
+                  </div>
+                </span>
+              </span>
+            </div>
 
             <div class="control-group" data-bind="visible: tableFormat() == 'regexp'">
               <label for="customRegexp" class="control-label"><div>${ _('Regexp') }</div>
@@ -1224,7 +1232,10 @@ ${ assist.assistPanel() }
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
+
+      // UI
       self.bulkColumnNames = ko.observable('');
+      self.showProperties = ko.observable(false);
 
       self.columns.subscribe(function (newVal) {
         self.bulkColumnNames(newVal.map(function (item) {
