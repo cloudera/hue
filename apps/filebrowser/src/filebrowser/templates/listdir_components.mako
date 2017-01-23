@@ -20,6 +20,8 @@ from django.template.defaultfilters import urlencode, stringformat, filesizeform
 from desktop.lib.django_util import reverse_with_get, extract_field_data
 from django.utils.encoding import smart_str
 from django.utils.translation import ugettext as _
+
+from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 %>
 
 <%namespace name="edit" file="editor_components.mako" />
@@ -550,6 +552,11 @@ from django.utils.translation import ugettext as _
     <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
     </li>
+    % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
+      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0">
+        <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+      </li>
+    % endif
   <!-- /ko -->
   <!-- ko if: $root.inTrash -->
     <li><a href="#" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash() &&  selectedFiles().length > 0 && isCurrentDirSelected().length == 0, click: restoreTrashSelected"><i class="fa fa-fw fa-cloud-upload"></i> ${_('Restore')}</a></li>
