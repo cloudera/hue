@@ -332,7 +332,7 @@ class CSVFormat(FileFormat):
   @classmethod
   def _guess_from_file_stream(cls, file_stream):
     sample = cls._get_sample(file_stream)
-    
+
     try:
       dialect, has_header = cls._guess_dialect(sample)
       delimiter = dialect.delimiter
