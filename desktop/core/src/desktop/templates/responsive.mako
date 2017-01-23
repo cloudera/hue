@@ -46,7 +46,10 @@
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
+  <link href="${ static('desktop/css/cui.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
 </head>
@@ -440,7 +443,8 @@ ${ hueIcons.symbols() }
 </div>
 
 
-<script src="${ static('desktop/ext/js/jquery/jquery-2.2.3.min.js') }"></script>
+<script src="${ static('desktop/js/cui-bundle.js') }"></script>
+
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
@@ -477,11 +481,9 @@ ${ hueIcons.symbols() }
   window.d3v3 = d3;
 </script>
 
-<script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
-<script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
