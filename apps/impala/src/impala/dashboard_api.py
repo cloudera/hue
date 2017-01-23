@@ -53,9 +53,7 @@ class SQLApi():
     if query['qs'] == [{'q': '_root_:*'}]:
       return {'response': {'numFound': 0}}
 
-    filters = []
-    for q in query['qs']:
-      filters.append(q['q'])
+    filters = [q['q'] for q in query['qs'] if q['q']]
     filters.extend(self._get_fq(dashboard, query, facet))
 
     if facet:
@@ -107,7 +105,7 @@ class SQLApi():
           'fields': fields
       }
       if filters:
-        sql += self._convert_filters_to_where(filters)
+        sql += ' ' + self._convert_filters_to_where(filters)
       sql += ' LIMIT %s' % LIMIT
 
 

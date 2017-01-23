@@ -1431,7 +1431,7 @@ var QueryResult = function (vm, initial) {
 
   self.id = ko.observable(UUID());
   self.type = ko.mapping.fromJS(initial.type);
-  self.status = ko.observable('running');
+  self.status = ko.observable(initial.status || 'running');
   self.progress = ko.mapping.fromJS(initial.progress || 0);
 
   self.hasResultset = ko.observable(true);
@@ -1443,7 +1443,7 @@ var QueryResult = function (vm, initial) {
   self.result.type = ko.observable('table');
 
   self.getContext = function() {
-	return self;
+  return self;
   }
 };
 
@@ -1528,11 +1528,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.hasRetrievedResults = ko.observable(true);
   self.asyncSearchesCounter = ko.observableArray([]);
   self.asyncSearchesCounter.subscribe(function(newVal) {
-	if (newVal.length == 0) {
-	  self.isRetrievingResults(false);
-	  self.hasRetrievedResults(true);
-	  $('.btn-loading').button('reset');
-	}
+  if (newVal.length == 0) {
+    self.isRetrievingResults(false);
+    self.hasRetrievedResults(true);
+    $('.btn-loading').button('reset');
+  }
   });
 
   self.showCores = ko.observable(false);
@@ -1639,7 +1639,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       } else {
 
         if (data.status == 0) {
-      	  facet.queryResult().status(data.query_status.status);
+          facet.queryResult().status(data.query_status.status);
 
           if (facet.queryResult().status() == 'running' || facet.queryResult().status() == 'starting') {
             // if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
@@ -1653,10 +1653,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             facet.queryResult().progress(99);
           }
         } else if (data.status == -3) {
-      	  facet.queryResult().status('expired');
+          facet.queryResult().status('expired');
         } else {
           //self._ajaxError(data); // common?
-      	$(document).trigger("error", data.message);
+        $(document).trigger("error", data.message);
         }
       }
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1691,6 +1691,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     });
   };
 
+  self.close = function (facet) {
+    $.post("/notebook/api/close_statement", {
+        notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
+        snippet: ko.mapping.toJSON(facet.queryResult().getContext())
+    }, function (data) {
+      if (data.status == 0) {
+        // self.status('closed'); // Keep as 'running' as currently it happens before running a new query
+      } else {
+        //self._ajaxError(data);
+      }
+    }).fail(function (xhr, textStatus, errorThrown) {
+      $(document).trigger("error", xhr.responseText);
+      self.queryResult().status('failed');
+    });
+  };
+  
   self.fetchResult = function(facet) {
     $.post("/search/search", {
         collection: ko.mapping.toJSON(self.collection),
@@ -1715,22 +1731,22 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self.fetchResultSize = function(facet) {
-	$.post("/notebook/api/fetch_result_size", {
+  $.post("/notebook/api/fetch_result_size", {
       notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
       snippet: ko.mapping.toJSON(facet.queryResult)
-	}, function (data) {
-	  if (data.status == 0) {
-	    if (data.result.rows != null) {
-	  	facet.response().response.numFound(data.result.rows);
-	    }
-	  } else if (data.status == 5) {
-	    // No supported yet for this snippet
-	  } else {
-	    $(document).trigger("error", data.message);
-	  }
-	}).fail(function (xhr, textStatus, errorThrown) {
-	  $(document).trigger("error", xhr.responseText);
-	});
+  }, function (data) {
+    if (data.status == 0) {
+      if (data.result.rows != null) {
+      facet.response().response.numFound(data.result.rows);
+      }
+    } else if (data.status == 5) {
+      // No supported yet for this snippet
+    } else {
+      $(document).trigger("error", data.message);
+    }
+  }).fail(function (xhr, textStatus, errorThrown) {
+    $(document).trigger("error", xhr.responseText);
+  });
   };
 
 
@@ -1782,20 +1798,26 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     }
 
     if (self.collection.async()) {
+      $.each([self.collection].concat(self.collection.facets()), function(index, facet) {
+        if (facet.queryResult().result.handle) {
+          self.close(facet);
+        }
+      });
+
       multiQs = $.map(self.collection.facets(), function(facet) {
         return $.post("/search/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             facet: ko.mapping.toJSON(facet),
         }, function (data) {
-            facet.queryResult(new QueryResult(self, {
-                type: self.collection.engine(),
-                result: data,
-                status: 'running',
-                progress: 0,
-            }));
+          facet.queryResult(new QueryResult(self, {
+              type: self.collection.engine(),
+              result: data,
+              status: 'running',
+              progress: 0,
+          }));
 
-          	self.checkStatus(facet);
+          self.checkStatus(facet);
         });
       });
       self.asyncSearchesCounter([self.collection].concat(self.collection.facets()));
@@ -1827,7 +1849,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
                   status: 'running',
                   progress: 0,
                }));
-           	  self.checkStatus(self.collection);
+               self.checkStatus(self.collection);
             }
           }
           catch (e) {
