@@ -220,9 +220,10 @@ body {
   right: 10px;
   font-size: 13px;
   border-radius: 2px;
-  background-color: #FFF;
-  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  background-color: #FFFFFF;
+  -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.18), 0 -2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 .notification-history {
   overflow-y: auto;
@@ -252,14 +253,10 @@ body {
   background-image: none;
   font-weight: 600;
   font-size: 14px;
-  -webkit-transition-duration: 0.2s;
-  -mos-transition-duration: 0.2s;
-  -ms-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -webkit-transition-property: background-color, color;
-  -moz-transition-property: background-color, color;
-  -ms-transition-property: background-color, color;
-  transition-property: background-color, color;
+  -webkit-transition: background-color, color 0.2s ease;
+  -moz-transition: background-color, color 0.2s ease;
+  -ms-transition: background-color, color 0.2s ease;
+  transition: background-color, color 0.2s ease;
 }
 .compose-action .btn:hover {
   background-color: rgba(240, 240, 240, 0.92);
@@ -273,14 +270,10 @@ body {
   padding: 1px 5px;
   border-radius: 10px;
   font-size: 12px;
-  -webkit-transition-duration: 0.2s;
-  -mos-transition-duration: 0.2s;
-  -ms-transition-duration: 0.2s;
-  transition-duration: 0.2s;
-  -webkit-transition-property: background-color, color;
-  -moz-transition-property: background-color, color;
-  -ms-transition-property: background-color, color;
-  transition-property: background-color, color;
+  -webkit-transition: background-color, color 0.2s ease;
+  -moz-transition: background-color, color 0.2s ease;
+  -ms-transition: background-color, color 0.2s ease;
+  transition: background-color, color 0.2s ease;
 }
 .compose-action .btn:hover .jobs-badge {
   background-color: #338BB8;
@@ -376,7 +369,7 @@ body {
   -ms-flex: 0;
   flex: 0;
   position: relative;
-  background-color: #FFF;
+  background-color: #FFFFFF;
   min-width: 250px;
 }
 .side-panel-closed {
@@ -437,11 +430,11 @@ body {
 }
 .left-nav-menu li:not(.header) {
   background-color: transparent;
-  -webkit-transition: 0.4s background-color;
-  -moz-transition: 0.4s background-color;
-  -ms-transition: 0.4s background-color;
-  transition: 0.4s background-color;
   cursor: pointer;
+  -webkit-transition: background-color 0.2s ease;
+  -moz-transition: background-color 0.2s ease;
+  -ms-transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 .left-nav-menu li:not(.header):hover {
   background-color: rgba(240, 240, 240, 0.9);
@@ -450,10 +443,10 @@ body {
   font-size: 14px;
   letter-spacing: 1px;
   color: #f9f9f9;
-  -webkit-transition: 0.4s color;
-  -moz-transition: 0.4s color;
-  -ms-transition: 0.4s color;
-  transition: 0.4s color;
+  -webkit-transition: color 0.2s ease;
+  -moz-transition: color 0.2s ease;
+  -ms-transition: color 0.2s ease;
+  transition: color 0.2s ease;
 }
 .left-nav-menu li:not(.header):hover a {
   color: #003F6C;
@@ -463,8 +456,9 @@ body {
 }
 .left-nav-visible {
   width: 200px;
-  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.18), 0 -2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 .left-nav-drop {
   border-top: 1px solid rgba(240, 240, 240, 0.9);
@@ -490,11 +484,11 @@ body {
 }
 .inactive-action,
 .inactive-action a {
+  color: #999;
   -webkit-transition: color 0.2s ease;
   -moz-transition: color 0.2s ease;
   -ms-transition: color 0.2s ease;
   transition: color 0.2s ease;
-  color: #999;
 }
 .inactive-action:hover {
   text-decoration: none;
@@ -505,7 +499,7 @@ body {
 }
 .inactive-action:not(.disabled):hover,
 .inactive-action:not(.disabled):hover > a {
-  color: #338bb8 !important;
+  color: #338BB8 !important;
 }
 .inactive-action:focus {
   color: #999;
@@ -599,7 +593,7 @@ a:visited {
 .hamburger-inner::after {
   width: 24px;
   height: 3px;
-  background-color: #FFF;
+  background-color: #FFFFFF;
   border-radius: 4px;
   position: absolute;
   transition-property: -webkit-transform;
@@ -642,9 +636,10 @@ a:visited {
 .hue-context-menu,
 .hue-popover-bottom {
   border-radius: 2px;
-  background-color: #FFF;
-  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  background-color: #FFFFFF;
+  -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.18), 0 -2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 .hue-popover {
   position: absolute;
@@ -656,7 +651,7 @@ a:visited {
   left: 0;
   z-index: 1060;
   padding: 1px;
-  background-color: #fff;
+  background-color: #FFFFFF;
   -webkit-background-clip: padding-box;
   background-clip: padding-box;
   border: 1px solid transparent;
@@ -735,7 +730,7 @@ a:visited {
   padding: 6px 10px;
   margin: 0;
   font-size: 0.9rem;
-  background-color: #fff;
+  background-color: #FFFFFF;
 }
 .hue-popover-title:empty {
   display: none;
@@ -754,20 +749,23 @@ a:visited {
 }
 .hue-popover-top {
   border-radius: 2px;
-  background-color: #FFF;
-  -webkit-box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.18);
-  box-shadow: 0 -2px 6px 0 rgba(0, 0, 0, 0.18), 0 -2px 8px 0 rgba(0, 0, 0, 0.13);
+  background-color: #FFFFFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 .hue-popover-right {
   border-radius: 2px;
-  background-color: #FFF;
+  background-color: #FFFFFF;
   -webkit-box-shadow: 2px 0 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: 2px 0 8px rgba(0, 0, 0, 0.18);
   box-shadow: 2px 0 6px 0 rgba(0, 0, 0, 0.18), 2px 0 8px 0 rgba(0, 0, 0, 0.13);
 }
 .hue-popover-left {
   border-radius: 2px;
-  background-color: #FFF;
+  background-color: #FFFFFF;
   -webkit-box-shadow: -2px 0 8px rgba(0, 0, 0, 0.18);
+  -moz-box-shadow: -2px 0 8px rgba(0, 0, 0, 0.18);
   box-shadow: -2px 0 6px 0 rgba(0, 0, 0, 0.18), -2px 0 8px 0 rgba(0, 0, 0, 0.13);
 }
 .hue-inner-drop-down {
@@ -793,7 +791,10 @@ a:visited {
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
-  transition: background-color 0.3s;
+  -webkit-transition: background-color 0.2s ease;
+  -moz-transition: background-color 0.2s ease;
+  -ms-transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 .hue-context-menu > li > a {
   display: block;
@@ -807,7 +808,10 @@ a:visited {
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
-  transition: background-color 0.3s;
+  -webkit-transition: background-color 0.2s ease;
+  -moz-transition: background-color 0.2s ease;
+  -ms-transition: background-color 0.2s ease;
+  transition: background-color 0.2s ease;
 }
 .hue-context-menu > li > .disabled {
   display: block;
