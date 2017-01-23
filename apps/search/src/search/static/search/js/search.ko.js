@@ -1433,7 +1433,7 @@ var QueryResult = function (vm, initial) {
   self.type = ko.mapping.fromJS(initial.type);
   self.status = ko.observable('running');
   self.progress = ko.mapping.fromJS(initial.progress || 0);
-  
+
   self.hasResultset = ko.observable(true);
 
   self.result = ko.mapping.fromJS(initial.result);
@@ -1441,7 +1441,7 @@ var QueryResult = function (vm, initial) {
     return self.hasResultset(); // && self.data().length > 0; // status() == 'available'
   });
   self.result.type = ko.observable('table');
-  
+
   self.getContext = function() {
 	return self;
   }
@@ -1526,6 +1526,14 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
   self.isRetrievingResults = ko.observable(false);
   self.hasRetrievedResults = ko.observable(true);
+  self.asyncSearchesCounter = ko.observable(0);
+  self.asyncSearchesCounter.subscribe(function(newVal) {
+	if (newVal == 0) {
+	  self.isRetrievingResults(false);
+	  self.hasRetrievedResults(true);
+	  $('.btn-loading').button('reset');
+	}
+  });
 
   self.showCores = ko.observable(false);
   self.showCores.subscribe(function(newValue) {
@@ -1671,12 +1679,15 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
        } else {
          self._make_grid_result(data);
        }
+
+       self.asyncSearchesCounter(self.asyncSearchesCounter() - 1);
+
        //if (facet.queryResult().result['handle'].has_result_set()) {
        //  self.fetchResultSize(facet);
        //}
      });
    }
-   
+
    self.fetchResultSize = function(facet) {
 	  $.post("/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON({type: facet.queryResult().type()}),
@@ -1696,9 +1707,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 	  });
 	};
 
-  // self.searchAsync
 
-  self.search = function (callback) {
+  self.search = function (callback) {   // self.searchAsync == self.collection.async()
     $(".jHueNotify").hide();
     logGA('search');
     self.isRetrievingResults(true);
@@ -1751,7 +1761,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             facet: ko.mapping.toJSON(facet),
-        }, function (data) { 
+        }, function (data) {
             facet.queryResult(new QueryResult(self, {
                 type: self.collection.engine(),
                 result: data,
@@ -1761,7 +1771,8 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
           	self.checkStatus(facet);
         });
-      }); // Join save dashboard history
+      });
+      self.asyncSearchesCounter(multiQs.length + 1);
     }
 
     $.each(self.fieldAnalyses(), function (index, analyse) { // Invalidate stats analysis
@@ -1821,9 +1832,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       $(document).trigger("error", xhr.responseText);
     })
     .always(function () {
-      self.isRetrievingResults(false);
-      self.hasRetrievedResults(true);
-      $('.btn-loading').button('reset');
+      if (! self.collection.async()) {
+        self.isRetrievingResults(false);
+        self.hasRetrievedResults(true);
+        $('.btn-loading').button('reset');
+      }
     });
   };
 
