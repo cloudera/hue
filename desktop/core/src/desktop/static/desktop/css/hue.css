@@ -506,6 +506,173 @@ a {
   line-height: 18px;
   margin-bottom: 10px;
 }
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+.hue-ace-autocompleter {
+  position: fixed;
+  display: flex;
+  z-index: 1000;
+  max-height: 250px;
+  align-items: flex-start;
+}
+.autocompleter-suggestions {
+  flex: 0 0 300px;
+  z-index: 1002;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  max-height: 250px;
+  border: 1px solid #DDD;
+  border-radius: 2px;
+  background-color: #FFFFFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+}
+.autocompleter-details {
+  flex: 0 0 300px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  width: 300px;
+  margin-left: 5px;
+  max-height: 250px;
+  border: 1px solid #DDD;
+  border-radius: 2px;
+  background-color: #FFFFFF;
+  -webkit-box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+}
+.autocompleter-header {
+  flex: 0 0 20px;
+  padding: 5px;
+  background-color: #F9F9F9;
+  line-height: 20px;
+  font-size: 14px;
+}
+.autocompleter-list {
+  flex: 0 0 300px;
+  width: 300px;
+  overflow-y: auto;
+}
+.autocompleter-list > div {
+  height: 19px;
+  clear: both;
+  background-color: #FFFFFF;
+  padding: 3px;
+  cursor: pointer;
+}
+.autocompleter-list > div:hover {
+  background-color: #DBE8F1;
+}
+.autocompleter-list > div.selected {
+  background-color: #DBE8F1;
+}
+.autocompleter-spinner {
+  position: relative;
+  float: right;
+  width: 15px;
+  margin-top: 1px;
+}
+.autocompleter-entries {
+  display: flex;
+  position: relative;
+  flex: 1 1 100%;
+  overflow: hidden;
+}
+.autocompleter-categories {
+  display: inline-block;
+}
+.autocompleter-categories > div {
+  display: inline-block;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.autocompleter-categories > div.active {
+  display: inline-block;
+  border-bottom: 2px solid #338BB8;
+  cursor: default;
+}
+.autocompleter-suggestion {
+  display: flex;
+  flex-direction: row;
+  font: 12px / normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  direction: ltr;
+  line-height: 18px;
+}
+.autocompleter-suggestion-value {
+  flex: 1 1 100%;
+  margin-left: 3px;
+  margin-right: 6px;
+  overflow-x: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.autocompleter-suggestion-value b {
+  text-shadow: 0 0 0.01em;
+}
+.autocompleter-suggestion-meta {
+  flex: 1;
+  color: #737373;
+  white-space: nowrap;
+  margin-right: 3px;
+}
+.autocompleter-dot {
+  display: inline-block;
+  margin-top: 5px;
+  width: 8px;
+  height: 8px;
+  border-radius: 4px;
+}
+.popular-icon {
+  color: #EDB233;
+}
+.autocompleter-details-contents {
+  flex: 1 1 100%;
+  overflow-y: auto;
+  padding: 7px;
+}
+.autocompleter-details-contents .details-attribute,
+.autocompleter-details-contents .details-popularity {
+  color: #737373;
+  display: inline-block;
+}
+.autocompleter-details-contents .details-popularity .progress {
+  display: inline-block;
+  border-radius: 2px;
+  height: 10px;
+  width: 80px;
+}
+.autocompleter-details-contents .details-popularity .progress .bar {
+  background-color: #338BB8;
+}
+.autocompleter-details-contents .details-comment {
+  margin-top: 5px;
+  color: #737373;
+  font-style: italic;
+}
+.autocompleter-details-contents .details-code {
+  background-color: #F9F9F9;
+  padding: 3px;
+  color: #737373;
+  font: 12px / normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  direction: ltr;
+}
 html {
   height: 100%;
   width: 100%;
