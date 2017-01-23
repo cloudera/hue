@@ -50,10 +50,13 @@ class SQLApi():
   def query(self, dashboard, query, facet=None):
     database, table = self._get_database_table_names(dashboard['name'])
 
-    if query and query['qs'] == [{'q': '_root_:*'}]:
+    if query['qs'] == [{'q': '_root_:*'}]:
       return {'response': {'numFound': 0}}
 
-    filters = self._get_fq(dashboard, query, facet)
+    filters = []
+    for q in query['qs']:
+      filters.append(q['q'])
+    filters.extend(self._get_fq(dashboard, query, facet))
 
     if facet:
       if facet['type'] == 'nested':
@@ -116,7 +119,7 @@ class SQLApi():
         status='ready-execute'
         # historify=False
     )
-    
+
     # TODO: sync
     return editor.execute(MockRequest(self.user))
 
