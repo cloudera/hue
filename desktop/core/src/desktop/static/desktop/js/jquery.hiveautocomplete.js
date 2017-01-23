@@ -58,6 +58,9 @@
           .appendTo($("body"));
     }
 
+    _el.wrap('<div class="inline">');
+    _el.parent().append('<i class="fa fa-spinner fa-spin muted" style="position: absolute; margin-top: 8px; margin-left: -24px; display:none"></i>');
+
     function setHueBreadcrumbCaretAtEnd(element) {
       var elemLength = element.value.length;
       if (document.selection) {
@@ -216,6 +219,7 @@
     var _currentFiles = [];
 
     function showAutocomplete(callback) {
+      _el.parent().find('.fa-spinner').show();
       var path = _el.val();
       if (_this.options.startingPath != ''){
         path = _this.options.startingPath + path;
@@ -375,6 +379,7 @@
             }
           }
         }
+        _el.parent().find('.fa-spinner').hide();
       });
     }
 
