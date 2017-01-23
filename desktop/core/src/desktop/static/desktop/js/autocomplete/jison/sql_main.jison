@@ -1435,6 +1435,13 @@ TableExpression_EDIT
          keywords = keywords.concat(createWeightedKeywords($1.tableReferenceList.suggestKeywords, 3));
        }
 
+       // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
+       keywords.forEach(function (keyword) {
+         if (keyword.value === 'TABLESAMPLE' || keyword.value === 'LATERAL VIEW') {
+           keyword.weight = 1.1;
+         }
+       });
+
        if (!$1.hasLateralViews && $1.tableReferenceList.types) {
          var veKeywords = getValueExpressionKeywords($1.tableReferenceList);
          keywords = keywords.concat(veKeywords.suggestKeywords);
