@@ -23,9 +23,9 @@ from itertools import groupby
 from django.utils.html import escape
 
 from beeswax.server import dbms
-from search.models import Collection2
 from notebook.models import make_notebook
 from notebook.connectors.base import get_api
+from search.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
@@ -111,15 +111,19 @@ class SQLApi():
 
     editor = make_notebook(
         name='Execute and watch',
-        editor_type='impala',
+        editor_type=dashboard['engine'],
         statement=sql,
         database=database,
         status='ready-execute'
         # historify=False
     )
 
-    # TODO: sync
-    return editor.execute(MockRequest(self.user))
+    response = editor.execute(MockRequest(self.user))
+
+    if 'handle' in response and response['handle'].get('sync'):
+      response['result'] = self._convert_result(response['result'], dashboard, facet, query)
+
+    return response
 
 
   def fetch_result(self, dashboard, query, facet):
@@ -135,16 +139,7 @@ class SQLApi():
         start_over=start_over
     )
 
-    result['has_more'] # TODO
-
-    # TODO: add query id to allow closing
-
-    if not facet.get('type'):
-      return self._convert_impala_results(result, dashboard, query)
-    elif facet['type'] == 'function':
-      return self._convert_impala_function_facet(result, facet, query)
-    else:
-      return self._convert_impala_facet(result, facet, query) # query needed
+    return self._convert_result(result, dashboard, facet, query)
 
 
   def datasets(self, show_all=False):
@@ -154,18 +149,19 @@ class SQLApi():
 
   def fields(self, dashboard):
     database, table = self._get_database_table_names(dashboard)
+    snippet = {'type': self.engine}
 
-    db = dbms.get(self.user)
-    table_metadata = db.get_table(database=database, table_name=table)
+    table_metadata = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table)
+
     return [{
-        'name': str(escape(col.name)),
-        'type': str(col.type),
+        'name': str(escape(col['name'])),
+        'type': str(col['type']),
         'isId': False, # TODO Kudu
         'isDynamic': False,
         'indexed': False,
         'stored': True
         # isNested
-      } for col in table_metadata.cols
+      } for col in table_metadata['extended_columns']
     ]
 
 
@@ -178,14 +174,22 @@ class SQLApi():
     return {'fields': Collection2._make_luke_from_schema_fields(fields)}
 
 
-  def close_query(self, collection, query, facet=None): pass
+  def _convert_result(self, result, dashboard, facet, query):
+    if not facet.get('type'):
+      return self._convert_notebook_results(result, dashboard, query)
+    elif facet['type'] == 'function':
+      return self._convert_notebook_function_facet(result, facet, query)
+    else:
+      return self._convert_notebook_facet(result, facet, query)
 
 
   def _get_dimension_fields(self, facet):
     return [facet] + [f for f in facet['properties']['facets'] if f['aggregate']['function'] == 'count']
 
+
   def _convert_filters_to_where(self, filters):
     return ('WHERE ' + ' AND '.join(filters)) if filters else ''
+
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
@@ -257,7 +261,7 @@ class SQLApi():
 
     return database, table_name
 
-  def _convert_impala_facet(self, result, facet, query):
+  def _convert_notebook_facet(self, result, facet, query):
     response = json.loads('''{
    "fieldsAttributes":[],
    "response":{
@@ -333,7 +337,7 @@ class SQLApi():
     return {'normalized_facets': [response]}
 
 
-  def _convert_impala_function_facet(self, result, facet, query):
+  def _convert_notebook_function_facet(self, result, facet, query):
     rows = list(result['data'])
 
     response = {"query": facet['id'], "counts": rows[0][0], "type": "function", "id": facet['id'], "label": facet['id']}
@@ -341,7 +345,7 @@ class SQLApi():
     return {'normalized_facets': [response]}
 
 
-  def _convert_impala_results(self, result, dashboard, query):
+  def _convert_notebook_results(self, result, dashboard, query):
     cols = [col['name'] for col in result['meta']]
 
     docs = []

@@ -63,8 +63,6 @@ class DashboardApi(object):
 
   def terms(self, collection, field, properties): pass
 
-  def close_query(self, collection, query, facet=None): pass
-
   def fetch_result(self, collection, query, facet=None): pass
 
 
