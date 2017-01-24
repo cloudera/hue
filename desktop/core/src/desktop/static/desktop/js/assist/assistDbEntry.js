@@ -293,15 +293,12 @@ var AssistDbEntry = (function () {
       var index = 0;
       if (typeof data.tables_meta !== "undefined") {
         newEntries = $.map(data.tables_meta, function(table) {
-          return self.createEntry({
-            name: table.name,
-            index: index++,
-            displayName: table.name,
-            title: table.name + (table.comment ? ' - ' + table.comment : ''),
-            type: table.type,
-            isTable: /table/i.test(table.type),
-            isView: /view/i.test(table.type)
-          });
+          table.index = index++;
+          table.title = table.name + (table.comment ? ' - ' + table.comment : '');
+          table.displayName = table.name;
+          table.isTable = /table/i.test(table.type);
+          table.isView = /view/i.test(table.type);
+          return self.createEntry(table);
         });
       } else if (typeof data.extended_columns !== "undefined" && data.extended_columns !== null) {
         newEntries = $.map(data.extended_columns, function (columnDef) {
@@ -317,14 +314,12 @@ var AssistDbEntry = (function () {
           if (typeof columnDef.type !== "undefined" && columnDef.type !== null) {
             shortType = columnDef.type.match(/^[^<]*/g)[0]; // everything before '<'
           }
-          return self.createEntry({
-            name: columnDef.name,
-            index: index++,
-            displayName: displayName,
-            title: title,
-            isColumn: true,
-            type: shortType
-          });
+          columnDef.index = index++;
+          columnDef.displayName = displayName;
+          columnDef.title = title;
+          columnDef.isColumn = true;
+          columnDef.type = shortType;
+          return self.createEntry(columnDef);
         });
       } else if (typeof data.columns !== "undefined" && data.columns !== null) {
         newEntries = $.map(data.columns, function(columnName) {
