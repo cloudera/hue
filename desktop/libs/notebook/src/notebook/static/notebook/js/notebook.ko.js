@@ -18,10 +18,10 @@ var EditorViewModel = (function() {
 
   var NOTEBOOK_MAPPING = {
     ignore: [
-      "ace", "autocompleter", "availableSnippets", "history", "images", "inFocus", "selectedStatement", "user",
-      "availableDatabases", "hasProperties", "aceMode", "snippetImage", "errorLoadingQueries",
-      "cleanedStringMeta", "cleanedDateTimeMeta", "cleanedMeta", "cleanedNumericMeta",
-      "dependents", "canWrite", "queries", "avoidClosing"
+      'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
+      'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
+      'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
+      'snippetImage', 'user'
     ]
   };
 
@@ -767,6 +767,7 @@ var EditorViewModel = (function() {
     });
 
     self.settingsVisible = ko.observable(typeof snippet.settingsVisible != "undefined" && snippet.settingsVisible != null ? snippet.settingsVisible : false);
+    self.saveResultsModalVisible = ko.observable(false);
 
     self.checkStatusTimeout = null;
 
