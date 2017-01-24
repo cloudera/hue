@@ -331,6 +331,14 @@ except ImportError, e:
 
         self.checkDownloadInterval = -1;
 
+        $('#saveResultsModal, #downloadProgressModal').on('show', function () {
+          self.snippet.saveResultsModalVisible(true);
+        });
+
+        $('#saveResultsModal, #downloadProgressModal').on('hide', function () {
+          self.snippet.saveResultsModalVisible(false);
+        });
+
         self.isValidDestination = ko.pureComputed(function () {
           return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^[a-zA-Z0-9_]*$/.test(self.savePath()));
         });
@@ -373,7 +381,7 @@ except ImportError, e:
           window.clearInterval(self.checkDownloadInterval);
           $('#downloadProgressModal').modal('hide');
         };
-      };
+      }
 
       DownloadResultsViewModel.prototype.download = function (format) {
         if (typeof trackOnGA == 'function') {
