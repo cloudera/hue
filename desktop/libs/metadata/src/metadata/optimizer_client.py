@@ -139,7 +139,7 @@ class OptimizerApi(object):
 
 
   def top_tables(self, workfloadId=None, database_name='default'):
-    return self._api.call_api('getTopTables', {'tenant' : self._product_name}).json()
+    return self._api.call_api('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower()}).json()
 
 
   def table_details(self, database_name, table_name):
