@@ -14,11 +14,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
 import csv
+import gzip
 import operator
 import itertools
 import logging
 
 from django.utils.translation import ugettext as _
+
+from desktop.lib import i18n
 
 from indexer.argument import CheckboxArgument, TextDelimiterArgument
 from indexer.conf import ENABLE_NEW_INDEXER
@@ -27,6 +30,10 @@ from indexer.operations import get_operator
 
 
 LOG = logging.getLogger(__name__)
+
+
+IMPORT_PEEK_SIZE = 1024 * 1024 * 5
+IMPORT_PEEK_NLINES = 20
 
 
 def get_format_types():
@@ -331,48 +338,56 @@ class CSVFormat(FileFormat):
 
   @classmethod
   def _guess_from_file_stream(cls, file_stream):
-    sample = cls._get_sample(file_stream)
+    for sample in  cls._get_sample(file_stream):
+      try:
+        dialect, has_header = cls._guess_dialect(sample)
+        delimiter = dialect.delimiter
+        line_terminator = dialect.lineterminator
+        quote_char = dialect.quotechar
 
-    try:
-      dialect, has_header = cls._guess_dialect(sample)
-      delimiter = dialect.delimiter
-      line_terminator = dialect.lineterminator
-      quote_char = dialect.quotechar
-    except Exception:
-      # guess dialect failed, fall back to defaults:
-      return cls()
+        return cls(**{
+          "delimiter": delimiter,
+          "line_terminator": line_terminator,
+          "quote_char": quote_char,
+          "has_header": has_header,
+          "sample": sample
+        })
+      except Exception:
+        LOG.exception('Warning, cannot read the file format.')
 
-    return cls(**{
-      "delimiter": delimiter,
-      "line_terminator": line_terminator,
-      "quote_char": quote_char,
-      "has_header": has_header,
-      "sample": sample
-    })
+    # Guess dialect failed, fall back to defaults:
+    return cls()
 
   @classmethod
   def _get_sample(cls, file_stream):
-    file_stream.seek(0)
-    sample = '\n'.join(file_stream.read(1024 * 1024 * 5).splitlines()[:20])
-    file_stream.seek(0)
+    encoding = i18n.get_site_encoding()
 
-    return sample
+    for reader in [TextFileReader, GzipFileReader]:
+      file_stream.seek(0)
+      lines = reader.readlines(file_stream, encoding)
+      file_stream.seek(0)
+
+      if lines is not None:
+        yield '\n'.join(lines)
 
   @classmethod
   def _from_format(cls, file_stream, format_):
-    sample = cls._get_sample(file_stream)
+    for sample in cls._get_sample(file_stream):
+      try:
+        delimiter = format_["fieldSeparator"].encode('utf-8')
+        line_terminator = format_["recordSeparator"].encode('utf-8')
+        quote_char = format_["quoteChar"].encode('utf-8')
+        has_header = format_["hasHeader"]
 
-    delimiter = format_["fieldSeparator"].encode('utf-8')
-    line_terminator = format_["recordSeparator"].encode('utf-8')
-    quote_char = format_["quoteChar"].encode('utf-8')
-    has_header = format_["hasHeader"]
-    return cls(**{
-      "delimiter": delimiter,
-      "line_terminator": line_terminator,
-      "quote_char": quote_char,
-      "has_header": has_header,
-      "sample": sample
-    })
+        return cls(**{
+          "delimiter": delimiter,
+          "line_terminator": line_terminator,
+          "quote_char": quote_char,
+          "has_header": has_header,
+          "sample": sample
+        })
+      except Exception:
+        LOG.exception('Warning, cannot read the file format.')
 
   @classmethod
   def get_instance(cls, file_stream, format_):
@@ -481,6 +496,34 @@ class CSVFormat(FileFormat):
       fields = []
 
     return fields
+
+
+class GzipFileReader(object):
+  TYPE = 'gzip'
+
+  @staticmethod
+  def readlines(fileobj, encoding):
+    gz = gzip.GzipFile(fileobj=fileobj, mode='rb')
+    try:
+      data = gz.read(IMPORT_PEEK_SIZE)
+    except IOError:
+      return None
+    try:
+      return data.splitlines()[:IMPORT_PEEK_NLINES]
+    except UnicodeError:
+      return None
+
+
+class TextFileReader(object):
+  TYPE = 'text'
+
+  @staticmethod
+  def readlines(fileobj, encoding):
+    try:
+      data = fileobj.read(IMPORT_PEEK_SIZE)
+      return data.splitlines()[:IMPORT_PEEK_NLINES]
+    except UnicodeError:
+      return None
 
 
 class HiveFormat(CSVFormat):
