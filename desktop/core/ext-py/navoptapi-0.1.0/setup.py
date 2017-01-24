@@ -1,18 +1,4 @@
-# Copyright 2012-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
-#
-# Modifications made by Cloudera are:
-#     Copyright (c) 2016 Cloudera, Inc. All rights reserved.
-#
-# Licensed under the Apache License, Version 2.0 (the "License"). You
-# may not use this file except in compliance with the License. A copy of
-# the License is located at
-#
-#     http://aws.amazon.com/apache2.0/
-#
-# or in the "license" file accompanying this file. This file is
-# distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF
-# ANY KIND, either express or implied. See the License for the specific
-# language governing permissions and limitations under the License.
+# Copyright (c) 2016 Cloudera, Inc. All rights reserved.
 
 from codecs import open
 from os import path
@@ -20,6 +6,7 @@ import sys
 
 from setuptools import find_packages
 from setuptools import setup
+import versioneer
 
 here = path.abspath(path.dirname(__file__))
 
@@ -40,7 +27,7 @@ if sys.version_info[:2] == (2, 6):
 
 setup(
     name='navoptapi',
-    version='0.1.0',
+    version=versioneer.get_version(),
     description='Cloudera Navigator Optimizer Api',
     long_description=long_description,
     url='http://www.cloudera.com/',
@@ -61,4 +48,5 @@ setup(
     packages=find_packages(exclude=['tests']),
     include_package_data=True,
     install_requires=requirements,
+    cmdclass=versioneer.get_cmdclass(),
 )

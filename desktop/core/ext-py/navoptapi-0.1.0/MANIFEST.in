@@ -1,0 +1,4 @@
+include README.rst
+include versioneer.py
+include ccscli/compat.py
+include navoptapi/_version.py

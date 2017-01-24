@@ -19,10 +19,11 @@ import logging
 import os
 import platform
 
-from navoptapi.auth import RSAv1Auth
-from navoptapi.credentials import Credentials
+from ccscli.auth import RSAv1Auth
+from ccscli.credentials import Credentials
+from ccscli.signers import RequestSigner
+
 from navoptapi.serialize import Serializer
-from navoptapi.signers import RequestSigner
 
 from requests import put, Request, Session
 
@@ -42,7 +43,7 @@ class ApiLib(object):
         # get Credentials
         self._access_key = access_key
         self._private_key = private_key
-        self._endpoint_url = "http://"+host_name+":8982/"+service_name+"/"
+        self._endpoint_url = "http://" + host_name + ":8982/" + service_name + "/"
         self._service_name = service_name
         self._cred = Credentials(access_key, private_key,
                                  method='shared-credentials-file')
@@ -100,7 +101,7 @@ class ApiLib(object):
             put(resp['url'], data=open(params['fileLocation']).read())
             # build upload parameters
             upload_params = {'rowDelim': '', 'colDelim': '', 'headerFields': [],
-                             'tenant': ''}
+                             'tenant': '', 'fileType': 0}
             # now do actual upload
             if 'tenant' in params and params['tenant']:
                 upload_params['tenant'] = params['tenant']
@@ -118,6 +119,8 @@ class ApiLib(object):
                 upload_params['rowDelim'] = params['rowDelim']
             if 'headerFields' in params and params['headerFields']:
                 upload_params['headerFields'] = params['headerFields']
+            if 'fileType' in params and params['fileType']:
+                upload_params['fileType'] = params['fileType']
             # prepare the body
             serializer = Serializer()
             serial_obj = serializer.serialize_to_request(upload_params, None)

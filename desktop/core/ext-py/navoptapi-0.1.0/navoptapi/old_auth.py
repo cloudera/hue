@@ -14,13 +14,16 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 from base64 import urlsafe_b64encode
+try:
+    from collections import OrderedDict
+except ImportError:
+    from ordereddict import OrderedDict   # Python 2.6
 from email.utils import formatdate
+import json
 import logging
 
-from ccscli.compat import json
-from ccscli.compat import OrderedDict
-from ccscli.compat import urlsplit
-from ccscli.exceptions import NoCredentialsError
+from urlparse import urlsplit
+
 from Crypto.Hash import SHA256
 from Crypto.PublicKey import RSA
 from Crypto.Signature import PKCS1_v1_5
@@ -95,7 +98,7 @@ class RSAv1Auth(BaseSigner):
 
     def add_auth(self, request):
         if self.credentials is None:
-            raise NoCredentialsError
+            return
         LOG.debug("Calculating signature using RSAv1Auth.")
         LOG.debug('HTTP request method: %s', request.method)
         split = urlsplit(request.url)

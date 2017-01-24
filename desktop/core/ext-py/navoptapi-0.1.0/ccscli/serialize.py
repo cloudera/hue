@@ -14,11 +14,15 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-try:
-    from collections import OrderedDict
-except ImportError:
-    from ordereddict import OrderedDict  # Python 2.6
-import json
+from ccscli import validate
+from ccscli.compat import json
+from ccscli.compat import OrderedDict
+
+
+def create_serializer():
+    serializer = Serializer()
+    validator = validate.ParamValidator()
+    return validate.ParamValidationDecorator(validator, serializer)
 
 
 class Serializer(object):
@@ -30,16 +34,23 @@ class Serializer(object):
             (k, v) for k, v in parameters.items() if v is not None)
 
         serialized = {}
+        serialized['method'] = operation_model.http['method']
+        serialized['headers'] = {'Content-Type': 'application/json'}
+        serialized['url_path'] = operation_model.http['requestUri']
+
         serialized_body = OrderedDict()
         if len(filtered_parameters) != 0:
-            self._serialize(serialized_body, filtered_parameters, None)
-
+            self._serialize(serialized_body,
+                            filtered_parameters,
+                            operation_model.input_shape)
         serialized['body'] = json.dumps(serialized_body).encode(self.DEFAULT_ENCODING)
 
         return serialized
 
     def _serialize(self, serialized, value, shape, key=None):
-        self._default_serialize(serialized, value, shape, key)
+        serialize_method_name = '_serialize_type_%s' % shape.type_name
+        method = getattr(self, serialize_method_name, self._default_serialize)
+        method(serialized, value, shape, key)
 
     def _serialize_type_object(self, serialized, value, shape, key):
         if key is not None:
@@ -67,8 +78,4 @@ class Serializer(object):
             array_obj.append(wrapper["__current__"])
 
     def _default_serialize(self, serialized, value, shape, key):
-        if key:
-            serialized[key] = value
-        else:
-            for member_key, member_value in value.items():
-                serialized[member_key] = member_value
+        serialized[key] = value
