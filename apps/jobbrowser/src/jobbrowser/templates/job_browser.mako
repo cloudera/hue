@@ -243,7 +243,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 </div>
 
-  nav nav-pills hueBreadcrumbBar
 
 <script type="text/html" id="breadcrumbs">
   <h3>
