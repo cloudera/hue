@@ -40,7 +40,7 @@ from desktop.views import _ko
                 css: { 'selected': $index() === $parent.selectedIndex() },
                 event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
               <div class="autocompleter-suggestion-value">
-                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span>
+                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key --><i class="fa fa-key"></i><!-- /ko -->
               </div>
               <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
@@ -101,6 +101,9 @@ from desktop.views import _ko
       <div class="autocompleter-details-contents">
         <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
+        <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key -->
+        <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
+        <!-- /ko -->
         <!-- ko if: typeof details.popularity !== 'undefined' -->
         <br/>
         <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
