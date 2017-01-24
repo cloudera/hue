@@ -395,6 +395,19 @@ def list_oozie_workflow(request, job_id):
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
+  if request.GET.get('graph'):
+    return render('dashboard/list_oozie_workflow_graph.mako', request, {
+      'workflow_graph': workflow_graph,
+      'layout_json': json.dumps(workflow_data.get('layout', ''), cls=JSONEncoderForHTML),
+      'workflow_json': json.dumps(workflow_data.get('workflow', ''), cls=JSONEncoderForHTML),
+      'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML) if credentials else '',
+      'workflow_properties_json': json.dumps(WORKFLOW_NODE_PROPERTIES, cls=JSONEncoderForHTML),
+      'doc_uuid': doc.uuid if doc else '',
+      'graph_element_id': request.GET.get('element') if request.GET.get('element') else 'loaded' + doc_uuid + 'graph',
+      'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+    })
+
   oozie_slas = []
   if oozie_workflow.has_sla:
     oozie_api = get_oozie(request.user, api_version="v2")

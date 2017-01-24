@@ -370,11 +370,15 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 %endif
 
 % if layout_json != '':
+
 <link rel="stylesheet" href="${ static('oozie/css/common-editor.css') }">
 <link rel="stylesheet" href="${ static('oozie/css/workflow-editor.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
 
 ${ dashboard.import_layout() }
 
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('oozie/js/workflow-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
@@ -417,13 +421,7 @@ ${ dashboard.import_layout() }
 
 <script type="text/javascript">
 
-${ utils.slaGlobal() }
-
-  ko.bindingHandlers.editable = { // overwrite the editable bindings with a simple text filler
-    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
-      $(element).text(valueAccessor()());
-    }
-  }
+  ${ utils.slaGlobal() }
 
   var Action = function (action) {
     return {

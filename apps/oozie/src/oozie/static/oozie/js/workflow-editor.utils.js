@@ -18,6 +18,12 @@ function linkWidgets(fromId, toId) {
   var _from = $("#wdg_" + (typeof fromId == "function" ? fromId() : fromId));
   var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));
   if (_from.length > 0 && _to.length > 0) {
+    var $painter = $(document.body);
+
+    if ($('.content-panel').length > 0){
+      $painter = $('.content-panel');
+    }
+
     var _fromCenter = {
       x: _from.position().left + _from.outerWidth() / 2,
       y: _from.position().top + _from.outerHeight() + 3
@@ -45,7 +51,7 @@ function linkWidgets(fromId, toId) {
       _curveCoords.y = _fromCenter.y + (_toCenter.y - _fromCenter.y) / 2;
     }
 
-    $(document.body).curvedArrow({
+    $painter.curvedArrow({
       p0x: _fromCenter.x,
       p0y: _fromCenter.y,
       p1x: _curveCoords.x,
@@ -72,6 +78,8 @@ function drawArrows() {
     });
   }
 }
+
+huePubSub.subscribe('draw.graph.arrows', drawArrows);
 
 function toggleProperties(widget) {
   if (widget.oozieMovable()) {
