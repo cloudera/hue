@@ -468,15 +468,14 @@ ${ assist.assistPanel() }
               <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
                 ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
               </span>
-              <span class="help-inline muted" data-bind="visible: isTargetExisting()">
+              <span class="help-inline muted" data-bind="visible: isTargetExisting(), click: function(){ window.open(existingTargetUrl()) }">
                 <!-- ko if: outputFormat() == 'index' -->
                   ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
                 <!-- /ko -->
                 <!-- ko if: outputFormat() != 'index' -->
-                  <span class="alert">${ _('Already existing') } <span data-bind="text: outputFormat"></span></span>
+                <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
                 <!-- /ko -->
                 <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
-                .
               </span>
             </label>
           </div>
