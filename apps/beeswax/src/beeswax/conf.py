@@ -29,6 +29,7 @@ from desktop.lib.exceptions import StructuredThriftTransportException
 
 from beeswax.settings import NICE_NAME
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -220,6 +221,7 @@ AUTH_PASSWORD_SCRIPT = Config(
 def config_validator(user):
   # dbms is dependent on beeswax.conf (this file)
   # import in method to avoid circular dependency
+  from beeswax.design import hql_query
   from beeswax.server import dbms
 
   res = []
@@ -227,7 +229,12 @@ def config_validator(user):
     try:
       if not 'test' in sys.argv: # Avoid tests hanging
         server = dbms.get(user)
-        server.execute_statement("SELECT 'Hello World!';")
+        query = hql_query("SELECT 'Hello World!';")
+        handle = server.execute_and_wait(query, timeout_sec=10.0)
+
+        if handle:
+          server.fetch(handle, rows=100)
+          server.close(handle)
     except StructuredThriftTransportException, e:
       if 'Error validating the login' in str(e):
         msg = 'Failed to authenticate to HiveServer2, check authentication configurations.'
