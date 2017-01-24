@@ -640,7 +640,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   <div class="tab-content">
     <div class="tab-pane active" id="workflow-page-graph">
-      <span data-bind="html: properties['graph']"></span>
     </div>
 
     <div class="tab-pane" id="workflow-page-logs">
@@ -870,6 +869,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.job().fetchLogs();
             vm.job().fetchStatus();
 
+            var lastPosition = {
+              top: 0,
+              left: 0
+            }
+
+            var updateArrowPosition = function () {
+              huePubSub.publish('draw.graph.arrows');
+              if ($('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
+                lastPosition = $('canvas').position();
+                window.setTimeout(updateArrowPosition, 100);
+              }
+            }
+
+            if (vm.job().type() === 'workflow') {
+              // load the graph
+              $.ajax({
+                url: "/oozie/list_oozie_workflow/" + vm.job().id(),
+                data: {
+                  'graph': true,
+                  'element': 'workflow-page-graph'
+                },
+                beforeSend: function (xhr) {
+                  xhr.setRequestHeader("X-Requested-With", "Hue");
+                },
+                dataType: "html",
+                success: function (response) {
+                  $('#workflow-page-graph').html(response);
+                  updateArrowPosition();
+                }
+              });
+            }
+
             if (self.mainType() == 'schedules') {
               //vm.job().coordVM.setActions(data.app.actions);
             }
@@ -1072,6 +1103,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   })();
 </script>
 </span>
+
+<div id="diocan"></div>
 
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
