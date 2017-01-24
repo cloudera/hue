@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import os
 import sys
 import socket
 
@@ -24,6 +25,7 @@ from desktop.conf import default_ssl_cacerts, default_ssl_validate, AUTH_USERNAM
   AUTH_PASSWORD as DEFAULT_AUTH_PASSWORD
 from desktop.lib.conf import ConfigSection, Config, coerce_bool, coerce_csv, coerce_password_from_script
 from desktop.lib.exceptions import StructuredThriftTransportException
+from desktop.lib.paths import get_desktop_root
 
 from impala.settings import NICE_NAME
 
@@ -97,6 +99,12 @@ CONFIG_WHITELIST = Config(
   default='debug_action,explain_level,mem_limit,optimize_partition_key_scans,query_timeout_s,request_pool',
   type=coerce_csv,
   help=_t('A comma-separated list of white-listed Impala configuration properties that users are authorized to set.')
+)
+
+IMPALA_CONF_DIR = Config(
+  key='impala_conf_dir',
+  help=_t('Impala configuration directory, where impala_flags is located.'),
+  default=os.environ.get("HUE_CONF_DIR", get_desktop_root("conf")) + '/impala-conf'
 )
 
 SSL = ConfigSection(
