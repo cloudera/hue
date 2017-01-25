@@ -21,7 +21,6 @@ import logging
 import struct
 
 from django.http import Http404
-from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
@@ -33,12 +32,13 @@ from notebook.models import Notebook
 from metadata.conf import NAVIGATOR
 from metadata.optimizer_client import OptimizerApi
 
-
 LOG = logging.getLogger(__name__)
 
 
 try:
   from beeswax.api import get_table_stats
+  from beeswax.design import hql_query
+  from beeswax.server import dbms
 except ImportError, e:
   LOG.warn("Hive lib not enabled")
 
@@ -367,8 +367,15 @@ def upload_table_stats(request):
             "avg_col_len": int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1
           })
 
-#       if with_ddl:
-#         table_ddl.append((original_query_id, execution_time, query_data['snippets'][0]['statement']))
+      if with_ddl:
+        db = dbms.get(request.user)
+        query = hql_query('SHOW CREATE TABLE `%(database)s`.`%(table)s`' % path)
+        handle = db.execute_and_wait(query, timeout_sec=5.0)
+
+        if handle:
+          result = db.fetch(handle, rows=5000)
+          db.close(handle)
+          table_ddls.append((0, 0, '\n'.join([row[0] for row in result.rows()])))
 
     except Exception, e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))

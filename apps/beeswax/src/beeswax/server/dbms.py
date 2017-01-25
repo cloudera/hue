@@ -825,7 +825,7 @@ class HiveServer2Dbms(object):
     hql = []
 
     for partition_spec in partition_specs:
-        hql.append("ALTER TABLE `%s`.`%s` DROP IF EXISTS PARTITION (%s) PURGE" % (db_name, table_name, partition_spec))
+      hql.append("ALTER TABLE `%s`.`%s` DROP IF EXISTS PARTITION (%s) PURGE" % (db_name, table_name, partition_spec))
 
     query = hql_query(';'.join(hql), db_name)
     design.data = query.dumps()
@@ -842,6 +842,7 @@ class HiveServer2Dbms(object):
 
     if handle:
       result = self.fetch(handle, rows=5000)
+      self.close(handle)
 
     return result
 
@@ -859,6 +860,7 @@ class HiveServer2Dbms(object):
 
     if handle:
       result = self.fetch(handle, rows=5000)
+      self.close(handle)
 
     return result
 

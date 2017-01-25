@@ -1473,7 +1473,7 @@ var EditorViewModel = (function() {
       logGA('load_table_stats');
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
-    	db_tables: ko.mapping.toJSON(activeTables),
+        db_tables: ko.mapping.toJSON(activeTables),
         sourcePlatform: ko.mapping.toJSON(self.type()),
         with_columns: ko.mapping.toJSON(true),
         with_ddl: ko.mapping.toJSON(true)
