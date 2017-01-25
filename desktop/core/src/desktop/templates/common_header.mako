@@ -143,6 +143,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
+  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
   <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
 
   ${ koComponents.all() }

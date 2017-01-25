@@ -95,6 +95,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     color: #CCC;
     padding-right: 12px;
   }
+
+  #jobbrowserComponents .app-icon {
+    vertical-align: text-top;
+  }
 </style>
 
 <div class="navbar navbar-inverse navbar-fixed-top">
@@ -244,9 +248,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 
+<script type="text/html" id="breadcrumbs-icons">
+<!-- ko switch: type -->
+  <!-- ko case: 'workflow' -->
+    <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/>
+  <!-- /ko -->
+  <!-- ko case: 'workflow-action' -->
+    <i class="fa fa-fw fa-code-fork"></i>
+  <!-- /ko -->
+  <!-- ko case: 'schedule' -->
+    <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/>
+  <!-- /ko -->
+  <!-- ko case: 'bundle' -->
+    <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/>
+  <!-- /ko -->
+<!-- /ko -->
+</script>
+
 <script type="text/html" id="breadcrumbs">
   <h3>
-    <ul class="nav nav-pills hueBreadcrumbBar" data-bind="foreach: breadcrumbs">
+    <ul class="inline hueBreadcrumbBar" data-bind="foreach: breadcrumbs">
       <li>
       <!-- ko if: $index() > 0 -->
         <span class="divider">&gt;</span>
@@ -257,14 +278,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <!-- /ko -->
       <!-- ko if: $index() != 0 -->
         <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
-          <a href="javascript:void(0)" data-bind="text: type, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
-          :
-          <a href="javascript:void(0)" data-bind="text: id, click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }"></a>
+          <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
+          <span data-bind="template: 'breadcrumbs-icons'"></span>
+          <span data-bind="text: id"></span></a>
         <!-- /ko -->
         <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
-          <span data-bind="text: type"></span>
-          :
-          <span data-bind="text: id"></span>
+          <span data-bind="template: 'breadcrumbs-icons'"></span>
+          <span data-bind="text: id, attr: {title: id}"></span>
         <!-- /ko -->
       <!-- /ko -->
       </li>
