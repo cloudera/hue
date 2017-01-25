@@ -669,7 +669,9 @@ var Collection = function (vm, collection) {
         return _fields;
       });
 
-      facet.properties.facets_form.aggregate.percentiles = ko.mapping.fromJS([{'value': 50}]);
+      if (typeof facets_form != 'undefined' && typeof facets_form.aggregate != 'undefined') {
+        facet.properties.facets_form.aggregate.percentiles = ko.mapping.fromJS([{'value': 50}]);
+      }
 
       facet.template.fieldsSelected.subscribe(function(newValue) { // Could be more efficient as we don't need to research, just redraw
         vm.getFacetFromQuery(facet.id()).resultHash('');

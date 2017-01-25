@@ -59,7 +59,7 @@ class DashboardApi(object):
 
   def update(self, collection, json_edits, content_type, version): pass
 
-  def stats(self, collection, field, query, facet): pass
+  def stats(self, collection, field, query=None, facet=''): pass
 
   def terms(self, collection, field, properties): pass
 
@@ -75,7 +75,7 @@ class SearchApi(DashboardApi):
   def query(self, collection, query, facet=None):
     response = self.api.query(collection, query)
     return augment_solr_response(response, collection, query)
-  
+
   def datasets(self, show_all=False):
     return SearchController(self.user).get_all_indexes(show_all=show_all)
 
@@ -84,8 +84,9 @@ class SearchApi(DashboardApi):
 
   def schema_fields(self, collection):
     return self.api.fields(collection)
-  
+
   def luke(self, collection):
     return self.api.luke(collection)
 
-  
+  def stats(self, collection, field, query=None, facet=''):
+    return self.api.stats(collection, field, query, facet)

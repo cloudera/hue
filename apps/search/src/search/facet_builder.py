@@ -27,6 +27,7 @@ from time import mktime
 
 from django.utils.translation import ugettext as _
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -44,7 +45,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
     print e
     # stats not supported on all the fields, like text
     pass
-  
+
 def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None):
 
     if widget_type == 'pie-widget' or widget_type == 'pie2-widget':
