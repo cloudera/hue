@@ -21,10 +21,10 @@ var AssistDbSource = (function () {
       return a.definition.name.localeCompare(b.definition.name);
     },
     creation: function (a, b) {
-      if (!a.definition.isColumn || !a.definition.isComplex) {
-        return sortFunctions.alpha(a, b);
+      if (a.definition.isColumn || a.definition.isComplex) {
+        return a.definition.index - b.definition.index;
       }
-      return a.definition.index - b.definition.index;
+      return sortFunctions.alpha(a, b);
     },
     popular: function (a, b) {
       if (a.definition.popularity && !b.definition.popularity) {
