@@ -1059,6 +1059,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     var viewModel;
 
+    huePubSub.subscribe('oozie.action.logs.click', function (widget) {
+      viewModel.job().id(widget.externalId());
+      viewModel.job().fetchJob();
+    });
+
+    huePubSub.subscribe('oozie.action.click', function (widget) {
+      viewModel.job().id(widget.externalId());
+      viewModel.job().fetchJob();
+    });
+
     $(document).ready(function () {
       var options = {
         user: '${ user.username }',

@@ -49,6 +49,7 @@ ${ workflow.render() }
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#${graph_element_id}")[0]);
   viewModel.isViewer = ko.observable(true);
+  viewModel.isEmbeddable = ko.observable(true);
   viewModel.init();
   fullLayout(viewModel);
 
@@ -94,6 +95,7 @@ ${ workflow.render() }
               _w.actionURL(action.url);
               _w.logsURL(action.log);
               _w.externalIdUrl(action.externalIdUrl);
+              _w.externalId(action.id);
             }
           });
           %endif
