@@ -1436,6 +1436,9 @@ var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
 
   self.hasResultset = ko.observable(true);
 
+  // UI
+  self.saveResultsModalVisible = ko.observable(false);
+
   self.result = ko.mapping.fromJS(initial.result);
   self.result.hasSomeResults = ko.computed(function () {
     return self.hasResultset(); // && self.data().length > 0; // status() == 'available'
