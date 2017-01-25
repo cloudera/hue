@@ -1361,6 +1361,7 @@ var ExtendedWidget = function (params) {
   self.progress = ko.observable(0);
   self.actionURL = ko.observable("");
   self.logsURL = ko.observable("");
+  self.externalId = ko.observable("");
   self.externalIdUrl = ko.observable("");
   return self;
 }

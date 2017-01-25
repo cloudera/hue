@@ -231,7 +231,12 @@
       <!-- /ko -->
 
       <span data-bind="visible: typeof $root.isViewer == 'undefined' || ! $root.isViewer(), editable: name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}, attr: {'title': id().slice(0, 4)}"></span>
-      <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- ko if: typeof $root.isEmbeddable !== 'undefined' -->
+        <a class="pointer" data-bind="visible: typeof $root.isEmbeddable != 'undefined' && $root.isEmbeddable(), click: function(){ huePubSub.publish('oozie.action.click', $data); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- /ko -->
+      <!-- ko if: typeof $root.isEmbeddable === 'undefined' -->
+        <a class="pointer" data-bind="visible: typeof $root.isViewer != 'undefined' && $root.isViewer(), click: function(){ location.href = actionURL(); }, text: name" title="${ _('View workflow action') }"></a>
+      <!-- /ko -->
 
       <div class="inline pull-right" data-bind="visible: (typeof $root.isViewer == 'undefined' || ! $root.isViewer()) && !$root.isEditing()" style="margin-right: 4px">
         <a href="javascript:void(0)" data-bind="click: function(w) { viewModel.showSubmitActionPopup(w); }"><i class="fa fa-play-circle-o"></i></a>
@@ -660,7 +665,12 @@
 
 <script type="text/html" id="logs-icon">
   <!-- ko if: $parent.widgetType() != 'subworkflow-widget' && $parent.logsURL() != '' && $parent.logsURL() != null -->
+    <!-- ko if: typeof $root.isEmbeddable !== 'undefined' -->
+    <a class="pull-right pointer logs-icon" data-bind="click: function(){ huePubSub.publish('oozie.action.logs.click', $parent); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <!-- /ko -->
+    <!-- ko if: typeof $root.isEmbeddable === 'undefined' -->
     <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <!-- /ko -->
   <!-- /ko -->
   <!-- ko if: $parent.widgetType() == 'subworkflow-widget' && $parent.externalIdUrl()-->
     <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon"/></a>
