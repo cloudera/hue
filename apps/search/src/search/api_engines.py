@@ -55,8 +55,6 @@ class DashboardApi(object):
 
   def luke(self, collection, query): pass
 
-  def get(self, collection, doc_id): pass
-
   def update(self, collection, json_edits, content_type, version): pass
 
   def stats(self, collection, field, query=None, facet=''): pass
@@ -64,6 +62,8 @@ class DashboardApi(object):
   def terms(self, collection, field, properties): pass
 
   def fetch_result(self, collection, query, facet=None): pass
+
+  def get(self, collection, doc_id): pass
 
 
 class SearchApi(DashboardApi):
@@ -90,3 +90,6 @@ class SearchApi(DashboardApi):
 
   def stats(self, collection, field, query=None, facet=''):
     return self.api.stats(collection, field, query, facet)
+
+  def get(self, collection, doc_id):
+    return self.api.get(collection, doc_id)
