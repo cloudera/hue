@@ -41,7 +41,7 @@ class JobApi(Api):
     self.impala_api = ImpalaApi(user)
     self.request = None
 
-  def apps(self):
+  def apps(self, filters):
     jobs = self.yarn_api.apps()
     # += Impala
     # += Sqoop2

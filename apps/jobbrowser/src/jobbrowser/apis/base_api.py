@@ -49,7 +49,7 @@ class Api(object):
     self.user = user
     self.request = None
 
-  def apps(self): return []
+  def apps(self, filters): return []
 
   def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, FINISHED, PAUSED]
 

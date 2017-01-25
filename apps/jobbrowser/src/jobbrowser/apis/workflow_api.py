@@ -36,9 +36,9 @@ except Exception, e:
 
 class WorkflowApi(Api):
 
-  def apps(self):
+  def apps(self, filters):
     oozie_api = get_oozie(self.user)
-    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': filters}
     wf_list = oozie_api.get_workflows(**kwargs)
 
     return [{
