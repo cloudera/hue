@@ -1825,18 +1825,30 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
   <script type="text/html" id="assistant-panel-template">
     ${ _('Tables') }
+    <!-- ko if: HAS_OPTIMIZER -->
+      <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
+        <i class="fa fa-fw fa-cloud-upload"></i>
+      </a>
+    <!-- /ko -->
     <br/>
     <ul data-bind="foreach: activeTables">
-      <li><span data-bind="text: $data"></span> <i class="fa fa-info"></i>
+      <li>
+        <span data-bind="text: $data"></span> <i class="fa fa-info"></i>
+      </i>
     </ul>
 
     <form class="form-horizontal">
       <fieldset>
         ${ _('Fields') }<br/>
         <ul>
-          <li>F1</li>
-          <li>F2</li>
-          <li>F3</li>
+          <li>'country-code' is a popular field <a href="javascript:void(0)">add</a></li>
+          <li>'gender' would be a good dimension with low cardinality (2) <a href="javascript:void(0)">add</a></li>
+          <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
+          <li>'f1'</li>
+          <li>'f2'</li>
+          <li>'f3'</li>
+          <li>'f4'</li>
+          <li>'f5'</li>
         </ul>
       </fieldset>
     </form>
@@ -1848,6 +1860,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           <li>Popular fields for the tables are: [code, salary, amount]</li>
           <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
           <li>Parameterize the query?</li>
+          <li>Could be automated with integrated scheduler</li>
+          <li>Data has not been refreshed since last run 3 days ago  <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li></li>
+          <li>A schema change happened last week, a new column 'salary_med' was added</li>
+          <li>Data statistics are not accurate, click to refresh them</li>
+          <li>Query ran 17 times last week</li>
+          <li>The datasets are sometimes joined with table [Population]</li>
+          <li>Query would be a good candidate to run interactively with Impala</li>
         </ul>
       </fieldset>
     </form>

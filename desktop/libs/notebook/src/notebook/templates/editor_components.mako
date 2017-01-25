@@ -1064,7 +1064,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 
 
-  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}">
+  <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
     <ul class="nav nav-tabs">
       % if has_optimizer():
       <li class="active"><a href="#assistantTab" data-toggle="tab">${_('Assistant')}</a></li>
@@ -1078,13 +1078,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </ul>
 
     <div class="tab-content" style="border: none">
-      <div class="tab-pane ${ 'active' if not has_optimizer() else '' }" id="sessionsTab">
-        <div class="row-fluid">
-          <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+      % if has_optimizer():
+      <div class="tab-pane ${ 'active' if has_optimizer() else '' }" id="assistantTab">
+        <div class="span12">
+          <form class="form-horizontal">
+            <fieldset>
+              <div data-bind="component: { name: 'assistant-panel' }"></div>
+            </fieldset>
+          </form>
         </div>
       </div>
+      % endif
 
-      % if ENABLE_QUERY_SCHEDULING.get():
+    <div class="tab-pane ${ 'active' if not has_optimizer() else '' }" id="sessionsTab">
+      <div class="row-fluid">
+        <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+      </div>
+    </div>
+
+    % if ENABLE_QUERY_SCHEDULING.get():
       <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
       <!-- ko with: $root.selectedNotebook() -->
       <div class="tab-pane" id="scheduleTab">
@@ -1099,14 +1111,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <br>
         <div id="schedulerEditor"></div>
         <!-- /ko -->
+
         <!-- ko ifnot: isSaved() -->
         ${ _('Query needs to be saved first.') }
         <!-- /ko -->
       </div>
       <!-- /ko -->
       <!-- /ko -->
-      % endif
-    </div>
+    % endif
   </div>
 </script>
 

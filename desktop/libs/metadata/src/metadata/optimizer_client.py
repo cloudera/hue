@@ -97,9 +97,18 @@ class OptimizerApi(object):
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
     if data_type in ('table_stats', 'cols_stats'):
-      data_suffix = '.log'
+      data_suffix = '.json'
+      if data_type == 'table_stats':
+        extra_parameters = {'fileType': 'TABLE_STATS'}
+      else:
+        extra_parameters = {'fileType': 'COLUMN_STATS'}
     else:
       data_suffix = '.csv'
+      extra_parameters = {
+          'colDelim': ',',
+          'rowDelim': '\n',
+          'headerFields': OptimizerApi.UPLOAD[data_type]['headerFields']
+      }
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
     f_queries_path.close() # Reopened as real file below to work well with the command
@@ -108,24 +117,29 @@ class OptimizerApi(object):
       f_queries = open(f_queries_path.name, 'w+')
 
       try:
-        content_generator = OptimizerDataAdapter(data, data_type=data_type)
-        queries_csv = export_csvxls.create_generator(content_generator, 'csv')
+        # Queries
+        if data_suffix == '.csv':
+          content_generator = OptimizerQueryDataAdapter(data)
+          queries_csv = export_csvxls.create_generator(content_generator, 'csv')
 
-        for row in queries_csv:
-          f_queries.write(row)
+          for row in queries_csv:
+            f_queries.write(row)
+        else:
+          # Table, column stats
+          f_queries.write(json.dumps(data))
 
       finally:
         f_queries.close()
 
-      response = self._api.call_api('upload', {
+      parameters = {
           'tenant' : self._product_name,
           'fileLocation': f_queries.name,
           'sourcePlatform': source_platform,
-          'colDelim': ',',
-          'rowDelim': '\n',
-          'headerFields': OptimizerApi.UPLOAD[data_type]['headerFields']
-      })
+      }
+      parameters.update(extra_parameters)
+      response = self._api.call_api('upload', parameters)
       status = json.loads(response)
+
       status['count'] = len(data)
       return status
 
@@ -133,6 +147,7 @@ class OptimizerApi(object):
       raise PopupException(e, title=_('Error while accessing Optimizer'))
     finally:
       os.remove(f_queries_path.name)
+
 
   def upload_status(self, workload_id):
     return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id}).json()
@@ -234,90 +249,16 @@ class OptimizerApi(object):
               "name": "SQL_FULLTEXT"
           }
       ]
-    },
-    'table_stats': {
-        'headers': ['TABLE_NAME', 'NUM_ROWS'],
-        "colDelim": ",",
-        "rowDelim": "\\n",
-        "headerFields": [
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "TABLE_NAME"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "NUM_ROWS"
-            }
-        ]
-    },
-    'cols_stats': {
-        'headers': ['table_name', 'column_name', 'data_type', 'num_distinct', 'num_nulls', 'avg_col_len'], # Lower case for some reason
-        "colDelim": ",",
-        "rowDelim": "\\n",
-        "headerFields": [
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "table_name"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "column_name"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "data_type"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "num_distinct"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "num_nulls"
-            },
-            {
-                "count": 0,
-                "coltype": "NONE",
-                "use": True,
-                "tag": "",
-                "name": "avg_col_len"
-            }
-        ]
     }
   }
 
 
-def OptimizerDataAdapter(data, data_type='queries'):
-  headers = OptimizerApi.UPLOAD[data_type]['headers']
+def OptimizerQueryDataAdapter(data):
+  headers = OptimizerApi.UPLOAD['queries']['headers']
 
-  if data_type in ('table_stats', 'cols_stats'):
+  if data and len(data[0]) == 3:
     rows = data
   else:
-    if data and len(data[0]) == 3:
-      rows = data
-    else:
-      rows = ([str(uuid.uuid4()), 0.0, q] for q in data)
+    rows = ([str(uuid.uuid4()), 0.0, q] for q in data)
 
   yield headers, rows
-

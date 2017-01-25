@@ -1465,6 +1465,30 @@ var EditorViewModel = (function() {
       });
     };
 
+    huePubSub.subscribe("editor.table.stats.upload", function (activeTables) {
+      self.loadTableStats(activeTables);
+    });
+
+    self.loadTableStats = function (activeTables) {
+      logGA('load_table_stats');
+
+      $.post("/metadata/api/optimizer/upload/table_stats", {
+    	db_tables: ko.mapping.toJSON(activeTables),
+        sourcePlatform: ko.mapping.toJSON(self.type()),
+        with_columns: ko.mapping.toJSON(true),
+        with_ddl: ko.mapping.toJSON(true)
+      }, function(data) {
+        if (data.status == 0) {
+          $(document).trigger("info", activeTables + " stats uploaded successfully.");
+          if (data.upload_table_ddl) {
+            self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
+          }
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
     self.watchUploadStatus = function (workloadId) {
       $.post("/metadata/api/optimizer/upload/status", {
         workloadId: workloadId

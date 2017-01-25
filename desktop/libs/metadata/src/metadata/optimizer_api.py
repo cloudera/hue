@@ -331,12 +331,14 @@ def upload_history(request):
 def upload_table_stats(request):
   response = {'status': -1}
 
-  db_tables = json.loads(request.POST.get('dbTables'), '[]')
+  db_tables = json.loads(request.POST.get('db_tables'), '[]')
   source_platform = request.POST.get('sourcePlatform', 'hive')
   with_columns = json.loads(request.POST.get('with_columns', 'false'))
+  with_ddl = json.loads(request.POST.get('with_ddl', 'false'))
 
   table_stats = []
   column_stats = []
+  table_ddls = []
 
   for db_table in db_tables:
     path = _get_table_name(db_table)
@@ -345,30 +347,41 @@ def upload_table_stats(request):
       full_table_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table']).content)
       stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
-      table_stats.append((db_table, stats.get('numRows', -1)))
+      table_stats.append({
+        'table_name': db_table,
+        #'avg_row_len':  stats.get('numRows', -1),
+        'num_rows':  stats.get('numRows', -1)
+      })
 
       if with_columns:
         for col in full_table_stats['columns']:
           col_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table'], column=col).content)['stats']
           col_stats = dict([(key, val) for col_stat in col_stats for key, val in col_stat.iteritems()])
 
-          column_stats.append(
-              (db_table, col, col_stats['data_type'],
-               int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
-               int(col_stats['num_nulls']) if col_stats['num_nulls'] != '' else -1,
-               int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1
-            )
-          )
+          column_stats.append({
+            'table_name': db_table,
+            'column_name': col,
+            'data_type': col_stats['data_type'],
+            "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
+            "num_nulls": int(col_stats['num_nulls']) if col_stats['num_nulls'] != '' else -1,
+            "avg_col_len": int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1
+          })
+
+#       if with_ddl:
+#         table_ddl.append((original_query_id, execution_time, query_data['snippets'][0]['statement']))
+
     except Exception, e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
   api = OptimizerApi()
 
   response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
-  if with_columns:
+  response['status'] = 0 if response['upload_table_stats']['status']['state'] == 'FINISHED' else -1
+  if column_stats:
     response['upload_cols_stats'] = api.upload(data=column_stats, data_type='cols_stats', source_platform=source_platform)
-
-  response['status'] = 0
+    response['status'] = response['status'] if response['upload_cols_stats']['status']['state'] == 'FINISHED' else -1
+  if table_ddls:
+    response['upload_table_ddl'] = api.upload(data=table_ddls, data_type='queries', source_platform=source_platform)
 
   return JsonResponse(response)
 
@@ -392,6 +405,6 @@ def _get_table_name(path):
   if '.' in path:
     database, table = path.split('.', 1)
   else:
-    database, table = '', path
+    database, table = 'default', path
 
   return {'database': database, 'table': table}
