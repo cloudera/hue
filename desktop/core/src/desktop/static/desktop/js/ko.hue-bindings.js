@@ -3798,7 +3798,12 @@
           window.clearTimeout(autocompleteThrottle);
           autocompleteThrottle = window.setTimeout(function () {
             var textBeforeCursor = editor.getTextBeforeCursor();
-            var questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]$/i);
+            var questionMarkMatch;
+            if ($('.hue-ace-autocompleter').length > 0) {
+              questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]\s$/i);
+            } else {
+              questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]$/i);
+            }
             if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
               editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
               editor.removeTextBeforeCursor(1);
