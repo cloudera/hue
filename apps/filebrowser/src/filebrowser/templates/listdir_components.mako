@@ -621,7 +621,7 @@ from django.utils.translation import ugettext as _
 
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
-  <script src="${ static('desktop/js/dropzone.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/dropzone.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/js/apiHelper.js') }"></script>
 
 
@@ -2075,6 +2075,14 @@ from django.utils.translation import ugettext as _
                 $('#progressStatusBar').removeClass('hide');
                 $('#progressStatusBar div').css("width", "0");
               }
+            },
+            processing: function (file) {
+              var newDest = ops.path;
+              if (file.fullPath) {
+                newDest = ops.path + '/' + file.fullPath.substr(0, file.fullPath.length - file.name.length);
+              }
+              this.options.params.dest = newDest;
+              this.options.url = '/filebrowser/upload/file?dest=' + newDest;
             },
             uploadprogress: function (file, progress) {
               $("[data-dz-name]").each(function (cnt, item) {
