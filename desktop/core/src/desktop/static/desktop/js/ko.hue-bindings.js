@@ -2752,10 +2752,13 @@
           startingPath: options.database + '.',
           rewriteVal: true,
           onPathChange: options.onChange,
-          searchEverywhere : options.searchEverywhere || false
+          searchEverywhere : options.searchEverywhere || false,
+          apiHelperUser: options.apiHelperUser || '',
+          apiHelperType: options.apiHelperType || '',
         });
       }
       else {
+        options = allBindingsAccessor();
         function setPathFromAutocomplete(path) {
           self.val(path);
           valueAccessor()(path);
@@ -2772,7 +2775,9 @@
         self.jHueGenericAutocomplete({
           showOnFocus: true,
           home: "/",
-          skipColumns: allBindingsAccessor().skipColumns || false,
+          skipColumns: options.skipColumns || false,
+          apiHelperUser: options.apiHelperUser || '',
+          apiHelperType: options.apiHelperType || '',
           onPathChange: function (path) {
             setPathFromAutocomplete(path);
           },
