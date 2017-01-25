@@ -225,7 +225,7 @@ def get_stats(request):
     field = analysis['name']
     facet = analysis['stats']['facet']
 
-    result['stats'] = SolrApi(SOLR_URL.get(), request.user).stats(collection['name'], [field], query, facet)
+    result['stats'] = get_engine(request.user, collection).stats(collection['name'], [field], query, facet)
     result['status'] = 0
     result['message'] = ''
 
@@ -393,10 +393,12 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     if widget_type in ('bucket-widget', 'pie2-widget', 'timeline-widget', 'tree2-widget', 'text-facet-widget', 'hit-widget'):
       if widget_type == 'text-facet-widget':
         properties['type'] = facet_type
+
       if widget_type == 'hit-widget':
         facet_type = 'function'
       else:
         facet_type = 'nested'
+
       properties['facets_form'] = {'field': '', 'mincount': 1, 'limit': 10, 'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}}
       properties['facets'] = []
       properties['domain'] = {'blockParent': [], 'blockChildren': []}
@@ -423,6 +425,11 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
       properties['limit'] = 100
     else:
       properties['scope'] = 'stack' if widget_type == 'heatmap-widget' else 'tree'
+
+  if widget_type == 'histogram-widget':
+    properties['enableSelection'] = True
+    properties['timelineChartType'] = 'bar'
+    properties['extraSeries'] = []
 
   return {
     'id': facet_id,
