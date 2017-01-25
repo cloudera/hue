@@ -1282,7 +1282,7 @@ var EditorViewModel = (function() {
           if (data.status == 0) {
             self.status(data.query_status.status);
 
-            if (self.status() == 'running' || self.status() == 'starting') {
+            if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting' ) {
               self.result.endTime(new Date());
               if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
             }
