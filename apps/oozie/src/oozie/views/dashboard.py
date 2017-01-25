@@ -397,6 +397,7 @@ def list_oozie_workflow(request, job_id):
 
   if request.GET.get('graph'):
     return render('dashboard/list_oozie_workflow_graph.mako', request, {
+      'oozie_workflow': oozie_workflow,
       'workflow_graph': workflow_graph,
       'layout_json': json.dumps(workflow_data.get('layout', ''), cls=JSONEncoderForHTML),
       'workflow_json': json.dumps(workflow_data.get('workflow', ''), cls=JSONEncoderForHTML),

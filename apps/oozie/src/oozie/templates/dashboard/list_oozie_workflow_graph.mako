@@ -64,11 +64,53 @@ ${ workflow.render() }
     },
     deploymentDir: viewModel.workflow.properties.deployment_dir()
   }
+
+  function refreshView() {
+      $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
+
+        if (data.actions){
+          % if layout_json != '':
+          ko.utils.arrayForEach(data.actions, function(action) {
+            var _w, actionId = action.id.substr(action.id.length - 4);
+            if (actionId === '@End'){
+              _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
+            }
+            else {
+              _w = viewModel.getWidgetById($("[id^=wdg_" + actionId + "]").attr("id").substr(4));
+            }
+            if (_w != null) {
+              if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
+                _w.status("success");
+                _w.progress(100);
+              }
+              else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(action.status) > -1) {
+                _w.status("running");
+                _w.progress(50);
+              }
+              else {
+                _w.status("failed");
+                _w.progress(100);
+              }
+              _w.actionURL(action.url);
+              _w.logsURL(action.log);
+              _w.externalIdUrl(action.externalIdUrl);
+            }
+          });
+          %endif
+        }
+        if (data.status != "RUNNING" && data.status != "PREP"){
+          return;
+        }
+        window.setTimeout(refreshView, 1000);
+      });
+    }
+
   %endif
 
   $(document).ready(function() {
     % if layout_json != '':
     drawArrows();
+    refreshView();
     %endif
   });
 </script>
