@@ -161,7 +161,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
 
             <!-- ko if: ! $root.job() -->
-            ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }" />
+            ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
             <div class="btn-group">
               <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
               <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
@@ -1020,16 +1020,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.apps = ko.observableArray();
       self.loadingJobs = ko.observable(false);
-
       self.username = ko.observable('${ user.username }');
+      self.textFilter = ko.observable('${ user.username }').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
+
+      self.filters = [ {'text': self.textFilter} ];
+
+      self.textFilter.subscribe(function(value) {
+        self.fetchJobs();
+        // TBD: refreshPagination()
+      });
 
       self.fetchJobs = function () {
         self.loadingJobs(true);
         vm.job(null);
-        $.post("/jobbrowser/api/jobs", {
+
+        url_data = {
           username: ko.mapping.toJSON(self.username),
-          interface: ko.mapping.toJSON(vm.interface)
-        }, function (data) {
+          interface: ko.mapping.toJSON(vm.interface),
+          filters: ko.mapping.toJSON(self.filters),
+        }
+
+        $.post("/jobbrowser/api/jobs", url_data, function (data) {
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {

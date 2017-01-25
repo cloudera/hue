@@ -38,7 +38,7 @@ except Exception, e:
 
 class BundleApi(Api):
 
-  def apps(self):
+  def apps(self, filters):
     oozie_api = get_oozie(self.user)
     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
     wf_list = oozie_api.get_bundles(**kwargs)
