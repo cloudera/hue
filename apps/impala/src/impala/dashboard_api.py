@@ -22,9 +22,9 @@ from itertools import groupby
 
 from django.utils.html import escape
 
-from beeswax.server import dbms
 from notebook.models import make_notebook
 from notebook.connectors.base import get_api
+
 from search.models import Collection2
 
 
@@ -98,11 +98,11 @@ class SQLApi():
             'filters': self._convert_filters_to_where(filters),
         }
     else:
-      fields =  '*'
+      fields = Collection2.get_field_list(dashboard)
       sql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
           'database': database,
           'table': table,
-          'fields': fields
+          'fields': ', '.join(['`%s`' % f for f in fields])
       }
       if filters:
         sql += ' ' + self._convert_filters_to_where(filters)

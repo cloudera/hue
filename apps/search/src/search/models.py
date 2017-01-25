@@ -613,7 +613,6 @@ class Collection2(object):
   def _make_gridlayout_header_field(cls, field, isDynamic=False):
     return {'name': field['name'], 'type': field['type'], 'sort': {'direction': None}, 'isDynamic': isDynamic}
 
-
   @classmethod
   def _make_luke_from_schema_fields(cls, schema_fields):
     return dict([
@@ -662,6 +661,20 @@ class Collection2(object):
     properties_['autocomplete'] = autocomplete
     self.data = json.dumps(properties_)
 
+  @classmethod
+  def get_field_list(cls, collection):
+    if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
+      fields = set(collection['template']['fieldsSelected'] + ([collection['idField']] if collection['idField'] else []))
+      # Add field if needed
+      if collection['template']['leafletmap'].get('latitudeField'):
+        fields.add(collection['template']['leafletmap']['latitudeField'])
+      if collection['template']['leafletmap'].get('longitudeField'):
+        fields.add(collection['template']['leafletmap']['longitudeField'])
+      if collection['template']['leafletmap'].get('labelField'):
+        fields.add(collection['template']['leafletmap']['labelField'])
+      return list(fields)
+    else:
+      return ['*']
 
 def get_facet_field(category, field, facets):
   if category in ('nested', 'function'):

@@ -163,7 +163,7 @@ class SolrApi(object):
             })
             if timeFilter and timeFilter['time_field'] == facet['field'] and (facet['id'] not in timeFilter['time_filter_overrides'] or facet['widgetType'] != 'bucket-widget'):
               _f.update(self._get_time_filter_query(timeFilter, facet))
-          else:            
+          else:
             _f.update({
                 'type': 'terms',
                 'field': facet['field'],
@@ -215,18 +215,8 @@ class SolrApi(object):
 
     params += self._get_fq(collection, query)
 
-    if collection['template']['fieldsSelected'] and collection['template']['isGridLayout']:
-      fields = set(collection['template']['fieldsSelected'] + [collection['idField']] if collection['idField'] else [])
-      # Add field if needed
-      if collection['template']['leafletmap'].get('latitudeField'):
-        fields.add(collection['template']['leafletmap']['latitudeField'])
-      if collection['template']['leafletmap'].get('longitudeField'):
-        fields.add(collection['template']['leafletmap']['longitudeField'])
-      if collection['template']['leafletmap'].get('labelField'):
-        fields.add(collection['template']['leafletmap']['labelField'])
-      fl = urllib.unquote(utf_quoter(','.join(list(fields))))
-    else:
-      fl = '*'
+    from search.models import Collection2
+    fl = urllib.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
 
     nested_fields = self._get_nested_fields(collection)
     if nested_fields:
