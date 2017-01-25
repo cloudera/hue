@@ -881,8 +881,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               }
             }
 
+            $('canvas').remove();
+
             if (vm.job().type() === 'workflow') {
-              $('canvas').remove();
               $('#workflow-page-graph').empty();
               $.ajax({
                 url: "/oozie/list_oozie_workflow/" + vm.job().id(),
