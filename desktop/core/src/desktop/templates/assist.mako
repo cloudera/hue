@@ -1744,11 +1744,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           }
         });
 
-        self.activeType.subscribe(function (newType) {
-          console.log(newType);
-          self.selectedFunction(selectedFunctionPerType[newType]);
-        });
-
         self.activeCategories = ko.observable();
 
         self.filteredCategories = ko.pureComputed(function () {
@@ -1760,8 +1755,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           })
         });
 
-        self.activeType.subscribe(function (newValue) {
-          self.activeCategories(self.categories[newValue]);
+        self.activeType.subscribe(function (newType) {
+          self.selectedFunction(selectedFunctionPerType[newType]);
+          self.activeCategories(self.categories[newType]);
         });
 
         self.activeType(self.availableTypes()[0]);

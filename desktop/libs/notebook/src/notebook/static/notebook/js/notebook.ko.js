@@ -2303,6 +2303,9 @@ var EditorViewModel = (function() {
     ApiHelper.getInstance(self).withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
     self.isContextPanelVisible = ko.observable(false);
+    self.isContextPanelVisible.subscribe(function (newValue) {
+      huePubSub.publish('context.panel.visible', newValue);
+    });
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 

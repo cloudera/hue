@@ -1079,140 +1079,81 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </ul>
 
     <div class="tab-content" style="border: none">
-      % if has_optimizer():
-      <div class="tab-pane active" id="assistantTab">
-        <div class="row-fluid">
-          <div class="span12">
-            <form class="form-horizontal">
-              <fieldset>
-               ${ _('Active tables') }<br/>
-               <ul>
-                 <li>sample_07 <i class="fa fa-info"></i> <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li>
-                 <li>sample_08 <i class="fa fa-info"></i> </li>
-               </ul>
-             </fieldset>
-
-            <form class="form-horizontal">
-              <fieldset>
-                ${ _('Fields') }<br/>
-                <ul>
-                  <li>'country-code' is a popular field <a href="javascript:void(0)">add</a></li>
-                  <li>'gender' would be a good dimension with low cardinality (2) <a href="javascript:void(0)">add</a></li>
-                  <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
-                  <li>'f1'</li>
-                  <li>'f2'</li>
-                  <li>'f3'</li>
-                  <li>'f4'</li>
-                  <li>'f5'</li>
-                </ul>
-              </fieldset>
-            </form>
-
-            <form class="form-horizontal">
-              <fieldset>
-                ${ _('Suggestions') }<br/>
-                <ul>
-                  <li>Popular fields for the tables are: [code, salary, amount]</li>
-                  <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
-                  <li>Parameterize the query?</li>
-                  <li>Could be automated with integrated scheduler</li>
-                  <li>Data has not been refreshed since last run 3 days ago  <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li></li>
-                  <li>A schema change happened last week, a new column 'salary_med' was added</li>
-                  <li>Data statistics are not accurate, click to refresh them</li>
-                  <li>Query ran 17 times last week</li>
-                  <li>The datasets are sometimes joined with table [Population]</li>
-                  <li>Query would be a good candidate to run interactively with Impala</li>
-                </ul>
-              </fieldset>
-            </form>
-
-              <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-                <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
-              </a>
-
-           </form>
-         </div>
-       </div>
-      </div>
-      % endif
-
       <div class="tab-pane ${ 'active' if not has_optimizer() else '' }" id="sessionsTab">
         <div class="row-fluid">
-          <div class="span12">
-            <!-- ko with: $root.selectedNotebook() -->
-            <form class="form-horizontal session-config">
-              <fieldset>
-                <!-- ko ifnot: sessions().length -->
-               <p>${ _('There are currently no active sessions, please reload the page.') }</p>
-               <!-- /ko -->
-               <!-- ko foreach: sessions -->
-               <h4 data-bind="text: $root.getSnippetName(type())" style="clear:left; display: inline-block"></h4>
-               <div class="session-actions">
-                 <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
-                 <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
-                 % if conf.USE_DEFAULT_CONFIGURATION.get():
-                 <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $root.selectedNotebook().saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
-                 % endif
-                 <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
-                 <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
-                 <!-- /ko -->
-               </div>
-               <div style="width:100%;">
-                 <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
-               </div>
-               <div style="clear:both; padding-left: 120px;">
-                 <!-- ko if: availableNewProperties().length -->
-                 <select data-bind="options: availableNewProperties,
+          <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+        </div>
+      </div>
+
+      % if ENABLE_QUERY_SCHEDULING.get():
+      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
+      <!-- ko with: $root.selectedNotebook() -->
+      <div class="tab-pane" id="scheduleTab">
+        <!-- ko if: isSaved() -->
+        <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
+        <a data-bind="click: $root.saveNotebook">${ _('Changes not saved') }</a>
+        <!-- /ko -->
+        <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() -->
+        <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
+        <!-- /ko -->
+        <br>
+        <br>
+        <div id="schedulerEditor"></div>
+        <!-- /ko -->
+        <!-- ko ifnot: isSaved() -->
+        ${ _('Query needs to be saved first.') }
+        <!-- /ko -->
+      </div>
+      <!-- /ko -->
+      <!-- /ko -->
+      % endif
+    </div>
+  </div>
+</script>
+
+<script type="text/html" id="notebook-session-config-template">
+  <!-- ko with: selectedNotebook() -->
+  <form class="form-horizontal session-config">
+    <fieldset>
+      <!-- ko ifnot: sessions().length -->
+      <p>${ _('There are currently no active sessions, please reload the page.') }</p>
+      <!-- /ko -->
+      <!-- ko foreach: sessions -->
+      <h4 data-bind="text: $parents[1].getSnippetName(type())" style="clear:left; display: inline-block"></h4>
+      <div class="session-actions">
+        <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
+        <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
+        % if conf.USE_DEFAULT_CONFIGURATION.get():
+          <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
+        % endif
+        <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
+        <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
+        <!-- /ko -->
+      </div>
+      <div style="width:100%;">
+        <!-- ko component: { name: 'property-selector', params: { properties: properties } } --><!-- /ko -->
+      </div>
+      <div style="clear:both; padding-left: 120px;">
+        <!-- ko if: availableNewProperties().length -->
+        <select data-bind="options: availableNewProperties,
                           optionsText: 'nice_name',
                           optionsValue: 'name',
                           value: selectedSessionProperty,
                           optionsCaption: '${ _ko('Choose a property...') }'"></select>
-                 <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
+        <a class="pointer" style="padding:5px;" data-bind="click: selectedSessionProperty() && function() {
                     properties.push(ko.mapping.fromJS({'name': selectedSessionProperty(), 'value': ''}));
                     selectedSessionProperty('');
                    }" style="margin-left:10px;vertical-align: text-top;">
-                   <i class="fa fa-plus"></i>
-                 </a>
-                 <!-- /ko -->
-               </div>
-               <!-- /ko -->
-               <!-- /ko -->
-               <br/>
-             </fieldset>
-           </form>
-           <!-- /ko -->
-         </div>
-       </div>
-    </div>
-
-    % if ENABLE_QUERY_SCHEDULING.get():
-    <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
-    <!-- ko with: $root.selectedNotebook() -->
-    <div class="tab-pane" id="scheduleTab">
-      <!-- ko if: isSaved() -->
-        <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
-          <a data-bind="click: $root.saveNotebook">${ _('Changes not saved') }</a>
+          <i class="fa fa-plus"></i>
+        </a>
         <!-- /ko -->
-        <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() -->
-          <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
-        <!-- /ko -->
-        <br>
-        <br>
-        <div id="schedulerEditor">
-        </div>
+      </div>
       <!-- /ko -->
-
-      <!-- ko ifnot: isSaved() -->
-        ${ _('Query needs to be saved first.') }
       <!-- /ko -->
-    </div>
-    <!-- /ko -->
-    <!-- /ko -->
-
-    <!-- /ko -->
-    % endif
-
-  </div>
+      <br/>
+    </fieldset>
+  </form>
+  <!-- /ko -->
 </script>
 
 <script type="text/html" id="snippetIcon">

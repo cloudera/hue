@@ -384,9 +384,9 @@ ${ hueIcons.symbols() }
 
       <div data-bind="visible: rightAssistVisible" style="display: none; height: 100%; width: 100%; position: relative;">
         <ul class="right-panel-tabs nav nav-pills">
-          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="#functions" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
-          <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="#functions" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
-          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="#functions" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedules') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedules') }</a></li>
         </ul>
 
         <div class="right-panel-tab-content tab-content">
@@ -402,6 +402,24 @@ ${ hueIcons.symbols() }
           <div>Schedules</div>
           <!-- /ko -->
         </div>
+      </div>
+    </div>
+
+    <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
+      <ul class="nav nav-tabs">
+        <!-- ko if: sessionsAvailable -->
+        <li class="active"><a href="#sessionsTab" data-toggle="tab" data-bind="visible: sessionsAvailable">${_('Sessions')}</a></li>
+        <!-- /ko -->
+      </ul>
+
+      <div class="tab-content">
+        <!-- ko if: sessionsAvailable -->
+        <div class="tab-pane active" id="sessionsTab">
+          <div class="row-fluid">
+            <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: activeAppViewModel }"></div>
+          </div>
+        </div>
+        <!-- /ko -->
       </div>
     </div>
   </div>
@@ -571,15 +589,30 @@ ${ assist.assistPanel() }
 
         self.embeddable_cache = {};
 
-        self.getActiveAppViewmodel = function () {
-          var koElementID = '#' + self.currentApp() + 'Components';
-          if ($(koElementID).length > 0 && ko.dataFor($(koElementID)[0])) {
-            return ko.dataFor($(koElementID)[0]);
-          }
-          return null;
+        self.getActiveAppViewModel = function (callback) {
+          var checkInterval = window.setInterval(function () {
+            var $koElement = $('#' + self.currentApp() + 'Components');
+            if ($koElement.length > 0 && ko.dataFor($koElement[0])) {
+              window.clearInterval(checkInterval);
+              callback(ko.dataFor($koElement[0]));
+            }
+          }, 25);
         }
 
         self.currentApp = ko.observable();
+
+        self.currentApp.subscribe(function () {
+          self.getActiveAppViewModel(function (viewModel) {
+            huePubSub.publish('set.current.app.view.model', viewModel);
+          })
+        })
+
+        huePubSub.subscribe('get.current.app.view.model', function () {
+          self.getActiveAppViewModel(function (viewModel) {
+            huePubSub.publish('set.current.app.view.model', viewModel);
+          })
+        })
+
         self.isLoadingEmbeddable = ko.observable(false);
 
         self.extraEmbeddableURLParams = ko.observable('');
@@ -587,14 +620,13 @@ ${ assist.assistPanel() }
         self.changeEditorType = function (type) {
           self.extraEmbeddableURLParams('?type=' + type);
           hueUtils.changeURLParameter('type', type);
-          var checkForEditor = window.setInterval(function(){
-            if (self.getActiveAppViewmodel() && self.getActiveAppViewmodel().selectedNotebook && self.getActiveAppViewmodel().selectedNotebook()) {
-              self.getActiveAppViewmodel().selectedNotebook().selectedSnippet(type);
-              self.getActiveAppViewmodel().editorType(type);
-              self.getActiveAppViewmodel().newNotebook();
-              window.clearInterval(checkForEditor);
+          self.getActiveAppViewModel(function (viewModel) {
+            if (viewModel && viewModel.selectedNotebook && viewModel.selectedNotebook()) {
+              viewModel.selectedNotebook().selectedSnippet(type);
+              viewModel.editorType(type);
+              viewModel.newNotebook();
             }
-          }, 100);
+          })
         }
 
         huePubSub.subscribe('open.fb.file', function (path) {
@@ -758,6 +790,19 @@ ${ assist.assistPanel() }
         self.rightAssistVisible = ko.observable();
         self.assistantAvailable = ko.observable(false);
         self.activeRightTab = ko.observable();
+        self.activeAppViewModel = ko.observable();
+
+        self.contextPanelVisible = ko.observable(false);
+        self.sessionsAvailable = ko.observable(false);
+
+        self.activeAppViewModel.subscribe(function (viewModel) {
+          self.sessionsAvailable(typeof viewModel.selectedNotebook !== 'undefined');
+        })
+
+        huePubSub.subscribe('context.panel.visible', function (visible) {
+          console.log(visible);
+          self.contextPanelVisible(visible);
+        })
 
         huePubSub.subscribe('active.snippet.type.changed', function (type) {
           if (type === 'hive' || type === 'impala') {
@@ -773,12 +818,15 @@ ${ assist.assistPanel() }
           }
         });
 
+        huePubSub.subscribe('set.current.app.view.model', self.activeAppViewModel);
+        huePubSub.publish('get.current.app.view.model');
+
         if (!self.activeRightTab()) {
           self.activeRightTab('functions');
         }
 
         if (self.assistantAvailable()) {
-          self.activeRightTab = ko.observable('functions');
+          self.activeRightTab = ko.observable('assistant');
         }
 
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
@@ -790,6 +838,7 @@ ${ assist.assistPanel() }
       ko.applyBindings(sidePanelViewModel, $('#leftResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
+      ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
       return sidePanelViewModel;
     })();
 
