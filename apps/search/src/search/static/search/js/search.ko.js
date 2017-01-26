@@ -1377,7 +1377,7 @@ var NewTemplate = function (vm, initial) {
     if (self.inited()) {
       // If new dashboard
       vm.collection.name.subscribe(function(newValue) {
-        if (newValue) {
+        if (newValue && (vm.collection.engine() == 'solr' || /^[^\.]+\.[^\.]+$/.test(newValue))) {
           vm.collection.label(newValue);
           vm.collection.switchCollection();
           vm.search();

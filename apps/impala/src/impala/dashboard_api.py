@@ -102,7 +102,7 @@ class SQLApi():
       sql = "SELECT %(fields)s FROM `%(database)s`.`%(table)s`" % {
           'database': database,
           'table': table,
-          'fields': ', '.join(['`%s`' % f for f in fields])
+          'fields': ', '.join(['`%s`' % f if f != '*' else '*' for f in fields])
       }
       if filters:
         sql += ' ' + self._convert_filters_to_where(filters)
@@ -114,8 +114,8 @@ class SQLApi():
         editor_type=dashboard['engine'],
         statement=sql,
         database=database,
-        status='ready-execute'
-        # historify=False
+        status='ready-execute',
+        skip_historify=True
     )
 
     response = editor.execute(MockRequest(self.user))
