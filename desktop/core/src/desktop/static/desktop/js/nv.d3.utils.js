@@ -102,7 +102,7 @@ nv.utils.getColor = function (color) {
 
     //if passed an array, turn it into a color scale
   } else if (nv.utils.isArray(color)) {
-    var color_scale = d3.scale.ordinal().range(color);
+    var color_scale = d3v3.scale.ordinal().range(color);
     return function (d, i) {
       var key = i === undefined ? d : i;
       return d.color || color_scale(key);
@@ -123,7 +123,7 @@ nv.utils.getColor = function (color) {
  */
 nv.utils.defaultColor = function () {
   // get range of the scale so we'll turn it into our own function.
-  return nv.utils.getColor(d3.scale.category20().range());
+  return nv.utils.getColor(d3v3.scale.category20().range());
 };
 
 
@@ -136,7 +136,7 @@ nv.utils.customTheme = function (dictionary, getKey, defaultColors) {
   getKey = getKey || function (series) {
       return series.key
     };
-  defaultColors = defaultColors || d3.scale.category20().range();
+  defaultColors = defaultColors || d3v3.scale.category20().range();
 
   // start at end of default color list and walk back to index 0
   var defIndex = defaultColors.length;
@@ -168,24 +168,24 @@ nv.utils.customTheme = function (dictionary, getKey, defaultColors) {
 nv.utils.pjax = function (links, content) {
 
   var load = function (href) {
-    d3.html(href, function (fragment) {
-      var target = d3.select(content).node();
+    d3v3.html(href, function (fragment) {
+      var target = d3v3.select(content).node();
       target.parentNode.replaceChild(
-        d3.select(fragment).select(content).node(),
+        d3v3.select(fragment).select(content).node(),
         target);
       nv.utils.pjax(links, content);
     });
   };
 
-  d3.selectAll(links).on("click", function () {
+  d3v3.selectAll(links).on("click", function () {
     history.pushState(this.href, this.textContent, this.href);
     load(this.href);
-    d3.event.preventDefault();
+    d3v3.event.preventDefault();
   });
 
-  d3.select(window).on("popstate", function () {
-    if (d3.event.state) {
-      load(d3.event.state);
+  d3v3.select(window).on("popstate", function () {
+    if (d3v3.event.state) {
+      load(d3v3.event.state);
     }
   });
 };
@@ -224,7 +224,7 @@ nv.utils.NaNtoZero = function (n) {
 /*
  Add a way to watch for d3 transition ends to d3
  */
-d3.selection.prototype.watchTransition = function (renderWatch) {
+d3v3.selection.prototype.watchTransition = function (renderWatch) {
   var args = [this].concat([].slice.call(arguments, 1));
   return renderWatch.transition.apply(renderWatch, args);
 };
@@ -371,7 +371,7 @@ nv.utils.state = function () {
   var init = null;
   var changed = null;
 
-  this.dispatch = d3.dispatch('change', 'set');
+  this.dispatch = d3v3.dispatch('change', 'set');
 
   this.dispatch.on('set', function (state) {
     _setState(state, true);
@@ -444,7 +444,7 @@ nv.utils.state = function () {
  */
 nv.utils.optionsFunc = function (args) {
   if (args) {
-    d3.map(args).forEach((function (key, value) {
+    d3v3.map(args).forEach((function (key, value) {
       if (nv.utils.isFunction(this[key])) {
         this[key](value);
       }
@@ -539,14 +539,14 @@ nv.utils.initOptions = function (chart) {
 
 /*
  Inherit options from a D3 object
- d3.rebind makes calling the function on target actually call it on source
+ d3v3.rebind makes calling the function on target actually call it on source
  Also use _d3options so we can track what we inherit for documentation and chained inheritance
  */
 nv.utils.inheritOptionsD3 = function (target, d3_source, oplist) {
   target._d3options = oplist.concat(target._d3options || []);
   oplist.unshift(d3_source);
   oplist.unshift(target);
-  d3.rebind.apply(this, oplist);
+  d3v3.rebind.apply(this, oplist);
 };
 
 
@@ -561,15 +561,15 @@ nv.utils.arrayUnique = function (a) {
 
 
 /*
- Keeps a list of custom symbols to draw from in addition to d3.svg.symbol
+ Keeps a list of custom symbols to draw from in addition to d3v3.svg.symbol
  Necessary since d3 doesn't let you extend its list -_-
  Add new symbols by doing nv.utils.symbols.set('name', function(size){...});
  */
-nv.utils.symbolMap = d3.map();
+nv.utils.symbolMap = d3v3.map();
 
 
 /*
- Replaces d3.svg.symbol so that we can look both there and our own map
+ Replaces d3v3.svg.symbol so that we can look both there and our own map
  */
 nv.utils.symbol = function () {
   var type,
@@ -578,8 +578,8 @@ nv.utils.symbol = function () {
   function symbol(d, i) {
     var t = type.call(this, d, i);
     var s = size.call(this, d, i);
-    if (d3.svg.symbolTypes.indexOf(t) !== -1) {
-      return d3.svg.symbol().type(t).size(s)();
+    if (d3v3.svg.symbolTypes.indexOf(t) !== -1) {
+      return d3v3.svg.symbol().type(t).size(s)();
     } else {
       return nv.utils.symbolMap.get(t)(s);
     }
@@ -587,12 +587,12 @@ nv.utils.symbol = function () {
 
   symbol.type = function (_) {
     if (!arguments.length) return type;
-    type = d3.functor(_);
+    type = d3v3.functor(_);
     return symbol;
   };
   symbol.size = function (_) {
     if (!arguments.length) return size;
-    size = d3.functor(_);
+    size = d3v3.functor(_);
     return symbol;
   };
   return symbol;
@@ -601,7 +601,7 @@ nv.utils.symbol = function () {
 
 /*
  Inherit option getter/setter functions from source to target
- d3.rebind makes calling the function on target actually call it on source
+ d3v3.rebind makes calling the function on target actually call it on source
  Also track via _inherited and _d3options so we can track what we inherit
  for documentation generation purposes and chained inheritance
  */
@@ -614,7 +614,7 @@ nv.utils.inheritOptions = function (target, source) {
   var args = ops.concat(calls).concat(inherited).concat(d3ops);
   args.unshift(source);
   args.unshift(target);
-  d3.rebind.apply(this, args);
+  d3v3.rebind.apply(this, args);
   // pass along the lists to keep track of them, don't allow duplicates
   target._inherited = nv.utils.arrayUnique(ops.concat(calls).concat(inherited).concat(ops).concat(target._inherited || []));
   target._d3options = nv.utils.arrayUnique(d3ops.concat(target._d3options || []));
@@ -695,7 +695,7 @@ nv.utils.noData = function (chart, container) {
  */
 nv.utils.wrapTicks = function (text, width) {
   text.each(function () {
-    var text = d3.select(this),
+    var text = d3v3.select(this),
       words = text.text().split(/\s+/).reverse(),
       word,
       line = [],

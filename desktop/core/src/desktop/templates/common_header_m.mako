@@ -62,7 +62,7 @@ if USE_NEW_EDITOR.get():
     }
   </style>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
@@ -153,9 +153,13 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
+  <script type="text/javascript">
+    window.d3v3 = d3;
+  </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {

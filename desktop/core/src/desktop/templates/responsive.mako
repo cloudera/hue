@@ -459,8 +459,8 @@ ${ hueIcons.symbols() }
 
 <script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
 
-<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/jquery.hiveautocomplete.js') }"></script>
+<script src="${ static('desktop/js/jquery.hdfsautocomplete.js') }"></script>
 <script src="${ static('desktop/js/jquery.filechooser.js') }"></script>
 <script src="${ static('desktop/js/jquery.selector.js') }"></script>
 <script src="${ static('desktop/js/jquery.delayedinput.js') }"></script>
@@ -471,6 +471,11 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
+
+<script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
+<script type="text/javascript">
+  window.d3v3 = d3;
+</script>
 
 <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
@@ -505,7 +510,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 (function () {
     var proxiedKORegister = ko.components.register;
     var LOADED_COMPONENTS = [];
@@ -527,7 +532,7 @@ ${ assist.assistPanel() }
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   (function () {
     var proxiedKORegister = ko.components.register;
     var LOADED_COMPONENTS = [];

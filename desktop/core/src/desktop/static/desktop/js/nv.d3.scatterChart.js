@@ -33,8 +33,8 @@ nv.models.scatterChart = function() {
     , width        = null
     , height       = null
     , color        = nv.utils.defaultColor()
-    , x            = d3.fisheye ? d3.fisheye.scale(d3.scale.linear).distortion(0) : scatter.xScale()
-    , y            = d3.fisheye ? d3.fisheye.scale(d3.scale.linear).distortion(0) : scatter.yScale()
+    , x            = d3v3.fisheye ? d3v3.fisheye.scale(d3v3.scale.linear).distortion(0) : scatter.xScale()
+    , y            = d3v3.fisheye ? d3v3.fisheye.scale(d3v3.scale.linear).distortion(0) : scatter.yScale()
     , xPadding     = 0
     , yPadding     = 0
     , showDistX    = false
@@ -43,7 +43,7 @@ nv.models.scatterChart = function() {
     , showXAxis    = true
     , showYAxis    = true
     , rightAlignYAxis = false
-    , showControls = !!d3.fisheye
+    , showControls = !!d3v3.fisheye
     , fisheye      = 0
     , pauseFisheye = false
     , tooltips     = true
@@ -52,7 +52,7 @@ nv.models.scatterChart = function() {
     , tooltip      = null
     , state = {}
     , defaultState = null
-    , dispatch     = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState')
+    , dispatch     = d3v3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState')
     , noData       = "No Data Available."
     , transitionDuration = 250
     ;
@@ -116,7 +116,7 @@ nv.models.scatterChart = function() {
 
   function chart(selection) {
     selection.each(function(data) {
-      var container = d3.select(this),
+      var container = d3v3.select(this),
           that = this;
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
@@ -344,7 +344,7 @@ nv.models.scatterChart = function() {
 
 
 
-      if (d3.fisheye) {
+      if (d3v3.fisheye) {
         g.select('.nv-background')
             .attr('width', availableWidth)
             .attr('height', availableHeight);
@@ -365,7 +365,7 @@ nv.models.scatterChart = function() {
 
         g.select('.nv-point-paths').style('pointer-events', 'none' );
 
-        var mouse = d3.mouse(this);
+        var mouse = d3v3.mouse(this);
         x.distortion(fisheye).focus(mouse[0]);
         y.distortion(fisheye).focus(mouse[1]);
 
@@ -420,9 +420,9 @@ nv.models.scatterChart = function() {
       });
 
       scatter.dispatch.on('elementMouseover.tooltip', function(e) {
-        d3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-distx-' + e.pointIndex)
+        d3v3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-distx-' + e.pointIndex)
             .attr('y1', function(d,i) { return e.pos[1] - availableHeight;});
-        d3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-disty-' + e.pointIndex)
+        d3v3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-disty-' + e.pointIndex)
             .attr('x2', e.pos[0] + distX.size());
 
         e.pos = [e.pos[0] + margin.left, e.pos[1] + margin.top];
@@ -468,9 +468,9 @@ nv.models.scatterChart = function() {
   scatter.dispatch.on('elementMouseout.tooltip', function(e) {
     dispatch.tooltipHide(e);
 
-    d3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-distx-' + e.pointIndex)
+    d3v3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-distx-' + e.pointIndex)
         .attr('y1', 0);
-    d3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-disty-' + e.pointIndex)
+    d3v3.select('.nv-chart-' + scatter.id() + ' .nv-series-' + e.seriesIndex + ' .nv-disty-' + e.pointIndex)
         .attr('x2', distY.size());
   });
   dispatch.on('tooltipHide', function() {
@@ -494,7 +494,7 @@ nv.models.scatterChart = function() {
   chart.distX = distX;
   chart.distY = distY;
 
-  d3.rebind(chart, scatter, 'id', 'interactive', 'pointActive', 'x', 'y', 'shape', 'size', 'xScale', 'yScale', 'zScale', 'xDomain', 'yDomain', 'xRange', 'yRange', 'sizeDomain', 'sizeRange', 'forceX', 'forceY', 'forceSize', 'clipVoronoi', 'clipRadius', 'useVoronoi');
+  d3v3.rebind(chart, scatter, 'id', 'interactive', 'pointActive', 'x', 'y', 'shape', 'size', 'xScale', 'yScale', 'zScale', 'xDomain', 'yDomain', 'xRange', 'yRange', 'sizeDomain', 'sizeRange', 'forceX', 'forceY', 'forceSize', 'clipVoronoi', 'clipRadius', 'useVoronoi');
   chart.options = nv.utils.optionsFunc.bind(chart);
   
   chart.margin = function(_) {

@@ -151,7 +151,7 @@ var HueColors = {
   },
 
   d3Scale: function () {
-    return d3.scale.category20().range().concat(d3.scale.category20b().range().concat(d3.scale.category20c().range()));
+    return d3v3.scale.category20().range().concat(d3v3.scale.category20b().range().concat(d3v3.scale.category20c().range()));
   },
   cuiD3Scale: function (swatch) {
     var colors = this.getCUIChartColors().map(function (c) {

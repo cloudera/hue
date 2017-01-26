@@ -41,7 +41,7 @@ nv.models.growingDiscreteBarChart = function() {
     , x
     , y
     , noData = "No Data Available."
-    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'beforeUpdate')
+    , dispatch = d3v3.dispatch('tooltipShow', 'tooltipHide', 'beforeUpdate')
     , transitionDuration = 250
     , selectBars = null
     ;
@@ -54,7 +54,7 @@ nv.models.growingDiscreteBarChart = function() {
     ;
   yAxis
     .orient((rightAlignYAxis) ? 'right' : 'left')
-    .tickFormat(d3.format(',.1f'))
+    .tickFormat(d3v3.format(',.1f'))
     ;
 
   //============================================================
@@ -79,7 +79,7 @@ nv.models.growingDiscreteBarChart = function() {
 
   function chart(selection) {
     selection.each(function(data) {
-      var container = d3.select(this),
+      var container = d3v3.select(this),
           that = this;
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
@@ -197,7 +197,7 @@ nv.models.growingDiscreteBarChart = function() {
 
           g.select('.nv-x.nv-axis')
               .attr('transform', 'translate(0,' + (y.range()[0] + ((discretebar.showValues() && y.domain()[0] < 0) ? 16 : 0)) + ')');
-          //d3.transition(g.select('.nv-x.nv-axis'))
+          //d3v3.transition(g.select('.nv-x.nv-axis'))
           g.select('.nv-x.nv-axis').transition()
               .call(xAxis);
 
@@ -209,7 +209,7 @@ nv.models.growingDiscreteBarChart = function() {
             xTicks
                 .selectAll('text')
                 .attr('transform', function(d,i,j) {
-                  var self = d3.select(this),
+                  var self = d3v3.select(this),
                     textLength = self.node().getComputedTextLength(),
                     text = self.text();
                   while (textLength > rangeBand*2 && text.length > 0) {
@@ -293,7 +293,7 @@ nv.models.growingDiscreteBarChart = function() {
   chart.xAxis = xAxis;
   chart.yAxis = yAxis;
 
-  d3.rebind(chart, discretebar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'id', 'showValues', 'valueFormat');
+  d3v3.rebind(chart, discretebar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'id', 'showValues', 'valueFormat');
 
   chart.options = nv.utils.optionsFunc.bind(chart);
 

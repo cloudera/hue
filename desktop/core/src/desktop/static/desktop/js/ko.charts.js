@@ -68,7 +68,7 @@
                   return '<h3>' + hueUtils.htmlEncode(key) + '</h3><p>' + y + '</p>'
                 });
 
-            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
 
             _d3.datum(_data)
                 .transition().duration(150)
@@ -112,7 +112,7 @@
 
             return _chart;
           }, function () {
-            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
             _d3.selectAll(".nv-slice").on("click",
                 function (d, i) {
                   if (typeof _options.onClick != "undefined") {
@@ -132,7 +132,7 @@
       });
       var _chart = $(element).data("chart");
       if (_chart) {
-        var _d3 = d3.select($(element).find("svg")[0]);
+        var _d3 = d3v3.select($(element).find("svg")[0]);
         _d3.datum(_data)
               .transition().duration(150)
               .each("end", _options.onComplete != null ? _options.onComplete : void(0))
@@ -189,7 +189,7 @@
         }
         else {
           window.setTimeout(function () {
-          var _d3 = d3.select($(element).find("svg")[0]);
+          var _d3 = d3v3.select($(element).find("svg")[0]);
           _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
@@ -289,7 +289,7 @@
           else {
             _chart.disableSelection();
           }
-          var _d3 = d3.select($(element).find("svg")[0]);
+          var _d3 = d3v3.select($(element).find("svg")[0]);
           _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
@@ -341,9 +341,9 @@
       var _chart = $(element).data("chart");
       if (_chart) {
         window.setTimeout(function () {
-          var _d3 = d3.select($(element).find("svg")[0]);
+          var _d3 = d3v3.select($(element).find("svg")[0]);
           if (_datum.length > 0 && _datum[0].values.length > 0 && typeof _datum[0].values[0].x.isValid === 'function'){
-            _chart.xAxis.tickFormat(function(d) { return d3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
+            _chart.xAxis.tickFormat(function(d) { return d3v3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
             _chart.onChartUpdate(function () {
               _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
                 insertLinebreaks(d, this);
@@ -940,17 +940,17 @@
           nv.addGraph(function () {
             var _chart = nv.models.scatterChart()
                 .transitionDuration(350)
-                .color(d3.scale.category10().range());
+                .color(d3v3.scale.category10().range());
 
             _chart.tooltipContent(function (key, x, y, obj) {
               return '<h3>' + key + '</h3><div class="center">' + obj.point.size + '</div>';
             });
 
-            _chart.xAxis.tickFormat(d3.format('.02f'));
-            _chart.yAxis.tickFormat(d3.format('.02f'));
+            _chart.xAxis.tickFormat(d3v3.format('.02f'));
+            _chart.yAxis.tickFormat(d3v3.format('.02f'));
             _chart.scatter.onlyCircles(true);
 
-            var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+            var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
             _d3.datum(_datum)
                 .transition().duration(150)
                 .each("end", options.onComplete != null ? options.onComplete : void(0))
@@ -976,7 +976,7 @@
   };
 
   var insertLinebreaks = function (d, ref) {
-    var _el = d3.select(ref);
+    var _el = d3v3.select(ref);
     var _mom = moment(d);
     if (_mom != null && _mom.isValid()) {
       var _words = _mom.format("HH:mm:ss YYYY-MM-DD").split(" ");
@@ -1027,7 +1027,7 @@
         });
         _chart.xAxis.showMaxMin(false);
         if (isTimeline){
-          _chart.xAxis.tickFormat(function(d) { return d3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
+          _chart.xAxis.tickFormat(function(d) { return d3v3.time.format("%Y-%m-%d %H:%M:%S")(new Date(d)); })
           _chart.onChartUpdate(function () {
             _d3.selectAll("g.nv-x.nv-axis g text").each(function (d){
               insertLinebreaks(d, this);
@@ -1036,9 +1036,9 @@
         }
 
         _chart.yAxis
-            .tickFormat(d3.format(",0f"));
+            .tickFormat(d3v3.format(",0f"));
 
-        var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+        var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
         _d3.datum(_datum)
             .transition().duration(150)
             .each("end", function () {
@@ -1066,7 +1066,7 @@
 
         return _chart;
       }, function () {
-        var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+        var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
         _d3.selectAll(".nv-line").on("click",
             function (d, i) {
               if (typeof options.onClick != "undefined") {
@@ -1120,7 +1120,7 @@
           options.onSelectRange(from, to);
         });
         _chart.staggerLabels(true);
-        _chart.xAxis.tickFormat(d3.time.format("%Y-%m-%d %H:%M:%S"));
+        _chart.xAxis.tickFormat(d3v3.time.format("%Y-%m-%d %H:%M:%S"));
         _chart.multibar.hideable(true);
         _chart.multibar.stacked(typeof options.stacked != "undefined" ? options.stacked : false);
         _chart.onStateChange(options.onStateChange);
@@ -1192,7 +1192,7 @@
             _chart.hideSelection();
           }
           else {
-            _chart.xAxis.showMaxMin(false).tickFormat(d3.format(",0f"));
+            _chart.xAxis.showMaxMin(false).tickFormat(d3v3.format(",0f"));
           }
           _chart.staggerLabels(true);
           _chart.multibar.hideable(true);
@@ -1210,11 +1210,11 @@
       _chart.transitionDuration(0);
 
       _chart.yAxis
-        .tickFormat(d3.format("s"));
+        .tickFormat(d3v3.format("s"));
 
       $(element).data("chart", _chart);
 
-      var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+      var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
       _d3.datum(_datum)
         .transition().duration(150)
         .each("end", function () {
@@ -1265,7 +1265,7 @@
 
       return _chart;
     }, function () {
-      var _d3 = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+      var _d3 = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
       _d3.selectAll(".nv-bar").on("click",
         function (d, i) {
           if (typeof options.onClick != "undefined") {
@@ -1286,14 +1286,14 @@
 
       var _w = $(element).width(),
           _h = 300,
-          _x = d3.scale.linear().range([0, _w]),
-          _y = d3.scale.linear().range([0, _h]);
+          _x = d3v3.scale.linear().range([0, _w]),
+          _y = d3v3.scale.linear().range([0, _h]);
 
       if ($(element).find("svg").length > 0) {
         $(element).find("svg").empty();
       }
 
-      var _tip = d3.tip()
+      var _tip = d3v3.tip()
           .attr("class", "d3-tip")
           .html(function (d) {
             if (d.depth == 0) {
@@ -1309,20 +1309,20 @@
           .offset([-12, 0])
 
 
-      var _svg = ($(element).find("svg.tip").length > 0) ? d3.select($(element).find("svg.tip")[0]) : d3.select($(element)[0]).append("svg");
+      var _svg = ($(element).find("svg.tip").length > 0) ? d3v3.select($(element).find("svg.tip")[0]) : d3v3.select($(element)[0]).append("svg");
       _svg.attr("class", "tip")
           .style("height", "0px")
       _svg.call(_tip);
 
 
-      var _vis = ($(element).find("svg").length > 0) ? d3.select($(element).find("svg")[0]) : d3.select($(element)[0]).append("svg");
+      var _vis = ($(element).find("svg").length > 0) ? d3v3.select($(element).find("svg")[0]) : d3v3.select($(element)[0]).append("svg");
       _vis.attr("class", "partitionChart")
           .style("width", _w + "px")
           .style("height", _h + "px")
           .attr("width", _w)
           .attr("height", _h);
 
-      var _partition = d3.layout.partition()
+      var _partition = d3v3.layout.partition()
           .value(function (d) {
             return d.size;
           });
@@ -1339,14 +1339,14 @@
             }
 
             if (this.__data__.parent == undefined) return;
-            d3.select(this).select("rect").classed("mouseover", true)
+            d3v3.select(this).select("rect").classed("mouseover", true)
           })
           .on("mouseout", function (d, i) {
             if (element.querySelectorAll("rect")[i].getBBox().height < MIN_HEIGHT_FOR_TOOLTIP || d.depth == 0) {
               _tip.attr("class", "d3-tip").show(d);
               _tip.hide();
             }
-            d3.select(this).select("rect").classed("mouseover", false)
+            d3v3.select(this).select("rect").classed("mouseover", false)
           });
 
       if (typeof _options.zoomable == "undefined" || _options.zoomable) {
@@ -1412,7 +1412,7 @@
             }
           });
 
-      d3.select(window)
+      d3v3.select(window)
           .on("click", function () {
             click(_data);
           });
@@ -1428,7 +1428,7 @@
 
         var t = g.transition()
             .delay(250)
-            .duration(d3.event.altKey ? 7500 : 750)
+            .duration(d3v3.event.altKey ? 7500 : 750)
             .attr("transform", function (d) {
               return "translate(" + _x(d.y) + "," + _y(d.x) + ")";
             });
@@ -1445,7 +1445,7 @@
               return d.dx * _ky > 12 ? 1 : 0;
             });
 
-        d3.event.stopPropagation();
+        d3v3.event.stopPropagation();
       }
 
       function transform(d) {
@@ -1500,7 +1500,7 @@
       var content = html.apply(this, args),
           poffset = offset.apply(this, args),
           dir = direction.apply(this, args),
-          nodel = d3.select(node), i = 0,
+          nodel = d3v3.select(node), i = 0,
           coords
 
       nodel.html(content)
@@ -1520,7 +1520,7 @@
     //
     // Returns a tip
     tip.hide = function () {
-      nodel = d3.select(node)
+      nodel = d3v3.select(node)
       nodel.style({ opacity: 0, "pointer-events": "none" })
       return tip
     }
@@ -1533,10 +1533,10 @@
     // Returns tip or attribute value
     tip.attr = function (n, v) {
       if (arguments.length < 2 && typeof n === "string") {
-        return d3.select(node).attr(n)
+        return d3v3.select(node).attr(n)
       } else {
         var args = Array.prototype.slice.call(arguments)
-        d3.selection.prototype.attr.apply(d3.select(node), args)
+        d3v3.selection.prototype.attr.apply(d3v3.select(node), args)
       }
 
       return tip
@@ -1550,10 +1550,10 @@
     // Returns tip or style property value
     tip.style = function (n, v) {
       if (arguments.length < 2 && typeof n === "string") {
-        return d3.select(node).style(n)
+        return d3v3.select(node).style(n)
       } else {
         var args = Array.prototype.slice.call(arguments)
-        d3.selection.prototype.style.apply(d3.select(node), args)
+        d3v3.selection.prototype.style.apply(d3v3.select(node), args)
       }
 
       return tip
@@ -1567,7 +1567,7 @@
     // Returns tip or direction
     tip.direction = function (v) {
       if (!arguments.length) return direction
-      direction = v == null ? v : d3.functor(v)
+      direction = v == null ? v : d3v3.functor(v)
 
       return tip
     }
@@ -1579,7 +1579,7 @@
     // Returns offset or
     tip.offset = function (v) {
       if (!arguments.length) return offset
-      offset = v == null ? v : d3.functor(v)
+      offset = v == null ? v : d3v3.functor(v)
 
       return tip
     }
@@ -1591,7 +1591,7 @@
     // Returns html value or tip
     tip.html = function (v) {
       if (!arguments.length) return html
-      html = v == null ? v : d3.functor(v)
+      html = v == null ? v : d3v3.functor(v)
 
       return tip
     }
@@ -1608,7 +1608,7 @@
       return " "
     }
 
-    var direction_callbacks = d3.map({
+    var direction_callbacks = d3v3.map({
           n: direction_n,
           s: direction_s,
           e: direction_e,
@@ -1686,7 +1686,7 @@
     }
 
     function initNode() {
-      var node = d3.select(document.createElement("div"))
+      var node = d3v3.select(document.createElement("div"))
       node.style({
         position: "absolute",
         opacity: 0,
@@ -1721,7 +1721,7 @@
     //
     // Returns an Object {n, s, e, w, nw, sw, ne, se}
     function getScreenBBox() {
-      var targetel = target || d3.event.target,
+      var targetel = target || d3v3.event.target,
           bbox = {},
           matrix = targetel.getScreenCTM(),
           tbbox = targetel.getBBox(),
@@ -1759,7 +1759,7 @@
   };
 
   if (typeof d3 !== 'undefined') {
-    d3.tip = tipBuilder;
+    d3v3.tip = tipBuilder;
   }
 
 })();

@@ -25,9 +25,9 @@ nv.models.scatter = function() {
     , height       = 500
     , color        = nv.utils.defaultColor() // chooses color
     , id           = Math.floor(Math.random() * 100000) //Create semi-unique ID incase user doesn't select one
-    , x            = d3.scale.linear()
-    , y            = d3.scale.linear()
-    , z            = d3.scale.linear() //linear because d3.svg.shape.size is treated as area
+    , x            = d3v3.scale.linear()
+    , y            = d3v3.scale.linear()
+    , z            = d3v3.scale.linear() //linear because d3v3.svg.shape.size is treated as area
     , getX         = function(d) { return d.x } // accessor to get the x value
     , getY         = function(d) { return d.y } // accessor to get the y value
     , getSize      = function(d) { return d.size || 1} // accessor to get the point size
@@ -51,7 +51,7 @@ nv.models.scatter = function() {
     , sizeDomain   = null // Override point size domain
     , sizeRange    = null
     , singlePoint  = false
-    , dispatch     = d3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
+    , dispatch     = d3v3.dispatch('elementClick', 'elementMouseover', 'elementMouseout')
     , useVoronoi   = true
     ;
 
@@ -74,7 +74,7 @@ nv.models.scatter = function() {
     selection.each(function(data) {
       var availableWidth = width - margin.left - margin.right,
           availableHeight = height - margin.top - margin.bottom,
-          container = d3.select(this);
+          container = d3v3.select(this);
 
       //add series index to each data point for reference
       data.forEach(function(series, i) {
@@ -88,7 +88,7 @@ nv.models.scatter = function() {
 
       // remap and flatten the data for use in calculating the scales' domains
       var seriesData = (xDomain && yDomain && sizeDomain) ? [] : // if we know xDomain and yDomain and sizeDomain, no need to calculate.... if Size is constant remember to set sizeDomain to speed up performance
-            d3.merge(
+            d3v3.merge(
               data.map(function(d) {
                 return d.values.map(function(d,i) {
                   return { x: getX(d,i), y: getY(d,i), size: getSize(d,i) }
@@ -96,7 +96,7 @@ nv.models.scatter = function() {
               })
             );
 
-      x   .domain(xDomain || d3.extent(seriesData.map(function(d) { return d.x; }).concat(forceX)))
+      x   .domain(xDomain || d3v3.extent(seriesData.map(function(d) { return d.x; }).concat(forceX)))
 
       if (padData && data[0])
         x.range(xRange || [(availableWidth * padDataOuter +  availableWidth) / (2 *data[0].values.length), availableWidth - availableWidth * (1 + padDataOuter) / (2 * data[0].values.length)  ]);
@@ -104,10 +104,10 @@ nv.models.scatter = function() {
       else
         x.range(xRange || [0, availableWidth]);
 
-      y   .domain(yDomain || d3.extent(seriesData.map(function(d) { return d.y }).concat(forceY)))
+      y   .domain(yDomain || d3v3.extent(seriesData.map(function(d) { return d.y }).concat(forceY)))
           .range(yRange || [availableHeight, 0]);
 
-      z   .domain(sizeDomain || d3.extent(seriesData.map(function(d) { return d.size }).concat(forceSize)))
+      z   .domain(sizeDomain || d3v3.extent(seriesData.map(function(d) { return d.size }).concat(forceSize)))
           .range(sizeRange || [16, 256]);
 
       // If scale's domain don't have a range, slightly adjust to make one... so a chart can show a single data point
@@ -172,12 +172,12 @@ nv.models.scatter = function() {
 
         var eventElements;
 
-        var vertices = d3.merge(data.map(function(group, groupIndex) {
+        var vertices = d3v3.merge(data.map(function(group, groupIndex) {
             return group.values
               .map(function(point, pointIndex) {
                 // *Adding noise to make duplicates very unlikely
                 // *Injecting series and point index for reference
-                /* *Adding a 'jitter' to the points, because there's an issue in d3.geom.voronoi.
+                /* *Adding a 'jitter' to the points, because there's an issue in d3v3.geom.voronoi.
                 */
                 var pX = getX(point,pointIndex);
                 var pY = getY(point,pointIndex);
@@ -229,14 +229,14 @@ nv.models.scatter = function() {
             vertices.push([x.range()[1] + 20, y.range()[1] - 20, null, null]);
           }
 
-          var bounds = d3.geom.polygon([
+          var bounds = d3v3.geom.polygon([
               [-10,-10],
               [-10,height + 10],
               [width + 10,height + 10],
               [width + 10,-10]
           ]);
 
-          var voronoi = d3.geom.voronoi(vertices).map(function(d, i) {
+          var voronoi = d3v3.geom.voronoi(vertices).map(function(d, i) {
               return {
                 'data': bounds.clip(d),
                 'series': vertices[i][2],
@@ -383,7 +383,7 @@ nv.models.scatter = function() {
             .attr('cy', function(d,i) { return nv.utils.NaNtoZero(y(getY(d,i))) })
             .remove();
         points.each(function(d,i) {
-          d3.select(this)
+          d3v3.select(this)
             .classed('nv-point', true)
             .classed('nv-point-' + i, true)
             .classed('hover',false)
@@ -405,7 +405,7 @@ nv.models.scatter = function() {
               return 'translate(' + x0(getX(d,i)) + ',' + y0(getY(d,i)) + ')'
             })
             .attr('d',
-              d3.svg.symbol()
+              d3v3.svg.symbol()
                 .type(getShape)
                 .size(function(d,i) { return z(getSize(d,i)) })
             );
@@ -417,7 +417,7 @@ nv.models.scatter = function() {
             })
             .remove();
         points.each(function(d,i) {
-          d3.select(this)
+          d3v3.select(this)
             .classed('nv-point', true)
             .classed('nv-point-' + i, true)
             .classed('hover',false)
@@ -429,7 +429,7 @@ nv.models.scatter = function() {
               return 'translate(' + x(getX(d,i)) + ',' + y(getY(d,i)) + ')'
             })
             .attr('d',
-              d3.svg.symbol()
+              d3v3.svg.symbol()
                 .type(getShape)
                 .size(function(d,i) { return z(getSize(d,i)) })
             );
@@ -457,11 +457,11 @@ nv.models.scatter = function() {
   //------------------------------------------------------------
   chart.clearHighlights = function() {
       //Remove the 'hover' class from all highlighted points.
-      d3.selectAll(".nv-chart-" + id + " .nv-point.hover").classed("hover",false);
+      d3v3.selectAll(".nv-chart-" + id + " .nv-point.hover").classed("hover",false);
   };
 
   chart.highlightPoint = function(seriesIndex,pointIndex,isHoverOver) {
-      d3.select(".nv-chart-" + id + " .nv-series-" + seriesIndex + " .nv-point-" + pointIndex)
+      d3v3.select(".nv-chart-" + id + " .nv-series-" + seriesIndex + " .nv-point-" + pointIndex)
           .classed("hover",isHoverOver);
   };
 
@@ -486,19 +486,19 @@ nv.models.scatter = function() {
 
   chart.x = function(_) {
     if (!arguments.length) return getX;
-    getX = d3.functor(_);
+    getX = d3v3.functor(_);
     return chart;
   };
 
   chart.y = function(_) {
     if (!arguments.length) return getY;
-    getY = d3.functor(_);
+    getY = d3v3.functor(_);
     return chart;
   };
 
   chart.size = function(_) {
     if (!arguments.length) return getSize;
-    getSize = d3.functor(_);
+    getSize = d3v3.functor(_);
     return chart;
   };
 

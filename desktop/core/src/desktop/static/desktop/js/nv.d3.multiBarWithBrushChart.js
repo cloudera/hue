@@ -32,7 +32,7 @@ nv.models.multiBarWithBrushChart = function() {
     , yAxis = nv.models.axis()
     , legend = nv.models.legend()
     , controls = nv.models.legend()
-    , brush = d3.svg.brush()
+    , brush = d3v3.svg.brush()
     ;
 
   var margin = {top: 30, right: 20, bottom: 50, left: 60}
@@ -57,7 +57,7 @@ nv.models.multiBarWithBrushChart = function() {
     , state = { stacked: false, selectionEnabled: false }
     , defaultState = null
     , noData = "No Data Available."
-    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
+    , dispatch = d3v3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState', 'brush')
     , controlWidth = function() { return showControls ? (selectionHidden ? 240 : 300) : 0 }
     , transitionDuration = 250
     , extent
@@ -82,7 +82,7 @@ nv.models.multiBarWithBrushChart = function() {
     ;
   yAxis
     .orient((rightAlignYAxis) ? 'right' : 'left')
-    .tickFormat(d3.format(',.1f'))
+    .tickFormat(d3v3.format(',.1f'))
     ;
 
   controls.updateState(false);
@@ -108,7 +108,7 @@ nv.models.multiBarWithBrushChart = function() {
 
   function chart(selection) {
     selection.each(function(data) {
-      var container = d3.select(this),
+      var container = d3v3.select(this),
           that = this;
 
       var availableWidth = (width  || parseInt(container.style('width')) || 960)
@@ -206,7 +206,7 @@ nv.models.multiBarWithBrushChart = function() {
 
         if (multibar.barColor())
           data.forEach(function(series,i) {
-            series.color = d3.rgb('#ccc').darker(i * 1.5).toString();
+            series.color = d3v3.rgb('#ccc').darker(i * 1.5).toString();
           })
 
         try {
@@ -365,7 +365,7 @@ nv.models.multiBarWithBrushChart = function() {
               xTicks
                 .selectAll("text")
                 .attr('transform', function(d,i,j) {
-                    var self = d3.select(this),
+                    var self = d3v3.select(this),
                       textLength = self.node().getComputedTextLength(),
                       text = self.text();
                     while (textLength > rangeBand && text.length > 0) {
@@ -376,7 +376,7 @@ nv.models.multiBarWithBrushChart = function() {
                     return  getTranslate(0, (j % 2 == 0 ? staggerUp : staggerDown));
                   });
 
-              var totalInBetweenTicks = d3.selectAll(".nv-x.nv-axis .nv-wrap g g text")[0].length;
+              var totalInBetweenTicks = d3v3.selectAll(".nv-x.nv-axis .nv-wrap g g text")[0].length;
               g.selectAll(".nv-x.nv-axis .nv-axisMaxMin text")
                 .attr("transform", function(d,i) {
                     return getTranslate(0, (i === 0 || totalInBetweenTicks % 2 !== 0) ? staggerDown : staggerUp);
@@ -551,7 +551,7 @@ nv.models.multiBarWithBrushChart = function() {
   chart.yAxis = yAxis;
   chart.LABELS = LABELS;
 
-  d3.rebind(chart, multibar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'clipEdge',
+  d3v3.rebind(chart, multibar, 'x', 'y', 'xDomain', 'yDomain', 'xRange', 'yRange', 'forceX', 'forceY', 'clipEdge',
    'id', 'stacked', 'stackOffset', 'delay', 'barColor','groupSpacing');
 
   chart.options = nv.utils.optionsFunc.bind(chart);
