@@ -506,6 +506,9 @@ a {
   line-height: 18px;
   margin-bottom: 10px;
 }
+.popular-color {
+  color: #EDB233;
+}
 /*
  Licensed to Cloudera, Inc. under one
  or more contributor license agreements.  See the NOTICE file
@@ -638,9 +641,6 @@ a {
   width: 8px;
   height: 8px;
   border-radius: 4px;
-}
-.popular-icon {
-  color: #EDB233;
 }
 .autocompleter-details-contents {
   flex: 1 1 100%;

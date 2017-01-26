@@ -134,7 +134,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
-        <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span>
+        <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o popular-color"></i> <!-- /ko -->
       </a>
       <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
