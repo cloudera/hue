@@ -34,7 +34,7 @@ class RedactionEngine(object):
     self.policies.append(policy)
 
   def add_policy_from_file(self, filename):
-    self.policies.append(parse_redaction_policy_from_filename(filename))
+    self.policies.append(parse_redaction_policy_from_file(filename))
 
   def redact(self, message):
     """
@@ -104,7 +104,7 @@ class RedactionRule(object):
     `trigger` string then it will return the original string unmodified.
     """
 
-    if self.trigger is None or self.trigger.search(message):
+    if message and (self.trigger is None or self.trigger.search(message)):
       return self.regex.sub(self.replace, message)
     else:
       return message
