@@ -103,7 +103,7 @@ def _execute_notebook(request, notebook, snippet):
   result = None
   history = None
 
-  historify = notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')
+  historify = (notebook['type'] != 'notebook' or snippet.get('wasBatchExecuted')) and not notebook.get('skipHistorify')
 
   try:
     try:

@@ -74,6 +74,7 @@ class Notebook(object):
           'isManaged': False,
           'sessions': [],
           'snippets': [],
+          'skipHistorify': False
       }
       _data.update(options)
       self.data = json.dumps(_data)
