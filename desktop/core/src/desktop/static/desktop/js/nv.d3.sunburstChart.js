@@ -33,7 +33,7 @@ nv.models.sunburstChart = function () {
     , defaultState = null
     , noData = null
     , duration = 250
-    , dispatch = d3.dispatch('stateChange', 'changeState', 'renderEnd');
+    , dispatch = d3v3.dispatch('stateChange', 'changeState', 'renderEnd');
 
 
   //============================================================
@@ -58,7 +58,7 @@ nv.models.sunburstChart = function () {
     renderWatch.models(sunburst);
 
     selection.each(function (data) {
-      var container = d3.select(this);
+      var container = d3v3.select(this);
 
       nv.utils.initSVG(container);
 

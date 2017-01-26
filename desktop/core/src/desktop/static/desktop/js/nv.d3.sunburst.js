@@ -55,21 +55,21 @@ nv.models.sunburst = function () {
   }
     , groupColorByParent = true
     , duration = 500
-    , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMousemove', 'elementMouseover', 'elementMouseout', 'renderEnd');
+    , dispatch = d3v3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMousemove', 'elementMouseover', 'elementMouseout', 'renderEnd');
 
   //============================================================
   // aux functions and setup
   //------------------------------------------------------------
 
-  var x = d3.scale.linear().range([0, 2 * Math.PI]);
-  var y = d3.scale.sqrt();
+  var x = d3v3.scale.linear().range([0, 2 * Math.PI]);
+  var y = d3v3.scale.sqrt();
 
-  var partition = d3.layout.partition().sort(sort);
+  var partition = d3v3.layout.partition().sort(sort);
 
   var node, availableWidth, availableHeight, radius;
   var prevPositions = {};
 
-  var arc = d3.svg.arc()
+  var arc = d3v3.svg.arc()
     .startAngle(function (d) {
       return Math.max(0, Math.min(2 * Math.PI, x(d.x)))
     })
@@ -116,9 +116,9 @@ nv.models.sunburst = function () {
 
   // When zooming: interpolate the scales.
   function arcTweenZoom(e, i) {
-    var xd = d3.interpolate(x.domain(), [node.x, node.x + node.dx]),
-      yd = d3.interpolate(y.domain(), [node.y, 1]),
-      yr = d3.interpolate(y.range(), [node.y ? 20 : 0, radius]);
+    var xd = d3v3.interpolate(x.domain(), [node.x, node.x + node.dx]),
+      yd = d3v3.interpolate(y.domain(), [node.y, 1]),
+      yr = d3v3.interpolate(y.range(), [node.y ? 20 : 0, radius]);
 
     if (i === 0) {
       return function () {
@@ -136,7 +136,7 @@ nv.models.sunburst = function () {
   }
 
   function arcTweenUpdate(d) {
-    var ipo = d3.interpolate({x: d.x0, dx: d.dx0, y: d.y0, dy: d.dy0}, d);
+    var ipo = d3v3.interpolate({x: d.x0, dx: d.dx0, y: d.y0, dy: d.dy0}, d);
 
     return function (t) {
       var b = ipo(t);
@@ -200,7 +200,7 @@ nv.models.sunburst = function () {
         if (e.x >= d.x && e.x < (d.x + d.dx)) {
           if (e.depth >= d.depth) {
             // get a selection of the associated text element
-            var parentNode = d3.select(this.parentNode);
+            var parentNode = d3v3.select(this.parentNode);
             var arcText = parentNode.select('text');
 
             // fade in the text element and recalculate positions
@@ -248,7 +248,7 @@ nv.models.sunburst = function () {
     renderWatch.reset();
 
     selection.each(function (data) {
-      container = d3.select(this);
+      container = d3v3.select(this);
       availableWidth = nv.utils.availableWidth(width, container, margin);
       availableHeight = nv.utils.availableHeight(height, container, margin);
       radius = Math.min(availableWidth, availableHeight) / 2;
@@ -256,7 +256,7 @@ nv.models.sunburst = function () {
       y.range([0, radius]);
 
       // Setup containers and skeleton of chart
-      var wrap = container.select('g.nvd3.nv-wrap.nv-sunburst');
+      var wrap = container.select('g.nvd3v3.nv-wrap.nv-sunburst');
       if (!wrap[0][0]) {
         wrap = container.append('g')
           .attr('class', 'nvd3 nv-wrap nv-sunburst nv-chart-' + id)
@@ -269,7 +269,7 @@ nv.models.sunburst = function () {
         dispatch.chartClick({
           data: d,
           index: i,
-          pos: d3.event,
+          pos: d3v3.event,
           id: id
         });
       });
@@ -310,15 +310,15 @@ nv.models.sunburst = function () {
           })
         })
         .on('mouseover', function (d, i) {
-          d3.select(this).classed('hover', true).style('opacity', 0.8);
+          d3v3.select(this).classed('hover', true).style('opacity', 0.8);
           dispatch.elementMouseover({
             data: d,
-            color: d3.select(this).style("fill"),
+            color: d3v3.select(this).style("fill"),
             percent: computeNodePercentage(d)
           });
         })
         .on('mouseout', function (d, i) {
-          d3.select(this).classed('hover', false).style('opacity', 1);
+          d3v3.select(this).classed('hover', false).style('opacity', 1);
           dispatch.elementMouseout({
             data: d
           });
@@ -333,7 +333,7 @@ nv.models.sunburst = function () {
       ///makes it work ... a cG.selectAll('path') doesn't.
       ///Without iteration the data (in the element) didn't update.
       cG.each(function (d) {
-        d3.select(this).select('path')
+        d3v3.select(this).select('path')
           .transition()
           .duration(duration)
           .attrTween('d', arcTweenUpdate);

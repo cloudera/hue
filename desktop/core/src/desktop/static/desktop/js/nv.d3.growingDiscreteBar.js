@@ -25,19 +25,19 @@ nv.models.growingDiscreteBar = function() {
     , width = 960
     , height = 500
     , id = Math.floor(Math.random() * 10000) //Create semi-unique ID in case user doesn't select one
-    , x = d3.scale.ordinal()
-    , y = d3.scale.linear()
+    , x = d3v3.scale.ordinal()
+    , y = d3v3.scale.linear()
     , getX = function(d) { return d.x }
     , getY = function(d) { return d.y }
     , forceY = [0] // 0 is forced by default.. this makes sense for the majority of bar graphs... user can always do chart.forceY([]) to remove
     , color = nv.utils.defaultColor()
     , showValues = false
-    , valueFormat = d3.format(',.2f')
+    , valueFormat = d3v3.format(',.2f')
     , xDomain
     , yDomain
     , xRange
     , yRange
-    , dispatch = d3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
+    , dispatch = d3v3.dispatch('chartClick', 'elementClick', 'elementDblClick', 'elementMouseover', 'elementMouseout')
     , rectClass = 'discreteBar'
     , selectBars = null
     ;
@@ -58,7 +58,7 @@ nv.models.growingDiscreteBar = function() {
     selection.each(function(data) {
       var availableWidth = width - margin.left - margin.right,
           availableHeight = height - margin.top - margin.bottom,
-          container = d3.select(this);
+          container = d3v3.select(this);
 
 
       //add series index to each data point for reference
@@ -81,10 +81,10 @@ nv.models.growingDiscreteBar = function() {
               })
             });
 
-      x   .domain(xDomain || d3.merge(seriesData).map(function(d) { return d.x }))
+      x   .domain(xDomain || d3v3.merge(seriesData).map(function(d) { return d.x }))
           .rangeBands(xRange || [0, availableWidth], .1);
 
-      y   .domain(yDomain || d3.extent(d3.merge(seriesData).map(function(d) { return d.y }).concat(forceY)));
+      y   .domain(yDomain || d3v3.extent(d3v3.merge(seriesData).map(function(d) { return d.y }).concat(forceY)));
 
 
       // If showValues, pad the Y axis range to account for label height
@@ -143,7 +143,7 @@ nv.models.growingDiscreteBar = function() {
         $(selected).each(function(cnt, item){
           bars.each(function(d, i) {
             if (d.x == item) {
-              d3.select(this).classed('selected', true);
+              d3v3.select(this).classed('selected', true);
             }
           });
         });
@@ -155,7 +155,7 @@ nv.models.growingDiscreteBar = function() {
               return 'translate(' + (x(getX(d,i)) + x.rangeBand() * .05 ) + ', ' + y(0) + ')'
           })
           .on('mouseover', function(d,i) { //TODO: figure out why j works above, but not here
-            d3.select(this).classed('hover', true);
+            d3v3.select(this).classed('hover', true);
             dispatch.elementMouseover({
               value: getY(d,i),
               point: d,
@@ -163,18 +163,18 @@ nv.models.growingDiscreteBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (d.series + .5) / data.length), y(getY(d,i))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
           })
           .on('mouseout', function(d,i) {
-            d3.select(this).classed('hover', false);
+            d3v3.select(this).classed('hover', false);
             dispatch.elementMouseout({
               value: getY(d,i),
               point: d,
               series: data[d.series],
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
           })
           .on('click', function(d,i) {
@@ -185,9 +185,9 @@ nv.models.growingDiscreteBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (d.series + .5) / data.length), y(getY(d,i))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
-            d3.event.stopPropagation();
+            d3v3.event.stopPropagation();
           })
           .on('dblclick', function(d,i) {
             dispatch.elementDblClick({
@@ -197,9 +197,9 @@ nv.models.growingDiscreteBar = function() {
               pos: [x(getX(d,i)) + (x.rangeBand() * (d.series + .5) / data.length), y(getY(d,i))],  // TODO: Figure out why the value appears to be shifted
               pointIndex: i,
               seriesIndex: d.series,
-              e: d3.event
+              e: d3v3.event
             });
-            d3.event.stopPropagation();
+            d3v3.event.stopPropagation();
           });
 
       barsEnter.append('rect')

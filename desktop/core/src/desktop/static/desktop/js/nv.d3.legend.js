@@ -29,7 +29,7 @@ nv.models.legend = function() {
     , rightAlign = true
     , updateState = true   //If true, legend will update data.disabled and trigger a 'stateChange' dispatch.
     , radioButtonMode = false   //If true, clicking legend items will cause it to behave like a radio button. (only one can be selected at a time)
-    , dispatch = d3.dispatch('legendClick', 'legendDblclick', 'legendMouseover', 'legendMouseout', 'stateChange')
+    , dispatch = d3v3.dispatch('legendClick', 'legendDblclick', 'legendMouseover', 'legendMouseout', 'stateChange')
     ;
 
   //============================================================
@@ -38,7 +38,7 @@ nv.models.legend = function() {
   function chart(selection) {
     selection.each(function(data) {
       var availableWidth = width - margin.left - margin.right,
-          container = d3.select(this);
+          container = d3v3.select(this);
 
       //------------------------------------------------------------
       // Setup containers and skeleton of chart
@@ -134,7 +134,7 @@ nv.models.legend = function() {
 
         var seriesWidths = [];
         series.each(function(d,i) {
-              var legendText = d3.select(this).select('text');
+              var legendText = d3v3.select(this).select('text');
               var nodeTextLength;
               try {
                 nodeTextLength = legendText.getComputedTextLength();
@@ -202,7 +202,7 @@ nv.models.legend = function() {
             xpos;
         series
             .attr('transform', function(d, i) {
-              var length = d3.select(this).select('text').node().getComputedTextLength() + 28;
+              var length = d3v3.select(this).select('text').node().getComputedTextLength() + 28;
               xpos = newxpos;
 
               if (width < margin.left + margin.right + xpos + length) {

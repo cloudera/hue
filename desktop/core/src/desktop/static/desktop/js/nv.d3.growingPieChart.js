@@ -38,7 +38,7 @@ nv.models.growingPieChart = function() {
     , defaultState = null
     , noData = "No Data Available."
     , selectSlices = null
-    , dispatch = d3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState')
+    , dispatch = d3v3.dispatch('tooltipShow', 'tooltipHide', 'stateChange', 'changeState')
     ;
 
   //============================================================
@@ -64,7 +64,7 @@ nv.models.growingPieChart = function() {
   function chart(selection) {
     selection.each(function(data) {
 
-      var container = d3.select(this),
+      var container = d3v3.select(this),
           that = this;
 
       var availableWidth = (width || parseInt(container.style('width')) || 960)
@@ -179,7 +179,7 @@ nv.models.growingPieChart = function() {
 
       selectSlices = pie.selectSlices;
 
-      d3.transition(pieWrap).call(pie);
+      d3v3.transition(pieWrap).call(pie);
 
       //------------------------------------------------------------
 
@@ -249,7 +249,7 @@ nv.models.growingPieChart = function() {
   chart.dispatch = dispatch;
   chart.pie = pie;
 
-  d3.rebind(chart, pie, 'valueFormat', 'values', 'x', 'y', 'description', 'id', 'showLabels', 'donutLabelsOutside', 'pieLabelsOutside', 'labelType', 'donut', 'donutRatio', 'labelThreshold');
+  d3v3.rebind(chart, pie, 'valueFormat', 'values', 'x', 'y', 'description', 'id', 'showLabels', 'donutLabelsOutside', 'pieLabelsOutside', 'labelType', 'donut', 'donutRatio', 'labelThreshold');
   chart.options = nv.utils.optionsFunc.bind(chart);
 
   chart.margin = function(_) {

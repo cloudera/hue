@@ -74,7 +74,7 @@ nv.models.tooltip = function () {
       return '';
     }
 
-    var table = d3.select(document.createElement("table"));
+    var table = d3v3.select(document.createElement("table"));
     if (headerEnabled) {
       var theadEnter = table.selectAll("thead")
         .data([d])
@@ -129,14 +129,14 @@ nv.models.tooltip = function () {
     }).append("td")
       .classed("percent", true)
       .html(function (p, i) {
-        return "(" + d3.format('%')(p.percent) + ")"
+        return "(" + d3v3.format('%')(p.percent) + ")"
       });
 
     trowEnter.selectAll("td").each(function (p) {
       if (p.highlight) {
-        var opacityScale = d3.scale.linear().domain([0, 1]).range(["#fff", p.color]);
+        var opacityScale = d3v3.scale.linear().domain([0, 1]).range(["#fff", p.color]);
         var opacity = 0.6;
-        d3.select(this)
+        d3v3.select(this)
           .style("border-bottom-color", opacityScale(opacity))
           .style("border-top-color", opacityScale(opacity))
         ;
@@ -160,8 +160,8 @@ nv.models.tooltip = function () {
    */
   var position = function () {
     var pos = {
-      left: d3.event !== null ? d3.event.clientX : 0,
-      top: d3.event !== null ? d3.event.clientY : 0
+      left: d3v3.event !== null ? d3v3.event.clientX : 0,
+      top: d3v3.event !== null ? d3v3.event.clientY : 0
     };
 
     if (getComputedStyle(document.body).transform != 'none') {
@@ -263,7 +263,7 @@ nv.models.tooltip = function () {
         // using tooltip.style('transform') returns values un-usable for tween
         var old_translate = 'translate(' + lastPosition.left + 'px, ' + lastPosition.top + 'px)';
         var new_translate = 'translate(' + Math.round(left) + 'px, ' + Math.round(top) + 'px)';
-        var translateInterpolator = d3.interpolateString(old_translate, new_translate);
+        var translateInterpolator = d3v3.interpolateString(old_translate, new_translate);
         var is_hidden = tooltip.style('opacity') < 0.1;
 
         tooltip
@@ -293,7 +293,7 @@ nv.models.tooltip = function () {
       // Create new tooltip div if it doesn't exist on DOM.
 
       var data = [1];
-      tooltip = d3.select(document.body).select('#' + id).data(data);
+      tooltip = d3v3.select(document.body).select('#' + id).data(data);
 
       tooltip.enter().append('div')
         .attr("class", "nvtooltip " + (classes ? classes : "xy-tooltip"))
