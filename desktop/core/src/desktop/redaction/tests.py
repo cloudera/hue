@@ -138,6 +138,14 @@ class TestRedactionEngine(object):
     assert_equal(engine1, engine2)
     assert_not_equal(engine1, engine3)
 
+  def test_redact_empty_string(self):
+    engine = RedactionEngine([
+        RedactionRule('password=', 'password=".*"', 'password="???"'),
+    ])
+
+    assert_equal(engine.redact(None), None)
+    assert_equal(engine.redact(''), '')
+
 
 class TestRedactionLogFilter(object):
 
