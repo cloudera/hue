@@ -42,7 +42,7 @@ from desktop.views import _ko
               <div class="autocompleter-suggestion-value">
                 <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key --><i class="fa fa-key"></i><!-- /ko -->
               </div>
-              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-icon"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
+              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
             </div>
           </div>
         </div>
@@ -82,7 +82,7 @@ from desktop.views import _ko
       <div class="autocompleter-details-contents">
         <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
         <!-- ko if: typeof details.popularity !== 'undefined' -->
-        <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
           </div>
@@ -106,7 +106,7 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko if: typeof details.popularity !== 'undefined' -->
         <br/>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
           </div>
@@ -137,7 +137,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join')}</div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
           </div>
@@ -151,7 +151,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join condition')}</div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
           </div>
@@ -165,7 +165,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> ${ _('Popular aggregate')} - <span data-bind="text: details.aggregateFunction"></span></div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
           </div>
@@ -198,7 +198,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular group by')}</div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
           </div>
@@ -212,7 +212,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
           </div>
@@ -226,7 +226,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular filter')}</div>
       <div class="autocompleter-details-contents">
         <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-icon"></i>
+        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
           <div class="progress">
             <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
           </div>

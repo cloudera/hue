@@ -52,8 +52,7 @@ var AssistDbEntry = (function () {
     self.highlight = ko.observable(false);
     self.highlightParent = ko.observable(false);
     self.activeSort = self.assistDbSource.activeSort;
-    self.popularityIndex = {};
-    self.popularityIndexSet = false;
+    self.popularity = ko.observable(0);
 
     self.expandable = typeof definition.type === "undefined" || /table|view|struct|array|map/i.test(definition.type);
 
@@ -77,34 +76,8 @@ var AssistDbEntry = (function () {
       return self.entries().length > 0;
     });
 
-    var deferredSort = false;
-
-    self.assistDbSource.selectedDatabase.subscribe(function (newValue) {
-      if (newValue === self && deferredSort) {
-        self.applySort(self.assistDbSource.activeSort(), self.entries);
-      }
-    });
-
-    self.applySort = function (sortName, entries) {
-      if (sortName === 'popular' && self.definition.isDatabase) {
-        if (self.assistDbSource.selectedDatabase() === self) {
-          self.entries().forEach(function (entry) {
-            if (self.popularityIndex[entry.definition.name]) {
-              entry.definition.popularity = self.popularityIndex[entry.definition.name];
-            }
-            entries.sort(self.sortFunctions.popular);
-          });
-          deferredSort = false;
-        } else {
-          deferredSort = true;
-        }
-      } else {
-        entries.sort(self.sortFunctions[sortName]);
-      }
-    };
-
     self.assistDbSource.activeSort.subscribe(function (newSort) {
-      self.applySort(newSort, self.entries);
+      self.entries.sort(self.sortFunctions[newSort]);
     });
 
     self.filteredEntries = ko.pureComputed(function () {
@@ -180,12 +153,6 @@ var AssistDbEntry = (function () {
       return parts.slice(1).join("");
     });
   }
-
-  AssistDbEntry.prototype.setPopularityIndex = function (popularityIndex) {
-    var self = this;
-    self.popularityIndexSet = true;
-    self.popularityIndex = popularityIndex;
-  };
 
   AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var self = this;
@@ -383,7 +350,7 @@ var AssistDbEntry = (function () {
         self.entries(newEntries);
         self.entries()[0].open(true);
       } else {
-        self.applySort(self.assistDbSource.activeSort(), newEntries);
+        newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
         self.entries(newEntries);
       }
       if (typeof callback === 'function') {
