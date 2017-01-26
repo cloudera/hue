@@ -1964,23 +1964,23 @@
 
       var onPosition = options.onPosition || function() {};
 
-      var panelStartWidth = $sidePanel.width();
+      $sidePanel.css('flex-basis', sidePanelWidth + 'px');
       $resizer.draggable({
-        axis: "x",
+        axis: 'x',
         containment: $container,
         start: function () {
-          panelStartWidth = $sidePanel.width();
+          sidePanelWidth = $sidePanel.width();
         },
         drag: function (event, ui) {
           if (isLeft) {
-            $sidePanel.css("flex-basis", Math.max(panelStartWidth + ui.position.left, 200) + "px");
+            $sidePanel.css('flex-basis', Math.max(sidePanelWidth + ui.position.left, 200) + 'px');
           } else {
-            $sidePanel.css("flex-basis", Math.max(panelStartWidth - ui.position.left, 200) + "px");
+            $sidePanel.css('flex-basis', Math.max(sidePanelWidth - ui.position.left, 200) + 'px');
           }
           onPosition();
           ui.position.left = 0;
         },
-        stop: function (event, ui) {
+        stop: function () {
           sidePanelWidth = $sidePanel.width();
           $.totalStorage(options.appName + '_' + options.orientation + '_panel_width', sidePanelWidth);
           window.setTimeout(positionPanels, 100);
@@ -2006,7 +2006,7 @@
       });
 
       function initialPositioning() {
-        if(! $container.is(":visible") && ! $sidePanel.is(":visible")) {
+        if(! $container.is(':visible') && ! $sidePanel.is(':visible')) {
           window.setTimeout(initialPositioning, 50);
         } else {
           positionPanels();
