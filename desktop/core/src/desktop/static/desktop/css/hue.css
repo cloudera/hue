@@ -509,6 +509,10 @@ a {
 .popular-color {
   color: #EDB233;
 }
+.top-star {
+  vertical-align: text-top;
+  font-size: 70%;
+}
 /*
  Licensed to Cloudera, Inc. under one
  or more contributor license agreements.  See the NOTICE file

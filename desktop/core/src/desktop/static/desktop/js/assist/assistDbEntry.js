@@ -251,6 +251,8 @@ var AssistDbEntry = (function () {
     }
     self.loading(true);
 
+    var loadEntriesDeferred = $.Deferred();
+
     var successCallback = function(data) {
       self.entries([]);
       self.hasErrors(false);
@@ -353,6 +355,7 @@ var AssistDbEntry = (function () {
         newEntries.sort(self.sortFunctions[self.assistDbSource.activeSort()]);
         self.entries(newEntries);
       }
+      loadEntriesDeferred.resolve(newEntries);
       if (typeof callback === 'function') {
         callback();
       }
@@ -361,7 +364,38 @@ var AssistDbEntry = (function () {
     var errorCallback = function () {
       self.hasErrors(true);
       self.loading(false);
+      loadEntriesDeferred.resolve([]);
     };
+
+    if (self.definition.isTable) {
+      self.assistDbSource.apiHelper.fetchNavOptTopColumns({
+        sourceType: self.assistDbSource.sourceType,
+        successCallback: function (data) {
+          if (data.status === 0 && data.values && data.values.selectColumns && data.values.selectColumns.length > 0) {
+            var colIndex = {};
+            data.values.selectColumns.forEach(function (col) {
+              colIndex[col.columnName] = col;
+            });
+            $.when(loadEntriesDeferred).done(function () {
+              if (!self.hasErrors()) {
+                self.entries().forEach(function (entry) {
+                  if (colIndex[entry.definition.name]) {
+                    entry.popularity(colIndex[entry.definition.name].columnCount);
+                  }
+                });
+
+                if (self.assistDbSource.activeSort() === 'popular') {
+                  self.entries.sort(self.sortFunctions.popular);
+                }
+              }
+            })
+          }
+        },
+        silenceErrors: true,
+        tables: [{ identifierChain: [{ name: self.definition.name }] }],
+        defaultDatabase: self.parent.definition.name
+      })
+    }
 
     self.assistDbSource.apiHelper.fetchPanelData({
       sourceType: self.assistDbSource.sourceType,
