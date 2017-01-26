@@ -413,25 +413,7 @@ ${ components.menubar() }
         <!-- /ko -->
       </div>
       <!-- /ko -->
-
-      <!-- ko if: $root.optimizerEnabled() && $root.database().optimizerStats() && $root.database().optimizerStats().length > 0 -->
-      <div class="span4 tile chart-container">
-        <h4>${ _('Popularity') }</h4>
-
-        <ul>
-          <li>
-            <span>Diagram?</span>
-          </li>
-          <li>
-            <span>DB specific stats</span>
-          </li>
-        </ul>
-
-      </div>
-      <!-- /ko -->
-
     </div>
-
 
     <div class="row-fluid">
       <div class="span12 tile">
