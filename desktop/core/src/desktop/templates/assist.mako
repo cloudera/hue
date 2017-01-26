@@ -134,7 +134,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       </div>
       <a class="assist-entry assist-table-link" href="javascript:void(0)" data-bind="click: toggleOpen, attr: {'title': definition.title }, draggableText: { text: editorText,  meta: {'type': 'sql', 'table': tableName, 'database': databaseName} }">
         <i class="fa fa-fw fa-table muted valign-middle" data-bind="css: { 'fa-eye': definition.isView, 'fa-table': definition.isTable }"></i>
-        <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o popular-color"></i> <!-- /ko -->
+        <span data-bind="text: definition.displayName, css: { 'highlight': highlight }"></span> <!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --><i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </a>
       <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
       <!-- ko template: { if: open, name: 'assist-db-entries'  } --><!-- /ko -->
@@ -153,7 +153,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
       <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="event: { dblClick: dblClick }, attr: {'title': definition.title }">
-        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key --> <i class="fa fa-key"></i><!-- /ko -->
+        <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
       <div class="center" data-bind="visible: loading"><i class="fa fa-spinner fa-spin assist-spinner"></i></div>
