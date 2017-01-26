@@ -46,8 +46,6 @@
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/bootstrap2.css') }" rel="stylesheet">
-  <link href="${ static('desktop/css/bootstrap-responsive2.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/jquery-ui.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/cui.css') }" rel="stylesheet">
 
