@@ -102,10 +102,11 @@ ROW FORMAT \
 %     if table.has_key('field_terminator'):
     FIELDS TERMINATED BY '${table["field_terminator"] | n}'
 %     endif
-%     if table.has_key('collection_terminator'):
+## [LINES TERMINATED BY char]
+%     if table.get('collection_terminator') is not None:
     COLLECTION ITEMS TERMINATED BY '${table["collection_terminator"] | n}'
 %     endif
-%     if table.has_key('map_key_terminator'):
+%     if table.get('map_key_terminator') is not None:
     MAP KEYS TERMINATED BY '${table["map_key_terminator"] | n}'
 %     endif
 %   else:

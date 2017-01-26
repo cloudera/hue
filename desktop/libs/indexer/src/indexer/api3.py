@@ -269,12 +269,16 @@ def _create_table_from_a_file(request, source, destination):
           'database': database,
           'table_name': table_name
       }
-    else:
+    else: # Manual
       row_format = ''
       file_format = table_format
       skip_header = False
       if table_format == 'kudu':
         columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]
+
+  if table_format == 'kudu':
+    collection_delimiter = None
+    map_delimiter = None
 
   if external or (load_data and table_format in ('parquet', 'kudu')):
     if not request.fs.isdir(external_path): # File selected
@@ -292,7 +296,7 @@ def _create_table_from_a_file(request, source, destination):
           'row_format': row_format,
           'field_terminator': field_delimiter,
           'collection_terminator': collection_delimiter, # Only if Hive
-          'map_key_terminator': map_delimiter, # Only if Hive # [LINES TERMINATED BY char]
+          'map_key_terminator': map_delimiter, # Only if Hive
           'serde_name': serde_name,
           'serde_properties': serde_properties,
           'file_format': file_format,
@@ -314,7 +318,7 @@ def _create_table_from_a_file(request, source, destination):
   if load_data and table_format in ('parquet', 'kudu'):
     file_format = table_format
     if table_format == 'kudu':
-      columns_list = ['`%s`' % col for col in [primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]]
+      columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
       extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
       PARTITION BY HASH PARTITIONS 16
       STORED AS %(file_format)s
