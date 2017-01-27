@@ -55,9 +55,6 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-keyword">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-udf">
@@ -71,9 +68,6 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-database">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-table">
@@ -120,15 +114,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-hdfs">
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
-      <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"><div>
+      <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"></div>
     </div>
   </script>
 
@@ -176,21 +167,12 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-value">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-identifier">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-cte">
-    <div class="autocompleter-details">
-      <pre data-bind="text: ko.mapping.toJSON(details)"></pre>
-    </div>
   </script>
 
   <script type="text/html" id="autocomplete-details-group-by">
