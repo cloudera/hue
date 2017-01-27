@@ -320,7 +320,7 @@ case 698:
      suggestColumns({
        identifierChain: $$[$0-2]
      });
-     this.$ = { suggestKeywords: [{ value: '*', weight: 1099 }] };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
    
 break;
 case 699:
@@ -328,7 +328,7 @@ case 699:
      suggestColumns({
        identifierChain: $$[$0-4]
      });
-     this.$ = { suggestKeywords: [{ value: '*', weight: 1099 }] };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
    
 break;
 case 700: case 1168: case 1494:
@@ -514,9 +514,9 @@ case 799:
      if ($$[$0].cursorAtStart) {
        var keywords = [];
        if ($$[$0-1]) {
-         keywords = [{ value: '*', weight: 1099 }];
+         keywords = [{ value: '*', weight: 10000 }];
        } else {
-         keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+         keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        }
        if (isImpala()) {
          keywords.push('STRAIGHT_JOIN');
@@ -547,13 +547,13 @@ case 800:
 
      var keywords = [];
      if ($$[$0-1]) {
-       keywords = [{ value: '*', weight: 1099 }];
+       keywords = [{ value: '*', weight: 10000 }];
        if ($$[$0-1] === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -579,13 +579,13 @@ case 803:
 
      var keywords = [];
      if ($$[$0-2]) {
-       keywords = [{ value: '*', weight: 1099 }];
+       keywords = [{ value: '*', weight: 10000 }];
        if ($$[$0-2] === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -1578,12 +1578,12 @@ case 1171: case 1172: case 1562:
 break;
 case 1176:
 
-     this.$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    
 break;
 case 1178: case 1179: case 1181:
 
-     this.$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    
 break;
 case 1183:
@@ -2159,7 +2159,7 @@ case 1426:
 
      valueExpressionSuggest();
      if (!$$[$0-2]) {
-       var keywords = isImpala() ? [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 1099 }, 'DISTINCT'];
+       var keywords = isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
