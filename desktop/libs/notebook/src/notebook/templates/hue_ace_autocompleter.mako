@@ -372,13 +372,7 @@ from desktop.views import _ko
 
         var positionInterval = -1;
 
-        self.detach = function () {
-          if (!self.active()) {
-            return;
-          }
-          self.active(false);
-          self.base.detach();
-          self.base = null;
+        var disposeEventHanders = function () {
           window.clearTimeout(changeTimeout);
           window.clearInterval(positionInterval);
           $(document).off('click', closeOnClickOutside);
@@ -388,17 +382,32 @@ from desktop.views import _ko
           self.editor().off('mousewheel', self.mousewheelListener);
         };
 
+        self.detach = function () {
+          disposeEventHanders();
+          if (!self.active()) {
+            return;
+          }
+          self.active(false);
+          self.base.detach();
+          self.base = null;
+        };
+
         self.attach = function () {
+          disposeEventHanders();
           $(document).on('click', closeOnClickOutside);
           self.editor().keyBinding.addKeyboardHandler(self.keyboardHandler);
           self.editor().on('changeSelection', self.changeListener);
           self.editor().on('mousedown', self.mousedownListener);
           self.editor().on('mousewheel', self.mousewheelListener);
           var $container = $(self.editor().container);
-          var initialOffset = $(self.editor().container).offset();
+          var initialOffset = $container.offset();
+          var initialDevicePixelRation = window.devicePixelRatio; // Detect zoom changes
           positionInterval = window.setInterval(function () {
             var newOffset = $container.offset();
-            if (newOffset.top !== initialOffset.top || newOffset.left !== initialOffset.left) {
+            if (initialDevicePixelRation !== window.devicePixelRatio) {
+              initialOffset = newOffset;
+              initialDevicePixelRation = window.devicePixelRatio;
+            } else if (newOffset.top !== initialOffset.top || newOffset.left !== initialOffset.left) {
               self.detach();
             }
           }, 300);
