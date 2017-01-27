@@ -74,7 +74,8 @@ class Notebook(object):
           'isManaged': False,
           'sessions': [],
           'snippets': [],
-          'skipHistorify': False
+          'skipHistorify': False,
+          'isTask': False,
       }
       _data.update(options)
       self.data = json.dumps(_data)
@@ -181,9 +182,10 @@ class Notebook(object):
     from notebook.api import _execute_notebook # Cyclic dependency
 
     notebook_data = self.get_data()
-    #snippet = {'wasBatchExecuted': batch, 'type': 'oozie', 'id': notebook_data['snippets'][0]['id'], 'statement': ''}
     snippet = notebook_data['snippets'][0]
     snippet['wasBatchExecuted'] = batch
+    if batch:
+      notebook_data['isTask'] = True
 
     return _execute_notebook(request, notebook_data, snippet)
 

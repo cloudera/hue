@@ -197,13 +197,14 @@ def check_status(request):
     else:
       status = 'failed'
 
-    if notebook['type'].startswith('query'):
+    if notebook['type'].startswith('query') or notebook.get('isTask'):
       nb_doc = Document2.objects.get(id=notebook['id'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()
-        nb['snippets'][0]['status'] = status
-        nb_doc.update_data(nb)
-        nb_doc.save()
+        if status != nb['snippets'][0]['status']:
+          nb['snippets'][0]['status'] = status
+          nb_doc.update_data(nb)
+          nb_doc.save()
 
   return JsonResponse(response)
 
