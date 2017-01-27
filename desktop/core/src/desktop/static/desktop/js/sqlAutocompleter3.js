@@ -368,9 +368,9 @@ var SqlAutocompleter3 = (function () {
       self.loadingKeywords(true);
       // Wait for the column reference type to be resolved to pick the right keywords
       colRefDeferred.done(function (colRef) {
-        var colRefKeywordSuggestions = self.keywords();
+        var colRefKeywordSuggestions = [];
         Object.keys(self.parseResult.suggestColRefKeywords).forEach(function (typeForKeywords) {
-          if (SqlFunctions.matchesType(sourceType, [typeForKeywords], [colRef.type.toUpperCase()])) {
+          if (SqlFunctions.matchesType(self.snippet.type(), [typeForKeywords], [colRef.type.toUpperCase()])) {
             self.parseResult.suggestColRefKeywords[typeForKeywords].forEach(function (keyword) {
               colRefKeywordSuggestions.push({
                 value: self.parseResult.lowerCase ? keyword.toLowerCase() : keyword,
