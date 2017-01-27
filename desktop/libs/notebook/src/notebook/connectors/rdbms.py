@@ -53,7 +53,8 @@ class RdbmsApi(Api):
 
     data = list(table.rows())
     has_result_set = data is not None
-
+    print table.columns
+    print table.columns_description
     return {
       'sync': True,
       'has_result_set': has_result_set,
@@ -62,10 +63,10 @@ class RdbmsApi(Api):
         'has_more': False,
         'data': data if has_result_set else [],
         'meta': [{
-          'name': col,
-          'type': '',
+          'name': col['name'],
+          'type': col.get('type', ''),
           'comment': ''
-        } for col in table.columns] if has_result_set else [],
+        } for col in table.columns_description] if has_result_set else [],
         'type': 'table'
       }
     }

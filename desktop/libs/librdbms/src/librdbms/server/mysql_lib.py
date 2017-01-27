@@ -33,6 +33,7 @@ if (version < (1,2,1) or (version[:3] == (1, 2, 1) and
     raise ImproperlyConfigured("MySQLdb-1.2.1p2 or newer is required; you have %s" % Database.__version__)
 
 from django.utils.translation import ugettext as _
+from MySQLdb.converters import FIELD_TYPE
 
 from librdbms.server.rdbms_base_lib import BaseRDBMSDataTable, BaseRDBMSResult, BaseRDMSClient
 
@@ -44,6 +45,53 @@ class DataTable(BaseRDBMSDataTable): pass
 
 
 class Result(BaseRDBMSResult): pass
+
+
+def _convert_types(t):
+  if t == FIELD_TYPE.DECIMAL:
+    return 'DECIMAL_TYPE'
+  elif t == FIELD_TYPE.TINY:
+    return 'TINYINT_TYPE'
+  elif t == FIELD_TYPE.SHORT:
+    return 'SMALLINT_TYPE'
+  elif t == FIELD_TYPE.LONG:
+    return 'BIGINT_TYPE'
+  elif t == FIELD_TYPE.FLOAT:
+    return 'FLOAT_TYPE'
+  elif t == FIELD_TYPE.DOUBLE:
+    return 'DOUBLE_TYPE'
+  elif t == FIELD_TYPE.NULL:
+    return 'NULL_TYPE'
+  elif t == FIELD_TYPE.LONGLONG:
+    return 'BIGINT_TYPE'
+  elif t == FIELD_TYPE.INT24:
+    return 'INT_TYPE'
+  elif t == FIELD_TYPE.TIMESTAMP:
+    return 'TIMESTAMP_TYPE'
+  elif t == FIELD_TYPE.DATE:
+    return 'DATE_TYPE'
+  elif t == FIELD_TYPE.YEAR:
+    return 'INT_TYPE'
+  elif t == FIELD_TYPE.NEWDATE:
+    return 'DATE_TYPE'
+  elif t == FIELD_TYPE.VARCHAR:
+    return 'VARCHAR_TYPE'
+  elif t == FIELD_TYPE.BIT:
+    return 'BOOLEAN_TYPE'
+  elif t == FIELD_TYPE.NEWDECIMAL:
+    return 'DECIMAL_TYPE'
+  elif t == FIELD_TYPE.ENUM:
+    return 'INT_TYPE'
+  elif t == FIELD_TYPE.SET:
+    return 'ARRAY_TYPE'
+  elif t == FIELD_TYPE.TINY_BLOB:
+    return 'BINARY_TYPE'
+  elif t == FIELD_TYPE.MEDIUM_BLOB:
+    return 'BINARY_TYPE'
+  elif t == FIELD_TYPE.LONG_BLOB:
+    return 'BINARY_TYPE'
+  else:
+    return 'STRING_TYPE'
 
 
 class MySQLClient(BaseRDMSClient):
@@ -88,8 +136,9 @@ class MySQLClient(BaseRDMSClient):
     cursor = self.connection.cursor()
     cursor.execute(statement)
     self.connection.commit()
+
     if cursor.description:
-      columns = [column[0] for column in cursor.description]
+      columns = [{'name': column[0], 'type': _convert_types(column[1])} for column in cursor.description]
     else:
       columns = []
     return self.data_table_cls(cursor, columns)
