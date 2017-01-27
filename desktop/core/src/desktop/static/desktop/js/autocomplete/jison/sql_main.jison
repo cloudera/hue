@@ -925,14 +925,14 @@ BasicIdentifierChain_EDIT
      suggestColumns({
        identifierChain: $1
      });
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }] };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
    }
  | BasicIdentifierChain AnyDot PartialBacktickedOrPartialCursor AnyDot BasicIdentifierChain
    {
      suggestColumns({
        identifierChain: $1
      });
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }] };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
    }
  ;
 
@@ -1281,9 +1281,9 @@ SelectStatement_EDIT
      if ($3.cursorAtStart) {
        var keywords = [];
        if ($2) {
-         keywords = [{ value: '*', weight: 1099 }];
+         keywords = [{ value: '*', weight: 10000 }];
        } else {
-         keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+         keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        }
        if (isImpala()) {
          keywords.push('STRAIGHT_JOIN');
@@ -1313,13 +1313,13 @@ SelectStatement_EDIT
    {
      var keywords = [];
      if ($2) {
-       keywords = [{ value: '*', weight: 1099 }];
+       keywords = [{ value: '*', weight: 10000 }];
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -1344,13 +1344,13 @@ SelectStatement_EDIT
    {
      var keywords = [];
      if ($2) {
-       keywords = [{ value: '*', weight: 1099 }];
+       keywords = [{ value: '*', weight: 10000 }];
        if ($2 === 'ALL') {
          suggestAggregateFunctions();
          suggestAnalyticFunctions();
        }
      } else {
-       keywords = [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'];
+       keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        suggestAggregateFunctions();
        suggestAnalyticFunctions();
      }
@@ -2364,21 +2364,21 @@ SelectList_EDIT
    }
  | SelectList ',' AnyCursor
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestTables: true, suggestDatabases: true, suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true };
    }
  | SelectList ',' SelectSpecification_EDIT                 -> $3
  | SelectList ',' AnyCursor SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' AnyCursor ','
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ','             -> $3
  | SelectList ',' AnyCursor ',' SelectList
    {
-     $$ = { suggestKeywords: [{ value: '*', weight: 1099 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
+     $$ = { suggestKeywords: [{ value: '*', weight: 10000 }], suggestFunctions: true, suggestColumns: true, suggestAggregateFunctions: true,  };
    }
  | SelectList ',' SelectSpecification_EDIT ',' SelectList  -> $3
  ;
@@ -3347,7 +3347,7 @@ CountFunction_EDIT
    {
      valueExpressionSuggest();
      if (!$3) {
-       var keywords = isImpala() ? [{ value: '*', weight: 1099 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 1099 }, 'DISTINCT'];
+       var keywords = isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
