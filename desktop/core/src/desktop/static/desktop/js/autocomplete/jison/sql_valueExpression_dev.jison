@@ -398,12 +398,12 @@ OptionalAggregateOrAnalytic
  | AggregateOrAnalytic
  ;
 
-OptionalExtended
+OptionalHiveExtended
  :
  | '<hive>EXTENDED'
  ;
 
-OptionalExtendedOrFormatted
+OptionalHiveExtendedOrFormatted
  :
  | '<hive>EXTENDED'
  | '<hive>FORMATTED'
@@ -415,8 +415,9 @@ OptionalExternal
  | '<impala>EXTERNAL'
  ;
 
-OptionalFormatted
+OptionalImpalaExtendedOrFormatted
  :
+ | '<impala>EXTENDED'
  | '<impala>FORMATTED'
  ;
 
@@ -687,7 +688,6 @@ DatabaseIdentifier_EDIT
  : PartialBacktickedOrCursor
    {
      suggestDatabases();
-     $$ = { cursorOrPartialIdentifier: true };
    }
  ;
 
