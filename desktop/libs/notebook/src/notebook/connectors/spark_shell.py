@@ -201,10 +201,10 @@ class SparkApi(Api):
     LOG.debug("Property Spark Conf kvp list from UI is: " + str(listitems))
     confDict = {}
     for i in range(len(listitems)):
-       kvp = listitems[i]
-       LOG.debug("Property Spark Conf key " + str(i) + " = " + str(kvp.get('key')))
-       LOG.debug("Property Spark Conf value " + str(i) + " = " + str(kvp.get('value')))
-       confDict[kvp.get('key')] = kvp.get('value')
+      kvp = listitems[i]
+      LOG.debug("Property Spark Conf key " + str(i) + " = " + str(kvp.get('key')))
+      LOG.debug("Property Spark Conf value " + str(i) + " = " + str(kvp.get('value')))
+      confDict[kvp.get('key')] = kvp.get('value')
     props['conf'] = confDict
     LOG.debug("Property Spark Conf dictionary is: " + str(confDict))
 
