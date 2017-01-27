@@ -200,6 +200,7 @@
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
 <impala>'EXPLAIN'                          { determineCase(yytext); return '<impala>EXPLAIN'; }
 <impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
+<impala>'EXTENDED'                         { return '<impala>EXTENDED'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
 <impala>'FILEFORMAT'                       { return '<impala>FILEFORMAT'; }
 <impala>'FINALIZE_FN'                      { return '<impala>FINALIZE_FN'; }
