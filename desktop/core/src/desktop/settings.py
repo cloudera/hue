@@ -320,6 +320,7 @@ else:
     "ENGINE" : desktop.conf.DATABASE.ENGINE.get(),
     "NAME" : desktop.conf.DATABASE.NAME.get(),
     "USER" : desktop.conf.DATABASE.USER.get(),
+    "SCHEMA" : desktop.conf.DATABASE.SCHEMA.get(),
     "PASSWORD" : desktop.conf.get_database_password(),
     "HOST" : desktop.conf.DATABASE.HOST.get(),
     "PORT" : str(desktop.conf.DATABASE.PORT.get()),
