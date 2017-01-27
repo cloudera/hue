@@ -3233,6 +3233,7 @@
 
       $.extend(editorOptions, aceOptions);
 
+      var activeTokens = [];
       if (window.Worker) {
         var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?version=1');
         var workerIsReady = false;
@@ -3262,6 +3263,11 @@
           }
 
           huePubSub.publish('editor.active.locations', { type: snippet.type(), locations: e.data.locations });
+
+          // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
+          while(activeTokens.length > 0) {
+            delete activeTokens.pop().parseLocation;
+          }
 
           e.data.locations.forEach(function (location) {
             if ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined') {
@@ -3297,6 +3303,7 @@
                         location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
                         delete location.tables;
                         token.parseLocation = location;
+                        activeTokens.push(token);
                       } else if (tablesToGo.length > 0) {
                         findIdentifierChainInTable(tablesToGo);
                       }
@@ -3307,6 +3314,7 @@
                 findIdentifierChainInTable(location.tables.concat());
               } else {
                 token.parseLocation = location;
+                activeTokens.push(token);
               }
             }
           });
