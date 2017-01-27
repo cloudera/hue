@@ -16,8 +16,8 @@
 # limitations under the License.
 
 import logging
-import sys
 import os
+import sys
 
 LOG = logging.getLogger(__name__)
 
@@ -123,7 +123,7 @@ class Cursor():
     else:
       return [[
         self._meta.getColumnName(i),
-        self._meta.getColumnTypeName(i),
+        self._meta.getColumnTypeName(i) + '_TYPE',
         self._meta.getColumnDisplaySize(i),
         self._meta.getColumnDisplaySize(i),
         self._meta.getPrecision(i),
