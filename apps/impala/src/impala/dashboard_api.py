@@ -65,7 +65,7 @@ class SQLApi():
         for f in reversed(facet['properties']['facets']):
           if f['aggregate']['function'] == 'count':
             if not last_dimension_seen:
-              fields.insert(0, 'COUNT(*)')
+              fields.insert(0, 'COUNT(*) AS Count')
               last_dimension_seen = True
             fields.insert(0, '`%(field)s`' % f)
           else:
@@ -73,14 +73,14 @@ class SQLApi():
               fields.insert(0, self._get_aggregate_function(f))
 
         if not last_dimension_seen:
-          fields.insert(0, 'COUNT(*)')
+          fields.insert(0, 'COUNT(*) as Count')
         fields.insert(0, '`%(field)s`' % facet)
 
         sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
-        ORDER BY COUNT(*) DESC
+        ORDER BY Count DESC
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
@@ -208,6 +208,11 @@ class SQLApi():
     response = editor.execute(request)
     
     print response
+    
+# SELECT MIN(`year_i`), MAX(`year_i`) FROM `default`.`jobs`'),), kwargs={})
+# [29/Jan/2017 21:20:46 +0000] thrift_util  DEBUG    Thrift call <class 'ImpalaService.ImpalaHiveServer2Service.Client'>.ExecuteStatement returned in 92ms: TExecuteStatementResp(status=TStatus(errorCode=None, errorMessage=None, sqlState=None, infoMessages=None, statusCode=0), operationHandle=TOperationHandle(hasResultSet=True, modifiedRowCount=None, operationType=0, operationId=THandleIdentifier(secret=c14afa5d016a34ce:8c61ef4c00000000, guid=c14afa5d016a34ce:8c61ef4c00000000)))
+# {'status': 0, 'handle': {'log_context': None, 'statements_count': 1, 'end': {'column': 56, 'row': 0}, 'statement_id': 0, 'has_more_statements': False, 'start': {'column': 0, 'row': 0}, 'secret': 'zjRqAV36SsEAAAAATO9hjA==\n', 'has_result_set': True, 'session_guid': u'sxvpMfirS7SVu8QfJ04Umg==\n', 'statement': u'SELECT MIN(`year_i`), MAX(`year_i`) FROM `default`.`jobs`', 'operation_type': 0, 'modified_row_count': None, 'guid': 'zjRqAV36SsEAAAAATO9hjA==\n'}}
+    
     
     if 'handle' in response:
       if response['handle'].get('sync'):
