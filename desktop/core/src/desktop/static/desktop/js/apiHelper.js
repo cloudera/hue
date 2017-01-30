@@ -14,6 +14,41 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+var ApiQueueManager = (function () {
+
+  var instance = null;
+
+  function ApiQueueManager() {
+    var self = this;
+    self.callQueue = {};
+  }
+
+  ApiQueueManager.prototype.getQueued = function (url, hash) {
+    var self = this;
+    return self.callQueue[url + (hash || '')];
+  };
+
+  ApiQueueManager.prototype.addToQueue = function (promise, url, hash) {
+    var self = this;
+    self.callQueue[url + (hash || '')] = promise;
+    promise.always(function () {
+      delete self.callQueue[url + (hash || '')];
+    })
+  };
+
+  return {
+    /**
+     * @returns {ApiQueueManager}
+     */
+    getInstance: function () {
+      if (instance === null) {
+        instance = new ApiQueueManager();
+      }
+      return instance;
+    }
+  };
+})();
+
 var ApiHelper = (function () {
 
   var AUTOCOMPLETE_API_PREFIX = "/notebook/api/autocomplete/";
@@ -45,7 +80,7 @@ var ApiHelper = (function () {
     self.i18n = i18n;
     self.user = user;
     self.lastKnownDatabases = {};
-    self.fetchQueue = {};
+    self.queueManager = ApiQueueManager.getInstance();
     self.invalidateImpala = 'cache';
 
     huePubSub.subscribe('assist.clear.db.cache', function (options) {
@@ -470,21 +505,6 @@ var ApiHelper = (function () {
     }));
   };
 
-  ApiHelper.prototype.getFetchQueue = function (fetchFunction, identifier) {
-    var self = this;
-    if (! self.fetchQueue[fetchFunction]) {
-      self.fetchQueue[fetchFunction] = {};
-    }
-    var queueForFunction = self.fetchQueue[fetchFunction];
-
-    var id = typeof identifier === 'undefined' || identifier === null ? 'DEFAULT_QUEUE' : identifier;
-
-    if (! queueForFunction[id]) {
-      queueForFunction[id] = [];
-    }
-    return queueForFunction[id];
-  };
-
   /**
    * @param {Object} options
    * @param {Function} [options.successCallback]
@@ -537,9 +557,16 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchDocuments = function (options) {
     var self = this;
 
-    var queue = self.getFetchQueue('fetchDocuments', options.uuid);
-    queue.push(options);
-    if (queue.length > 1) {
+    var promise = self.queueManager.getQueued(DOCUMENTS_API, options.uuid);
+    var firstInQueue = typeof promise === 'undefined';
+    if (firstInQueue) {
+      promise = $.Deferred();
+      self.queueManager.addToQueue(promise, DOCUMENTS_API, options.uuid);
+    }
+
+    promise.done(options.successCallback).fail(self.assistErrorCallback(options));
+
+    if (!firstInQueue) {
       return;
     }
 
@@ -549,22 +576,14 @@ var ApiHelper = (function () {
         uuid: options.uuid
       },
       success: function (data) {
-        while (queue.length > 0) {
-          var next = queue.shift();
-          if (! self.successResponseIsError(data)) {
-            next.successCallback(data);
-          } else {
-            self.assistErrorCallback(next)(data);
-          }
+        if (! self.successResponseIsError(data)) {
+          promise.resolve(data);
+        } else {
+          promise.reject(data);
         }
       }
     })
-    .fail(function (response) {
-      while (queue.length > 0) {
-        var next = queue.shift();
-        self.assistErrorCallback(next)(response);
-      }
-    });
+    .fail(promise.reject);
   };
 
   /**
@@ -1650,24 +1669,25 @@ var ApiHelper = (function () {
       options.editor.showSpinner();
     }
 
-    var queue = self.getFetchQueue('fetchAssistData', options.sourceType + '_' + options.url);
-    queue.push(options);
-    if (queue.length > 1) {
+    var promise = self.queueManager.getQueued(options.url, options.sourceType);
+    var firstInQueue = typeof promise === 'undefined';
+    if (firstInQueue) {
+      promise = $.Deferred();
+      self.queueManager.addToQueue(promise, options.url, options.sourceType);
+    }
+
+    promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
+      if (typeof options.editor !== 'undefined' && options.editor !== null) {
+        options.editor.hideSpinner();
+      }
+    });
+
+    if (!firstInQueue) {
       return;
     }
 
-    var failCallback = function (data) {
-      while (queue.length > 0) {
-        var next = queue.shift();
-        next.errorCallback(data);
-        if (typeof next.editor !== 'undefined' && next.editor !== null) {
-          next.editor.hideSpinner();
-        }
-      }
-    };
-
     if (options.timeout === 0) {
-      failCallback({ status: -1 });
+      promise.reject({ status: -1 });
       return;
     }
 
@@ -1692,18 +1712,12 @@ var ApiHelper = (function () {
         };
         $.totalStorage(cacheIdentifier, cachedData);
       }
-      while (queue.length > 0) {
-        var next = queue.shift();
-        if (data.status === 0 && !self.successResponseIsError(data)) {
-          next.successCallback(data);
-        } else {
-          next.errorCallback(data);
-        }
-        if (typeof next.editor !== 'undefined' && next.editor !== null) {
-          next.editor.hideSpinner();
-        }
+      if (data.status === 0 && !self.successResponseIsError(data)) {
+        promise.resolve(data);
+      } else {
+        promise.reject(data);
       }
-    }).fail(failCallback);
+    }).fail(promise.reject);
   };
 
   /**
