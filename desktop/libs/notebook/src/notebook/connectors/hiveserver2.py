@@ -532,7 +532,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     response = self._get_current_statement(db, snippet)
     query = response['statement']
-
+    print query
     api = OptimizerApi()
 
     return api.query_compatibility(source_platform, target_platform, query)
