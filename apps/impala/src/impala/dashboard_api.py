@@ -178,20 +178,13 @@ class SQLApi():
     database, table = self._get_database_table_names(dashboard)
   
     # TODO: check column stats
-  
-    print '----------------------'
-    print fields
+
     sql = "SELECT MIN(`%(field)s`), MAX(`%(field)s`) FROM `%(database)s`.`%(table)s`" % {
       'field': fields[0],
       'database': database,
       'table': table      
     }
-    
-    print '\n\n'
-    print sql
-    print '\n\n'
 
-    
     editor = make_notebook(
         name='Execute and watch',
         editor_type=self.engine,
@@ -201,20 +194,15 @@ class SQLApi():
         skip_historify=True
         # async=False
     )
-    print 'aaaaaaaaa aaaaaaaa'
+
     request = MockRequest(self.user)
     snippet = {'type': self.engine}
-    print 'aaaaaaaaa'
     response = editor.execute(request)
-    
-    print response
-    
-# SELECT MIN(`year_i`), MAX(`year_i`) FROM `default`.`jobs`'),), kwargs={})
-# [29/Jan/2017 21:20:46 +0000] thrift_util  DEBUG    Thrift call <class 'ImpalaService.ImpalaHiveServer2Service.Client'>.ExecuteStatement returned in 92ms: TExecuteStatementResp(status=TStatus(errorCode=None, errorMessage=None, sqlState=None, infoMessages=None, statusCode=0), operationHandle=TOperationHandle(hasResultSet=True, modifiedRowCount=None, operationType=0, operationId=THandleIdentifier(secret=c14afa5d016a34ce:8c61ef4c00000000, guid=c14afa5d016a34ce:8c61ef4c00000000)))
-# {'status': 0, 'handle': {'log_context': None, 'statements_count': 1, 'end': {'column': 56, 'row': 0}, 'statement_id': 0, 'has_more_statements': False, 'start': {'column': 0, 'row': 0}, 'secret': 'zjRqAV36SsEAAAAATO9hjA==\n', 'has_result_set': True, 'session_guid': u'sxvpMfirS7SVu8QfJ04Umg==\n', 'statement': u'SELECT MIN(`year_i`), MAX(`year_i`) FROM `default`.`jobs`', 'operation_type': 0, 'modified_row_count': None, 'guid': 'zjRqAV36SsEAAAAATO9hjA==\n'}}
     
     
     if 'handle' in response:
+      snippet['result'] = response
+      
       if response['handle'].get('sync'):
         result = response['result']
       else:
@@ -227,14 +215,15 @@ class SQLApi():
         
         while curr <= end:
           status = api.check_status(dashboard, snippet)
-          if status == 'available':
-            result = api.fetch_result(dashboard, snippet)
-#               self.close(handle)
+          if status['status'] == 'available':
+            result = api.fetch_result(dashboard, snippet, rows=10, start_over=True)
+#           self.close(handle)
+            break
           time.sleep(sleep_interval)
           curr = time.time()
           
-      print result
-      min_value, max_value = result[0]
+      r = list(result['data'])
+      min_value, max_value = r[0]
   
 #       msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
 #       try:
@@ -251,7 +240,7 @@ class SQLApi():
       return {
         'stats': {
           'stats_fields': {
-            fields[0]['name' ]: {'min': min_value, 'max': max_value}
+            fields[0]: {'min': min_value, 'max': max_value}
           }
         }
       } 
@@ -276,7 +265,7 @@ class SQLApi():
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
-
+    
     # Facets should not filter themselves
     fqs = [fq for fq in query['fqs'] if not facet or facet['id'] != fq['id']]
 
@@ -293,14 +282,18 @@ class SQLApi():
     for fq in merged_fqs:
       if fq['type'] == 'field':
         f = []
+        if self._is_number(self._get_field(collection, fq['field'])['type']):
+          sql_condition = "`%s` %s %s"
+        else:
+          sql_condition = "`%s` %s '%s'" 
         for _filter in fq['filter']:
           exclude = '!=' if _filter['exclude'] else '='
           value = _filter['value']
           if value is not None:
             if isinstance(value, list):
-              f.append(' AND '.join(["`%s` %s '%s'" % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
+              f.append(' AND '.join([sql_condition % (_f, exclude, _val) for _f, _val in zip(fq['field'], value)]))
             else:
-              f.append("%s %s '%s'" % (fq['field'], exclude, value))
+              f.append(sql_condition % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
 
     return clauses
@@ -334,6 +327,14 @@ class SQLApi():
       elif f['function'] == 'percentiles':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
+
+  def _get_field(self, collection, name):
+    _field = [_f for _f in collection['template']['fieldsAttributes'] if _f['name'] == name]
+    if _field:
+      return _field[0]
+
+  def _is_number(self, _type):
+    return _type in ('int', 'long', 'bigint', 'float')
 
   def _get_database_table_names(self, name):
     if '.' in name:
