@@ -38,6 +38,7 @@ def utf_quoter(what):
 def _guess_range_facet(widget_type, solr_api, collection, facet_field, properties, start=None, end=None, gap=None):
   try:
     stats_json = solr_api.stats(collection['name'], [facet_field])
+    print stats_json
     stat_facet = stats_json['stats']['stats_fields'][facet_field]
 
     _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)

@@ -17,6 +17,7 @@
 
 import logging
 import json
+import time
 
 from itertools import groupby
 
@@ -108,7 +109,6 @@ class SQLApi():
         sql += ' ' + self._convert_filters_to_where(filters)
       sql += ' LIMIT %s' % LIMIT
 
-
     editor = make_notebook(
         name='Execute and watch',
         editor_type=dashboard['engine'],
@@ -172,6 +172,84 @@ class SQLApi():
   def luke(self, collection):
     fields = self.schema_fields(collection)
     return {'fields': Collection2._make_luke_from_schema_fields(fields)}
+
+
+  def stats(self, dashboard, fields):
+    database, table = self._get_database_table_names(dashboard)
+  
+    # TODO: check column stats
+  
+    print '----------------------'
+    print fields
+    sql = "SELECT MIN(`%(field)s`), MAX(`%(field)s`) FROM `%(database)s`.`%(table)s`" % {
+      'field': fields[0],
+      'database': database,
+      'table': table      
+    }
+    
+    print '\n\n'
+    print sql
+    print '\n\n'
+
+    
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=self.engine,
+        statement=sql,
+        database=database,
+        status='ready-execute',
+        skip_historify=True
+        # async=False
+    )
+    print 'aaaaaaaaa aaaaaaaa'
+    request = MockRequest(self.user)
+    snippet = {'type': self.engine}
+    print 'aaaaaaaaa'
+    response = editor.execute(request)
+    
+    print response
+    
+    if 'handle' in response:
+      if response['handle'].get('sync'):
+        result = response['result']
+      else:
+        timeout_sec = 20
+        sleep_interval = 0.5
+        curr = time.time()
+        end = curr + timeout_sec
+    
+        api = get_api(request, snippet)
+        
+        while curr <= end:
+          status = api.check_status(dashboard, snippet)
+          if status == 'available':
+            result = api.fetch_result(dashboard, snippet)
+#               self.close(handle)
+          time.sleep(sleep_interval)
+          curr = time.time()
+          
+      print result
+      min_value, max_value = result[0]
+  
+#       msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
+#       try:
+#         self.cancel_operation(handle)
+#       except Exception, e:
+#         msg = "Failed to cancel query."
+#         LOG.warning(msg)
+#         self.close_operation(handle)
+#         raise QueryServerException(e, message=msg)
+#   
+#       raise QueryServerTimeoutException(message=msg)
+
+    
+      return {
+        'stats': {
+          'stats_fields': {
+            fields[0]['name' ]: {'min': min_value, 'max': max_value}
+          }
+        }
+      } 
 
 
   def _convert_result(self, result, dashboard, facet, query):
@@ -315,11 +393,8 @@ class SQLApi():
         })
     elif dimension == 2:
       for row in rows:
-        value_fields = [f['field'] for f in dimension_fields]
+        value_fields = [f['field'] for f in dimension_fields] # e.g. SELECT `job`, avg(salary), `gender`, COUNT(*), avg(salary)
         fq_values = [row[0], row[1]]
-        # SELECT `job`, `gender`, COUNT(*), avg(salary)
-        # -->
-        # SELECT `job`, avg(salary), `gender`, COUNT(*)
         counts.append({
             "count": row[-1],
             "fq_values": fq_values,
