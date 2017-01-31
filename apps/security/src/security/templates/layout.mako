@@ -51,6 +51,8 @@ def is_selected(section, matcher):
   <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
   <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 
+  <script src="${ static('desktop/js/apiHelper.js') }"></script>
+
 
   <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
