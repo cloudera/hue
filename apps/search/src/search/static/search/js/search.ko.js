@@ -691,7 +691,7 @@ var Collection = function (vm, collection) {
 
       // TODO Reload QueryResult
       facet.queryResult = ko.observable(new QueryResult(self, {
-         type: self.engine(),
+        type: self.engine(),
       }));
     }
   }
