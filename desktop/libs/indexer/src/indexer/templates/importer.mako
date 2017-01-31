@@ -379,7 +379,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
-              <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" placeholder="${ _('Table name or <database>.<table>') }">
+              <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: createWizard.source.apiHelperType" placeholder="${ _('Table name or <database>.<table>') }">
             </label>
           </div>
 
@@ -1134,6 +1134,7 @@ ${ assist.assistPanel() }
       self.table.subscribe(function(val) {
         resizeElements();
       });
+      self.apiHelperType = ko.observable('hive');
 
       // Queries
       self.query = ko.observable('');

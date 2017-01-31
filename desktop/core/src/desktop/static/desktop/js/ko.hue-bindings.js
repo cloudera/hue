@@ -2728,7 +2728,7 @@
   };
 
   ko.bindingHandlers.hivechooser = {
-    init: function (element, valueAccessor, allBindingsAccessor, vm) {
+    update: function (element, valueAccessor, allBindingsAccessor, vm) {
       var self = $(element);
       var options = ko.unwrap(valueAccessor());
       var complexConfiguration = false;
@@ -2748,13 +2748,13 @@
       if (complexConfiguration) {
         self.jHueGenericAutocomplete({
           showOnFocus: true,
-          skipColumns: options.skipColumns,
+          skipColumns: ko.unwrap(options.skipColumns),
           startingPath: options.database + '.',
           rewriteVal: true,
           onPathChange: options.onChange,
-          searchEverywhere : options.searchEverywhere || false,
-          apiHelperUser: options.apiHelperUser || '',
-          apiHelperType: options.apiHelperType || '',
+          searchEverywhere : ko.unwrap(options.searchEverywhere) || false,
+          apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
+          apiHelperType: ko.unwrap(options.apiHelperType) || '',
         });
       }
       else {
@@ -2775,9 +2775,9 @@
         self.jHueGenericAutocomplete({
           showOnFocus: true,
           home: "/",
-          skipColumns: options.skipColumns || false,
-          apiHelperUser: options.apiHelperUser || '',
-          apiHelperType: options.apiHelperType || '',
+          skipColumns: ko.unwrap(options.skipColumns) || false,
+          apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
+          apiHelperType: ko.unwrap(options.apiHelperType) || '',
           onPathChange: function (path) {
             setPathFromAutocomplete(path);
           },
