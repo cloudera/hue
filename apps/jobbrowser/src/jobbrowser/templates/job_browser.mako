@@ -1135,8 +1135,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 </span>
 
-<div id="diocan"></div>
-
 % if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 % endif
