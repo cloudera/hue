@@ -134,9 +134,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/jquery.nicescroll.js') }"></script>
   <script src="${ static('desktop/js/jquery.datatables.sorting.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-  <script type="text/javascript">
-    window.d3v3 = d3;
-  </script>
+  <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
