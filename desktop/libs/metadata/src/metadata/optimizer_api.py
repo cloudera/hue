@@ -349,8 +349,14 @@ def upload_table_stats(request):
 
       table_stats.append({
         'table_name': db_table,
-        #'avg_row_len':  stats.get('numRows', -1),
-        'num_rows':  stats.get('numRows', -1)
+        'num_rows':  stats.get('numRows', -1),
+        'last_modified_time':  stats.get('transient_lastDdlTime', -1),
+        'total_size':  stats.get('totalSize', -1),
+        'raw_data_size':  stats.get('rawDataSize', -1),
+        'num_files':  stats.get('numFiles', -1),
+        # bytes_cached
+        # cache_replication
+        # format
       })
 
       if with_columns:
@@ -364,7 +370,12 @@ def upload_table_stats(request):
             'data_type': col_stats['data_type'],
             "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
             "num_nulls": int(col_stats['num_nulls']) if col_stats['num_nulls'] != '' else -1,
-            "avg_col_len": int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1
+            "avg_col_len": int(float(col_stats['avg_col_len'])) if col_stats['avg_col_len'] != '' else -1,
+            "max_size": int(float(col_stats['max_col_len'])) if col_stats['max_col_len'] != '' else -1,
+            "min": col_stats['min'] if col_stats.get('min', '') != '' else -1,
+            "max": col_stats['max'] if col_stats.get('max', '') != '' else -1,
+            "num_trues": col_stats['num_trues'] if col_stats.get('num_trues', '') != '' else -1,
+            "num_falses": col_stats['num_falses'] if col_stats.get('num_falses', '') != '' else -1,
           })
 
       if with_ddl:
@@ -383,10 +394,10 @@ def upload_table_stats(request):
   api = OptimizerApi()
 
   response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
-  response['status'] = 0 if response['upload_table_stats']['status']['state'] == 'FINISHED' else -1
+  response['status'] = 0 if response['upload_table_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
   if column_stats:
     response['upload_cols_stats'] = api.upload(data=column_stats, data_type='cols_stats', source_platform=source_platform)
-    response['status'] = response['status'] if response['upload_cols_stats']['status']['state'] == 'FINISHED' else -1
+    response['status'] = response['status'] if response['upload_cols_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
   if table_ddls:
     response['upload_table_ddl'] = api.upload(data=table_ddls, data_type='queries', source_platform=source_platform)
 
