@@ -340,7 +340,15 @@ ${ assist.assistPanel() }
               <!-- /ko -->
             <!-- /ko -->
           </div>
-          <div class="caption">${ _('Move it to ') }<span data-bind="text: createWizard.destination.outputFormat"></span> <span data-bind="text: createWizard.destination.name"></span></div>
+          <div class="caption">
+            <!-- ko if: createWizard.source.inputFormat() != 'manual' -->
+              ${ _('Move it to ') }
+            <!-- /ko -->
+            <!-- ko if: createWizard.source.inputFormat() == 'manual' -->
+              ${ _('Create') }
+            <!-- /ko -->
+            <span data-bind="text: createWizard.destination.outputFormat"></span> <span data-bind="text: createWizard.destination.name"></span>
+          </div>
         </li>
       </ol>
     </div>
@@ -461,7 +469,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
+                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
               <!-- /ko -->
 
               <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
@@ -1399,7 +1407,7 @@ ${ assist.assistPanel() }
 
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
-        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^[a-zA-Z0-9_]*$/.test(self.destination.name()));
+        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.destination.name()));
         var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
 
         return validDestination && validFields && isTargetAlreadyExisting;
