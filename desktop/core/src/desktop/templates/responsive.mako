@@ -475,9 +475,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
 
 <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
-<script type="text/javascript">
-  window.d3v3 = d3;
-</script>
+<script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
 
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
