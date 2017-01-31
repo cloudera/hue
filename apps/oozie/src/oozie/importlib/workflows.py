@@ -35,6 +35,7 @@ import json
 import logging
 from lxml import etree
 import os
+import re
 
 from django.core import serializers
 from django.utils.encoding import smart_str
@@ -711,7 +712,7 @@ def generate_v2_graph_nodes(workflow_definition):
 
   # Transform XML using XSLT
   transformed_root = transform(workflow_definition_root)
-  node_list = str(transformed_root).replace('\n', '').replace(' ', '')
+  node_list = re.sub('[\s]', '', str(transformed_root))
   node_list = json.loads(node_list)
 
   return [node for node in node_list if node]
