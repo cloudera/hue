@@ -75,7 +75,7 @@ from desktop.views import commonheader, commonfooter, _ko
 
     <span data-bind="visible: columns().length != 0">&nbsp;&nbsp;&nbsp;</span>
 
-    <a class="btn" href="${ url('search:new_search') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+    <a class="btn" href="javascript:void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: newSearch">
       <i class="fa fa-file-o"></i>
     </a>
     <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
@@ -3584,6 +3584,15 @@ $(document).ready(function () {
   huePubSub.subscribe('check.autorefresh', function () {
     checkAutoRefresh();
   });
+
+  function newSearch() {
+    ko.cleanNode($('#searchComponents')[0]);
+    viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
+    ko.applyBindings(viewModel, $('#searchComponents')[0]);
+    viewModel.init();
+    
+    viewModel.search();
+  }
 
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){

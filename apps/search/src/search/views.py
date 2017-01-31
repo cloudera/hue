@@ -41,6 +41,18 @@ from django.core.urlresolvers import reverse
 LOG = logging.getLogger(__name__)
 
 
+DEFAULT_LAYOUT = [
+     {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
+     {"size":10,"rows":[{"widgets":[
+         {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
+                        {"widgets":[
+         {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
+          "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
+        "drops":["temp"],"klass":"card card-home card-column span10"},
+]
+
+
 def index(request, is_mobile=False, is_embeddable=False):
   hue_collections = SearchController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
@@ -75,7 +87,7 @@ def index(request, is_mobile=False, is_embeddable=False):
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
-    'initial': json.dumps({'collections': [], 'layout': [], 'is_latest': LATEST.get(),
+    'initial': json.dumps({'collections': [], 'layout': DEFAULT_LAYOUT, 'is_latest': LATEST.get(),
         'engines': get_engines(request.user)
     }),
     'is_owner': collection_doc.doc.get().can_write(request.user),
@@ -107,16 +119,7 @@ def new_search(request, is_embeddable=False):
     'query': query,
     'initial': json.dumps({
          'collections': collections,
-         'layout': [
-              {"size":2,"rows":[{"widgets":[]}],"drops":["temp"],"klass":"card card-home card-column span2"},
-              {"size":10,"rows":[{"widgets":[
-                  {"size":12,"name":"Filter Bar","widgetType":"filter-widget", "id":"99923aef-b233-9420-96c6-15d48293532b",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]},
-                                 {"widgets":[
-                  {"size":12,"name":"Grid Results","widgetType":"resultset-widget", "id":"14023aef-b233-9420-96c6-15d48293532b",
-                   "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
-                 "drops":["temp"],"klass":"card card-home card-column span10"},
-         ],
+         'layout': DEFAULT_LAYOUT,
          'is_latest': LATEST.get(),
          'engines': get_engines(request.user)
      }),
