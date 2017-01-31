@@ -5044,4 +5044,79 @@
     }
   };
 
+  var aceInstancesById = {},
+    aceInitId = 0;
+
+  ko.bindingHandlers.ace = {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+
+      var options = allBindingsAccessor().aceOptions || {};
+      var value = ko.utils.unwrapObservable(valueAccessor());
+
+      if (!element.id) {
+        element.id = 'knockoutAce' + aceInitId;
+        aceInitId = aceInitId + 1;
+      }
+
+      var editor = ace.edit(element.id);
+
+      editor.setOptions(options);
+
+      if (options.theme) {
+        editor.setTheme('ace/theme/' + options.theme);
+      }
+      else {
+        editor.setTheme('ace/theme/hue');
+      }
+      if (options.mode) {
+        editor.getSession().setMode('ace/mode/' + options.mode);
+      }
+      if (options.readOnly) {
+        editor.setReadOnly(true);
+      }
+
+      editor.setValue(value);
+      editor.gotoLine(0);
+
+      editor.getSession().on('change', function (delta) {
+        if (ko.isWriteableObservable(valueAccessor())) {
+          valueAccessor()(editor.getValue());
+        }
+      });
+
+      aceInstancesById[element.id] = editor;
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        editor.destroy();
+        delete aceInstancesById[element.id];
+      });
+    },
+    update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+      var value = ko.utils.unwrapObservable(valueAccessor());
+      var id = element.id;
+
+      if (typeof id !== 'undefined' && id !== '' && aceInstancesById.hasOwnProperty(id)) {
+        var editor = aceInstancesById[id];
+        var content = editor.getValue();
+        if (content !== value) {
+          editor.setValue(value);
+          editor.gotoLine(0);
+        }
+      }
+    }
+  };
+
+  ko.aceEditors = {
+    resizeAll: function () {
+      for (var id in aceInstancesById) {
+        if (!aceInstancesById.hasOwnProperty(id)) continue;
+        var editor = aceInstancesById[id];
+        editor.resize();
+      }
+    },
+    get: function (id) {
+      return aceInstancesById[id];
+    }
+  };
+
 })();
