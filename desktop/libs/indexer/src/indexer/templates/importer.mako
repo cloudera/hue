@@ -90,11 +90,20 @@ ${ assist.assistPanel() }
     text-align: right;
     padding-right: 8px;
     display: inline-block;
-    vertical-align: middle;
+    vertical-align: top;
+    padding-top: 6px;
   }
 
   .step label.checkbox {
     margin-left: 130px;
+  }
+
+  .step .index-field label.checkbox {
+    margin-left: 5px;
+  }
+
+  .step .index-field label > div:first-child {
+    width: initial;
   }
 
   .step .field-properties label.checkbox {
@@ -128,6 +137,14 @@ ${ assist.assistPanel() }
     vertical-align: -12px;
   }
 
+  .step .selectize-input {
+    max-height: 31px;
+  }
+
+  .step .selectize-control.multi .selectize-input {
+    padding-top: 3px!important;
+  }
+
   .step .show-edit-on-hover i {
     opacity: 0;
     -webkit-transition: opacity 0.2s linear;
@@ -144,6 +161,10 @@ ${ assist.assistPanel() }
   .step .show-edit-on-hover .inactive-action {
     margin-left: 6px;
     vertical-align: middle;
+  }
+
+  .step .fa-padding-top {
+    padding-top: 8px;
   }
 
   .kudu-partitions li {
@@ -526,7 +547,7 @@ ${ assist.assistPanel() }
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
-                  <i class="fa fa-sliders"></i>
+                  <i class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
             </div>
@@ -581,7 +602,7 @@ ${ assist.assistPanel() }
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                   <div class="clearfix"></div>
                 </div>
-                <a data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus"></i> ${_('Add partition')}</a>
+                <a data-bind="click: function() { partitionColumns.push($root.loadDefaultField({isPartition: true})); }" class="pointer" title="${_('Add Partition')}"><i class="fa fa-plus fa-padding-top"></i> ${_('Add partition')}</a>
               </div>
               <!-- /ko -->
 
@@ -651,7 +672,7 @@ ${ assist.assistPanel() }
                 <!-- /ko -->
 
                 <!-- ko if: $parent.outputFormat() == 'index' -->
-                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
                   <div class="clearfix"></div>
                 <!-- /ko -->
               </form>
@@ -746,11 +767,11 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="table-field-template">
   <div>
-    <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }
+    <label data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">${ _('Name') }&nbsp;
       <input type="text" class="input-large" placeholder="${ _('Field name') }" required data-bind="textInput: name">
     </label>
 
-    <label>${ _('Type') }
+    <label class="margin-left-5">${ _('Type') }&nbsp;
     <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
       <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
     <!-- /ko -->
@@ -787,10 +808,10 @@ ${ assist.assistPanel() }
 
 
 <script type="text/html" id="index-field-template">
-  <label>${ _('Name') }
+  <label>${ _('Name') }&nbsp;
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
-  <label>${ _('Type') }
+  <label class="margin-left-5">${ _('Type') }&nbsp;
     <select class="input-small" data-bind="selectize: $root.createWizard.fieldTypes, value: type"></select>
   </label>
   <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
@@ -825,13 +846,13 @@ ${ assist.assistPanel() }
     <select data-bind="selectize: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
-      <label> ${ _('Number of expected fields') }
+      <label class="margin-left-5">${ _('Number of expected fields') }
       <input type="number" class="input-mini" data-bind="value: operation.numExpectedFields">
       </label>
     <!-- /ko -->
     <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name:'index-field-template', data:$data }" class="margin-top-10 field"></div>
+      <div data-bind="template: { name:'index-field-template', data:$data }" class="margin-top-10 field index-field"></div>
     </div>
   </div>
 </script>
@@ -845,7 +866,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-text">
   <label>
     <div data-bind="text: description"></div>
-    <input type="text" class="input-small" data-bind="attr: {placeholder: description}, value: value">
+    <input type="text" class="input" data-bind="attr: {placeholder: description}, value: value">
   </label>
 </script>
 
@@ -859,7 +880,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-checkbox">
   <label class="checkbox">
     <input type="checkbox" data-bind="checked: value">
-    <div data-bind="text: description"></div>
+    <span data-bind="text: description"></span>
   </label>
 </script>
 
