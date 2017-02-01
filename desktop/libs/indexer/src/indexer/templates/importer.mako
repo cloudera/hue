@@ -29,7 +29,7 @@
 %if not is_embeddable:
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
-# Todo lot of those
+## TODO lot of those re-imported
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
@@ -539,19 +539,19 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group">
-              <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
-                <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
-              </label>
-            </div>
-
-            <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
             </div>
+
             <span data-bind="visible: showProperties">
+              <div class="control-group">
+                <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
+                  <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
+                </label>
+              </div>
               <div class="control-group">
                 <label><div>${ _('Description') }</div>
                    <input type="text" class="form-control input-xxlarge" data-bind="value: description, valueUpdate: 'afterkeydown'" placeholder="${ _('Description') }">
@@ -1181,7 +1181,7 @@ ${ assist.assistPanel() }
         }
 
         if (typeof newVal.fieldSeparator !== 'undefined') {
-          vm.createWizard.destination.useCustomDelimiters(true);
+          vm.createWizard.destination.useCustomDelimiters(newVal.fieldSeparator() != ',');
           vm.createWizard.destination.customFieldDelimiter(newVal.fieldSeparator());
           newVal.fieldSeparator.subscribe(function(newVal) {
             vm.createWizard.destination.customFieldDelimiter(newVal);
@@ -1356,13 +1356,11 @@ ${ assist.assistPanel() }
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
-          {'value': 'json', 'name': 'Json'},
           {'value': 'kudu', 'name': 'Kudu'},
-          {'value': 'avro', 'name': 'Avro'},
+          {'value': 'csv', 'name': 'Csv'},
+          {'value': 'json', 'name': 'Json'},
           {'value': 'regexp', 'name': 'Regexp'},
-          {'value': 'rcfile', 'name': 'RCFile'},
           {'value': 'orc', 'name': 'ORC'},
-          {'value': 'sequencefile', 'name': 'SequenceFile'}
       ]);
 
       self.partitionColumns = ko.observableArray();
