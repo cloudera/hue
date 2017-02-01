@@ -225,6 +225,10 @@ ${ assist.assistPanel() }
     margin-top: 10px;
   }
 
+  .inline-table {
+    display: inline-table;
+  }
+
 </style>
 
 <span id="importerComponents" class="notebook">
@@ -570,7 +574,7 @@ ${ assist.assistPanel() }
             <label class="control-label"><div>${ _('Partitions') }</div>
 
               <!-- ko if: tableFormat() != 'kudu' -->
-              <div style="display: inline-table">
+              <div class="inline-table">
                 <div class="form-inline" data-bind="foreach: partitionColumns">
                   <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.partitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
@@ -581,7 +585,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <!-- ko if: tableFormat() == 'kudu' -->
-              <div class="form-inline" style="display: inline-table">
+              <div class="form-inline inline-table">
                 <ul class="unstyled kudu-partitions" data-bind="foreach: kuduPartitionColumns">
                   <li>
                   <a class="pointer pull-right" data-bind="click: function() { $parent.kuduPartitionColumns.remove($data); }"><i class="fa fa-minus"></i></a>
@@ -635,22 +639,26 @@ ${ assist.assistPanel() }
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
-            <div class="card-body">
-              <form class="form-inline" data-bind="foreach: columns">
+            <div class="card-body no-margin-top">
+              <form class="form-inline inline-table" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
-                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field"></div>
                   <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
-                    <a data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i> </a>
+                  <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
                   <!-- /ko -->
+                  <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                  <div class="clearfix"></div>
                 <!-- /ko -->
 
                 <!-- ko if: $parent.outputFormat() == 'index' -->
-                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field"></div>
+                  <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                  <div class="clearfix"></div>
                 <!-- /ko -->
               </form>
 
+              <div class="clearfix"></div>
+
               <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
-                <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer margin-left-20" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+                <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
               <!-- /ko -->
             </div>
           </div>
