@@ -23,13 +23,14 @@ except ImportError:
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop import appmanager
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_string, coerce_bool, coerce_csv
 
 
 def is_oozie_enabled():
   """Oozie needs to be available as it is the backend."""
-  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0
+  return len([app for app in appmanager.DESKTOP_MODULES if app.name == 'oozie']) > 0 and is_hue4()
 
 
 SHOW_NOTEBOOKS = Config(
@@ -127,7 +128,7 @@ ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
   type=bool,
-  default=False
+  dynamic_default=is_hue4
 )
 
 ENABLE_BATCH_EXECUTE = Config(

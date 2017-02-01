@@ -1226,9 +1226,14 @@ USE_NEW_EDITOR = Config( # To remove in Hue 4
   help=_('Choose whether to show the new SQL editor.')
 )
 
+def is_hue4():
+  """Hue is configured to show version 4."""
+  return IS_HUE_4.get()
+
+
 USE_NEW_SIDE_PANELS = Config( # To remove in Hue 4
   key='use_new_side_panels',
-  default=False,
+  dynamic_default=is_hue4,
   type=coerce_bool,
   help=_('Choose whether to show extended left and right panels.')
 )
@@ -1239,6 +1244,7 @@ USE_DEFAULT_CONFIGURATION = Config(
   type=coerce_bool,
   help=_('Enable saved default configurations for Hive, Impala, Spark, and Oozie.')
 )
+
 
 IS_HUE_4 = Config( # To remove in Hue 5
   key='is_hue_4',
