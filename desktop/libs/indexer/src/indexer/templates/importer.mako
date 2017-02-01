@@ -218,6 +218,7 @@ ${ assist.assistPanel() }
     bottom: 0;
     margin: 0;
     z-index: 1000;
+    border-top: 1px solid #e5e5e5;
   }
 
   #importerNotebook {
@@ -333,7 +334,7 @@ ${ assist.assistPanel() }
           </div>
         </li>
 
-        <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { currentStep(2) }">
+        <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { if (!createWizard.isGuessingFormat() && createWizard.source.show()){ currentStep(2); }}">
           <div class="step" title="${ _('Go to Step 2') }">
             <!-- ko if: currentStep() < 3 -->
               <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -694,14 +695,14 @@ ${ assist.assistPanel() }
         <button class="btn" data-bind="click: previousStep">${ _('Back') }</button>
       <!-- /ko -->
 
-      <!-- ko if: currentStep() == 1 && createWizard.source.show -->
-      <button class="btn" data-bind="visible: !createWizard.isGuessingFormat(), click: function() { currentStep(2); }">
+      <!-- ko if: currentStep() == 1 -->
+      <button class="btn" data-bind="enable: !createWizard.isGuessingFormat() && createWizard.source.show(), click: function() { currentStep(2); }">
         ${_('Next')}
       </button>
       <!-- /ko -->
 
       <!-- ko if: currentStep() == 2 -->
-        <button href="javascript:void(0)" class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && ! createWizard.indexingStarted()">
+        <button class="btn btn-primary disable-feedback" data-bind="click: createWizard.indexFile, enable: createWizard.readyToIndex() && ! createWizard.indexingStarted()">
           ${ _('Submit') } <i class="fa fa-spinner fa-spin" data-bind="visible: createWizard.indexingStarted"></i>
         </button>
       <!-- /ko -->
