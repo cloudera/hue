@@ -1401,14 +1401,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 <script type="text/html" id="longer-operation">
-  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The operation in the server is taking longer than expected') }" class="inline-block">
-    <i  class="fa fa-exclamation-triangle warning"></i>
+  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The operation in the server is taking longer than expected') }" class="inline-block margin-right-10">
+    <i class="fa fa-exclamation-triangle warning"></i>
+  </div>
+</script>
+
+<script type="text/html" id="query-redacted">
+  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: is_redacted" title="${ _('The current query has been redacted to hide sensitive information.') }" class="inline-block margin-right-10">
+    <i class="fa fa-low-vision warning"></i>
   </div>
 </script>
 
 <script type="text/html" id="notebook-snippet-header">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
+    <!-- ko template: { name: 'query-redacted' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
@@ -1423,6 +1430,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="editor-snippet-header">
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode() ? '40px' : '0' }">
+    <!-- ko template: { name: 'query-redacted' } --><!-- /ko -->
     <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
@@ -1520,66 +1528,47 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
-  <div class="alert alert-gradient" data-bind="visible: is_redacted">
-    <div style="float:left;">
-      <svg class="hi" style="height: 20px; width: 20px;">
-        <use xlink:href="#hi-warning"></use>
-      </svg>
-    </div>
-    <div style="margin-left: 30px; line-height:20px;vertical-align: middle;">${ _('The current query has been redacted to hide sensitive information.') }</div>
-  </div>
-
-  <div class="alert alert-error alert-error-gradient" data-bind="visible: hasComplexity">
-    <div style="float:left;">
-      <svg class="hi" style="height: 20px; width: 20px;">
-        <use xlink:href="#hi-warning"></use>
-      </svg>
-    </div>
-    <!-- ko if: hasComplexity -->
-    <div style="margin-left: 30px; line-height: 20px; vertical-align: middle;">
-      <!-- ko if: complexity().risk().length == 0 -->
-        <span style="margin-right:10px; font-weight: bold;">
-          ${ _('No risks were detected in this query.') }
-        </span>
+  <!-- ko if: HAS_OPTIMIZER -->
+  <div class="alert alert-empty">
+    &nbsp;
+    <!-- ko if: hasComplexity() -->
+      <!-- ko if: complexity() && complexity().risk() -->
+      <div class="alert alert-neutral" data-bind="css: {'alert-success': complexity().risk().length == 0, 'alert-warning': complexity().risk().length > 0 && complexity().risk() !== 'high', 'alert-error': complexity().risk() === 'high' }">
+        <!-- ko if: complexity().risk().length == 0 -->
+        <i class="fa fa-check-circle" data-bind="toggleIconExplanation"></i> <span class="icon-explanation">${ _('No risks were detected in this query.') }</span>
+        <!-- /ko -->
+        <!-- ko if: complexity().risk().length > 0 && complexity().risk() !== 'high' -->
+        <i class="fa fa-arrow-circle-down" data-bind="toggleIconExplanation"></i> <span class="icon-explanation">${ _('This query has a low risk profile.') }</span>
+        <!-- /ko -->
+        <!-- ko if: complexity().risk() === 'high' -->
+        <i class="fa fa-exclamation-circle" data-bind="toggleIconExplanation"></i> <span class="icon-explanation"><strong data-bind="text: complexity().riskAnalysis"></strong> <span data-bind="text: complexity().riskRecommendation"></span></span>
+        <!-- /ko -->
+      </div>
       <!-- /ko -->
-      <span style="margin-right:10px; font-weight: bold;" data-bind="text: complexity().risk"></span>
-      <span data-bind="text: complexity().riskAnalysis"></span>
-      <span data-bind="text: complexity().riskRecommendation"></span>
-    </div>
     <!-- /ko -->
-  </div>
 
-  <div class="alert" data-bind="visible: hasSuggestion">
-    <div style="float:left;">
-      <svg class="hi" style="height: 20px; width: 20px;">
-        <use xlink:href="#hi-warning"></use>
-      </svg>
-    </div>
-    <div style="margin-left: 30px; line-height:20px; vertical-align: middle;">
-      <!-- ko if: hasSuggestion -->
+    <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
-        <!-- ko if: queryError.encounteredString().length == 0 && ! parseError -->
-          ${ _('The query is compatible!') } <a href="javascript:void(0)" data-bind="click: function() { $parent.type('impala') }">${ _('Execute with Impala?') }</a>
+        <div class="alert alert-neutral" data-bind="css: {'alert-success': queryError.encounteredString().length == 0 && !parseError(), 'alert-warning': queryError.encounteredString().length > 0 && !parseError(), 'alert-error': parseError() }">
+        <!-- ko if: !parseError() && $parent.compatibilityTarget() != $parent.type() && queryError.encounteredString().length == 0 -->
+          <i class="fa fa-check" data-bind="toggleIconExplanation"></i> <span class="icon-explanation">${ _('The query is compatible with Impala.') } <a href="javascript:void(0)" data-bind="click: function() { $parent.type('impala') }">${ _('Execute it now in Impala!') }</a></span>
+        <!-- /ko -->
+        <!-- ko if: !parseError() && $parent.compatibilityTarget() == $parent.type() -->
+          <i class="fa fa-check" data-bind="toggleIconExplanation"></i> <span class="icon-explanation">${ _('The query has no errors.') }</span>
         <!-- /ko -->
         <!-- ko if: parseError -->
-          <span data-bind="text: parseError"></span>
+          <i class="fa fa-exclamation" data-bind="toggleIconExplanation"></i> <span class="icon-explanation"><span data-bind="text: parseError"></span></span>
         <!-- /ko -->
         <!-- ko if: queryError.encounteredString -->
-          ${ _('Query is not compatible with Impala.') }
-          <br>
-          <span data-bind="text: queryError.encounteredString"></span>
-          <span data-bind="text: queryError.errorString"></span>
+          <i class="fa fa-exclamation" data-bind="toggleIconExplanation"></i> <span class="icon-explanation">${ _('This query is not compatible with Impala.') }</span>
         <!-- /ko -->
-        <!-- ko if: queryError.expectedString -->
-          <br>
-          <!-- ko if: queryError.expectedString -->
-            <span data-bind="text: queryError.expectedString"></span>
-          <!-- /ko -->
-        <!-- /ko -->
+        </div>
       <!-- /ko -->
-      <!-- /ko -->
-    </div>
+    <!-- /ko -->
   </div>
+  <!-- /ko -->
+
+
   <div class="row-fluid" style="margin-bottom: 5px">
 
     <div class="editor span12" data-bind="css: {'single-snippet-editor ace-container-resizable' : $root.editorMode() }, clickForAceFocus: ace">

@@ -573,6 +573,21 @@
     }
   };
 
+  ko.bindingHandlers.toggleIconExplanation = {
+    init: function (element, valueAccessor) {
+      var $explanation = $(element).next('.icon-explanation');
+      $explanation.addClass('hide');
+      $(element).addClass('pointer').on('click', function(){
+        if ($explanation.hasClass('hide')) {
+          $explanation.removeClass('hide');
+        }
+        else {
+          $explanation.addClass('hide');
+        }
+      });
+    }
+  };
+
   /**
    * This binding can be used to show a custom context menu on right-click,
    * It assumes that the context menu is nested within the bound element and
@@ -3149,31 +3164,45 @@
         editor.setOptions({ fontSize: "14px" });
       }
 
-      snippet.errors.subscribe(function(newErrors) {
-        editor.clearErrors();
+      function processErrorsAndWarnings(type, list) {
+        editor.clearErrorsAndWarnings();
         var offset = 0;
         if (snippet.isSqlDialect()) {
-          if (editor.getSelectedText()){
+          if (editor.getSelectedText()) {
             var selectionRange = editor.getSelectionRange();
             offset = Math.min(selectionRange.start.row, selectionRange.end.row);
           }
-          if (snippet.result && snippet.result.statements_count() > 1){
+          if (snippet.result && snippet.result.statements_count() > 1) {
             offset = snippet.result.statement_range().start.row;
           }
         }
-        if (newErrors.length > 0) {
-          newErrors.forEach(function (err, cnt) {
-            if (err.line !== null) {
-              editor.addError(err.message, err.line + offset);
+        if (list.length > 0) {
+          list.forEach(function (item, cnt) {
+            if (item.line !== null) {
+              if (type === 'error') {
+                editor.addError(item.message, item.line + offset);
+              }
+              else {
+                editor.addWarning(item.message, item.line + offset);
+              }
               if (cnt == 0) {
-                editor.scrollToLine(err.line + offset, true, true, function () {});
-                if (err.col !== null){
-                  editor.renderer.scrollCursorIntoView({row: err.line + offset, column: err.col + 10}, 0.5)
+                editor.scrollToLine(item.line + offset, true, true, function () {
+                });
+                if (item.col !== null) {
+                  editor.renderer.scrollCursorIntoView({row: item.line + offset, column: item.col + 10}, 0.5)
                 }
               }
             }
           });
         }
+      }
+
+      snippet.warnings.subscribe(function (newWarnings) {
+        processErrorsAndWarnings('warning', newWarnings);
+      });
+
+      snippet.errors.subscribe(function (newErrors) {
+        processErrorsAndWarnings('error', newErrors);
       });
 
       editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
@@ -3600,7 +3629,7 @@
       });
 
       editor.on("click", function (e) {
-        editor.clearErrors();
+        editor.clearErrorsAndWarnings();
       });
 
       editor.on("change", function (e) {
