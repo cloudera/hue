@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 
 
@@ -45,6 +46,6 @@ LATEST = Config(
 ENABLE_SQL = Config(
   key="enable_sql",
   help=_("Offer to use SQL engines to compute the dashboards."),
-  default=False,
+  dynamic_default=is_hue4,
   private=True,
   type=coerce_bool)
