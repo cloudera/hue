@@ -344,7 +344,7 @@ def unsupported(request):
   return render('unsupported.mako', request, None)
 
 def index(request):
-  if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home':
+  if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
     return redirect(reverse('about:index'))
   else:
     if IS_HUE_4.get():

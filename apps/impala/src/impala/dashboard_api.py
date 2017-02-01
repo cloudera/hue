@@ -17,6 +17,7 @@
 
 import logging
 import json
+import numbers
 import time
 
 from itertools import groupby
@@ -27,6 +28,7 @@ from notebook.models import make_notebook
 from notebook.connectors.base import get_api
 
 from search.models import Collection2
+import re
 
 
 LOG = logging.getLogger(__name__)
@@ -237,6 +239,9 @@ class SQLApi():
 #
 #       raise QueryServerTimeoutException(message=msg)
 
+      if not isinstance(min_value, numbers.Number):
+        min_value = min_value.replace(' ', 'T') + 'Z'
+        max_value = max_value.replace(' ', 'T') + 'Z'
 
       return {
         'stats': {
@@ -343,10 +348,10 @@ class SQLApi():
       field_name = '`%(field)s_range`' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
-        pass
+        slot = re.sub('^\+\d+', '', facet['properties']['gap']).rstrip('S')
+        select = "trunc(`%(field)s`, '%(slot)s') AS %(field_name)s" % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
       else:
         slot = max((facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit'], 1)
-
         select = 'cast(`%(field)s` / %(slot)s AS int) * %(slot)s AS %(field_name)s' % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
     else:
       field_name = '`%(field)s`' % facet

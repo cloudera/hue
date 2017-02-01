@@ -98,7 +98,7 @@ def top_tables(request):
       'patternCount': table['patternCount'],
       'total': table['total'],
       'is_fact': table['type'] != 'Dimension'
-      } for table in data['results']
+    } for table in data['results']
   ]
 
   if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
