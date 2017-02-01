@@ -59,7 +59,7 @@ class SQLApi():
 
     if facet:
       if facet['type'] == 'nested':
-        fields_dimensions = ['`%(field)s`' % f for f in self._get_dimension_fields(facet)]
+        fields_dimensions = [self._get_dimension_field(f)['name'] for f in self._get_dimension_fields(facet)]
         last_dimension_seen = False
         fields = []
         for f in reversed(facet['properties']['facets']):
@@ -67,25 +67,26 @@ class SQLApi():
             if not last_dimension_seen:
               fields.insert(0, 'COUNT(*) AS Count')
               last_dimension_seen = True
-            fields.insert(0, '`%(field)s`' % f)
+            fields.insert(0, self._get_dimension_field(f)['select'])
           else:
             if not last_dimension_seen:
               fields.insert(0, self._get_aggregate_function(f))
 
         if not last_dimension_seen:
           fields.insert(0, 'COUNT(*) as Count')
-        fields.insert(0, '`%(field)s`' % facet)
+        fields.insert(0, self._get_dimension_field(facet)['select'])
 
         sql = '''SELECT %(fields)s
         FROM %(database)s.%(table)s
         %(filters)s
         GROUP BY %(fields_dimensions)s
-        ORDER BY Count DESC
+        ORDER BY %(order_by)s
         LIMIT %(limit)s''' % {
             'database': database,
             'table': table,
             'fields': ', '.join(fields),
             'fields_dimensions': ', '.join(fields_dimensions),
+            'order_by': ', '.join([self._get_dimension_field(f)['order_by'] for f in self._get_dimension_fields(facet)]),
             'filters': self._convert_filters_to_where(filters),
             'limit': LIMIT
         }
@@ -296,11 +297,11 @@ class SQLApi():
               f.append(sql_condition % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
       elif fq['type'] == 'range':
-        clauses.append("`%(field)s` >= %(to)s AND `%(field)s` < %(from)s" % {
+        clauses.append("`%(field)s` >= %(from)s AND `%(field)s` < %(to)s" % {
           'field': fq['field'],
           'to': fq['properties'][0]['to'],
           'from': fq['properties'][0]['from']
-        })        
+        })
 
     return clauses
 
@@ -333,6 +334,30 @@ class SQLApi():
       elif f['function'] == 'percentiles':
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
+
+  def _get_dimension_field(self, facet):
+    # facet salary --> cast(salary / 11000 as INT) * 10 AS salary_range
+    # facet salary --> salary_range
+    # facets --> Count DESC   |   salary_range ASC
+    if facet['properties']['canRange']:
+      field_name = '`%(field)s_range`' % facet
+      order_by = '`%(field)s_range` ASC' % facet
+      if facet['properties']['isDate']:
+        pass
+      else:
+        slot = max((facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit'], 1)
+
+        select = 'cast(`%(field)s` / %(slot)s AS int) * %(slot)s AS %(field_name)s' % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
+    else:
+      field_name = '`%(field)s`' % facet
+      select = field_name
+      order_by = 'Count DESC'
+
+    return {
+      'name': field_name,
+      'select': select,
+      'order_by': order_by
+    }
 
   def _get_field(self, collection, name):
     _field = [_f for _f in collection['template']['fieldsAttributes'] if _f['name'] == name]
@@ -405,7 +430,7 @@ class SQLApi():
         })
     elif dimension == 2:
       for row in rows:
-        value_fields = [f['field'] for f in dimension_fields] # e.g. SELECT `job`, avg(salary), `gender`, COUNT(*), avg(salary)
+        value_fields = [f['field'] for f in dimension_fields] # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)
         fq_values = [row[0], row[1]]
         counts.append({
             "count": row[-1],
