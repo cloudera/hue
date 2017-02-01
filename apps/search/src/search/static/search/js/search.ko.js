@@ -1715,7 +1715,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
     }).fail(function (xhr, textStatus, errorThrown) {
       $(document).trigger("error", xhr.responseText);
-      self.queryResult().status('failed');
+      facet.queryResult().status('failed');
     });
   };
 

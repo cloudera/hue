@@ -176,13 +176,13 @@ class SQLApi():
 
   def stats(self, dashboard, fields):
     database, table = self._get_database_table_names(dashboard)
-  
+
     # TODO: check column stats
 
     sql = "SELECT MIN(`%(field)s`), MAX(`%(field)s`) FROM `%(database)s`.`%(table)s`" % {
       'field': fields[0],
       'database': database,
-      'table': table      
+      'table': table
     }
 
     editor = make_notebook(
@@ -198,11 +198,11 @@ class SQLApi():
     request = MockRequest(self.user)
     snippet = {'type': self.engine}
     response = editor.execute(request)
-    
-    
+
+
     if 'handle' in response:
       snippet['result'] = response
-      
+
       if response['handle'].get('sync'):
         result = response['result']
       else:
@@ -210,9 +210,9 @@ class SQLApi():
         sleep_interval = 0.5
         curr = time.time()
         end = curr + timeout_sec
-    
+
         api = get_api(request, snippet)
-        
+
         while curr <= end:
           status = api.check_status(dashboard, snippet)
           if status['status'] == 'available':
@@ -221,10 +221,10 @@ class SQLApi():
             break
           time.sleep(sleep_interval)
           curr = time.time()
-          
+
       r = list(result['data'])
       min_value, max_value = r[0]
-  
+
 #       msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
 #       try:
 #         self.cancel_operation(handle)
@@ -233,17 +233,17 @@ class SQLApi():
 #         LOG.warning(msg)
 #         self.close_operation(handle)
 #         raise QueryServerException(e, message=msg)
-#   
+#
 #       raise QueryServerTimeoutException(message=msg)
 
-    
+
       return {
         'stats': {
           'stats_fields': {
             fields[0]: {'min': min_value, 'max': max_value}
           }
         }
-      } 
+      }
 
 
   def _convert_result(self, result, dashboard, facet, query):
@@ -265,7 +265,7 @@ class SQLApi():
 
   def _get_fq(self, collection, query, facet=None):
     clauses = []
-    
+
     # Facets should not filter themselves
     fqs = [fq for fq in query['fqs'] if not facet or facet['id'] != fq['id']]
 
@@ -285,7 +285,7 @@ class SQLApi():
         if self._is_number(self._get_field(collection, fq['field'])['type']):
           sql_condition = "`%s` %s %s"
         else:
-          sql_condition = "`%s` %s '%s'" 
+          sql_condition = "`%s` %s '%s'"
         for _filter in fq['filter']:
           exclude = '!=' if _filter['exclude'] else '='
           value = _filter['value']
@@ -295,6 +295,12 @@ class SQLApi():
             else:
               f.append(sql_condition % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
+      elif fq['type'] == 'range':
+        clauses.append("`%(field)s` >= %(to)s AND `%(field)s` < %(from)s" % {
+          'field': fq['field'],
+          'to': fq['properties'][0]['to'],
+          'from': fq['properties'][0]['from']
+        })        
 
     return clauses
 
