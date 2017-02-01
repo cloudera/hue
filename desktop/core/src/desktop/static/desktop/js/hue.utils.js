@@ -108,6 +108,13 @@ if (!String.prototype.includes) {
   };
 }
 
+if (!('addRule' in CSSStyleSheet.prototype)) {
+  CSSStyleSheet.prototype.addRule = function (selector, rule, idx) {
+    return this.insertRule(selector + "{" + rule + "}", idx || 0);
+  }
+}
+
+
 /*
  * Add utility methods to the HUE object
 */
