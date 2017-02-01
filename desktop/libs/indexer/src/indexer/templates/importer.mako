@@ -514,7 +514,7 @@ ${ assist.assistPanel() }
             </label>
 
             <div class="control-group">
-              <label class="control-label"><div>${ _('Extra') }</div>
+              <label class="control-label"><div>${ _('Extras') }</div>
                 <a href="javascript:void(0)" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders"></i>
                 </a>
