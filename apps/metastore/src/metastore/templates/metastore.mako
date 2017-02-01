@@ -42,7 +42,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 
 ${ assist.assistJSModels() }
 
@@ -1204,8 +1203,10 @@ ${ components.menubar() }
       window.scrollToColumn = function (col) {
         if (!col.table.samples.loading()) {
           $('a[href="#sample"]').click();
-          window.setTimeout(function () {
-            var sampleTable = $('#sample').find('table');
+          hueUtils.waitForRendered('#sample .sample-table', function (el) {
+            return el.parent().hasClass('dataTables_wrapper')
+          }, function () {
+            var sampleTable = $('#sample .sample-table');
             var sampleCol = sampleTable.find('th').filter(function () {
               return $.trim($(this).text()).indexOf(col.name()) > -1;
             });
@@ -1215,8 +1216,10 @@ ${ components.menubar() }
             sampleTable.find('th:lt(' + sampleCol.index() + ')').each(function () {
               scrollLeft += $(this).outerWidth();
             });
+            scrollLeft = Math.max(0, scrollLeft - 40);
             sampleTable.parent().scrollLeft(scrollLeft);
-          }, 200);
+            sampleTable.parent().trigger('scroll_update');
+          });
         }
       }
 
