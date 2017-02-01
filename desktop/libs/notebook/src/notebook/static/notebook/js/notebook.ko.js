@@ -272,6 +272,7 @@ var EditorViewModel = (function() {
     // Ace stuff
     self.ace = ko.observable(null);
     self.errors = ko.observableArray([]);
+    self.warnings = ko.observableArray([]);
 
     self.availableSnippets = vm.availableSnippets();
     self.inFocus = ko.observable(false);
@@ -795,13 +796,16 @@ var EditorViewModel = (function() {
     self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
     self.hasSuggestion = ko.observable(false);
 
-    self.complexityCheckActive = ko.observable(false);
+    self.complexityCheckActive = ko.observable(true);
+    self.compatibilityCheckActive = ko.observable(true);
+
+    self.isOptimizing = ko.observable(false);
 
     if (HAS_OPTIMIZER) {
       var lastRequest;
       var lastCheckedStatement;
 
-      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+      self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 3000 } });
 
       self.checkComplexity = function () {
         if (lastCheckedStatement === self.statement_raw()) {
@@ -811,9 +815,9 @@ var EditorViewModel = (function() {
         if (lastRequest && lastRequest.readyState < 4) {
           lastRequest.abort();
         }
-        self.complexity(null);
 
         logGA('get_query_risk');
+        self.isOptimizing(true);
         lastRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
@@ -830,17 +834,30 @@ var EditorViewModel = (function() {
               $(document).trigger('error', data.message);
             }
             lastCheckedStatement = self.statement_raw();
+            self.isOptimizing(false);
           }
         });
       };
 
       self.delayedStatement.subscribe(function () {
-        if (self.type() === 'hive' && self.complexityCheckActive()) {
-          self.checkComplexity();
+        if (self.type() === 'hive') {
+          if (self.complexityCheckActive()) {
+            self.checkComplexity();
+          }
+          if (self.compatibilityCheckActive()) {
+            self.queryCompatibility();
+          }
         }
       });
-      if (self.statement_raw() && self.complexityCheckActive()) {
-        window.setTimeout(self.checkComplexity, 2000);
+      if (self.statement_raw()) {
+        window.setTimeout(function(){
+          if (self.complexityCheckActive()) {
+            self.checkComplexity();
+          }
+          if (self.compatibilityCheckActive()) {
+            self.queryCompatibility();
+          }
+        }, 2000);
       }
     }
 
@@ -1120,28 +1137,51 @@ var EditorViewModel = (function() {
       });
     };
 
+    self.compatibilityTarget = ko.observable('');
+
     self.queryCompatibility = function (targetPlatform) {
       logGA('compatibility');
-      self.suggestion(false);
+      self.isOptimizing(true);
 
-      if (! targetPlatform) {
+      if (!targetPlatform) {
         targetPlatform = self.type();
       }
+
+      self.compatibilityTarget(targetPlatform);
 
       $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
         sourcePlatform: self.type(),
         targetPlatform: targetPlatform
-      }, function(data) {
+      }, function (data) {
         if (data.status == 0) {
-         self.suggestion(ko.mapping.fromJS(data.query_compatibility));
-         self.hasSuggestion(true);
+          self.suggestion(ko.mapping.fromJS(data.query_compatibility));
+          if (self.suggestion().queryError.errorString()) {
+            var match = ERROR_REGEX.exec(self.suggestion().queryError.errorString());
+            self.warnings.push({
+              message: self.suggestion().queryError.errorString(),
+              line: match === null ? null : parseInt(match[1]) - 1,
+              col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
+            });
+          }
+          if (self.suggestion().parseError()) {
+            var match = ERROR_REGEX.exec(self.suggestion().parseError());
+            self.errors.push({
+              message: self.suggestion().parseError(),
+              line: match === null ? null : parseInt(match[1]) - 1,
+              col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
+            });
+          }
+
+          self.hasSuggestion(true);
         } else {
           $(document).trigger("error", data.message);
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+      }).always(function () {
+        self.isOptimizing(false);
       });
     };
 

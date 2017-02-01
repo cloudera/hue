@@ -73,10 +73,10 @@ try {
       $(".ace-inline-button").hide();
     }
 
-    editor.clearErrors = function() {
+    editor.clearErrorsAndWarnings = function() {
       for (var id in this.session.getMarkers()) {
         var _marker = this.session.getMarkers()[id];
-        if (_marker.clazz == "ace_error-line"){
+        if (_marker.clazz == "ace_error-line" || _marker.clazz == "ace_warning-line"){
           this.session.removeMarker(_marker.id);
         }
       };
@@ -92,6 +92,18 @@ try {
         raw: message,
         text: message,
         type: "error"
+      }]);
+    }
+
+    editor.addWarning = function (message, line) {
+      var _range = new AceRange(line, 0, line, this.session.getLine(line).length);
+      this.session.addMarker(_range, "ace_warning-line");
+      this.session.setAnnotations([{
+        row: _range.start.row,
+        column: _range.start.column,
+        raw: message,
+        text: message,
+        type: "warning"
       }]);
     }
 
