@@ -880,7 +880,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-checkbox">
   <label class="checkbox">
     <input type="checkbox" data-bind="checked: value">
-    <span data-bind="text: description"></span>
+    <span data-bind="text: description" style="vertical-align: middle"></span>
   </label>
 </script>
 
