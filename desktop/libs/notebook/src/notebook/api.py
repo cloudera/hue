@@ -329,9 +329,10 @@ def _save_notebook(notebook, user):
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
 
-  if notebook_doc.doc is not None:
+  try:
     notebook_doc1 = notebook_doc.doc.get()
-  else:
+  except Exception, e:
+    LOG.error('Exception when retrieving document object for saved query: %s' % e)
     notebook_doc1 = Document.objects.link(
       notebook_doc,
       owner=notebook_doc.owner,
