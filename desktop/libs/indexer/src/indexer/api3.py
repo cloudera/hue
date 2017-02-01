@@ -250,15 +250,20 @@ def _create_table_from_a_file(request, source, destination):
 
   if table_format == 'json':
     row_format = 'serde'
-    serde_name = 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-    serde_properties = '''"separatorChar" = "\\t",
-   "quoteChar"     = "'",
-   "escapeChar"    = "\\\\"
-   '''
+    serde_name = 'org.apache.hive.hcatalog.data.JsonSerDe'
   elif table_format == 'regexp':
     row_format = 'serde'
     serde_name = 'org.apache.hadoop.hive.serde2.RegexSerDe'
     serde_properties = '"input.regex" = "%s"' % regexp_delimiter
+  elif table_format == 'csv':
+    if source['format']['quoteChar'] == '"':
+      source['format']['quoteChar'] = '\\"'
+    row_format = 'serde'
+    serde_name = 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
+    serde_properties = '''"separatorChar" = "%(fieldSeparator)s",
+  "quoteChar"     = "%(quoteChar)s",
+  "escapeChar"    = "\\\\"
+  ''' % source['format']
 
 
   if table_format in ('parquet', 'kudu'):
@@ -312,7 +317,7 @@ def _create_table_from_a_file(request, source, destination):
     }
   )
 
-  if table_format == 'text' and not external and load_data:
+  if table_format in ('text', 'json', 'csv', 'regexp') and not external and load_data:
     sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (source_path, database, table_name)
 
   if load_data and table_format in ('parquet', 'kudu'):
