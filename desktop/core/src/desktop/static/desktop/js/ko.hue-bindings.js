@@ -573,21 +573,6 @@
     }
   };
 
-  ko.bindingHandlers.toggleIconExplanation = {
-    init: function (element, valueAccessor) {
-      var $explanation = $(element).next('.icon-explanation');
-      $explanation.addClass('hide');
-      $(element).addClass('pointer').on('click', function(){
-        if ($explanation.hasClass('hide')) {
-          $explanation.removeClass('hide');
-        }
-        else {
-          $explanation.addClass('hide');
-        }
-      });
-    }
-  };
-
   /**
    * This binding can be used to show a custom context menu on right-click,
    * It assumes that the context menu is nested within the bound element and
@@ -3165,7 +3150,7 @@
       }
 
       function processErrorsAndWarnings(type, list) {
-        editor.clearErrorsAndWarnings();
+        editor.clearErrorsAndWarnings(type);
         var offset = 0;
         if (snippet.isSqlDialect()) {
           if (editor.getSelectedText()) {
@@ -3197,11 +3182,16 @@
         }
       }
 
-      snippet.warnings.subscribe(function (newWarnings) {
+
+      snippet.errors.subscribe(function (newErrors) {
+        processErrorsAndWarnings('error', newErrors);
+      });
+
+      snippet.aceWarnings.subscribe(function (newWarnings) {
         processErrorsAndWarnings('warning', newWarnings);
       });
 
-      snippet.errors.subscribe(function (newErrors) {
+      snippet.aceErrors.subscribe(function (newErrors) {
         processErrorsAndWarnings('error', newErrors);
       });
 
