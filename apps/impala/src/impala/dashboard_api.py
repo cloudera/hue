@@ -18,6 +18,7 @@
 import logging
 import json
 import numbers
+import re
 import time
 
 from itertools import groupby
@@ -25,10 +26,9 @@ from itertools import groupby
 from django.utils.html import escape
 
 from notebook.models import make_notebook
-from notebook.connectors.base import get_api
+from notebook.connectors.base import get_api, OperationTimeout
 
 from search.models import Collection2
-import re
 
 
 LOG = logging.getLogger(__name__)
@@ -180,7 +180,7 @@ class SQLApi():
   def stats(self, dashboard, fields):
     database, table = self._get_database_table_names(dashboard)
 
-    # TODO: check column stats
+    # TODO: check column stats to go faster
 
     sql = "SELECT MIN(`%(field)s`), MAX(`%(field)s`) FROM `%(database)s`.`%(table)s`" % {
       'field': fields[0],
@@ -209,7 +209,7 @@ class SQLApi():
       if response['handle'].get('sync'):
         result = response['result']
       else:
-        timeout_sec = 20
+        timeout_sec = 20 # To move to Notebook API
         sleep_interval = 0.5
         curr = time.time()
         end = curr + timeout_sec
@@ -220,24 +220,21 @@ class SQLApi():
           status = api.check_status(dashboard, snippet)
           if status['status'] == 'available':
             result = api.fetch_result(dashboard, snippet, rows=10, start_over=True)
-#           self.close(handle)
+            api.close_statement(snippet)
             break
           time.sleep(sleep_interval)
           curr = time.time()
 
-      r = list(result['data'])
-      min_value, max_value = r[0]
+        if curr > end:
+          try:
+            api.cancel_operation(snippet)
+          except Exception, e:
+            LOG.warning("Failed to cancel query: %s" % e)
+            api.close_statement(snippet)
+          raise OperationTimeout(e)
 
-#       msg = "The query timed out after %(timeout)d seconds, canceled query." % {'timeout': timeout_sec}
-#       try:
-#         self.cancel_operation(handle)
-#       except Exception, e:
-#         msg = "Failed to cancel query."
-#         LOG.warning(msg)
-#         self.close_operation(handle)
-#         raise QueryServerException(e, message=msg)
-#
-#       raise QueryServerTimeoutException(message=msg)
+      stats = list(result['data'])
+      min_value, max_value = stats[0]
 
       if not isinstance(min_value, numbers.Number):
         min_value = min_value.replace(' ', 'T') + 'Z'
@@ -286,9 +283,10 @@ class SQLApi():
       merged_fqs.append(field_fq)
 
     for fq in merged_fqs:
+      field = self._get_field(collection, fq['field'])
       if fq['type'] == 'field':
         f = []
-        if self._is_number(self._get_field(collection, fq['field'])['type']):
+        if self._is_number(field['type']):
           sql_condition = "`%s` %s %s"
         else:
           sql_condition = "`%s` %s '%s'"
@@ -302,13 +300,19 @@ class SQLApi():
               f.append(sql_condition % (fq['field'], exclude, value))
         clauses.append(' OR '.join(f))
       elif fq['type'] == 'range':
-        clauses.append("`%(field)s` >= %(from)s AND `%(field)s` < %(to)s" % {
+        if self._is_date(field['type']):
+          quote = "'"
+        else:
+          quote = ''
+        clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
           'field': fq['field'],
           'to': fq['properties'][0]['to'],
-          'from': fq['properties'][0]['from']
+          'from': fq['properties'][0]['from'],
+          'quote': quote
         })
 
     return clauses
+
 
   @classmethod
   def _get_aggregate_function(cls, facet):
@@ -321,6 +325,7 @@ class SQLApi():
       f['ops'] = [{'function': 'field', 'value': facet['field'], 'ops': []}]
 
     return cls.__get_aggregate_function(f)
+
 
   @classmethod
   def __get_aggregate_function(cls, f):
@@ -340,6 +345,7 @@ class SQLApi():
         fields.extend(map(lambda a: str(a), [_p['value'] for _p in f['percentiles']]))
       return '%s(%s)' % (f['function'], ','.join(fields))
 
+
   def _get_dimension_field(self, facet):
     # facet salary --> cast(salary / 11000 as INT) * 10 AS salary_range
     # facet salary --> salary_range
@@ -348,8 +354,13 @@ class SQLApi():
       field_name = '`%(field)s_range`' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
-        slot = re.sub('^\+\d+', '', facet['properties']['gap']).rstrip('S')
-        select = "trunc(`%(field)s`, '%(slot)s') AS %(field_name)s" % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
+        gap = facet['properties']['gap'] if 'gap' in facet['properties'] else facet['properties']['initial_gap']
+        slot = re.sub('^\+\d+', '', gap).rstrip('S')
+        select = "trunc(`%(field)s`, '%(slot)s') AS %(field_name)s, trunc(`%(field)s`, '%(slot)s') + interval 1 %(slot)s AS `%(field)s_range_to`" % {
+            'field': facet['field'],
+            'slot': slot,
+            'field_name': field_name
+        }
       else:
         slot = max((facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit'], 1)
         select = 'cast(`%(field)s` / %(slot)s AS int) * %(slot)s AS %(field_name)s' % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
@@ -364,13 +375,20 @@ class SQLApi():
       'order_by': order_by
     }
 
+
   def _get_field(self, collection, name):
     _field = [_f for _f in collection['template']['fieldsAttributes'] if _f['name'] == name]
     if _field:
       return _field[0]
 
+
   def _is_number(self, _type):
     return _type in ('int', 'long', 'bigint', 'float')
+
+
+  def _is_date(self, _type):
+    return _type in ('timestamp')
+
 
   def _get_database_table_names(self, name):
     if '.' in name:
@@ -380,6 +398,7 @@ class SQLApi():
       table_name = name
 
     return database, table_name
+
 
   def _convert_notebook_facet(self, result, facet, query):
     response = json.loads('''{
@@ -403,7 +422,7 @@ class SQLApi():
     response['label'] = facet['field']
 
     cols = [col['name'] for col in result['meta']]
-    rows = list(result['data']) # escape_rows
+    rows = list(result['data']) # No escape_rows
 
     response['fieldsAttributes'] = [{
          "sort":{
@@ -417,7 +436,7 @@ class SQLApi():
     # Grid
     response['docs'] = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
 
-    fq_fields = [_f['value'] for fq in query['fqs'] for _f in fq['filter']] # type == 'field
+    fq_fields = [_f['value'] for fq in query['fqs'] for _f in fq['filter']]
 
     dimension_fields = self._get_dimension_fields(facet)
     dimension = len(dimension_fields)
@@ -426,13 +445,26 @@ class SQLApi():
     counts = []
     if dimension == 1:
       for row in rows:
-        counts.append({
-           "cat": facet['field'],
-           "count": row[-1],
-           "exclude": False,
-           "selected": row[0] in fq_fields,
-           "value": row[0]
-        })
+        if facet['properties']['isDate']:
+          counts.append({
+            "field": facet['field'],
+            "total_counts": row[-1],
+            "is_single_unit_gap": True,
+            "from": row[0].replace(' ', 'T') + 'Z',
+            "is_up": False,
+            "to": row[1].replace(' ', 'T') + 'Z',
+            "exclude": False,
+            "selected": (row[0].replace(' ', 'T') + 'Z') in fq_fields,
+            "value": row[-1]
+          })
+        else:
+          counts.append({
+             "cat": facet['field'],
+             "count": row[-1],
+             "exclude": False,
+             "selected": row[0] in fq_fields,
+             "value": row[0]
+          })
     elif dimension == 2:
       for row in rows:
         value_fields = [f['field'] for f in dimension_fields] # e.g. SELECT `job`, cast(salary / 11000 as INT) * 10 AS salary_range, `gender`, COUNT(*), avg(salary)

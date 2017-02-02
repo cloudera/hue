@@ -101,11 +101,13 @@ from desktop.views import commonheader, commonfooter, _ko
           <i class="fa fa-spinner fa-spin" data-bind="visible: isSyncingCollections"></i>
         </label>
       <!-- /ko -->
+    <!-- /ko -->
 
-      <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
-      <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
-      <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
+    <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
+    <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
+    <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
 
+    <!-- ko if: $root.collection.engine() == 'solr' -->
       <span data-bind="template: {name: 'nested-document-filter'}"></span>
     <!-- /ko -->
 
