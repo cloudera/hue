@@ -48,6 +48,7 @@ var EditorViewModel = (function() {
       }
     });
     self.statements_count = ko.observable(typeof result.statements_count != "undefined" && result.statements_count != null ? result.statements_count : 1);
+    self.previous_statement_hash = ko.observable(typeof result.previous_statement_hash != "undefined" && result.previous_statement_hash != null ? result.previous_statement_hash : null);
     self.cleanedMeta = ko.computed(function () {
       return ko.utils.arrayFilter(self.meta(), function (item) {
         return item.name != ''
@@ -166,7 +167,8 @@ var EditorViewModel = (function() {
       self.handle({ // Keep multiquery indexing
           has_more_statements: self.handle()['has_more_statements'],
           statement_id: self.handle()['statement_id'],
-          statements_count: self.handle()['statements_count']
+          statements_count: self.handle()['statements_count'],
+          previous_statement_hash: self.handle()['previous_statement_hash'],
       });
       self.startTime(new Date());
       self.endTime(new Date());
@@ -1045,6 +1047,7 @@ var EditorViewModel = (function() {
           if (data.handle.statements_count != null) {
             self.result.statements_count(data.handle.statements_count);
             self.result.statement_id(data.handle.statement_id);
+            self.result.previous_statement_hash(data.previous_statement_hash);
 
             if (data.handle.statements_count > 1 && data.handle.start != null && data.handle.end != null) {
               self.result.statement_range({
@@ -1076,6 +1079,7 @@ var EditorViewModel = (function() {
         column: 0
       };
       self.result.handle()['has_more_statements'] = false;
+      self.result.handle()['previous_statement_hash'] = '';
 
       self.execute();
     };

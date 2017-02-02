@@ -18,6 +18,7 @@
 import base64
 import binascii
 import copy
+import hashlib
 import logging
 import re
 import StringIO
@@ -624,22 +625,27 @@ DROP TABLE IF EXISTS `%(table)s`;
     statement_id = snippet['result']['handle'].get('statement_id', 0)
     statements_count = snippet['result']['handle'].get('statements_count', 1)
 
+    statements = self._get_statements(snippet['statement'])
+
     if snippet['result']['handle'].get('has_more_statements'):
       try:
         handle = self._get_handle(snippet)
         db.close_operation(handle)  # Close all the time past multi queries
       except:
         LOG.warn('Could not close previous multiquery query')
-      statement_id += 1
+
+      previous_statement_hash = hashlib.sha224(statements[statement_id]['statement']).hexdigest()
+      if previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash'):
+        statement_id += 1
     else:
       statement_id = 0
 
-    statements = self._get_statements(snippet['statement'])
 
     resp = {
       'statement_id': statement_id,
       'has_more_statements': statement_id < len(statements) - 1,
-      'statements_count': len(statements)
+      'statements_count': len(statements),
+      'previous_statement_hash': hashlib.sha224(statements[statement_id]['statement']).hexdigest()
     }
 
     if statements_count != len(statements):
