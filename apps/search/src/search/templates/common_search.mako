@@ -103,18 +103,18 @@ from desktop.views import commonheader, commonfooter, _ko
       <!-- /ko -->
     <!-- /ko -->
 
+    <!-- ko if: $root.collection.engine() != 'solr' -->
+      <!-- ko if: columns().length == 0 -->
+        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+      <!-- /ko -->
+    <!-- /ko -->
+
     <select data-bind="options: $root.availableDateFields, value: collection.timeFilter.field, optionsValue: 'name', visible: $root.isEditing() && $root.availableDateFields().length > 0" class="input-medium" style="margin-left: 4px"></select>
     <span class="time-filter" data-bind="template: {name: 'time-filter'}, visible: collection.timeFilter.type() == 'rolling'"></span>
     <span class="time-fixed-filter" data-bind="template: {name: 'time-fixed-filter'}, visible: collection.timeFilter.type() == 'fixed'"></span>
 
     <!-- ko if: $root.collection.engine() == 'solr' -->
       <span data-bind="template: {name: 'nested-document-filter'}"></span>
-    <!-- /ko -->
-
-    <!-- ko if: $root.collection.engine() != 'solr' -->
-      <!-- ko if: columns().length == 0 -->
-        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
-      <!-- /ko -->
     <!-- /ko -->
   </form>
 
@@ -2487,6 +2487,7 @@ ${ dashboard.layout_skeleton() }
           <fieldset>
             <legend><i class="fa fa-cogs"></i> ${ _('General settings') }</legend>
             <!-- ko if: $root.initial.inited() -->
+
             <!-- ko if: $root.collection.engine() == 'solr' -->
             <div class="control-group">
               <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
@@ -2495,12 +2496,23 @@ ${ dashboard.layout_skeleton() }
               </div>
             </div>
             <!-- /ko -->
+            <!-- ko if: $root.collection.engine() != 'solr' -->
+            <div class="control-group">
+              <label class="control-label" for="settingssolrindex">${ _('Solr index') }</label>
+              <div class="controls">
+                <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+              </div>
+            </div>
+            <!-- /ko -->
+
             <div class="control-group">
               <label class="control-label" for="settingsdescription">${ _('Description') }</label>
               <div class="controls">
                 <input id="settingsdescription" type="text" class="input-xlarge" data-bind="textInput: $root.collection.description, tagsNotAllowed" style="margin-bottom: 0" />
               </div>
             </div>
+
+            <!-- ko if: $root.collection.engine() == 'solr' -->
             <div class="control-group">
               <label class="control-label">${ _('Autocomplete') }</label>
               <div class="controls">
@@ -2526,6 +2538,8 @@ ${ dashboard.layout_skeleton() }
               </div>
             </div>
             <!-- /ko -->
+            <!-- /ko -->
+
             <!-- /ko -->
           </fieldset>
         </form>
@@ -3533,12 +3547,19 @@ $(document).ready(function () {
 
   var _refreshTimeout = null;
 
-  viewModel.collection.autorefresh.subscribe(function (value) {
+  viewModel.collection.autorefresh.subscribe(function (value) { 
     if (value) {
       refresh();
     }
     else {
       window.clearTimeout(_refreshTimeout);
+    }
+  });
+
+  viewModel.collection.autorefreshSeconds.subscribe(function (value) {
+    if (viewModel.collection.autorefresh()) {
+      window.clearTimeout(_refreshTimeout);
+      refresh();
     }
   });
 
