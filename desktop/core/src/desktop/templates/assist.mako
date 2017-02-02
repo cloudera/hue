@@ -1833,7 +1833,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <br/>
     <ul data-bind="foreach: activeTables">
       <li>
-        <span data-bind="text: $data"></span> <i class="fa fa-info"></i>
+        <span data-bind="text: $data"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
       </i>
     </ul>
 
