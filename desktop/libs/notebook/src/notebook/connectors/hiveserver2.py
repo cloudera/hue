@@ -60,6 +60,7 @@ except ImportError, e:
 try:
   from impala import api   # Force checking if Impala is enabled
   from impala.conf import CONFIG_WHITELIST as impala_settings, SSL as impala_ssl_conf
+  from impala.impala_flags import get_webserver_certificate_file
   from impala.server import get_api as get_impalad_api, ImpalaDaemonApiException
 except ImportError, e:
   LOG.warn("Impala app is not enabled")
@@ -786,7 +787,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     query_id = self._get_impala_query_id(snippet)
     session = Session.objects.get_session(self.user, application='impala')
-    protocol = 'https' if impala_ssl_conf.ENABLED.get() else 'http'
+    protocol = 'https' if get_webserver_certificate_file() else 'http'
     server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
     if query_id:
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
