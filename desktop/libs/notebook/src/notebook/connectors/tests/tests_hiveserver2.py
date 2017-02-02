@@ -22,7 +22,7 @@ import re
 import time
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true, assert_false
+from nose.tools import assert_equal, assert_true
 
 from django.contrib.auth.models import User
 from django.core.urlresolvers import reverse
@@ -431,6 +431,41 @@ class TestHiveserver2Api(object):
     assert_equal(jobs[0]['name'], 'job_1466630204796_0059')
     assert_equal(jobs[0]['started'], True)
     assert_equal(jobs[0]['finished'], True)
+
+
+  def test_get_current_statement(self):
+    snippet = json.loads("""
+        {
+            "status": "running",
+            "database": "default",
+            "id": "d70d31ee-a62a-4854-b2b1-b852f6a390f5",
+            "result": {
+                "type": "table",
+                "handle": {
+                  "statement_id": 0,
+                  "statements_count": 1,
+                  "has_more_statements": false
+                },
+                "id": "ca11fcb1-11a5-f534-8200-050c8e1e57e3"
+            },
+            "statement": "%(statement)s",
+            "type": "hive",
+            "properties": {
+                "files": [],
+                "functions": [],
+                "settings": []
+            }
+        }
+      """ % {'statement': "SELECT * FROM sample_07;"}
+    )
+
+    statement = self.api._get_current_statement(MockDb(), snippet)
+
+    assert_equal('7d283ad4794a3d2efd48a3ab44b1d9672625837c7dfc73f010ce82ab', statement['previous_statement_hash'])
+
+
+def MockDb():
+  def close_operation(handle): pass
 
 
 class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):

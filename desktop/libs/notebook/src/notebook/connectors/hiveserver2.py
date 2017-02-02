@@ -626,6 +626,8 @@ DROP TABLE IF EXISTS `%(table)s`;
     statements_count = snippet['result']['handle'].get('statements_count', 1)
 
     statements = self._get_statements(snippet['statement'])
+    previous_statement_hash = hashlib.sha224(statements[statement_id]['statement']).hexdigest()
+    non_edited_statement = previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash')
 
     if snippet['result']['handle'].get('has_more_statements'):
       try:
@@ -634,11 +636,11 @@ DROP TABLE IF EXISTS `%(table)s`;
       except:
         LOG.warn('Could not close previous multiquery query')
 
-      previous_statement_hash = hashlib.sha224(statements[statement_id]['statement']).hexdigest()
-      if previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash'):
+      if non_edited_statement:
         statement_id += 1
     else:
-      statement_id = 0
+      if non_edited_statement:
+        statement_id = 0
 
 
     resp = {
