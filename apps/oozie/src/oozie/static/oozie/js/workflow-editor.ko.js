@@ -484,6 +484,12 @@ var Workflow = function (vm, workflow) {
     });
     return _node;
   };
+
+  self.hasKillNode = ko.pureComputed(function() {
+    return $.grep(self.nodes(), function(node) {
+      return node.type() == 'kill-widget';
+    }).length > 0;
+  });
 }
 
 var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_json, workflow_properties_json, subworkflows_json, can_edit_json, history_json) {

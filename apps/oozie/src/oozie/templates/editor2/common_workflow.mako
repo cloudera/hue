@@ -79,7 +79,9 @@
 
     <div data-bind="template: { name: 'row-template', data: oozieEndRow }"></div>
 
-    <div data-bind="template: { name: 'row-template', data: oozieKillRow }" style="margin-top: 60px"></div>
+    <!-- ko if: $root.workflow.hasKillNode() -->
+      <div data-bind="template: { name: 'row-template', data: oozieKillRow }" style="margin-top: 60px"></div>
+    <!-- /ko -->
   </div>
 </script>
 
