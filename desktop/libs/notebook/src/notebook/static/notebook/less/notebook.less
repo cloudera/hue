@@ -1189,6 +1189,49 @@ h4.header {
   filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#F1F1F1', endColorstr='#00ffffff', GradientType=1);
 }
 
+.alert-warning {
+  background-color: #fcf8e3;
+  border: 1px solid #f0c36d;
+  color: #c09853;
+}
+
+.round-icon {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  text-align: center;
+  line-height: 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #FFF;
+  opacity: .8;
+  cursor: pointer;
+  margin-bottom: 12px;
+  &.empty {
+    width: 1px;
+  }
+  &.idle {
+    background-color: #CCC;
+  }
+  &:hover {
+    opacity: 1;
+  }
+  &.success {
+    background-color: #468847;
+  }
+  &.warning {
+    background-color: #f0c36d;
+    color: #FFF;
+  }
+  &.error {
+    background-color: #b94a48;
+  }
+}
+
+.active .round-icon {
+  opacity: 1;
+}
+
 .alert-neutral {
   border: none;
   margin-top: -3px;
