@@ -25,10 +25,13 @@ from itertools import groupby
 
 from django.utils.html import escape
 
+from libsolr.api import GAPS
+
 from notebook.models import make_notebook
 from notebook.connectors.base import get_api, OperationTimeout
 
 from search.models import Collection2
+from search.facet_builder import _compute_range_facet
 
 
 LOG = logging.getLogger(__name__)
@@ -58,6 +61,10 @@ class SQLApi():
 
     filters = [q['q'] for q in query['qs'] if q['q']]
     filters.extend(self._get_fq(dashboard, query, facet))
+
+    timeFilter = self._get_time_filter_query(dashboard, query)
+    if timeFilter:
+      filters.append(timeFilter)
 
     if facet:
       if facet['type'] == 'nested':
@@ -388,6 +395,32 @@ class SQLApi():
 
   def _is_date(self, _type):
     return _type in ('timestamp')
+
+
+  def _get_time_filter_query(self, collection, query):
+    time_field = collection['timeFilter'].get('field')
+
+    if time_field and (collection['timeFilter']['value'] != 'all' or collection['timeFilter']['type'] == 'fixed'):
+      props = {
+        'field': collection['timeFilter']['field'],
+      }
+      # fqs overrides main time filter
+#       fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
+#       props['time_filter_overrides'] = fq_time_ids
+#       props['time_field'] = time_field
+
+      if collection['timeFilter']['type'] == 'rolling':
+        empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
+
+        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
+        props['to'] = 'now()' # TODO +/- Tz of user
+      elif collection['timeFilter']['type'] == 'fixed':
+        props['from'] = collection['timeFilter'].get('from', 'now() - 7 DAY')
+        props['to'] = collection['timeFilter'].get('to', 'now()')
+
+      return "(`%(field)s` >= %(from)s AND `%(field)s` <= %(to)s)" %  props
+    else:
+      return {}
 
 
   def _get_database_table_names(self, name):
