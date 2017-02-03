@@ -204,7 +204,7 @@ ${layout.menubar(section='users')}
       toggleActions();
     });
 
-    $(".userCheck").click(function () {
+    $(document).on('click', '.userCheck', function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
