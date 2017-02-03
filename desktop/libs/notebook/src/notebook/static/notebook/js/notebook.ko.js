@@ -1456,7 +1456,7 @@ var EditorViewModel = (function() {
             }
           });
 
-          if (data.jobs.length > 0) {
+          if (data.jobs && data.jobs.length > 0) {
             data.jobs.forEach(function (job) {
               var _found = ko.utils.arrayFilter(self.jobs(), function (item) {
                 return item.name === job.name;
