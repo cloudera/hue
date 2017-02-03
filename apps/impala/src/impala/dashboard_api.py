@@ -415,7 +415,7 @@ class SQLApi():
         props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
         props['to'] = 'now()' # TODO +/- Tz of user
       elif collection['timeFilter']['type'] == 'fixed':
-        props['from'] = collection['timeFilter'].get('from', 'now() - 7 DAY')
+        props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
         props['to'] = collection['timeFilter'].get('to', 'now()')
 
       return "(`%(field)s` >= %(from)s AND `%(field)s` <= %(to)s)" %  props
