@@ -602,10 +602,13 @@ table.display td.center {
 
 .sorting {
   cursor: pointer;
-  background: url('../art/datatables/sort_both.png') no-repeat center right;
   border-top: 3px solid #FFFFFF !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
+}
+
+.sorting:hover {
+  background: url('../art/datatables/sort_both.png') no-repeat center right;
 }
 
 .sorting_asc {
@@ -616,12 +619,20 @@ table.display td.center {
   vertical-align: middle!important;
 }
 
+.sorting_asc:hover {
+  background: url('../art/datatables/sort_asc.png') no-repeat center right;
+}
+
 .sorting_desc {
   cursor: pointer;
   background: url('../art/datatables/sort_desc.png') no-repeat center right;
   border-top: 3px solid #FFFFFF !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
+}
+
+.sorting_desc:hover {
+  background: url('../art/datatables/sort_desc.png') no-repeat center right;
 }
 
 .table-huedatatable {
