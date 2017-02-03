@@ -3559,14 +3559,18 @@ $(document).ready(function () {
   });
 
   viewModel.collection.autorefreshSeconds.subscribe(function (value) {
-    if (viewModel.collection.autorefresh()) {
-      window.clearTimeout(_refreshTimeout);
-      refresh();
-    }
+    checkAutoRefresh();
   });
 
   if (viewModel.collection.autorefresh()) {
     refresh();
+  }
+
+  function checkAutoRefresh() {
+    if (viewModel.collection.autorefresh()) {
+      window.clearTimeout(_refreshTimeout);
+      refresh();
+    }
   }
 
   function refresh() {
@@ -3577,6 +3581,9 @@ $(document).ready(function () {
     }, ($.isNumeric(viewModel.collection.autorefreshSeconds()) ? viewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
   }
 
+  huePubSub.subscribe('check.autorefresh', function () {
+    checkAutoRefresh();
+  });
 
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){
