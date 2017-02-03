@@ -173,7 +173,7 @@ ${layout.menubar(section='groups')}
       toggleActions();
     });
 
-    $(".groupCheck").click(function () {
+    $(document).on('click', '.groupCheck', function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
