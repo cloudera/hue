@@ -2699,16 +2699,16 @@ ${ dashboard.layout_skeleton() }
               </div>
               <div class="control-group">
                 <div class="controls">
-                  <label class="checkbox">
-                    <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+                  <label class="checkbox inline-block">
+                    <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="textInput: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
                   </label>
                 </div>
               </div>
             </span>
 
             <!-- ko if: $root.availableDateFields().length == 0 -->
-              <label class="checkbox">
-                <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="value: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
+              <label class="checkbox inline-block">
+                <input type="checkbox" style="margin-right: 4px; margin-top: 9px" data-bind="checked: $root.collection.autorefresh"/> ${ _('Auto-refresh every') } <input type="number" class="input-mini" style="margin-bottom: 0; margin-left: 6px; margin-right: 6px; width: 46px; text-align:center" data-bind="textInput: $root.collection.autorefreshSeconds"/> ${ _('seconds') }
               </label>
             <!-- /ko -->
           </fieldset>
@@ -3547,7 +3547,7 @@ $(document).ready(function () {
 
   var _refreshTimeout = null;
 
-  viewModel.collection.autorefresh.subscribe(function (value) { 
+  viewModel.collection.autorefresh.subscribe(function (value) {
     if (value) {
       refresh();
     }
