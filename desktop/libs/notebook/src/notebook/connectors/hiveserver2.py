@@ -615,7 +615,7 @@ DROP TABLE IF EXISTS `%(table)s`;
           'row': end_row,
           'column': end_col
         },
-        'statement': strip_trailing_semicolon(statement.strip())
+        'statement': strip_trailing_semicolon(statement.rstrip())
       })
     return statements
 
@@ -626,6 +626,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     statements_count = snippet['result']['handle'].get('statements_count', 1)
 
     statements = self._get_statements(snippet['statement'])
+
     statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
     previous_statement_hash = self.__compute_statement_hash(statements[statement_id]['statement'])
     non_edited_statement = previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash')
