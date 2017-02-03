@@ -889,9 +889,7 @@ class Document2QueryMixin(object):
       docs = docs.exclude(is_managed=True)
 
     if not include_trashed:
-      # Since the Trash folder can have multiple directory levels, we need to check full path and exclude those IDs
-      trashed_ids = [doc.id for doc in docs if Document2.TRASH_DIR in doc.path]
-      docs = docs.exclude(id__in=trashed_ids)
+      docs = docs.exclude(is_trashed=True)
 
     return docs.defer('description', 'data', 'extra', 'search').distinct().order_by('-last_modified')
 
@@ -1051,6 +1049,7 @@ class Document2(models.Model):
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
   is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user'))
+  is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
 
@@ -1089,11 +1088,6 @@ class Document2(models.Model):
   @property
   def is_directory(self):
     return self.type == 'directory'
-
-  @property
-  def is_trashed(self):
-    dirs = self.path.split('/')
-    return len(dirs) > 1 and dirs[1] == '.Trash'
 
   @property
   def is_home_directory(self):
@@ -1238,6 +1232,8 @@ class Document2(models.Model):
     try:
       trash_dir = Directory.objects.get(name=self.TRASH_DIR, owner=self.owner)
       self.move(trash_dir, self.owner)
+      self.is_trashed = True
+      self.save()
     except Document2.MultipleObjectsReturned:
       LOG.error('Multiple Trash directories detected. Merging all into one.')
 
@@ -1250,9 +1246,12 @@ class Document2(models.Model):
       self.move(parent_trash_dir, self.owner)
 
   def restore(self):
-   # Currently restoring any doucment to /home
-   home_dir = Document2.objects.get_home_directory(self.owner)
-   self.move(home_dir, self.owner)
+    # Currently restoring any doucment to /home
+    home_dir = Document2.objects.get_home_directory(self.owner)
+    self.move(home_dir, self.owner)
+    self.is_trashed = False
+    self.save()
+
 
   def can_read(self, user):
     perm = self.get_permission('read')
@@ -1419,8 +1418,7 @@ class Directory(Document2):
     documents = documents.exclude(is_history=True).exclude(is_managed=True)
 
     # Excluding all trashed docs across users
-    trashed_ids = [doc.id for doc in documents if Document2.TRASH_DIR in doc.parent_directory.path]
-    documents = documents.exclude(id__in=trashed_ids)
+    documents = documents.exclude(is_trashed=True)
 
     # Optimizing roll up for /home by checking only with directories instead of all documents
     # For all other directories roll up is done in _filter_documents()

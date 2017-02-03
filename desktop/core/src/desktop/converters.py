@@ -157,6 +157,20 @@ class DocumentConverter(object):
     if self.imported_docs:
       LOG.info('Successfully imported %d documents' % len(self.imported_docs))
 
+    # Set is_trashed field for old documents with is_trashed=None
+    try:
+      docs = Document2.objects.filter(owner=self.user, is_trashed=None)
+      for doc in docs:
+        try:
+          dirs = doc.path.split('/')
+          if len(filter(None, dirs)) > 1: # Removing empty strings from the list
+            doc.is_trashed = dirs[1] == '.Trash'
+            doc.save()
+        except Exception, e:
+          LOG.error("Failed to set is_trashed field with exception: %s" % e)
+    except ImportError, e:
+      LOG.warn('Failed to set is_trashed field for old documents')
+
 
   def _get_unconverted_docs(self, content_type, with_history=False):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
