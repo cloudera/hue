@@ -123,7 +123,7 @@ def _execute_notebook(request, notebook, snippet):
           _snippet['result']['handle'] = response['handle']
           _snippet['result']['statements_count'] = response['handle'].get('statements_count', 1)
           _snippet['result']['statement_id'] = response['handle'].get('statement_id', 0)
-          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']) # For non HS2, as non multi query yet
+          _snippet['result']['handle']['statement'] = response['handle'].get('statement', snippet['statement']).strip() # For non HS2, as non multi query yet
         else:
           _snippet['status'] = 'failed'
 
