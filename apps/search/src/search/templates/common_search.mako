@@ -2697,6 +2697,7 @@ ${ dashboard.layout_skeleton() }
                   <input id="settingstimeend" type="text" data-bind="value: collection.timeFilter.to, datepicker: {momentFormat: 'YYYY-MM-DD[T]HH:mm:SS[Z]'}" />
                 </div>
               </div>
+              <!-- ko if: collection.timeFilter.type() == 'rolling' -->
               <div class="control-group">
                 <div class="controls">
                   <label class="checkbox inline-block">
@@ -2704,6 +2705,7 @@ ${ dashboard.layout_skeleton() }
                   </label>
                 </div>
               </div>
+              <!-- /ko -->
             </span>
 
             <!-- ko if: $root.availableDateFields().length == 0 -->
