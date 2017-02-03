@@ -483,7 +483,7 @@ var Collection = function (vm, collection) {
   };
   self.enabled = ko.mapping.fromJS(collection.enabled);
   self.autorefresh = ko.mapping.fromJS(collection.autorefresh);
-  self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60).extend("throttle", 1000);
+  self.autorefreshSeconds = ko.mapping.fromJS(collection.autorefreshSeconds || 60).extend({ numeric: 0, throttle: 1000 });
   self.idField = ko.observable(collection.idField);
   self.timeFilter = ko.mapping.fromJS(collection.timeFilter);
   self.timeFilter.value.subscribe(function () {
