@@ -901,6 +901,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               }
             }
 
+            var arrowsPolling = function () {
+              if ($('#workflow-page-graph').is(':visible')){
+                window.setTimeout(arrowsPolling, 100);
+              }
+              else {
+                $('canvas').remove();
+              }
+            }
+
             $('canvas').remove();
 
             if (vm.job().type() === 'workflow') {
@@ -918,6 +927,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 success: function (response) {
                   $('#workflow-page-graph').html(response);
                   updateArrowPosition();
+                  arrowsPolling();
                 }
               });
             }
