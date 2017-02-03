@@ -134,7 +134,9 @@ var AssistDbSource = (function () {
 
             if (db.loading()) {
               var subscription = db.loading.subscribe(function () {
-                subscription.remove();
+                if (subscription) {
+                  subscription.remove();
+                }
                 applyPopularity();
               });
             } else {
