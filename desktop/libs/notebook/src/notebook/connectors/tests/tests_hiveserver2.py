@@ -456,12 +456,12 @@ class TestHiveserver2Api(object):
                 "settings": []
             }
         }
-      """ % {'statement': "SELECT * FROM sample_07;"}
+      """ % {'statement': u"SELECT 'Привет', '你好';"}
     )
 
     statement = self.api._get_current_statement(MockDb(), snippet)
 
-    assert_equal('7d283ad4794a3d2efd48a3ab44b1d9672625837c7dfc73f010ce82ab', statement['previous_statement_hash'])
+    assert_equal('086ecec9a8b89b1b47cce358bdbb343be23b1f8b54ca76bc81927e27', statement['previous_statement_hash'])
 
 
 def MockDb():
