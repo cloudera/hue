@@ -32,7 +32,7 @@ from desktop.conf import USE_DEFAULT_CONFIGURATION
 from desktop.lib.conf import BoundConfig
 from desktop.lib.exceptions import StructuredException
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import force_unicode, smart_str
 from desktop.lib.rest.http_client import RestException
 from desktop.models import DefaultConfiguration
 from metadata.optimizer_client import OptimizerApi
@@ -626,7 +626,8 @@ DROP TABLE IF EXISTS `%(table)s`;
     statements_count = snippet['result']['handle'].get('statements_count', 1)
 
     statements = self._get_statements(snippet['statement'])
-    previous_statement_hash = hashlib.sha224(statements[statement_id]['statement']).hexdigest()
+    statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
+    previous_statement_hash = self.__compute_statement_hash(statements[statement_id]['statement'])
     non_edited_statement = previous_statement_hash == snippet['result']['handle'].get('previous_statement_hash') or not snippet['result']['handle'].get('previous_statement_hash')
 
     if snippet['result']['handle'].get('has_more_statements'):
@@ -642,19 +643,22 @@ DROP TABLE IF EXISTS `%(table)s`;
       if non_edited_statement:
         statement_id = 0
 
+    if statements_count != len(statements):
+      statement_id = min(statement_id, len(statements) - 1)
 
     resp = {
       'statement_id': statement_id,
       'has_more_statements': statement_id < len(statements) - 1,
       'statements_count': len(statements),
-      'previous_statement_hash': hashlib.sha224(statements[statement_id]['statement']).hexdigest()
+      'previous_statement_hash': self.__compute_statement_hash(statements[statement_id]['statement'])
     }
-
-    if statements_count != len(statements):
-      statement_id = 0
 
     resp.update(statements[statement_id])
     return resp
+
+
+  def __compute_statement_hash(self, statement):
+    return hashlib.sha224(smart_str(statement)).hexdigest()
 
 
   def _prepare_hql_query(self, snippet, statement, session):
