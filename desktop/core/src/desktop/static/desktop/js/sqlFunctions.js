@@ -1028,7 +1028,7 @@ var SqlFunctions = (function () {
       current_timestamp: {
         returnTypes: ['TIMESTAMP'],
         arguments: [],
-        signature: 'current_timestamp',
+        signature: 'current_timestamp()',
         description: 'Returns the current timestamp at the start of query evaluation (as of Hive 1.2.0). All calls of current_timestamp within the same query return the same value.'
       },
       datediff: {
@@ -2523,7 +2523,7 @@ var SqlFunctions = (function () {
     var functionsToSuggest = getFunctionsWithReturnTypes(dialect, returnTypes, includeAggregate, includeAnalytic);
     Object.keys(functionsToSuggest).forEach(function (name) {
       completions.push({
-        value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
+        value: name + '()',
         meta: functionsToSuggest[name].returnTypes.join('|'),
         weight: returnTypes.filter(function (type) {
           return functionsToSuggest[name].returnTypes.filter(

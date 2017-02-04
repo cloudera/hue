@@ -469,7 +469,7 @@ var SqlAutocompleter3 = (function () {
           Object.keys(functionsToSuggest).forEach(function (name) {
             functionSuggestions.push({
               category: CATEGORIES.UDF,
-              value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
+              value: name + '()',
               meta: functionsToSuggest[name].returnTypes.join('|'),
               weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
                   return otherType === colRef.type.toUpperCase();
@@ -489,7 +489,7 @@ var SqlAutocompleter3 = (function () {
         Object.keys(functionsToSuggest).forEach(function (name) {
           functionSuggestions.push({
             category: CATEGORIES.UDF,
-            value: name === 'current_date' || name === 'current_timestamp' ? name : name + '()',
+            value: name + '()',
             meta: functionsToSuggest[name].returnTypes.join('|'),
             weightAdjust: functionsToSuggest[name].returnTypes.filter(function (otherType) {
               return otherType === types[0].toUpperCase();
