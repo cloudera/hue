@@ -151,7 +151,8 @@ def browse(request, name, is_mobile=False):
                "properties":{},"offset":0,"isLoading":True,"klass":"card card-widget span12"}]}],
           "drops":["temp"],"klass":"card card-home card-column span10"}
       ],
-      'is_latest': LATEST.get()
+      'is_latest': LATEST.get(),
+      'engines': get_engines(request.user)
     }),
     'is_owner': True,
     'can_edit_index': can_edit_index(request.user),
