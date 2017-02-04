@@ -21,6 +21,7 @@ import numbers
 import re
 import time
 
+from datetime import datetime
 from itertools import groupby
 
 from django.utils.html import escape
@@ -184,8 +185,8 @@ class SQLApi():
     return {'fields': Collection2._make_luke_from_schema_fields(fields)}
 
 
-  def stats(self, dashboard, fields):
-    database, table = self._get_database_table_names(dashboard)
+  def stats(self, dataset, fields):
+    database, table = self._get_database_table_names(dataset)
 
     # TODO: check column stats to go faster
 
@@ -224,9 +225,9 @@ class SQLApi():
         api = get_api(request, snippet)
 
         while curr <= end:
-          status = api.check_status(dashboard, snippet)
+          status = api.check_status(dataset, snippet)
           if status['status'] == 'available':
-            result = api.fetch_result(dashboard, snippet, rows=10, start_over=True)
+            result = api.fetch_result(dataset, snippet, rows=10, start_over=True)
             api.close_statement(snippet)
             break
           time.sleep(sleep_interval)
@@ -246,6 +247,13 @@ class SQLApi():
       if not isinstance(min_value, numbers.Number):
         min_value = min_value.replace(' ', 'T') + 'Z'
         max_value = max_value.replace(' ', 'T') + 'Z'
+      else:
+        print '============================================'
+        print dataset
+#         print self._get_field(dataset, fields[0])
+        min_value = datetime.fromtimestamp(1486142551).strftime('%Y-%m-%dT%H:%M:%SZ')
+        max_value = datetime.fromtimestamp(1486152551).strftime('%Y-%m-%dT%H:%M:%SZ')
+        # is field a timeline?
 
       return {
         'stats': {
@@ -359,14 +367,24 @@ class SQLApi():
     # facets --> Count DESC   |   salary_range ASC
     if facet['properties']['canRange']:
       field_name = '`%(field)s_range`' % facet
+      field_name_to = '`%(field)s_range_to`' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
+        if False:
+          field = '`%(field)s`' % facet
+        else:
+          field = 'cast(`%(field)s` AS timestamp)' % facet
         gap = facet['properties']['gap'] if 'gap' in facet['properties'] else facet['properties']['initial_gap']
-        slot = re.sub('^\+\d+', '', gap).rstrip('S')
-        select = "trunc(`%(field)s`, '%(slot)s') AS %(field_name)s, trunc(`%(field)s`, '%(slot)s') + interval 1 %(slot)s AS `%(field)s_range_to`" % {
-            'field': facet['field'],
+        slot = slot_interval = re.sub('^\+\d+', '', gap).rstrip('S')
+        if slot == 'MINUTE':
+          slot = 'MI'
+          slot_interval = 'MINUTE'
+        select = "trunc(%(field)s, '%(slot)s') AS %(field_name)s, trunc(%(field)s, '%(slot)s') + interval 1 %(slot_interval)s AS %(field_name_to)s" % {
+            'field': field,
             'slot': slot,
-            'field_name': field_name
+            'slot_interval': slot_interval,
+            'field_name': field_name,
+            'field_name_to': field_name_to
         }
       else:
         slot = max((facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit'], 1)
@@ -394,7 +412,7 @@ class SQLApi():
 
 
   def _is_date(self, _type):
-    return _type in ('timestamp')
+    return _type in ('timestamp', 'bigint')
 
 
   def _get_time_filter_query(self, collection, query):
@@ -412,8 +430,10 @@ class SQLApi():
       if collection['timeFilter']['type'] == 'rolling':
         empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
 
-        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
-        props['to'] = 'now()' # TODO +/- Tz of user
+#         props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
+#         props['to'] = 'now()' # TODO +/- Tz of user
+        props['from'] = "unix_timestamp() - %(coeff)s * 60" % {'coeff': coeff, 'unit': unit.strip('S')}
+        props['to'] = 'unix_timestamp()' # TODO +/- Tz of user
       elif collection['timeFilter']['type'] == 'fixed':
         props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
         props['to'] = collection['timeFilter'].get('to', 'now()')

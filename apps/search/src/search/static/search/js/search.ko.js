@@ -1460,7 +1460,7 @@ var QueryResult = function (vm, initial) { // Similar to to Notebook Snippet
 };
 
 
-var DATE_TYPES = ['date', 'tdate', 'timestamp'];
+var DATE_TYPES = ['date', 'tdate', 'timestamp', 'bigint'];
 var NUMBER_TYPES = ['int', 'tint', 'long', 'tlong', 'float', 'tfloat', 'double', 'tdouble', 'currency'];
 var FLOAT_TYPES = ['float', 'tfloat', 'double', 'tdouble'];
 var GEO_TYPES = ['SpatialRecursivePrefixTreeFieldType'];

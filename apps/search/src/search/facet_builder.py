@@ -42,12 +42,10 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
     _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)
   except Exception, e:
-    print e
-    # stats not supported on all the fields, like text
-    pass
+    LOG.info('Stats not supported on all the fields, like text: %s' % e)
+
 
 def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=None, gap=None):
-
     if widget_type == 'pie-widget' or widget_type == 'pie2-widget':
       SLOTS = 5
     elif widget_type == 'facet-widget' or widget_type == 'text-facet-widget':
@@ -55,7 +53,7 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
     else:
       SLOTS = 100
 
-    is_date = False
+    is_date = widget_type == 'timeline-widget'
 
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # Cast floats to int currently
