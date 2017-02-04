@@ -292,14 +292,12 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
       <ul class="left-nav-menu">
-        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Applications') }</li>
+        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
         <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('search') }"><a href="javascript: void(0);">Dashboard</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Report</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
-        <li><a href="javascript: void(0);">Custom App 1</a></li>
-        <li><a href="javascript: void(0);">Custom App 2</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
@@ -310,6 +308,10 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
         <li><a href="javascript: void(0);">SLAs</a></li>
+        <li class="header">&nbsp;</li>
+        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
+        <li><a href="javascript: void(0);">Custom App 1</a></li>
+        <li><a href="javascript: void(0);">Custom App 2</a></li>
       </ul>
       <div class="left-nav-drop">
         <div data-bind="click: function () { onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">

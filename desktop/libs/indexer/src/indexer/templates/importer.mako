@@ -527,7 +527,7 @@ ${ assist.assistPanel() }
             </div>
 
             <div class="control-group">
-              <label class="checkbox" data-bind="visible: tableFormat() != 'kudu'">
+              <label class="checkbox inline-block" data-bind="visible: tableFormat() != 'kudu'">
                 <input type="checkbox" data-bind="checked: useDefaultLocation"> ${_('Store in Default location')}
               </label>
             </div>
@@ -548,7 +548,7 @@ ${ assist.assistPanel() }
 
             <span data-bind="visible: showProperties">
               <div class="control-group">
-                <label class="checkbox" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
+                <label class="checkbox inline-block" data-bind="visible: $root.createWizard.source.inputFormat() != 'manual'">
                   <input type="checkbox" data-bind="checked: importData, disable: ! useDefaultLocation() && $parent.createWizard.source.path() == nonDefaultLocation();"> ${_('Import data')}
                 </label>
               </div>
@@ -558,12 +558,12 @@ ${ assist.assistPanel() }
                 </label>
               </div>
               <div class="control-group" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
-                <label class="checkbox">
+                <label class="checkbox inline-block">
                   <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
                 </label>
               </div>
               <div class="control-group" data-bind="visible: tableFormat() == 'text'">
-                <label class="checkbox">
+                <label class="checkbox inline-block">
                   <input type="checkbox" data-bind="checked: useCustomDelimiters"> ${_('Custom char delimiters')}
                 </label>
               </div>
