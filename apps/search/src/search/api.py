@@ -365,6 +365,7 @@ def _create_facet(collection, user, facet_id, facet_label, facet_field, widget_t
     'limit': 10,
     'mincount': 0,
     'isDate': False,
+    'isBigIntDate': False,
     'aggregate': {'function': 'unique', 'ops': [], 'percentiles': [{'value': 50}]}
   }
 

@@ -14,10 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
+
 from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop.views.home')

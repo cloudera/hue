@@ -1589,7 +1589,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
   self.availableDateFields = ko.computed(function() {
-    return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1; });
+    return $.grep(self.collection.availableFacetFields(), function(field) { return DATE_TYPES.indexOf(field.type()) != -1 && field.name() != '_version_'; });
   });
   self.availableNumberFields = ko.computed(function() {
     return $.grep(self.collection.availableFacetFields(), function(field) { return NUMBER_TYPES.indexOf(field.type()) != -1; });
