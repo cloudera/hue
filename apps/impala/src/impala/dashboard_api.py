@@ -243,22 +243,19 @@ class SQLApi():
 
       stats = list(result['data'])
       min_value, max_value = stats[0]
+      is_big_int_date = isinstance(min_value, numbers.Number)
 
-      if not isinstance(min_value, numbers.Number):
+      if not is_big_int_date:
         min_value = min_value.replace(' ', 'T') + 'Z'
         max_value = max_value.replace(' ', 'T') + 'Z'
       else:
-        print '============================================'
-        print dataset
-#         print self._get_field(dataset, fields[0])
-        min_value = datetime.fromtimestamp(1486142551).strftime('%Y-%m-%dT%H:%M:%SZ')
-        max_value = datetime.fromtimestamp(1486152551).strftime('%Y-%m-%dT%H:%M:%SZ')
-        # is field a timeline?
+        min_value = datetime.fromtimestamp(min_value).strftime('%Y-%m-%dT%H:%M:%SZ')
+        max_value = datetime.fromtimestamp(max_value).strftime('%Y-%m-%dT%H:%M:%SZ')
 
       return {
         'stats': {
           'stats_fields': {
-            fields[0]: {'min': min_value, 'max': max_value}
+            fields[0]: {'min': min_value, 'max': max_value, 'is_big_int_date': is_big_int_date}
           }
         }
       }
@@ -370,15 +367,18 @@ class SQLApi():
       field_name_to = '`%(field)s_range_to`' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
-        if False:
-          field = '`%(field)s`' % facet
-        else:
+        if facet['properties']['isBigIntDate']:
           field = 'cast(`%(field)s` AS timestamp)' % facet
+        else:
+          field = '`%(field)s`' % facet
+
         gap = facet['properties']['gap'] if 'gap' in facet['properties'] else facet['properties']['initial_gap']
+
         slot = slot_interval = re.sub('^\+\d+', '', gap).rstrip('S')
         if slot == 'MINUTE':
           slot = 'MI'
           slot_interval = 'MINUTE'
+
         select = "trunc(%(field)s, '%(slot)s') AS %(field_name)s, trunc(%(field)s, '%(slot)s') + interval 1 %(slot_interval)s AS %(field_name_to)s" % {
             'field': field,
             'slot': slot,
@@ -429,11 +429,13 @@ class SQLApi():
 
       if collection['timeFilter']['type'] == 'rolling':
         empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
+        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
+        props['to'] = 'now()' # TODO +/- Proper Tz of user
 
-#         props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
-#         props['to'] = 'now()' # TODO +/- Tz of user
-        props['from'] = "unix_timestamp() - %(coeff)s * 60" % {'coeff': coeff, 'unit': unit.strip('S')}
-        props['to'] = 'unix_timestamp()' # TODO +/- Tz of user
+        if any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == time_field]):
+          props['from'] = 'cast(%(from)s AS bigint)' % props
+          props['to'] = 'cast(%(to)s AS bigint)' % props
+
       elif collection['timeFilter']['type'] == 'fixed':
         props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
         props['to'] = collection['timeFilter'].get('to', 'now()')
