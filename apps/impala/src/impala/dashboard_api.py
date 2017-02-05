@@ -316,6 +316,9 @@ class SQLApi():
           quote = "'"
         else:
           quote = ''
+          if  any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == fq['field']]):
+            fq['properties'][0]['from'] = "unix_timestamp('%(from)s')" % fq['properties'][0]
+            fq['properties'][0]['to'] = "unix_timestamp('%(to)s')" % fq['properties'][0]
         clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
           'field': fq['field'],
           'to': fq['properties'][0]['to'],
@@ -412,7 +415,7 @@ class SQLApi():
 
 
   def _is_date(self, _type):
-    return _type in ('timestamp', 'bigint')
+    return _type in ('timestamp',)
 
 
   def _get_time_filter_query(self, collection, query):
@@ -424,8 +427,10 @@ class SQLApi():
       }
       # fqs overrides main time filter
 #       fq_time_ids = [fq['id'] for fq in query['fqs'] if fq['field'] == time_field]
-#       props['time_filter_overrides'] = fq_time_ids
-#       props['time_field'] = time_field
+#       if fq_time_ids:
+#         return {}
+#         props['time_filter_overrides'] = fq_time_ids
+#         props['time_field'] = time_field
 
       if collection['timeFilter']['type'] == 'rolling':
         empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
@@ -433,8 +438,8 @@ class SQLApi():
         props['to'] = 'now()' # TODO +/- Proper Tz of user
 
         if any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == time_field]):
-          props['from'] = 'cast(%(from)s AS bigint)' % props
-          props['to'] = 'cast(%(to)s AS bigint)' % props
+          props['from'] = 'unix_timestamp(%(from)s)' % props
+          props['to'] = 'unix_timestamp(%(to)s)' % props
 
       elif collection['timeFilter']['type'] == 'fixed':
         props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
