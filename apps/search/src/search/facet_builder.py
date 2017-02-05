@@ -42,6 +42,7 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
     _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)
   except Exception, e:
+    print '=========================================================================================================================='
     LOG.info('Stats not supported on all the fields, like text: %s' % e)
 
 
@@ -53,8 +54,12 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
     else:
       SLOTS = 100
       
-    is_big_int_date = stat_facet.get('is_big_int_date')
-    is_date = is_big_int_date
+    is_date = widget_type == 'timeline-widget'
+    is_big_int_date = is_date and stat_facet.get('maybe_is_big_int_date')
+
+    if is_big_int_date:
+      stat_facet['min'] = stat_facet['min_date_if_bigint']
+      stat_facet['max'] = stat_facet['max_date_if_bigint']
 
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # Cast floats to int currently

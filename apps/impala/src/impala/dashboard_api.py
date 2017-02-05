@@ -21,7 +21,7 @@ import numbers
 import re
 import time
 
-from datetime import datetime
+from datetime import datetime, timedelta
 from itertools import groupby
 
 from django.utils.html import escape
@@ -243,19 +243,22 @@ class SQLApi():
 
       stats = list(result['data'])
       min_value, max_value = stats[0]
-      is_big_int_date = isinstance(min_value, numbers.Number)
+      maybe_is_big_int_date = isinstance(min_value, (int, long))
 
-      if not is_big_int_date:
+      if not isinstance(min_value, numbers.Number):
         min_value = min_value.replace(' ', 'T') + 'Z'
         max_value = max_value.replace(' ', 'T') + 'Z'
-      else:
-        min_value = datetime.fromtimestamp(min_value).strftime('%Y-%m-%dT%H:%M:%SZ')
-        max_value = datetime.fromtimestamp(max_value).strftime('%Y-%m-%dT%H:%M:%SZ')
 
       return {
         'stats': {
           'stats_fields': {
-            fields[0]: {'min': min_value, 'max': max_value, 'is_big_int_date': is_big_int_date}
+            fields[0]: {
+              'min': min_value,
+              'max': max_value,
+              'min_date_if_bigint': datetime.fromtimestamp(min_value).strftime('%Y-%m-%dT%H:%M:%SZ') if maybe_is_big_int_date else min_value,
+              'max_date_if_bigint': datetime.fromtimestamp(max_value).strftime('%Y-%m-%dT%H:%M:%SZ') if maybe_is_big_int_date else max_value,
+              'maybe_is_big_int_date': maybe_is_big_int_date
+            }
           }
         }
       }
@@ -418,7 +421,9 @@ class SQLApi():
     return _type in ('timestamp',)
 
 
-  def _get_time_filter_query(self, collection, query):
+  def _get_time_filter_range(self, collection, query):
+    props = {}
+
     time_field = collection['timeFilter'].get('field')
 
     if time_field and (collection['timeFilter']['value'] != 'all' or collection['timeFilter']['type'] == 'fixed'):
@@ -434,7 +439,10 @@ class SQLApi():
 
       if collection['timeFilter']['type'] == 'rolling':
         empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
-        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit.strip('S')}
+        unit = unit.strip('S')
+        props['coeff'] = coeff
+        props['unit'] = unit
+        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit}
         props['to'] = 'now()' # TODO +/- Proper Tz of user
 
         if any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == time_field]):
@@ -445,6 +453,13 @@ class SQLApi():
         props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
         props['to'] = collection['timeFilter'].get('to', 'now()')
 
+    return props
+
+
+  def _get_time_filter_query(self, collection, query):
+    props = self._get_time_filter_range(collection, query)
+    
+    if props:
       return "(`%(field)s` >= %(from)s AND `%(field)s` <= %(to)s)" %  props
     else:
       return {}
@@ -483,6 +498,25 @@ class SQLApi():
 
     cols = [col['name'] for col in result['meta']]
     rows = list(result['data']) # No escape_rows
+
+    if facet['properties']['canRange']:
+      if facet['properties']['isDate']:
+        props = {}#self._get_time_filter_range(collection, query)
+        if props['unit'] == 'SECOND':
+          dt = timedelta(seconds=1)
+        elif props['unit'] == 'MINUTE':
+          dt = timedelta(seconds=60)
+        elif props['unit'] == 'HOUR':
+          dt = timedelta(hours=1)
+        elif props['unit'] == 'DAY':
+          dt = timedelta(days=1)
+        else:
+          dt = timedelta(days=365)
+        #rows = augment_date_range_list(rows, facet['properties']['start'], facet['properties']['end'], timedelta(seconds=60), len(cols))
+        pass
+      else:
+        pass
+        #rows = augment_number_range_list(rows, facet['properties']['start'], facet['properties']['end'], facet['properties']['gap'], len(cols))
 
     response['fieldsAttributes'] = [{
          "sort":{
@@ -601,3 +635,36 @@ class SQLApi():
     response['response']['numFound'] = len(docs)
 
     return response
+
+
+def augment_date_range_list(source_rows, start, end, delta, nb_cols):
+  start_ts = datetime.strptime(start, '%Y-%m-%dT%H:%M:%SZ')
+  end_ts = datetime.strptime(end, '%Y-%m-%dT%H:%M:%SZ')
+
+  current = start_ts
+  indexed_rows = dict([(row[0], row) for row in source_rows])
+  augmented = []
+  
+  while current <= end_ts:
+    if str(current) in indexed_rows:
+      augmented.append(indexed_rows[str(current)])
+    else:
+      augmented.append([str(current), str(current + delta)] + [0] * (nb_cols - 2))
+    current += delta
+
+  return augmented
+
+
+def augment_number_range_list(source_rows, start, end, delta, nb_cols):
+  current = start
+  indexed_rows = dict([(row[0], row) for row in source_rows])
+  augmented = []
+  
+  while current <= end:
+    if current in indexed_rows:
+      augmented.append(indexed_rows[current])
+    else:
+      augmented.append([current] + [0] * (nb_cols - 1))
+    current += delta
+
+  return augmented

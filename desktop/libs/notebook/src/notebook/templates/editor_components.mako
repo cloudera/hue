@@ -1401,7 +1401,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 <script type="text/html" id="longer-operation">
-  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The operation in the server is taking longer than expected') }" class="inline-block margin-right-10">
+  <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The query is hanging and taking longer than expected.') }" class="inline-block margin-right-10">
     <i class="fa fa-exclamation-triangle warning"></i>
   </div>
 </script>
