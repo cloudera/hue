@@ -18,7 +18,7 @@
 from django.utils.translation import ugettext as _
 
 from desktop import conf
-from desktop.conf import USE_NEW_SIDE_PANELS
+from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
@@ -31,6 +31,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 <script src="${ static('desktop/js/assist/assistDbEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistDbSource.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHdfsEntry.js') }"></script>
+<script src="${ static('desktop/js/assist/assistGitEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistS3Entry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistCollectionEntry.js') }"></script>
 <script src="${ static('desktop/js/assist/assistHBaseEntry.js') }"></script>
@@ -286,6 +287,73 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                   <!-- /ko -->
                   <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 's3', 'definition': definition} }"></span>
+                </a>
+              </li>
+            </ul>
+            <!-- ko if: !loading() && entries().length === 0 -->
+            <ul class="assist-tables">
+              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+            </ul>
+            <!-- /ko -->
+          </div>
+          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+            <span>${ _('Error loading contents.') }</span>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
+      <!-- ko with: $parents[1] -->
+      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+      <!-- /ko -->
+    </div>
+  </script>
+
+
+  <script type="text/html" id="git-details-title">
+    <span data-bind="text: definition.name"></span>
+  </script>
+
+  <script type="text/html" id="assist-git-header-actions">
+    <div class="assist-db-header-actions" style="margin-top: -1px;">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+    </div>
+  </script>
+
+  <script type="text/html" id="assist-git-inner-panel">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <!-- ko with: selectedGitEntry -->
+        <div class="assist-flex-header assist-breadcrumb" >
+          <!-- ko if: parent !== null -->
+          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
+            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </a>
+          <!-- /ko -->
+          <!-- ko if: parent === null -->
+          <div style="padding-left: 5px;">
+            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+          </div>
+          <!-- /ko -->
+          <!-- ko template: 'assist-git-header-actions' --><!-- /ko -->
+        </div>
+        <div class="assist-flex-fill assist-git-scrollable">
+          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-git-scrollable' }">
+              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+
+                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+                  <!-- ko if: definition.type === 'dir' -->
+                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <!-- ko if: definition.type === 'file' -->
+                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+                  <!-- /ko -->
+                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'git', 'definition': definition} }"></span>
                 </a>
               </li>
             </ul>
@@ -902,7 +970,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
        * @param {boolean} [options.rightAlignIcon] - Default false
        * @param {boolean} options.visible
        * @param {boolean} [options.showNavSearch] - Default true
-       * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
+       * @param {(AssistDbPanel|AssistHdfsPanel|AssistGitPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
        * @constructor
        */
       function AssistInnerPanel (options) {
@@ -1154,6 +1222,51 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       }
 
       AssistHdfsPanel.prototype.init = function () {
+        this.reload();
+      };
+
+      /**
+       * @param {Object} options
+       * @param {ApiHelper} options.apiHelper
+       * @constructor
+       **/
+      function AssistGitPanel (options) {
+        var self = this;
+        self.apiHelper = ApiHelper.getInstance();
+
+        self.selectedGitEntry = ko.observable();
+        self.reload = function () {
+          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentGitPath', '${ home_dir }');
+          var parts = lastKnownPath.split('/');
+          parts.shift();
+
+          var currentEntry = new AssistGitEntry({
+            definition: {
+              name: '/',
+              type: 'dir'
+            },
+            parent: null,
+            apiHelper: self.apiHelper
+          });
+
+          currentEntry.loadDeep(parts, function (entry) {
+            self.selectedGitEntry(entry);
+            entry.open(true);
+          });
+        };
+
+        huePubSub.subscribe('assist.selectGitEntry', function (entry) {
+          self.selectedGitEntry(entry);
+          self.apiHelper.setInTotalStorage('assist', 'currentGitPath', entry.path);
+        });
+
+        huePubSub.subscribe('assist.git.refresh', function () {
+          huePubSub.publish('assist.clear.git.cache');
+          self.reload();
+        });
+      }
+
+      AssistGitPanel.prototype.init = function () {
         this.reload();
       };
 
@@ -1450,6 +1563,20 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             rightAlignIcon: true,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
+
+          if (${ len(VCS.keys()) } > 0) {
+            self.availablePanels.push(new AssistInnerPanel({
+              panelData: new AssistGitPanel({
+                apiHelper: self.apiHelper
+              }),
+              apiHelper: self.apiHelper,
+              name: '${ _("GIT") }',
+              type: 'git',
+              icon: 'fa-github',
+              minHeight: 50,
+              rightAlignIcon: true
+            }));
+          }
         }
 
         self.performSearch = function () {

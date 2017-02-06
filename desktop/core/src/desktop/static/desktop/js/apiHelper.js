@@ -56,6 +56,7 @@ var ApiHelper = (function () {
   var DOCUMENTS_API = "/desktop/api2/doc/";
   var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
   var HDFS_API_PREFIX = "/filebrowser/view=";
+  var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
   var S3_API_PREFIX = "/filebrowser/view=S3A://";
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
@@ -102,6 +103,10 @@ var ApiHelper = (function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
     });
 
+    huePubSub.subscribe('assist.clear.git.cache', function () {
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+    });
+
     huePubSub.subscribe('assist.clear.s3.cache', function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
     });
@@ -124,6 +129,7 @@ var ApiHelper = (function () {
         clearAll: true
       });
       huePubSub.publish('assist.clear.hdfs.cache');
+      huePubSub.publish('assist.clear.git.cache');
       huePubSub.publish('assist.clear.s3.cache');
       huePubSub.publish('assist.clear.collections.cache');
       huePubSub.publish('assist.clear.hbase.cache');
@@ -370,6 +376,48 @@ var ApiHelper = (function () {
 
     fetchCached.bind(self)($.extend({}, options, {
       sourceType: 'hdfs',
+      url: url,
+      fetchFunction: fetchFunction
+    }));
+  };
+
+  /**
+   * @param {Object} options
+   * @param {Function} options.successCallback
+   * @param {Function} [options.errorCallback]
+   * @param {boolean} [options.silenceErrors]
+   * @param {Number} [options.timeout]
+   *
+   * @param {string[]} options.pathParts
+   */
+  ApiHelper.prototype.fetchGitPath = function (options) {
+    var self = this;
+    var url = GIT_API_PREFIX + '?path=' + options.pathParts.join("/");
+    var fetchFunction = function (storeInCache) {
+      if (options.timeout === 0) {
+        self.assistErrorCallback(options)({ status: -1 });
+        return;
+      }
+      $.ajax({
+        dataType: "json",
+        url: url,
+        timeout: options.timeout,
+        success: function (data) {
+          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
+            if (data.files.length > 2) {
+              storeInCache(data);
+            }
+            options.successCallback(data);
+          } else {
+            self.assistErrorCallback(options)(data);
+          }
+        }
+      })
+      .fail(self.assistErrorCallback(options));
+    };
+
+    fetchCached.bind(self)($.extend({}, options, {
+      sourceType: 'git',
       url: url,
       fetchFunction: fetchFunction
     }));

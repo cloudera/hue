@@ -97,10 +97,3 @@ urlpatterns += patterns('notebook.api',
   url(r'^api/sample/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/?$', 'get_sample_data', name='api_sample_data'),
   url(r'^api/sample/(?P<server>\w+)/(?P<database>[\w._\-0-9]+)/(?P<table>\w+)/(?P<column>\w+)/?$', 'get_sample_data', name='api_sample_data_column'),
 )
-
-# Github
-urlpatterns += patterns('notebook.api',
-  url(r'^api/github/fetch/?$', 'github_fetch', name='github_fetch'),
-  url(r'^api/github/authorize/?$', 'github_authorize', name='github_authorize'),
-  url(r'^api/github/callback/?$', 'github_callback', name='github_callback'),
-)

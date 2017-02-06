@@ -29,7 +29,7 @@ from desktop.redaction.engine import parse_redaction_policy_from_file
 from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_bool, coerce_csv, coerce_json_dict,\
                              validate_path, list_of_compiled_res, coerce_str_lowercase, \
-                             coerce_password_from_script
+                             coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
 
@@ -419,6 +419,42 @@ ALLOWED_HOSTS = Config(
   type=coerce_csv,
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
+
+VCS = UnspecifiedConfigSection(
+  "vcs",
+  help="One entry for each Version Control",
+  each=ConfigSection(
+    help="""Configuration options for source version control used to list and
+            save files from the editor. Example: Git, SVN""",
+    members=dict(
+      REMOTE_URL = Config(
+        key="remote_url",
+        help=_("Base URL to Interface Remote Server"),
+        default='https://github.com/cloudera/hue/',
+        type=coerce_string,
+      ),
+      API_URL = Config(
+        key="api_url",
+        help=_("Base URL to Interface API"),
+        default='https://api.github.com',
+        type=coerce_string,
+      ),
+      CLIENT_ID = Config(
+        key="client_id",
+        help=_("The Client ID of the Interface application."),
+        type=coerce_string,
+        default=""
+      ),
+      CLIENT_SECRET = Config(
+        key="client_secret",
+        help=_("The Client Secret of the Interface application."),
+        type=coerce_string,
+        default=""
+      )
+    )
+  )
+)
+
 
 def default_secure_cookie():
   """Enable secure cookies if HTTPS is enabled."""

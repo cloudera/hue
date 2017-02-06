@@ -33,7 +33,7 @@ ${ header.menubar() }
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; 3.11 - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Visit the project website!') }">${ _("The Hadoop UI") }</a>
+        Hue&trade; 3.12 - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Visit the project website!') }">${ _("The Hadoop UI") }</a>
       </h2>
 
      % if user.is_superuser:

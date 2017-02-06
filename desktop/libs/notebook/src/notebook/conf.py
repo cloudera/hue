@@ -139,34 +139,6 @@ ENABLE_BATCH_EXECUTE = Config(
 #  dynamic_default=is_oozie_enabled
 )
 
-GITHUB_REMOTE_URL = Config(
-    key="github_remote_url",
-    help=_t("Base URL to GitHub Remote Server"),
-    default='https://github.com',
-    type=coerce_string,
-)
-
-GITHUB_API_URL = Config(
-    key="github_api_url",
-    help=_t("Base URL to GitHub API"),
-    default='https://api.github.com',
-    type=coerce_string,
-)
-
-GITHUB_CLIENT_ID = Config(
-    key="github_client_id",
-    help=_t("The Client ID of the GitHub application."),
-    type=coerce_string,
-    default=""
-)
-
-GITHUB_CLIENT_SECRET = Config(
-    key="github_client_secret",
-    help=_t("The Client Secret of the GitHub application."),
-    type=coerce_string,
-    default=""
-)
-
 
 def _default_interpreters():
   INTERPRETERS.set_for_testing(OrderedDict((
