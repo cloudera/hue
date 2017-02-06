@@ -511,6 +511,44 @@
           # The username attribute in the LDAP schema
           ## group_name_attr=cn
 
+  # Configuration options for specifying the Source Version Control.
+  # ----------------------------------------------------------------
+  [[vcs]]
+
+  ## [[[git-read-only]]]
+      ## Base URL to Remote Server
+      # remote_url=https://github.com/cloudera/hue/tree/master
+
+      ## Base URL to Version Control API
+      # api_url=https://api.github.com
+  ## [[[github]]]
+
+      ## Base URL to Remote Server
+      # remote_url=https://github.com/cloudera/hue/tree/master
+
+      ## Base URL to Version Control API
+      # api_url=https://api.github.com
+
+      # These will be necessary when you want to write back to the repository.
+      ## Client ID for Authorized Application
+      # client_id=
+
+      ## Client Secret for Authorized Application
+      # client_secret=
+  ## [[[svn]]
+      ## Base URL to Remote Server
+      # remote_url=https://github.com/cloudera/hue/tree/master
+
+      ## Base URL to Version Control API
+      # api_url=https://api.github.com
+
+      # These will be necessary when you want to write back to the repository.
+      ## Client ID for Authorized Application
+      # client_id=
+
+      ## Client Secret for Authorized Application
+      # client_secret=
+
   # Configuration options for specifying the Desktop Database. For more info,
   # see http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine
   # ------------------------------------------------------------------------
@@ -629,18 +667,6 @@
 
   ## Flag to enable the creation of a coordinator for the current SQL query.
   # enable_query_scheduling=false
-
-  ## Base URL to Remote GitHub Server
-  # github_remote_url=https://github.com
-
-  ## Base URL to GitHub API
-  # github_api_url=https://api.github.com
-
-  ## Client ID for Authorized GitHub Application
-  # github_client_id=
-
-  ## Client Secret for Authorized GitHub Application
-  # github_client_secret=
 
   # One entry for each type of snippet.
   [[interpreters]]

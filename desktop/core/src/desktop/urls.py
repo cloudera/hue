@@ -152,6 +152,11 @@ dynamic_patterns += patterns('useradmin.views',
   (r'^desktop/api/users/autocomplete', 'list_for_autocomplete'),
 )
 
+dynamic_patterns += patterns('desktop.lib.vcs.api',
+  (r'^desktop/api/vcs/contents/?$', 'contents'),
+  (r'^desktop/api/vcs/authorize/?$', 'authorize'),
+)
+
 # Metrics specific
 if METRICS.ENABLE_WEB_METRICS.get():
   dynamic_patterns += patterns('',

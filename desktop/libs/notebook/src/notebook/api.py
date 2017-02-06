@@ -22,7 +22,6 @@ import sqlparse
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
@@ -32,7 +31,6 @@ from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.github import GithubClient
 from notebook.models import escape_rows
 from notebook.views import upgrade_session_properties
 
@@ -606,64 +604,6 @@ def format(request):
   response['formatted_statements'] = sqlparse.format(statements, reindent=True, keyword_case='upper') # SQL only currently
 
   return JsonResponse(response)
-
-
-@require_GET
-@api_error_handler
-def github_fetch(request):
-  response = {'status': -1}
-
-  api = GithubClient(access_token=request.session.get('github_access_token'))
-
-  response['url'] = url = request.GET.get('url')
-
-  if url:
-    owner, repo, branch, filepath = api.parse_github_url(url)
-    content = api.get_file_contents(owner, repo, filepath, branch)
-    try:
-      response['content'] = json.loads(content)
-    except ValueError:
-      # Content is not JSON-encoded so return plain-text
-      response['content'] = content
-    response['status'] = 0
-  else:
-    return HttpResponseBadRequest(_('url param is required'))
-
-  return JsonResponse(response)
-
-
-@api_error_handler
-def github_authorize(request):
-  access_token = request.session.get('github_access_token')
-  if access_token and GithubClient.is_authenticated(access_token):
-    response = {
-      'status': 0,
-      'message': _('User is already authenticated to GitHub.')
-    }
-    return JsonResponse(response)
-  else:
-    auth_url = GithubClient.get_authorization_url()
-    request.session['github_callback_redirect'] = request.GET.get('currentURL')
-    request.session['github_callback_fetch'] = request.GET.get('fetchURL')
-    response = {
-      'status': -1,
-      'auth_url':auth_url
-    }
-    if (request.is_ajax()):
-      return JsonResponse(response)
-
-    return HttpResponseRedirect(auth_url)
-
-
-@api_error_handler
-def github_callback(request):
-  redirect_base = request.session['github_callback_redirect'] + "&github_status="
-  if 'code' in request.GET:
-    session_code = request.GET.get('code')
-    request.session['github_access_token'] = GithubClient.get_access_token(session_code)
-    return HttpResponseRedirect(redirect_base + "0&github_fetch=" + request.session['github_callback_fetch'])
-  else:
-    return HttpResponseRedirect(redirect_base + "-1&github_fetch=" + request.session['github_callback_fetch'])
 
 
 @require_POST

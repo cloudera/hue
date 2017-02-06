@@ -25,7 +25,8 @@ import urllib
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 
-from notebook.conf import GITHUB_REMOTE_URL, GITHUB_API_URL, GITHUB_CLIENT_ID, GITHUB_CLIENT_SECRET
+from desktop.conf import VCS
+from desktop.lib.vcs.apis.base_api import GITHUB_OFFICIAL
 
 
 LOG = logging.getLogger(__name__)
@@ -49,8 +50,8 @@ class GithubClient(object):
 
 
   def __init__(self, **options):
-    self._github_base_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
-    self._api_url = options.get('api_url', GITHUB_API_URL.get()).strip('/')
+    self._github_base_url = options.get('remote_url', VCS[GITHUB_OFFICIAL].REMOTE_URL.get()).strip('/')
+    self._api_url = options.get('api_url', VCS[GITHUB_OFFICIAL].API_URL.get()).strip('/')
 
     self._client = HttpClient(self._api_url, logger=LOG)
     self._root = resource.Resource(self._client)
@@ -68,8 +69,8 @@ class GithubClient(object):
     """
     https://developer.github.com/guides/basics-of-authentication/
     """
-    remote_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
-    client_id = options.get('client_id', GITHUB_CLIENT_ID.get())
+    remote_url = options.get('remote_url', VCS[GITHUB_OFFICIAL].REMOTE_URL.get()).strip('/')
+    client_id = options.get('client_id', VCS[GITHUB_OFFICIAL].CLIENT_ID.get())
     scopes_list = options.get('scopes_list', cls.DEFAULT_SCOPES)
     scopes = ','.join(scopes_list)
     return '%s/login/oauth/authorize?scope=%s&client_id=%s' % (remote_url, scopes, client_id)
@@ -77,9 +78,9 @@ class GithubClient(object):
 
   @classmethod
   def get_access_token(cls, session_code, **options):
-    remote_url = options.get('remote_url', GITHUB_REMOTE_URL.get()).strip('/')
-    client_id = options.get('client_id', GITHUB_CLIENT_ID.get())
-    client_secret = options.get('client_secret', GITHUB_CLIENT_SECRET.get())
+    remote_url = options.get('remote_url', VCS[GITHUB_OFFICIAL].REMOTE_URL.get()).strip('/')
+    client_id = options.get('client_id', VCS[GITHUB_OFFICIAL].CLIENT_ID.get())
+    client_secret = options.get('client_secret', VCS[GITHUB_OFFICIAL].CLIENT_SECRET.get())
 
     try:
       client = HttpClient(remote_url, logger=LOG)
@@ -104,7 +105,7 @@ class GithubClient(object):
 
   @classmethod
   def is_authenticated(cls, access_token, **options):
-    api_url = options.get('api_url', GITHUB_API_URL.get()).strip('/')
+    api_url = options.get('api_url', VCS[GITHUB_OFFICIAL].API_URL.get()).strip('/')
 
     try:
       client = HttpClient(api_url, logger=LOG)
