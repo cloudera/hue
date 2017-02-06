@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"><html xmlns="http://www.w3.org/1999/xhtml"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8" /><title></title><link rel="stylesheet" type="text/css" href="docbook.css" /><meta name="generator" content="DocBook XSL Stylesheets V1.78.1" /></head><body><div xml:lang="en" class="article" lang="en"><div class="titlepage"><hr /></div><p>Cloudera Desktop v0.4.2, released May 21, 2010</p><p>Besides the list of key enhancements and bug fixes below, the most important
+changes to highlight are:</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Internet Explorer 8 support.
+</li><li class="listitem">
+User groups and group-based permissions.
+</li><li class="listitem">
+Many new features and usability improvement for Beeswax.
+</li></ul></div><p>ENHANCEMENTS</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem"><p class="simpara">
+Compatibility:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+Basic support for Internet Explorer 8. Support for Chrome and Safari.
+</li><li class="listitem">
+Support Python 2.6.
+</li><li class="listitem">
+Support Ubuntu 10.04 (Lucid).
+</li></ul></div></li><li class="listitem"><p class="simpara">
+Desktop Administration:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+Support for using MySQL as the Django database.
+</li><li class="listitem">
+Automatic log rotation.
+</li></ul></div></li><li class="listitem"><p class="simpara">
+User Management:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+Added group support. You can assign users to groups, and grant (or deny)
+    access to use any Cloudera Desktop application based on group.
+</li><li class="listitem">
+A new user access log.
+</li><li class="listitem">
+The superuser may view the recent accesses of all users grouped by
+    applications.
+</li></ul></div></li><li class="listitem"><p class="simpara">
+Beeswax:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+You can save a query with parameters, which will prompt for inputs when
+    executed.
+</li><li class="listitem">
+When creating new Hive tables for existing data files, the new import
+    wizard can help defining the table columns by reading your data, as
+    well as loading the data into the new table.
+</li><li class="listitem">
+You can save the temporary results of a query as a new table, or simply as
+    files in HDFS.
+</li></ul></div></li><li class="listitem"><p class="simpara">
+The Cloudera Desktop SDK:
+</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: circle; "><li class="listitem">
+The ability to create a URL link to a specific view of an individual
+    application. Various email notifications use this to link to their result
+    pages.
+</li></ul></div></li><li class="listitem">
+UI speed improvement.
+</li></ul></div><p>KEY BUG FIXES</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+Handle large number of Data Nodes.
+</li><li class="listitem">
+File upload under HTTPS now works.
+</li><li class="listitem">
+Job Browser filters by job status correctly.
+</li></ul></div><p>KNOWN BUGS</p><div class="itemizedlist"><ul class="itemizedlist" style="list-style-type: disc; "><li class="listitem">
+After a successful upload with Linux’s flash player (which may warn you about
+  hanging your computer), the upload screen does not clear. Click the red (x)
+  button to clear it.
+</li><li class="listitem">
+Running on Internet Explorer 8 has a memory leak issue, which can cause
+  instability with prolonged use.
+</li></ul></div></div></body></html>
