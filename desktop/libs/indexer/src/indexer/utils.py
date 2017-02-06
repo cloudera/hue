@@ -62,8 +62,10 @@ def get_config_template_path(solr_cloud_mode):
 class SchemaXml(object):
   def __init__(self, xml):
     self.xml = xml
+    self.unique_key_field = None
 
   def uniqueKeyField(self, unique_key_field):
+    self.unique_key_field = unique_key_field
     self.xml = force_unicode(force_unicode(self.xml).replace(u'<!-- REPLACE UNIQUE KEY -->', force_unicode(unique_key_field)))
 
   def fields(self, fields):
@@ -71,6 +73,8 @@ class SchemaXml(object):
     for field in fields:
       field_dict = DEFAULT_FIELD.copy()
       field_dict.update(field)
+      if self.unique_key_field == field['name']:
+        field_dict['required'] = 'true'
       fields_xml += FIELD_XML_TEMPLATE % field_dict + '\n'
     self.xml = force_unicode(force_unicode(self.xml).replace(u'<!-- REPLACE FIELDS -->', force_unicode(fields_xml)))
 
