@@ -19,8 +19,6 @@ import errno
 import logging
 import os.path
 
-from impala import conf
-
 LOG = logging.getLogger(__name__)
 
 _IMPALA_FLAGS = None
@@ -46,18 +44,39 @@ def get_webserver_certificate_file():
   return get_conf().get(_WEBSERVER_CERTIFICATE_FILE)
 
 def get_ssl_server_certificate():
+  """
+    The path to the TLS/SSL file containing the server certificate key used for TLS/SSL. Used when Catalog
+    Server Webserver is acting as a TLS/SSL server. The certificate file must be in PEM format.
+  """
   return get_conf().get(_SSL_SERVER_CERTIFICATE)
 
 def get_max_result_cache_size():
+  """
+    Maximum number of query results a client may request to be cached on a per-query basis to support restarting
+    fetches. This option guards against unreasonably large result caches requested by clients. Requests exceeding
+    this maximum will be rejected.
+  """
   result_size = get_conf().get(_MAX_RESULT_CACHE_SIZE)
-  return int(result_size) if result_size else None
-
+  return int(result_size) if result_size else 50000
 
 def get_authorized_proxy_user_config():
+  """
+    Specifies the set of authorized proxy users (users who can impersonate other users during authorization) and whom
+    they are allowed to impersonate. Input is a semicolon-separated list of key=value pairs of authorized proxy users
+    to the user(s) they can impersonate. These users are specified as a comma separated list of short usernames, or '*'
+    to indicate all users. For example: joe=alice,bob;hue=*;admin=*. Only valid when Sentry is enabled.
+  """
   return get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
 
+def is_impersonation_enabled():
+  """
+    Returns True if user_config config contains 'hue='
+  """
+  user_config = get_conf().get(_AUTHORIZED_PROXY_USER_CONFIG)
+  return True if user_config and 'hue=' in user_config else False
 
 def _parse_impala_flags():
+  from impala import conf # Cyclic dependency
   global _IMPALA_FLAGS
 
   try:
