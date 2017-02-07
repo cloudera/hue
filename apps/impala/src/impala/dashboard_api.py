@@ -166,7 +166,7 @@ class SQLApi():
 
     return {
       'schema': {
-        'fields': 
+        'fields':
             dict([(col['name'], {
               'name': str(escape(col['name'])),
               'type': str(col['type']),
@@ -175,7 +175,7 @@ class SQLApi():
               'indexed': False,
               'stored': True,
               'required': col.get('primary_key') == 'true'
-          }) 
+          })
           for col in table_metadata['extended_columns']]
         )
       }
@@ -183,7 +183,9 @@ class SQLApi():
 
 
   def schema_fields(self, collection):
-    return {'fields': self.fields(collection)}
+    return {
+      'fields': [f for f in self.fields(collection)['schema']['fields'].itervalues()]
+    }
 
 
   def luke(self, collection):
@@ -204,7 +206,7 @@ class SQLApi():
 
     result = self._sync_execute(sql, database)
 
-    if result:      
+    if result:
       stats = list(result['data'])
       min_value, max_value = stats[0]
       maybe_is_big_int_date = isinstance(min_value, (int, long))
@@ -231,7 +233,7 @@ class SQLApi():
   def get(self, dashboard, doc_id):
     database, table = self._get_database_table_names(dashboard['name'])
     field = self._get_field(dashboard, dashboard['idField'])
-    quotes = '' if self._is_number(field['type']) else "'" 
+    quotes = '' if self._is_number(field['type']) else "'"
 
     sql = "SELECT * FROM `%(database)s`.`%(table)s` WHERE `%(idField)s` = %(quotes)s%(doc_id)s%(quotes)s" % {
       'database': database,
@@ -242,8 +244,8 @@ class SQLApi():
     }
 
     result = self._sync_execute(sql, database)
-    
-    if result:    
+
+    if result:
       cols = [col['name'] for col in result['meta']]
       rows = list(result['data']) # No escape_rows
       doc_data = dict([(header, cell) for row in rows for header, cell in zip(cols, row)])
@@ -300,7 +302,7 @@ class SQLApi():
             LOG.warning("Failed to cancel query: %s" % e)
             api.close_statement(snippet)
           raise OperationTimeout(e)
-        
+
     return result
 
   def _convert_result(self, result, dashboard, facet, query):
@@ -497,7 +499,7 @@ class SQLApi():
 
   def _get_time_filter_query(self, collection, query):
     props = self._get_time_filter_range(collection, query)
-    
+
     if props:
       return "(`%(field)s` >= %(from)s AND `%(field)s` <= %(to)s)" %  props
     else:
@@ -685,7 +687,7 @@ def augment_date_range_list(source_rows, start, end, delta, nb_cols):
   current = start_ts
   indexed_rows = dict([(row[0], row) for row in source_rows])
   augmented = []
-  
+
   while current <= end_ts:
     if str(current) in indexed_rows:
       augmented.append(indexed_rows[str(current)])
@@ -700,7 +702,7 @@ def augment_number_range_list(source_rows, start, end, delta, nb_cols):
   current = start
   indexed_rows = dict([(row[0], row) for row in source_rows])
   augmented = []
-  
+
   while current <= end:
     if current in indexed_rows:
       augmented.append(indexed_rows[current])

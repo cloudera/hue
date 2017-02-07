@@ -3445,6 +3445,71 @@ function queryTypeahead(query, process) {
   }
 }
 
+function newSearch() {
+  
+  ko.cleanNode($('#searchComponents')[0]);
+  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
+
+  ko.applyBindings(viewModel, $('#searchComponents')[0]);
+
+  viewModel.timelineChartTypes = ko.observableArray([
+    {
+      value: "line",
+      label: "${ _('Lines')}"
+    },
+    {
+      value: "bar",
+      label: "${ _('Bars')}"
+    }
+  ]);
+
+  viewModel.init(function(data){
+    $(".chosen-select").trigger("chosen:updated");
+  });
+
+  viewModel.isRetrievingResults.subscribe(function(value){
+    if (! value){
+      resizeFieldsList();
+    }
+  });
+
+  viewModel.isEditing.subscribe(function(value){
+    if (value){
+      window.setTimeout(function(){
+        if ($(".slider-cnt").length > 0 && $(".slider-cnt").data("slider")){
+          $(".slider-cnt").slider("redraw");
+        }
+      }, 300);
+    }
+  });
+
+  viewModel.isPlayerMode.subscribe(function(value) {
+    if (value){
+      $(".navigator").hide();
+      $("body").css("paddingTop", "40px");
+    }
+    else {
+      $(".navigator").show();
+      $("body").css("paddingTop", "80px");
+    }
+  });
+
+  var _refreshTimeout = null;
+
+  viewModel.collection.autorefresh.subscribe(function (value) {
+    if (value) {
+      refresh();
+    }
+    else {
+      window.clearTimeout(_refreshTimeout);
+    }
+  });
+
+  viewModel.collection.autorefreshSeconds.subscribe(function (value) {
+    checkAutoRefresh();
+  });
+  }
+
 $(document).ready(function () {
 
   var _resizeTimeout = -1;
@@ -3500,68 +3565,24 @@ $(document).ready(function () {
     }, 200);
   });
 
-  var _query = ${ query | n,unicode };
-  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
-
-  viewModel.timelineChartTypes = ko.observableArray([
-    {
-      value: "line",
-      label: "${ _('Lines')}"
-    },
-    {
-      value: "bar",
-      label: "${ _('Bars')}"
-    }
-  ]);
-
+/*
+function newSearch() {
+  ko.cleanNode($('#searchComponents')[0]);
+  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
   ko.applyBindings(viewModel, $('#searchComponents')[0]);
 
-  viewModel.init(function(data){
-    $(".chosen-select").trigger("chosen:updated");
-  });
+  viewModel.init();
+  //viewModel.collection.facets.removeAll();
+  //viewModel.columns([]);
 
-  viewModel.isRetrievingResults.subscribe(function(value){
-    if (! value){
-      resizeFieldsList();
-    }
-  });
+  viewModel.search();
+}*/
 
-  viewModel.isEditing.subscribe(function(value){
-    if (value){
-      window.setTimeout(function(){
-        if ($(".slider-cnt").length > 0 && $(".slider-cnt").data("slider")){
-          $(".slider-cnt").slider("redraw");
-        }
-      }, 300);
-    }
-  });
+  var _query = ${ query | n,unicode };
 
-  viewModel.isPlayerMode.subscribe(function(value) {
-    if (value){
-      $(".navigator").hide();
-      $("body").css("paddingTop", "40px");
-    }
-    else {
-      $(".navigator").show();
-      $("body").css("paddingTop", "80px");
-    }
-  });
-
-  var _refreshTimeout = null;
-
-  viewModel.collection.autorefresh.subscribe(function (value) {
-    if (value) {
-      refresh();
-    }
-    else {
-      window.clearTimeout(_refreshTimeout);
-    }
-  });
-
-  viewModel.collection.autorefreshSeconds.subscribe(function (value) {
-    checkAutoRefresh();
-  });
-
+  newSearch();
+  
+  
   if (viewModel.collection.autorefresh()) {
     refresh();
   }
@@ -3584,15 +3605,6 @@ $(document).ready(function () {
   huePubSub.subscribe('check.autorefresh', function () {
     checkAutoRefresh();
   });
-
-  function newSearch() {
-    ko.cleanNode($('#searchComponents')[0]);
-    viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, _query, ${ initial | n,unicode });
-    ko.applyBindings(viewModel, $('#searchComponents')[0]);
-    viewModel.init();
-    
-    viewModel.search();
-  }
 
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){

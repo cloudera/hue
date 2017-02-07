@@ -1108,7 +1108,7 @@ var Collection = function (vm, collection) {
 
   self.template.filteredModalFields = ko.pureComputed(function () {
     var filter = self.template.fieldsModalFilter();
-    if (!filter) {
+    if (! filter) {
       return self.template.availableWidgetFields();
     } else {
       return ko.utils.arrayFilter(self.template.availableWidgetFields(), function (field) {
