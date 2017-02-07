@@ -352,7 +352,7 @@ class HS2Api(Api):
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
 
-      file_name = _get_snippet_name(notebook)
+      file_name = '%s.%s' % (_get_snippet_name(notebook), format)
 
       return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name)
     except Exception, e:
