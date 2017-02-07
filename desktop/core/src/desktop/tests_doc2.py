@@ -277,9 +277,11 @@ class TestDocument2(object):
     assert_equal(0, data['count'])
 
     # Delete query2.sql
+    assert_false(Document2.objects.get(uuid=query.uuid).is_trashed)
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(query.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'])
+    assert_true(Document2.objects.get(uuid=query.uuid).is_trashed)
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
@@ -287,9 +289,11 @@ class TestDocument2(object):
     assert_equal(data['children'][0]['uuid'], query.uuid)
 
     # Delete test_dir directory w/ contents
+    assert_false(Document2.objects.get(uuid=dir.uuid).is_trashed)
     response = self.client.post('/desktop/api2/doc/delete', {'uuid': json.dumps(dir.uuid)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
+    assert_true(Document2.objects.get(uuid=dir.uuid).is_trashed)
 
     response = self.client.get('/desktop/api2/doc', {'path': '/.Trash'})
     data = json.loads(response.content)
