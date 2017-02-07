@@ -87,7 +87,10 @@ def index(request, is_mobile=False, is_embeddable=False):
   return render(template, request, {
     'collection': collection,
     'query': json.dumps(query),
-    'initial': json.dumps({'collections': [], 'layout': DEFAULT_LAYOUT, 'is_latest': LATEST.get(),
+    'initial': json.dumps({
+        'collections': [],
+        'layout': DEFAULT_LAYOUT,
+        'is_latest': LATEST.get(),
         'engines': get_engines(request.user)
     }),
     'is_owner': collection_doc.doc.get().can_write(request.user),
@@ -118,10 +121,10 @@ def new_search(request, is_embeddable=False):
     'collection': collection,
     'query': query,
     'initial': json.dumps({
-         'collections': collections,
-         'layout': DEFAULT_LAYOUT,
-         'is_latest': LATEST.get(),
-         'engines': get_engines(request.user)
+        'collections': collections,
+        'layout': DEFAULT_LAYOUT,
+        'is_latest': LATEST.get(),
+        'engines': get_engines(request.user)
      }),
     'is_owner': True,
     'can_edit_index': can_edit_index(request.user)

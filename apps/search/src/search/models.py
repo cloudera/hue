@@ -546,8 +546,6 @@ class Collection2(object):
 
   def get_default(self, user, name, engine='solr'):
     fields = self.fields_data(user, name, engine)
-    print 'aaaaaaaaaaaaaaaaa'
-    print fields
     id_field = [field['name'] for field in fields if field.get('isId')]
 
     if id_field:
@@ -618,14 +616,15 @@ class Collection2(object):
   @classmethod
   def _make_luke_from_schema_fields(cls, schema_fields):
     return dict([
-          (f['name'], {
+        (f['name'], {
               'copySources': [],
               'type': f['type'],
               'required': True,
               'uniqueKey': f.get('uniqueKey'),
               'flags': u'%s-%s-----OF-----l' % ('I' if f['indexed'] else '-', 'S' if f['stored'] else '-'), u'copyDests': []
-          })
-        for f in schema_fields['fields']])
+        })
+        for f in schema_fields['fields']
+    ])
 
   def get_absolute_url(self):
     return reverse('search:index') + '?collection=%s' % self.id
