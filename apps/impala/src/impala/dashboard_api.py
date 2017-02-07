@@ -228,14 +228,17 @@ class SQLApi():
       }
 
 
-  def get(self, db_table, doc_id):
-    database, table = self._get_database_table_names(db_table)
+  def get(self, dashboard, doc_id):
+    database, table = self._get_database_table_names(dashboard['name'])
+    field = self._get_field(dashboard, dashboard['idField'])
+    quotes = '' if self._is_number(field['type']) else "'" 
 
-    sql = "SELECT * FROM `%(database)s`.`%(table)s` WHERE %(pk)s = %(doc_id)s" % {
+    sql = "SELECT * FROM `%(database)s`.`%(table)s` WHERE `%(idField)s` = %(quotes)s%(doc_id)s%(quotes)s" % {
       'database': database,
       'table': table,
-      'pk': doc_id,
-      'doc_id': doc_id
+      'idField': dashboard['idField'], # Only 1 PK currently,
+      'doc_id': doc_id,
+      'quotes': quotes
     }
 
     result = self._sync_execute(sql, database)
@@ -243,16 +246,12 @@ class SQLApi():
     if result:    
       cols = [col['name'] for col in result['meta']]
       rows = list(result['data']) # No escape_rows
-      doc_data = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
+      doc_data = dict([(header, cell) for row in rows for header, cell in zip(cols, row)])
     else:
       doc_data = {}
 
     return {
-      "status": 0,
-      "doc": {
-        "doc": doc_data
-      },
-      "message": ""
+      "doc": doc_data
     }
 
   def _sync_execute(self, sql, database):
