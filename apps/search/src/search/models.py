@@ -981,6 +981,9 @@ def augment_solr_response(response, collection, query):
       if 'link-meta' in doc:
         meta = json.loads(doc['link-meta'])
         link = get_data_link(meta)
+      elif 'link' in doc:
+        meta = {'type': 'link', 'link': doc['link']}
+        link = get_data_link(meta)
 
       doc['externalLink'] = link
       doc['details'] = []
