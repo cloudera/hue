@@ -153,7 +153,7 @@ def get_document(request):
     doc_id = request.POST.get('id')
 
     if doc_id:
-      result['doc'] = get_engine(request.user, collection).get(collection['name'], doc_id)
+      result['doc'] = get_engine(request.user, collection).get(collection, doc_id)
       if result['doc']['doc']:
         result['status'] = 0
         result['message'] = ''
