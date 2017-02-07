@@ -31,7 +31,7 @@ from libsolr.api import GAPS
 from notebook.models import make_notebook
 from notebook.connectors.base import get_api, OperationTimeout
 
-from search.models import Collection2
+from search.models import Collection2, augment_response
 from search.facet_builder import _compute_range_facet
 
 
@@ -164,16 +164,22 @@ class SQLApi():
 
     table_metadata = get_api(MockRequest(self.user), snippet).autocomplete(snippet, database, table)
 
-    return [{
-        'name': str(escape(col['name'])),
-        'type': str(col['type']),
-        'isId': False, # TODO Kudu
-        'isDynamic': False,
-        'indexed': False,
-        'stored': True
-        # isNested
-      } for col in table_metadata['extended_columns']
-    ]
+    return {
+      'schema': {
+        'fields': 
+            dict([(col['name'], {
+              'name': str(escape(col['name'])),
+              'type': str(col['type']),
+              'uniqueKey': col.get('primary_key') == 'true',
+              # 'dynamicBase': False,
+              'indexed': False,
+              'stored': True,
+              'required': col.get('primary_key') == 'true'
+          }) 
+          for col in table_metadata['extended_columns']]
+        )
+      }
+    }
 
 
   def schema_fields(self, collection):
@@ -196,51 +202,9 @@ class SQLApi():
       'table': table
     }
 
-    editor = make_notebook(
-        name='Execute and watch',
-        editor_type=self.engine,
-        statement=sql,
-        database=database,
-        status='ready-execute',
-        skip_historify=True
-        # async=False
-    )
+    result = self._sync_execute(sql, database)
 
-    request = MockRequest(self.user)
-    snippet = {'type': self.engine}
-    response = editor.execute(request)
-
-
-    if 'handle' in response:
-      snippet['result'] = response
-
-      if response['handle'].get('sync'):
-        result = response['result']
-      else:
-        timeout_sec = 20 # To move to Notebook API
-        sleep_interval = 0.5
-        curr = time.time()
-        end = curr + timeout_sec
-
-        api = get_api(request, snippet)
-
-        while curr <= end:
-          status = api.check_status(dataset, snippet)
-          if status['status'] == 'available':
-            result = api.fetch_result(dataset, snippet, rows=10, start_over=True)
-            api.close_statement(snippet)
-            break
-          time.sleep(sleep_interval)
-          curr = time.time()
-
-        if curr > end:
-          try:
-            api.cancel_operation(snippet)
-          except Exception, e:
-            LOG.warning("Failed to cancel query: %s" % e)
-            api.close_statement(snippet)
-          raise OperationTimeout(e)
-
+    if result:      
       stats = list(result['data'])
       min_value, max_value = stats[0]
       maybe_is_big_int_date = isinstance(min_value, (int, long))
@@ -263,6 +227,82 @@ class SQLApi():
         }
       }
 
+
+  def get(self, db_table, doc_id):
+    database, table = self._get_database_table_names(db_table)
+
+    sql = "SELECT * FROM `%(database)s`.`%(table)s` WHERE %(pk)s = %(doc_id)s" % {
+      'database': database,
+      'table': table,
+      'pk': doc_id,
+      'doc_id': doc_id
+    }
+
+    result = self._sync_execute(sql, database)
+    
+    if result:    
+      cols = [col['name'] for col in result['meta']]
+      rows = list(result['data']) # No escape_rows
+      doc_data = [dict((header, cell) for header, cell in zip(cols, row)) for row in rows]
+    else:
+      doc_data = {}
+
+    return {
+      "status": 0,
+      "doc": {
+        "doc": doc_data
+      },
+      "message": ""
+    }
+
+  def _sync_execute(self, sql, database):
+    editor = make_notebook(
+        name='Execute and watch',
+        editor_type=self.engine,
+        statement=sql,
+        database=database,
+        status='ready-execute',
+        skip_historify=True
+        # async=False
+    )
+
+    request = MockRequest(self.user)
+    mock_notebook = {}
+    snippet = {'type': self.engine}
+    response = editor.execute(request)
+
+
+    if 'handle' in response:
+      snippet['result'] = response
+
+      if response['handle'].get('sync'):
+        result = response['result']
+      else:
+        timeout_sec = 20 # To move to Notebook API
+        sleep_interval = 0.5
+        curr = time.time()
+        end = curr + timeout_sec
+
+        api = get_api(request, snippet)
+
+        while curr <= end:
+          status = api.check_status(mock_notebook, snippet)
+          if status['status'] == 'available':
+            result = api.fetch_result(mock_notebook, snippet, rows=10, start_over=True)
+            api.close_statement(snippet)
+            break
+          time.sleep(sleep_interval)
+          curr = time.time()
+
+        if curr > end:
+          try:
+            api.cancel_operation(snippet)
+          except Exception, e:
+            LOG.warning("Failed to cancel query: %s" % e)
+            api.close_statement(snippet)
+          raise OperationTimeout(e)
+        
+    return result
 
   def _convert_result(self, result, dashboard, facet, query):
     if not facet.get('type'):
@@ -633,6 +673,8 @@ class SQLApi():
 
     response['response']['docs'] = docs
     response['response']['numFound'] = len(docs)
+
+    augment_response(dashboard, query, response)
 
     return response
 

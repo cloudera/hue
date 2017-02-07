@@ -546,6 +546,8 @@ class Collection2(object):
 
   def get_default(self, user, name, engine='solr'):
     fields = self.fields_data(user, name, engine)
+    print 'aaaaaaaaaaaaaaaaa'
+    print fields
     id_field = [field['name'] for field in fields if field.get('isId')]
 
     if id_field:
@@ -960,6 +962,15 @@ def augment_solr_response(response, collection, query):
       response.pop('facet_counts')
       response.pop('facets')
 
+  augment_response(collection, query, response)
+
+  if normalized_facets:
+    augmented['normalized_facets'].extend(normalized_facets)
+
+  return augmented
+
+
+def augment_response(collection, query, response):
   # HTML escaping
   if not query.get('download'):
     id_field = collection.get('idField', '')
@@ -1006,12 +1017,6 @@ def augment_solr_response(response, collection, query):
             doc.update(escaped_highlighting)
     else:
       response['warning'] = _("The Solr schema requires an id field for performing the result highlighting")
-
-
-  if normalized_facets:
-    augmented['normalized_facets'].extend(normalized_facets)
-
-  return augmented
 
 
 def _augment_pivot_2d(name, facet_id, counts, selected_values):

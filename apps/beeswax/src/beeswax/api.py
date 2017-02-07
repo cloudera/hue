@@ -113,6 +113,9 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
 
       cols_extended = massage_columns_for_json(table.cols)
 
+      if 'org.apache.kudu.mapreduce.KuduTableOutputFormat' in str(table.properties): # When queries from Impala directly
+        table.is_impala_only = True
+
       if table.is_impala_only: # Expand Kudu columns information
         query_server = get_query_server_config('impala')
         db = dbms.get(db.client.user, query_server)
