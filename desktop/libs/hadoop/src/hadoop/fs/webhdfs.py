@@ -36,6 +36,7 @@ from hadoop.fs.webhdfs_types import WebHdfsStat, WebHdfsContentSummary
 from hadoop.conf import UPLOAD_CHUNK_SIZE
 from hadoop.hdfs_site import get_nn_sentry_prefixes, get_umask_mode, get_supergroup
 
+
 import hadoop.conf
 import desktop.conf
 
@@ -415,6 +416,14 @@ class WebHdfs(Hdfs):
     ls = self.listdir(old_dir)
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
+
+  def set_replication_factor(self, filename, repl_factor):
+    """set replication factor(filename, repl_factor)"""
+    params = self._getparams()
+    params['op'] = 'SETREPLICATION'
+    params['replication'] = repl_factor
+    result = self._root.put(filename, params)
+    return result['boolean']
 
   def chown(self, path, user=None, group=None, recursive=False):
     """chown(path, user=None, group=None, recursive=False)"""
