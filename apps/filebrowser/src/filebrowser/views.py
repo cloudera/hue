@@ -69,7 +69,7 @@ from filebrowser.lib.rwx import filetype, rwx
 from filebrowser.lib import xxd
 from filebrowser.forms import RenameForm, UploadFileForm, UploadArchiveForm, MkDirForm, EditorForm, TouchForm,\
                               RenameFormSet, RmTreeFormSet, ChmodFormSet, ChownFormSet, CopyFormSet, RestoreFormSet,\
-                              TrashPurgeForm
+                              TrashPurgeForm, SetReplicationFactorForm
 
 
 DEFAULT_CHUNK_SIZE_BYTES = 1024 * 4 # 4KB
@@ -528,10 +528,11 @@ def stat(request, path):
 def content_summary(request, path):
     if not request.fs.exists(path):
         raise Http404(_("File not found: %(path)s") % {'path': escape(path)})
-
     response = {'status': -1, 'message': '', 'summary': None}
     try:
         stats = request.fs.get_content_summary(path)
+        replication_factor = request.fs.stats(path)['replication']
+        stats.summary.update({'replication': replication_factor})
         response['status'] = 0
         response['summary'] = stats.summary
     except WebHdfsException, e:
@@ -1053,6 +1054,14 @@ def rename(request):
         request.fs.rename(src_path, dest_path)
 
     return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
+
+def set_replication_factor(request):
+    def smart_set_replication_factor(src_path, replication_factor):
+        result = request.fs.set_replication_factor(src_path, replication_factor)
+        if not result:
+            raise PopupException(_("Setting of replication factor failed"))
+
+    return generic_op(SetReplicationFactorForm, request, smart_set_replication_factor, ["src_path", "replication_factor"], None)
 
 
 def mkdir(request):

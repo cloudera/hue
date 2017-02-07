@@ -237,6 +237,28 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
   </form>
 
+  <!-- set replication factor modal -->
+  <form id="setReplicationFactorForm" action="/filebrowser/set_replication_factor?next=${current_request_path | n,unicode }"  method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+    ${ csrf_token(request) | n,unicode }
+    <div id="setReplicationModal" class="modal hide fade">
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Setting replication factor for :')} <span id="setReplFileName">file name</span></h3>
+      </div>
+      <div class="modal-body">
+        <label>${_('Replication factor')} <input id="newRepFactorInput" name="replication_factor" value="" type="number" class="input-xlarge"/></label>
+      </div>
+      <div class="modal-footer">
+        <div id="replicationFactorRequiredAlert" class="hide" style="position: absolute; left: 10px;">
+          <span class="label label-important">${_('Replication factor is required.')}</span>
+        </div>
+        <input id="SrcPath" type="hidden" name="src_path" type="text">
+        <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+        <input type="submit" value="${_('Submit')}" class="btn btn-primary" />
+      </div>
+    </div>
+  </form>
+
   <!-- chown modal -->
   % if is_fs_superuser:
   <form id="chownForm" action="/filebrowser/chown" method="POST" enctype="multipart/form-data" class="form-stacked form-padding-fix">
@@ -501,6 +523,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <tr>
           <th>${ _('Disk space quota') }</th>
           <td data-bind="text: formatBytes(contentSummary().spaceQuota(), 4)"></td>
+        </tr>
+        <tr>
+          <th>${ _('Replication factor') }</th>
+          <td data-bind="text: contentSummary().replication()"></td>
         </tr>
         <tr>
           <th>${ _('Number of directories') }</th>
@@ -1108,7 +1134,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         spaceQuota: -1,
         length: 0,
         directoryCount: 0,
-        fileCount: 0
+        fileCount: 0,
+        replication: 0
       }));
       self.showSummary = function () {
         self.isLoadingSummary(true);
@@ -1344,6 +1371,27 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         });
 
         $("#renameModal").modal({
+          keyboard:true,
+          show:true
+        });
+      };
+
+      self.setReplicationFactor = function () {
+        $("#SrcPath").attr("value", self.selectedFile().path);
+
+        $("#setReplFileName").text(self.selectedFile().path);
+
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication_factor?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+
+        $('#setReplicationFactorForm').ajaxForm({
+          dataType: 'json',
+          success: function() {
+            $("#setReplicationModal").modal('hide');
+            self.retrieveData(true);
+          }
+        });
+
+        $("#setReplicationModal").modal({
           keyboard:true,
           show:true
         });
@@ -1996,6 +2044,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         hideContextMenu();
       });
 
+      // Allow only numeric symbols for setting replication factor
+      $("#newRepFactorInput").keydown(function (e) {
+        if ($.inArray(e.keyCode, [46, 8, 9, 27, 13, 110, 190]) !== -1 ||
+          (e.keyCode == 65 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode == 67 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode == 88 && (e.ctrlKey === true || e.metaKey === true)) ||
+          (e.keyCode >= 35 && e.keyCode <= 39)) {
+            return;
+        }
+        if ((e.shiftKey || (e.keyCode < 48 || e.keyCode > 57)) && (e.keyCode < 96 || e.keyCode > 105)) {
+          e.preventDefault();
+        }
+      });
+
       // Drag and drop uploads from anywhere on filebrowser screen
       if (window.FileReader) {
         var showHoverMsg = function (msg) {
@@ -2249,6 +2311,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
            return false;
         }
        });
+
+      $("#setReplicationFactorForm").submit(function () {
+        if ($("#newRepFactorInput").val() == "") {
+          $("#replicationFactorRequiredAlert").show();
+          $("#newRepFactorInput").addClass("fieldError");
+          resetPrimaryButtonsStatus(); //globally available
+          return false;
+        }
+      });
+
+      $("#newRepFactorInput").focus(function () {
+        $("#replicationFactorRequiredAlert").hide();
+        $("#newRepFactorInput").removeClass("fieldError");
+      });
 
       huePubSub.subscribe('update.autocompleters', function(){
         $("#moveDestination").jHueHdfsAutocomplete({

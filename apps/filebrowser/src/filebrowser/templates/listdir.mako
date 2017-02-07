@@ -68,6 +68,8 @@ ${ fb_components.menubar() }
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li><a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
+              <li><a href="javascript: void(0)" title="${_('Set Replication Factor')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor"
+              ><i class="fa fa-fw fa-hdd-o"></i>${_('Set replication factor')}</a></li>
               % if show_download_button:
               <li>
                 <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
