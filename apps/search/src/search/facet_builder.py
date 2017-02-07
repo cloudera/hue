@@ -42,7 +42,6 @@ def _guess_range_facet(widget_type, solr_api, collection, facet_field, propertie
 
     _compute_range_facet(widget_type, stat_facet, properties, start, end, gap)
   except Exception, e:
-    print '=========================================================================================================================='
     LOG.info('Stats not supported on all the fields, like text: %s' % e)
 
 

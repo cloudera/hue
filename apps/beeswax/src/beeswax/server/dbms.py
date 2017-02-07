@@ -203,7 +203,6 @@ class HiveServer2Dbms(object):
       return self.client.get_table(database, table_name)
     except QueryServerException, e:
       LOG.debug("Seems like %s.%s could be a Kudu table" % (database, table_name))
-
       if 'java.lang.ClassNotFoundException' in e.message and [prop for prop in self.get_table_properties(database, table_name, property_name='storage_handler').rows() if 'KuduStorageHandler' in prop[0]]:
         query_server = get_query_server_config('impala')
         db = get(self.client.user, query_server)
