@@ -2469,8 +2469,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     });
   }
 
-  var showHoverMsg = function () {
-    $(".hoverMsg").removeClass("hide");
+  var showHoverMsg = function (e) {
+    var dt = e.dataTransfer;
+    if (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))) {
+      $(".hoverMsg").removeClass("hide");
+    }
   };
 
   var hideHoverMsg = function (vm) {
