@@ -2698,7 +2698,7 @@ msgstr " エントリ"
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:228
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:233
 msgid "Showing "
-msgstr "表示しています "
+msgstr "表示中 "
 
 #: src/oozie/templates/dashboard/list_oozie_bundles.mako:201
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:228
@@ -2710,7 +2710,7 @@ msgstr " 先 "
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:228
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:233
 msgid " of "
-msgstr " ／ "
+msgstr " / "
 
 #: src/oozie/templates/dashboard/list_oozie_bundles.mako:204
 #: src/oozie/templates/dashboard/list_oozie_coordinators.mako:231
@@ -4898,7 +4898,7 @@ msgstr "名前。入力など"
 #: src/oozie/templates/editor2/common_workflow.mako:1781
 #: src/oozie/templates/editor2/common_workflow.mako:1793
 msgid "to"
-msgstr "先"
+msgstr "から"
 
 #: src/oozie/templates/editor2/common_workflow.mako:1857
 msgid "Source path"

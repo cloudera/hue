@@ -154,7 +154,7 @@ msgstr "ジョブ %(id)s に対してタスクが見つかりません。"
 #: src/jobbrowser/views.py:458 src/jobbrowser/views.py:477
 #, python-format
 msgid "Cannot find attempt '%(id)s' in task"
-msgstr "タスクで試行 %(id)s が見つかりません"
+msgstr "タスクの試行 %(id)s が見つかりません"
 
 #: src/jobbrowser/views.py:496
 msgid "Failed to retrieve log. TaskTracker not found."
@@ -334,7 +334,7 @@ msgstr "名前"
 #: src/jobbrowser/templates/job.mako:453 src/jobbrowser/templates/task.mako:127
 #: src/jobbrowser/templates/tasks.mako:70
 msgid "Type"
-msgstr "タイプ"
+msgstr "種類"
 
 #: src/jobbrowser/templates/apps.mako:154
 #: src/jobbrowser/templates/apps.mako:225
@@ -401,7 +401,7 @@ msgstr "期間"
 #: src/jobbrowser/templates/apps.mako:286
 #: src/jobbrowser/templates/apps.mako:300 src/jobbrowser/templates/jobs.mako:76
 msgid "Submitted"
-msgstr "送信済み"
+msgstr "投入時刻"
 
 #: src/jobbrowser/templates/apps.mako:321
 msgid "There are no actions to be shown."
@@ -474,7 +474,7 @@ msgstr "このタスクを表示"
 
 #: src/jobbrowser/templates/attempt.mako:92
 msgid "Task Type"
-msgstr "タスクのタイプ"
+msgstr "タスクの種類"
 
 #: src/jobbrowser/templates/attempt.mako:96
 #: src/jobbrowser/templates/task.mako:131
@@ -537,7 +537,7 @@ msgstr "Map の完了"
 #: src/jobbrowser/templates/attempt.mako:151
 #: src/jobbrowser/templates/task.mako:73
 msgid "Node Address"
-msgstr "ノードアドレス"
+msgstr "ノードのアドレス"
 
 #: src/jobbrowser/templates/attempt.mako:189
 #: src/jobbrowser/templates/attempt.mako:205
@@ -694,12 +694,12 @@ msgstr "プロキシユーザー"
 #: src/jobbrowser/templates/job.mako:245 src/jobbrowser/templates/job.mako:367
 #: src/jobbrowser/templates/jobs.mako:71
 msgid "Maps"
-msgstr "マップ"
+msgstr "Map"
 
 #: src/jobbrowser/templates/job.mako:247 src/jobbrowser/templates/job.mako:371
 #: src/jobbrowser/templates/jobs.mako:72
 msgid "Reduces"
-msgstr "Reduces"
+msgstr "Reduce"
 
 #: src/jobbrowser/templates/job.mako:259
 msgid "Output"
@@ -826,12 +826,12 @@ msgstr "カウンタ名："
 #: src/jobbrowser/templates/jobbrowser_components.mako:82
 #: src/jobbrowser/templates/jobbrowser_components.mako:123
 msgid "Maps Total"
-msgstr "合計 Map"
+msgstr "Mapでの合計"
 
 #: src/jobbrowser/templates/jobbrowser_components.mako:83
 #: src/jobbrowser/templates/jobbrowser_components.mako:124
 msgid "Reduces Total"
-msgstr "合計 Reduce"
+msgstr "Reduceでの合計"
 
 #: src/jobbrowser/templates/jobbrowser_components.mako:84
 #: src/jobbrowser/templates/jobbrowser_components.mako:125
@@ -856,7 +856,7 @@ msgstr "指定された検索条件に一致するジョブがありません。
 
 #: src/jobbrowser/templates/jobs.mako:68
 msgid "Application Type"
-msgstr "アプリケーションタイプ"
+msgstr "アプリケーションの種類"
 
 #: src/jobbrowser/templates/jobs.mako:73
 msgid "Queue"
@@ -873,7 +873,7 @@ msgstr "サーバーとの通信で問題が発生しました： "
 #: src/jobbrowser/templates/jobs.mako:233
 #: src/jobbrowser/templates/jobs.mako:267
 msgid "Kill"
-msgstr "強制終了"
+msgstr "Kill"
 
 #: src/jobbrowser/templates/task.mako:22 src/jobbrowser/templates/task.mako:51
 #, python-format
@@ -924,7 +924,7 @@ msgstr "実行中"
 
 #: src/jobbrowser/templates/tasks.mako:44
 msgid "failed"
-msgstr "失敗しました"
+msgstr "失敗"
 
 #: src/jobbrowser/templates/tasks.mako:45
 msgid "killed"
@@ -936,7 +936,7 @@ msgstr "保留中"
 
 #: src/jobbrowser/templates/tasks.mako:50
 msgid "All types"
-msgstr "すべてのタイプ"
+msgstr "すべての種類"
 
 #: src/jobbrowser/templates/tasks.mako:51
 msgid "maps"
@@ -1060,7 +1060,7 @@ msgstr "失敗カウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:41
 msgid "Map Count"
-msgstr "マップカウント"
+msgstr "Map カウント"
 
 #: src/jobbrowser/templates/tasktrackers.mako:42
 msgid "Reduce Count"
