@@ -496,9 +496,9 @@ var Collection = function (vm, collection) {
     vm.search();
   });
   self.timeFilter.type.subscribe(function (val) {
-	if (val == 'fixed'){
+    if (val == 'fixed'){
       self.autorefresh(false);
-	}
+    }
 	if (val == 'fixed' && self.timeFilter.from().length == 0) {
       $.ajax({
         type: "POST",

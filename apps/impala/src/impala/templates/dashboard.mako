@@ -366,7 +366,6 @@ ${ dashboard.layout_skeleton() }
       onStateChange: function(state){ $root.collection.getFacetById(id()).properties.stacked(state.stacked); },
       onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: $parent.id(), from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
       onComplete: function(){ viewModel.getWidgetById(id()).isLoading(false) }}" />
-
     </div>
   <!-- /ko -->
 

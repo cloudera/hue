@@ -410,8 +410,7 @@ class SQLApi():
     # facet salary --> salary_range
     # facets --> Count DESC   |   salary_range ASC
     if facet['properties']['canRange']:
-      field_name = '`%(field)s_range`' % facet
-      field_name_to = '`%(field)s_range_to`' % facet
+      field_name = '%(field)s_range' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
         if facet['properties']['isBigIntDate']:
@@ -419,30 +418,40 @@ class SQLApi():
         else:
           field = '`%(field)s`' % facet
 
-        gap = facet['properties']['gap'] if 'gap' in facet['properties'] else facet['properties']['initial_gap']
+        gap = facet['properties']['gap']# if 'gap' in facet['properties'] else facet['properties']['initial_gap']
 
         slot = slot_interval = re.sub('^\+\d+', '', gap).rstrip('S')
         if slot == 'MINUTE':
           slot = 'MI'
           slot_interval = 'MINUTE'
+        # ...
 
-        select = "trunc(%(field)s, '%(slot)s') AS %(field_name)s, trunc(%(field)s, '%(slot)s') + interval 1 %(slot_interval)s AS %(field_name_to)s" % {
+        select = """
+          trunc(%(field)s, '%(slot)s') AS `%(field_name)s`,
+          trunc(%(field)s, '%(slot)s') + interval 1 %(slot_interval)s AS `%(field_name)s_to`""" % {
             'field': field,
             'slot': slot,
             'slot_interval': slot_interval,
             'field_name': field_name,
-            'field_name_to': field_name_to
+            'start': facet['properties']['start'],
+            'end': facet['properties']['end'],
         }
       else:
-        slot = max((facet['properties']['end'] - facet['properties']['start']) / facet['properties']['limit'], 1)
-        select = 'cast(`%(field)s` / %(slot)s AS int) * %(slot)s AS %(field_name)s' % {'field': facet['field'], 'slot': slot, 'field_name': field_name}
+        slot = gap
+        select = """
+        floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s`""" % { # Beware: start might be not in sync with the UI
+          'field': facet['field'],
+          'slot': slot,
+          'field_name': field_name,
+          'start': facet['properties']['start']
+        }
     else:
-      field_name = '`%(field)s`' % facet
+      field_name = '%(field)s' % facet
       select = field_name
       order_by = 'Count DESC'
 
     return {
-      'name': field_name,
+      'name': '`%s`' % field_name,
       'select': select,
       'order_by': order_by
     }
@@ -542,6 +551,9 @@ class SQLApi():
 
     if facet['properties']['canRange']:
       if facet['properties']['isDate']:
+        
+        # Add min, max, slot into query?
+        
         props = {}#self._get_time_filter_range(collection, query)
         if props['unit'] == 'SECOND':
           dt = timedelta(seconds=1)
@@ -556,8 +568,7 @@ class SQLApi():
         #rows = augment_date_range_list(rows, facet['properties']['start'], facet['properties']['end'], timedelta(seconds=60), len(cols))
         pass
       else:
-        pass
-        #rows = augment_number_range_list(rows, facet['properties']['start'], facet['properties']['end'], facet['properties']['gap'], len(cols))
+        rows = augment_number_range_list(rows, facet['properties']['start'], facet['properties']['end'], facet['properties']['gap'], len(cols))
 
     response['fieldsAttributes'] = [{
          "sort":{
