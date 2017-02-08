@@ -418,26 +418,26 @@ class SQLApi():
         else:
           field = '`%(field)s`' % facet
 
-        gap = facet['properties']['gap']# if 'gap' in facet['properties'] else facet['properties']['initial_gap']
+        slot = self._gap_to_units(facet['properties']['gap'])
 
-        slot = slot_interval = re.sub('^\+\d+', '', gap).rstrip('S')
-        if slot == 'MINUTE':
-          slot = 'MI'
-          slot_interval = 'MINUTE'
-        # ...
-
-        select = """
-          trunc(%(field)s, '%(slot)s') AS `%(field_name)s`,
-          trunc(%(field)s, '%(slot)s') + interval 1 %(slot_interval)s AS `%(field_name)s_to`""" % {
+        if slot['unit'] != 'SECOND':
+          select = """
+            trunc(%(field)s, '%(slot)s') AS `%(field_name)s`,
+            trunc(%(field)s, '%(slot)s') + interval %(slot_interval)s AS `%(field_name)s_to`""" 
+        else:
+          select = """
+            %(field)s AS `%(field_name)s`,
+            %(field)s + interval %(slot_interval)s AS `%(field_name)s_to`"""
+        select = select % {
             'field': field,
-            'slot': slot,
-            'slot_interval': slot_interval,
+            'slot': slot['sql_trunc'],
+            'slot_interval': slot['sql_interval'],
             'field_name': field_name,
             'start': facet['properties']['start'],
             'end': facet['properties']['end'],
         }
       else:
-        slot = gap
+        slot = facet['properties']['gap']
         select = """
         floor(floor((`%(field)s` - %(start)s) / %(slot)s) * %(slot)s) + %(start)s AS `%(field_name)s`""" % { # Beware: start might be not in sync with the UI
           'field': facet['field'],
@@ -456,6 +456,47 @@ class SQLApi():
       'order_by': order_by
     }
 
+
+  def _gap_to_units(self, gap):
+    skip, coeff, unit = re.split('(\d+)', gap.strip('+')) # e.g. +1HOURS
+    duration = {
+      'coeff': int(coeff),
+      'unit': unit.rstrip('S'),
+      'sql_trunc': None,
+      'sql_interval': '1 SECOND',
+      'timedelta': timedelta(seconds=1) # TODO: switch to dateutil.relativedelta or create a SELECT INTERVAL + N query to get all the buckets
+    }
+
+    if duration['unit'] == 'MINUTE':
+      duration['sql_trunc'] = 'MI'
+      duration['sql_interval'] = '1 MINUTE'
+      duration['timedelta'] = timedelta(seconds=60)
+    elif duration['unit'] == 'HOUR':
+      duration['sql_trunc'] = 'HH'
+      duration['sql_interval'] = '1 HOUR'
+      duration['timedelta'] = timedelta(seconds=60 * 60)
+    elif duration['unit'] == 'DAY'  and duration['coeff'] == 1:
+      duration['sql_trunc'] = 'DD'
+      duration['sql_interval'] = '1 DAY'
+      duration['timedelta'] = timedelta(days=1)
+    elif duration['unit'] == 'WEEK':
+      duration['sql_trunc'] = 'WW'
+      duration['sql_interval'] = '1 WEEK'
+      duration['timedelta'] = timedelta(days=7)
+    elif duration['unit'] == 'MONTH' and duration['coeff'] == 1:
+      duration['sql_trunc'] = 'MM'
+      duration['sql_interval'] = '1 MONTH'
+      duration['timedelta'] = timedelta(days=30)
+    elif duration['unit'] == 'MONTH':
+      duration['sql_trunc'] = 'Q'
+      duration['sql_interval'] = '4 MONTH'
+      duration['timedelta'] = timedelta(days=30 * 3)
+    elif duration['unit'] == 'YEAR':
+      duration['sql_trunc'] = 'YY'
+      duration['sql_interval'] = '1 YEAR'
+      duration['timedelta'] = timedelta(days=365)
+
+    return duration
 
   def _get_field(self, collection, name):
     _field = [_f for _f in collection['template']['fieldsAttributes'] if _f['name'] == name]
@@ -488,11 +529,9 @@ class SQLApi():
 #         props['time_field'] = time_field
 
       if collection['timeFilter']['type'] == 'rolling':
-        empty, coeff, unit = re.split('(\d+)', collection['timeFilter']['value'])
-        unit = unit.strip('S')
-        props['coeff'] = coeff
-        props['unit'] = unit
-        props['from'] = "now() - interval %(coeff)s %(unit)s" % {'coeff': coeff, 'unit': unit}
+        duration = self._gap_to_units(collection['timeFilter']['value'])
+
+        props['from'] = "now() - interval %(coeff)s %(unit)s" % duration
         props['to'] = 'now()' # TODO +/- Proper Tz of user
 
         if any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == time_field]):
@@ -551,22 +590,8 @@ class SQLApi():
 
     if facet['properties']['canRange']:
       if facet['properties']['isDate']:
-        
-        # Add min, max, slot into query?
-        
-        props = {}#self._get_time_filter_range(collection, query)
-        if props['unit'] == 'SECOND':
-          dt = timedelta(seconds=1)
-        elif props['unit'] == 'MINUTE':
-          dt = timedelta(seconds=60)
-        elif props['unit'] == 'HOUR':
-          dt = timedelta(hours=1)
-        elif props['unit'] == 'DAY':
-          dt = timedelta(days=1)
-        else:
-          dt = timedelta(days=365)
-        #rows = augment_date_range_list(rows, facet['properties']['start'], facet['properties']['end'], timedelta(seconds=60), len(cols))
-        pass
+        slot = self._gap_to_units(facet['properties']['gap'])
+        print augment_date_range_list(rows, facet['properties']['start'], facet['properties']['end'], slot['timedelta'], len(cols))
       else:
         rows = augment_number_range_list(rows, facet['properties']['start'], facet['properties']['end'], facet['properties']['gap'], len(cols))
 
