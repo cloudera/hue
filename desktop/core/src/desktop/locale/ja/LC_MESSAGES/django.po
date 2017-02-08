@@ -471,7 +471,7 @@ msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
 msgstr ""
-"セキュアな Hadoop クラスターを構築するために Hue の Kerberos 統合を\n"
+"セキュアな Hadoop クラスタを構築するために Hue の Kerberos 統合を\n"
 "          指定する設定オプションです。"
 
 #: src/desktop/conf.py:628
@@ -1124,7 +1124,7 @@ msgstr "前回の変更"
 
 #: src/desktop/models.py:584
 msgid "Schema version"
-msgstr "スキーマバージョン"
+msgstr "スキーマのバージョン"
 
 #: src/desktop/models.py:651 src/desktop/models.py:657
 #: src/desktop/models.py:1239 src/desktop/models.py:1250
@@ -1173,7 +1173,7 @@ msgstr "最終変更時刻"
 
 #: src/desktop/models.py:1038
 msgid "Document version"
-msgstr "ドキュメントバージョン"
+msgstr "ドキュメントのバージョン"
 
 #: src/desktop/models.py:1040
 msgid "If managed under the cover by Hue and never by the user"
@@ -1213,7 +1213,7 @@ msgstr "無効なパーミッションタイプ：%s"
 
 #: src/desktop/settings.py:84
 msgid "German"
-msgstr "ドイツ"
+msgstr "ドイツ語"
 
 #: src/desktop/settings.py:85
 msgid "English"
@@ -1476,7 +1476,7 @@ msgstr "アプリケーション名"
 
 #: src/desktop/management/commands/create_desktop_app.py:37
 msgid "Expected arguments: app_name [app_dir]"
-msgstr "予期される引数：app_name [app_dir]"
+msgstr "予想される引数：app_name [app_dir]"
 
 #: src/desktop/management/commands/create_desktop_app.py:45
 #: src/desktop/management/commands/create_proxy_app.py:50
@@ -1488,7 +1488,7 @@ msgstr "App テンプレートディレクトリがありません：%(template)
 #: src/desktop/management/commands/create_proxy_app.py:54
 #, python-format
 msgid "The template path, %(path)r, does not exist."
-msgstr "テンプレートパス %(path)r が存在しません。"
+msgstr "テンプレートのパス %(path)r が存在しません。"
 
 #: src/desktop/management/commands/create_desktop_app.py:52
 #: src/desktop/management/commands/create_proxy_app.py:57
@@ -1633,7 +1633,7 @@ msgstr "サーバーエラーです。"
 msgid ""
 "Sorry, there's been an error. An email was sent to your administrators. "
 "Thank you for your patience."
-msgstr "申し訳ありません。エラーが発生しました。管理者に電子メールが送信されました。ご協力いただき、ありがとうございます。"
+msgstr "申し訳ありません。エラーが発生しました。管理者に電子メールが送信されました。ご協力いただきありがとうございます。"
 
 #: src/desktop/templates/500.mako:48
 msgid "See the stacktrace"
@@ -1645,7 +1645,7 @@ msgstr "詳細情報..."
 
 #: src/desktop/templates/500.mako:50 src/desktop/templates/500.mako:73
 msgid "View server logs"
-msgstr "サーバーログを表示"
+msgstr "サーバーのログを表示"
 
 #: src/desktop/templates/500.mako:50 src/desktop/templates/500.mako:73
 msgid "View logs"
@@ -1681,7 +1681,7 @@ msgstr "設定"
 #: src/desktop/templates/about_layout.mako:42
 #: src/desktop/templates/logs.mako:27
 msgid "Server Logs"
-msgstr "サーバーログ"
+msgstr "サーバーのログ"
 
 #: src/desktop/templates/actionbar.mako:31
 #: src/desktop/templates/assist.mako:1153
@@ -1890,7 +1890,7 @@ msgstr "クラスタ"
 
 #: src/desktop/templates/assist.mako:960
 msgid "No clusters available."
-msgstr "利用可能なクラスターがありません。"
+msgstr "利用可能なクラスタがありません。"
 
 #: src/desktop/templates/assist.mako:963
 msgid "No tables available."
@@ -2062,7 +2062,7 @@ msgstr "ドキュメント"
 
 #: src/desktop/templates/assist.mako:1908
 msgid "Cluster"
-msgstr "クラスター"
+msgstr "クラスタ"
 
 #: src/desktop/templates/assist_m.mako:24
 #: src/desktop/templates/common_header_m.mako:291
@@ -2333,7 +2333,7 @@ msgstr "ユーザーを管理"
 
 #: src/desktop/templates/common_header.mako:531
 msgid "Documentation"
-msgstr "ドキュメンテーション"
+msgstr "ドキュメント"
 
 #: src/desktop/templates/common_header.mako:534
 #: src/desktop/templates/common_header_m.mako:305

@@ -175,7 +175,7 @@ msgstr "Hue および Hue のロゴは Cloudera, Inc. の商標です。"
 
 #: src/about/templates/admin_wizard.mako:224
 msgid "Learn more about Hue and Hadoop on"
-msgstr "Hue および Hadoop の詳細"
+msgstr "Hue および Hadoop の詳細はこちらをご覧ください: "
 
 #: src/about/templates/admin_wizard.mako:228
 msgid "Sign in now!"

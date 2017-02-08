@@ -331,7 +331,7 @@ msgstr "クラスター %s で Spark セッションを作成できませんで�
 
 #: src/notebook/templates/editor.mako:27
 msgid "Editor"
-msgstr "エディター"
+msgstr "エディタ"
 
 #: src/notebook/templates/editor_components.mako:232
 msgid "Saving..."
@@ -394,7 +394,7 @@ msgstr "コンテキスト"
 
 #: src/notebook/templates/editor_components.mako:314
 msgid " Editor"
-msgstr " エディター"
+msgstr " エディタ"
 
 #: src/notebook/templates/editor_components.mako:372
 msgid "This is a history query"
@@ -418,7 +418,7 @@ msgstr "行の詳細"
 
 #: src/notebook/templates/editor_components.mako:430
 msgid "Editor keyboard shortcuts"
-msgstr "エディターのキーボードショートカット"
+msgstr "エディタのキーボードショートカット"
 
 #: src/notebook/templates/editor_components.mako:435
 msgid "Line Operations"
@@ -932,7 +932,7 @@ msgstr "結果を折りたたむ"
 #: src/notebook/templates/editor_components.mako:1290
 #: src/notebook/templates/editor_components.mako:2193
 msgid "Explain"
-msgstr "新しい"
+msgstr "実行計画"
 
 #: src/notebook/templates/editor_components.mako:1312
 msgid "No queries to be shown."
@@ -1025,7 +1025,7 @@ msgstr "設定とプロパティ"
 
 #: src/notebook/templates/editor_components.mako:1475
 msgid "Show editor shortcuts"
-msgstr "エディターのショートカットを表示"
+msgstr "エディタのショートカットを表示"
 
 #: src/notebook/templates/editor_components.mako:1568
 msgid "The current query has been redacted to hide sensitive information."
@@ -1365,7 +1365,7 @@ msgstr "フォーマット"
 
 #: src/notebook/templates/editor_components.mako:2204
 msgid "Clear the current editor"
-msgstr "現在のエディターをクリア"
+msgstr "現在のエディタをクリア"
 
 #: src/notebook/templates/editor_components.mako:2205
 msgid "Clear"
@@ -1715,7 +1715,7 @@ msgstr "ダウンロードをキャンセル"
 #: src/notebook/templates/notebooks.mako:32
 #, python-format
 msgid "%s Editor"
-msgstr "%s エディター"
+msgstr "%s エディタ"
 
 #: src/notebook/templates/notebooks.mako:35
 msgid "Impala Queries"
