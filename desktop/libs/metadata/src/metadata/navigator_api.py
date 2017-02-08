@@ -131,9 +131,6 @@ def search_entities_interactive(request):
       "parentPath" : {
         "type" : "dynamic"
       },
-      "deleteTime" : {
-        "type" : "date"
-      },
       "lastAccessed" : {
         "type" : "date"
       },
@@ -160,9 +157,6 @@ def search_entities_interactive(request):
       },
       "clusteredByColNames" : {
         "type" : "dynamic"
-      },
-      "deleted" : {
-        "type" : "bool"
       },
       "originalName" : {
         "type" : "dynamic"
