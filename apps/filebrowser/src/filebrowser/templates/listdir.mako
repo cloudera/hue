@@ -68,8 +68,6 @@ ${ fb_components.menubar() }
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li><a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
-              <li><a href="javascript: void(0)" title="${_('Set Replication Factor')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor"
-              ><i class="fa fa-fw fa-hdd-o"></i>${_('Set replication factor')}</a></li>
               % if show_download_button:
               <li>
                 <a href="javascript: void(0)" title="${_('Download')}" data-bind="visible: !inTrash() && selectedFiles().length == 1 && selectedFile().type == 'file', click: downloadFile">
@@ -96,8 +94,13 @@ ${ fb_components.menubar() }
                   <i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}
                 </a>
               </li>
+              <li>
+                <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
+                  <i class="fa fa-fw fa-hdd-o"></i>${_('Set replication')}
+                </a>
+              </li>
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0">
+                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0, visible: !isS3()">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
                 </li>
               % endif
@@ -128,7 +131,7 @@ ${ fb_components.menubar() }
             </button>
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
               <button class="btn extractArchiveBtn" title="${_('Extract')}"
-                data-bind="visible: selectedFiles().length == 1 && isArchive(), click: confirmExtractArchive">
+                data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
                 <i class="fa fa-play"></i> ${_('Extract')}
               </button>
             % endif
