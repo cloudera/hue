@@ -1002,7 +1002,7 @@ var EditorViewModel = (function() {
 
       self.currentQueryTab('queryHistory');
 
-      self.executingBlockingOperation = $.post("/notebook/api/execute", {
+      self.executingBlockingOperation = $.post("/notebook/api/execute/" + self.type(), {
         notebook: vm.editorMode() ? ko.mapping.toJSON(notebook, NOTEBOOK_MAPPING) : ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
       }, function (data) {

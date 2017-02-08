@@ -156,7 +156,7 @@ def _execute_notebook(request, notebook, snippet):
 @require_POST
 @check_document_access_permission()
 @api_error_handler
-def execute(request):
+def execute(request, engine=None):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
