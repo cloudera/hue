@@ -1055,13 +1055,13 @@ def rename(request):
 
     return generic_op(RenameForm, request, smart_rename, ["src_path", "dest_path"], None)
 
-def set_replication_factor(request):
-    def smart_set_replication_factor(src_path, replication_factor):
-        result = request.fs.set_replication_factor(src_path, replication_factor)
+def set_replication(request):
+    def smart_set_replication(src_path, replication_factor):
+        result = request.fs.set_replication(src_path, replication_factor)
         if not result:
             raise PopupException(_("Setting of replication factor failed"))
 
-    return generic_op(SetReplicationFactorForm, request, smart_set_replication_factor, ["src_path", "replication_factor"], None)
+    return generic_op(SetReplicationFactorForm, request, smart_set_replication, ["src_path", "replication_factor"], None)
 
 
 def mkdir(request):

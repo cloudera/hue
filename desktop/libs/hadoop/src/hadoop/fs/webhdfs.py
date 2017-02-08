@@ -417,7 +417,7 @@ class WebHdfs(Hdfs):
     for dirent in ls:
       self.rename(Hdfs.join(old_dir, dirent), Hdfs.join(new_dir, dirent))
 
-  def set_replication_factor(self, filename, repl_factor):
+  def set_replication(self, filename, repl_factor):
     """set replication factor(filename, repl_factor)"""
     params = self._getparams()
     params['op'] = 'SETREPLICATION'

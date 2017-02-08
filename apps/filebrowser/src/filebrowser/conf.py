@@ -17,6 +17,7 @@
 
 from django.utils.translation import ugettext_lazy as _
 
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 
 
@@ -50,5 +51,5 @@ ENABLE_EXTRACT_UPLOADED_ARCHIVE = Config(
   key="enable_extract_uploaded_archive",
   help=_("Flag to enable the extraction of a uploaded archive in HDFS."),
   type=bool,
-  default=False
+  default=is_hue4()
 )

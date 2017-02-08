@@ -238,7 +238,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   </form>
 
   <!-- set replication factor modal -->
-  <form id="setReplicationFactorForm" action="/filebrowser/set_replication_factor?next=${current_request_path | n,unicode }"  method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
+  <form id="setReplicationFactorForm" action="/filebrowser/set_replication?next=${current_request_path | n,unicode }"  method="POST" enctype="multipart/form-data" class="form-inline form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div id="setReplicationModal" class="modal hide fade">
       <div class="modal-header">
@@ -246,7 +246,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <h3>${_('Setting replication factor for :')} <span id="setReplFileName">file name</span></h3>
       </div>
       <div class="modal-body">
-        <label>${_('Replication factor')} <input id="newRepFactorInput" name="replication_factor" value="" type="number" class="input-xlarge"/></label>
+        <label>${_('Replication factor')} <input id="newRepFactorInput" name="replication_factor" value="" type="number" class="input-mini"/></label>
       </div>
       <div class="modal-footer">
         <div id="replicationFactorRequiredAlert" class="hide" style="position: absolute; left: 10px;">
@@ -578,8 +578,13 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <li data-bind="css: {'disabled': selectedFiles().length > 1 }, visible: !isS3()">
       <a class="pointer" data-bind="click: function(){ selectedFiles().length == 1 ? showSummary(): void(0)}"><i class="fa fa-fw fa-pie-chart"></i> ${_('Summary')}</a>
     </li>
+    <li>
+      <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
+        <i class="fa fa-fw fa-hdd-o"></i>${_('Set replication')}
+      </a>
+    </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0">
+      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0, visible: !isS3()">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
     % endif
@@ -1381,7 +1386,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("#setReplFileName").text(self.selectedFile().path);
 
-        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication_factor?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
+        $("#setReplicationFactorForm").attr("action", "/filebrowser/set_replication?next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $('#setReplicationFactorForm').ajaxForm({
           dataType: 'json',
