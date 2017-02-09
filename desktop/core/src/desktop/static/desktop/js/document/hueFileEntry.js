@@ -408,13 +408,16 @@ var HueFileEntry = (function () {
       if (!self.loaded()) {
         self.load();
       }
-    }
-    else {
-      if (e && ((e.which || e.button) !== 1 || (e.ctrlKey || e.shiftKey || e.metaKey))) {
-        window.open(self.definition().absoluteUrl);
-      }
-      else {
-        window.location.href = self.definition().absoluteUrl;
+    } else {
+      if (IS_HUE_4) {
+        huePubSub.publish('open.link', self.definition().absoluteUrl);
+      } else {
+        if (e && ((e.which || e.button) !== 1 || (e.ctrlKey || e.shiftKey || e.metaKey))) {
+          window.open(self.definition().absoluteUrl);
+        }
+        else {
+          window.location.href = self.definition().absoluteUrl;
+        }
       }
     }
   };

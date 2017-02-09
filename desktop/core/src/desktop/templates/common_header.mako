@@ -153,6 +153,11 @@ if USE_NEW_EDITOR.get():
   ${ koComponents.all() }
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
+
+  <script type="text/javascript" charset="utf-8">
+    var IS_HUE_4 = false;
+  </script>
+
 </head>
 <body>
 
