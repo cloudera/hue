@@ -214,6 +214,7 @@
   padding-left: 12px;
   height: 40px;
   border-bottom: 1px solid #f1f1f1;
+  padding-right: 15px;
 }
 .assist-type-switch {
   display: inline-block;
