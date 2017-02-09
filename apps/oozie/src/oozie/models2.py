@@ -328,7 +328,7 @@ class Workflow(Job):
 
   @property
   def id(self):
-    return self.document.id
+    return self.document.id if self.document else None
 
   @property
   def uuid(self):
@@ -3250,6 +3250,7 @@ class Coordinator(Job):
     if self.document is None:
       raise PopupException(_('Cannot return workflow since document attribute is None.'))
 
+    # Integrated scheduler
     if self.data['properties']['document']:
       document = Document2.objects.get_by_uuid(user=self.document.owner, uuid=self.data['properties']['document'])
       wf_doc = WorkflowBuilder().create_workflow(document=document, user=self.document.owner, managed=True)
