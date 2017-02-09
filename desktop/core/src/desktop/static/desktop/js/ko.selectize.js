@@ -72,6 +72,22 @@ ko.bindingHandlers.selectize = {
       })
     }
 
+    if (allBindingsAccessor.get('innerSubscriber')) {
+      valueAccessor()().forEach(function (item) {
+        var previousValue;
+        item[allBindingsAccessor.get('innerSubscriber')].subscribe(function (oldValue) {
+          previousValue = oldValue;
+        }, null, 'beforeChange');
+        item[allBindingsAccessor.get('innerSubscriber')].subscribe(function (newValue) {
+          var newOption = {};
+          newOption[options.valueField] = newValue;
+          newOption[options.labelField] = newValue;
+          $select.updateOption(previousValue, newOption);
+          $select.refreshOptions(false);
+        });
+      });
+    }
+
     if (typeof allBindingsAccessor.get('selectedOptions') == 'function') {
       allBindingsAccessor.get('selectedOptions').subscribe(function (new_val) {
         // Removing items which are not in new value
@@ -138,6 +154,20 @@ ko.bindingHandlers.selectize = {
           newOption[options.labelField] = optionLabel;
 
           $select.addOption(newOption);
+
+          if (allBindingsAccessor.get('innerSubscriber')) {
+            var previousValue;
+            item[allBindingsAccessor.get('innerSubscriber')].subscribe(function (oldValue) {
+              previousValue = oldValue;
+            }, null, 'beforeChange');
+            item[allBindingsAccessor.get('innerSubscriber')].subscribe(function (newValue) {
+              var newOption = {};
+              newOption[options.valueField] = newValue;
+              newOption[options.labelField] = newValue;
+              $select.updateOption(previousValue, newOption);
+              $select.refreshOptions(false);
+            });
+          }
         });
 
       }, null, "arrayChange");
