@@ -50,6 +50,11 @@
   <link href="${ static('desktop/css/cui.css') }" rel="stylesheet">
 
   ${ commonHeaderFooterComponents.header_i18n_redirection(user, is_s3_enabled, apps) }
+
+  <script type="text/javascript" charset="utf-8">
+    var IS_HUE_4 = true;
+  </script>
+
 </head>
 
 <body>
@@ -648,41 +653,38 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/notebook/editor')){
-            if (location.getParameter('type') !== ''){
+            if (hueUtils.getSearchParameter(href, 'editor') !== '') {
+              hueUtils.changeURLParameter('editor', hueUtils.getSearchParameter(href, 'editor'));
+              self.currentApp('editor')
+              self.getActiveAppViewModel(function (viewModel) {
+                viewModel.openNotebook(hueUtils.getSearchParameter(href, 'editor'));
+              })
+            } else if (location.getParameter('type') !== ''){
               if (hueUtils.getSearchParameter(href, 'type') !== '' && hueUtils.getSearchParameter(href, 'type') !== location.getParameter('type')) {
                 self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
               }
-            }
-            else {
+            } else {
               if (hueUtils.getSearchParameter(href, 'type') !== ''){
                 self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
-              }
-              else {
+              } else {
                 self.changeEditorType('hive');
               }
               self.currentApp('editor')
             }
-          }
-          else if (href.startsWith('/notebook')){
+          } else if (href.startsWith('/notebook')){
             self.currentApp('notebook');
-          }
-          else if (href.startsWith('/pig')){
+          } else if (href.startsWith('/pig')){
             self.changeEditorType('pig');
             self.currentApp('editor');
-          }
-          else if (href.startsWith('/search')){
+          } else if (href.startsWith('/search')){
             self.currentApp('search');
-          }
-          else if (href.startsWith('/oozie/editor/workflow/new')){
+          } else if (href.startsWith('/oozie/editor/workflow/new')){
             self.currentApp('oozie_workflow');
-          }
-          else if (href.startsWith('/oozie/editor/coordinator/new')){
+          } else if (href.startsWith('/oozie/editor/coordinator/new')){
             self.currentApp('oozie_coordinator');
-          }
-          else if (href.startsWith('/oozie/editor/bundle/new')){
+          } else if (href.startsWith('/oozie/editor/bundle/new')){
             self.currentApp('oozie_bundle');
-          }
-          else if (href.startsWith('/filebrowser')){
+          } else if (href.startsWith('/filebrowser')){
             self.currentApp('filebrowser');
           }
         });
