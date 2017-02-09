@@ -415,7 +415,8 @@ LOG_REDACTION_FILE = Config(
 
 ALLOWED_HOSTS = Config(
   key='allowed_hosts',
-  dynamic_default=get_dn,
+  # dynamic_default=get_dn, # Currently off as pretty disruptive
+  default=['*'],
   type=coerce_csv,
   help=_('Comma separated list of strings representing the host/domain names that the Hue server can serve.')
 )
