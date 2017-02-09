@@ -20,9 +20,12 @@ import json
 
 from datetime import datetime
 
-from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal
+from nose.tools import assert_equal, assert_false, assert_true, assert_not_equal, assert_raises
 from django.contrib.auth.models import User
+from django.core import management
+from django.db.utils import OperationalError
 
+from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import Directory, Document2
@@ -402,6 +405,81 @@ class TestDocument2(object):
 
     assert_true('data' in data, data)
     assert_equal(data['data'], doc_data)
+
+  def test_is_trashed_migration(self):
+
+    start_migration = '0024_auto__add_field_document2_is_managed'
+    mid_migration = '0025_auto__add_field_document2_is_trashed'
+    end_migration = '0026_change_is_trashed_default_to_false'
+    APP = 'desktop'
+
+    # Making sure Migration is up-to-date with fake migrations
+    management.call_command('migrate', 'desktop', fake=True, verbosity=0)
+
+    dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    query = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+    trashed_query = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+    trashed_query.trash()
+
+    try:
+      assert_false(dir.is_trashed)
+      assert_false(query.is_trashed)
+      assert_true(trashed_query.is_trashed)
+
+      # Reverse migrate to 0025
+      management.call_command('migrate', APP, mid_migration, verbosity=0)
+
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_false(dir.is_trashed)
+      assert_false(query.is_trashed)
+      assert_true(trashed_query.is_trashed)
+
+      # Reverse migrate to 0024. Deletes 'is_trashed' field from desktop_documents2
+      management.call_command('migrate', APP, start_migration, verbosity=0)
+
+      assert_raises(OperationalError, Document2.objects.get, uuid=dir.uuid)
+      assert_raises(OperationalError, Document2.objects.get, uuid=query.uuid)
+      assert_raises(OperationalError, Document2.objects.get, uuid=trashed_query.uuid)
+
+      # Forward migrate to 0025
+      management.call_command('migrate', APP, mid_migration, verbosity=0)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_true(dir.is_trashed is None)
+      assert_true(query.is_trashed is None)
+      assert_true(trashed_query.is_trashed is None)
+
+      # Forward migrate to 0026
+      management.call_command('migrate', APP, end_migration, verbosity=0)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      assert_true(dir.is_trashed is None)
+      assert_true(query.is_trashed is None)
+      assert_true(trashed_query.is_trashed is None)
+
+      # New Documents should have is_trashed=False
+      query1 = Document2.objects.create(name='new_query.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
+      assert_true(query1.is_trashed is False)
+
+      # Converter sets is_trashed=True for currently trashed docs
+      converter = DocumentConverter(self.user)
+      converter.convert()
+      trashed_query = Document2.objects.get(uuid=trashed_query.uuid)
+      dir = Document2.objects.get(uuid=dir.uuid)
+      query = Document2.objects.get(uuid=query.uuid)
+      assert_true(trashed_query.is_trashed)
+      assert_true(dir.is_trashed is False)
+      assert_true(query.is_trashed is False)
+    finally:
+      # Delete docs
+      dir.delete()
+      query.delete()
+      query1.delete()
+      trashed_query.delete()
 
 
 class TestDocument2Permissions(object):
