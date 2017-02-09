@@ -809,7 +809,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- ko if: availablePanels.length > 1 -->
       <div style="position: relative; flex: 0 0 40px; line-height: 40px;" class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
-        <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, attr: { 'title': name }">
+        <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
           <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
         </div>
         <!-- /ko -->
@@ -893,6 +893,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
        * @param {string} options.type
        * @param {number} options.minHeight
        * @param {string} options.icon
+       * @param {boolean} [options.rightAlignIcon] - Default false
        * @param {boolean} options.visible
        * @param {boolean} [options.showNavSearch] - Default true
        * @param {(AssistDbPanel|AssistHdfsPanel|AssistDocumentsPanel|AssistS3Panel|AssistCollectionsPanel)} panelData
@@ -906,6 +907,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.name = options.name;
         self.panelData = options.panelData;
         self.showNavSearch = typeof options.showNavSearch !== 'undefined' ? options.showNavSearch : true;
+        self.rightAlignIcon = !!options.rightAlignIcon;
 
         self.visible = ko.observable(options.visible || true);
         options.apiHelper.withTotalStorage('assist', 'showingPanel_' + self.type, self.visible, false, options.visible);
@@ -1439,6 +1441,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             type: 'documents',
             icon: 'fa-files-o',
             minHeight: 50,
+            rightAlignIcon: true,
             visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
           }));
         }

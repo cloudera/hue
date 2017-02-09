@@ -2037,7 +2037,7 @@
   ko.bindingHandlers.splitDraggable = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
-      var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? $.totalStorage(options.appName + "_left_panel_width") : 250;
+      var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? Math.max($.totalStorage(options.appName + "_left_panel_width"), 250) : 250;
 
       var containerSelector = options.containerSelector || ".panel-container";
       var leftPanelSelector = options.leftPanelSelector || ".left-panel";
@@ -2077,7 +2077,7 @@
         axis: "x",
         containment: $container,
         drag: function (event, ui) {
-          ui.position.left = Math.min($container.width() - $container.position().left - 200, Math.max(150, ui.position.left));
+          ui.position.left = Math.min($container.width() - $container.position().left - 200, Math.max(250, ui.position.left));
 
           dragTimeout = window.setTimeout(function () {
             $leftPanel.css("width", ui.position.left + "px");
