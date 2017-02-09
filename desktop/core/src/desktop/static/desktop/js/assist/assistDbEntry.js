@@ -367,7 +367,7 @@ var AssistDbEntry = (function () {
       loadEntriesDeferred.resolve([]);
     };
 
-    if (self.definition.isTable) {
+    if (HAS_OPTIMIZER && self.definition.isTable) {
       self.assistDbSource.apiHelper.fetchNavOptTopColumns({
         sourceType: self.assistDbSource.sourceType,
         successCallback: function (data) {
