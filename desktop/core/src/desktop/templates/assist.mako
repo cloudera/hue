@@ -642,8 +642,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       % if ENABLE_NEW_CREATE_TABLE.get():
-        <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + 'default' }"><i class="pointer fa fa-plus" title="${_('Create table')}"></i></a>
-        ## For DB --> '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'
+        <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
+        <!-- ko if: typeof databaseName !== 'undefined' -->
+        <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName }"><i class="pointer fa fa-plus" title="${_('Create table')}"></i></a>
+        <!-- /ko -->
+        <!-- ko if: typeof databases !== 'undefined' -->
+        <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }"><i class="pointer fa fa-plus" title="${_('Create database')}"></i></a>
+        <!-- /ko -->
+        <!-- /ko -->
       % endif
       <!-- ko if: sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
