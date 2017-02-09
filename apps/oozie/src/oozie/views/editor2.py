@@ -594,7 +594,13 @@ def save_coordinator(request):
   if coordinator_data.get('id'):
     coordinator_doc = Document2.objects.get(id=coordinator_data['id'])
   else:
-    coordinator_doc = Document2.objects.create(name=coordinator_data['name'], uuid=coordinator_data['uuid'], type='oozie-coordinator2', owner=request.user, is_managed=coordinator_data.get('isManaged'))
+    coordinator_doc = Document2.objects.create(
+        name=coordinator_data['name'],
+        uuid=coordinator_data['uuid'],
+        type='oozie-coordinator2',
+        owner=request.user,
+        is_managed=coordinator_data.get('isManaged')
+    )
     Document.objects.link(coordinator_doc, owner=coordinator_doc.owner, name=coordinator_doc.name, description=coordinator_doc.description, extra='coordinator2')
 
   scheduled_id = coordinator_data['properties']['workflow'] or coordinator_data['properties']['document']

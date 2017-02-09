@@ -203,7 +203,7 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">20</div></button>
+          <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">5</div></button>
         </div>
         <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
           <a class="pointer pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-times"></i></a>
@@ -277,7 +277,7 @@ ${ hueIcons.symbols() }
         </div>
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } </button>
+          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">10</div></button>
           <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
             <span class="caret"></span>
           </button>
@@ -389,7 +389,7 @@ ${ hueIcons.symbols() }
         <ul class="right-panel-tabs nav nav-pills">
           <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
           <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
-          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedules') }</a></li>
+          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedule') }</a></li>
         </ul>
 
         <div class="right-panel-tab-content tab-content">
