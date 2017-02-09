@@ -519,7 +519,7 @@
       <span class="muted move-widget">
         <i class="fa fa-arrows"></i>
       </span>
-      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }" validate="nonempty"/>
+      <input type="text" class="span11" data-bind="value: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
       <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
         <i class="fa fa-minus"></i>
       </a>
@@ -783,7 +783,7 @@
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
                 </span>
-                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.arguments.help_text }" validate="nonempty"/>
+                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder: $root.workflow_properties.arguments.help_text }, parseArguments: { list: $parent.properties.arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
                 <a href="#" data-bind="click: function(){ $parent.properties.arguments.remove(this); $(document).trigger('drawArrows') }">
                   <i class="fa fa-minus"></i>
@@ -945,7 +945,7 @@
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
                 </span>
-                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }" validate="nonempty"/>
+                <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, attr: { placeholder:  $root.workflow_properties.spark_arguments.help_text }, parseArguments: { list: $parent.properties.spark_arguments, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
                 <span data-bind='template: { name: "common-fs-link", data: {path: value, with_label: false}}'></span>
                 <a href="#" data-bind="click: function(){ $parent.properties.spark_arguments.remove(this); $(document).trigger('drawArrows') }">
                   <i class="fa fa-minus"></i>
@@ -2113,7 +2113,7 @@
             <span class="muted move-widget">
               <i class="fa fa-arrows"></i>
             </span>
-            <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }" validate="nonempty"/>
+            <input type="text" class="input-xlarge filechooser-input seventy" data-bind="filechooser: value, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: value, value: value, attr: { placeholder: $root.workflow_properties.distcp_parameters.help_text }, parseArguments: { list: $parent.properties.distcp_parameters, objectKey: 'value', callback: function(){ $(document).trigger('drawArrows'); } }" validate="nonempty"/>
             <span data-bind='template: { name: "common-fs-link", data: {path: value(), with_label: false} }, visible: value().length > 0'></span>
             <a href="#" data-bind="click: function(){ $parent.properties.distcp_parameters.remove(this);  }">
               <i class="fa fa-minus"></i>

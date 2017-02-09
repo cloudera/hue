@@ -5073,6 +5073,51 @@
     }
   };
 
+  ko.bindingHandlers.parseArguments = {
+    init: function (element, valueAccessor, allBindingsAccessor) {
+      $el = $(element);
+
+      function splitStrings(str) {
+        var bits = [];
+        var isInQuotes = false;
+        var tempStr = '';
+        str.split('').forEach(function (char) {
+          if (char == '"' || char == "'") {
+            isInQuotes = !isInQuotes;
+          }
+          else if ((char == ' ' || char == '\n') && !isInQuotes && tempStr != '') {
+            bits.push(tempStr);
+            tempStr = '';
+          }
+          else {
+            tempStr += char;
+          }
+        });
+        if (tempStr != '') {
+          bits.push(tempStr);
+        }
+        return bits;
+      }
+
+      $el.bind('paste', function (e) {
+        var pasted = e.originalEvent.clipboardData.getData('text');
+        var args = splitStrings(pasted);
+        if (args.length > 1) {
+          var newList = [];
+          args.forEach(function (arg) {
+            var obj = {};
+            obj[valueAccessor().objectKey] = arg;
+            newList.push(obj);
+          });
+          valueAccessor().list(ko.mapping.fromJS(newList)());
+          valueAccessor().callback();
+        }
+      });
+
+    }
+  };
+
+
   var aceInstancesById = {},
     aceInitId = 0;
 
