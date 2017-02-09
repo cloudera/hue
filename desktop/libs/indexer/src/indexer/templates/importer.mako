@@ -589,7 +589,7 @@ ${ assist.assistPanel() }
             <div class="control-group" data-bind="visible: tableFormat() == 'kudu'">
               <label for="kuduPks" class="control-label"><div>${ _('Primary keys') }</div>
                 ## At least one selected
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name'" size="3" multiple="true"></select>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="3" multiple="true"></select>
               </label>
             </div>
 
