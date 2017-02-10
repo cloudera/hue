@@ -286,20 +286,23 @@
 
     self.queriesFilter = ko.observable('');
     self.queriesFilterVisible = ko.observable(false);
-    self.queriesFilter.extend({ rateLimit: 300 });
+    self.queriesFilter.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 900 } });
     self.queriesFilter.subscribe(function(val){
       self.fetchQueries();
     });
 
+    var lastFetchQueriesRequest = null;
+
     self.fetchQueries = function () {
-      var QUERIES_PER_PAGE = 50;
-      if (self.loadingQueries()) {
-        return;
+      if (lastFetchQueriesRequest !== null && lastFetchQueriesRequest.readyState < 4) {
+        lastFetchQueriesRequest.abort();
       }
+
+      var QUERIES_PER_PAGE = 50;
       lastQueriesPage = self.queriesCurrentPage();
       self.loadingQueries(true);
       self.queriesHasErrors(false);
-      self.getApiHelper().searchDocuments({
+      lastFetchQueriesRequest = self.getApiHelper().searchDocuments({
         successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
           self.queries(result.documents);
