@@ -33,7 +33,6 @@ def test_impala_flags():
   finish = None
 
   try:
-    assert_equal(conf.SSL.CACERTS.get(), None)
     assert_equal(conf.QUERYCACHE_ROWS.get(), 50000)
     assert_equal(conf.IMPERSONATION_ENABLED.get(), False)
 
@@ -54,7 +53,6 @@ def test_impala_flags():
     assert_equal(impala_flags.get_authorized_proxy_user_config(), 'hue=*')
 
     # From Config
-    assert_equal(conf.SSL.CACERTS.get(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
     assert_equal(conf.QUERYCACHE_ROWS.get(), 100000)
     assert_equal(conf.IMPERSONATION_ENABLED.get(), True)
   finally:
