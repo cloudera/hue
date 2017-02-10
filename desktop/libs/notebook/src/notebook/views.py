@@ -181,7 +181,7 @@ def execute_and_watch(request):
     editor = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready-execute', database=snippet['database'], on_success_url=success_url)
   elif action == 'index_query':
     if destination == '__hue__':
-      destination = _get_snippet_name(notebook)
+      destination = _get_snippet_name(notebook, unique=True, table_format=True)
       live_indexing = True
     else:
       live_indexing = False

@@ -1220,7 +1220,7 @@ ${ assist.assistPanel() }
           name = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
         }
 
-        return name.replace(' ', '_');
+        return name.replace(/ /g, '_').toLowerCase();
       });
       self.defaultName.subscribe(function(newVal) {
         vm.createWizard.destination.name(newVal);
