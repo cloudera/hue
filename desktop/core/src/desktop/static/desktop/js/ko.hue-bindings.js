@@ -4618,7 +4618,7 @@
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
-        $(element).niceScroll({
+        var niceScroll = $(element).niceScroll({
           cursorcolor: "#C1C1C1",
           cursorborder: "1px solid #C1C1C1",
           cursoropacitymin: 0,
@@ -4629,6 +4629,7 @@
           horizrailenabled: typeof options.horizrailenabled !== 'undefined' ? options.horizrailenabled : true
         });
         $(element).addClass('nicescrollified');
+        ko.utils.domNodeDisposal.addDisposeCallback(element, niceScroll.remove);
       }
     }
   };
