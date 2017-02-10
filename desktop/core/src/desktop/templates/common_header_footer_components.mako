@@ -247,9 +247,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
       % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+      var lastJobBrowserRequest = null;
 
       function checkJobBrowserStatus(){
-        $.post("/jobbrowser/jobs/", {
+        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+          return;
+        }
+        window.clearTimeout(checkJobBrowserStatusIdx);
+        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
             "format": "json",
             "state": "running",
             "user": "${user.username}"
@@ -258,10 +263,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
             if (data != null && data.jobs != null) {
               huePubSub.publish('jobbrowser.data', data.jobs);
               if (data.jobs.length > 0){
-                $("#jobBrowserCount").removeClass("hide").text(data.jobs.length);
-              }
-              else {
-                $("#jobBrowserCount").addClass("hide");
+                $("#jobBrowserCount").show().text(data.jobs.length);
+              } else {
+                $("#jobBrowserCount").hide();
               }
             }
           checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);

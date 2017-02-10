@@ -231,9 +231,14 @@ if USE_NEW_EDITOR.get():
       % if 'jobbrowser' in apps:
       var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
       var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+      var lastJobBrowserRequest = null;
 
       function checkJobBrowserStatus(){
-        $.post("/jobbrowser/jobs/", {
+        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+          return;
+        }
+        window.clearTimeout(checkJobBrowserStatusIdx);
+        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
             "format": "json",
             "state": "running",
             "user": "${user.username}"

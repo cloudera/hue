@@ -2241,7 +2241,7 @@ var EditorViewModel = (function() {
       });
       if (vm.editorMode() && self.history().length == 0) {
         self.fetchHistory(function() {
-          self.updateHistory(['starting', 'running'], 20000);
+          self.updateHistory(['starting', 'running'], 30000);
           self.updateHistory(['available'], 60000 * 5);
         });
       }
