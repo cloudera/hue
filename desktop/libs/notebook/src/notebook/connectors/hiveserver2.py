@@ -353,7 +353,7 @@ class HS2Api(Api):
       # Test handle to verify if still valid
       db.fetch(handle, start_over=True, rows=1)
 
-      file_name = '%s.%s' % (_get_snippet_name(notebook), format)
+      file_name = _get_snippet_name(notebook)
 
       return data_export.download(handle, format, db, id=snippet['id'], file_name=file_name)
     except Exception, e:
@@ -502,7 +502,7 @@ ALTER TABLE `%(table)s` SET TBLPROPERTIES('EXTERNAL'='TRUE');
 
 DROP TABLE IF EXISTS `%(table)s`;
     ''' % {
-      'table': _get_snippet_name(notebook),
+      'table': _get_snippet_name(notebook, unique=True, table_format=True),
       'location': destination,
       'hql': query.hql_query
     }
