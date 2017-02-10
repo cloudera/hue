@@ -36,7 +36,9 @@
     this.options = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
-    this.setupScrollLeft();
+    if ($(element).attr('jHueLeftScrollified') !== 'true') {
+      this.setupScrollLeft();
+    }
   }
 
   Plugin.prototype.setOptions = function (options) {
@@ -54,6 +56,8 @@
     else {
       link = $("<a/>").attr("id", "jHueScrollLeftAnchor").addClass("hueAnchor hueAnchorScroller").attr("href", "javascript:void(0)").html("<i class='fa fa-fw fa-chevron-left'></i>").appendTo("body");
     }
+
+    $(_this.element).attr("jHueLeftScrollified", "true");
 
     if ($(_this.element).is("body")) {
       setScrollBehavior($(window), $("body, html"));
@@ -97,7 +101,7 @@
 
     function checkForAllScrolls() {
       var _allOk = true;
-      $(document).find("[jHueScrollified='true']").each(function (cnt, item) {
+      $(document).find("[jHueLeftScrollified='true']").each(function (cnt, item) {
         if ($(item).is("body")) {
           if ($(window).scrollLeft() > _this.options.threshold) {
             _allOk = false;
@@ -120,7 +124,7 @@
     $(document).on("click", "#jHueScrollLeftAnchor", function (event) {
       if ($("#jHueScrollLeftAnchor").data("caller") != null) {
         $("#jHueScrollLeftAnchor").data("caller").animate({scrollLeft: 0}, 300, function () {
-          if ($(document).find("[jHueScrollified='true']").not($("#jHueScrollLeftAnchor").data("caller")).is("body") && $(window).scrollLeft() > _this.options.threshold) {
+          if ($(document).find("[jHueLeftScrollified='true']").not($("#jHueScrollLeftAnchor").data("caller")).is("body") && $(window).scrollLeft() > _this.options.threshold) {
             $("#jHueScrollLeftAnchor").data("caller", $("body, html"));
           }
           else {

@@ -37,7 +37,9 @@
     this.options = $.extend({}, defaults, options);
     this._defaults = defaults;
     this._name = pluginName;
-    this.setupScrollUp();
+    if ($(element).attr('jHueScrollified') !== 'true') {
+      this.setupScrollUp();
+    }
     if (this.options.scrollLeft) {
       $(element).jHueScrollLeft(this.options.threshold);
     }
