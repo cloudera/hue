@@ -142,7 +142,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TO']
@@ -156,7 +155,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GROUP', 'ROLE', 'USER']
@@ -170,7 +168,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GROUP', 'ROLE', 'USER']
@@ -184,7 +181,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH GRANT OPTION']
@@ -198,7 +194,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GRANT OPTION']
@@ -395,7 +390,6 @@
             dialect: 'hive',
             noErrors: true,
             containsKeywords: ['SELECT'],
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -502,7 +496,6 @@
             afterCursor: '',
             noErrors: true,
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TO']
@@ -516,7 +509,6 @@
             afterCursor: '',
             noErrors: true,
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ROLE']
@@ -530,7 +522,6 @@
             afterCursor: '',
             noErrors: true,
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH GRANT OPTION']
@@ -544,7 +535,6 @@
             afterCursor: '',
             noErrors: true,
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GRANT OPTION']
@@ -558,7 +548,6 @@
             afterCursor: '',
             noErrors: true,
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['OPTION']
@@ -586,7 +575,6 @@
             dialect: 'impala',
             noErrors: true,
             containsKeywords: ['SELECT'],
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -866,7 +854,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FROM']
@@ -893,7 +880,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GROUP', 'ROLE', 'USER']
@@ -907,7 +893,6 @@
             afterCursor: '',
             dialect: 'hive',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['GROUP', 'ROLE', 'USER']
@@ -948,7 +933,6 @@
             dialect: 'hive',
             noErrors: true,
             containsKeywords: ['SELECT'],
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }
@@ -1068,7 +1052,6 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FROM']
@@ -1082,7 +1065,6 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ROLE']
@@ -1096,7 +1078,6 @@
             afterCursor: '',
             dialect: 'impala',
             noErrors: true,
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['ROLE']
@@ -1164,7 +1145,6 @@
             dialect: 'impala',
             noErrors: true,
             containsKeywords: ['SELECT'],
-            hasLocations: true,
             expectedResult: {
               lowerCase: false
             }

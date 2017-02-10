@@ -1118,6 +1118,36 @@ var addFunctionLocation = function (location, functionName) {
   });
 };
 
+var addStatementLocation = function (location) {
+  // Don't report lonely cursor as a statement
+  if (location.first_line === location.last_line && Math.abs(location.last_column - location.first_column) === 1) {
+    return;
+  }
+  var adjustedLocation;
+  if (parser.yy.cursorFound && parser.yy.cursorFound.last_line === location.last_line &&
+      parser.yy.cursorFound.first_column >= location.first_column && parser.yy.cursorFound.last_column <= location.last_column) {
+    var additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
+    adjustedLocation = {
+      first_line: location.first_line,
+      last_line: location.last_line,
+      first_column: location.first_column + 1,
+      last_column: location.last_column + additionalSpace - (parser.yy.partialCursor ? 0 : 2)
+    }
+  } else {
+    adjustedLocation = {
+      first_line: location.first_line,
+      last_line: location.last_line,
+      first_column: location.first_column + 1,
+      last_column: location.last_column + 1
+    }
+  }
+
+  parser.yy.locations.push({
+    type: 'statement',
+    location: adjustedLocation
+  });
+};
+
 var addHdfsLocation = function (location, path) {
   parser.yy.locations.push({
     type: 'hdfs',

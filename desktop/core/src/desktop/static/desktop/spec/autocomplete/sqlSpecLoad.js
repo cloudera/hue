@@ -80,7 +80,6 @@
           beforeCursor: 'LOAD DATA INPATH \'/',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/'}
@@ -93,7 +92,6 @@
           beforeCursor: 'LOAD DATA INPATH \'/some/path\' ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE', 'OVERWRITE INTO TABLE']
@@ -106,7 +104,6 @@
           beforeCursor: 'LOAD DATA INPATH \'/some/path\' OVERWRITE ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE']
@@ -119,7 +116,6 @@
           beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -132,7 +128,6 @@
           beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO TABLE boo ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
@@ -145,7 +140,6 @@
           beforeCursor: 'LOAD DATA INPATH \'some/path\' INTO TABLE boo PARTITION (',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }] }] }
@@ -159,7 +153,6 @@
           beforeCursor: 'LOAD DATA INPATH \'/',
           afterCursor: '/bar\' INTO TABLE foo',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/'}
@@ -175,7 +168,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -236,7 +228,6 @@
           beforeCursor: 'LOAD DATA INPATH \'/',
           afterCursor: '\'',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/'}
@@ -249,7 +240,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE', 'OVERWRITE INTO TABLE']
@@ -262,7 +252,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' OVERWRITE ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO TABLE']
@@ -275,7 +264,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' INTO ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -288,7 +276,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' OVERWRITE INTO TABLE ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -302,7 +289,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' INTO TABLE baa ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
@@ -315,7 +301,6 @@
           beforeCursor: 'LOAD DATA INPATH \'baa\' INTO TABLE boo.baa PARTITION (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
@@ -343,7 +328,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -357,7 +341,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -371,7 +354,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -385,7 +367,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -399,7 +380,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -474,7 +454,6 @@
           beforeCursor: 'IMPORT TABLE bla ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'FROM']
@@ -487,7 +466,6 @@
           beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FROM']
@@ -500,7 +478,6 @@
           beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '' }
@@ -513,7 +490,6 @@
           beforeCursor: 'IMPORT FROM \'/bla/bla\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['LOCATION']
@@ -526,7 +502,6 @@
           beforeCursor: 'IMPORT EXTERNAL TABLE bla PARTITION (bla=1) FROM \'/bla/bla\' LOCATION \'/bla/',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '/bla/' }
@@ -540,7 +515,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -554,7 +528,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -568,7 +541,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -606,7 +578,6 @@
           beforeCursor: 'EXPORT TABLE db.tbl ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'TO']
@@ -619,7 +590,6 @@
           beforeCursor: 'EXPORT TABLE db.tbl PARTITION (bla=1) ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TO']
@@ -632,7 +602,6 @@
           beforeCursor: 'EXPORT TABLE db.tbl PARTITION (bla=1) TO \'',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '' }
@@ -645,7 +614,6 @@
           beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FOR replication()']
@@ -658,7 +626,6 @@
           beforeCursor: 'EXPORT TABLE db.tbl TO \'/bla/bla\' FOR ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['replication()']
