@@ -211,7 +211,7 @@ ${ hueIcons.symbols() }
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
 
         <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div class="jobs-badge">10</div></button>
+          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" style="display:none;">0</div></button>
           <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
             <span class="caret"></span>
           </button>
