@@ -37,7 +37,8 @@
         expectedResult: {
           lowerCase: false,
           locations: [
-            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] }
+            { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 13 } },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] }
           ]
         }
       });
@@ -51,8 +52,9 @@
         expectedResult: {
           lowerCase: false,
           locations: [
-            {type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] },
-            {type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }, { name: 'field'}] }
+            { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 23 } },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }, { name: 'field'}] }
           ]
         }
       });
@@ -66,6 +68,7 @@
         expectedResult: {
           lowerCase: false,
           locations: [
+            { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 22 } },
             {type: 'table', location: { first_line: 1, last_line: 1, first_column: 19, last_column: 22 }, identifierChain: [{ name: 'tbl' }] }
           ]
         }
@@ -76,7 +79,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE EXTENDED tbl col.field;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -88,7 +90,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE ',
         afterCursor: ' tbl;',
-        hasLocations: true,
         containsKeywords: ['EXTENDED', 'FORMATTED'],
         expectedResult: {
           lowerCase: false
@@ -100,7 +101,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE ext',
         afterCursor: ' db.tbl;',
-        hasLocations: true,
         containsKeywords: ['EXTENDED', 'FORMATTED'],
         expectedResult: {
           lowerCase: false
@@ -112,7 +112,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE FORMATTED tbl;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -124,7 +123,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE FORMATTED tbl col.field;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -158,7 +156,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE DATABASE db;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -170,7 +167,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE DATABASE EXTENDED db;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -182,7 +178,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE SCHEMA db;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -194,7 +189,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE SCHEMA EXTENDED db;',
         afterCursor: '',
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -243,7 +237,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE db.tbl ',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -370,7 +363,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE EXTENDED db.tbl ',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -407,7 +399,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE FORMATTED db.tbl ',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
@@ -419,7 +410,6 @@
       assertAutoComplete({
         beforeCursor: 'DESCRIBE FORMATTED db.tbl col.',
         afterCursor: '',
-        hasLocations: true,
         expectedResult: {
           lowerCase: false,
           suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }, { name: 'col' }] }] }

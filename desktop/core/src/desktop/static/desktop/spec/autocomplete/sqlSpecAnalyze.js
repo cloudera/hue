@@ -34,7 +34,6 @@
           dialect: 'hive',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -73,7 +72,6 @@
           afterCursor: ' tbl',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['TABLE']
@@ -87,7 +85,6 @@
           afterCursor: ' tbl',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['TABLE']
@@ -128,7 +125,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'COMPUTE STATISTICS']
@@ -142,7 +138,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COMPUTE STATISTICS']
@@ -156,7 +151,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['STATISTICS']
@@ -170,7 +164,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA', 'NOSCAN']
@@ -184,7 +177,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COLUMNS']
@@ -198,7 +190,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CACHE METADATA', 'NOSCAN']
@@ -212,7 +203,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -226,7 +216,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOSCAN']
@@ -240,7 +229,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FOR COLUMNS', 'CACHE METADATA']
@@ -254,7 +242,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -268,7 +255,6 @@
           afterCursor: ' NOSCAN',
           dialect: 'hive',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['CACHE METADATA']
@@ -284,7 +270,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -298,7 +283,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -312,7 +296,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -352,7 +335,6 @@
           afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INCREMENTAL STATS', 'STATS']
@@ -366,7 +348,6 @@
           afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INCREMENTAL STATS', 'STATS']
@@ -380,7 +361,6 @@
           afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['STATS']
@@ -461,7 +441,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION']
@@ -474,7 +453,6 @@
           beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -487,7 +465,6 @@
           beforeCursor: 'COMPUTE INCREMENTAL STATS db.tbl PARTITION (bla = 1, ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }]} ]}
@@ -517,7 +494,6 @@
           dialect: 'impala',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -556,7 +532,6 @@
           afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -570,7 +545,6 @@
           afterCursor: ' tbl',
           dialect: 'impala',
           noErrors:true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['METADATA']
@@ -614,7 +588,6 @@
           dialect: 'impala',
           noErrors:true,
           containsKeywords: ['SELECT'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }

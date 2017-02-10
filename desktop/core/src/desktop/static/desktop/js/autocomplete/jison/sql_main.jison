@@ -190,21 +190,40 @@ Sql
 
 SqlStatements
  :
- | DataDefinition
+ | SqlStatement
+   {
+     addStatementLocation(@1);
+   }
+ | SqlStatements ';' NewStatement SqlStatements
+ ;
+
+SqlStatements_EDIT
+ : SqlStatement_EDIT
+   {
+     addStatementLocation(@1);
+   }
+ | SqlStatement_EDIT ';' NewStatement SqlStatements
+   {
+     addStatementLocation(@1);
+   }
+ | SqlStatements ';' NewStatement SqlStatement_EDIT
+   {
+     addStatementLocation(@4);
+   }
+ | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
+   {
+     addStatementLocation(@4);
+   }
+ ;
+
+SqlStatement
+ : DataDefinition
  | DataManipulation
  | QuerySpecification
  | SetSpecification
  | ExplainClause DataDefinition
  | ExplainClause DataManipulation
  | ExplainClause QuerySpecification
- | SqlStatements ';' NewStatement SqlStatements
- ;
-
-SqlStatements_EDIT
- : SqlStatement_EDIT
- | SqlStatement_EDIT ';' NewStatement SqlStatements
- | SqlStatements ';' NewStatement SqlStatement_EDIT
- | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
  ;
 
 SqlStatement_EDIT

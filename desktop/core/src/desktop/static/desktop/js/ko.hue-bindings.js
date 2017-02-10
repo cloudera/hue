@@ -3299,7 +3299,7 @@
           }
 
           e.data.locations.forEach(function (location) {
-            if ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined') {
+            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
               return;
             }
             if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {

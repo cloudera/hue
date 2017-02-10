@@ -19,7 +19,8 @@ var SqlTestUtils = (function() {
   var jsonStringToJsString = function (jsonString) {
     return jsonString.replace(/'([a-zA-Z]+)':/g, function (all, group) {
       return group + ':';
-    }).replace(/([:{,])/g, function (all, group) { return group + ' ' }).replace(/[}]/g, ' }');
+    }).replace(/([:{,])/g, function (all, group) { return group + ' ' }).replace(/[}]/g, ' }').replace(/["]/g, '\'')
+        .replace(/'([a-z_]+)':/gi, '$1:');
   };
 
   return {
@@ -61,8 +62,8 @@ var SqlTestUtils = (function() {
                 pass: jasmine.matchersUtil.equals(actualResponse.locations, testDefinition.expectedLocations),
                 message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                 '          Dialect: ' + testDefinition.dialect + '\n' +
-                'Expected locations: ' + JSON.stringify(testDefinition.expectedLocations).replace(/["]/g, '\'') + '\n' +
-                '  Parser locations: ' + JSON.stringify(actualResponse.locations).replace(/["]/g, '\'') +   '\n'
+                'Expected locations: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedLocations)) + '\n' +
+                '  Parser locations: ' + jsonStringToJsString(JSON.stringify(actualResponse.locations)) +   '\n'
               };
             }
 
@@ -74,17 +75,17 @@ var SqlTestUtils = (function() {
               actualResponse.suggestKeywords = weightFreeKeywords;
             }
 
-            if (testDefinition.hasLocations) {
-              if (actualResponse.locations.length === 0) {
+            if (!!testDefinition.noLocations) {
+              if (actualResponse.locations.length > 0) {
                 return {
                   pass: false,
                   message: '\nStatement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                   '  Dialect: ' + testDefinition.dialect + '\n' +
-                  '           No locations found'
+                  '           Expected no locations, found ' + actualResponse.locations.length
                 }
               }
             }
-            if (testDefinition.hasLocations || actualResponse.locations.length === 0) {
+            if (typeof testDefinition.expectedResult.locations === 'undefined') {
               delete actualResponse.locations;
             }
             var deleteKeywords = false;
@@ -149,8 +150,8 @@ var SqlTestUtils = (function() {
               pass: jasmine.matchersUtil.equals(actualResponse, testDefinition.expectedResult),
               message: '\n        Statement: ' + testDefinition.beforeCursor + '|' + testDefinition.afterCursor + '\n' +
                          '          Dialect: ' + testDefinition.dialect + '\n' +
-                         'Expected response: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedResult).replace(/["]/g, '\'') + '\n') +
-                         '  Parser response: ' + jsonStringToJsString(JSON.stringify(actualResponse).replace(/["]/g, '\'') +   '\n')
+                         'Expected response: ' + jsonStringToJsString(JSON.stringify(testDefinition.expectedResult) + '\n') +
+                         '  Parser response: ' + jsonStringToJsString(JSON.stringify(actualResponse) +   '\n')
             };
           }
         }

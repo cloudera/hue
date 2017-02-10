@@ -211,7 +211,6 @@
             beforeCursor: 'EXPLAIN DEPENDENCY SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             noErrors: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
@@ -278,7 +277,6 @@
             beforeCursor: 'EXPLAIN SELECT key, count(1) FROM srcpart WHERE ds IS NOT NULL GROUP BY key;',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             noErrors: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
@@ -440,6 +438,7 @@
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [
+            { type: 'statement', location: { first_line: 2, last_line: 2, first_column: 1, last_column: 25 } },
             { type: 'asterisk', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             { type: 'table', location: { first_line:2, last_line:2, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
           ],
@@ -455,6 +454,7 @@
         containsKeywords: ['SELECT'],
         expectedResult: {
           locations: [
+            { type: 'statement', location: { first_line: 4, last_line: 4, first_column: 1, last_column: 25 } },
             { type: 'asterisk', location: { first_line: 4, last_line: 4, first_column: 8, last_column: 9 }, tables: [{ identifierChain: [{ name: 'testTable1' }] }] },
             { type: 'table', location: { first_line:4, last_line:4, first_column:15, last_column:25 }, identifierChain: [{ name: 'testTable1' }] }
           ],

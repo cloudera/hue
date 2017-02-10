@@ -31,7 +31,6 @@
         beforeCursor: 'INSERT INTO bla.boo VALUES (1, 2, \'a\', 3); ',
         afterCursor: '',
         noErrors: true,
-        hasLocations: true,
         containsKeywords: ['SELECT'],
         expectedResult: {
           lowerCase: false
@@ -107,7 +106,6 @@
         afterCursor: '',
         containsKeywords: ['VALUES'],
         noErrors: true,
-        hasLocations: true,
         expectedResult: {
           lowerCase: false
         }
@@ -120,7 +118,6 @@
         afterCursor: '',
         containsKeywords: ['VALUES'],
         noErrors: true,
-        hasLocations: true,
         expectedResult: {
           lowerCase: false
         }
@@ -134,7 +131,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -148,7 +144,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -162,7 +157,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -176,7 +170,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -192,7 +185,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -206,7 +198,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -260,7 +251,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['INSERT INTO', 'INSERT OVERWRITE', 'SELECT']
@@ -274,7 +264,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['INTO', 'OVERWRITE']
@@ -288,7 +277,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -304,7 +292,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: { identifierChain: [{ name: 'baa' }] }
@@ -318,7 +305,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'SELECT']
@@ -331,7 +317,6 @@
           beforeCursor: 'FROM baa.boo INSERT INTO TABLE baa PARTITION (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }] }] }
@@ -344,7 +329,6 @@
           beforeCursor: 'FROM baa.boo INSERT INTO TABLE baa PARTITION (a,b) (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }] }] }
@@ -358,7 +342,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -372,7 +355,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['ALL', 'DISTINCT'],
           expectedResult: {
             lowerCase: false,
@@ -390,7 +372,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
@@ -408,7 +389,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsColRefKeywords: true,
           containsKeywords: ['WHERE', 'ORDER BY'],
           doesNotContainKeywords: ['FROM'],
@@ -425,7 +405,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'SELECT']
@@ -439,7 +418,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'SELECT']
@@ -452,7 +430,6 @@
           beforeCursor: 'FROM baa.boo INSERT OVERWRITE bla.ble PARTITION (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'bla' }, { name: 'ble' }] }] }
@@ -466,7 +443,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IF NOT EXISTS', 'SELECT']
@@ -480,7 +456,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT EXISTS']
@@ -494,7 +469,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['EXISTS']
@@ -508,7 +482,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -522,7 +495,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
@@ -540,7 +512,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsColRefKeywords: true,
           containsKeywords: ['WHERE', 'ORDER BY'],
           doesNotContainKeywords: ['FROM'],
@@ -557,7 +528,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsColRefKeywords: true,
           containsKeywords: ['WHERE', 'ORDER BY'],
           doesNotContainKeywords: ['FROM'],
@@ -574,7 +544,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
@@ -592,7 +561,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsColRefKeywords: true,
           containsKeywords: ['WHERE', 'ORDER BY'],
           doesNotContainKeywords: ['FROM'],
@@ -650,7 +618,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'VALUES', 'SELECT']
@@ -663,7 +630,6 @@
           beforeCursor: 'INSERT INTO TABLE baa PARTITION (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }] }] }
@@ -676,7 +642,6 @@
           beforeCursor: 'INSERT INTO TABLE baa PARTITION (a,b) (x, ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'baa' }] }] }
@@ -690,7 +655,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestKeywords: ['SELECT']
@@ -704,7 +668,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
@@ -723,7 +686,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
@@ -741,7 +703,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['AS', 'IN'],
           expectedResult: {
             lowerCase: false,
@@ -798,7 +759,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -812,7 +772,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'SELECT']
@@ -826,7 +785,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', 'SELECT']
@@ -839,7 +797,6 @@
           beforeCursor: 'INSERT OVERWRITE bla.ble PARTITION (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'bla' }, { name: 'ble' }] }] }
@@ -853,7 +810,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IF NOT EXISTS', 'SELECT']
@@ -867,7 +823,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['NOT EXISTS']
@@ -881,7 +836,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['EXISTS']
@@ -895,7 +849,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -909,7 +862,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['*'],
           expectedResult: {
             lowerCase: false,
@@ -927,7 +879,6 @@
           beforeCursor: 'INSERT OVERWRITE bla.ble SELECT c, d ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           noErrors: true,
           containsKeywords: ['AS', 'IN'],
           expectedResult: {
@@ -944,7 +895,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -961,7 +911,6 @@
           beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) PARTITION (a=1) VALUES (1, 2);',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -975,7 +924,6 @@
           beforeCursor: 'INSERT OVERWRITE boo.baa [SHUFFLE] SELECT * FROM bla;',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -989,7 +937,6 @@
           beforeCursor: 'WITH t1 AS (SELECT 1), t2 AS (SELECT 2) INSERT OVERWRITE tab SELECT * FROM t1, t2;',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           noErrors: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
@@ -1058,7 +1005,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
@@ -1072,7 +1018,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['SELECT']
@@ -1086,7 +1031,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -1100,7 +1044,6 @@
           beforeCursor: 'INSERT INTO boo.baa (',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
@@ -1113,7 +1056,6 @@
           beforeCursor: 'INSERT INTO boo.baa (a, ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
@@ -1127,7 +1069,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
@@ -1140,7 +1081,6 @@
           beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) PARTITION(a = 1, ',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'boo' }, { name: 'baa' }] }] }
@@ -1153,7 +1093,6 @@
           beforeCursor: 'INSERT INTO TABLE boo.baa (a, b) VALUES (1, 2) |',
           afterCursor: '',
           dialect: 'impala',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1181,7 +1120,6 @@
           afterCursor: '',
           dialect: 'impala',
           noErrors: true,
-          hasLocations: true,
           expectedResult: {
             lowerCase: true,
             suggestTables: {},

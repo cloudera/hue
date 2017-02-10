@@ -178,7 +178,6 @@
             beforeCursor: 'CREATE DATABASE foo COMMENT \'bla\' LOCATION \'/bla\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['WITH DBPROPERTIES']
@@ -304,7 +303,6 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' SYMBOL=\'baaa\'; ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -318,7 +316,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'cos\' PREPARE_FN=\'cos\' CLOSE_FN=\'cos\' SERIALIZE_FN=\'cos\' FINALIZE_FN=\'cos\'; ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['SELECT'],
             expectedResult: {
               lowerCase: false
@@ -428,7 +425,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['INIT_FN', 'UPDATE_FN']
@@ -441,7 +437,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
@@ -456,7 +451,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['UPDATE_FN']
@@ -469,7 +463,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestAnalyticFunctions: true,
@@ -484,7 +477,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['MERGE_FN']
@@ -498,7 +490,6 @@
             beforeCursor: 'CREATE AGGREGATE FUNCTION boo() RETURNS INT LOCATION \'/boo\' INIT_FN=\'cos\' UPDATE_FN=\'sin\' MERGE_FN=\'tan\' PREPARE_FN=\'boo\' SERIALIZE_FN=\'baa\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['FINALIZE_FN']
@@ -657,7 +648,6 @@
             beforeCursor: 'CREATE FUNCTION boo(INT, BOOLEAN) RETURNS INT LOCATION \'/boo\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SYMBOL']
@@ -675,7 +665,6 @@
           'TBLPROPERTIES ("bla"=1) COMMENT \"booo\"; ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -688,7 +677,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE db.tbl (a, b, c) AS \'boo.baa.bitmap\'; ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -738,7 +726,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -751,7 +738,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE foo.bar (a, b, c, ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'foo' }, { name: 'bar' }] }] }
@@ -764,7 +750,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -777,7 +762,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
@@ -790,7 +774,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BIT',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['\'BITMAP\'', '\'COMPACT\'']
@@ -803,7 +786,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['WITH DEFERRED REBUILD', 'IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -816,7 +798,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DEFERRED REBUILD']
@@ -829,7 +810,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['REBUILD']
@@ -842,7 +822,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' WITH DEFERRED REBUILD ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IDXPROPERTIES', 'IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -855,7 +834,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IDXPROPERTIES ("baa"="boo") ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IN TABLE', 'ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -868,7 +846,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TABLE']
@@ -881,7 +858,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
@@ -895,7 +871,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' IN TABLE boo ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['ROW FORMAT', 'STORED AS', 'STORED BY', 'LOCATION', 'TBLPROPERTIES', 'COMMENT']
@@ -908,7 +883,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['FORMAT']
@@ -921,7 +895,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DELIMITED', 'SERDE']
@@ -936,7 +909,6 @@
           dialect: 'hive',
           containsKeywords: ['MAP KEYS TERMINATED BY', 'NULL DEFINED AS', 'LOCATION', 'TBLPROPERTIES', 'COMMENT'],
           doesNotContainKeywords: ['AS'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -948,7 +920,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'BITMAP\' ROW FORMAT DELIMITED NULL ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['DEFINED AS']
@@ -961,7 +932,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' ROW FORMAT DELIMITED STORED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS']
@@ -974,7 +944,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' STORED ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['AS', 'BY']
@@ -988,7 +957,6 @@
           afterCursor: '',
           dialect: 'hive',
           containsKeywords: ['ORC', 'PARQUET'],
-          hasLocations: true,
           expectedResult: {
             lowerCase: false
           }
@@ -1000,7 +968,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestHdfs: { path: '' }
@@ -1013,7 +980,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' LOCATION \'/baa\' ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['TBLPROPERTIES', 'COMMENT']
@@ -1026,7 +992,6 @@
           beforeCursor: 'CREATE INDEX bla ON TABLE boo (a, b, c) AS \'COMPACT\' TBLPROPERTIES ("baa"="boo") ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['COMMENT']
@@ -1195,7 +1160,6 @@
             beforeCursor: 'CREATE TABLE foo LIKE PARQUET \'/blabla/\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['COMMENT', 'CACHED IN'],
             expectedResult: {
               lowerCase: false
@@ -1208,7 +1172,6 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'CACHED IN', 'AS']
@@ -1257,7 +1220,6 @@
             beforeCursor: 'CREATE TABLE foo (id int) PARTITIONED BY (boo INT, baa BIGINT ',
             afterCursor: ', boo INT) AS SELECT * FROM baa;',
             dialect: 'impala',
-            hasLocations: true,
             containsKeywords: ['COMMENT'],
             expectedResult: {
               lowerCase: false
@@ -1423,7 +1385,6 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1441,7 +1402,6 @@
             'CACHED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['IN']
@@ -1470,7 +1430,6 @@
             beforeCursor: 'CREATE EXTERNAL TABLE IF NOT EXISTS dbOne.tableName LIKE boo.baa COMMENT \'Table comment...\' STORED ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['AS']
@@ -1488,7 +1447,6 @@
             'CACHED IN \'boo\' AS ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -1836,7 +1794,6 @@
             beforeCursor: 'CREATE TABLE foo (i INT PRIMARY KEY, j INT PRIMARY KEY) PARTITION BY RANGE (i) (PARTITION cos(10) < VALUES, PARTITION VALUES ',
             afterCursor: '',
             dialect: 'impala',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['<', '<=']
@@ -1986,7 +1943,6 @@
             beforeCursor: 'CREATE TABLE foo (id int) LOCATION \'/baa\' ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['TBLPROPERTIES', 'AS']
@@ -2283,7 +2239,6 @@
               'STORED AS ORC LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -2298,7 +2253,6 @@
               'LOCATION \'/asdf/boo/\' TBLPROPERTIES ("comment"="boo") AS ',
             afterCursor: '',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestKeywords: ['SELECT']
@@ -2311,7 +2265,6 @@
             beforeCursor: 'CREATE TEMPORARY EXTERNAL TABLE IF NOT EXISTS db.boo LIKE ',
             afterCursor: ' LOCATION \'/some/loc\';',
             dialect: 'hive',
-            hasLocations: true,
             expectedResult: {
               lowerCase: false,
               suggestTables: {},
@@ -2549,7 +2502,6 @@
           afterCursor: '',
           dialect: 'hive',
           noErrors: true,
-          hasLocations: true,
           containsKeywords: ['SELECT'],
           expectedResult: {
             lowerCase: false
@@ -2622,7 +2574,6 @@
           beforeCursor: 'CREATE TEMPORARY MACRO boo(x INT, y STRING) cos(x) + y - ',
           afterCursor: '',
           dialect: 'hive',
-          hasLocations: true,
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
@@ -2665,7 +2616,6 @@
         assertAutoComplete({
           beforeCursor: 'CREATE VIEW ',
           afterCursor: ' boo AS SELECT * FROM baa;',
-          hasLocations: true,
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['IF NOT EXISTS']
