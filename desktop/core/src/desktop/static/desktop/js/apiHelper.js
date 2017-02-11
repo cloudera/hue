@@ -181,6 +181,9 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.assistErrorCallback = function (options) {
     return function (errorResponse) {
+      if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
+        return;
+      }
       var errorMessage = 'Unknown error occurred';
       if (errorResponse !== 'undefined') {
         if (typeof errorResponse.responseText !== 'undefined') {
@@ -569,7 +572,7 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.searchDocuments = function (options) {
     var self = this;
-    $.ajax({
+    return $.ajax({
       url: DOCUMENTS_SEARCH_API,
       data: {
         uuid: options.uuid,
