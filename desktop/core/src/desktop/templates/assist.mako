@@ -1969,8 +1969,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <br/>
     <ul data-bind="foreach: activeTables">
       <li>
-        <span data-bind="text: $data"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
-      </i>
+        <span data-bind="text: name"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
+##         <span data-bind="text: name"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
+      </li>
     </ul>
 
     <form class="form-horizontal">
@@ -2021,35 +2022,76 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         self.disposals = [];
 
-        self.activeType = ko.observable();
+        self.activeCursorLocation = ko.observable();
+        self.locationIndex = ko.observable({});
 
-        self.lastLocationsPerType = ko.observable({});
+        self.activeSourceType = ko.observable();
+        self.activeTables = ko.observableArray();
+        self.activeColumns = ko.observableArray();
 
-        self.activeLocations = ko.pureComputed(function () {
-          return self.lastLocationsPerType()[self.activeType()] ? self.lastLocationsPerType()[self.activeType()] : [];
-        });
-        self.activeTables = ko.pureComputed(function () {
-          var allTables = $.grep(self.activeLocations(), function(item) { return item.type == 'table'; });
-          var tables = [];
-          $.each(allTables, function(i, item) {
-            var tableName = item.identifierChain[item.identifierChain.length - 1].name;
-            if (tables.indexOf(tableName) == -1) {
-              tables.push(tableName);
+        var isPointInside = function (location, row, col) {
+          return (location.first_line < row && row < location.last_line) ||
+              (location.first_line === row && row === location.last_line && location.first_column <= col && col <= location.last_column) ||
+              (location.first_line === row && row < location.last_line && col >= location.first_column) ||
+              (location.first_line < row && row === location.last_line && col <= location.last_column);
+        };
+
+        var createQualifiedIdentifier = function (identifierChain) {
+          return $.map(identifierChain, function (identifier) {
+            return identifier.name;
+          }).join('.');
+        };
+
+        var initActive = function () {
+          if (typeof self.activeCursorLocation() !== 'undefined' && typeof self.locationIndex()[self.activeCursorLocation().id] !== 'undefined') {
+            var locations = self.locationIndex()[self.activeCursorLocation().id].locations;
+            self.activeSourceType(self.locationIndex()[self.activeCursorLocation().id].type);
+            var statementFound = false;
+
+            var tableIndex = {};
+            var columnIndex = {};
+            for (var i = 0; i < locations.length; i++) {
+              var location = locations[i];
+              if (location.type === 'statement') {
+                if (statementFound) {
+                  break;
+                }
+                var cursorPos = self.activeCursorLocation().position;
+                if (isPointInside(location.location, cursorPos.row+1, cursorPos.column+1)) {
+                  statementFound = true;
+                }
+              } else if (statementFound && location.type === 'table') {
+                tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
+              } else if (statementFound && locations[i].type === 'column') {
+                columnIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
+              }
             }
-          });
-          return tables;
-        });
+            self.activeTables($.map(tableIndex, function (value) {
+              return value;
+            }));
+            self.activeColumns($.map(columnIndex, function (value) {
+              return value;
+            }));
+          }
+        };
 
-        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeType).remove);
-
-        huePubSub.subscribeOnce('set.active.snippet.type', self.activeType);
+        huePubSub.subscribeOnce('set.active.snippet.type', self.activeSourceType);
         huePubSub.publish('get.active.snippet.type');
+        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeSourceType).remove);
+
+        self.disposals.push(huePubSub.subscribe('editor.active.cursor.location', function (location) {
+          self.activeCursorLocation(location);
+          initActive();
+        }).remove);
 
         self.disposals.push(huePubSub.subscribe('editor.active.locations', function (activeLocations) {
-          var locationsIndex = self.lastLocationsPerType();
-          locationsIndex[activeLocations.type] = activeLocations.locations;
-          self.lastLocationsPerType(locationsIndex);
+          var index = self.locationIndex();
+          index[activeLocations.id] = activeLocations;
+          self.locationIndex(index);
+          initActive();
         }).remove);
+
+        huePubSub.publish('get.active.editor.locations');
       }
 
       AssistantPanel.prototype.dispose = function () {

@@ -3291,7 +3291,13 @@
             });
           }
 
-          huePubSub.publish('editor.active.locations', { type: snippet.type(), locations: e.data.locations });
+          var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), locations: e.data.locations };
+          huePubSub.publish('editor.active.locations', lastKnownLocations);
+
+          huePubSub.subscribe('get.active.editor.locations', function () {
+            huePubSub.publish('editor.active.cursor.location', lastKnownLocations);
+          });
+
 
           // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
           while(activeTokens.length > 0) {
@@ -3458,6 +3464,18 @@
             }
           }
         }
+      });
+
+      var changeSelectionThrottle = -1;
+      editor.selection.on("changeSelection", function () {
+        window.clearTimeout(changeSelectionThrottle);
+        changeSelectionThrottle = window.setTimeout(function () {
+          huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
+        }, 100);
+      });
+
+      huePubSub.subscribe('get.active.editor.locations', function () {
+        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
       });
 
       editor.selection.on("changeSelection", function () {
