@@ -1394,5 +1394,20 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
     delete result.error;
   }
 
+  // Adjust all the statement locations to include white space surrounding them
+  var lastStatementLocation = null;
+  result.locations.forEach(function (location) {
+    if (location.type === 'statement') {
+      if (lastStatementLocation === null) {
+        location.location.first_line = 1;
+        location.location.first_column = 1;
+      } else {
+        location.location.first_line = lastStatementLocation.location.last_line;
+        location.location.first_column = lastStatementLocation.location.last_column + 1;
+      }
+      lastStatementLocation = location;
+    }
+  });
+
   return result;
 };

@@ -270,11 +270,11 @@
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 56, last_column: 57 }, identifierChain: [{ name: 'testTable' }, { name: 'c' }]},
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 64, last_column: 66 }, identifierChain: [{ name: 'testTable' }]},
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 67, last_column: 68 }, identifierChain: [{ name: 'testTable' }, { name: 'd' }]},
-            { type: 'statement', location: { first_line: 2, last_line: 2, first_column: 1, last_column: 33 } },
+            { type: 'statement', location: { first_line: 1, last_line: 2, first_column: 69, last_column: 33 } },
             { type: 'table', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'testTable2' }]},
             { type: 'column', location: { first_line: 2, last_line: 2, first_column: 11, last_column: 14 }, identifierChain: [{ name: 'testTable2' }, { name: 'bla' }]},
             { type: 'table', location: { first_line: 2, last_line: 2, first_column: 20, last_column: 30 }, identifierChain: [{ name: 'testTable2' }]},
-            { type: 'statement', location: { first_line: 3, last_line: 3, first_column: 1, last_column: 43 } },
+            { type: 'statement', location: { first_line: 2, last_line: 3, first_column: 34, last_column: 43 } },
             { type: 'asterisk', location: { first_line: 3, last_line: 3, first_column: 8, last_column: 9 }, tables: [{ alias: 't3', identifierChain: [{ name: 'testTable3' }]}, { alias: 't4', identifierChain: [{ name: 'testTable4' }] }] },
             { type: 'table', location: { first_line: 3, last_line: 3, first_column: 15, last_column: 25 }, identifierChain: [{ name: 'testTable3' }]},
             { type: 'table', location: { first_line: 3, last_line: 3, first_column: 30, last_column: 40 }, identifierChain: [{ name: 'testTable4' }]}
