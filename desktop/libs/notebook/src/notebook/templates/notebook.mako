@@ -52,6 +52,7 @@ ${ editorComponents.topBar() }
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }

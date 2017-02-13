@@ -3703,7 +3703,7 @@
 
       editor.commands.addCommand({
         name: "format",
-        bindKey: {win: "Ctrl-i", mac: "Command-i|Ctrl-i"},
+        bindKey: {win: "Ctrl-i|Ctrl-Shift-f|Ctrl-Alt-l", mac: "Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l"},
         exec: function () {
           if (['ace/mode/hive', 'ace/mode/impala', 'ace/mode/sql', 'ace/mode/mysql', 'ace/mode/pgsql', 'ace/mode/sqlite', 'ace/mode/oracle'].indexOf(snippet.getAceMode()) > -1) {
             $.post("/notebook/api/format", {

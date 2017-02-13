@@ -42,6 +42,7 @@ ${ editorComponents.commonHTML() }
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }
 ${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
 
