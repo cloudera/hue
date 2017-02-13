@@ -438,6 +438,21 @@ var AssistDbEntry = (function () {
     huePubSub.publish('assist.dblClickDbItem', self);
   };
 
+  AssistDbEntry.prototype.openInMetastore = function () {
+    var self = this;
+
+    // TODO: Enable metastore links for databases
+    var path = [];
+    path.push(self.parent.definition.name);
+    path.push(self.definition.name);
+
+    if (IS_HUE_4) {
+      huePubSub.publish('open.link', '/metastore/table/' + path.join('/'));
+    } else {
+      window.open('/metastore/table/' + path.join('/'), '_blank');
+    }
+  };
+
   AssistDbEntry.prototype.toggleOpen = function () {
     var self = this;
     self.open(!self.open());

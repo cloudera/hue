@@ -78,6 +78,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   <script type="text/html" id="sql-context-items">
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+    <!-- ko if: definition.isTable || definition.isDatabase -->
+    <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Metastore') }</a></li>
+    <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
     <!-- ko if: definition.isColumn -->
     <li class="divider"></li>

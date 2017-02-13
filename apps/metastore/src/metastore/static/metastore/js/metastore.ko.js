@@ -760,66 +760,6 @@ var MetastoreViewModel = (function () {
 
     loadDatabases();
 
-    var setDatabaseByName = function (databaseName, callback) {
-      if (databaseName === '') {
-        databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
-            self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
-      }
-      if (self.database() && self.database().name == databaseName) {
-        if (callback) {
-          callback();
-        }
-        return;
-      }
-      var foundDatabases = $.grep(self.databases(), function (database) {
-        return database.name === databaseName;
-      });
-      if (foundDatabases.length === 1) {
-        self.setDatabase(foundDatabases[0], callback);
-      } else {
-        foundDatabases = $.grep(self.databases(), function (database) {
-          return database.name === 'default';
-        });
-        if (foundDatabases.length === 1) {
-          self.setDatabase(foundDatabases[0], callback);
-        }
-      }
-    };
-
-    var loadTableDef = function (tableDef, callback) {
-      setDatabaseByName(tableDef.database);
-      if (self.database()) {
-        if (self.database().table() && self.database().table().name == tableDef.name) {
-          return;
-        }
-        var setTableAfterLoad = function () {
-          var foundTables = $.grep(self.database().tables(), function (table) {
-            return table.name === tableDef.name;
-          });
-          if (foundTables.length === 1) {
-            self.database().setTable(foundTables[0], callback);
-          }
-          else {
-            huePubSub.publish('assist.clear.db.cache', {
-              sourceType: 'hive',
-              clearAll: false,
-              databaseName: self.database().name
-            });
-            self.database().load(setTableAfterLoad, self.optimizerEnabled(), self.navigatorEnabled());
-          }
-        };
-
-        if (!self.database().loaded()) {
-          var doOnce = self.database().loaded.subscribe(function () {
-            setTableAfterLoad();
-            doOnce.dispose();
-          });
-        } else {
-          setTableAfterLoad();
-        }
-      }
-    };
-
     huePubSub.subscribe('assist.db.refresh', function (options) {
       if (options.sourceType !== 'hive') {
         return;
@@ -841,7 +781,7 @@ var MetastoreViewModel = (function () {
       }
       loadDatabases(function () {
         if (currentDatabase) {
-          setDatabaseByName(currentDatabase, function () {
+          self.setDatabaseByName(currentDatabase, function () {
             if (self.database() && currentTable) {
               self.database().setTableByName(currentTable);
             }
@@ -863,7 +803,7 @@ var MetastoreViewModel = (function () {
       if (self.database()) {
         self.database().table(null);
       }
-      setDatabaseByName(databaseDef.name, function () {
+      self.setDatabaseByName(databaseDef.name, function () {
         huePubSub.publish('metastore.url.change')
       });
     });
@@ -884,35 +824,11 @@ var MetastoreViewModel = (function () {
       }
     });
 
-    function loadURL() {
-      var path = window.location.pathname.split('/');
-      switch (path[2]) {
-        case 'databases':
-          if (self.database()) {
-            self.database().table(null);
-            self.database(null);
-          }
-          break;
-        case 'tables':
-          if (self.database()) {
-            self.database().table(null);
-          }
-          setDatabaseByName(path[3]);
-          break;
-        case 'table':
-          window.setTimeout(function() {
-            loadTableDef({
-              name: path[4],
-              database: path[3]
-            });
-          }, 200);
-          break;
-      }
-    }
+    self.loadURL();
 
-    loadURL();
-
-    window.onpopstate = loadURL;
+    window.onpopstate = function () {
+      self.loadURL();
+    };
 
     self.databasesBreadcrumb = function () {
       if (self.database()) {
@@ -927,6 +843,102 @@ var MetastoreViewModel = (function () {
       huePubSub.publish('metastore.url.change')
     }
   }
+
+  MetastoreViewModel.prototype.loadTableDef = function (tableDef, callback) {
+    var self = this;
+    self.setDatabaseByName(tableDef.database);
+    if (self.database()) {
+      if (self.database().table() && self.database().table().name == tableDef.name) {
+        return;
+      }
+      var setTableAfterLoad = function () {
+        var foundTables = $.grep(self.database().tables(), function (table) {
+          return table.name === tableDef.name;
+        });
+        if (foundTables.length === 1) {
+          self.database().setTable(foundTables[0], callback);
+        }
+        else {
+          huePubSub.publish('assist.clear.db.cache', {
+            sourceType: 'hive',
+            clearAll: false,
+            databaseName: self.database().name
+          });
+          self.database().load(setTableAfterLoad, self.optimizerEnabled(), self.navigatorEnabled());
+        }
+      };
+
+      if (!self.database().loaded()) {
+        var doOnce = self.database().loaded.subscribe(function () {
+          setTableAfterLoad();
+          doOnce.dispose();
+        });
+      } else {
+        setTableAfterLoad();
+      }
+    }
+  };
+
+  MetastoreViewModel.prototype.setDatabaseByName = function (databaseName, callback) {
+    var self = this;
+    if (databaseName === '') {
+      databaseName = self.apiHelper.getFromTotalStorage('editor', 'last.selected.database') ||
+          self.apiHelper.getFromTotalStorage('metastore', 'last.selected.database') || 'default';
+    }
+    if (self.database() && self.database().name == databaseName) {
+      if (callback) {
+        callback();
+      }
+      return;
+    }
+    var foundDatabases = $.grep(self.databases(), function (database) {
+      return database.name === databaseName;
+    });
+    if (foundDatabases.length === 1) {
+      self.setDatabase(foundDatabases[0], callback);
+    } else {
+      foundDatabases = $.grep(self.databases(), function (database) {
+        return database.name === 'default';
+      });
+      if (foundDatabases.length === 1) {
+        self.setDatabase(foundDatabases[0], callback);
+      }
+    }
+  };
+
+  MetastoreViewModel.prototype.loadURL = function () {
+    var self = this;
+
+    var path = (IS_HUE_4 ? window.location.getParameter('path', true) : window.location.pathname).split('/');
+    if (path[0] === '') {
+      path.shift();
+    }
+    if (path[0] === 'metastore') {
+      path.shift();
+    }
+    switch (path[0]) {
+      case 'databases':
+        if (self.database()) {
+          self.database().table(null);
+          self.database(null);
+        }
+        break;
+      case 'tables':
+        if (self.database()) {
+          self.database().table(null);
+        }
+        self.setDatabaseByName(path[1]);
+        break;
+      case 'table':
+        window.setTimeout(function() {
+          self.loadTableDef({
+            name: path[2],
+            database: path[1]
+          });
+        }, 200);
+        break;
+    }
+  };
 
   MetastoreViewModel.prototype.setDatabase = function (metastoreDatabase, callback) {
     var self = this;
