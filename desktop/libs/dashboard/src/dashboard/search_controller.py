@@ -25,7 +25,7 @@ from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
-from search.models import Collection2
+from dashboard.models import Collection2
 
 
 LOG = logging.getLogger(__name__)

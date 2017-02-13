@@ -31,8 +31,8 @@ from libsolr.api import GAPS
 from notebook.models import make_notebook
 from notebook.connectors.base import get_api, OperationTimeout
 
-from search.models import Collection2, augment_response
-from search.facet_builder import _compute_range_facet
+from dashboard.models import Collection2, augment_response
+from dashboard.facet_builder import _compute_range_facet
 
 
 LOG = logging.getLogger(__name__)

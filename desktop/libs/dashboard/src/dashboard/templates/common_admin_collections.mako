@@ -24,9 +24,9 @@
 
 <%def name="page_structure(is_mobile=False)">
 
-<link rel="stylesheet" href="${ static('search/css/admin.css') }">
+<link rel="stylesheet" href="${ static('dashboard/css/admin.css') }">
 %if is_mobile:
-<link rel="stylesheet" href="${ static('search/css/admin_mobile.css') }">
+<link rel="stylesheet" href="${ static('dashboard/css/admin_mobile.css') }">
 <h3 style="text-align: center">${_('Dashboards')}</h3>
 %endif
 
@@ -75,7 +75,7 @@
 
       <%def name="creation()">
         %if not is_mobile:
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('search:new_search') }" title="${ _('Create a new dashboard') }">
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('dashboard:new_search') }" title="${ _('Create a new dashboard') }">
           <i class="fa fa-plus-circle"></i> ${ _('Create') }
         </a>
         <a data-bind="visible: !isLoading(), click: function() { $('#import-documents').modal('show'); }" class="btn">
@@ -87,13 +87,13 @@
 
     <div class="row-fluid" data-bind="visible: collections().length == 0 && !isLoading()">
       <div class="span10 offset1 center importBtn pointer">
-        <a href="${ url('search:new_search') }">
+        <a href="${ url('dashboard:new_search') }">
           <i class="fa fa-plus-circle waiting"></i>
         </a>
 
         <h1 class="emptyMessage">
           ${ _('There are currently no dashboards defined.') }<br/>
-          <a href="${ url('search:new_search') }">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
+          <a href="${ url('dashboard:new_search') }">${ _('Click here to add') }</a> ${ _('one or more.') }</h1>
         </h1>
       </div>
     </div>
@@ -164,7 +164,7 @@ ${ commonshare() | n,unicode }
 ${ commonimportexport(request) | n,unicode }
 
 
-<script src="${ static('search/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('dashboard/js/collections.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
 
 
@@ -172,12 +172,12 @@ ${ commonimportexport(request) | n,unicode }
   var appProperties = {
     labels: [],
     %if is_mobile:
-    listCollectionsUrl: "${ url("search:admin_collections") }?format=json&is_mobile=true",
+    listCollectionsUrl: "${ url("dashboard:admin_collections") }?format=json&is_mobile=true",
     %else:
-    listCollectionsUrl: "${ url("search:admin_collections") }?format=json",
+    listCollectionsUrl: "${ url("dashboard:admin_collections") }?format=json",
     %endif
-    deleteUrl: "${ url("search:admin_collection_delete") }",
-    copyUrl: "${ url("search:admin_collection_copy") }",
+    deleteUrl: "${ url("dashboard:admin_collection_delete") }",
+    copyUrl: "${ url("dashboard:admin_collection_copy") }",
     indexerUrl: "/indexer/#link/"
   }
 

@@ -26,12 +26,12 @@ from django.utils.translation import ugettext as _
 import tablib
 
 from desktop.lib.exceptions_renderable import PopupException
+from dashboard.models import Collection2
 from libsolr.api import SolrApi
 from libsolr.conf import SOLR_ZK_PATH
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
-from search.models import Collection2
 
 from indexer.conf import CORE_INSTANCE_DIR
 from indexer.utils import copy_configs, field_values_from_log, field_values_from_separated_file

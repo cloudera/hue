@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -15,10 +14,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = ["indexer"]
-NICE_NAME = "Data Importer"
-REQUIRES_HADOOP = False
-MENU_INDEX = 43
-ICON = "search/art/icon_search_48.png"
+DJANGO_APPS = ["dashboard"]
+NICE_NAME = "Analytics Dashboards"
+MENU_INDEX = -1
+ICON = "dashboard/art/icon_search_48.png"
 
+REQUIRES_HADOOP = False
 IS_URL_NAMESPACED = True

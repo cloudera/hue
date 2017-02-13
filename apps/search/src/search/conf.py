@@ -17,7 +17,6 @@
 
 from django.utils.translation import ugettext_lazy as _
 
-from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 
 
@@ -41,11 +40,4 @@ LATEST = Config(
   key="latest",
   help=_("Use latest Solr 5.2+ features."),
   default=False,
-  type=coerce_bool)
-
-ENABLE_SQL = Config(
-  key="enable_sql",
-  help=_("Offer to use SQL engines to compute the dashboards."),
-  dynamic_default=is_hue4,
-  private=True,
   type=coerce_bool)

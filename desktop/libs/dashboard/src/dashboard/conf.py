@@ -15,10 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-DJANGO_APPS = ["indexer"]
-NICE_NAME = "Data Importer"
-REQUIRES_HADOOP = False
-MENU_INDEX = 43
-ICON = "search/art/icon_search_48.png"
+from django.utils.translation import ugettext_lazy as _
 
-IS_URL_NAMESPACED = True
+from desktop.conf import is_hue4
+from desktop.lib.conf import Config, coerce_bool
+
+
+IS_ENABLED = Config(
+  key="is_enabled",
+  help=_("Activate the app in the menu."),
+  dynamic_default=is_hue4,
+  private=True,
+  type=coerce_bool)
+
+# TODO [[interfaces]] instead
+IS_SQL_ENABLED = Config(
+  key="is_sql_enabled",
+  help=_("Offer to use SQL engines to compute the dashboards."),
+  dynamic_default=is_hue4,
+  private=True,
+  type=coerce_bool)

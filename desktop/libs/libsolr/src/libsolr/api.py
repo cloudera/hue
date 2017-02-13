@@ -31,9 +31,9 @@ from desktop.lib.conf import BoundConfig
 from desktop.lib.i18n import force_unicode
 from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
+from dashboard.facet_builder import _compute_range_facet
 
 from search.conf import EMPTY_QUERY, SECURITY_ENABLED
-from search.facet_builder import _compute_range_facet
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
@@ -215,7 +215,7 @@ class SolrApi(object):
 
     params += self._get_fq(collection, query)
 
-    from search.models import Collection2
+    from dashboard.models import Collection2
     fl = urllib.unquote(utf_quoter(','.join(Collection2.get_field_list(collection))))
 
     nested_fields = self._get_nested_fields(collection)

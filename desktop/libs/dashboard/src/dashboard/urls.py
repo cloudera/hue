@@ -17,15 +17,7 @@
 
 from django.conf.urls import patterns, url
 
-
-urlpatterns = patterns('search.views',
-  url(r'^install_examples$', 'install_examples', name='install_examples'),
-)
-
-
-# Those are all deprecated and dashboard.urls.py is the new reference.
-
-urlpatterns += patterns('dashboard.views',
+urlpatterns = patterns('dashboard.views',
   url(r'^$', 'index', name='index'),
   url(r'^m$', 'index_m', name='index_m'),
   url(r'^embeddable$', 'index_embeddable', name='index_embeddable'),

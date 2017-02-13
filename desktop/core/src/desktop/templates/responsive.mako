@@ -21,6 +21,7 @@
   from desktop.lib.i18n import smart_unicode
   from desktop.views import login_modal
 
+  from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -122,8 +123,8 @@ ${ hueIcons.symbols() }
           % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
             <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
           % endif
-          % if 'search' in apps:
-            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('search') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
+          % if IS_DASHBOARD_ENABLED.get():
+            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
           % endif
           <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Presentation') }</a></li>
           % if 'oozie' in apps:
@@ -300,7 +301,7 @@ ${ hueIcons.symbols() }
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
         <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('search') }"><a href="javascript: void(0);">Dashboard</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('dashboard') }"><a href="javascript: void(0);">Dashboard</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Report</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
         <li class="header">&nbsp;</li>
@@ -363,7 +364,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_notebook" class="embeddable"></div>
       <div id="embeddable_metastore" class="embeddable"></div>
-      <div id="embeddable_search" class="embeddable"></div>
+      <div id="embeddable_dashboard" class="embeddable"></div>
       <div id="embeddable_oozie_workflow" class="embeddable"></div>
       <div id="embeddable_oozie_coordinator" class="embeddable"></div>
       <div id="embeddable_oozie_bundle" class="embeddable"></div>
@@ -581,7 +582,7 @@ ${ assist.assistPanel() }
           editor: '/notebook/editor_embeddable',
           notebook: '/notebook/notebook_embeddable',
           metastore: '/metastore/tables/?is_embeddable=true',
-          search: '/search/embeddable/new_search',
+          dashboard: '/dashboard/embeddable/new_search',
           oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
           oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
           oozie_bundle: '/oozie/editor/bundle/new/?is_embeddable=true',
@@ -591,7 +592,7 @@ ${ assist.assistPanel() }
           fileviewer: 'filebrowser/view=',
           home: '/home_embeddable',
           indexer: '/indexer/indexer/?is_embeddable=true',
-          collections: '/search/admin/collections?is_embeddable=true',
+          collections: '/dashboard/admin/collections?is_embeddable=true',
           indexes: '/indexer/?is_embeddable=true',
           importer: '/indexer/importer/?is_embeddable=true',
         };
@@ -683,8 +684,8 @@ ${ assist.assistPanel() }
           } else if (href.startsWith('/pig')){
             self.changeEditorType('pig');
             self.currentApp('editor');
-          } else if (href.startsWith('/search')){
-            self.currentApp('search');
+          } else if (href.startsWith('/dashboard')){
+            self.currentApp('dashboard');
           } else if (href.startsWith('/oozie/editor/workflow/new')){
             self.currentApp('oozie_workflow');
           } else if (href.startsWith('/oozie/editor/coordinator/new')){
