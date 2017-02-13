@@ -146,7 +146,7 @@ var AssistGitEntry = (function () {
 
   AssistGitEntry.prototype.toggleOpen = function () {
     var self = this;
-    if (self.definition.type === 'file') {
+    if (self.definition.type != 'dir') {
       return;
     }
     self.open(!self.open());

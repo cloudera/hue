@@ -353,7 +353,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                   <!-- ko if: definition.type === 'dir' -->
                   <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
                   <!-- /ko -->
-                  <!-- ko if: definition.type === 'file' -->
+                  <!-- ko ifnot: definition.type === 'dir' -->
                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
                   <!-- /ko -->
                   <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'git', 'definition': definition} }"></span>
