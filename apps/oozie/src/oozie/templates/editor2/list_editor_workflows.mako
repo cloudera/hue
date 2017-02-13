@@ -85,7 +85,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
       </tr>
     </thead>
     <tbody data-bind="foreach: { data: jobs }">
-      <tr>
+      <tr data-bind="attr: { 'oozie-data-id': id() }">
         <td data-bind="click: $root.handleSelect" class="center" style="cursor: default" data-row-selector-exclude="true">
           <div data-bind="multiCheck: '#workflowTable', css: { 'hueCheckbox': true, 'fa': true, 'fa-check': isSelected }" data-row-selector-exclude="true"></div>
           <!-- ko if: ! uuid() -->
@@ -173,10 +173,15 @@ ${ commonimportexport(request) | n,unicode }
       wf.isSelected(! wf.isSelected());
     }
 
-    self.selectAll = function() {
-      self.allSelected(! self.allSelected());
+    self.selectAll = function () {
+      self.allSelected(!self.allSelected());
       ko.utils.arrayForEach(self.jobs(), function (job) {
-        job.isSelected(self.allSelected());
+        if ($('[oozie-data-id=' + job.id() + ']').is(':visible')) {
+          job.isSelected(self.allSelected());
+        }
+        else {
+          job.isSelected(false);
+        }
       });
     }
 
