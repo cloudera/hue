@@ -359,6 +359,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
       $.jHueNotify.error(msg);
     });
 
+    $($('#zoomDetectFrame')[0].contentWindow).resize(function () {
+      $(window).trigger('zoom');
+    });
+
     %if messages:
       %for message in messages:
         %if message.tags == 'error':
