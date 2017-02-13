@@ -707,7 +707,12 @@ from metadata.conf import has_navigator
           }));
 
           pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
-            window.open('/metastore/table/' + path.join('/'), '_blank');
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/metastore/table/' + path.join('/'));
+              huePubSub.publish('sql.context.popover.hide');
+            } else {
+              window.open('/metastore/table/' + path.join('/'), '_blank');
+            }
           }));
         });
       }

@@ -489,6 +489,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
@@ -671,6 +672,12 @@ ${ assist.assistPanel() }
               }
               self.currentApp('editor')
             }
+          } else if (href.startsWith('/metastore')){
+            self.currentApp('metastore');
+            hueUtils.changeURLParameter('path', href.substring('/metastore'.length + 1));
+            self.getActiveAppViewModel(function (metastoreViewModel) {
+              metastoreViewModel.loadURL();
+            });
           } else if (href.startsWith('/notebook')){
             self.currentApp('notebook');
           } else if (href.startsWith('/pig')){
