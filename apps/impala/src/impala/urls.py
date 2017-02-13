@@ -27,14 +27,4 @@ urlpatterns = patterns('impala.api',
   url(r'^api/query/(?P<query_history_id>\d+)/runtime_profile', 'get_runtime_profile', name='get_runtime_profile'),
 )
 
-urlpatterns += patterns('impala.dashboards',
-  url(r'^dashboard/$', 'dashboard', name='dashboard'),
-  url(r'^dashboard/query', 'query', name='query'),
-
-  url(r'^dashboard/new_facet$', 'new_facet', name='new_facet'),
-  url(r'^dashboard/new_search$', 'new_search', name='new_search'),
-  url(r'^dashboard/save$', 'save', name='save'),
-  url(r'^dashboard/get_fields', 'get_fields', name='get_fields'),
-)
-
 urlpatterns += beeswax_urls
