@@ -5285,7 +5285,7 @@ var expandIdentifierChain = function (wrapper, anyOwner) {
   if (identifierChain.length > 0 && identifierChain[identifierChain.length - 1].asterisk) {
     var tables = [];
     tablePrimaries.forEach(function (tablePrimary) {
-      if (identifierChain.length > 1) {
+      if (identifierChain.length > 1 && !tablePrimary.subQueryAlias) {
         if (identifierChain.length === 2 && tablePrimary.alias === identifierChain[0].name) {
           addCleanTablePrimary(tables, tablePrimary);
         } else if (identifierChain.length === 2 && tablePrimary.identifierChain[0].name === identifierChain[0].name) {

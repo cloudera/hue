@@ -82,6 +82,33 @@ var SqlAutocompleter3 = (function () {
     TABLES: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true
   };
 
+  var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
+    suggestions.forEach(function (suggestion) {
+      suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
+      suggestion.weightAdjust = suggestion.details.popularity.relativePopularity;
+    });
+  };
+
+  var initLoading = function (loadingObservable, deferred) {
+    loadingObservable(true);
+    deferred.always(function () {
+      loadingObservable(false);
+    })
+  };
+
+  var locateSubQuery = function (subQueries, subQueryName) {
+    if (typeof subQueries === 'undefined') {
+      return null;
+    }
+    var foundSubQueries = subQueries.filter(function (knownSubQuery) {
+      return knownSubQuery.alias === subQueryName
+    });
+    if (foundSubQueries.length > 0) {
+      return foundSubQueries[0];
+    }
+    return null;
+  };
+
   /**
    *
    * @param options
@@ -94,6 +121,8 @@ var SqlAutocompleter3 = (function () {
     self.editor = options.editor;
 
     self.entries = ko.observableArray();
+
+    self.activeDeferrals = [];
 
     self.loadingKeywords = ko.observable(false);
     self.loadingFunctions = ko.observable(false);
@@ -110,6 +139,10 @@ var SqlAutocompleter3 = (function () {
     self.loadingFilters = ko.observable(false);
     self.loadingPopularTables = ko.observable(false);
     self.loadingPopularColumns = ko.observable(false);
+
+    self.appendEntries = function (entries) {
+      self.entries(self.entries().concat(entries));
+    };
 
     self.loading = ko.pureComputed(function () {
       return self.loadingKeywords() || self.loadingFunctions() || self.loadingDatabases() || self.loadingTables() ||
@@ -241,6 +274,11 @@ var SqlAutocompleter3 = (function () {
 
   Suggestions.prototype.update = function (parseResult) {
     var self = this;
+
+    while (self.activeDeferrals.length > 0) {
+      self.activeDeferrals.pop().reject();
+    }
+
     self.activeDatabase = parseResult.useDatabase || self.snippet.database();
     self.parseResult = parseResult;
 
@@ -265,7 +303,9 @@ var SqlAutocompleter3 = (function () {
     self.filter('');
 
     var colRefDeferred = self.handleColumnReference();
+    self.activeDeferrals.push(colRefDeferred);
     var databasesDeferred = self.loadDatabases();
+    self.activeDeferrals.push(databasesDeferred);
 
     self.handleKeywords(colRefDeferred);
     self.handleIdentifiers();
@@ -274,22 +314,22 @@ var SqlAutocompleter3 = (function () {
     self.handleFunctions(colRefDeferred);
     self.handleDatabases(databasesDeferred);
     var tablesDeferred = self.handleTables(databasesDeferred);
+    self.activeDeferrals.push(tablesDeferred);
     var columnsDeferred = self.handleColumns(colRefDeferred, tablesDeferred);
+    self.activeDeferrals.push(columnsDeferred);
     self.handleValues(colRefDeferred);
-    var pathsDeferred = self.handlePaths();
+    self.activeDeferrals.push(self.handlePaths());
 
-    var joinsDeferred = self.handleJoins();
-    var joinConditionsDeferred = self.handleJoinConditions();
-    var aggregateFunctionsDeferred = self.handleAggregateFunctions();
-    var groupBysDeferred = self.handleGroupBys();
-    var orderBysDeferred = self.handleOrderBys();
-    var filtersDeferred = self.handleFilters();
-    var popularTablesDeferred = self.handlePopularTables(tablesDeferred);
-    var popularColumnsDeferred = self.handlePopularColumns(columnsDeferred);
+    self.activeDeferrals.push(self.handleJoins());
+    self.activeDeferrals.push(self.handleJoinConditions());
+    self.activeDeferrals.push(self.handleAggregateFunctions());
+    self.activeDeferrals.push(self.handleGroupBys());
+    self.activeDeferrals.push(self.handleOrderBys());
+    self.activeDeferrals.push(self.handleFilters());
+    self.activeDeferrals.push(self.handlePopularTables(tablesDeferred));
+    self.activeDeferrals.push(self.handlePopularColumns(columnsDeferred));
 
-    $.when(colRefDeferred, databasesDeferred, tablesDeferred, columnsDeferred, pathsDeferred, joinsDeferred,
-        joinConditionsDeferred, aggregateFunctionsDeferred, groupBysDeferred, orderBysDeferred, filtersDeferred,
-        popularTablesDeferred, popularColumnsDeferred).done(function () {
+    $.when.apply($, self.activeDeferrals).always(function () {
       huePubSub.publish('hue.ace.autocompleter.done');
     });
   };
@@ -341,9 +381,7 @@ var SqlAutocompleter3 = (function () {
       successCallback: databasesDeferred.resolve,
       timeout: AUTOCOMPLETE_TIMEOUT,
       silenceErrors: true,
-      errorCallback: function () {
-        databasesDeferred.resolve([]);
-      }
+      errorCallback: databasesDeferred.reject
     });
     return databasesDeferred;
   };
@@ -361,11 +399,11 @@ var SqlAutocompleter3 = (function () {
           details: null
         };
       });
-      self.entries(self.entries().concat(keywordSuggestions));
+      self.appendEntries(keywordSuggestions);
     }
 
     if (self.parseResult.suggestColRefKeywords) {
-      self.loadingKeywords(true);
+      initLoading(self.loadingKeywords, colRefDeferred);
       // Wait for the column reference type to be resolved to pick the right keywords
       colRefDeferred.done(function (colRef) {
         var colRefKeywordSuggestions = [];
@@ -384,8 +422,7 @@ var SqlAutocompleter3 = (function () {
             })
           }
         });
-        self.entries(self.entries().concat(colRefKeywordSuggestions));
-        self.loadingKeywords(false);
+        self.appendEntries(colRefKeywordSuggestions);
       });
     }
   };
@@ -403,7 +440,7 @@ var SqlAutocompleter3 = (function () {
           details: null
         });
       });
-      self.entries(self.entries().concat(identifierSuggestions));
+      self.appendEntries(identifierSuggestions);
     }
   };
 
@@ -431,7 +468,7 @@ var SqlAutocompleter3 = (function () {
           });
         }
       });
-      self.entries(self.entries().concat(columnAliasSuggestions));
+      self.appendEntries(columnAliasSuggestions);
     }
   };
 
@@ -453,7 +490,7 @@ var SqlAutocompleter3 = (function () {
           details: null
         });
       });
-      self.entries(self.entries().concat(commonTableExpressionSuggestions));
+      self.appendEntries(commonTableExpressionSuggestions);
     }
   };
 
@@ -462,7 +499,8 @@ var SqlAutocompleter3 = (function () {
     if (self.parseResult.suggestFunctions) {
       var functionSuggestions = [];
       if (self.parseResult.suggestFunctions.types && self.parseResult.suggestFunctions.types[0] === 'COLREF') {
-        self.loadingFunctions(true);
+        initLoading(self.loadingFunctions, colRefDeferred);
+
         colRefDeferred.done(function (colRef) {
           var functionsToSuggest = SqlFunctions.getFunctionsWithReturnTypes(self.snippet.type(), [colRef.type.toUpperCase()], self.parseResult.suggestAggregateFunctions || false, self.parseResult.suggestAnalyticFunctions || false);
 
@@ -479,8 +517,7 @@ var SqlAutocompleter3 = (function () {
             })
           });
 
-          self.entries(self.entries().concat(functionSuggestions));
-          self.loadingFunctions(false);
+          self.appendEntries(functionSuggestions);
         });
       } else {
         var types = self.parseResult.suggestFunctions.types || ['T'];
@@ -498,7 +535,7 @@ var SqlAutocompleter3 = (function () {
             details: functionsToSuggest[name]
           })
         });
-        self.entries(self.entries().concat(functionSuggestions));
+        self.appendEntries(functionSuggestions);
       }
     }
   };
@@ -507,12 +544,14 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     var suggestDatabases = self.parseResult.suggestDatabases;
     if (suggestDatabases) {
+      initLoading(self.loadingDatabases, databasesDeferred);
+
       var prefix = suggestDatabases.prependQuestionMark ? '? ' : '';
       if (suggestDatabases.prependFrom) {
         prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
       }
       var databaseSuggestions = [];
-      self.loadingDatabases(true);
+
       databasesDeferred.done(function (dbs) {
         dbs.forEach(function (db) {
           databaseSuggestions.push({
@@ -524,8 +563,7 @@ var SqlAutocompleter3 = (function () {
             details: null
           })
         });
-        self.entries(self.entries().concat(databaseSuggestions));
-        self.loadingDatabases(false);
+        self.appendEntries(databaseSuggestions);
       });
     }
   };
@@ -533,10 +571,13 @@ var SqlAutocompleter3 = (function () {
   Suggestions.prototype.handleTables = function (databasesDeferred) {
     var self = this;
     var tablesDeferred = $.Deferred();
+
     if (self.parseResult.suggestTables) {
       var suggestTables = self.parseResult.suggestTables;
       var fetchTables = function () {
-        self.loadingTables(true);
+        initLoading(self.loadingTables, tablesDeferred);
+        tablesDeferred.done(self.appendEntries);
+
         var prefix = suggestTables.prependQuestionMark ? '? ' : '';
         if (suggestTables.prependFrom) {
           prefix += self.parseResult.lowerCase ? 'from ' : 'FROM ';
@@ -565,15 +606,10 @@ var SqlAutocompleter3 = (function () {
                 details: details
               });
             });
-            self.loadingTables(false);
-            self.entries(self.entries().concat(tableSuggestions));
             tablesDeferred.resolve(tableSuggestions);
           },
           silenceErrors: true,
-          errorCallback: function () {
-            self.loadingTables(false);
-            tablesDeferred.resolve([]);
-          },
+          errorCallback: tablesDeferred.reject,
           timeout: AUTOCOMPLETE_TIMEOUT
         });
       };
@@ -587,17 +623,17 @@ var SqlAutocompleter3 = (function () {
             fetchTables();
           } else {
             self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-            tablesDeferred.resolve([]);
+            tablesDeferred.reject();
           }
         });
       } else if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length > 1) {
         self.parseResult.suggestColumns = { tables: [{ identifierChain: self.parseResult.suggestTables.identifierChain }] };
-        tablesDeferred.resolve([]);
+        tablesDeferred.reject();
       } else {
         fetchTables();
       }
     } else {
-      tablesDeferred.resolve([]);
+      tablesDeferred.reject();
     }
 
     return tablesDeferred;
@@ -606,28 +642,30 @@ var SqlAutocompleter3 = (function () {
   Suggestions.prototype.handleColumns = function (colRefDeferred, tablesDeferred) {
     var self = this;
     var columnsDeferred = $.Deferred();
-    $.when(tablesDeferred).done(function () {
+
+    tablesDeferred.always(function () {
       if (self.parseResult.suggestColumns) {
+        initLoading(self.loadingColumns, columnsDeferred);
+        columnsDeferred.done(self.appendEntries);
+
         var suggestColumns = self.parseResult.suggestColumns;
         var columnSuggestions = [];
         // For multiple tables we need to merge and make sure identifiers are unique
         var columnDeferrals = [];
 
         if (suggestColumns.types && suggestColumns.types[0] === 'COLREF') {
-          self.loadingColumns(true);
           colRefDeferred.done(function (colRef) {
             suggestColumns.tables.forEach(function (table) {
               columnDeferrals.push(self.addColumns(table, [colRef.type.toUpperCase()], columnSuggestions));
             });
           });
         } else {
-          self.loadingColumns(true);
           suggestColumns.tables.forEach(function (table) {
             columnDeferrals.push(self.addColumns(table, suggestColumns.types || ['T'], columnSuggestions));
           });
         }
 
-        $.when.apply($, columnDeferrals).done(function () {
+        $.when.apply($, columnDeferrals).always(function () {
           self.mergeColumns(columnSuggestions);
           if (self.snippet.type() === 'hive' && /[^\.]$/.test(self.editor().getTextBeforeCursor())) {
             columnSuggestions.push({
@@ -645,12 +683,10 @@ var SqlAutocompleter3 = (function () {
               details: null
             });
           }
-          self.entries(self.entries().concat(columnSuggestions));
           columnsDeferred.resolve(columnSuggestions);
-          self.loadingColumns(false);
         });
       } else {
-        columnsDeferred.resolve([]);
+        columnsDeferred.reject();
       }
     });
 
@@ -662,7 +698,7 @@ var SqlAutocompleter3 = (function () {
     var addColumnsDeferred = $.Deferred();
 
     if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].subQuery !== 'undefined') {
-      var foundSubQuery = self.locateSubQuery(self.parseResult.subQueries, table.identifierChain[0].subQuery);
+      var foundSubQuery = locateSubQuery(self.parseResult.subQueries, table.identifierChain[0].subQuery);
 
       var addSubQueryColumns = function (subQueryColumns) {
         subQueryColumns.forEach(function (column) {
@@ -691,7 +727,7 @@ var SqlAutocompleter3 = (function () {
               })
             }
           } else if (column.subQuery && foundSubQuery.subQueries) {
-            var foundNestedSubQuery = self.locateSubQuery(foundSubQuery.subQueries, column.subQuery);
+            var foundNestedSubQuery = locateSubQuery(foundSubQuery.subQueries, column.subQuery);
             if (foundNestedSubQuery !== null) {
               addSubQueryColumns(foundNestedSubQuery.columns);
             }
@@ -742,7 +778,6 @@ var SqlAutocompleter3 = (function () {
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
                 value: self.backTickIfNeeded(column.name) + '[]',
-                filterValue: column.name,
                 filterValue: column.name,
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
@@ -981,7 +1016,7 @@ var SqlAutocompleter3 = (function () {
             })
           });
         }
-        self.entries(self.entries().concat(valueSuggestions));
+        self.appendEntries(valueSuggestions);
       });
     }
   };
@@ -990,14 +1025,17 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     var suggestHdfs = self.parseResult.suggestHdfs;
     var pathsDeferred = $.Deferred();
+
     if (suggestHdfs) {
+      initLoading(self.loadingPaths, pathsDeferred);
+      pathsDeferred.done(self.appendEntries);
+
       var parts = suggestHdfs.path.split('/');
       // Drop the first " or '
       parts.shift();
       // Last one is either partial name or empty
       parts.pop();
 
-      self.loadingPaths(true);
       self.apiHelper.fetchHdfsPath({
         pathParts: parts,
         successCallback: function (data) {
@@ -1014,20 +1052,16 @@ var SqlAutocompleter3 = (function () {
                 });
               }
             });
-            self.entries(self.entries().concat(pathSuggestions));
             pathsDeferred.resolve(pathSuggestions);
           }
-          self.loadingPaths(false);
+          pathsDeferred.reject();
         },
         silenceErrors: true,
-        errorCallback: function () {
-          pathsDeferred.resolve([]);
-          self.loadingPaths(false);
-        },
+        errorCallback: pathsDeferred.reject,
         timeout: AUTOCOMPLETE_TIMEOUT
       });
     } else {
-      pathsDeferred.resolve([]);
+      pathsDeferred.reject();
     }
     return pathsDeferred;
   };
@@ -1037,7 +1071,9 @@ var SqlAutocompleter3 = (function () {
     var joinsDeferred = $.Deferred();
     var suggestJoins = self.parseResult.suggestJoins;
     if (HAS_OPTIMIZER && suggestJoins) {
-      self.loadingJoins(true);
+      initLoading(self.loadingJoins, joinsDeferred);
+      joinsDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1097,17 +1133,12 @@ var SqlAutocompleter3 = (function () {
             suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
             suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
           });
-          self.entries(self.entries().concat(joinSuggestions));
-          self.loadingJoins(false);
           joinsDeferred.resolve(joinSuggestions);
         },
-        errorCallback: function () {
-          self.loadingJoins(false);
-          joinsDeferred.resolve([]);
-        }
+        errorCallback: joinsDeferred.reject
       });
     } else {
-      joinsDeferred.resolve([]);
+      joinsDeferred.reject();
     }
     return joinsDeferred;
   };
@@ -1117,7 +1148,9 @@ var SqlAutocompleter3 = (function () {
     var joinConditionsDeferred = $.Deferred();
     var suggestJoinConditions = self.parseResult.suggestJoinConditions;
     if (HAS_OPTIMIZER && suggestJoinConditions) {
-      self.loadingJoinConditions(true);
+      initLoading(self.loadingJoinConditions, joinConditionsDeferred);
+      joinConditionsDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptPopularJoins({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1153,17 +1186,12 @@ var SqlAutocompleter3 = (function () {
             suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
           });
 
-          self.entries(self.entries().concat(joinConditionSuggestions));
-          joinConditionsDeferred.resolve();
-          self.loadingJoinConditions(false);
+          joinConditionsDeferred.resolve(joinConditionSuggestions);
         },
-        errorCallback: function () {
-          self.loadingJoinConditions(false);
-          joinConditionsDeferred.resolve([]);
-        }
+        errorCallback: joinConditionsDeferred.reject
       });
     } else {
-      joinConditionsDeferred.resolve([]);
+      joinConditionsDeferred.reject();
     }
 
     return joinConditionsDeferred;
@@ -1172,9 +1200,12 @@ var SqlAutocompleter3 = (function () {
   Suggestions.prototype.handleAggregateFunctions = function () {
     var self = this;
     var aggregateFunctionsDeferred = $.Deferred();
+
     var suggestAggregateFunctions = self.parseResult.suggestAggregateFunctions;
     if (HAS_OPTIMIZER && suggestAggregateFunctions && suggestAggregateFunctions.tables.length > 0) {
-      self.loadingAggregateFunctions(true);
+      initLoading(self.loadingAggregateFunctions, aggregateFunctionsDeferred);
+      aggregateFunctionsDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptTopAggs({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1231,19 +1262,13 @@ var SqlAutocompleter3 = (function () {
               suggestion.details.relativePopularity = totalCount === 0 ? suggestion.details.totalQueryCount : Math.round(100 * suggestion.details.totalQueryCount / totalCount);
               suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
             });
-
-            self.entries(self.entries().concat(aggregateFunctionsSuggestions));
           }
-          aggregateFunctionsDeferred.resolve();
-          self.loadingAggregateFunctions(false);
+          aggregateFunctionsDeferred.resolve(aggregateFunctionsSuggestions);
         },
-        errorCallback: function () {
-          self.loadingAggregateFunctions(false);
-          aggregateFunctionsDeferred.resolve();
-        }
+        errorCallback: aggregateFunctionsDeferred.reject
       });
     } else {
-      aggregateFunctionsDeferred.resolve();
+      aggregateFunctionsDeferred.reject();
     }
     return aggregateFunctionsDeferred;
   };
@@ -1253,7 +1278,9 @@ var SqlAutocompleter3 = (function () {
     var groupBysDeferred = $.Deferred();
     var suggestGroupBys = self.parseResult.suggestGroupBys;
     if (HAS_OPTIMIZER && suggestGroupBys) {
-      self.loadingGroupBys(true);
+      initLoading(self.loadingGroupBys, groupBysDeferred);
+      groupBysDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1278,16 +1305,12 @@ var SqlAutocompleter3 = (function () {
             });
           }
           self.entries(self.entries().concat(groupBySuggestions));
-          self.loadingGroupBys(false);
           groupBysDeferred.resolve(groupBySuggestions);
         },
-        errorCallback: function () {
-          self.loadingGroupBys(false);
-          groupBysDeferred.resolve([])
-        }
+        errorCallback: groupBysDeferred.reject
       });
     } else {
-      groupBysDeferred.resolve([]);
+      groupBysDeferred.reject();
     }
 
     return groupBysDeferred;
@@ -1298,6 +1321,9 @@ var SqlAutocompleter3 = (function () {
     var orderBysDeferred = $.Deferred();
     var suggestOrderBys = self.parseResult.suggestOrderBys;
     if (HAS_OPTIMIZER && suggestOrderBys) {
+      initLoading(self.loadingOrderBys, orderBysDeferred);
+      orderBysDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1321,17 +1347,12 @@ var SqlAutocompleter3 = (function () {
               });
             });
           }
-          self.entries(self.entries().concat(orderBySuggestions));
-          self.loadingOrderBys(false);
           orderBysDeferred.resolve(orderBySuggestions);
         },
-        errorCallback: function () {
-          self.loadingOrderBys(false);
-          orderBysDeferred.resolve([]);
-        }
+        errorCallback: orderBysDeferred.reject
       });
     } else {
-      orderBysDeferred.resolve([]);
+      orderBysDeferred.reject();
     }
     return orderBysDeferred;
   };
@@ -1341,7 +1362,9 @@ var SqlAutocompleter3 = (function () {
     var filtersDeferred = $.Deferred();
     var suggestFilters = self.parseResult.suggestFilters;
     if (HAS_OPTIMIZER && suggestFilters) {
-      self.loadingFilters(true);
+      initLoading(self.loadingFilters, filtersDeferred);
+      filtersDeferred.done(self.appendEntries);
+
       self.apiHelper.fetchNavOptTopFilters({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1384,33 +1407,22 @@ var SqlAutocompleter3 = (function () {
             suggestion.weightAdjust = suggestion.details.relativePopularity + 1;
           });
 
-          self.entries(self.entries().concat(filterSuggestions));
-          self.loadingFilters(false);
           filtersDeferred.resolve(filterSuggestions);
         },
-        errorCallback: function () {
-          self.loadingFilters(false);
-          filtersDeferred.resolve([]);
-        }
+        errorCallback: filtersDeferred.reject
       });
     } else {
-      filtersDeferred.resolve([]);
+      filtersDeferred.reject();
     }
     return filtersDeferred;
-  };
-
-  var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
-    suggestions.forEach(function (suggestion) {
-      suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
-      suggestion.weightAdjust = suggestion.details.popularity.relativePopularity;
-    });
   };
 
   Suggestions.prototype.handlePopularTables = function (tablesDeferred) {
     var self = this;
     var popularTablesDeferred = $.Deferred();
     if (HAS_OPTIMIZER && self.parseResult.suggestTables) {
-      self.loadingPopularTables(true);
+      initLoading(self.loadingPopularTables, popularTablesDeferred);
+
       self.apiHelper.fetchNavOptTopTables({
         database: self.activeDatabase,
         sourceType: self.snippet.type(),
@@ -1418,15 +1430,14 @@ var SqlAutocompleter3 = (function () {
         successCallback: function (data) {
           var popularityIndex = {};
           if (data.top_tables.length == 0) {
-            self.loadingPopularTables(false);
-            popularTablesDeferred.resolve([]);
+            popularTablesDeferred.reject();
             return;
           }
           data.top_tables.forEach(function (topTable) {
             popularityIndex[topTable.name] = topTable;
           });
 
-          $.when(tablesDeferred).done(function (tableSuggestions) {
+          tablesDeferred.done(function (tableSuggestions) {
             var totalMatchedPopularity = 0;
             var matchedSuggestions = [];
             tableSuggestions.forEach(function (suggestion) {
@@ -1441,7 +1452,6 @@ var SqlAutocompleter3 = (function () {
                 matchedSuggestions.push(suggestion);
               }
             });
-            self.loadingPopularTables(false);
             popularTablesDeferred.resolve(data.top_tables);
             if (matchedSuggestions.length > 0) {
               adjustWeightsBasedOnPopularity(matchedSuggestions, totalMatchedPopularity);
@@ -1449,13 +1459,10 @@ var SqlAutocompleter3 = (function () {
             }
           });
         },
-        errorCallback: function () {
-          self.loadingPopularTables(false);
-          popularTablesDeferred.resolve([]);
-        }
+        errorCallback: popularTablesDeferred.reject
       });
     } else {
-      popularTablesDeferred.resolve([]);
+      popularTablesDeferred.reject();
     }
     return popularTablesDeferred
   };
@@ -1466,7 +1473,8 @@ var SqlAutocompleter3 = (function () {
     var suggestColumns = self.parseResult.suggestColumns;
     // TODO: Handle tables from different databases
     if (HAS_OPTIMIZER && suggestColumns && suggestColumns.source !== 'undefined') {
-      self.loadingPopularColumns(true);
+      initLoading(self.loadingPopularColumns, popularColumnsDeferred);
+
       self.apiHelper.fetchNavOptTopColumns({
         sourceType: self.snippet.type(),
         timeout: AUTOCOMPLETE_TIMEOUT,
@@ -1491,7 +1499,7 @@ var SqlAutocompleter3 = (function () {
 
           if (popularColumns.length === 0) {
             self.loadingPopularColumns(false);
-            popularColumnsDeferred.resolve([]);
+            popularColumnsDeferred.reject();
             return;
           }
 
@@ -1500,7 +1508,7 @@ var SqlAutocompleter3 = (function () {
             popularityIndex[popularColumn.columnName.toLowerCase()] = popularColumn;
           });
 
-          $.when(columnsDeferred).done(function (columns) {
+          columnsDeferred.done(function (columns) {
             var totalMatchedPopularity = 0;
             var matchedSuggestions = [];
             columns.forEach(function (suggestion) {
@@ -1520,20 +1528,17 @@ var SqlAutocompleter3 = (function () {
               }
             });
             self.loadingPopularColumns(false);
-            popularColumnsDeferred.resolve(popularColumns);
+            popularColumnsDeferred.reject();
             if (matchedSuggestions.length > 0) {
               adjustWeightsBasedOnPopularity(matchedSuggestions, totalMatchedPopularity);
               self.entries.notifySubscribers();
             }
           });
         },
-        errorCallback: function () {
-          self.loadingPopularColumns(false);
-          popularColumnsDeferred.resolve([]);
-        }
+        errorCallback: popularColumnsDeferred.reject
       });
     } else {
-      popularColumnsDeferred.resolve([]);
+      popularColumnsDeferred.reject();
     }
     return popularColumnsDeferred;
   };
@@ -1674,7 +1679,7 @@ var SqlAutocompleter3 = (function () {
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
-      if (identifierChain.length > 1) {
+      if (identifierChain.length > 1 && !identifierChain.subQuery) {
         self.apiHelper.loadDatabases({
           sourceType: self.snippet.type(),
           timeout: AUTOCOMPLETE_TIMEOUT,

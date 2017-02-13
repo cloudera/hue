@@ -6504,6 +6504,17 @@
         });
       });
 
+      it('should suggest keywords for "select foo.* from (|) foo"', function () {
+        assertAutoComplete({
+          beforeCursor: 'select foo.* from (',
+          afterCursor: ') foo',
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true
+          }
+        });
+      });
+
       it('should suggest tables for "SELECT * FROM (SELECT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM (SELECT ',
