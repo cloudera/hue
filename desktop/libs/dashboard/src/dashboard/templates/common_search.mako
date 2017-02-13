@@ -78,7 +78,7 @@ from desktop.views import commonheader, commonfooter, _ko
     <a class="btn" href="javascript:void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: newSearch">
       <i class="fa fa-file-o"></i>
     </a>
-    <a class="btn" href="${ url('search:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+    <a class="btn" href="${ url('dashboard:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i>
     </a>
   </div>
@@ -1478,7 +1478,7 @@ ${ dashboard.layout_skeleton() }
         <!-- /ko -->
 
         <!-- ko if: $root.collection.engine() == 'solr' -->
-        <form method="POST" action="${ url('search:download') }" style="display:inline">
+        <form method="POST" action="${ url('dashboard:download') }" style="display:inline">
           ${ csrf_token(request) | n,unicode }
           <input type="hidden" name="collection" data-bind="value: ko.mapping.toJSON($root.collection)"/>
           <input type="hidden" name="query" data-bind="value: ko.mapping.toJSON($root.query)"/>
@@ -2753,9 +2753,9 @@ ${ dashboard.layout_skeleton() }
 <span id="extra" data-bind="augmenthtml: $root.collection.template.extracode"></span>
 
 
-<link rel="stylesheet" href="${ static('search/css/search.css') }">
+<link rel="stylesheet" href="${ static('dashboard/css/search.css') }">
 %if is_mobile:
-<link rel="stylesheet" href="${ static('search/css/search_mobile.css') }">
+<link rel="stylesheet" href="${ static('dashboard/css/search_mobile.css') }">
 %endif
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-filetypes.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/hue-charts.css') }">
@@ -2767,7 +2767,7 @@ ${ dashboard.layout_skeleton() }
 
 ${ dashboard.import_layout(True) }
 
-<script src="${ static('search/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('dashboard/js/search.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.textsqueezer.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/ko.editable.js') }" type="text/javascript" charset="utf-8"></script>
@@ -2778,7 +2778,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/select2/select2.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
-<script src="${ static('search/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 ${ dashboard.import_charts() }

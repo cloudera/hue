@@ -24,7 +24,7 @@ from desktop import conf
 <%namespace name="common_search" file="common_search.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 
-${ commonheader(_('Search'), "search", user, request, "80px") | n,unicode }
+${ commonheader(_('Dashboard'), "dashboard", user, request, "80px") | n,unicode }
 
 ${ notebookKoComponents.downloadSnippetResults() }
 

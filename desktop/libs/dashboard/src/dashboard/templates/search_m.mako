@@ -15,14 +15,22 @@
 ## limitations under the License.
 
 <%!
-  from desktop.views import commonheader_m, commonfooter_m
-  from django.utils.translation import ugettext as _
+from django.utils.translation import ugettext as _
+
+from desktop.views import commonheader_m, commonfooter_m, _ko
+from desktop import conf
 %>
 
-<%namespace name="common_admin_collections" file="common_admin_collections.mako" />
+<%namespace name="common_search" file="common_search.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 
-${ commonheader_m(_('Search'), "search", user, request, "29px") | n,unicode }
+${ commonheader_m(_('Dashboard'), "dashboard", user, request, "80px") | n,unicode }
 
-${ common_admin_collections.page_structure(True) }
+${ notebookKoComponents.downloadSnippetResults() }
+
+
+<div id="searchComponents">
+${ common_search.page_structure(is_mobile=True) }
+</div>
 
 ${ commonfooter_m(request, messages) | n,unicode }

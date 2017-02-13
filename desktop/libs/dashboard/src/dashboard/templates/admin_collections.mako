@@ -15,13 +15,18 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter, _ko
-from desktop import conf
-from django.utils.translation import ugettext as _
+  from desktop.views import commonheader, commonfooter
+  from django.utils.translation import ugettext as _
 %>
 
-<%namespace name="common_search" file="common_search.mako" />
+<%namespace name="common_admin_collections" file="common_admin_collections.mako" />
 
-<div id="searchComponents">
-${ common_search.page_structure(is_embeddable=True) }
-</div>
+%if not is_embeddable:
+${ commonheader(_('Dashboard'), "dashboard", user, request, "29px") | n,unicode }
+%endif
+
+${ common_admin_collections.page_structure() }
+
+%if not is_embeddable:
+${ commonfooter(request, messages) | n,unicode }
+%endif

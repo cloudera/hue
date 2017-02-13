@@ -21,10 +21,10 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="macros" file="macros.mako" />
 
-${ commonheader(_('Search'), "search", user, request, "120px") | n,unicode }
+${ commonheader(_('Dashboard'), "dashboard", user, request, "120px") | n,unicode }
+
 
 <style type="text/css">
-
   .waiting {
     font-size: 196px;
     color: #DDD;
@@ -35,7 +35,6 @@ ${ commonheader(_('Search'), "search", user, request, "120px") | n,unicode }
     color: #BBB;
     line-height: 60px;
   }
-
 </style>
 
 <div class="container-fluid">

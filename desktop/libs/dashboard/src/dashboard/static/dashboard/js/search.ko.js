@@ -388,7 +388,7 @@ var FieldAnalysis = function (vm, fieldName, fieldType) {
   self.getTerms = function () {
     self.isLoading(true);
     self.terms.data.removeAll();
-    $.post("/search/get_terms", {
+    $.post("/dashboard/get_terms", {
       collection: ko.mapping.toJSON(vm.collection),
       analysis: ko.mapping.toJSON(self)
     }, function (data) {
@@ -415,7 +415,7 @@ var FieldAnalysis = function (vm, fieldName, fieldType) {
   self.getStats = function () {
     self.stats.data.removeAll();
     self.isLoading(true);
-    $.post("/search/get_stats", {
+    $.post("/dashboard/get_stats", {
       collection: ko.mapping.toJSON(vm.collection),
       query: ko.mapping.toJSON(vm.query),
       analysis: ko.mapping.toJSON(self)
@@ -502,7 +502,7 @@ var Collection = function (vm, collection) {
 	if (val == 'fixed' && self.timeFilter.from().length == 0) {
       $.ajax({
         type: "POST",
-        url: "/search/get_range_facet",
+        url: "/dashboard/get_range_facet",
         data: {
           collection: ko.mapping.toJSON(self),
           facet: ko.mapping.toJSON({widgetType: 'facet-widget', field: self.timeFilter.field()}),
@@ -831,7 +831,7 @@ var Collection = function (vm, collection) {
     self.removeFacet(function(){return facet_json.widget_id});
     logGA('add_facet/' + facet_json.widgetType);
 
-    $.post("/search/template/new_facet", {
+    $.post("/dashboard/template/new_facet", {
         "collection": ko.mapping.toJSON(self),
         "id": facet_json.widget_id,
         "label": facet_json.name,
@@ -1118,7 +1118,7 @@ var Collection = function (vm, collection) {
   });
 
   self.switchCollection = function() {
-    $.post("/search/get_collection", {
+    $.post("/dashboard/get_collection", {
         name: self.name(),
         engine: self.engine()
     }, function (data) {
@@ -1179,7 +1179,7 @@ var Collection = function (vm, collection) {
   }
 
   self.syncFields = function() {
-    $.post("/search/get_collection", {
+    $.post("/dashboard/get_collection", {
         name: self.name(),
         engine: self.engine()
       }, function (data) {
@@ -1194,7 +1194,7 @@ var Collection = function (vm, collection) {
   };
 
   self.syncDynamicFields = function () {
-    $.post("/search/index/fields/dynamic", {
+    $.post("/dashboard/index/fields/dynamic", {
         name: self.name(),
         engine: self.engine()
       }, function (data) {
@@ -1210,7 +1210,7 @@ var Collection = function (vm, collection) {
   };
 
   self.getNestedDocuments = function () {
-    $.post("/search/index/fields/nested_documents", {
+    $.post("/dashboard/index/fields/nested_documents", {
         collection: ko.mapping.toJSON(self),
         engine: self.engine()
       }, function (data) {
@@ -1303,7 +1303,7 @@ var Collection = function (vm, collection) {
 
     $.ajax({
       type: "POST",
-      url: "/search/get_range_facet",
+      url: "/dashboard/get_range_facet",
       data: {
         collection: ko.mapping.toJSON(self),
         facet: ko.mapping.toJSON(facet),
@@ -1397,7 +1397,7 @@ var NewTemplate = function (vm, initial) {
 
   self.syncCollections = function () {
     vm.isSyncingCollections(true);
-    $.post("/search/get_collections", {
+    $.post("/dashboard/get_collections", {
         collection: ko.mapping.toJSON(vm.collection),
         show_all: ko.mapping.toJSON(vm.showCores)
       }, function (data) {
@@ -1738,7 +1738,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     if (! self.collection.async()) {
       self._loadResults(facet, facet.queryResult().asyncResult());
     } else {
-      $.post("/search/search", {
+      $.post("/dashboard/search", {
           collection: ko.mapping.toJSON(self.collection),
           query: ko.mapping.toJSON(self.query),
           facet: ko.mapping.toJSON(facet),
@@ -1809,7 +1809,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       }
 
       multiQs = $.map(queries, function (qdata) {
-        return $.post("/search/get_timeline", {
+        return $.post("/dashboard/get_timeline", {
           collection: ko.mapping.toJSON(self.collection),
           query: ko.mapping.toJSON(self.query),
           facet: ko.mapping.toJSON(facet),
@@ -1829,7 +1829,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
 
       multiQs = $.map(self.collection.facets(), function(facet) {
-        return $.post("/search/search", {
+        return $.post("/dashboard/search", {
             collection: ko.mapping.toJSON(self.collection),
             query: ko.mapping.toJSON(self.query),
             facet: ko.mapping.toJSON(facet),
@@ -1860,7 +1860,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 
     $.when.apply($, [
-      $.post("/search/search", {
+      $.post("/dashboard/search", {
           collection: ko.mapping.toJSON(self.collection),
           query: ko.mapping.toJSON(self.query),
           layout: ko.mapping.toJSON(self.columns)
@@ -2047,7 +2047,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   }
 
   self.suggest = function (query, callback) {
-    $.post("/search/suggest/", {
+    $.post("/dashboard/suggest/", {
       collection: ko.mapping.toJSON(self.collection),
       query: query
     }, function (data) {
@@ -2103,7 +2103,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   }
 
   self.getDocument = function (doc, callback) {
-    $.post("/search/get_document", {
+    $.post("/dashboard/get_document", {
       collection: ko.mapping.toJSON(self.collection),
       id: doc.id
     }, function (data) {
@@ -2146,7 +2146,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   };
 
   self.updateDocument = function (doc) {
-    $.post("/search/update_document", {
+    $.post("/dashboard/update_document", {
       collection: ko.mapping.toJSON(self.collection),
       document: ko.mapping.toJSON(doc),
       id: doc.id
@@ -2200,7 +2200,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   }
 
   self.save = function () {
-    $.post("/search/save", {
+    $.post("/dashboard/save", {
       collection: ko.mapping.toJSON(self.collection),
       layout: ko.mapping.toJSON(self.columns)
     }, function (data) {
@@ -2208,7 +2208,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         self.collection.id(data.id);
         $(document).trigger("info", data.message);
         if (window.location.search.indexOf("collection") == -1) {
-          hueUtils.changeURL('/search/?collection=' + data.id);
+          hueUtils.changeURL('/dashboard/?collection=' + data.id);
         }
       }
       else {
@@ -2223,6 +2223,6 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
 function logGA(page) {
   if (typeof trackOnGA == 'function') {
-    trackOnGA('search/' + page);
+    trackOnGA('dashboard/' + page);
   }
 }
