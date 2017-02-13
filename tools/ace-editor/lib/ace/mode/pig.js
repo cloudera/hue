@@ -33,7 +33,21 @@ oop.inherits(Mode, TextMode);
     // this.lineCommentStart = ""/\\*"";
     // this.blockComment = {start: ""/*"", end: ""*/""};
     // Extra logic goes here.
-    this.$id = "ace/mode/pig"
+    this.$id = "ace/mode/pig";
+
+    this.getCompletions = function(state, session, pos, prefix) {
+        var keywords = this.$keywordList || this.$createKeywordList();
+        return keywords.map(function (word) {
+            return {
+                ignoreCase: true,
+                name: word,
+                value: word,
+                upperCaseValue: word.toUpperCase(),
+                score: 1,
+                meta: "keyword"
+            };
+        });
+    };
 }).call(Mode.prototype);
 
 exports.Mode = Mode;
