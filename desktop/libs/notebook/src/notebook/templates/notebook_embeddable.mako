@@ -48,6 +48,7 @@ ${ editorComponents.topBar() }
 </%editorComponents:commonHTML>
 
 ${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.addSnippetMenu() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }

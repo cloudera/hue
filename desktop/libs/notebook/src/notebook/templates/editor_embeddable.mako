@@ -38,6 +38,7 @@ ${ editorComponents.topBar() }
 ${ editorComponents.commonHTML(with_assist='false') }
 
 ${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
 
