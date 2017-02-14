@@ -243,6 +243,8 @@ def _augment_highlighting(query_s, records):
     name = record.get('originalName', '') or ''
     record['hue_description'] = ''
     record['hue_name'] = record.get('parentPath', '') if record.get('parentPath') else ''
+    if record.get('parentPath') is None:
+      record['parentPath'] = ''
 
     if record['hue_name'] and record.get('sourceType', '') != 'S3':
       record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
