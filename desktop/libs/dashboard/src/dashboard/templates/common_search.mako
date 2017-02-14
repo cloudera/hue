@@ -203,7 +203,7 @@ from desktop.views import commonheader, commonfooter, _ko
          </a>
     </div>
 
-    <div data-bind="visible: $root.isLatest,
+    <div data-bind="visible: $root.collection.supportAnalytics,
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableCounter(), isEnabled: availableDraggableNumbers,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -216,7 +216,7 @@ from desktop.views import commonheader, commonfooter, _ko
       </%def>
 
       <%def name="widgets()">
-    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableFacet(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -225,7 +225,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableTextFacet(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -234,7 +234,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-sort-amount-asc"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -243,7 +243,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="hcha hcha-pie-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
+    <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggablePie2(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -252,7 +252,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-pie-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(),
+    <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableChart() },
                     draggable: {data: draggableBar(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -262,7 +262,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="hcha hcha-bar-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(),
+    <div data-bind="visible: $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': ! availableDraggableChart() },
                     draggable: {data: draggableBucket(), isEnabled: availableDraggableChart,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -272,7 +272,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-bar-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(),
+    <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': !availableDraggableNumbers() },
                     draggable: {data: draggableLine(), isEnabled: availableDraggableNumbers,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -282,7 +282,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="hcha hcha-line-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -291,7 +291,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-sitemap fa-rotate-270"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': false },
+    <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableTree2(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -300,7 +300,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-sitemap fa-rotate-270"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(),
+    <div data-bind="visible: ! $root.collection.supportAnalytics(),
                     css: { 'draggable-widget': true, 'disabled': false },
                     draggable: {data: draggableHeatmap(), isEnabled: true,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
@@ -310,7 +310,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-th"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
+    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableHistogram() },
                     draggable: {data: draggableHistogram(), isEnabled: availableDraggableHistogram,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -319,7 +319,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="hcha hcha-timeline-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableTimeline() },
+    <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableTimeline() },
                     draggable: {data: draggableTimeline(), isEnabled: availableTimeline,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -328,7 +328,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="fa fa-line-chart"></i>
          </a>
     </div>
-    <div data-bind="visible: ! $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+    <div data-bind="visible: ! $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableMap(), isEnabled: availableDraggableMap,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -337,7 +337,7 @@ from desktop.views import commonheader, commonfooter, _ko
                        <i class="hcha hcha-map-chart"></i>
          </a>
    </div>
-    <div data-bind="visible: $root.isLatest(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
+    <div data-bind="visible: $root.collection.supportAnalytics(), css: { 'draggable-widget': true, 'disabled': ! availableDraggableMap() },
                     draggable: {data: draggableGradienMap(), isEnabled: availableDraggableMap,
                     options: {'start': function(event, ui){lastWindowScrollPosition = $(window).scrollTop();$('.card-body').slideUp('fast');},
                               'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"
@@ -2524,7 +2524,7 @@ ${ dashboard.layout_skeleton() }
                 </label>
               </div>
             </div>
-            <!-- ko if: $root.isLatest -->
+            <!-- ko if: $root.collection.supportAnalytics -->
             <div class="control-group">
               <label class="control-label">${ _('Nested documents') }</label>
               <div class="controls">
@@ -2725,7 +2725,7 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="nested-document-filter">
-  <!-- ko if: $root.isLatest -->
+  <!-- ko if: $root.collection.supportAnalytics -->
   <span data-bind="visible: $root.collection.nested.enabled" >
     <a class="btn pointer" title="${ _('Nested schema') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal">
       <i class="fa fa-sitemap"></i>

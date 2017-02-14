@@ -15,59 +15,94 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _t
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.conf import is_hue4
-from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
+from desktop.appmanager import get_apps_dict
+from notebook.conf import get_ordered_interpreters
 
 
 IS_ENABLED = Config(
   key="is_enabled",
-  help=_t("Activate the app in the menu."),
+  help=_t("Activate the Dashboard link in the menu."),
   dynamic_default=is_hue4,
   private=True,
   type=coerce_bool
 )
 
-# ANALYTICS_ENABLED 
-SUPPORT_LATEST_SOLR = Config(
-  key="support_latest_solr",
-  help=_t("Use latest Solr 5+ functionalities like Analytics Facets and Nested Documents (warning: still in beta)."),
-  default=True,
-  type=coerce_bool
-)
+# [[properties]]
+#  [[[solr]]]
+#  analytics=false
+#  nesting=false
+#  [[sql]]]
+#  analytics=true
+#  nesting=false
+ 
+def get_properties():
+  if PROPERTIES.get():
+    engines = PROPERTIES.get()
+    return dict([
+      (i, {
+        'analytics': engines[i].ANALYTICS.get(),
+        'nesting': engines[i].NESTING.get()
+      }) for i in engines]
+    )
+  else:
+    return {
+      'solr': {
+        'analytics': False,
+        'nesting': False,
+      },
+      'sql': {
+        'analytics': True,
+        'nesting': False,
+      },
+    }
+    
+def get_engines(user):
+  engines = []
+  apps = get_apps_dict()
+  settings = get_properties()
 
-NESTED_ENABLED = Config(
-  key="support_latest_solr",
-  help=_t("Use latest Solr 5+ functionalities like Analytics Facets and Nested Documents (warning: still in beta)."),
-  default=True,
-  type=coerce_bool
-)
+  if 'search' in apps:
+    engines.append({
+      'name': _('index (Solr)'),
+      'type': 'solr',
+      'analytics': settings.get('solr') and settings['solr'].get('analytics'),
+      'nesting': settings.get('solr') and settings['solr'].get('nesting'),
+    })
 
-# TODO [[interfaces]] instead
-IS_SQL_ENABLED = Config(
-  key="is_sql_enabled",
-  help=_t("Offer to use SQL engines to compute the dashboards."),
-  dynamic_default=is_hue4,
-  private=True,
-  type=coerce_bool
-)
+  if 'beeswax' in apps or 'rdbms' in apps:
+    engines += [{
+          'name': _('table (%s)') % interpreter['name'],
+          'type': interpreter['type'],
+          'async': interpreter['interface'] == 'hiveserver2',
+          'analytics': settings.get('sql') and settings['sql'].get('analytics'),
+          'nesting': settings.get('sql') and settings['sql'].get('nesting'),
+      }
+      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
+    ]
+    
+  return engines
 
-INTERPRETERS = UnspecifiedConfigSection(
-  "connectors",
+
+
+PROPERTIES = UnspecifiedConfigSection(
+  "properties",
   help="One entry for each type of snippet.",
   each=ConfigSection(
-    help=_t("Define the name and how to connect and execute the language."),
+    help=_t("Name of the interface to use as query engine for the dashboard, e.g. solr, sql."),
     members=dict(
-      ANALYTICS_SUPPORT=Config(
-          "name",
-          help=_t("The name of the snippet."),
+      ANALYTICS=Config(
+          "analytics",
+          help=_t("Support analytics facets or not."),
           default=False,
           type=coerce_bool,
       ),
-      NESTED_SUPPORT=Config(
-          "name",
-          help=_t("The name of the snippet."),
+      NESTING=Config(
+          "nesting",
+          help=_t("Support nested documents or not."),
           default=False,
           type=coerce_bool,
       ),

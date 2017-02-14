@@ -461,7 +461,12 @@ var Collection = function (vm, collection) {
   self.queryResult = ko.observable(new QueryResult(self, {
     type: self.engine(),
   }));
-  //self.hasAnalytics = ko.observable(typeof collection.hasAnalytics != "undefined" && collection.hasAnalytics != null ? collection.hasAnalytics : false);
+  self.supportAnalytics = ko.pureComputed(function() {
+    return self.engine()['analytics'];
+  });
+  self.supportNesting = ko.pureComputed(function() {
+    return self.engine()['nesting'];
+  });
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
     function flatten(values) {
@@ -1205,7 +1210,7 @@ var Collection = function (vm, collection) {
         }
     }).fail(function (xhr, textStatus, errorThrown) {});
 
-    if (vm.isLatest()) {
+    if (self.supportNesting()) {
       self.getNestedDocuments();
     }
   };
@@ -1474,12 +1479,11 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
   self.intervalOptions = ko.observableArray(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);
   self.isNested = ko.observable(false);
-  self.isLatest = ko.mapping.fromJS(typeof initial_json.is_latest != "undefined" ? initial_json.is_latest : false);
 
   // Models
+  self.initial = new NewTemplate(self, initial_json);
   self.collection = new Collection(self, collection_json.collection);
   self.query = new Query(self, query_json);
-  self.initial = new NewTemplate(self, initial_json);
 
   // UI
   self.selectedQDefinition = ko.observable();

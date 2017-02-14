@@ -31,7 +31,8 @@ from search.conf import LATEST
 
 from dashboard.dashboard_api import get_engine
 from dashboard.decorators import allow_owner_only
-from dashboard.models import Collection2, get_engines
+from dashboard.models import Collection2
+from dashboard.conf import get_engines
 from dashboard.controller import DashboardController, can_edit_index
 
 
@@ -131,7 +132,8 @@ def new_search_embeddable(request):
   return new_search(request, True)
 
 def browse(request, name, is_mobile=False):
-  collections = DashboardController(request.user).get_all_indexes() # TODO convert
+  engine = request.GET.get('engine', 'solr')
+  collections = get_engine(request.user, engine).datasets()
   if not collections:
     return no_collections(request)
 

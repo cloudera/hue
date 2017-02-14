@@ -30,9 +30,7 @@ from desktop.lib.i18n import smart_unicode, smart_str
 from desktop.models import get_data_link
 
 from libsolr.api import SolrApi
-from notebook.conf import get_ordered_interpreters
 
-from dashboard.conf import IS_SQL_ENABLED, SUPPORT_LATEST_SOLR
 from dashboard.dashboard_api import get_engine
 
 
@@ -102,7 +100,7 @@ class Collection2(object):
     for field in props['collection']['template']['fieldsAttributes']:
       if 'type' not in field:
         field['type'] = 'string'
-    if 'nested' not in props['collection'] and SUPPORT_LATEST_SOLR.get():
+    if 'nested' not in props['collection']:
       props['collection']['nested'] = {
         'enabled': False,
         'schema': []
@@ -751,21 +749,6 @@ def _convert_nested_to_augmented_pivot_nd(facet_fields, facet_id, counts, select
     c['exclude'] = False
     c['fq_fields'] = fq_fields
     c['fq_values'] = fq_values
-
-
-def get_engines(user):
-  engines = [{'name': _('index (Solr)'), 'type': 'solr'}]
-
-  if IS_SQL_ENABLED.get():
-    engines += [{
-          'name': _('table (%s)') % interpreter['name'],
-          'type': interpreter['type'],
-          'async': interpreter['interface'] == 'hiveserver2'
-      }
-      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
-    ]
-
-  return engines
 
 
 def augment_solr_exception(response, collection):
