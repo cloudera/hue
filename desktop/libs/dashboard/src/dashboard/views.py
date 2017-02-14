@@ -115,18 +115,30 @@ def new_search(request, is_embeddable=False):
   if is_embeddable:
     template = 'search_embeddable.mako'
 
-  return render(template, request, {
-    'collection': collection,
-    'query': query,
-    'initial': json.dumps({
-        'collections': collections,
-        'layout': DEFAULT_LAYOUT,
-        'is_latest': LATEST.get(),
-        'engines': get_engines(request.user)
-     }),
-    'is_owner': True,
-    'can_edit_index': can_edit_index(request.user)
-  })
+  if request.GET.get('format', 'plain') == 'json':
+    return JsonResponse({
+      'collection': collection.get_props(request.user),
+      'query': query,
+      'initial': {
+          'collections': collections,
+          'layout': DEFAULT_LAYOUT,
+          'is_latest': LATEST.get(),
+          'engines': get_engines(request.user)
+       }
+     })
+  else:
+    return render(template, request, {
+      'collection': collection,
+      'query': query,
+      'initial': json.dumps({
+          'collections': collections,
+          'layout': DEFAULT_LAYOUT,
+          'is_latest': LATEST.get(),
+          'engines': get_engines(request.user)
+       }),
+      'is_owner': True,
+      'can_edit_index': can_edit_index(request.user)
+    })
 
 def new_search_embeddable(request):
   return new_search(request, True)

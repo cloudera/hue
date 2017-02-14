@@ -3446,9 +3446,17 @@ function queryTypeahead(query, process) {
 }
 
 function newSearch() {
+  $.getJSON('/search/new_search?format=json', function(data){
+    viewModel.collectionJson = data.collection;
+    viewModel.queryJson = data.query;
+    viewModel.initialJson = data.initial;
+    viewModel.reset();
+  });
+}
+
+function loadSearch(collection, query, initial) {
   
-  ko.cleanNode($('#searchComponents')[0]);
-  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
+  viewModel = new SearchViewModel(collection, query, initial);
 
   ko.applyBindings(viewModel, $('#searchComponents')[0]);
 
@@ -3580,7 +3588,7 @@ function newSearch() {
 
   var _query = ${ query | n,unicode };
 
-  newSearch();
+  loadSearch(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
   
   
   if (viewModel.collection.autorefresh()) {
