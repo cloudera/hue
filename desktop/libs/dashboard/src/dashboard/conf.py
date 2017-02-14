@@ -15,23 +15,62 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import is_hue4
-from desktop.lib.conf import Config, coerce_bool
+from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_json_dict, coerce_bool
 
 
 IS_ENABLED = Config(
   key="is_enabled",
-  help=_("Activate the app in the menu."),
+  help=_t("Activate the app in the menu."),
   dynamic_default=is_hue4,
   private=True,
-  type=coerce_bool)
+  type=coerce_bool
+)
+
+# ANALYTICS_ENABLED 
+SUPPORT_LATEST_SOLR = Config(
+  key="support_latest_solr",
+  help=_t("Use latest Solr 5+ functionalities like Analytics Facets and Nested Documents (warning: still in beta)."),
+  default=True,
+  type=coerce_bool
+)
+
+NESTED_ENABLED = Config(
+  key="support_latest_solr",
+  help=_t("Use latest Solr 5+ functionalities like Analytics Facets and Nested Documents (warning: still in beta)."),
+  default=True,
+  type=coerce_bool
+)
 
 # TODO [[interfaces]] instead
 IS_SQL_ENABLED = Config(
   key="is_sql_enabled",
-  help=_("Offer to use SQL engines to compute the dashboards."),
+  help=_t("Offer to use SQL engines to compute the dashboards."),
   dynamic_default=is_hue4,
   private=True,
-  type=coerce_bool)
+  type=coerce_bool
+)
+
+INTERPRETERS = UnspecifiedConfigSection(
+  "connectors",
+  help="One entry for each type of snippet.",
+  each=ConfigSection(
+    help=_t("Define the name and how to connect and execute the language."),
+    members=dict(
+      ANALYTICS_SUPPORT=Config(
+          "name",
+          help=_t("The name of the snippet."),
+          default=False,
+          type=coerce_bool,
+      ),
+      NESTED_SUPPORT=Config(
+          "name",
+          help=_t("The name of the snippet."),
+          default=False,
+          type=coerce_bool,
+      ),
+    )
+  )
+)

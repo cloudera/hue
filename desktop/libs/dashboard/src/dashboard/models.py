@@ -32,9 +32,7 @@ from desktop.models import get_data_link
 from libsolr.api import SolrApi
 from notebook.conf import get_ordered_interpreters
 
-from search.conf import LATEST
-
-from dashboard.conf import IS_SQL_ENABLED
+from dashboard.conf import IS_SQL_ENABLED, SUPPORT_LATEST_SOLR
 from dashboard.dashboard_api import get_engine
 
 
@@ -104,7 +102,7 @@ class Collection2(object):
     for field in props['collection']['template']['fieldsAttributes']:
       if 'type' not in field:
         field['type'] = 'string'
-    if 'nested' not in props['collection'] and LATEST.get():
+    if 'nested' not in props['collection'] and SUPPORT_LATEST_SOLR.get():
       props['collection']['nested'] = {
         'enabled': False,
         'schema': []
@@ -763,8 +761,8 @@ def get_engines(user):
           'name': _('table (%s)') % interpreter['name'],
           'type': interpreter['type'],
           'async': interpreter['interface'] == 'hiveserver2'
-        }
-        for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
+      }
+      for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
     ]
 
   return engines
