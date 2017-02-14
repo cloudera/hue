@@ -31,17 +31,10 @@ IS_ENABLED = Config(
   type=coerce_bool
 )
 
-# [[properties]]
-#  [[[solr]]]
-#  analytics=false
-#  nesting=false
-#  [[sql]]]
-#  analytics=true
-#  nesting=false
  
 def get_properties():
-  if PROPERTIES.get():
-    engines = PROPERTIES.get()
+  if ENGINES.get():
+    engines = ENGINES.get()
     return dict([
       (i, {
         'analytics': engines[i].ANALYTICS.get(),
@@ -88,8 +81,8 @@ def get_engines(user):
 
 
 
-PROPERTIES = UnspecifiedConfigSection(
-  "properties",
+ENGINES = UnspecifiedConfigSection(
+  "engines",
   help="One entry for each type of snippet.",
   each=ConfigSection(
     help=_t("Name of the interface to use as query engine for the dashboard, e.g. solr, sql."),
