@@ -1258,9 +1258,11 @@ ${ assist.assistPanel() }
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable('table');
-      self.outputFormat.subscribe(function () {
-        wizard.guessFieldTypes();
-        resizeElements();
+      self.outputFormat.subscribe(function (newValue) {
+        if (newValue != 'database') {
+          wizard.guessFieldTypes();
+          resizeElements();
+        }
       });
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
@@ -1578,6 +1580,7 @@ ${ assist.assistPanel() }
                 var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                 if (! snippet.result.handle().has_more_statements) {
                   if (self.editorVM.selectedNotebook().onSuccessUrl()) {
+                    huePubSub.publish('assist.clear.db.cache', {sourceType: 'hive'});
                     window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                   }
                 } else { // Perform last DROP statement execute
