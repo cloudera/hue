@@ -31,7 +31,7 @@ IS_ENABLED = Config(
   type=coerce_bool
 )
 
- 
+
 def get_properties():
   if ENGINES.get():
     engines = ENGINES.get()
@@ -52,7 +52,7 @@ def get_properties():
         'nesting': False,
       },
     }
-    
+
 def get_engines(user):
   engines = []
   apps = get_apps_dict()
@@ -76,7 +76,7 @@ def get_engines(user):
       }
       for interpreter in get_ordered_interpreters(user) if interpreter['interface'] in ('hiveserver2', 'jdbc', 'rdbms')
     ]
-    
+
   return engines
 
 
