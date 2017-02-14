@@ -32,7 +32,7 @@ from search.conf import LATEST
 from dashboard.dashboard_api import get_engine
 from dashboard.decorators import allow_owner_only
 from dashboard.models import Collection2, get_engines
-from dashboard.search_controller import SearchController, can_edit_index
+from dashboard.controller import DashboardController, can_edit_index
 
 
 LOG = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ DEFAULT_LAYOUT = [
 
 
 def index(request, is_mobile=False, is_embeddable=False):
-  hue_collections = SearchController(request.user).get_search_collections()
+  hue_collections = DashboardController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
 
   if not hue_collections or not collection_id:
@@ -131,7 +131,7 @@ def new_search_embeddable(request):
   return new_search(request, True)
 
 def browse(request, name, is_mobile=False):
-  collections = SearchController(request.user).get_all_indexes()
+  collections = DashboardController(request.user).get_all_indexes() # TODO convert
   if not collections:
     return no_collections(request)
 
@@ -207,7 +207,7 @@ def no_collections(request):
 
 
 def admin_collections(request, is_redirect=False, is_mobile=False):
-  existing_hue_collections = SearchController(request.user).get_search_collections()
+  existing_hue_collections = DashboardController(request.user).get_search_collections()
 
   if request.GET.get('format') == 'json':
     collections = []
@@ -235,7 +235,7 @@ def admin_collection_delete(request):
     raise PopupException(_('POST request required.'))
 
   collections = json.loads(request.POST.get('collections'))
-  searcher = SearchController(request.user)
+  searcher = DashboardController(request.user)
   response = {
     'result': searcher.delete_collections([collection['id'] for collection in collections])
   }
@@ -248,7 +248,7 @@ def admin_collection_copy(request):
     raise PopupException(_('POST request required.'))
 
   collections = json.loads(request.POST.get('collections'))
-  searcher = SearchController(request.user)
+  searcher = DashboardController(request.user)
   response = {
     'result': searcher.copy_collections([collection['id'] for collection in collections])
   }

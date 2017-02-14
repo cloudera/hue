@@ -417,8 +417,8 @@ ${ hueIcons.symbols() }
        </li>
        % endif
        % if 'search' in apps:
-         <% from dashboard.search_controller import SearchController %>
-         <% controller = SearchController(user) %>
+         <% from dashboard.controller import DashboardController %>
+         <% controller = DashboardController(user) %>
          <% collections = controller.get_shared_search_collections() %>
          % if not collections:
            <li>

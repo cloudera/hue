@@ -22,19 +22,15 @@ from django.db.models import Q
 
 from desktop.conf import USE_NEW_EDITOR
 from desktop.models import Document2, Document, SAMPLE_USER_OWNERS
-from libsolr.api import SolrApi
 
-from search.conf import SOLR_URL
 from dashboard.models import Collection2
 
 
 LOG = logging.getLogger(__name__)
 
 
-class SearchController(object):
-  """
-  Glue the models to the views.
-  """
+class DashboardController(object):
+
   def __init__(self, user):
     self.user = user
 
@@ -68,13 +64,13 @@ class SearchController(object):
 
   def get_icon(self, name):
     if name == 'Twitter':
-      return 'search/art/icon_twitter_48.png'
+      return 'dashboard/art/icon_twitter_48.png'
     elif name == 'Yelp Reviews':
-      return 'search/art/icon_yelp_48.png'
+      return 'dashboard/art/icon_yelp_48.png'
     elif name == 'Web Logs':
-      return 'search/art/icon_logs_48.png'
+      return 'dashboard/art/icon_logs_48.png'
     else:
-      return 'search/art/icon_search_48.png'
+      return 'dashboard/art/icon_search_48.png'
 
   def delete_collections(self, collection_ids):
     result = {'status': -1, 'message': ''}
@@ -115,33 +111,6 @@ class SearchController(object):
       result['message'] = unicode(str(e), "utf8")
 
     return result
-
-  def is_collection(self, collection_name):
-    return collection_name in self.get_solr_collections()
-
-  def is_core(self, core_name):
-    solr_cores = SolrApi(SOLR_URL.get(), self.user).cores()
-    return core_name in solr_cores
-
-  def get_solr_collections(self):
-    return SolrApi(SOLR_URL.get(), self.user).collections()
-
-  def get_all_indexes(self, show_all=False):
-    indexes = []
-    try:
-      indexes = self.get_solr_collections().keys()
-    except:
-      LOG.exception('failed to get indexes')
-
-    try:
-      indexes += SolrApi(SOLR_URL.get(), self.user).aliases().keys()
-    except:
-      LOG.exception('failed to get index aliases')
-
-    if show_all or not indexes:
-      return indexes + SolrApi(SOLR_URL.get(), self.user).cores().keys()
-    else:
-      return indexes
 
 
 def can_edit_index(user):

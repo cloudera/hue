@@ -461,6 +461,7 @@ var Collection = function (vm, collection) {
   self.queryResult = ko.observable(new QueryResult(self, {
     type: self.engine(),
   }));
+  //self.hasAnalytics = ko.observable(typeof collection.hasAnalytics != "undefined" && collection.hasAnalytics != null ? collection.hasAnalytics : false);
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
     function flatten(values) {

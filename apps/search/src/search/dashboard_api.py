@@ -15,13 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 
 from dashboard.dashboard_api import DashboardApi
 from dashboard.models import augment_solr_response
-from dashboard.search_controller import SearchController
 from libsolr.api import SolrApi
 
 from search.conf import SOLR_URL
+from search.controller import SearchController
+
+
+LOG = logging.getLogger(__name__)
 
 
 class SearchApi(DashboardApi):
