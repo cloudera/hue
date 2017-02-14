@@ -508,6 +508,16 @@ ${ components.menubar() }
           <h3 id="dropTableMessage">${_('Do you really want to drop the selected table(s)?')}</h3>
         </div>
         <div class="modal-body">
+          <ul data-bind="foreach: selectedTables">
+            <!-- ko if: $index() <= 9 -->
+            <li>
+              <span data-bind="text: name"></span>
+            </li>
+            <!-- /ko -->
+          </ul>
+          <!-- ko if: selectedTables().length > 10 -->
+            ${_('and')} <span data-bind="text: selectedTables().length - 10"></span> ${_('others')}.<br>
+          <!-- /ko -->
           <label class="checkbox" style="display: inline-block; margin-top: 5px">
             <input type="checkbox" name="skip_trash" /> ${ _('Skip the trash') }
           </label>
