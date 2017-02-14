@@ -568,7 +568,7 @@ DATABASE = ConfigSection(
       key='schema',
       help=_('Database schema, to be used only when public schema is revoked in postgres.'),
       type=str,
-      default='',
+      default='public',
     ),
     PASSWORD=Config(
       key='password',
