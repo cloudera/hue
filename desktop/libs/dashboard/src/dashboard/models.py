@@ -29,8 +29,6 @@ from django.utils.translation import ugettext as _
 from desktop.lib.i18n import smart_unicode, smart_str
 from desktop.models import get_data_link
 
-from libsolr.api import SolrApi
-
 from dashboard.dashboard_api import get_engine
 
 
@@ -443,6 +441,7 @@ def augment_solr_response(response, collection, query):
             cols.append(f['field'])
             last_xx_col = last_x_col
             last_x_col = i + 2
+          from libsolr.api import SolrApi
           cols.append(SolrApi._get_aggregate_function(f))
         rows = []
 

@@ -462,10 +462,12 @@ var Collection = function (vm, collection) {
     type: self.engine(),
   }));
   self.supportAnalytics = ko.pureComputed(function() {
-    return self.engine()['analytics'];
+    var engine = vm.initial.getEngine(self.engine());
+    return engine && engine.analytics();
   });
   self.supportNesting = ko.pureComputed(function() {
-    return self.engine()['nesting'];
+    var engine = vm.initial.getEngine(self.engine());
+    return engine && engine.nesting();
   });
   self.nested = ko.mapping.fromJS(collection.nested);
   self.nestedNames = ko.computed(function() {
@@ -1436,6 +1438,17 @@ var NewTemplate = function (vm, initial) {
       vm.isSyncingCollections(false);
       self.inited(true);
     });
+  };
+
+  self.getEngine = function(type) {
+     var _engine = null;
+     $.each(self.engines(), function (index, engine) {
+      if (engine.type() == type) {
+        _engine = engine;
+        return false;
+      }
+    });
+    return _engine;
   };
 };
 
