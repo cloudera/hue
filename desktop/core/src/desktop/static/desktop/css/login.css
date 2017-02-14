@@ -155,6 +155,7 @@
   margin-left: auto;
   margin-right: auto;
   width: 100%;
+  background-color: #FAFAFA;
 }
 
 @media screen and (max-width: 800px) {
