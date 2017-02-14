@@ -53,6 +53,9 @@ class Collection2(object):
       }
 
   def get_json(self, user):
+    return json.dumps(self.get_props(user))
+
+  def get_props(self, user):
     props = self.data
 
     if self.document is not None:
@@ -133,7 +136,7 @@ class Collection2(object):
     if 'qdefinitions' not in props['collection']:
       props['collection']['qdefinitions'] = []
 
-    return json.dumps(props)
+    return props
 
   def get_default(self, user, name, engine='solr'):
     fields = self.fields_data(user, name, engine)
