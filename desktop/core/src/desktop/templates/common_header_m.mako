@@ -17,6 +17,7 @@
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 from django.utils.translation import ugettext as _
+from metadata.conf import has_optimizer, OPTIMIZER
 
 home_url = url('desktop.views.home')
 from desktop.conf import USE_NEW_EDITOR
@@ -66,6 +67,14 @@ if USE_NEW_EDITOR.get():
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
+    var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
+
+    var CACHEABLE_TTL = {
+      default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
+      optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
+    };
+
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
 
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
@@ -156,6 +165,13 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout-mapping.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/knockout.validation.min.js') }"></script>
+  <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
+  <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+  <script src="${ static('desktop/js/hue.colors.js') }"></script>
+
 
   <script type="text/javascript">
 
