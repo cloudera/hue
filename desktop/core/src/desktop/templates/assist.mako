@@ -856,7 +856,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           itemTemplate: 'nav-search-autocomp-item',
           noMatchTemplate: 'nav-search-autocomp-no-match',
           classPrefix: 'nav-',
-          showOnFocus: true,
+          showOnFocus: false,
           onEnter: performSearch,
           valueObservable: searchInput,
           onSelect: performSearch,

@@ -175,6 +175,8 @@
             e.preventDefault();
             return false;
           }
+        } else if (e.which === 32 && e.ctrlKey) {
+          $element.hueAutocomplete('search', $element.val());
         }
       });
 
