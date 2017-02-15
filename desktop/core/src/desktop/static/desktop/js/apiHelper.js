@@ -79,6 +79,10 @@ var ApiHelper = (function () {
     TOP_TABLES: '/metadata/api/optimizer/top_tables'
   };
 
+  var genericCacheCondition = function (data) {
+    return typeof data !== 'undefined' && typeof data.status !== 'undefined' && data.status === 0;
+  };
+
   /**
    * @param {Object} i18n
    * @param {string} i18n.errorLoadingDatabases
@@ -825,7 +829,7 @@ var ApiHelper = (function () {
   ApiHelper.prototype.restoreDocument = function (options) {
     var self = this;
     self.simplePost("/desktop/api2/doc/restore", {
-      uuids: ko.mapping.toJSON(options.uuids),
+      uuids: ko.mapping.toJSON(options.uuids)
     }, options);
   };
 
@@ -899,9 +903,7 @@ var ApiHelper = (function () {
           self.lastKnownDatabases[options.sourceType] = [];
           self.assistErrorCallback(options)(response);
         },
-        cacheCondition: function (data) {
-          return typeof data !== 'undefined' && data !== null && typeof data.databases !== 'undefined' && data.databases !== null && data.databases.length > 0;
-        }
+        cacheCondition: genericCacheCondition
       }));
     };
 
@@ -1133,23 +1135,8 @@ var ApiHelper = (function () {
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName,
       errorCallback: self.assistErrorCallback(options),
-      cacheCondition: function (data) {
-        return typeof data !== 'undefined' && data !== null && typeof data.tables_meta !== 'undefined' && data.tables_meta !== null && data.tables_meta.length > 0;
-      }
+      cacheCondition: genericCacheCondition
     }));
-  };
-
-  var fieldCacheCondition = function (data) {
-    if (typeof data !== 'undefined' && data !== null) {
-      return (typeof data.item !== 'undefined' && data.item !== null) ||
-          (typeof data.key !== 'undefined' && data.key !== null) ||
-          (typeof data.sample !== 'undefined' && data.sample !== null) ||
-          (typeof data.tables_meta !== 'undefined' && data.tables_meta !== null && data.tables_meta.length > 0) ||
-          (typeof data.extended_columns !== 'undefined' && data.extended_columns !== null && data.extended_columns.length > 0) ||
-          (typeof data.columns !== 'undefined' && data.columns !== null && data.columns.length > 0) ||
-          (typeof data.fields !== 'undefined' && data.fields !== null && data.fields.length > 0)
-    }
-    return false;
   };
 
   /**
@@ -1171,7 +1158,7 @@ var ApiHelper = (function () {
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.databaseName + "/" + options.tableName + fieldPart,
       errorCallback: self.assistErrorCallback(options),
-      cacheCondition: fieldCacheCondition
+      cacheCondition: genericCacheCondition
     }));
   };
 
@@ -1289,7 +1276,7 @@ var ApiHelper = (function () {
       fetchAssistData.bind(self)($.extend({}, options, {
         url: AUTOCOMPLETE_API_PREFIX + path.join('/'),
         errorCallback: self.assistErrorCallback(options),
-        cacheCondition: fieldCacheCondition
+        cacheCondition: genericCacheCondition
       }));
     });
   };
@@ -1313,9 +1300,7 @@ var ApiHelper = (function () {
       fetchAssistData.bind(self)($.extend({}, options, {
         url: SAMPLE_API_PREFIX + path.join('/'),
         errorCallback: self.assistErrorCallback(options),
-        cacheCondition: function (data) {
-          return data.status === 0 && typeof data.rows !== 'undefined' && data.rows.length > 0;
-        }
+        cacheCondition: genericCacheCondition
       }));
     });
   };
@@ -1403,7 +1388,7 @@ var ApiHelper = (function () {
     fetchAssistData.bind(self)($.extend({}, options, {
       url: AUTOCOMPLETE_API_PREFIX + options.hierarchy.join("/"),
       errorCallback: self.assistErrorCallback(options),
-      cacheCondition: fieldCacheCondition
+      cacheCondition: genericCacheCondition
     }));
   };
 
@@ -1635,7 +1620,7 @@ var ApiHelper = (function () {
         timeout: options.timeout
       })
       .done(function (data) {
-        if (data.status === 0 && !self.successResponseIsError(data)) {
+        if (data.status === 0) {
           if (cacheCondition(data)) {
             storeInCache(data);
           }
@@ -1760,7 +1745,7 @@ var ApiHelper = (function () {
       timeout: options.timeout
     }).success(function (data) {
       // Safe to assume all requests in the queue have the same cacheCondition
-      if (!options.noCache && data.status === 0 && !self.successResponseIsError(data) && options.cacheCondition(data)) {
+      if (!options.noCache && data.status === 0 && options.cacheCondition(data)) {
         var cacheIdentifier = self.getAssistCacheIdentifier(options);
         cachedData = $.totalStorage(cacheIdentifier) || {};
         cachedData[options.url] = {
@@ -1769,7 +1754,7 @@ var ApiHelper = (function () {
         };
         $.totalStorage(cacheIdentifier, cachedData);
       }
-      if (data.status === 0 && !self.successResponseIsError(data)) {
+      if (data.status === 0) {
         promise.resolve(data);
       } else {
         promise.reject(data);
