@@ -30,7 +30,7 @@ from desktop.models import Document2
 
 from dashboard.facet_builder import _round_number_range
 from dashboard.models import Collection2
-from dashboard.search_controller import SearchController
+from dashboard.controller import DashboardController
 
 
 QUERY = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
@@ -157,7 +157,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal(-1, data['status'])
 
     # There are no collections with user_not_me
-    search_controller = SearchController(self.user_not_me)
+    search_controller = DashboardController(self.user_not_me)
     hue_collections = search_controller.get_search_collections()
     assert_true(len(hue_collections) == 0)
 
@@ -200,7 +200,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true('docs' in data['response'], data)
 
     # For self.user_not_me
-    search_controller = SearchController(self.user_not_me)
+    search_controller = DashboardController(self.user_not_me)
     hue_collections = search_controller.get_search_collections()
     assert_equal(len(hue_collections), 1)
     assert_equal(hue_collections[0].name, 'test_dashboard')
@@ -212,7 +212,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal(len(hue_collections), 0)
 
     # For self.user
-    search_controller = SearchController(self.user)
+    search_controller = DashboardController(self.user)
     hue_collections = search_controller.get_search_collections()
     assert_equal(len(hue_collections), 1)
     assert_equal(hue_collections[0].name, 'test_dashboard')
@@ -261,7 +261,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_true(doc1.can_write(self.user_not_me))
 
     # For self.user_not_me
-    search_controller = SearchController(self.user_not_me)
+    search_controller = DashboardController(self.user_not_me)
     hue_collections = search_controller.get_search_collections()
     assert_equal(len(hue_collections), 2)
 
@@ -274,7 +274,7 @@ class TestWithMockedSolr(TestSearchBase):
     assert_equal(hue_collections[0].name, 'test_dashboard1')
 
     # For self.user
-    search_controller = SearchController(self.user)
+    search_controller = DashboardController(self.user)
     hue_collections = search_controller.get_search_collections()
     assert_equal(len(hue_collections), 2)
 
