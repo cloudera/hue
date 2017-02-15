@@ -29,7 +29,7 @@ from hadoop.conf import HDFS_CLUSTERS
 from libsentry.privilege_checker import PrivilegeChecker
 from libsentry.sentry_site import get_hive_sentry_provider
 
-from metadata.conf import NAVIGATOR
+from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.metadata_sites import get_navigator_hue_server_name
 
 
@@ -58,8 +58,8 @@ class NavigatorApi(object):
 
   def __init__(self, user=None):
     self._api_url = '%s/%s' % (NAVIGATOR.API_URL.get().strip('/'), VERSION)
-    self._username = NAVIGATOR.AUTH_USERNAME.get()
-    self._password = NAVIGATOR.AUTH_PASSWORD.get()
+    self._username = get_navigator_auth_username()
+    self._password = get_navigator_auth_password()
 
     self.user = user
     self._client = HttpClient(self._api_url, logger=LOG)
