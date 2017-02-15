@@ -105,7 +105,7 @@ from desktop.views import commonheader, commonfooter, _ko
 
     <!-- ko if: $root.collection.engine() != 'solr' -->
       <!-- ko if: columns().length == 0 -->
-        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true" placeholder="${ _('Table name or <database>.<table>') }">
+        <input type="text" class="no-margin" data-bind="value: $root.collection.name, hivechooser: $root.collection.name, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: $root.collection.engine()" placeholder="${ _('Table name or <database>.<table>') }">
       <!-- /ko -->
     <!-- /ko -->
 
@@ -2779,6 +2779,7 @@ ${ dashboard.import_layout(True) }
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('dashboard/js/search.ko.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 ${ dashboard.import_charts() }
