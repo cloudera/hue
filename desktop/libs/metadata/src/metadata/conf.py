@@ -48,7 +48,6 @@ def default_navigator_url():
 def get_optimizer_url():
   return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
 
-
 def has_optimizer():
   return bool(get_optimizer_url())
 
@@ -56,9 +55,8 @@ def has_optimizer():
 def get_navigator_url():
   return NAVIGATOR.API_URL.get() and NAVIGATOR.API_URL.get().strip('/')[:-3]
 
-
 def has_navigator(user):
-  return bool(get_navigator_url() and NAVIGATOR.AUTH_PASSWORD.get()) \
+  return bool(get_navigator_url() and get_navigator_auth_password()) \
       and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
@@ -132,9 +130,43 @@ OPTIMIZER = ConfigSection(
 )
 
 
+def get_navigator_auth_type():
+  return NAVIGATOR.AUTH_TYPE.get().lower()
+
+
+def get_navigator_auth_username():
+  '''Get the username to authenticate with.'''
+
+  if get_navigator_auth_type() == 'ldap':
+    return NAVIGATOR.AUTH_LDAP_USERNAME.get()
+  elif get_navigator_auth_type() == 'saml':
+    return NAVIGATOR.AUTH_SAML_USERNAME.get()
+  else:
+    return NAVIGATOR.AUTH_CM_USERNAME.get()
+
 def get_navigator_auth_password():
+  '''Get the password to authenticate with.'''
+
+  if get_navigator_auth_type() == 'ldap':
+    return NAVIGATOR.AUTH_LDAP_PASSWORD.get()
+  elif get_navigator_auth_type() == 'saml':
+    return NAVIGATOR.AUTH_SAML_PASSWORD.get()
+  else:
+    return NAVIGATOR.AUTH_CM_PASSWORD.get()
+
+
+def get_navigator_cm_password():
   '''Get default password from secured file'''
-  return NAVIGATOR.AUTH_PASSWORD_SCRIPT.get()
+  return NAVIGATOR.AUTH_CM_PASSWORD_SCRIPT.get()
+
+def get_navigator_ldap_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_LDAP_PASSWORD_SCRIPT.get()
+
+def get_navigator_saml_password():
+  '''Get default password from secured file'''
+  return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
+
 
 def get_security_default():
   '''Get default security value from Hadoop'''
@@ -152,21 +184,59 @@ NAVIGATOR = ConfigSection(
       key='api_url',
       help=_t('Base URL to Navigator API.'),
       dynamic_default=default_navigator_url),
-    AUTH_USERNAME=Config(
-      key="auth_username",
-      help=_t("Auth username of the hue user used for authentications."),
+    AUTH_TYPE=Config(
+      key="navmetaserver_auth_type",
+      help=_t("Which authentication to use: CM or external via LDAP or SAML."),
+      default='CMDB'),
+
+    AUTH_CM_USERNAME=Config(
+      key="auth_cmusername",
+      help=_t("Username of the CM user used for authentication."),
       dynamic_default=get_auth_username),
-    AUTH_PASSWORD=Config(
-      key="auth_password",
-      help=_t("LDAP/PAM/.. password of the hue user used for authentications."),
+    AUTH_CM_PASSWORD=Config(
+      key="auth_cmpassword",
+      help=_t("CM password of the user used for authentication."),
       private=True,
-      dynamic_default=get_navigator_auth_password),
-    AUTH_PASSWORD_SCRIPT=Config(
+      dynamic_default=get_navigator_cm_password),
+    AUTH_CM_PASSWORD_SCRIPT=Config(
       key="auth_password_script",
-      help=_t("Execute this script to produce the auth password. This will be used when `auth_password` is not set."),
+      help=_t("Execute this script to produce the CM password. This will be used when the plain password is not set."),
       private=True,
       type=coerce_password_from_script,
       default=None),
+
+    AUTH_LDAP_USERNAME=Config(
+      key="auth_ldapusername",
+      help=_t("Username of the LDAP user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_LDAP_PASSWORD=Config(
+      key="auth_ldappassword",
+      help=_t("LDAP password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_ldap_password),
+    AUTH_LDAP_PASSWORD_SCRIPT=Config(
+      key="auth_ldappassword_script",
+      help=_t("Execute this script to produce the LDAP password. This will be used when the plain password is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
+    AUTH_SAML_USERNAME=Config(
+      key="auth_samlusername",
+      help=_t("Username of the SAML user used for authentication."),
+      dynamic_default=get_auth_username),
+    AUTH_SAML_PASSWORD=Config(
+      key="auth_samlpassword",
+      help=_t("SAML password of the user used for authentication."),
+      private=True,
+      dynamic_default=get_navigator_saml_password),
+    AUTH_SAML_PASSWORD_SCRIPT=Config(
+      key="auth_samlpassword_script",
+      help=_t("Execute this script to produce the SAML password. This will be used when the plain password  is not set."),
+      private=True,
+      type=coerce_password_from_script,
+      default=None),
+
     CONF_DIR = Config(
       key='conf_dir',
       help=_t('Navigator configuration directory, where navigator.client.properties is located.'),

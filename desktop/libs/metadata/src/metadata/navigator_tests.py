@@ -30,7 +30,8 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
-from metadata.conf import has_navigator
+from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password,\
+  get_navigator_auth_username
 from metadata.navigator_api import _augment_highlighting
 from metadata.navigator_client import NavigatorApi
 
@@ -160,3 +161,35 @@ class TestNavigatorAPI(object):
 
     _augment_highlighting(query_s, records)
     assert_equal('', records[0]['parentPath'])
+
+  def test_navigator_conf(self):
+    resets = [
+      NAVIGATOR.AUTH_CM_USERNAME.set_for_testing('cm_username'),
+      NAVIGATOR.AUTH_CM_PASSWORD.set_for_testing('cm_pwd'),
+      NAVIGATOR.AUTH_LDAP_USERNAME.set_for_testing('ldap_username'),
+      NAVIGATOR.AUTH_LDAP_PASSWORD.set_for_testing('ldap_pwd'),
+      NAVIGATOR.AUTH_SAML_USERNAME.set_for_testing('saml_username'),
+      NAVIGATOR.AUTH_SAML_PASSWORD.set_for_testing('saml_pwd'),
+    ]
+
+    reset = NAVIGATOR.AUTH_TYPE.set_for_testing('CMDB')
+
+    try:
+      assert_equal('cm_username', get_navigator_auth_username())
+      assert_equal('cm_pwd', get_navigator_auth_password())
+
+      reset()
+      reset = NAVIGATOR.AUTH_TYPE.set_for_testing('ldap')
+
+      assert_equal('ldap_username', get_navigator_auth_username())
+      assert_equal('ldap_pwd', get_navigator_auth_password())
+
+      reset()
+      reset = NAVIGATOR.AUTH_TYPE.set_for_testing('SAML')
+
+      assert_equal('saml_username', get_navigator_auth_username())
+      assert_equal('saml_pwd', get_navigator_auth_password())
+    finally:
+      reset()
+      for _reset in resets:
+        _reset()

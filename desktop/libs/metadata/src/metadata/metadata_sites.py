@@ -44,7 +44,7 @@ def get_conf(name='navigator'):
 
 def get_navigator_server_url():
   """Returns the navigator.server.url"""
-  return get_conf().get(_CONF_NAVIGATOR_SERVER_URL, 'http://localhost:7187')
+  return get_conf('navigator-lineage').get(_CONF_NAVIGATOR_SERVER_URL, 'http://localhost:7187')
 
 
 def get_navigator_audit_log_dir():
@@ -59,7 +59,7 @@ def get_navigator_audit_max_file_size():
 
 
 def get_navigator_hue_server_name():
-  return get_conf().get(_CONF_NAVIGATOR_HUE_SERVER_NAME, '')
+  return get_conf('navigator-lineage').get(_CONF_NAVIGATOR_HUE_SERVER_NAME, '')
 
 
 def _parse_sites():
@@ -69,7 +69,8 @@ def _parse_sites():
   _SITE_DICT ={}
 
   paths = [
-    ('navigator', os.path.join(NAVIGATOR.CONF_DIR.get(), 'navigator.client.properties')),
+    ('navigator', os.path.join(NAVIGATOR.CONF_DIR.get(), 'navigator.client.properties')), # 'audit'
+    ('navigator-lineage', os.path.join(NAVIGATOR.CONF_DIR.get(), 'navigator.lineage.client.properties')),
   ]
 
   for name, path in paths:
