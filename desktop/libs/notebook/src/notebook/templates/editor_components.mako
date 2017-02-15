@@ -1127,7 +1127,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <div class="ace-editor" data-bind="visible: statementType() === 'text' || statementType() !== 'text' && externalStatementLoaded(), css: {'single-snippet-editor ace-editor-resizable' : $root.editorMode(), 'active-editor': inFocus }, attr: { id: id() }, delayedOverflow, aceEditor: {
         snippet: $data,
         contextTooltip: '${ _ko("Right-click for details") }',
-        expandStar: '${ _ko("Shift + Click to replace with all columns") }',
+        expandStar: '${ _ko("Right-click to expand with columns") }',
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,

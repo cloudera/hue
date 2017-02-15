@@ -3541,7 +3541,7 @@
                 tooltipTimeout = window.setTimeout(function () {
                   var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
 
-                  var tooltipText = options.contextTooltip;
+                  var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
                   if (token.parseLocation.identifierChain) {
                     tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
                   } else if (token.parseLocation.function) {
