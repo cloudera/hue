@@ -1026,11 +1026,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="code-editor-snippet-body">
   <!-- ko if: HAS_OPTIMIZER -->
-  <div title="${ _('Query Validator') }" data-bind="click: function(){ showOptimizer(!showOptimizer()) }, css: { 'active': showOptimizer }">
+  <div data-bind="click: function(){ showOptimizer(!showOptimizer()) }, css: { 'active': showOptimizer }, attr: { 'title': showOptimizer() ? '${ _ko('Close Query Validator') }' : '${ _ko('Open Query Validator') }'}">
     <div class="round-icon empty">&nbsp;</div>
-    <!-- ko if: !hasSuggestion() -->
+    <!-- ko if: !hasSuggestion() || compatibilityCheckRunning() -->
     <div class="round-icon idle">
-      <i class="fa fa-check"></i>
+      <i class="fa fa-spinner fa-spin"></i>
     </div>
     <!-- /ko -->
     <!-- ko if: hasSuggestion() -->
@@ -1564,7 +1564,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="snippet-execution-status">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
-    <div class="snippet-progress-container" data-bind="visible: status() != 'canceled'">
+    <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
       <div class="progress-snippet progress active" data-bind="css: {
         'progress-starting': progress() == 0 && status() == 'running',
         'progress-warning': progress() > 0 && progress() < 100,
