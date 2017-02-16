@@ -818,8 +818,15 @@ var EditorViewModel = (function() {
     self.complexityCheckRunning = ko.observable(false);
     self.compatibilityCheckRunning = ko.observable(false);
     self.compatibilitySourcePlatform = ko.observable(self.type());
+    self.compatibilitySourcePlatform.subscribe(function(newValue) {
+      if (newValue != self.type()) {
+        self.hasSuggestion(null);
+        self.compatibilityTargetPlatform(self.type());
+        self.queryCompatibility();
+      }
+    });
     self.compatibilitySourcePlatforms = ko.observableArray([
-      {'name': 'Teradata', 'value': 'teradata'}, 
+      {'name': 'Teradata', 'value': 'teradata'},
       {'name': 'Oracle', 'value': 'oracle'},
       {'name': 'Netezza', 'value': 'netezza'},
       {'name': 'Impala', 'value': 'impala'},
@@ -1186,16 +1193,12 @@ var EditorViewModel = (function() {
       self.compatibilitySourcePlatform(self.type());
       self.compatibilityTargetPlatform(self.type());
 
-      self.queryCompatibility(); 
+      self.queryCompatibility();
     };
 
     self.queryCompatibility = function (targetPlatform) {
       if (lastCompatibilityRequest && lastCompatibilityRequest.readyState < 4) {
         lastCompatibilityRequest.abort();
-      }
-      
-      if (!targetPlatform) {
-      //  targetPlatform = self.compatibilityTargetPlatform(); 
       }
 
       logGA('compatibility');
