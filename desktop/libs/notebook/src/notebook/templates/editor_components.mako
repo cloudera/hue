@@ -1026,7 +1026,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="code-editor-snippet-body">
   <!-- ko if: HAS_OPTIMIZER -->
-  <div data-bind="css: { 'active': showOptimizer }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+  <div data-bind="css: { 'active': showOptimizer }">
     <div class="round-icon empty">&nbsp;</div>
     <!-- ko if: hasSuggestion() == null -->
     <div class="round-icon idle">
@@ -1037,40 +1037,56 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <!-- ko if: hasSuggestion() -->
       <!-- ko with: suggestion() -->
         <!-- ko if: parseError -->
-          <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
-            <i class="fa fa-exclamation"></i>
-          </div>
-          <!-- ko if: $parent.showOptimizer -->
-          <span class="icon-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
+          <!-- ko if: $parent.compatibilityTargetPlatform() == $parent.type() && $parent.compatibilitySourcePlatform() == $parent.type() -->
+            <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+              <i class="fa fa-exclamation"></i>
+            </div>
+            <!-- ko if: $parent.showOptimizer -->
+              <span class="icon-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
+            <!-- /ko -->
+          <!-- /ko -->
+          ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
+          <!-- ko if: $parent.compatibilityTargetPlatform() != $parent.type() || $parent.type() != $parent.compatibilitySourcePlatform() -->
+            <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+              <i class="fa fa-exclamation"></i>
+            </div>
+            <!-- ko if: $parent.showOptimizer -->
+              <span class="icon-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+            <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
-        <!-- ko if: !parseError() && $parent.compatibilityTargetPlatform() != $parent.type() -->
+        <!-- ko if: !parseError() && ($parent.compatibilityTargetPlatform() != $parent.type() || $parent.compatibilitySourcePlatform() != $parent.type()) -->
           <!-- ko if: queryError.encounteredString().length == 0 -->
-            <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
+            <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
               <i class="fa fa-check"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
             <span class="icon-explanation alert-success alert-neutral">
               ${ _('The ') } <select data-bind="options: $parent.compatibilitySourcePlatforms, optionsText: 'name', value: $parent.compatibilitySourcePlatform, optionsValue: 'value'" class="input-medium"></select>
-              ${ _(' query is compatible with ') } <select data-bind="options: $parent.compatibilityTargetPlatforms, optionsText: 'name', value: $parent.compatibilityTargetPlatform, optionsValue: 'value'" class="input-medium"></select>. 
-              <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform()); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span></a>.
+              <!-- ko if: $parent.compatibilitySourcePlatform() == $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
+                <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform()); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span></a>.
+              <!-- /ko -->
+              <!-- ko if: $parent.compatibilitySourcePlatform() != $parent.type() -->
+                ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
+              <!-- /ko -->
             </span>
           <!-- /ko -->
         <!-- /ko -->
         <!-- ko ifnot: queryError.encounteredString().length == 0 -->
-          <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
+          <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }, attr: { 'title': $parent.showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
             <i class="fa fa-exclamation"></i>
           </div>
           <!-- ko if: $parent.showOptimizer -->
-            <span class="icon-explanation alert-warning alert-neutral">${ _('This query is not compatible with Impala.') }</span>
+            <span class="icon-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: hasComplexity() && hasSuggestion() && compatibilityTargetPlatform() === type() && suggestion() && !suggestion().parseError() -->
+    <!-- ko if: hasComplexity() && hasSuggestion() && compatibilitySourcePlatform() === type() && compatibilityTargetPlatform() === type() && suggestion() && !suggestion().parseError() -->
       <!-- ko if: complexity() && complexity().risk() && (complexity().risk().length === 0 || complexity().risk() === 'low') -->
-        <div class="round-icon success" data-bind="click: function(){ $root.showOptimizer(! $root.showOptimizer()) }">
+        <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
         <!-- ko if: showOptimizer -->
@@ -1078,7 +1094,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: complexity() && complexity().risk() && complexity().risk() === 'high' -->
-        <div class="round-icon error" data-bind="click: function(){ $root.showOptimizer(! $root.showOptimizer()) }">
+        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
