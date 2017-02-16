@@ -813,7 +813,7 @@ var EditorViewModel = (function() {
     });
 
     self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
-    self.hasSuggestion = ko.observable(false);
+    self.hasSuggestion = ko.observable(null);
 
     self.complexityCheckRunning = ko.observable(false);
     self.compatibilityCheckRunning = ko.observable(false);
@@ -864,17 +864,17 @@ var EditorViewModel = (function() {
         });
       };
 
-      self.delayedStatement.subscribe(function () {
-        if (self.type() === 'hive') {
+      if (self.type() === 'hive' || self.type() === 'impala') {
+        self.delayedStatement.subscribe(function () {
           self.checkComplexity();
           self.queryCompatibility();
+        });
+        if (self.statement_raw()) {
+          window.setTimeout(function(){
+            self.checkComplexity();
+            self.queryCompatibility();
+          }, 2000);
         }
-      });
-      if (self.statement_raw()) {
-        window.setTimeout(function(){
-          self.checkComplexity();
-          self.queryCompatibility();
-        }, 2000);
       }
     }
 
@@ -1171,7 +1171,6 @@ var EditorViewModel = (function() {
 
       logGA('compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
-      self.hasSuggestion(false);
 
       self.compatibilityTarget(targetPlatform);
 

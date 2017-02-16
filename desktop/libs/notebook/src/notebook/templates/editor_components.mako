@@ -1026,18 +1026,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="code-editor-snippet-body">
   <!-- ko if: HAS_OPTIMIZER -->
-  <div data-bind="click: function(){ showOptimizer(!showOptimizer()) }, css: { 'active': showOptimizer }, attr: { 'title': showOptimizer() ? '${ _ko('Close Query Validator') }' : '${ _ko('Open Query Validator') }'}">
+  <div data-bind="css: { 'active': showOptimizer }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
     <div class="round-icon empty">&nbsp;</div>
-    <!-- ko if: !hasSuggestion() || compatibilityCheckRunning() -->
+    <!-- ko if: hasSuggestion() == null || compatibilityCheckRunning() -->
     <div class="round-icon idle">
-      <i class="fa fa-check" data-bind="css: {'fa-spinner fa-spin': compatibilityCheckRunning}"></i>
+      <i class="fa" data-bind="css: {'fa-spinner fa-spin': compatibilityCheckRunning}"></i>
     </div>
     <!-- /ko -->
 
     <!-- ko if: hasSuggestion() -->
         <!-- ko with: suggestion() -->
           <!-- ko if: parseError -->
-            <div class="round-icon error">
+            <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
@@ -1046,7 +1046,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <!-- /ko -->
           <!-- ko if: !parseError() && $parent.compatibilityTarget() != $parent.type() -->
             <!-- ko if: queryError.encounteredString().length == 0 -->
-              <div class="round-icon success">
+              <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
                 <i class="fa fa-check"></i>
               </div>
               <!-- ko if: $parent.showOptimizer -->
@@ -1054,7 +1054,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <!-- /ko -->
             <!-- /ko -->
             <!-- ko ifnot: queryError.encounteredString().length == 0 -->
-              <div class="round-icon warning">
+              <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
                 <i class="fa fa-exclamation"></i>
               </div>
               <!-- ko if: $parent.showOptimizer -->
@@ -1066,7 +1066,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <!-- /ko -->
     <!-- ko if: hasComplexity() && hasSuggestion() && compatibilityTarget() === type() && suggestion() && !suggestion().parseError() -->
       <!-- ko if: complexity() && complexity().risk() && (complexity().risk().length === 0 || complexity().risk() === 'low') -->
-        <div class="round-icon success">
+        <div class="round-icon success" data-bind="click: function(){ $root.showOptimizer(! $root.showOptimizer()) }">
           <i class="fa fa-check"></i>
         </div>
         <!-- ko if: showOptimizer -->
@@ -1074,7 +1074,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: complexity() && complexity().risk() && complexity().risk() === 'high' -->
-        <div class="round-icon error">
+        <div class="round-icon error" data-bind="click: function(){ $root.showOptimizer(! $root.showOptimizer()) }">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
