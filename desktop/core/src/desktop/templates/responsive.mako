@@ -712,7 +712,7 @@ ${ assist.assistPanel() }
               dataType: 'html',
               success: function (response) {
                 self.extraEmbeddableURLParams('');
-                var r = $(response);
+                var r = $('<span>').html(response);
                 r.find('link').each(function () {
                   $(this).attr('href', $(this).attr('href') + '?' + Math.random())
                 });
@@ -733,6 +733,7 @@ ${ assist.assistPanel() }
                   }
                   $(this).remove();
                 });
+                r.unwrap('<span>');
                 if (self.SKIP_CACHE.indexOf(newVal) === -1) {
                   self.embeddable_cache[newVal] = r;
                 }
