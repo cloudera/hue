@@ -815,12 +815,16 @@ var EditorViewModel = (function() {
     self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
     self.hasSuggestion = ko.observable(false);
 
-    self.complexityCheckActive = ko.observable(true);
-    self.compatibilityCheckActive = ko.observable(true);
+    self.complexityCheckRunning = ko.observable(false);
+    self.compatibilityCheckRunning = ko.observable(false);
 
-    self.showOptimizer = ko.observable(false);
+    self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
+    self.showOptimizer.subscribe(function (newValue) {
+      if (newValue !== null) {
+        self.getApiHelper().setInTotalStorage('editor', 'show.optimizer', newValue);
+      }
+    });
 
-    self.isOptimizing = ko.observable(false);
 
     if (HAS_OPTIMIZER) {
       var lastComplexityRequest;
@@ -838,7 +842,7 @@ var EditorViewModel = (function() {
         }
 
         logGA('get_query_risk');
-        self.isOptimizing(true);
+        self.complexityCheckRunning(true);
         lastComplexityRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
@@ -855,29 +859,21 @@ var EditorViewModel = (function() {
               $(document).trigger('error', data.message);
             }
             lastCheckedComplexityStatement = self.statement_raw();
-            self.isOptimizing(false);
+            self.complexityCheckRunning(false);
           }
         });
       };
 
       self.delayedStatement.subscribe(function () {
         if (self.type() === 'hive') {
-          if (self.complexityCheckActive()) {
-            self.checkComplexity();
-          }
-          if (self.compatibilityCheckActive()) {
-            self.queryCompatibility();
-          }
+          self.checkComplexity();
+          self.queryCompatibility();
         }
       });
       if (self.statement_raw()) {
         window.setTimeout(function(){
-          if (self.complexityCheckActive()) {
-            self.checkComplexity();
-          }
-          if (self.compatibilityCheckActive()) {
-            self.queryCompatibility();
-          }
+          self.checkComplexity();
+          self.queryCompatibility();
         }, 2000);
       }
     }
@@ -1170,7 +1166,8 @@ var EditorViewModel = (function() {
       }
 
       logGA('compatibility');
-      self.isOptimizing(true);
+      self.compatibilityCheckRunning(true);
+      self.hasSuggestion(false);
 
       if (!targetPlatform) {
         targetPlatform = self.type();
@@ -1195,6 +1192,7 @@ var EditorViewModel = (function() {
               line: match === null ? null : parseInt(match[1]) - 1,
               col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
             });
+            self.status('with-optimizer-report');
           }
           if (self.suggestion().parseError()) {
             var match = ERROR_REGEX.exec(self.suggestion().parseError());
@@ -1203,6 +1201,7 @@ var EditorViewModel = (function() {
               line: match === null ? null : parseInt(match[1]) - 1,
               col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
             });
+            self.status('with-optimizer-report');
           }
           self.hasSuggestion(true);
         } else {
@@ -1211,7 +1210,7 @@ var EditorViewModel = (function() {
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       }).always(function () {
-        self.isOptimizing(false);
+        self.compatibilityCheckRunning(false);
       });
     };
 
