@@ -1165,13 +1165,13 @@ var EditorViewModel = (function() {
         lastCompatibilityRequest.abort();
       }
 
-      logGA('compatibility');
-      self.compatibilityCheckRunning(true);
-      self.hasSuggestion(false);
-
       if (!targetPlatform) {
         targetPlatform = self.type();
       }
+
+      logGA('compatibility');
+      self.compatibilityCheckRunning(targetPlatform != self.type());
+      self.hasSuggestion(false);
 
       self.compatibilityTarget(targetPlatform);
 
