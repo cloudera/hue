@@ -895,28 +895,66 @@ class TestDocument(object):
     assert_equal(Document2.objects.get(name='Test Document2').id, self.document2.id)
     assert_equal(Document.objects.get(name='Test Document').id, self.document.id)
 
-  def test_document_trashed(self):
+  def test_document_trashed_and_restore(self):
     home_dir = Directory.objects.get_home_directory(self.user)
     test_dir, created = Directory.objects.get_or_create(
-          parent_directory=home_dir,
-          owner=self.user,
-          name='test_dir'
-        )
-    test_doc = Document2.objects.create(name='Test Document2',
-                                              type='search-dashboard',
-                                              owner=self.user,
-                                              description='Test Document2',
-                                              parent_directory=test_dir)
+        parent_directory=home_dir,
+        owner=self.user,
+        name='test_dir'
+    )
+    test_doc = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2',
+        parent_directory=test_dir
+    )
+
+    child_dir, created = Directory.objects.get_or_create(
+        parent_directory=test_dir,
+        owner=self.user,
+        name='child_dir'
+    )
+    test_doc1 = Document2.objects.create(
+        name='Test Document2',
+        type='search-dashboard',
+        owner=self.user,
+        description='Test Document2',
+        parent_directory=child_dir
+    )
 
     assert_false(test_dir.is_trashed)
     assert_false(test_doc.is_trashed)
+    assert_false(child_dir.is_trashed)
+    assert_false(test_doc1.is_trashed)
 
-    test_dir.trash()
-    assert_true(test_doc.is_trashed)
-    assert_true(test_dir.is_trashed)
+    try:
+      test_dir.trash()
+      test_dir = Document2.objects.get(id=test_dir.id)
+      test_doc = Document2.objects.get(id=test_doc.id)
+      child_dir = Document2.objects.get(id=child_dir.id)
+      test_doc1 = Document2.objects.get(id=test_doc1.id)
+      assert_true(test_doc.is_trashed)
+      assert_true(test_dir.is_trashed)
+      assert_true(child_dir.is_trashed)
+      assert_true(test_doc1.is_trashed)
 
-    test_doc.delete()
-    test_dir.delete()
+      # Test restore
+      test_dir.restore()
+      test_dir = Document2.objects.get(id=test_dir.id)
+      test_doc = Document2.objects.get(id=test_doc.id)
+      child_dir = Document2.objects.get(id=child_dir.id)
+      test_doc1 = Document2.objects.get(id=test_doc1.id)
+      assert_false(test_doc.is_trashed)
+      assert_false(test_dir.is_trashed)
+      assert_false(child_dir.is_trashed)
+      assert_false(test_doc1.is_trashed)
+    finally:
+      test_doc.delete()
+      test_dir.delete()
+      test_doc1.delete()
+      child_dir.delete()
+
 
   def test_multiple_home_directories(self):
     home_dir = Directory.objects.get_home_directory(self.user)

@@ -1234,6 +1234,10 @@ class Document2(models.Model):
       self.move(trash_dir, self.owner)
       self.is_trashed = True
       self.save()
+
+      if self.is_directory:
+        children_ids = self._get_child_ids_recursively(self.id)
+        Document2.objects.filter(id__in=children_ids).update(is_trashed=True)
     except Document2.MultipleObjectsReturned:
       LOG.error('Multiple Trash directories detected. Merging all into one.')
 
@@ -1252,6 +1256,21 @@ class Document2(models.Model):
     self.is_trashed = False
     self.save()
 
+    if self.is_directory:
+      children_ids = self._get_child_ids_recursively(self.id)
+      Document2.objects.filter(id__in=children_ids).update(is_trashed=False)
+
+  def _get_child_ids_recursively(self, directory_id):
+    """
+    Returns the list of all children ids for a given directory id recursively, excluding history documents
+    """
+    directory = Directory.objects.get(id=directory_id)
+    children_ids = []
+    for child in directory.children.filter(is_history=False).filter(is_managed=False):
+      children_ids.append(child.id)
+      if child.is_directory:
+        children_ids.extend(self._get_child_ids_recursively(child.id))
+    return children_ids
 
   def can_read(self, user):
     perm = self.get_permission('read')
