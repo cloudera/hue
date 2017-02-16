@@ -1030,9 +1030,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <div class="round-icon empty">&nbsp;</div>
     <!-- ko if: !hasSuggestion() || compatibilityCheckRunning() -->
     <div class="round-icon idle">
-      <i class="fa fa-spinner fa-spin"></i>
+      <i class="fa fa-check" data-bind="css: {'fa-spinner fa-spin': compatibilityCheckRunning}"></i>
     </div>
     <!-- /ko -->
+
     <!-- ko if: hasSuggestion() -->
         <!-- ko with: suggestion() -->
           <!-- ko if: parseError -->
