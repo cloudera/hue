@@ -66,7 +66,12 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 
     <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
-        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }">
+       %if is_embeddable:
+        href="javascript: void(0)" data-bind="css: {'btn': true}, click: function() { huePubSub.publish('open.fb.folder', $root.workflow.properties.deployment_dir()) }"
+       %else:
+        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }"
+       %endif
+      >
       <i class="fa fa-fw fa-folder-open"></i>
     </a>
 
@@ -85,9 +90,15 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 
     &nbsp;&nbsp;&nbsp;
 
+    %if is_embeddable:
+    <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: function(){ huePubSub.publish('open.link', '${ url('oozie:new_workflow') }') }">
+      <i class="fa fa-fw fa-file-o"></i>
+    </a>
+    %else:
     <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-fw fa-file-o"></i>
     </a>
+    %endif
 
   </div>
 </%def>
