@@ -762,7 +762,7 @@ ${ dashboard.import_bindings() }
       }
     }
 
-    resizeToolbar();
+    hueUtils.waitForRendered($('.card-toolbar'), function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
 
     $(document).on("blur", "[validate]", function() {
       validateFields();
