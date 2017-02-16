@@ -1700,28 +1700,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility(); }" title="${ _('Get syntax checks') }">
-            <i class="fa fa-fw fa-check"></i> ${_('Check syntax')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: checkComplexity" title="${ _('Get recommendations on query risks and optimizations') }">
-            <i class="fa fa-fw fa-bolt"></i> ${_('Check complexity')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility('impala'); }, visible: type() == 'hive'" title="${ _('Get Impala compatibility hints') }">
-            <i class="fa fa-fw fa-random"></i> ${_('Check Impala compatibility')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: getSimilarQueries" title="${ _('Expand query with similar queries suggestions') }">
-            <i class="fa fa-fw fa-comments"></i> ${_('Show similarities')}
-          </a>
-        </li>
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function() { loadQueryHistory(10); }" title="${ _('Load past query history in order to improve recommendations') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
+          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility('impala'); }, visible: type() == 'hive'" title="${ _('Get hints on how to port SQL from other databases') }">
+            <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
         <!-- /ko -->
