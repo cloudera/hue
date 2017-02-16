@@ -291,7 +291,11 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
 
   <div class="container-fluid">
   <div class="row-fluid">
+    %if is_embeddable:
+    <div class="span12 margin-top-20">
+    %else:
     <div class="span12" data-bind="style:{'marginTop' : $root.isEditing() ? '120px': '50px'}">
+    %endif
     <div class="object-name" style="text-align: center">
       <span data-bind="editable: $root.workflow.name, editableOptions: {enabled: $root.isEditing(), placement: 'right'}"></span>
     </div>
