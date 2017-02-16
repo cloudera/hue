@@ -498,7 +498,7 @@ case 773:
      addCommonTableExpressions($$[$0-3]);
    
 break;
-case 774: case 775:
+case 774: case 775: case 815:
 
      addCommonTableExpressions($$[$0-2]);
    
@@ -636,6 +636,17 @@ this.$ = $$[$0];
 break;
 case 813:
 this.$ = $$[$0-2].concat([$$[$0]]);;
+break;
+case 817:
+
+     addCommonTableExpressions($$[$0-4]);
+   
+break;
+case 818:
+
+     $$[$0-1].alias = $$[$0-4];
+     this.$ = $$[$0-1];
+   
 break;
 case 819: case 1410: case 2104: case 2163: case 2242: case 2246: case 2311:
 
@@ -4719,6 +4730,7 @@ var prepareNewStatement = function () {
 };
 
 var addCommonTableExpressions = function (identifiers) {
+  parser.yy.result.commonTableExpressions = identifiers;
   parser.yy.latestCommonTableExpressions = identifiers;
 };
 
@@ -5068,9 +5080,24 @@ var commitLocations = function () {
 var prioritizeSuggestions = function () {
   parser.yy.result.lowerCase = parser.yy.lowerCase || false;
 
+  var cteIndex = {};
+
+  if (typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
+    parser.yy.latestCommonTableExpressions.forEach(function (cte) {
+      cteIndex[cte.alias.toLowerCase()] = cte;
+    })
+  }
+
   SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
     if (suggestionType !== 'suggestAggregateFunctions' && typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
       delete parser.yy.result[suggestionType];
+    } else if (typeof parser.yy.result[suggestionType] !== 'undefined' && typeof parser.yy.result[suggestionType].tables !== 'undefined') {
+      for (var i = parser.yy.result[suggestionType].tables.length - 1; i >= 0; i--) {
+        var table = parser.yy.result[suggestionType].tables[i];
+        if (table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined' && typeof cteIndex[table.identifierChain[0].name] !== 'undefined') {
+          parser.yy.result[suggestionType].tables.splice(i, 1);
+        }
+      }
     }
   });
 
@@ -5120,6 +5147,17 @@ var prioritizeSuggestions = function () {
     } else {
       delete parser.yy.result.suggestTables;
       delete parser.yy.result.suggestDatabases;
+
+      suggestColumns.tables.forEach(function (table) {
+        if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined') {
+          var cte = cteIndex[table.identifierChain[0].name.toLowerCase()];
+          if (typeof cte !== 'undefined') {
+            delete table.identifierChain[0].name;
+            table.identifierChain[0].cte = cte.alias;
+          }
+        }
+      });
+
       if (typeof suggestColumns.identifierChain !== 'undefined') {
         delete suggestColumns.identifierChain;
       }
@@ -5136,15 +5174,15 @@ var prioritizeSuggestions = function () {
 
   if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
     var ctes = [];
-    parser.yy.latestCommonTableExpressions.forEach(function (identifier) {
-      var cte = { name: identifier };
+    parser.yy.latestCommonTableExpressions.forEach(function (cte) {
+      var suggestion = { name: cte.alias };
       if (parser.yy.result.suggestTables.prependFrom) {
-        cte.prependFrom = true
+        suggestion.prependFrom = true
       }
       if (parser.yy.result.suggestTables.prependQuestionMark) {
-        cte.prependQuestionMark = true;
+        suggestion.prependQuestionMark = true;
       }
-      ctes.push(cte);
+      ctes.push(suggestion);
     });
     if (ctes.length > 0) {
       parser.yy.result.suggestCommonTableExpressions = ctes;
