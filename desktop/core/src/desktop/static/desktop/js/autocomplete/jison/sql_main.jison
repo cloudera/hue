@@ -1414,12 +1414,22 @@ WithQueries
 WithQueries_EDIT
  : WithQuery_EDIT
  | WithQueries ',' WithQuery_EDIT
+   {
+     addCommonTableExpressions($1);
+   }
  | WithQuery_EDIT ',' WithQueries
  | WithQueries ',' WithQuery_EDIT ',' WithQueries
+   {
+     addCommonTableExpressions($1);
+   }
  ;
 
 WithQuery
  : RegularOrBacktickedIdentifier AnyAs '(' TableSubQueryInner ')'
+   {
+     $4.alias = $1;
+     $$ = $4;
+   }
  ;
 
 WithQuery_EDIT

@@ -5580,7 +5580,44 @@
             suggestFunctions: {},
             suggestTables: { prependQuestionMark: true, prependFrom: true },
             suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot:true },
-            suggestCommonTableExpressions: [{ name: 't1', prependFrom: true, prependQuestionMark:true }]
+            suggestCommonTableExpressions: [{ name: 't1', prependFrom: true, prependQuestionMark:true }],
+            commonTableExpressions: [{ alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }]
+          }
+        });
+      });
+
+      it('should suggest identifiers for "WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT |', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT * FROM FOO), t2 AS (SELECT ',
+          afterCursor: '',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestTables: { prependQuestionMark: true, prependFrom: true },
+            suggestDatabases: { prependQuestionMark: true, prependFrom: true, appendDot: true },
+            lowerCase: false,
+            suggestCommonTableExpressions: [{ name: 't1', prependFrom: true, prependQuestionMark: true }],
+            commonTableExpressions: [{ alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }]
+          }
+        });
+      });
+
+      it('should suggest identifiers for "WITH t1 AS (SELECT id FROM foo), t2 AS (SELECT | FROM t1)', function () {
+        assertAutoComplete({
+          beforeCursor: 'WITH t1 AS (SELECT id FROM foo), t2 AS (SELECT ',
+          afterCursor: ' FROM t1)',
+          dialect: 'hive',
+          noErrors: true,
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ cte: 't1' }] }] },
+            commonTableExpressions: [{ alias: 't1', columns: [{ identifierChain: [{ name: 'foo' }, { name: 'id' }], type: 'COLREF' }] }],
+            lowerCase: false
           }
         });
       });
@@ -5594,7 +5631,8 @@
             lowerCase: false,
             suggestTables: { },
             suggestDatabases: { appendDot: true },
-            suggestCommonTableExpressions: [{ name: 't1' }]
+            suggestCommonTableExpressions: [{ name: 't1' }],
+            commonTableExpressions: [{  alias: 't1', columns: [{ tables: [{ identifierChain: [{ name: 'FOO' }] }] }] }]
           }
         });
       });

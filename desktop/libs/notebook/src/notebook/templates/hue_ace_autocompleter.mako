@@ -90,6 +90,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="autocomplete-details-column">
+    <!-- ko if: typeof details.name !== 'undefined' -->
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
@@ -111,6 +112,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="autocomplete-details-variable">

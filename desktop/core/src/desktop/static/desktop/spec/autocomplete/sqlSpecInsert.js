@@ -898,8 +898,9 @@
           expectedResult: {
             lowerCase: false,
             suggestTables: {},
-            suggestDatabases: { appendDot: true},
-            suggestCommonTableExpressions: [{ name: 't1' },{ name: 't2' }]
+            suggestDatabases: { appendDot: true },
+            suggestCommonTableExpressions: [{ name: 't1' }, { name: 't2' }],
+            commonTableExpressions: [{ alias: 't1', columns: [{ type: 'NUMBER' }] }, { alias: 't2', columns: [{ type: 'NUMBER' }] }],
           }
         });
       });
@@ -1071,7 +1072,8 @@
           noErrors: true,
           expectedResult: {
             lowerCase: false,
-            suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES']
+            suggestKeywords: ['PARTITION', '[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES'],
+            commonTableExpressions: [{ alias: 't1', columns: [{ type: 'NUMBER' }] }, { alias: 't2', columns: [{ type: 'NUMBER' }] }]
           }
         });
       });
@@ -1123,8 +1125,9 @@
           expectedResult: {
             lowerCase: true,
             suggestTables: {},
-            suggestDatabases: { appendDot: true},
-            suggestCommonTableExpressions: [{ name: 't1' },{ name: 't2' }]
+            suggestDatabases: { appendDot: true },
+            suggestCommonTableExpressions: [{ name: 't1' },{ name: 't2' }],
+            commonTableExpressions: [{ alias: 't1', columns: [{ type: 'NUMBER' }] }, { alias: 't2', columns: [{ type: 'NUMBER' }] }]
           }
         });
       });

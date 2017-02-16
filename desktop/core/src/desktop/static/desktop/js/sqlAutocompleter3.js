@@ -697,7 +697,41 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     var addColumnsDeferred = $.Deferred();
 
-    if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].subQuery !== 'undefined') {
+    if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].cte !== 'undefined') {
+      if (typeof self.parseResult.commonTableExpressions !== 'undefined' && self.parseResult.commonTableExpressions.length > 0) {
+        self.parseResult.commonTableExpressions.every(function (cte) {
+          if (cte.alias === table.identifierChain[0].cte) {
+            cte.columns.forEach(function (column) {
+              var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
+              if (typeof column.alias !== 'undefined') {
+                columnSuggestions.push({
+                  value: self.backTickIfNeeded(column.alias),
+                  filterValue: column.alias,
+                  meta: type,
+                  category: CATEGORIES.COLUMN,
+                  table: table,
+                  popular: ko.observable(false),
+                  details: column
+                })
+              } else if (typeof column.identifierChain !== 'undefined' && column.identifierChain.length > 0 && typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined') {
+                columnSuggestions.push({
+                  value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
+                  filterValue: column.identifierChain[column.identifierChain.length - 1].name,
+                  meta: type,
+                  category: CATEGORIES.COLUMN,
+                  table: table,
+                  popular: ko.observable(false),
+                  details: column
+                })
+              }
+            });
+            return false;
+          }
+          return true;
+        })
+      }
+      addColumnsDeferred.resolve();
+    } else if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].subQuery !== 'undefined') {
       var foundSubQuery = locateSubQuery(self.parseResult.subQueries, table.identifierChain[0].subQuery);
 
       var addSubQueryColumns = function (subQueryColumns) {
