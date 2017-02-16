@@ -137,16 +137,23 @@ class ProtocolIndependentOrdinaryCallingFormat(OrdinaryCallingFormat):
 
 class Location(object):
 
-    DEFAULT = ''  # US Classic Region
-    EU = 'EU'  # Ireland
-    EUCentral1 = 'eu-central-1'  # Frankfurt
+    # http://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+    DEFAULT = ''
+    EU = 'EU'
+    EUCentral = 'eu-central-1'
+    EUWest = 'eu-west-1'
+    EUWest2 = 'eu-west-2'
+    CACentral = 'ca-central-1'
+    USEast = 'us-east-1'
+    USEast2 = 'us-east-2'
     USWest = 'us-west-1'
     USWest2 = 'us-west-2'
     SAEast = 'sa-east-1'
     APNortheast = 'ap-northeast-1'
+    APNortheast2 = 'ap-northeast-2'
     APSoutheast = 'ap-southeast-1'
     APSoutheast2 = 'ap-southeast-2'
-    CNNorth1 = 'cn-north-1'
+    APSouth = 'ap-south-1'
 
 
 class NoHostProvided(object):
