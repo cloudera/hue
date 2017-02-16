@@ -1028,43 +1028,47 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- ko if: HAS_OPTIMIZER -->
   <div data-bind="css: { 'active': showOptimizer }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
     <div class="round-icon empty">&nbsp;</div>
-    <!-- ko if: hasSuggestion() == null || compatibilityCheckRunning() -->
+    <!-- ko if: hasSuggestion() == null -->
     <div class="round-icon idle">
       <i class="fa" data-bind="css: {'fa-spinner fa-spin': compatibilityCheckRunning}"></i>
     </div>
     <!-- /ko -->
 
     <!-- ko if: hasSuggestion() -->
-        <!-- ko with: suggestion() -->
-          <!-- ko if: parseError -->
-            <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
-              <i class="fa fa-exclamation"></i>
-            </div>
-            <!-- ko if: $parent.showOptimizer -->
-            <span class="icon-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
-            <!-- /ko -->
-          <!-- /ko -->
-          <!-- ko if: !parseError() && $parent.compatibilityTarget() != $parent.type() -->
-            <!-- ko if: queryError.encounteredString().length == 0 -->
-              <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
-                <i class="fa fa-check"></i>
-              </div>
-              <!-- ko if: $parent.showOptimizer -->
-              <span class="icon-explanation alert-success alert-neutral">${ _('The query is compatible with Impala.') } <a href="javascript:void(0)" data-bind="click: function() { $parent.type('impala') }">${ _('Execute it now in Impala!') }</a></span>
-              <!-- /ko -->
-            <!-- /ko -->
-            <!-- ko ifnot: queryError.encounteredString().length == 0 -->
-              <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
-                <i class="fa fa-exclamation"></i>
-              </div>
-              <!-- ko if: $parent.showOptimizer -->
-              <span class="icon-explanation alert-warning alert-neutral">${ _('This query is not compatible with Impala.') }</span>
-              <!-- /ko -->
-            <!-- /ko -->
+      <!-- ko with: suggestion() -->
+        <!-- ko if: parseError -->
+          <div class="round-icon error" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
+            <i class="fa fa-exclamation"></i>
+          </div>
+          <!-- ko if: $parent.showOptimizer -->
+          <span class="icon-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
           <!-- /ko -->
         <!-- /ko -->
+        <!-- ko if: !parseError() && $parent.compatibilityTargetPlatform() != $parent.type() -->
+          <!-- ko if: queryError.encounteredString().length == 0 -->
+            <div class="round-icon success" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
+              <i class="fa fa-check"></i>
+            </div>
+            <!-- ko if: $parent.showOptimizer -->
+            <span class="icon-explanation alert-success alert-neutral">
+              ${ _('The ') } <select data-bind="options: $parent.compatibilitySourcePlatforms, optionsText: 'name', value: $parent.compatibilitySourcePlatform, optionsValue: 'value'" class="input-medium"></select>
+              ${ _(' query is compatible with ') } <select data-bind="options: $parent.compatibilityTargetPlatforms, optionsText: 'name', value: $parent.compatibilityTargetPlatform, optionsValue: 'value'" class="input-medium"></select>. 
+              <a href="javascript:void(0)" data-bind="click: function() { $parent.type($parent.compatibilityTargetPlatform()); }">${ _('Execute it with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span></a>.
+            </span>
+          <!-- /ko -->
+        <!-- /ko -->
+        <!-- ko ifnot: queryError.encounteredString().length == 0 -->
+          <div class="round-icon warning" data-bind="click: function(){ $parent.showOptimizer(! $parent.showOptimizer()) }">
+            <i class="fa fa-exclamation"></i>
+          </div>
+          <!-- ko if: $parent.showOptimizer -->
+            <span class="icon-explanation alert-warning alert-neutral">${ _('This query is not compatible with Impala.') }</span>
+          <!-- /ko -->
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: hasComplexity() && hasSuggestion() && compatibilityTarget() === type() && suggestion() && !suggestion().parseError() -->
+    <!-- ko if: hasComplexity() && hasSuggestion() && compatibilityTargetPlatform() === type() && suggestion() && !suggestion().parseError() -->
       <!-- ko if: complexity() && complexity().risk() && (complexity().risk().length === 0 || complexity().risk() === 'low') -->
         <div class="round-icon success" data-bind="click: function(){ $root.showOptimizer(! $root.showOptimizer()) }">
           <i class="fa fa-check"></i>
@@ -1700,7 +1704,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- ko if: HAS_OPTIMIZER -->
         <li class="divider"></li>
         <li>
-          <a href="javascript:void(0)" data-bind="click: function() { queryCompatibility('impala'); }, visible: type() == 'hive'" title="${ _('Get hints on how to port SQL from other databases') }">
+          <a href="javascript:void(0)" data-bind="click: function() { hasSuggestion(null); compatibilitySourcePlatform(type()); compatibilityTargetPlatform(type() == 'hive' ? 'impala' : 'hive'); queryCompatibility(); }, visible: type() == 'hive' || type() == 'impala'" title="${ _('Get hints on how to port SQL from other databases') }">
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>

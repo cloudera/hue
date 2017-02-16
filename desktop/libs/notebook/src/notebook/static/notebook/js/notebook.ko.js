@@ -817,6 +817,30 @@ var EditorViewModel = (function() {
 
     self.complexityCheckRunning = ko.observable(false);
     self.compatibilityCheckRunning = ko.observable(false);
+    self.compatibilitySourcePlatform = ko.observable(self.type());
+    self.compatibilitySourcePlatforms = ko.observableArray([
+      {'name': 'Teradata', 'value': 'teradata'}, 
+      {'name': 'Oracle', 'value': 'oracle'},
+      {'name': 'Netezza', 'value': 'netezza'},
+      {'name': 'Impala', 'value': 'impala'},
+      {'name': 'Hive', 'value': 'hive'},
+      {'name': 'DB2', 'value': 'db2'},
+      {'name': 'Greenplum', 'value': 'greenplum'},
+      {'name': 'MySQL', 'value': 'mysql'},
+      {'name': 'PostgreSQL', 'value': 'postgresql'},
+      {'name': 'Informix', 'value': 'informix'},
+      {'name': 'SQL Server', 'value': 'sqlserver'},
+      {'name': 'Sybase', 'value': 'sybase'},
+      {'name': 'Access', 'value': 'access'},
+      {'name': 'Firebird', 'value': 'firebird'},
+      {'name': 'ANSISQL', 'value': 'ansisql'},
+      {'name': 'Generic', 'value': 'generic'}
+    ]);
+    self.compatibilityTargetPlatform = ko.observable(self.type());
+    self.compatibilityTargetPlatforms = ko.observableArray([
+      {'name': 'Impala', 'value': 'impala'},
+      {'name': 'Hive', 'value': 'hive'},
+    ]);
 
     self.showOptimizer = ko.observable(self.getApiHelper().getFromTotalStorage('editor', 'show.optimizer', false));
     self.showOptimizer.subscribe(function (newValue) {
@@ -867,12 +891,12 @@ var EditorViewModel = (function() {
       if (self.type() === 'hive' || self.type() === 'impala') {
         self.delayedStatement.subscribe(function () {
           self.checkComplexity();
-          self.queryCompatibility();
+          self.querySyntaxCompatibility();
         });
         if (self.statement_raw()) {
           window.setTimeout(function(){
             self.checkComplexity();
-            self.queryCompatibility();
+            self.querySyntaxCompatibility();
           }, 2000);
         }
       }
@@ -1156,29 +1180,32 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.compatibilityTarget = ko.observable('');
-
     var lastCompatibilityRequest;
+
+    self.querySyntaxCompatibility = function () {
+      self.compatibilitySourcePlatform(self.type());
+      self.compatibilityTargetPlatform(self.type());
+
+      self.queryCompatibility(); 
+    };
 
     self.queryCompatibility = function (targetPlatform) {
       if (lastCompatibilityRequest && lastCompatibilityRequest.readyState < 4) {
         lastCompatibilityRequest.abort();
       }
-
+      
       if (!targetPlatform) {
-        targetPlatform = self.type();
+      //  targetPlatform = self.compatibilityTargetPlatform(); 
       }
 
       logGA('compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
 
-      self.compatibilityTarget(targetPlatform);
-
       lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext()),
-        sourcePlatform: self.type(),
-        targetPlatform: targetPlatform
+        sourcePlatform: self.compatibilitySourcePlatform(),
+        targetPlatform: self.compatibilityTargetPlatform()
       }, function (data) {
         if (data.status == 0) {
           self.aceErrorsHolder([]);
