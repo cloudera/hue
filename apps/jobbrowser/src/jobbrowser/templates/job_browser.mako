@@ -77,7 +77,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-            <li data-bind="css: {'active': interface() === 'dashboard'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Dashboard') }</a></li>
             <li data-bind="css: {'active': interface() === 'apps'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" style="display:none;">0</div></a></li>
             <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ interface('workflows') }">${ _('Workflows') }</a></li>
             <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ interface('schedules') }">${ _('Schedules') }</a></li>

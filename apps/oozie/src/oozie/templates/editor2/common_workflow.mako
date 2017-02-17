@@ -177,7 +177,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'impala-widget' || widgetType() == 'impala-document-widget' -->
-      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'pig-widget' || widgetType() == 'pig-document-widget'  -->

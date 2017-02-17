@@ -4997,7 +4997,7 @@
         'distcp-doc': 'query-distcp',
         'mapreduce-doc': 'query-mapreduce',
       }
-      var type = 'query-hive';
+      var type = 'query-impala'; // tmp
       if (options.type) {
         type = TYPE_MAP[options.type()] ? TYPE_MAP[options.type()] : options.type();
       }

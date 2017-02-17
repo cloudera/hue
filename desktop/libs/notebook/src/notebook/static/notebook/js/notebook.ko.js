@@ -268,6 +268,7 @@ var EditorViewModel = (function() {
 
     self.isBatchable = ko.computed(function() {
       return self.type() == 'hive'
+          || self.type() == 'impala'
           || $.grep(vm.availableLanguages, function(language) { return language.type == self.type() && language.interface == 'oozie'; }).length > 0;
     });
 
