@@ -599,10 +599,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <div class="tab-pane" id="scheduleTab">
         <!-- ko if: isSaved() -->
         <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
-        <a data-bind="click: $root.saveNotebook">${ _('Changes not saved') }</a>
+          <a data-bind="click: $root.saveNotebook">${ _('Save changes') }</a>
         <!-- /ko -->
-        <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() -->
-        <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
+        <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
+          <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
+        <!-- /ko -->
+        <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
+          <a data-bind="click: showSubmitPopup">${ _('View') }</a>
+          ##<a data-bind="click: showSubmitPopup">${ _('Synchronize') }</a>
+          <a data-bind="click: showSubmitPopup">${ _('Stop') }</a>
         <!-- /ko -->
         <br>
         <br>
