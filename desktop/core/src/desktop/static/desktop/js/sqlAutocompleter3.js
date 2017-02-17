@@ -31,28 +31,30 @@ var SqlAutocompleter3 = (function () {
   };
 
   var CATEGORIES = {
-    ALL: { color: HueColors.BLUE, label: AutocompleterGlobals.i18n.category.all },
-    POPULAR: { color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular },
-    POPULAR_AGGREGATE: { weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'agg-udf' },
-    POPULAR_GROUP_BY: { weight: 1400, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'group-by' },
-    POPULAR_ORDER_BY: { weight: 1300, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'order-by' },
-    POPULAR_FILTER: { weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'filter' },
-    POPULAR_ACTIVE_JOIN: { weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' },
-    POPULAR_JOIN_CONDITION: { weight: 1100, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join-condition' },
-    COLUMN: { weight: 1000, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
-    SAMPLE: { weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' },
-    IDENTIFIER: { weight: 800, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.identifier, detailsTemplate: 'identifier' },
-    CTE: { weight: 700, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.cte, detailsTemplate: 'cte' },
-    TABLE: { weight: 600, color: COLORS.TABLE, label: AutocompleterGlobals.i18n.category.table, detailsTemplate: 'table' },
-    DATABASE: { weight: 500, color: COLORS.DATABASE, label: AutocompleterGlobals.i18n.category.database, detailsTemplate: 'database' },
-    UDF: { weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.udf, detailsTemplate: 'udf' },
-    HDFS: { weight: 300, color: COLORS.HDFS, label: AutocompleterGlobals.i18n.category.hdfs, detailsTemplate: 'hdfs' },
-    VIRTUAL_COLUMN: { weight: 200, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
-    COLREF_KEYWORD: { weight: 100, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
-    VARIABLE: { weight: 50, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.variable, detailsTemplate: 'variable' },
-    KEYWORD: { weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
-    POPULAR_JOIN: { weight: -1, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' }
+    ALL: { id: 'all', color: HueColors.BLUE, label: AutocompleterGlobals.i18n.category.all },
+    POPULAR: { id: 'popular', color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular },
+    POPULAR_AGGREGATE: { id: 'popularAggregate', weight: 1500, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'agg-udf' },
+    POPULAR_GROUP_BY: { id: 'popularGroupBy', weight: 1400, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'group-by' },
+    POPULAR_ORDER_BY: { id: 'popularOrderBy', weight: 1300, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'order-by' },
+    POPULAR_FILTER: { id: 'popularFilter', weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'filter' },
+    POPULAR_ACTIVE_JOIN: { id: 'popularActiveJoin', weight: 1200, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' },
+    POPULAR_JOIN_CONDITION: { id: 'popularJoinCondition', weight: 1100, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join-condition' },
+    COLUMN: { id: 'column', weight: 1000, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
+    SAMPLE: { id: 'sample',weight: 900, color: COLORS.SAMPLE, label: AutocompleterGlobals.i18n.category.sample, detailsTemplate: 'value' },
+    IDENTIFIER: { id: 'identifier', weight: 800, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.identifier, detailsTemplate: 'identifier' },
+    CTE: { id: 'cte', weight: 700, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.cte, detailsTemplate: 'cte' },
+    TABLE: { id: 'table', weight: 600, color: COLORS.TABLE, label: AutocompleterGlobals.i18n.category.table, detailsTemplate: 'table' },
+    DATABASE: { id: 'database', weight: 500, color: COLORS.DATABASE, label: AutocompleterGlobals.i18n.category.database, detailsTemplate: 'database' },
+    UDF: { id: 'udf', weight: 400, color: COLORS.UDF, label: AutocompleterGlobals.i18n.category.udf, detailsTemplate: 'udf' },
+    HDFS: { id: 'hdfs', weight: 300, color: COLORS.HDFS, label: AutocompleterGlobals.i18n.category.hdfs, detailsTemplate: 'hdfs' },
+    VIRTUAL_COLUMN: { id: 'virtualColumn', weight: 200, color: COLORS.COLUMN, label: AutocompleterGlobals.i18n.category.column, detailsTemplate: 'column' },
+    COLREF_KEYWORD: { id: 'colrefKeyword', weight: 100, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
+    VARIABLE: { id: 'variable', weight: 50, color: COLORS.IDENT_CTE_VAR, label: AutocompleterGlobals.i18n.category.variable, detailsTemplate: 'variable' },
+    KEYWORD: { id: 'keyword', weight: 0, color: COLORS.KEYWORD, label: AutocompleterGlobals.i18n.category.keyword, detailsTemplate: 'keyword' },
+    POPULAR_JOIN: { id: 'popularJoin', weight: -1, color: COLORS.POPULAR, label: AutocompleterGlobals.i18n.category.popular, detailsTemplate: 'join' }
   };
+
+  var POPULAR_CATEGORIES = [CATEGORIES.POPULAR_AGGREGATE, CATEGORIES.POPULAR_GROUP_BY, CATEGORIES.POPULAR_ORDER_BY, CATEGORIES.POPULAR_FILTER, CATEGORIES.POPULAR_ACTIVE_JOIN, CATEGORIES.POPULAR_JOIN_CONDITION, CATEGORIES.POPULAR_JOIN];
 
   var hiveReservedKeywords = {
     ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CASE: true, CAST: true,
@@ -219,11 +221,20 @@ var SqlAutocompleter3 = (function () {
       updateCategories(result);
 
       var activeCategory = self.activeCategory();
-      if (activeCategory !== CATEGORIES.ALL) {
-        result = result.filter(function (suggestion) {
-          return activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular());
-        });
-      }
+
+      var categoriesCount = {};
+
+      result = result.filter(function (suggestion) {
+        if (typeof categoriesCount[suggestion.category.id] === 'undefined') {
+          categoriesCount[suggestion.category.id] = 0;
+        } else {
+          categoriesCount[suggestion.category.id]++;
+        }
+        if (activeCategory !== CATEGORIES.POPULAR && categoriesCount[suggestion.category.id] >= 10 && POPULAR_CATEGORIES.indexOf(suggestion.category) !== -1) {
+          return false;
+        }
+        return activeCategory === CATEGORIES.ALL || activeCategory === suggestion.category || (activeCategory === CATEGORIES.POPULAR && suggestion.popular());
+      });
 
       result.sort(function (a, b) {
         if (self.filter()) {
