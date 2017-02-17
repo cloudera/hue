@@ -363,6 +363,8 @@ class HS2Api(Api):
       if hasattr(e, 'message') and e.message:
         if 'generic failure: Unable to find a callback: 32775' in e.message:
           message = e.message + " " + _("Increase the sasl_max_buffer value in hue.ini")
+        elif 'query result cache exceeded its limit' in e.message:
+          message = e.message.replace("Restarting the fetch is not possible.", _("Please execute the query again."))
         else:
           message = e.message
       else:
