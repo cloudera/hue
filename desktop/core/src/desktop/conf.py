@@ -430,7 +430,7 @@ VCS = UnspecifiedConfigSection(
       REMOTE_URL = Config(
         key="remote_url",
         help=_("Base URL to Interface Remote Server"),
-        default='https://github.com/cloudera/hue/',
+        default='https://github.com/cloudera/hue/tree/master',
         type=coerce_string,
       ),
       API_URL = Config(

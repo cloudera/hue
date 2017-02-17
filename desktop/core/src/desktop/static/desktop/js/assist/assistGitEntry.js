@@ -40,6 +40,8 @@ var AssistGitEntry = (function () {
     }
     self.path += self.definition.name;
 
+    self.fileContent = ko.observable('');
+
     self.entries = ko.observableArray([]);
 
     self.loaded = false;
@@ -61,7 +63,27 @@ var AssistGitEntry = (function () {
 
   AssistGitEntry.prototype.dblClick = function () {
     var self = this;
-    huePubSub.publish('assist.dblClickGitItem', self);
+    if (self.definition.type !== 'file') {
+      return;
+    }
+    self.hasErrors(false);
+
+    var successCallback = function(data) {
+      self.fileContent(data.content);
+      huePubSub.publish('assist.dblClickGitItem', self);
+    };
+
+    var errorCallback = function () {
+      self.hasErrors(true);
+      self.loading(false);
+    };
+
+    self.apiHelper.fetchGitContents({
+      pathParts: self.getHierarchy(),
+      fileType: self.definition.type,
+      successCallback: successCallback,
+      errorCallback: errorCallback
+    })
   };
 
   AssistGitEntry.prototype.loadEntries = function(callback) {
@@ -98,8 +120,9 @@ var AssistGitEntry = (function () {
       }
     };
 
-    self.apiHelper.fetchGitPath({
+    self.apiHelper.fetchGitContents({
       pathParts: self.getHierarchy(),
+      fileType: self.definition.type,
       successCallback: successCallback,
       errorCallback: errorCallback
     })
@@ -146,7 +169,7 @@ var AssistGitEntry = (function () {
 
   AssistGitEntry.prototype.toggleOpen = function () {
     var self = this;
-    if (self.definition.type != 'dir') {
+    if (self.definition.type !== 'dir') {
       return;
     }
     self.open(!self.open());
