@@ -591,7 +591,7 @@
 
 
 <script type="text/html" id="common-action-credentials">
-  <!-- ko if: $parent.widgetType() != 'impala-widget' -->
+  <!-- ko if: $parent.widgetType() != 'impala-widget' && $parent.widgetType() != 'impala-document-widget' -->
     <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
     <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
       <li>
@@ -604,7 +604,7 @@
     </em>
   <!-- /ko -->
 
-  <!-- ko if: $parent.widgetType() == 'impala-widget' -->
+  <!-- ko if: $parent.widgetType() == 'impala-widget' || $parent.widgetType() == 'impala-document-widget' -->
     <input type="text" class="filechooser-input seventy" data-bind="filechooser: properties.key_tab_path, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.key_tab_path, attr: { placeholder:  $root.workflow_properties.key_tab_path.help_text }"/>
     <input type="text" data-bind="value: properties.user_principal, attr: { placeholder: $root.workflow_properties.user_principal.help_text }" />
   <!-- /ko -->
@@ -1145,12 +1145,21 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <!-- ko if: $root.workflow_properties.jdbc_url -->
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.password -->
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.impalad_host -->
+          <span data-bind="text: $root.workflow_properties.impalad_host.label"></span>
+          <input type="text" data-bind="value: properties.impalad_host, attr: { placeholder: $root.workflow_properties.impalad_host.help_text }" />
+          <br/>
+          <!-- /ko -->
           <span data-bind="template: { name: 'common-action-properties' }"></span>
           <br/>
           <br/>
@@ -1172,6 +1181,11 @@
   </div>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="impala-document-widget">
+  <span data-bind="template: { name: 'hive-document-widget' }"></span>
 </script>
 
 

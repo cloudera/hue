@@ -202,9 +202,19 @@ class Submission(object):
           self.job.override_subworkflow_id(action, workflow.id) # For displaying the correct graph
           self.properties['workspace_%s' % workflow.uuid] = workspace # For pointing to the correct workspace
 
-        elif action.data['type'] == 'impala':
+        elif action.data['type'] == 'impala' or action.data['type'] == 'impala-document':
           from oozie.models2 import _get_impala_url
           from impala.impala_flags import get_ssl_server_certificate
+
+          if action.data['type'] == 'impala-document':
+            from notebook.models import Notebook
+            if action.data['properties'].get('uuid'):
+              notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
+              statements = notebook.get_str()
+              script_name = action.data['name'] + '.sql'
+              self._create_file(deployment_dir, script_name, statements)
+          else:
+            script_name = os.path.basename(action.data['properties'].get('script_path'))
 
           if self.api.security_enabled:
             kinit = 'kinit -k -t *.keytab %(user_principal)s' % {
@@ -224,11 +234,11 @@ impala-shell %(kerberos_option)s %(ssl_option)s -i %(impalad_host)s -f %(query_f
   'impalad_host': action.data['properties'].get('impalad_host') or _get_impala_url(),
   'kerberos_option': '' if self.api.security_enabled else '-k',
   'ssl_option': '--ssl' if get_ssl_server_certificate() else '',
-  'query_file': action.data['properties'].get('script_path'),
+  'query_file': script_name,
   'kinit': kinit
   }
 
-          self._create_file(deployment_dir, 'impala.sh', shell_script)
+          self._create_file(deployment_dir, action.data['name'] + '.sh', shell_script)
 
         elif action.data['type'] == 'hive-document':
           from notebook.models import Notebook

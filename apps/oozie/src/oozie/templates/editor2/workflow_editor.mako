@@ -151,9 +151,18 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
-         title="${_('Saved Hive query')}" rel="tooltip" data-placement="top">
+         title="${_('Hive query')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
+
+    % if ENABLE_IMPALA_ACTION.get():
+      <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableImpalaDocumentAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaDocumentAction());}}}"
+         title="${_('Impala query')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon"></a>
+      </div>
+    % endif
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
@@ -386,7 +395,7 @@ ${ workflow.render() }
           <!-- ko if: type() == 'workflow' -->
           <select data-bind="options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: value"></select>
           <!-- /ko -->
-          <!-- ko if: ['hive', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
+          <!-- ko if: ['hive', 'impala', 'java', 'spark', 'pig', 'sqoop', 'distcp-doc', 'shell-doc', 'mapreduce-doc'].indexOf(type()) != -1 -->
             <div class="selectize-wrapper" style="width: 300px;">
               <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { value: value, document: $root.tempDocument, type: type }"></select>
             </div>

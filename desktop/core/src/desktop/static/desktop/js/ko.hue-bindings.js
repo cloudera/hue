@@ -4995,7 +4995,7 @@
         'pig': 'query-pig',
         'sqoop': 'query-sqoop1',
         'distcp-doc': 'query-distcp',
-        'mapreduce-doc': 'query-mapreduce'
+        'mapreduce-doc': 'query-mapreduce',
       }
       var type = 'query-hive';
       if (options.type) {

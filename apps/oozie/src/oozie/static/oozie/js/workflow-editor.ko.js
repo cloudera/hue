@@ -174,7 +174,7 @@ var Node = function (node, vm) {
     });
   }
 
-  if ((type == 'hive-document-widget' || type == 'spark-document-widget') && typeof self.properties.uuid != "undefined") {
+  if ((type == 'hive-document-widget' || type == 'impala-document-widget' || type == 'spark-document-widget') && typeof self.properties.uuid != "undefined") {
     self.properties.uuid.subscribe(function () {
       self.actionParametersFetched(false);
       self.fetch_parameters();
@@ -1271,6 +1271,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.draggableSparkAction = ko.observable(bareWidgetBuilder("Spark", "spark-widget"));
   self.draggableGenericAction = ko.observable(bareWidgetBuilder("Generic", "generic-widget"));
   self.draggableHiveDocumentAction = ko.observable(bareWidgetBuilder("Hive", "hive-document-widget"));
+  self.draggableImpalaDocumentAction = ko.observable(bareWidgetBuilder("Impala", "impala-document-widget"));
   self.draggableJavaDocumentAction = ko.observable(bareWidgetBuilder("Java", "java-document-widget"));
   self.draggableSparkDocumentAction = ko.observable(bareWidgetBuilder("Spark", "spark-document-widget"));
   self.draggablePigDocumentAction = ko.observable(bareWidgetBuilder("Pig", "pig-document-widget"));
