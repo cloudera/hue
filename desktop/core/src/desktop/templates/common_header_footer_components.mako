@@ -19,6 +19,7 @@ from django.template.defaultfilters import escape, escapejs
 
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
+
 from metadata.conf import has_optimizer, OPTIMIZER
 %>
 

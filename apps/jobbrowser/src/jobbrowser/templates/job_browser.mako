@@ -77,10 +77,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-            <li data-bind="css: {'active': interface() === 'apps'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Apps') }</a></li>
+            <li data-bind="css: {'active': interface() === 'dashboard'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Dashboard') }</a></li>
+            <li data-bind="css: {'active': interface() === 'apps'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" style="display:none;">0</div></a></li>
             <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ interface('workflows') }">${ _('Workflows') }</a></li>
             <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ interface('schedules') }">${ _('Schedules') }</a></li>
             <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ interface('bundles') }">${ _('Bundles') }</a></li>
+            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ interface('apps') }">${ _('SLAs') }</a></li>
             </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right alert alert-warning" style="margin-top: 4px">${ _("Hive jobs are running as the 'hive' user") }</div>

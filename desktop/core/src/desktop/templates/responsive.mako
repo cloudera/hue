@@ -314,7 +314,6 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
-        <li><a href="javascript: void(0);">SLAs</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
         <li><a href="javascript: void(0);">Custom App 1</a></li>
@@ -1068,6 +1067,38 @@ ${ assist.assistPanel() }
 
       return topNavViewModel;
     })(onePageViewModel);
+
+    % if 'jobbrowser' in apps:
+      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+      var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+      var lastJobBrowserRequest = null;
+
+      function checkJobBrowserStatus(){
+        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+          return;
+        }
+        window.clearTimeout(checkJobBrowserStatusIdx);
+        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
+            "format": "json",
+            "state": "running",
+            "user": "${user.username}"
+          },
+          function(data) {
+            if (data != null && data.jobs != null) {
+              huePubSub.publish('jobbrowser.data', data.jobs);
+              if (data.jobs.length > 0){
+                $("#jobBrowserCount").show().text(data.jobs.length);
+              } else {
+                $("#jobBrowserCount").hide();
+              }
+            }
+          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+        }).fail(function () {
+          window.clearTimeout(checkJobBrowserStatusIdx);
+        });
+      }
+      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
+    % endif
 
     window.hueDebug = {
       viewModel: function (element) {

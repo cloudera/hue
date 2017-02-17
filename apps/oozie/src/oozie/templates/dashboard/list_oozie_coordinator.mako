@@ -137,7 +137,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 </div>
                 % endif
               </li>
-              <li class="nav-header">${ _('Edit') }</li>
+              <li class="nav-header">${ _('Synchronize') }</li>
               <li class="white">
                 <div class="btn-group" style="margin-left: 0; margin-bottom: 5px">
                   % if has_job_edition_permission(oozie_coordinator, user):
