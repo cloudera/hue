@@ -653,16 +653,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <div class="assist-db-header-actions">
       <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
-      <!-- ko if: $parent.activeSort && isSearchVisible() -->
-      <a class="inactive-action" data-toggle="dropdown" href="javascript:void(0)"><i class="pointer fa fa-sort" title="${_('Sort')}"></i></a>
-      <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
-        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }</a></li>
-        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }</a></li>
-        <!-- ko if: HAS_OPTIMIZER -->
-        <li><a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }"><i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }</a></li>
-        <!-- /ko -->
-      </ul>
-      <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       % if ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
@@ -734,6 +724,32 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
         <label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
+        <!-- ko if: $parent.activeSort -->
+        <span class="margin-left-10">
+          <a data-toggle="dropdown" href="javascript:void(0)">
+            <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
+          </a>
+          <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
+            <li>
+              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
+                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
+              </a>
+            </li>
+            <li>
+              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
+                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
+              </a>
+            </li>
+            <!-- ko if: HAS_OPTIMIZER -->
+            <li>
+              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
+                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
+              </a>
+            </li>
+            <!-- /ko -->
+          </ul>
+        </span>
+        <!-- /ko -->
       </div>
       <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
