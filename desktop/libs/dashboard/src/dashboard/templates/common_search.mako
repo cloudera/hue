@@ -1080,7 +1080,7 @@ ${ dashboard.layout_skeleton() }
       </div>
     <!-- /ko -->
 
-    <div id="result-main" style="overflow-x: auto">
+    <div class="result-main" style="overflow-x: auto">
       <div data-bind="visible: $root.hasRetrievedResults() && $root.results().length == 0">
         <br/>
         ${ _('Your search did not match any documents.') }
@@ -1091,7 +1091,7 @@ ${ dashboard.layout_skeleton() }
       <!-- /ko -->
 
 
-      <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
+      <table class="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
         <thead>
           <tr>
             <th>&nbsp;</th>
@@ -1163,7 +1163,7 @@ ${ dashboard.layout_skeleton() }
       </table>
 
       <!-- ko if: doc.childDocuments != undefined -->
-        <table id="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
+        <table class="result-container" data-bind="visible: $root.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
           <thead>
             <tr data-bind="visible: $root.collection.template.fieldsSelected().length > 0, template: {name: 'result-sorting', data: $root.collection}">
             </tr>
@@ -1533,7 +1533,7 @@ ${ dashboard.layout_skeleton() }
           </a>
           <strong>${_('Field Name')}</strong>
         </div>
-        <div class="fields-list" data-bind="foreach: template.filteredAttributeFields">
+        <div class="fields-list" data-bind="foreach: { data: template.filteredAttributeFields, afterRender: resizeFieldsListThrottled }">
           <div style="margin-bottom: 3px; white-space: nowrap; position:relative">
             <input type="checkbox" data-bind="checkedValue: name, checked: $parent.template.fieldsSelected" style="margin: 0" />
             <div data-bind="text: name, css:{'field-selector': true, 'hoverable': $parent.template.fieldsSelected.indexOf(name()) > -1}, click: highlightColumn" style="margin-right:10px"></div>
@@ -1565,10 +1565,10 @@ ${ dashboard.layout_skeleton() }
           <div data-bind="template: {name: 'resultset-pagination', data: $parent.response()}" style="padding:8px; color:#666"></div>
         <!-- /ko -->
 
-        <div id="result-main" style="overflow-x: auto">
-          <table id="result-container" data-bind="visible: $parent.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
+        <div class="result-main" style="overflow-x: auto">
+          <table class="result-container" data-bind="visible: $parent.hasRetrievedResults()" style="margin-top: 0; width: 100%; border-collapse: initial">
             <thead>
-              <tr class="result-sorting" data-bind="visible: template.fieldsSelected().length > 0, template: {name: 'result-sorting'}">
+              <tr class="result-sorting" data-bind="visible: template.fieldsSelected().length > 0, template: {name: 'result-sorting', afterRender: throttledHeaderScroll}">
               </tr>
               <tr data-bind="visible: template.fieldsSelected().length == 0">
                 <th style="width: 18px">&nbsp;</th>
@@ -3381,36 +3381,50 @@ function multiSerieDataTransformerGrid(rawDatum) {
 }
 
 
+function resizeFieldsListCallback() {
+  $('.fields-list').each(function(){
+    $fieldsList = $(this);
+    var $resultContainer = $fieldsList.parents('.card-widget').find('.result-container');
+    $fieldsList.css("max-height", Math.max($resultContainer.height(), 230));
+    window.setTimeout(function () {
+      var _fillHeight = $resultContainer.height() - 40;
+      if ($fieldsList.height() < _fillHeight) {
+        $fieldsList.height(_fillHeight);
+        $fieldsList.css("max-height", _fillHeight);
+      }
+    }, 100);
+
+    var positionInfo = function () {
+      var leftPos = 184;
+      if ($fieldsList.get(0).scrollHeight > $fieldsList.height()) {
+        leftPos -= hueUtils.scrollbarWidth();
+      }
+      $fieldsList.find('i').css('left', (leftPos + $fieldsList.scrollLeft()) + 'px');
+    }
+
+    var checkHeight = function () {
+      if ($fieldsList.height() > 0) {
+        positionInfo();
+      } else {
+        window.setTimeout(checkHeight, 100);
+      }
+    }
+
+    checkHeight();
+
+    $fieldsList.off('scroll');
+    $fieldsList.on('scroll', positionInfo);
+  });
+}
+
+var resizeTimeout = -1;
+function resizeFieldsListThrottled() {
+  window.clearTimeout(resizeTimeout);
+  resizeTimeout = window.setTimeout(resizeFieldsListCallback, 200);
+}
+
 function resizeFieldsList() {
-  $(".fields-list").css("max-height", Math.max($("#result-container").height(), 230));
-  window.setTimeout(function () {
-    var _fillHeight = $("#result-container").height() - 40;
-    if ($(".fields-list").height() < _fillHeight) {
-      $(".fields-list").height(_fillHeight);
-      $(".fields-list").css("max-height", _fillHeight);
-    }
-  }, 100);
-
-  var positionInfo = function () {
-    var leftPos = 184;
-    if ($('.fields-list').get(0).scrollHeight > $('.fields-list').height()) {
-      leftPos -= hueUtils.scrollbarWidth();
-    }
-    $('.fields-list i').css('left', (leftPos + $('.fields-list').scrollLeft()) + 'px');
-  }
-
-  var checkHeight = function () {
-    if ($('.fields-list').height() > 0) {
-      positionInfo();
-    } else {
-      window.setTimeout(checkHeight, 100);
-    }
-  }
-
-  checkHeight();
-
-  $('.fields-list').off('scroll');
-  $('.fields-list').on('scroll', positionInfo);
+  resizeFieldsListCallback();
 }
 
 function toggleDocDetails(doc) {
@@ -3420,7 +3434,7 @@ function toggleDocDetails(doc) {
     viewModel.getDocument(doc, resizeFieldsList);
   }
   else {
-    window.setTimeout(resizeFieldsList, 0);
+    resizeFieldsListThrottled();
   }
 }
 
@@ -3674,9 +3688,12 @@ function newSearch() {
     loadQueryDefinition(_query.qd);
   }
 
-  function throttledHeaderPadding() {
-    $('#result-main').find("thead>tr th").each(function () {
-      var leftPosition = $(this).position().left - $('#result-main').position().left;
+});
+
+  function throttledHeaderPadding(e) {
+    $resultMain = $(e.target);
+    $resultMain.find("thead>tr th").each(function () {
+      var leftPosition = $(this).position().left - $resultMain.position().left;
       if (leftPosition + $(this).outerWidth() > 0 && leftPosition < 0) {
         if ($(this).find('span').width() + -leftPosition < $(this).outerWidth() - 20) { // 20 is the sorting css width
           $(this).find('span').css('paddingLeft', -leftPosition);
@@ -3688,14 +3705,20 @@ function newSearch() {
     });
   }
 
-  var scrollTimeout = -1;
-  $('#result-main').off('scroll');
-  $('#result-main').on('scroll', function () {
-    window.clearTimeout(scrollTimeout);
-    scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
-  });
-
-});
+  var throttledScrollTimeout = -1;
+  function throttledHeaderScroll() {
+    window.clearTimeout(throttledScrollTimeout);
+    throttledScrollTimeout = window.setTimeout(function(){
+      var scrollTimeout = -1;
+      $('.result-main').off('scroll');
+      $('.result-main').on('scroll', function (e) {
+        window.clearTimeout(scrollTimeout);
+        scrollTimeout = window.setTimeout(function(){
+          throttledHeaderPadding(e);
+        }, 200);
+      });
+    }, 200);
+  }
 
 
   function toggleGridFieldsSelection(widget) {
@@ -3808,14 +3831,18 @@ function newSearch() {
   }
 
   $(document).on("setResultsHeight", function () {
-    $("#result-main").height($("#result-container").outerHeight() + 100);
+    $('.result-main').each(function(){
+      $resultMain = $(this);
+      $resultMain.height($resultMain.parents('.card-widget').find('.result-container').outerHeight() + 30);
+    });
     resizeFieldsList();
   });
 
-  function highlightColumn(column) {
+  function highlightColumn(column, e) {
+    var $resultContainer = $(e.target).parents('.card-widget').find('.result-container');
     var _colName = $.trim(column.name());
     if (viewModel.collection.template.fieldsSelected.indexOf(_colName) > -1) {
-      var _t = $("#result-container");
+      var _t = $resultContainer;
       var _col = _t.find("th").filter(function () {
         return $.trim($(this).text()) == _colName;
       });
