@@ -850,13 +850,19 @@ class Node():
       self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['files']]
       self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
-    elif self.data['type'] == ImpalaAction.TYPE:
-      self.data['properties']['shell_command'] = 'impala.sh'
+    elif self.data['type'] == ImpalaAction.TYPE or self.data['type'] == ImpalaDocumentAction.TYPE:
+      shell_command_name = self.data['name'] + '.sh'
+      self.data['properties']['shell_command'] = shell_command_name
       self.data['properties']['env_var'] = []
       self.data['properties']['capture_output'] = False
       self.data['properties']['arguments'] = []
 
-      files = [{'value': 'impala.sh'}]
+      if self.data['type'] == ImpalaAction.TYPE:
+        script_path = self.data['properties'].get('script_path')
+      else:
+        script_path = self.data['name'] + '.sql'
+
+      files = [{'value': shell_command_name}, {'value': script_path}]
       if self.data['properties']['key_tab_path']:
         files.append({'value': self.data['properties']['key_tab_path']})
 
@@ -1257,16 +1263,6 @@ def _get_hiveserver2_url():
     return 'jdbc:hive2://localhost:10000/default'
 
 
-def _get_impala_url():
-  try:
-    from impala.dbms import get_query_server_config
-    return get_query_server_config()['server_host']
-  except Exception, e:
-    # Might fail is Impala is disabled
-    LOG.exception('Could not get Impalad URL: %s' % smart_str(e))
-    return 'localhost'
-
-
 class HiveServer2Action(Action):
   TYPE = 'hive2'
   DEFAULT_CREDENTIALS = 'hive2'
@@ -1364,9 +1360,20 @@ class HiveServer2Action(Action):
     return [cls.FIELDS['script_path']]
 
 
+def _get_impala_url():
+  try:
+    from impala.dbms import get_query_server_config
+    return get_query_server_config()['server_host']
+  except Exception, e:
+    # Might fail is Impala is disabled
+    LOG.exception('Could not get Impalad URL: %s' % smart_str(e))
+    return 'localhost'
+
+
 class ImpalaAction(HiveServer2Action):
+  # Executed as shell action until Oozie supports an Impala Action
   TYPE = 'impala'
-  DEFAULT_CREDENTIALS = 'impala' # None at this time
+  DEFAULT_CREDENTIALS = 'impala' # None at this time, need to upload user keytab
 
   FIELDS = HiveServer2Action.FIELDS.copy()
   del FIELDS['jdbc_url']
@@ -2154,7 +2161,7 @@ class HiveDocumentAction(Action):
           'name': 'parameters',
           'label': _('Parameters'),
           'value': [],
-          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'help_text': _('The parameters of the script. E.g. N=5, INPUT=${inputDir}'),
           'type': ''
      },
      # Common
@@ -2227,6 +2234,43 @@ class HiveDocumentAction(Action):
   @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['uuid']]
+
+
+class ImpalaDocumentAction(HiveDocumentAction):
+  TYPE = 'impala-document'
+  DEFAULT_CREDENTIALS = 'impala' # None at this time, need to upload user keytab
+
+  FIELDS = HiveServer2Action.FIELDS.copy()
+  del FIELDS['jdbc_url']
+  del FIELDS['password']
+  FIELDS['impalad_host'] = {
+      'name': 'impalad_host',
+      'label': _('Impalad hostname'),
+      'value': "",
+      'help_text': _('e.g. impalad-001.cluster.com. The hostname of the Impalad to send the query to.'),
+      'type': ''
+  }
+  FIELDS['key_tab_path'] = {
+      'name': 'key_tab_path',
+      'label': _('Keytab path'),
+      'value': '',
+      'help_text': _('Path to the keytab to use when on a secure cluster, e.g. /user/joe/joe.keytab.'),
+      'type': ''
+  }
+  FIELDS['user_principal'] = {
+      'name': 'user_principal',
+      'label': _('User principal'),
+      'value': 'joe@PROD.EDH',
+      'help_text': _('Name of the principal to use in the kinit, e.g.: kinit -k -t /home/joe/joe.keytab joe@PROD.EDH.'),
+      'type': ''
+  }
+  FIELDS['uuid'] = {
+      'name': 'uuid',
+      'label': _('Hive query'),
+      'value': '',
+      'help_text': _('Select a saved Hive query you want to schedule.'),
+      'type': 'impala'
+  }
 
 
 class JavaDocumentAction(Action):
@@ -2785,6 +2829,7 @@ NODES = {
   'spark-widget': SparkAction,
   'generic-widget': GenericAction,
   'hive-document-widget': HiveDocumentAction,
+  'impala-document-widget': ImpalaDocumentAction,
   'java-document-widget': JavaDocumentAction,
   'spark-document-widget': SparkDocumentAction,
   'pig-document-widget': PigDocumentAction,
@@ -3613,6 +3658,8 @@ class WorkflowBuilder():
         node = self.get_java_document_node(document)
       elif document.type == 'query-hive':
         node = self.get_hive_document_node(document, user)
+      elif document.type == 'query-impala':
+        node = self.get_impala_document_node(document, user)
       elif document.type == 'query-spark2':
         node = self.get_spark_document_node(document, user)
       elif document.type == 'query-pig':
@@ -3647,6 +3694,8 @@ class WorkflowBuilder():
         node = self.get_java_snippet_node(snippet)
       elif snippet['type'] == 'query-hive':
         node = self.get_hive_snippet_node(snippet, user)
+      elif snippet['type'] == 'query-impala':
+        node = self.get_impala_snippet_node(snippet, user)
       elif snippet['type'] == 'shell':
         node = self.get_shell_snippet_node(snippet)
       else:
@@ -3715,6 +3764,63 @@ class WorkflowBuilder():
 
   def get_hive_document_node(self, document, user):
     node = self._get_hive_node(document.uuid, user, is_document_node=True)
+
+    notebook = Notebook(document=document)
+    node['properties']['parameters'] = [{'value': '%(name)s=%(value)s' % v} for v in notebook.get_data()['snippets'][0]['variables']]
+    node['properties']['uuid'] = document.uuid
+
+    return node
+
+  def _get_impala_node(self, node_id, user, is_document_node=False):
+    credentials = []
+
+    return {
+        u'id': node_id,
+        u'name': u'impala-%s' % node_id[:4],
+        u"type": u"impala-document-widget",
+        u'properties': {
+            u'files': [],
+            u'job_xml': u'',
+            u'retry_interval': [],
+            u'retry_max': [],
+            u'job_properties': [],
+            u'arguments': [],
+            u'parameters': [],
+            u'sla': [
+                {u'key': u'enabled', u'value': False},
+                {u'key': u'nominal-time', u'value': u'${nominal_time}'},
+                {u'key': u'should-start', u'value': u''},
+                {u'key': u'should-end', u'value': u'${30 * MINUTES}'},
+                {u'key': u'max-duration', u'value': u''},
+                {u'key': u'alert-events', u'value': u''},
+                {u'key': u'alert-contact', u'value': u''},
+                {u'key': u'notification-msg', u'value': u''},
+                {u'key': u'upstream-apps', u'value': u''},
+            ],
+            u'archives': [],
+            u'prepares': [],
+            u'credentials': credentials,
+            u'impalad_host': u'',
+            u'key_tab_path': u'',
+            u'user_principal': u''
+        },
+        u'children': [
+            {u'to': u'33430f0f-ebfa-c3ec-f237-3e77efa03d0a'},
+            {u'error': u'17c9c895-5a16-7443-bb81-f34b30b21548'}
+        ],
+        u'actionParameters': [],
+    }
+
+  def get_impala_snippet_node(self, snippet, user):
+    node = self._get_impala_node(snippet['id'], user)
+
+    node['properties']['parameters'] = [{'value': '%(name)s=%(value)s' % v} for v in snippet['variables']]
+    node['properties']['statements'] = 'USE %s;\n\n%s' % (snippet['database'], snippet['statement_raw'])
+
+    return node
+
+  def get_impala_document_node(self, document, user):
+    node = self._get_impala_node(document.uuid, user, is_document_node=True)
 
     notebook = Notebook(document=document)
     node['properties']['parameters'] = [{'value': '%(name)s=%(value)s' % v} for v in notebook.get_data()['snippets'][0]['variables']]
