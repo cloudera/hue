@@ -939,7 +939,7 @@ class Node():
     node_type = self.data['type']
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
-    elif self.data['type'] == ImpalaAction.TYPE:
+    elif self.data['type'] == ImpalaAction.TYPE or self.data['type'] == ImpalaDocumentAction.TYPE:
       node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
@@ -2455,7 +2455,7 @@ class PigDocumentAction(Action):
   FIELDS = {
     'uuid': {
         'name': 'uuid',
-        'label': _('Spark program'),
+        'label': _('Pig script'),
         'value': '',
         'help_text': _('Select a saved Spark program you want to schedule.'),
         'type': 'pig'
@@ -2522,7 +2522,7 @@ class SqoopDocumentAction(Action):
   FIELDS = {
     'uuid': {
         'name': 'uuid',
-        'label': _('Sqoop program'),
+        'label': _('Sqoop command'),
         'value': '',
         'help_text': _('Select a saved Sqoop program you want to schedule.'),
         'type': 'sqoop'

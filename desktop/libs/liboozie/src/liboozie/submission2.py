@@ -232,7 +232,7 @@ export PYTHON_EGG_CACHE=./myeggs
 
 impala-shell %(kerberos_option)s %(ssl_option)s -i %(impalad_host)s -f %(query_file)s""" % {
   'impalad_host': action.data['properties'].get('impalad_host') or _get_impala_url(),
-  'kerberos_option': '' if self.api.security_enabled else '-k',
+  'kerberos_option': '-k' if self.api.security_enabled else '',
   'ssl_option': '--ssl' if get_ssl_server_certificate() else '',
   'query_file': script_name,
   'kinit': kinit
