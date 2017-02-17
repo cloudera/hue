@@ -392,7 +392,7 @@ var EditorViewModel = (function() {
       lastFetchQueriesRequest = self.getApiHelper().searchDocuments({
         successCallback: function (result) {
           self.queriesTotalPages(Math.ceil(result.count / QUERIES_PER_PAGE));
-          self.queries(result.documents);
+          self.queries(ko.mapping.fromJS(result.documents)());
           self.loadingQueries(false);
           self.queriesHasErrors(false);
         },
@@ -1917,14 +1917,18 @@ var EditorViewModel = (function() {
           self.isHistory(false);
           $(document).trigger("info", data.message);
           if (vm.editorMode()) {
-            if (! data.save_as && self.snippets()[0].queries().length != 0) {
-              self.snippets()[0].queries.unshift({
-                'uuid': data.uuid,
-                'name': data.name,
-                'description': data.description,
-                'owner': data.owner,
-                'last_modified': data.last_modified
+            if (data.save_as) {
+              var existingQuery = self.snippets()[0].queries().filter(function (item) {
+                return item.uuid() === data.uuid
               });
+              if (existingQuery.length > 0) {
+                existingQuery[0].name(data.name);
+                existingQuery[0].description(data.description);
+                existingQuery[0].last_modified(data.last_modified);
+              }
+            }
+            else {
+              self.snippets()[0].queries.unshift(ko.mapping.fromJS(data));
             }
 
             if (self.coordinatorUuid()) {
