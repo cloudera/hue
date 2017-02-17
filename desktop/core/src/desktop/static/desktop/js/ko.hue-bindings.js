@@ -3741,6 +3741,12 @@
         }
       });
 
+      huePubSub.subscribe("assist.dblClickGitItem", function(assistGitEntry) {
+        if ($el.data("last-active-editor")) {
+          editor.session.setValue(assistGitEntry.fileContent());
+        }
+      });
+
       huePubSub.subscribe("assist.dblClickS3Item", function(assistS3Entry) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), "'S3A://" + assistS3Entry.path + "'");

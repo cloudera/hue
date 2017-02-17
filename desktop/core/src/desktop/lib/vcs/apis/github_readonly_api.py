@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+
+import binascii
 import logging
 import re
 import urllib
@@ -58,14 +60,24 @@ class GithubReadOnlyApi(Api):
     https://developer.github.com/v3/repos/contents/#get-contents
     """
     response = {'status': -1}
+    response['fileType'] = filetype = request.GET.get('fileType', 'dir')
     filepath = request.GET.get('path', '/')
     filepath = self._clean_path(filepath)
 
     if self._remote_url:
       owner, repo, branch = self.parse_github_url(self._remote_url)
-      content = self._get_contents(owner, repo, filepath)
-      response['files'] = _massage_content(content)
-      response['status'] = 0
+      blob = self._get_contents(owner, repo, filepath)
+      if filetype == 'dir':
+        response['files'] = _massage_content(blob)
+        response['status'] = 0
+      elif filetype == 'file':
+        try:
+          response['content'] = blob['content'].decode('base64')
+          response['status'] = 0
+        except binascii.Error, e:
+          raise GithubClientException('Failed to decode file contents, check if file content is properly base64-encoded: %s' % e)
+        except KeyError, e:
+          raise GithubClientException('Failed to find expected content object in blob object: %s' % e)
     else:
       return HttpResponseBadRequest(_('url param is required'))
     return JsonResponse(response)
@@ -105,9 +117,9 @@ class GithubReadOnlyApi(Api):
       raise GithubClientException('Could not find GitHub object, check owner, repo or path: %s' % e)
 
 
-def _massage_content(content):
+def _massage_content(blob):
   response = []
-  for file in content:
+  for file in blob:
     file['stats'] = {
       'size': file.get('size', 0),
       'path': file.get('path', '')

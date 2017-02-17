@@ -393,10 +393,11 @@ var ApiHelper = (function () {
    * @param {Number} [options.timeout]
    *
    * @param {string[]} options.pathParts
+   * @param {string} options.fileType
    */
-  ApiHelper.prototype.fetchGitPath = function (options) {
+  ApiHelper.prototype.fetchGitContents = function (options) {
     var self = this;
-    var url = GIT_API_PREFIX + '?path=' + options.pathParts.join("/");
+    var url = GIT_API_PREFIX + '?path=' + options.pathParts.join("/") + '&fileType=' + options.fileType;
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
@@ -407,11 +408,15 @@ var ApiHelper = (function () {
         url: url,
         timeout: options.timeout,
         success: function (data) {
-          if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
-            if (data.files.length > 2) {
-              storeInCache(data);
+          if (!data.error && !self.successResponseIsError(data)) {
+            if (data.fileType === 'dir' && typeof data.files !== 'undefined' && data.files !== null) {
+              if (data.files.length > 2) {
+                storeInCache(data);
+              }
+              options.successCallback(data);
+            } else if (data.fileType === 'file' && typeof data.content !== 'undefined' && data.content !== null) {
+              options.successCallback(data);
             }
-            options.successCallback(data);
           } else {
             self.assistErrorCallback(options)(data);
           }
