@@ -832,11 +832,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               </tr>
             </thead>
             <tbody data-bind="foreach: queries">
-            <tr data-bind="click: function() { if (uuid != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid, 'savedQueries'); } }, css: { 'highlight': uuid == $root.selectedNotebook().uuid(), 'pointer': uuid != $root.selectedNotebook().uuid() }">
-              <td style="width: 16%"><span data-bind="ellipsis: {data: name, length: 50}"></span></td>
+            <tr data-bind="click: function() { if (uuid() != $root.selectedNotebook().uuid()) { $root.openNotebook(uuid(), 'savedQueries'); } }, css: { 'highlight': uuid() == $root.selectedNotebook().uuid(), 'pointer': uuid() != $root.selectedNotebook().uuid() }">
+              <td style="width: 16%"><span data-bind="ellipsis: {data: name(), length: 50}"></span></td>
               <td style="width: 50%; white-space: normal"><span data-bind="text: description"></span></td>
               <td style="width: 18%"><span data-bind="text: owner"></span></td>
-              <td style="width: 16%"><span data-bind="text: localeFormat(last_modified)"></span></td>
+              <td style="width: 16%"><span data-bind="text: localeFormat(last_modified())"></span></td>
             </tr>
             </tbody>
           </table>
