@@ -16,10 +16,10 @@
 <%!
 from django.utils.translation import ugettext as _
 
-from desktop.views import commonheader, commonfooter, commonshare, _ko
 from desktop import conf
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 
-from oozie.conf import ENABLE_DOCUMENT_ACTION
+from oozie.conf import ENABLE_DOCUMENT_ACTION, ENABLE_IMPALA_ACTION
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -222,6 +222,15 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
+
+    % if ENABLE_IMPALA_ACTION.get():
+    <div data-bind="css: { 'draggable-widget': true },
+                    draggable: {data: draggableImpalaAction(), isEnabled: true,
+                    options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaAction());}}}"
+         title="${_('Impala Script')}" rel="tooltip" data-placement="top">
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon"></a>
+    </div>
+    % endif
 
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,

@@ -757,6 +757,7 @@ class Node():
     if self.data['type'] in ('hive2', 'hive-document') and not self.data['properties']['jdbc_url']:
       self.data['properties']['jdbc_url'] = _get_hiveserver2_url()
 
+
     if self.data['type'] == 'fork':
       links = [link for link in self.data['children'] if link['to'] in node_mapping]
       if len(links) != len(self.data['children']):
@@ -849,6 +850,19 @@ class Node():
       self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['files']]
       self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
+    elif self.data['type'] == ImpalaAction.TYPE:
+      self.data['properties']['shell_command'] = 'impala.sh'
+      self.data['properties']['env_var'] = []
+      self.data['properties']['capture_output'] = False
+      self.data['properties']['arguments'] = []
+
+      files = [{'value': 'impala.sh'}]
+      if self.data['properties']['key_tab_path']:
+        files.append({'value': self.data['properties']['key_tab_path']})
+
+      self.data['properties']['files'] = files
+      self.data['properties']['archives'] = []
+
     data = {
       'node': self.data,
       'mapping': mapping,
@@ -919,6 +933,8 @@ class Node():
     node_type = self.data['type']
     if self.data['type'] == JavaDocumentAction.TYPE:
       node_type = JavaAction.TYPE
+    elif self.data['type'] == ImpalaAction.TYPE:
+      node_type = ShellAction.TYPE
 
     return 'editor2/gen/workflow-%s.xml.mako' % node_type
 
@@ -1237,8 +1253,18 @@ def _get_hiveserver2_url():
     return hiveserver2_jdbc_url()
   except Exception, e:
     # Might fail is Hive is disabled
-    LOG.warn('Could not guess HiveServer2 URL: %s' % smart_str(e))
+    LOG.exception('Could not guess HiveServer2 URL: %s' % smart_str(e))
     return 'jdbc:hive2://localhost:10000/default'
+
+
+def _get_impala_url():
+  try:
+    from impala.dbms import get_query_server_config
+    return get_query_server_config()['server_host']
+  except Exception, e:
+    # Might fail is Impala is disabled
+    LOG.exception('Could not get Impalad URL: %s' % smart_str(e))
+    return 'localhost'
 
 
 class HiveServer2Action(Action):
@@ -1266,7 +1292,6 @@ class HiveServer2Action(Action):
           'help_text': _('Arguments for beeline. E.g. --showHeader=true, -Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks'),
           'type': []
      },
-     # Common
      'jdbc_url': {
           'name': 'jdbc_url',
           'label': _('HiveServer2 URL'),
@@ -1282,6 +1307,7 @@ class HiveServer2Action(Action):
                          'something requiring a password (e.g. LDAP); non-secured Hive Server 2 or Kerberized Hive Server 2 don\'t require a password.'),
           'type': ''
      },
+     # Common
      'files': {
           'name': 'files',
           'label': _('Files'),
@@ -1336,6 +1362,36 @@ class HiveServer2Action(Action):
   @classmethod
   def get_mandatory_fields(cls):
     return [cls.FIELDS['script_path']]
+
+
+class ImpalaAction(HiveServer2Action):
+  TYPE = 'impala'
+  DEFAULT_CREDENTIALS = 'impala' # None at this time
+
+  FIELDS = HiveServer2Action.FIELDS.copy()
+  del FIELDS['jdbc_url']
+  del FIELDS['password']
+  FIELDS['impalad_host'] = {
+      'name': 'impalad_host',
+      'label': _('Impalad hostname'),
+      'value': "",
+      'help_text': _('e.g. impalad-001.cluster.com. The hostname of the Impalad to send the query to.'),
+      'type': ''
+  }
+  FIELDS['key_tab_path'] = {
+      'name': 'key_tab_path',
+      'label': _('Keytab path'),
+      'value': '',
+      'help_text': _('Path to the keytab to use when on a secure cluster, e.g. /user/joe/joe.keytab.'),
+      'type': ''
+  }
+  FIELDS['user_principal'] = {
+      'name': 'user_principal',
+      'label': _('User principal'),
+      'value': 'joe@PROD.EDH',
+      'help_text': _('Name of the principal to use in the kinit, e.g.: kinit -k -t /home/joe/joe.keytab joe@PROD.EDH.'),
+      'type': ''
+  }
 
 
 class SubWorkflowAction(Action):
@@ -2712,6 +2768,7 @@ NODES = {
   'java-widget': JavaAction,
   'hive-widget': HiveAction,
   'hive2-widget': HiveServer2Action,
+  'impala-widget': ImpalaAction,
   'sqoop-widget': SqoopAction,
   'mapreduce-widget': MapReduceAction,
   'subworkflow-widget': SubWorkflowAction,

@@ -176,6 +176,10 @@
       <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
       <!-- /ko -->
 
+      <!-- ko if: widgetType() == 'impala-widget' || widgetType() == 'impala-document-widget' -->
+      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <!-- /ko -->
+
       <!-- ko if: widgetType() == 'pig-widget' || widgetType() == 'pig-document-widget'  -->
       <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon">
       <!-- /ko -->
@@ -587,16 +591,23 @@
 
 
 <script type="text/html" id="common-action-credentials">
-  <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
-  <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
-    <li>
-      <label class="checkbox"><input type="checkbox" data-bind="checkedValue: $data, checked: $parent.properties.credentials" /> <span data-bind="text: $data"></span></label>
-    </li>
-  </ul>
+  <!-- ko if: $parent.widgetType() != 'impala-widget' -->
+    <em data-bind="visible: $root.credentials() == null || $root.credentials().length == 0">${ _('No available credentials.') }</em>
+    <ul data-bind="visible: $root.credentials() != null && $root.credentials().length > 0, foreach: $root.credentials" class="unstyled">
+      <li>
+        <label class="checkbox"><input type="checkbox" data-bind="checkedValue: $data, checked: $parent.properties.credentials" /> <span data-bind="text: $data"></span></label>
+      </li>
+    </ul>
 
-  <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
-    ${ _('Requires hbase-site.xml in job path') }
-  </em>
+    <em data-bind="visible: properties.credentials && properties.credentials.indexOf('hbase') != -1">
+      ${ _('Requires hbase-site.xml in job path') }
+    </em>
+  <!-- /ko -->
+
+  <!-- ko if: $parent.widgetType() == 'impala-widget' -->
+    <input type="text" class="filechooser-input seventy" data-bind="filechooser: properties.key_tab_path, filechooserOptions: globalFilechooserOptions, hdfsAutocomplete: properties.key_tab_path, attr: { placeholder:  $root.workflow_properties.key_tab_path.help_text }"/>
+    <input type="text" data-bind="value: properties.user_principal, attr: { placeholder: $root.workflow_properties.user_principal.help_text }" />
+  <!-- /ko -->
 </script>
 
 
@@ -768,12 +779,21 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
+          <!-- ko if: $root.workflow_properties.jdbc_url -->
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.password -->
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
+          <!-- /ko -->
+          <!-- ko if: $root.workflow_properties.impalad_host -->
+          <span data-bind="text: $root.workflow_properties.impalad_host.label"></span>
+          <input type="text" data-bind="value: properties.impalad_host, attr: { placeholder: $root.workflow_properties.impalad_host.help_text }" />
+          <br/>
+          <!-- /ko -->
           <a class="pointer" data-bind="click: function(){ properties.arguments.push(ko.mapping.fromJS({'value': ''})); $(document).trigger('drawArrows') }">
             ${ _('Arguments') } <i class="fa fa-plus"></i>
           </a>
@@ -813,6 +833,11 @@
     </div>
   </div>
   <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="impala-widget">
+  <span data-bind="template: { name: 'hive2-widget' }"></span>
 </script>
 
 
