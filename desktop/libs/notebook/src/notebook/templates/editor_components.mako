@@ -1821,7 +1821,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </div>
 
 <div class="ace-filechooser">
-  <a class="pointer pull-right" data-bind="click: function(){ $('.filechooser').hide(); }"><i class="fa fa-times"></i></a>
+  <div class="ace-filechooser-close">
+    <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
+  </div>
   <div class="ace-filechooser-content">
     <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i><!--<![endif]-->
     <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->

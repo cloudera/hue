@@ -3880,25 +3880,27 @@
             var btn = editor.showFileButton();
             btn.on("click", function (ie) {
               ie.preventDefault();
-              if ($(".ace-filechooser-content").data("spinner") == null) {
-                $(".ace-filechooser-content").data("spinner", $(".ace-filechooser-content").html());
+              // TODO: Turn the ace file chooser into a component and remove css class references
+              if (!$($(".ace-filechooser-content")).data('jHueFileChooser')) {
+                if ($(".ace-filechooser-content").data("spinner") == null) {
+                  $(".ace-filechooser-content").data("spinner", $(".ace-filechooser-content").html());
+                } else {
+                  $(".ace-filechooser-content").html($(".ace-filechooser-content").data("spinner"));
+                }
+                $(".ace-filechooser-content").jHueFileChooser({
+                  onFileChoose: function (filePath) {
+                    editor.session.insert(editor.getCursorPosition(), filePath + "'");
+                    editor.hideFileButton();
+                    if (autocompleteTemporarilyDisabled) {
+                      editor.enableAutocomplete();
+                      autocompleteTemporarilyDisabled = false;
+                    }
+                    $(".ace-filechooser").hide();
+                  },
+                  selectFolder: false,
+                  createFolder: false
+                });
               }
-              else {
-                $(".ace-filechooser-content").html($(".ace-filechooser-content").data("spinner"));
-              }
-              $(".ace-filechooser-content").jHueFileChooser({
-                onFileChoose: function (filePath) {
-                  editor.session.insert(editor.getCursorPosition(), filePath + "'");
-                  editor.hideFileButton();
-                  if (autocompleteTemporarilyDisabled) {
-                    editor.enableAutocomplete();
-                    autocompleteTemporarilyDisabled = false;
-                  }
-                  $(".ace-filechooser").hide();
-                },
-                selectFolder: false,
-                createFolder: false
-              });
               $(".ace-filechooser").css({ "top": $(ie.currentTarget).position().top, "left": $(ie.currentTarget).position().left}).show();
             });
           } else {
