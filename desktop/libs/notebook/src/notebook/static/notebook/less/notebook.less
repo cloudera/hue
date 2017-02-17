@@ -1256,3 +1256,23 @@ h4.header {
 .popover {
   z-index: 1030;
 }
+
+
+// TODO: Switch to the context popover css for the file chooser
+.ace-filechooser {
+  border-radius: @hue-panel-border-radius;
+  background-color: @cui-white;
+  .hue-box-shadow-bottom;
+}
+
+.ace-filechooser-content .filechooser-tree {
+  position: relative;
+  margin-right: 10px;
+}
+
+.ace-filechooser-close {
+  position: absolute;
+  right: 10px;
+  top: 10px;
+  z-index: 1000;
+}

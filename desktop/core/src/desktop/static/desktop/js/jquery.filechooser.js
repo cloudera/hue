@@ -63,6 +63,7 @@
 
   function Plugin(element, options) {
     this.element = element;
+    $(element).data('jHueFileChooser', this);
     if (typeof jHueFileChooserGlobals != 'undefined') {
       var extendedDefaults = $.extend({}, defaults, jHueFileChooserGlobals);
       extendedDefaults.labels = $.extend({}, defaults.labels, jHueFileChooserGlobals.labels);
