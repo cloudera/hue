@@ -19,6 +19,7 @@ import os.path
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
+from desktop.conf import is_hue4
 from desktop.lib.conf import Config, coerce_bool
 from desktop.lib import paths
 from liboozie.conf import get_oozie_status
@@ -93,6 +94,13 @@ ENABLE_DOCUMENT_ACTION = Config(
   help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
   type=bool,
   default=False
+)
+
+ENABLE_IMPALA_ACTION = Config(
+  key="enable_impala_action",
+  help=_t("Flag to enable the Impala action."),
+  type=bool,
+  default=is_hue4()
 )
 
 
