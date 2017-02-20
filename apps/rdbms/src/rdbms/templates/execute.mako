@@ -150,7 +150,6 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
           <div class="card card-small scrollable">
             <div class="row-fluid">
               <div class="span10 offset1 center empty-wrapper">
-                <i class="fa fa-frown-o"></i>
                 <h1>${_('The server returned no results.')}</h1>
                 <br />
               </div>
