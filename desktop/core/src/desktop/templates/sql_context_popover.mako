@@ -1261,6 +1261,18 @@ from metadata.conf import has_navigator
           });
         }
 
+        var closeOnEsc = function (e) {
+          if (e.keyCode === 27) {
+            hidePopover();
+          }
+        };
+
+        $(document).on('keyup', closeOnEsc);
+
+        self.disposalFunctions.push(function () {
+          $(document).off('keyup', closeOnEsc);
+        });
+
         window.setTimeout(function() {
           $(document).on('click', hideOnClickOutside);
         }, 0);
