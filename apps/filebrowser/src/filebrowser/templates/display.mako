@@ -124,9 +124,8 @@ ${ fb_components.menubar() }
           ${fb_components.breadcrumbs(path, breadcrumbs, is_embeddable=is_embeddable)}
         %endif
         <div class="card-body" style="padding: 0">
-            <!-- ko if: $root.file() && $root.file().stats.size() === 0 -->
+            <!-- ko if: $root.file() && $root.file().stats.size() === 0 && $root.isViewing() -->
             <div class="center empty-wrapper">
-              <i class="fa fa-frown-o"></i>
               <h1>${_('The current file is empty.')}</h1>
               <br/>
             </div>
@@ -146,7 +145,7 @@ ${ fb_components.menubar() }
               <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
             </div>
             <!-- ko if: $root.isViewing -->
-            <div id="fileArea" data-bind="css: {'loading': isLoading}">
+            <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()">
               <pre></pre>
               <table class="binary">
                 <tbody>
@@ -185,16 +184,14 @@ ${ fb_components.menubar() }
     max_size: ${view['max_chunk_size']}
   });
 
-  function resizeText () {
-    var _fileArea = $("#fileArea");
-    if (_fileArea.height() > 0) {
-      _fileArea.height($(window).height() - _fileArea.offset().top - 26);
-      $("#loader").css("marginLeft", (_fileArea.width() - $("#loader").width()) / 2);
-    }
+  function resizeText() {
+    hueUtils.waitForRendered('#fileArea', function(el){ return el.height() > 0 }, function(){
+      $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 26);
+    });
   }
 
-  function formatHex (number, padding) {
-    if ("undefined" != typeof number){
+  function formatHex(number, padding) {
+    if ("undefined" != typeof number) {
       var _filler = "";
       for (var i = 0; i < padding - 1; i++) {
         _filler += "0";
@@ -204,7 +201,7 @@ ${ fb_components.menubar() }
     return "";
   }
 
-  function renderPages () {
+  function renderPages() {
     var _html = "";
     for (var i = viewModel.page(); i <= viewModel.upperPage(); i++) {
       _html += "<a id='page" + i + "'><div class='fill-file-area'></div></a>";
@@ -294,10 +291,18 @@ ${ fb_components.menubar() }
     self.PAGES_PER_CHUNK = 50;
 
     self.isViewing = ko.observable(true);
+    self.isViewing.subscribe(function(val){
+      if (val){
+        window.setTimeout(resizeText, 0);
+      }
+    });
 
     self.base_url = ko.observable(params.base_url);
     self.compression = ko.observable(params.compression);
     self.mode = ko.observable(params.mode);
+    self.mode.subscribe(function(val){
+      window.setTimeout(resizeText, 0);
+    });
     self.begin = ko.observable(params.begin);
     self.end = ko.observable(params.end);
     self.length = ko.observable(params.length);
@@ -477,17 +482,18 @@ ${ fb_components.menubar() }
   $(document).ready(function () {
     ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
+    $("#loader").css("marginLeft", ($(".hueBreadcrumbBar").width() - $("#loader").width()) / 2);
+
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
     });
 
     setTimeout(function () {
+      resizeText();
       getContent(function () {
         viewModel.toggleDisables();
       });
     }, 100);
-
-    resizeText();
 
     var _resizeTimeout = -1;
 
