@@ -39,7 +39,8 @@ module.exports = function(grunt) {
           'apps/metastore/src/metastore/static/metastore/css/metastore.css': 'apps/metastore/src/metastore/static/metastore/less/metastore.less',
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook.less',
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook-layout.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook-layout.less',
-          'apps/oozie/src/oozie/static/oozie/css/workflow-editor.css': 'apps/oozie/src/oozie/static/oozie/less/workflow-editor.less'
+          'apps/oozie/src/oozie/static/oozie/css/workflow-editor.css': 'apps/oozie/src/oozie/static/oozie/less/workflow-editor.less',
+          'apps/filebrowser/src/filebrowser/static/filebrowser/css/display.css': 'apps/filebrowser/src/filebrowser/static/filebrowser/less/display.less',
         }
       }
     },
@@ -51,7 +52,11 @@ module.exports = function(grunt) {
           'apps/metastore/src/metastore/static/metastore/less/*.less',
           'apps/metastore/src/metastore/static/metastore/less/**/*.less',
           'desktop/libs/notebook/src/notebook/static/notebook/less/*.less',
-          'desktop/libs/notebook/src/notebook/static/notebook/less/**/*.less'
+          'desktop/libs/notebook/src/notebook/static/notebook/less/**/*.less',
+          'apps/oozie/src/oozie/static/oozie/less/*.less',
+          'apps/oozie/src/oozie/static/oozie/less/**/*.less',
+          'apps/filebrowser/src/filebrowser/static/filebrowser/less/*.less',
+          'apps/filebrowser/src/filebrowser/static/filebrowser/less/**/*.less',
         ],
         tasks: ['less']
       }
