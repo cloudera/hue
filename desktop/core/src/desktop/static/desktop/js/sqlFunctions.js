@@ -1403,7 +1403,7 @@ var SqlFunctions = (function () {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'STRING'}]],
         signature: 'trunc(TIMESTAMP date, STRING unit)',
-        description: 'Strips off fields and optionally rounds a TIMESTAMP value.'
+        description: 'Strips off fields and optionally rounds a TIMESTAMP value. The unit argument value is case-sensitive. This argument string can be one of: SYYYY, YYYY, YEAR, SYEAR, YYY, YY, Y: Year. Q: Quarter. MONTH, MON, MM, RM: Month. WW, W: Same day of the week as the first day of the month. DDD, DD, J: Day. DAY, DY, D: Starting day of the week. (Not necessarily the current day.) HH, HH12, HH24: Hour. A TIMESTAMP value truncated to the hour is always represented in 24-hour notation, even for the HH12 argument string. MI: Minute.'
       },
       unix_timestamp: {
         returnTypes: ['INT'],
