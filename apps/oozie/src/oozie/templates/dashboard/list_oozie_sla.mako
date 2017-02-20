@@ -113,7 +113,6 @@ ${ layout.menubar(section='sla', dashboard=True) }
           </div>
 
           <div class="no-results center empty-wrapper hide">
-            <i class="fa fa-frown-o"></i>
             <h1>${_('The server returned no results.')}</h1>
             <br/>
           </div>
