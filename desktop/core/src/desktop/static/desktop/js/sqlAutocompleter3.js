@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SqlAutocompleter3 = (function () {
+var AutocompleteResults = (function () {
 
   var normalizedColors = HueColors.getNormalizedColors();
 
@@ -116,7 +116,7 @@ var SqlAutocompleter3 = (function () {
    * @param options
    * @constructor
    */
-  function Suggestions (options) {
+  function AutocompleteResults (options) {
     var self = this;
     self.apiHelper = ApiHelper.getInstance();
     self.snippet = options.snippet;
@@ -265,7 +265,7 @@ var SqlAutocompleter3 = (function () {
     }).extend({ rateLimit: 200 });
   }
 
-  Suggestions.prototype.backTickIfNeeded = function (text) {
+  AutocompleteResults.prototype.backTickIfNeeded = function (text) {
     var self = this;
     if (text.indexOf('`') === 0) {
       return text;
@@ -283,7 +283,7 @@ var SqlAutocompleter3 = (function () {
     return text;
   };
 
-  Suggestions.prototype.update = function (parseResult) {
+  AutocompleteResults.prototype.update = function (parseResult) {
     var self = this;
 
     while (self.activeDeferrals.length > 0) {
@@ -353,7 +353,7 @@ var SqlAutocompleter3 = (function () {
    *
    * @returns {object} - jQuery Deferred
    */
-  Suggestions.prototype.handleColumnReference = function () {
+  AutocompleteResults.prototype.handleColumnReference = function () {
     var self = this;
     var colRefDeferred = $.Deferred();
     if (self.parseResult.colRef) {
@@ -384,7 +384,7 @@ var SqlAutocompleter3 = (function () {
     return colRefDeferred;
   };
 
-  Suggestions.prototype.loadDatabases = function () {
+  AutocompleteResults.prototype.loadDatabases = function () {
     var self = this;
     var databasesDeferred = $.Deferred();
     self.apiHelper.loadDatabases({
@@ -397,7 +397,7 @@ var SqlAutocompleter3 = (function () {
     return databasesDeferred;
   };
 
-  Suggestions.prototype.handleKeywords = function (colRefDeferred) {
+  AutocompleteResults.prototype.handleKeywords = function (colRefDeferred) {
     var self = this;
     if (self.parseResult.suggestKeywords) {
       var keywordSuggestions = $.map(self.parseResult.suggestKeywords, function (keyword) {
@@ -438,7 +438,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleIdentifiers = function () {
+  AutocompleteResults.prototype.handleIdentifiers = function () {
     var self = this;
     if (self.parseResult.suggestIdentifiers) {
       var identifierSuggestions = [];
@@ -455,7 +455,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleColumnAliases = function () {
+  AutocompleteResults.prototype.handleColumnAliases = function () {
     var self = this;
     if (self.parseResult.suggestColumnAliases) {
       var columnAliasSuggestions = [];
@@ -483,7 +483,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleCommonTableExpressions = function () {
+  AutocompleteResults.prototype.handleCommonTableExpressions = function () {
     var self = this;
     if (self.parseResult.suggestCommonTableExpressions) {
       var commonTableExpressionSuggestions = [];
@@ -505,7 +505,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleFunctions = function (colRefDeferred) {
+  AutocompleteResults.prototype.handleFunctions = function (colRefDeferred) {
     var self = this;
     if (self.parseResult.suggestFunctions) {
       var functionSuggestions = [];
@@ -551,7 +551,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleDatabases = function (databasesDeferred) {
+  AutocompleteResults.prototype.handleDatabases = function (databasesDeferred) {
     var self = this;
     var suggestDatabases = self.parseResult.suggestDatabases;
     if (suggestDatabases) {
@@ -579,7 +579,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleTables = function (databasesDeferred) {
+  AutocompleteResults.prototype.handleTables = function (databasesDeferred) {
     var self = this;
     var tablesDeferred = $.Deferred();
 
@@ -650,7 +650,7 @@ var SqlAutocompleter3 = (function () {
     return tablesDeferred;
   };
 
-  Suggestions.prototype.handleColumns = function (colRefDeferred, tablesDeferred) {
+  AutocompleteResults.prototype.handleColumns = function (colRefDeferred, tablesDeferred) {
     var self = this;
     var columnsDeferred = $.Deferred();
 
@@ -704,7 +704,7 @@ var SqlAutocompleter3 = (function () {
     return columnsDeferred;
   };
 
-  Suggestions.prototype.addColumns = function (table, types, columnSuggestions) {
+  AutocompleteResults.prototype.addColumns = function (table, types, columnSuggestions) {
     var self = this;
     var addColumnsDeferred = $.Deferred();
 
@@ -996,7 +996,7 @@ var SqlAutocompleter3 = (function () {
     return addColumnsDeferred;
   };
 
-  Suggestions.prototype.mergeColumns = function (columnSuggestions) {
+  AutocompleteResults.prototype.mergeColumns = function (columnSuggestions) {
     columnSuggestions.sort(function (a, b) {
       return a.value.localeCompare(b.value);
     });
@@ -1032,7 +1032,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handleValues = function (colRefDeferred) {
+  AutocompleteResults.prototype.handleValues = function (colRefDeferred) {
     var self = this;
     var suggestValues = self.parseResult.suggestValues;
     if (suggestValues) {
@@ -1066,7 +1066,7 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
-  Suggestions.prototype.handlePaths = function () {
+  AutocompleteResults.prototype.handlePaths = function () {
     var self = this;
     var suggestHdfs = self.parseResult.suggestHdfs;
     var pathsDeferred = $.Deferred();
@@ -1111,7 +1111,7 @@ var SqlAutocompleter3 = (function () {
     return pathsDeferred;
   };
 
-  Suggestions.prototype.handleJoins = function () {
+  AutocompleteResults.prototype.handleJoins = function () {
     var self = this;
     var joinsDeferred = $.Deferred();
     var suggestJoins = self.parseResult.suggestJoins;
@@ -1188,7 +1188,7 @@ var SqlAutocompleter3 = (function () {
     return joinsDeferred;
   };
 
-  Suggestions.prototype.handleJoinConditions = function () {
+  AutocompleteResults.prototype.handleJoinConditions = function () {
     var self = this;
     var joinConditionsDeferred = $.Deferred();
     var suggestJoinConditions = self.parseResult.suggestJoinConditions;
@@ -1242,7 +1242,7 @@ var SqlAutocompleter3 = (function () {
     return joinConditionsDeferred;
   };
 
-  Suggestions.prototype.handleAggregateFunctions = function () {
+  AutocompleteResults.prototype.handleAggregateFunctions = function () {
     var self = this;
     var aggregateFunctionsDeferred = $.Deferred();
 
@@ -1318,7 +1318,7 @@ var SqlAutocompleter3 = (function () {
     return aggregateFunctionsDeferred;
   };
 
-  Suggestions.prototype.handleGroupBys = function () {
+  AutocompleteResults.prototype.handleGroupBys = function () {
     var self = this;
     var groupBysDeferred = $.Deferred();
     var suggestGroupBys = self.parseResult.suggestGroupBys;
@@ -1361,7 +1361,7 @@ var SqlAutocompleter3 = (function () {
     return groupBysDeferred;
   };
 
-  Suggestions.prototype.handleOrderBys = function () {
+  AutocompleteResults.prototype.handleOrderBys = function () {
     var self = this;
     var orderBysDeferred = $.Deferred();
     var suggestOrderBys = self.parseResult.suggestOrderBys;
@@ -1402,7 +1402,7 @@ var SqlAutocompleter3 = (function () {
     return orderBysDeferred;
   };
 
-  Suggestions.prototype.handleFilters = function () {
+  AutocompleteResults.prototype.handleFilters = function () {
     var self = this;
     var filtersDeferred = $.Deferred();
     var suggestFilters = self.parseResult.suggestFilters;
@@ -1462,7 +1462,7 @@ var SqlAutocompleter3 = (function () {
     return filtersDeferred;
   };
 
-  Suggestions.prototype.handlePopularTables = function (tablesDeferred) {
+  AutocompleteResults.prototype.handlePopularTables = function (tablesDeferred) {
     var self = this;
     var popularTablesDeferred = $.Deferred();
     if (HAS_OPTIMIZER && self.parseResult.suggestTables) {
@@ -1512,7 +1512,7 @@ var SqlAutocompleter3 = (function () {
     return popularTablesDeferred
   };
 
-  Suggestions.prototype.handlePopularColumns = function (columnsDeferred) {
+  AutocompleteResults.prototype.handlePopularColumns = function (columnsDeferred) {
     var self = this;
     var popularColumnsDeferred = $.Deferred();
     var suggestColumns = self.parseResult.suggestColumns;
@@ -1588,7 +1588,7 @@ var SqlAutocompleter3 = (function () {
     return popularColumnsDeferred;
   };
 
-  Suggestions.prototype.createNavOptIdentifier = function (navOptTableName, navOptColumnName, tables) {
+  AutocompleteResults.prototype.createNavOptIdentifier = function (navOptTableName, navOptColumnName, tables) {
     var self = this;
     var path = navOptTableName + '.' + navOptColumnName.split('.').pop();
     for (var i = 0; i < tables.length; i++) {
@@ -1609,7 +1609,7 @@ var SqlAutocompleter3 = (function () {
     return path;
   };
 
-  Suggestions.prototype.createNavOptIdentifierForColumn = function (navOptColumn, tables) {
+  AutocompleteResults.prototype.createNavOptIdentifierForColumn = function (navOptColumn, tables) {
     var self = this;
     for (var i = 0; i < tables.length; i++) {
       if (navOptColumn.dbName && (navOptColumn.dbName !== self.activeDatabase || navOptColumn.dbName !== tables[i].identifierChain[0].name)) {
@@ -1629,7 +1629,7 @@ var SqlAutocompleter3 = (function () {
     return navOptColumn.columnName;
   };
 
-  Suggestions.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {
+  AutocompleteResults.prototype.convertNavOptQualifiedIdentifier = function (qualifiedIdentifier, tables) {
     var self = this;
     var aliases = [];
     var tablesHasDefaultDatabase = false;
@@ -1659,8 +1659,7 @@ var SqlAutocompleter3 = (function () {
    * @param callback
    * @param errorCallback
    */
-
-  Suggestions.prototype.fetchFieldsForIdentifiers = function (originalIdentifierChain, callback, errorCallback) {
+  AutocompleteResults.prototype.fetchFieldsForIdentifiers = function (originalIdentifierChain, callback, errorCallback) {
     var self = this;
     var identifierChain = originalIdentifierChain.concat();
 
@@ -1751,6 +1750,10 @@ var SqlAutocompleter3 = (function () {
     }
   };
 
+  return AutocompleteResults;
+})();
+
+var SqlAutocompleter3 = (function () {
   /**
    * @param {Object} options
    * @param {Snippet} options.snippet
@@ -1760,7 +1763,7 @@ var SqlAutocompleter3 = (function () {
     var self = this;
     self.snippet = options.snippet;
     self.editor = options.editor;
-    self.suggestions = new Suggestions(options);
+    self.suggestions = new AutocompleteResults(options);
   }
 
   SqlAutocompleter3.prototype.autocomplete = function () {

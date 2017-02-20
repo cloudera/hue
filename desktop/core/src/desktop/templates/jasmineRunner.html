@@ -8,17 +8,58 @@
   <link rel="stylesheet" href="../static/desktop/ext/js/jasmine-2.3.4/jasmine.css">
 
   <script type="text/javascript" charset="utf-8">
-    ApiHelperGlobals = {
+    var ApiHelperGlobals = {
       i18n: {
         errorLoadingDatabases: 'errorLoadingDatabases',
         errorLoadingTablePreview: 'errorLoadingTablePreview'
       },
       user: 'user'
-    }
+    };
+
+
+    var AUTOCOMPLETE_TIMEOUT = 0;
+
+    var AutocompleterGlobals = {
+      i18n: {
+        category: {
+          all: 'All',
+          column: 'Columns',
+          cte: 'CTEs',
+          database: 'Databases',
+          identifier: 'Identifiers',
+          keyword: 'Keywords',
+          popular: 'Popular',
+          sample: 'Samples',
+          table: 'Tables',
+          udf: 'UDFs',
+          variable: 'Variables'
+        },
+        meta: {
+          aggregateFunction: 'aggregate',
+          alias: 'alias',
+          commonTableExpression: 'cte',
+          database: 'database',
+          filter: 'filter',
+          groupBy: 'group by',
+          join: 'join',
+          joinCondition: 'condition',
+          keyword: 'keyword',
+          orderBy: 'order by',
+          table: 'table',
+          value: 'value',
+          variable: 'variable',
+          view: 'view',
+          virtual: 'virtual'
+        }
+      }
+    };
+
+    var HAS_OPTIMIZER = false;
   </script>
 
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/jquery-2.1.1.min.js"></script>
   <script type="text/javascript" src="../static/desktop/js/jquery.migration.js"></script>
+  <script type="text/javascript" src="../static/desktop/js/hue.colors.js"></script>
   <script type="text/javascript" src="../static/desktop/js/hue.utils.js"></script>
   <script type="text/javascript" src="../static/desktop/ext/js/jquery/plugins/jquery.total-storage.min.js"></script>
   <script type="text/javascript" src="../static/desktop/js/ace/ace.js"></script>
@@ -44,6 +85,9 @@
 
   <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter2.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleter2Spec.js"></script>
+
+  <script type="text/javascript" src="../static/desktop/js/sqlAutocompleter3.js"></script>
+  <script type="text/javascript" src="../static/desktop/spec/sqlAutocompleter3Spec.js"></script>
 
   <script type="text/javascript" src="../static/desktop/js/sqlFunctions.js"></script>
   <script type="text/javascript" src="../static/desktop/spec/sqlFunctionsSpec.js"></script>
