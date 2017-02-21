@@ -28,38 +28,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 %>
 
 <%def name="assistSearch()">
-  <style>
-    .nav-autocomplete-item .ui-state-focus {
-      border: 1px solid #DBE8F1;
-      background-color: #DBE8F1 !important;
-    }
-
-    .nav-autocomplete-item-link {
-      height: 44px;
-      overflow:hidden;
-    }
-
-    .nav-autocomplete-item-link i {
-      font-size: 18px;
-      color: #338bb8;
-    }
-
-    .nav-autocomplete-item-link em, .result-entry em {
-      font-style: normal;
-      font-weight: bold;
-    }
-
-    .nav-autocomplete-item-link > div {
-      vertical-align: top;
-      display:inline-block;
-    }
-
-    .nav-autocomplete-divider {
-      height: 2px;
-      border-top: 1px solid #dddddd;
-    }
-  </style>
-
   <script type="text/html" id="nav-search-autocomp-item">
     <a>
       <div class="nav-autocomplete-item-link">
