@@ -123,8 +123,31 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
 
 <%dashboard:layout_toolbar>
   <%def name="skipLayout()"></%def>
-  <%def name="widgetSectionName()">${ _('DOCUMENTS') }</%def>
+  <%def name="widgetSectionName()">
+    % if ENABLE_DOCUMENT_ACTION.get():
+      <a class="dropdown-toggle" data-toggle="dropdown" href="javascript: void(0)">
+        <!-- ko if: $root.currentDraggableSection() === 'documents' -->
+        ${ _('DOCUMENTS') }
+        <!-- /ko -->
+        <!-- ko if: $root.currentDraggableSection() === 'actions' -->
+        ${ _('ACTIONS') }
+        <!-- /ko -->
+        <b class="caret"></b>
+      </a>
+    <ul class="dropdown-menu toolbar-dropdown">
+      <!-- ko if: $root.currentDraggableSection() === 'actions' -->
+      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('documents') }">${ _('View documents') }</a></li>
+      <!-- /ko -->
+      <!-- ko if: $root.currentDraggableSection() === 'documents' -->
+      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('actions') }">${ _('View actions') }</a></li>
+      <!-- /ko -->
+    </ul>
+    % endif
+  </%def>
   <%def name="widgets()">
+    % if ENABLE_DOCUMENT_ACTION.get():
+    <!-- ko if: $root.currentDraggableSection() === 'documents' -->
+    <span class="draggable-documents">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
@@ -132,7 +155,6 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
-    % if ENABLE_DOCUMENT_ACTION.get():
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaDocumentAction());}}}"
@@ -181,10 +203,12 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          title="${_('Saved Shell command')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
     </div>
+    </span>
+    <!-- /ko -->
     % endif
 
-    <div class="toolbar-label">${ _('ACTIONS') }</div>
-
+    <!-- ko if: $root.currentDraggableSection() === 'actions' -->
+    <span class="draggable-actions">
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveAction());}}}"
@@ -296,6 +320,9 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
          title="${_('Kill')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-stop"></i></a>
     </div>
+    </span>
+    <!-- /ko -->
+    <div class="clearfix"></div>
 </%def>
 </%dashboard:layout_toolbar>
 
@@ -561,6 +588,12 @@ ${ dashboard.import_bindings() }
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocUuid('${ doc_uuid }');
 
+  % if ENABLE_DOCUMENT_ACTION.get():
+  viewModel.currentDraggableSection('documents');
+  % else:
+  viewModel.currentDraggableSection('actions');
+  % endif
+
   viewModel.init();
   viewModel.workflow.tracker().markCurrentStateAsClean();
   fullLayout(viewModel);
@@ -775,9 +808,11 @@ ${ dashboard.import_bindings() }
           $('.draggable-widget .draggable-icon').css('fontSize', width / 2);
         }
       }
+      var marginLeft = $('.card-toolbar').width()/2 - $('.card-toolbar-content').width()/2;
+      $('.card-toolbar-content').css('marginLeft', marginLeft + 'px');
     }
 
-    hueUtils.waitForRendered($('.card-toolbar'), function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
+    hueUtils.waitForRendered('.card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
 
     $(document).on("blur", "[validate]", function() {
       validateFields();
@@ -800,6 +835,15 @@ ${ dashboard.import_bindings() }
         renderChangeables();
         resizeToolbar();
       }, 200);
+    });
+
+    huePubSub.subscribe('oozie.draggable.section.change', function(val){
+      if (val === 'actions'){
+        hueUtils.waitForRendered('.draggable-actions', function(el){ return el.length > 0 }, resizeToolbar);
+      }
+      if (val === 'documents'){
+        hueUtils.waitForRendered('.draggable-documents', function(el){ return el.length > 0 }, resizeToolbar);
+      }
     });
 
     $(document).on("click", ".widget-main-section", function(e){

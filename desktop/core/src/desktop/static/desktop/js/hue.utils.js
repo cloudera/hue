@@ -261,7 +261,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
    * @constructor
    */
   hueUtils.waitForRendered = function (selector, condition, callback, timeout) {
-    var $el = $(selector);
+    var $el = selector instanceof jQuery ? selector: $(selector);
     if (condition($el)) {
       callback($el);
     }
