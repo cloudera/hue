@@ -220,6 +220,10 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       newSearch = window.location.search + (value ? (window.location.search.indexOf('?') > -1 ? '&' : '?') + param + '=' + value : '' );
     }
 
+    if (newSearch === '?') {
+      newSearch = '';
+    }
+
     hueUtils.changeURL(window.location.pathname + newSearch);
   }
 
