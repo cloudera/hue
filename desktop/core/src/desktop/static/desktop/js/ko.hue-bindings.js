@@ -90,7 +90,9 @@
         blurOnEnter: false,
         classPrefix: 'hue-',
         showOnFocus: false,
-        minLength: 0
+        minLength: 0,
+        limitWidthToInput: false,
+        minWidth: 200
       }, options);
 
       if (options.addCount) {
@@ -128,6 +130,9 @@
             }
           },
           _renderMenu: function (ul, items) {
+            if (options.limitWidthToInput) {
+              ul.css('max-width', Math.max(options.minWidth, $element.outerWidth(true)) + 'px');
+            }
             var self = this;
             ul.addClass(this.options.classPrefix + 'autocomplete');
             $.each(items, function (index, item) {
