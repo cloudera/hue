@@ -46,9 +46,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       home_dir = '/'
   %>
 
+  <%namespace name="assistSearch" file="assist_search.mako" />
   <%namespace name="sqlContextPopover" file="/sql_context_popover.mako" />
   <%namespace name="nav_components" file="/nav_components.mako" />
 
+  ${ assistSearch.assistSearch() }
   ${ sqlContextPopover.sqlContextPopover() }
   ${ nav_components.nav_tags(readOnly=not user.has_hue_permission(action="write", app="metadata")) }
 
@@ -215,21 +217,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-sql-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
-        <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
-        <!-- ko with: selectedSource -->
-        <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
-        <!-- ko with: selectedDatabase -->
-        <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
-        <!-- /ko -->
-        <!-- /ko -->
-      </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
-    </div>
+    <!-- ko template: { if: breadcrumb() !== null, name: 'assist-db-breadcrumb' } --><!-- /ko -->
+    <!-- ko template: { ifnot: selectedSource, name: 'assist-sources-template' } --><!-- /ko -->
+    <!-- ko with: selectedSource -->
+    <!-- ko template: { ifnot: selectedDatabase, name: 'assist-databases-template' }--><!-- /ko -->
+    <!-- ko with: selectedDatabase -->
+    <!-- ko template: { name: 'assist-tables-template' } --><!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="s3-details-content">
@@ -252,66 +247,58 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-s3-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: selectedS3Entry -->
-        <div class="assist-flex-header assist-breadcrumb" >
-          <!-- ko if: parent !== null -->
-          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
-            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </a>
-          <!-- /ko -->
-          <!-- ko if: parent === null -->
-          <div>
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </div>
-          <!-- /ko -->
-          <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-fill assist-s3-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-                <div class="assist-actions table-actions" style="opacity: 0;" >
-                  <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
-                    <i class='fa fa-info' title="${ _('Details') }"></i>
-                  </a>
-                </div>
+    <!-- ko with: selectedS3Entry -->
+    <div class="assist-flex-header assist-breadcrumb" >
+      <!-- ko if: parent !== null -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: parent === null -->
+      <div>
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </div>
+      <!-- /ko -->
+      <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill assist-s3-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+        <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+            <div class="assist-actions table-actions" style="opacity: 0;" >
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
+                <i class='fa fa-info' title="${ _('Details') }"></i>
+              </a>
+            </div>
 
-                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-                  <!-- ko if: definition.type === 'dir' -->
-                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <!-- ko if: definition.type === 'file' -->
-                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 's3', 'definition': definition} }"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- ko if: !loading() && entries().length === 0 -->
-            <ul class="assist-tables">
-              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
-            </ul>
-            <!-- /ko -->
-          </div>
-          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-        </div>
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+              <!-- ko if: definition.type === 'dir' -->
+              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: definition.type === 'file' -->
+              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <!-- /ko -->
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 's3', 'definition': definition} }"></span>
+            </a>
+          </li>
+        </ul>
+        <!-- ko if: !loading() && entries().length === 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+        </ul>
         <!-- /ko -->
       </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
     </div>
+    <!-- /ko -->
   </script>
-
 
   <script type="text/html" id="git-details-title">
     <span data-bind="text: definition.name"></span>
@@ -324,59 +311,52 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-git-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: selectedGitEntry -->
-        <div class="assist-flex-header assist-breadcrumb" >
-          <!-- ko if: parent !== null -->
-          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
-            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </a>
-          <!-- /ko -->
-          <!-- ko if: parent === null -->
-          <div style="padding-left: 5px;">
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </div>
-          <!-- /ko -->
-          <!-- ko template: 'assist-git-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-fill assist-git-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-git-scrollable' }">
-              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+    <!-- ko with: selectedGitEntry -->
+    <div class="assist-flex-header assist-breadcrumb" >
+      <!-- ko if: parent !== null -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: parent === null -->
+      <div style="padding-left: 5px;">
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </div>
+      <!-- /ko -->
+      <!-- ko template: 'assist-git-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill assist-git-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+        <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-git-scrollable' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
 
-                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-                  <!-- ko if: definition.type === 'dir' -->
-                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <!-- ko ifnot: definition.type === 'dir' -->
-                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'git', 'definition': definition} }"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- ko if: !loading() && entries().length === 0 -->
-            <ul class="assist-tables">
-              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
-            </ul>
-            <!-- /ko -->
-          </div>
-          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-        </div>
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+              <!-- ko if: definition.type === 'dir' -->
+              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko ifnot: definition.type === 'dir' -->
+              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <!-- /ko -->
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'git', 'definition': definition} }"></span>
+            </a>
+          </li>
+        </ul>
+        <!-- ko if: !loading() && entries().length === 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+        </ul>
         <!-- /ko -->
       </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="hdfs-details-content">
@@ -404,64 +384,57 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-hdfs-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: selectedHdfsEntry -->
-        <div class="assist-flex-header assist-breadcrumb" >
-          <!-- ko if: parent !== null -->
-          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
-            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </a>
-          <!-- /ko -->
-          <!-- ko if: parent === null -->
-          <div style="padding-left: 5px;">
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
-          </div>
-          <!-- /ko -->
-          <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-fill assist-hdfs-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-                <div class="assist-actions table-actions" style="opacity: 0;" >
-                  <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
-                    <i class='fa fa-info' title="${ _('Details') }"></i>
-                  </a>
-                </div>
+    <!-- ko with: selectedHdfsEntry -->
+    <div class="assist-flex-header assist-breadcrumb" >
+      <!-- ko if: parent !== null -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: parent === null -->
+      <div style="padding-left: 5px;">
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      </div>
+      <!-- /ko -->
+      <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill assist-hdfs-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+        <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+            <div class="assist-actions table-actions" style="opacity: 0;" >
+              <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
+                <i class='fa fa-info' title="${ _('Details') }"></i>
+              </a>
+            </div>
 
-                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
-                  <!-- ko if: definition.type === 'dir' -->
-                  <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <!-- ko if: definition.type === 'file' -->
-                  <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                  <!-- /ko -->
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- ko if: !loading() && entries().length === 0 -->
-            <ul class="assist-tables">
-              <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
-            </ul>
-            <!-- /ko -->
-          </div>
-          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-        </div>
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
+              <!-- ko if: definition.type === 'dir' -->
+              <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko if: definition.type === 'file' -->
+              <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+              <!-- /ko -->
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'hdfs', 'definition': definition} }"></span>
+            </a>
+          </li>
+        </ul>
+        <!-- ko if: !loading() && entries().length === 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+        </ul>
         <!-- /ko -->
       </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="file-details-content">
@@ -486,62 +459,55 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-documents-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: activeEntry -->
-        <div class="assist-flex-header assist-breadcrumb">
-          <!-- ko ifnot: isRoot -->
-          <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
-            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
-          </a>
-          <!-- /ko -->
-          <!-- ko if: isRoot -->
-          <div style="padding-left: 5px;">
-            <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top;margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
-          </div>
-          <!-- /ko -->
-          <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-fill assist-file-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
-             <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
-               <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
-                 <div class="assist-file-actions table-actions" style="opacity: 0;" >
-                   <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
-                     <i class='fa fa-info' title="${ _('Details') }"></i>
-                   </a>
-                 </div>
-                 <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
-                   <!-- ko if: isDirectory -->
-                   <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-                   <!-- /ko -->
-                   <!-- ko ifnot: isDirectory -->
-                   <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-                   <!-- /ko -->
-                   <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
-                 </a>
-               </li>
-             </ul>
-          </div>
-          <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
-            <span style="font-style: italic;">${_('Empty directory')}</span>
-          </div>
-          <div class="center" data-bind="visible: loading() && ! hasErrors()">
-            <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-            <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
-          </div>
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-          <!-- /ko -->
-          <!-- ko with: $parents[1] -->
-          <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-        </div>
-        <!-- /ko -->
+    <!-- ko with: activeEntry -->
+    <div class="assist-flex-header assist-breadcrumb">
+      <!-- ko ifnot: isRoot -->
+      <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: isRoot -->
+      <div style="padding-left: 5px;">
+        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top;margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
       </div>
+      <!-- /ko -->
+      <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill assist-file-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
+         <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
+           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+             <div class="assist-file-actions table-actions" style="opacity: 0;" >
+               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
+                 <i class='fa fa-info' title="${ _('Details') }"></i>
+               </a>
+             </div>
+             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
+               <!-- ko if: isDirectory -->
+               <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
+               <!-- /ko -->
+               <!-- ko ifnot: isDirectory -->
+               <i class="fa fa-fw fa-file-o muted valign-middle"></i>
+               <!-- /ko -->
+               <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
+             </a>
+           </li>
+         </ul>
+      </div>
+      <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
+        <span style="font-style: italic;">${_('Empty directory')}</span>
+      </div>
+      <div class="center" data-bind="visible: loading() && ! hasErrors()">
+        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
+        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+      </div>
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
+      <!-- /ko -->
     </div>
   </script>
 
@@ -553,46 +519,39 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-collections-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: selectedCollectionEntry -->
-        <div class="assist-inner-header assist-breadcrumb">
-          ${_('Collections')}
-          <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
-          <div>
-            <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
-          </div>
-          <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
-        </div>
-        <div class="assist-flex-fill assist-collections-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 20, container: '.assist-collections-scrollable' }">
-              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
-                  <i class="fa fa-fw fa-search muted valign-middle"></i>
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- ko if: !loading() && entries().length === 0 -->
-            <ul class="assist-tables">
-              <li class="assist-entry" style="font-style: italic;">${_('No collections available.')}</li>
-            </ul>
-            <!-- /ko -->
-          </div>
-          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-        </div>
+    <!-- ko with: selectedCollectionEntry -->
+    <div class="assist-inner-header assist-breadcrumb">
+      ${_('Collections')}
+      <!-- ko template: 'assist-collections-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-table-search" data-bind="visible: $parent.isSearchVisible() && !loading() && !hasErrors() && entries().length > 0">
+      <div>
+        <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: $parent.showCores" />${_('Show cores')}</label>
+      </div>
+      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Collection name...') }" data-bind="hasFocus: $parent.editingSearch, clearable: $parent.filter, value: $parent.filter, valueUpdate: 'afterkeydown'"/></div>
+    </div>
+    <div class="assist-flex-fill assist-collections-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 20, container: '.assist-collections-scrollable' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
+              <i class="fa fa-fw fa-search muted valign-middle"></i>
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
+            </a>
+          </li>
+        </ul>
+        <!-- ko if: !loading() && entries().length === 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">${_('No collections available.')}</li>
+        </ul>
         <!-- /ko -->
       </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-hbase-header-actions">
@@ -602,62 +561,55 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="assist-hbase-inner-panel">
-    <div class="assist-inner-panel">
-      <div class="assist-flex-panel">
-        <!-- ko with: selectedHBaseEntry -->
-        <div class="assist-inner-header assist-breadcrumb" >
-          <!-- ko if: definition.host !== '' -->
-          <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickHBaseRootItem'); }">
-            <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-            <i class="fa fa-th-large" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-            <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition.name"></span>
-          </a>
-          <!-- /ko -->
-          <!-- ko if: definition.host === '' -->
-          ${_('Clusters')}
-          <!-- /ko -->
+    <!-- ko with: selectedHBaseEntry -->
+    <div class="assist-inner-header assist-breadcrumb" >
+      <!-- ko if: definition.host !== '' -->
+      <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickHBaseRootItem'); }">
+        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
+        <i class="fa fa-th-large" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
+        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition.name"></span>
+      </a>
+      <!-- /ko -->
+      <!-- ko if: definition.host === '' -->
+      ${_('Clusters')}
+      <!-- /ko -->
 
-          <!-- ko template: 'assist-hbase-header-actions' --><!-- /ko -->
-        </div>
-        <div class="assist-flex-fill assist-hbase-scrollable">
-          <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-            <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
-              <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
-                <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
-                  <!-- ko if: definition.host -->
-                  <i class="fa fa-fw fa-th-large muted valign-middle"></i>
-                  <!-- /ko -->
-                  <!-- ko ifnot: definition.host -->
-                  <i class="fa fa-fw fa-th muted valign-middle"></i>
-                  <!-- /ko -->
-                  <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + definition.name + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
-                </a>
-              </li>
-            </ul>
-            <!-- ko if: !loading() && entries().length === 0 -->
-            <ul class="assist-tables">
-              <li class="assist-entry" style="font-style: italic;">
-                <!-- ko if: definition.host === '' -->
-                ${_('No clusters available.')}
-                <!-- /ko -->
-                <!-- ko if: definition.host !== '' -->
-                ${_('No tables available.')}
-                <!-- /ko -->
-              </li>
-            </ul>
+      <!-- ko template: 'assist-hbase-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-fill assist-hbase-scrollable">
+      <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+            <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
+              <!-- ko if: definition.host -->
+              <i class="fa fa-fw fa-th-large muted valign-middle"></i>
+              <!-- /ko -->
+              <!-- ko ifnot: definition.host -->
+              <i class="fa fa-fw fa-th muted valign-middle"></i>
+              <!-- /ko -->
+              <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + definition.name + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
+            </a>
+          </li>
+        </ul>
+        <!-- ko if: !loading() && entries().length === 0 -->
+        <ul class="assist-tables">
+          <li class="assist-entry" style="font-style: italic;">
+            <!-- ko if: definition.host === '' -->
+            ${_('No clusters available.')}
             <!-- /ko -->
-          </div>
-          <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
-          <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
-            <span>${ _('Error loading contents.') }</span>
-          </div>
-        </div>
+            <!-- ko if: definition.host !== '' -->
+            ${_('No tables available.')}
+            <!-- /ko -->
+          </li>
+        </ul>
         <!-- /ko -->
       </div>
-      <!-- ko with: $parents[1] -->
-      <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
-      <!-- /ko -->
+      <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
+      <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
+        <span>${ _('Error loading contents.') }</span>
+      </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-sources-template">
@@ -796,82 +748,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     </div>
   </script>
 
-  <style>
-    .nav-autocomplete-item .ui-state-focus {
-      border: 1px solid #DBE8F1;
-      background-color: #DBE8F1 !important;
-    }
-
-    .nav-autocomplete-item-link {
-      height: 44px;
-      overflow:hidden;
-    }
-
-    .nav-autocomplete-item-link i {
-      font-size: 18px;
-      color: #338bb8;
-    }
-
-    .nav-autocomplete-item-link em, .result-entry em {
-      font-style: normal;
-      font-weight: bold;
-    }
-
-    .nav-autocomplete-item-link > div {
-      vertical-align: top;
-      display:inline-block;
-    }
-
-    .nav-autocomplete-divider {
-      height: 2px;
-      border-top: 1px solid #dddddd;
-    }
-  </style>
-
-  <script type="text/html" id="nav-search-autocomp-item">
-    <a>
-      <div class="nav-autocomplete-item-link">
-        <div style="padding: 12px 8px 0 8px;"><i class="fa fa-fw" data-bind="css: icon"></i></div>
-        <div>
-          <div style="font-size: 14px; color: #338bb8" data-bind="html: label, style: { 'padding-top': description ? 0 : '10px' }"></div>
-          <!-- ko if: description -->
-          <div style="display:inline-block; width: 250px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="html: description"></div>
-          <!-- /ko -->
-        </div>
-      </div>
-    </a>
-  </script>
-
-  <script type="text/html" id="nav-search-autocomp-no-match">
-    <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div style="font-size: 12px; margin: 6px 8px; color: #737373; font-style: italic;">${ _('No recent match found') }</div>
-    </div>
-  </script>
-
-  <script type="text/html" id="assist-panel-navigator-search">
-    <!-- ko if: navigatorEnabled -->
-      <div class="search-container" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }">
-        <input placeholder="${ _('Search...') }" type="text" data-bind="autocomplete: {
-          source: navAutocompleteSource,
-          itemTemplate: 'nav-search-autocomp-item',
-          noMatchTemplate: 'nav-search-autocomp-no-match',
-          classPrefix: 'nav-',
-          showOnFocus: false,
-          onEnter: performSearch,
-          valueObservable: searchInput,
-          onSelect: performSearch,
-          reopenPattern: /.*:$/
-        },
-        hasFocus: searchHasFocus,
-        clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
-        textInput: searchInput,
-        valueUpdate: 'afterkeydown',
-        attr: { placeholder: '${ _('Search ') }' + $parent.name.replace(/s$/g, '') + ($parent.type == 'sql' ? '${ _(' tables') }' : '${ _(' files') }' ) + '...' }">
-        <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
-      </div>
-    <!-- /ko -->
-  </script>
-
   <script type="text/html" id="assist-panel-inner-header">
     <div class="assist-header assist-fixed-height" data-bind="visibleOnHover: { selector: '.assist-header-actions' }, css: { 'assist-resizer': $index() > 0 }" style="display:none;">
       <span data-bind="text: $parent.name"></span>
@@ -893,41 +769,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       </div>
       <!-- /ko -->
       <!-- ko with: visiblePanel -->
-      <!-- ko template: { if: showNavSearch && $parent.navigatorEnabled, name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
+      <!-- ko template: { if: showNavSearch && $parent.navigatorSearch.navigatorEnabled(), name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
       <div style="position: relative; -ms-flex: 1 1 100%; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': $parent.availablePanels.length > 1 ? '10px' : '5px' }">
-        <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
-      </div>
-      <!-- /ko -->
-    </div>
-  </script>
-
-  <script type="text/html" id="nav-search-result">
-    <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;" data-bind="niceScroll">
-      <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
-        <div class="assist-db-header-actions">
-          <span class="assist-tables-counter" data-bind="visible: searchResult().length > 0">(<span data-bind="text: searchResultCount">0</span>)</span>
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
-        </div>
-      </div>
-      <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
-      <!-- ko if: !searching() -->
-      <!-- ko if: searchResult().length == 0 -->
-        <div class="result-entry">${ _('No result found.') }</div>
-      <!-- /ko -->
-      <div data-bind="foreach: searchResult" style="overflow-x:hidden">
-        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
-          <div class="icon-col">
-            <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
+        <div class="assist-inner-panel">
+          <div class="assist-flex-panel">
+            <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
           </div>
-          <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
-            <!-- ko if: typeof click !== 'undefined' -->
-            <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
-            <!-- /ko -->
-            <!-- ko if: typeof click === 'undefined' && typeof link !== 'undefined'-->
-            <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
-            <!-- /ko -->
-            <div class="doc-desc" data-bind="html: hue_description"></div>
-          </div>
+          <!-- ko with: $parent.navigatorSearch -->
+          <!-- ko template: { if: searchActive() && searchInput() !== '' && navigatorEnabled(), name: 'nav-search-result' } --><!-- /ko -->
+          <!-- /ko -->
         </div>
       </div>
       <!-- /ko -->
@@ -1467,27 +1317,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             'notebook': "${ _('Notebook') }"
           }
         };
-        self.apiHelper = ApiHelper.getInstance({
-          i18n: i18n,
-          user: params.user
-        });
 
-        self.navigatorEnabled = ko.observable('${ has_navigator(user) }' === 'True');
+        self.apiHelper = ApiHelper.getInstance();
+
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
-
-        self.searchInput = ko.observable('').extend({rateLimit: 500});
-        self.searchResult = ko.observableArray();
-        self.searchResultCount = ko.observable();
-
-        self.searchHasFocus = ko.observable(false);
-        self.searching = ko.observable(false);
-        self.searchActive = ko.observable(false);
-
-        huePubSub.subscribe('assist.hide.search', function () {
-          self.searchActive(false);
-        });
-
-        var lastQuery = -1;
 
         self.availablePanels = [
           new AssistInnerPanel({
@@ -1582,148 +1415,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           }
         }
 
-        self.performSearch = function () {
-          huePubSub.publish('autocomplete.close');
-          if (self.searchInput() === '') {
-            self.searchActive(false);
-            return;
-          }
-          if (!self.searchActive()) {
-            self.searchActive(true);
-          } else if (self.searchInput() === lastQuery) {
-            return;
-          }
-          if (self.searching()) {
-            window.setTimeout(function() {
-              self.performSearch();
-            }, 100);
-            return;
-          }
-          lastQuery = self.searchInput();
-          self.searching(true);
-
-          var showInAssist = function (entry) {
-            self.searchInput('');
-            self.searchHasFocus(false);
-            var path = entry.parentPath.split('/').concat([entry.originalName]).splice(1);
-            window.setTimeout(function () {
-              huePubSub.publish('assist.db.highlight', { sourceType: entry.sourceType.toLowerCase(), path: path });
-            }, 200); // For animation effect
-          };
-
-          var showNavContextPopover = function (entry, event) {
-            if (entry.type && entry.type !== 'TABLE' && entry.type !== 'VIEW' && entry.type !== 'DATABASE' && entry.type !== 'FIELD') {
-              return;
-            }
-            var $source = $(event.target).closest('.result-entry');
-            var offset = $source.offset();
-            entry.statsVisible(true);
-            huePubSub.publish('sql.context.popover.show', {
-              data: {
-                type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
-                identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.originalName })
-              },
-              delayedHide: '.result-entry',
-              orientation: 'right',
-              sourceType: entry.sourceType.toLowerCase(),
-              defaultDatabase: entry.parentPath.substring(1),
-              pinEnabled: params.sql.navigationSettings.pinEnabled,
-              source: {
-                element: event.target,
-                left: offset.left,
-                top: offset.top - 3,
-                right: offset.left + $source.width() + 3,
-                bottom: offset.top + $source.height() - 3
-              }
-            });
-            huePubSub.subscribeOnce('sql.context.popover.hidden', function () {
-              entry.statsVisible(false);
-            });
-          };
-
-          var navContextPopoverTimeout = -1;
-
-          var showNavContextPopoverDelayed = function (entry, event) {
-            window.clearTimeout(navContextPopoverTimeout);
-            navContextPopoverTimeout = window.setTimeout(function () {
-              showNavContextPopover(entry, event);
-            }, 500);
-          };
-
-          var clearNavContextPopoverDelay = function () {
-            window.clearTimeout(navContextPopoverTimeout);
-          };
-
-          $.post('/desktop/api/search/entities', {
-            query_s: ko.mapping.toJSON(self.searchInput()),
-            limit: 25,
-            sources: ko.mapping.toJSON([self.visiblePanel().type])
-          }, function (data) {
-            data.entities.forEach(function (entity) {
-              entity.statsVisible = ko.observable(false);
-              entity.showNavContextPopoverDelayed = showNavContextPopoverDelayed;
-              entity.clearNavContextPopoverDelay = clearNavContextPopoverDelay;
-              entity.icon = NAV_TYPE_ICONS[entity.type];
-              switch (entity.type) {
-                case 'DATABASE': { }
-                case 'TABLE': { }
-                case 'VIEW': { }
-                case 'FIELD': {
-                  entity.click = function () {
-                    showInAssist(entity);
-                  };
-                  break;
-                }
-                case 'SOURCE': {
-                  entity.originalDescription = '${ _("Cluster") }: ' + entity.clusterName;
-                  entity.link = entity.sourceUrl;
-                  break;
-                }
-                case 'OPERATION_EXECUTION': {
-                  entity.link = '/jobbrowser/jobs/' + entity.jobID;
-                  break;
-                }
-                case 'DIRECTORY': {
-                  entity.originalDescription = entity.parentPath;
-                  if (entity.sourceType == 'S3') {
-                    entity.link = '/filebrowser/view=S3A://#s3a://' + entity.bucketName + '/' + entity.fileSystemPath;
-                  } else {
-                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
-                  }
-                  break;
-                }
-                case 'FILE': {
-                  entity.originalDescription = entity.parentPath;
-                  if (entity.sourceType == 'S3') {
-                    entity.link = '/filebrowser/view=S3A://#s3a://' + entity.bucketName + '/' + entity.fileSystemPath;
-                  } else {
-                    entity.link = '/filebrowser/#' + entity.fileSystemPath;
-                  }
-                  break;
-                }
-                case 'S3BUCKET': {
-                  entity.originalDescription = '${ _("Region") }: ' + entity.region;
-                  entity.link = '/filebrowser/view=S3A://#s3a://' + entity.originalName;
-                  break;
-                }
-                case 'SUB_OPERATION': {
-                  entity.originalDescription = entity.metaClassName;
-                  break;
-                }
-                case 'PARTITION': {}
-                case 'OPERATION': {}
-              }
-              entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
-            });
-            self.searchResult(data.entities);
-            self.searchResultCount(data.count);
-            self.searching(false);
-          }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
-            self.searching(false);
-          });
-        };
-
         var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels[0].type);
 
         var lastFoundPanel = self.availablePanels.filter(function (panel) { return panel.type === lastOpenPanelType });
@@ -1737,79 +1428,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         self.visiblePanel.subscribe(function(newValue) {
           self.apiHelper.setInTotalStorage('assist', 'last.open.panel', newValue.type);
-          if (self.navigatorEnabled() && self.searchActive()) {
-            lastQuery = 'refresh';
-            self.performSearch();
-          }
           newValue.panelData.init();
         });
 
-        self.navAutocompleteSource = function (request, callback) {
-          var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
-          var isFacet = facetMatch !== null;
-          var partialMatch = isFacet ? null : request.term.match(/\S+$/);
-          var partial = isFacet && facetMatch[2] ? facetMatch[2] : (partialMatch ? partialMatch[0] : '');
-          var beforePartial = request.term.substring(0, request.term.length - partial.length);
-
-          self.apiHelper.navSearchAutocomplete({
-            source: self.visiblePanel().type === 'sql' ?
-                (self.visiblePanel().panelData.selectedSource() ? self.visiblePanel().panelData.selectedSource().sourceType : 'hive') : self.visiblePanel().type,
-            query:  request.term,
-            successCallback: function (data) {
-              var values = [];
-              var facetPartialRe = new RegExp(partial.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&"), 'i'); // Protect for 'tags:*axe'
-              if (isFacet && typeof data.facets !== 'undefined') { // Is typed facet, e.g. type: type:bla
-                var facetInQuery = facetMatch[1];
-                if (typeof data.facets[facetInQuery] !== 'undefined') {
-                  $.map(data.facets[facetInQuery], function (count, value) {
-                    if (facetPartialRe.test(value)) {
-                      values.push({ data: { label: facetInQuery + ':' + value, icon: NAV_FACET_ICON, description: count }, value: beforePartial + value})
-                    }
-                  });
-                }
-              } else {
-                if (typeof data.facets !== 'undefined') {
-                  Object.keys(data.facets).forEach(function (facet) {
-                    if (facetPartialRe.test(facet)) {
-                      if (Object.keys(data.facets[facet]).length > 0) {
-                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: $.map(data.facets[facet], function (key, value) { return value + ' (' + key + ')'; }).join(', ') }, value: beforePartial + facet + ':'});
-                      } else { // Potential facet from the list
-                        values.push({ data: { label: facet + ':', icon: NAV_FACET_ICON, description: '' }, value: beforePartial + facet + ':'});
-                      }
-                    } else if (partial.length > 0) {
-                      Object.keys(data.facets[facet]).forEach(function (facetValue) {
-                        if (facetValue.indexOf(partial) !== -1) {
-                          values.push({ data: { label: facet + ':' + facetValue, icon: NAV_FACET_ICON, description: facetValue }, value: beforePartial + facet + ':' + facetValue });
-                        }
-                      });
-                    }
-                  });
-                }
-              }
-
-              if (values.length > 0) {
-                values.push({ divider: true });
-              }
-              if (typeof data.results !== 'undefined') {
-                data.results.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
-                });
-              }
-
-              if (values.length > 0 && values[values.length - 1].divider) {
-                values.pop();
-              }
-              if (values.length === 0) {
-                values.push({ noMatch: true });
-              }
-              callback(values);
-            },
-            silenceErrors: true,
-            errorCallback: function () {
-              callback([]);
-            }
-          });
-        };
+        self.navigatorSearch = new NavigatorSearch(self, params.sql.navigationSettings);
       }
 
       ko.components.register('assist-panel', {
@@ -1973,7 +1595,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <ul data-bind="foreach: activeTables">
       <li>
         <span data-bind="text: name"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
-##         <span data-bind="text: name"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
       </li>
     </ul>
 
