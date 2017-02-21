@@ -389,6 +389,7 @@ except ImportError, e:
         }
 
         var self = this;
+        $.cookie('download-' + self.snippet.id(), null, { expires: -1, path: '/' })
         self.$downloadForm.find('input[name=\'format\']').val(format);
         self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
         self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
