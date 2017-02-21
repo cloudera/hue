@@ -290,6 +290,7 @@ ${ hueIcons.symbols() }
         </div>
         <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
           <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
+          <div id="mini_jobbrowser"></div>
         </div>
       % endif
     </div>
@@ -540,16 +541,6 @@ ${ assist.assistPanel() }
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 <script type="text/javascript">
-  (function () {
-    var proxiedKORegister = ko.components.register;
-    var LOADED_COMPONENTS = [];
-    ko.components.register = function () {
-      if (LOADED_COMPONENTS.indexOf(arguments[0]) === -1) {
-        LOADED_COMPONENTS.push(arguments[0]);
-        return proxiedKORegister.apply(this, arguments);
-      }
-    };
-  })();
 
   $(document).ready(function () {
     var options = {
@@ -697,6 +688,32 @@ ${ assist.assistPanel() }
           }
         });
 
+        function processHeaders(response){
+          var r = $('<span>').html(response);
+          r.find('link').each(function () {
+            $(this).attr('href', $(this).attr('href') + '?' + Math.random())
+          });
+          // load just CSS and JS files that are not loaded before
+          r.find('script[src]').each(function () {
+            var jsFile = $(this).attr('src').split('?')[0];
+            if (LOADED_JS.indexOf(jsFile) === -1) {
+              LOADED_JS.push(jsFile);
+              $(this).clone().appendTo($('head'));
+            }
+            $(this).remove();
+          });
+          r.find('link[href]').each(function () {
+            var cssFile = $(this).attr('href').split('?')[0];
+            if (LOADED_CSS.indexOf(cssFile) === -1) {
+              LOADED_CSS.push(cssFile);
+              $(this).clone().appendTo($('head'));
+            }
+            $(this).remove();
+          });
+          r.unwrap('<span>');
+          return r;
+        }
+
         self.currentApp.subscribe(function (newVal) {
           hueUtils.changeURLParameter('app', newVal);
           if (newVal !== 'editor') {
@@ -712,28 +729,7 @@ ${ assist.assistPanel() }
               dataType: 'html',
               success: function (response) {
                 self.extraEmbeddableURLParams('');
-                var r = $('<span>').html(response);
-                r.find('link').each(function () {
-                  $(this).attr('href', $(this).attr('href') + '?' + Math.random())
-                });
-                // load just CSS and JS files that are not loaded before
-                r.find('script[src]').each(function () {
-                  var jsFile = $(this).attr('src').split('?')[0];
-                  if (LOADED_JS.indexOf(jsFile) === -1) {
-                    LOADED_JS.push(jsFile);
-                    $(this).clone().appendTo($('head'));
-                  }
-                  $(this).remove();
-                });
-                r.find('link[href]').each(function () {
-                  var cssFile = $(this).attr('href').split('?')[0];
-                  if (LOADED_CSS.indexOf(cssFile) === -1) {
-                    LOADED_CSS.push(cssFile);
-                    $(this).clone().appendTo($('head'));
-                  }
-                  $(this).remove();
-                });
-                r.unwrap('<span>');
+                var r = processHeaders(response);
                 if (self.SKIP_CACHE.indexOf(newVal) === -1) {
                   self.embeddable_cache[newVal] = r;
                 }
@@ -789,6 +785,19 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
+        });
+
+        // load the mini jobbrowser
+        $.ajax({
+          url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('X-Requested-With', 'Hue');
+          },
+          dataType: 'html',
+          success: function (response) {
+            var r = processHeaders(response);
+            $('#mini_jobbrowser').html(r);
+          }
         });
 
       };
