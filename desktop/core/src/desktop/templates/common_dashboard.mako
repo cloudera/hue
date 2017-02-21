@@ -39,7 +39,7 @@
 
 <%def name="layout_toolbar()">
 
-<div class="card card-toolbar" data-bind="slideVisible: isEditing">
+<div class="card card-toolbar" data-bind="visible: isEditing">
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left">
     <div class="toolbar-label">${_('LAYOUT')}</div>
@@ -68,7 +68,7 @@
   </div>
   %endif
   %if hasattr(caller, "widgets"):
-  <div style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
+  <div class="card-toolbar-content" style="float: left; margin-left: 20px" data-bind="visible: columns().length > 0">
     %if hasattr(caller, "widgetSectionName"):
       <div class="toolbar-label">${caller.widgetSectionName()}</div>
     %else:

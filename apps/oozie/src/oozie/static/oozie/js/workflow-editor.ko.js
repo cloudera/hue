@@ -497,6 +497,11 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.isNested = ko.observable(true);
 
+  self.currentDraggableSection = ko.observable();
+  self.currentDraggableSection.subscribe(function (newVal) {
+    huePubSub.publish('oozie.draggable.section.change', newVal);
+  });
+
   self.canEdit = ko.mapping.fromJS(can_edit_json);
   self.isEditing = ko.observable(workflow_json.id == null);
   self.isEditing.subscribe(function (newVal) {
