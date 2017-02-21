@@ -14,4 +14,4 @@ distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
- */.retired{display:inline;margin-right:10px;margin-top:4px}.retired input{float:none !important;margin-right:3px;margin-top:-4px}#jobsTable tbody tr{height:45px}#noJobs{margin-top:40px;margin-bottom:40px;padding:20px;display:none}
+ */#jobbrowserComponents .content-panel-inner{padding:10px}#jobbrowserComponents .tab-content{padding:10px;border:none !important}#jobbrowserComponents .hueBreadcrumbBar{padding:0}#jobbrowserComponents .hueBreadcrumbBar li{padding:12px}#jobbrowserComponents .hueBreadcrumbBar li:first-child{padding-left:0;padding-right:0}#jobbrowserComponents .hueBreadcrumbBar a{color:#338BB8 !important;display:inline !important}#jobbrowserComponents .divider{color:#CCC;padding-right:12px}#jobbrowserComponents .app-icon{vertical-align:text-top}

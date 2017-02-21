@@ -105,6 +105,7 @@ def get_job(request, job_id):
 def apps(request):
   return render('job_browser.mako', request, {
     'is_embeddable': request.GET.get('is_embeddable', False),
+    'is_mini': request.GET.get('is_mini', False),
     'hiveserver2_impersonation_enabled': hiveserver2_impersonation_enabled()
   })
 

@@ -41,6 +41,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 </style>
 % endif
+<link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.basictable.min.js') }"></script>
@@ -64,43 +65,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 
 
-<style type="text/css">
-  #jobbrowserComponents .content-panel-inner {
-    padding: 10px;
-  }
-  #jobbrowserComponents .tab-content {
-    padding: 10px;
-    border: none!important;
-  }
-
-  #jobbrowserComponents .hueBreadcrumbBar {
-    padding: 0;
-  }
-
-  #jobbrowserComponents .hueBreadcrumbBar li {
-    padding: 12px;
-  }
-
-  #jobbrowserComponents .hueBreadcrumbBar li:first-child {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  #jobbrowserComponents .hueBreadcrumbBar a {
-    color: #338BB8 !important;
-    display: inline !important;
-  }
-
-  #jobbrowserComponents .divider {
-    color: #CCC;
-    padding-right: 12px;
-  }
-
-  #jobbrowserComponents .app-icon {
-    vertical-align: text-top;
-  }
-</style>
-
+% if not is_mini:
 <div class="navbar navbar-inverse navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
@@ -124,6 +89,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 </div>
+% endif
 
 <div class="main-content">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
