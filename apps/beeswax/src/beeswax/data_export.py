@@ -28,7 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 FETCH_SIZE = 1000
-DOWNLOAD_COOKIE_AGE = 5
+DOWNLOAD_COOKIE_AGE = 1800 # 30 minutes
 
 
 def download(handle, format, db, id=None):

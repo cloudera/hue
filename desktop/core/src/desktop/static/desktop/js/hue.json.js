@@ -62,10 +62,14 @@ JSON.bigdataParse = (function () {
 
 // Get the next character. When there are no more characters,
 // return the empty string.
-
-        ch = text.charAt(at);
-        at += 1;
-        return ch;
+        try {
+          ch = text.charAt(at);
+          at += 1;
+          return ch;
+        }
+        catch (e) {
+          return '';
+        }
       },
 
       number = function () {
