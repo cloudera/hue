@@ -76,7 +76,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;" data-bind="niceScroll">
       <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
         <div class="assist-db-header-actions">
-          <span class="assist-tables-counter" data-bind="visible: searchResult().length > 0">(<span data-bind="text: searchResultCount">0</span>)</span>
           <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
         </div>
       </div>
@@ -140,7 +139,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         self.searchInput = ko.observable('').extend({rateLimit: 500});
         self.searchResult = ko.observableArray();
-        self.searchResultCount = ko.observable();
 
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
@@ -293,7 +291,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
               entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
             });
             self.searchResult(data.entities);
-            self.searchResultCount(data.count);
             self.searching(false);
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);
