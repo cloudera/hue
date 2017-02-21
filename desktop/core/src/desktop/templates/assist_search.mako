@@ -31,11 +31,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   <script type="text/html" id="nav-search-autocomp-item">
     <a>
       <div class="nav-autocomplete-item-link">
-        <div style="padding: 12px 8px 0 8px;"><i class="fa fa-fw" data-bind="css: icon"></i></div>
-        <div>
-          <div style="font-size: 14px; color: #338bb8" data-bind="html: label, style: { 'padding-top': description ? 0 : '10px' }"></div>
+        <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
+        <div class="nav-search-result-text">
+          <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
           <!-- ko if: description -->
-          <div style="display:inline-block; width: 250px; overflow: hidden; white-space: nowrap; text-overflow:ellipsis; font-size: 12px;" data-bind="html: description"></div>
+          <div class="nav-search-result-description" data-bind="html: description"></div>
           <!-- /ko -->
         </div>
       </div>
@@ -44,7 +44,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
   <script type="text/html" id="nav-search-autocomp-no-match">
     <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div style="font-size: 12px; margin: 6px 8px; color: #737373; font-style: italic;">${ _('No recent match found') }</div>
+      <div class="nav-autocomplete-empty">${ _('No recent match found') }</div class>
     </div>
   </script>
 
@@ -60,6 +60,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           onEnter: performSearch,
           valueObservable: searchInput,
           onSelect: performSearch,
+          limitWidthToInput: true,
           reopenPattern: /.*:$/
         },
         hasFocus: searchHasFocus,
@@ -73,34 +74,38 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="nav-search-result">
-    <div style="position:absolute; left:0; right: 0; top: 0; bottom: 0; overflow: hidden; background-color: #FFF;" data-bind="niceScroll">
-      <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
-        <div class="assist-db-header-actions">
-          <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
-        </div>
-      </div>
-      <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
-      <!-- ko if: !searching() -->
-      <!-- ko if: searchResult().length == 0 -->
-        <div class="result-entry">${ _('No result found.') }</div>
-      <!-- /ko -->
-      <div data-bind="foreach: searchResult" style="overflow-x:hidden">
-        <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
-          <div class="icon-col">
-            <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
-          </div>
-          <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
-            <!-- ko if: typeof click !== 'undefined' -->
-            <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
-            <!-- /ko -->
-            <!-- ko if: typeof click === 'undefined' && typeof link !== 'undefined'-->
-            <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
-            <!-- /ko -->
-            <div class="doc-desc" data-bind="html: hue_description"></div>
+    <div class="nav-search-result assist-flex-panel">
+      <div class="assist-flex-header">
+        <div class="assist-inner-header" style="width: inherit;">${ _('Search result') }
+          <div class="assist-db-header-actions">
+            <a class="inactive-action" href="javascript:void(0)" data-bind="click: function() { searchActive(false); }"><i class="pointer fa fa-times" title="${ _('Close') }"></i></a>
           </div>
         </div>
       </div>
-      <!-- /ko -->
+      <div class="assist-flex-fill" data-bind="niceScroll" style="overflow:hidden;">
+        <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
+        <!-- ko if: !searching() -->
+        <!-- ko if: searchResult().length == 0 -->
+          <div class="result-entry">${ _('No result found.') }</div>
+        <!-- /ko -->
+        <div data-bind="foreach: searchResult">
+          <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
+            <div class="icon-col">
+              <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
+            </div>
+            <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
+              <!-- ko if: typeof click !== 'undefined' -->
+              <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
+              <!-- /ko -->
+              <!-- ko if: typeof click === 'undefined' && typeof link !== 'undefined'-->
+              <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+              <!-- /ko -->
+              <div class="doc-desc" data-bind="html: hue_description"></div>
+            </div>
+          </div>
+        </div>
+        <!-- /ko -->
+      </div>
     </div>
   </script>
 
