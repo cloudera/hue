@@ -351,7 +351,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
               }
               if (typeof data.results !== 'undefined') {
                 data.results.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: result.originalName });
                 });
               }
 
