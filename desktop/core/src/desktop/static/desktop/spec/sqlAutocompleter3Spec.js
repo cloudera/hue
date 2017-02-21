@@ -36,7 +36,6 @@
           suggestKeywords: [{ value: 'BAR', weight: 1 }, { value: 'FOO', weight: 2 }]
         });
         expect(subject.filtered().length).toBe(2);
-        console.log(subject.filtered());
         // Sorted by weight, case adjusted
         expect(subject.filtered()[0].meta).toBe(AutocompleterGlobals.i18n.meta.keyword);
         expect(subject.filtered()[0].value).toBe('foo');

@@ -269,9 +269,9 @@ var ApiHelper = (function () {
           errorMessage = errorResponse.message;
         } else if (typeof errorResponse.statusText !== 'undefined') {
           errorMessage = errorResponse.statusText;
-        } else if (errorResponse.error !== 'undefined' && toString.call(errorResponse.error) === '[object String]' ) {
+        } else if (errorResponse.error !== 'undefined' && Object.prototype.toString.call(errorResponse.error) === '[object String]' ) {
           errorMessage = errorResponse.error;
-        } else if (toString.call(errorResponse) === '[object String]') {
+        } else if (Object.prototype.toString.call(errorResponse) === '[object String]') {
           errorMessage = errorResponse;
         }
       }

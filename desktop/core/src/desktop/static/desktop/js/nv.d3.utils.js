@@ -63,7 +63,7 @@ nv.utils.isFunction = function (a) {
   return typeof a === 'function';
 };
 nv.utils.isDate = function (a) {
-  return toString.call(a) === '[object Date]';
+  return Object.prototype.toString.call(a) === '[object Date]';
 };
 nv.utils.isNumber = function (a) {
   return !isNaN(a) && typeof a === 'number';
