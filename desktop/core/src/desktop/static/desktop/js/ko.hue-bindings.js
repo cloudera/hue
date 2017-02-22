@@ -4217,7 +4217,7 @@
 
       var huePubSubs = [];
 
-      var scrollToIndex = function (idx, offset) {
+      var scrollToIndex = function (idx, offset, entry) {
         var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
         if (! lastKnownHeights) {
           return;
@@ -4226,26 +4226,25 @@
         for (var i = 0; i < idx; i++) {
           top += lastKnownHeights[i];
         }
-        $container.scrollTop(top + offset);
+        window.setTimeout(function () {
+          $('.assist-db-scrollable').stop().animate({ scrollTop: top + offset }, '500', 'swing', function () {
+            huePubSub.publish('assist.db.scrollToComplete', entry);
+          });
+        }, 0);
+
       };
 
-      huePubSubs.push(huePubSub.subscribe('assist.db.scrollToHighlight', function () {
-        var foundIndex;
+      huePubSubs.push(huePubSub.subscribe('assist.db.scrollTo', function (targetEntry) {
+        var foundIndex = -1;
         $.each(allEntries, function (idx, entry) {
-          if ((typeof entry.highlight !== 'undefined' && entry.highlight() || (typeof entry.highlightParent !== 'undefined' && entry.highlightParent()))) {
+          if (targetEntry === entry) {
             foundIndex = idx;
-            window.setTimeout(function () {
-              entry.highlight(false);
-              entry.highlightParent(false);
-            }, 500); // 500 for animation effect
             return false;
           }
         });
-        if (foundIndex) {
-          var offset = depth > 0 ? $container.scrollTop() : 0;
-          window.setTimeout(function () {
-            scrollToIndex(foundIndex, offset);
-          }, 0);
+        if (foundIndex !== -1) {
+          var offset = depth > 0 ? $parentFVOwnerElement.position().top : 0;
+          scrollToIndex(foundIndex, offset, targetEntry);
         }
       }));
 
@@ -4473,7 +4472,7 @@
         setStartAndEndFromScrollTop();
         if (typeof options.fetchMore !== 'undefined' && endIndex !== lastEndIndex && endIndex === allEntries.length - 1) {
           options.fetchMore();
-        };
+        }
 
         clearTimeout(renderThrottle);
         if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||

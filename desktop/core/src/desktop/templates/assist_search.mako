@@ -187,6 +187,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             self.searchHasFocus(false);
             var path = entry.parentPath.split('/').concat([entry.originalName]).splice(1);
             window.setTimeout(function () {
+              huePubSub.publish('sql.context.popover.hide');
               huePubSub.publish('assist.db.highlight', { sourceType: entry.sourceType.toLowerCase(), path: path });
             }, 200); // For animation effect
           };

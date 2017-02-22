@@ -301,32 +301,48 @@ var AssistDbSource = (function () {
 
     var foundDb;
     var index;
+
     var findDatabase = function () {
       $.each(self.databases(), function (idx, db) {
+        db.highlight(false);
         if (db.databaseName === path[0]) {
           foundDb = db;
           index = idx;
         }
       });
-      if (foundDb && path.length > 1) {
+
+      if (foundDb) {
         var whenLoaded = function () {
-          self.selectedDatabase(foundDb);
-          foundDb.highlightInside(path.slice(1), []);
-          foundDb.open(true);
+          if (self.selectedDatabase() !== foundDb) {
+            self.selectedDatabase(foundDb);
+          }
+          if (!foundDb.open()) {
+            foundDb.open(true);
+          }
+          window.setTimeout(function () {
+            huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+              foundDb.highlight(true);
+              // Timeout is for animation effect
+              window.setTimeout(function () {
+                foundDb.highlight(false);
+              }, 400);
+            });
+            if (path.length > 1) {
+              foundDb.highlightInside(path.slice(1), []);
+            } else {
+              huePubSub.publish('assist.db.scrollTo', foundDb);
+            }
+          }, 0);
         };
+
         if (foundDb.hasEntries()) {
           whenLoaded();
         } else {
           foundDb.loadEntries(whenLoaded);
         }
-      } else if (foundDb) {
-        self.selectedDatabase(null);
-        foundDb.highlight(true);
-        window.setTimeout(function() {
-          huePubSub.publish('assist.db.scrollToHighlight');
-        }, 0)
       }
     };
+
     if (!self.loaded()) {
       self.initDatabases(findDatabase);
     } else {

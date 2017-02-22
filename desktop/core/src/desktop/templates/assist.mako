@@ -903,25 +903,29 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         });
 
         huePubSub.subscribe('assist.db.highlight', function (location) {
-          huePubSub.publish('assist.hide.search');
-          var foundSource;
-          $.each(self.sources(), function (idx, source) {
-            if (source.sourceType === location.sourceType) {
-              foundSource = source;
-              return false;
-            }
-          });
-          if (foundSource) {
-            if (foundSource.hasEntries()) {
-              self.selectedSource(foundSource);
-              foundSource.highlightInside(location.path);
-            } else {
-              foundSource.initDatabases(function () {
-                self.selectedSource(foundSource);
+          huePubSub.publish('sql.context.popover.hide');
+          window.setTimeout(function () {
+            var foundSource;
+            $.each(self.sources(), function (idx, source) {
+              if (source.sourceType === location.sourceType) {
+                foundSource = source;
+                return false;
+              }
+            });
+            if (foundSource) {
+              var whenLoaded = function () {
+                if (self.selectedSource() !== foundSource) {
+                  self.selectedSource(foundSource);
+                }
                 foundSource.highlightInside(location.path);
-              });
+              };
+              if (foundSource.hasEntries()) {
+                whenLoaded();
+              } else {
+                foundSource.initDatabases(whenLoaded);
+              }
             }
-          }
+          }, 0);
         });
 
         self.selectedSource = ko.observable(null);
