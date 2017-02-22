@@ -50,7 +50,6 @@ var AssistDbEntry = (function () {
     self.sourceType = self.assistDbSource.sourceType;
     self.invalidateOnRefresh =  self.assistDbSource.invalidateOnRefresh;
     self.highlight = ko.observable(false);
-    self.highlightParent = ko.observable(false);
     self.activeSort = self.assistDbSource.activeSort;
     self.popularity = ko.observable(0);
 
@@ -217,28 +216,45 @@ var AssistDbEntry = (function () {
     var searchEntry = function () {
       var foundEntry;
       $.each(self.entries(), function (idx, entry) {
+        entry.highlight(false);
         if (entry.definition.name === path[0]) {
           foundEntry = entry;
-          entry.open(true);
-          return false;
         }
       });
       if (foundEntry) {
-        if (path.length > 1) {
-          foundEntry.highlightParent(true);
-          huePubSub.publish('assist.db.scrollToHighlight');
-          window.setTimeout(function () {
-            foundEntry.highlightInside(path.slice(1));
-          }, 0);
-        } else {
-          foundEntry.highlight(true);
-          huePubSub.publish('assist.db.scrollToHighlight');
+        if (foundEntry.expandable && !foundEntry.open()) {
+          foundEntry.open(true);
         }
+
+        window.setTimeout(function () {
+          huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+            foundEntry.highlight(true);
+            // Timeout is for animation effect
+            window.setTimeout(function () {
+              foundEntry.highlight(false);
+            }, 400);
+          });
+
+          if (path.length > 1) {
+            foundEntry.highlightInside(path.slice(1));
+          } else {
+            huePubSub.publish('assist.db.scrollTo', foundEntry);
+          }
+        }, 0);
       }
     };
 
-    if (self.entries().length == 0) {
-      self.loadEntries(searchEntry);
+    if (self.entries().length === 0) {
+      if (self.loading()) {
+        var subscription = self.loading.subscribe(function (newVal) {
+          if (!newVal) {
+            subscription.dispose();
+            searchEntry();
+          }
+        });
+      } else {
+        self.loadEntries(searchEntry);
+      }
     } else {
       searchEntry();
     }
