@@ -3435,6 +3435,19 @@
         }
       }
 
+      var lastEditorValue = null;
+      var checkEditorValueInterval = -1;
+      editor.on('paste', function (e) {
+        window.clearInterval(checkEditorValueInterval);
+        checkEditorValueInterval = window.setInterval(function () {
+          if (lastEditorValue !== editor.getValue()) {
+            window.clearInterval(checkEditorValueInterval);
+            lastEditorValue = editor.getValue();
+            editor.setValue(removeUnicodes(lastEditorValue), 1);
+          }
+        }, 10);
+      });
+
       editor.on("input", function () {
         if (editor.getValue().length == 0) {
           if (!placeHolderVisible && placeHolderElement) {
