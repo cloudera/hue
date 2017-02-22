@@ -136,10 +136,10 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
       </a>
     <ul class="dropdown-menu toolbar-dropdown">
       <!-- ko if: $root.currentDraggableSection() === 'actions' -->
-      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('documents') }">${ _('View documents') }</a></li>
+      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('documents') }">${ _('Documents') }</a></li>
       <!-- /ko -->
       <!-- ko if: $root.currentDraggableSection() === 'documents' -->
-      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('actions') }">${ _('View actions') }</a></li>
+      <li><a href="javascript: void(0)" data-bind="click: function(){ $root.currentDraggableSection('actions') }">${ _('Actions') }</a></li>
       <!-- /ko -->
     </ul>
     % endif
@@ -579,6 +579,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/ext/chosen/chosen.jquery.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/select2.full.patched.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
+<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ dashboard.import_bindings() }
 
@@ -600,17 +601,22 @@ ${ dashboard.import_bindings() }
 <script type="text/javascript">
   ${ utils.slaGlobal() }
 
+  var apiHelper = ApiHelper.getInstance();
+
   var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
   shareViewModel.setDocUuid('${ doc_uuid }');
 
+
   % if ENABLE_DOCUMENT_ACTION.get():
-  viewModel.currentDraggableSection('documents');
+  var defaultSection = 'documents';
   % else:
-  viewModel.currentDraggableSection('actions');
+  var defaultSection = 'actions';
   % endif
+
+  viewModel.currentDraggableSection(apiHelper.getFromTotalStorage('oozie', 'draggable_section', defaultSection));
 
   viewModel.init();
   viewModel.workflow.tracker().markCurrentStateAsClean();
@@ -856,6 +862,7 @@ ${ dashboard.import_bindings() }
     });
 
     huePubSub.subscribe('oozie.draggable.section.change', function(val){
+      apiHelper.setInTotalStorage('oozie', 'draggable_section', val);
       if (val === 'actions'){
         hueUtils.waitForRendered('.draggable-actions', function(el){ return el.length > 0 }, resizeToolbar);
       }
