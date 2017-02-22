@@ -2266,9 +2266,9 @@ class ImpalaDocumentAction(HiveDocumentAction):
   }
   FIELDS['uuid'] = {
       'name': 'uuid',
-      'label': _('Hive query'),
+      'label': _('Impala query'),
       'value': '',
-      'help_text': _('Select a saved Hive query you want to schedule.'),
+      'help_text': _('Select a saved Impala query you want to schedule.'),
       'type': 'impala'
   }
 
