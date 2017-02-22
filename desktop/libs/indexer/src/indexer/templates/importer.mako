@@ -489,28 +489,27 @@ ${ assist.assistPanel() }
             </label>
           </div>
           <div class="control-group">
-            <label for="collectionName" class="control-label"><div>${ _('Name') }</div>
-              <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
-                <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
-              <!-- /ko -->
+            <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
+            <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
+              <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+            <!-- /ko -->
 
-              <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-                <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
-              <!-- /ko -->
+            <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
+            <!-- /ko -->
 
-              <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
-                ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
-              </span>
-              <span class="help-inline muted" data-bind="visible: isTargetExisting(), click: function(){ window.open(existingTargetUrl()) }">
-                <!-- ko if: outputFormat() == 'index' -->
-                  ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
-                <!-- /ko -->
-                <!-- ko if: outputFormat() != 'index' -->
-                <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
-                <!-- /ko -->
-                <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
-              </span>
-            </label>
+            <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
+              ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
+            </span>
+            <span class="help-inline muted" data-bind="visible: isTargetExisting(), click: function(){ window.open(existingTargetUrl()) }">
+              <!-- ko if: outputFormat() == 'index' -->
+                ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
+              <!-- /ko -->
+              <!-- ko if: outputFormat() != 'index' -->
+              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
+              <!-- /ko -->
+              <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
+            </span>
           </div>
         </div>
       </div>
