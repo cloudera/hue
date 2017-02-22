@@ -154,7 +154,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       <p class="muted">${_('Deleting a bucket will delete all of its contents and release the bucket name to be reserved by others.')}</p>
       <!-- /ko -->
       <!-- ko ifnot: isS3() && isS3Root() -->
+      <!-- ko ifnot: $root.skipTrash -->
       <p>${_('Are you sure you want to delete these files?')}</p>
+      <!-- /ko -->
+      <!-- ko if: $root.skipTrash -->
+      <p>${_('Are you sure you want to permanently delete these files?')}</p>
+      <!-- /ko -->
       <ul data-bind="foreach: $root.selectedFiles">
         <li data-bind="visible: $index() <= 10">
           <span data-bind="text: name"></span>
@@ -996,6 +1001,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.sortDescending = ko.observable(false);
       self.searchQuery = ko.observable("");
       self.searchQuery.extend({ rateLimit: 500 });
+      self.skipTrash = ko.observable(false);
       self.enableFilterAfterSearch = true;
       self.isCurrentDirSentryManaged = ko.observable(false);
       self.pendingUploads = ko.observable(0);
@@ -1614,7 +1620,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       };
 
-      var deleteSelected = function(skip_trash) {
+      var deleteSelected = function() {
         var paths = [];
 
         $(self.selectedFiles()).each(function (index, file) {
@@ -1624,7 +1630,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         hiddenFields($("#deleteForm"), 'path', paths);
 
         $("#deleteForm").attr("action", "/filebrowser/rmtree" + "?" +
-          (skip_trash ? "skip_trash=true&" : "") +
+          (self.skipTrash() ? "skip_trash=true&" : "") +
           "next=${url('filebrowser.views.view', path='')}" + self.currentPath());
 
         $("#deleteModal").modal({
@@ -1656,10 +1662,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       };
 
       self.deleteSelected = function () {
-        deleteSelected(true);
+        self.skipTrash(true);
+        deleteSelected();
       };
 
       self.trashSelected = function () {
+        self.skipTrash(false);
         deleteSelected();
       };
 
