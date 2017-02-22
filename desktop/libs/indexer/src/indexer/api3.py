@@ -26,6 +26,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
 from notebook.connectors.base import get_api, Notebook
+from notebook.decorators import api_error_handler
 from notebook.models import make_notebook
 
 from indexer.controller import CollectionManagerController
@@ -149,6 +150,7 @@ def index_file(request):
   return JsonResponse(job_handle)
 
 
+@api_error_handler
 def importer_submit(request):
   source = json.loads(request.POST.get('source', '{}'))
   outputFormat = json.loads(request.POST.get('destination', '{}'))['outputFormat']
@@ -189,19 +191,13 @@ def create_database(request, source, destination):
   editor_type = 'hive'
   on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
 
-  try:
-    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url)
-    return notebook.execute(request, batch=False)
-  except Exception, e:
-    raise PopupException(_('The table could not be created.'), detail=e.message)
+  notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url)
+  return notebook.execute(request, batch=False)
 
 
 def _create_table(request, source, destination):
-  try:
-    notebook = _create_table_from_a_file(request, source, destination)
-    return notebook.execute(request, batch=False)
-  except Exception, e:
-    raise PopupException(_('The table could not be created.'), detail=e.message)
+  notebook = _create_table_from_a_file(request, source, destination)
+  return notebook.execute(request, batch=False)
 
 
 def _create_table_from_a_file(request, source, destination):

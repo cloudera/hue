@@ -1534,65 +1534,71 @@ ${ assist.assistPanel() }
           "source": ko.mapping.toJSON(self.source),
           "destination": ko.mapping.toJSON(self.destination)
         }, function (resp) {
-          self.showCreate(true);
-          self.editorId(resp.history_id);
-          self.jobId(resp.handle.id);
-          $('#importerNotebook').html($('#importerNotebook-progress').html());
+          if (resp.status != 0) {
+            $(document).trigger("error", resp.message);
+            self.indexingStarted(false);
+            self.isIndexing(false);
+          } else {
+            self.showCreate(true);
+            self.editorId(resp.history_id);
+            self.jobId(resp.handle.id);
+            $('#importerNotebook').html($('#importerNotebook-progress').html());
 
-          self.editorVM = new EditorViewModel(resp.history_uuid, '', {
-            user: '${ user.username }',
-            userId: ${ user.id },
-            languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
-            snippetViewSettings: {
-              java : {
-                snippetIcon: 'fa-file-archive-o '
-              },
-              hive: {
-                placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-                aceMode: 'ace/mode/hive',
-                snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-                sqlDialect: true
-              },
-              impala: {
-                placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-                aceMode: 'ace/mode/impala',
-                snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-                sqlDialect: true
-              }
-            }
-          });
-          self.editorVM.editorMode(true);
-          self.editorVM.isNotificationManager(true);
-          ko.cleanNode($("#importerNotebook")[0]);
-          ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
-
-          self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
-            self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
-              if (val == 100){
-                self.indexingStarted(false);
-                self.isIndexing(false);
-                self.indexingSuccess(true);
-              }
-            });
-            self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
-              if (val == 'failed'){
-                self.isIndexing(false);
-                self.indexingStarted(false);
-                self.indexingError(true);
-              } else if (val == 'available') {
-                var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
-                if (! snippet.result.handle().has_more_statements) {
-                  if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                    huePubSub.publish('assist.clear.db.cache', {sourceType: 'hive'});
-                    window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
-                  }
-                } else { // Perform last DROP statement execute
-                  snippet.execute();
+            self.editorVM = new EditorViewModel(resp.history_uuid, '', {
+              user: '${ user.username }',
+              userId: ${ user.id },
+              languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
+              snippetViewSettings: {
+                java : {
+                  snippetIcon: 'fa-file-archive-o '
+                },
+                hive: {
+                  placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+                  aceMode: 'ace/mode/hive',
+                  snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
+                  sqlDialect: true
+                },
+                impala: {
+                  placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
+                  aceMode: 'ace/mode/impala',
+                  snippetImage: '${ static("impala/art/icon_impala_48.png") }',
+                  sqlDialect: true
                 }
               }
             });
-            self.editorVM.selectedNotebook().snippets()[0].checkStatus();
-          });
+            self.editorVM.editorMode(true);
+            self.editorVM.isNotificationManager(true);
+            ko.cleanNode($("#importerNotebook")[0]);
+            ko.applyBindings(self.editorVM, $("#importerNotebook")[0]);
+
+            self.editorVM.openNotebook(resp.history_uuid, null, true, function(){
+              self.editorVM.selectedNotebook().snippets()[0].progress.subscribe(function(val){
+                if (val == 100){
+                  self.indexingStarted(false);
+                  self.isIndexing(false);
+                  self.indexingSuccess(true);
+                }
+              });
+              self.editorVM.selectedNotebook().snippets()[0].status.subscribe(function(val){
+                if (val == 'failed'){
+                  self.isIndexing(false);
+                  self.indexingStarted(false);
+                  self.indexingError(true);
+                } else if (val == 'available') {
+                  var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
+                  if (! snippet.result.handle().has_more_statements) {
+                    if (self.editorVM.selectedNotebook().onSuccessUrl()) {
+                      huePubSub.publish('assist.clear.db.cache', {sourceType: 'hive'});
+                      window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
+                    }
+                  } else { // Perform last DROP statement execute
+                    snippet.execute();
+                  }
+                }
+              });
+              self.editorVM.selectedNotebook().snippets()[0].checkStatus();
+            });
+          }
           viewModel.isLoading(false);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
