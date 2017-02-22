@@ -320,9 +320,9 @@ ${ components.menubar() }
           ${ csrf_token(request) | n,unicode }
           <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times</a>
-            <div class="alert-message block-message warning">${ _('Warning: This will drop all tables and objects within the database.') }</div>
-            </br>
             <h3 id="dropDatabaseMessage">${ _('Do you really want to delete the following database(s)?') }</h3>
+          </div>
+          <div class="modal-body">
             <ul data-bind="foreach: selectedDatabases">
               <li>
                 <span data-bind="text: name"></span>
@@ -333,6 +333,7 @@ ${ components.menubar() }
             </ul>
           </div>
           <div class="modal-footer">
+            <div class="label label-important margin-top-5 pull-left">${ _('Warning: This will drop all tables and objects within the database.') }</div>
             <input type="button" class="btn" data-dismiss="modal" value="${_('No')}">
             <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
           </div>
