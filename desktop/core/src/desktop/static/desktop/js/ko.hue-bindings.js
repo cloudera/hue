@@ -93,7 +93,8 @@
         minLength: 0,
         limitWidthToInput: false,
         minWidth: 200,
-        disabled: true
+        disabled: true,
+        delay: 400
       }, options);
 
       if (options.addCount) {

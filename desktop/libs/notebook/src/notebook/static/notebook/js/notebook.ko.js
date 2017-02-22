@@ -382,9 +382,7 @@ var EditorViewModel = (function() {
     var lastFetchQueriesRequest = null;
 
     self.fetchQueries = function () {
-      if (lastFetchQueriesRequest !== null && lastFetchQueriesRequest.readyState < 4) {
-        lastFetchQueriesRequest.abort();
-      }
+      self.getApiHelper().cancelActiveRequest(lastFetchQueriesRequest);
 
       var QUERIES_PER_PAGE = 50;
       lastQueriesPage = self.queriesCurrentPage();
@@ -869,9 +867,7 @@ var EditorViewModel = (function() {
           return;
         }
 
-        if (lastComplexityRequest && lastComplexityRequest.readyState < 4) {
-          lastComplexityRequest.abort();
-        }
+        self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
 
         logGA('get_query_risk');
         self.complexityCheckRunning(true);
@@ -1198,9 +1194,7 @@ var EditorViewModel = (function() {
     };
 
     self.queryCompatibility = function (targetPlatform) {
-      if (lastCompatibilityRequest && lastCompatibilityRequest.readyState < 4) {
-        lastCompatibilityRequest.abort();
-      }
+      self.getApiHelper().cancelActiveRequest(lastCompatibilityRequest);
 
       logGA('compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());

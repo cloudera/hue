@@ -290,6 +290,12 @@ var ApiHelper = (function () {
     };
   };
 
+  ApiHelper.prototype.cancelActiveRequest = function (request) {
+    if (typeof request !== 'undefined' && request !== null && request.readyState < 4) {
+      request.abort();
+    }
+  };
+
   /**
    * @param {string} url
    * @param {Object} data
@@ -1672,7 +1678,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.navSearchAutocomplete = function (options) {
     var self = this;
-    $.post('/desktop/api/search/entities_interactive', {
+    return $.post('/desktop/api/search/entities_interactive', {
       query_s: ko.mapping.toJSON(options.query),
       limit: 10,
       sources: '["' + options.source + '"]'
