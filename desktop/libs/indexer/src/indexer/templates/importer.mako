@@ -732,8 +732,6 @@ ${ assist.assistPanel() }
         <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
           ${_('Status')}
         </a>
-
-        ${ _('View collection') } <a href="javascript:void(0)" data-bind="attr: {href: '${ url("indexer:collections") }' +'#edit/' + createWizard.source.name() }, text: createWizard.source.name" target="_blank"></a>
       </span>
 
       <div id="importerNotebook"></div>
@@ -924,6 +922,11 @@ ${ assist.assistPanel() }
         'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%; height: 4px">
         <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
       </div>
+    <div class="snippet-error-container alert alert-error alert-error-gradient" data-bind="visible: errors().length > 0">
+      <ul class="unstyled" data-bind="foreach: errors">
+        <li data-bind="text: message"></li>
+      </ul>
+    </div>
     <!-- /ko -->
   <!-- /ko -->
 </script>
