@@ -699,12 +699,6 @@ ${ dashboard.import_bindings() }
     viewModel.newAction(null);
   }
 
-  $(document).on("editingToggled", function(){
-    $("canvas").remove();
-    exposeOverlayClickHandler();
-    window.setTimeout(renderChangeables, 100);
-  });
-
   function resizeDrops() {
     $(".drop-target-side").each(function () {
       var _el = $(this);
@@ -816,6 +810,24 @@ ${ dashboard.import_bindings() }
   $(document).ready(function(){
     renderChangeables();
 
+    $(document).on("editingToggled", function () {
+      $("canvas").remove();
+      exposeOverlayClickHandler();
+      if (viewModel.isEditing()) {
+        hueUtils.waitForRendered('.card-toolbar-content', function (el) {
+          return el.height() > 40 && el.height() < 200
+        }, function () {
+          resizeToolbar();
+          renderChangeables();
+        });
+      }
+      else {
+        hueUtils.waitForRendered('.card-toolbar-content', function (el) {
+          return !el.is(':visible')
+        }, renderChangeables);
+      }
+    });
+
     function resizeToolbar() {
       $('.draggable-widget').css('width', '');
       $('.draggable-widget img').css({
@@ -832,11 +844,13 @@ ${ dashboard.import_bindings() }
           $('.draggable-widget .draggable-icon').css('fontSize', width / 2);
         }
       }
-      var marginLeft = $('.card-toolbar').width()/2 - $('.card-toolbar-content').width()/2;
+      var marginLeft = $('.card-toolbar').width() / 2 - $('.card-toolbar-content').width() / 2;
       $('.card-toolbar-content').css('marginLeft', marginLeft + 'px');
     }
 
-    hueUtils.waitForRendered('.card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
+    if (viewModel.isEditing()){
+      hueUtils.waitForRendered('.card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
+    }
 
     $(document).on("blur", "[validate]", function() {
       validateFields();
