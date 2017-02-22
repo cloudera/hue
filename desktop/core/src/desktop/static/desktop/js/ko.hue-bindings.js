@@ -92,7 +92,8 @@
         showOnFocus: false,
         minLength: 0,
         limitWidthToInput: false,
-        minWidth: 200
+        minWidth: 200,
+        disabled: true
       }, options);
 
       if (options.addCount) {
@@ -226,6 +227,11 @@
       }
 
       $element.hueAutocomplete(options);
+
+      // IE 11 trick to prevent it from being shown on page refresh
+      window.setTimeout(function () {
+        $element.hueAutocomplete("option", "disabled", false);
+      }, 1000);
     }
   };
 
