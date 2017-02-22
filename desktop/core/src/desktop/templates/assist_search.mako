@@ -44,7 +44,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
   <script type="text/html" id="nav-search-autocomp-no-match">
     <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div class="nav-autocomplete-empty">${ _('No recent match found') }</div class>
+      <div class="nav-autocomplete-empty">${ _('No recent match found') }</div>
     </div>
   </script>
 

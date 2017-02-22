@@ -130,10 +130,15 @@
             }
           },
           _renderMenu: function (ul, items) {
+            var self = this;
             if (options.limitWidthToInput) {
               ul.css('max-width', Math.max(options.minWidth, $element.outerWidth(true)) + 'px');
             }
-            var self = this;
+
+            if (!ul.hasClass('nicescrollified')) {
+              ko.bindingHandlers.niceScroll.init(ul[0], function () {});
+            }
+
             ul.addClass(this.options.classPrefix + 'autocomplete');
             $.each(items, function (index, item) {
               self._renderItemData(ul, item);
