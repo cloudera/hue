@@ -34,16 +34,14 @@ from desktop.views import _ko
           <div class="autocompleter-spinner"><!-- ko hueSpinner: { spin: suggestions.loading, size: 'small' } --><!-- /ko --></div>
         </div>
         <!-- /ko -->
-        <div class="autocompleter-entries">
-          <div class="autocompleter-list" data-bind="foreach: suggestions.filtered">
-            <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
-                css: { 'selected': $index() === $parent.selectedIndex() },
-                event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
-              <div class="autocompleter-suggestion-value">
-                <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
-              </div>
-              <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
+        <div class="autocompleter-entries" data-bind="foreach: suggestions.filtered">
+          <div class="autocompleter-suggestion" data-bind="click: function () { $parent.selectedIndex($index()); $parent.insertSuggestion(); $parent.editor().focus(); },
+              css: { 'selected': $index() === $parent.selectedIndex() },
+              event: { 'mouseover': function () { $parent.hoveredIndex($index()); }, 'mouseout': function () { $parent.hoveredIndex(null); } }">
+            <div class="autocompleter-suggestion-value">
+              <div class="autocompleter-dot" data-bind="style: { 'background-color': category.color }"></div> <span data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter }"></span> <!-- ko if: details && details.primary_key === 'true' --><i class="fa fa-key"></i><!-- /ko -->
             </div>
+            <div class="autocompleter-suggestion-meta"><!-- ko if: popular --><i class="fa fa-star-o popular-color"></i> <!-- /ko --><span data-bind="text: meta"></span></div>
           </div>
         </div>
       </div>
@@ -61,8 +59,10 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> <span data-bind="text: details.signature.substring(0, details.signature.indexOf('('));"></span></div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: details.signature"></div>
-        <div class="details-comment" data-bind="text: details.description"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: details.signature"></div>
+          <div class="details-comment" data-bind="text: details.description"></div>
+        </div>
       </div>
     </div>
   </script>
@@ -74,17 +74,19 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-eye': details.type.toLowerCase() !== 'table', 'fa-table': details.type.toLowerCase() === 'table' }"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
-        <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
-        <!-- ko if: typeof details.popularity !== 'undefined' -->
-        <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
+          <!-- ko if: typeof details.popularity !== 'undefined' -->
+          <div class="details-popularity margin-left-5" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+            </div>
           </div>
+          <!-- /ko -->
+          <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
+          <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
-        <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
-        <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
-        <!-- /ko -->
       </div>
     </div>
   </script>
@@ -94,22 +96,24 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
-        <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
-        <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
-        <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
-        <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
-        <!-- /ko -->
-        <!-- ko if: typeof details.popularity !== 'undefined' -->
-        <br/>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
+          <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
+          <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
+          <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
+          <!-- /ko -->
+          <!-- ko if: typeof details.popularity !== 'undefined' -->
+          <br/>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.popularity.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.popularity.relativePopularity + '%' }"></div>
+            </div>
           </div>
+          <!-- /ko -->
+          <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
+          <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
-        <!-- ko if: typeof details.comment !== 'undefined' && details.comment !== null -->
-        <div class="details-comment" data-bind="matchedText: { suggestion: $data, filter: $parent.suggestions.filter, isComment: true }"></div>
-        <!-- /ko -->
       </div>
     </div>
     <!-- /ko -->
@@ -120,8 +124,10 @@ from desktop.views import _ko
 
   <script type="text/html" id="autocomplete-details-hdfs">
     <div class="autocompleter-details">
-      <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
-      <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"></div>
+      <div class="autocompleter-details-contents-inner">
+        <div class="autocompleter-header"><i class="fa fa-fw" data-bind="css: { 'fa-folder-o': details.type === 'dir', 'fa-file-o': details.type !== 'dir' }"></i> <span data-bind="text: details.name"></span></div>
+        <div class="autocompleter-details-contents" data-bind="template: { name: 'hdfs-details-content', data: { definition: details } }"></div>
+      </div>
     </div>
   </script>
 
@@ -129,10 +135,12 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join')}</div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -143,10 +151,12 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular join condition')}</div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -157,13 +167,15 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-superscript"></i> ${ _('Popular aggregate')} - <span data-bind="text: details.aggregateFunction"></span></div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+            </div>
           </div>
+          <div class="details-comment" data-bind="text: details.function.description"></div>
         </div>
-        <div class="details-comment" data-bind="text: details.function.description"></div>
       </div>
     </div>
   </script>
@@ -181,10 +193,12 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular group by')}</div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -195,10 +209,12 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular order by')}</div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Workload percent') } ' + details.workloadPercent + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.workloadPercent + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -209,10 +225,12 @@ from desktop.views import _ko
     <div class="autocompleter-details">
       <div class="autocompleter-header"><i class="fa fa-fw fa-star-o"></i> ${ _('Popular filter')}</div>
       <div class="autocompleter-details-contents">
-        <div class="details-code" data-bind="text: value"></div>
-        <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
-          <div class="progress">
-            <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+        <div class="autocompleter-details-contents-inner">
+          <div class="details-code" data-bind="text: value"></div>
+          <div class="details-popularity margin-top-10" data-bind="tooltip: { title: '${ _ko('Popularity') } ' + details.relativePopularity + '%', placement: 'bottom' }"><i class="fa fa-fw fa-star-o popular-color"></i>
+            <div class="progress">
+              <div class="bar" data-bind="style: { 'width': details.relativePopularity + '%' }"></div>
+            </div>
           </div>
         </div>
       </div>
@@ -450,7 +468,7 @@ from desktop.views import _ko
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
         var self = this;
-        var $autocompleterList = $('.autocompleter-list');
+        var $autocompleterList = $('.autocompleter-entries');
         var selected = $autocompleterList.children().eq(self.selectedIndex());
         var selectedTop = selected.position().top;
         if (selectedTop < 0) {

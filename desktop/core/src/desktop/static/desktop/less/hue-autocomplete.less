@@ -20,71 +20,45 @@
 
 .hue-ace-autocompleter {
   position: fixed;
-  display: flex;
+  .display-flex();
   z-index: 1000;
   max-height: 250px;
   align-items: flex-start;
 }
 
-.autocompleter-suggestions {
-  flex: 0 0 300px;
-  z-index: 1002;
-  display: flex;
-  flex-direction: column;
+.autocompleter-suggestions,
+.autocompleter-details {
+  .flex(0 0 300px);
+  .display-flex();
+  .flex-direction(column);
   width: 300px;
   max-height: 250px;
+  overflow: hidden;
 
   border: 1px solid #DDD;
   border-radius: 2px;
   background-color: @cui-white;
-  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
+  .hue-box-shadow-bottom();
+}
+
+.autocompleter-suggestions {
+  z-index: 1002;
 }
 
 .autocompleter-details {
-  flex: 0 0 300px;
   z-index: 1001;
-  display: flex;
-  flex-direction: column;
-  width: 300px;
   margin-left: 5px;
-  max-height: 250px;
-
-  border: 1px solid #DDD;
-  border-radius: 2px;
-  background-color: @cui-white;
-  -webkit-box-shadow: 0 2px 8px rgba(0,0,0,.18);
-  box-shadow: 0 2px 6px 0 rgba(0, 0, 0, 0.18), 0 2px 8px 0 rgba(0, 0, 0, 0.13);
 }
 
 .autocompleter-header {
-  flex: 0 0 20px;
+  .flex(0 0 20px);
   padding: 5px;
   background-color: #F9F9F9;
   line-height: 20px;
   font-size: 14px;
-}
-
-.autocompleter-list {
-  flex: 0 0 300px;
-  width: 300px;
-  overflow-y: auto;
-}
-
-.autocompleter-list > div {
-  height: 19px;
-  clear: both;
-  background-color: @cui-white;
-  padding:3px;
-  cursor: pointer;
-}
-
-.autocompleter-list > div:hover {
-  background-color: @hue-primary-color-light;
-}
-
-.autocompleter-list > div.selected {
-  background-color: @hue-primary-color-light;
+  overflow-x: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .autocompleter-spinner {
@@ -92,13 +66,6 @@
   float: right;
   width: 15px;
   margin-top: 1px;
-}
-
-.autocompleter-entries {
-  display: flex;
-  position: relative;
-  flex: 1 1 100%;
-  overflow: hidden;
 }
 
 .autocompleter-categories {
@@ -118,15 +85,30 @@
   cursor: default;
 }
 
+.autocompleter-entries {
+  max-height: 225px;
+  position: relative;
+  overflow-y: auto;
+}
+
 .autocompleter-suggestion {
-  display: flex;
-  flex-direction: row;
+  height: 19px;
+  clear: both;
+  background-color: @cui-white;
+  padding:3px;
+  cursor: pointer;
+  position: relative;
   font: 12px/normal 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;direction: ltr;
   line-height: 18px;
 }
 
+.autocompleter-suggestion:hover,
+.autocompleter-suggestion.selected {
+  background-color: @hue-primary-color-light;
+}
+
 .autocompleter-suggestion-value {
-  flex: 1 1 100%;
+  width: 85%;
   margin-left: 3px;
   margin-right: 6px;
   overflow-x: hidden;
@@ -139,10 +121,14 @@
 }
 
 .autocompleter-suggestion-meta {
-  flex: 1;
+  position: absolute;
+  background-color: inherit;
+  z-index: 1;
+  right: 0;
+  top: 3px;
+  padding-right: 3px;
   color: #737373;
   white-space: nowrap;
-  margin-right: 3px;
 }
 
 .autocompleter-dot {
@@ -154,8 +140,13 @@
 }
 
 .autocompleter-details-contents {
-  flex: 1 1 100%;
+  max-height: 225px;
+  position: relative;
   overflow-y: auto;
+}
+
+// IE 11 fix to prevent overflow
+.autocompleter-details-contents-inner {
   padding: 7px;
 }
 

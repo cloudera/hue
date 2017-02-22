@@ -58,3 +58,27 @@
   -moz-box-shadow: @left @top 8px rgba(0,0,0,.18);
   box-shadow: @left @top 6px 0 rgba(0, 0, 0, 0.18), @left @top 8px 0 rgba(0, 0, 0, 0.13);
 }
+
+// Flexbox mixins
+
+.display-flex() {
+  display: -webkit-flex;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -ms-flex;
+  display: flex;
+}
+
+.flex(@flex: initial) {
+  -webkit-box-flex: @flex;
+  -moz-box-flex: @flex;
+  -ms-flex: @flex;
+  -webkit-flex: @flex;
+  flex: @flex;
+}
+
+.flex-direction(@direction: row) {
+  -webkit-flex-direction: @direction;
+  -ms-flex-direction: @direction;
+  flex-direction: @direction;
+}
