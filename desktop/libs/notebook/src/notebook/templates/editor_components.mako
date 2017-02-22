@@ -639,7 +639,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         % if conf.USE_DEFAULT_CONFIGURATION.get():
           <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
         % endif
-        <!-- ko if: type()== 'impala' && typeof http_addr != 'undefined' -->
+        <!-- ko if: type() == 'impala' && typeof http_addr != 'undefined' -->
         <a class="margin-left-10" data-bind="attr: {'href': window.location.protocol + '//' + http_addr().replace(/^(https?):\/\//, '')}" target="_blank"><i class="fa fa-external-link"></i> <span data-bind="text: http_addr().replace(/^(https?):\/\//, '')"></span></a>
         <!-- /ko -->
       </div>
@@ -1030,7 +1030,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 <script type="text/html" id="code-editor-snippet-body">
-  <!-- ko if: HAS_OPTIMIZER -->
+  <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
   <div data-bind="css: { 'active': showOptimizer }">
     <div class="round-icon empty">&nbsp;</div>
     <!-- ko if: hasSuggestion() == null -->
