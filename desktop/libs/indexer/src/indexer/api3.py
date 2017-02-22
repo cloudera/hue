@@ -66,11 +66,15 @@ def _convert_format(format_dict, inverse=False):
       format_dict[field] = _escape_white_space_characters(format_dict[field], inverse)
 
 
+@api_error_handler
 def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
     indexer = Indexer(request.user, request.fs)
+    if not request.fs.isfile(file_format["path"]):
+      raise PopupException(_('Path %(path)s is not a file') % file_format)
+
     stream = request.fs.open(file_format["path"])
     format_ = indexer.guess_format({
       "file": {
@@ -93,6 +97,7 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
 
+  format_['status'] = 0
   return JsonResponse(format_)
 
 
