@@ -304,6 +304,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           });
         };
 
+        var previousCall = null;
         self.navAutocompleteSource = function (request, callback) {
           var facetMatch = request.term.match(/([a-z]+):\s*(\S+)?$/i);
           var isFacet = facetMatch !== null;
@@ -313,7 +314,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
           var visiblePanel = self.assistPanel.visiblePanel();
 
-          self.apiHelper.navSearchAutocomplete({
+          self.apiHelper.cancelActiveRequest(previousCall);
+
+          previousCall = self.apiHelper.navSearchAutocomplete({
             source: visiblePanel.type === 'sql' ?
                 (visiblePanel.panelData.selectedSource() ? visiblePanel.panelData.selectedSource().sourceType : 'hive') : visiblePanel.type,
             query:  request.term,
