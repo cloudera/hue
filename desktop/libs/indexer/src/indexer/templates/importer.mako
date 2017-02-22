@@ -1481,15 +1481,20 @@ ${ assist.assistPanel() }
         $.post("${ url('indexer:guess_format') }", {
           "fileFormat": ko.mapping.toJSON(self.source)
         }, function (resp) {
-          var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
-          self.source.format(newFormat);
-          self.guessFieldTypes();
+          if (resp.status != 0) {
+            $(document).trigger("error", resp.message);
+          } else {
+            var newFormat = ko.mapping.fromJS(new FileType(resp['type'], resp));
+            self.source.format(newFormat);
+            self.guessFieldTypes();
+          }
 
           self.isGuessingFormat(false);
           viewModel.wizardEnabled(true);
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
           viewModel.isLoading(false);
+          self.isGuessingFormat(false);
         });
       };
 
