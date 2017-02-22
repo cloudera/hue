@@ -5009,10 +5009,23 @@
         'sqoop': 'query-sqoop1',
         'distcp-doc': 'query-distcp',
         'mapreduce-doc': 'query-mapreduce',
+        'hive-document-widget': 'query-hive',
+        'impala-document-widget': 'query-impala',
+        'java-document-widget': 'query-java',
+        'spark-document-widget': 'query-spark2',
+        'pig-document-widget': 'query-pig',
+        'sqoop-document-widget': 'query-sqoop1',
+        'distcp-document-widget': 'query-distcp',
+        'shell-document-widget': 'query-shell',
+        'mapreduce-document-widget': 'query-mapreduce',
       }
-      var type = 'query-impala'; // tmp
+      var type = 'query-hive';
       if (options.type) {
-        type = TYPE_MAP[options.type()] ? TYPE_MAP[options.type()] : options.type();
+        var tempType = options.type();
+        if (tempType === 'function') {
+          tempType = tempType();
+        }
+        type = TYPE_MAP[tempType] ? TYPE_MAP[tempType] : tempType;
       }
       var firstLoad = false;
       $(element).selectize({

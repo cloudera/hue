@@ -635,7 +635,7 @@
 </script>
 
 <script type="text/html" id="common-document-widget">
-  <div data-bind="visible: ! $root.isEditing()">
+  <div data-bind="visible: !$root.isEditing()">
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: associatedDocumentLoading -->
         <i class="fa fa-spinner fa-spin muted"></i>
@@ -648,15 +648,16 @@
     </div>
 
     <div data-bind="visible: $root.isEditing">
-      <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
+      <div data-bind="visible: !$parent.ooziePropertiesExpanded()" class="nowrap">
         <div class="selectize-wrapper" style="width: 300px;">
-          <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument }"></select>
+          <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
         </div>
         <!-- ko if: associatedDocument -->
           <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl }" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
-          <div data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></div>
+          <div class="clearfix"></div>
+          <div data-bind='text: associatedDocument().description' style="padding-left: 3px;" class="muted"></div>
         <!-- /ko -->
         <div class="row-fluid">
           <div class="span6" data-bind="template: { name: 'common-properties-parameters' }"></div>
