@@ -456,32 +456,37 @@ except ImportError, e:
 
 <%def name="aceKeyboardShortcuts()">
   <script type="text/html" id="ace-keyboard-shortcuts-template">
-    <input class="clearable" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
-
-    <ul class="nav nav-tabs" data-bind="foreach: categories">
-      <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
-    </ul>
-    <div class="tab-content" data-bind="with: activeCategory">
-      <div class="tab-pane active">
-        <table class="table">
-          <thead>
-            <tr>
-              <th>${ _('Windows/Linux')}</th>
-              <th>${ _('Mac')}</th>
-              <th>${ _('Action')}</th>
-            </tr>
-          </thead>
-          <tbody data-bind="foreach: filteredShortcuts">
-            <tr>
-              <td data-bind="text: shortcut"></td>
-              <td data-bind="text: macShortcut"></td>
-              <td data-bind="text: description"></td>
-            </tr>
-          </tbody>
-        </table>
+    <div class="editor-help">
+      <input class="clearable pull-right margin-right-5" type="text" placeholder="${ _('Search...')}" data-bind="clearable: query, value: query, valueUpdate: 'afterkeydown'">
+      <!-- ko if: activeCategory() &&  activeCategory().filteredShortcuts().length === 0 -->
+        <em>${ _('No matches found for your search.') }</em>
+      <!-- /ko -->
+      <ul class="nav nav-pills" data-bind="foreach: categories">
+        <li data-bind="css: { 'active': $parent.activeCategory().label === $data.label }, visible: filteredShortcuts().length > 0"><a href="javascript: void(0);" data-bind="click: function () { $parent.activeCategory($data); }, text: label"></a></li>
+      </ul>
+      <div class="tab-content" data-bind="with: activeCategory">
+        <div class="tab-pane active">
+          <!-- ko if: filteredShortcuts().length > 0 -->
+          <table class="table table-striped">
+            <thead>
+              <tr>
+                <th>${ _('Windows/Linux')}</th>
+                <th>${ _('Mac')}</th>
+                <th>${ _('Action')}</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: filteredShortcuts">
+              <tr>
+                <td data-bind="text: shortcut"></td>
+                <td data-bind="text: macShortcut"></td>
+                <td data-bind="text: description"></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- /ko -->
+        </div>
       </div>
     </div>
-
   </script>
 
   <script type="text/javascript" charset="utf-8">
