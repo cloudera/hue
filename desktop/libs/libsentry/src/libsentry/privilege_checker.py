@@ -47,6 +47,7 @@ SENTRY_OBJECTS = (
 )
 
 SENTRY_PRIVILEGE_KEY = 'SENTRY_PRIVILEGE'
+SENTRY_PRIVILEGE_CACHE_KEY = 'checker-%(username)s'
 
 
 class PrivilegeChecker(object):
