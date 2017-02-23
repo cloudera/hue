@@ -585,7 +585,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </li>
     <li>
       <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
-        <i class="fa fa-fw fa-hdd-o"></i>${_('Set replication')}
+        <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
       </a>
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
@@ -923,7 +923,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         handleSelect: function (row, e) {
           e.preventDefault();
           e.stopPropagation();
-          this.selected(! this.selected());
+          this.selected(!this.selected());
+          if (!this.selected()) {
+            hideContextMenu();
+          }
           this.highlighted(false);
           this.deleted(false);
           viewModel.allSelected(false);
