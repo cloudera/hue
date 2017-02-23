@@ -2768,6 +2768,7 @@
         self.jHueGenericAutocomplete({
           showOnFocus: true,
           skipColumns: ko.unwrap(options.skipColumns),
+          skipTables: ko.unwrap(options.skipTables),
           startingPath: options.database + '.',
           rewriteVal: true,
           onPathChange: options.onChange,
@@ -2795,6 +2796,7 @@
           showOnFocus: true,
           home: "/",
           skipColumns: ko.unwrap(options.skipColumns) || false,
+          skipTables: ko.unwrap(options.skipTables) || false,
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
           onPathChange: function (path) {

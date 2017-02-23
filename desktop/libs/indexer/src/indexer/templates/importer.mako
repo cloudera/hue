@@ -499,7 +499,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, valueUpdate: 'afterkeydown'" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
             <!-- /ko -->
 
             <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
@@ -1261,6 +1261,8 @@ ${ assist.assistPanel() }
         }
         resizeElements();
       });
+
+      self.apiHelperType = ko.observable('hive');
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable('table');
