@@ -935,7 +935,11 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadURL = function () {
     var self = this;
 
-    var path = (IS_HUE_4 ? window.location.getParameter('path', true) : window.location.pathname).split('/');
+    var path = (IS_HUE_4 ? window.location.getParameter('path', true) : window.location.pathname);
+    if (!path) {
+      path = '/metastore/tables';
+    }
+    path = path.split('/');
     if (path[0] === '') {
       path.shift();
     }
