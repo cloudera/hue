@@ -2775,6 +2775,7 @@
           searchEverywhere : ko.unwrap(options.searchEverywhere) || false,
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
+          mainScrollable: ko.unwrap(options.mainScrollable) || $(window)
         });
       }
       else {
@@ -2799,6 +2800,7 @@
           skipTables: ko.unwrap(options.skipTables) || false,
           apiHelperUser: ko.unwrap(options.apiHelperUser) || '',
           apiHelperType: ko.unwrap(options.apiHelperType) || '',
+          mainScrollable: ko.unwrap(options.mainScrollable) || $(window),
           onPathChange: function (path) {
             setPathFromAutocomplete(path);
           },

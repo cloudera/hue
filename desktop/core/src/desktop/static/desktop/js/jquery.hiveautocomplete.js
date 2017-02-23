@@ -39,6 +39,7 @@
       searchEverywhere: false,
       apiHelperUser: '',
       apiHelperType: '',
+      mainScrollable: $(window)
     };
 
   function Plugin(element, options) {
@@ -134,7 +135,7 @@
       }
     }
 
-    $(window).on("scroll", function () {
+    self.options.mainScrollable.on("scroll", function () {
       $("#jHueGenericAutocomplete").css("top", $el.offset().top + $el.outerHeight() - 1).css("left", $el.offset().left).width($el.outerWidth() - 4);
     });
 
