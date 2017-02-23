@@ -137,10 +137,6 @@
               ul.css('max-width', Math.max(options.minWidth, $element.outerWidth(true)) + 'px');
             }
 
-            if (!ul.hasClass('nicescrollified')) {
-              ko.bindingHandlers.niceScroll.init(ul[0], function () {});
-            }
-
             ul.addClass(this.options.classPrefix + 'autocomplete');
             $.each(items, function (index, item) {
               self._renderItemData(ul, item);
@@ -228,6 +224,8 @@
       }
 
       $element.hueAutocomplete(options);
+      
+      ko.bindingHandlers.niceScroll.init($element.data('custom-hueAutocomplete').menu.element, function () {});
 
       // IE 11 trick to prevent it from being shown on page refresh
       window.setTimeout(function () {
