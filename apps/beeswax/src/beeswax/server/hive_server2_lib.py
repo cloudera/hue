@@ -36,7 +36,7 @@ from TCLIService.ttypes import TOpenSessionReq, TGetTablesReq, TFetchResultsReq,
   TStatusCode, TGetResultSetMetadataReq, TGetColumnsReq, TTypeId,\
   TExecuteStatementReq, TGetOperationStatusReq, TFetchOrientation,\
   TCloseSessionReq, TGetSchemasReq, TGetLogReq, TCancelOperationReq,\
-  TCloseOperationReq, TFetchResultsResp, TRowSet, TProtocolVersion
+  TCloseOperationReq, TFetchResultsResp, TRowSet
 
 from beeswax import conf as beeswax_conf
 from beeswax import hive_site
@@ -811,6 +811,19 @@ class HiveServerClient:
           query = 'DESCRIBE FORMATTED `%s`' % table_name
         (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
         self.close_operation(operation_handle)
+      elif 'not have privileges for DESCTABLE' in str(e): # HUE-5608: No table permission but some column permissions
+        query = 'DESCRIBE `%s`.`%s`' % (database, table_name)
+        (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
+        self.close_operation(operation_handle)
+        desc_results.results.columns[0].stringVal.values.insert(0, '# col_name')
+        desc_results.results.columns[0].stringVal.values.insert(1, '')
+        desc_results.results.columns[0].stringVal.values.append('')
+        desc_results.results.columns[1].stringVal.values.insert(0, 'data_type')
+        desc_results.results.columns[1].stringVal.values.insert(1, None)
+        desc_results.results.columns[1].stringVal.values.append(None)
+        desc_results.results.columns[2].stringVal.values.insert(0, 'comment')
+        desc_results.results.columns[2].stringVal.values.insert(1, None)
+        desc_results.results.columns[2].stringVal.values.append(None)
       else:
         raise e
 
