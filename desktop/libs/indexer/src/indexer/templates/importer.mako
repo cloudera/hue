@@ -398,7 +398,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">
             <label for="path" class="control-label"><div>${ _('Path') }</div>
-              <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true }" placeholder="${ _('Click or drag & drop') }">
+              <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag & drop') }">
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
               <a data-bind="attr: {href: '/filebrowser/view=' + createWizard.source.path() }" target="_blank" title="${ _('Open') }">

@@ -2967,7 +2967,7 @@
           _initialPath = _initialPath.substring(7);
         }
 
-        var supportSelectFolder = (typeof selectFolder !== 'undefined' ? selectFolder : false);
+        var supportSelectFolder = !!selectFolder;
         if (typeof allBindingsAccessor().filechooserOptions.selectFolder !== 'undefined') {
           supportSelectFolder = allBindingsAccessor().filechooserOptions.selectFolder;
         }
