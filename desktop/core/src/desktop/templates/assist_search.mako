@@ -61,6 +61,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           valueObservable: searchInput,
           onSelect: performSearch,
           limitWidthToInput: true,
+          showSpinner: true,
           reopenPattern: /.*:$/
         },
         hasFocus: searchHasFocus,
