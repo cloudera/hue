@@ -59,7 +59,7 @@ class PrivilegeChecker(object):
     self.user = user
     self.api_v1 = api_v1 if api_v1 else get_api_v1(self.user)
     self.api_v2 = api_v2 if api_v2 else get_api_v2(self.user, component='solr')
-    
+
     privileges_v1 = self._get_privileges_for_user(self.api_v1)
     self.privilege_hierarchy_v1 = self._to_privilege_hierarchy_v1(privileges_v1)
 
