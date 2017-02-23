@@ -84,6 +84,8 @@
       var options = valueAccessor();
       var $element = $(element);
 
+      var delay = 400;
+
       options = $.extend({
         addCount: false,
         closeOnEnter: true,
@@ -94,7 +96,7 @@
         limitWidthToInput: false,
         minWidth: 200,
         disabled: true,
-        delay: 400
+        delay: delay
       }, options);
 
       if (options.addCount) {
@@ -185,6 +187,16 @@
           }
         } else if (e.which === 32 && e.ctrlKey) {
           $element.hueAutocomplete('search', $element.val());
+        }
+        if (e.which === 13) {
+          // Prevent autocomplete on enter
+          $element.hueAutocomplete('close');
+          $element.hueAutocomplete("option", "disabled", true);
+          window.setTimeout(function () {
+            $element.hueAutocomplete("option", "disabled", false);
+          }, delay + 100);
+          e.preventDefault();
+          return false;
         }
       });
 
