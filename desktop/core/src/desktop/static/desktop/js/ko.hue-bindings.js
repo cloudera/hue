@@ -2966,9 +2966,15 @@
         if (_initialPath.indexOf("hdfs://") > -1) {
           _initialPath = _initialPath.substring(7);
         }
+
+        var supportSelectFolder = (typeof selectFolder !== 'undefined' ? selectFolder : false);
+        if (typeof allBindingsAccessor().filechooserOptions.selectFolder !== 'undefined') {
+          supportSelectFolder = allBindingsAccessor().filechooserOptions.selectFolder;
+        }
+
         $("#filechooser").jHueFileChooser({
           suppressErrors: true,
-          selectFolder: (selectFolder) ? true : false,
+          selectFolder: supportSelectFolder,
           onFolderChoose: function (filePath) {
             handleChoice(filePath, stripHdfsPrefix);
             if (selectFolder) {
