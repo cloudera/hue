@@ -1341,7 +1341,11 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.fetchResultSize = function() {
+    self.fetchResultSize = function(n) {
+      if (typeof n === 'undefined') {
+        n = 10;
+      }
+
       $.post("/notebook/api/fetch_result_size", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
         snippet: ko.mapping.toJSON(self.getContext())
@@ -1349,6 +1353,10 @@ var EditorViewModel = (function() {
         if (data.status == 0) {
           if (data.result.rows != null) {
             self.result.rows(data.result.rows);
+          } else if (self.type() == 'impala' && n > 0) {
+            setTimeout(function () {
+              self.fetchResultSize(n - 1);
+            }, 1000);
           }
         } else if (data.status == 5) {
           // No supported yet for this snippet
