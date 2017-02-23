@@ -256,7 +256,7 @@ except ImportError, e:
                   &nbsp;${ _('Table') }
                 </label>
                 <div data-bind="visible: saveTarget() == 'hive-table'" class="inline">
-                  <input data-bind="hivechooser: savePath" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
+                  <input data-bind="hivechooser: savePath, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: 'hive'" type="text" name="target_table" class="input-xlarge margin-left-10"  pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${_('Table name or <database>.<table>')}">
                 </div>
               </div>
             </div>
@@ -278,7 +278,7 @@ except ImportError, e:
       </div>
       <div class="modal-footer">
         <button class="btn" data-dismiss="modal">${_('Cancel')}</button>
-        <button data-bind="click: trySaveResults, css: {'disabled': ! isValidDestination()}" class="btn btn-primary disable-feedback">${_('Save')}</button>
+        <button data-bind="click: trySaveResults, css: {'disabled': !isValidDestination()}" class="btn btn-primary disable-enter disable-feedback">${_('Save')}</button>
       </div>
     </div>
 
@@ -340,7 +340,7 @@ except ImportError, e:
         });
 
         self.isValidDestination = ko.pureComputed(function () {
-          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^[a-zA-Z0-9_]*$/.test(self.savePath()));
+          return self.savePath() !== '' && (self.saveTarget() != 'hive-table' || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.savePath()));
         });
 
         self.trySaveResults = function () {
