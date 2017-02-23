@@ -416,8 +416,11 @@ class HS2Api(Api):
 
   @query_error_handler
   def get_sample_data(self, snippet, database=None, table=None, column=None):
-    db = self._get_db(snippet)
-    return _get_sample_data(db, database, table, column)
+    try:
+      db = self._get_db(snippet)
+      return _get_sample_data(db, database, table, column)
+    except QueryServerException, ex:
+      raise QueryError(ex.message)
 
 
   @query_error_handler
