@@ -22,11 +22,14 @@ import re
 
 from itertools import islice
 
+from django.core.cache import cache
+
 from desktop.lib.rest import resource
 from desktop.lib.rest.http_client import HttpClient, RestException
 
 from hadoop.conf import HDFS_CLUSTERS
-from libsentry.privilege_checker import PrivilegeChecker
+from libsentry.conf import PRIVILEGE_CHECKER_CACHING
+from libsentry.privilege_checker import PrivilegeChecker, SENTRY_PRIVILEGE_CACHE_KEY
 from libsentry.sentry_site import get_hive_sentry_provider
 
 from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
@@ -222,9 +225,15 @@ class NavigatorApi(object):
       raise NavigatorApiException(msg)
 
 
-  def _secure_results(self, results):
+  def _secure_results(self, results, checker=None):
     if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
-      checker = PrivilegeChecker(user=self.user)
+
+      cache_key = SENTRY_PRIVILEGE_CACHE_KEY % {'username': self.user.username}
+      checker = checker or cache.get(cache_key)
+      if not checker:
+        checker = PrivilegeChecker(user=self.user)
+        cache.set(cache_key, checker, PRIVILEGE_CHECKER_CACHING.get())
+
       action = 'SELECT'
 
       def getkey(result):
