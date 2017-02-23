@@ -24,6 +24,7 @@
       serverType: "HIVE",
       home: "/",
       skipColumns: false,
+      skipTables: false,
       onEnter: function () {
       },
       onBlur: function () {
@@ -148,6 +149,7 @@
           if (path.indexOf(".") > -1) {
             path = path.substr(path.lastIndexOf(".") + 1);
           }
+          $("#jHueGenericAutocomplete").show();
           $("#jHueGenericAutocomplete ul li").show();
           if (path != "") {
             $("#jHueGenericAutocomplete ul li").each(function () {
@@ -162,6 +164,9 @@
                 }
               }
             });
+            if ($("#jHueGenericAutocomplete ul li:visible").length === 0){
+              $("#jHueGenericAutocomplete").hide();
+            }
           }
         }, 500);
       }
@@ -266,6 +271,7 @@
         var _ico = "";
         var _iterable = [];
         var _isSkipColumns = false;
+        var _isSkipTables = false;
 
         if (self.options.serverType == "SOLR") {
           _iterable = data.collections;
@@ -277,10 +283,15 @@
             _ico = "fa-database";
           }
           else if (data.tables_meta != null) { // it's a table
-            _iterable = $.map(data.tables_meta, function (tablesMeta) {
-              return tablesMeta.name;
-            });
-            _ico = "fa-table";
+            if (!self.options.skipTables) {
+              _iterable = $.map(data.tables_meta, function (tablesMeta) {
+                return tablesMeta.name;
+              });
+              _ico = "fa-table";
+            }
+            else {
+              _isSkipTables = true;
+            }
           }
           else {
             if (!self.options.skipColumns) {
@@ -296,7 +307,7 @@
         var firstSolrCollection = false;
         var firstSolrConfig = false;
 
-        if (!_isSkipColumns) {
+        if (!_isSkipColumns && !_isSkipTables) {
           $(_iterable).each(function (cnt, item) {
             if (self.options.serverType == "SOLR") {
               if (item.isCollection && !firstSolrCollection) {
@@ -316,6 +327,8 @@
               _currentFiles.push('<li class="hiveAutocompleteItem" data-value="' + item + '" title="' + item + '"><i class="fa ' + _ico + '"></i> ' + item + '</li>');
             }
           });
+
+
 
           $("#jHueGenericAutocomplete").css("top", $el.offset().top + $el.outerHeight() - 1).css("left", $el.offset().left).width($el.outerWidth() - 4);
           $("#jHueGenericAutocomplete").find("ul").empty().html(_currentFiles.join(""));
@@ -342,9 +355,16 @@
             }
 
             if ($(this).html().indexOf("database") > -1) {
-              $el.val(item + ".");
+              if (self.options.skipTables) {
+                $el.val(item);
+              }
+              else {
+                $el.val(item + ".");
+              }
               self.options.onPathChange($el.val());
-              showAutocomplete();
+              if (!self.options.skipTables) {
+                showAutocomplete();
+              }
             }
 
             if ($(this).html().indexOf("table") > -1) {
