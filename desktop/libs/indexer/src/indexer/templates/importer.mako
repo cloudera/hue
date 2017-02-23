@@ -331,7 +331,7 @@ ${ assist.assistPanel() }
   <div data-bind="visible: createWizard.show">
     <div class="step-indicator-fixed">
       <ol class="list-inline text-center step-indicator">
-        <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1 }, click: function() { currentStep(1) }">
+        <li data-bind="css: { 'active': currentStep() == 1, 'complete': currentStep() > 1, 'pointer': currentStep() > 1 }, click: function() { currentStep(1) }">
           <div class="step" title="${ _('Go to Step 1') }">
             <!-- ko if: currentStep() == 1 -->
               <!-- ko if: createWizard.isGuessingFormat -->
@@ -355,7 +355,7 @@ ${ assist.assistPanel() }
           </div>
         </li>
 
-        <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3 }, click: function() { if (!createWizard.isGuessingFormat() && createWizard.source.show()){ currentStep(2); }}">
+        <li data-bind="css: { 'inactive': currentStep() == 1, 'active': currentStep() == 2, 'complete': currentStep() == 3, 'pointer': currentStep() == 1 && !createWizard.isGuessingFormat() && createWizard.source.show() }, click: function() { if (!createWizard.isGuessingFormat() && createWizard.source.show()){ currentStep(2); }}">
           <div class="step" title="${ _('Go to Step 2') }">
             <!-- ko if: currentStep() < 3 -->
               <!-- ko if: createWizard.isGuessingFieldTypes -->
@@ -386,10 +386,14 @@ ${ assist.assistPanel() }
       <h3 class="card-heading simple">${_('Source')}</h3>
       <div class="card-body">
         <div>
-          <div class="control-group" data-bind="visible: ! createWizard.prefill.target_type || createWizard.prefill.source_type() == 'all'">
+          <div class="control-group" data-bind="visible: !createWizard.prefill.target_type() || createWizard.prefill.source_type() == 'all'">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
+          </div>
+
+          <div class="control-group" data-bind="visible: createWizard.prefill.target_type() == 'database'">
+            <label for="sourceType" class="control-label">${ _('No source is needed for creating a database.') }</label>
           </div>
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">

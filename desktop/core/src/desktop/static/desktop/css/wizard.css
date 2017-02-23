@@ -113,12 +113,10 @@
   margin: 0 auto;
   position: relative;
   z-index: 1;
-  cursor: pointer;
 }
 
 .step-indicator .caption {
   box-sizing: border-box;
   color: #dddddd;
   padding: 11px 16px;
-  cursor: pointer;
 }
