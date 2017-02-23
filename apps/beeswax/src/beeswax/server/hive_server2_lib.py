@@ -147,10 +147,14 @@ class HiveServerTable(Table):
 
   @property
   def stats(self):
-    rows = self.properties
-    col_row_index = map(itemgetter('col_name'), rows).index('Table Parameters:') + 1
-    end_cols_index = map(itemgetter('data_type'), rows[col_row_index:]).index(None)
-    return rows[col_row_index:][:end_cols_index]
+    try:
+      rows = self.properties
+      col_row_index = map(itemgetter('col_name'), rows).index('Table Parameters:') + 1
+      end_cols_index = map(itemgetter('data_type'), rows[col_row_index:]).index(None)
+      return rows[col_row_index:][:end_cols_index]
+    except:
+      LOG.exception('Table stats could not be retrieved')
+      return []
 
   @property
   def storage_details(self):

@@ -29,14 +29,14 @@ from django.views.decorators.http import require_http_methods
 from desktop.context_processors import get_app_name
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document, Document2
+from desktop.models import Document2
 
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 
 from beeswax.design import hql_query
-from beeswax.models import SavedQuery, MetaInstall
+from beeswax.models import SavedQuery
 from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config, QueryServerException
+from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
@@ -272,7 +272,10 @@ def describe_table(request, database, table):
 
     partitions = None
     if app_name != 'impala' and table.partition_keys:
-      partitions = [_massage_partition(database, table, partition) for partition in db.get_partitions(database, table)]
+      try:
+        partitions = [_massage_partition(database, table, partition) for partition in db.get_partitions(database, table)]
+      except:
+        LOG.exception('Table partitions could not be retrieved')
 
     return render(renderable, request, {
       'breadcrumbs': [{
@@ -450,7 +453,11 @@ def describe_partitions(request, database, table):
   else:
     partition_spec = ''
 
-  partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
+  try:
+    partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)    
+  except:
+    LOG.exception('Table partitions could not be retrieved')
+    partitions = []
   massaged_partitions = [_massage_partition(database, table_obj, partition) for partition in partitions]
 
   if request.method == "POST" or request.GET.get('format', 'html') == 'json':
