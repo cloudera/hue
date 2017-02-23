@@ -21,6 +21,7 @@ from collections import defaultdict
 
 from libsentry.api import get_api as get_api_v1
 from libsentry.api2 import get_api as get_api_v2
+from libsentry.sentry_site import get_hive_sentry_provider
 
 
 LOG = logging.getLogger(__name__)
@@ -63,7 +64,7 @@ class PrivilegeChecker(object):
     privileges_v1 = self._get_privileges_for_user(self.api_v1)
     self.privilege_hierarchy_v1 = self._to_privilege_hierarchy_v1(privileges_v1)
 
-    privileges_v2 = self._get_privileges_for_user(self.api_v2)
+    privileges_v2 = self._get_privileges_for_user(self.api_v2, serviceName=get_hive_sentry_provider())
     self.privilege_hierarchy_v2 = self._to_privilege_hierarchy_v2(privileges_v2)
 
 
@@ -118,11 +119,14 @@ class PrivilegeChecker(object):
     return object_authorizables
 
 
-  def _get_privileges_for_user(self, api):
+  def _get_privileges_for_user(self, api, serviceName=None):
     privileges = []
     user_roles = api.list_sentry_roles_by_group('*')  # Get all roles for user
     for role in user_roles:
-      role_privileges = api.list_sentry_privileges_by_role(role['name'])
+      if serviceName is not None:
+        role_privileges = api.list_sentry_privileges_by_role(serviceName=serviceName, roleName=role['name'])
+      else:
+        role_privileges = api.list_sentry_privileges_by_role(role['name'])
       privileges.extend(role_privileges)  # This may result in duplicates but will get reduced in hierarchy tree
     return privileges
 
