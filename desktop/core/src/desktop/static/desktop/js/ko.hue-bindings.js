@@ -2775,7 +2775,7 @@
   };
 
   ko.bindingHandlers.hivechooser = {
-    update: function (element, valueAccessor, allBindingsAccessor, vm) {
+    init: function (element, valueAccessor, allBindingsAccessor, vm) {
       var self = $(element);
       var options = ko.unwrap(valueAccessor());
       var complexConfiguration = false;
