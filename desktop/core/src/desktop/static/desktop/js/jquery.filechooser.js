@@ -205,7 +205,7 @@
         _parent.previousPath = path;
         _parent.options.onNavigate(_parent.previousPath);
 
-        var $search = $('<div>').html('<i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding-left: 20px">').css({
+        var $search = $('<div>').html('<i class="fa fa-refresh inactive-action pointer" style="position: absolute; top: 3px; margin-left: -16px"></i> <i class="fa fa-search inactive-action pointer" style="position: absolute; top: 3px"></i><input type="text" class="small-search" style="display: none; width: 0; padding-left: 20px">').css({
           'position': 'absolute',
           'right': '20px',
           'background-color': '#FFF',
@@ -216,6 +216,7 @@
             'width': '0'
           }, 100, function(){
             $search.find('input').hide();
+            $search.find('.fa-refresh').show();
           });
         }
 
@@ -241,17 +242,22 @@
           }
         });
 
-        $search.find('i').on('click', function(){
+        $search.find('.fa-search').on('click', function(){
           if ($searchInput.is(':visible')){
             slideOutInput();
           }
           else {
+            $search.find('.fa-refresh').hide();
             $searchInput.show().animate({
               'width': '100px'
             }, 100, function(){
               $searchInput.focus();
             });
           }
+        });
+
+        $search.find('.fa-refresh').on('click', function(){
+          _parent.navigateTo(path);
         });
 
         $search.appendTo($(_parent.element).find('.filechooser-tree'));
@@ -378,7 +384,7 @@
         var resizeBreadcrumbs = window.setInterval(function(){
           if ($homeBreadcrumb.is(':visible') && $homeBreadcrumb.width() > 0){
             window.clearInterval(resizeBreadcrumbs);
-            $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 50);
+            $scrollingBreadcrumbs.width($(_parent.element).find('.filechooser-tree').width() - $homeBreadcrumb.width() - 65);
           }
         }, 100);
 
