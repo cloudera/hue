@@ -1,0 +1,111 @@
+Linux Build Hints
+-----------------
+(Tested on RedHat 4.x, Gentoo 2008.0, Ubuntu 8.x, and Debian 4.x)
+These hints are based on using Oracle's instantclient_11_1.  It is necessary
+to download both 'instantclient-linux-basic' and 'instantclient-sdk-linux' from
+oracle.com in order to successfully compile. Note, however, that if using RPMs
+you do not need to do anything as cx_Oracle will compile out of the box without
+any changes to the configuration of the machine.
+
+http://www.oracle.com/technology/software/tech/oci/instantclient/index.html
+
+Each compressed tarball needs to be extracted to the exact same location.
+Uncompress and untar each file from the same location in order to achieve this
+result. If placing into a system area such as /opt or /usr/local, make sure to
+have the correct permissions for writing to these filesystems and/or
+directories. It is advisable to use the same account from start to finish while
+installing cx_Oracle in order not to clobber the pre-set environment variables
+set below.
+
+It is necessary to set environment variables ORACLE_HOME and LD_LIBRARY_PATH
+inside $HOME/.profile in order for cx_Oracle to import properly after
+installation and in order to build correctly. Using a text editor add the
+settings below to $HOME/.profile making sure to change the location of your 
+actual installation path.
+
+   Example ($HOME/.profile):
+   -------------------------
+   export ORACLE_HOME=[your installation path]/instantclient_11_1
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME
+
+To put these variables into the working shell env, either source .profile
+(. $HOME/.profile) or execute each export statement above from a shell
+individually to set these variables. If these are not added to $HOME/.profile
+they will need to be manually set each time cx_Oracle is loaded into Python.
+
+After both packages are untarred to there installation location a link needs
+to be made inside the instantclient_11_1 directory. If you are using a
+different version of the instant client simply adjust the link per the version
+of libclntsh.so.
+
+   Steps:
+   ------
+   cd $ORACLE_HOME
+   ln -s libclntsh.so.x.x libclntsh.so
+
+Continue to step: Building and Compilation.
+
+
+OS X Build Hints
+----------------
+(Tested on Leopard 10.5.x)
+The procedures for OS X are almost idential to Linux except for the package
+names and a few environmental caveats. For OS X it is necessary to download
+both 'instantclient-basic-macosx' and 'instantclient-sdk-macosx'. Download and
+extract each file per the build hints for Linux.
+
+For OS X it is necessary to set environment variables ORACLE_HOME,
+LD_LIBRARY_PATH and DYLD_LIBRARY_PATH inside $HOME/.profile and start a new
+shell before testing cx_Oracle. If .profile does not exist, simply create one
+with a text editor and add the necessary path info to these variables.
+
+   Example ($HOME/.profile):
+   -------------------------
+   export ORACLE_HOME=[your installation path]/instantclient_11_1
+   export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$ORACLE_HOME
+   export DYLD_LIBRARY_PATH=$ORACLE_HOME
+
+The variables placed inside $HOME/.profile need to be set prior to building.
+Therefore, source .profile (. $HOME/.profile) or execute each export statement
+above from a shell individually to set these variables.  Not having
+DYLD_LIBRARY_PATH set inside $HOME/.profile prior to building will cause a
+compilation error regardless of being set in the current shell's env.
+
+After both packages are untarred a link needs to be made inside the
+instantclient_11_1 directory.  If you are using a different version of the
+instant client simply adjust the link per the version of libclntsh.dylib.
+
+   Steps:
+   ------
+   cd $ORACLE_HOME
+   ln -s libclntsh.dylib.x.x libclntsh.dylib
+
+Continue to step: Building and Compilation.
+
+
+Building and Compilation
+------------------------
+Use the provided setup.py to build and install the module which makes use of 
+the distutils module. Note that on Windows, I have used mingw32 
+(http://www.mingw.org) and the module will not build with MSVC without 
+modification. The commands required to build and install the module are as 
+follows:
+
+    python setup.py build
+    python setup.py install
+
+
+Testing (Post Installation Quick Test)
+--------------------------------------
+A very quick installation test can be performed from the command line using
+the Python interpreter. Below is an example of how this done. After importing
+cx_Oracle there should be a line containing only '>>>' which indicates the
+library successfully loaded.
+
+    $ python
+    Python 2.5.2 (r252:60911, Oct 25 2008, 19:37:28)
+    [GCC 4.1.2 (Gentoo 4.1.2 p1.1)] on linux2
+    Type "help", "copyright", "credits" or "license" for more information.
+    >>> import cx_Oracle
+    >>>
+
