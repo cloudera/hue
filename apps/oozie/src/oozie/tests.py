@@ -3140,6 +3140,8 @@ class TestImportWorkflow04WithOozie(OozieBase):
 class TestOozieSubmissions(OozieBase):
 
   def test_submit_hiveserver2_action(self):
+    raise SkipTest
+
     wf_uuid = "c1c3cba9-edec-fb6f-a526-9f80b66fe993"
     wf = Document2.objects.get(uuid=wf_uuid)
     wf.data.replace('hive2://localhost:10000/default', _get_hiveserver2_url())
@@ -3164,6 +3166,8 @@ class TestOozieSubmissions(OozieBase):
 
 
   def test_submit_spark_action(self):
+    raise SkipTest
+
     wf_uuid = "2d667ab2-70f9-c2bf-0726-abe84fa7130d"
     wf = Document2.objects.get(uuid=wf_uuid)
 
