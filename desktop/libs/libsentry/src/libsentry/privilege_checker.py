@@ -59,6 +59,12 @@ class PrivilegeChecker(object):
     self.user = user
     self.api_v1 = api_v1 if api_v1 else get_api_v1(self.user)
     self.api_v2 = api_v2 if api_v2 else get_api_v2(self.user, component='solr')
+    
+    privileges_v1 = self._get_privileges_for_user(self.api_v1)
+    self.privilege_hierarchy_v1 = self._to_privilege_hierarchy_v1(privileges_v1)
+
+    privileges_v2 = self._get_privileges_for_user(self.api_v2)
+    self.privilege_hierarchy_v2 = self._to_privilege_hierarchy_v2(privileges_v2)
 
 
   def filter_objects(self, objects, action='READ', key=lambda x: x.copy()):
@@ -82,19 +88,13 @@ class PrivilegeChecker(object):
     v2_authorizables = [(obj, auth) for (obj, auth) in object_authorizables if 'component' in auth]
 
     if v1_authorizables:
-      privileges = self._get_privileges_for_user(self.api_v1)
-      privilege_hierarchy = self._to_privilege_hierarchy_v1(privileges)
-
       for (object, authorizable) in v1_authorizables:
-        if self._is_object_action_authorized_v1(hierarchy=privilege_hierarchy, object=authorizable, action=action):
+        if self._is_object_action_authorized_v1(hierarchy=self.privilege_hierarchy_v1, object=authorizable, action=action):
           yield object
 
     if v2_authorizables:
-      privileges = self._get_privileges_for_user(self.api_v2)
-      privilege_hierarchy = self._to_privilege_hierarchy_v2(privileges)
-
       for (object, authorizable) in v2_authorizables:
-        if self._is_object_action_authorized_v2(hierarchy=privilege_hierarchy, object=authorizable, action=action):
+        if self._is_object_action_authorized_v2(hierarchy=self.privilege_hierarchy_v2, object=authorizable, action=action):
           yield object
 
 
