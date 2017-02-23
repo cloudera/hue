@@ -435,7 +435,9 @@ ${ assist.assistPanel() }
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
         </label>
         <span class="inline-labels" data-bind="with: createWizard.source.format, visible: createWizard.source.show">
-          <!-- ko template: {name: 'format-settings'} --> <!-- /ko -->
+          <span data-bind="foreach: getArguments()">
+            <!-- ko template: {name: 'arg-' + $data.type, data:{description: $data.description, value: $parent[$data.name]}}--><!-- /ko -->
+          </span>
         </span>
       </div>
       <!-- /ko -->
@@ -756,13 +758,6 @@ ${ assist.assistPanel() }
   </div>
 
 
-</script>
-
-
-<script type="text/html" id="format-settings">
-  <!-- ko foreach: {data: getArguments(), as: 'argument'} -->
-    <!-- ko template: {name: 'arg-' + argument.type, data:{description: argument.description, value: $parent[argument.name]}}--><!-- /ko -->
-  <!-- /ko -->
 </script>
 
 
