@@ -228,10 +228,20 @@ class NavigatorApi(object):
       action = 'SELECT'
 
       def getkey(result):
-        if result['type'] == 'TABLE':
-          return {u'column': None, u'table': result.get('originalName', ''), u'db': result.get('parentPath', '') and result.get('parentPath', '').strip('/'), 'server': get_hive_sentry_provider()}
-        else:
-          return {u'column': None, u'table': None, u'db': None, u'server': None}
+        key = {u'column': None, u'table': None, u'db': None, u'server': get_hive_sentry_provider()}
+
+        if result['type'] == 'TABLE' or result['type'] == 'VIEW':
+          key['db'] = result.get('parentPath', '') and result.get('parentPath', '').strip('/')
+          key['table'] = result.get('originalName', '')
+        elif result['type'] == 'DATABASE':
+          key['db'] = result.get('originalName', '')
+        elif result['type'] == 'FIELD':
+          parents = result.get('parentPath', '').strip('/').split('/')
+          if len(parents) == 2:
+            key['db'], key['table'] = parents
+            key['column'] = result.get('originalName', '')
+
+        return key
 
       return checker.filter_objects(results, action, key=getkey)
     else:
