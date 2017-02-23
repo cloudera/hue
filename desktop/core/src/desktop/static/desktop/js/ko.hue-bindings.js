@@ -86,6 +86,17 @@
 
       var delay = 400;
 
+      var showSpinner = function () {
+        if (options.showSpinner) {
+          $element.addClass('input-spinner');
+        }
+      };
+
+      var hideSpinner = function () {
+        $element.removeClass('input-spinner');
+      };
+
+      var spinThrottle = -1;
       options = $.extend({
         addCount: false,
         closeOnEnter: true,
@@ -96,7 +107,19 @@
         limitWidthToInput: false,
         minWidth: 200,
         disabled: true,
-        delay: delay
+        delay: delay,
+        search: function(event, ui) {
+          window.clearTimeout(spinThrottle);
+          if (!$element.hueAutocomplete("option", "disabled")) {
+            spinThrottle = window.setTimeout(showSpinner, 50);
+          }
+        },
+        open: function(event, ui) {
+          hideSpinner();
+        },
+        close: function(event, ui) {
+          hideSpinner();
+        }
       }, options);
 
       if (options.addCount) {
@@ -158,6 +181,11 @@
             }
             if (options.closeOnEnter) {
               $element.hueAutocomplete('close');
+              // Prevent autocomplete on enter
+              $element.hueAutocomplete("option", "disabled", true);
+              window.setTimeout(function () {
+                $element.hueAutocomplete("option", "disabled", false);
+              }, delay + 200);
             }
             if (options.valueObservable) {
               options.valueObservable($element.val());
@@ -187,16 +215,6 @@
           }
         } else if (e.which === 32 && e.ctrlKey) {
           $element.hueAutocomplete('search', $element.val());
-        }
-        if (e.which === 13) {
-          // Prevent autocomplete on enter
-          $element.hueAutocomplete('close');
-          $element.hueAutocomplete("option", "disabled", true);
-          window.setTimeout(function () {
-            $element.hueAutocomplete("option", "disabled", false);
-          }, delay + 100);
-          e.preventDefault();
-          return false;
         }
       });
 
@@ -236,7 +254,7 @@
       }
 
       $element.hueAutocomplete(options);
-      
+
       ko.bindingHandlers.niceScroll.init($element.data('custom-hueAutocomplete').menu.element, function () {});
 
       // IE 11 trick to prevent it from being shown on page refresh
