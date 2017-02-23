@@ -454,7 +454,7 @@ def describe_partitions(request, database, table):
     partition_spec = ''
 
   try:
-    partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)    
+    partitions = db.get_partitions(database, table_obj, partition_spec, reverse_sort=reverse_sort)
   except:
     LOG.exception('Table partitions could not be retrieved')
     partitions = []

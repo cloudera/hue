@@ -113,7 +113,7 @@ class HiveServerTable(Table):
     try:
       end_cols_index = map(itemgetter('col_name'), rows[col_row_index:]).index('')
       return rows[col_row_index:][:end_cols_index] + self._get_partition_column()
-    except ValueError:  # DESCRIBE on columns and nested columns does not contain add'l rows beyond cols
+    except ValueError:  # DESCRIBE on columns and nested columns does not always contain additional rows beyond cols
       return rows[col_row_index:]
     except:
       # Impala does not have it
@@ -806,7 +806,8 @@ class HiveServerClient:
       (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
       self.close_operation(operation_handle)
     except Exception, e:
-      if 'cannot find field' in str(e): # Workaround until Hive 2.0 and HUE-3751
+      ex_string = str(e)
+      if 'cannot find field' in ex_string: # Workaround until Hive 2.0 and HUE-3751
         (desc_results, desc_schema), operation_handle = self.execute_statement('USE `%s`' % database)
         self.close_operation(operation_handle)
         if partition_spec:
@@ -815,19 +816,31 @@ class HiveServerClient:
           query = 'DESCRIBE FORMATTED `%s`' % table_name
         (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
         self.close_operation(operation_handle)
-      elif 'not have privileges for DESCTABLE' in str(e): # HUE-5608: No table permission but some column permissions
+      elif 'not have privileges for DESCTABLE' in ex_string or 'AuthorizationException' in ex_string: # HUE-5608: No table permission but some column permissions
         query = 'DESCRIBE `%s`.`%s`' % (database, table_name)
         (desc_results, desc_schema), operation_handle = self.execute_statement(query, max_rows=10000, orientation=TFetchOrientation.FETCH_NEXT)
         self.close_operation(operation_handle)
+
         desc_results.results.columns[0].stringVal.values.insert(0, '# col_name')
         desc_results.results.columns[0].stringVal.values.insert(1, '')
-        desc_results.results.columns[0].stringVal.values.append('')
         desc_results.results.columns[1].stringVal.values.insert(0, 'data_type')
         desc_results.results.columns[1].stringVal.values.insert(1, None)
-        desc_results.results.columns[1].stringVal.values.append(None)
         desc_results.results.columns[2].stringVal.values.insert(0, 'comment')
         desc_results.results.columns[2].stringVal.values.insert(1, None)
-        desc_results.results.columns[2].stringVal.values.append(None)
+        try:
+          part_index = desc_results.results.columns[0].stringVal.values.index('# Partition Information')
+          desc_results.results.columns[0].stringVal.values = desc_results.results.columns[0].stringVal.values[:part_index] # Strip duplicate columns of partitioned tables
+          desc_results.results.columns[1].stringVal.values = desc_results.results.columns[1].stringVal.values[:part_index]
+          desc_results.results.columns[2].stringVal.values = desc_results.results.columns[2].stringVal.values[:part_index]
+
+          desc_results.results.columns[1].stringVal.nulls = '' # Important to not clear the last two types
+
+          desc_results.results.columns[1].stringVal.values[-1] = None
+          desc_results.results.columns[2].stringVal.values[-1] = None
+        except ValueError:
+          desc_results.results.columns[0].stringVal.values.append('')
+          desc_results.results.columns[1].stringVal.values.append(None)
+          desc_results.results.columns[2].stringVal.values.append(None)
       else:
         raise e
 
