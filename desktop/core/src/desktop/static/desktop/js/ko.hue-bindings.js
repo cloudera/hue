@@ -269,6 +269,21 @@
       var options = valueAccessor();
       var $element = $(element);
 
+      var validRegExp = options.validRegExp ? new RegExp(options.validRegExp) : undefined;
+
+      var showErrorMessage = function () {
+        var $errorWrapper = $element.siblings('.selectize-error');
+        if (options.invalidMessage && $errorWrapper.length > 0) {
+          $errorWrapper.find('.message').text(options.invalidMessage);
+          $errorWrapper.show();
+          window.setTimeout(function () {
+            $errorWrapper.fadeOut(400, function () {
+              $errorWrapper.hide();
+            })
+          }, 4000);
+        }
+      };
+
       options = $.extend({
         plugins: ['remove_button'],
         options: $.map(options.setTags(), function (value) { return { value: value, text: value } }),
@@ -278,6 +293,11 @@
         persist: true,
         preload: true,
         create: function(input) {
+          if (typeof validRegExp !== 'undefined' && !validRegExp.test(input)) {
+            showErrorMessage();
+            return false;
+          }
+
           return {
             value: input.replace(/\s/g, '-'),
             text: input.replace(/\s/g, '-')
