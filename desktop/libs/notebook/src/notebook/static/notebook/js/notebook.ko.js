@@ -1393,7 +1393,8 @@ var EditorViewModel = (function() {
 
             if (self.status() == 'running' || self.status() == 'starting' || self.status() == 'waiting') {
               self.result.endTime(new Date());
-              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, 1000); };
+              var delay = self.result.executionTime() > 120000 ? 5000 : 1000; // 5s if more than 2min
+              if (! notebook.unloaded()) { self.checkStatusTimeout = setTimeout(self.checkStatus, delay); };
             }
             else if (self.status() == 'available') {
               self.fetchResult(100);
