@@ -438,7 +438,7 @@ ${ assist.assistPanel() }
         </label>
         <span class="inline-labels" data-bind="with: createWizard.source.format, visible: createWizard.source.show">
           <span data-bind="foreach: getArguments()">
-            <!-- ko template: {name: 'arg-' + $data.type, data:{description: $data.description, value: $parent[$data.name]}}--><!-- /ko -->
+            <!-- ko template: {name: 'arg-' + $data.type, data: {description: $data.description, value: $parent[$data.name]}}--><!-- /ko -->
           </span>
         </span>
       </div>
@@ -1114,11 +1114,8 @@ ${ assist.assistPanel() }
       self.inputFormat = ko.observable('file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
-        if (val === 'table'){
-          huePubSub.publish('assist.database.get', function (activeDBEntry) {
-            self.table(activeDBEntry.databaseName + '.');
-          });
-        }
+        self.sample.removeAll();
+        self.path('');
         resizeElements();
       });
       self.inputFormats = ko.observableArray([
@@ -1234,7 +1231,7 @@ ${ assist.assistPanel() }
       var self = this;
 
       self.name = ko.observable('').extend({throttle: 500});
-      self.name.subscribe(function (name) {
+      self.name.subscribe(function(name) {
         var exists = false;
 
         if (name.length == 0) {
