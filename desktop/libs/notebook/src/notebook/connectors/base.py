@@ -35,7 +35,9 @@ class SessionExpired(Exception):
   pass
 
 class QueryExpired(Exception):
-  pass
+  def __init__(self, message=None):
+    super(QueryExpired, self).__init__()
+    self.message = message
 
 class AuthenticationRequired(Exception):
   pass

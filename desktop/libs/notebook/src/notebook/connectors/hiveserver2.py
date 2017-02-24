@@ -275,7 +275,13 @@ class HS2Api(Api):
     db = self._get_db(snippet)
 
     handle = self._get_handle(snippet)
-    results = db.fetch(handle, start_over=start_over, rows=rows)
+    try:
+      results = db.fetch(handle, start_over=start_over, rows=rows)
+    except QueryServerException, ex:
+      if re.search('(client inactivity)|(Invalid query handle)', str(ex)) and ex.message:
+        raise QueryExpired(message=ex.message)
+      else:
+        raise QueryError(ex)
 
     # No escaping...
     return {
