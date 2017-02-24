@@ -645,12 +645,10 @@ class HiveServerClient:
     session = None
 
     if not withMultipleSession:
-
       # Default behaviour: get one session
       session = Session.objects.get_session(self.user, self.query_server['server_name'])
 
     else:
-
       # Get 2 + n_sessions sessions and filter out the busy ones
       sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
       LOG.debug('%s sessions found' % len(sessions))
