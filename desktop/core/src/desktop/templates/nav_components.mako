@@ -32,8 +32,11 @@ from django.utils.translation import ugettext as _
           readOnly: '${ readOnly }' === 'True',
           setTags: currentTags,
           onSave: onSave,
+          validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
+          invalidMessage: '${_ko("Tags can only contain 1 to 50 alphanumeric characters, '_' or '-'.")}',
           load: loadTags
         }"></textarea>
+       <div class="selectize-error" style="display: none;"><i class="fa fa-exclamation-triangle"></i> <span class="message"></span></div>
      </div>
   </script>
 
