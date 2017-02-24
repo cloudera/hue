@@ -1205,8 +1205,10 @@ ${ assist.assistPanel() }
         var name = ''
 
         if (self.inputFormat() == 'file') {
+          name = wizard.prefill.target_path ? wizard.prefill.target_path() : 'default';
+
           if (self.path()) {
-            name = self.path().split('/').pop().split('.')[0];
+            name += '.' + self.path().split('/').pop().split('.')[0];
           }
         } else if (self.inputFormat() == 'table') {
           if (self.table().split('.', 2).length == 2) {
