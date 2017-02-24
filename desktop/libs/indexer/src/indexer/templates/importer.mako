@@ -112,6 +112,7 @@ ${ assist.assistPanel() }
 
   .step label:not(.checkbox) {
     display: inline-block;
+    vertical-align: middle;
   }
 
   .step input[type='text'] {
@@ -126,6 +127,7 @@ ${ assist.assistPanel() }
 
   .step .form-inline .selectize-control {
     width: 120px !important;
+    margin-bottom: -8px;
   }
 
   .step .inline-labels {
@@ -501,7 +503,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $('.content-panel')" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }" placeholder="${ _('Table name or <database>.<table>') }">
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $('.content-panel'), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
 
             <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
