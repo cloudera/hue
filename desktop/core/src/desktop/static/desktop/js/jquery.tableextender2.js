@@ -443,7 +443,7 @@
     var firstColumnInner = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(self.$parent.get(0).scrollHeight);
     clonedTable.appendTo(firstColumnInner);
 
-    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("overflow", "hidden").css("top", topPosition + "px");
+    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("marginLeft", "-2px").css("overflow", "hidden").css("top", topPosition + "px");
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
