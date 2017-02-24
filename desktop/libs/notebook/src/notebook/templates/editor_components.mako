@@ -2204,7 +2204,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             _lastScrollPosition--; //hack for forcing fetching
           }
           if (_lastScrollPosition != scrollElement.scrollTop() && scrollElement.scrollTop() + scrollElement.outerHeight() + 20 >= scrollElement[0].scrollHeight && _dt && snippet.result.hasMore()) {
-            dataTableEl.animate({opacity: '0.55'}, 200);
+            huePubSub.publish('editor.snippet.result.gray', snippet);
             snippet.fetchResult(100, false);
           }
         }, 100);
@@ -3467,14 +3467,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             }
             catch (e) {}
             var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-            _dtElement.animate({opacity: '1'}, 50);
+            huePubSub.publish('editor.snippet.result.normal', options.snippet);
             _dtElement.scrollTop(_dtElement.data("scrollPosition"));
             redrawFixedHeaders();
             resizeToggleResultSettings(options.snippet, options.initial);
           }, 300);
         } else {
-          var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-          _dtElement.animate({opacity: '1'}, 50);
+          huePubSub.publish('editor.snippet.result.normal', options.snippet);
         }
         $("#snippet_" + options.snippet.id()).find("select").trigger('chosen:updated');
         $('#snippet_' + options.snippet.id()).find('.snippet-grid-settings').mCustomScrollbar({axis: 'xy', theme: 'minimal-dark', scrollbarPosition: 'outside', mouseWheel:{ preventDefault: true, deltaFactor: 10 }, scrollInertia: 0});
@@ -3485,9 +3484,24 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         }, 200)
       });
 
+      huePubSub.subscribe('editor.snippet.result.gray', function (snippet) {
+        var $snippet = $("#snippet_" + snippet.id());
+        $snippet.find(".dataTables_wrapper .fixed-first-column").css({opacity: '0'});
+        $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '0'});
+        $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '0'});
+        $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '0.55'});
+      });
+
+      huePubSub.subscribe('editor.snippet.result.normal', function (snippet) {
+        var $snippet = $("#snippet_" + snippet.id());
+        $snippet.find(".dataTables_wrapper .fixed-first-column").css({opacity: '1'});
+        $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '1'});
+        $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '1'});
+        $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '1'});
+      });
+
       $(document).on("renderDataError", function (e, options) {
-        var _dtElement = $("#snippet_" + options.snippet.id()).find(".dataTables_wrapper");
-        _dtElement.animate({opacity: '1'}, 50);
+        huePubSub.subscribe('editor.snippet.result.normal', options.snippet);
       });
 
       $(document).on("progress", function (e, options) {
