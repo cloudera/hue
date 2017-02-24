@@ -18,6 +18,7 @@
   from desktop.views import commonheader, commonfooter, commonshare, _ko
   from beeswax import conf as beeswax_conf
   from desktop import conf
+  from desktop.conf import USE_NEW_EDITOR
   from django.utils.translation import ugettext as _
   from notebook.conf import ENABLE_QUERY_BUILDER
 %>
@@ -238,6 +239,16 @@ ${ layout.menubar(section='query') }
   </div>
   <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition, leftPanelVisible: isEditor }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
   <div class="content-panel" id="querySide">
+    % if USE_NEW_EDITOR.get():
+    <div class="alert">
+      ${ _('This is the old SQL Editor, it is recommended to instead use: ') }
+      % if app_name == 'impala':
+        <a href="${ url('notebook:editor') }?type=impala" target="_blank">${_('Impala')}</a>
+      % else:
+        <a href="${ url('notebook:editor') }?type=hive" target="_blank">${_('Hive')}</a>
+      % endif
+    </div>
+    % endif
     <div class="alert" data-bind="visible: design.isRedacted">
       ${ _('This query had some sensitive information removed when saved.') }
     </div>
