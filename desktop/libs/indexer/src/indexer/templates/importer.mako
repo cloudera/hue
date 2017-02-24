@@ -1243,9 +1243,15 @@ ${ assist.assistPanel() }
           // self.path()
         }
         else if (self.outputFormat() == 'table') {
-          $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
-            self.isTargetExisting(data.code != 500);
-          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+          if (self.tableName() !== '') {
+            self.isTargetExisting(false);
+            $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
+              self.isTargetExisting(data.code != 500);
+            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+          }
+          else {
+            self.isTargetExisting(false);
+          }
         }
         else if (self.outputFormat() == 'index') {
           $.post("/search/get_collection", {
