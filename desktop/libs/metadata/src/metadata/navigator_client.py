@@ -36,9 +36,28 @@ from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_
 from metadata.metadata_sites import get_navigator_hue_server_name
 
 
-_JSON_CONTENT_TYPE = 'application/json'
 LOG = logging.getLogger(__name__)
 VERSION = 'v9'
+_JSON_CONTENT_TYPE = 'application/json'
+CLUSTER_SOURCE_IDS = None
+
+
+def get_cluster_source_ids(api):
+  '''
+  ClusterName is handled by getting the list of sourceIds of a Cluster. We can't filter directly on a clusterName.
+  '''
+  global CLUSTER_SOURCE_IDS
+
+  if CLUSTER_SOURCE_IDS is None:
+    CLUSTER_SOURCE_IDS = ''
+    if get_navigator_hue_server_name():
+      sources = api.get_cluster_source_ids()
+      if sources:
+        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(['sourceId:%(sourceId)s' % _id for _id in api.get_cluster_source_ids()]) + ') AND '
+      else:
+        CLUSTER_SOURCE_IDS = 'sourceId:0 AND'
+
+  return CLUSTER_SOURCE_IDS
 
 
 def get_filesystem_host():
@@ -135,8 +154,10 @@ class NavigatorApi(object):
       filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
       if source_type_filter:
         filter_query += ' AND (%s)' % 'OR '.join(source_type_filter)
-      if get_navigator_hue_server_name():
-        filter_query += 'AND clusterName:%s' % get_navigator_hue_server_name()
+
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        filter_query = source_ids + '(' + filter_query + ')'
 
       params += (
         ('query', filter_query),
@@ -199,8 +220,9 @@ class NavigatorApi(object):
       if fq_type:
         filterQueries += ['{!tag=type} %s' % ' OR '.join(['type:%s' % fq for fq in fq_type])]
 
-      if get_navigator_hue_server_name():
-        filterQueries.append('clusterName:%s' % get_navigator_hue_server_name())
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        body['query'] = source_ids + '(' + body['query'] + ')'
 
       body['facetFields'] = facetFields or [] # Currently mandatory in API
       if facetPrefix:
@@ -280,13 +302,15 @@ class NavigatorApi(object):
         'originalName': name,
         'deleted': 'false'
       }
-      if get_navigator_hue_server_name():
-        query_filters['clusterName'] = get_navigator_hue_server_name()
 
       for key, value in filters.items():
         query_filters[key] = value
 
       filter_query = 'AND'.join('(%s:%s)' % (key, value) for key, value in query_filters.items())
+
+      source_ids = get_cluster_source_ids(self)
+      if source_ids:
+        filter_query = source_ids + '(' + filter_query + ')'
 
       params += (
         ('query', filter_query),
@@ -333,6 +357,16 @@ class NavigatorApi(object):
       msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
       LOG.exception(msg)
       raise NavigatorApiException(msg)
+
+
+  def get_cluster_source_ids(self):
+    params = (
+      ('query', 'clusterName:"%s"' % get_navigator_hue_server_name()),
+      ('limit', 200),
+    )
+
+    LOG.info(params)
+    return self._root.get('entities', headers=self.__headers, params=params)
 
 
   def get_database(self, name):

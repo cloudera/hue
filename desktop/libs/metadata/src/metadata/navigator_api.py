@@ -81,7 +81,7 @@ def search_entities(request):
 
   offset = request.POST.get('offset', 0)
   limit = int(request.POST.get('limit', 100))
-  sources = json.loads(request.POST.get('sources')) or []
+  sources = json.loads(request.POST.get('sources') or '[]')
 
   query_s = query_s.strip() or '*'
 
@@ -303,6 +303,7 @@ def find_entity(request):
   response = {'status': -1}
 
   api = NavigatorApi(request.user)
+
   entity_type = request.GET.get('type', '')
   database = request.GET.get('database', '')
   table = request.GET.get('table', '')
