@@ -258,6 +258,8 @@ def _augment_highlighting(query_s, records):
     if record['hue_name'] and record.get('sourceType', '') != 'S3':
       record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
 
+    record['originalName'] = record['hue_name'] + name # Used in autocomplete
+
     for term in ts:
       name = _highlight(term, name)
       if record.get('tags'):
