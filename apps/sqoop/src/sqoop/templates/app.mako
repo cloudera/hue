@@ -148,14 +148,14 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
                 <i class="fa fa-times"></i> ${_('Delete')}
               </a>
             </li>
-            <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Submissions')}</li>
+            <li class="nav-header" data-bind="visible: $root.job().persisted() && ($root.job().outputDirectoryFilebrowserURL() || $root.job().inputDirectoryFilebrowserURL() || $root.job().submission().external_id())">${_('Submissions')}</li>
             <li data-bind="visible: $root.job().persisted() && $root.job().outputDirectoryFilebrowserURL">
-              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_new">
+              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_blank">
                 <i class="fa fa-folder-open"></i> ${_('Output directory')}
               </a>
             </li>
             <li data-bind="visible: $root.job().persisted() && $root.job().inputDirectoryFilebrowserURL">
-              <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_new">
+              <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_blank">
                 <i class="fa fa-folder-open"></i> ${_('Input directory')}
               </a>
             </li>
