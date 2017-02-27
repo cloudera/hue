@@ -509,14 +509,14 @@ ${ assist.assistPanel() }
             <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
               ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
             </span>
-            <span class="help-inline muted" data-bind="visible: isTargetExisting(), click: function(){ window.open(existingTargetUrl()) }">
+            <span class="help-inline muted" data-bind="visible: isTargetExisting()">
               <!-- ko if: outputFormat() == 'index' -->
                 ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
               <!-- /ko -->
               <!-- ko if: outputFormat() != 'index' -->
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <!-- /ko -->
-              <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank"></a>
+              <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank" title="${ _('Open it.') }"></a>
             </span>
           </div>
         </div>
@@ -1254,6 +1254,17 @@ ${ assist.assistPanel() }
             self.isTargetExisting(false);
           }
         }
+        else if (self.outputFormat() == 'database') {
+          if (self.databaseName() !== '') {
+            self.isTargetExisting(false);
+            $.get("/beeswax/api/autocomplete/" + self.databaseName(), function (data) {
+              self.isTargetExisting(data.code != 500);
+            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+          }
+          else {
+            self.isTargetExisting(false);
+          }
+        }
         else if (self.outputFormat() == 'index') {
           $.post("/search/get_collection", {
               name: self.name()
@@ -1341,6 +1352,9 @@ ${ assist.assistPanel() }
           }
           else if (self.outputFormat() == 'table') {
             return '/metastore/table/' + self.databaseName() + '/' + self.tableName();
+          }
+          else if (self.outputFormat() == 'database') {
+            return '/metastore/tables/' + self.databaseName();
           }
           else if (self.outputFormat() == 'index') {
             return '${ url("indexer:collections") }#edit/' + self.name();
