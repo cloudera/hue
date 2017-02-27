@@ -1368,8 +1368,9 @@ ${ assist.assistPanel() }
       self.tableFormats = ko.observableArray([
           {'value': 'text', 'name': 'Text'},
           {'value': 'parquet', 'name': 'Parquet'},
-          {'value': 'kudu', 'name': 'Kudu'},
+          {'value': 'kudu', 'name': 'Kudu'},          
           {'value': 'csv', 'name': 'Csv'},
+          {'value': 'avro', 'name': 'Avro'},
           {'value': 'json', 'name': 'Json'},
           {'value': 'regexp', 'name': 'Regexp'},
           {'value': 'orc', 'name': 'ORC'},
