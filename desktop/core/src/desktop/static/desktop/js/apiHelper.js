@@ -277,12 +277,9 @@ var ApiHelper = (function () {
       }
 
       if (! options.silenceErrors) {
-        if (typeof window.console !== 'undefined') {
-          console.error(errorResponse);
-          console.error(new Error().stack);
-        }
+        hueUtils.logError(errorResponse);
         $(document).trigger("error", errorMessage);
-      }
+      };
 
       if (options.errorCallback) {
         options.errorCallback(errorMessage);
