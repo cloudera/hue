@@ -2004,8 +2004,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   }
 
   var showHoverMsg = function (e) {
-    var dt = e.dataTransfer;
-    if (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))) {
+    var dt = null;
+    if (e) {
+      dt = e.dataTransfer;
+    }
+    if (!dt || (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files')))) {
       $(".hoverMsg").removeClass("hide");
     }
   };
@@ -3100,7 +3103,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         evt.dataTransfer.dropEffect = "copy";
       }
 
-      var dropZone = $("body")[0];
+      var dropZone = $(".editorComponents")[0];
       dropZone.addEventListener("dragenter", showHoverMsg, false);
       dropZone.addEventListener("dragover", handleDragOver, false);
       dropZone.addEventListener("drop", handleFileSelect, false);
