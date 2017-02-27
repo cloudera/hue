@@ -331,6 +331,7 @@ else:
     "TEST_USER" : test_user,
     # Wrap each request in a transaction.
     "ATOMIC_REQUESTS" : True,
+    "CONN_MAX_AGE" : desktop.conf.DATABASE.CONN_MAX_AGE.get(),
   }
 
 DATABASES = {
