@@ -24,8 +24,10 @@ from itertools import islice
 
 from django.core.cache import cache
 
+from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest import resource
 from desktop.lib.rest.http_client import HttpClient, RestException
+
 
 from hadoop.conf import HDFS_CLUSTERS
 from libsentry.conf import PRIVILEGE_CHECKER_CACHING
@@ -70,7 +72,11 @@ def get_filesystem_host():
 
 
 class NavigatorApiException(Exception):
-  pass
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
 
 
 class NavigatorApi(object):
@@ -173,8 +179,8 @@ class NavigatorApi(object):
       return response
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % query_s
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e)
 
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
@@ -241,10 +247,10 @@ class NavigatorApi(object):
       response['results'] = list(islice(self._secure_results(response['results']), limit)) # Apply Sentry perms
 
       return response
-    except RestException:
+    except RestException, e:
       msg = 'Failed to search for entities with search query %s' % json.dumps(body)
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def _secure_results(self, results, checker=None):
@@ -284,8 +290,8 @@ class NavigatorApi(object):
       return self._root.get('interactive/suggestions?query=%s' % (prefix or '*'))
     except RestException, e:
       msg = 'Failed to search for entities with search query: %s' % prefix
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def find_entity(self, source_type, type, name, **filters):
@@ -328,8 +334,8 @@ class NavigatorApi(object):
       return response[0]
     except RestException, e:
       msg = 'Failed to find entity: %s' % str(e)
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def get_entity(self, entity_id):
@@ -341,8 +347,8 @@ class NavigatorApi(object):
       return self._root.get('entities/%s' % entity_id, headers=self.__headers, params=self.__params)
     except RestException, e:
       msg = 'Failed to get entity %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def update_entity(self, entity_id, **metadata):
@@ -355,8 +361,8 @@ class NavigatorApi(object):
       return self._root.put('entities/%s' % entity_id, params=self.__params, data=data, allow_redirects=True, clear_cookies=True)
     except RestException, e:
       msg = 'Failed to update entity %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
   def get_cluster_source_ids(self):
@@ -444,8 +450,8 @@ class NavigatorApi(object):
       return self._root.get('lineage', headers=self.__headers, params=params)
     except RestException, e:
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
-      LOG.exception(msg)
-      raise NavigatorApiException(msg)
+      LOG.error(msg)
+      raise NavigatorApiException(e.message)
 
 
 
