@@ -48,6 +48,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     </div>
   </script>
 
+  <script type="text/html" id="nav-search-autocomp-error">
+    <div class="nav-autocomplete-item-link" style="height: 30px;">
+      <div class="nav-autocomplete-empty">${ _('Error loading suggestions, see log for details.') }</div>
+    </div>
+  </script>
+
   <script type="text/html" id="assist-panel-navigator-search">
     <!-- ko if: navigatorSearch.navigatorEnabled() -->
       <div class="search-container" data-bind="style: { 'padding-right': tabsEnabled ? null : '20px' }, with: navigatorSearch">
@@ -55,6 +61,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           source: navAutocompleteSource,
           itemTemplate: 'nav-search-autocomp-item',
           noMatchTemplate: 'nav-search-autocomp-no-match',
+          errorTemplate: 'nav-search-autocomp-error',
           classPrefix: 'nav-',
           showOnFocus: false,
           onEnter: performSearch,
@@ -86,8 +93,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <div class="assist-flex-fill" data-bind="niceScroll" style="overflow:hidden;">
         <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
         <!-- ko if: !searching() -->
+        <!-- ko if: hasErrors() -->
+        <div class="result-entry">${ _('Error searching, see logs for details.') }</div>
+        <!-- /ko -->
+        <!-- ko ifnot: hasErrors() -->
         <!-- ko if: searchResult().length == 0 -->
-          <div class="result-entry">${ _('No result found.') }</div>
+        <div class="result-entry">${ _('No result found.') }</div>
         <!-- /ko -->
         <div data-bind="foreach: searchResult">
           <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
@@ -105,6 +116,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             </div>
           </div>
         </div>
+        <!-- /ko -->
         <!-- /ko -->
       </div>
     </div>
@@ -146,6 +158,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.searchInput = ko.observable('').extend({rateLimit: 500});
         self.searchResult = ko.observableArray();
 
+        self.hasErrors = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
         self.searchActive = ko.observable(false);
@@ -182,6 +195,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           }
           lastQuery = self.searchInput();
           self.searching(true);
+          self.hasErrors(false);
 
           var showInAssist = function (entry) {
             self.searchInput('');
@@ -240,7 +254,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             query_s: ko.mapping.toJSON(self.searchInput()),
             limit: 25,
             sources: ko.mapping.toJSON([self.assistPanel.visiblePanel().type])
-          }, function (data) {
+          }).done(function (data) {
             data.entities.forEach(function (entity) {
               entity.statsVisible = ko.observable(false);
               entity.showNavContextPopoverDelayed = showNavContextPopoverDelayed;
@@ -298,9 +312,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
               entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
             });
             self.searchResult(data.entities);
-            self.searching(false);
           }).fail(function (xhr, textStatus, errorThrown) {
+            self.hasErrors(true);
             $(document).trigger("error", xhr.responseText);
+          }).always(function () {
             self.searching(false);
           });
         };
@@ -372,7 +387,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             },
             silenceErrors: true,
             errorCallback: function () {
-              callback([]);
+              callback([{ error: true }]);
             }
           });
         };
