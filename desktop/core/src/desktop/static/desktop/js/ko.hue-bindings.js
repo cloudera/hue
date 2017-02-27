@@ -141,7 +141,13 @@
       if (typeof $().hueAutocomplete === 'undefined') {
         $.widget('custom.hueAutocomplete', $.ui.autocomplete, {
           _renderItemData: function( ul, item ) {
-            if (item.noMatch && this.options.noMatchTemplate) {
+            if (item.error && this.options.errorTemplate) {
+              var $li = $('<li data-bind="template: { name: \'' + this.options.errorTemplate + '\' }">')
+                  .addClass(this.options.classPrefix + 'autocomplete-item')
+                  .appendTo(ul)
+                  .data( "ui-autocomplete-item", item );
+              ko.applyBindings(item.data, $li[0]);
+            } else if (item.noMatch && this.options.noMatchTemplate) {
               var $li = $('<li data-bind="template: { name: \'' + this.options.noMatchTemplate + '\' }">')
                   .addClass(this.options.classPrefix + 'autocomplete-item')
                   .appendTo(ul)
