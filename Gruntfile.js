@@ -41,6 +41,7 @@ module.exports = function(grunt) {
           'desktop/libs/notebook/src/notebook/static/notebook/css/notebook-layout.css': 'desktop/libs/notebook/src/notebook/static/notebook/less/notebook-layout.less',
           'apps/oozie/src/oozie/static/oozie/css/workflow-editor.css': 'apps/oozie/src/oozie/static/oozie/less/workflow-editor.less',
           'apps/filebrowser/src/filebrowser/static/filebrowser/css/display.css': 'apps/filebrowser/src/filebrowser/static/filebrowser/less/display.less',
+          'apps/filebrowser/src/filebrowser/static/filebrowser/css/listdir_components.css': 'apps/filebrowser/src/filebrowser/static/filebrowser/less/listdir_components.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser-embeddable.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser-embeddable.less',
         }

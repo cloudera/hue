@@ -603,17 +603,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
   <div id="submit-wf-modal" class="modal hide"></div>
 
-  <div id="progressStatus" class="uploadstatus well hide">
-    <h4>${ _('Upload progress') }</h4>
-    <div id="progressStatusBar" class="hide progress active">
-      <div class="bar bar-upload"></div>
-    </div>
-    <div id="progressStatusContent" class="scrollable-uploadstatus">
-      <div class="updateStatus"> </div>
-    </div>
-  <div>
-</div>
-
   <script id="fileTemplate" type="text/html">
     <tr class="row-animated" style="cursor: pointer" data-bind="drop: { enabled: name !== '.' && type !== 'file' && (!$root.isS3() || ($root.isS3() && !$root.isS3Root())), value: $data }, event: { mouseover: toggleHover, mouseout: toggleHover, contextmenu: showContextMenu }, click: $root.viewFile, css: { 'row-selected': selected(), 'row-highlighted': highlighted(), 'row-deleted': deleted() }">
       <td class="center" data-bind="click: handleSelect" style="cursor: default">
@@ -2145,7 +2134,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 '<span class="break-word" data-dz-name></span>' +
                 '<div class="pull-right">' +
                 '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
-                '<span data-dz-remove><a href="javascript:undefined;" title="${ _('Cancel upload') }"><i class="fa fa-fw fa-times"></i></a></span>' +
+                '<span data-dz-remove><a href="javascript:undefined;" title="' + DropzoneGlobals.i18n.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
                 '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
                 '</div>' +
                 '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
@@ -2157,7 +2146,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               if (e.dataTransfer.files.length > 0) {
                 $('#progressStatus').removeClass('hide');
                 $('#progressStatusBar').removeClass('hide');
-                $('#progressStatusBar div').css("width", "0");
+                $('#progressStatusBar div').css('width', '0');
               }
             },
             processing: function (file) {
@@ -2169,12 +2158,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               this.options.url = '/filebrowser/upload/file?dest=' + newDest;
             },
             uploadprogress: function (file, progress) {
-              $("[data-dz-name]").each(function (cnt, item) {
+              $('[data-dz-name]').each(function (cnt, item) {
                 if ($(item).text() === file.name) {
-                  $(item).parents(".progress-row").find("[data-dz-uploadprogress]").width(progress.toFixed() + "%");
-                  if (progress.toFixed() === "100"){
-                    $(item).parents(".progress-row").find("[data-dz-remove]").hide();
-                    $(item).parents(".progress-row").find("[data-dz-uploaded]").show();
+                  $(item).parents('.progress-row').find('[data-dz-uploadprogress]').width(progress.toFixed() + '%');
+                  if (progress.toFixed() === '100') {
+                    $(item).parents('.progress-row').find('[data-dz-remove]').hide();
+                    $(item).parents('.progress-row').find('[data-dz-uploaded]').show();
                   }
                 }
               });
@@ -2183,7 +2172,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $('#progressStatusBar div').width(progress.toFixed() + "%");
             },
             canceled: function () {
-              $.jHueNotify.info("${_('Upload has been canceled')}");
+              $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
             },
             complete: function (data) {
               if (data.xhr.response != '') {
@@ -2193,7 +2182,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                     $(document).trigger('error', response.data);
                   }
                   else {
-                    $(document).trigger('info', response.path + "${ _(' uploaded successfully.') }");
+                    $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);
                     viewModel.filesToHighlight.push(response.path);
                   }
                 }
@@ -2201,7 +2190,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             }
           };
           if (ops.path.toLowerCase() !== 's3a://') {
-            _dropzone = new Dropzone($('.filebrowser')[0], options);
+            _dropzone = new Dropzone($('.hoverMsg')[0], options);
 
             _dropzone.on('queuecomplete', function () {
               setTimeout(function () {

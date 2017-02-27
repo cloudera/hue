@@ -5326,6 +5326,66 @@
       var value = ko.unwrap(valueAccessor());
 
       var options = {
+        autoDiscover: false,
+        maxFilesize: 5000000,
+        previewsContainer: '#progressStatusContent',
+        previewTemplate: '<div class="progress-row">' +
+        '<span class="break-word" data-dz-name></span>' +
+        '<div class="pull-right">' +
+        '<span class="muted" data-dz-size></span>&nbsp;&nbsp;' +
+        '<span data-dz-remove><a href="javascript:undefined;" title="' + DropzoneGlobals.i18n.cancelUpload + '"><i class="fa fa-fw fa-times"></i></a></span>' +
+          '<span style="display: none" data-dz-uploaded><i class="fa fa-fw fa-check muted"></i></span>' +
+        '</div>' +
+        '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
+        '</div>',
+        drop: function (e) {
+          $('.hoverMsg').addClass('hide');
+          if (e.dataTransfer.files.length > 0) {
+            $('#progressStatus').removeClass('hide');
+            $('#progressStatusBar').removeClass('hide');
+            $('#progressStatusBar div').css('width', '0');
+          }
+        },
+        uploadprogress: function (file, progress) {
+          $('[data-dz-name]').each(function (cnt, item) {
+            if ($(item).text() === file.name) {
+              $(item).parents('.progress-row').find('[data-dz-uploadprogress]').width(progress.toFixed() + '%');
+              if (progress.toFixed() === '100') {
+                $(item).parents('.progress-row').find('[data-dz-remove]').hide();
+                $(item).parents('.progress-row').find('[data-dz-uploaded]').show();
+              }
+            }
+          });
+        },
+        totaluploadprogress: function (progress) {
+          $('#progressStatusBar div').width(progress.toFixed() + "%");
+        },
+        canceled: function () {
+          $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
+        },
+        complete: function (data) {
+          if (data.xhr.response != '') {
+            var response = JSON.parse(data.xhr.response);
+            if (response && response.status != null) {
+              if (response.status != 0) {
+                $(document).trigger('error', response.data);
+              }
+              else {
+                $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);
+                if (value.onComplete) {
+                  value.onComplete(response.path);
+                }
+              }
+            }
+          }
+        },
+        queuecomplete: function () {
+          window.setTimeout(function () {
+            $('#progressStatus').addClass('hide');
+            $('#progressStatusBar').addClass('hide');
+            $('#progressStatusBar div').css('width', '0');
+          }, 2500);
+        },
         createImageThumbnails: false
       };
 

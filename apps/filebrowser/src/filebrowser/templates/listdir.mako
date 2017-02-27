@@ -201,8 +201,6 @@ ${ fb_components.menubar() }
   <p class="hoverText"></p>
 </div>
 
-</div>
-
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 %endif

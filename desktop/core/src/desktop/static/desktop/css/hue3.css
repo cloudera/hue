@@ -3500,3 +3500,50 @@ input:invalid:focus,textarea:invalid:focus,select:invalid:focus {
   -moz-box-shadow: 0 0 6px #f8b9b7;
   box-shadow: 0 0 6px #f8b9b7
 }
+
+.uploadstatus {
+  border: 1px solid #d8d8d8;
+  border-bottom: none;
+  bottom: 0;
+  right: 60px;
+  margin: 0;
+  position: fixed;
+  width: 560px;
+  z-index: 1001;
+}
+
+.scrollable-uploadstatus {
+  max-height: 170px;
+  overflow-y: auto;
+}
+
+.uploadstatusbar {
+  background-color: #d9edf7;
+  height: 4px;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  position: fixed;
+  width: 100%;
+}
+
+.uploadstatusbar div {
+  background-color: #338bb8;
+  height: 4px;
+  width: 30%;
+}
+
+.progress-row {
+  margin-top: 7px;
+}
+
+.progress-row-bar {
+  height: 1px;
+  background-color: #338BB8;
+  width: 0;
+  margin-top: 3px;
+}
+
+.progress .bar-upload {
+  background-color: #338BB8!important;
+}
