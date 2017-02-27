@@ -395,7 +395,7 @@ ${ components.menubar() }
           </div>
           <div class="span6 tile">
             <!-- ko if: $root.navigatorEnabled()  -->
-            <h4>${ _('Tagging') }</h4>
+            <h4>${ _('Tags') }</h4>
             <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
               sourceType: 'hive',
               database: db_name
@@ -616,7 +616,7 @@ ${ components.menubar() }
     </div>
     <!-- ko if: $root.navigatorEnabled() && navigatorStats() -->
     <div class="span6 tile">
-      <h4>${ _('Tagging') }</h4>
+      <h4>${ _('Tags') }</h4>
       <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
         sourceType: 'hive',
         database: database.name,
