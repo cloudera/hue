@@ -298,6 +298,14 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
   }
 
+  hueUtils.logError = function (error) {
+    if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
+      if (typeof error !== 'undefined') {
+        console.error(error);
+      }
+      console.error(new Error().stack);
+    }
+  };
 
 }(hueUtils = window.hueUtils || {}));
 

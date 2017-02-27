@@ -271,7 +271,7 @@
 
       var validRegExp = options.validRegExp ? new RegExp(options.validRegExp) : undefined;
 
-      var showErrorMessage = function () {
+      var showValidationError = function () {
         var $errorWrapper = $element.siblings('.selectize-error');
         if (options.invalidMessage && $errorWrapper.length > 0) {
           $errorWrapper.find('.message').text(options.invalidMessage);
@@ -280,7 +280,7 @@
             $errorWrapper.fadeOut(400, function () {
               $errorWrapper.hide();
             })
-          }, 4000);
+          }, 5000);
         }
       };
 
@@ -294,7 +294,7 @@
         preload: true,
         create: function(input) {
           if (typeof validRegExp !== 'undefined' && !validRegExp.test(input)) {
-            showErrorMessage();
+            showValidationError();
             return false;
           }
 
@@ -376,12 +376,13 @@
           options.setTags().forEach(function (tag) {
             $('<div>').text(tag).appendTo($readOnlyInner);
           });
+        } else if (options.hasErrors()) {
+          $('<span>').addClass('selectize-no-tags').text(options.errorMessage).appendTo($readOnlyInner);
         } else {
           $('<span>').addClass('selectize-no-tags').text(options.placeholder).appendTo($readOnlyInner);
         }
 
-
-        if (! options.readOnly) {
+        if (! options.readOnly && !options.hasErrors()) {
           $('<i>').addClass('fa fa-edit selectize-edit pointer').appendTo($readOnlyInner);
           $readOnlyInner.click(function () {
             showEdit();

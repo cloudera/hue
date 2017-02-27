@@ -30,6 +30,8 @@ from django.utils.translation import ugettext as _
        <textarea style="width: 100%" data-bind="tagEditor: {
           placeholder: '${_ko('No tags')}',
           readOnly: '${ readOnly }' === 'True',
+          hasErrors: hasErrors,
+          errorMessage: '${_ko("There was a problem loading the tags, see server logs for details.")}',
           setTags: currentTags,
           onSave: onSave,
           validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
@@ -72,40 +74,59 @@ from django.utils.translation import ugettext as _
         }
 
         self.identity;
+        self.hasErrors = ko.observable(false);
         self.loading = ko.observable(true);
         self.navEntity = ko.observable();
         self.currentTags = ko.observableArray();
         self.allTags = ko.observableArray();
 
-        apiHelper.fetchNavEntity({
-          sourceType: ko.unwrap(params.sourceType),
-          identifierChain: identifierChain,
-          defaultDatabase: ko.unwrap(params.defaultDatabase),
-          silenceErrors: true,
-          noCache: true,
-          successCallback: function (data) {
-            self.identity = data.entity.identity;
-            self.currentTags(data.entity.tags);
-            self.loading(false);
-          },
-          errorCallback: function () {
-            self.loading(false);
-          }
-        });
+
+        var fetchNavEntity = function () {
+          var fetchDeferral = $.Deferred();
+          apiHelper.fetchNavEntity({
+            sourceType: ko.unwrap(params.sourceType),
+            identifierChain: identifierChain,
+            defaultDatabase: ko.unwrap(params.defaultDatabase),
+            silenceErrors: true,
+            noCache: true,
+            successCallback: function (data) {
+              fetchDeferral.resolve(data.entity);
+            },
+            errorCallback: function (error) {
+              hueUtils.logError(error);
+              fetchDeferral.reject()
+            }
+          });
+          return fetchDeferral;
+        };
+
 
         var fetchAllTags = function () {
           var fetchDeferral = $.Deferred();
           apiHelper.listNavTags({
             successCallback: function (data) {
-              self.allTags(Object.keys(data.tags));
-              fetchDeferral.resolve();
+              fetchDeferral.reject('fail');
+              //fetchDeferral.resolve(Object.keys(data.tags));
             },
             silenceErrors: true,
-            errorCallback: fetchDeferral.reject
+            errorCallback: function (error) {
+              hueUtils.logError(error);
+              fetchDeferral.reject()
+            }
           });
-          return fetchDeferral.promise();
+          return fetchDeferral;
         };
-        fetchAllTags();
+
+        self.loading(true);
+        $.when(fetchNavEntity(), fetchAllTags()).done(function (entity, allTags) {
+          self.identity = entity.identity;
+          self.currentTags(entity.tags);
+          self.allTags(allTags);
+        }).fail(function () {
+          self.hasErrors(true);
+        }).always(function () {
+          self.loading(false);
+        });
 
         self.loadTags = function (query, callback) {
           callback($.map(self.allTags(), function (tag) { return { value: tag, text: tag }}));
@@ -133,21 +154,53 @@ from django.utils.translation import ugettext as _
             }
           });
 
-          var deferrals = [];
+          self.loading(true);
+          self.hasErrors(false);
+          var addTagsDeferral = $.Deferred();
           if (tagsToAdd.length > 0) {
-            deferrals.push(apiHelper.addNavTags(self.identity, tagsToAdd));
+            if (typeof self.identity === 'undefined' || self.identity === null) {
+              addTagsDeferral.reject('${ _("Can\'t add tags without an entity.") }');
+            } else {
+              addTagsDeferral = apiHelper.addNavTags(self.identity, tagsToAdd);
+            }
+          } else {
+            addTagsDeferral.resolve();
           }
+
+          var removeTagsDeferral = $.Deferred();
           if (tagsToRemove.length > 0) {
-            deferrals.push(apiHelper.deleteNavTags(self.identity, tagsToRemove));
+            if (typeof self.identity === 'undefined' || self.identity === null) {
+              removeTagsDeferral.reject('Can\'t remove tags without an entity');
+            } else {
+              removeTagsDeferral = apiHelper.deleteNavTags(self.identity, tagsToRemove);
+            }
+          } else {
+            removeTagsDeferral.resolve();
           }
-          self.currentTags(newTags);
-          deferrals.push(fetchAllTags());
 
-          var doneLoading = function () {
+          var fetchAllTagsDeferral = $.Deferred();
+
+          $.when(addTagsDeferral, removeTagsDeferral).done(function () {
+            self.currentTags(newTags);
+            fetchAllTags().done(function (tags) {
+              self.allTags(tags);
+              fetchAllTagsDeferral.resolve();
+            }).fail(fetchAllTagsDeferral.reject);
+          }).fail(fetchAllTagsDeferral.reject);
+
+          $.when(addTagsDeferral, removeTagsDeferral, fetchAllTagsDeferral).fail(function (addTagsError, removeTagsError) {
+            if (typeof addTagsError !== 'undefined') {
+              hueUtils.logError(addTagsError);
+              $(document).trigger('error', '${ _("Could not add tags, see the server log for details.") }');
+            }
+            if (typeof removeTagsError !== 'undefined') {
+              hueUtils.logError(removeTagsError);
+              $(document).trigger('error', '${ _("Could not remove tags, see the server log for details.") }');
+            }
+            self.hasErrors(true);
+          }).always(function () {
             self.loading(false);
-          };
-
-          $.when.apply($, deferrals).then(doneLoading, doneLoading);
+          });
         };
       }
 
