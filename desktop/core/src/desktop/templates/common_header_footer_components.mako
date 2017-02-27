@@ -91,6 +91,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
       user: '${ user.username }'
     };
 
+    DropzoneGlobals = {
+      homeDir: '${ user.get_home_directory() }'
+    };
+
     AutocompleterGlobals = {
       i18n: {
         category: {
@@ -154,6 +158,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 <%def name="header_pollers(user, is_s3_enabled, apps)">
   <script type="text/javascript">
+    Dropzone.autoDiscover = false;
     moment.locale(window.navigator.userLanguage || window.navigator.language);
     localeFormat = function (time) {
       var mTime = time;

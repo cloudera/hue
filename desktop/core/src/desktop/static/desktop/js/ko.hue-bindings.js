@@ -5313,4 +5313,19 @@
     }
   };
 
+  ko.bindingHandlers.dropzone = {
+    init: function (element, valueAccessor) {
+      var value = ko.unwrap(valueAccessor());
+
+      var options = {
+        createImageThumbnails: false
+      };
+
+      $.extend(options, value);
+
+      $(element).addClass('dropzone');
+      new Dropzone(element, options);
+    }
+  };
+
 })();
