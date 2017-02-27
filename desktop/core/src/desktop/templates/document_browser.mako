@@ -23,7 +23,8 @@ from desktop.views import _ko
 
 <%def name="docBrowser(is_embeddable=False)">
 
-  <script src="/static/desktop/ext/js/bootstrap-fileupload.js" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-fileupload.js') }" type="text/javascript" charset="utf-8"></script>
+  <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
   <link rel="stylesheet" href="/static/desktop/ext/css/bootstrap-fileupload.css">
 
   <style>
@@ -1050,6 +1051,13 @@ from desktop.views import _ko
               entry.selected(false);
             });
           }
+        });
+        $(window).bind('keydown', 'ctrl+a alt+a meta+a', function (e) {
+          self.activeEntry().entries().forEach(function (entry) {
+            entry.selected(true);
+          })
+          e.preventDefault();
+          return false;
         });
       }
 
