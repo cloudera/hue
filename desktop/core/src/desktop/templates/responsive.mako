@@ -481,10 +481,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.tablescroller.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender.js') }"></script>
 <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
-
 <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
 <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
-
 <script src="${ static('desktop/js/hue.colors.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
@@ -498,15 +496,14 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
-
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
-
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 <script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
+<script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 # Task History
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
@@ -516,6 +513,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
+
 
 <script type="text/javascript">
 (function () {
