@@ -92,11 +92,12 @@
         }
       };
 
+      var spinThrottle = -1;
       var hideSpinner = function () {
+        window.clearTimeout(spinThrottle);
         $element.removeClass('input-spinner');
       };
 
-      var spinThrottle = -1;
       options = $.extend({
         addCount: false,
         closeOnEnter: true,
@@ -158,6 +159,7 @@
           },
           _renderMenu: function (ul, items) {
             var self = this;
+            hideSpinner();
             if (options.limitWidthToInput) {
               ul.css('max-width', Math.max(options.minWidth, $element.outerWidth(true)) + 'px');
             }
