@@ -92,7 +92,12 @@ from metadata.conf import has_optimizer, OPTIMIZER
     };
 
     DropzoneGlobals = {
-      homeDir: '${ user.get_home_directory() }'
+      homeDir: '${ user.get_home_directory() }',
+      i18n: {
+        cancelUpload: '${ _('Cancel upload') }',
+        uploadCanceled: '${ _('The upload has been canceled') }',
+        uploadSucceeded: '${ _('uploaded successfully') }',
+      }
     };
 
     AutocompleterGlobals = {
@@ -357,6 +362,17 @@ from metadata.conf import has_optimizer, OPTIMIZER
 </%def>
 
 <%def name="footer(messages)">
+
+<div id="progressStatus" class="uploadstatus well hide">
+  <h4>${ _('Upload progress') }</h4>
+  <div id="progressStatusBar" class="hide progress active">
+    <div class="bar bar-upload"></div>
+  </div>
+  <div id="progressStatusContent" class="scrollable-uploadstatus">
+    <div class="updateStatus"> </div>
+  </div>
+</div>
+
 <script type="text/javascript">
   $(document).ready(function () {
     $(document).on("info", function (e, msg) {
