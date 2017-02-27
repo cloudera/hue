@@ -2088,16 +2088,16 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           // determine if the item dragged originated outside DOM
           _isExternalFile = true;
 
-        $('body').on('dragstart', function (e) {
+        $('.filebrowser').on('dragstart', function (e) {
           // External files being dragged into the DOM won't have a dragstart event
           _isExternalFile = false;
         });
 
-        $('body').on('dragend', function (e) {
+        $('.filebrowser').on('dragend', function (e) {
           _isExternalFile = true;
         });
 
-        $('body').on('dragenter', function (e) {
+        $('.filebrowser').on('dragenter', function (e) {
           e.preventDefault();
 
           if (_isExternalFile && !($("#uploadFileModal").is(":visible")) && !($("#uploadArchiveModal").is(":visible")) && (!viewModel.isS3() || (viewModel.isS3() && !viewModel.isS3Root()))) {
@@ -2201,7 +2201,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             }
           };
           if (ops.path.toLowerCase() !== 's3a://') {
-            _dropzone = new Dropzone(document.body, options);
+            _dropzone = new Dropzone($('.filebrowser')[0], options);
 
             _dropzone.on('queuecomplete', function () {
               setTimeout(function () {
