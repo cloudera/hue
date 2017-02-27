@@ -105,8 +105,7 @@ from django.utils.translation import ugettext as _
           var fetchDeferral = $.Deferred();
           apiHelper.listNavTags({
             successCallback: function (data) {
-              fetchDeferral.reject('fail');
-              //fetchDeferral.resolve(Object.keys(data.tags));
+              fetchDeferral.resolve(Object.keys(data.tags));
             },
             silenceErrors: true,
             errorCallback: function (error) {
