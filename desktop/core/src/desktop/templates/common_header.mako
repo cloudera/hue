@@ -431,22 +431,16 @@ ${ hueIcons.symbols() }
                <i class="fa fa-search inline-block hideMoreThan950"></i><span class="hide950">${_('Search')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
-               % if 'indexer' in apps or 'search' in apps:
-                 % if 'search' in apps:
-                 <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
-                 <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
-                 % endif
-                 % if 'indexer' in apps:
-                 <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
-                 <%!
+               <li><a href="${ url('search:new_search') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Dashboard') }</a></li>
+               <li><a href="${ url('search:admin_collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-tags" style="vertical-align: middle"></i>${ _('Dashboards') }</a></li>
+               <li><a href="${ url('indexer:collections') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-database" style="vertical-align: middle"></i> ${ _('Indexes') }</a></li>
+               <%!
                  from indexer.conf import ENABLE_NEW_INDEXER
-                 %>
-                 % if hasattr(ENABLE_NEW_INDEXER, 'get') and ENABLE_NEW_INDEXER.get():
+               %>
+               % if ENABLE_NEW_INDEXER.get():
                  <li><a href="${ url('indexer:indexer') }" style="height: 24px; line-height: 24px!important;"><i class="fa fa-plus" style="vertical-align: middle"></i> ${ _('Index') }</a></li>
-                 % endif
-                 % endif
-                 <li class="divider"></li>
                % endif
+               <li class="divider"></li>
                % for collection in collections:
                  <li>
                    <a href="${ url('search:index') }?collection=${ collection.id }">
