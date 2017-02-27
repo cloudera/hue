@@ -92,7 +92,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     };
 
     DropzoneGlobals = {
-      homeDir: '${ user.get_home_directory() }',
+      homeDir: '${ user.get_home_directory() if not user.is_anonymous else "" }',
       i18n: {
         cancelUpload: '${ _('Cancel upload') }',
         uploadCanceled: '${ _('The upload has been canceled') }',
