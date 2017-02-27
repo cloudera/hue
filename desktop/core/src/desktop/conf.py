@@ -637,6 +637,12 @@ DATABASE = ConfigSection(
       help=_('Database options to send to the server when connecting.'),
       type=coerce_json_dict,
       dynamic_default=default_database_options
+    ),
+    CONN_MAX_AGE=Config(
+      key='conn_max_age',
+      help=_('The CONN_MAX_AGE parameter controls db connections persistency in seconds.'),
+      type=coerce_positive_integer,
+      default=0,
     )
   )
 )
