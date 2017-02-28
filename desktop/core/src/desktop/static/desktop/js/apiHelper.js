@@ -1682,6 +1682,11 @@ var ApiHelper = (function () {
     }).done(function (data) {
       if (data.status === 0 && !self.successResponseIsError(data)) {
         options.successCallback(data);
+      } else if (data.status === -2 && typeof data.message !== 'undefined' && typeof data.message.message !== 'undefined') {
+        options.errorCallback({
+          source: 'navigator',
+          message: data.message.message
+        })
       } else {
         self.assistErrorCallback(options)(data);
       }
