@@ -1766,7 +1766,6 @@ ${ assist.assistPanel() }
       document.styleSheets[0].addRule('.step-indicator li:first-child:before','left: ' + ($contentPanel.find('.step-indicator li:first-child .caption').width()/2) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','max-width: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()) + 'px');
       document.styleSheets[0].addRule('.step-indicator li:last-child:before','right: ' + ($contentPanel.find('.step-indicator li:last-child .caption').width()/2) + 'px');
-      //document.styleSheets[0].addRule('.step-indicator li::before','max-width: ' + (($contentPanel.width()/2) + ($contentPanel.find('.step-indicator .step').width()/2)) + 'px');
     }
 
     $(document).ready(function () {
@@ -1788,7 +1787,8 @@ ${ assist.assistPanel() }
 
 
       huePubSub.subscribe('split.panel.resized', resizeElements);
-      resizeElements();
+
+      hueUtils.waitForRendered('.step-indicator li:first-child .caption', function(el){ return el.width() < $('#importerComponents').find('.content-panel-inner').width()/2 }, resizeElements);
 
       $(window).on('resize', resizeElements);
 
