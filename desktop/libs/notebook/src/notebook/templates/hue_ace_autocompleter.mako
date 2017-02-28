@@ -461,7 +461,11 @@ from desktop.views import _ko
             self.editor().session.remove(range);
           }
         }
-        self.editor().execCommand('insertstring', self.suggestions.filtered()[self.selectedIndex()].value);
+        var match = self.editor().getTextAfterCursor().match(/^[^\s.]+/);
+        if (match) {
+          self.editor().removeTextAfterCursor(match[0].length);
+        }
+        self.editor().insert(self.suggestions.filtered()[self.selectedIndex()].value);
         self.editor().renderer.scrollCursorIntoView();
         self.detach();
       };
