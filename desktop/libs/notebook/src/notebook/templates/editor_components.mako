@@ -2003,12 +2003,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     });
   }
 
+  var isLeftNavOpen = false;
+  huePubSub.subscribe('responsive.left.nav.toggle', function(val) {
+    isLeftNavOpen = val;
+  });
+
   var showHoverMsg = function (e) {
     var dt = null;
     if (e) {
       dt = e.dataTransfer;
     }
-    if (!dt || (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files')))) {
+    if (!isLeftNavOpen && (!dt || (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))))) {
       $(".hoverMsg").removeClass("hide");
     }
   };
