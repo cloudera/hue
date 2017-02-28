@@ -50,7 +50,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
   <script type="text/html" id="nav-search-autocomp-error">
     <div class="nav-autocomplete-item-link" style="height: 30px;">
-      <div class="nav-autocomplete-empty">${ _('Error loading suggestions, see log for details.') }</div>
+      <div class="nav-autocomplete-empty" data-bind="text: typeof message !== 'undefined' ? message : '${ _ko("Error loading suggestions, see log for details.") }'"></div>
     </div>
   </script>
 
@@ -386,8 +386,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
               callback(values);
             },
             silenceErrors: true,
-            errorCallback: function () {
-              callback([{ error: true }]);
+            errorCallback: function (data) {
+              if (typeof data.message !== 'undefined' && data.source === 'navigator') {
+                callback([{ error: true, message: data.message }]);
+              } else {
+                callback([{ error: true }]);
+              }
             }
           });
         };

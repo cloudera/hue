@@ -146,13 +146,13 @@
                   .addClass(this.options.classPrefix + 'autocomplete-item')
                   .appendTo(ul)
                   .data( "ui-autocomplete-item", item );
-              ko.applyBindings(item.data, $li[0]);
+              ko.applyBindings(item, $li[0]);
             } else if (item.noMatch && this.options.noMatchTemplate) {
               var $li = $('<li data-bind="template: { name: \'' + this.options.noMatchTemplate + '\' }">')
                   .addClass(this.options.classPrefix + 'autocomplete-item')
                   .appendTo(ul)
                   .data( "ui-autocomplete-item", item );
-              ko.applyBindings(item.data, $li[0]);
+              ko.applyBindings(item, $li[0]);
             } else if (item.divider) {
               $('<li/>').addClass(this.options.classPrefix + 'autocomplete-divider').appendTo(ul);
             } else {
