@@ -320,8 +320,8 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Custom App 2</a></li>
       </ul>
       <div class="left-nav-drop">
-        <div data-bind="click: function () { onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">
-          <i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files or click') }
+        <div data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ onePageViewModel.currentApp('importer'); onePageViewModel.getActiveAppViewModel(function (vm) { vm.createWizard.source.path(path); })  } }" class="pointer" title="${ _('Import data wizard') }">
+          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files here') }</div>
         </div>
       </div>
     </div>
@@ -869,6 +869,9 @@ ${ assist.assistPanel() }
         var self = this;
         self.onePageViewModel = onePageViewModel;
         self.leftNavVisible = ko.observable(false);
+        self.leftNavVisible.subscribe(function (val) {
+          huePubSub.publish('responsive.left.nav.toggle', val);
+        });
 
         self.onePageViewModel.currentApp.subscribe(function () {
           self.leftNavVisible(false);
