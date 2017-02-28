@@ -14,8 +14,14 @@ Windmill-tests:
 runs all the windmill tests.  It uses port 8999.
 
   build/env/bin/hue runserver_plus
+
 followed by
+
   build/env/bin/windmill -e test=core/src/desktop/windmilltests.py firefox http://localhost:8000/
+
+Jasmine tests (from your browser):
+
+  http://localhost:8000/jasmine
 
 
 Longer story
