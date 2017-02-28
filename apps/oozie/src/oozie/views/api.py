@@ -454,8 +454,8 @@ def get_log(request, oozie_workflow, make_links=True, log_start_pattern=None, lo
             is_really_done = re_log_end.search(action_logs) is not None
             if is_really_done and not action_logs:
               LOG.warn('Unable to scrape full logs, try increasing the jobbrowser log_offset configuration value.')
-    except Exception, e:
-      LOG.error('An error occurred while watching the job running: %(error)s' % {'error': e})
+    except Exception:
+      LOG.exception('An error occurred while watching the job running')
       is_really_done = True
 
   workflow_actions = _get_workflow_actions(oozie_workflow, logs, is_really_done)
