@@ -38,6 +38,11 @@ try {
       return separator ? this.session.getTextRange(_r).split(separator).pop() : this.session.getTextRange(_r);
     }
 
+    editor.removeTextAfterCursor = function (length) {
+      var _r = new AceRange(this.getCursorPosition().row, this.getCursorPosition().column, this.getCursorPosition().row, this.getCursorPosition().column + length);
+      editor.getSession().getDocument().remove(_r);
+    }
+
     editor.getTextAfterCursor = function (separator) {
       var _r = new AceRange(this.getCursorPosition().row, this.getCursorPosition().column, this.session.getLength(), this.session.getRowLength(this.session.getLength()));
       return separator ? this.session.getTextRange(_r).split(separator).shift() : this.session.getTextRange(_r);
