@@ -1368,7 +1368,7 @@ ${ assist.assistPanel() }
         return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[1] : self.name();
       });
       self.databaseName = ko.computed(function() {
-        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : 'default';
+        return self.outputFormat() == 'table' && self.name().indexOf('.') > 0 ? self.name().split('.', 2)[0] : (self.name() !== '' ? self.name() : 'default');
       });
       self.tableFormat = ko.observable('text');
       self.tableFormat.subscribe(function(newVal) {
