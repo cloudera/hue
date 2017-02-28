@@ -21,7 +21,7 @@
     });
 
     it("should show the milliseconds in number format if the time is less than 60 seconds", function() {
-      expect(Number(10123).toHHMMSS()).toEqual('10.123s');
+      expect(Number(10123).toHHMMSS()).toEqual('10.12s');
     });
 
     it("should skip the seconds if it's zero and it's specified in the function", function() {
