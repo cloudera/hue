@@ -358,6 +358,7 @@
             if ($(this).html().indexOf("database") > -1) {
               if (self.options.skipTables) {
                 $el.val(item);
+                $("#jHueGenericAutocomplete").hide();
               }
               else {
                 $el.val(item + ".");
