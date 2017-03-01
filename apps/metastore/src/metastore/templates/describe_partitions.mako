@@ -27,7 +27,6 @@ ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name
 ${ components.menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>
 <script src="${ static('desktop/js/apiHelper.js') }"></script>
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
