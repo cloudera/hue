@@ -1472,7 +1472,7 @@ ${ assist.assistPanel() }
 
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
-        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$/.test(self.destination.name()));
+        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
         var validTableColumns = self.destination.outputFormat() != 'table' || $.grep(self.destination.columns(), function(column) {
           return column.name().length == 0;
         }).length == 0;
