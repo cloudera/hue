@@ -27,7 +27,6 @@
   <script src="${ static('desktop/js/apiHelper.js') }"></script>
   <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
   <script src="${ static('desktop/js/ko.editable.js') }"></script>
-  <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.mousewheel.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery.mCustomScrollbar.concat.min.js') }"></script>
   <script src="${ static('desktop/js/home2.vm.js') }"></script>
