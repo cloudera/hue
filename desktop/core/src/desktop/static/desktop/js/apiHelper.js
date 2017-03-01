@@ -249,12 +249,11 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.assistErrorCallback = function (options) {
     return function (errorResponse) {
-      if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
-        return;
-      }
       var errorMessage = 'Unknown error occurred';
-      if (errorResponse !== 'undefined') {
-        if (typeof errorResponse.responseText !== 'undefined') {
+      if (typeof errorResponse !== 'undefined' && errorResponse !== null) {
+        if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText === 'abort') {
+          return;
+        } else if (typeof errorResponse.responseText !== 'undefined') {
           try {
             var errorJs = JSON.parse(errorResponse.responseText);
             if (typeof errorJs.message !== 'undefined') {
@@ -265,9 +264,9 @@ var ApiHelper = (function () {
           } catch(err) {
             errorMessage = errorResponse.responseText;
           }
-        } else if (typeof errorResponse.message !== 'undefined') {
+        } else if (typeof errorResponse.message !== 'undefined' && errorResponse.message !== null) {
           errorMessage = errorResponse.message;
-        } else if (typeof errorResponse.statusText !== 'undefined') {
+        } else if (typeof errorResponse.statusText !== 'undefined' && errorResponse.statusText !== null) {
           errorMessage = errorResponse.statusText;
         } else if (errorResponse.error !== 'undefined' && Object.prototype.toString.call(errorResponse.error) === '[object String]' ) {
           errorMessage = errorResponse.error;
@@ -279,7 +278,7 @@ var ApiHelper = (function () {
       if (! options.silenceErrors) {
         hueUtils.logError(errorResponse);
         $(document).trigger("error", errorMessage);
-      };
+      }
 
       if (options.errorCallback) {
         options.errorCallback(errorMessage);
