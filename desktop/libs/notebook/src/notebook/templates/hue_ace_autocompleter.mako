@@ -465,7 +465,8 @@ from desktop.views import _ko
         if (match) {
           self.editor().removeTextAfterCursor(match[0].length);
         }
-        self.editor().insert(self.suggestions.filtered()[self.selectedIndex()].value);
+        // TODO: Move cursor handling for '? FROM tbl' here
+        self.editor().execCommand('insertstring', self.suggestions.filtered()[self.selectedIndex()].value);
         self.editor().renderer.scrollCursorIntoView();
         self.detach();
       };
