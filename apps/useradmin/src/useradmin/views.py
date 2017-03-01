@@ -248,6 +248,7 @@ def edit_user(request, username=None):
     raise PopupException(_("You must be a superuser to add or edit another user."), error_code=401)
 
   userprofile = get_profile(request.user)
+  updated = False
 
   if username is not None:
     instance = User.objects.get(username=username)
@@ -275,6 +276,9 @@ def edit_user(request, username=None):
         if request.user.username == username and not form.instance.is_active:
           raise PopupException(_("You cannot make yourself inactive."), error_code=401)
 
+        # user changing his own information, form.changed_data=['ensure_home_directory', 'language'] or changing information about another user, form.changed_data=['ensure_home_directory']
+        updated = (request.user.username == username and len(form.changed_data) > 2) or (request.user.username != username and len(form.changed_data) > 1)
+
         global __users_lock
         __users_lock.acquire()
         try:
@@ -289,7 +293,6 @@ def edit_user(request, username=None):
 
           # All ok
           form.save()
-          request.info(_('User information updated'))
 
           # Unlock account if selected
           if form.cleaned_data.get('unlock_account'):
@@ -310,10 +313,16 @@ def edit_user(request, username=None):
           ensure_home_directory(request.fs, instance)
         except (IOError, WebHdfsException), e:
           request.error(_('Cannot make home directory for user %s.') % instance.username)
+        else:
+          updated = True
 
       # Change langugage preference, if necessary
       if form.cleaned_data.get('language') and form.cleaned_data.get('language') != get_language():
         request.session['django_language'] = form.cleaned_data.get('language')
+        updated = True
+
+      if updated:
+        request.info(_('User information updated'))
 
       # Audit log
       if username is not None:
