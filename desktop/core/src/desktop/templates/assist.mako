@@ -651,8 +651,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
   <script type="text/html" id="assist-db-header-actions">
     <div class="assist-db-header-actions">
-      <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <!-- ko ifnot: loading -->
+      <span class="assist-tables-counter">(<span data-bind="text: filteredEntries().length"></span>)</span>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: toggleSearch, css: { 'blue' : isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       % if ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
@@ -672,7 +672,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
-      <span style="color: #aaa;"><i class="fa fa-filter" title="${_('Filter tables')}"></i></span>
       <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i>
       <!-- /ko -->
     </div>
