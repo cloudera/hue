@@ -470,7 +470,8 @@ class HiveServerClient:
       'NONE': 'PLAIN',
       'NOSASL': 'NOSASL',
       'LDAP': 'PLAIN',
-      'PAM': 'PLAIN'
+      'PAM': 'PLAIN',
+      'CUSTOM': 'NOSASL'
   }
 
   DEFAULT_TABLE_TYPES = [
@@ -564,7 +565,7 @@ class HiveServerClient:
       hive_mechanism = hive_site.get_hiveserver2_authentication()
       if hive_mechanism not in HiveServerClient.HS2_MECHANISMS:
         raise Exception(_('%s server authentication not supported. Valid are %s.') % (hive_mechanism, HiveServerClient.HS2_MECHANISMS.keys()))
-      use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP', 'PAM')
+      use_sasl = hive_mechanism in ('KERBEROS', 'NONE', 'LDAP', 'PAM', 'CUSTOM')
       mechanism = HiveServerClient.HS2_MECHANISMS[hive_mechanism]
       impersonation_enabled = hive_site.hiveserver2_impersonation_enabled()
 
