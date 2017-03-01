@@ -340,7 +340,7 @@ def _create_table_from_a_file(request, source, destination):
       }
     else:
       columns_list = ['*']
-    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`
+    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
       %(extra_create_properties)s
       AS SELECT %(columns_list)s
       FROM `%(database)s`.`%(table_name)s`;''' % {
@@ -349,6 +349,7 @@ def _create_table_from_a_file(request, source, destination):
         'table_name': table_name,
         'extra_create_properties': extra_create_properties,
         'columns_list': ', '.join(columns_list),
+        'comment': ' COMMENT "%s"' % comment if comment else ''
     }
     sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
         'database': database,
