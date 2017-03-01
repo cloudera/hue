@@ -3850,6 +3850,12 @@
         }
       });
 
+      huePubSub.subscribe('sample.error.insert.click', function(popoverEntry) {
+          var table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1]['name'];
+          var text = "SELECT * FROM " + table + " LIMIT 100";
+          editor.session.insert(editor.getCursorPosition(), text);
+      });
+
       var $tableDropMenu = $el.next('.table-drop-menu');
       var $identifierDropMenu = $tableDropMenu.find('.editor-drop-identifier');
 
