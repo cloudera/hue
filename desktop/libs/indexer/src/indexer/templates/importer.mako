@@ -505,9 +505,8 @@ ${ assist.assistPanel() }
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
               <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $('.content-panel'), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
-
-            <span class="help-inline muted" data-bind="visible: ! isTargetExisting()">
-              ${ _('Create a new ') } <span data-bind="text: outputFormat"></span>
+            <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
+              <i class="fa fa-spinner fa-spin"></i>
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
               <!-- ko if: outputFormat() == 'index' -->
@@ -1238,6 +1237,7 @@ ${ assist.assistPanel() }
 
         if (name.length == 0) {
           self.isTargetExisting(false);
+          self.isTargetChecking(false);
         }
         else if (self.outputFormat() == 'file') {
           // Todo
@@ -1246,23 +1246,29 @@ ${ assist.assistPanel() }
         else if (self.outputFormat() == 'table') {
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
+            self.isTargetChecking(true);
             $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
               self.isTargetExisting(data.code != 500);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+              self.isTargetChecking(false);
+            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
           }
           else {
             self.isTargetExisting(false);
+            self.isTargetChecking(false);
           }
         }
         else if (self.outputFormat() == 'database') {
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
+            self.isTargetChecking(true);
             $.get("/beeswax/api/autocomplete/" + self.databaseName(), function (data) {
               self.isTargetExisting(data.code != 500);
-            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+              self.isTargetChecking(false);
+            }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
           }
           else {
             self.isTargetExisting(false);
+            self.isTargetChecking(false);
           }
         }
         else if (self.outputFormat() == 'index') {
@@ -1270,7 +1276,8 @@ ${ assist.assistPanel() }
               name: self.name()
           }, function (data) {
             self.isTargetExisting(data.status == 0);
-          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); });
+            self.isTargetChecking(false);
+          }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
         }
         resizeElements();
       });
@@ -1344,6 +1351,7 @@ ${ assist.assistPanel() }
       }
 
       self.isTargetExisting = ko.observable();
+      self.isTargetChecking = ko.observable(false);
       self.existingTargetUrl = ko.computed(function() { // Should open generic sample popup instead
         if (self.isTargetExisting()) {
           if (self.outputFormat() == 'file') {

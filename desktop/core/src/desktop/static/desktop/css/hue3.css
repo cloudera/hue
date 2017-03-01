@@ -3547,3 +3547,7 @@ input:invalid:focus,textarea:invalid:focus,select:invalid:focus {
 .progress .bar-upload {
   background-color: #338BB8!important;
 }
+
+.help-inline.muted {
+  color: #999;
+}
