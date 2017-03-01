@@ -1477,8 +1477,12 @@ ${ assist.assistPanel() }
           return column.name().length == 0;
         }).length == 0;
         var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
+        var isValidTable = self.destination.outputFormat() != 'table' || (
+          self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
+              $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
+        );
 
-        return validDestination && validFields && validTableColumns && isTargetAlreadyExisting;
+        return validDestination && validFields && validTableColumns && isTargetAlreadyExisting && isValidTable;
       });
 
       self.formatTypeSubscribed = false;
