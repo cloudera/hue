@@ -84,7 +84,7 @@ def api_error_handler(func):
       response['status'] = -2
     except QueryExpired, e:
       response['status'] = -3
-      if e.message:
+      if e.message and isinstance(e.message, basestring):
         response['message'] = e.message
     except AuthenticationRequired, e:
       response['status'] = 401
