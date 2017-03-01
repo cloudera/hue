@@ -396,7 +396,12 @@ from metadata.conf import has_navigator
             <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
             <!-- ko if: ! loading() && hasErrors() -->
             <div class="sql-context-flex-fill">
-              <div class="alert" data-bind="text: $parent.errorText"></div>
+                <div class="alert">
+                <span data-bind="text: $parent.errorText"></span>
+                <!-- ko if: $parent.enableSampleError -->
+                <a href="javascript:void(0);" data-bind="click: function(){ huePubSub.publish('sample.error.insert.click', $data); huePubSub.publish('sql.context.popover.hide');}">${_('Insert ')}<span data-bind="text:$parent.title"></span> ${_(' sample query')}</a> ${_('at cursor')}
+                <!-- /ko -->
+                </div>
             </div>
             <!-- /ko -->
             <!-- ko if: ! loading() && ! hasErrors() -->
@@ -504,6 +509,7 @@ from metadata.conf import has_navigator
         });
       };
 
+
       function TableAndColumnContextTabs(data, sourceType, defaultDatabase, isColumn, isComplex) {
         var self = this;
         self.tabs = ko.observableArray();
@@ -605,7 +611,9 @@ from metadata.conf import has_navigator
             template: 'sql-context-table-and-column-sample',
             templateData: self.sample,
             errorText: '${ _("There was a problem loading the samples.") }',
-            isColumn: isColumn
+            isColumn: isColumn,
+            title: self.title,
+            enableSampleError: true
           });
         }
 
