@@ -724,8 +724,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
         <!-- ko if: $parent.activeSort -->
-        <span class="margin-left-5">
-          <a data-toggle="dropdown" href="javascript:void(0)">
+        <span class="margin-left-10" style="position: absolute">
+          <a class="inactive-action" data-toggle="dropdown" href="javascript:void(0)">
             <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
           </a>
           <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
