@@ -765,7 +765,7 @@ var MetastoreViewModel = (function () {
     });
 
     huePubSub.subscribe("assist.table.selected", function (tableDef) {
-      loadTableDef(tableDef, function () {
+      self.loadTableDef(tableDef, function () {
         huePubSub.publish('metastore.url.change')
       });
     });
