@@ -248,6 +248,10 @@ def _create_table_from_a_file(request, source, destination):
 
   if source['inputFormat'] == 'manual':
     load_data = False
+    source['format'] = {
+      'quoteChar': '"',
+      'fieldSeparator': ','
+    }
 
   if table_format == 'json':
     row_format = 'serde'
