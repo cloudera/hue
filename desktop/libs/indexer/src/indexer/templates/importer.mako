@@ -1534,7 +1534,7 @@ ${ assist.assistPanel() }
             if (self.destination.outputFormat() === 'table'){
               entry.type = MAPPINGS.get(MAPPINGS.SOLR_TO_HIVE, entry.type, 'string');
             }
-            arr[i] = loadField(entry, self.destination.columns, i);
+            arr[i] = loadField(entry, self.destination, i);
           });
           self.source.sampleCols(resp.sample_cols ? resp.sample_cols : resp.columns);
           self.source.sample(resp.sample);
@@ -1692,11 +1692,14 @@ ${ assist.assistPanel() }
           if (newVal.indexOf(',') > -1) {
             var fields = newVal.split(',');
             fields.forEach(function (val, i) {
-              if (parent.length <= i + idx && parent()[i + idx]) {
-                parent()[i + idx].name(val);
+              if (i + idx < parent.columns().length) {
+                parent.columns()[i + idx].name(val);
               }
             });
           }
+          parent.bulkColumnNames(parent.columns().map(function (item) {
+            return item.name()
+          }).join(','));
         });
       }
 
