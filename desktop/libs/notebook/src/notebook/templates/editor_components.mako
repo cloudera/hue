@@ -68,7 +68,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
-<script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/js/jquery.hdfstree.js') }"></script>
 <script src="${ static('desktop/ext/js/markdown.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
