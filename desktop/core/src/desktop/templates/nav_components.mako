@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
           placeholder: '${_ko('No tags')}',
           readOnly: '${ readOnly }' === 'True',
           hasErrors: hasErrors,
-          errorMessage: '${_ko("There was a problem loading the tags, see server logs for details.")}',
+          errorMessage: '${_ko("Tags could not be loaded.")}',
           setTags: currentTags,
           onSave: onSave,
           validRegExp: '^[a-zA-z0-9_\-]{1,50}$',
