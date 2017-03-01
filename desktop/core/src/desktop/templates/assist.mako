@@ -70,10 +70,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     </ul>
   </script>
 
-  <script type="text/html" id="assist-entry-actions">
-    <div class="assist-actions" data-bind="css: { 'table-actions' : definition.isTable || definition.isView, 'column-actions': definition.isColumn, 'database-actions' : definition.isDatabase } " style="opacity: 0">
+  <script type="text/html" id="assist-database-actions">
+    <div class="assist-actions database-actions" style="opacity: 0">
+      %if has_navigator(user):
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
-      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem || (navigationSettings.openDatabase && definition.isDatabase), click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
+      %endif
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
   </script>
 
@@ -695,7 +697,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
         <li class="assist-table" data-bind="visibleOnHover: { selector: '.database-actions' }">
-          <!-- ko template: { name: 'assist-entry-actions' } --><!-- /ko -->
+          <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
           <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: definition.name, css: { 'highlight': highlight() }"></span></a>
         </li>
       </ul>
