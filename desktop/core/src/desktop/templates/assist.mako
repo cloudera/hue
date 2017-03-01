@@ -721,10 +721,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     <div class="assist-flex-table-search" data-bind="visible: hasEntries() && isSearchVisible() && !$parent.loading() && !$parent.hasErrors()">
       <div>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
-        <label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
-        <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-10"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
+        <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
+        <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
         <!-- ko if: $parent.activeSort -->
-        <span class="margin-left-10">
+        <span class="margin-left-5">
           <a data-toggle="dropdown" href="javascript:void(0)">
             <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
           </a>
