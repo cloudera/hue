@@ -567,6 +567,14 @@ def augment_response(collection, query, response):
     id_field = collection.get('idField', '')
 
     for doc in response['response']['docs']:
+      link = None
+      if 'link-meta' in doc:
+        meta = json.loads(doc['link-meta'])
+        link = get_data_link(meta)
+      elif 'link' in doc:
+        meta = {'type': 'link', 'link': doc['link']}
+        link = get_data_link(meta)
+
       for field, value in doc.iteritems():
         if isinstance(value, numbers.Number):
           escaped_value = value
@@ -578,14 +586,6 @@ def augment_response(collection, query, response):
           value = smart_unicode(value, errors='replace')
           escaped_value = escape(value)
         doc[field] = escaped_value
-
-      link = None
-      if 'link-meta' in doc:
-        meta = json.loads(doc['link-meta'])
-        link = get_data_link(meta)
-      elif 'link' in doc:
-        meta = {'type': 'link', 'link': doc['link']}
-        link = get_data_link(meta)
 
       doc['externalLink'] = link
       doc['details'] = []
