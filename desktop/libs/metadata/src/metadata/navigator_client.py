@@ -79,6 +79,14 @@ class NavigatorApiException(Exception):
     return smart_unicode(self.message)
 
 
+class EntityDoesNotExistException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
+
+
 class NavigatorApi(object):
   """
   http://cloudera.github.io/navigator/apidocs/v3/index.html
@@ -330,7 +338,7 @@ class NavigatorApi(object):
       response = self._root.get('entities', headers=self.__headers, params=params)
 
       if not response:
-        raise NavigatorApiException('Could not find entity with query filters: %s' % str(query_filters))
+        raise EntityDoesNotExistException('Could not find entity with query filters: %s' % str(query_filters))
       elif len(response) > 1:
         raise NavigatorApiException('Found more than 1 entity with query filters: %s' % str(query_filters))
 
@@ -455,7 +463,6 @@ class NavigatorApi(object):
       msg = 'Failed to get lineage for entity ID %s: %s' % (entity_id, str(e))
       LOG.error(msg)
       raise NavigatorApiException(e.message)
-
 
 
   def _clean_path(self, path):

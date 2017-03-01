@@ -34,7 +34,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.conf import has_navigator, NAVIGATOR
-from metadata.navigator_client import NavigatorApi, NavigatorApiException
+from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException
 
 
 LOG = logging.getLogger(__name__)
@@ -59,20 +59,20 @@ def error_handler(view_fn):
         raise MetadataApiException('Navigator API is not configured.')
     except Http404, e:
       raise e
+    except EntityDoesNotExistException, e:
+      response['message'] = e.message
+      response['status'] = -3
+      status = 200
     except NavigatorApiException, e:
       try:
         response['message'] = json.loads(e.message)
         response['status'] = -2
-      except Exception, e:
-        response['message'] = LOG.error(str(e))
+      except Exception, ex:
+        response['message'] = e.message
     except Exception, e:
       status = 500
       message = force_unicode(e)
       LOG.exception(message)
-
-      if 'Could not find' in message:
-        status = 200
-      response['message'] = message
 
     return JsonResponse(response, status=status)
   return decorator
