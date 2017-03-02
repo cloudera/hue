@@ -49,7 +49,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   </script>
 
   <script type="text/html" id="nav-search-autocomp-error">
-    <div class="nav-autocomplete-item-link" style="height: 30px;">
+    <div class="nav-autocomplete-item-link nav-autocomplete-error">
       <div class="nav-autocomplete-empty" data-bind="text: typeof message !== 'undefined' ? message : '${ _ko("Error loading suggestions, see log for details.") }'"></div>
     </div>
   </script>
