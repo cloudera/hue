@@ -200,7 +200,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           var showInAssist = function (entry) {
             self.searchInput('');
             self.searchHasFocus(false);
-            var path = entry.parentPath.split('/').concat([entry.originalName]).splice(1);
+            var path = entry.parentPath.split('/').concat([entry.selectionName]).splice(1);
             window.setTimeout(function () {
               huePubSub.publish('sql.context.popover.hide');
               huePubSub.publish('assist.db.highlight', { sourceType: entry.sourceType.toLowerCase(), path: path });
@@ -217,7 +217,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             huePubSub.publish('sql.context.popover.show', {
               data: {
                 type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
-                identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.originalName })
+                identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.selectionName })
               },
               delayedHide: '.result-entry',
               orientation: 'right',

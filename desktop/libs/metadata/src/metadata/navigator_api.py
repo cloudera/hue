@@ -258,7 +258,8 @@ def _augment_highlighting(query_s, records):
     if record['hue_name'] and record.get('sourceType', '') != 'S3':
       record['hue_name'] = (record['hue_name'].replace('/', '.') + '.').lstrip('.')
 
-    record['originalName'] = record['hue_name'] + name # Used in autocomplete
+    record['originalName'] = record['hue_name'] + name # Inserted when selected in autocomplete, full path
+    record['selectionName'] = name # Use when hovering / selecting a search result
 
     for term in ts:
       name = _highlight(term, name)
