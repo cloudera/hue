@@ -100,6 +100,14 @@ def coerce_positive_integer(integer):
 
   return integer
 
+def coerce_zero_or_positive_integer(integer):
+  integer = int(integer)
+
+  if integer < 0:
+    raise Exception('integer is negative')
+
+  return integer
+
 def is_https_enabled():
   """Hue is configured for HTTPS."""
   return bool(SSL_CERTIFICATE.get() and SSL_PRIVATE_KEY.get())
@@ -641,7 +649,7 @@ DATABASE = ConfigSection(
     CONN_MAX_AGE=Config(
       key='conn_max_age',
       help=_('The CONN_MAX_AGE parameter controls db connections persistency in seconds.'),
-      type=coerce_positive_integer,
+      type=coerce_zero_or_positive_integer,
       default=0,
     )
   )
