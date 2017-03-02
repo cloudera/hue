@@ -214,15 +214,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             var $source = $(event.target).closest('.result-entry');
             var offset = $source.offset();
             entry.statsVisible(true);
+            var identifierChain = $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.selectionName });
+            if (identifierChain.length > 0 && identifierChain[0].name === '') {
+              identifierChain.shift();
+            }
             huePubSub.publish('sql.context.popover.show', {
               data: {
                 type: entry.type === 'FIELD' ? 'column' : (entry.type === 'DATABASE' ? 'database' : 'table'),
-                identifierChain: $.map(entry.parentPath.substring(1).split('/'), function (part) { return { name: part } }).concat({ name: entry.selectionName })
+                identifierChain: identifierChain
               },
               delayedHide: '.result-entry',
               orientation: 'right',
               sourceType: entry.sourceType.toLowerCase(),
-              defaultDatabase: entry.parentPath.substring(1),
+              defaultDatabase: entry.type === 'DATABASE' ? entry.originalName : (identifierChain.length > 0 ? identifierChain[0].name : 'default'),
               pinEnabled: self.navigationSettings.pinEnabled,
               source: {
                 element: event.target,
