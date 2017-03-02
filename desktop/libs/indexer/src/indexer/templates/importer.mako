@@ -146,7 +146,7 @@ ${ assist.assistPanel() }
     padding-top: 3px!important;
   }
 
-  .step .show-edit-on-hover i {
+  .step .show-edit-on-hover a {
     opacity: 0;
     -webkit-transition: opacity 0.2s linear;
     -moz-transition: opacity 0.2s linear;
@@ -155,7 +155,7 @@ ${ assist.assistPanel() }
     transition: opacity 0.2s linear;
   }
 
-  .step .show-edit-on-hover:hover i {
+  .step .show-edit-on-hover:hover a {
     opacity: 1;
   }
 
@@ -245,7 +245,11 @@ ${ assist.assistPanel() }
 
   #importerNotebook {
     height: 5px;
-    margin-top: 10px;
+    float: right;
+  }
+
+  #importerNotebook .snippet-error-container  {
+    background: transparent;
   }
 
   .inline-table {
@@ -666,7 +670,7 @@ ${ assist.assistPanel() }
 
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
-            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
+            <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body no-margin-top">
               <form class="form-inline inline-table" data-bind="foreach: columns">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
@@ -735,9 +739,9 @@ ${ assist.assistPanel() }
       <!-- /ko -->
 
       <span data-bind="visible: createWizard.editorId">
-        <a href="javascript:void(0)" class="btn btn-success" data-bind="attr: {href: '${ url('notebook:editor') }?editor=' + createWizard.editorId() }" target="_blank" title="${ _('Open') }">
-          ${_('Status')}
-        </a>
+        <button class="btn btn-success" data-bind="click: function(){ window.open('${ url('notebook:editor') }?editor=' + createWizard.editorId()) }" title="${ _('Open') }">
+          ${_('Check status')}
+        </button>
       </span>
 
       <div id="importerNotebook"></div>
