@@ -73,7 +73,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER
   <script type="text/html" id="assist-database-actions">
     <div class="assist-actions database-actions" style="opacity: 0">
       %if has_navigator(user):
+      <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.showStats, click: function (data, event) { showContextPopover(data, event); }, css: { 'blue': statsVisible }"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a>
+      <!-- /ko -->
       %endif
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: navigationSettings.openItem, click: openItem"><i class="fa fa-long-arrow-right" title="${_('Open')}"></i></a>
     </div>
