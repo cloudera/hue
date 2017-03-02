@@ -164,7 +164,7 @@ class NavigatorApi(object):
       if query_clauses:
         filter_query = 'OR'.join(['(%s)' % clause for clause in query_clauses])
 
-      user_filter_clause = 'OR '.join(['(%s)' % f for f in user_filters]) or '*'
+      user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
       source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
       if 's3' in sources:
         source_type_filter.append('sourceType:s3')
