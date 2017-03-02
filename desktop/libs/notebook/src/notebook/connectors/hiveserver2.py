@@ -262,6 +262,8 @@ class HS2Api(Api):
     if status.index in (QueryHistory.STATE.failed.index, QueryHistory.STATE.expired.index):
       if operation.errorMessage and 'transition from CANCELED to ERROR' in operation.errorMessage: # Hive case on canceled query
         raise QueryExpired()
+      elif  operation.errorMessage and re.search('Cannot validate serde: org.apache.hive.hcatalog.data.JsonSerDe', str(operation.errorMessage)):
+        raise QueryError(message=operation.errorMessage + _('. Is hive-hcatalog-core.jar registered?'))
       else:
         raise QueryError(operation.errorMessage)
 
