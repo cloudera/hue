@@ -1262,7 +1262,7 @@ ${ assist.assistPanel() }
             self.isTargetExisting(false);
             self.isTargetChecking(true);
             $.get("/beeswax/api/autocomplete/" + self.databaseName(), function (data) {
-              self.isTargetExisting(data.code != 500);
+              self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
               self.isTargetChecking(false);
             }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
           }
