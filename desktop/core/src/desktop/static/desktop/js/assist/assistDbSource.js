@@ -325,7 +325,7 @@ var AssistDbSource = (function () {
               // Timeout is for animation effect
               window.setTimeout(function () {
                 foundDb.highlight(false);
-              }, 400);
+              }, 1800);
             });
             if (path.length > 1) {
               foundDb.highlightInside(path.slice(1), []);
