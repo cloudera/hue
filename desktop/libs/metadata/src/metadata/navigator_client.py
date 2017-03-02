@@ -146,9 +146,10 @@ class NavigatorApi(object):
 
       for term in search_terms:
         if ':' not in term:
-          if ('sql' in sources or 'hive' in sources or 'impala' in sources) and '.' in term:
-            parent, term = term.rsplit('.', 2)
-            user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
+          if ('sql' in sources or 'hive' in sources or 'impala' in sources):
+            if '.' in term:
+              parent, term = term.rsplit('.', 1)
+              user_filters.append('parentPath:"/%s"' % parent.replace('.', '/'))
           query_clauses.append('OR'.join(['(%s:*%s*)' % (field, term) for field in search_fields]))
         else:
           name, val = term.split(':')
