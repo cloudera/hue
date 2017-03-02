@@ -84,14 +84,14 @@ EXTERNAL \
 % endif
 TABLE ${ '`%s`.`%s`' % (database, table["name"]) | n }
 ${ column_list(table, columns) | n } \
-% if partition_columns and table.get('file_format') != 'kudu':
-PARTITIONED BY ${ column_list(table, partition_columns) | n }
-% endif
 % if kudu_partition_columns  and table.get('file_format') == 'kudu':
 PARTITION BY ${ ', '.join([kudu_partition(partition) for partition in kudu_partition_columns]) | n }
 % endif
 % if table["comment"]:
 COMMENT "${table["comment"] | n }"
+% endif
+% if partition_columns and table.get('file_format') != 'kudu':
+PARTITIONED BY ${ column_list(table, partition_columns) | n }
 % endif
 ## TODO: CLUSTERED BY here
 ## TODO: SORTED BY...INTO...BUCKETS here
