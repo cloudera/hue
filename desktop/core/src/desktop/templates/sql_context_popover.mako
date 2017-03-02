@@ -198,8 +198,10 @@ from metadata.conf import has_navigator
       <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
       <!-- /ko -->
       %if has_navigator(user):
+        <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
         <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
         <div style="margin-left: 15px;" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+        <!-- /ko -->
       %endif
     </div>
     <!-- /ko -->
@@ -208,14 +210,16 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-column-details">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
       <div style="margin: 15px;">
-        <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+        <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko -->
         <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
         <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
         <div data-bind="text: comment"></div>
         <!-- /ko -->
         %if has_navigator(user):
+          <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
           <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
           <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+          <!-- /ko -->
         %endif
       </div>
     </div>
@@ -225,7 +229,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
       <div style="margin: 15px;">
         <a class="pointer" data-bind="visible: typeof sample !== 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name || $parents[2].title); }"></a>
-        <span data-bind="visible: typeof sample === 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }"></span> (<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)
+        <span data-bind="visible: typeof sample === 'undefined', text: name || $parents[2].title, attr: { title: name || $parents[2].title }"></span> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko -->
       </div>
     </div>
   </script>
