@@ -227,17 +227,16 @@ var AssistDbEntry = (function () {
         }
 
         window.setTimeout(function () {
-          huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
-            foundEntry.highlight(true);
-            // Timeout is for animation effect
-            window.setTimeout(function () {
-              foundEntry.highlight(false);
-            }, 400);
-          });
-
           if (path.length > 1) {
             foundEntry.highlightInside(path.slice(1));
           } else {
+            huePubSub.subscribeOnce('assist.db.scrollToComplete', function () {
+              foundEntry.highlight(true);
+              // Timeout is for animation effect
+              window.setTimeout(function () {
+                foundEntry.highlight(false);
+              }, 1800);
+            });
             huePubSub.publish('assist.db.scrollTo', foundEntry);
           }
         }, 0);
