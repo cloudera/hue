@@ -539,6 +539,22 @@ var MetastoreViewModel = (function () {
       })
     };
 
+    self.drop = function () {
+      $.post('/tables/drop/' + self.database.name, {
+    	table_selection: ko.mapping.toJSON([self.name]),
+    	skip_trash: 'off',
+    	is_embeddable: true
+      }, function(data) {
+        if (data && data.status == 0) {
+          self.navigatorStats().tags.push(self.addTagName());
+          self.addTagName('');
+          self.showAddTagName(false);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+      });
+    };
+
     self.addTags = function () {
       $.post('/metadata/api/navigator/add_tags', {
         id: ko.mapping.toJSON(self.navigatorStats().identity),

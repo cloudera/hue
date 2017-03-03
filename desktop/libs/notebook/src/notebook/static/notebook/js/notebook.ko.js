@@ -1410,7 +1410,7 @@ var EditorViewModel = (function() {
                 }
               }
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
-                window.location.href = vm.successUrl();
+                window.location.href = vm.successUrl(); // Not used anymore in responsive 
               }
             }
             else if (self.status() == 'success') {

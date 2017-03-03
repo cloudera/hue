@@ -1062,9 +1062,14 @@ ${ assist.assistPanel() }
             } else if (val == 'available') {
               var snippet = notebook.snippets()[0];
               if (! snippet.result.handle().has_more_statements) {
+                // TODO: Show finish notification and clicking on it does onSuccessUrl
+                // or if still on initial spinner we redirect automatically to onSuccessUrl
                 if (notebook.onSuccessUrl()) {
                   // TODO: If we are in FB directory, also refresh FB dir
-                  window.location.href = notebook.onSuccessUrl(); // TODO: Show finish notification or if still on initial spinner redirect automatically
+                  window.location.href = notebook.onSuccessUrl();
+                  // TODO: switch to something like params = ko.mapping.fromJSON(notebook.onSuccessUrl())
+                  // {'app': 'metastore', 'path': 'table/%(database)s' % {'database': database}}
+                  // huePubSub.publish('open.app', {'app': 'importer', 'prefill': {'source_type: 'all', 'target_type': 'table'}, 'database': 'huedb'})
                 }
               } else { // Perform last DROP statement execute
                 snippet.execute();

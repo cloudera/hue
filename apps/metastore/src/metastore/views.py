@@ -31,16 +31,18 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
 
-from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
-
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery
 from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
+from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
+from notebook.connectors.base import Notebook
+from notebook.models import make_notebook
+
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
-from notebook.connectors.base import Notebook
+
 
 
 LOG = logging.getLogger(__name__)
@@ -371,16 +373,28 @@ def drop_table(request, database):
     tables = request.POST.getlist('table_selection')
     tables_objects = [db.get_table(database, table) for table in tables]
     skip_trash = request.POST.get('skip_trash') == 'on'
-    try:
-      # Can't be simpler without an important refactoring
-      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-      query_history = db.drop_tables(database, tables_objects, design, skip_trash=skip_trash)
-      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
-      return redirect(url)
-    except Exception, ex:
-      error_message, log = dbms.expand_exception(ex, db)
-      error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
-      raise PopupException(error, title=_("Hive Error"), detail=log)
+    
+    if request.POST.get('is_embeddable'):
+      sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
+      return make_notebook(
+          name='Execute and watch',
+          editor_type='hive',
+          statement=sql.strip(),
+          status='ready',
+          database=database,
+          on_success_url=json.dumps({'app': 'metastore', 'path': 'table/%(database)s' % {'database': database}})
+      )
+    else:    
+      try:
+        # Can't be simpler without an important refactoring
+        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
+        query_history = db.drop_tables(database, tables_objects, design, skip_trash=skip_trash)
+        url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
+        return redirect(url)
+      except Exception, ex:
+        error_message, log = dbms.expand_exception(ex, db)
+        error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
+        raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the table(s)?")
     return render('confirm.mako', request, {'url': request.path, 'title': title})
