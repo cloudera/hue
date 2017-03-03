@@ -558,7 +558,7 @@ class HiveServer2Dbms(object):
     return self.execute_query(query, design)
 
 
-  def drop_tables(self, database, tables, design, skip_trash=False):
+  def drop_tables(self, database, tables, design, skip_trash=False, generate_ddl_only=False):
     hql = []
 
     for table in tables:
@@ -570,10 +570,14 @@ class HiveServer2Dbms(object):
         hql.append(drop_query)
 
     query = hql_query(';'.join(hql), database)
-    design.data = query.dumps()
-    design.save()
-
-    return self.execute_query(query, design)
+    
+    if generate_ddl_only:
+      return query
+    else:   
+      design.data = query.dumps()
+      design.save()
+  
+      return self.execute_query(query, design)
 
 
   def drop_database(self, database):

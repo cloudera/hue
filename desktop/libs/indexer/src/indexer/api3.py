@@ -357,7 +357,11 @@ def _create_table_from_a_file(request, source, destination):
     }
 
   editor_type = 'impala' if table_format == 'kudu' else 'hive'
-  on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
+  
+  if request.POST.get('is_embeddable'):
+    on_success_url = json.dumps({'app': 'metastore', 'path': 'table/%(database)s/%(table)s' % {'database': database, 'table': table_name}})
+  else:
+    on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
   return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql.strip(), status='ready', database=database, on_success_url=on_success_url)
 

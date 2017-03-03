@@ -557,6 +557,7 @@ ${ components.menubar() }
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { onePageViewModel.currentApp('importer') }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
+        ## huePubSub.publish('open.app', {'app': 'importer', 'prefill': {'source_type: 'all', 'target_type': 'table'}, 'database': 'huedb'})
       % elif ENABLE_NEW_CREATE_TABLE.get():
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }" title="${_('Create a new database')}"><i class="fa fa-plus"></i></a>
       % else:
@@ -592,15 +593,18 @@ ${ components.menubar() }
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
     <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    % if user.is_superuser:
     <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
       <a class="inactive-action" title="${_('View in Optimizer')}" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas fa-fw"></i></a>
     <!-- /ko -->
+    % endif
 ##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
     % if has_write_access:
       <a class="inactive-action" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i></a>
+      ## 
     % endif
     <!-- ko if: tableDetails() -->
       <!-- ko if: tableDetails().partition_keys.length -->
