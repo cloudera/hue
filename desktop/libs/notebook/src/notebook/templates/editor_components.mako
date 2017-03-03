@@ -3107,7 +3107,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         evt.dataTransfer.dropEffect = "copy";
       }
 
-      var dropZone = $(".editorComponents")[0];
+      var dropZone = $(".notebook")[0];
       dropZone.addEventListener("dragenter", showHoverMsg, false);
       dropZone.addEventListener("dragover", handleDragOver, false);
       dropZone.addEventListener("drop", handleFileSelect, false);
