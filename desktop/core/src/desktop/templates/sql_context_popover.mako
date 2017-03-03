@@ -193,6 +193,10 @@ from metadata.conf import has_navigator
         </span>
       </div>
       <!-- /ko -->
+      <!-- ko if: typeof viewSql !== 'undefined' -->
+      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
+      <div style="margin-left: 15px;" data-bind="text: viewSql"></div>
+      <!-- /ko -->
       <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
       <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
       <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
@@ -499,6 +503,13 @@ from metadata.conf import has_navigator
                   column.type = column.type.substring(0, column.type.indexOf('<'));
                 }
               });
+            }
+            if (typeof data.properties !== 'undefined') {
+              data.properties.forEach(function (property) {
+                if (property.col_name.toLowerCase() === 'view original text:') {
+                  data.viewSql = property.data_type;
+                }
+              })
             }
             self.fetchedData(data);
             self.loading(false);
