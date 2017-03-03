@@ -180,10 +180,6 @@ ${ common_home.navbar() }
           params: {
             user: '${user.username}',
             sql: {
-              sourceTypes: [{
-                name: 'hive',
-                type: 'hive'
-              }],
               navigationSettings: {
                 openItem: false,
                 showStats: true

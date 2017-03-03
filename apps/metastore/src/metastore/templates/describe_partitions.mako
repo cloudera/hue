@@ -70,10 +70,6 @@ ${ assist.assistPanel() }
               name: 'assist-panel',
               params: {
                 sql: {
-                  sourceTypes: [{
-                    name: 'hive',
-                    type: 'hive'
-                  }],
                   user: '${user.username}',
                   navigationSettings: {
                     openItem: false,
