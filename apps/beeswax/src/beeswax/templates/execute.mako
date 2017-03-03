@@ -239,7 +239,7 @@ ${ layout.menubar(section='query') }
   </div>
   <div class="resizer" data-bind="splitDraggable : { appName: '${app_name}', onPosition: onPanelPosition, leftPanelVisible: isEditor }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
   <div class="content-panel" id="querySide">
-    % if USE_NEW_EDITOR.get():
+    % if USE_NEW_EDITOR.get() and action != 'watch-redirect' and action != 'watch-results':
     <div class="alert">
       ${ _('This is the old SQL Editor, it is recommended to instead use: ') }
       % if app_name == 'impala':
