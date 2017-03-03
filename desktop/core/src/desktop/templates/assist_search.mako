@@ -376,8 +376,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                 values.push({ divider: true });
               }
               if (typeof data.results !== 'undefined') {
+                var upToLastSpace = '';
+                if (request.term.lastIndexOf(' ') > -1) {
+                  upToLastSpace = request.term.substring(0, request.term.lastIndexOf(' ') + 1);
+                }
+
                 data.results.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                  values.push({ data: { label: result.hue_name, icon: NAV_TYPE_ICONS[result.type],  description: result.hue_description }, value: upToLastSpace + result.originalName });
                 });
               }
 
