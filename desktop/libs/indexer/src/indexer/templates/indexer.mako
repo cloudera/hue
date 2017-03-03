@@ -151,10 +151,6 @@ ${ assist.assistPanel() }
                 user: '${user.username}',
                 onlySql: false,
                 sql: {
-                  sourceTypes: [{
-                    name: 'hive',
-                    type: 'hive'
-                  }],
                   navigationSettings: {
                     openItem: false,
                     showStats: true

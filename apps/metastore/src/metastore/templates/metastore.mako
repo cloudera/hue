@@ -1043,10 +1043,6 @@ ${ components.menubar() }
             params: {
               user: '${user.username}',
               sql: {
-                sourceTypes: [{
-                  name: 'hive',
-                  type: 'hive'
-                }],
                 navigationSettings: {
                   openItem: true,
                   showStats: true

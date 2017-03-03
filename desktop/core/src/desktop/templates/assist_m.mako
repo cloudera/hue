@@ -53,10 +53,6 @@ ${ assist.assistPanel() }
     params: {
       user: '${user.username}',
       sql: {
-        sourceTypes: [{
-          name: 'hive',
-          type: 'hive'
-        }],
         navigationSettings: {
           enableActiveFilter: true,
           openDatabase: false,

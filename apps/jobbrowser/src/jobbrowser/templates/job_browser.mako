@@ -106,10 +106,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               params: {
                 user: '${user.username}',
                 sql: {
-                  sourceTypes: [{
-                    name: 'hive',
-                    type: 'hive'
-                  }],
                   navigationSettings: {
                     openItem: false,
                     showStats: true
