@@ -285,7 +285,7 @@ ${ components.menubar() }
           ${_('Stored in')} Kudu
         <!-- /ko -->
         <!-- ko if: details.properties.format != 'kudu' -->
-          <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}">${_('Location')}</a>
+          <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
@@ -596,7 +596,6 @@ ${ components.menubar() }
       <a class="inactive-action" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i></a>
     % endif
     <!-- ko if: tableDetails() -->
-      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, visible: tableDetails().hdfs_link, attr: {'href': tableDetails().hdfs_link, 'rel': tableDetails().path_location}" title="${_('View File Location')}"><i class="fa fa-fw fa-hdd-o fa-fw"></i></a>
       <!-- ko if: tableDetails().partition_keys.length -->
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }" title="${_('Show Partitions')}"><i class="fa fa-sitemap fa-fw"></i></a>
       <!-- /ko -->
