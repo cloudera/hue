@@ -25,6 +25,7 @@ from desktop.views import _ko
 from metadata.conf import has_navigator
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER
+from notebook.conf import get_ordered_interpreters
 %>
 
 <%def name="assistJSModels()">
@@ -891,6 +892,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.options = options;
         self.apiHelper = options.apiHelper;
         self.i18n = options.i18n;
+
+        if (typeof options.sourceTypes === 'undefined') {
+          options.sourceTypes = [];
+          % for interpreter in get_ordered_interpreters(request.user):
+            % if interpreter["interface"] in ["hiveserver2", "rdbms", "jdbc"]:
+              options.sourceTypes.push({
+                type: '${ interpreter["type"] }',
+                name: '${ interpreter["name"] }'
+              });
+            % endif
+          % endfor
+        }
 
         self.sources = ko.observableArray();
         self.sourceIndex = {};
