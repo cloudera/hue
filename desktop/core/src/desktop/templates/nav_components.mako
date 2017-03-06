@@ -80,12 +80,12 @@ from django.utils.translation import ugettext as _
         self.currentTags = ko.observableArray();
         self.allTags = ko.observableArray();
 
-
         var fetchNavEntity = function () {
           var fetchDeferral = $.Deferred();
           apiHelper.fetchNavEntity({
             sourceType: ko.unwrap(params.sourceType),
             identifierChain: identifierChain,
+            isView: params.fetchedData() !== 'undefined' && params.fetchedData().is_view,
             defaultDatabase: ko.unwrap(params.defaultDatabase),
             silenceErrors: true,
             noCache: true,
