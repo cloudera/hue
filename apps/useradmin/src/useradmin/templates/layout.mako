@@ -61,12 +61,12 @@ def is_selected(section, matcher):
                 </a>
               </li>
               %if user.is_superuser:
-              <li class="${is_selected(section, 'users')}"><a href="/useradmin/users">${_('Users')}</a></li>
-              <li class="${is_selected(section, 'groups')}"><a href="/useradmin/groups">${_('Groups')}</a></li>
-              <li class="${is_selected(section, 'permissions')}"><a href="/useradmin/permissions">${_('Permissions')}</a></li>
-              %if conf.USE_DEFAULT_CONFIGURATION.get():
-              <li class="${is_selected(section, 'configurations')}"><a href="/useradmin/configurations">${_('Configurations')}</a></li>
-              %endif
+                <li class="${is_selected(section, 'users')}"><a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/useradmin/users')" or "/useradmin/users" }">${_('Users')}</a></li>
+                <li class="${is_selected(section, 'groups')}"><a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/useradmin/groups')" or "/useradmin/groups" }">${_('Groups')}</a></li>
+                <li class="${is_selected(section, 'permissions')}"><a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/useradmin/permissions')" or "/useradmin/permissions" }">${_('Permissions')}</a></li>
+                %if conf.USE_DEFAULT_CONFIGURATION.get():
+                <li class="${is_selected(section, 'configurations')}"><a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/useradmin/configurations')" or "/useradmin/configurations" }">${_('Configurations')}</a></li>
+                %endif
               %endif
             </ul>
           </div>
