@@ -1408,6 +1408,7 @@ var ApiHelper = (function () {
    * @param {Function} [options.errorCallback]
    * @param {boolean} [options.silenceErrors]
    *
+   * @param {boolean} [options.isView] - Default false
    * @param {Object[]} options.identifierChain
    * @param {string} options.identifierChain.name
    * @param {string} [options.defaultDatabase]
@@ -1421,9 +1422,11 @@ var ApiHelper = (function () {
 
     var url = NAV_URLS.FIND_ENTITY + '?type=database&name=' + database;
 
+    var isView = !!options.isView;
+
     if (clonedIdentifierChain.length > 0) {
       var table = clonedIdentifierChain.shift().name;
-      url = NAV_URLS.FIND_ENTITY + '?type=table&database=' + database + '&name=' + table;
+      url = NAV_URLS.FIND_ENTITY + (isView ? '?type=view' : '?type=table') + '&database=' + database + '&name=' + table;
       if (clonedIdentifierChain.length > 0) {
         url = NAV_URLS.FIND_ENTITY + '?type=field&database=' + database + '&table=' + table + '&name=' + clonedIdentifierChain.shift().name;
       }
