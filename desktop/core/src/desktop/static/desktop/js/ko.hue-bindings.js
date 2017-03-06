@@ -5405,4 +5405,10 @@
     }
   };
 
+  ko.bindingHandlers.jHueRowSelector = {
+    init: function (element, valueAccessor) {
+      $(element).jHueRowSelector();
+    }
+  }
+
 })();
