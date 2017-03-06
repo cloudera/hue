@@ -57,6 +57,7 @@ ${layout.menubar(section='users')}
       </%def>
     </%actionbar:render>
 
+    <!-- ko ifnot: isLoadingUsers()  -->
     <table class="table table-condensed">
       <thead>
       <tr>
@@ -114,6 +115,8 @@ ${layout.menubar(section='users')}
       </tfoot>
       <!-- /ko -->
     </table>
+    <!-- /ko -->
+    <!-- ko hueSpinner: { spin: isLoadingUsers, center: true, size: 'xlarge' } --><!-- /ko -->
   </div>
 
   <div id="syncLdap" class="modal hide fade"></div>
@@ -193,8 +196,11 @@ ${layout.menubar(section='users')}
         return filtered.length > 0 && filtered.length < self.filteredUsers().length - 1
       });
 
+      self.isLoadingUsers = ko.observable(true);
+
       self.init = function () {
         $.getJSON('/useradmin/users?format=json', function (data) {
+          self.isLoadingUsers(false);
           if (data && data.users) {
             var users = [];
             data.users.forEach(function (u) {
@@ -208,6 +214,9 @@ ${layout.menubar(section='users')}
               users.push(user);
             })
             self.availableUsers(users);
+          }
+          else {
+            $.jHueNotify.error('${ _('There was an error while loading users.') }')
           }
         });
       }
