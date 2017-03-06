@@ -388,6 +388,9 @@ var MetastoreViewModel = (function () {
 
     //TODO: Fetch table comment async and don't set it from python
     self.comment = ko.observable(options.comment);
+    self.commentWithoutNewLines = ko.pureComputed(function(){
+      return self.comment() ? self.comment().replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '') : '';
+    });
 
     self.comment.subscribe(function (newValue) {
       $.post('/metastore/table/' + self.database.name + '/' + self.name + '/alter', {
