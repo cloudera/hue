@@ -60,8 +60,12 @@ __groups_lock = threading.Lock()
 
 def list_users(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+  users = User.objects.all()
+  if request.ajax:
+    return JsonResponse({'users' : massage_users_for_json(users, True)})
+
   return render("list_users.mako", request, {
-      'users': User.objects.all(),
+      'users': users,
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
       'is_ldap_setup': is_ldap_setup
@@ -120,7 +124,9 @@ def massage_users_for_json(users, extended=False):
       'username': user.username,
       'first_name': user.first_name,
       'last_name': user.last_name,
-      'email': user.email
+      'email': user.email,
+      'last_login': user.last_login,
+      'editURL': reverse('useradmin.views.edit_user', kwargs={'username': user.username})
     }
     if extended:
       appendable['groups'] = massage_groups_for_json(user.groups.all())
