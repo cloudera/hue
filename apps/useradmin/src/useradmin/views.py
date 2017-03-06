@@ -61,7 +61,7 @@ __groups_lock = threading.Lock()
 def list_users(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
   users = User.objects.all()
-  if request.ajax:
+  if request.GET.get('format') == 'json':
     return JsonResponse({'users' : massage_users_for_json(users, True)})
 
   return render("list_users.mako", request, {

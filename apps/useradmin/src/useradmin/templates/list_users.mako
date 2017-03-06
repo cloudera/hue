@@ -87,7 +87,7 @@ ${layout.menubar(section='users')}
           <!-- /ko -->
           <td>
             <!-- ko if: $parent.isSuperUser() || username() == '${user.username}' -->
-            <strong><a data-bind="text: username, attr: {'title': '${ _ko('Edit user') } ' + username(), 'href': editURL}" data-row-selector="true"></a></strong>
+            <strong><a data-bind="text: username, attr: {'title': '${ _ko('Edit user') } ' + username(), 'href': editURL}, jHueRowSelector"></a></strong>
             <!-- /ko -->
             <!-- ko if: !$parent.isSuperUser() && username() != '${user.username}' -->
             <strong data-bind="text: username"></strong>
@@ -192,7 +192,7 @@ ${layout.menubar(section='users')}
       });
 
       self.init = function () {
-        $.getJSON('/useradmin/users', function (data) {
+        $.getJSON('/useradmin/users?format=json', function (data) {
           if (data && data.users) {
             var users = [];
             data.users.forEach(function (u) {
@@ -236,7 +236,6 @@ ${layout.menubar(section='users')}
       $("#deleteUser").modal("show");
     });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
