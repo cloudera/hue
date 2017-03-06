@@ -1204,8 +1204,18 @@ a#advanced-btn:hover {
   cursor: default;
 }
 
+.hueCheckbox.disabled {
+  border: 1px solid #DDDDDD;
+  background-color: #FEFEFE;
+  cursor: not-allowed;
+}
+
 .hueCheckbox:hover {
   border-color: #999999;
+}
+
+.hueCheckbox.disabled:hover {
+  border-color: #DDDDDD;
 }
 
 .hueCheckboxText {
