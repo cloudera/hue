@@ -312,7 +312,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('users') }"><a href="javascript: void(0);">Users</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);">Users</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
         <li class="header">&nbsp;</li>
@@ -374,7 +374,10 @@ ${ hueIcons.symbols() }
       <div id="embeddable_importer" class="embeddable"></div>
       <div id="embeddable_collections" class="embeddable"></div>
       <div id="embeddable_indexes" class="embeddable"></div>
-      <div id="embeddable_users" class="embeddable"></div>
+      <div id="embeddable_useradmin_users" class="embeddable"></div>
+      <div id="embeddable_useradmin_groups" class="embeddable"></div>
+      <div id="embeddable_useradmin_permissions" class="embeddable"></div>
+      <div id="embeddable_useradmin_configurations" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -582,10 +585,13 @@ ${ assist.assistPanel() }
           collections: '/dashboard/admin/collections?is_embeddable=true',
           indexes: '/indexer/?is_embeddable=true',
           importer: '/indexer/importer/?is_embeddable=true',
-          users: '/useradmin/users?is_embeddable=true',
+          useradmin_users: '/useradmin/users?is_embeddable=true',
+          useradmin_groups: '/useradmin/groups?is_embeddable=true',
+          useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
+          useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
         };
 
-        self.SKIP_CACHE = ['fileviewer', 'users'];
+        self.SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations'];
 
         self.embeddable_cache = {};
 
@@ -682,6 +688,14 @@ ${ assist.assistPanel() }
             self.currentApp('oozie_bundle');
           } else if (href.startsWith('/filebrowser')){
             self.currentApp('filebrowser');
+          } else if (href.startsWith('/useradmin/users')){
+            self.currentApp('useradmin_users');
+          } else if (href.startsWith('/useradmin/groups')){
+            self.currentApp('useradmin_groups');
+          } else if (href.startsWith('/useradmin/permissions')){
+            self.currentApp('useradmin_permissions');
+          } else if (href.startsWith('/useradmin/configurations')){
+            self.currentApp('useradmin_configurations');
           }
         });
 
