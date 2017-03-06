@@ -188,6 +188,7 @@
               return;
             }
             if (options.closeOnEnter) {
+              hideSpinner();
               $element.hueAutocomplete('close');
               // Prevent autocomplete on enter
               $element.hueAutocomplete("option", "disabled", true);
@@ -202,6 +203,7 @@
               options.onEnter();
             }
             if (options.blurOnEnter) {
+              hideSpinner();
               $element.blur();
             }
           }
@@ -233,6 +235,7 @@
       }
 
       var closeSubscription = huePubSub.subscribe('autocomplete.close', function () {
+        hideSpinner();
         $element.hueAutocomplete('close');
       });
 
