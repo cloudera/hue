@@ -28,7 +28,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex-bottom-links">
       <div class="sql-context-link-row">
         <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }</a>
-        <a class="inactive-action pointer" data-bind="visible: isTable, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
+        <a class="inactive-action pointer" data-bind="visible: isTable || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore', isTable ? 'table' : 'db') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }"><i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }</a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }"><i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }</a>
         <!-- ko if: isAsterisk -->
@@ -174,10 +174,12 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-database-details">
     <div class="sql-context-flex-fill">
       <div class="sql-context-flex">
-        <div class="sql-context-flex-header">
-          <div style="margin: 10px 5px 0 10px;">
-            <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
-          </div>
+        <div data-bind="if: $parent.comment">
+          <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
+          <div style="margin-left: 15px; font-style: italic;" data-bind="text: $parent.comment"></div>
+        </div>
+        <div style="margin: 10px 5px 0 10px;">
+          <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
         </div>
         <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
           <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
@@ -634,15 +636,6 @@ from metadata.conf import has_navigator
               path: path
             });
           }));
-
-          pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {
-            if (IS_HUE_4) {
-              huePubSub.publish('open.link', '/metastore/table/' + path.join('/'));
-              huePubSub.publish('sql.context.popover.hide');
-            } else {
-              window.open('/metastore/table/' + path.join('/'), '_blank');
-            }
-          }));
         });
       }
 
@@ -727,10 +720,17 @@ from metadata.conf import has_navigator
 
       function DatabaseContextTabs(data, sourceType, defaultDatabase) {
         var self = this;
+        self.dbComment = ko.observable('');
+        var dbName = data.identifierChain[data.identifierChain.length - 1].name;
+        $.getJSON('/metastore/databases/' + dbName + '/metadata', function (data) {
+          if (data && data.status == 0 && data.data.comment) {
+              self.dbComment(data.data.comment);
+          }
+        });
         self.tabs = [
-          { id: 'tags', label: '${ _("Tags") }', template: 'sql-context-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
+          { id: 'details', label: '${ _("Details") }', comment : self.dbComment, template: 'sql-context-database-details', templateData: new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, ApiHelper.getInstance().fetchAutocomplete) }
         ];
-        self.activeTab = ko.observable('tags');
+        self.activeTab = ko.observable('details');
       }
 
 
@@ -1161,6 +1161,20 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-info'
         }
         self.orientationClass = 'hue-popover-' + orientation;
+
+        apiHelper.identifierChainToPath({
+          sourceType: self.sourceType,
+          identifierChain: self.data.identifierChain
+        }, function (path) {
+          pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function (type) {
+            if (IS_HUE_4) {
+              huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
+              huePubSub.publish('sql.context.popover.hide');
+            } else {
+              window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
+            }
+          }));
+        });
 
         if (params.delayedHide) {
           var hideTimeout = -1;
