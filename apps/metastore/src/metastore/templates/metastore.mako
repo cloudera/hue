@@ -40,12 +40,16 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.min.js') }"></script>
+<script src="${ static('desktop/ext/js/wysihtml5-0.3.0.min.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-wysihtml5-0.0.2.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-editable.wysihtml5.js') }"></script>
 <script src="${ static('beeswax/js/stats.utils.js') }"></script>
 
 ${ assist.assistJSModels() }
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
@@ -141,8 +145,11 @@ ${ components.menubar() }
           <!-- /ko -->
           <td>
             % if has_write_access:
-              <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'left', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}" class="editable editable-click editable-empty">
+              <div class="show-inactive-on-hover">
+              <a class="inactive-action pointer toggle-editable" title="${ _('Edit the comment') }"><i class="fa fa-pencil"></i></a>
+              <span data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', skipNewLines: true, toggleElement: '.toggle-editable', placement: 'left', placeholder: '${ _ko('Add a comment...') }', emptytext: '${ _ko('Add a comment...') }', inputclass: 'input-xlarge'}">
                 ${ _('Add a comment...') }</span>
+              </div>
             % else:
               <span data-bind="text: comment"></span>
             % endif
@@ -459,7 +466,7 @@ ${ components.menubar() }
               <td>
                 <a class="tableLink" href="javascript:void(0);" data-bind="text: name, click: function() { $parent.setTable($data, function(){ huePubSub.publish('metastore.url.change'); }) }"></a>
               </td>
-              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="text: comment, attr: {title: comment}"></td>
+              <td style="text-overflow: ellipsis; overflow: hidden; max-width: 0" data-bind="html: commentWithoutNewLines, attr: {title: hueUtils.html2text(commentWithoutNewLines())}"></td>
               <!-- ko if: $root.optimizerEnabled -->
                 <!-- ko if: optimizerStats() -->
                 <td>
@@ -765,13 +772,15 @@ ${ components.menubar() }
   <div class="clearfix"></div>
 
   % if has_write_access:
-  <span data-bind="editable: comment, editableOptions: {enabled: true, placement: 'bottom', emptytext: '${ _ko('Add a description...') }', inputclass:'input-xlarge', rows: 10 }" class="editable editable-click editable-empty" data-type="textarea">
-    ${ _('Add a description...') }
-  </span>
+  <div class="show-inactive-on-hover">
+    <a class="inactive-action pointer toggle-editable" title="${ _('Edit the description') }"><i class="fa fa-pencil vertical-align-top"></i></a>
+    <div data-bind="editable: comment, editableOptions: {enabled: true, type: 'wysihtml5', toggle: 'manual', toggleElement: '.toggle-editable', placement: 'bottom', placeholder: '${ _ko('Add a description...') }', emptytext: '${ _ko('No description available') }', inputclass:'input-xlarge', rows: 10 }" class="inline-block margin-left-5">
+      ${ _('Add a description...') }
+    </div>
+  </div>
   % else:
-    <span data-bind="text: comment"></span>
+    <span data-bind="html: comment"></span>
   %endif
-
 
   <ul class="nav nav-pills margin-top-30">
     <li><a href="#overview" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-overview'); }">${_('Overview')}</a></li>

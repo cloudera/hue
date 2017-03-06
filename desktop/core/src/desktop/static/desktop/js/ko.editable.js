@@ -94,8 +94,26 @@
       //update observable on save
       if (ko.isObservable(value)) {
         $editable.on('save.ko', function (e, params) {
-          value(params.newValue.replace(/<(?:.|\n)*?>/gm, '').replace(/\r?\n|\r/g, ' '));
+          if (editableOptions.type && editableOptions.type == 'wysihtml5') {
+            if (editableOptions.skipNewLines) {
+              value(params.newValue.replace(/<br\s*[\/]?>/gi, ' ').replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+            }
+            else {
+              value(params.newValue.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, ''));
+            }
+          }
+          else {
+            value(params.newValue.replace(/<(?:.|\n)*?>/gm, '').replace(/\r?\n|\r/g, ' '));
+          }
         })
+      }
+
+      if (editableOptions.toggleElement) {
+        $element.parent().find(editableOptions.toggleElement).on('click', function (e) {
+          e.stopPropagation();
+          e.preventDefault();
+          $editable.editable('toggle');
+        });
       }
 
       if (editableOptions.save) {
