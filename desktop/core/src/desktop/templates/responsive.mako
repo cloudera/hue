@@ -312,6 +312,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('users') }"><a href="javascript: void(0);">Users</a></li>
         <li><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
         <li class="header">&nbsp;</li>
@@ -373,6 +374,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_importer" class="embeddable"></div>
       <div id="embeddable_collections" class="embeddable"></div>
       <div id="embeddable_indexes" class="embeddable"></div>
+      <div id="embeddable_users" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -580,9 +582,10 @@ ${ assist.assistPanel() }
           collections: '/dashboard/admin/collections?is_embeddable=true',
           indexes: '/indexer/?is_embeddable=true',
           importer: '/indexer/importer/?is_embeddable=true',
+          users: '/useradmin/users?is_embeddable=true',
         };
 
-        self.SKIP_CACHE = ['fileviewer'];
+        self.SKIP_CACHE = ['fileviewer', 'users'];
 
         self.embeddable_cache = {};
 

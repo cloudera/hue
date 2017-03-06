@@ -21,10 +21,12 @@ from django.utils.translation import ugettext as _
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+%if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
+%endif
 ${layout.menubar(section='users')}
 
-<div class="container-fluid">
+<div id="usersComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users')}</h1>
 
@@ -215,7 +217,7 @@ ${layout.menubar(section='users')}
 
     viewModel.init();
 
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#usersComponents')[0]);
 
     $(".confirmationModal").click(function () {
       var _this = $(this);
@@ -241,4 +243,6 @@ ${layout.menubar(section='users')}
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
