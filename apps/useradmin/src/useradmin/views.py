@@ -68,6 +68,7 @@ def list_users(request):
       'users': users,
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup
   })
 
