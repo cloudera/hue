@@ -259,6 +259,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             limit: 25,
             sources: ko.mapping.toJSON([self.assistPanel.visiblePanel().type])
           }).done(function (data) {
+            if (typeof data === 'undefined' || data === null) {
+              data = {};
+            }
+            if (typeof data.entities === 'undefined') {
+              data.entities = [];
+            }
             data.entities.forEach(function (entity) {
               entity.statsVisible = ko.observable(false);
               entity.showNavContextPopoverDelayed = showNavContextPopoverDelayed;
