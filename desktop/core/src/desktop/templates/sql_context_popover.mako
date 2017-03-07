@@ -1358,8 +1358,9 @@ from metadata.conf import has_navigator
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
         <table style="width: 100%" class="table table-striped table-condensed table-nowrap">
+          <!-- ko if: filteredColumns().length !== 0 -->
           <thead>
-          <tr data-bind="visible: filteredColumns().length !== 0">
+          <tr>
             <th width="6%">&nbsp;</th>
             <!-- ko if: typeof filteredColumns()[0].table === 'undefined' -->
             <th width="60%">${_('Name')}</th>
@@ -1372,6 +1373,7 @@ from metadata.conf import has_navigator
             <th width="6%">&nbsp;</th>
           </tr>
           </thead>
+          <!-- /ko -->
           <tbody data-bind="foreachVisible: { data: filteredColumns, minHeight: 29, container: '.sql-columns-table', pubSubDispose: 'sql.context.popover.dispose' }">
           <tr>
             <!-- ko if: typeof selected === 'undefined' -->
