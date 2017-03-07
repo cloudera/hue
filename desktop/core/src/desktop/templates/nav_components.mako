@@ -85,7 +85,7 @@ from django.utils.translation import ugettext as _
           apiHelper.fetchNavEntity({
             sourceType: ko.unwrap(params.sourceType),
             identifierChain: identifierChain,
-            isView: typeof params.fetchedData !== 'undefined' && params.fetchedData().is_view,
+            isView: typeof params.fetchedData !== 'undefined' && typeof params.fetchedData() !== 'undefined' && params.fetchedData().is_view,
             defaultDatabase: ko.unwrap(params.defaultDatabase),
             silenceErrors: true,
             noCache: true,
