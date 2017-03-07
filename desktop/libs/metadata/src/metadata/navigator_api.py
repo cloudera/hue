@@ -322,8 +322,6 @@ def find_entity(request):
   name = request.GET.get('name', '')
   path = request.GET.get('path', '')
 
-  # TODO: support arbitrary optional filter params
-
   if not entity_type:
     raise MetadataApiException("find_entity requires a type value, e.g. - 'database', 'table', 'file'")
 
