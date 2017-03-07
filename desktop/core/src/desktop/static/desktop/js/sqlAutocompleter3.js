@@ -1349,7 +1349,6 @@ var AutocompleteResults = (function () {
               });
             });
           }
-          self.entries(self.entries().concat(groupBySuggestions));
           groupBysDeferred.resolve(groupBySuggestions);
         },
         errorCallback: groupBysDeferred.reject
