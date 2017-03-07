@@ -23,6 +23,7 @@ import re
 from itertools import islice
 
 from django.core.cache import cache
+from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest import resource
@@ -55,7 +56,7 @@ def get_cluster_source_ids(api):
     if get_navigator_hue_server_name():
       sources = api.get_cluster_source_ids()
       if sources:
-        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(['sourceId:%(sourceId)s' % _id for _id in api.get_cluster_source_ids()]) + ') AND '
+        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in api.get_cluster_source_ids()]) + ') AND '
       else:
         CLUSTER_SOURCE_IDS = 'sourceId:0 AND'
 
@@ -80,6 +81,14 @@ class NavigatorApiException(Exception):
 
 
 class EntityDoesNotExistException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
+
+
+class NavigathorAuthException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
 
@@ -155,7 +164,7 @@ class NavigatorApi(object):
           name, val = term.split(':')
           if val:
             if name == 'type':
-              term = '%s:%s' % (name, val.upper().strip('*'))
+              term = '%s:"%s"' % (name, val.upper().strip('*'))
               default_entity_types = entity_types # Make sure type value still makes sense for the source
             user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
 
@@ -190,9 +199,11 @@ class NavigatorApi(object):
 
       return response
     except RestException, e:
-      msg = 'Failed to search for entities with search query: %s' % query_s
-      LOG.error(msg)
-      raise NavigatorApiException(e)
+      LOG.error('Failed to search for entities with search query: %s' % query_s)
+      if e.code == 401:
+        raise NavigathorAuthException(_('Failed to authenticate.'))
+      else:
+        raise NavigatorApiException(e)
 
 
   def search_entities_interactive(self, query_s=None, limit=100, offset=0, facetFields=None, facetPrefix=None, facetRanges=None, filterQueries=None, firstClassEntitiesOnly=None, sources=None):
@@ -260,9 +271,11 @@ class NavigatorApi(object):
 
       return response
     except RestException, e:
-      msg = 'Failed to search for entities with search query %s' % json.dumps(body)
-      LOG.error(msg)
-      raise NavigatorApiException(e.message)
+      LOG.error('Failed to search for entities with search query: %s' % json.dumps(body))
+      if e.code == 401:
+        raise NavigathorAuthException(_('Failed to authenticate.'))
+      else:
+        raise NavigatorApiException(e.message)
 
 
   def _secure_results(self, results, checker=None):

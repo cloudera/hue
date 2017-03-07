@@ -34,7 +34,8 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
 from metadata.conf import has_navigator, NAVIGATOR
-from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException
+from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException,\
+  NavigathorAuthException
 
 
 LOG = logging.getLogger(__name__)
@@ -63,12 +64,15 @@ def error_handler(view_fn):
       response['message'] = e.message
       response['status'] = -3
       status = 200
+    except NavigathorAuthException, e:
+      response['message'] = force_unicode(e.message)
+      response['status'] = -2
     except NavigatorApiException, e:
       try:
         response['message'] = json.loads(e.message)
         response['status'] = -2
-      except Exception, ex:
-        response['message'] = e.message
+      except Exception:
+        response['message'] = force_unicode(e.message)
     except Exception, e:
       status = 500
       message = force_unicode(e)
