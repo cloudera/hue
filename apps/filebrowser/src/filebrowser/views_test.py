@@ -687,6 +687,24 @@ class TestFileBrowserWithHadoop(object):
     assert_true('SR3_ndw_otlt_cmf_xref_INA' in response.context['view']['contents'], response.context['view']['contents'])
 
 
+  def test_view_bz2(self):
+    prefix = self.cluster.fs_prefix + '/test_view_bz2'
+    self.cluster.fs.mkdir(prefix)
+
+    # Bz2 file encoded as hex.
+    test_data = "425a6839314159265359338bcfac000001018002000c00200021981984185dc914e14240ce2f3eb0"
+
+    f = self.cluster.fs.open(prefix + '/test-view.bz2', "w")
+    f.write(test_data.decode('hex'))
+
+    # autodetect
+    response = self.c.get('/filebrowser/view=%s/test-view.bz2?compression=bz2' % prefix)
+    assert_true('test' in response.context['view']['contents'])
+
+    response = self.c.get('/filebrowser/view=%s/test-view.bz2' % prefix)
+    assert_true('test' in response.context['view']['contents'])
+
+
   def test_view_gz(self):
     prefix = self.cluster.fs_prefix + '/test_view_gz'
     self.cluster.fs.mkdir(prefix)
