@@ -8,6 +8,7 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
