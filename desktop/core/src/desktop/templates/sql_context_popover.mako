@@ -193,10 +193,6 @@ from metadata.conf import has_navigator
         </span>
       </div>
       <!-- /ko -->
-      <!-- ko if: typeof viewSql !== 'undefined' -->
-      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
-      <div style="margin-left: 15px;" data-bind="text: viewSql"></div>
-      <!-- /ko -->
       <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
       <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
       <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
@@ -207,6 +203,10 @@ from metadata.conf import has_navigator
         <div style="margin-left: 15px;" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
         <!-- /ko -->
       %endif
+      <!-- ko if: typeof viewSql !== 'undefined' -->
+      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") } <a href="javascript:void(0);" title="${ _("Copy") }" class="inactive-action" data-bind="clickToCopy: viewSql"><i class="fa fa-fw fa-clipboard"></i></a> <a href="javascript:void(0);" title="${ _("Insert at cursor") }" data-bind="click: function () { $parent.insertAtCursor(viewSql) }" class="inactive-action"><i class="fa fa-fw fa-terminal"></i></a></div>
+      <div style="margin: 0 10px;" class="pointer" title="${ _("Insert at cursor") }" data-bind="click: function () { $parent.insertAtCursor(viewSql) }, highlight: viewSql, flavor: $parent.sourceType"></div>
+      <!-- /ko -->
     </div>
     <!-- /ko -->
   </script>
@@ -471,6 +471,11 @@ from metadata.conf import has_navigator
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
       }
+
+      GenericTabContents.prototype.insertAtCursor = function (value) {
+        huePubSub.publish('editor.insert.at.cursor', value);
+        huePubSub.publish('sql.context.popover.hide');
+      };
 
       GenericTabContents.prototype.formatAnalysisValue = function (type, val) {
         if (type === 'last_modified_time' || type === 'transient_lastDdlTime') {

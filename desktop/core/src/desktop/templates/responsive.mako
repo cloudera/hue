@@ -271,7 +271,7 @@ ${ hueIcons.symbols() }
                     </div>
                     <div class="clearfix"></div>
                     <strong data-bind="text: name, attr: { title: uuid }"></strong>
-                    <div data-bind="highlight: 'statement'" class="history-item"></div>
+                    <div data-bind="highlight: 'statement'"></div>
                   </li>
                 <!-- /ko -->
               </ul>
