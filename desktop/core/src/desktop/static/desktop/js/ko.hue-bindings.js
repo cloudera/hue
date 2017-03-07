@@ -4339,6 +4339,7 @@
             });
           });
 
+      var withNiceScroll = !options.disableNiceScroll;
       var $wrapper = $element.parent();
       if (!$wrapper.hasClass('foreach-wrapper')) {
         $wrapper = $('<div>').css({
@@ -4351,7 +4352,7 @@
           'width': '100%'
         }).appendTo($wrapper);
 
-        if ($.fn.niceScroll) {
+        if ($.fn.niceScroll && withNiceScroll) {
           $container.niceScroll({
             cursorcolor: "#C1C1C1",
             cursorborder: "1px solid #C1C1C1",
@@ -4365,7 +4366,7 @@
         }
       } else {
         window.setTimeout(function(){
-          if ($.fn.niceScroll) {
+          if ($.fn.niceScroll && withNiceScroll) {
             $container.getNiceScroll().resize();
           }
         }, 200);
@@ -5201,9 +5202,12 @@
 
   ko.bindingHandlers.truncatedText = {
     update: function (element, valueAccessor, allBindingsAccessor) {
-      var text = ko.isObservable(valueAccessor()) ? ko.utils.unwrapObservable(valueAccessor()) : valueAccessor(),
-        length = ko.utils.unwrapObservable(allBindingsAccessor().maxLength) || 20,
+      var text = ko.isObservable(valueAccessor()) ? ko.utils.unwrapObservable(valueAccessor()) : valueAccessor();
+      var length = ko.utils.unwrapObservable(allBindingsAccessor().maxLength) || 20;
+      var truncated = '';
+      if (typeof text !== 'undefined' && text !== null){
         truncated = text.length > length ? text.substring(0, length) + '...' : text;
+      }
       ko.bindingHandlers.text.update(element, function () {
         return truncated;
       });
