@@ -672,7 +672,7 @@ ${ assist.assistPanel() }
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body no-margin-top">
-              <form class="form-inline inline-table columns-form" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel' }">
+              <form class="form-inline inline-table columns-form" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel', disableNiceScroll: true }">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
                   <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
                   <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
@@ -796,8 +796,15 @@ ${ assist.assistPanel() }
       <a data-bind="click: function() { $parent.nested.remove($data); }"><i class="fa fa-minus"></i></a>
     <!-- /ko -->
     <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && level() == 0 && (typeof isPartition === 'undefined' || !isPartition()) -->
-      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
-      <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
+      <!-- ko if: $root.createWizard.source.sample() && $root.createWizard.source.sample().length > 0 -->
+        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[0][$index()]"></div>
+        <!-- ko if: $root.createWizard.source.sample().length > 1 -->
+        <div class="inline-block muted field-content-preview" data-bind="truncatedText: $root.createWizard.source.sample()[1][$index()]"></div>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: !$root.createWizard.source.sample() || $root.createWizard.source.sample().length === 0 -->
+      <div class="inline-block muted field-content-preview">${ _("No sample to be shown") }</div>
+      <!-- /ko -->
     <!-- /ko -->
 
     <!-- ko if: type() == 'array' || type() == 'map' || type() == 'struct' -->
