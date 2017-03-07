@@ -609,10 +609,10 @@ class TestUserAdmin(BaseUserAdminTests):
                                                password1="test",
                                                password2="test",
                                                is_active="True"))
-      response = c.get('/useradmin/')
+      response = c.get('/useradmin/?format=json')
       assert_true(FUNNY_NAME_QUOTED in response.content)
-      assert_true(len(response.context["users"]) > 1)
-      assert_true("Hue Users" in response.content)
+      assert_true(len(json.loads(response.content)['users']) > 1)
+
       # Validate profile is created.
       assert_true(UserProfile.objects.filter(user__username=FUNNY_NAME).exists())
 
