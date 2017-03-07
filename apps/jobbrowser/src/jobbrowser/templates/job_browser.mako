@@ -53,7 +53,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 
-<div id="jobbrowserComponents">
+% if not is_mini:
+<div id="jobbrowserComponents" class="jobbrowser-components">
+% else:
+<div id="jobbrowserMiniComponents" class="jobbrowserComponents">
+% endif
 
 % if not is_embeddable:
   ${ assist.assistJSModels() }
@@ -1083,7 +1087,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
+      % if not is_mini:
       ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
+      % else:
+      ko.applyBindings(viewModel, $('#jobbrowserMiniComponents')[0]);
+      % endif
 
       var loadHash = function () {
         var h = window.location.hash;
