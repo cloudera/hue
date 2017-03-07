@@ -256,6 +256,10 @@ ${ assist.assistPanel() }
     display: inline-table;
   }
 
+  .columns-form {
+    margin-bottom: 100px;
+  }
+
 </style>
 
 <span id="importerComponents" class="notebook" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
@@ -668,7 +672,7 @@ ${ assist.assistPanel() }
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body no-margin-top">
-              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel' }">
+              <form class="form-inline inline-table columns-form" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel' }">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
                   <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
                   <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
