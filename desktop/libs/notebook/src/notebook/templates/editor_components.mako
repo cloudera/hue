@@ -3508,7 +3508,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
 
       $(document).on("renderDataError", function (e, options) {
-        huePubSub.subscribe('editor.snippet.result.normal', options.snippet);
+        huePubSub.publish('editor.snippet.result.normal', options.snippet);
       });
 
       $(document).on("progress", function (e, options) {
