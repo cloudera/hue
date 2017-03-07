@@ -391,9 +391,9 @@ class NavigatorApi(object):
     return self.find_entity(source_type='HIVE', type='DATABASE', name=name)
 
 
-  def get_table(self, database_name, table_name):
+  def get_table(self, database_name, table_name, is_view=False):
     parent_path = '\/%s' % database_name
-    return self.find_entity(source_type='HIVE', type='TABLE', name=table_name, parentPath=parent_path)
+    return self.find_entity(source_type='HIVE', type='VIEW' if is_view else 'TABLE', name=table_name, parentPath=parent_path)
 
 
   def get_field(self, database_name, table_name, field_name):
