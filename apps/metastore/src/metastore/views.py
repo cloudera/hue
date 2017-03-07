@@ -528,6 +528,7 @@ def read_partition(request, database, table, partition_spec):
   except Exception, e:
     raise PopupException(_('Cannot read partition'), detail=e.message)
 
+
 @require_http_methods(["GET", "POST"])
 @check_has_write_access_permission
 def drop_partition(request, database, table):
