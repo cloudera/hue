@@ -79,6 +79,16 @@
     return ko.observableArray(typeof prop != "undefined" && prop != null ? prop : defvalue);
   };
 
+  ko.bindingHandlers.clickToCopy = {
+    init: function (element, valueAccessor) {
+      $(element).click(function () {
+        var $input = $('<input>').css({ opacity: 0 }).val(valueAccessor()).appendTo('body').select();
+        document.execCommand('copy');
+        $input.remove()
+      });
+    }
+  };
+
   ko.bindingHandlers.autocomplete = {
     init: function (element, valueAccessor) {
       var options = valueAccessor();
@@ -3835,6 +3845,13 @@
         }
       });
 
+      huePubSub.subscribe("editor.insert.at.cursor", function(value) {
+        if ($el.data("last-active-editor")) {
+          editor.session.insert(editor.getCursorPosition(), value);
+          editor.renderer.scrollCursorIntoView(editor.getCursorPosition(), 0.5)
+        }
+      });
+
       huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), "'" + assistHdfsEntry.path + "'");
@@ -4893,6 +4910,9 @@
 
 
   ko.bindingHandlers.highlight = {
+    init: function (element) {
+      $(element).addClass('ace-highlight');
+    },
     update: function (element, valueAccessor, allBindingsAccessor) {
       var value = ko.unwrap(valueAccessor());
       var options = ko.unwrap(allBindingsAccessor());
@@ -4912,7 +4932,7 @@
 
           var Tokenizer = tokenizer.Tokenizer;
           var Rules = hiveRules.HiveHighlightRules;
-          if (options.flavor && options.flavor() == 'impala') {
+          if (options.flavor && ko.unwrap(options.flavor) == 'impala') {
             Rules = impalaRules.ImpalaHighlightRules;
           }
 
