@@ -1775,6 +1775,10 @@ var EditorViewModel = (function() {
       if (session.restarting()) {
         return;
       }
+      //Show the reloading spinner and hide the form
+      $("#sessionsTab form").hide();
+      $("#sessionsTab .sk-circle").show();
+
       session.restarting(true);
       var snippets = self.getSnippets(session.type());
 
@@ -1785,16 +1789,24 @@ var EditorViewModel = (function() {
       var sessionJson = ko.mapping.toJSON(session);
 
       self.closeSession (session, true, function() {
+        //Removing the session is apparently the key to getting KO to have the right mapping
+        self.sessions.remove(session);
         self.createSession(session, function () {
           $.each(snippets, function(index, snippet) {
             snippet.status('ready');
           });
           session.restarting(false);
+          //The session is all done restarting. Hide the spinner and show the form.
+          $("#sessionsTab form").show();
+          $("#sessionsTab .sk-circle").hide();
           if (callback) {
             callback();
           }
         }, function () {
           session.restarting(false);
+          //If something went wrong, don't show the spinner forever
+          $("#sessionsTab form").show();
+          $("#sessionsTab .sk-circle").hide();
         });
       });
     };
