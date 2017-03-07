@@ -334,7 +334,8 @@ def find_entity(request):
   elif entity_type.lower() == 'table' or entity_type.lower() == 'view':
     if not database or not name:
       raise MetadataApiException('get_table requires database and name param')
-    response['entity'] = api.get_table(database, name)
+    is_view = entity_type.lower() == 'view'
+    response['entity'] = api.get_table(database, name, is_view=is_view)
   elif entity_type.lower() == 'field':
     if not database or not table or not name:
       raise MetadataApiException('get_field requires database, table, and name params')
