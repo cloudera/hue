@@ -802,7 +802,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                     <!-- /ko -->
                   </td>
                   <td style="width: 25px" class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
-                  <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query(), flavor: $parent.type" class="history-item"></div></td>
+                  <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query(), flavor: $parent.type"></div></td>
                 </tr>
               </tbody>
             </table>
