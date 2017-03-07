@@ -316,7 +316,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
                   entity.originalDescription = entity.metaClassName;
                   break;
                 }
-                case 'PARTITION': {}
+                case 'PARTITION': {
+                  entity.hue_description = entity.originalName;
+                  break;
+                }
                 case 'OPERATION': {}
               }
               entity.hasDescription = typeof entity.originalDescription !== 'undefined' && entity.originalDescription !== null && entity.originalDescription.length > 0;
