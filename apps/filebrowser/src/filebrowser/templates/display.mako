@@ -56,6 +56,10 @@ ${ fb_components.menubar() }
               <li><a class="pointer" data-bind="click: function(){ switchCompression('gzip'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Gzip')}</a></li>
             <!-- /ko -->
 
+            <!-- ko if: $root.file().view.compression() !== "bz2" && ($root.file().path().toLowerCase().endsWith('.bz2') || $root.file().path().toLowerCase().endsWith('.bzip2'))-->
+              <li><a class="pointer" data-bind="click: function(){ switchCompression('bz2'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Bzip2')}</a></li>
+            <!-- /ko -->
+
             <!-- ko if: $root.file().view.compression() !== "avro" && $root.file().view.compression() !== "snappy_avro" && $root.file().path().toLowerCase().endsWith('.avro') -->
               <li><a class="pointer" data-bind="click: function(){ switchCompression('avro'); }"><i class="fa fa-youtube-play"></i> ${_('Preview as Avro')}</a></li>
             <!-- /ko -->
@@ -135,7 +139,7 @@ ${ fb_components.menubar() }
                 <!-- ko if: $root.file().view.contents && $root.file().view.masked_binary_data() -->
                 <div class="alert alert-warning">${_("Warning: some binary data has been masked out with '&#xfffd'.")}</div>
                 <!-- /ko -->
-                <!-- ko if: ['avro', 'gzip', 'parquet', 'snappy'].indexOf($root.file().view.compression()) > -1 -->
+                <!-- ko if: ['avro', 'bz2', 'gzip', 'parquet', 'snappy'].indexOf($root.file().view.compression()) > -1 -->
                 <div class="alert alert-warning"><i class="fa fa-info-circle"></i> ${_('Output rendered from compressed %s file.') % view['compression']}</div>
                 <!-- /ko -->
               <!-- /ko -->
