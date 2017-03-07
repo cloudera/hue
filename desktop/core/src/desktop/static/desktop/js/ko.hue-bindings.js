@@ -4375,7 +4375,7 @@
       // height changes of the elements.
       var renderedElements = [];
 
-      if (! $parentFVOwnerElement.data('lastKnownHeights')) {
+      if (! $parentFVOwnerElement.data('lastKnownHeights') || $parentFVOwnerElement.data('lastKnownHeights').length !== allEntries.length) {
         var lastKnownHeights = [];
         $.each(allEntries, function () {
           lastKnownHeights.push(entryMinHeight);
