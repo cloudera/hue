@@ -801,7 +801,8 @@ from metadata.conf import has_navigator
             scrollspeed: 100,
             mousescrollstep: 60,
             cursorminheight: 20,
-            horizrailenabled: true
+            horizrailenabled: true,
+            autohidemode: "leave"
           });
 
           if (data && data.rows) {

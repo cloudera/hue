@@ -86,7 +86,8 @@
         cursorminheight: 20,
         horizrailenabled: false,
         zindex: 14000,
-        railoffset: {left: 5}
+        railoffset: {left: 5},
+        autohidemode: 'leave'
       });
 
       if (_this.options.css != null) {
