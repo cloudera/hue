@@ -429,9 +429,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
             $('.jHueNotify').remove();
           }, 200);
         }
-        else {
-          location.reload();
-        }
       }
     });
 
