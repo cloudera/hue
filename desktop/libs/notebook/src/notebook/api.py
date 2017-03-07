@@ -40,6 +40,9 @@ LOG = logging.getLogger(__name__)
 
 DEFAULT_HISTORY_NAME = ''
 
+# HUE-6017 - Array to track closed notebooks
+_notebooks_closed_since_create_session = []
+
 
 @require_POST
 @api_error_handler
@@ -78,6 +81,15 @@ def create_session(request):
 
   response['session'] = get_api(request, session).create_session(lang=session['type'], properties=properties)
   response['status'] = 0
+
+  # HUE-6017 - If the associated notebook was closed since the session create request was sent,
+  # close the newly created session.
+  for i in range(len(_notebooks_closed_since_create_session)):
+    if (str(notebook['uuid']) == (_notebooks_closed_since_create_session[i])[0]):
+      session = response['session']
+      response['session'] = get_api(request, {'type': session['type']}).close_session(session=session)
+      response['status'] = 0
+      break
 
   return JsonResponse(response)
 
@@ -496,6 +508,23 @@ def close_notebook(request):
   response = {'status': -1, 'result': []}
 
   notebook = json.loads(request.POST.get('notebook', '{}'))
+
+  # HUE-6017 - Add the closed notebook plus time since epoch to the array for any actively creating session.
+  closed_notebook_data = [str(notebook['uuid']), str(time.time())]
+  _notebooks_closed_since_create_session.append(closed_notebook_data)
+
+  # HUE-6017 - Cleanup any closed notebooks uuid/time data that is older than one hour.
+  # If the notebook was closed more than an hour ago, it probably doesn't have any sessions that are
+  # actively being created anymore.
+  # Store the data elements to pop as if we pop them here, we will get an index out of bounds exception.
+  notebook_data_to_pop = []
+  for i in range(len(_notebooks_closed_since_create_session)):
+    if (float((_notebooks_closed_since_create_session[i])[1]) + 3600) <= time.time():
+      notebook_data_to_pop.append(i)
+
+  # Finally pop the old data out of the array.
+  for i in range(len(notebook_data_to_pop)):
+    _notebooks_closed_since_create_session.pop(notebook_data_to_pop[i])
 
   for session in [_s for _s in notebook['sessions'] if _s['type'] in ('scala', 'spark', 'pyspark', 'sparkr')]:
     try:
