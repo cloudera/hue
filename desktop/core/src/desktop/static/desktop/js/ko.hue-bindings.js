@@ -4361,7 +4361,8 @@
             scrollspeed: 1,
             mousescrollstep: 60,
             cursorminheight: options.cursorminheight || 20,
-            horizrailenabled: options.horizrailenabled || false
+            horizrailenabled: options.horizrailenabled || false,
+            autohidemode: "leave"
           });
         }
       } else {
@@ -4750,7 +4751,8 @@
           mousescrollstep: 60,
           scrollspeed: 1,
           cursorminheight: options.cursorminheight || 20,
-          horizrailenabled: typeof options.horizrailenabled !== 'undefined' ? options.horizrailenabled : true
+          horizrailenabled: typeof options.horizrailenabled !== 'undefined' ? options.horizrailenabled : true,
+          autohidemode: "leave"
         });
         $(element).addClass('nicescrollified');
         ko.utils.domNodeDisposal.addDisposeCallback(element, niceScroll.remove);

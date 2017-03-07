@@ -376,7 +376,8 @@
             mousescrollstep: 60,
             railhoffset: {
               top: 2
-            }
+            },
+            autohidemode: "leave"
           });
           $scrollingBreadcrumbs.parents('.modal').find('.nicescroll-rails-vr').remove();
         }
