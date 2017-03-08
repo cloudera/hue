@@ -127,7 +127,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
           keyword: '${ _('keyword') }',
           orderBy: '${ _('order by') }',
           table: '${ _('table') }',
-          value: '${ _('value') }',
+          sample: '${ _('sample') }',
           variable: '${ _('variable') }',
           view: '${ _('view') }',
           virtual: '${ _('virtual') }'
