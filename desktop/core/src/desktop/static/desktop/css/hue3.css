@@ -3551,7 +3551,3 @@ input:invalid:focus,textarea:invalid:focus,select:invalid:focus {
 .help-inline.muted {
   color: #999;
 }
-
-.vertical-align-top {
-  vertical-align: top;
-}
