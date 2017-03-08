@@ -204,8 +204,8 @@ from metadata.conf import has_navigator
         <!-- /ko -->
       %endif
       <!-- ko if: typeof viewSql !== 'undefined' -->
-      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") } <a href="javascript:void(0);" title="${ _("Copy") }" class="inactive-action" data-bind="clickToCopy: viewSql"><i class="fa fa-fw fa-clipboard"></i></a> <a href="javascript:void(0);" title="${ _("Insert at cursor") }" data-bind="click: function () { $parent.insertAtCursor(viewSql) }" class="inactive-action"><i class="fa fa-fw fa-terminal"></i></a></div>
-      <div style="margin: 0 10px;" class="pointer" title="${ _("Insert at cursor") }" data-bind="click: function () { $parent.insertAtCursor(viewSql) }, highlight: viewSql, flavor: $parent.sourceType"></div>
+      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
+      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: viewSql flavor: $parent.sourceType"></div>
       <!-- /ko -->
     </div>
     <!-- /ko -->
@@ -471,11 +471,6 @@ from metadata.conf import has_navigator
         self.loading = ko.observable(false);
         self.hasErrors = ko.observable(false);
       }
-
-      GenericTabContents.prototype.insertAtCursor = function (value) {
-        huePubSub.publish('editor.insert.at.cursor', value);
-        huePubSub.publish('sql.context.popover.hide');
-      };
 
       GenericTabContents.prototype.formatAnalysisValue = function (type, val) {
         if (type === 'last_modified_time' || type === 'transient_lastDdlTime') {
