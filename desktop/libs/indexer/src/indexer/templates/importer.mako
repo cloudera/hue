@@ -579,13 +579,13 @@ ${ assist.assistPanel() }
               </div>
               <span class="inline-labels" data-bind="visible: tableFormat() == 'text' && useCustomDelimiters()">
                 <label for="fieldDelimiter" class="control-label"><div>${ _('Field') }</div>
-                  <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                  <select id="fieldDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customFieldDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
                 <label for="collectionDelimiter" class="control-label"><div>${ _('Array, Map') }</div>
-                  <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                  <select id="collectionDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customCollectionDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
                 <label for="structDelimiter" class="control-label"><div>${ _('Struct') }</div>
-                  <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
+                  <select id="structDelimiter" data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: customMapDelimiter, optionsValue: 'value', optionsText: 'name'"></select>
                 </label>
               </span>
             </span>
@@ -881,7 +881,7 @@ ${ assist.assistPanel() }
 <script type="text/html" id="arg-text-delimiter">
   <label>
     <div data-bind="text: description"></div>
-    <select data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
+    <select data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
   </label>
 </script>
 
@@ -1464,7 +1464,7 @@ ${ assist.assistPanel() }
       self.source = new Source(vm, self);
       self.destination = new Destination(vm, self);
 
-      self.customDelimiters = ko.observable([
+      self.customDelimiters = ko.observableArray([
         {'value': ',', 'name': 'Comma (,)'},
         {'value': '\\t', 'name': '^Tab (\\t)'},
         {'value': '\\n', 'name': 'New line'},
