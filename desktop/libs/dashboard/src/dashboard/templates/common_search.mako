@@ -1222,7 +1222,7 @@ ${ dashboard.layout_skeleton() }
   <a href="javascript: void(0)" title="${ _('Previous') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-chevron-left" data-bind="
-        visible: $data.response.start * 1.0 >= $parent.template.rows() * 1.0,
+        visible: $data.response.start * 1.0 >= ($parent.template ? $parent : $root.collection).template.rows() * 1.0,
         click: function() { $root.query.paginate('prev') }">
     </i>
   </a>
@@ -1230,7 +1230,7 @@ ${ dashboard.layout_skeleton() }
   ${ _('Showing') }
   <span data-bind="text: ($data.response.start + 1)"></span>
   ${ _('to') }
-  <span data-bind="text: Math.min(($data.response.start + $parent.template.rows()), $data.response.numFound)"></span>
+  <span data-bind="text: Math.min(($data.response.start + ($parent.template ? $parent : $root.collection).template.rows()), $data.response.numFound)"></span>
   ${ _('of') }
   <span data-bind="text: $data.response.numFound"></span>
   ${ _(' results') }
@@ -1238,7 +1238,7 @@ ${ dashboard.layout_skeleton() }
   <span data-bind="visible: $root.isEditing()">
     ${ _('Show') }
     <span class="spinedit-cnt">
-      <input type="text" data-bind="spinedit: $parent.template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
+      <input type="text" data-bind="spinedit: ($parent.template ? $parent : $root.collection).template.rows, valueUpdate:'afterkeydown'" style="text-align: center; margin-bottom: 0" />
     </span>
     ${ _('results per page') }
   </span>
@@ -1246,7 +1246,7 @@ ${ dashboard.layout_skeleton() }
   <a href="javascript: void(0)" title="${ _('Next') }">
     <span data-bind="click: $root.collection.toggleSortColumnGridLayout"></span>
     <i class="fa fa-chevron-right" data-bind="
-        visible: ($parent.template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
+        visible: (($parent.template ? $parent : $root.collection).template.rows() * 1.0 + $data.response.start * 1.0) < $data.response.numFound,
         click: function() { $root.query.paginate('next') }">
     </i>
   </a>
