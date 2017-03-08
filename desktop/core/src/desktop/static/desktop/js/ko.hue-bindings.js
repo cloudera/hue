@@ -4899,82 +4899,104 @@
         $(element).data('aceEditor').setValue(value, -1)
       }
     }
-  }
-
+  };
 
   ko.bindingHandlers.highlight = {
     init: function (element) {
       $(element).addClass('ace-highlight');
     },
     update: function (element, valueAccessor, allBindingsAccessor) {
-      var value = ko.unwrap(valueAccessor());
-      var options = ko.unwrap(allBindingsAccessor());
+      var options = $.extend({
+        dialect: 'hive',
+        value: '',
+        format: false
+      }, valueAccessor());
 
-      if (typeof value !== 'undefined' && value !== '') { // allows highlighting static code
-        if (options.path) {
-          value = value[options.path];
-        }
-        ace.require([
-          'ace/mode/impala_highlight_rules',
-          'ace/mode/hive_highlight_rules',
-          'ace/mode/xml_highlight_rules',
-          'ace/tokenizer',
-          'ace/layer/text'
-        ], function (impalaRules, hiveRules, xmlRules, tokenizer, text) {
-          var res = [];
-
-          var Tokenizer = tokenizer.Tokenizer;
-          var Rules = hiveRules.HiveHighlightRules;
-          if (options.flavor && ko.unwrap(options.flavor) == 'impala') {
-            Rules = impalaRules.ImpalaHighlightRules;
+      var createAceHighlight = function (value) {
+        if (typeof value !== 'undefined' && value !== '') { // allows highlighting static code
+          if (options.path) {
+            value = value[options.path];
           }
+          ace.require([
+            'ace/mode/impala_highlight_rules',
+            'ace/mode/hive_highlight_rules',
+            'ace/mode/xml_highlight_rules',
+            'ace/tokenizer',
+            'ace/layer/text'
+          ], function (impalaRules, hiveRules, xmlRules, tokenizer, text) {
+            var res = [];
 
-          var Text = text.Text;
-
-          var tok = new Tokenizer(new Rules().getRules());
-          var lines = value.split('\n');
-
-          var renderSimpleLine = function(txt, stringBuilder, tokens) {
-            var screenColumn = 0;
-            var token = tokens[0];
-            var value = token.value;
-            if (value) {
-              screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
+            var Tokenizer = tokenizer.Tokenizer;
+            var Rules = hiveRules.HiveHighlightRules;
+            if (options.dialect && ko.unwrap(options.dialect) == 'impala') {
+              Rules = impalaRules.ImpalaHighlightRules;
             }
-            for (var i = 1; i < tokens.length; i++) {
-              token = tokens[i];
-              value = token.value;
-              try {
+
+            var Text = text.Text;
+
+            var tok = new Tokenizer(new Rules().getRules());
+            var lines = value.split('\n');
+
+            var renderSimpleLine = function(txt, stringBuilder, tokens) {
+              var screenColumn = 0;
+              var token = tokens[0];
+              var value = token.value;
+              if (value) {
                 screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
               }
-              catch (e) {
-                if (console && console.warn) {
-                  console.warn(value, 'This token has some parsing errors and it has been rendered without highlighting.');
+              for (var i = 1; i < tokens.length; i++) {
+                token = tokens[i];
+                value = token.value;
+                try {
+                  screenColumn = txt.$renderToken(stringBuilder, screenColumn, token, value);
                 }
-                stringBuilder.push(value);
-                screenColumn = screenColumn + value.length;
+                catch (e) {
+                  if (console && console.warn) {
+                    console.warn(value, 'This token has some parsing errors and it has been rendered without highlighting.');
+                  }
+                  stringBuilder.push(value);
+                  screenColumn = screenColumn + value.length;
+                }
               }
-            }
-          };
+            };
 
-          var additionalClass = 'pull-left';
-          if (options.splitLines) {
-            additionalClass = '';
+            var additionalClass = '';
+            if (!options.splitLines && !options.format) {
+              additionalClass = 'pull-left';
+            } else if (options.format) {
+              additionalClass = 'ace-highlight-pre';
+            }
+
+            lines.forEach(function (line) {
+              var renderedTokens = [];
+              var tokens = tok.getLineTokens(line);
+
+              if (tokens && tokens.tokens.length) {
+                renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
+              }
+
+              res.push('<div class="ace_line ' + additionalClass + '">' + renderedTokens.join('') + '&nbsp;</div>');
+            });
+
+            element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
+          });
+        }
+      };
+
+      var value = ko.unwrap(options.value);
+
+      if (options.format) {
+        ApiHelper.getInstance().formatSql(value).done(function (data) {
+          if (data.status == 0) {
+            createAceHighlight(data.formatted_statements);
+          } else {
+            createAceHighlight(value);
           }
-
-          lines.forEach(function (line) {
-            var renderedTokens = [];
-            var tokens = tok.getLineTokens(line);
-
-            if (tokens && tokens.tokens.length) {
-              renderSimpleLine(new Text(document.createElement('div')), renderedTokens, tokens.tokens);
-            }
-
-            res.push('<div class="ace_line ' + additionalClass + '">' + renderedTokens.join('') + '&nbsp;</div>');
-          })
-
-          element.innerHTML = '<div class="ace_editor ace-hue"><div class="ace_layer" style="position: static;">' + res.join('') + '</div></div>';
-        });
+        }).fail(function () {
+          createAceHighlight(value);
+        })
+      } else {
+        createAceHighlight(value);
       }
     }
   };
