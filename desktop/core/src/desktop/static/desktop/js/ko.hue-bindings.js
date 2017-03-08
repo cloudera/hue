@@ -3845,13 +3845,6 @@
         }
       });
 
-      huePubSub.subscribe("editor.insert.at.cursor", function(value) {
-        if ($el.data("last-active-editor")) {
-          editor.session.insert(editor.getCursorPosition(), value);
-          editor.renderer.scrollCursorIntoView(editor.getCursorPosition(), 0.5)
-        }
-      });
-
       huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), "'" + assistHdfsEntry.path + "'");
