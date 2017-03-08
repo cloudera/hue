@@ -1065,7 +1065,7 @@ var Collection = function (vm, collection) {
   self.getTemplateField = function (name, fields) {
     var _field = null;
     $.each(fields, function (index, field) {
-      if (field.name() == name) {
+      if (field && field.name() == name) {
         _field = field;
         return false;
       }
