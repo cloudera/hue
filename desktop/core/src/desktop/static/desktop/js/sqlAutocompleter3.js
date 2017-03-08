@@ -1054,7 +1054,7 @@ var AutocompleteResults = (function () {
           colRef.sample.forEach(function (sample) {
             valueSuggestions.push({
               value: isString ? startQuote + sample + endQuote : new String(sample),
-              meta: AutocompleterGlobals.i18n.meta.value,
+              meta: AutocompleterGlobals.i18n.meta.sample,
               category: CATEGORIES.SAMPLE,
               popular: ko.observable(false),
               details: null
