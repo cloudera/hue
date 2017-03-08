@@ -205,7 +205,10 @@ from metadata.conf import has_navigator
       %endif
       <!-- ko if: typeof viewSql !== 'undefined' -->
       <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
-      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: { value: viewSql, format: true, dialect: $parent.sourceType }"></div>
+      <!-- ko hueSpinner: { spin: loadingViewSql, center: true, size: 'large' } --><!-- /ko -->
+      <!-- ko ifnot: loadingViewSql -->
+      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: { value: viewSql, formatted: true, dialect: $parent.sourceType }"></div>
+      <!-- /ko -->
       <!-- /ko -->
     </div>
     <!-- /ko -->
@@ -507,7 +510,19 @@ from metadata.conf import has_navigator
             if (typeof data.properties !== 'undefined') {
               data.properties.forEach(function (property) {
                 if (property.col_name.toLowerCase() === 'view original text:') {
-                  data.viewSql = property.data_type;
+                  data.viewSql = ko.observable();
+                  data.loadingViewSql = ko.observable(true);
+                  ApiHelper.getInstance().formatSql(property.data_type).done(function (formatResponse) {
+                    if (formatResponse.status == 0) {
+                      data.viewSql(formatResponse.formatted_statements);
+                    } else {
+                      data.viewSql(property.data_type);
+                    }
+                  }).fail(function () {
+                    data.viewSql(property.data_type);
+                  }).always(function () {
+                    data.loadingViewSql(false);
+                  })
                 }
               })
             }
