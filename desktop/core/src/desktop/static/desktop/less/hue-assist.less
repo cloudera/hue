@@ -19,8 +19,7 @@
 @import (reference) "hue-attributes.less";
 
 .assist-panel {
-  -ms-flex: 0 0 200px;
-  flex: 0 0 200px;
+  .flex(0 0 200px);
   position: relative;
   overflow-x: hidden;
   white-space: nowrap;
@@ -31,8 +30,7 @@
 }
 
 .assist-hidden {
-  -ms-flex: 0;
-  flex: 0;
+  .flex(0);
 }
 
 .assist-panel .assist {
@@ -173,8 +171,7 @@
 }
 
 .assist-header {
-  -ms-flex: 1;
-  flex: 1;
+  .flex(1);
   color: @hue-primary-color-dark;
   background-color: #f9f9f9;
   border-top: 1px solid #f1f1f1;
@@ -414,51 +411,44 @@
 }
 
 .assist-flex-panel {
+  .display-flex();
   position: relative;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-flow: column nowrap;
-  flex-flow: column nowrap;
-  align-items: stretch;
+  .flex-flow(column nowrap);
+  .flex-align-items(stretch);
   height:100%;
 }
 
 .assist-flex-header {
   overflow: hidden;
   position: relative;
-  -ms-flex: 0 0 25px;
-  flex: 0 0 25px;
+  .flex(0 0 25px);
   white-space: nowrap;
 }
 
 .assist-flex-table-search {
   overflow: hidden;
   position: relative;
-  -ms-flex: 0 0 65px;
-  flex: 0 0 65px;
+  .flex(0 0 65px);
   white-space: nowrap;
 }
 
 .assist-flex-function-search {
   overflow: hidden;
   position: relative;
-  -ms-flex: 0 0 35px;
-  flex: 0 0 35px;
+  .flex(0 0 35px);
   white-space: nowrap;
 }
 
 .assist-flex-search {
   overflow: hidden;
   position: relative;
-  -ms-flex: 0 0 43px;
-  flex: 0 0 43px;
+  .flex(0 0 43px);
   white-space: nowrap;
 }
 
 .assist-flex-fill {
   position: relative;
-  -ms-flex: 1 1 100%;
-  flex: 1 1 100%;
+  .flex(1 1 100%);
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto;
@@ -467,8 +457,7 @@
 
 .assist-flex-half {
   position: relative;
-  -ms-flex: 1 1 50%;
-  flex: 1 1 50%;
+  .flex(1 1 50%);
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto;
@@ -599,13 +588,13 @@
   }
 
   .nav-autocomplete-item-link {
-    display: flex;
+    .display-flex();
     width: 100%;
     height: 40px;
   }
 
   .nav-search-result-icon {
-    flex: 0 0 35px;
+    .flex(0 0 35px);
     line-height: 40px;
     height: 40px;
     font-size: 18px;
@@ -613,7 +602,7 @@
   }
 
   .nav-search-result-text {
-    flex: 1;
+    .flex(1);
     width: 100%;
     overflow: hidden;
   }
@@ -669,4 +658,122 @@
 
 .input-spinner {
   background: url(/static/desktop/art/spinner-input.gif) no-repeat right -8px center !important;
+}
+
+
+
+// --- Context Popover ---
+
+.sql-context-popover-content {
+  .display-flex();
+  .flex(1 1 100%);
+  .flex-direction(column);
+  padding: 0;
+  overflow: hidden;
+}
+
+.sql-context-tab-pane {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.sql-context-tabs {
+  .flex(0 1 auto);
+  border-bottom: 1px solid #ebebeb;
+  margin-left: -1px;
+  margin-right: -1px;
+  padding-left: 15px;
+}
+
+.sql-context-tab-container {
+  position: relative;
+  .flex(1 1 100%);
+  border: none;
+  overflow: auto;
+}
+
+.sql-context-tab {
+  padding-top: 0 !important;
+  padding-bottom: 5px !important;
+  margin-bottom: -1px !important
+}
+
+.sql-context-flex {
+  .display-flex();
+  .flex-flow(column nowrap);
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+.sql-context-flex-header {
+  .flex(0 0 35px);
+}
+
+.sql-context-flex-fill {
+  overflow: hidden;
+  position: relative;
+  .flex(1 1 100%);
+
+  .alert {
+    margin: 0 15px;
+  }
+}
+
+.sql-context-flex-bottom-links {
+  .flex(0 0 35px);
+  border-top: 1px solid #ebebeb;
+  z-index: 100;
+  background-color: #FFF;
+}
+
+.sql-context-link-row {
+  float: right;
+  margin: 8px 15px 0 10px;
+}
+
+.sql-context-link-row a {
+  margin-left: 10px;
+}
+
+.sql-context-inline-search {
+  border-radius: 8px !important;
+  min-height: 18px !important;
+  height: 18px !important;
+  margin: 0 5px 0 5px !important;
+  padding-right: 18px !important;
+}
+
+.sql-context-empty-columns {
+  letter-spacing: 0.035em;
+  margin-top: 50px;
+  font-size: 14px;
+  color: #737373;
+  text-align: center;
+}
+
+.context-sample th {
+  border-right: 1px solid #e5e5e5;
+}
+
+.context-sample td {
+  border-right: 1px solid #e5e5e5;
+  white-space: nowrap;
+}
+
+.context-sample .fixed-first-column {
+  margin-top: -1px;
+}
+
+.context-sample .fixed-header-row {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.context-sample .fixed-first-cell {
+  border-right: 1px solid #e5e5e5;
+  margin-top: -1px;
+  margin-left: -1px;
 }
