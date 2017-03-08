@@ -56,8 +56,11 @@ def get_cluster_source_ids(api):
     if get_navigator_hue_server_name():
       sources = api.get_cluster_source_ids()
       if sources:
-        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in api.get_cluster_source_ids()]) + ') AND '
+        # Sometimes sourceId seems to be missing
+        source_ids = ['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in api.get_cluster_source_ids()]
+        CLUSTER_SOURCE_IDS = '(' + ' OR '.join(source_ids) + ') AND '
       else:
+        # 0 means always false
         CLUSTER_SOURCE_IDS = 'sourceId:0 AND'
 
   return CLUSTER_SOURCE_IDS
@@ -164,7 +167,7 @@ class NavigatorApi(object):
           name, val = term.split(':')
           if val:
             if name == 'type':
-              term = '%s:"%s"' % (name, val.upper().strip('*'))
+              term = '%s:%s' % (name, val.upper().strip('*'))
               default_entity_types = entity_types # Make sure type value still makes sense for the source
             user_filters.append(term + '*') # Manual filter allowed e.g. type:VIE* ca
 
@@ -175,8 +178,11 @@ class NavigatorApi(object):
 
       user_filter_clause = 'AND '.join(['(%s)' % f for f in user_filters]) or '*'
       source_filter_clause = 'OR'.join(['(%s:%s)' % ('type', entity_type) for entity_type in default_entity_types])
+
       if 's3' in sources:
         source_type_filter.append('sourceType:s3')
+      elif 'sql' in sources or 'hive' in sources or 'impala' in sources:
+        source_type_filter.append('sourceType:HIVE OR sourceType:IMPALA')
 
       filter_query = '%s AND (%s) AND (%s)' % (filter_query, user_filter_clause, source_filter_clause)
       if source_type_filter:
@@ -223,6 +229,7 @@ class NavigatorApi(object):
 
         if 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
+          filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
         elif 'hdfs' in sources:
           fq_type = entity_types
         elif 's3' in sources:

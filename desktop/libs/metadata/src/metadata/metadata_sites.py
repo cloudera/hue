@@ -59,7 +59,7 @@ def get_navigator_audit_max_file_size():
 
 
 def get_navigator_hue_server_name():
-  return get_conf('navigator-lineage').get(_CONF_NAVIGATOR_HUE_SERVER_NAME, 'Cluster 1')
+  return get_conf('navigator-lineage').get(_CONF_NAVIGATOR_HUE_SERVER_NAME, '')
 
 
 def _parse_sites():
