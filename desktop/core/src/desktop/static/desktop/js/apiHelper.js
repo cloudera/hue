@@ -1695,6 +1695,12 @@ var ApiHelper = (function () {
     }).fail(self.assistErrorCallback(options));
   };
 
+  ApiHelper.prototype.formatSql = function (statements) {
+    return $.post("/notebook/api/format", {
+      statements: statements
+    });
+  };
+
   /**
    * @param {Object} options
    * @param {string} options.sourceType
