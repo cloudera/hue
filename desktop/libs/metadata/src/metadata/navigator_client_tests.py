@@ -163,12 +163,12 @@ class TestNavigatorClientTest(NavigatorClientTest):
 
   def test_search_entities(self):
     assert_equal(
-        '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND (*) AND ((type:TABLE)OR(type:VIEW))',
+        '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='cases', sources=['hive'])[0][1]
     )
 
     assert_equal(
-        '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD))',
+        '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='type:FIELD', sources=['hive'])[0][1]
     )
 
