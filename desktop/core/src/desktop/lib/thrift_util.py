@@ -255,6 +255,7 @@ def construct_superclient(conf):
 
 
 def connect_to_thrift(conf):
+  print 'connect_to_thrift transport_mode:' + conf.transport_mode
   """
   Connect to a thrift endpoint as determined by the 'conf' parameter.
   Note that this does *not* open the transport.
@@ -288,6 +289,7 @@ def connect_to_thrift(conf):
       if conf.mechanism == 'PLAIN':
         saslc.setAttr("username", str(conf.username))
         saslc.setAttr("password", str(conf.password)) # Defaults to 'hue' for a non-empty string unless using LDAP
+        print 'thrift_util.py username:' + str(conf.username) + ',password:' + str(conf.password)
       else:
         saslc.setAttr("maxbufsize", SASL_MAX_BUFFER.get())
       saslc.init()

@@ -471,13 +471,25 @@ class HiveServerClient:
       'NOSASL': 'NOSASL',
       'LDAP': 'PLAIN',
       'PAM': 'PLAIN',
-      'CUSTOM': 'NOSASL'
+      'CUSTOM': 'PLAIN'
   }
 
   DEFAULT_TABLE_TYPES = [
     'TABLE',
     'VIEW',
   ]
+
+  def get_user_password(self, username):
+    f = open('/etc/hue-user.txt')
+    d = f.readlines()
+    f.close()
+    userdict = {}
+    for ea in d:
+      user = ea.split(',')[0]
+      password = ea.split(',')[1].rstrip('\n')
+      userdict[user] = password
+
+    return userdict[username]
 
   def __init__(self, query_server, user):
     self.query_server = query_server
@@ -510,12 +522,19 @@ class HiveServerClient:
       validate = beeswax_conf.SSL.VALIDATE.get()
       timeout = beeswax_conf.SERVER_CONN_TIMEOUT.get()
 
-    if auth_username:
+    if user.username:
+      username = user.username
+      password = self.get_user_password(username)
+      print 'hive_server2_lib configurated user.username:' + username + ',password:' + password
+
+    elif auth_username:
+      print 'hive_server2_lib configurated auth_username:' + auth_username
       username = auth_username
       password = auth_password
     else:
       username = user.username
       password = None
+      print 'hive_server2_lib use default configuration,username:' + username + ',password:None'
 
     thrift_class = TCLIService
     if self.query_server['server_name'] == 'impala':
