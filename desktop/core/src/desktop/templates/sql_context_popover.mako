@@ -205,7 +205,7 @@ from metadata.conf import has_navigator
       %endif
       <!-- ko if: typeof viewSql !== 'undefined' -->
       <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
-      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: viewSql flavor: $parent.sourceType"></div>
+      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: { value: viewSql, format: true, dialect: $parent.sourceType }"></div>
       <!-- /ko -->
     </div>
     <!-- /ko -->

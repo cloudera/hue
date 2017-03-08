@@ -151,7 +151,7 @@ ${ commonheader_m(editor_type, editor_type, user, request, "68px") | n,unicode }
           <!-- /ko -->
         </td>
         <td class="muted" data-bind="ellipsis: {data: name(), length: 30}, style: {'border-top-width': $index() == 0 ? '0' : ''}"></td>
-        <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: query(), flavor: $parent.type"></div></td>
+        <td data-bind="style: {'border-top-width': $index() == 0 ? '0' : ''}"><div data-bind="highlight: { value: query, dialect: $parent.type }"></div></td>
       </tr>
     <!-- /ko -->
     </tbody>
