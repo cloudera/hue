@@ -24,128 +24,6 @@ from metadata.conf import has_navigator
 %>
 
 <%def name="sqlContextPopover()">
-  <style>
-    .sql-context-popover-content {
-      -ms-flex: 1 1 100%;
-      flex: 1 1 100%;
-      display: -ms-flexbox;
-      display: flex;
-      -ms-flex-direction: column;
-      flex-direction: column;
-      padding: 0;
-      overflow: hidden;
-    }
-
-    .sql-context-tab-pane {
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 100%;
-    }
-
-    .sql-context-tabs {
-      -ms-flex: 0 1 auto;
-      flex: 0 1 auto;
-      border-bottom: 1px solid #ebebeb;
-      margin-left: -1px;
-      margin-right: -1px;
-      padding-left: 15px;
-    }
-
-    .sql-context-tab-container {
-      position: relative;
-      -ms-flex: 1 1 100%;
-      flex: 1 1 100%;
-      border: none;
-      overflow: auto;
-    }
-
-    .sql-context-tab {
-      padding-top: 0 !important;
-      padding-bottom: 5px !important;
-      margin-bottom: -1px !important
-    }
-
-    .sql-context-flex {
-      display: -ms-flexbox;
-      display: flex;
-      -ms-flex-flow: column nowrap;
-      flex-flow: column nowrap;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      width: 100%;
-    }
-
-    .sql-context-flex-header {
-      -ms-flex: 0 0 35px;
-      flex: 0 0 35px;
-    }
-
-    .sql-context-flex-fill {
-      overflow: hidden;
-      position: relative;
-      -ms-flex: 1 1 100%;
-      flex: 1 1 100%;
-    }
-
-    .sql-context-flex-bottom-links {
-      -ms-flex: 0 0 35px;
-      flex: 0 0 35px;
-      border-top: 1px solid #ebebeb;
-      z-index: 100;
-      background-color: #FFF;
-    }
-
-    .sql-context-link-row {
-      float: right;
-      margin: 8px 15px 0 10px;
-    }
-
-    .sql-context-link-row a {
-      margin-left: 10px;
-    }
-
-    .sql-context-inline-search {
-      border-radius: 8px !important;
-      min-height: 18px !important;
-      height: 18px !important;
-      margin: 0 5px 0 5px !important;
-      padding-right: 18px !important;
-    }
-
-    .sql-context-empty-columns {
-      letter-spacing: 0.035em;
-      margin-top: 50px;
-      font-size: 14px;
-      color: #737373;
-      text-align: center;
-    }
-
-    .context-sample th {
-      border-right: 1px solid #e5e5e5;
-    }
-
-    .context-sample td {
-      border-right: 1px solid #e5e5e5;
-      white-space: nowrap;
-    }
-
-    .context-sample .fixed-first-column {
-      margin-top: -1px;
-    }
-
-    .context-sample .fixed-header-row {
-      border-bottom: 1px solid #e5e5e5;
-    }
-
-    .context-sample .fixed-first-cell {
-      border-right: 1px solid #e5e5e5;
-      margin-top: -1px;
-      margin-left: -1px;
-    }
-  </style>
-
   <script type="text/html" id="sql-context-footer">
     <div class="sql-context-flex-bottom-links">
       <div class="sql-context-link-row">
@@ -325,12 +203,19 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-function-details">
+    <!-- ko if: typeof details === 'undefined' -->
+    <div class="sql-context-flex-fill">
+      <div class="alert">${_('Could not find details for the function')} <span data-bind="text: $parents[2].title"></span>()</div>
+    </div>
+    <!-- /ko -->
+    <!-- ko if: typeof details !== 'undefined' -->
     <div class="sql-context-flex-fill" data-bind="with: details, niceScroll">
       <div style="padding: 8px">
         <p style="margin: 10px 10px 18px 10px;"><span style="white-space: pre; font-family: monospace;" data-bind="text: signature"></span></p>
         <p><span data-bind="text: description"></span></p>
       </div>
     </div>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="sql-context-table-partitions">
@@ -499,6 +384,11 @@ from metadata.conf import has_navigator
           defaultDatabase: self.defaultDatabase,
           silenceErrors: true,
           successCallback: function (data) {
+            if (data.code === 500) {
+              self.loading(false);
+              self.hasErrors(true);
+              return;
+            }
             if (typeof data.extended_columns !== 'undefined') {
               data.extended_columns.forEach(function (column) {
                 column.extendedType = column.type.replace(/</g, '&lt;').replace(/>/g, '&lt;');
