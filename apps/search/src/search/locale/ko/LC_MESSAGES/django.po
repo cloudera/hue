@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -29,1145 +29,772 @@ msgstr "기간을 입력하지 않은 경우 보낸 쿼리입니다."
 msgid "Whether Solr requires client to perform Kerberos authentication."
 msgstr "Solr에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
 
-#: src/search/conf.py:41
+#: src/search/conf.py:42
 msgid "Use latest Solr 5.2+ features."
 msgstr "최신 Solr 5.2+ 기능을 사용합니다."
 
-#: src/search/decorators.py:45 src/search/decorators.py:65
-#: src/search/views.py:64
-msgid "Dashboard does not exist or you don't have the permission to access it."
-msgstr "대시보드가 존재하지 않거나 액세스 권한이 없습니다."
-
-#: src/search/models.py:236
+#: src/search/models.py:230
 msgid "Solr index name pointing to"
 msgstr "가리키는 Solr 인덱스 이름"
 
-#: src/search/models.py:237
+#: src/search/models.py:231
 msgid "Friendlier name in UI"
 msgstr "친숙한 UI 이름"
 
-#: src/search/models.py:239
+#: src/search/models.py:233
 msgid "Collection with cores data"
 msgstr "코어 데이터가 있는 컬렉션"
 
-#: src/search/models.py:239
+#: src/search/models.py:233
 msgid "Solr json"
 msgstr "Solr json"
 
-#: src/search/models.py:241
+#: src/search/models.py:235
 msgid "Properties"
 msgstr "속성"
 
-#: src/search/models.py:242
+#: src/search/models.py:236
 msgid "Hue properties (e.g. results by pages number)"
 msgstr "Hue 속성(예: 페이지 번호별 결과)"
 
-#: src/search/models.py:249
-#: src/search/templates/common_admin_collections.mako:117
+#: src/search/models.py:243
 msgid "Owner"
 msgstr "소유자"
 
-#: src/search/models.py:249
+#: src/search/models.py:243
 msgid "User who created the job."
 msgstr "Job을 생성한 사용자입니다."
 
-#: src/search/models.py:918
-msgid ""
-"The Solr schema requires an id field for performing the result "
-"highlighting"
-msgstr "결과를 강조 표시하려면 Solr 스키마에 id 필드가 필요합니다."
-
-#: src/search/views.py:188
-msgid "Error while accessing Solr"
-msgstr "Solr에 액세스하는 중 오류 발생"
-
-#: src/search/views.py:192 src/search/views.py:230
-msgid "There is no collection to search."
-msgstr "검색할 컬렉션이 없습니다."
-
-#: src/search/views.py:228
-msgid "Page saved !"
-msgstr "페이지가 저장되었습니다!"
-
-#: src/search/views.py:250
-#, python-format
-msgid "Could not download search results: %s"
-msgstr "검색 결과를 다운로드할 수 없음: %s"
-
-#: src/search/views.py:282 src/search/views.py:295 src/search/views.py:308
-msgid "POST request required."
-msgstr "POST 요청이 필요합니다."
-
-#: src/search/views.py:387
-msgid "No document was returned by Solr."
-msgstr "Solr에서 반환된 문서가 없습니다."
-
-#: src/search/views.py:389
-msgid "This document does not have any index id."
-msgstr "이 문서에는 인덱스 ID가 없습니다."
-
-#: src/search/views.py:403
-msgid "Permission to edit the document denied"
-msgstr "거부된 문서를 편집할 권한"
-
-#: src/search/views.py:424
-msgid "Document successfully updated."
-msgstr "문서를 성공적으로 업데이트했습니다."
-
-#: src/search/views.py:428
-msgid "Document has no modifications to change."
-msgstr "문서에 변경할 수정 내용이 없습니다."
-
-#: src/search/views.py:462
-msgid "This field type does not support stats"
-msgstr "이 필드 유형은 상태를 지원하지 않음"
-
-#: src/search/views.py:494 src/search/templates/common_search.mako:2318
-msgid "This field does not support stats"
-msgstr "이 필드는 상태를 지원하지 않음"
-
-#: src/search/views.py:707
+#: src/search/views.py:35
 msgid "You must be a superuser."
 msgstr "superuser여야 합니다."
 
-#: src/search/views.py:710
+#: src/search/views.py:38
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/search/templates/admin_collections.mako:24
-#: src/search/templates/admin_collections_m.mako:24
-#: src/search/templates/common_search.mako:104
-#: src/search/templates/no_collections.mako:24
-#: src/search/templates/search.mako:25 src/search/templates/search_m.mako:25
-msgid "Search"
-msgstr "검색"
-
-#: src/search/templates/common_admin_collections.mako:30
-#: src/search/templates/common_admin_collections.mako:43
-#: src/search/templates/common_search.mako:79
-msgid "Dashboards"
-msgstr "대시보드"
-
-#: src/search/templates/common_admin_collections.mako:39
-msgid "Indexes"
-msgstr "인덱스"
-
-#: src/search/templates/common_admin_collections.mako:51
-msgid "Filter dashboards..."
-msgstr "대시보드 필터링..."
-
-#: src/search/templates/common_admin_collections.mako:57
-msgid "Copy"
-msgstr "복사"
-
-#: src/search/templates/common_admin_collections.mako:61
-#: src/search/templates/common_search.mako:2004
-#: src/search/templates/common_search.mako:2013
-msgid "Delete"
-msgstr "삭제"
-
-#: src/search/templates/common_admin_collections.mako:67
-msgid "Share"
-msgstr "공유"
-
-#: src/search/templates/common_admin_collections.mako:71
-msgid "Export"
-msgstr "내보내기"
-
-#: src/search/templates/common_admin_collections.mako:78
-msgid "Create a new dashboard"
-msgstr "새 대시보드 생성"
-
-#: src/search/templates/common_admin_collections.mako:79
-msgid "Create"
-msgstr "생성"
-
-#: src/search/templates/common_admin_collections.mako:82
-msgid "Import"
-msgstr "가져오기"
-
-#: src/search/templates/common_admin_collections.mako:95
-msgid "There are currently no dashboards defined."
-msgstr "현재 정의된 대시보드가 없습니다."
-
-#: src/search/templates/common_admin_collections.mako:96
-msgid "Click here to add"
-msgstr "추가하려면 여기 클릭"
-
-#: src/search/templates/common_admin_collections.mako:96
-msgid "one or more."
-msgstr "하나 이상입니다."
-
-#: src/search/templates/common_admin_collections.mako:115
-msgid "Name"
-msgstr "이름"
-
-#: src/search/templates/common_admin_collections.mako:116
-#: src/search/templates/common_search.mako:2405
-msgid "Description"
-msgstr "설명"
-
-#: src/search/templates/common_admin_collections.mako:125
-msgid "Click to edit"
-msgstr "편집하려면 클릭"
-
-#: src/search/templates/common_admin_collections.mako:148
-msgid "Confirm Delete"
-msgstr "삭제 확인"
-
-#: src/search/templates/common_admin_collections.mako:151
-msgid "Are you sure you want to delete the selected dashboards?"
-msgstr "선택한 대시보드를 삭제하시겠습니까?"
-
-#: src/search/templates/common_admin_collections.mako:154
-msgid "No"
-msgstr "아니요"
-
-#: src/search/templates/common_admin_collections.mako:155
-msgid "Yes"
-msgstr "예"
-
-#: src/search/templates/common_admin_collections.mako:223
-msgid "Dashboard(s) deleted successfully."
-msgstr "대시보드를 삭제했습니다."
-
-#: src/search/templates/common_admin_collections.mako:227
-msgid "Dashboard(s) copied successfully."
-msgstr "대시보드를 복사했습니다."
-
-#: src/search/templates/common_search.mako:29
-msgid "Increment"
-msgstr "증분"
-
-#: src/search/templates/common_search.mako:53
-msgid "Edit"
-msgstr "편집"
-
-#: src/search/templates/common_search.mako:57
-msgid "Save"
-msgstr "저장"
-
-#: src/search/templates/common_search.mako:57
-msgid "Saving..."
-msgstr "저장하는 중..."
-
-#: src/search/templates/common_search.mako:61
-msgid "Player mode"
-msgstr "플레이어 모드"
-
-#: src/search/templates/common_search.mako:65
-msgid "General Settings"
-msgstr "일반 설정"
-
-#: src/search/templates/common_search.mako:69
-msgid "Query Definitions"
-msgstr "쿼리 정의"
-
-#: src/search/templates/common_search.mako:76
-msgid "New"
-msgstr "새로 만들기"
-
-#: src/search/templates/common_search.mako:85
-msgid "Select a search index"
-msgstr "검색 인덱스 선택"
-
-#: src/search/templates/common_search.mako:91
-msgid "Show cores"
-msgstr "코어 표시"
-
-#: src/search/templates/common_search.mako:142
-#: src/search/templates/common_search.mako:917
-msgid "Grid"
-msgstr "눈금선"
-
-#: src/search/templates/common_search.mako:158
-#: src/search/templates/common_search.mako:1166
-msgid "HTML"
-msgstr "HTML"
-
-#: src/search/templates/common_search.mako:167
-msgid "Filter Bar"
-msgstr "필터 막대"
-
-#: src/search/templates/common_search.mako:178
-msgid "Counter"
-msgstr "카운터"
-
-#: src/search/templates/common_search.mako:188
-#: src/search/templates/common_search.mako:961
-msgid "Marker Map"
-msgstr "Marker Map"
-
-#: src/search/templates/common_search.mako:201
-#: src/search/templates/common_search.mako:210
-msgid "Text Facet"
-msgstr "텍스트 패싯"
-
-#: src/search/templates/common_search.mako:219
-#: src/search/templates/common_search.mako:228
-msgid "Pie Chart"
-msgstr "파이 차트"
-
-#: src/search/templates/common_search.mako:238
-msgid "Bar Chart"
-msgstr "막대 차트"
-
-#: src/search/templates/common_search.mako:248
-msgid "Chart"
-msgstr "차트"
-
-#: src/search/templates/common_search.mako:258
-msgid "Line Chart"
-msgstr "줄 차트"
-
-#: src/search/templates/common_search.mako:267
-#: src/search/templates/common_search.mako:276
-msgid "Tree"
-msgstr "트리"
-
-#: src/search/templates/common_search.mako:286
-msgid "Heatmap"
-msgstr "Heatmap"
-
-#: src/search/templates/common_search.mako:295
-#: src/search/templates/common_search.mako:304
-msgid "Timeline"
-msgstr "시간대"
-
-#: src/search/templates/common_search.mako:313
-#: src/search/templates/common_search.mako:322
-msgid "Gradient Map"
-msgstr "경사도 Map"
-
-#: src/search/templates/common_search.mako:352
-msgid "This is an empty widget."
-msgstr "빈 위젯입니다."
-
-#: src/search/templates/common_search.mako:359
-msgid "Settings"
-msgstr "설정"
-
-#: src/search/templates/common_search.mako:365
-#: src/search/templates/common_search.mako:508
-#: src/search/templates/common_search.mako:2567
-msgid "Type"
-msgstr "유형"
-
-#: src/search/templates/common_search.mako:366
-#: src/search/templates/common_search.mako:509
-msgid "Toggle how to group the values"
-msgstr "값을 그룹화하는 방식 전환"
-
-#: src/search/templates/common_search.mako:368
-#: src/search/templates/common_search.mako:511
-msgid "range"
-msgstr "범위"
-
-#: src/search/templates/common_search.mako:369
-#: src/search/templates/common_search.mako:512
-msgid "range & up"
-msgstr "범위 이상"
-
-#: src/search/templates/common_search.mako:370
-#: src/search/templates/common_search.mako:513
-msgid "field"
-msgstr "필드"
-
-#: src/search/templates/common_search.mako:375
-#: src/search/templates/common_search.mako:519
-#: src/search/templates/common_search.mako:1168
-#: src/search/templates/common_search.mako:1589
-msgid "Sorting"
-msgstr "정렬"
-
-#: src/search/templates/common_search.mako:376
-#: src/search/templates/common_search.mako:520
-#: src/search/templates/common_search.mako:1590
-msgid "Toggle sort order"
-msgstr "정렬 순서 전환"
-
-#: src/search/templates/common_search.mako:378
-#: src/search/templates/common_search.mako:522
-#: src/search/templates/common_search.mako:1592
-msgid "descending"
-msgstr "내림차순"
-
-#: src/search/templates/common_search.mako:379
-#: src/search/templates/common_search.mako:523
-#: src/search/templates/common_search.mako:1593
-msgid "ascending"
-msgstr "오름차순"
-
-#: src/search/templates/common_search.mako:387
-#: src/search/templates/common_search.mako:416
-#: src/search/templates/common_search.mako:479
-#: src/search/templates/common_search.mako:541
-#: src/search/templates/common_search.mako:595
-#: src/search/templates/common_search.mako:625
-#: src/search/templates/common_search.mako:679
-#: src/search/templates/common_search.mako:1824
-#: src/search/templates/common_search.mako:1926
-#: src/search/templates/common_search.mako:2158
-msgid "Limit"
-msgstr "제한"
-
-#: src/search/templates/common_search.mako:396
-#: src/search/templates/common_search.mako:488
-#: src/search/templates/common_search.mako:550
-#: src/search/templates/common_search.mako:604
-#: src/search/templates/common_search.mako:688
-#: src/search/templates/common_search.mako:1833
-#: src/search/templates/common_search.mako:1934
-#: src/search/templates/common_search.mako:2167
-msgid "Min Count"
-msgstr "최소 수"
-
-#: src/search/templates/common_search.mako:427
-#: src/search/templates/common_search.mako:638
-msgid "Scope"
-msgstr "범위"
-
-#: src/search/templates/common_search.mako:430
-#: src/search/templates/common_search.mako:641
-msgid "World"
-msgstr "세계"
-
-#: src/search/templates/common_search.mako:431
-#: src/search/templates/common_search.mako:642
-msgid "Europe"
-msgstr "유럽"
-
-#: src/search/templates/common_search.mako:432
-#: src/search/templates/common_search.mako:643
-msgid "Australia"
-msgstr "오스트레일리아"
-
-#: src/search/templates/common_search.mako:433
-#: src/search/templates/common_search.mako:644
-msgid "Brazil"
-msgstr "브라질"
-
-#: src/search/templates/common_search.mako:434
-#: src/search/templates/common_search.mako:645
-msgid "Canada"
-msgstr "캐나다"
-
-#: src/search/templates/common_search.mako:435
-#: src/search/templates/common_search.mako:646
-msgid "China"
-msgstr "중국"
-
-#: src/search/templates/common_search.mako:436
-#: src/search/templates/common_search.mako:647
-msgid "France"
-msgstr "프랑스"
-
-#: src/search/templates/common_search.mako:437
-#: src/search/templates/common_search.mako:648
-msgid "Germany"
-msgstr "독일"
-
-#: src/search/templates/common_search.mako:438
-#: src/search/templates/common_search.mako:649
-msgid "Italy"
-msgstr "이탈리아"
-
-#: src/search/templates/common_search.mako:439
-#: src/search/templates/common_search.mako:650
-msgid "Japan"
-msgstr "일본"
-
-#: src/search/templates/common_search.mako:440
-#: src/search/templates/common_search.mako:651
-msgid "UK"
-msgstr "영국"
-
-#: src/search/templates/common_search.mako:441
-#: src/search/templates/common_search.mako:652
-msgid "USA"
-msgstr "미국"
-
-#: src/search/templates/common_search.mako:452
-msgid "Add a dimension"
-msgstr "치수 추가"
-
-#: src/search/templates/common_search.mako:459
-msgid "Field"
-msgstr "필드"
-
-#: src/search/templates/common_search.mako:469
-#: src/search/templates/common_search.mako:587
-#: src/search/templates/common_search.mako:620
-#: src/search/templates/common_search.mako:670
-#: src/search/templates/common_search.mako:1978
-msgid "Metric"
-msgstr "메트릭"
-
-#: src/search/templates/common_search.mako:559
-msgid "Domain"
-msgstr "도메인"
-
-#: src/search/templates/common_search.mako:561
-msgid "Parent"
-msgstr "상위"
-
-#: src/search/templates/common_search.mako:563
-msgid "Children"
-msgstr "하위 항목"
-
-#: src/search/templates/common_search.mako:661
-#: src/search/templates/common_search.mako:2002
-#: src/search/templates/common_search.mako:2009
-#: src/search/templates/common_search.mako:2711
-msgid "Add"
-msgstr "추가"
-
-#: src/search/templates/common_search.mako:718
-#: src/search/templates/common_search.mako:757
-#: src/search/templates/common_search.mako:779
-#: src/search/templates/common_search.mako:822
-#: src/search/templates/common_search.mako:861
-#: src/search/templates/common_search.mako:883
-#: src/search/templates/common_search.mako:2301
-msgid "Exclude this value"
-msgstr "이 값 제외"
-
-#: src/search/templates/common_search.mako:737
-#: src/search/templates/common_search.mako:841
-msgid "Show more..."
-msgstr "더 표시..."
-
-#: src/search/templates/common_search.mako:742
-#: src/search/templates/common_search.mako:846
-msgid "Show more"
-msgstr "더 표시"
-
-#: src/search/templates/common_search.mako:746
-#: src/search/templates/common_search.mako:850
-msgid "less..."
-msgstr "다음 미만..."
-
-#: src/search/templates/common_search.mako:943
-#: src/search/templates/common_search.mako:3365
-msgid "Bars"
-msgstr "막대"
-
-#: src/search/templates/common_search.mako:949
-#: src/search/templates/common_search.mako:3361
-msgid "Lines"
-msgstr "줄"
-
-#: src/search/templates/common_search.mako:955
-msgid "Pie"
-msgstr "파이"
-
-#: src/search/templates/common_search.mako:989
-#: src/search/templates/common_search.mako:999
-msgid "Download first rows as JSON"
-msgstr "첫 번째 행을 JSON으로 다운로드"
-
-#: src/search/templates/common_search.mako:994
-msgid "Download first rows as XLS"
-msgstr "첫 번째 행을 XLS로 다운로드"
-
-#: src/search/templates/common_search.mako:1015
-#: src/search/templates/common_search.mako:2370
-msgid "Filter fields"
-msgstr "필터 필드"
-
-#: src/search/templates/common_search.mako:1017
-#: src/search/templates/common_search.mako:2533
-msgid "All"
-msgstr "모두"
-
-#: src/search/templates/common_search.mako:1017
-msgid "Current"
-msgstr "현재"
-
-#: src/search/templates/common_search.mako:1025
-msgid "Field Name"
-msgstr "필드 이름"
-
-#: src/search/templates/common_search.mako:1051
-#: src/search/templates/common_search.mako:1258
-msgid "Your search did not match any documents."
-msgstr "검색에서 일치하는 문서가 없습니다."
-
-#: src/search/templates/common_search.mako:1066
-msgid "Document"
-msgstr "문서"
-
-#: src/search/templates/common_search.mako:1095
-msgid "Please select the chart parameters on the left."
-msgstr "왼쪽에서 차트 매개변수를 선택하십시오."
-
-#: src/search/templates/common_search.mako:1119
-msgid "x-axis"
-msgstr "X축"
-
-#: src/search/templates/common_search.mako:1120
-msgid "region"
-msgstr "영역"
-
-#: src/search/templates/common_search.mako:1121
-msgid "latitude"
-msgstr "위도"
-
-#: src/search/templates/common_search.mako:1122
-msgid "legend"
-msgstr "범례"
-
-#: src/search/templates/common_search.mako:1129
-msgid "y-axis"
-msgstr "Y축"
-
-#: src/search/templates/common_search.mako:1130
-msgid "longitude"
-msgstr "경도"
-
-#: src/search/templates/common_search.mako:1131
-msgid "value"
-msgstr "값"
-
-#: src/search/templates/common_search.mako:1144
-msgid "label"
-msgstr "레이블"
-
-#: src/search/templates/common_search.mako:1152
-msgid "sorting"
-msgstr "정렬"
-
-#: src/search/templates/common_search.mako:1155
-msgid "No sorting"
-msgstr "정렬되지 않음"
-
-#: src/search/templates/common_search.mako:1156
-msgid "Sort ascending"
-msgstr "오름차순으로 정렬"
-
-#: src/search/templates/common_search.mako:1157
-msgid "Sort descending"
-msgstr "내림차순으로 정렬"
-
-#: src/search/templates/common_search.mako:1165
-msgid "Editor"
-msgstr "편집기"
-
-#: src/search/templates/common_search.mako:1167
-msgid "CSS & JS"
-msgstr "CSS 및 JS"
-
-#: src/search/templates/common_search.mako:1179
-#: src/search/templates/common_search.mako:1213
-msgid "Available Fields"
-msgstr "사용 가능한 필드"
-
-#: src/search/templates/common_search.mako:1181
-#: src/search/templates/common_search.mako:1215
-msgid "Click on this button to add the field"
-msgstr "필드를 추가하려면 이 버튼 클릭"
-
-#: src/search/templates/common_search.mako:1185
-#: src/search/templates/common_search.mako:1219
-msgid "Available Functions"
-msgstr "사용 가능한 기능"
-
-#: src/search/templates/common_search.mako:1187
-msgid "Formats date or timestamp in DD-MM-YYYY"
-msgstr "DD-MM-YYYY로 날짜 또는 타임스탬프 형식 지정"
-
-#: src/search/templates/common_search.mako:1188
-msgid "Formats date or timestamp in HH:mm:ss"
-msgstr "HH:mm:ss로 날짜 또는 타임스탬프 형식 지정"
-
-#: src/search/templates/common_search.mako:1189
-msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
-msgstr "DD-MM-YYYY HH:mm:ss로 날짜 또는 타임스탬프 형식 지정"
-
-#: src/search/templates/common_search.mako:1190
-#: src/search/templates/common_search.mako:1224
-msgid "Formats a date in the full format"
-msgstr "전체 형식으로 날짜 형식 지정"
-
-#: src/search/templates/common_search.mako:1191
-#: src/search/templates/common_search.mako:1225
-msgid "Formats a date as a Unix timestamp"
-msgstr "Unix 타임스탬프로 날짜 형식 지정"
-
-#: src/search/templates/common_search.mako:1192
-msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "Unix 타임스탬프를 Ns, Nmin, Ndays... 전으로 형식 지정"
-
-#: src/search/templates/common_search.mako:1193
-#: src/search/templates/common_search.mako:1227
-msgid "Downloads and embed the file in the browser"
-msgstr "브라우저에서 파일을 다운로드하여 포함"
-
-#: src/search/templates/common_search.mako:1194
-#: src/search/templates/common_search.mako:1228
-msgid "Downloads the linked file"
-msgstr "연결된 파일 다운로드"
-
-#: src/search/templates/common_search.mako:1195
-#: src/search/templates/common_search.mako:1229
-msgid "Preview file in File Browser"
-msgstr "파일 브라우저에서 파일 미리 보기"
-
-#: src/search/templates/common_search.mako:1196
-#: src/search/templates/common_search.mako:1230
-msgid "Truncate a value after 100 characters"
-msgstr "100자 이후의 값 자르기"
-
-#: src/search/templates/common_search.mako:1197
-#: src/search/templates/common_search.mako:1231
-msgid "Truncate a value after 250 characters"
-msgstr "250자 이후의 값 자르기"
-
-#: src/search/templates/common_search.mako:1198
-#: src/search/templates/common_search.mako:1232
-msgid "Truncate a value after 500 characters"
-msgstr "500자 이후의 값 자르기"
-
-#: src/search/templates/common_search.mako:1200
-#: src/search/templates/common_search.mako:1234
-msgid "Click on this button to add the function"
-msgstr "함수를 추가하려면 이 버튼 클릭"
-
-#: src/search/templates/common_search.mako:1221
-msgid "Formats a date in the DD-MM-YYYY format"
-msgstr "DD-MM-YYYY 형식으로 날짜 형식 지정"
-
-#: src/search/templates/common_search.mako:1222
-msgid "Formats a date in the HH:mm:ss format"
-msgstr "HH:mm:ss 형식으로 날짜 형식 지정"
-
-#: src/search/templates/common_search.mako:1223
-msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
-msgstr "DD-MM-YYYY HH:mm:ss 형식으로 날짜 형식 지정"
-
-#: src/search/templates/common_search.mako:1226
-msgid "Shows the relative time"
-msgstr "상대 시간 표시"
-
-#: src/search/templates/common_search.mako:1305
-msgid "Edit this document"
-msgstr "이 문서 편집"
-
-#: src/search/templates/common_search.mako:1308
-msgid "Undo changes"
-msgstr "변경 내용 취소"
-
-#: src/search/templates/common_search.mako:1311
-msgid "Update this document"
-msgstr "이 문서 업데이트"
-
-#: src/search/templates/common_search.mako:1314
-msgid "Show original document"
-msgstr "원본 문서 표시"
-
-#: src/search/templates/common_search.mako:1344
-msgid "Child Documents"
-msgstr "하위 문서"
-
-#: src/search/templates/common_search.mako:1376
-#: src/search/templates/common_search.mako:1377
-msgid "Click to sort"
-msgstr "정렬하려면 클릭"
-
-#: src/search/templates/common_search.mako:1380
-msgid "Move to the left"
-msgstr "왼쪽으로 이동"
-
-#: src/search/templates/common_search.mako:1383
-msgid "Move to the right"
-msgstr "오른쪽으로 이동"
-
-#: src/search/templates/common_search.mako:1393
-msgid "Previous"
-msgstr "이전"
-
-#: src/search/templates/common_search.mako:1401
-msgid "Showing"
-msgstr "표시 중 "
-
-#: src/search/templates/common_search.mako:1403
-msgid "to"
-msgstr "->"
-
-#: src/search/templates/common_search.mako:1405
-msgid "of"
-msgstr "/"
-
-#: src/search/templates/common_search.mako:1407
-msgid " results"
-msgstr " 결과"
-
-#: src/search/templates/common_search.mako:1410
-msgid "Show"
-msgstr "표시"
-
-#: src/search/templates/common_search.mako:1414
-msgid "results per page"
-msgstr "페이지별 결과"
-
-#: src/search/templates/common_search.mako:1417
-msgid "Next"
-msgstr "다음"
-
-#: src/search/templates/common_search.mako:1444
-#: src/search/templates/common_search.mako:1492
-#: src/search/templates/common_search.mako:1599
-msgid "Chart Type"
-msgstr "차트 유형"
-
-#: src/search/templates/common_search.mako:1450
-#: src/search/templates/common_search.mako:1498
-#: src/search/templates/common_search.mako:1607
-#: src/search/templates/common_search.mako:2574
-msgid "Interval"
-msgstr "간격"
-
-#: src/search/templates/common_search.mako:1457
-#: src/search/templates/common_search.mako:1505
-#: src/search/templates/common_search.mako:1542
-#: src/search/templates/common_search.mako:1618
-#: src/search/templates/common_search.mako:1694
-msgid "Zoom"
-msgstr "확대/축소"
-
-#: src/search/templates/common_search.mako:1458
-#: src/search/templates/common_search.mako:1506
-#: src/search/templates/common_search.mako:1543
-#: src/search/templates/common_search.mako:1619
-#: src/search/templates/common_search.mako:1695
-msgid "reset"
-msgstr "재설정"
-
-#: src/search/templates/common_search.mako:1459
-#: src/search/templates/common_search.mako:1507
-msgid "Group by"
-msgstr "그룹 기준"
-
-#: src/search/templates/common_search.mako:1808
-msgid "Selected dimensions"
-msgstr "선택한 치수"
-
-#: src/search/templates/common_search.mako:1910
-#: src/search/templates/common_search.mako:2142
-msgid "Selected dimension"
-msgstr "선택한 치수"
-
-#: src/search/templates/common_search.mako:2020
-msgid "Add formula operation"
-msgstr "수식 작업 추가"
-
-#: src/search/templates/common_search.mako:2033
-msgid "There are currently no filters applied."
-msgstr "현재 적용된 필터가 없습니다."
-
-#: src/search/templates/common_search.mako:2046
-#: src/search/templates/common_search.mako:2069
-#: src/search/templates/common_search.mako:2108
-msgid "selected"
-msgstr "선택됨"
-
-#: src/search/templates/common_search.mako:2051
-#: src/search/templates/common_search.mako:2086
-msgid "excluded"
-msgstr "제외됨"
-
-#: src/search/templates/common_search.mako:2078
-msgid "Until"
-msgstr "종료 기준"
-
-#: src/search/templates/common_search.mako:2114
-msgid "TO"
-msgstr "대상"
-
-#: src/search/templates/common_search.mako:2248
-msgid "Latitude"
-msgstr "위도"
-
-#: src/search/templates/common_search.mako:2252
-msgid "Longitude"
-msgstr "경도"
-
-#: src/search/templates/common_search.mako:2256
-msgid "Label"
-msgstr "레이블"
-
-#: src/search/templates/common_search.mako:2279
-msgid "Prefix filter..."
-msgstr "접두사 필터..."
-
-#: src/search/templates/common_search.mako:2280
-msgid "Field name..."
-msgstr "필드 이름..."
-
-#: src/search/templates/common_search.mako:2283
-msgid "Terms"
-msgstr "용어"
-
-#: src/search/templates/common_search.mako:2284
-msgid "Stats"
-msgstr "상태"
-
-#: src/search/templates/common_search.mako:2292
-msgid "There are no terms to be shown"
-msgstr "표시할 용어가 없습니다."
-
-#: src/search/templates/common_search.mako:2298
-msgid "Select this value"
-msgstr "이 값 선택"
-
-#: src/search/templates/common_search.mako:2319
-msgid "There are no stats to be shown"
-msgstr "표시할 상태가 없습니다."
-
-#: src/search/templates/common_search.mako:2337
-msgid "Not available"
-msgstr "이용할 수 없음"
-
-#: src/search/templates/common_search.mako:2381
-msgid "There are no fields matching your search term."
-msgstr "검색어와 일치하는 필드가 없습니다."
-
-#: src/search/templates/common_search.mako:2395
-msgid "General settings"
-msgstr "일반 설정"
-
-#: src/search/templates/common_search.mako:2398
-msgid "Solr index"
-msgstr "Solr 인덱스"
-
-#: src/search/templates/common_search.mako:2411
-msgid "Autocomplete"
-msgstr "자동 완성"
-
-#: src/search/templates/common_search.mako:2416
-msgid "Dictionary"
-msgstr "사전"
-
-#: src/search/templates/common_search.mako:2416
-msgid "Dictionary name or blank for default"
-msgstr "사전 이름 또는 빈 상태(기본값 사용)"
-
-#: src/search/templates/common_search.mako:2423
-msgid "Nested documents"
-msgstr "중첩된 문서"
-
-#: src/search/templates/common_search.mako:2428
-msgid "Schema"
-msgstr "스키마"
-
-#: src/search/templates/common_search.mako:2451
-msgid "Query definitions"
-msgstr "쿼리 정의"
-
-#: src/search/templates/common_search.mako:2453
-msgid "Add current query as..."
-msgstr "현재 쿼리를 새로 추가..."
-
-#: src/search/templates/common_search.mako:2454
-msgid "Click on this button to add the currenty query as a new definition"
-msgstr "현재 쿼리를 새 정의로 추가하려면 이 버튼 클릭"
-
-#: src/search/templates/common_search.mako:2472
-msgid "There are currently no query definitions."
-msgstr "현재 쿼리 정의가 없습니다."
-
-#: src/search/templates/common_search.mako:2505
-msgid "Level"
-msgstr "레벨"
-
-#: src/search/templates/common_search.mako:2514
-#: src/search/templates/common_search.mako:2522
-msgid "Time Settings"
-msgstr "시간 설정"
-
-#: src/search/templates/common_search.mako:2534
-msgid "Past 5 Minutes"
-msgstr "지난 5분"
-
-#: src/search/templates/common_search.mako:2535
-msgid "Past 30 Minutes"
-msgstr "지난 30분"
-
-#: src/search/templates/common_search.mako:2536
-msgid "Past 1 Hour"
-msgstr "지난 1시간"
-
-#: src/search/templates/common_search.mako:2537
-msgid "Past 12 Hours"
-msgstr "지난 12시간"
-
-#: src/search/templates/common_search.mako:2538
-msgid "Past day"
-msgstr "지난 1일"
-
-#: src/search/templates/common_search.mako:2539
-msgid "Past 2 days"
-msgstr "지난 2일"
-
-#: src/search/templates/common_search.mako:2540
-msgid "Past 7 days"
-msgstr "지난 7일"
-
-#: src/search/templates/common_search.mako:2541
-msgid "Past 1 Month"
-msgstr "지난 1개월"
-
-#: src/search/templates/common_search.mako:2542
-msgid "Past 3 Months"
-msgstr "지난 3개월"
-
-#: src/search/templates/common_search.mako:2543
-msgid "Past Year"
-msgstr "지난 1년"
-
-#: src/search/templates/common_search.mako:2544
-msgid "Past 2 Years"
-msgstr "지난 2년"
-
-#: src/search/templates/common_search.mako:2545
-msgid "Past 10 Years"
-msgstr "지난 10년"
-
-#: src/search/templates/common_search.mako:2557
-msgid "Time settings"
-msgstr "시간 설정"
-
-#: src/search/templates/common_search.mako:2561
-msgid "Date/time field"
-msgstr "날짜/시간 필드"
-
-#: src/search/templates/common_search.mako:2569
-msgid "Rolling"
-msgstr "롤링"
-
-#: src/search/templates/common_search.mako:2570
-msgid "Fixed"
-msgstr "고정"
-
-#: src/search/templates/common_search.mako:2580
-msgid "Start date/time"
-msgstr "시작 날짜/시간"
-
-#: src/search/templates/common_search.mako:2586
-msgid "End date/time"
-msgstr "종료 날짜/시간"
-
-#: src/search/templates/common_search.mako:2594
-#: src/search/templates/common_search.mako:2602
-msgid "Auto-refresh every"
-msgstr "자동 새로 고침 간격"
-
-#: src/search/templates/common_search.mako:2594
-#: src/search/templates/common_search.mako:2602
-msgid "seconds"
-msgstr "초"
-
-#: src/search/templates/common_search.mako:2619
-msgid "Nested schema"
-msgstr "중첩된 스키마"
-
-#: src/search/templates/common_search.mako:2702
-msgid "Count"
-msgstr "개수"
-
-#: src/search/templates/common_search.mako:2703
-msgid "Unique Count"
-msgstr "고유 개수"
-
-#: src/search/templates/common_search.mako:2704
-msgid "Average"
-msgstr "평균"
-
-#: src/search/templates/common_search.mako:2705
-msgid "Sum"
-msgstr "합계"
-
-#: src/search/templates/common_search.mako:2706
-msgid "Min"
-msgstr "최소"
-
-#: src/search/templates/common_search.mako:2707
-msgid "Max"
-msgstr "최대"
-
-#: src/search/templates/common_search.mako:2708
-msgid "Median"
-msgstr "중앙값"
-
-#: src/search/templates/common_search.mako:2709
-msgid "Percentiles"
-msgstr "백분위"
-
-#: src/search/templates/common_search.mako:2710
-msgid "Multiply"
-msgstr "곱하기"
-
-#: src/search/templates/common_search.mako:2712
-msgid "Substract"
-msgstr "빼기"
-
-#: src/search/templates/common_search.mako:2713
-msgid "Substract dates"
-msgstr "날짜 빼기"
-
-#: src/search/templates/common_search.mako:2836
-#: src/search/templates/common_search.mako:2884
-msgid "Up"
-msgstr "초과"
-
-#: src/search/templates/common_search.mako:2836
-#: src/search/templates/common_search.mako:2884
-msgid "Less"
-msgstr "미만"
-
-#: src/search/templates/common_search.mako:2961
-msgid "Total"
-msgstr "합계"
-
-#: src/search/templates/common_search.mako:3637
-msgid ""
-"Result highlighting is unavailable: the collection does not have an index"
-" field"
-msgstr "결과 강조 표시를 사용할 수 없습니다(컬렉션에 인덱스 필드가 없음)"
-
-#: src/search/templates/macros.mako:197
-#, python-format
-msgid "Retweeted %s times"
-msgstr "%s회 리트윗"
-
-#: src/search/templates/macros.mako:207
-msgid "Reply"
-msgstr "회신"
-
-#: src/search/templates/macros.mako:213
-msgid "Retweet"
-msgstr "리트윗"
-
-#: src/search/templates/no_collections.mako:46
-msgid "It seems there is nothing to search on ..."
-msgstr "검색할 항목이 없는 것 같습니다..."
-
-#: src/search/templates/no_collections.mako:49
-msgid "What about creating a"
-msgstr "다음을 생성하시겠습니까?"
-
-#: src/search/templates/no_collections.mako:50
-msgid "new index"
-msgstr "새 인덱스"
-
-#~ msgid "About Hue"
+#~ msgid "Dashboard does not exist or you don't have the permission to access it."
 #~ msgstr ""
 
-#~ msgid "Configuration"
+#~ msgid ""
+#~ "The Solr schema requires an id "
+#~ "field for performing the result "
+#~ "highlighting"
 #~ msgstr ""
 
-#~ msgid "Check for misconfiguration"
+#~ msgid "Error while accessing Solr"
 #~ msgstr ""
 
-#~ msgid "Server Logs"
+#~ msgid "There is no collection to search."
+#~ msgstr ""
+
+#~ msgid "Page saved !"
+#~ msgstr ""
+
+#~ msgid "Could not download search results: %s"
+#~ msgstr ""
+
+#~ msgid "POST request required."
+#~ msgstr ""
+
+#~ msgid "No document was returned by Solr."
+#~ msgstr ""
+
+#~ msgid "This document does not have any index id."
+#~ msgstr ""
+
+#~ msgid "Permission to edit the document denied"
+#~ msgstr ""
+
+#~ msgid "Document successfully updated."
+#~ msgstr ""
+
+#~ msgid "Document has no modifications to change."
+#~ msgstr ""
+
+#~ msgid "This field type does not support stats"
+#~ msgstr ""
+
+#~ msgid "This field does not support stats"
+#~ msgstr ""
+
+#~ msgid "Search"
+#~ msgstr ""
+
+#~ msgid "Dashboards"
+#~ msgstr ""
+
+#~ msgid "Indexes"
+#~ msgstr ""
+
+#~ msgid "Filter dashboards..."
+#~ msgstr ""
+
+#~ msgid "Copy"
+#~ msgstr ""
+
+#~ msgid "Delete"
+#~ msgstr ""
+
+#~ msgid "Share"
+#~ msgstr ""
+
+#~ msgid "Export"
+#~ msgstr ""
+
+#~ msgid "Create a new dashboard"
+#~ msgstr ""
+
+#~ msgid "Create"
+#~ msgstr ""
+
+#~ msgid "Import"
+#~ msgstr ""
+
+#~ msgid "There are currently no dashboards defined."
+#~ msgstr ""
+
+#~ msgid "Click here to add"
+#~ msgstr ""
+
+#~ msgid "one or more."
+#~ msgstr ""
+
+#~ msgid "Name"
+#~ msgstr ""
+
+#~ msgid "Description"
+#~ msgstr ""
+
+#~ msgid "Click to edit"
+#~ msgstr ""
+
+#~ msgid "Confirm Delete"
+#~ msgstr ""
+
+#~ msgid "Are you sure you want to delete the selected dashboards?"
+#~ msgstr ""
+
+#~ msgid "No"
+#~ msgstr ""
+
+#~ msgid "Yes"
+#~ msgstr ""
+
+#~ msgid "Dashboard(s) deleted successfully."
+#~ msgstr ""
+
+#~ msgid "Dashboard(s) copied successfully."
+#~ msgstr ""
+
+#~ msgid "Increment"
+#~ msgstr ""
+
+#~ msgid "Edit"
+#~ msgstr ""
+
+#~ msgid "Save"
+#~ msgstr ""
+
+#~ msgid "Saving..."
+#~ msgstr ""
+
+#~ msgid "Player mode"
+#~ msgstr ""
+
+#~ msgid "General Settings"
+#~ msgstr ""
+
+#~ msgid "Query Definitions"
+#~ msgstr ""
+
+#~ msgid "New"
+#~ msgstr ""
+
+#~ msgid "Select a search index"
+#~ msgstr ""
+
+#~ msgid "Show cores"
+#~ msgstr ""
+
+#~ msgid "Grid"
+#~ msgstr ""
+
+#~ msgid "HTML"
+#~ msgstr ""
+
+#~ msgid "Filter Bar"
+#~ msgstr ""
+
+#~ msgid "Counter"
+#~ msgstr ""
+
+#~ msgid "Marker Map"
+#~ msgstr ""
+
+#~ msgid "Text Facet"
+#~ msgstr ""
+
+#~ msgid "Pie Chart"
+#~ msgstr ""
+
+#~ msgid "Bar Chart"
+#~ msgstr ""
+
+#~ msgid "Chart"
+#~ msgstr ""
+
+#~ msgid "Line Chart"
+#~ msgstr ""
+
+#~ msgid "Tree"
+#~ msgstr ""
+
+#~ msgid "Heatmap"
+#~ msgstr ""
+
+#~ msgid "Timeline"
+#~ msgstr ""
+
+#~ msgid "Gradient Map"
+#~ msgstr ""
+
+#~ msgid "This is an empty widget."
+#~ msgstr ""
+
+#~ msgid "Settings"
+#~ msgstr ""
+
+#~ msgid "Type"
+#~ msgstr ""
+
+#~ msgid "Toggle how to group the values"
+#~ msgstr ""
+
+#~ msgid "range"
+#~ msgstr ""
+
+#~ msgid "range & up"
+#~ msgstr ""
+
+#~ msgid "field"
+#~ msgstr ""
+
+#~ msgid "Sorting"
+#~ msgstr ""
+
+#~ msgid "Toggle sort order"
+#~ msgstr ""
+
+#~ msgid "descending"
+#~ msgstr ""
+
+#~ msgid "ascending"
+#~ msgstr ""
+
+#~ msgid "Limit"
+#~ msgstr ""
+
+#~ msgid "Min Count"
+#~ msgstr ""
+
+#~ msgid "Scope"
+#~ msgstr ""
+
+#~ msgid "World"
+#~ msgstr ""
+
+#~ msgid "Europe"
+#~ msgstr ""
+
+#~ msgid "Australia"
+#~ msgstr ""
+
+#~ msgid "Brazil"
+#~ msgstr ""
+
+#~ msgid "Canada"
+#~ msgstr ""
+
+#~ msgid "China"
+#~ msgstr ""
+
+#~ msgid "France"
+#~ msgstr ""
+
+#~ msgid "Germany"
+#~ msgstr ""
+
+#~ msgid "Italy"
+#~ msgstr ""
+
+#~ msgid "Japan"
+#~ msgstr ""
+
+#~ msgid "UK"
+#~ msgstr ""
+
+#~ msgid "USA"
+#~ msgstr ""
+
+#~ msgid "Add a dimension"
+#~ msgstr ""
+
+#~ msgid "Field"
+#~ msgstr ""
+
+#~ msgid "Metric"
+#~ msgstr ""
+
+#~ msgid "Domain"
+#~ msgstr ""
+
+#~ msgid "Parent"
+#~ msgstr ""
+
+#~ msgid "Children"
+#~ msgstr ""
+
+#~ msgid "Add"
+#~ msgstr ""
+
+#~ msgid "Exclude this value"
+#~ msgstr ""
+
+#~ msgid "Show more..."
+#~ msgstr ""
+
+#~ msgid "Show more"
+#~ msgstr ""
+
+#~ msgid "less..."
+#~ msgstr ""
+
+#~ msgid "Bars"
+#~ msgstr ""
+
+#~ msgid "Lines"
+#~ msgstr ""
+
+#~ msgid "Pie"
+#~ msgstr ""
+
+#~ msgid "Download first rows as JSON"
+#~ msgstr ""
+
+#~ msgid "Download first rows as XLS"
+#~ msgstr ""
+
+#~ msgid "Filter fields"
+#~ msgstr ""
+
+#~ msgid "All"
+#~ msgstr ""
+
+#~ msgid "Current"
+#~ msgstr ""
+
+#~ msgid "Field Name"
+#~ msgstr ""
+
+#~ msgid "Your search did not match any documents."
+#~ msgstr ""
+
+#~ msgid "Document"
+#~ msgstr ""
+
+#~ msgid "Please select the chart parameters on the left."
+#~ msgstr ""
+
+#~ msgid "x-axis"
+#~ msgstr ""
+
+#~ msgid "region"
+#~ msgstr ""
+
+#~ msgid "latitude"
+#~ msgstr ""
+
+#~ msgid "legend"
+#~ msgstr ""
+
+#~ msgid "y-axis"
+#~ msgstr ""
+
+#~ msgid "longitude"
+#~ msgstr ""
+
+#~ msgid "value"
+#~ msgstr ""
+
+#~ msgid "label"
+#~ msgstr ""
+
+#~ msgid "sorting"
+#~ msgstr ""
+
+#~ msgid "No sorting"
+#~ msgstr ""
+
+#~ msgid "Sort ascending"
+#~ msgstr ""
+
+#~ msgid "Sort descending"
+#~ msgstr ""
+
+#~ msgid "Editor"
+#~ msgstr ""
+
+#~ msgid "CSS & JS"
+#~ msgstr ""
+
+#~ msgid "Available Fields"
+#~ msgstr ""
+
+#~ msgid "Click on this button to add the field"
+#~ msgstr ""
+
+#~ msgid "Available Functions"
+#~ msgstr ""
+
+#~ msgid "Formats date or timestamp in DD-MM-YYYY"
+#~ msgstr ""
+
+#~ msgid "Formats date or timestamp in HH:mm:ss"
+#~ msgstr ""
+
+#~ msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
+#~ msgstr ""
+
+#~ msgid "Formats a date in the full format"
+#~ msgstr ""
+
+#~ msgid "Formats a date as a Unix timestamp"
+#~ msgstr ""
+
+#~ msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
+#~ msgstr ""
+
+#~ msgid "Downloads and embed the file in the browser"
+#~ msgstr ""
+
+#~ msgid "Downloads the linked file"
+#~ msgstr ""
+
+#~ msgid "Preview file in File Browser"
+#~ msgstr ""
+
+#~ msgid "Truncate a value after 100 characters"
+#~ msgstr ""
+
+#~ msgid "Truncate a value after 250 characters"
+#~ msgstr ""
+
+#~ msgid "Truncate a value after 500 characters"
+#~ msgstr ""
+
+#~ msgid "Click on this button to add the function"
+#~ msgstr ""
+
+#~ msgid "Formats a date in the DD-MM-YYYY format"
+#~ msgstr ""
+
+#~ msgid "Formats a date in the HH:mm:ss format"
+#~ msgstr ""
+
+#~ msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
+#~ msgstr ""
+
+#~ msgid "Shows the relative time"
+#~ msgstr ""
+
+#~ msgid "Edit this document"
+#~ msgstr ""
+
+#~ msgid "Undo changes"
+#~ msgstr ""
+
+#~ msgid "Update this document"
+#~ msgstr ""
+
+#~ msgid "Show original document"
+#~ msgstr ""
+
+#~ msgid "Child Documents"
+#~ msgstr ""
+
+#~ msgid "Click to sort"
+#~ msgstr ""
+
+#~ msgid "Move to the left"
+#~ msgstr ""
+
+#~ msgid "Move to the right"
+#~ msgstr ""
+
+#~ msgid "Previous"
+#~ msgstr ""
+
+#~ msgid "Showing"
+#~ msgstr ""
+
+#~ msgid "to"
+#~ msgstr ""
+
+#~ msgid "of"
+#~ msgstr ""
+
+#~ msgid " results"
+#~ msgstr ""
+
+#~ msgid "Show"
+#~ msgstr ""
+
+#~ msgid "results per page"
+#~ msgstr ""
+
+#~ msgid "Next"
+#~ msgstr ""
+
+#~ msgid "Chart Type"
+#~ msgstr ""
+
+#~ msgid "Interval"
+#~ msgstr ""
+
+#~ msgid "Zoom"
+#~ msgstr ""
+
+#~ msgid "reset"
+#~ msgstr ""
+
+#~ msgid "Group by"
+#~ msgstr ""
+
+#~ msgid "Selected dimensions"
+#~ msgstr ""
+
+#~ msgid "Selected dimension"
+#~ msgstr ""
+
+#~ msgid "Add formula operation"
+#~ msgstr ""
+
+#~ msgid "There are currently no filters applied."
+#~ msgstr ""
+
+#~ msgid "selected"
+#~ msgstr ""
+
+#~ msgid "excluded"
+#~ msgstr ""
+
+#~ msgid "Until"
+#~ msgstr ""
+
+#~ msgid "TO"
+#~ msgstr ""
+
+#~ msgid "Latitude"
+#~ msgstr ""
+
+#~ msgid "Longitude"
+#~ msgstr ""
+
+#~ msgid "Label"
+#~ msgstr ""
+
+#~ msgid "Prefix filter..."
+#~ msgstr ""
+
+#~ msgid "Field name..."
+#~ msgstr ""
+
+#~ msgid "Terms"
+#~ msgstr ""
+
+#~ msgid "Stats"
+#~ msgstr ""
+
+#~ msgid "There are no terms to be shown"
+#~ msgstr ""
+
+#~ msgid "Select this value"
+#~ msgstr ""
+
+#~ msgid "There are no stats to be shown"
+#~ msgstr ""
+
+#~ msgid "Not available"
+#~ msgstr ""
+
+#~ msgid "There are no fields matching your search term."
+#~ msgstr ""
+
+#~ msgid "General settings"
+#~ msgstr ""
+
+#~ msgid "Solr index"
+#~ msgstr ""
+
+#~ msgid "Autocomplete"
+#~ msgstr ""
+
+#~ msgid "Dictionary"
+#~ msgstr ""
+
+#~ msgid "Dictionary name or blank for default"
+#~ msgstr ""
+
+#~ msgid "Nested documents"
+#~ msgstr ""
+
+#~ msgid "Schema"
+#~ msgstr ""
+
+#~ msgid "Query definitions"
+#~ msgstr ""
+
+#~ msgid "Add current query as..."
+#~ msgstr ""
+
+#~ msgid "Click on this button to add the currenty query as a new definition"
+#~ msgstr ""
+
+#~ msgid "There are currently no query definitions."
+#~ msgstr ""
+
+#~ msgid "Level"
+#~ msgstr ""
+
+#~ msgid "Time Settings"
+#~ msgstr ""
+
+#~ msgid "Past 5 Minutes"
+#~ msgstr ""
+
+#~ msgid "Past 30 Minutes"
+#~ msgstr ""
+
+#~ msgid "Past 1 Hour"
+#~ msgstr ""
+
+#~ msgid "Past 12 Hours"
+#~ msgstr ""
+
+#~ msgid "Past day"
+#~ msgstr ""
+
+#~ msgid "Past 2 days"
+#~ msgstr ""
+
+#~ msgid "Past 7 days"
+#~ msgstr ""
+
+#~ msgid "Past 1 Month"
+#~ msgstr ""
+
+#~ msgid "Past 3 Months"
+#~ msgstr ""
+
+#~ msgid "Past Year"
+#~ msgstr ""
+
+#~ msgid "Past 2 Years"
+#~ msgstr ""
+
+#~ msgid "Past 10 Years"
+#~ msgstr ""
+
+#~ msgid "Time settings"
+#~ msgstr ""
+
+#~ msgid "Date/time field"
+#~ msgstr ""
+
+#~ msgid "Rolling"
+#~ msgstr ""
+
+#~ msgid "Fixed"
+#~ msgstr ""
+
+#~ msgid "Start date/time"
+#~ msgstr ""
+
+#~ msgid "End date/time"
+#~ msgstr ""
+
+#~ msgid "Auto-refresh every"
+#~ msgstr ""
+
+#~ msgid "seconds"
+#~ msgstr ""
+
+#~ msgid "Nested schema"
+#~ msgstr ""
+
+#~ msgid "Count"
+#~ msgstr ""
+
+#~ msgid "Unique Count"
+#~ msgstr ""
+
+#~ msgid "Average"
+#~ msgstr ""
+
+#~ msgid "Sum"
+#~ msgstr ""
+
+#~ msgid "Min"
+#~ msgstr ""
+
+#~ msgid "Max"
+#~ msgstr ""
+
+#~ msgid "Median"
+#~ msgstr ""
+
+#~ msgid "Percentiles"
+#~ msgstr ""
+
+#~ msgid "Multiply"
+#~ msgstr ""
+
+#~ msgid "Substract"
+#~ msgstr ""
+
+#~ msgid "Substract dates"
+#~ msgstr ""
+
+#~ msgid "Up"
+#~ msgstr ""
+
+#~ msgid "Less"
+#~ msgstr ""
+
+#~ msgid "Total"
+#~ msgstr ""
+
+#~ msgid ""
+#~ "Result highlighting is unavailable: the "
+#~ "collection does not have an index "
+#~ "field"
+#~ msgstr ""
+
+#~ msgid "Retweeted %s times"
+#~ msgstr ""
+
+#~ msgid "Reply"
+#~ msgstr ""
+
+#~ msgid "Retweet"
+#~ msgstr ""
+
+#~ msgid "It seems there is nothing to search on ..."
+#~ msgstr ""
+
+#~ msgid "What about creating a"
+#~ msgstr ""
+
+#~ msgid "new index"
 #~ msgstr ""

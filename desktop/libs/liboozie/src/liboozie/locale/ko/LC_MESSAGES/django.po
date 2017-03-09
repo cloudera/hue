@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -63,38 +63,26 @@ msgstr "Oozie Share Lib가 기본 위치에 설치되어 있지 않습니다."
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "이미 제출됨(Oozie Job ID %s)"
 
-#: src/liboozie/submission2.py:181 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:184 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "배포 디렉토리 %s을(를) 생성하지 못했습니다."
 
-#: src/liboozie/submission2.py:336 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:370 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "경로가 디렉토리가 아닙니다: %s."
 
-#: src/liboozie/submission2.py:341 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:375 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "디렉토리 '%s'에 액세스하는 중 오류 발생: %s"
 
-#: src/liboozie/types.py:381
+#: src/liboozie/types.py:387
 msgid "Insufficient permission."
 msgstr "권한 부족."
 
-#: src/liboozie/types.py:382
+#: src/liboozie/types.py:388
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr "권한이 거부되었습니다. 사용자 %(username)s은(는) 사용자 %(user)s의 Job을 수정할 수 없습니다."
-
-#~ msgid "URL of Oozie server. This is required for job submission."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Location on HDFS where the "
-#~ "workflows/coordinators are deployed when "
-#~ "submitted by a non-owner."
-#~ msgstr ""
-
-#~ msgid "Failed to access deployment directory."
-#~ msgstr ""

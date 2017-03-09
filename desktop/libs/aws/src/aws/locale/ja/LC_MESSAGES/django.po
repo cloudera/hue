@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,13 +17,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/conf.py:65
+#: src/aws/conf.py:53
+msgid "One entry for each AWS account"
+msgstr "AWS アカウントごとに 1 つのエントリ"
+
+#: src/aws/conf.py:55
+msgid "Information about single AWS account"
+msgstr "1 つの AWS アカウントについての情報"
+
+#: src/aws/conf.py:68
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "このスクリプトを実行して AWS アクセスキー ID を作成します。"
 
-#: src/aws/conf.py:77
+#: src/aws/conf.py:80
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "このスクリプトを実行して AWS シークレットアクセスキーを作成します。"
+
+#: src/aws/conf.py:88
+msgid ""
+"Allow to use environment sources of credentials (environment variables, "
+"EC2 profile)."
+msgstr ""
+"資格情報の環境ソース（環境変数、EC2 プロファイル）の使用を"
+"許可します。"
+
+#: src/aws/conf.py:99
+msgid "Alternate address for endpoint."
+msgstr "エンドポイントの代替アドレスです。"
+
+#: src/aws/conf.py:105
+msgid "Alternate port for endpoint."
+msgstr "エンドポイントの代替ポートです。"
 
 #: src/aws/s3/s3fs.py:59
 msgid ""

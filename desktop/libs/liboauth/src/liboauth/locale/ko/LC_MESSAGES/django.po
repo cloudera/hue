@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2014-01-03 20:09+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -131,38 +131,38 @@ msgstr "Hue - 등록"
 msgid "Hue - Sign in"
 msgstr "Hue - 로그인"
 
-#: src/liboauth/templates/oauth-login.mako:157
+#: src/liboauth/templates/oauth-login.mako:158
 msgid "Visit gethue.com"
 msgstr "gethue.com 방문"
 
-#: src/liboauth/templates/oauth-login.mako:157
+#: src/liboauth/templates/oauth-login.mako:158
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "작동하지 않습니까? gethue.com을 방문하십시오!"
 
-#: src/liboauth/templates/oauth-login.mako:172
+#: src/liboauth/templates/oauth-login.mako:173
 msgid "Error!"
 msgstr "오류!"
 
-#: src/liboauth/templates/oauth-login.mako:172
+#: src/liboauth/templates/oauth-login.mako:173
 msgid "Invalid username or password."
 msgstr "사용자 이름 또는 암호가 올바르지 않습니다."
 
-#: src/liboauth/templates/oauth-login.mako:179
+#: src/liboauth/templates/oauth-login.mako:180
 msgid "This is your first time logging in."
 msgstr "첫 번째 로그인입니다."
 
-#: src/liboauth/templates/oauth-login.mako:180
+#: src/liboauth/templates/oauth-login.mako:181
 msgid "You will become Hue superuser."
 msgstr "Hue 수퍼 사용자가 될 예정입니다."
 
-#: src/liboauth/templates/oauth-login.mako:182
+#: src/liboauth/templates/oauth-login.mako:183
 msgid "Sign Up via"
 msgstr "등록 수단"
 
-#: src/liboauth/templates/oauth-login.mako:185
+#: src/liboauth/templates/oauth-login.mako:186
 msgid "Sign In via"
 msgstr "로그인 수단"
 
-#: src/liboauth/templates/oauth-login.mako:214
+#: src/liboauth/templates/oauth-login.mako:215
 msgid "The oauth app is not configured with any provider."
 msgstr "oauth 앱에 제공자가 구성되지 않았습니다."

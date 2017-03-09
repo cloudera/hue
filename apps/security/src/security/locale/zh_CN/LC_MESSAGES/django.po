@@ -52,7 +52,7 @@ msgstr "密码不匹配。"
 
 #: src/security/forms.py:68
 msgid "You must specify a password when creating a new user."
-msgstr "创建新用户时您必须指定密码."
+msgstr "创建新用户时您必须指定密码。"
 
 #: src/security/forms.py:109 src/security/forms.py:141
 msgid "Distinguished name"

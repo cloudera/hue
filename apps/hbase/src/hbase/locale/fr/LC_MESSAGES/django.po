@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -171,7 +171,7 @@ msgstr "Ajouter une famille de colonnes supplémentaire"
 
 #: src/hbase/templates/app.mako:203 src/hbase/templates/app.mako:334
 #: src/hbase/templates/app.mako:357 src/hbase/templates/app.mako:399
-#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:440
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -315,110 +315,98 @@ msgstr "Enregistrer"
 msgid "Revert"
 msgstr "Revenir en arrière"
 
-#: src/hbase/templates/app.mako:440 src/hbase/templates/app.mako:458
+#: src/hbase/templates/app.mako:441 src/hbase/templates/app.mako:459
 msgid "Confirm"
 msgstr "Confirmer"
 
-#: src/hbase/templates/app.mako:452
+#: src/hbase/templates/app.mako:453
 msgid "Confirm Delete"
 msgstr "Confirmer la suppression"
 
-#: src/hbase/templates/app.mako:453
+#: src/hbase/templates/app.mako:454
 msgid "Delete row "
 msgstr "Supprimer la ligne "
 
-#: src/hbase/templates/app.mako:454
+#: src/hbase/templates/app.mako:455
 msgid "? (This cannot be undone)"
 msgstr "? (Cette opération ne peut pas être annulée.)"
 
-#: src/hbase/templates/app.mako:455
+#: src/hbase/templates/app.mako:456
 msgid "Are you sure you want to drop this column?"
 msgstr "Voulez-vous vraiment supprimer cette colonne ?"
 
-#: src/hbase/templates/app.mako:456
+#: src/hbase/templates/app.mako:457
 msgid "enable"
 msgstr "activer"
 
-#: src/hbase/templates/app.mako:457
+#: src/hbase/templates/app.mako:458
 msgid "disable"
 msgstr "désactiver"
 
-#: src/hbase/templates/app.mako:459
+#: src/hbase/templates/app.mako:460
 msgid "Are you sure you want to"
 msgstr "Voulez-vous vraiment"
 
-#: src/hbase/templates/app.mako:460
+#: src/hbase/templates/app.mako:461
 msgid "this table?"
 msgstr "cette table ?"
 
-#: src/hbase/templates/app.mako:461
+#: src/hbase/templates/app.mako:462
 msgid "End Query"
 msgstr "Requête de fin"
 
-#: src/hbase/templates/app.mako:462
+#: src/hbase/templates/app.mako:463
 msgid "Prefix Scan"
 msgstr "Analyse du préfixe"
 
-#: src/hbase/templates/app.mako:463
+#: src/hbase/templates/app.mako:464
 msgid "Start Scan"
 msgstr "Démarrer l'analyse"
 
-#: src/hbase/templates/app.mako:464
+#: src/hbase/templates/app.mako:465
 msgid "Start Select Columns"
 msgstr "Démarrer la sélection de colonnes"
 
-#: src/hbase/templates/app.mako:465
+#: src/hbase/templates/app.mako:466
 msgid "End Column/Family"
 msgstr "Colonne/famille de fin"
 
-#: src/hbase/templates/app.mako:466
+#: src/hbase/templates/app.mako:467
 msgid "End Select Columns"
 msgstr "Fin de la sélection de colonnes"
 
-#: src/hbase/templates/app.mako:467
+#: src/hbase/templates/app.mako:468
 msgid "Start FilterString"
 msgstr "Démarrer FilterString"
 
-#: src/hbase/templates/app.mako:468
+#: src/hbase/templates/app.mako:469
 msgid "End FilterString"
 msgstr "Chaîne de filtre de fin"
 
-#: src/hbase/templates/app.mako:469
+#: src/hbase/templates/app.mako:470
 msgid "Row Key Value"
 msgstr "Valeur de clé de ligne"
 
-#: src/hbase/templates/app.mako:470
+#: src/hbase/templates/app.mako:471
 msgid "Length of Scan or Row Key"
 msgstr "Longueur de la clé Analyse ou Ligne"
 
-#: src/hbase/templates/app.mako:471
+#: src/hbase/templates/app.mako:472
 msgid "Column Family: Column Name"
 msgstr "Famille de colonne : nom de la colonne"
 
-#: src/hbase/templates/app.mako:472
+#: src/hbase/templates/app.mako:473
 msgid "Rows starting with"
 msgstr "Lignes commençant par"
 
-#: src/hbase/templates/app.mako:473
+#: src/hbase/templates/app.mako:474
 msgid "String"
 msgstr "Chaîne"
 
-#: src/hbase/templates/app.mako:474
+#: src/hbase/templates/app.mako:475
 msgid "Integer"
 msgstr "Entier"
 
-#: src/hbase/templates/app.mako:475
+#: src/hbase/templates/app.mako:476
 msgid "Column Range"
 msgstr "Plage de colonnes"
-
-#~ msgid "About Hue"
-#~ msgstr ""
-
-#~ msgid "Configuration"
-#~ msgstr ""
-
-#~ msgid "Check for misconfiguration"
-#~ msgstr ""
-
-#~ msgid "Server Logs"
-#~ msgstr ""

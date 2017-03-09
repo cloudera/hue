@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -44,7 +44,7 @@ msgstr "Berechtigung zum Bearbeiten des Dokuments verweigert"
 
 #: src/dashboard/api.py:200
 msgid "Document successfully updated."
-msgstr "Dashboard erfolgreich aktualisiert."
+msgstr "Dokument erfolgreich aktualisiert."
 
 #: src/dashboard/api.py:204
 msgid "Document has no modifications to change."
@@ -56,7 +56,7 @@ msgstr "Dieser Feldtyp unterstützt keine Statistiken"
 
 #: src/dashboard/api.py:270 src/dashboard/templates/common_search.mako:2411
 msgid "This field does not support stats"
-msgstr "Dieses Feld unterstützt keine Statistiken."
+msgstr "Dieses Feld unterstützt keine Statistiken"
 
 #: src/dashboard/api.py:290
 #, python-format
@@ -65,44 +65,45 @@ msgstr "Suchergebnisse konnten nicht heruntergeladen werden: %s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "Aktivieren Sie den Dashboard-Link im Menü."
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "Index (Solr)"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "Tabelle (%s)"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"Name der Schnittstelle, die als Abfrage-Engine für das Dashboard verwendet werden soll, z. B. "
+"solr, sql."
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "Analysefacetten unterstützen oder nicht."
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "Verschachtelte Dokumente"
+msgstr "Verschachtelte Dokumente unterstützen oder nicht."
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
 msgid "Dashboard does not exist or you don't have the permission to access it."
-msgstr ""
-"Dashboard ist nicht vorhanden oder Sie sind nicht berechtigt, darauf "
-"zuzugreifen."
+msgstr "Dashboard ist nicht vorhanden oder Sie sind nicht berechtigt, darauf zuzugreifen."
 
 #: src/dashboard/models.py:610
 msgid ""
 "The Solr schema requires an id field for performing the result "
 "highlighting"
-msgstr "Für das Hervorheben der Ergebnisse erfordert das Solr-Schema ein ID-Feld"
+msgstr ""
+"Für das Hervorheben der Ergebnisse erfordert das Solr-Schema ein ID-Feld"
+""
 
 #: src/dashboard/views.py:212
 msgid "Page saved !"
@@ -113,9 +114,8 @@ msgstr "Seite gespeichert!"
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
-msgstr "Dashboards"
+msgstr "Dashboard"
 
 #: src/dashboard/templates/common_admin_collections.mako:30
 #: src/dashboard/templates/common_admin_collections.mako:43
@@ -199,9 +199,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "Möchten Sie die ausgewählten Dashboards wirklich löschen?"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "Frankreich"
+msgstr "Abbrechen"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -248,23 +247,21 @@ msgid "New"
 msgstr "Neu"
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "ausgewählt"
+msgstr "Einen auswählen"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "neuen Index"
+msgstr "Index"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
-msgstr "Kerne anzeigen..."
+msgstr "Kerne anzeigen"
 
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "Tabellenname oder <database>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -287,7 +284,7 @@ msgstr "Filterleiste"
 #: src/dashboard/templates/common_search.mako:200
 #: src/dashboard/templates/common_search.mako:1459
 msgid "Marker Map"
-msgstr "Markierungskarte"
+msgstr "Markierungs-Map"
 
 #: src/dashboard/templates/common_search.mako:211
 msgid "Counter"
@@ -334,7 +331,7 @@ msgstr "Zeitleiste"
 #: src/dashboard/templates/common_search.mako:344
 #: src/dashboard/templates/common_search.mako:1453
 msgid "Gradient Map"
-msgstr "Verlaufskarte"
+msgstr "Verlaufs-Map"
 
 #: src/dashboard/templates/common_search.mako:374
 msgid "This is an empty widget."
@@ -375,7 +372,7 @@ msgstr "Feld"
 #: src/dashboard/templates/common_search.mako:996
 #: src/dashboard/templates/common_search.mako:1759
 msgid "Sorting"
-msgstr "Sortieren"
+msgstr "Sortierung"
 
 #: src/dashboard/templates/common_search.mako:398
 #: src/dashboard/templates/common_search.mako:542
@@ -406,7 +403,7 @@ msgstr "aufsteigend"
 #: src/dashboard/templates/common_search.mako:2027
 #: src/dashboard/templates/common_search.mako:2259
 msgid "Limit"
-msgstr "Beschränkung"
+msgstr "Limit"
 
 #: src/dashboard/templates/common_search.mako:418
 #: src/dashboard/templates/common_search.mako:510
@@ -417,7 +414,7 @@ msgstr "Beschränkung"
 #: src/dashboard/templates/common_search.mako:2035
 #: src/dashboard/templates/common_search.mako:2268
 msgid "Min Count"
-msgstr "Mindestzahl"
+msgstr "Mindestanzahl"
 
 #: src/dashboard/templates/common_search.mako:449
 #: src/dashboard/templates/common_search.mako:660
@@ -542,7 +539,7 @@ msgstr "Mehr anzeigen"
 #: src/dashboard/templates/common_search.mako:768
 #: src/dashboard/templates/common_search.mako:872
 msgid "less..."
-msgstr "Weniger..."
+msgstr "weniger..."
 
 #: src/dashboard/templates/common_search.mako:945
 msgid "x-axis"
@@ -578,7 +575,7 @@ msgstr "Kennzeichnung"
 
 #: src/dashboard/templates/common_search.mako:978
 msgid "sorting"
-msgstr "Sortieren"
+msgstr "Sortierung"
 
 #: src/dashboard/templates/common_search.mako:981
 msgid "No sorting"
@@ -639,7 +636,7 @@ msgstr "Formatiert ein Datum als Unix-Zeitstempel"
 
 #: src/dashboard/templates/common_search.mako:1020
 msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "Formatiert einen Unix-Zeitstempel als Ns, Nmin, Ndays... vor"
+msgstr "Formatiert einen Unix-Zeitstempel als vor Ns, Nmin, Ndays... "
 
 #: src/dashboard/templates/common_search.mako:1021
 #: src/dashboard/templates/common_search.mako:1055
@@ -736,7 +733,7 @@ msgstr "Zurück"
 
 #: src/dashboard/templates/common_search.mako:1230
 msgid "Showing"
-msgstr "Anzeigen: "
+msgstr "Anzeigen:"
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
@@ -838,9 +835,8 @@ msgid "Field Name"
 msgstr "Feldname"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "Änderungen rückgängig machen"
+msgstr "Keine Übereinstimmungen."
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -953,9 +949,7 @@ msgstr "Wörterbuch"
 
 #: src/dashboard/templates/common_search.mako:2522
 msgid "Dictionary name or blank for default"
-msgstr ""
-"Wörterbuchname eingeben oder leer lassen, um den Standardwert zu "
-"übernehmen"
+msgstr "Wörterbuchname eingeben oder leer lassen, um den Standardwert zu übernehmen"
 
 #: src/dashboard/templates/common_search.mako:2529
 msgid "Nested documents"
@@ -975,9 +969,7 @@ msgstr "Aktuelle Abfrage hinzufügen als..."
 
 #: src/dashboard/templates/common_search.mako:2563
 msgid "Click on this button to add the currenty query as a new definition"
-msgstr ""
-"Klicken Sie auf diese Schaltfläche, um die aktuelle Query als neue "
-"Definition hinzuzufügen"
+msgstr "Klicken Sie auf diese Schaltfläche, um die aktuelle Abfrage als neue Definition hinzuzufügen"
 
 #: src/dashboard/templates/common_search.mako:2581
 msgid "There are currently no query definitions."
@@ -1168,51 +1160,3 @@ msgstr "Wie wäre es mit einem"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "neuen Index"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "URL des Solr-Servers."
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "Wenn kein Begriff eingegeben wird, wird eine Abfrage gesendet."
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr ""
-#~ "Ob Solr für die Durchführung der "
-#~ "Kerberos-Authentifizierung einen Client benötigt."
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "Nutzen Sie aktuelle Solr 5.2+-Funktionen."
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "Solr-Indexname verweist auf"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "Benutzerfreundlicherer Name in UI"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "Sammlung mit Kerndaten"
-
-#~ msgid "Solr json"
-#~ msgstr "Solr-JSON"
-
-#~ msgid "Properties"
-#~ msgstr "Eigenschaften"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Hue-Eigenschaften (z. B. Ergebnisse nach Seitenzahl)"
-
-#~ msgid "User who created the job."
-#~ msgstr "Der Benutzer, der den Job erstellt hat."
-
-#~ msgid "You must be a superuser."
-#~ msgstr "Sie müssen ein Superuser sein."
-
-#~ msgid "A POST request is required."
-#~ msgstr "Eine POST-Anforderung ist erforderlich."
-
-#~ msgid "No"
-#~ msgstr "Nein"
-
-#~ msgid "Select a search index"
-#~ msgstr "Suchindex auswählen"
-

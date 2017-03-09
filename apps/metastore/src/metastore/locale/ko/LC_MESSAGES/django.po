@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -16,6 +16,10 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
+
+#: src/metastore/conf.py:25
+msgid "Flag to turn on the new version of the create table wizard."
+msgstr "테이블 생성 마법사의 새 버전을 켜는 플래그입니다."
 
 #: src/metastore/forms.py:46
 msgid "Path"
@@ -43,9 +47,9 @@ msgstr "metastore:write 권한이 있어야 합니다."
 msgid "Failed to remove %(databases)s.  Error: %(error)s"
 msgstr "%(databases)s을(를) 제거하지 못했습니다. 오류: %(error)s"
 
-#: src/metastore/views.py:107 src/metastore/views.py:250
-#: src/metastore/views.py:252 src/metastore/views.py:378
-#: src/metastore/views.py:539
+#: src/metastore/views.py:107 src/metastore/views.py:252
+#: src/metastore/views.py:254 src/metastore/views.py:380
+#: src/metastore/views.py:541
 msgid "Hive Error"
 msgstr "Hive 오류"
 
@@ -77,66 +81,61 @@ msgstr "테이블 %s.%s과(와) 관련된 쿼리를 가져올 수 없음: %s"
 msgid "Failed to retrieve tables for database: %s"
 msgstr "데이터베이스의 테이블을 검색할 수 없음: %s"
 
-#: src/metastore/views.py:235
-#, python-format
-msgid "Cannot get metadata for table: `%s`.`%s`"
-msgstr "테이블에 대한 메타데이터를 가져올 수 없음: `%s`.`%s`"
-
-#: src/metastore/views.py:321
+#: src/metastore/views.py:323
 #, python-format
 msgid "Failed to alter table `%s`.`%s`: %s"
 msgstr "테이블 `%s`.`%s`을(를) 바꿀 수 없음: %s"
 
-#: src/metastore/views.py:335
+#: src/metastore/views.py:337
 msgid "alter_column requires a column parameter"
 msgstr "alter_column에 열 매개변수가 필요함"
 
-#: src/metastore/views.py:353
+#: src/metastore/views.py:355
 #, python-format
 msgid "Column `%s`.`%s` `%s` not found"
 msgstr "열 `%s`.`%s` `%s`을(를) 찾지 못함"
 
-#: src/metastore/views.py:356
+#: src/metastore/views.py:358
 #, python-format
 msgid "Failed to alter column `%s`.`%s` `%s`: %s"
 msgstr "열 `%s`.`%s` `%s`을(를) 바꿀 수 없음: %s"
 
-#: src/metastore/views.py:377
+#: src/metastore/views.py:379
 #, python-format
 msgid "Failed to remove %(tables)s.  Error: %(error)s"
 msgstr "%(tables)s을(를) 제거하지 못했습니다. 오류: %(error)s"
 
-#: src/metastore/views.py:380
+#: src/metastore/views.py:382
 msgid "Do you really want to delete the table(s)?"
 msgstr "테이블을 삭제하시겠습니까?"
 
-#: src/metastore/views.py:394
+#: src/metastore/views.py:396
 msgid "Cannot read table"
 msgstr "테이블을 읽을 수 없음"
 
-#: src/metastore/views.py:416
+#: src/metastore/views.py:418
 msgid "Can't load the data: "
 msgstr "데이터를 로드할 수 없음: "
 
-#: src/metastore/views.py:438
+#: src/metastore/views.py:440
 #, python-format
 msgid "Table '%(table)s' is not partitioned."
 msgstr "테이블 '%(table)s'이(가) 분할되지 않았습니다."
 
-#: src/metastore/views.py:509
+#: src/metastore/views.py:511
 msgid "Cannot browse partition"
 msgstr "파티션을 찾아볼 수 없음"
 
-#: src/metastore/views.py:520
+#: src/metastore/views.py:522
 msgid "Cannot read partition"
 msgstr "파티션을 읽을 수 없음"
 
-#: src/metastore/views.py:538
+#: src/metastore/views.py:540
 #, python-format
 msgid "Failed to remove %(partition)s.  Error: %(error)s"
 msgstr "%(partition)s을(를) 제거하지 못함. 오류: %(error)s"
 
-#: src/metastore/views.py:541
+#: src/metastore/views.py:543
 msgid "Do you really want to delete the partition(s)?"
 msgstr "파티션을 삭제하시겠습니까?"
 
@@ -145,7 +144,7 @@ msgid "Metastore Manager"
 msgstr "Metastore Manager"
 
 #: src/metastore/templates/components.mako:49
-#: src/metastore/templates/metastore.mako:72
+#: src/metastore/templates/metastore.mako:75
 msgid "Databases"
 msgstr "데이터베이스"
 
@@ -156,15 +155,15 @@ msgstr "작업 확인"
 
 #: src/metastore/templates/confirm.mako:33
 #: src/metastore/templates/describe_partitions.mako:172
-#: src/metastore/templates/metastore.mako:324
-#: src/metastore/templates/metastore.mako:522
+#: src/metastore/templates/metastore.mako:337
+#: src/metastore/templates/metastore.mako:527
 msgid "Yes"
 msgstr "예"
 
 #: src/metastore/templates/confirm.mako:34
-#: src/metastore/templates/metastore.mako:323
-#: src/metastore/templates/metastore.mako:521
-#: src/metastore/templates/metastore.mako:1154
+#: src/metastore/templates/metastore.mako:336
+#: src/metastore/templates/metastore.mako:526
+#: src/metastore/templates/metastore.mako:1094
 msgid "No"
 msgstr "아니요"
 
@@ -175,8 +174,8 @@ msgstr "테이블 파티션: %(tableName)s"
 
 #: src/metastore/templates/describe_partitions.mako:56
 #: src/metastore/templates/describe_partitions.mako:67
-#: src/metastore/templates/metastore.mako:1087
-#: src/metastore/templates/metastore.mako:1097
+#: src/metastore/templates/metastore.mako:1027
+#: src/metastore/templates/metastore.mako:1037
 msgid "Toggle Assist"
 msgstr "지원 전환"
 
@@ -209,8 +208,8 @@ msgid "Drop partition(s)"
 msgstr "파티션 삭제"
 
 #: src/metastore/templates/describe_partitions.mako:136
-#: src/metastore/templates/metastore.mako:276
-#: src/metastore/templates/metastore.mako:378
+#: src/metastore/templates/metastore.mako:288
+#: src/metastore/templates/metastore.mako:391
 msgid "Location"
 msgstr "위치"
 
@@ -236,493 +235,507 @@ msgstr "데이터베이스를 로드하는 중에 문제 발생"
 msgid "There was a problem loading the table preview."
 msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
 
-#: src/metastore/templates/metastore.mako:31
+#: src/metastore/templates/metastore.mako:34
 msgid "Metastore"
 msgstr "Metastore"
 
-#: src/metastore/templates/metastore.mako:85
+#: src/metastore/templates/metastore.mako:88
 msgid "Edit path"
 msgstr "경로 편집"
 
-#: src/metastore/templates/metastore.mako:108
-#: src/metastore/templates/metastore.mako:156
+#: src/metastore/templates/metastore.mako:111
+#: src/metastore/templates/metastore.mako:162
 msgid "Name"
 msgstr "이름"
 
-#: src/metastore/templates/metastore.mako:109
-#: src/metastore/templates/metastore.mako:157
-#: src/metastore/templates/metastore.mako:237
-#: src/metastore/templates/metastore.mako:454
+#: src/metastore/templates/metastore.mako:112
+#: src/metastore/templates/metastore.mako:163
+#: src/metastore/templates/metastore.mako:243
+#: src/metastore/templates/metastore.mako:449
 msgid "Type"
 msgstr "유형"
 
-#: src/metastore/templates/metastore.mako:111
-#: src/metastore/templates/metastore.mako:405
-#: src/metastore/templates/metastore.mako:451
-#: src/metastore/templates/metastore.mako:699
-#: src/metastore/templates/metastore.mako:992
+#: src/metastore/templates/metastore.mako:114
+#: src/metastore/templates/metastore.mako:446
+#: src/metastore/templates/metastore.mako:716
+#: src/metastore/templates/metastore.mako:932
 msgid "Popularity"
 msgstr "인기도"
 
-#: src/metastore/templates/metastore.mako:113
-#: src/metastore/templates/metastore.mako:367
-#: src/metastore/templates/metastore.mako:449
+#: src/metastore/templates/metastore.mako:116
+#: src/metastore/templates/metastore.mako:380
+#: src/metastore/templates/metastore.mako:444
 msgid "Comment"
 msgstr "설명"
 
-#: src/metastore/templates/metastore.mako:119
-#: src/metastore/templates/metastore.mako:462
+#: src/metastore/templates/metastore.mako:122
+#: src/metastore/templates/metastore.mako:457
 msgid "Show details"
 msgstr "세부 정보 표시"
 
-#: src/metastore/templates/metastore.mako:120
+#: src/metastore/templates/metastore.mako:123
 msgid "Scroll to the column"
 msgstr "열 스크롤"
 
-#: src/metastore/templates/metastore.mako:139
+#: src/metastore/templates/metastore.mako:145
 msgid "Add a comment..."
 msgstr "설명 추가..."
 
-#: src/metastore/templates/metastore.mako:179
+#: src/metastore/templates/metastore.mako:185
 msgid "Values"
 msgstr "값"
 
-#: src/metastore/templates/metastore.mako:180
+#: src/metastore/templates/metastore.mako:186
 msgid "Spec"
 msgstr "사양"
 
-#: src/metastore/templates/metastore.mako:181
+#: src/metastore/templates/metastore.mako:187
 msgid "Browse"
 msgstr "찾아보기"
 
-#: src/metastore/templates/metastore.mako:191
+#: src/metastore/templates/metastore.mako:197
 msgid "Data"
 msgstr "데이터"
 
-#: src/metastore/templates/metastore.mako:192
+#: src/metastore/templates/metastore.mako:198
 msgid "Files"
 msgstr "파일"
 
-#: src/metastore/templates/metastore.mako:225
+#: src/metastore/templates/metastore.mako:231
 msgid "Did you know?"
 msgstr "유용한 정보"
 
-#: src/metastore/templates/metastore.mako:227
+#: src/metastore/templates/metastore.mako:233
 msgid ""
 "If the sample contains a large number of columns, click a row to select a"
 " column to jump to"
 msgstr "샘플에 열이 많은 경우 행을 클릭하여 이동할 열 선택"
 
-#: src/metastore/templates/metastore.mako:235
-#: src/metastore/templates/metastore.mako:366
+#: src/metastore/templates/metastore.mako:241
+#: src/metastore/templates/metastore.mako:379
 msgid "Properties"
 msgstr "속성"
 
-#: src/metastore/templates/metastore.mako:239
-#: src/metastore/templates/metastore.mako:427
-#: src/metastore/templates/metastore.mako:488
+#: src/metastore/templates/metastore.mako:245
+#: src/metastore/templates/metastore.mako:422
+#: src/metastore/templates/metastore.mako:483
 msgid "View"
 msgstr "보기"
 
-#: src/metastore/templates/metastore.mako:242
-#: src/metastore/templates/metastore.mako:485
+#: src/metastore/templates/metastore.mako:248
+#: src/metastore/templates/metastore.mako:480
 msgid "Table"
 msgstr "테이블"
 
-#: src/metastore/templates/metastore.mako:245
-#: src/metastore/templates/metastore.mako:374
+#: src/metastore/templates/metastore.mako:251
+#: src/metastore/templates/metastore.mako:387
 msgid "Owner"
 msgstr "소유자"
 
-#: src/metastore/templates/metastore.mako:248
+#: src/metastore/templates/metastore.mako:254
 msgid "Created"
 msgstr "생성됨"
 
-#: src/metastore/templates/metastore.mako:249
+#: src/metastore/templates/metastore.mako:255
 msgid "Format"
 msgstr "형식"
 
-#: src/metastore/templates/metastore.mako:251
+#: src/metastore/templates/metastore.mako:258
 msgid "Compressed"
 msgstr "압축됨"
 
-#: src/metastore/templates/metastore.mako:252
+#: src/metastore/templates/metastore.mako:259
 msgid "Not compressed"
 msgstr "압축되지 않음"
 
-#: src/metastore/templates/metastore.mako:261
+#: src/metastore/templates/metastore.mako:268
 msgid "Stats"
 msgstr "상태"
 
-#: src/metastore/templates/metastore.mako:271
+#: src/metastore/templates/metastore.mako:278
 msgid "The column stats for this table are not accurate"
 msgstr "이 테이블의 열 상태가 정확하지 않음"
 
-#: src/metastore/templates/metastore.mako:280
+#: src/metastore/templates/metastore.mako:285
+msgid "Stored in"
+msgstr "저장 위치"
+
+#: src/metastore/templates/metastore.mako:293
 msgid "Last modified by"
 msgstr "최종 수정자"
 
-#: src/metastore/templates/metastore.mako:283
+#: src/metastore/templates/metastore.mako:296
 msgid "Last modified time"
 msgstr "마지막 수정 시간"
 
-#: src/metastore/templates/metastore.mako:286
+#: src/metastore/templates/metastore.mako:299
 msgid "Number of files"
 msgstr "파일 수"
 
-#: src/metastore/templates/metastore.mako:286
+#: src/metastore/templates/metastore.mako:299
 msgid "files"
 msgstr "파일"
 
-#: src/metastore/templates/metastore.mako:289
+#: src/metastore/templates/metastore.mako:302
 msgid "Number of rows"
 msgstr "행 수"
 
-#: src/metastore/templates/metastore.mako:289
+#: src/metastore/templates/metastore.mako:302
 msgid "rows"
 msgstr "행"
 
-#: src/metastore/templates/metastore.mako:292
+#: src/metastore/templates/metastore.mako:305
 msgid "Total size"
 msgstr "총 크기"
 
-#: src/metastore/templates/metastore.mako:302
+#: src/metastore/templates/metastore.mako:315
 msgid "Search for a database..."
 msgstr "데이터베이스 검색..."
 
-#: src/metastore/templates/metastore.mako:304
+#: src/metastore/templates/metastore.mako:317
 msgid "Drop the selected databases"
 msgstr "선택한 데이터베이스 삭제"
 
-#: src/metastore/templates/metastore.mako:304
-#: src/metastore/templates/metastore.mako:432
+#: src/metastore/templates/metastore.mako:317
+#: src/metastore/templates/metastore.mako:427
 msgid "Drop"
 msgstr "삭제"
 
-#: src/metastore/templates/metastore.mako:310
+#: src/metastore/templates/metastore.mako:323
 msgid "Warning: This will drop all tables and objects within the database."
 msgstr "경고: 데이터베이스 내 테이블과 개체가 모두 삭제됩니다."
 
-#: src/metastore/templates/metastore.mako:312
+#: src/metastore/templates/metastore.mako:325
 msgid "Do you really want to delete the following database(s)?"
 msgstr "다음 데이터베이스를 삭제하시겠습니까?"
 
-#: src/metastore/templates/metastore.mako:337
+#: src/metastore/templates/metastore.mako:350
 msgid "Database Name"
 msgstr "데이터베이스 이름"
 
-#: src/metastore/templates/metastore.mako:351
+#: src/metastore/templates/metastore.mako:364
 msgid "No databases found"
 msgstr "데이터베이스를 찾을 수 없음"
 
-#: src/metastore/templates/metastore.mako:372
+#: src/metastore/templates/metastore.mako:385
 msgid "No comment."
 msgstr "설명이 없습니다."
 
-#: src/metastore/templates/metastore.mako:384
-#: src/metastore/templates/metastore.mako:601
+#: src/metastore/templates/metastore.mako:397
+#: src/metastore/templates/metastore.mako:618
 msgid "Tagging"
 msgstr "태깅"
 
-#: src/metastore/templates/metastore.mako:394
+#: src/metastore/templates/metastore.mako:407
 msgid "Parameters"
 msgstr "매개변수"
 
-#: src/metastore/templates/metastore.mako:424
+#: src/metastore/templates/metastore.mako:419
 msgid "Tables"
 msgstr "테이블"
 
-#: src/metastore/templates/metastore.mako:426
+#: src/metastore/templates/metastore.mako:421
 msgid "Search for a table..."
 msgstr "테이블 검색..."
 
-#: src/metastore/templates/metastore.mako:427
+#: src/metastore/templates/metastore.mako:422
 msgid "Browse the selected table"
 msgstr "선택한 테이블 찾아보기"
 
-#: src/metastore/templates/metastore.mako:428
+#: src/metastore/templates/metastore.mako:423
 msgid "Query the selected table"
 msgstr "선택한 테이블 쿼리"
 
-#: src/metastore/templates/metastore.mako:429
-#: src/metastore/templates/metastore.mako:701
+#: src/metastore/templates/metastore.mako:424
+#: src/metastore/templates/metastore.mako:718
 msgid "Query"
 msgstr "쿼리"
 
-#: src/metastore/templates/metastore.mako:432
+#: src/metastore/templates/metastore.mako:427
 msgid "Delete the selected tables"
 msgstr "선택한 테이블 삭제"
 
-#: src/metastore/templates/metastore.mako:437
+#: src/metastore/templates/metastore.mako:432
 msgid "View the selected table"
 msgstr "선택한 테이블 보기"
 
-#: src/metastore/templates/metastore.mako:438
-#: src/metastore/templates/metastore.mako:571
+#: src/metastore/templates/metastore.mako:433
+#: src/metastore/templates/metastore.mako:588
 msgid "View in Optimizer"
 msgstr "Optimizer에서 보기"
 
-#: src/metastore/templates/metastore.mako:448
-#: src/metastore/templates/metastore.mako:993
+#: src/metastore/templates/metastore.mako:443
+#: src/metastore/templates/metastore.mako:933
 msgid "Table Name"
 msgstr "테이블 이름"
 
-#: src/metastore/templates/metastore.mako:452
-#: src/metastore/templates/metastore.mako:612
-#: src/metastore/templates/metastore.mako:663
-#: src/metastore/templates/metastore.mako:761
+#: src/metastore/templates/metastore.mako:447
+#: src/metastore/templates/metastore.mako:629
+#: src/metastore/templates/metastore.mako:680
+#: src/metastore/templates/metastore.mako:778
 msgid "Columns"
 msgstr "열"
 
-#: src/metastore/templates/metastore.mako:493
+#: src/metastore/templates/metastore.mako:488
 msgid "Fact table"
 msgstr "팩트 테이블"
 
-#: src/metastore/templates/metastore.mako:496
+#: src/metastore/templates/metastore.mako:491
 msgid "Dimension table"
 msgstr "치수 테이블"
 
-#: src/metastore/templates/metastore.mako:503
+#: src/metastore/templates/metastore.mako:498
 msgid "No tables found."
 msgstr "테이블이 없습니다."
 
-#: src/metastore/templates/metastore.mako:513
+#: src/metastore/templates/metastore.mako:508
 msgid "Do you really want to drop the selected table(s)?"
 msgstr "선택한 테이블을 삭제하시겠습니까?"
 
-#: src/metastore/templates/metastore.mako:517
+#: src/metastore/templates/metastore.mako:519
+msgid "and"
+msgstr "및"
+
+#: src/metastore/templates/metastore.mako:519
+msgid "others"
+msgstr "기타"
+
+#: src/metastore/templates/metastore.mako:522
 msgid "Skip the trash"
 msgstr "휴지통 건너뛰기"
 
-#: src/metastore/templates/metastore.mako:543
-#: src/metastore/templates/metastore.mako:552
-#: src/metastore/templates/metastore.mako:569
+#: src/metastore/templates/metastore.mako:548
+#: src/metastore/templates/metastore.mako:563
+#: src/metastore/templates/metastore.mako:586
 msgid "Refresh"
 msgstr "새로 고침"
 
-#: src/metastore/templates/metastore.mako:545
+#: src/metastore/templates/metastore.mako:551
+#: src/metastore/templates/metastore.mako:553
+#: src/metastore/templates/metastore.mako:555
 msgid "Create a new database"
 msgstr "새 데이터베이스 생성"
 
-#: src/metastore/templates/metastore.mako:554
+#: src/metastore/templates/metastore.mako:566
+#: src/metastore/templates/metastore.mako:568
+msgid "Create a new table"
+msgstr "새 테이블 생성"
+
+#: src/metastore/templates/metastore.mako:570
 msgid "Create a new table from a file"
 msgstr "파일에서 새 테이블을 생성합니다."
 
-#: src/metastore/templates/metastore.mako:555
+#: src/metastore/templates/metastore.mako:571
 msgid "Create a new table manually"
 msgstr "새 테이블을 직접 생성합니다."
 
-#: src/metastore/templates/metastore.mako:565
+#: src/metastore/templates/metastore.mako:582
 msgid "Query the table"
 msgstr "테이블 쿼리"
 
-#: src/metastore/templates/metastore.mako:567
+#: src/metastore/templates/metastore.mako:584
 msgid "Browse Data"
 msgstr "데이터 찾아보기"
 
-#: src/metastore/templates/metastore.mako:575
+#: src/metastore/templates/metastore.mako:592
 msgid "Import Data"
 msgstr "데이터 가져오기"
 
-#: src/metastore/templates/metastore.mako:578
+#: src/metastore/templates/metastore.mako:595
 msgid "Drop View"
 msgstr "보기 삭제"
 
-#: src/metastore/templates/metastore.mako:578
-#: src/metastore/templates/metastore.mako:1147
+#: src/metastore/templates/metastore.mako:595
+#: src/metastore/templates/metastore.mako:1087
 msgid "Drop Table"
 msgstr "테이블 삭제"
 
-#: src/metastore/templates/metastore.mako:581
+#: src/metastore/templates/metastore.mako:598
 msgid "View File Location"
 msgstr "파일 위치 보기"
 
-#: src/metastore/templates/metastore.mako:583
+#: src/metastore/templates/metastore.mako:600
 msgid "Show Partitions"
 msgstr "파티션 표시"
 
-#: src/metastore/templates/metastore.mako:618
-#: src/metastore/templates/metastore.mako:629
-#: src/metastore/templates/metastore.mako:645
+#: src/metastore/templates/metastore.mako:635
+#: src/metastore/templates/metastore.mako:646
+#: src/metastore/templates/metastore.mako:662
 msgid "View more..."
 msgstr "더 보기..."
 
-#: src/metastore/templates/metastore.mako:623
-#: src/metastore/templates/metastore.mako:765
+#: src/metastore/templates/metastore.mako:640
+#: src/metastore/templates/metastore.mako:782
 msgid "Sample"
 msgstr "샘플"
 
-#: src/metastore/templates/metastore.mako:632
-#: src/metastore/templates/metastore.mako:686
+#: src/metastore/templates/metastore.mako:649
+#: src/metastore/templates/metastore.mako:703
 msgid "The view does not contain any data."
 msgstr "보기에 데이터가 없습니다."
 
-#: src/metastore/templates/metastore.mako:633
-#: src/metastore/templates/metastore.mako:687
+#: src/metastore/templates/metastore.mako:650
+#: src/metastore/templates/metastore.mako:704
 msgid "The table does not contain any data."
 msgstr "테이블에 데이터가 없습니다."
 
-#: src/metastore/templates/metastore.mako:640
-#: src/metastore/templates/metastore.mako:667
-#: src/metastore/templates/metastore.mako:763
+#: src/metastore/templates/metastore.mako:657
+#: src/metastore/templates/metastore.mako:684
+#: src/metastore/templates/metastore.mako:780
 msgid "Partitions"
 msgstr "파티션"
 
-#: src/metastore/templates/metastore.mako:648
-#: src/metastore/templates/metastore.mako:670
+#: src/metastore/templates/metastore.mako:665
+#: src/metastore/templates/metastore.mako:687
 msgid "The partition does not contain any values"
 msgstr "파티션에 값이 없음"
 
-#: src/metastore/templates/metastore.mako:674
+#: src/metastore/templates/metastore.mako:691
 msgid "View all"
 msgstr "모두 보기"
 
-#: src/metastore/templates/metastore.mako:698
-#: src/metastore/templates/metastore.mako:991
+#: src/metastore/templates/metastore.mako:715
+#: src/metastore/templates/metastore.mako:931
 msgid "Id"
 msgstr "ID"
 
-#: src/metastore/templates/metastore.mako:700
+#: src/metastore/templates/metastore.mako:717
 msgid "Character"
 msgstr "문자"
 
-#: src/metastore/templates/metastore.mako:702
+#: src/metastore/templates/metastore.mako:719
 msgid "Complexity"
 msgstr "복잡도"
 
-#: src/metastore/templates/metastore.mako:703
+#: src/metastore/templates/metastore.mako:720
 msgid "Hive Compatible"
 msgstr "Hive 호환 가능"
 
-#: src/metastore/templates/metastore.mako:704
+#: src/metastore/templates/metastore.mako:721
 msgid "Impala Compatible"
 msgstr "Impala 호환 가능"
 
-#: src/metastore/templates/metastore.mako:722
+#: src/metastore/templates/metastore.mako:739
 msgid "No queries found for the current table."
 msgstr "현재 테이블에 대한 쿼리를 찾을 수 없습니다."
 
-#: src/metastore/templates/metastore.mako:752
+#: src/metastore/templates/metastore.mako:769
 msgid "Add a description..."
 msgstr "설명 추가..."
 
-#: src/metastore/templates/metastore.mako:760
+#: src/metastore/templates/metastore.mako:777
 msgid "Overview"
 msgstr "개요"
 
-#: src/metastore/templates/metastore.mako:768
+#: src/metastore/templates/metastore.mako:785
 msgid "Permissions"
 msgstr "권한"
 
-#: src/metastore/templates/metastore.mako:769
+#: src/metastore/templates/metastore.mako:786
 msgid "Queries"
 msgstr "쿼리"
 
-#: src/metastore/templates/metastore.mako:770
+#: src/metastore/templates/metastore.mako:787
 msgid "Joins"
 msgstr "가입"
 
-#: src/metastore/templates/metastore.mako:773
-msgid "Relationships"
-msgstr "관계"
-
-#: src/metastore/templates/metastore.mako:776
+#: src/metastore/templates/metastore.mako:793
 msgid "Details"
 msgstr "세부 정보"
 
-#: src/metastore/templates/metastore.mako:788
+#: src/metastore/templates/metastore.mako:805
 msgid "Search for a column..."
 msgstr "열 검색..."
 
-#: src/metastore/templates/metastore.mako:994
+#: src/metastore/templates/metastore.mako:934
 msgid "Join Column"
 msgstr "가입 열"
 
-#: src/metastore/templates/metastore.mako:995
+#: src/metastore/templates/metastore.mako:935
 msgid "Join counts"
 msgstr "가입 수"
 
-#: src/metastore/templates/metastore.mako:1017
+#: src/metastore/templates/metastore.mako:957
 msgid "Inputs"
 msgstr "입력"
 
-#: src/metastore/templates/metastore.mako:1023
+#: src/metastore/templates/metastore.mako:963
 msgid "Not inputs"
 msgstr "입력 없음"
 
-#: src/metastore/templates/metastore.mako:1029
+#: src/metastore/templates/metastore.mako:969
 msgid "Targets"
 msgstr "대상"
 
-#: src/metastore/templates/metastore.mako:1035
+#: src/metastore/templates/metastore.mako:975
 msgid "Not targets"
 msgstr "대상 없음"
 
-#: src/metastore/templates/metastore.mako:1041
+#: src/metastore/templates/metastore.mako:981
 msgid "Source query"
 msgstr "소스 쿼리"
 
-#: src/metastore/templates/metastore.mako:1047
+#: src/metastore/templates/metastore.mako:987
 msgid "No source query"
 msgstr "소스 쿼리 없음"
 
-#: src/metastore/templates/metastore.mako:1053
+#: src/metastore/templates/metastore.mako:993
 msgid "Target queries"
 msgstr "대상 쿼리"
 
-#: src/metastore/templates/metastore.mako:1061
+#: src/metastore/templates/metastore.mako:1001
 msgid "Not target queries"
 msgstr "대상 쿼리 없음"
 
-#: src/metastore/templates/metastore.mako:1067
+#: src/metastore/templates/metastore.mako:1007
 msgid "Lineage"
 msgstr "계보"
 
-#: src/metastore/templates/metastore.mako:1069
+#: src/metastore/templates/metastore.mako:1009
 msgid "Open in Navigator "
 msgstr "Navigator에서 열기 "
 
-#: src/metastore/templates/metastore.mako:1070
+#: src/metastore/templates/metastore.mako:1010
 msgid "View in Navigator"
 msgstr "Navigator에서 보기"
 
-#: src/metastore/templates/metastore.mako:1150
+#: src/metastore/templates/metastore.mako:1090
 msgid "Do you really want to drop the table"
 msgstr "테이블을 삭제하시겠습니까?"
 
-#: src/metastore/templates/metastore.mako:1155
+#: src/metastore/templates/metastore.mako:1095
 msgid "Yes, drop this table"
 msgstr "예, 이 테이블 삭제"
 
-#: src/metastore/templates/metastore.mako:1189
+#: src/metastore/templates/metastore.mako:1132
 msgid "An error occurred fetching the table details. Please try again."
 msgstr "테이블 세부 정보를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1190
+#: src/metastore/templates/metastore.mako:1133
 msgid "An error occurred fetching the table fields. Please try again."
 msgstr "테이블 필드를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1191
+#: src/metastore/templates/metastore.mako:1134
 msgid "An error occurred fetching the table sample. Please try again."
 msgstr "테이블 샘플을 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1192
+#: src/metastore/templates/metastore.mako:1135
 msgid "An error occurred refreshing the table stats. Please try again."
 msgstr "테이블 상태를 가져오는 중 오류가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1193
+#: src/metastore/templates/metastore.mako:1136
 msgid "There was a problem loading the databases. Please try again."
 msgstr "데이터베이스를 로드하는 중 문제가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1194
+#: src/metastore/templates/metastore.mako:1137
 msgid "There was a problem loading the table preview. Please try again."
 msgstr "테이블 미리 보기를 로드하는 중 문제가 발생했습니다. 다시 시도하십시오."
 
-#: src/metastore/templates/metastore.mako:1225
+#: src/metastore/templates/metastore.mako:1168
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/metastore/templates/metastore.mako:1226
+#: src/metastore/templates/metastore.mako:1169
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
@@ -752,32 +765,8 @@ msgstr "데이터를 로드하면 해당 위치에서 테이블의 스토리지 
 msgid "Submit"
 msgstr "제출"
 
-#~ msgid "Beeswax Error"
+#~ msgid "Cannot get metadata for table: `%s`.`%s`"
 #~ msgstr ""
 
-#~ msgid "Actions"
-#~ msgstr ""
-
-#~ msgid "Show Table"
-#~ msgstr ""
-
-#~ msgid "Table has no partitions."
-#~ msgstr ""
-
-#~ msgid "%s : %s"
-#~ msgstr ""
-
-#~ msgid "Comment:"
-#~ msgstr ""
-
-#~ msgid "Partition Columns"
-#~ msgstr ""
-
-#~ msgid "Error!"
-#~ msgstr ""
-
-#~ msgid "Database %s"
-#~ msgstr ""
-
-#~ msgid "database"
+#~ msgid "Relationships"
 #~ msgstr ""

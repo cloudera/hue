@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2017-02-15 09:58-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,23 +17,23 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/rdbms/api.py:138 src/rdbms/api.py:183 src/rdbms/api.py:266
+#: src/rdbms/api.py:139 src/rdbms/api.py:184 src/rdbms/api.py:267
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
-#: src/rdbms/api.py:170 src/rdbms/api.py:208
+#: src/rdbms/api.py:171 src/rdbms/api.py:209
 msgid "There was an error with your query."
 msgstr "クエリにエラーがありました。"
 
-#: src/rdbms/api.py:293
+#: src/rdbms/api.py:294
 msgid "A GET request is required."
 msgstr "GET 要求が必要です。"
 
-#: src/rdbms/api.py:334
+#: src/rdbms/api.py:335
 msgid "Server specified doesn't exist."
 msgstr "指定されたサーバーが存在しません。"
 
-#: src/rdbms/api.py:340
+#: src/rdbms/api.py:341
 msgid "No databases are available. Permissions could be missing."
 msgstr "データベースを使用できません。パーミッションがない可能性があります。"
 
@@ -108,7 +108,7 @@ msgstr "テーブル名..."
 msgid "The selected database has no tables."
 msgstr "選択したデータベースにはテーブルがありません。"
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:821
+#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:818
 msgid "Query name"
 msgstr "クエリ名"
 
@@ -164,54 +164,50 @@ msgstr "説明"
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/rdbms/templates/execute.mako:395
+#: src/rdbms/templates/execute.mako:392
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
 
-#: src/rdbms/templates/execute.mako:584
+#: src/rdbms/templates/execute.mako:581
 msgid "Did you know?"
 msgstr "便利な使い方"
 
-#: src/rdbms/templates/execute.mako:670
+#: src/rdbms/templates/execute.mako:667
 msgid "No query provided to save."
 msgstr "保存するクエリが指定されていません。"
 
-#: src/rdbms/templates/execute.mako:692
+#: src/rdbms/templates/execute.mako:689
 msgid "Oops, no server found!"
 msgstr "サーバーが見つかりません。"
 
-#: src/rdbms/templates/execute.mako:698
+#: src/rdbms/templates/execute.mako:695
 msgid "Oops, no database found!"
 msgstr "データベースが見つかりません。"
 
-#: src/rdbms/templates/execute.mako:815
+#: src/rdbms/templates/execute.mako:812
 msgid "This field is required."
 msgstr "このフィールドは必須です。"
 
-#: src/rdbms/templates/execute.mako:828
+#: src/rdbms/templates/execute.mako:825
 msgid "Empty description"
 msgstr "空の説明"
 
-#: src/rdbms/templates/execute.mako:834
+#: src/rdbms/templates/execute.mako:831
 msgid "Query saved successfully!"
 msgstr "クエリが正常に保存されました。"
 
-#: src/rdbms/templates/execute.mako:880
+#: src/rdbms/templates/execute.mako:877
 msgid "No data available"
 msgstr "利用可能なデータがありません"
 
-#: src/rdbms/templates/execute.mako:881
+#: src/rdbms/templates/execute.mako:878
 msgid "No matching records"
 msgstr "一致するレコードがありません"
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:916
 msgid "Server error occured: "
 msgstr "サーバーエラーが発生しました： "
 
-#: src/rdbms/templates/execute.mako:922
+#: src/rdbms/templates/execute.mako:919
 msgid "Unmanageable server error occured: "
 msgstr "管理不能なサーバーエラーが発生しました： "
-
-#~ msgid "Share"
-#~ msgstr "共有"
-

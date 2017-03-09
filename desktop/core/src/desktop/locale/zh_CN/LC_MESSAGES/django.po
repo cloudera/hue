@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -50,31 +50,35 @@ msgstr "权限已更新！"
 msgid "Invalid value for perms, acceptable values are: owned, shared, both."
 msgstr "无效的权限值，可接受的值有：已拥有、共享、两者。"
 
-#: src/desktop/api2.py:266
+#: src/desktop/api2.py:265
 msgid "move_document requires source_doc_uuid and destination_doc_uuid"
 msgstr "move_document 需要 source_doc_uuid 和 destination_doc_uuid"
 
-#: src/desktop/api2.py:286
+#: src/desktop/api2.py:285
 msgid "create_directory requires parent_uuid and name"
 msgstr "create_directory 需要 parent_uuid 和姓名"
 
-#: src/desktop/api2.py:304
+#: src/desktop/api2.py:303
 msgid "update_document requires uuid"
 msgstr "update_document 需要 uuid"
 
-#: src/desktop/api2.py:339
+#: src/desktop/api2.py:338
 msgid "delete_document requires uuid"
 msgstr "delete_document 需要 uuid"
 
-#: src/desktop/api2.py:365
+#: src/desktop/api2.py:362
+msgid "restore_document requires comma separated uuids"
+msgstr "restore_document 要求使用以逗号分隔的 UUID"
+
+#: src/desktop/api2.py:385
 msgid "share_document requires uuid and perms_dict"
 msgstr "share_document 需要 uuid 和 perms_dict"
 
-#: src/desktop/api2.py:452
+#: src/desktop/api2.py:476
 msgid "Failed to import documents, the file does not contain valid JSON."
 msgstr "无法导入文档，该文件不包含有效的 JSON。"
 
-#: src/desktop/api2.py:456
+#: src/desktop/api2.py:480
 msgid ""
 "Failed to import documents, the file does not contain the expected JSON "
 "schema for Hue documents."
@@ -82,7 +86,7 @@ msgstr ""
 "无法导入文档，该文件不包含 Hue 文档的预期 JSON "
 "架构。"
 
-#: src/desktop/api2.py:686
+#: src/desktop/api2.py:712
 #, python-format
 msgid "Cannot import document, dependency with UUID: %s not found."
 msgstr "无法依赖于 UUID 导入文档：未找到 %s。"
@@ -91,57 +95,57 @@ msgstr "无法依赖于 UUID 导入文档：未找到 %s。"
 msgid "load_apps has already been called."
 msgstr "已调用 load_apps。"
 
-#: src/desktop/conf.py:97
+#: src/desktop/conf.py:109
 msgid "HTTP host to bind to."
 msgstr "要绑定的 HTTP 主机。"
 
-#: src/desktop/conf.py:103
+#: src/desktop/conf.py:115
 msgid "HTTP port to bind to."
 msgstr "要绑定的 HTTP 端口。"
 
-#: src/desktop/conf.py:109
+#: src/desktop/conf.py:121
 msgid "HTTP methods the server will be allowed to service."
 msgstr "将允许服务器提供服务的 HTTP 方法。"
 
-#: src/desktop/conf.py:116
+#: src/desktop/conf.py:128
 msgid "X-Frame-Options HTTP header value."
 msgstr "X-Frame 选项 HTTP 标头值。"
 
-#: src/desktop/conf.py:122
+#: src/desktop/conf.py:134
 msgid "Filename of SSL Certificate"
 msgstr "SSL 证书的文件名"
 
-#: src/desktop/conf.py:128
+#: src/desktop/conf.py:140
 msgid "Filename of SSL RSA Private Key"
 msgstr "SSL RSA 私钥的文件名"
 
-#: src/desktop/conf.py:134
+#: src/desktop/conf.py:146
 msgid "Filename of SSL Certificate Chain"
 msgstr "SSL 证书链的文件名"
 
-#: src/desktop/conf.py:140
+#: src/desktop/conf.py:152
 msgid "List of allowed and disallowed ciphers"
 msgstr "允许和禁止的密码列表"
 
-#: src/desktop/conf.py:162
+#: src/desktop/conf.py:174
 msgid "SSL password of the certificate"
 msgstr "证书的 SSL 密码"
 
-#: src/desktop/conf.py:167
+#: src/desktop/conf.py:179
 msgid ""
 "Execute this script to produce the SSL password. This will be used when "
 "`ssl_password` is not set."
 msgstr "执行此脚本以生成 SSL 密码。这将用于未设置 `ssl_password` 的情况。"
 
-#: src/desktop/conf.py:173
+#: src/desktop/conf.py:185
 msgid "Path to default Certificate Authority certificates."
 msgstr "默认证书颁发机构证书的路径。"
 
-#: src/desktop/conf.py:179
+#: src/desktop/conf.py:191
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "选择 Hue 是否应验证从服务器收到的证书。"
 
-#: src/desktop/conf.py:185
+#: src/desktop/conf.py:197
 msgid ""
 "Strict-Transport-Security: max-age=31536000 This is a HTTP response "
 "header, Once a supported browser receives this header that browser will "
@@ -153,7 +157,7 @@ msgstr ""
 "阻止通过 HTTP 向指定"
 "域发送任何通信，而是改为通过 HTTPS 发送所有通信。"
 
-#: src/desktop/conf.py:191
+#: src/desktop/conf.py:203
 msgid ""
 "Strict-Transport-Security: This is a HTTP response header, Once a "
 "supported browser receives this header that browser will prevent any "
@@ -165,7 +169,7 @@ msgstr ""
 "通信，"
 "而是改为通过 HTTPS 发送所有通信。"
 
-#: src/desktop/conf.py:197 src/desktop/conf.py:209
+#: src/desktop/conf.py:209 src/desktop/conf.py:221
 msgid ""
 "X-Content-Type-Options: nosniff This is a HTTP response header feature "
 "that helps prevent attacks based on MIME-type confusion."
@@ -173,7 +177,7 @@ msgstr ""
 "X-Content-Type-Options: 这是 HTTP 响应标头功能，"
 "该功能有助于防止基于 MIME 类型混淆的攻击。"
 
-#: src/desktop/conf.py:203
+#: src/desktop/conf.py:215
 msgid ""
 "X-Xss-Protection: \"1; mode=block\" This is a HTTP response header "
 "feature to force XSS protection."
@@ -181,15 +185,15 @@ msgstr ""
 "X-Xss-Protection: \"1; mode=block\" 这是 HTTP 响应标头"
 "功能，可用于强制执行 XSS 保护。"
 
-#: src/desktop/conf.py:220
+#: src/desktop/conf.py:232
 msgid "If all non-SSL requests should be permanently redirected to SSL."
 msgstr "如果所有非 SSL 请求都应永久重定向至 SSL。"
 
-#: src/desktop/conf.py:226
+#: src/desktop/conf.py:238
 msgid "If all non-SSL requests should be permanently redirected to this SSL host."
 msgstr "如果所有非 SSL 请求都应永久重定向至此 SSL 主机。"
 
-#: src/desktop/conf.py:232
+#: src/desktop/conf.py:244
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can not serve https."
@@ -197,74 +201,74 @@ msgstr ""
 "逗号分隔的字符串列表表示 Hue 服务器无法提供"
 " https 的主机/域名。"
 
-#: src/desktop/conf.py:239
+#: src/desktop/conf.py:251
 msgid ""
 "LDAP password of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
 msgstr "Hue 用户用于 LDAP 身份验证的 LDAP 密码。例如，使用 HiveServer2/Impala 进行 LDAP 身份验证。"
 
-#: src/desktop/conf.py:246
+#: src/desktop/conf.py:258
 msgid ""
 "Execute this script to produce the LDAP password. This will be used when "
 "`ldap_password` is not set."
 msgstr "执行此脚本以生成 LDAP 密码。这将用于未设置 `ldap_password` 的情况。"
 
-#: src/desktop/conf.py:254
+#: src/desktop/conf.py:266
 msgid ""
 "LDAP username of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
 msgstr "Hue 用户用于 LDAP 身份验证的 LDAP 用户名。例如，使用 HiveServer2/Impala 进行 LDAP 身份验证。"
 
-#: src/desktop/conf.py:264
+#: src/desktop/conf.py:276
 msgid ""
 "Auth username of the hue user used for authentications. For example for "
 "LDAP Authentication with HiveServer2/Impala."
 msgstr "Hue 用户用于身份验证的身份验证用户名。例如，使用 HiveServer2/Impala 进行 LDAP 身份验证。"
 
-#: src/desktop/conf.py:290
+#: src/desktop/conf.py:302
 msgid ""
 "LDAP/PAM/.. password of the hue user used for authentications. Inactive "
 "if empty. For example for LDAP Authentication with HiveServer2/Impala."
 msgstr "Hue 用户用于身份验证的 LDAP/PAM/.. 密码。例如，使用 HiveServer2/Impala 进行 LDAP 身份验证。"
 
-#: src/desktop/conf.py:296
+#: src/desktop/conf.py:308
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr "执行此脚本以生成身份验证密码。这将用于未设置 `auth_password` 的情况。"
 
-#: src/desktop/conf.py:303
+#: src/desktop/conf.py:315
 msgid ""
 "If set to false, runcpserver will not actually start the web server.  "
 "Used if Apache is being used as a WSGI container."
 msgstr "如果设置为 false，runcpserver 实际上将不启动 Web 服务器。如果 Apache 正用作 WSGI 容器，则使用它。"
 
-#: src/desktop/conf.py:309
+#: src/desktop/conf.py:321
 msgid "Number of threads used by the CherryPy web server."
 msgstr "CherryPy Web 服务器使用的线程数。"
 
-#: src/desktop/conf.py:315
+#: src/desktop/conf.py:327
 msgid "Used in hashing algorithms for sessions."
 msgstr "在会话的散列算法中使用。"
 
-#: src/desktop/conf.py:320
+#: src/desktop/conf.py:332
 msgid ""
 "Execute this script to produce the Django secret key. This will be used "
 "when `secret_key` is not set."
 msgstr "执行此脚本以生成 Django 密钥。这将用于未设置 `secret_key` 的情况。"
 
-#: src/desktop/conf.py:327
+#: src/desktop/conf.py:339
 msgid "Number of user access to remember per view per user."
 msgstr "要记住的每用户视图的用户访问数。"
 
-#: src/desktop/conf.py:333
+#: src/desktop/conf.py:345
 msgid ""
 "Help improve Hue with anonymous usage analytics.Use Google Analytics to "
 "see how many times an application or specific section of an application "
 "is used, nothing more."
 msgstr "使用匿名使用分析帮助改进 Hue。使用 Google Analytics 查看应用程序或应用程序特定部分的使用次数，就这么简单。"
 
-#: src/desktop/conf.py:340
+#: src/desktop/conf.py:352
 msgid ""
 "Tile layer server URL for the Leaflet map charts. Read more on "
 "http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile"
@@ -276,15 +280,15 @@ msgstr ""
 "域添加到 secure_content_security_policy "
 "配置参数的 img-src 部分中。"
 
-#: src/desktop/conf.py:346
+#: src/desktop/conf.py:358
 msgid "The copyright message for the specified Leaflet maps Tile Layer"
 msgstr "特定传单图图块层的版权消息"
 
-#: src/desktop/conf.py:351
+#: src/desktop/conf.py:363
 msgid "Use poll(2) in Hue thrift pool."
 msgstr "在 Hue Thrift 池中使用 poll(2)。"
 
-#: src/desktop/conf.py:358
+#: src/desktop/conf.py:370
 msgid ""
 "Comma-separated list of Django middleware classes to use. See "
 "https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on"
@@ -293,7 +297,7 @@ msgstr ""
 "用逗号分隔的要使用的 Django 中间件类列表。有关 Django 中的中间件的更多详情，请参阅 "
 "https://docs.djangoproject.com/en/1.4/ref/middleware/。"
 
-#: src/desktop/conf.py:366
+#: src/desktop/conf.py:378
 msgid ""
 "Comma-separated list of regular expressions, which match the redirect "
 "URL.For example, to restrict to your local domain and FQDN, the following"
@@ -302,85 +306,101 @@ msgstr ""
 "用逗号分隔的与重定向 URL 匹配的正则表达式列表。例如，要限制您的本地域和 "
 "FQDN，可使用以下值：^\\/.*$、^http:\\/\\/www.mydomain.com\\/.*$"
 
-#: src/desktop/conf.py:374
+#: src/desktop/conf.py:386
 msgid "Enable X-Forwarded-Host header if the load balancer requires it."
 msgstr "如果负载平衡器需要，请启用 X-Forwarded-Host 标头。"
 
-#: src/desktop/conf.py:380
+#: src/desktop/conf.py:392
 msgid ""
 "Support for HTTPS termination at the load-balancer level with "
 "SECURE_PROXY_SSL_HEADER."
 msgstr "支持 HTTPS 在平衡负载器级别为 SECURE_PROXY_SSL_HEADER 时终止。"
 
-#: src/desktop/conf.py:388
+#: src/desktop/conf.py:400
 msgid "Comma separated list of apps to not load at server startup."
 msgstr "在服务器启动时不加载的应用程序逗号分隔列表。"
 
-#: src/desktop/conf.py:393
+#: src/desktop/conf.py:405
 msgid "To set to true in combination when using Hue demo backend."
 msgstr "使用 Hue 演示后台时设置为 True 组合。"
 
-#: src/desktop/conf.py:400
+#: src/desktop/conf.py:412
 msgid "Use this file to parse and redact log message."
 msgstr "使用此文件解析和编校日志消息。"
 
-#: src/desktop/conf.py:408
+#: src/desktop/conf.py:420
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can serve."
 msgstr "字符串逗号分隔的列表表示 Hue 服务器可承担的主机/域名。"
 
-#: src/desktop/conf.py:455
+#: src/desktop/conf.py:432
+msgid "Base URL to Interface Remote Server"
+msgstr "接口远程服务器的基本 URL"
+
+#: src/desktop/conf.py:438
+msgid "Base URL to Interface API"
+msgstr "接口 API 的基本 URL"
+
+#: src/desktop/conf.py:444
+msgid "The Client ID of the Interface application."
+msgstr "接口应用程序的客户端 ID。"
+
+#: src/desktop/conf.py:450
+msgid "The Client Secret of the Interface application."
+msgstr "接口应用程序的客户端机密。"
+
+#: src/desktop/conf.py:503
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "用于连接到外部 SMTP 服务器的配置选项。"
 
-#: src/desktop/conf.py:459
+#: src/desktop/conf.py:507
 msgid "The SMTP server for email notification delivery."
 msgstr "发送电子邮件通知的 SMTP 服务器。"
 
-#: src/desktop/conf.py:466
+#: src/desktop/conf.py:514
 msgid "The SMTP server port."
 msgstr "SMTP 服务器端口。"
 
-#: src/desktop/conf.py:473
+#: src/desktop/conf.py:521
 msgid "The username for the SMTP host."
 msgstr "SMTP 主机用户名。"
 
-#: src/desktop/conf.py:480
+#: src/desktop/conf.py:528
 msgid "The password for the SMTP user."
 msgstr "SMTP 用户密码。"
 
-#: src/desktop/conf.py:488
+#: src/desktop/conf.py:536
 msgid ""
 "Execute this script to produce the SMTP user password. This will be used "
 "when the SMTP `password` is not set."
 msgstr "执行此脚本以生成 SMTP 用户密码。这将用于未设置 SMTP“密码”的情况。"
 
-#: src/desktop/conf.py:496
+#: src/desktop/conf.py:544
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr "与 SMTP 服务器会话时是否使用 TLS（安全）连接。"
 
-#: src/desktop/conf.py:503
+#: src/desktop/conf.py:551
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr "用于来自 Hue 的各种自动通知的默认电子邮件地址。"
 
-#: src/desktop/conf.py:512
+#: src/desktop/conf.py:560
 msgid "Configuration options for metrics"
 msgstr "度量的配置选项。"
 
-#: src/desktop/conf.py:516
+#: src/desktop/conf.py:564
 msgid "Enable metrics URL \"desktop/metrics\""
 msgstr "启用度量 URL \"desktop/metrics\""
 
-#: src/desktop/conf.py:521
+#: src/desktop/conf.py:569
 msgid "If specified, Hue will write metrics to this file"
 msgstr "如果指定，Hue 将度量写入到此文件"
 
-#: src/desktop/conf.py:525
+#: src/desktop/conf.py:573
 msgid "Time in milliseconds on how frequently to collect metrics"
 msgstr "收集度量频率的时间（以毫秒为单位）"
 
-#: src/desktop/conf.py:533
+#: src/desktop/conf.py:581
 msgid ""
 "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see "
@@ -390,41 +410,49 @@ msgstr ""
 "          有关详细信息，请参阅 "
 "http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
 
-#: src/desktop/conf.py:538
+#: src/desktop/conf.py:586
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "数据库引擎，如 postgresql_psycopg2、mysql 或 sqlite3。"
 
-#: src/desktop/conf.py:544
+#: src/desktop/conf.py:592
 msgid "Database name, or path to DB if using sqlite3."
 msgstr "数据库名称，或数据库路径（如果使用 sqlite3）。"
 
-#: src/desktop/conf.py:550
+#: src/desktop/conf.py:598
 msgid "Database username."
 msgstr "数据库用户名。"
 
-#: src/desktop/conf.py:556
+#: src/desktop/conf.py:604
+msgid ""
+"Database schema, to be used only when public schema is revoked in "
+"postgres."
+msgstr ""
+"数据库架构，只有在 "
+"postgres 中撤销公共架构后才会使用。"
+
+#: src/desktop/conf.py:610
 msgid "Database password."
 msgstr "数据库密码。"
 
-#: src/desktop/conf.py:563
+#: src/desktop/conf.py:617
 msgid ""
 "Execute this script to produce the database password. This will be used "
 "when `password` is not set."
 msgstr "执行此脚本以生成数据库密码。这将用于未设置“密码”的情况。"
 
-#: src/desktop/conf.py:570
+#: src/desktop/conf.py:624
 msgid "Database host."
 msgstr "数据库主机。"
 
-#: src/desktop/conf.py:576
+#: src/desktop/conf.py:630
 msgid "Database port."
 msgstr "数据库端口。"
 
-#: src/desktop/conf.py:582
+#: src/desktop/conf.py:636
 msgid "Database options to send to the server when connecting."
 msgstr "连接时发送到服务器的数据库选项。"
 
-#: src/desktop/conf.py:591
+#: src/desktop/conf.py:645
 msgid ""
 "Configuration options for specifying the Desktop session.\n"
 "          For more info, see "
@@ -434,29 +462,29 @@ msgstr ""
 "          有关详细信息，请参阅 "
 "https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
 
-#: src/desktop/conf.py:596
+#: src/desktop/conf.py:650
 msgid ""
 "The cookie containing the users' session ID will expire after this amount"
 " of time in seconds."
 msgstr "包含用户会话 ID 的 Cookie 将在此时间长度（以秒为单位）后过期。"
 
-#: src/desktop/conf.py:602
+#: src/desktop/conf.py:656
 msgid ""
 "The cookie containing the users' session ID will be secure. This should "
 "only be enabled with HTTPS."
 msgstr "包含用户会话 ID 的 Cookie 将是安全的。这仅应使用 HTTPS 启用。"
 
-#: src/desktop/conf.py:608
+#: src/desktop/conf.py:662
 msgid "The cookie containing the users' session ID will use the HTTP only flag."
 msgstr "包含用户会话 ID 的 Cookie 将使用 HTTP Only 标记。"
 
-#: src/desktop/conf.py:614
+#: src/desktop/conf.py:668
 msgid ""
 "Use session-length cookies. Logs out the user when she closes the browser"
 " window."
 msgstr "使用会话长度 cookie。当用户关闭浏览器窗口时注销用户。"
 
-#: src/desktop/conf.py:623
+#: src/desktop/conf.py:677
 msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
@@ -464,27 +492,27 @@ msgstr ""
 "用于指定 Hue 的 Kerberos 集成以\n"
 "          提供安全 Hadoop 集群的配置选项。"
 
-#: src/desktop/conf.py:628
+#: src/desktop/conf.py:682
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr "包含 Hue 的服务凭据的 Kerberos keytab 文件的路径。"
 
-#: src/desktop/conf.py:633
+#: src/desktop/conf.py:687
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr "Hue 的 Kerberos 主体名称。通常为“hue/hostname.foo.com”。"
 
-#: src/desktop/conf.py:638
+#: src/desktop/conf.py:692
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Hue 更新其 keytab 的频率（秒数）。"
 
-#: src/desktop/conf.py:643
+#: src/desktop/conf.py:697
 msgid "Path to keep Kerberos credentials cached."
 msgstr "保留缓存 Kerberos 凭据的路径。"
 
-#: src/desktop/conf.py:650
+#: src/desktop/conf.py:704
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Kerberos 'kinit' 命令的路径。"
 
-#: src/desktop/conf.py:659
+#: src/desktop/conf.py:713
 msgid ""
 "This property specifies the maximum size of the receive buffer in bytes "
 "in thrift sasl communication."
@@ -492,35 +520,35 @@ msgstr ""
 "此属性用于指定 thrift sasl 通信中接收缓冲区的"
 "最大大小（以字节为单位）。"
 
-#: src/desktop/conf.py:667
+#: src/desktop/conf.py:721
 msgid "Time zone name."
 msgstr "时区名称。"
 
-#: src/desktop/conf.py:674
+#: src/desktop/conf.py:728
 msgid "Default system-wide unicode encoding."
 msgstr "默认系统范围 unicode 编码。"
 
-#: src/desktop/conf.py:681
+#: src/desktop/conf.py:735
 msgid "Username to run servers as."
 msgstr "运行服务器的角色的用户名。"
 
-#: src/desktop/conf.py:687
+#: src/desktop/conf.py:741
 msgid "Group to run servers as."
 msgstr "运行服务器的角色的组。"
 
-#: src/desktop/conf.py:693
+#: src/desktop/conf.py:747
 msgid "This should be the user running hue webserver"
 msgstr "这应该是运行 Hue Web 服务器的用户"
 
-#: src/desktop/conf.py:699
+#: src/desktop/conf.py:753
 msgid "This should be the hdfs super user"
 msgstr "这应该是 HDFS 超级用户"
 
-#: src/desktop/conf.py:705
+#: src/desktop/conf.py:759
 msgid "Customizations to the UI."
 msgstr "UI 自定义。"
 
-#: src/desktop/conf.py:709
+#: src/desktop/conf.py:763
 msgid ""
 "Top banner HTML code. This code will be placed in the navigation bar so "
 "that it will reside at the top of the page in a fixed position. One "
@@ -529,23 +557,27 @@ msgstr ""
 "顶部横幅 HTML 代码。此代码将位于导航栏中，因此它将驻留在页面顶部的固定位置。一个公用值为 `<img "
 "src=\"http://www.example.com/example.gif\" />`"
 
-#: src/desktop/conf.py:714
+#: src/desktop/conf.py:768
 msgid ""
 "The login splash HTML code. This code will be placed in the login page, "
 "useful for security warning messages."
 msgstr "登录 splash HTML 代码。此代码位于登录页面，对安全性警告消息很有用。"
 
-#: src/desktop/conf.py:719
+#: src/desktop/conf.py:773
 msgid ""
 "The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
 "to 0 it disables the cache."
 msgstr "用于 assist/autocomplete/ 等呼叫的缓存 TTL（以毫秒为单位）。设置为 0，它将禁用缓存。"
 
-#: src/desktop/conf.py:724
+#: src/desktop/conf.py:776
+msgid "SVG code to replace the default Hue logo in the top bar and sign in screen"
+msgstr "SVG 代码，用于替换顶部栏和登录屏幕中的默认 Hue 徽标"
+
+#: src/desktop/conf.py:781
 msgid "Configuration options for user authentication into the web application."
 msgstr "到 Web 应用程序用户身份验证的配置选项。"
 
-#: src/desktop/conf.py:729
+#: src/desktop/conf.py:786
 msgid ""
 "Authentication backend.  Common settings are "
 "django.contrib.auth.backends.ModelBackend (fully Django backend), "
@@ -558,17 +590,17 @@ msgstr ""
 "后端）、desktop.auth.backend.AllowAllBackend（允许所有人）、desktop.auth.backend.AllowFirstUserDjangoBackend（首次登录后取决于"
 " Django 和用户管理员）。可通过按优先级顺序指定逗号分隔的列表支持多个身份验证后端。"
 
-#: src/desktop/conf.py:736
+#: src/desktop/conf.py:793
 msgid "Class which defines extra accessor methods for User objects."
 msgstr "定义用户对象的其他存取器方法的类。"
 
-#: src/desktop/conf.py:739
+#: src/desktop/conf.py:796
 msgid ""
 "The service to use when querying PAM. The service usually corresponds to "
 "a single filename in /etc/pam.d"
 msgstr "查询 PAM 时使用的服务。服务通常对应于 /etc/pam.d 中的单一文件名"
 
-#: src/desktop/conf.py:743
+#: src/desktop/conf.py:800
 msgid ""
 "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
 "the normalized name of the header that contains the remote user. The HTTP"
@@ -581,75 +613,75 @@ msgstr ""
 "时，会设置包含远程用户的标头的规范化名称。通过将所有字符转换为大写，用下划线替换所有连字符，并向名称中添加 HTTP_ 前缀，可将请求中的 "
 "HTTP 标头转换为密钥。因此，举例来说，如果标头称为 Remote-User，则可配置为 HTTP_REMOTE_USER"
 
-#: src/desktop/conf.py:750 src/desktop/conf.py:849
+#: src/desktop/conf.py:807 src/desktop/conf.py:906
 msgid "Ignore the case of usernames when searching for existing users in Hue."
 msgstr "在 Hue 中搜索现有用户时，忽略用户名的大小写。"
 
-#: src/desktop/conf.py:754
+#: src/desktop/conf.py:811
 msgid "Force usernames to lowercase when creating new users."
 msgstr "创建新用户时，用户名必须为小写。"
 
-#: src/desktop/conf.py:758
+#: src/desktop/conf.py:815
 msgid "Force usernames to uppercase when creating new users."
 msgstr "创建新用户时，用户名必须为大写。"
 
-#: src/desktop/conf.py:762
+#: src/desktop/conf.py:819
 msgid ""
 "Users will expire after they have not logged in for 'n' amount of "
 "seconds.A negative number means that users will never expire."
 msgstr "如果用户 'n' 秒内未登录，则将过期。负数表示用户永不过期。"
 
-#: src/desktop/conf.py:767
+#: src/desktop/conf.py:824
 msgid "Apply 'expires_after' to superusers."
 msgstr "将 'expires_after' 应用到超级用户。"
 
-#: src/desktop/conf.py:771
+#: src/desktop/conf.py:828
 msgid ""
 "Users will automatically be logged out after 'n' seconds of inactivity.A "
 "negative number means that idle sessions will not be timed out."
 msgstr "用户将在不活动“n”秒后自动注销。负数意味着空闲会话不会超时。"
 
-#: src/desktop/conf.py:777
+#: src/desktop/conf.py:834
 msgid ""
 "When set to true this will allow you to specify a password for the user "
 "when you create the user and then force them to change their password "
 "upon first login.  The default is false."
 msgstr "当设置为 true 时，可允许您在创建用户时为该用户指定密码，然后在首次登录时必须更改密码。默认设置为 false。"
 
-#: src/desktop/conf.py:785
+#: src/desktop/conf.py:842
 msgid ""
 "Number of login attempts allowed before a record is created for failed "
 "logins"
 msgstr "在为失败登录创建记录之前，允许的登录次数"
 
-#: src/desktop/conf.py:791
+#: src/desktop/conf.py:848
 msgid ""
 "After number of allowed login attempts are exceeded, do we lock out this "
 "IP and optionally user agent?"
 msgstr "在超过尝试登录的次数后，我们是否要锁定此 IP 和可选用户代理？"
 
-#: src/desktop/conf.py:797
+#: src/desktop/conf.py:854
 msgid ""
 "If set, defines period of inactivity in seconds after which failed logins"
 " will be forgotten"
 msgstr "如果已设置，定义在多久不活动时间段（秒）后忘记登录失败"
 
-#: src/desktop/conf.py:804
+#: src/desktop/conf.py:861
 msgid "If True, lock out based on IP and browser user agent"
 msgstr "如果为 True，根据 IP 和浏览器用户代理锁定"
 
-#: src/desktop/conf.py:810
+#: src/desktop/conf.py:867
 msgid ""
 "If True, lock out based on an IP address AND a user agent.This means "
 "requests from different user agents but from the same IP are treated "
 "differently."
 msgstr "如果为 True，根据 IP 地址和用户代理锁定。这意味着对来自不同用户代理、同一 IP 的请求具有不同的处理方式。"
 
-#: src/desktop/conf.py:817
+#: src/desktop/conf.py:874
 msgid "If True, lock out based on IP and user"
 msgstr "如果为 True，根据 IP 和用户锁定"
 
-#: src/desktop/conf.py:823
+#: src/desktop/conf.py:880
 msgid ""
 "If True, it will look for the IP address from the header defined at "
 "reverse_proxy_header."
@@ -657,7 +689,7 @@ msgstr ""
 "如果为 True，它将从在 "
 "reverse_proxy_header 处定义的标头中查找 IP 地址。"
 
-#: src/desktop/conf.py:829
+#: src/desktop/conf.py:886
 msgid ""
 "If behind_reverse_proxy is True, it will look for the IP address from "
 "this header. Default: HTTP_X_FORWARDED_FOR"
@@ -665,49 +697,49 @@ msgstr ""
 "如果 behind_reverse_proxy 为 True，它将从"
 "此标头中查找 IP 地址。默认值: HTTP_X_FORWARDED_FOR"
 
-#: src/desktop/conf.py:838
+#: src/desktop/conf.py:895
 msgid "Configuration options for LDAP connectivity."
 msgstr "LDAP 连接的配置选项。"
 
-#: src/desktop/conf.py:841
+#: src/desktop/conf.py:898
 msgid "Create users when they login with their LDAP credentials."
 msgstr "用户以其 LDAP 凭据登录后，创建用户。"
 
-#: src/desktop/conf.py:845
+#: src/desktop/conf.py:902
 msgid "Synchronize a users groups when they login."
 msgstr "在用户登录时同步用户组。"
 
-#: src/desktop/conf.py:853
+#: src/desktop/conf.py:910
 msgid "Force usernames to lowercase when creating new users from LDAP."
 msgstr "从 LDAP 创建新用户时，用户名必须为小写。"
 
-#: src/desktop/conf.py:857
+#: src/desktop/conf.py:914
 msgid "Force usernames to uppercase when creating new users from LDAP."
 msgstr "从 LDAP 创建新用户时，用户名必须为大写。"
 
-#: src/desktop/conf.py:861
+#: src/desktop/conf.py:918
 msgid ""
 "Choose which kind of subgrouping to use: nested or suboordinate "
 "(deprecated)."
 msgstr "选择要使用的子分组类型：嵌套或子级（不推荐使用）。"
 
-#: src/desktop/conf.py:865
+#: src/desktop/conf.py:922
 msgid "Define the number of levels to search for nested members."
 msgstr "定义搜索嵌套成员的级别数。"
 
-#: src/desktop/conf.py:869 src/desktop/conf.py:928
+#: src/desktop/conf.py:926 src/desktop/conf.py:985
 msgid "Whether or not to follow referrals."
 msgstr "无论是否按照参照。"
 
-#: src/desktop/conf.py:876 src/desktop/conf.py:935
+#: src/desktop/conf.py:933 src/desktop/conf.py:992
 msgid "Set to a value to enable python-ldap debugging."
 msgstr "设置值以启用 python-ldap 调试。"
 
-#: src/desktop/conf.py:880 src/desktop/conf.py:939
+#: src/desktop/conf.py:937 src/desktop/conf.py:996
 msgid "Sets the debug level within the underlying LDAP C lib."
 msgstr "在基本 LDAP C lib 中设置调试级别。"
 
-#: src/desktop/conf.py:884 src/desktop/conf.py:943
+#: src/desktop/conf.py:941 src/desktop/conf.py:1000
 msgid ""
 "Possible values for trace_level are 0 for no logging, 1 for only logging "
 "the method calls with arguments,2 for logging the method calls with "
@@ -717,27 +749,27 @@ msgstr ""
 "trace_level "
 "的可能值有：0（不记录）、1（仅记录具有参数的方法调用）、2（记录具有参数和完整结果的方法调用）、9（还记录方法调用的跟踪）。"
 
-#: src/desktop/conf.py:889
+#: src/desktop/conf.py:946
 msgid "LDAP server record."
 msgstr "LDAP 服务器记录。"
 
-#: src/desktop/conf.py:894 src/desktop/conf.py:981
+#: src/desktop/conf.py:951 src/desktop/conf.py:1038
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "用于 LDAP 搜索的基本 LDAP 可分辨名称。"
 
-#: src/desktop/conf.py:897 src/desktop/conf.py:984
+#: src/desktop/conf.py:954 src/desktop/conf.py:1041
 msgid "The NT domain used for LDAP authentication."
 msgstr "用于 LDAP 身份验证的 NT 域。"
 
-#: src/desktop/conf.py:900 src/desktop/conf.py:987
+#: src/desktop/conf.py:957 src/desktop/conf.py:1044
 msgid "The LDAP URL to connect to."
 msgstr "要连接至的 LDAP URL。"
 
-#: src/desktop/conf.py:904 src/desktop/conf.py:991
+#: src/desktop/conf.py:961 src/desktop/conf.py:1048
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "与 LDAP 服务器通信时使用 StartTLS。"
 
-#: src/desktop/conf.py:907 src/desktop/conf.py:994
+#: src/desktop/conf.py:964 src/desktop/conf.py:1051
 msgid ""
 "A PEM-format file containing certificates for the CA's that Hue will "
 "trust for authentication over TLS. The certificate for the CA that signed"
@@ -747,119 +779,119 @@ msgstr ""
 "如果 PEM 格式文件包含 CA 对此 Hue 颁发的证书，将支持通过 TLS 进行身份验证。在这些证书中必须包含对 LDAP 服务器证书签名的 "
 "CA 的证书。更多详情，请访问 http://www.openldap.org/doc/admin24/tls.html。"
 
-#: src/desktop/conf.py:910 src/desktop/conf.py:997
+#: src/desktop/conf.py:967 src/desktop/conf.py:1054
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "用于构造 LDAP 用户名的模式。"
 
-#: src/desktop/conf.py:913 src/desktop/conf.py:1000
+#: src/desktop/conf.py:970 src/desktop/conf.py:1057
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "从 LDAP 导入时，要进行绑定的可分辨名称。"
 
-#: src/desktop/conf.py:917 src/desktop/conf.py:1004
+#: src/desktop/conf.py:974 src/desktop/conf.py:1061
 msgid "The password for the bind user."
 msgstr "绑定用户的密码。"
 
-#: src/desktop/conf.py:922 src/desktop/conf.py:1009
+#: src/desktop/conf.py:979 src/desktop/conf.py:1066
 msgid ""
 "Execute this script to produce the LDAP bind user password. This will be "
 "used when `bind_password` is not set."
 msgstr "执行此脚本也生成 LDAP 绑定用户密码。这将用于未设置 `bind_password` 的情况。"
 
-#: src/desktop/conf.py:926 src/desktop/conf.py:1013
+#: src/desktop/conf.py:983 src/desktop/conf.py:1070
 msgid "Use search bind authentication."
 msgstr "使用搜索/绑定身份验证。"
 
-#: src/desktop/conf.py:948 src/desktop/conf.py:1017
+#: src/desktop/conf.py:1005 src/desktop/conf.py:1074
 msgid "Configuration for LDAP user schema and search."
 msgstr "LDAP 用户架构和搜索的配置。"
 
-#: src/desktop/conf.py:952 src/desktop/conf.py:1021
+#: src/desktop/conf.py:1009 src/desktop/conf.py:1078
 msgid "A base filter for use when searching for users."
 msgstr "搜索用户时使用的基础筛选器。"
 
-#: src/desktop/conf.py:955 src/desktop/conf.py:1024
+#: src/desktop/conf.py:1012 src/desktop/conf.py:1081
 msgid ""
 "The username attribute in the LDAP schema. Typically, this is "
 "'sAMAccountName' for AD and 'uid' for other LDAP systems."
 msgstr "LDAP 架构中的用户名属性。通常，对于 AD 为“sAMAccountName”，对于其他 LDAP 系统为“uid”。"
 
-#: src/desktop/conf.py:963 src/desktop/conf.py:1031
+#: src/desktop/conf.py:1020 src/desktop/conf.py:1088
 msgid "Configuration for LDAP group schema and search."
 msgstr "LDAP 组架构和搜索的配置。"
 
-#: src/desktop/conf.py:967 src/desktop/conf.py:1035
+#: src/desktop/conf.py:1024 src/desktop/conf.py:1092
 msgid "A base filter for use when searching for groups."
 msgstr "搜索组时使用的基础筛选器。"
 
-#: src/desktop/conf.py:970 src/desktop/conf.py:1038
+#: src/desktop/conf.py:1027 src/desktop/conf.py:1095
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "LDAP 架构中的组名属性。通常为 'cn'。"
 
-#: src/desktop/conf.py:974 src/desktop/conf.py:1042
+#: src/desktop/conf.py:1031 src/desktop/conf.py:1099
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "指定组成员的 LDAP 属性。"
 
-#: src/desktop/conf.py:1049
+#: src/desktop/conf.py:1106
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Oauth 1.0 身份验证的配置选项"
 
-#: src/desktop/conf.py:1053
+#: src/desktop/conf.py:1110
 msgid "The Consumer key of the application."
 msgstr "应用程序的使用者密钥。"
 
-#: src/desktop/conf.py:1060
+#: src/desktop/conf.py:1117
 msgid "The Consumer secret of the application."
 msgstr "应用程序的使用者机密。"
 
-#: src/desktop/conf.py:1067
+#: src/desktop/conf.py:1124
 msgid "The Request token URL."
 msgstr "请求令牌 URL。"
 
-#: src/desktop/conf.py:1074
+#: src/desktop/conf.py:1131
 msgid "The Access token URL."
 msgstr "访问令牌 URL。"
 
-#: src/desktop/conf.py:1081
+#: src/desktop/conf.py:1138
 msgid "The Authorize URL."
 msgstr "授权 URL。"
 
-#: src/desktop/conf.py:1092
+#: src/desktop/conf.py:1149
 msgid "Paths on the local file system that users should be able to browse."
 msgstr "本地文件系统上用户可以浏览的路径。"
 
-#: src/desktop/conf.py:1097
+#: src/desktop/conf.py:1154
 msgid "The path on the local filesystem."
 msgstr "本地文件系统上的路径。"
 
-#: src/desktop/conf.py:1106
+#: src/desktop/conf.py:1163
 msgid "Link for 'feedback' tab."
 msgstr "“反馈”选项卡链接。"
 
-#: src/desktop/conf.py:1113
+#: src/desktop/conf.py:1170
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr "是否从 JavaScript 向服务器日志发送调试消息。"
 
-#: src/desktop/conf.py:1120
+#: src/desktop/conf.py:1177
 msgid "Enable or disable database debug mode."
 msgstr "启用或禁用数据库调试模式。"
 
-#: src/desktop/conf.py:1127
+#: src/desktop/conf.py:1184
 msgid "Administrators that should receive error emails."
 msgstr "应接收错误电子邮件的管理员。"
 
-#: src/desktop/conf.py:1132
+#: src/desktop/conf.py:1189
 msgid "The full name of the admin."
 msgstr "管理员的全名。"
 
-#: src/desktop/conf.py:1135
+#: src/desktop/conf.py:1192
 msgid "The email address of the admin."
 msgstr "管理员的电子邮件地址。"
 
-#: src/desktop/conf.py:1139
+#: src/desktop/conf.py:1196
 msgid "Enable or disable Django debug mode."
 msgstr "启用或禁用 Django 调试模式。"
 
-#: src/desktop/conf.py:1146
+#: src/desktop/conf.py:1203
 msgid ""
 "Enable or disable debugging information in the 500 internal server error "
 "response. Note that the debugging information may contain sensitive data."
@@ -868,79 +900,79 @@ msgstr ""
 "在 500 内部服务器错误的响应中启用或禁用调试信息。请注意，调试信息可能包含敏感数据。如果 django_debug_mode 为 "
 "True，则此选项已自动启用。"
 
-#: src/desktop/conf.py:1155
+#: src/desktop/conf.py:1212
 msgid "Enable or disable memory profiling."
 msgstr "启用或禁用内存分析。"
 
-#: src/desktop/conf.py:1162
+#: src/desktop/conf.py:1219
 msgid ""
 "The directory where to store the auditing logs. Auditing is disable if "
 "the value is empty."
 msgstr "用于存储审查日志的目录。如果值为空，则禁用审查。"
 
-#: src/desktop/conf.py:1169
+#: src/desktop/conf.py:1226
 msgid "Size in KB/MB/GB for audit log to rollover."
 msgstr "待滚动的审查日志的大小 (KB/MB/GB)。"
 
-#: src/desktop/conf.py:1176
+#: src/desktop/conf.py:1233
 msgid "Email address that internal error messages should send as."
 msgstr "内部错误消息应发送至的电子邮件地址。"
 
-#: src/desktop/conf.py:1182
+#: src/desktop/conf.py:1239
 msgid "The email backend to use."
 msgstr "要使用的电子邮件后端。"
 
-#: src/desktop/conf.py:1191
-msgid "Enable the new editor SQL autocompleter"
-msgstr "启用新编辑器 SQL autocompleter"
+#: src/desktop/conf.py:1248
+msgid "Enable the improved editor autocomplete dropdown"
+msgstr "启用经过改进的编辑器自动完成下拉菜单"
 
-#: src/desktop/conf.py:1198
+#: src/desktop/conf.py:1255
 msgid ""
 "Timeout value in ms for autocomplete of columns, tables, values etc. 0 = "
 "disabled"
 msgstr "自动完成列、表、值等的超时值（以毫秒为单位）。0 = 禁用"
 
-#: src/desktop/conf.py:1205
+#: src/desktop/conf.py:1262
 msgid "Choose whether to show the new SQL editor."
 msgstr "选择是否显示新 SQL 编辑器。"
 
-#: src/desktop/conf.py:1212
+#: src/desktop/conf.py:1274
 msgid "Choose whether to show extended left and right panels."
 msgstr "选择是否显示扩展的左侧和右侧面板。"
 
-#: src/desktop/conf.py:1219
+#: src/desktop/conf.py:1281
 msgid "Enable saved default configurations for Hive, Impala, Spark, and Oozie."
 msgstr "启用 Hive、Impala、Spark 和 Oozie 保存的默认配置。"
 
-#: src/desktop/conf.py:1226
+#: src/desktop/conf.py:1289
 msgid "Choose whether to enable the new interface."
 msgstr "选择是否启用新接口。"
 
-#: src/desktop/conf.py:1241
+#: src/desktop/conf.py:1304
 msgid "If you set bind_password, then you must set bind_dn."
 msgstr "如果您设置了 bind_password，则必须设置 bind_dn。"
 
-#: src/desktop/conf.py:1244
+#: src/desktop/conf.py:1307
 msgid "If you set bind_dn, then you must set bind_password."
 msgstr "如果您设置了 bind_dn，则您必须设置 bind_password。"
 
-#: src/desktop/conf.py:1250
+#: src/desktop/conf.py:1313
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr "LDAP 仅部分配置。必须提供 LDAP URL。"
 
-#: src/desktop/conf.py:1256
+#: src/desktop/conf.py:1319
 msgid ""
 "LDAP is only partially configured. An NT Domain or username search "
 "pattern must be provided."
 msgstr "LDAP 仅部分配置。必须提供 NT 域或用户名搜索模式。"
 
-#: src/desktop/conf.py:1262
+#: src/desktop/conf.py:1325
 msgid ""
 "The LDAP username pattern should contain the special<username> "
 "replacement string for authentication."
 msgstr "LDAP 用户名模式应包含用于身份验证的特殊<username>替换字符串。"
 
-#: src/desktop/conf.py:1289
+#: src/desktop/conf.py:1352
 msgid ""
 "We recommend MySQL InnoDB engine over\n"
 "                                                        MyISAM which does"
@@ -950,7 +982,7 @@ msgstr ""
 "不支持事务的 MySQL InnoDB engine over\n"
 "                                                        MyISAM。"
 
-#: src/desktop/conf.py:1293
+#: src/desktop/conf.py:1356
 msgid ""
 "All tables in the database must be of the same\n"
 "                                                        storage engine "
@@ -960,33 +992,33 @@ msgstr ""
 "                       存储引擎"
 "类型（首选 InnoDB）。"
 
-#: src/desktop/conf.py:1298
+#: src/desktop/conf.py:1361
 msgid ""
 "SQLite is only recommended for development environments. It might cause "
 "the \"Database is locked\" error. Migrating to MySQL, Oracle or "
 "PostgreSQL is strongly recommended."
 msgstr "SQLite 仅建议用于开发环境。它可能会造成“数据库锁定”错误。强烈建议迁移至 MySQL、Oracle 或 PostgreSQL。"
 
-#: src/desktop/conf.py:1313
+#: src/desktop/conf.py:1376
 msgid ""
 "Secret key should be configured as a random string. All sessions will be "
 "lost on restart"
 msgstr "密钥应配置为一个随机字符串。重新启动时，所有会话将丢失。"
 
-#: src/desktop/conf.py:1319
+#: src/desktop/conf.py:1382
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "应设置 SSL 私钥文件，以启用 HTTPS。"
 
-#: src/desktop/conf.py:1325
+#: src/desktop/conf.py:1388
 msgid "Encoding not supported."
 msgstr "不支持编码。"
 
-#: src/desktop/conf.py:1334
+#: src/desktop/conf.py:1397
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "Keytab 应具有 0600 权限（具有 %o）。"
 
-#: src/desktop/conf.py:1353
+#: src/desktop/conf.py:1416
 msgid ""
 "Email notifications is disabled for Workflows and Jobs as SMTP server is "
 "localhost."
@@ -994,7 +1026,7 @@ msgstr ""
 "对于 Workflows 和 Jobs，系统将禁用电子邮件通知，因为 SMTP 服务器是"
 "本地主机。"
 
-#: src/desktop/converters.py:236
+#: src/desktop/converters.py:246
 #, python-format
 msgid "Failed to convert Document object: %s"
 msgstr "无法转换文档对象：%s"
@@ -1013,34 +1045,34 @@ msgstr "您必须为超级用户才可执行此操作。"
 msgid "Job %(id)s does not exist"
 msgstr "作业 %(id)s 不存在"
 
-#: src/desktop/middleware.py:231
+#: src/desktop/middleware.py:232
 #, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "%(module)s 不是中间件模块。"
 
-#: src/desktop/middleware.py:236
+#: src/desktop/middleware.py:237
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "导入中间件 %(module)s 时出错：\"%(error)s\"。"
 
-#: src/desktop/middleware.py:240
+#: src/desktop/middleware.py:241
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "中间件模块 \"%(module)s\" 未定义 \"%(class)s\" 类。"
 
-#: src/desktop/middleware.py:252
+#: src/desktop/middleware.py:253
 #, python-format
 msgid ""
 "AppSpecificMiddleware module \"%(module)s\" has a process_request "
 "function which is impossible."
 msgstr "AppSpecificMiddleware 模块 \"%(module)s\" 具有无法实现的 process_request 函数。"
 
-#: src/desktop/middleware.py:313
+#: src/desktop/middleware.py:314
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "您没有访问 %(app_name)s 应用程序的权限。"
 
-#: src/desktop/middleware.py:677
+#: src/desktop/middleware.py:650
 #, python-format
 msgid "Redirect to %s is not allowed."
 msgstr "不允许重定向至 %s。"
@@ -1075,11 +1107,11 @@ msgstr "权限被拒绝。%(username)s 不具备访问文档 %(id)s 所需的权
 msgid "Document %(id)s does not exist"
 msgstr "文档 %(id)s 不存在"
 
-#: src/desktop/models.py:579 src/desktop/models.py:1026
-#: src/desktop/templates/assist.mako:779
+#: src/desktop/models.py:579 src/desktop/models.py:1037
+#: src/desktop/templates/assist.mako:472
 #: src/desktop/templates/common_import_export.mako:75
-#: src/desktop/templates/document_browser.mako:483
-#: src/desktop/templates/document_browser.mako:676
+#: src/desktop/templates/document_browser.mako:484
+#: src/desktop/templates/document_browser.mako:696
 #: src/desktop/templates/sql_context_popover.mako:182
 msgid "Owner"
 msgstr "所有者"
@@ -1097,7 +1129,7 @@ msgid "Schema version"
 msgstr "架构版本"
 
 #: src/desktop/models.py:651 src/desktop/models.py:657
-#: src/desktop/models.py:1239 src/desktop/models.py:1250
+#: src/desktop/models.py:1265 src/desktop/models.py:1276
 msgid "Document does not exist or you don't have the permission to access it."
 msgstr "文档不存在或您没有对其进行访问的权限。"
 
@@ -1110,73 +1142,77 @@ msgstr "文档复制方法需要 content_object argument。"
 msgid "Only %s permissions are supported, not %s."
 msgstr "仅支持 %s 权限，不支持 %s。"
 
-#: src/desktop/models.py:949
+#: src/desktop/models.py:947
 #, python-format
 msgid "Document with UUID %s not found."
 msgstr "未找到具有 UUID %s 的文档。"
 
-#: src/desktop/models.py:982
+#: src/desktop/models.py:993
 #, python-format
 msgid "Requested invalid path for user %s: %s"
 msgstr "用户 %s 的请求路径无效：%s"
 
-#: src/desktop/models.py:984
+#: src/desktop/models.py:995
 #, python-format
 msgid "Duplicate documents found for user %s at path: %s"
 msgstr "在以下路径中找到用户 %s 的复制文档：%s"
 
-#: src/desktop/models.py:1026
+#: src/desktop/models.py:1037
 msgid "Creator."
 msgstr "创建者。"
 
-#: src/desktop/models.py:1030
+#: src/desktop/models.py:1041
 msgid "Type of document, e.g. Hive query, Oozie workflow, Search Dashboard..."
 msgstr "文档类型，例如 Hive 查询、Oozie workflow、搜索仪表板..."
 
-#: src/desktop/models.py:1034
+#: src/desktop/models.py:1045
 msgid "Searchable text for the document."
 msgstr "该文档的可搜索文本。"
 
-#: src/desktop/models.py:1037
+#: src/desktop/models.py:1048
 msgid "Time last modified"
 msgstr "上次修改时间"
 
-#: src/desktop/models.py:1038
+#: src/desktop/models.py:1049
 msgid "Document version"
 msgstr "文档版本"
 
-#: src/desktop/models.py:1040
+#: src/desktop/models.py:1051
 msgid "If managed under the cover by Hue and never by the user"
 msgstr "如果由 Hue 管理，且从不由用户管理。"
 
-#: src/desktop/models.py:1194
+#: src/desktop/models.py:1052
+msgid "True if trashed"
+msgstr "如果已移至垃圾桶，则为 True"
+
+#: src/desktop/models.py:1201
 #, python-format
 msgid "Document %s contains some special characters: %s"
 msgstr "文档 %s 包含一些特殊字符：%s"
 
-#: src/desktop/models.py:1199
+#: src/desktop/models.py:1206
 #, python-format
 msgid "Cannot create or modify directory with name: %s"
 msgstr "无法使用以下名称创建或修改目录：%s"
 
-#: src/desktop/models.py:1203
+#: src/desktop/models.py:1210
 #, python-format
 msgid ""
 "Cannot save document %s under parent directory %s due to circular "
 "dependency"
 msgstr "由于循环依赖，无法在父目录 %s 下保存文档 %s。"
 
-#: src/desktop/models.py:1216
+#: src/desktop/models.py:1223
 #, python-format
 msgid "Target with UUID %s is not a directory"
 msgstr "具有 UUID %s 的目标不是目录"
 
-#: src/desktop/models.py:1266
+#: src/desktop/models.py:1292
 #, python-format
 msgid "Failed to share document: %s"
 msgstr "无法共享文档：%s"
 
-#: src/desktop/models.py:1277
+#: src/desktop/models.py:1303
 #, python-format
 msgid "Invalid permission type: %s"
 msgstr "无效的权限类型：%s"
@@ -1217,26 +1253,26 @@ msgstr "巴西葡萄牙语"
 msgid "Simplified Chinese"
 msgstr "简体中文"
 
-#: src/desktop/settings.py:487
+#: src/desktop/settings.py:489
 #, python-format
 msgid "SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s"
 msgstr "由 REQUESTS_CA_BUNDLE 指出的 SSL 证书不存在：%s"
 
-#: src/desktop/views.py:132 src/desktop/views.py:148 src/desktop/views.py:258
-#: src/desktop/views.py:277 src/desktop/views.py:288 src/desktop/views.py:551
-#: src/desktop/views.py:586 src/desktop/views.py:596
+#: src/desktop/views.py:145 src/desktop/views.py:161 src/desktop/views.py:271
+#: src/desktop/views.py:290 src/desktop/views.py:301 src/desktop/views.py:566
+#: src/desktop/views.py:601 src/desktop/views.py:611
 msgid "You must be a superuser."
 msgstr "您必须是超级用户。"
 
-#: src/desktop/views.py:140
+#: src/desktop/views.py:153
 msgid "No logs found!"
 msgstr "未找到日志！"
 
-#: src/desktop/views.py:181
+#: src/desktop/views.py:194
 msgid "No logs found."
 msgstr "未找到日志。"
 
-#: src/desktop/views.py:291
+#: src/desktop/views.py:304
 msgid ""
 "You must enable the memory profiler via the memory_profiler config in the"
 " hue.ini."
@@ -1405,6 +1441,30 @@ msgstr "由于主机为空，无法替换 %s 模式。"
 #: src/desktop/lib/thrift_util.py:388
 msgid "Increase the sasl_max_buffer value in hue.ini"
 msgstr "增加 hue.ini 中的 sasl_max_buffer 值"
+
+#: src/desktop/lib/tasks/compress_files/compress_utils.py:36
+#, python-format
+msgid "HDFS Compression to %(upload_path)s/hue_compressed.zip"
+msgstr "HDFS 压缩至 %(upload_path)s/hue_compressed.zip"
+
+#: src/desktop/lib/tasks/extract_archive/extract_utils.py:33
+#, python-format
+msgid "HDFS Extraction of %(upload_path)s/%(file_name)s"
+msgstr "HDFS 提取 %(upload_path)s/%(file_name)s"
+
+#: src/desktop/lib/vcs/apis/base_api.py:40
+#, python-format
+msgid "Interface %s is unknown"
+msgstr "接口 %s 未知"
+
+#: src/desktop/lib/vcs/apis/github_api.py:53
+#: src/desktop/lib/vcs/apis/github_readonly_api.py:70
+msgid "url param is required"
+msgstr "需要 url 参数"
+
+#: src/desktop/lib/vcs/apis/github_api.py:62
+msgid "User is already authenticated to GitHub."
+msgstr "用户已经 GitHub 验证。"
 
 #: src/desktop/management/commands/config_dump.py:39
 msgid "Dumping configuration..."
@@ -1634,8 +1694,8 @@ msgid "Function Name"
 msgstr "函数名称"
 
 #: src/desktop/templates/about_layout.mako:36
-#: src/desktop/templates/common_header.mako:543
-#: src/desktop/templates/responsive.mako:180
+#: src/desktop/templates/common_header.mako:275
+#: src/desktop/templates/responsive.mako:204
 msgid "About Hue"
 msgstr "关于 Hue"
 
@@ -1654,388 +1714,455 @@ msgid "Server Logs"
 msgstr "服务器日志"
 
 #: src/desktop/templates/actionbar.mako:31
-#: src/desktop/templates/assist.mako:1153
+#: src/desktop/templates/assist.mako:854
+#: src/desktop/templates/common_notebook_ko_components.mako:458
 msgid "Search..."
 msgstr "搜索..."
 
-#: src/desktop/templates/assist.mako:435
+#: src/desktop/templates/assist.mako:58
 msgid "The database has no tables"
 msgstr "数据库无表"
 
-#: src/desktop/templates/assist.mako:443
+#: src/desktop/templates/assist.mako:66
 msgid "The table has no columns"
 msgstr "该表无列"
 
-#: src/desktop/templates/assist.mako:450 src/desktop/templates/assist.mako:456
-#: src/desktop/templates/assist.mako:510 src/desktop/templates/assist.mako:525
+#: src/desktop/templates/assist.mako:73 src/desktop/templates/assist.mako:79
+#: src/desktop/templates/assist.mako:136 src/desktop/templates/assist.mako:151
 msgid "Show details"
 msgstr "显示详细信息"
 
-#: src/desktop/templates/assist.mako:451 src/desktop/templates/assist.mako:511
-#: src/desktop/templates/document_browser.mako:711
+#: src/desktop/templates/assist.mako:74 src/desktop/templates/assist.mako:137
+#: src/desktop/templates/document_browser.mako:732
 msgid "Open"
 msgstr "打开"
 
-#: src/desktop/templates/assist.mako:457
+#: src/desktop/templates/assist.mako:80
 msgid "Insert at cursor"
 msgstr "在光标处插入"
 
-#: src/desktop/templates/assist.mako:468 src/desktop/templates/home.mako:193
+#: src/desktop/templates/assist.mako:82
+msgid "Open in Metastore"
+msgstr "在 Metastore 中打开"
+
+#: src/desktop/templates/assist.mako:94 src/desktop/templates/home.mako:193
 msgid "Project"
 msgstr "项目"
 
-#: src/desktop/templates/assist.mako:470
+#: src/desktop/templates/assist.mako:96
 msgid "Select"
 msgstr "选择"
 
-#: src/desktop/templates/assist.mako:471
+#: src/desktop/templates/assist.mako:97
 msgid "Select distinct"
 msgstr "选择不同"
 
-#: src/desktop/templates/assist.mako:476
+#: src/desktop/templates/assist.mako:102
 msgid "Aggregate"
 msgstr "汇总"
 
-#: src/desktop/templates/assist.mako:478
+#: src/desktop/templates/assist.mako:104
 #, fuzzy
 msgid "Count"
 msgstr "计数"
 
-#: src/desktop/templates/assist.mako:479
+#: src/desktop/templates/assist.mako:105
 msgid "Count distinct"
 msgstr "计数不同"
 
-#: src/desktop/templates/assist.mako:480
+#: src/desktop/templates/assist.mako:106
 msgid "Sum"
 msgstr "总和"
 
-#: src/desktop/templates/assist.mako:481
+#: src/desktop/templates/assist.mako:107
 #, fuzzy
 msgid "Minimum"
 msgstr "最小"
 
-#: src/desktop/templates/assist.mako:482
+#: src/desktop/templates/assist.mako:108
 msgid "Maximum"
 msgstr "最大"
 
-#: src/desktop/templates/assist.mako:483
+#: src/desktop/templates/assist.mako:109
 msgid "Average"
 msgstr "平均值"
 
-#: src/desktop/templates/assist.mako:488 src/desktop/templates/assist.mako:790
-#: src/desktop/templates/assist.mako:869 src/desktop/templates/assist.mako:1023
-#: src/desktop/templates/assist.mako:2045
+#: src/desktop/templates/assist.mako:114 src/desktop/templates/assist.mako:483
+#: src/desktop/templates/assist.mako:550 src/desktop/templates/assist.mako:714
+#: src/desktop/templates/assist.mako:1829
 msgid "Filter"
 msgstr "筛选器"
 
-#: src/desktop/templates/assist.mako:490
+#: src/desktop/templates/assist.mako:116
 msgid "Is null"
 msgstr "为空"
 
-#: src/desktop/templates/assist.mako:491
+#: src/desktop/templates/assist.mako:117
 msgid "Is not null"
 msgstr "不为空"
 
-#: src/desktop/templates/assist.mako:492
+#: src/desktop/templates/assist.mako:118
 msgid "Equal to"
 msgstr "等于"
 
-#: src/desktop/templates/assist.mako:493
+#: src/desktop/templates/assist.mako:119
 msgid "Not equal to"
 msgstr "不等于"
 
-#: src/desktop/templates/assist.mako:494
+#: src/desktop/templates/assist.mako:120
 msgid "Greater than"
 msgstr "大于"
 
-#: src/desktop/templates/assist.mako:495
+#: src/desktop/templates/assist.mako:121
 msgid "Less than"
 msgstr "小于"
 
-#: src/desktop/templates/assist.mako:499
+#: src/desktop/templates/assist.mako:125
 msgid "Order"
 msgstr "排序"
 
-#: src/desktop/templates/assist.mako:501
+#: src/desktop/templates/assist.mako:127
 msgid "Ascending"
 msgstr "升序"
 
-#: src/desktop/templates/assist.mako:502
+#: src/desktop/templates/assist.mako:128
 msgid "Descending"
 msgstr "降序"
 
-#: src/desktop/templates/assist.mako:545 src/desktop/templates/assist.mako:1051
+#: src/desktop/templates/assist.mako:141 src/desktop/templates/assist.mako:160
+#: src/desktop/templates/common_header_footer_components.mako:102
+msgid "Popular"
+msgstr "热门"
+
+#: src/desktop/templates/assist.mako:171 src/desktop/templates/assist.mako:752
 msgid "No results found"
 msgstr "未找到结果"
 
-#: src/desktop/templates/assist.mako:559
+#: src/desktop/templates/assist.mako:185
 msgid "Error loading columns."
 msgstr "加载列时出错。"
 
-#: src/desktop/templates/assist.mako:562
+#: src/desktop/templates/assist.mako:188
 msgid "Error loading fields."
 msgstr "加载字段时出错。"
 
-#: src/desktop/templates/assist.mako:612 src/desktop/templates/assist.mako:692
+#: src/desktop/templates/assist.mako:238 src/desktop/templates/assist.mako:385
 msgid "Size"
 msgstr "大小"
 
-#: src/desktop/templates/assist.mako:613 src/desktop/templates/assist.mako:697
+#: src/desktop/templates/assist.mako:239 src/desktop/templates/assist.mako:390
 msgid "Permissions"
 msgstr "权限"
 
-#: src/desktop/templates/assist.mako:624 src/desktop/templates/assist.mako:709
-#: src/desktop/templates/assist.mako:791 src/desktop/templates/assist.mako:870
-#: src/desktop/templates/assist.mako:919
+#: src/desktop/templates/assist.mako:250 src/desktop/templates/assist.mako:322
+#: src/desktop/templates/assist.mako:402 src/desktop/templates/assist.mako:484
+#: src/desktop/templates/assist.mako:551 src/desktop/templates/assist.mako:600
 msgid "Manual refresh"
 msgstr "手动刷新"
 
-#: src/desktop/templates/assist.mako:655 src/desktop/templates/assist.mako:740
-#: src/desktop/templates/assist.mako:826
+#: src/desktop/templates/assist.mako:281 src/desktop/templates/assist.mako:433
+#: src/desktop/templates/assist.mako:514
 #: src/desktop/templates/sql_context_popover.mako:564
 #: src/desktop/templates/sql_context_popover.mako:574
 #: src/desktop/templates/sql_context_popover.mako:592
-#: src/desktop/templates/sql_context_popover.mako:901
-#: src/desktop/templates/sql_context_popover.mako:929
-#: src/desktop/templates/sql_context_popover.mako:943
+#: src/desktop/templates/sql_context_popover.mako:906
+#: src/desktop/templates/sql_context_popover.mako:934
+#: src/desktop/templates/sql_context_popover.mako:948
 msgid "Details"
 msgstr "详细信息"
 
-#: src/desktop/templates/assist.mako:672 src/desktop/templates/assist.mako:757
-#: src/desktop/templates/assist.mako:842
+#: src/desktop/templates/assist.mako:298 src/desktop/templates/assist.mako:365
+#: src/desktop/templates/assist.mako:450 src/desktop/templates/assist.mako:530
 msgid "Empty directory"
 msgstr "空目录"
 
-#: src/desktop/templates/assist.mako:678 src/desktop/templates/assist.mako:763
-#: src/desktop/templates/assist.mako:849 src/desktop/templates/assist.mako:906
-#: src/desktop/templates/assist.mako:971
+#: src/desktop/templates/assist.mako:304 src/desktop/templates/assist.mako:371
+#: src/desktop/templates/assist.mako:456 src/desktop/templates/assist.mako:537
+#: src/desktop/templates/assist.mako:587 src/desktop/templates/assist.mako:652
 msgid "Error loading contents."
 msgstr "加载内容时出错。"
 
-#: src/desktop/templates/assist.mako:694
+#: src/desktop/templates/assist.mako:387
 msgid "User"
 msgstr "用户"
 
-#: src/desktop/templates/assist.mako:695
+#: src/desktop/templates/assist.mako:388
 #: src/desktop/templates/common_share.mako:35
 #: src/desktop/templates/common_share.mako:46
 #: src/desktop/templates/common_share2.mako:35
 #: src/desktop/templates/common_share2.mako:46
-#: src/desktop/templates/document_browser.mako:372
-#: src/desktop/templates/document_browser.mako:387
+#: src/desktop/templates/document_browser.mako:373
+#: src/desktop/templates/document_browser.mako:388
 msgid "Group"
 msgstr "组"
 
-#: src/desktop/templates/assist.mako:698
+#: src/desktop/templates/assist.mako:391
 msgid "Date"
 msgstr "日期"
 
-#: src/desktop/templates/assist.mako:777 src/desktop/templates/home.mako:191
+#: src/desktop/templates/assist.mako:470 src/desktop/templates/home.mako:191
 msgid "Description"
 msgstr "描述"
 
-#: src/desktop/templates/assist.mako:778
+#: src/desktop/templates/assist.mako:471
 msgid "Modified"
 msgstr "已修改"
 
-#: src/desktop/templates/assist.mako:879 src/desktop/templates/assist.mako:1781
+#: src/desktop/templates/assist.mako:560 src/desktop/templates/assist.mako:1536
 msgid "Collections"
 msgstr "集合"
 
-#: src/desktop/templates/assist.mako:884
+#: src/desktop/templates/assist.mako:565
 msgid "Show cores"
 msgstr "显示内核"
 
-#: src/desktop/templates/assist.mako:886
+#: src/desktop/templates/assist.mako:567
 msgid "Collection name..."
 msgstr "集合名称..."
 
-#: src/desktop/templates/assist.mako:900
+#: src/desktop/templates/assist.mako:581
 msgid "No collections available."
 msgstr "无可用集合。"
 
-#: src/desktop/templates/assist.mako:936
+#: src/desktop/templates/assist.mako:617
 msgid "Clusters"
 msgstr "集群"
 
-#: src/desktop/templates/assist.mako:960
+#: src/desktop/templates/assist.mako:641
 msgid "No clusters available."
 msgstr "无可用集群。"
 
-#: src/desktop/templates/assist.mako:963
+#: src/desktop/templates/assist.mako:644
 msgid "No tables available."
 msgstr "无可用表。"
 
-#: src/desktop/templates/assist.mako:985
+#: src/desktop/templates/assist.mako:666
 msgid "Sources"
 msgstr "源"
 
-#: src/desktop/templates/assist.mako:1004
+#: src/desktop/templates/assist.mako:685
 msgid "Clear cache"
 msgstr "清除缓存"
 
-#: src/desktop/templates/assist.mako:1008
+#: src/desktop/templates/assist.mako:689
 msgid "Perform incremental metadata update"
 msgstr "执行增量元数据更新"
 
-#: src/desktop/templates/assist.mako:1010
+#: src/desktop/templates/assist.mako:691
 msgid "This will sync missing tables in Hive."
 msgstr "这将同步 Hive 中缺失的表。"
 
-#: src/desktop/templates/assist.mako:1013
+#: src/desktop/templates/assist.mako:694
 msgid "Invalidate all metadata and rebuild index"
 msgstr "使所有元数据无效并重建索引"
 
-#: src/desktop/templates/assist.mako:1015
+#: src/desktop/templates/assist.mako:696
 msgid "WARNING: This can be both resource and time-intensive."
 msgstr "警告：可消耗资源和时间。"
 
-#: src/desktop/templates/assist.mako:1016
+#: src/desktop/templates/assist.mako:697
 msgid "Refresh"
 msgstr "刷新"
 
-#: src/desktop/templates/assist.mako:1025
-#: src/desktop/templates/assist.mako:1028
-#: src/desktop/templates/assist.mako:1033
+#: src/desktop/templates/assist.mako:705
+msgid "Sort"
+msgstr "排序"
+
+#: src/desktop/templates/assist.mako:707
+msgid "Default"
+msgstr "默认"
+
+#: src/desktop/templates/assist.mako:708
+msgid "Alphabetical"
+msgstr "按字母顺序"
+
+#: src/desktop/templates/assist.mako:710
+msgid "Popularity"
+msgstr "热门程度"
+
+#: src/desktop/templates/assist.mako:718
+msgid "Create table"
+msgstr "创建表"
+
+#: src/desktop/templates/assist.mako:721
+msgid "Create database"
+msgstr "创建数据库"
+
+#: src/desktop/templates/assist.mako:726 src/desktop/templates/assist.mako:729
+#: src/desktop/templates/assist.mako:734
 msgid "Manually refresh the table list"
 msgstr "手动刷新表列表"
 
-#: src/desktop/templates/assist.mako:1032
+#: src/desktop/templates/assist.mako:733
 msgid "Filter tables"
 msgstr "筛选表"
 
-#: src/desktop/templates/assist.mako:1041
+#: src/desktop/templates/assist.mako:742
+#: src/desktop/templates/common_header_footer_components.mako:99
 msgid "Databases"
 msgstr "数据库"
 
-#: src/desktop/templates/assist.mako:1046
+#: src/desktop/templates/assist.mako:747
 msgid "Database name..."
 msgstr "数据库名称..."
 
-#: src/desktop/templates/assist.mako:1065
+#: src/desktop/templates/assist.mako:766
 msgid "Error loading databases."
 msgstr "加载数据库时出错。"
 
-#: src/desktop/templates/assist.mako:1068
+#: src/desktop/templates/assist.mako:769
 msgid "No databases found."
 msgstr "未找到数据库。"
 
-#: src/desktop/templates/assist.mako:1075
-#: src/desktop/templates/assist.mako:1081
+#: src/desktop/templates/assist.mako:776 src/desktop/templates/assist.mako:782
+#: src/desktop/templates/assist.mako:1966
+#: src/desktop/templates/common_header_footer_components.mako:104
 msgid "Tables"
 msgstr "表"
 
-#: src/desktop/templates/assist.mako:1082
+#: src/desktop/templates/assist.mako:783
 msgid "Views"
 msgstr "视图"
 
-#: src/desktop/templates/assist.mako:1083
+#: src/desktop/templates/assist.mako:784
 msgid "Active"
 msgstr "活动"
 
-#: src/desktop/templates/assist.mako:1085
+#: src/desktop/templates/assist.mako:786
 msgid "Table name..."
 msgstr "表名..."
 
-#: src/desktop/templates/assist.mako:1094
+#: src/desktop/templates/assist.mako:795
 msgid "Error loading tables."
 msgstr "加载表时出错。"
 
-#: src/desktop/templates/assist.mako:1146
+#: src/desktop/templates/assist.mako:847
 msgid "No recent match found"
 msgstr "未找到最近匹配项"
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 #, fuzzy
 msgid "Search "
 msgstr "搜索 "
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 msgid " tables"
 msgstr " 表"
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 msgid " files"
 msgstr " 文件"
 
-#: src/desktop/templates/assist.mako:1203
+#: src/desktop/templates/assist.mako:906
 msgid "Search result"
 msgstr "搜索结果"
 
-#: src/desktop/templates/assist.mako:1206
+#: src/desktop/templates/assist.mako:909
 #: src/desktop/templates/common_import_export.mako:90
-#: src/desktop/templates/document_browser.mako:414
-#: src/desktop/templates/document_browser.mako:441
-#: src/desktop/templates/document_browser.mako:498
-#: src/desktop/templates/document_browser.mako:573
+#: src/desktop/templates/common_notebook_ko_components.mako:74
+#: src/desktop/templates/common_notebook_ko_components.mako:309
+#: src/desktop/templates/document_browser.mako:415
+#: src/desktop/templates/document_browser.mako:442
+#: src/desktop/templates/document_browser.mako:499
+#: src/desktop/templates/document_browser.mako:593
 msgid "Close"
 msgstr "关闭"
 
-#: src/desktop/templates/assist.mako:1212
+#: src/desktop/templates/assist.mako:915
 msgid "No result found."
 msgstr "未找到结果。"
 
-#: src/desktop/templates/assist.mako:1710
-#: src/desktop/templates/assist_m.mako:119
-#: src/desktop/templates/common_header.mako:161
-#: src/desktop/templates/common_header_m.mako:118
-#: src/desktop/templates/responsive.mako:74
-#: src/desktop/templates/responsive.mako:351
+#: src/desktop/templates/assist.mako:1462
+#: src/desktop/templates/assist_m.mako:118
+#: src/desktop/templates/common_header_footer_components.mako:87
+#: src/desktop/templates/common_header_m.mako:127
+#: src/desktop/templates/responsive.mako:558
 msgid "There was a problem loading the databases"
 msgstr "加载数据库时出现问题"
 
-#: src/desktop/templates/assist.mako:1711
-#: src/desktop/templates/assist_m.mako:120
+#: src/desktop/templates/assist.mako:1463
+#: src/desktop/templates/assist_m.mako:119
 msgid "There was a problem loading the table preview."
 msgstr "加载表预览时出现问题。"
 
-#: src/desktop/templates/assist.mako:1713
-#: src/desktop/templates/document_browser.mako:621
-#: src/desktop/templates/document_browser.mako:758
+#: src/desktop/templates/assist.mako:1465
+#: src/desktop/templates/document_browser.mako:641
+#: src/desktop/templates/document_browser.mako:779
 #: src/desktop/templates/home.mako:125
+#: src/desktop/templates/responsive.mako:115
+#: src/desktop/templates/responsive.mako:121
 msgid "Hive Query"
 msgstr "Hive 查询"
 
-#: src/desktop/templates/assist.mako:1714
+#: src/desktop/templates/assist.mako:1466
+#: src/desktop/templates/responsive.mako:113
 msgid "Query"
 msgstr "查询"
 
-#: src/desktop/templates/assist.mako:1715
-#: src/desktop/templates/common_header.mako:599
-#: src/desktop/templates/common_header.mako:603
-#: src/desktop/templates/common_header.mako:607
-#: src/desktop/templates/document_browser.mako:633
-#: src/desktop/templates/document_browser.mako:754
+#: src/desktop/templates/assist.mako:1467
+#: src/desktop/templates/common_header.mako:335
+#: src/desktop/templates/common_header.mako:339
+#: src/desktop/templates/common_header.mako:343
+#: src/desktop/templates/document_browser.mako:653
+#: src/desktop/templates/document_browser.mako:775
 msgid "Notebook"
 msgstr "笔记本"
 
-#: src/desktop/templates/assist.mako:1743
+#: src/desktop/templates/assist.mako:1499
 msgid "SQL"
 msgstr "SQL"
 
-#: src/desktop/templates/assist.mako:1756
+#: src/desktop/templates/assist.mako:1512
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/desktop/templates/assist.mako:1768
+#: src/desktop/templates/assist.mako:1524
 msgid "S3"
 msgstr "S3"
 
-#: src/desktop/templates/assist.mako:1793
-#: src/desktop/templates/common_header.mako:633
+#: src/desktop/templates/assist.mako:1548
+#: src/desktop/templates/common_header.mako:369
 msgid "HBase"
 msgstr "HBase"
 
-#: src/desktop/templates/assist.mako:1807
+#: src/desktop/templates/assist.mako:1562
 msgid "Documents"
 msgstr "文档"
 
-#: src/desktop/templates/assist.mako:1908
+#: src/desktop/templates/assist.mako:1576
+msgid "GIT"
+msgstr "GIT"
+
+#: src/desktop/templates/assist.mako:1678
 msgid "Cluster"
 msgstr "集群"
 
+#: src/desktop/templates/assist.mako:1705
+msgid "Region"
+msgstr "区域"
+
+#: src/desktop/templates/assist.mako:1968
+msgid "Load table and columns stats in order to improve recommendations"
+msgstr "加载表和列统计信息以改进建议"
+
+#: src/desktop/templates/assist.mako:1982
+msgid "Fields"
+msgstr "字段"
+
+#: src/desktop/templates/assist.mako:1998
+msgid "Suggestions"
+msgstr "建议"
+
+#: src/desktop/templates/assist.mako:2015
+msgid "Load past query history in order to improve recommendations"
+msgstr "加载过去的查询历史记录以改进建议"
+
+#: src/desktop/templates/assist.mako:2016
+msgid "Upload workload"
+msgstr "上传工作负载"
+
 #: src/desktop/templates/assist_m.mako:24
-#: src/desktop/templates/common_header_m.mako:291
+#: src/desktop/templates/common_header_m.mako:314
 #: src/desktop/templates/sql_context_popover.mako:152
 msgid "Assist"
 msgstr "辅助"
@@ -2141,395 +2268,1077 @@ msgstr "例如"
 msgid "Read more..."
 msgstr "阅读更多..."
 
-#: src/desktop/templates/common_footer.mako:94
-#: src/desktop/templates/responsive.mako:719
-msgid "You have signed in successfully!"
-msgstr "您已成功登录！"
-
-#: src/desktop/templates/common_header.mako:116
-#: src/desktop/templates/common_header_m.mako:73
-#: src/desktop/templates/error.mako:40
-msgid "Back"
-msgstr "返回"
-
-#: src/desktop/templates/common_header.mako:117
-#: src/desktop/templates/common_header_m.mako:74
-msgid "Select this folder"
-msgstr "选择此文件夹"
-
-#: src/desktop/templates/common_header.mako:118
-#: src/desktop/templates/common_header.mako:130
-#: src/desktop/templates/common_header_m.mako:75
-#: src/desktop/templates/common_header_m.mako:87
-msgid "Create folder"
-msgstr "创建文件夹"
-
-#: src/desktop/templates/common_header.mako:119
-#: src/desktop/templates/common_header.mako:131
-#: src/desktop/templates/common_header_m.mako:76
-#: src/desktop/templates/common_header_m.mako:88
-msgid "Folder name"
-msgstr "文件夹名称"
-
-#: src/desktop/templates/common_header.mako:120
-#: src/desktop/templates/common_header.mako:132
-#: src/desktop/templates/common_header_m.mako:77
-#: src/desktop/templates/common_header_m.mako:89
-#: src/desktop/templates/common_import_export.mako:37
-#: src/desktop/templates/document_browser.mako:437
-#: src/desktop/templates/document_browser.mako:514
-#: src/desktop/templates/document_browser.mako:532
-#: src/desktop/templates/document_browser.mako:576
-#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
-msgid "Cancel"
-msgstr "取消"
-
-#: src/desktop/templates/common_header.mako:121
-#: src/desktop/templates/common_header_m.mako:78
-msgid "The file has not been found"
-msgstr "未找到文件"
-
-#: src/desktop/templates/common_header.mako:122
-#: src/desktop/templates/common_header_m.mako:79
-msgid "Upload a file"
-msgstr "上传文件"
-
-#: src/desktop/templates/common_header.mako:123
-#: src/desktop/templates/common_header_m.mako:80
-msgid "Failed"
-msgstr "失败"
-
-#: src/desktop/templates/common_header.mako:138
-#: src/desktop/templates/common_header_m.mako:95
-msgid "Go to column:"
-msgstr "转到列："
-
-#: src/desktop/templates/common_header.mako:139
-#: src/desktop/templates/common_header_m.mako:96
-msgid "column name..."
-msgstr "列名称..."
-
-#: src/desktop/templates/common_header.mako:140
-#: src/desktop/templates/common_header_m.mako:97
-msgid "Click to lock this row"
-msgstr "单击以锁定此行"
-
-#: src/desktop/templates/common_header.mako:141
-#: src/desktop/templates/common_header_m.mako:98
-msgid "Click to unlock this row"
-msgstr "单击以解锁此行"
-
-#: src/desktop/templates/common_header.mako:147
-#: src/desktop/templates/common_header_m.mako:104
-msgid "Available tours"
-msgstr "可用导览"
-
-#: src/desktop/templates/common_header.mako:148
-#: src/desktop/templates/common_header_m.mako:105
-msgid "None for this page."
-msgstr "此页面为无。"
-
-#: src/desktop/templates/common_header.mako:149
-#: src/desktop/templates/common_header_m.mako:106
-msgid "Read more about it..."
-msgstr "阅读更多内容..."
-
-#: src/desktop/templates/common_header.mako:150
-#: src/desktop/templates/common_header_m.mako:107
-msgid "Demo tutorials"
-msgstr "演示教程"
-
-#: src/desktop/templates/common_header.mako:162
-#: src/desktop/templates/common_header_m.mako:119
-#: src/desktop/templates/responsive.mako:75
-msgid "There was a problem loading the preview"
-msgstr "加载预览时出现问题"
-
-#: src/desktop/templates/common_header.mako:460
+#: src/desktop/templates/common_header.mako:192
 msgid "Manage HDFS"
 msgstr "管理 HDFS"
 
-#: src/desktop/templates/common_header.mako:461
+#: src/desktop/templates/common_header.mako:193
 #: src/desktop/templates/sql_context_popover.mako:155
 msgid "File Browser"
 msgstr "文件浏览器"
 
-#: src/desktop/templates/common_header.mako:466
-#: src/desktop/templates/common_header.mako:467
+#: src/desktop/templates/common_header.mako:198
+#: src/desktop/templates/common_header.mako:199
 msgid "File Browsers"
 msgstr "文件浏览器"
 
-#: src/desktop/templates/common_header.mako:471
-#: src/desktop/templates/common_header.mako:480
+#: src/desktop/templates/common_header.mako:203
+#: src/desktop/templates/common_header.mako:212
 msgid "HDFS Browser"
 msgstr "HDFS 浏览器"
 
-#: src/desktop/templates/common_header.mako:474
-#: src/desktop/templates/common_header.mako:486
+#: src/desktop/templates/common_header.mako:206
+#: src/desktop/templates/common_header.mako:218
 msgid "S3 Browser"
 msgstr "S3 浏览器"
 
-#: src/desktop/templates/common_header.mako:493
-#: src/desktop/templates/common_header.mako:497
+#: src/desktop/templates/common_header.mako:225
+#: src/desktop/templates/common_header.mako:229
 msgid "Manage jobs"
 msgstr "管理作业"
 
-#: src/desktop/templates/common_header.mako:493
-#: src/desktop/templates/common_header.mako:494
+#: src/desktop/templates/common_header.mako:225
+#: src/desktop/templates/common_header.mako:226
 msgid "Job Browser"
 msgstr "作业浏览器"
 
-#: src/desktop/templates/common_header.mako:498
-#: src/desktop/templates/common_header.mako:500
+#: src/desktop/templates/common_header.mako:230
+#: src/desktop/templates/common_header.mako:232
 msgid "Job Browser 2"
 msgstr "Job Browser 2"
 
-#: src/desktop/templates/common_header.mako:507
+#: src/desktop/templates/common_header.mako:240
 msgid "Administration"
 msgstr "管理"
 
-#: src/desktop/templates/common_header.mako:518
+#: src/desktop/templates/common_header.mako:248
+#: src/desktop/templates/responsive.mako:191
 msgid "View Profile"
 msgstr "查看配置文件"
 
-#: src/desktop/templates/common_header.mako:520
+#: src/desktop/templates/common_header.mako:250
+#: src/desktop/templates/responsive.mako:191
 msgid "Edit Profile"
 msgstr "编辑配置文件"
 
-#: src/desktop/templates/common_header.mako:525
-#: src/desktop/templates/responsive.mako:177
+#: src/desktop/templates/common_header.mako:255
+#: src/desktop/templates/responsive.mako:201
 msgid "Manage Users"
 msgstr "管理用户"
 
-#: src/desktop/templates/common_header.mako:531
+#: src/desktop/templates/common_header.mako:263
 msgid "Documentation"
 msgstr "文档"
 
-#: src/desktop/templates/common_header.mako:534
-#: src/desktop/templates/common_header_m.mako:305
-#: src/desktop/templates/responsive.mako:182
+#: src/desktop/templates/common_header.mako:266
+#: src/desktop/templates/common_header_m.mako:328
+#: src/desktop/templates/responsive.mako:206
 msgid "Sign out"
 msgstr "注销"
 
-#: src/desktop/templates/common_header.mako:546
-#: src/desktop/templates/document_browser.mako:589
-#: src/desktop/templates/document_browser.mako:597
-#: src/desktop/templates/home.mako:94 src/desktop/templates/home2.mako:178
+#: src/desktop/templates/common_header.mako:282
+#: src/desktop/templates/common_home.mako:48
+#: src/desktop/templates/document_browser.mako:609
+#: src/desktop/templates/document_browser.mako:617
+#: src/desktop/templates/home.mako:94
 msgid "My documents"
 msgstr "我的文档"
 
-#: src/desktop/templates/common_header.mako:552
-#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
+#: src/desktop/templates/common_header.mako:288
+#: src/desktop/templates/common_home.mako:159
+#: src/desktop/templates/home.mako:562
 msgid "Query data"
 msgstr "查询数据"
 
-#: src/desktop/templates/common_header.mako:556
-#: src/desktop/templates/common_header.mako:558
-#: src/desktop/templates/common_header_m.mako:294
-#: src/desktop/templates/responsive.mako:107
+#: src/desktop/templates/common_header.mako:292
+#: src/desktop/templates/common_header.mako:294
+#: src/desktop/templates/common_header_m.mako:317
 msgid "Hive"
 msgstr "Hive"
 
-#: src/desktop/templates/common_header.mako:563
-#: src/desktop/templates/common_header.mako:565
-#: src/desktop/templates/common_header_m.mako:299
-#: src/desktop/templates/responsive.mako:110
+#: src/desktop/templates/common_header.mako:299
+#: src/desktop/templates/common_header.mako:301
+#: src/desktop/templates/common_header_m.mako:322
 msgid "Impala"
 msgstr "Impala"
 
-#: src/desktop/templates/common_header.mako:570
-#: src/desktop/templates/common_header.mako:572
+#: src/desktop/templates/common_header.mako:306
+#: src/desktop/templates/common_header.mako:308
 msgid "DB Query"
 msgstr "DB 查询"
 
-#: src/desktop/templates/common_header.mako:577
-#: src/desktop/templates/common_header.mako:579
+#: src/desktop/templates/common_header.mako:313
+#: src/desktop/templates/common_header.mako:315
 msgid "Pig"
 msgstr "Pig"
 
-#: src/desktop/templates/common_header.mako:583
+#: src/desktop/templates/common_header.mako:319
 msgid "Job Designer"
 msgstr "作业设计器"
 
-#: src/desktop/templates/common_header.mako:599
-#: src/desktop/templates/common_header.mako:604
-#: src/desktop/templates/common_header.mako:608
+#: src/desktop/templates/common_header.mako:335
+#: src/desktop/templates/common_header.mako:340
+#: src/desktop/templates/common_header.mako:344
 msgid "Notebooks"
 msgstr "笔记本"
 
-#: src/desktop/templates/common_header.mako:627
+#: src/desktop/templates/common_header.mako:363
 msgid "Manage data"
 msgstr "管理数据"
 
-#: src/desktop/templates/common_header.mako:630
+#: src/desktop/templates/common_header.mako:366
 msgid "Metastore Tables"
 msgstr "元存储表"
 
-#: src/desktop/templates/common_header.mako:636
+#: src/desktop/templates/common_header.mako:372
 msgid "Sqoop Transfer"
 msgstr "Sqoop 传输"
 
-#: src/desktop/templates/common_header.mako:639
+#: src/desktop/templates/common_header.mako:375
 msgid "ZooKeeper"
 msgstr "ZooKeeper"
 
-#: src/desktop/templates/common_header.mako:648
-#: src/desktop/templates/responsive.mako:118
+#: src/desktop/templates/common_header.mako:384
+#: src/desktop/templates/responsive.mako:133
 msgid "Schedule with Oozie"
 msgstr "Oozie 计划"
 
-#: src/desktop/templates/common_header.mako:651
-#: src/desktop/templates/common_header.mako:700
+#: src/desktop/templates/common_header.mako:387
+#: src/desktop/templates/common_header.mako:436
 msgid "Dashboards"
 msgstr "仪表板"
 
-#: src/desktop/templates/common_header.mako:653
-#: src/desktop/templates/common_header.mako:664
-#: src/desktop/templates/common_header.mako:673
-#: src/desktop/templates/responsive.mako:118
-#: src/desktop/templates/responsive.mako:120
-#: src/desktop/templates/responsive.mako:194
+#: src/desktop/templates/common_header.mako:389
+#: src/desktop/templates/common_header.mako:400
+#: src/desktop/templates/common_header.mako:409
+#: src/desktop/templates/responsive.mako:292
 msgid "Workflows"
 msgstr "Workflow"
 
-#: src/desktop/templates/common_header.mako:654
-#: src/desktop/templates/common_header.mako:665
-#: src/desktop/templates/common_header.mako:674
-#: src/desktop/templates/responsive.mako:121
+#: src/desktop/templates/common_header.mako:390
+#: src/desktop/templates/common_header.mako:401
+#: src/desktop/templates/common_header.mako:410
 msgid "Coordinators"
 msgstr "Coordinator"
 
-#: src/desktop/templates/common_header.mako:655
-#: src/desktop/templates/common_header.mako:666
-#: src/desktop/templates/common_header.mako:675
-#: src/desktop/templates/responsive.mako:122
+#: src/desktop/templates/common_header.mako:391
+#: src/desktop/templates/common_header.mako:402
+#: src/desktop/templates/common_header.mako:411
 msgid "Bundles"
 msgstr "Bundles"
 
-#: src/desktop/templates/common_header.mako:662
-#: src/desktop/templates/common_header.mako:671
+#: src/desktop/templates/common_header.mako:398
+#: src/desktop/templates/common_header.mako:407
 msgid "Editors"
 msgstr "编辑器"
 
-#: src/desktop/templates/common_header.mako:689
-#: src/desktop/templates/common_header.mako:693
-#: src/desktop/templates/document_browser.mako:641
+#: src/desktop/templates/common_header.mako:425
+#: src/desktop/templates/common_header.mako:429
+#: src/desktop/templates/document_browser.mako:661
 msgid "Solr Search"
 msgstr "Solr 搜索"
 
-#: src/desktop/templates/common_header.mako:689
-#: src/desktop/templates/common_header.mako:694
-#: src/desktop/templates/common_header_m.mako:303
+#: src/desktop/templates/common_header.mako:425
+#: src/desktop/templates/common_header.mako:430
+#: src/desktop/templates/common_header_m.mako:326
 #: src/desktop/templates/config_ko_components.mako:108
-#: src/desktop/templates/document_browser.mako:614
+#: src/desktop/templates/document_browser.mako:634
 #, fuzzy
 msgid "Search"
 msgstr "搜索"
 
-#: src/desktop/templates/common_header.mako:699
-#: src/desktop/templates/responsive.mako:113
+#: src/desktop/templates/common_header.mako:435
+#: src/desktop/templates/common_notebook_ko_components.mako:196
+#: src/desktop/templates/common_notebook_ko_components.mako:268
+#: src/desktop/templates/responsive.mako:127
 msgid "Dashboard"
 msgstr "控制面板"
 
-#: src/desktop/templates/common_header.mako:703
+#: src/desktop/templates/common_header.mako:439
 msgid "Indexes"
 msgstr "索引"
 
-#: src/desktop/templates/common_header.mako:708
+#: src/desktop/templates/common_header.mako:444
 msgid "Index"
 msgstr "索引"
 
-#: src/desktop/templates/common_header.mako:727
+#: src/desktop/templates/common_header.mako:463
 msgid "Hadoop Security"
 msgstr "Hadoop 安全性"
 
-#: src/desktop/templates/common_header.mako:730
+#: src/desktop/templates/common_header.mako:466
 msgid "Hive Tables"
 msgstr "Hive 表"
 
-#: src/desktop/templates/common_header.mako:733
+#: src/desktop/templates/common_header.mako:469
 msgid "Hive Tables v2"
 msgstr "Hive 表 v2"
 
-#: src/desktop/templates/common_header.mako:736
+#: src/desktop/templates/common_header.mako:472
 msgid "Solr Collections"
 msgstr "Solr 集合"
 
-#: src/desktop/templates/common_header.mako:738
+#: src/desktop/templates/common_header.mako:474
 msgid "File ACLs"
 msgstr "文件 ACLs"
 
-#: src/desktop/templates/common_header.mako:744
+#: src/desktop/templates/common_header.mako:480
 msgid "Other apps"
 msgstr "其他应用程序"
 
-#: src/desktop/templates/common_header.mako:760
+#: src/desktop/templates/common_header.mako:496
+#: src/desktop/templates/responsive.mako:65
 msgid "Feedback"
 msgstr "反馈"
 
+#: src/desktop/templates/common_header_footer_components.mako:42
+#: src/desktop/templates/common_header_m.mako:82
+#: src/desktop/templates/error.mako:40
+msgid "Back"
+msgstr "返回"
+
+#: src/desktop/templates/common_header_footer_components.mako:43
+#: src/desktop/templates/common_header_m.mako:83
+msgid "Select this folder"
+msgstr "选择此文件夹"
+
+#: src/desktop/templates/common_header_footer_components.mako:44
+#: src/desktop/templates/common_header_footer_components.mako:56
+#: src/desktop/templates/common_header_m.mako:84
+#: src/desktop/templates/common_header_m.mako:96
+msgid "Create folder"
+msgstr "创建文件夹"
+
+#: src/desktop/templates/common_header_footer_components.mako:45
+#: src/desktop/templates/common_header_footer_components.mako:57
+#: src/desktop/templates/common_header_m.mako:85
+#: src/desktop/templates/common_header_m.mako:97
+msgid "Folder name"
+msgstr "文件夹名称"
+
+#: src/desktop/templates/common_header_footer_components.mako:46
+#: src/desktop/templates/common_header_footer_components.mako:58
+#: src/desktop/templates/common_header_m.mako:86
+#: src/desktop/templates/common_header_m.mako:98
+#: src/desktop/templates/common_import_export.mako:37
+#: src/desktop/templates/common_notebook_ko_components.mako:280
+#: src/desktop/templates/document_browser.mako:438
+#: src/desktop/templates/document_browser.mako:515
+#: src/desktop/templates/document_browser.mako:533
+#: src/desktop/templates/document_browser.mako:553
+#: src/desktop/templates/document_browser.mako:596
+#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
+msgid "Cancel"
+msgstr "取消"
+
+#: src/desktop/templates/common_header_footer_components.mako:47
+#: src/desktop/templates/common_header_m.mako:87
+msgid "The file has not been found"
+msgstr "未找到文件"
+
+#: src/desktop/templates/common_header_footer_components.mako:48
+#: src/desktop/templates/common_header_m.mako:88
+msgid "Upload a file"
+msgstr "上传文件"
+
+#: src/desktop/templates/common_header_footer_components.mako:49
+#: src/desktop/templates/common_header_m.mako:89
+msgid "Failed"
+msgstr "失败"
+
+#: src/desktop/templates/common_header_footer_components.mako:64
+#: src/desktop/templates/common_header_m.mako:104
+msgid "Go to column:"
+msgstr "转到列："
+
+#: src/desktop/templates/common_header_footer_components.mako:65
+#: src/desktop/templates/common_header_m.mako:105
+msgid "column name..."
+msgstr "列名称..."
+
+#: src/desktop/templates/common_header_footer_components.mako:66
+#: src/desktop/templates/common_header_m.mako:106
+msgid "Click to lock this row"
+msgstr "单击以锁定此行"
+
+#: src/desktop/templates/common_header_footer_components.mako:67
+#: src/desktop/templates/common_header_m.mako:107
+msgid "Click to unlock this row"
+msgstr "单击以解锁此行"
+
+#: src/desktop/templates/common_header_footer_components.mako:73
+#: src/desktop/templates/common_header_m.mako:113
+msgid "Available tours"
+msgstr "可用导览"
+
+#: src/desktop/templates/common_header_footer_components.mako:74
+#: src/desktop/templates/common_header_m.mako:114
+msgid "None for this page."
+msgstr "此页面为无。"
+
+#: src/desktop/templates/common_header_footer_components.mako:75
+#: src/desktop/templates/common_header_m.mako:115
+msgid "Read more about it..."
+msgstr "阅读更多内容..."
+
+#: src/desktop/templates/common_header_footer_components.mako:76
+#: src/desktop/templates/common_header_m.mako:116
+msgid "Demo tutorials"
+msgstr "演示教程"
+
+#: src/desktop/templates/common_header_footer_components.mako:88
+#: src/desktop/templates/common_header_m.mako:128
+msgid "There was a problem loading the preview"
+msgstr "加载预览时出现问题"
+
+#: src/desktop/templates/common_header_footer_components.mako:96
+msgid "All"
+msgstr "所有"
+
+#: src/desktop/templates/common_header_footer_components.mako:97
+#: src/desktop/templates/sql_context_popover.mako:328
+#: src/desktop/templates/sql_context_popover.mako:584
+#: src/desktop/templates/sql_context_popover.mako:1313
+msgid "Columns"
+msgstr "列"
+
+#: src/desktop/templates/common_header_footer_components.mako:98
+msgid "CTEs"
+msgstr "CTE"
+
+#: src/desktop/templates/common_header_footer_components.mako:100
+msgid "Identifiers"
+msgstr "标识符"
+
+#: src/desktop/templates/common_header_footer_components.mako:101
+msgid "Keywords"
+msgstr "关键字"
+
+#: src/desktop/templates/common_header_footer_components.mako:103
+msgid "Samples"
+msgstr "示例"
+
+#: src/desktop/templates/common_header_footer_components.mako:105
+msgid "UDFs"
+msgstr "UDF"
+
+#: src/desktop/templates/common_header_footer_components.mako:106
+msgid "Variables"
+msgstr "变量"
+
+#: src/desktop/templates/common_header_footer_components.mako:109
+msgid "aggregate"
+msgstr "汇总"
+
+#: src/desktop/templates/common_header_footer_components.mako:110
+msgid "alias"
+msgstr "别名"
+
+#: src/desktop/templates/common_header_footer_components.mako:111
+msgid "cte"
+msgstr "cte"
+
+#: src/desktop/templates/common_header_footer_components.mako:112
+msgid "database"
+msgstr "数据库"
+
+#: src/desktop/templates/common_header_footer_components.mako:113
+msgid "filter"
+msgstr "筛选器"
+
+#: src/desktop/templates/common_header_footer_components.mako:114
+msgid "group by"
+msgstr "分组依据"
+
+#: src/desktop/templates/common_header_footer_components.mako:115
+msgid "join"
+msgstr "连接"
+
+#: src/desktop/templates/common_header_footer_components.mako:116
+msgid "condition"
+msgstr "条件"
+
+#: src/desktop/templates/common_header_footer_components.mako:117
+msgid "keyword"
+msgstr "关键字"
+
+#: src/desktop/templates/common_header_footer_components.mako:118
+msgid "order by"
+msgstr "排序依据"
+
+#: src/desktop/templates/common_header_footer_components.mako:119
+msgid "table"
+msgstr "表"
+
+#: src/desktop/templates/common_header_footer_components.mako:120
+msgid "value"
+msgstr "值"
+
+#: src/desktop/templates/common_header_footer_components.mako:121
+msgid "variable"
+msgstr "变量"
+
+#: src/desktop/templates/common_header_footer_components.mako:122
+msgid "view"
+msgstr "视图"
+
+#: src/desktop/templates/common_header_footer_components.mako:123
+msgid "virtual"
+msgstr "虚拟"
+
+#: src/desktop/templates/common_header_footer_components.mako:428
+msgid "You have signed in successfully!"
+msgstr "您已成功登录！"
+
+#: src/desktop/templates/common_home.mako:82
+msgid "An error occurred fetching the table details. Please try again."
+msgstr "获取表详细信息时出错。请重试。"
+
+#: src/desktop/templates/common_home.mako:83
+msgid "An error occurred fetching the table fields. Please try again."
+msgstr "获取表字段时出错。请重试。"
+
+#: src/desktop/templates/common_home.mako:84
+msgid "An error occurred fetching the table sample. Please try again."
+msgstr "获取表样本时出错。请重试。"
+
+#: src/desktop/templates/common_home.mako:85
+msgid "An error occurred refreshing the table stats. Please try again."
+msgstr "刷新表状态时出错。请重试。"
+
+#: src/desktop/templates/common_home.mako:86
+msgid "There was a problem loading the databases. Please try again."
+msgstr "加载数据库时出现问题。请重试。"
+
+#: src/desktop/templates/common_home.mako:87
+msgid "There was a problem loading the table preview. Please try again."
+msgstr "加载表预览时出现问题。请重试。"
+
+#: src/desktop/templates/common_home.mako:154
+#: src/desktop/templates/home.mako:555
+msgid "Did you know?"
+msgstr "您知道吗？"
+
+#: src/desktop/templates/common_home.mako:158
+#: src/desktop/templates/home.mako:561
+msgid "Step 1:"
+msgstr "步骤 1："
+
+#: src/desktop/templates/common_home.mako:158
+#: src/desktop/templates/home.mako:561
+msgid "Add data"
+msgstr "添加数据"
+
+#: src/desktop/templates/common_home.mako:159
+#: src/desktop/templates/home.mako:562
+msgid "Step 2:"
+msgstr "步骤 2："
+
+#: src/desktop/templates/common_home.mako:160
+#: src/desktop/templates/home.mako:563
+msgid "Step 3:"
+msgstr "步骤 3："
+
+#: src/desktop/templates/common_home.mako:160
+#: src/desktop/templates/home.mako:563
+msgid "Do more!"
+msgstr "执行更多操作！"
+
+#: src/desktop/templates/common_home.mako:168
+#: src/desktop/templates/home.mako:572
+msgid "With"
+msgstr "带"
+
+#: src/desktop/templates/common_home.mako:169
+#: src/desktop/templates/home.mako:573
+msgid "and the apps in the"
+msgstr "及应用程序"
+
+#: src/desktop/templates/common_home.mako:169
+#: src/desktop/templates/home.mako:573
+msgid "section, upload, view your data and create tables."
+msgstr "划分、上传、查看您的数据并创建表。"
+
+#: src/desktop/templates/common_home.mako:172
+#: src/desktop/templates/home.mako:576
+msgid "Pre-installed samples are also already there."
+msgstr "此处还提供预安装的样本。"
+
+#: src/desktop/templates/common_home.mako:181
+#: src/desktop/templates/home.mako:585
+msgid "Then query and visualize the data with the"
+msgstr "然后，通过以下项查询和可视化数据"
+
+#: src/desktop/templates/common_home.mako:182
+#: src/desktop/templates/document_browser.mako:581
+#: src/desktop/templates/document_browser.mako:583
+#: src/desktop/templates/home.mako:586
+msgid "and"
+msgstr "并"
+
+#: src/desktop/templates/common_home.mako:192
+#: src/desktop/templates/home.mako:596
+msgid "Tours were created to guide you around."
+msgstr "已创建为您提供指导的教程。"
+
+#: src/desktop/templates/common_home.mako:193
+#: src/desktop/templates/home.mako:597
+msgid "You can see the list of tours by clicking on the checkered flag icon"
+msgstr "您可以通过单击方格旗图标查看教程列表"
+
+#: src/desktop/templates/common_home.mako:198
+#: src/desktop/templates/home.mako:602
+msgid "Additional documentation is available at"
+msgstr "其他文档位于"
+
+#: src/desktop/templates/common_home.mako:205
+#: src/desktop/templates/home.mako:609
+msgid "Do not show this dialog again"
+msgstr "不再显示此对话框"
+
+#: src/desktop/templates/common_home.mako:206
+msgid "Got it!"
+msgstr "知道了！"
+
 #: src/desktop/templates/common_import_export.mako:33
-#: src/desktop/templates/document_browser.mako:425
+#: src/desktop/templates/document_browser.mako:426
 msgid "Import Hue documents"
 msgstr "导入 Hue 文档"
 
 #: src/desktop/templates/common_import_export.mako:38
-#: src/desktop/templates/document_browser.mako:438
+#: src/desktop/templates/document_browser.mako:439
 msgid "Import"
 msgstr "导入"
 
 #: src/desktop/templates/common_import_export.mako:42
-#: src/desktop/templates/document_browser.mako:447
+#: src/desktop/templates/document_browser.mako:448
 msgid "Select json file"
 msgstr "选择 json 文件"
 
 #: src/desktop/templates/common_import_export.mako:43
-#: src/desktop/templates/document_browser.mako:448
+#: src/desktop/templates/document_browser.mako:449
 msgid "Change"
 msgstr "更改"
 
 #: src/desktop/templates/common_import_export.mako:60
-#: src/desktop/templates/document_browser.mako:468
+#: src/desktop/templates/document_browser.mako:469
 msgid "Document Summary"
 msgstr "文档摘要"
 
 #: src/desktop/templates/common_import_export.mako:62
-#: src/desktop/templates/document_browser.mako:470
+#: src/desktop/templates/document_browser.mako:471
 msgid "Imported: "
 msgstr "已导入： "
 
 #: src/desktop/templates/common_import_export.mako:63
-#: src/desktop/templates/document_browser.mako:471
+#: src/desktop/templates/document_browser.mako:472
 msgid "Created: "
 msgstr "已创建： "
 
 #: src/desktop/templates/common_import_export.mako:64
-#: src/desktop/templates/document_browser.mako:472
+#: src/desktop/templates/document_browser.mako:473
 msgid "Updated: "
 msgstr "已更新： "
 
 #: src/desktop/templates/common_import_export.mako:67
-#: src/desktop/templates/document_browser.mako:475
+#: src/desktop/templates/document_browser.mako:476
 msgid "Show Details"
 msgstr "显示详细信息"
 
 #: src/desktop/templates/common_import_export.mako:73
 #: src/desktop/templates/config_ko_components.mako:492
 #: src/desktop/templates/config_ko_components.mako:497
-#: src/desktop/templates/document_browser.mako:481
-#: src/desktop/templates/document_browser.mako:673
+#: src/desktop/templates/document_browser.mako:482
+#: src/desktop/templates/document_browser.mako:693
 #: src/desktop/templates/home.mako:190
 #: src/desktop/templates/sql_context_popover.mako:335
-#: src/desktop/templates/sql_context_popover.mako:1319
-#: src/desktop/templates/sql_context_popover.mako:1322
+#: src/desktop/templates/sql_context_popover.mako:1324
+#: src/desktop/templates/sql_context_popover.mako:1327
 msgid "Name"
 msgstr "名称"
 
 #: src/desktop/templates/common_import_export.mako:74
-#: src/desktop/templates/document_browser.mako:482
-#: src/desktop/templates/document_browser.mako:675
-#: src/desktop/templates/sql_context_popover.mako:1325
+#: src/desktop/templates/document_browser.mako:483
+#: src/desktop/templates/document_browser.mako:695
+#: src/desktop/templates/sql_context_popover.mako:1330
 msgid "Type"
 msgstr "类型"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:40
+msgid "Add a new snippet"
+msgstr "添加新代码段"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:41
+msgid "Select snippet"
+msgstr "选择代码段"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:56
+msgid "Add Snippet"
+msgstr "添加代码段"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:173
+msgid "Export results"
+msgstr "导出结果"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:184
+#, python-format
+msgid "Download first %s rows as CSV"
+msgstr "以 CSV 格式下载前 %s 行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:185
+msgid "CSV"
+msgstr "CSV"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:189
+#, python-format
+msgid "Download first %s rows as XLS"
+msgstr "以 XLS 格式下载前 %s 行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:190
+msgid "Excel"
+msgstr "Excel"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:195
+msgid "Explore result in a dashboard"
+msgstr "在控制面板中查看结果"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:201
+msgid "Save the result in a file, a new table..."
+msgstr "将结果保存到文件（即新表）..."
+
+#: src/desktop/templates/common_notebook_ko_components.mako:202
+#: src/desktop/templates/common_notebook_ko_components.mako:281
+msgid "Save"
+msgstr "保存"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:217
+msgid "Save query result in a"
+msgstr "将查询结果保存在"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:227
+#, python-format
+msgid "File (first %s rows)"
+msgstr "文件（前 %s 行）"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:230
+msgid "Path to CSV file"
+msgstr "CSV 文件路径"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:234
+#: src/desktop/templates/common_notebook_ko_components.mako:578
+msgid "Overwrite"
+msgstr "覆盖"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:242
+#: src/desktop/templates/document_browser.mako:772
+msgid "Directory"
+msgstr "目录"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:245
+msgid "Path to empty directory"
+msgstr "空目录路径"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:256
+#: src/desktop/templates/sql_context_popover.mako:1328
+msgid "Table"
+msgstr "表"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:259
+msgid "Only alphanumeric and underscore characters"
+msgstr "仅限字母数字和下划线字符"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:259
+msgid "Table name or <database>.<table>"
+msgstr "表名或 <database>.<table>"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:271
+msgid "Index name"
+msgstr "索引名称"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:288
+msgid "Your download is being prepared"
+msgstr "正在准备下载"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:291
+msgid "Your downloaded results have been truncated"
+msgstr "您的下载结果已被截断"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:296
+msgid "Please wait, it might take a while..."
+msgstr "请稍候，该操作可能需要一些时间..."
+
+#: src/desktop/templates/common_notebook_ko_components.mako:299
+msgid ""
+"The number of resulting rows was too big to be downloaded and the "
+"resulting file has been truncated to"
+msgstr ""
+"结果行数过多，无法下载，"
+"结果文件已截断为"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:301
+msgid "rows."
+msgstr "行。"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:306
+msgid "Cancel Download"
+msgstr "取消下载"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:468
+msgid "Windows/Linux"
+msgstr "Windows/Linux"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:469
+msgid "Mac"
+msgstr "Mac"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:470
+msgid "Action"
+msgstr "操作"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:493
+msgid "Line Operations"
+msgstr "行操作"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:494
+msgid "Remove line"
+msgstr "删除行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:495
+msgid "Copy lines down"
+msgstr "向下复制行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:496
+msgid "Copy lines up"
+msgstr "向上复制行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:497
+msgid "Move lines down"
+msgstr "下移行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:498
+msgid "Move lines up"
+msgstr "上移行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:499
+msgid "Remove to line end"
+msgstr "删除到行尾"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:500
+msgid "Remove to line start"
+msgstr "删除到行首"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:501
+msgid "Remove word left"
+msgstr "删除左移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:502
+msgid "Remove word right"
+msgstr "删除右移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:503
+msgid "Split line"
+msgstr "拆分行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:505
+#, fuzzy
+msgid "Selection"
+msgstr "选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:506
+#: src/desktop/templates/config_ko_components.mako:109
+msgid "Select all"
+msgstr "全选"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:507
+msgid "Select left"
+msgstr "选择左侧"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:508
+msgid "Select right"
+msgstr "选择右侧"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:509
+msgid "Select word left"
+msgstr "选择左移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:510
+msgid "Select word right"
+msgstr "选择右移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:511
+msgid "Select line start"
+msgstr "选择行首"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:512
+msgid "Select line end"
+msgstr "选择行尾"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:513
+msgid "Select to line end"
+msgstr "选择到行尾"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:514
+msgid "Select to line start"
+msgstr "选择到行首"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:515
+msgid "Select up"
+msgstr "向上选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:516
+msgid "Select down"
+msgstr "向下选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:517
+msgid "Select page up"
+msgstr "向上选择页"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:518
+msgid "Select page down"
+msgstr "向下选择页"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:519
+msgid "Select to start"
+msgstr "选择到开始"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:520
+#, fuzzy
+msgid "Select to end"
+msgstr "选择到结束"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:521
+msgid "Duplicate selection"
+msgstr "复制选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:522
+msgid "Select to matching bracket"
+msgstr "选择匹配的括号"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:524
+msgid "Multi-cursor"
+msgstr "Multi-cursor"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:525
+msgid "Add multi-cursor above"
+msgstr "在上方添加 multi-cursor"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:526
+msgid "Add multi-cursor below"
+msgstr "在下方添加 multi-cursor"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:527
+msgid "Add next occurrence to multi-selection"
+msgstr "将下一个匹配项添加到多项选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:528
+msgid "Add previous occurrence to multi-selection"
+msgstr "将上一个匹配项添加到多项选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:529
+msgid "Move multicursor from current line to the line above"
+msgstr "将 multicursor 从当前行移至上方行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:530
+msgid "Move multicursor from current line to the line below"
+msgstr "将 multicursor 从当前行移至下方行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:531
+msgid "Remove current occurrence from multi-selection and move to next"
+msgstr "从多项选择删除当前匹配项并移至下一个匹配项"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:532
+msgid "Remove current occurrence from multi-selection and move to previous"
+msgstr "从多项选择删除当前匹配项并移至上一个匹配项"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:533
+msgid "Select all from multi-selection"
+msgstr "从多项选择中选择所有"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:535
+msgid "Go to"
+msgstr "转至"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:536
+msgid "Go to left"
+msgstr "转至左侧"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:537
+msgid "Go to right"
+msgstr "转至右侧"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:538
+msgid "Go to word left"
+msgstr "转至左移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:539
+msgid "Go to word right"
+msgstr "转至右移单词"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:540
+msgid "Go line up"
+msgstr "转至上一行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:541
+msgid "Go line down"
+msgstr "转至下一行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:542
+msgid "Go to line start"
+msgstr "转至行首"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:543
+msgid "Go to line end"
+msgstr "转至行尾"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:544
+msgid "Go to page up"
+msgstr "转至上一页"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:545
+msgid "Go to page down"
+msgstr "转至下一页"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:546
+msgid "Go to start"
+msgstr "转至开始"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:547
+msgid "Go to end"
+msgstr "转至结束"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:548
+msgid "Go to line"
+msgstr "转至行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:549
+msgid "Scroll line down"
+msgstr "向下滚动行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:550
+msgid "Scroll line up"
+msgstr "向上滚动行"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:551
+msgid "Go to matching bracket"
+msgstr "转至匹配的括号"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:552
+msgid "Scroll page down"
+msgstr "向下滚动页面"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:553
+msgid "Scroll page up"
+msgstr "向上滚动页面"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:555
+msgid "Find/Replace"
+msgstr "查找/替换"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:556
+msgid "Find"
+msgstr "查找"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:557
+msgid "Replace"
+msgstr "替换"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:558
+msgid "Find next"
+msgstr "查找下一项"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:559
+msgid "Find previous"
+msgstr "查找上一项"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:561
+msgid "Folding"
+msgstr "折叠"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:562
+msgid "Fold selection"
+msgstr "折叠选择"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:563
+msgid "Unfold"
+msgstr "展开"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:564
+msgid "Fold all"
+msgstr "折叠全部"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:565
+msgid "Unfold all"
+msgstr "展开全部"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:567
+#, fuzzy
+msgid "Other"
+msgstr "其他"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:568
+msgid "Autocomplete when Live Autocompletion is off"
+msgstr "实时自动填写处于关闭状态时自动填写"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:569
+msgid "Format selection or all"
+msgstr "设置选择项或所有项的格式"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:570
+msgid "Indent"
+msgstr "增加缩进"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:571
+msgid "Outdent"
+msgstr "减小缩进"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:572
+msgid "Undo"
+msgstr "撤消"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:573
+msgid "Redo"
+msgstr "重做"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:574
+msgid "Toggle comment"
+msgstr "切换注释"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:575
+msgid "Transpose letters"
+msgstr "转置字母"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:576
+msgid "Change to lower case"
+msgstr "更改为小写"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:577
+msgid "Change to upper case"
+msgstr "更改为大写"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:579
+msgid "Macros replay"
+msgstr "宏重播"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:580
+msgid "Macros recording"
+msgstr "宏录制"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:581
+#: src/desktop/templates/document_browser.mako:725
+msgid "Delete"
+msgstr "删除"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:582
+msgid "Center selection"
+msgstr "将选定内容居中"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:585
+msgid "Settings"
+msgstr "设置"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:586
+msgid "Show the settings menu"
+msgstr "显示设置菜单"
 
 #: src/desktop/templates/common_share.mako:24
 #: src/desktop/templates/common_share2.mako:24
@@ -2540,15 +3349,15 @@ msgstr "共享设置"
 #: src/desktop/templates/common_share.mako:61
 #: src/desktop/templates/common_share2.mako:29
 #: src/desktop/templates/common_share2.mako:61
-#: src/desktop/templates/document_browser.mako:363
-#: src/desktop/templates/document_browser.mako:403
-#: src/desktop/templates/document_browser.mako:406
+#: src/desktop/templates/document_browser.mako:364
+#: src/desktop/templates/document_browser.mako:404
+#: src/desktop/templates/document_browser.mako:407
 msgid "Read"
 msgstr "读取"
 
 #: src/desktop/templates/common_share.mako:30
 #: src/desktop/templates/common_share2.mako:30
-#: src/desktop/templates/document_browser.mako:364
+#: src/desktop/templates/document_browser.mako:365
 msgid "The document is not shared for read."
 msgstr "文档未共享为读取。"
 
@@ -2566,7 +3375,7 @@ msgstr "文档未共享为读取和修改。"
 
 #: src/desktop/templates/common_share.mako:54
 #: src/desktop/templates/common_share2.mako:54
-#: src/desktop/templates/document_browser.mako:401
+#: src/desktop/templates/document_browser.mako:402
 msgid "Type a username or a group name"
 msgstr "键入一个用户名或组名"
 
@@ -2586,10 +3395,6 @@ msgstr "检测到配置错误"
 #: src/desktop/templates/config_ko_components.mako:78
 msgid "Remove"
 msgstr "删除"
-
-#: src/desktop/templates/config_ko_components.mako:109
-msgid "Select all"
-msgstr "全选"
 
 #: src/desktop/templates/config_ko_components.mako:319
 #: src/desktop/templates/config_ko_components.mako:419
@@ -2622,184 +3427,186 @@ msgstr "类别，如 org.hue.Bar"
 msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
 msgstr "文件路径，如 hdfs://localhost:8020/user/hue/file.hue"
 
-#: src/desktop/templates/document_browser.mako:357
+#: src/desktop/templates/document_browser.mako:358
 #: src/desktop/templates/home.mako:194
 msgid "Sharing"
 msgstr "共享"
 
-#: src/desktop/templates/document_browser.mako:378
-#: src/desktop/templates/document_browser.mako:403
-#: src/desktop/templates/document_browser.mako:407
+#: src/desktop/templates/document_browser.mako:379
+#: src/desktop/templates/document_browser.mako:404
+#: src/desktop/templates/document_browser.mako:408
 msgid "Modify"
 msgstr "修改"
 
-#: src/desktop/templates/document_browser.mako:379
+#: src/desktop/templates/document_browser.mako:380
 msgid "The document is not shared for modify."
 msgstr "文档未共享为修改。"
 
-#: src/desktop/templates/document_browser.mako:397
+#: src/desktop/templates/document_browser.mako:398
 msgid "There was an error loading the document."
 msgstr "加载文档时出错。"
 
-#: src/desktop/templates/document_browser.mako:430
+#: src/desktop/templates/document_browser.mako:431
 msgid "Importing..."
 msgstr "正在导入..."
 
-#: src/desktop/templates/document_browser.mako:431
+#: src/desktop/templates/document_browser.mako:432
 msgid "Import complete!"
 msgstr "完成导入！"
 
-#: src/desktop/templates/document_browser.mako:432
+#: src/desktop/templates/document_browser.mako:433
 msgid "Import failed!"
 msgstr "导入失败！"
 
-#: src/desktop/templates/document_browser.mako:508
+#: src/desktop/templates/document_browser.mako:509
 msgid "Create Directory"
 msgstr "创建目录"
 
-#: src/desktop/templates/document_browser.mako:511
-#: src/desktop/templates/document_browser.mako:529
+#: src/desktop/templates/document_browser.mako:512
+#: src/desktop/templates/document_browser.mako:530
 msgid "Directory name"
 msgstr "目录名称"
 
-#: src/desktop/templates/document_browser.mako:515
+#: src/desktop/templates/document_browser.mako:516
 msgid "Create"
 msgstr "创建"
 
-#: src/desktop/templates/document_browser.mako:526
+#: src/desktop/templates/document_browser.mako:527
 msgid "Rename Directory"
 msgstr "重命名目录"
 
-#: src/desktop/templates/document_browser.mako:533
-#: src/desktop/templates/document_browser.mako:709
+#: src/desktop/templates/document_browser.mako:534
+#: src/desktop/templates/document_browser.mako:730
 msgid "Rename"
 msgstr "重命名"
 
 #: src/desktop/templates/document_browser.mako:544
-#: src/desktop/templates/document_browser.mako:686
+msgid "Restore these document(s) to Home directory?"
+msgstr "是否要将这些文档还原到主目录？"
+
+#: src/desktop/templates/document_browser.mako:554
+#: src/desktop/templates/document_browser.mako:597
+#: src/desktop/templates/home.mako:333
+#: src/desktop/templates/responsive.mako:447
+msgid "Yes"
+msgstr "是"
+
+#: src/desktop/templates/document_browser.mako:564
+#: src/desktop/templates/document_browser.mako:706
 msgid "The trash is empty"
 msgstr "垃圾为空"
 
-#: src/desktop/templates/document_browser.mako:547
+#: src/desktop/templates/document_browser.mako:567
 msgid "Do you really want to delete the following document(s)?"
 msgstr "是否确实要删除以下文档？"
 
-#: src/desktop/templates/document_browser.mako:558
+#: src/desktop/templates/document_browser.mako:578
 msgid "used by"
 msgstr "使用者"
 
-#: src/desktop/templates/document_browser.mako:561
-#: src/desktop/templates/document_browser.mako:563
-#: src/desktop/templates/home.mako:586 src/desktop/templates/home2.mako:349
-msgid "and"
-msgstr "并"
-
-#: src/desktop/templates/document_browser.mako:563
+#: src/desktop/templates/document_browser.mako:583
 #, fuzzy
 msgid "other"
 msgstr "其他"
 
-#: src/desktop/templates/document_browser.mako:577
-#: src/desktop/templates/home.mako:333
-msgid "Yes"
-msgstr "是"
-
-#: src/desktop/templates/document_browser.mako:593
+#: src/desktop/templates/document_browser.mako:613
 msgid "Result for"
 msgstr "结果"
 
-#: src/desktop/templates/document_browser.mako:597
-#: src/desktop/templates/document_browser.mako:601
+#: src/desktop/templates/document_browser.mako:617
+#: src/desktop/templates/document_browser.mako:621
 msgid "Trash"
 msgstr "垃圾桶"
 
-#: src/desktop/templates/document_browser.mako:609
+#: src/desktop/templates/document_browser.mako:629
 msgid "Search for name, description, etc..."
 msgstr "搜索名称、描述等..."
 
-#: src/desktop/templates/document_browser.mako:618
+#: src/desktop/templates/document_browser.mako:638
 #: src/desktop/templates/home.mako:122
 msgid "New document"
 msgstr "新文档"
 
-#: src/desktop/templates/document_browser.mako:624
-#: src/desktop/templates/document_browser.mako:759
+#: src/desktop/templates/document_browser.mako:644
+#: src/desktop/templates/document_browser.mako:780
 #: src/desktop/templates/home.mako:128
+#: src/desktop/templates/responsive.mako:116
+#: src/desktop/templates/responsive.mako:124
 msgid "Impala Query"
 msgstr "Impala 查询"
 
-#: src/desktop/templates/document_browser.mako:627
-#: src/desktop/templates/document_browser.mako:752
+#: src/desktop/templates/document_browser.mako:647
+#: src/desktop/templates/document_browser.mako:773
 #: src/desktop/templates/home.mako:131
 msgid "Pig Script"
 msgstr "Pig 脚本"
 
-#: src/desktop/templates/document_browser.mako:636
-#: src/desktop/templates/document_browser.mako:757
+#: src/desktop/templates/document_browser.mako:656
+#: src/desktop/templates/document_browser.mako:778
 msgid "Oozie Workflow"
 msgstr "Oozie Workflow"
 
-#: src/desktop/templates/document_browser.mako:637
-#: src/desktop/templates/document_browser.mako:756
+#: src/desktop/templates/document_browser.mako:657
+#: src/desktop/templates/document_browser.mako:777
 msgid "Oozie Coordinator"
 msgstr "Oozie Coordinator"
 
-#: src/desktop/templates/document_browser.mako:638
-#: src/desktop/templates/document_browser.mako:755
+#: src/desktop/templates/document_browser.mako:658
+#: src/desktop/templates/document_browser.mako:776
 msgid "Oozie Bundle"
 msgstr "Oozie Bundle"
 
-#: src/desktop/templates/document_browser.mako:641
-#: src/desktop/templates/document_browser.mako:760
+#: src/desktop/templates/document_browser.mako:661
+#: src/desktop/templates/document_browser.mako:781
 msgid "Search Dashboard"
 msgstr "搜索仪表板"
 
-#: src/desktop/templates/document_browser.mako:647
+#: src/desktop/templates/document_browser.mako:667
 msgid "New folder"
 msgstr "新文件夹"
 
-#: src/desktop/templates/document_browser.mako:648
+#: src/desktop/templates/document_browser.mako:668
 msgid "Rename folder"
 msgstr "重命名文件夹"
 
-#: src/desktop/templates/document_browser.mako:650
-#: src/desktop/templates/document_browser.mako:714
+#: src/desktop/templates/document_browser.mako:670
+#: src/desktop/templates/document_browser.mako:735
 msgid "Delete forever"
 msgstr "永久删除"
 
-#: src/desktop/templates/document_browser.mako:650
-#: src/desktop/templates/document_browser.mako:713
+#: src/desktop/templates/document_browser.mako:670
+#: src/desktop/templates/document_browser.mako:734
 msgid "Move to trash"
 msgstr "移至垃圾桶"
 
-#: src/desktop/templates/document_browser.mako:652
-#: src/desktop/templates/document_browser.mako:715
+#: src/desktop/templates/document_browser.mako:672
+#: src/desktop/templates/document_browser.mako:736
 msgid "Share"
 msgstr "共享"
 
-#: src/desktop/templates/document_browser.mako:654
-#: src/desktop/templates/document_browser.mako:712
+#: src/desktop/templates/document_browser.mako:674
+#: src/desktop/templates/document_browser.mako:733
 msgid "Download"
 msgstr "下载"
 
-#: src/desktop/templates/document_browser.mako:655
+#: src/desktop/templates/document_browser.mako:675
 msgid "Upload"
 msgstr "上传"
 
-#: src/desktop/templates/document_browser.mako:658
+#: src/desktop/templates/document_browser.mako:678
 msgid "Show trash"
 msgstr "显示垃圾"
 
-#: src/desktop/templates/document_browser.mako:662
+#: src/desktop/templates/document_browser.mako:682
 msgid "Empty trash"
 msgstr "清空垃圾桶"
 
-#: src/desktop/templates/document_browser.mako:677
+#: src/desktop/templates/document_browser.mako:697
 #: src/desktop/templates/home.mako:192
 msgid "Last Modified"
 msgstr "上次修改"
 
-#: src/desktop/templates/document_browser.mako:683
+#: src/desktop/templates/document_browser.mako:703
 msgid ""
 "The current folder is empty, you can add a new document or folder form "
 "the top right menu"
@@ -2807,32 +3614,28 @@ msgstr ""
 "当前文件夹为空，您可以从"
 "右上角菜单添加新文档或文件夹"
 
-#: src/desktop/templates/document_browser.mako:689
+#: src/desktop/templates/document_browser.mako:709
 msgid "No documents found matching your query"
 msgstr "未找到符合查询条件的文档"
 
-#: src/desktop/templates/document_browser.mako:692
+#: src/desktop/templates/document_browser.mako:712
 msgid "There was an error loading the documents"
 msgstr "加载文档时出错"
 
-#: src/desktop/templates/document_browser.mako:705
-msgid "Delete"
-msgstr "删除"
+#: src/desktop/templates/document_browser.mako:726
+msgid "Restore to Home"
+msgstr "还原到主目录"
 
-#: src/desktop/templates/document_browser.mako:751
-msgid "Directory"
-msgstr "目录"
-
-#: src/desktop/templates/document_browser.mako:753
+#: src/desktop/templates/document_browser.mako:774
 msgid "Job Design"
 msgstr "作业设计"
 
-#: src/desktop/templates/document_browser.mako:904
-#: src/desktop/templates/document_browser.mako:907
+#: src/desktop/templates/document_browser.mako:927
+#: src/desktop/templates/document_browser.mako:930
 msgid "selected"
 msgstr "选择"
 
-#: src/desktop/templates/document_browser.mako:904
+#: src/desktop/templates/document_browser.mako:927
 msgid "shared ignored"
 msgstr "忽略共享"
 
@@ -2882,6 +3685,8 @@ msgid "Oozie Scheduler"
 msgstr "Oozie 计划程序"
 
 #: src/desktop/templates/home.mako:140
+#: src/desktop/templates/responsive.mako:133
+#: src/desktop/templates/responsive.mako:135
 msgid "Workflow"
 msgstr "Workflow"
 
@@ -2890,6 +3695,7 @@ msgid "Coordinator"
 msgstr "Coordinator"
 
 #: src/desktop/templates/home.mako:142
+#: src/desktop/templates/responsive.mako:137
 msgid "Bundle"
 msgstr "Bundle"
 
@@ -2922,7 +3728,7 @@ msgid "Page"
 msgstr "页面"
 
 #: src/desktop/templates/home.mako:203
-#: src/desktop/templates/sql_context_popover.mako:741
+#: src/desktop/templates/sql_context_popover.mako:746
 msgid "of"
 msgstr "的"
 
@@ -2967,6 +3773,7 @@ msgid "All its documents will be moved to the default tag."
 msgstr "所有其文档将移至默认标记。"
 
 #: src/desktop/templates/home.mako:332
+#: src/desktop/templates/responsive.mako:446
 msgid "No"
 msgstr "否"
 
@@ -2992,101 +3799,13 @@ msgstr "处理操作时出错： "
 msgid "Project updated successfully."
 msgstr "已成功更新项目。"
 
-#: src/desktop/templates/home.mako:555 src/desktop/templates/home2.mako:321
-msgid "Did you know?"
-msgstr "您知道吗？"
-
-#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
-msgid "Step 1:"
-msgstr "步骤 1："
-
-#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
-msgid "Add data"
-msgstr "添加数据"
-
-#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
-msgid "Step 2:"
-msgstr "步骤 2："
-
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
-msgid "Step 3:"
-msgstr "步骤 3："
-
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
-msgid "Do more!"
-msgstr "执行更多操作！"
-
-#: src/desktop/templates/home.mako:572 src/desktop/templates/home2.mako:335
-msgid "With"
-msgstr "带"
-
-#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
-msgid "and the apps in the"
-msgstr "及应用程序"
-
-#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
-msgid "section, upload, view your data and create tables."
-msgstr "划分、上传、查看您的数据并创建表。"
-
-#: src/desktop/templates/home.mako:576 src/desktop/templates/home2.mako:339
-msgid "Pre-installed samples are also already there."
-msgstr "此处还提供预安装的样本。"
-
-#: src/desktop/templates/home.mako:585 src/desktop/templates/home2.mako:348
-msgid "Then query and visualize the data with the"
-msgstr "然后，通过以下项查询和可视化数据"
-
-#: src/desktop/templates/home.mako:596 src/desktop/templates/home2.mako:359
-msgid "Tours were created to guide you around."
-msgstr "已创建为您提供指导的教程。"
-
-#: src/desktop/templates/home.mako:597 src/desktop/templates/home2.mako:360
-msgid "You can see the list of tours by clicking on the checkered flag icon"
-msgstr "您可以通过单击方格旗图标查看教程列表"
-
-#: src/desktop/templates/home.mako:602 src/desktop/templates/home2.mako:365
-msgid "Additional documentation is available at"
-msgstr "其他文档位于"
-
-#: src/desktop/templates/home.mako:609 src/desktop/templates/home2.mako:372
-msgid "Do not show this dialog again"
-msgstr "不再显示此对话框"
-
 #: src/desktop/templates/home.mako:610
 msgid "Got it, prof!"
 msgstr "明白了！"
 
-#: src/desktop/templates/home2.mako:196
+#: src/desktop/templates/home2.mako:175
 msgid "Toggle Assist"
 msgstr "切换帮助"
-
-#: src/desktop/templates/home2.mako:253
-msgid "An error occurred fetching the table details. Please try again."
-msgstr "获取表详细信息时出错。请重试。"
-
-#: src/desktop/templates/home2.mako:254
-msgid "An error occurred fetching the table fields. Please try again."
-msgstr "获取表字段时出错。请重试。"
-
-#: src/desktop/templates/home2.mako:255
-msgid "An error occurred fetching the table sample. Please try again."
-msgstr "获取表样本时出错。请重试。"
-
-#: src/desktop/templates/home2.mako:256
-msgid "An error occurred refreshing the table stats. Please try again."
-msgstr "刷新表状态时出错。请重试。"
-
-#: src/desktop/templates/home2.mako:257
-msgid "There was a problem loading the databases. Please try again."
-msgstr "加载数据库时出现问题。请重试。"
-
-#: src/desktop/templates/home2.mako:258
-msgid "There was a problem loading the table preview. Please try again."
-msgstr "加载表预览时出现问题。请重试。"
-
-#: src/desktop/templates/home2.mako:373
-msgid "Got it!"
-msgstr "知道了！"
 
 #: src/desktop/templates/ko_components.mako:61
 msgid "Selected entry"
@@ -3100,47 +3819,59 @@ msgstr "此处为编辑器"
 msgid "I'm a metastore"
 msgstr "此处为 metastore"
 
-#: src/desktop/templates/login.mako:24
+#: src/desktop/templates/login.mako:26
 msgid "Welcome to Hue"
 msgstr "欢迎使用 Hue"
 
-#: src/desktop/templates/login.mako:47
+#: src/desktop/templates/login.mako:51
 msgid "Go to gethue.com"
 msgstr "转至 gethue.com"
 
-#: src/desktop/templates/login.mako:64
+#: src/desktop/templates/login.mako:79
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
 msgstr "由于这是您的首次登录，因此请选择任意用户名和密码。务必牢记此用户名和密码，因为"
 
-#: src/desktop/templates/login.mako:65
+#: src/desktop/templates/login.mako:80
 msgid "they will become your Hue superuser credentials."
 msgstr "它们将成为 Hue 超级用户凭据。"
 
-#: src/desktop/templates/login.mako:113
+#: src/desktop/templates/login.mako:128
 msgid "Create Account"
 msgstr "创建帐户"
 
-#: src/desktop/templates/login.mako:115
+#: src/desktop/templates/login.mako:130
 msgid "Sign In"
 msgstr "登录"
 
-#: src/desktop/templates/login.mako:130
+#: src/desktop/templates/login.mako:146
+msgid "Powered by"
+msgstr "提供商："
+
+#: src/desktop/templates/login.mako:148
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue 和 Hue 徽标是 Cloudera, Inc. 的商标"
 
-#: src/desktop/templates/login_modal.mako:32
-msgid "Your session has expired."
-msgstr "您的会话已过期。"
+#: src/desktop/templates/login_modal.mako:33
+msgid "Your session expired and your current action requires to"
+msgstr "您的会话已过期，当前操作需要"
 
-#: src/desktop/templates/login_modal.mako:36
-msgid "Reload this page to sign in again"
-msgstr "请重新加载此页面以重新登录"
+#: src/desktop/templates/login_modal.mako:35
+msgid "reload this page"
+msgstr "重新加载此页面"
 
 #: src/desktop/templates/login_modal.mako:39
-msgid "Please reload this page"
-msgstr "请重新加载此页面"
+msgid "We did not hear from you for about"
+msgstr "我们未收到您关于以下内容的信息，"
+
+#: src/desktop/templates/login_modal.mako:39
+msgid "and for security reasons Hue logged you out"
+msgstr "出于安全原因，Hue 已将您注销"
+
+#: src/desktop/templates/login_modal.mako:42
+msgid "Please reload this page to continue"
+msgstr "请重新加载此页面以继续"
 
 #: src/desktop/templates/logs.mako:68
 msgid "Search in the logs"
@@ -3171,80 +3902,143 @@ msgstr "更多信息"
 msgid "View Logs"
 msgstr "查看日志"
 
-#: src/desktop/templates/responsive.mako:94
+#: src/desktop/templates/responsive.mako:99
 msgid "Homepage"
 msgstr "主页"
 
-#: src/desktop/templates/responsive.mako:100
+#: src/desktop/templates/responsive.mako:105
+msgid "Open editor"
+msgstr "打开编辑器"
+
+#: src/desktop/templates/responsive.mako:105
 msgid "Compose"
 msgstr "编写"
 
-#: src/desktop/templates/responsive.mako:130
+#: src/desktop/templates/responsive.mako:113
+msgid "Query editor"
+msgstr "查询编辑器"
+
+#: src/desktop/templates/responsive.mako:129
+msgid "Presentation"
+msgstr "演示文稿"
+
+#: src/desktop/templates/responsive.mako:136
+#: src/desktop/templates/responsive.mako:398
+msgid "Schedule"
+msgstr "计划"
+
+#: src/desktop/templates/responsive.mako:145
 msgid "More..."
 msgstr "更多..."
 
-#: src/desktop/templates/responsive.mako:130
+#: src/desktop/templates/responsive.mako:145
 msgid "More"
 msgstr "更多"
 
-#: src/desktop/templates/responsive.mako:139
+#: src/desktop/templates/responsive.mako:154
 msgid "Add more..."
 msgstr "添加更多..."
 
-#: src/desktop/templates/responsive.mako:149
+#: src/desktop/templates/responsive.mako:164
 msgid "Search all data and saved documents..."
 msgstr "搜索所有数据和已保存文档..."
 
-#: src/desktop/templates/responsive.mako:178
+#: src/desktop/templates/responsive.mako:202
 msgid "Set Permissions"
 msgstr "设置权限"
 
-#: src/desktop/templates/responsive.mako:179
+#: src/desktop/templates/responsive.mako:203
 msgid "Help"
 msgstr "帮助"
 
-#: src/desktop/templates/responsive.mako:188
+#: src/desktop/templates/responsive.mako:212
+msgid "Submission history"
+msgstr "提交历史记录"
+
+#: src/desktop/templates/responsive.mako:235
+msgid "No logs available at this moment."
+msgstr "此时无可用日志。"
+
+#: src/desktop/templates/responsive.mako:244
+msgid "No history to be shown."
+msgstr "没有要显示的历史记录。"
+
+#: src/desktop/templates/responsive.mako:248
+msgid "History"
+msgstr "历史记录"
+
+#: src/desktop/templates/responsive.mako:249
+msgid "Clear the query history"
+msgstr "清除查询历史记录"
+
+#: src/desktop/templates/responsive.mako:286
 msgid "Running jobs and workflows"
 msgstr "运行作业和 Workflow"
 
-#: src/desktop/templates/responsive.mako:188
+#: src/desktop/templates/responsive.mako:286
+#: src/desktop/templates/responsive.mako:292
 msgid "Jobs"
 msgstr "作业"
 
-#: src/desktop/templates/responsive.mako:203
-msgid "Applications"
-msgstr "应用程序"
+#: src/desktop/templates/responsive.mako:292
+msgid "Schedules"
+msgstr "计划"
 
-#: src/desktop/templates/responsive.mako:213
+#: src/desktop/templates/responsive.mako:301
+msgid "Analyse"
+msgstr "分析"
+
+#: src/desktop/templates/responsive.mako:308
 #: src/desktop/templates/sql_context_popover.mako:355
 msgid "Browse"
 msgstr "浏览"
 
-#: src/desktop/templates/responsive.mako:222
-msgid "Drop files here"
-msgstr "将文件放到此处"
+#: src/desktop/templates/responsive.mako:318
+msgid "Apps"
+msgstr "应用程序"
 
-#: src/desktop/templates/responsive.mako:227
-#: src/desktop/templates/responsive.mako:277
+#: src/desktop/templates/responsive.mako:323
+msgid "Import data wizard"
+msgstr "导入数据向导"
+
+#: src/desktop/templates/responsive.mako:324
+msgid "Drop files or click"
+msgstr "删除文件或单击"
+
+#: src/desktop/templates/responsive.mako:330
+#: src/desktop/templates/responsive.mako:391
 msgid "Show Assist"
 msgstr "显示助手"
 
-#: src/desktop/templates/responsive.mako:228
-#: src/desktop/templates/responsive.mako:278
+#: src/desktop/templates/responsive.mako:331
+#: src/desktop/templates/responsive.mako:392
 msgid "Hide Assist"
 msgstr "隐藏助手"
 
-#: src/desktop/templates/responsive.mako:282
+#: src/desktop/templates/responsive.mako:396
 msgid "Assistant"
 msgstr "助手"
 
-#: src/desktop/templates/responsive.mako:283
+#: src/desktop/templates/responsive.mako:397
 msgid "Functions"
 msgstr "功能"
 
-#: src/desktop/templates/responsive.mako:284
-msgid "Schedules"
-msgstr "计划"
+#: src/desktop/templates/responsive.mako:420
+msgid "Sessions"
+msgstr "会话"
+
+#: src/desktop/templates/responsive.mako:440
+msgid "Confirm History Clear"
+msgstr "确认历史记录清除"
+
+#: src/desktop/templates/responsive.mako:443
+msgid "Are you sure you want to clear the query history?"
+msgstr "是否确定要清除查询历史记录？"
+
+#: src/desktop/templates/responsive.mako:985
+#: src/desktop/templates/responsive.mako:991
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
 #: src/desktop/templates/sql_context_popover.mako:152
 msgid "Show in Assist..."
@@ -3307,19 +4101,13 @@ msgstr "备注"
 #: src/desktop/templates/sql_context_popover.mako:201
 #: src/desktop/templates/sql_context_popover.mako:217
 #: src/desktop/templates/sql_context_popover.mako:290
-#: src/desktop/templates/sql_context_popover.mako:796
+#: src/desktop/templates/sql_context_popover.mako:801
 msgid "Tags"
 msgstr "标记"
 
 #: src/desktop/templates/sql_context_popover.mako:237
 msgid "The selected table has no data."
 msgstr "所选表没有数据。"
-
-#: src/desktop/templates/sql_context_popover.mako:328
-#: src/desktop/templates/sql_context_popover.mako:584
-#: src/desktop/templates/sql_context_popover.mako:1308
-msgid "Columns"
-msgstr "列"
 
 #: src/desktop/templates/sql_context_popover.mako:347
 #: src/desktop/templates/sql_context_popover.mako:637
@@ -3386,157 +4174,75 @@ msgstr "加载表分析时出现问题。"
 msgid "There was a problem loading the table partitions."
 msgstr "加载表分区时出现问题。"
 
-#: src/desktop/templates/sql_context_popover.mako:740
+#: src/desktop/templates/sql_context_popover.mako:745
 msgid "No results found."
 msgstr "未找到结果。"
 
-#: src/desktop/templates/sql_context_popover.mako:1310
+#: src/desktop/templates/sql_context_popover.mako:1315
 msgid "Filter columns..."
 msgstr "筛选列..."
 
-#: src/desktop/templates/sql_context_popover.mako:1323
-msgid "Table"
-msgstr "表"
-
-#: src/desktop/templates/sql_context_popover.mako:1342
+#: src/desktop/templates/sql_context_popover.mako:1347
 msgid "Show sample"
 msgstr "显示示例"
 
-#: src/desktop/templates/sql_context_popover.mako:1356
+#: src/desktop/templates/sql_context_popover.mako:1361
 msgid "No columns found"
 msgstr "未找到列"
 
-#: src/desktop/templates/tours.mako:23
-msgid "Get started!"
-msgstr "开始！"
-
-#: src/desktop/templates/tours.mako:24
-msgid "Your new home."
-msgstr "您的新主页。"
-
-#: src/desktop/templates/tours.mako:24
-msgid ""
-"This is where you can access all your documents and you can tag them per "
-"project. Your home is always reachable from any part of Hue, just click "
-"on the house icon on the top navigator bar."
-msgstr "您可在此访问所有文档并可按项目对其进行标记。只需单击顶部导航栏上的小房子图标即可随时从 Hue 的任何部分到达您的主页。"
-
 #: src/desktop/templates/tours.mako:25
-msgid "Actions and projects"
-msgstr "操作和项目"
-
-#: src/desktop/templates/tours.mako:25
-msgid ""
-"From here you can create new documents or see a specific project or any "
-"trashed document for instance."
-msgstr "例如，您可在此创建新文档，或查看特定项目或任何已移至垃圾桶的文档。"
-
-#: src/desktop/templates/tours.mako:26
-msgid "Organize!"
-msgstr "整理！"
-
-#: src/desktop/templates/tours.mako:26
-msgid ""
-"You can organize your documents in projects and filter them out in this "
-"area. It's a smart and fast way to focus on a specific project you are "
-"currently tackling."
-msgstr "您可整理项目中的文档并在此区域中将这些文档筛选出来。这是一种明智而快捷的方法，可专注于您当前正在处理的特定项目。"
-
-#: src/desktop/templates/tours.mako:27
-msgid "Your documents"
-msgstr "您的文档"
-
-#: src/desktop/templates/tours.mako:27
-msgid ""
-"You can always have a glance at your hard work. This is the list of all "
-"your documents, The first column tells you the kind of document that is, "
-"then you can find its name, a description and some other fields."
-msgstr "您始终可以对自己的努力成果有所了解。这是您所有文档的列表，第一列描述文档类型，随后是文档名称、说明和一些其他字段。"
-
-#: src/desktop/templates/tours.mako:28
-msgid "Projects"
-msgstr "项目"
-
-#: src/desktop/templates/tours.mako:28
-msgid ""
-"You can assign one or more projects to a document just by clicking in "
-"this cell."
-msgstr "您只需单击此单元格便可将一个或多个项目分配到文档。"
-
-#: src/desktop/templates/tours.mako:29
-msgid "Share your documents"
-msgstr "共享文档"
-
-#: src/desktop/templates/tours.mako:29
-msgid ""
-"You can also share a document you have worked on with a specific user or "
-"a group of users. Just click on the icon in this column on every document"
-" you want to share and choose users and groups from the popup."
-msgstr "您也可与特定用户或用户组共享您处理过的文档。只需在要共享的每个文档上单击此列中的图标，然后从弹出菜单中选择用户和组即可。"
-
-#: src/desktop/templates/tours.mako:30
-msgid "Search your documents"
-msgstr "搜索文档"
-
-#: src/desktop/templates/tours.mako:30
-msgid ""
-"You can always filter out the documents by name, description or even "
-"owner. Enjoy your new home!"
-msgstr "您可随时按名称、说明乃至所有者筛选文档。享受您的新主页吧！"
-
-#: src/desktop/templates/tours.mako:35
 msgid "Read more on the Hue blog"
 msgstr "阅读有关 Hue 博客的更多信息"
 
-#: src/desktop/templates/tours.mako:42
+#: src/desktop/templates/tours.mako:32
 msgid "Hue blog: Hive"
 msgstr "Hue 博客：Hive"
 
-#: src/desktop/templates/tours.mako:49
+#: src/desktop/templates/tours.mako:39
 msgid "Hue blog: Impala"
 msgstr "Hue 博客：Impala"
 
-#: src/desktop/templates/tours.mako:56
+#: src/desktop/templates/tours.mako:46
 msgid "Hue blog: DB Query"
 msgstr "Hue 博客：DB 查询"
 
-#: src/desktop/templates/tours.mako:63
+#: src/desktop/templates/tours.mako:53
 msgid "Hue blog: Pig"
 msgstr "Hue 博客：Pig"
 
-#: src/desktop/templates/tours.mako:70
+#: src/desktop/templates/tours.mako:60
 msgid "Hue blog: Spark"
 msgstr "Hue 博客：Spark"
 
-#: src/desktop/templates/tours.mako:77
+#: src/desktop/templates/tours.mako:67
 msgid "Hue blog: HBase"
 msgstr "Hue 博客：HBase"
 
-#: src/desktop/templates/tours.mako:84
+#: src/desktop/templates/tours.mako:74
 msgid "Hue blog: Sqoop"
 msgstr "Hue 博客：Sqoop"
 
-#: src/desktop/templates/tours.mako:91
+#: src/desktop/templates/tours.mako:81
 msgid "Hue blog: Zookeeper"
 msgstr "Hue 博客：Zookeeper"
 
-#: src/desktop/templates/tours.mako:98
+#: src/desktop/templates/tours.mako:88
 msgid "Hue blog: Oozie"
 msgstr "Hue 博客：Oozie"
 
-#: src/desktop/templates/tours.mako:105
+#: src/desktop/templates/tours.mako:95
 msgid "Hue blog: Search"
 msgstr "Hue 博客：搜索"
 
-#: src/desktop/templates/tours.mako:112
+#: src/desktop/templates/tours.mako:102
 msgid "Hue blog: Security"
 msgstr "Hue 博客：安全性"
 
-#: src/desktop/templates/tours.mako:119
+#: src/desktop/templates/tours.mako:109
 msgid "Hue blog: HDFS"
 msgstr "Hue 博客：HDFS"
 
-#: src/desktop/templates/tours.mako:126
+#: src/desktop/templates/tours.mako:116
 msgid "Hue blog: Job Browser"
 msgstr "Hue 博客：作业浏览器"
 
@@ -3550,91 +4256,99 @@ msgid ""
 "the latest"
 msgstr "您似乎在运行旧版浏览器。建议升级到最新版"
 
-#~ msgid ""
-#~ "If set to true, CherryPy will be"
-#~ " used. Otherwise, Spawning will be "
-#~ "used as the webserver."
+#~ msgid "Enable the new editor SQL autocompleter"
+#~ msgstr ""
+
+#~ msgid "Your session has expired."
+#~ msgstr ""
+
+#~ msgid "Reload this page to sign in again"
+#~ msgstr ""
+
+#~ msgid "Please reload this page"
+#~ msgstr ""
+
+#~ msgid "Applications"
+#~ msgstr ""
+
+#~ msgid "Drop files here"
+#~ msgstr ""
+
+#~ msgid "Get started!"
+#~ msgstr ""
+
+#~ msgid "Your new home."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Configuration options for specifying the Desktop Database.\n"
-#~ "          For more info, see "
-#~ "http://docs.djangoproject.com/en/1.1/ref/settings/#database-"
-#~ "engine"
+#~ "This is where you can access all"
+#~ " your documents and you can tag "
+#~ "them per project. Your home is "
+#~ "always reachable from any part of "
+#~ "Hue, just click on the house icon"
+#~ " on the top navigator bar."
+#~ msgstr ""
+
+#~ msgid "Actions and projects"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Authentication backend.  Common settings are"
-#~ " django.contrib.auth.backends.ModelBackend (fully "
-#~ "Django backend), desktop.auth.backend.AllowAllBackend "
-#~ "(allows everyone), "
-#~ "desktop.auth.backend.AllowFirstUserDjangoBackend (relies "
-#~ "on Django and user manager, after "
-#~ "the first login). "
+#~ "From here you can create new "
+#~ "documents or see a specific project "
+#~ "or any trashed document for instance."
 #~ msgstr ""
 
-#~ msgid "If true, log all database requests."
+#~ msgid "Organize!"
 #~ msgstr ""
 
-#~ msgid "Secret key should be configured as a random string."
+#~ msgid ""
+#~ "You can organize your documents in "
+#~ "projects and filter them out in "
+#~ "this area. It's a smart and fast"
+#~ " way to focus on a specific "
+#~ "project you are currently tackling."
 #~ msgstr ""
 
-#~ msgid "Cannot find HDFS called \"%(fs_ref)s\"."
+#~ msgid "Your documents"
 #~ msgstr ""
 
-#~ msgid "Could not create home directory."
+#~ msgid ""
+#~ "You can always have a glance at"
+#~ " your hard work. This is the "
+#~ "list of all your documents, The "
+#~ "first column tells you the kind of"
+#~ " document that is, then you can "
+#~ "find its name, a description and "
+#~ "some other fields."
 #~ msgstr ""
 
-#~ msgid "starting server with options %(options)s"
+#~ msgid "Projects"
 #~ msgstr ""
 
-#~ msgid "Spawning Server for Hue."
+#~ msgid ""
+#~ "You can assign one or more "
+#~ "projects to a document just by "
+#~ "clicking in this cell."
 #~ msgstr ""
 
-#~ msgid "Not Found"
+#~ msgid "Share your documents"
 #~ msgstr ""
 
-#~ msgid "Page not found"
+#~ msgid ""
+#~ "You can also share a document you"
+#~ " have worked on with a specific "
+#~ "user or a group of users. Just "
+#~ "click on the icon in this column"
+#~ " on every document you want to "
+#~ "share and choose users and groups "
+#~ "from the popup."
 #~ msgstr ""
 
-#~ msgid "Server Error (500)"
+#~ msgid "Search your documents"
 #~ msgstr ""
 
-#~ msgid "Profile"
-#~ msgstr ""
-
-#~ msgid "Sign Out"
-#~ msgstr ""
-
-#~ msgid "Welcome Home."
-#~ msgstr ""
-
-#~ msgid "Hue is a Web UI for Apache Hadoop. Please select an application below."
-#~ msgstr ""
-
-#~ msgid "Shell"
-#~ msgstr ""
-
-#~ msgid "Hadoop"
-#~ msgstr ""
-
-#~ msgid "Designs"
-#~ msgstr ""
-
-#~ msgid "Editor"
-#~ msgstr ""
-
-#~ msgid "Hue - Sign up"
-#~ msgstr ""
-
-#~ msgid "Hue - Sign in"
-#~ msgstr ""
-
-#~ msgid "Invalid username or password."
-#~ msgstr ""
-
-#~ msgid "Sign up"
-#~ msgstr ""
-
-#~ msgid "Sign in"
+#~ msgid ""
+#~ "You can always filter out the "
+#~ "documents by name, description or even"
+#~ " owner. Enjoy your new home!"
 #~ msgstr ""

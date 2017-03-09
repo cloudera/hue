@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,13 +17,37 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/aws/conf.py:65
+#: src/aws/conf.py:53
+msgid "One entry for each AWS account"
+msgstr "각 AWS 계정마다 하나의 항목"
+
+#: src/aws/conf.py:55
+msgid "Information about single AWS account"
+msgstr "단일 AWS 계정에 대한 정보"
+
+#: src/aws/conf.py:68
 msgid "Execute this script to produce the AWS access key ID."
 msgstr "AWS 액세스 키 ID를 생성하려면 이 스크립트를 실행합니다."
 
-#: src/aws/conf.py:77
+#: src/aws/conf.py:80
 msgid "Execute this script to produce the AWS secret access key."
 msgstr "AWS 암호 액세스 키를 생성하려면 이 스크립트를 실행합니다."
+
+#: src/aws/conf.py:88
+msgid ""
+"Allow to use environment sources of credentials (environment variables, "
+"EC2 profile)."
+msgstr ""
+"자격 증명의 환경 소스 사용을 허용합니다(환경 변수, "
+"EC2 프로필)."
+
+#: src/aws/conf.py:99
+msgid "Alternate address for endpoint."
+msgstr "끝점에 대한 대체 주소입니다."
+
+#: src/aws/conf.py:105
+msgid "Alternate port for endpoint."
+msgstr "끝점에 대한 대체 포트입니다."
 
 #: src/aws/s3/s3fs.py:59
 msgid ""
