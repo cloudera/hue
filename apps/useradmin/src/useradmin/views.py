@@ -60,12 +60,9 @@ __groups_lock = threading.Lock()
 
 def list_users(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
-  users = User.objects.all()
-  if request.GET.get('format') == 'json':
-    return JsonResponse({'users' : massage_users_for_json(users, True)})
 
   return render("list_users.mako", request, {
-      'users': users,
+      'users': User.objects.all(),
       'users_json': json.dumps(list(User.objects.values_list('id', flat=True))),
       'request': request,
       'is_embeddable': request.GET.get('is_embeddable', False),
@@ -75,12 +72,9 @@ def list_users(request):
 
 def list_groups(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
-  groups = Group.objects.all()
-  if request.GET.get('format') == 'json':
-    return JsonResponse({'grups' : massage_groups_for_json(groups)})
 
   return render("list_groups.mako", request, {
-      'groups': groups,
+      'groups': Group.objects.all(),
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
       'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup
