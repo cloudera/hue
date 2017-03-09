@@ -297,7 +297,7 @@ class NavigatorApi(object):
       action = 'SELECT'
 
       def getkey(result):
-        key = {u'column': None, u'table': None, u'db': None, u'server': get_hive_sentry_provider()}
+        key = {u'server': get_hive_sentry_provider()}
 
         if result['type'] == 'TABLE' or result['type'] == 'VIEW':
           key['db'] = result.get('parentPath', '') and result.get('parentPath', '').strip('/')
