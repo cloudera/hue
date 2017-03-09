@@ -742,8 +742,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <!-- ko if: result.rows() != null  -->
               (<span data-bind="text: result.rows().toLocaleString()" title="${ _('Number of rows') }"></span>)
             <!-- /ko -->
+            <!-- ko if: showGrid -->
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the results')}" data-bind="click: function(data, e){ $(e.target).parents('.snippet').find('.resultTable').hueDataTable().fnShowSearch() }"><i class="snippet-icon fa fa-search"></i></div>
-            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && !$root.isPlayerMode(), click: function(){ $root.isPlayerMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
+            <!-- /ko -->
+            <div class="inline-block inactive-action pointer" title="${_('Expand results')}" rel="tooltip" data-bind="css: { 'margin-left-10': !showGrid()}, visible: !$root.isFullscreenMode() && !$root.isPlayerMode(), click: function(){ $root.isPlayerMode(true); }"><i class="snippet-icon fa fa-expand"></i></div>
             <div class="inline-block inactive-action pointer" title="${_('Collapse results')}" rel="tooltip" data-bind="visible: !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }"><i class="snippet-icon fa fa-compress"></i></div>
           </a>
         </li>
