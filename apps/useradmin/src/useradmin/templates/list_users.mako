@@ -36,7 +36,7 @@ ${layout.menubar(section='users')}
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button class="btn delete-user-btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -66,7 +66,7 @@ ${layout.menubar(section='users')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div id="selectAll" class="hueCheckbox fa"></div>
+              <div class="select-all hueCheckbox fa"></div>
             </th>
         %endif
         <th>${_('Username')}</th>
@@ -117,21 +117,19 @@ ${layout.menubar(section='users')}
 
   <div id="syncLdap" class="modal hide fade"></div>
 
-  <div id="deleteUser" class="modal hide fade">
-    <form id="dropTableForm" action="${ url('useradmin.views.delete_user') }" method="POST">
+  <div class="modal hide fade delete-user">
+    <form action="${ url('useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-
-        <h3 id="deleteUserMessage">${ _("Are you sure you want to delete the selected user(s)?") }</h3>
+        <h3>${ _("Are you sure you want to delete the selected user(s)?") }</h3>
       </div>
       <div class="modal-footer">
         <a href="#" class="btn" data-dismiss="modal">${_('No')}</a>
         <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
       </div>
       <div class="hide">
-        <select name="user_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers"
-                multiple="true"></select>
+        <select name="user_ids" data-bind="options: availableUsers, selectedOptions: chosenUsers" multiple="true"></select>
       </div>
     </form>
   </div>
@@ -198,13 +196,13 @@ ${layout.menubar(section='users')}
         },
         dataType: "html",
         success: function (data) {
-          $("#deleteUser").html(data);
-          $("#deleteUser").modal("show");
+          $usersComponents.find(".delete-user").html(data);
+          $usersComponents.find(".delete-user").modal("show");
         }
       });
     });
 
-    $usersComponents.find("#selectAll").click(function () {
+    $usersComponents.find(".select-all").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");;
         $usersComponents.find(".userCheck").removeClass("fa-check").removeAttr("checked");
@@ -228,21 +226,21 @@ ${layout.menubar(section='users')}
 
     function toggleActions() {
       if ($usersComponents.find(".userCheck[checked='checked']").length >= 1) {
-        $usersComponents.find("#deleteUserBtn").removeAttr("disabled");
+        $usersComponents.find(".delete-user-btn").removeAttr("disabled");
       }
       else {
-        $usersComponents.find("#deleteUserBtn").attr("disabled", "disabled");
+        $usersComponents.find(".delete-user-btn").attr("disabled", "disabled");
       }
     }
 
-    $usersComponents.find("#deleteUserBtn").click(function () {
+    $usersComponents.find(".delete-user-btn").click(function () {
       viewModel.chosenUsers.removeAll();
 
       $usersComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
         viewModel.chosenUsers.push($(this).data("id"));
       });
 
-      $usersComponents.find("#deleteUser").modal("show");
+      $usersComponents.find(".delete-user").modal("show");
     });
 
     $usersComponents.find("a[data-row-selector='true']").jHueRowSelector();
