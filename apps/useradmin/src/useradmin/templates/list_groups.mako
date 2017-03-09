@@ -37,7 +37,7 @@ ${layout.menubar(section='groups')}
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button class="btn delete-group-btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -61,7 +61,7 @@ ${layout.menubar(section='groups')}
       <tr>
         %if user.is_superuser:
             <th width="1%">
-              <div id="selectAll" class="hueCheckbox fa"></div>
+              <div class="select-all hueCheckbox fa"></div>
             </th>
         %endif
         <th>${_('Group Name')}</th>
@@ -103,12 +103,12 @@ ${layout.menubar(section='groups')}
       </tfoot>
     </table>
   </div>
-  <div id="deleteGroup" class="modal hide fade groupModal">
-    <form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
+  <div class="modal hide fade delete-group">
+    <form action="${ url('useradmin.views.delete_group') }" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
+        <h3>${_("Are you sure you want to delete the selected group(s)?")}</h3>
       </div>
       <div class="modal-footer">
         <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
@@ -171,7 +171,7 @@ ${layout.menubar(section='groups')}
     $groupsComponents.find(".dataTables_wrapper").css("min-height", "0");
     $groupsComponents.find(".dataTables_filter").hide();
 
-    $groupsComponents.find("#selectAll").click(function () {
+    $groupsComponents.find(".select-all").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");
         $groupsComponents.find(".groupCheck").removeClass("fa-check").removeAttr("checked");
@@ -195,21 +195,21 @@ ${layout.menubar(section='groups')}
 
     function toggleActions() {
       if ($groupsComponents.find(".groupCheck[checked='checked']").length > 0) {
-        $groupsComponents.find("#deleteGroupBtn").removeAttr("disabled");
+        $groupsComponents.find(".delete-group-btn").removeAttr("disabled");
       }
       else {
-        $groupsComponents.find("#deleteGroupBtn").attr("disabled", "disabled");
+        $groupsComponents.find(".delete-group-btn").attr("disabled", "disabled");
       }
     }
 
-    $groupsComponents.find("#deleteGroupBtn").click(function () {
+    $groupsComponents.find(".delete-group-btn").click(function () {
       viewModel.chosenGroups.removeAll();
 
       $groupsComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
         viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 
-      $groupsComponents.find("#deleteGroup").modal("show");
+      $groupsComponents.find(".delete-group").modal("show");
     });
 
     $groupsComponents.find("a[data-row-selector='true']").jHueRowSelector();
