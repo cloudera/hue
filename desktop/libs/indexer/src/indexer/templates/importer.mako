@@ -792,11 +792,11 @@ ${ assist.assistPanel() }
 
     <label class="margin-left-5">${ _('Type') }&nbsp;
     <!-- ko if: ! (level() > 0 && $parent.type() == 'map') -->
-      <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
+      <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.hiveFieldTypes, value: type"></select>
     <!-- /ko -->
     <!-- ko if: level() > 0 && $parent.type() == 'map' -->
-      <select class="input-small" data-bind="selectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
-      <select class="input-small" data-bind="selectize: $root.createWizard.hiveFieldTypes, value: type"></select>
+      <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.hivePrimitiveFieldTypes, value: keyType"></select>
+      <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.hiveFieldTypes, value: type"></select>
     <!-- /ko -->
 
       <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
@@ -838,7 +838,7 @@ ${ assist.assistPanel() }
     <input type="text" class="input-large" placeholder="${ _('Field name') }" data-bind="value: name">
   </label>
   <label class="margin-left-5">${ _('Type') }&nbsp;
-    <select class="input-small" data-bind="selectize: $root.createWizard.fieldTypes, value: type"></select>
+    <select class="input-small" data-bind="browserAwareSelectize: $root.createWizard.fieldTypes, value: type"></select>
   </label>
   <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
   <span data-bind="visible: showProperties" class="field-properties">
@@ -869,7 +869,7 @@ ${ assist.assistPanel() }
 
 <script type="text/html" id="operation-template">
   <div class="operation">
-    <select data-bind="selectize: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
+    <select data-bind="browserAwareSelectize: $root.createWizard.operationTypes.map(function(o){return o.name}), value: operation.type"></select>
     <!-- ko template: "args-template" --><!-- /ko -->
     <!-- ko if: operation.settings().outputType() == "custom_fields" -->
       <label class="margin-left-5">${ _('Number of expected fields') }
