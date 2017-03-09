@@ -579,7 +579,7 @@ from desktop.views import _ko
               (${_('used by')}
               <a class="pointer" data-bind="attr: { 'href': $data.dependents[0].absoluteUrl }, text: $data.dependents[0].name" target="_blank" ></a>
               <!-- ko if: $data.dependents.length > 1 -->
-              ${_('and')} <a class="pointer" data-bind="attr: { 'href': $data.dependents[0].absoluteUrl }, text: $data.dependents[1].name" target="_blank" ></a>
+              ${_('and')} <a class="pointer" data-bind="attr: { 'href': $data.dependents[1].absoluteUrl }, text: $data.dependents[1].name" target="_blank" ></a>
                 <!-- ko if: $data.dependents.length > 2 -->
                   ${_('and')} <span data-bind="text: $data.dependents.length - 2"></span> ${_('other')}
                 <!-- /ko -->
