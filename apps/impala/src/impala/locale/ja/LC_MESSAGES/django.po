@@ -1,14 +1,14 @@
 # Japanese translations for Hue.
-# Copyright (C) 2012 Cloudera
+# Copyright (C) 2013 Cloudera, Inc
 # This file is distributed under the same license as the Hue project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2012.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2013.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
+"Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-07-19 17:50-0700\n"
-"PO-Revision-Date: 2012-07-30 18:50-0700\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
+"PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
 "Plural-Forms: nplurals=1; plural=0\n"
@@ -17,220 +17,212 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/impala/api.py:51
+#: src/impala/api.py:50
 msgid "Successfully invalidated metadata"
 msgstr "メタデータを無効化しました"
 
-#: src/impala/api.py:66
+#: src/impala/api.py:65
 #, python-format
 msgid "Successfully refreshed metadata for `%s`.`%s`"
 msgstr "`%s`.`%s` のメタデータをリフレッシュしました"
 
-#: src/impala/api.py:81
+#: src/impala/api.py:80
 msgid "get_exec_summary requires a valid query_history_id"
 msgstr "get_exec_summary には有効な query_history_id が必要です"
 
-#: src/impala/api.py:103
+#: src/impala/api.py:102
 msgid "get_runtime_profile requires a valid query_history_id"
 msgstr "get_runtime_profile には有効な query_history_id が必要です"
 
-#: src/impala/conf.py:35
+#: src/impala/conf.py:39
 msgid "Host of the Impala Server."
 msgstr "Impala Server のホストです。"
 
-#: src/impala/conf.py:40
+#: src/impala/conf.py:44
 msgid "Port of the Impala Server."
 msgstr "Impala Server のポートです。"
 
-#: src/impala/conf.py:46
+#: src/impala/conf.py:50
 msgid "Kerberos principal name for Impala. Typically 'impala/hostname.foo.com'."
 msgstr "Impala の Kerberos プリンシパル名。一般的には 'impala/hostname.foo.com' です。"
 
-#: src/impala/conf.py:52
+#: src/impala/conf.py:56
 msgid "Turn on/off impersonation mechanism when talking to Impala."
 msgstr "Impala に通信する際のなりすましメカニズムをオン／オフします。"
 
-#: src/impala/conf.py:58
-msgid "Number of initial rows of a resultset to ask Impala to cache in order to support re-fetching them for downloading them. Set to 0 for disabling the option and backward compatibility."
+#: src/impala/conf.py:62
+msgid ""
+"Number of initial rows of a resultset to ask Impala to cache in order to "
+"support re-fetching them for downloading them. Set to 0 for disabling the"
+" option and backward compatibility."
 msgstr "Impalaのダウンロードを再フェッチするために、Impala にキャッシュを要求するための結果セットの最初の行数。オプションと下位互換性を無効にするには 0 に設定します。"
 
-#: src/impala/conf.py:68
+#: src/impala/conf.py:72
 msgid "Timeout in seconds for Thrift calls."
 msgstr "Thrift コールのタイムアウト時間（秒）。"
 
-#: src/impala/conf.py:72
-msgid "Hue will try to close the Impala query when the user leaves the editor page. This will free all the query resources in Impala, but also make its results inaccessible."
-msgstr "ユーザーがエディタページを移動すると、Hue は Impala クエリを閉じようとします。これにより、Impala のクエリリソースがすべて解放されますが、結果にもアクセスできなくなります。"
+#: src/impala/conf.py:76
+msgid ""
+"Hue will try to close the Impala query when the user leaves the editor "
+"page. This will free all the query resources in Impala, but also make its"
+" results inaccessible."
+msgstr ""
+"ユーザーがエディタページを移動すると、Hue は Impala クエリを閉じようとします。これにより、Impala "
+"のクエリリソースがすべて解放されますが、結果にもアクセスできなくなります。"
 
-#: src/impala/conf.py:80
-msgid "If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that query within QUERY_TIMEOUT_S seconds."
-msgstr "QUERY_TIMEOUT_S > 0 の場合に、QUERY_TIMEOUT_S 秒以内に Impala がそのクエリの処理（計算または結果の送信）を実行しない場合、クエリはタイムアウトになります（つまりキャンセルされます）。"
+#: src/impala/conf.py:84
+msgid ""
+"If QUERY_TIMEOUT_S > 0, the query will be timed out (i.e. cancelled) if "
+"Impala does not do any work (compute or send back results) for that query"
+" within QUERY_TIMEOUT_S seconds."
+msgstr ""
+"QUERY_TIMEOUT_S > 0 の場合に、QUERY_TIMEOUT_S 秒以内に Impala "
+"がそのクエリの処理（計算または結果の送信）を実行しない場合、クエリはタイムアウトになります（つまりキャンセルされます）。"
 
-#: src/impala/conf.py:88
-msgid "If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) if Impala does not do any work (compute or send back results) for that session within QUERY_TIMEOUT_S seconds."
-msgstr "SESSION_TIMEOUT_S > 0 の場合、QUERY_TIMEOUT_S 秒以内に Impala がそのセッションの処理（計算または結果の送信）を実行しないと、セッションはタイムアウトになります（つまりキャンセルされます）。"
+#: src/impala/conf.py:92
+msgid ""
+"If SESSION_TIMEOUT_S > 0, the session will be timed out (i.e. cancelled) "
+"if Impala does not do any work (compute or send back results) for that "
+"session within QUERY_TIMEOUT_S seconds. Default: 1 hour."
+msgstr ""
+"SESSION_TIMEOUT_S > 0 の場合、QUERY_TIMEOUT_S 秒以内に Impala が"
+"そのセッションの処理（計算または結果の送信）を実行しないと、セッションはタイムアウトになります"
+"（つまりキャンセルされます）。デフォルトは 1 時間です。"
 
-#: src/impala/conf.py:98
-msgid "A comma-separated list of white-listed Impala configuration properties that users are authorized to set."
+#: src/impala/conf.py:102
+msgid ""
+"A comma-separated list of white-listed Impala configuration properties "
+"that users are authorized to set."
 msgstr "ユーザーに設定を許可する Impala 設定プロパティのホワイトリスト（カンマ区切りリスト）です。"
 
-#: src/impala/conf.py:103
+#: src/impala/conf.py:107
+msgid "Impala configuration directory, where impala_flags is located."
+msgstr "impala_flags が格納されている Impala 設定ディレクトリです。"
+
+#: src/impala/conf.py:113
 msgid "SSL configuration for the server."
 msgstr "サーバーの SSL 設定です。"
 
-#: src/impala/conf.py:107
+#: src/impala/conf.py:117
 msgid "SSL communication enabled for this server."
 msgstr "このサーバーに対して、SSL 通信が有効になっています。"
 
-#: src/impala/conf.py:114
+#: src/impala/conf.py:124
 msgid "Path to Certificate Authority certificates."
 msgstr "認証局証明書へのパスです。"
 
-#: src/impala/conf.py:121
+#: src/impala/conf.py:131
 msgid "Path to the private key file, e.g. /etc/hue/key.pem"
 msgstr "/etc/hue/key.pem など、秘密鍵ファイルへのパスです。"
 
-#: src/impala/conf.py:128
+#: src/impala/conf.py:138
 msgid "Path to the public certificate file, e.g. /etc/hue/cert.pem"
 msgstr "/etc/hue/cert.pem など、公開証明書ファイルへのパスです"
 
-#: src/impala/conf.py:135
+#: src/impala/conf.py:145
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "サーバーから受け取った証明書を Hue で検証するかどうかを選択します。"
 
-#: src/impala/conf.py:148
+#: src/impala/conf.py:158
 msgid "Auth username of the hue user used for authentications."
 msgstr "認証に使用する Hue ユーザーの認証ユーザー名"
 
-#: src/impala/conf.py:162
+#: src/impala/conf.py:172
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
 msgstr "認証に使用する Hue ユーザーの LDAP/PAM/.. パスワードです。"
 
-#: src/impala/conf.py:168
-msgid "Execute this script to produce the auth password. This will be used when `auth_password` is not set."
+#: src/impala/conf.py:178
+msgid ""
+"Execute this script to produce the auth password. This will be used when "
+"`auth_password` is not set."
 msgstr "このスクリプトを実行して認証パスワードを作成します。これは auth_password が設定されていない場合に利用されます。"
 
-#: src/impala/dashboards.py:213
-msgid "Page saved !"
-msgstr "ページが保存されました。"
+#~ msgid "Page saved !"
+#~ msgstr ""
 
-#: src/impala/dashboards.py:215
-msgid "There is no dashboard to search."
-msgstr "検索するダッシュボードがありません。"
+#~ msgid "There is no dashboard to search."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:31
-msgid "Grid Results"
-msgstr "グリッドの結果"
+#~ msgid "Grid Results"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:39
-msgid "Text Facet"
-msgstr "テキストファセット"
+#~ msgid "Text Facet"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:46
-msgid "Pie Chart"
-msgstr "円グラフ"
+#~ msgid "Pie Chart"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:53
-msgid "Bar Chart"
-msgstr "棒グラフ"
+#~ msgid "Bar Chart"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:60
-msgid "Line Chart"
-msgstr "折れ線グラフ"
+#~ msgid "Line Chart"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:67
-msgid "Timeline"
-msgstr "時系列"
+#~ msgid "Timeline"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:74
-msgid "Filter Bar"
-msgstr "フィルタバー"
+#~ msgid "Filter Bar"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:81
-msgid "Map"
-msgstr "Map"
+#~ msgid "Map"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:91
-msgid "Edit"
-msgstr "編集"
+#~ msgid "Edit"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:93
-msgid "Save"
-msgstr "保存"
+#~ msgid "Save"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:93
-msgid "Saving..."
-msgstr "保存中..."
+#~ msgid "Saving..."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:94
-msgid "New"
-msgstr "新規"
+#~ msgid "New"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:99
-msgid "Select a database and a table"
-msgstr "データベースとテーブルを選択してください"
+#~ msgid "Select a database and a table"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:101
-msgid "Choose a database..."
-msgstr "データベースを選択..."
+#~ msgid "Choose a database..."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:102
-msgid "Choose a table..."
-msgstr "テーブルを選択..."
+#~ msgid "Choose a table..."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:104
-msgid "Manually refresh the dropdowns"
-msgstr "ドロップダウンを手動で更新"
+#~ msgid "Manually refresh the dropdowns"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:109
-msgid "Search"
-msgstr "検索"
+#~ msgid "Search"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:139
-msgid "Filter fields"
-msgstr "フィルタフィールド"
+#~ msgid "Filter fields"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:147
-msgid "Field Name"
-msgstr "フィールド名"
+#~ msgid "Field Name"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:169
-msgid "Your search did not match any documents."
-msgstr "条件に一致するドキュメントは見つかりませんでした。"
+#~ msgid "Your search did not match any documents."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:243
-msgid "Exclude this value"
-msgstr "この値を除外"
+#~ msgid "Exclude this value"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:377
-msgid "There are currently no filters applied."
-msgstr "現在適用されているフィルターはありません。"
+#~ msgid "There are currently no filters applied."
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:382
-#: src/impala/templates/dashboard.mako:392
-msgid "field"
-msgstr "フィールド"
+#~ msgid "field"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:385
-msgid "value"
-msgstr "値"
+#~ msgid "value"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:396
-msgid "from"
-msgstr "元"
+#~ msgid "from"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:398
-msgid "to"
-msgstr "先"
+#~ msgid "to"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:609
-msgid "Oops, no database found!"
-msgstr "データベースが見つかりません。"
+#~ msgid "Oops, no database found!"
+#~ msgstr ""
 
-#: src/impala/templates/dashboard.mako:633
-msgid "Oops, no table found!"
-msgstr "テーブルが見つかりません。"
-
-#~ msgid "No available Impalad to send queries to."
-#~ msgstr "クエリの送信先の Impalad がありません。"
-
+#~ msgid "Oops, no table found!"
+#~ msgstr ""

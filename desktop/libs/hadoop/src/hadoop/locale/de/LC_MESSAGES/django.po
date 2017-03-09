@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -71,115 +71,115 @@ msgstr "Kein HDFS gefunden"
 msgid "User %s does not have permissions to write to path \"%s\"."
 msgstr "Benutzer %s ist nicht berechtigt, in Pfad \"%s\" zu schreiben."
 
-#: src/hadoop/fs/webhdfs.py:250 src/hadoop/fs/webhdfs.py:286
+#: src/hadoop/fs/webhdfs.py:251 src/hadoop/fs/webhdfs.py:287
 #, python-format
 msgid "File %s not found"
 msgstr "Datei %s nicht gefunden"
 
-#: src/hadoop/fs/webhdfs.py:289
+#: src/hadoop/fs/webhdfs.py:290
 #, python-format
 msgid "File %s is a directory"
 msgstr "Datei %s ist ein Verzeichnis"
 
-#: src/hadoop/fs/webhdfs.py:292
+#: src/hadoop/fs/webhdfs.py:293
 #, python-format
 msgid "File %s is already trashed"
 msgstr "Datei %s wurde bereits entfernt"
 
-#: src/hadoop/fs/webhdfs.py:319
+#: src/hadoop/fs/webhdfs.py:320
 #, python-format
 msgid "Delete failed: %s"
 msgstr "Löschen fehlgeschlagen: %s"
 
-#: src/hadoop/fs/webhdfs.py:348
+#: src/hadoop/fs/webhdfs.py:349
 #, python-format
 msgid "File %s is not in trash"
 msgstr "Datei %s ist nicht im Papierkorb"
 
-#: src/hadoop/fs/webhdfs.py:362
+#: src/hadoop/fs/webhdfs.py:363
 #, python-format
 msgid "Path %s already exists."
 msgstr "Pfad %s ist bereits vorhanden."
 
-#: src/hadoop/fs/webhdfs.py:390
+#: src/hadoop/fs/webhdfs.py:391
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Mkdir fehlgeschlagen: %s"
 
-#: src/hadoop/fs/webhdfs.py:404
+#: src/hadoop/fs/webhdfs.py:405
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "Umbenennen fehlgeschlagen: %s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:410 src/hadoop/fs/webhdfs.py:414
+#: src/hadoop/fs/webhdfs.py:411 src/hadoop/fs/webhdfs.py:415
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "'%s' ist kein Verzeichnis"
 
-#: src/hadoop/fs/webhdfs.py:599
+#: src/hadoop/fs/webhdfs.py:608
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "Kopie-src '%s' ist nicht vorhanden"
 
-#: src/hadoop/fs/webhdfs.py:601
+#: src/hadoop/fs/webhdfs.py:610
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "Kopie-src '%s' ist ein Verzeichnis"
 
-#: src/hadoop/fs/webhdfs.py:603
+#: src/hadoop/fs/webhdfs.py:612
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "Kopie-dst '%s' ist eine Verzeichnis"
 
-#: src/hadoop/fs/webhdfs.py:684
+#: src/hadoop/fs/webhdfs.py:693
 #, python-format
 msgid "File not found: %s"
 msgstr "Datei nicht gefunden: %s"
 
-#: src/hadoop/fs/webhdfs.py:700
+#: src/hadoop/fs/webhdfs.py:709
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "Zieldatei %s existiert und ist kein Verzeichnis."
 
-#: src/hadoop/fs/webhdfs.py:742
+#: src/hadoop/fs/webhdfs.py:751
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "'%s' konnte nicht erstellt werden. HDFS gab keine Umleitung aus."
 
-#: src/hadoop/fs/webhdfs.py:808
+#: src/hadoop/fs/webhdfs.py:817
 msgid "Failed to upload file. WebHdfs requires a valid username to upload files."
 msgstr ""
 "Fehler beim Hochladen der Datei. WebHdfs erfordert einen gültigen "
 "Benutzernamen, um Dateien hochzuladen."
 
-#: src/hadoop/fs/webhdfs.py:832
+#: src/hadoop/fs/webhdfs.py:841
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "Ist ein Verzeichnis: '%s'"
 
-#: src/hadoop/fs/webhdfs.py:850
+#: src/hadoop/fs/webhdfs.py:859
 msgid "Invalid argument to seek for whence"
 msgstr "Ungültiges zu suchendes Argument"
 
-#: src/hadoop/fs/webhdfs.py:870
+#: src/hadoop/fs/webhdfs.py:879
 msgid "File not open for writing"
 msgstr "Datei nicht zum Schreiben geöffnet"
 
-#: src/hadoop/fs/webhdfs.py:916
+#: src/hadoop/fs/webhdfs.py:925
 #, python-format
 msgid "Filesystem root '/' should be owned by '%s'"
 msgstr "Dateisystemstamm \"/\" darf nicht Eigentum von \"%s\" sein"
 
-#: src/hadoop/fs/webhdfs.py:919
+#: src/hadoop/fs/webhdfs.py:928
 msgid "Failed to access filesystem root"
 msgstr "Dateisystemstamm konnte nicht aufgerufen werden"
 
-#: src/hadoop/fs/webhdfs.py:927
+#: src/hadoop/fs/webhdfs.py:936
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "Temporäre Datei \"%s\" konnte nicht erstellt werden"
 
-#: src/hadoop/fs/webhdfs.py:943
+#: src/hadoop/fs/webhdfs.py:952
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "Temporäre Datei \"%s\" konnte nicht entfernt werden"
@@ -205,9 +205,3 @@ msgstr "YARN RM gab eine Fehlermeldung zurück: %s"
 #: src/hadoop/yarn/spark_history_server_api.py:47
 msgid "No Spark History Server is available."
 msgstr "Kein Spark-Verlaufsserver verfügbar."
-
-#~ msgid "Trash is not enabled."
-#~ msgstr ""
-
-#~ msgid "Filesystem root '/' should be owned by 'hdfs'"
-#~ msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -65,31 +65,32 @@ msgstr "No se han podido descargar los resultados de la búsqueda: %s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "Active el enlace Panel en el menú."
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "índice (Solr)"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "tabla (%s)"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"Nombre de la interfaz que se debe usar como motor de consultas del panel; p. ej., "
+"Solr, SQL."
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "Admitir facetas de análisis o no."
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "Documentos anidados"
+msgstr "Admitir documentos anidados o no."
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
@@ -113,9 +114,8 @@ msgstr "¡Página guardada!"
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
-msgstr "Paneles"
+msgstr "Panel"
 
 #: src/dashboard/templates/common_admin_collections.mako:30
 #: src/dashboard/templates/common_admin_collections.mako:43
@@ -199,9 +199,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "¿Está seguro de que desea eliminar los paneles seleccionados?"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "Francia"
+msgstr "Cancelar"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -248,14 +247,12 @@ msgid "New"
 msgstr "Nuevo"
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "seleccionado"
+msgstr "Seleccione uno"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "nuevo índice?"
+msgstr "índice"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
@@ -264,7 +261,7 @@ msgstr "Mostrar núcleos"
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "Nombre de tabla o <database>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -477,7 +474,7 @@ msgstr "Japón"
 #: src/dashboard/templates/common_search.mako:462
 #: src/dashboard/templates/common_search.mako:673
 msgid "UK"
-msgstr "Gran Bretaña"
+msgstr "Reino Unido"
 
 #: src/dashboard/templates/common_search.mako:463
 #: src/dashboard/templates/common_search.mako:674
@@ -736,7 +733,7 @@ msgstr "Anterior"
 
 #: src/dashboard/templates/common_search.mako:1230
 msgid "Showing"
-msgstr "Mostrando "
+msgstr "Mostrando"
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
@@ -838,9 +835,8 @@ msgid "Field Name"
 msgstr "Nombre de campo"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "Deshacer cambios"
+msgstr "No hay coincidencias."
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -973,9 +969,7 @@ msgstr "Añadir consulta actual como..."
 
 #: src/dashboard/templates/common_search.mako:2563
 msgid "Click on this button to add the currenty query as a new definition"
-msgstr ""
-"Haga clic en este botón para añadir la consulta actual como una nueva "
-"definición"
+msgstr "Haga clic en este botón para añadir la consulta actual como una nueva definición"
 
 #: src/dashboard/templates/common_search.mako:2581
 msgid "There are currently no query definitions."
@@ -1166,49 +1160,3 @@ msgstr "¿Desea crear un"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "nuevo índice?"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "URL del servidor Solr."
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "Solicitud que se envía cuando no se introduce ningún término."
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr "Si Solr necesita que el cliente realice la autenticación de Kerberos."
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "Usar las funciones de Solr 5.2+ más recientes."
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "Nombre del índice Solr que apunta a"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "Nombre descriptivo en interfaz de usuario"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "Recopilación con datos de núcleos"
-
-#~ msgid "Solr json"
-#~ msgstr "Json de Solr"
-
-#~ msgid "Properties"
-#~ msgstr "Propiedades"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Propiedades de Hue (p. ej., resultados por número de páginas)"
-
-#~ msgid "User who created the job."
-#~ msgstr "El usuario que creó el job."
-
-#~ msgid "You must be a superuser."
-#~ msgstr "Debe ser un superusuario."
-
-#~ msgid "A POST request is required."
-#~ msgstr "Se necesita una solicitud POST."
-
-#~ msgid "No"
-#~ msgstr "No"
-
-#~ msgid "Select a search index"
-#~ msgstr "Seleccione un índice de búsqueda"
-

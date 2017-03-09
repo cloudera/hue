@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -608,57 +608,3 @@ msgstr "下一页"
 #: src/jobsub/templates/designs.mako:769
 msgid "Previous"
 msgstr "上一页"
-
-#~ msgid "Location on HDFS where the jobsub examples and templates are stored."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Deprecated, use liboozie.conf.OOZIE_URL instead. "
-#~ "URL of Oozie server. This is "
-#~ "required for job submission."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Deprecated, use liboozie.conf.SECURITY_ENABLED "
-#~ "instead. Whether Oozie requires client "
-#~ "to do perform Kerberos authentication"
-#~ msgstr ""
-
-#~ msgid "Submission for job design '%(name)s' (id %(id)s, owner %(username)s)."
-#~ msgstr ""
-
-#~ msgid "Job design already submitted (Oozie job id %(id)s)."
-#~ msgstr ""
-
-#~ msgid "Failed to access deployment directory."
-#~ msgstr ""
-
-#~ msgid "Failed to obtain HDFS reference. Check your configuration."
-#~ msgstr ""
-
-#~ msgid "Unexpected fixture type."
-#~ msgstr ""
-
-#~ msgid "Expected sample user fixture."
-#~ msgstr ""
-
-#~ msgid "Job Designs"
-#~ msgstr ""
-
-#~ msgid "Create Ssh design"
-#~ msgstr ""
-
-#~ msgid "Trash"
-#~ msgstr ""
-
-#~ msgid "Empty"
-#~ msgstr ""
-
-#~ msgid "Delete the selected designs?"
-#~ msgstr ""
-
-#~ msgid "Restore the selected designs?"
-#~ msgstr ""
-
-#~ msgid "Job properties"
-#~ msgstr ""

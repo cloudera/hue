@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -48,7 +48,7 @@ msgstr "文档已成功更新。"
 
 #: src/dashboard/api.py:204
 msgid "Document has no modifications to change."
-msgstr "文档没有要更改的修改。"
+msgstr "文档没有要更改的修订内容。"
 
 #: src/dashboard/api.py:238
 msgid "This field type does not support stats"
@@ -65,31 +65,32 @@ msgstr "无法下载搜索结果：%s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "在菜单中激活控制面板链接。"
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "索引 (Solr)"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "表 (%s)"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"用作控制面板查询引擎的接口名称，例如 "
+"solr、sql。"
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "是否支持分析方面。"
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "嵌套文档"
+msgstr "是否支持嵌套文档。"
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
@@ -100,7 +101,9 @@ msgstr "控制面板不存在或您没有访问权限。"
 msgid ""
 "The Solr schema requires an id field for performing the result "
 "highlighting"
-msgstr "Solr 纲要需要用于执行结果突出显示的 ID 字段"
+msgstr ""
+"Solr 架构需要一个 ID 字段以执行结果"
+"突出显示"
 
 #: src/dashboard/views.py:212
 msgid "Page saved !"
@@ -111,15 +114,14 @@ msgstr "页面已保存！"
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
-msgstr "仪表板"
+msgstr "控制面板"
 
 #: src/dashboard/templates/common_admin_collections.mako:30
 #: src/dashboard/templates/common_admin_collections.mako:43
 #: src/dashboard/templates/common_search.mako:81
 msgid "Dashboards"
-msgstr "仪表板"
+msgstr "控制面板"
 
 #: src/dashboard/templates/common_admin_collections.mako:39
 msgid "Indexes"
@@ -127,7 +129,7 @@ msgstr "索引"
 
 #: src/dashboard/templates/common_admin_collections.mako:51
 msgid "Filter dashboards..."
-msgstr "筛选器仪表板..."
+msgstr "筛选器控制面板..."
 
 #: src/dashboard/templates/common_admin_collections.mako:57
 msgid "Copy"
@@ -149,7 +151,7 @@ msgstr "导出"
 
 #: src/dashboard/templates/common_admin_collections.mako:78
 msgid "Create a new dashboard"
-msgstr "创建新仪表板"
+msgstr "创建新控制面板"
 
 #: src/dashboard/templates/common_admin_collections.mako:79
 msgid "Create"
@@ -161,7 +163,7 @@ msgstr "导入"
 
 #: src/dashboard/templates/common_admin_collections.mako:95
 msgid "There are currently no dashboards defined."
-msgstr "当前没有已定义的仪表板。"
+msgstr "当前没有已定义的控制面板。"
 
 #: src/dashboard/templates/common_admin_collections.mako:96
 msgid "Click here to add"
@@ -197,9 +199,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "是否确定要删除选定控制面板？"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "法国"
+msgstr "取消"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -207,7 +208,7 @@ msgstr "是"
 
 #: src/dashboard/templates/common_admin_collections.mako:223
 msgid "Dashboard(s) deleted successfully."
-msgstr "仪表板已成功删除。"
+msgstr "控制面板已成功删除。"
 
 #: src/dashboard/templates/common_admin_collections.mako:227
 msgid "Dashboard(s) copied successfully."
@@ -246,23 +247,21 @@ msgid "New"
 msgstr "新建"
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "选择"
+msgstr "选择一个"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "新索引"
+msgstr "索引"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
-msgstr "显示内核"
+msgstr "显示核心"
 
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "表名或 <database>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -280,7 +279,7 @@ msgstr "HTML"
 
 #: src/dashboard/templates/common_search.mako:190
 msgid "Filter Bar"
-msgstr "筛选器工具栏"
+msgstr "筛选器栏"
 
 #: src/dashboard/templates/common_search.mako:200
 #: src/dashboard/templates/common_search.mako:1459
@@ -320,7 +319,7 @@ msgstr "树形"
 
 #: src/dashboard/templates/common_search.mako:308
 msgid "Heatmap"
-msgstr "热图"
+msgstr "Heatmap"
 
 #: src/dashboard/templates/common_search.mako:317
 #: src/dashboard/templates/common_search.mako:326
@@ -504,11 +503,11 @@ msgstr "域"
 
 #: src/dashboard/templates/common_search.mako:583
 msgid "Parent"
-msgstr "父级"
+msgstr "父项"
 
 #: src/dashboard/templates/common_search.mako:585
 msgid "Children"
-msgstr "子"
+msgstr "子项"
 
 #: src/dashboard/templates/common_search.mako:683
 #: src/dashboard/templates/common_search.mako:2103
@@ -535,7 +534,7 @@ msgstr "显示更多..."
 #: src/dashboard/templates/common_search.mako:764
 #: src/dashboard/templates/common_search.mako:868
 msgid "Show more"
-msgstr "显示更多..."
+msgstr "显示更多"
 
 #: src/dashboard/templates/common_search.mako:768
 #: src/dashboard/templates/common_search.mako:872
@@ -584,11 +583,11 @@ msgstr "不排序"
 
 #: src/dashboard/templates/common_search.mako:982
 msgid "Sort ascending"
-msgstr "升序"
+msgstr "升序排序"
 
 #: src/dashboard/templates/common_search.mako:983
 msgid "Sort descending"
-msgstr "降序"
+msgstr "降序排序"
 
 #: src/dashboard/templates/common_search.mako:993
 msgid "Editor"
@@ -734,7 +733,7 @@ msgstr "上一页"
 
 #: src/dashboard/templates/common_search.mako:1230
 msgid "Showing"
-msgstr "正在显示 "
+msgstr "正在显示"
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
@@ -836,9 +835,8 @@ msgid "Field Name"
 msgstr "字段名称"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "撤消更改"
+msgstr "没有匹配项。"
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -869,7 +867,7 @@ msgstr "当前未应用筛选器。"
 #: src/dashboard/templates/common_search.mako:2170
 #: src/dashboard/templates/common_search.mako:2209
 msgid "selected"
-msgstr "选择"
+msgstr "已选择"
 
 #: src/dashboard/templates/common_search.mako:2152
 #: src/dashboard/templates/common_search.mako:2187
@@ -914,7 +912,7 @@ msgstr "统计数据"
 
 #: src/dashboard/templates/common_search.mako:2385
 msgid "There are no terms to be shown"
-msgstr "没有要显示的术语。"
+msgstr "没有要显示的术语"
 
 #: src/dashboard/templates/common_search.mako:2391
 msgid "Select this value"
@@ -930,7 +928,7 @@ msgstr "不可用"
 
 #: src/dashboard/templates/common_search.mako:2474
 msgid "There are no fields matching your search term."
-msgstr "没有与您的搜索条目匹配的字段。"
+msgstr "没有与您的搜索词匹配的字段。"
 
 #: src/dashboard/templates/common_search.mako:2488
 msgid "General settings"
@@ -971,7 +969,7 @@ msgstr "将当前查询添加为..."
 
 #: src/dashboard/templates/common_search.mako:2563
 msgid "Click on this button to add the currenty query as a new definition"
-msgstr "单击此按钮以作为新定义添加当前查询"
+msgstr "单击此按钮以将当前查询添加为新定义"
 
 #: src/dashboard/templates/common_search.mako:2581
 msgid "There are currently no query definitions."
@@ -1004,7 +1002,7 @@ msgstr "过去 12 小时"
 
 #: src/dashboard/templates/common_search.mako:2647
 msgid "Past day"
-msgstr "过去一天"
+msgstr "过去 1 天"
 
 #: src/dashboard/templates/common_search.mako:2648
 msgid "Past 2 days"
@@ -1024,7 +1022,7 @@ msgstr "过去 3 个月"
 
 #: src/dashboard/templates/common_search.mako:2652
 msgid "Past Year"
-msgstr "过去一年"
+msgstr "过去 1 年"
 
 #: src/dashboard/templates/common_search.mako:2653
 msgid "Past 2 Years"
@@ -1061,7 +1059,7 @@ msgstr "结束日期/时间"
 #: src/dashboard/templates/common_search.mako:2704
 #: src/dashboard/templates/common_search.mako:2713
 msgid "Auto-refresh every"
-msgstr "每天自动刷新"
+msgstr "自动刷新间隔"
 
 #: src/dashboard/templates/common_search.mako:2704
 #: src/dashboard/templates/common_search.mako:2713
@@ -1134,7 +1132,9 @@ msgstr "总计"
 msgid ""
 "Result highlighting is unavailable: the collection does not have an index"
 " field"
-msgstr "结果高亮显示功能不可用：集合没有索引字段"
+msgstr ""
+"结果突出显示功能不可用：此集合没有索引"
+"字段"
 
 #: src/dashboard/templates/macros.mako:200
 #, python-format
@@ -1160,49 +1160,3 @@ msgstr "创建"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "新索引"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "Solr 服务器的 URL。"
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "未输入术语时发送的查询。"
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr "Solr 是否需要客户端执行 Kerberos 身份验证。"
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "使用最新 Solr 5.2+ 功能。"
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "Solr 索引名称指向"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "UI 中更友好的名称"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "带核心数据的集合"
-
-#~ msgid "Solr json"
-#~ msgstr "Solr json"
-
-#~ msgid "Properties"
-#~ msgstr "属性"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Hue 属性（例如，按页码排列的结果）"
-
-#~ msgid "User who created the job."
-#~ msgstr "创建作业的用户。"
-
-#~ msgid "You must be a superuser."
-#~ msgstr "您必须是超级用户。"
-
-#~ msgid "A POST request is required."
-#~ msgstr "需要 POST 请求。"
-
-#~ msgid "No"
-#~ msgstr "否"
-
-#~ msgid "Select a search index"
-#~ msgstr "选择搜索索引"
-

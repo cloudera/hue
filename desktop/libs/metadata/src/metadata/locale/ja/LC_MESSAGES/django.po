@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -17,75 +17,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metadata/conf.py:71
+#: src/metadata/conf.py:67
 msgid "Configuration options for Optimizer API"
 msgstr "Optimizer API の設定オプション"
 
-#: src/metadata/conf.py:75
+#: src/metadata/conf.py:72
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 to disable the cache."
+msgstr ""
+"assist/autocomplete/etc コールのためのキャッシュ TTL（ミリ秒）です。"
+"0 に設定すると、キャッシュが無効になります。"
+
+#: src/metadata/conf.py:77
 msgid "Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)"
 msgstr "Optimizer API のベース URL（例： https://alpha.optimizer.cloudera.com/）"
 
-#: src/metadata/conf.py:80
+#: src/metadata/conf.py:82
 msgid ""
 "The name of the product or group which will have API access to the emails"
 " associated with it."
 msgstr "関連付けられた電子メールに API アクセスできる製品またはグループの名前です。"
 
-#: src/metadata/conf.py:85 src/metadata/conf.py:96
+#: src/metadata/conf.py:87 src/metadata/conf.py:98
 msgid "A secret passphrase associated with the productName."
 msgstr "productName に関連付けられたシークレットパスフレーズです。"
 
-#: src/metadata/conf.py:90 src/metadata/conf.py:101
+#: src/metadata/conf.py:92 src/metadata/conf.py:103
 msgid ""
 "Execute this script to produce the product secret. This will be used when"
 " `product_secret` is not set."
 msgstr "このスクリプトを実行して製品シークレットを作成します。これは product_secret が設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:108
+#: src/metadata/conf.py:110
 msgid "The email of the Optimizer account you want to associate with the Product."
 msgstr "製品と関連付ける Optimizer アカウントの電子メールです。"
 
-#: src/metadata/conf.py:113
+#: src/metadata/conf.py:115
 msgid ""
 "The password associated with the Optimizer account you to associate with "
 "the Product."
 msgstr "製品と関連付ける Optimizer アカウントのパスワードです。"
 
-#: src/metadata/conf.py:118
+#: src/metadata/conf.py:120
 msgid ""
 "Execute this script to produce the email password. This will be used when"
 " `email_password` is not set."
 msgstr "このスクリプトを実行して電子メールパスワードを作成します。これは email_password が設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:125
+#: src/metadata/conf.py:127
 msgid ""
 "In secure mode (HTTPS), if Optimizer SSL certificates have to be verified"
 " against certificate authority"
 msgstr "セキュアモード（HTTPS）で、Optimizer SSL 証明書を認証局に対して検証する必要がある場合"
 
-#: src/metadata/conf.py:135
+#: src/metadata/conf.py:149
 msgid "Configuration options for Navigator API"
 msgstr "Navigator API の設定オプション"
 
-#: src/metadata/conf.py:139
+#: src/metadata/conf.py:153
 msgid "Base URL to Navigator API."
 msgstr "Navigator API のベース URL です。"
 
-#: src/metadata/conf.py:143
+#: src/metadata/conf.py:157
 msgid "Auth username of the hue user used for authentications."
 msgstr "認証に使用する Hue ユーザーの認証ユーザー名"
 
-#: src/metadata/conf.py:147
+#: src/metadata/conf.py:161
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
 msgstr "認証に使用する Hue ユーザーの LDAP/PAM/.. パスワードです。"
 
-#: src/metadata/conf.py:152
+#: src/metadata/conf.py:166
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr "このスクリプトを実行して認証パスワードを作成します。これは auth_password が設定されていない場合に利用されます。"
 
-#: src/metadata/conf.py:158
+#: src/metadata/conf.py:172
 msgid ""
 "Navigator configuration directory, where navigator.client.properties is "
 "located."
@@ -93,33 +101,44 @@ msgstr ""
 "navigator.client.properties が格納されている Navigator 設定"
 "ディレクトリです。"
 
-#: src/metadata/conf.py:163
-msgid "Perform Sentry privilege filtering."
-msgstr "Sentry 権限のフィルター処理を実行します。"
+#: src/metadata/conf.py:177
+msgid ""
+"Perform Sentry privilege filtering. Default to true automatically if the "
+"cluster is secure."
+msgstr ""
+"Sentry 権限のフィルタ処理を実行します。デフォルトでは、クラスタがセキュアな場合、"
+"自動的に True に設定されます。"
 
-#: src/metadata/navigator_api.py:388 src/metadata/navigator_api.py:406
+#: src/metadata/conf.py:183
+msgid "Max number of items to fetch in one call in object search."
+msgstr "オブジェクト検索の 1 回のコールでフェッチされるアイテムの最大数。"
+
+#: src/metadata/conf.py:189
+msgid "Max number of items to fetch in one call in object search autocomplete."
+msgstr "オブジェクト検索のオートコンプリートの 1 回のコールでフェッチされるアイテムの最大数。"
+
+#: src/metadata/navigator_api.py:399 src/metadata/navigator_api.py:425
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
 msgstr "add_tags には、'id' パラメーターと 'tags' パラメーターが指定された、空ではないタグリストが必要です"
 
-#: src/metadata/navigator_api.py:424
+#: src/metadata/navigator_api.py:451
 msgid ""
 "update_properties requires an 'id' parameter and 'properties' parameter "
 "that is a non-empty dict"
 msgstr "update_properties には、id パラメーターと properties パラメーターが指定された空ではない dict が必要です"
 
-#: src/metadata/navigator_api.py:442
+#: src/metadata/navigator_api.py:477
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
 msgstr "update_properties には、id パラメーターと keys パラメーターが指定された空ではないリストが必要です"
 
-#: src/metadata/optimizer_client.py:96 src/metadata/optimizer_client.py:120
-#: src/metadata/optimizer_client.py:131 src/metadata/optimizer_client.py:142
-#: src/metadata/optimizer_client.py:174
+#: src/metadata/optimizer_client.py:84 src/metadata/optimizer_client.py:95
+#: src/metadata/optimizer_client.py:147
 msgid "Error while accessing Optimizer"
 msgstr "Optimizer へのアクセス中にエラーが発生しました"
 
-#~ msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+#~ msgid "Perform Sentry privilege filtering."
 #~ msgstr ""

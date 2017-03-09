@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -78,18 +78,18 @@ msgstr "Oozie Server 不运行的情况下应用程序不工作"
 msgid "Job with %(key)s=%(value)s does not exist"
 msgstr "具有 %(key)s=%(value)s 的作业不存在"
 
-#: src/oozie/decorators.py:98
+#: src/oozie/decorators.py:101
 #, python-format
 msgid "Job %(id)s does not exist"
 msgstr "作业 %(id)s 不存在"
 
-#: src/oozie/decorators.py:109
+#: src/oozie/decorators.py:112
 msgid "Missing permission to access the Oozie Editor"
 msgstr "缺失访问 Oozie 编辑器的权限"
 
 #: src/oozie/forms.py:91
 msgid "Local workflow.xml file"
-msgstr "本地 workflow .xml 文件"
+msgstr "本地 workflow.xml 文件"
 
 #: src/oozie/forms.py:92
 msgid "Workflow resource archive (zip)"
@@ -143,7 +143,7 @@ msgstr "禁止修改此作业"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:67
 #: src/oozie/templates/editor/list_trashed_workflows.mako:68
 #: src/oozie/templates/editor/list_workflows.mako:80
-#: src/oozie/templates/editor2/list_editor_bundles.mako:82
+#: src/oozie/templates/editor2/list_editor_bundles.mako:83
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:82
 #: src/oozie/templates/editor2/list_editor_workflows.mako:83
 msgid "Owner"
@@ -189,7 +189,7 @@ msgstr "作业名称，每个用户的作业名称必须具有唯一性。"
 #: src/oozie/templates/editor/list_trashed_workflows.mako:63
 #: src/oozie/templates/editor/list_workflows.mako:75
 #: src/oozie/templates/editor/workflow_utils.mako:31
-#: src/oozie/templates/editor2/list_editor_bundles.mako:80
+#: src/oozie/templates/editor2/list_editor_bundles.mako:81
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:80
 #: src/oozie/templates/editor2/list_editor_workflows.mako:81
 msgid "Name"
@@ -207,7 +207,7 @@ msgstr "名称"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:62
 #: src/oozie/templates/editor/list_trashed_workflows.mako:64
 #: src/oozie/templates/editor/list_workflows.mako:76
-#: src/oozie/templates/editor2/list_editor_bundles.mako:81
+#: src/oozie/templates/editor2/list_editor_bundles.mako:82
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:81
 #: src/oozie/templates/editor2/list_editor_workflows.mako:82
 msgid "Description"
@@ -276,16 +276,16 @@ msgstr "个人"
 #: src/oozie/models.py:330 src/oozie/models.py:857 src/oozie/models.py:925
 #: src/oozie/models.py:965 src/oozie/models.py:1004 src/oozie/models.py:1043
 #: src/oozie/models.py:1103 src/oozie/models.py:1141 src/oozie/models2.py:183
-#: src/oozie/models2.py:1022 src/oozie/models2.py:1121
-#: src/oozie/models2.py:1303 src/oozie/models2.py:1423
-#: src/oozie/models2.py:1490 src/oozie/models2.py:1581
-#: src/oozie/models2.py:1848 src/oozie/models2.py:1996
-#: src/oozie/models2.py:2138 src/oozie/models2.py:2230
-#: src/oozie/models2.py:2315 src/oozie/models2.py:2382
-#: src/oozie/models2.py:2456 src/oozie/models2.py:2587
-#: src/oozie/models2.py:2661
-#: src/oozie/templates/editor2/common_workflow.mako:415
-#: src/oozie/templates/editor2/common_workflow.mako:1428
+#: src/oozie/models2.py:1034 src/oozie/models2.py:1133
+#: src/oozie/models2.py:1315 src/oozie/models2.py:1435
+#: src/oozie/models2.py:1502 src/oozie/models2.py:1593
+#: src/oozie/models2.py:1860 src/oozie/models2.py:2008
+#: src/oozie/models2.py:2150 src/oozie/models2.py:2242
+#: src/oozie/models2.py:2327 src/oozie/models2.py:2394
+#: src/oozie/models2.py:2468 src/oozie/models2.py:2599
+#: src/oozie/models2.py:2673
+#: src/oozie/templates/editor2/common_workflow.mako:422
+#: src/oozie/templates/editor2/common_workflow.mako:1440
 #: src/oozie/templates/editor2/workflow_editor.mako:428
 msgid "Job XML"
 msgstr "作业 XML"
@@ -304,16 +304,16 @@ msgstr ""
 #: src/oozie/models.py:334 src/oozie/models.py:850 src/oozie/models.py:883
 #: src/oozie/models.py:920 src/oozie/models.py:960 src/oozie/models.py:999
 #: src/oozie/models.py:1038 src/oozie/models.py:1098 src/oozie/models.py:1136
-#: src/oozie/models.py:1210 src/oozie/models2.py:1008 src/oozie/models2.py:1107
-#: src/oozie/models2.py:1182 src/oozie/models2.py:1289
-#: src/oozie/models2.py:1348 src/oozie/models2.py:1409
-#: src/oozie/models2.py:1476 src/oozie/models2.py:1567
-#: src/oozie/models2.py:1836 src/oozie/models2.py:1892
-#: src/oozie/models2.py:1984 src/oozie/models2.py:2124
-#: src/oozie/models2.py:2216 src/oozie/models2.py:2303
-#: src/oozie/models2.py:2368 src/oozie/models2.py:2442
-#: src/oozie/models2.py:2508 src/oozie/models2.py:2573
-#: src/oozie/models2.py:2647
+#: src/oozie/models.py:1210 src/oozie/models2.py:1020 src/oozie/models2.py:1119
+#: src/oozie/models2.py:1194 src/oozie/models2.py:1301
+#: src/oozie/models2.py:1360 src/oozie/models2.py:1421
+#: src/oozie/models2.py:1488 src/oozie/models2.py:1579
+#: src/oozie/models2.py:1848 src/oozie/models2.py:1904
+#: src/oozie/models2.py:1996 src/oozie/models2.py:2136
+#: src/oozie/models2.py:2228 src/oozie/models2.py:2315
+#: src/oozie/models2.py:2380 src/oozie/models2.py:2454
+#: src/oozie/models2.py:2520 src/oozie/models2.py:2585
+#: src/oozie/models2.py:2659
 msgid "Hadoop job properties"
 msgstr "Hadoop 作业属性"
 
@@ -366,15 +366,15 @@ msgstr "%(node_type)s 未实施“add_node”方法。"
 
 #: src/oozie/models.py:846 src/oozie/models.py:879 src/oozie/models.py:905
 #: src/oozie/models.py:956 src/oozie/models.py:994 src/oozie/models.py:1033
-#: src/oozie/models.py:1094 src/oozie/models2.py:994 src/oozie/models2.py:1093
-#: src/oozie/models2.py:1168 src/oozie/models2.py:1275
-#: src/oozie/models2.py:1395 src/oozie/models2.py:1462
-#: src/oozie/models2.py:1553 src/oozie/models2.py:1824
-#: src/oozie/models2.py:1949 src/oozie/models2.py:2110
-#: src/oozie/models2.py:2202 src/oozie/models2.py:2282
-#: src/oozie/models2.py:2354 src/oozie/models2.py:2428
-#: src/oozie/models2.py:2559 src/oozie/models2.py:2633
-#: src/oozie/templates/editor2/common_workflow.mako:527
+#: src/oozie/models.py:1094 src/oozie/models2.py:1006 src/oozie/models2.py:1105
+#: src/oozie/models2.py:1180 src/oozie/models2.py:1287
+#: src/oozie/models2.py:1407 src/oozie/models2.py:1474
+#: src/oozie/models2.py:1565 src/oozie/models2.py:1836
+#: src/oozie/models2.py:1961 src/oozie/models2.py:2122
+#: src/oozie/models2.py:2214 src/oozie/models2.py:2294
+#: src/oozie/models2.py:2366 src/oozie/models2.py:2440
+#: src/oozie/models2.py:2571 src/oozie/models2.py:2645
+#: src/oozie/templates/editor2/common_workflow.mako:534
 msgid "Files"
 msgstr "文件"
 
@@ -388,16 +388,16 @@ msgstr "要添加到分布式缓存和任务运行目录的文件名称或路径
 
 #: src/oozie/models.py:848 src/oozie/models.py:881 src/oozie/models.py:907
 #: src/oozie/models.py:958 src/oozie/models.py:996 src/oozie/models.py:1035
-#: src/oozie/models.py:1096 src/oozie/models2.py:1001 src/oozie/models2.py:1100
-#: src/oozie/models2.py:1175 src/oozie/models2.py:1282
-#: src/oozie/models2.py:1402 src/oozie/models2.py:1469
-#: src/oozie/models2.py:1560 src/oozie/models2.py:1830
-#: src/oozie/models2.py:2117 src/oozie/models2.py:2209
-#: src/oozie/models2.py:2361 src/oozie/models2.py:2435
-#: src/oozie/models2.py:2566 src/oozie/models2.py:2640
+#: src/oozie/models.py:1096 src/oozie/models2.py:1013 src/oozie/models2.py:1112
+#: src/oozie/models2.py:1187 src/oozie/models2.py:1294
+#: src/oozie/models2.py:1414 src/oozie/models2.py:1481
+#: src/oozie/models2.py:1572 src/oozie/models2.py:1842
+#: src/oozie/models2.py:2129 src/oozie/models2.py:2221
+#: src/oozie/models2.py:2373 src/oozie/models2.py:2447
+#: src/oozie/models2.py:2578 src/oozie/models2.py:2652
 #: src/oozie/templates/editor/action_utils.mako:365
-#: src/oozie/templates/editor2/common_workflow.mako:438
-#: src/oozie/templates/editor2/common_workflow.mako:1434
+#: src/oozie/templates/editor2/common_workflow.mako:445
+#: src/oozie/templates/editor2/common_workflow.mako:1446
 msgid "Archives"
 msgstr "存档"
 
@@ -415,8 +415,8 @@ msgstr "要添加到分布式缓存的存档的名称或路径列表。"
 msgid "For the job configuration (e.g. mapred.job.queue.name=production)"
 msgstr "对于作业配置（如 mapred.job.queue.name=production）"
 
-#: src/oozie/models.py:852 src/oozie/models.py:909 src/oozie/models2.py:1053
-#: src/oozie/models2.py:1454
+#: src/oozie/models.py:852 src/oozie/models.py:909 src/oozie/models2.py:1065
+#: src/oozie/models2.py:1466
 msgid "Jar name"
 msgstr "Jar 名称"
 
@@ -427,15 +427,15 @@ msgstr "HDFS 上 %(program)s jar 文件的名称或路径。例如示例 jar。"
 
 #: src/oozie/models.py:854 src/oozie/models.py:922 src/oozie/models.py:962
 #: src/oozie/models.py:1001 src/oozie/models.py:1040 src/oozie/models.py:1100
-#: src/oozie/models.py:1138 src/oozie/models2.py:1015 src/oozie/models2.py:1114
-#: src/oozie/models2.py:1189 src/oozie/models2.py:1296
-#: src/oozie/models2.py:1416 src/oozie/models2.py:1483
-#: src/oozie/models2.py:1574 src/oozie/models2.py:1842
-#: src/oozie/models2.py:1886 src/oozie/models2.py:1990
-#: src/oozie/models2.py:2131 src/oozie/models2.py:2223
-#: src/oozie/models2.py:2309 src/oozie/models2.py:2375
-#: src/oozie/models2.py:2449 src/oozie/models2.py:2502
-#: src/oozie/models2.py:2580 src/oozie/models2.py:2654
+#: src/oozie/models.py:1138 src/oozie/models2.py:1027 src/oozie/models2.py:1126
+#: src/oozie/models2.py:1201 src/oozie/models2.py:1308
+#: src/oozie/models2.py:1428 src/oozie/models2.py:1495
+#: src/oozie/models2.py:1586 src/oozie/models2.py:1854
+#: src/oozie/models2.py:1898 src/oozie/models2.py:2002
+#: src/oozie/models2.py:2143 src/oozie/models2.py:2235
+#: src/oozie/models2.py:2321 src/oozie/models2.py:2387
+#: src/oozie/models2.py:2461 src/oozie/models2.py:2514
+#: src/oozie/models2.py:2592 src/oozie/models2.py:2666
 msgid "Prepares"
 msgstr "准备"
 
@@ -445,23 +445,23 @@ msgid ""
 "application. This should be used exclusively for directory cleanup."
 msgstr "启用应用程序之前应删除并创建的绝对路径列表。这仅适用于目录清理。"
 
-#: src/oozie/models.py:885 src/oozie/models2.py:1809
+#: src/oozie/models.py:885 src/oozie/models2.py:1821
 msgid "Mapper"
 msgstr "Mapper"
 
-#: src/oozie/models.py:886 src/oozie/models2.py:1811
+#: src/oozie/models.py:886 src/oozie/models2.py:1823
 msgid "The executable/script to be used as mapper."
 msgstr "用作 mapper 的可执行文件/脚本。"
 
-#: src/oozie/models.py:887 src/oozie/models2.py:1816
+#: src/oozie/models.py:887 src/oozie/models2.py:1828
 msgid "Reducer"
 msgstr "Reducer"
 
-#: src/oozie/models.py:888 src/oozie/models2.py:1818
+#: src/oozie/models.py:888 src/oozie/models2.py:1830
 msgid "The executable/script to be used as reducer."
 msgstr "用作 reducer 的可执行文件/脚本。"
 
-#: src/oozie/models.py:911 src/oozie/models2.py:1060 src/oozie/models2.py:1956
+#: src/oozie/models.py:911 src/oozie/models2.py:1072 src/oozie/models2.py:1968
 msgid "Main class"
 msgstr "Main class"
 
@@ -470,27 +470,27 @@ msgid "Full name of the Java class. E.g. org.apache.hadoop.examples.Grep"
 msgstr "Java 类的全名。如 org.apache.hadoop.examples.Grep"
 
 #: src/oozie/models.py:913 src/oozie/models.py:1074 src/oozie/models.py:1092
-#: src/oozie/models.py:1133 src/oozie/models2.py:986 src/oozie/models2.py:1067
-#: src/oozie/models2.py:1252 src/oozie/models2.py:1386
-#: src/oozie/models2.py:1528 src/oozie/models2.py:1626
-#: src/oozie/models2.py:1878 src/oozie/models2.py:1977
-#: src/oozie/models2.py:2176 src/oozie/models2.py:2289
-#: src/oozie/templates/editor2/common_workflow.mako:489
-#: src/oozie/templates/editor2/common_workflow.mako:507
-#: src/oozie/templates/editor2/common_workflow.mako:766
-#: src/oozie/templates/editor2/common_workflow.mako:925
+#: src/oozie/models.py:1133 src/oozie/models2.py:998 src/oozie/models2.py:1079
+#: src/oozie/models2.py:1264 src/oozie/models2.py:1398
+#: src/oozie/models2.py:1540 src/oozie/models2.py:1638
+#: src/oozie/models2.py:1890 src/oozie/models2.py:1989
+#: src/oozie/models2.py:2188 src/oozie/models2.py:2301
+#: src/oozie/templates/editor2/common_workflow.mako:496
+#: src/oozie/templates/editor2/common_workflow.mako:514
+#: src/oozie/templates/editor2/common_workflow.mako:778
+#: src/oozie/templates/editor2/common_workflow.mako:937
 msgid "Arguments"
 msgstr "参数"
 
-#: src/oozie/models.py:914 src/oozie/models2.py:1069 src/oozie/models2.py:2178
+#: src/oozie/models.py:914 src/oozie/models2.py:1081 src/oozie/models2.py:2190
 msgid ""
 "Arguments of the main method. The value of each arg element is considered"
 " a single argument and they are passed to the main method in the same "
 "order."
 msgstr "主方法的参数。每个参数元素的值被视为单个参数，并以相同的顺序传递到主方法。"
 
-#: src/oozie/models.py:916 src/oozie/models2.py:1075 src/oozie/models2.py:1898
-#: src/oozie/models2.py:2184 src/oozie/models2.py:2514
+#: src/oozie/models.py:916 src/oozie/models2.py:1087 src/oozie/models2.py:1910
+#: src/oozie/models2.py:2196 src/oozie/models2.py:2526
 msgid "Java options"
 msgstr "Java 选项"
 
@@ -505,14 +505,14 @@ msgstr ""
 "配置属性。例如，-Dexample-property=hue"
 
 #: src/oozie/models.py:929 src/oozie/models.py:1076 src/oozie/models.py:1107
-#: src/oozie/models2.py:1082 src/oozie/models2.py:1542
-#: src/oozie/models2.py:1633 src/oozie/models2.py:2191
+#: src/oozie/models2.py:1094 src/oozie/models2.py:1554
+#: src/oozie/models2.py:1645 src/oozie/models2.py:2203
 msgid "Capture output"
 msgstr "捕获输出"
 
-#: src/oozie/models.py:930 src/oozie/models.py:1108 src/oozie/models2.py:1084
-#: src/oozie/models2.py:1544 src/oozie/models2.py:1635
-#: src/oozie/models2.py:2193
+#: src/oozie/models.py:930 src/oozie/models.py:1108 src/oozie/models2.py:1096
+#: src/oozie/models2.py:1556 src/oozie/models2.py:1647
+#: src/oozie/models2.py:2205
 #, python-format
 msgid ""
 "Capture output of the stdout of the %(program)s command execution. The "
@@ -533,14 +533,14 @@ msgid "Script name or path to the Pig script. E.g. my_script.pig."
 msgstr "脚本名称或 Pig 脚本路径。如 my_script.pig。"
 
 #: src/oozie/models.py:954 src/oozie/models.py:992 src/oozie/models.py:1030
-#: src/oozie/models.py:1753 src/oozie/models2.py:979 src/oozie/models2.py:1160
-#: src/oozie/models2.py:1245 src/oozie/models2.py:2087
-#: src/oozie/models2.py:2295 src/oozie/models2.py:2420
-#: src/oozie/models2.py:2494 src/oozie/models2.py:2551
-#: src/oozie/models2.py:2625
+#: src/oozie/models.py:1753 src/oozie/models2.py:991 src/oozie/models2.py:1172
+#: src/oozie/models2.py:1257 src/oozie/models2.py:2099
+#: src/oozie/models2.py:2307 src/oozie/models2.py:2432
+#: src/oozie/models2.py:2506 src/oozie/models2.py:2563
+#: src/oozie/models2.py:2637
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:173
-#: src/oozie/templates/editor2/common_workflow.mako:545
-#: src/oozie/templates/editor2/common_workflow.mako:2117
+#: src/oozie/templates/editor2/common_workflow.mako:552
+#: src/oozie/templates/editor2/common_workflow.mako:2129
 msgid "Parameters"
 msgstr "参数"
 
@@ -553,10 +553,10 @@ msgstr "脚本的 Pig 参数。如 \"-param\", \"INPUT=${inputDir}\""
 msgid "Script name or path to the %(type)s script. E.g. my_script.sql."
 msgstr "脚本名称或 %(type)s 脚本路径。如 my_script.sql。"
 
-#: src/oozie/models.py:993 src/oozie/models2.py:1162 src/oozie/models2.py:1247
-#: src/oozie/models2.py:2089 src/oozie/models2.py:2297
-#: src/oozie/models2.py:2422 src/oozie/models2.py:2496
-#: src/oozie/models2.py:2553 src/oozie/models2.py:2627
+#: src/oozie/models.py:993 src/oozie/models2.py:1174 src/oozie/models2.py:1259
+#: src/oozie/models2.py:2101 src/oozie/models2.py:2309
+#: src/oozie/models2.py:2434 src/oozie/models2.py:2508
+#: src/oozie/models2.py:2565 src/oozie/models2.py:2639
 #, python-format
 msgid "The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}"
 msgstr "脚本的 %(type)s 参数。如 N=5，INPUT=${inputDir}"
@@ -577,14 +577,14 @@ msgstr "请参考 Workflow 部署目录中包含的 Hive hive-config.xml 文件�
 msgid "Command"
 msgstr "命令"
 
-#: src/oozie/models.py:1028 src/oozie/models2.py:1381
+#: src/oozie/models.py:1028 src/oozie/models2.py:1393
 #, python-format
 msgid ""
 "The full %(type)s command. Either put it here or split it by spaces and "
 "insert the parts as multiple parameters below."
 msgstr "完整 %(type)s 命令。将命令放在此处，或以空格对其进行拆分，然后将部分作为多参数插入下方。"
 
-#: src/oozie/models.py:1031 src/oozie/models2.py:1388
+#: src/oozie/models.py:1031 src/oozie/models2.py:1400
 #, python-format
 msgid ""
 "If no command is specified, split the command by spaces and insert the "
@@ -613,7 +613,7 @@ msgstr "用户正在执行 shell 命令。"
 msgid "Host"
 msgstr "主机"
 
-#: src/oozie/models.py:1071 src/oozie/models2.py:1614
+#: src/oozie/models.py:1071 src/oozie/models2.py:1626
 msgid "Where the shell will be executed."
 msgstr "将执行 shell 的位置。"
 
@@ -643,7 +643,7 @@ msgstr ""
 "%(program)s 命令执行 StdOut 的捕获输出。%(program)s 命令输出必须为 Java 属性文件格式，且不得超过 2KB。在"
 " workflow 定义中，可通过字符串 action:output（字符串节点，字符串密钥）功能访问 %(program)s 操作节点的输出"
 
-#: src/oozie/models.py:1091 src/oozie/models2.py:1621
+#: src/oozie/models.py:1091 src/oozie/models2.py:1633
 msgid "The path of the Shell command to execute."
 msgstr "要执行的 Shell 命令的路径。"
 
@@ -664,7 +664,7 @@ msgstr "%(type)s 命令的参数。先放置选项，然后是源路径，接下
 msgid "For the job configuration (e.g. mapred.job.queue.name=production"
 msgstr "对于作业配置（如 mapred.job.queue.name=production"
 
-#: src/oozie/models.py:1161 src/oozie/models2.py:1668
+#: src/oozie/models.py:1161 src/oozie/models2.py:1680
 msgid "Delete path"
 msgstr "删除路径"
 
@@ -674,7 +674,7 @@ msgid ""
 "all its content and then deletes the directory."
 msgstr "删除指定的路径，如果为目录，将递归地删除所有内容，然后删除目录。"
 
-#: src/oozie/models.py:1164 src/oozie/models2.py:1675
+#: src/oozie/models.py:1164 src/oozie/models2.py:1687
 msgid "Create directory"
 msgstr "创建目录"
 
@@ -692,7 +692,7 @@ msgstr "移动文件"
 msgid "Move a file or directory to another path."
 msgstr "将文件或目录移至另一个路径。"
 
-#: src/oozie/models.py:1169 src/oozie/models2.py:1689
+#: src/oozie/models.py:1169 src/oozie/models2.py:1701
 msgid "Change permissions"
 msgstr "更改权限"
 
@@ -703,7 +703,7 @@ msgid ""
 "octal representation (755)."
 msgstr "更改指定路径的权限。可使用 Unix 符号（例如  -rwxrw-rw-）或八进制数 (755) 指定权限。"
 
-#: src/oozie/models.py:1172 src/oozie/models2.py:1696
+#: src/oozie/models.py:1172 src/oozie/models2.py:1708
 msgid "Create or touch a file"
 msgstr "创建或触按文件"
 
@@ -725,7 +725,7 @@ msgstr "用逗号分开的值。"
 msgid "CC addresses (optional)"
 msgstr "抄送地址（可选）"
 
-#: src/oozie/models.py:1198 src/oozie/models2.py:1756
+#: src/oozie/models.py:1198 src/oozie/models2.py:1768
 msgid "Subject"
 msgstr "主题"
 
@@ -733,11 +733,11 @@ msgstr "主题"
 msgid "Plain-text."
 msgstr "纯文本。"
 
-#: src/oozie/models.py:1199 src/oozie/models2.py:1763
+#: src/oozie/models.py:1199 src/oozie/models2.py:1775
 msgid "Body"
 msgstr "主体"
 
-#: src/oozie/models.py:1206 src/oozie/models2.py:1334
+#: src/oozie/models.py:1206 src/oozie/models2.py:1346
 msgid "Sub-workflow"
 msgstr "子 Workflow"
 
@@ -747,17 +747,17 @@ msgid ""
 "workflows."
 msgstr "要包括的子 Workflow 应用程序。您必须拥有所有子 Workflow。"
 
-#: src/oozie/models.py:1208 src/oozie/models2.py:1341
+#: src/oozie/models.py:1208 src/oozie/models2.py:1353
 msgid "Propagate configuration"
 msgstr "传送配置"
 
-#: src/oozie/models.py:1209 src/oozie/models2.py:1343
+#: src/oozie/models.py:1209 src/oozie/models2.py:1355
 msgid ""
 "If the workflow job configuration should be propagated to the child "
 "workflow."
 msgstr "如果 workflow 作业配置应传送至子级 workflow。"
 
-#: src/oozie/models.py:1211 src/oozie/models2.py:1350
+#: src/oozie/models.py:1211 src/oozie/models2.py:1362
 msgid ""
 "Can be used to specify the job properties that are required to run the "
 "child workflow job."
@@ -875,7 +875,7 @@ msgid "The workflow to schedule repeatedly."
 msgstr "用于重复计划的 workflow。"
 
 #: src/oozie/models.py:1400
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:438
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:448
 msgid "Timeout"
 msgstr "超时"
 
@@ -887,7 +887,7 @@ msgstr "放弃 Coordinator 操作执行前，Coordinator 操作将处于 WATTING
 
 #: src/oozie/models.py:1403
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:367
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:441
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:451
 msgid "Concurrency"
 msgstr "并发"
 
@@ -898,7 +898,7 @@ msgid ""
 msgstr "Coordinator 引擎开始限制前，允许同时运行的 Coordinator 操作（RUNNING（运行）状态）的数量。"
 
 #: src/oozie/models.py:1406
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:444
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:454
 msgid "Execution"
 msgstr "执行"
 
@@ -907,12 +907,12 @@ msgid "FIFO (oldest first) default"
 msgstr "FIFO（先进先出）默认值"
 
 #: src/oozie/models.py:1408
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:447
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:457
 msgid "LIFO (newest first)"
 msgstr "LIFO（后进先出）"
 
 #: src/oozie/models.py:1409
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:448
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:458
 msgid "LAST_ONLY (discards all older materializations)"
 msgstr "LAST_ONLY（放弃所有更早的具体化）"
 
@@ -929,7 +929,7 @@ msgstr ""
 "作业的手动重新运行而发生。"
 
 #: src/oozie/models.py:1414
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:451
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:461
 msgid "Throttle"
 msgstr "限制"
 
@@ -1161,7 +1161,8 @@ msgid "Add one or more Oozie workflow job parameters."
 msgstr "添加一个或多个 Oozie Workflow 作业参数。"
 
 #: src/oozie/models2.py:146
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:473
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:471
+#: src/oozie/templates/dashboard/list_oozie_workflow_graph.mako:62
 #: src/oozie/templates/editor/edit_workflow.mako:48
 #: src/oozie/templates/editor2/workflow_editor.mako:67
 #: src/oozie/templates/editor2/workflow_editor.mako:404
@@ -1211,7 +1212,7 @@ msgstr "SLA 已启用"
 #: src/oozie/models2.py:199 src/oozie/templates/editor/action_utils.mako:82
 #: src/oozie/templates/editor/edit_coordinator.mako:290
 #: src/oozie/templates/editor/edit_workflow.mako:123
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:454
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:464
 #: src/oozie/templates/editor2/workflow_editor.mako:432
 msgid "SLA Configuration"
 msgstr "SLA 配置"
@@ -1220,167 +1221,167 @@ msgstr "SLA 配置"
 msgid "Oozie SLA properties"
 msgstr "Oozie SLA 属性"
 
-#: src/oozie/models2.py:295 src/oozie/models2.py:852 src/oozie/models2.py:2028
+#: src/oozie/models2.py:297 src/oozie/models2.py:864 src/oozie/models2.py:2040
 msgid "Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]"
 msgstr "操作失败，错误消息[${wf:errorMessage(wf:lastErrorNode())}]"
 
-#: src/oozie/models2.py:851
+#: src/oozie/models2.py:863
 msgid "${wf:name()} execution failure"
 msgstr "${wf:name()} 执行失败"
 
-#: src/oozie/models2.py:857
+#: src/oozie/models2.py:869
 msgid "${wf:name()} execution successful"
 msgstr "${wf:name()} 执行成功"
 
-#: src/oozie/models2.py:972 src/oozie/models2.py:1153 src/oozie/models2.py:1238
+#: src/oozie/models2.py:984 src/oozie/models2.py:1165 src/oozie/models2.py:1250
 msgid "Script"
 msgstr "脚本"
 
-#: src/oozie/models2.py:974 src/oozie/models2.py:1155 src/oozie/models2.py:1240
+#: src/oozie/models2.py:986 src/oozie/models2.py:1167 src/oozie/models2.py:1252
 msgid "Path to the script on HDFS."
 msgstr "HDFS 上的脚本路径。"
 
-#: src/oozie/models2.py:981
+#: src/oozie/models2.py:993
 msgid "The Pig parameters of the script without -param. e.g. INPUT=${inputDir}"
 msgstr "脚本的 Pig 参数，无 -param.，例如 INPUT=${inputDir}"
 
-#: src/oozie/models2.py:988
+#: src/oozie/models2.py:1000
 msgid "The Pig parameters of the script as is. e.g. -param, INPUT=${inputDir}"
 msgstr "脚本的 Pig 参数，无改动，例如 -param, INPUT=${inputDir}"
 
-#: src/oozie/models2.py:996 src/oozie/models2.py:1095 src/oozie/models2.py:1170
-#: src/oozie/models2.py:1277 src/oozie/models2.py:1397
-#: src/oozie/models2.py:1464 src/oozie/models2.py:1555
-#: src/oozie/models2.py:1826 src/oozie/models2.py:2112
-#: src/oozie/models2.py:2204 src/oozie/models2.py:2356
-#: src/oozie/models2.py:2430 src/oozie/models2.py:2561
-#: src/oozie/models2.py:2635
+#: src/oozie/models2.py:1008 src/oozie/models2.py:1107
+#: src/oozie/models2.py:1182 src/oozie/models2.py:1289
+#: src/oozie/models2.py:1409 src/oozie/models2.py:1476
+#: src/oozie/models2.py:1567 src/oozie/models2.py:1838
+#: src/oozie/models2.py:2124 src/oozie/models2.py:2216
+#: src/oozie/models2.py:2368 src/oozie/models2.py:2442
+#: src/oozie/models2.py:2573 src/oozie/models2.py:2647
 msgid "Files put in the running directory."
 msgstr "放入运行目录的文件。"
 
-#: src/oozie/models2.py:1003 src/oozie/models2.py:1102
-#: src/oozie/models2.py:1177 src/oozie/models2.py:1284
-#: src/oozie/models2.py:1404 src/oozie/models2.py:1471
-#: src/oozie/models2.py:1562 src/oozie/models2.py:1832
-#: src/oozie/models2.py:2119 src/oozie/models2.py:2211
-#: src/oozie/models2.py:2363 src/oozie/models2.py:2437
-#: src/oozie/models2.py:2568 src/oozie/models2.py:2642
+#: src/oozie/models2.py:1015 src/oozie/models2.py:1114
+#: src/oozie/models2.py:1189 src/oozie/models2.py:1296
+#: src/oozie/models2.py:1416 src/oozie/models2.py:1483
+#: src/oozie/models2.py:1574 src/oozie/models2.py:1844
+#: src/oozie/models2.py:2131 src/oozie/models2.py:2223
+#: src/oozie/models2.py:2375 src/oozie/models2.py:2449
+#: src/oozie/models2.py:2580 src/oozie/models2.py:2654
 msgid "zip, tar and tgz/tar.gz uncompressed into the running directory."
 msgstr "zip、tar 和 tgz/tar.gz 解压到运行目录中。"
 
-#: src/oozie/models2.py:1010 src/oozie/models2.py:1109
-#: src/oozie/models2.py:1184 src/oozie/models2.py:1291
-#: src/oozie/models2.py:1411 src/oozie/models2.py:1478
-#: src/oozie/models2.py:1569 src/oozie/models2.py:1838
-#: src/oozie/models2.py:1894 src/oozie/models2.py:1986
-#: src/oozie/models2.py:2126 src/oozie/models2.py:2218
-#: src/oozie/models2.py:2305 src/oozie/models2.py:2370
-#: src/oozie/models2.py:2444 src/oozie/models2.py:2510
-#: src/oozie/models2.py:2575 src/oozie/models2.py:2649
+#: src/oozie/models2.py:1022 src/oozie/models2.py:1121
+#: src/oozie/models2.py:1196 src/oozie/models2.py:1303
+#: src/oozie/models2.py:1423 src/oozie/models2.py:1490
+#: src/oozie/models2.py:1581 src/oozie/models2.py:1850
+#: src/oozie/models2.py:1906 src/oozie/models2.py:1998
+#: src/oozie/models2.py:2138 src/oozie/models2.py:2230
+#: src/oozie/models2.py:2317 src/oozie/models2.py:2382
+#: src/oozie/models2.py:2456 src/oozie/models2.py:2522
+#: src/oozie/models2.py:2587 src/oozie/models2.py:2661
 msgid "value, e.g. production"
 msgstr "值，例如生产"
 
-#: src/oozie/models2.py:1017 src/oozie/models2.py:1116
-#: src/oozie/models2.py:1191 src/oozie/models2.py:1298
-#: src/oozie/models2.py:1418 src/oozie/models2.py:1485
-#: src/oozie/models2.py:1576 src/oozie/models2.py:1844
-#: src/oozie/models2.py:1888 src/oozie/models2.py:1992
-#: src/oozie/models2.py:2133 src/oozie/models2.py:2225
-#: src/oozie/models2.py:2311 src/oozie/models2.py:2377
-#: src/oozie/models2.py:2451 src/oozie/models2.py:2504
-#: src/oozie/models2.py:2582 src/oozie/models2.py:2656
+#: src/oozie/models2.py:1029 src/oozie/models2.py:1128
+#: src/oozie/models2.py:1203 src/oozie/models2.py:1310
+#: src/oozie/models2.py:1430 src/oozie/models2.py:1497
+#: src/oozie/models2.py:1588 src/oozie/models2.py:1856
+#: src/oozie/models2.py:1900 src/oozie/models2.py:2004
+#: src/oozie/models2.py:2145 src/oozie/models2.py:2237
+#: src/oozie/models2.py:2323 src/oozie/models2.py:2389
+#: src/oozie/models2.py:2463 src/oozie/models2.py:2516
+#: src/oozie/models2.py:2594 src/oozie/models2.py:2668
 msgid "Path to manipulate before starting the application."
 msgstr "启动应用程序前的操作路径。"
 
-#: src/oozie/models2.py:1024 src/oozie/models2.py:1123
-#: src/oozie/models2.py:1305 src/oozie/models2.py:1425
-#: src/oozie/models2.py:1492 src/oozie/models2.py:1583
-#: src/oozie/models2.py:1850 src/oozie/models2.py:1998
-#: src/oozie/models2.py:2140 src/oozie/models2.py:2232
-#: src/oozie/models2.py:2317 src/oozie/models2.py:2384
-#: src/oozie/models2.py:2458 src/oozie/models2.py:2589
-#: src/oozie/models2.py:2663
+#: src/oozie/models2.py:1036 src/oozie/models2.py:1135
+#: src/oozie/models2.py:1317 src/oozie/models2.py:1437
+#: src/oozie/models2.py:1504 src/oozie/models2.py:1595
+#: src/oozie/models2.py:1862 src/oozie/models2.py:2010
+#: src/oozie/models2.py:2152 src/oozie/models2.py:2244
+#: src/oozie/models2.py:2329 src/oozie/models2.py:2396
+#: src/oozie/models2.py:2470 src/oozie/models2.py:2601
+#: src/oozie/models2.py:2675
 msgid "Refer to a Hadoop JobConf job.xml"
 msgstr "请参考 Hadoop JobConf job.xml"
 
-#: src/oozie/models2.py:1029 src/oozie/models2.py:1128
-#: src/oozie/models2.py:1203 src/oozie/models2.py:1310
-#: src/oozie/models2.py:1355 src/oozie/models2.py:1430
-#: src/oozie/models2.py:1497 src/oozie/models2.py:1588
-#: src/oozie/models2.py:1644 src/oozie/models2.py:1711
-#: src/oozie/models2.py:1785 src/oozie/models2.py:1854
-#: src/oozie/models2.py:1904 src/oozie/models2.py:2003
-#: src/oozie/models2.py:2145 src/oozie/models2.py:2237
-#: src/oozie/models2.py:2322 src/oozie/models2.py:2389
-#: src/oozie/models2.py:2463 src/oozie/models2.py:2520
-#: src/oozie/models2.py:2594 src/oozie/models2.py:2668
+#: src/oozie/models2.py:1041 src/oozie/models2.py:1140
+#: src/oozie/models2.py:1215 src/oozie/models2.py:1322
+#: src/oozie/models2.py:1367 src/oozie/models2.py:1442
+#: src/oozie/models2.py:1509 src/oozie/models2.py:1600
+#: src/oozie/models2.py:1656 src/oozie/models2.py:1723
+#: src/oozie/models2.py:1797 src/oozie/models2.py:1866
+#: src/oozie/models2.py:1916 src/oozie/models2.py:2015
+#: src/oozie/models2.py:2157 src/oozie/models2.py:2249
+#: src/oozie/models2.py:2334 src/oozie/models2.py:2401
+#: src/oozie/models2.py:2475 src/oozie/models2.py:2532
+#: src/oozie/models2.py:2606 src/oozie/models2.py:2680
 msgid "Max retry"
 msgstr "最大重试次数"
 
-#: src/oozie/models2.py:1031 src/oozie/models2.py:1130
-#: src/oozie/models2.py:1205 src/oozie/models2.py:1312
-#: src/oozie/models2.py:1357 src/oozie/models2.py:1432
-#: src/oozie/models2.py:1499 src/oozie/models2.py:1590
-#: src/oozie/models2.py:1646 src/oozie/models2.py:1713
-#: src/oozie/models2.py:1787 src/oozie/models2.py:1856
-#: src/oozie/models2.py:1906 src/oozie/models2.py:2005
-#: src/oozie/models2.py:2147 src/oozie/models2.py:2239
-#: src/oozie/models2.py:2324 src/oozie/models2.py:2391
-#: src/oozie/models2.py:2465 src/oozie/models2.py:2522
-#: src/oozie/models2.py:2596 src/oozie/models2.py:2670
+#: src/oozie/models2.py:1043 src/oozie/models2.py:1142
+#: src/oozie/models2.py:1217 src/oozie/models2.py:1324
+#: src/oozie/models2.py:1369 src/oozie/models2.py:1444
+#: src/oozie/models2.py:1511 src/oozie/models2.py:1602
+#: src/oozie/models2.py:1658 src/oozie/models2.py:1725
+#: src/oozie/models2.py:1799 src/oozie/models2.py:1868
+#: src/oozie/models2.py:1918 src/oozie/models2.py:2017
+#: src/oozie/models2.py:2159 src/oozie/models2.py:2251
+#: src/oozie/models2.py:2336 src/oozie/models2.py:2403
+#: src/oozie/models2.py:2477 src/oozie/models2.py:2534
+#: src/oozie/models2.py:2608 src/oozie/models2.py:2682
 msgid "Number of times, default is 3"
 msgstr "次数，默认为 3"
 
-#: src/oozie/models2.py:1036 src/oozie/models2.py:1135
-#: src/oozie/models2.py:1210 src/oozie/models2.py:1317
-#: src/oozie/models2.py:1362 src/oozie/models2.py:1437
-#: src/oozie/models2.py:1504 src/oozie/models2.py:1595
-#: src/oozie/models2.py:1651 src/oozie/models2.py:1718
-#: src/oozie/models2.py:1792 src/oozie/models2.py:1861
-#: src/oozie/models2.py:1911 src/oozie/models2.py:2010
-#: src/oozie/models2.py:2152 src/oozie/models2.py:2244
-#: src/oozie/models2.py:2329 src/oozie/models2.py:2396
-#: src/oozie/models2.py:2470 src/oozie/models2.py:2527
-#: src/oozie/models2.py:2601 src/oozie/models2.py:2675
+#: src/oozie/models2.py:1048 src/oozie/models2.py:1147
+#: src/oozie/models2.py:1222 src/oozie/models2.py:1329
+#: src/oozie/models2.py:1374 src/oozie/models2.py:1449
+#: src/oozie/models2.py:1516 src/oozie/models2.py:1607
+#: src/oozie/models2.py:1663 src/oozie/models2.py:1730
+#: src/oozie/models2.py:1804 src/oozie/models2.py:1873
+#: src/oozie/models2.py:1923 src/oozie/models2.py:2022
+#: src/oozie/models2.py:2164 src/oozie/models2.py:2256
+#: src/oozie/models2.py:2341 src/oozie/models2.py:2408
+#: src/oozie/models2.py:2482 src/oozie/models2.py:2539
+#: src/oozie/models2.py:2613 src/oozie/models2.py:2687
 msgid "Retry interval"
 msgstr "重试间隔"
 
-#: src/oozie/models2.py:1038 src/oozie/models2.py:1137
-#: src/oozie/models2.py:1212 src/oozie/models2.py:1319
-#: src/oozie/models2.py:1364 src/oozie/models2.py:1439
-#: src/oozie/models2.py:1506 src/oozie/models2.py:1597
-#: src/oozie/models2.py:1653 src/oozie/models2.py:1720
-#: src/oozie/models2.py:1794 src/oozie/models2.py:1863
-#: src/oozie/models2.py:1913 src/oozie/models2.py:2012
-#: src/oozie/models2.py:2154 src/oozie/models2.py:2246
-#: src/oozie/models2.py:2331 src/oozie/models2.py:2398
-#: src/oozie/models2.py:2472 src/oozie/models2.py:2529
-#: src/oozie/models2.py:2603 src/oozie/models2.py:2677
+#: src/oozie/models2.py:1050 src/oozie/models2.py:1149
+#: src/oozie/models2.py:1224 src/oozie/models2.py:1331
+#: src/oozie/models2.py:1376 src/oozie/models2.py:1451
+#: src/oozie/models2.py:1518 src/oozie/models2.py:1609
+#: src/oozie/models2.py:1665 src/oozie/models2.py:1732
+#: src/oozie/models2.py:1806 src/oozie/models2.py:1875
+#: src/oozie/models2.py:1925 src/oozie/models2.py:2024
+#: src/oozie/models2.py:2166 src/oozie/models2.py:2258
+#: src/oozie/models2.py:2343 src/oozie/models2.py:2410
+#: src/oozie/models2.py:2484 src/oozie/models2.py:2541
+#: src/oozie/models2.py:2615 src/oozie/models2.py:2689
 msgid "Wait time in minutes, default is 10"
 msgstr "等待时间（分钟），默认为 10"
 
-#: src/oozie/models2.py:1055 src/oozie/models2.py:1456
+#: src/oozie/models2.py:1067 src/oozie/models2.py:1468
 msgid "Path to the jar on HDFS."
 msgstr "HDFS 上的 jar 路径。"
 
-#: src/oozie/models2.py:1062
+#: src/oozie/models2.py:1074
 msgid "Java class. e.g. org.apache.hadoop.examples.Grep"
 msgstr "Java 类。如 org.apache.hadoop.examples.Grep"
 
-#: src/oozie/models2.py:1077 src/oozie/models2.py:1900
-#: src/oozie/models2.py:2186 src/oozie/models2.py:2516
+#: src/oozie/models2.py:1089 src/oozie/models2.py:1912
+#: src/oozie/models2.py:2198 src/oozie/models2.py:2528
 msgid "Parameters for the JVM, e.g. -Dprop1=a -Dprop2=b"
 msgstr "JVM 的参数，例如  -Dprop1=a -Dprop2=b"
 
-#: src/oozie/models2.py:1196
+#: src/oozie/models2.py:1208
 msgid "Hive XML"
 msgstr "Hive XML"
 
-#: src/oozie/models2.py:1198
+#: src/oozie/models2.py:1210
 msgid "Refer to a hive-site.xml for connecting to Hive"
 msgstr "参见 hive-site.xml 以连接 Hive"
 
-#: src/oozie/models2.py:1254
+#: src/oozie/models2.py:1266
 msgid ""
 "Arguments for beeline. E.g. --showHeader=true, "
 "-Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks"
@@ -1388,19 +1389,19 @@ msgstr ""
 "beeline 的参数。例如 --showHeader=true, "
 "-Djavax.net.ssl.trustStore=/etc/cdep-ssl-conf/CA_STANDARD/truststore.jks"
 
-#: src/oozie/models2.py:1260 src/oozie/models2.py:2095
+#: src/oozie/models2.py:1272 src/oozie/models2.py:2107
 msgid "HiveServer2 URL"
 msgstr "HiveServer2 URL"
 
-#: src/oozie/models2.py:1262 src/oozie/models2.py:2097
+#: src/oozie/models2.py:1274 src/oozie/models2.py:2109
 msgid "e.g. jdbc:hive2://localhost:10000/default. JDBC URL for the Hive Server 2."
 msgstr "例如，对于 Hive Server 2 为 jdbc:hive2://localhost:10000/default. JDBC URL。"
 
-#: src/oozie/models2.py:1267 src/oozie/models2.py:2102
+#: src/oozie/models2.py:1279 src/oozie/models2.py:2114
 msgid "Password"
 msgstr "密码"
 
-#: src/oozie/models2.py:1269 src/oozie/models2.py:2104
+#: src/oozie/models2.py:1281 src/oozie/models2.py:2116
 msgid ""
 "The password element must contain the password of the current user. "
 "However, the password is only used if Hive Server 2 is backed by "
@@ -1410,261 +1411,261 @@ msgstr ""
 "密码元素必须包含当前用户的密码。但是，仅当 Hive Server 2 受到某些需要密码的元素（例如 LDAP）支持时才会使用密码；非加密 "
 "Hive Server 2 或 Kerberized Hive Server 2 不需要密码。"
 
-#: src/oozie/models2.py:1336
+#: src/oozie/models2.py:1348
 msgid ""
 "The sub-workflow application to include. You must own all the sub-"
 "workflows"
 msgstr "要包括的子 Workflow 应用程序。您必须拥有所有子 Workflow"
 
-#: src/oozie/models2.py:1379
+#: src/oozie/models2.py:1391
 msgid "Sqoop command"
 msgstr "Sqoop 命令"
 
-#: src/oozie/models2.py:1521
+#: src/oozie/models2.py:1533
 msgid "Shell command"
 msgstr "Shell 命令"
 
-#: src/oozie/models2.py:1523
+#: src/oozie/models2.py:1535
 msgid "Shell command to execute, e.g script.sh"
 msgstr "要执行的 Shell 命令，例如 script.sh"
 
-#: src/oozie/models2.py:1530 src/oozie/models2.py:1628
+#: src/oozie/models2.py:1542 src/oozie/models2.py:1640
 msgid "One arg, e.g. -l, --help"
 msgstr "一个 arg，例如 -l, --help"
 
-#: src/oozie/models2.py:1535
+#: src/oozie/models2.py:1547
 msgid "Environment variables"
 msgstr "环境变量"
 
-#: src/oozie/models2.py:1537
+#: src/oozie/models2.py:1549
 msgid "e.g. MAX=10 or PATH=$PATH:mypath"
 msgstr "例如 MAX=10 或 PATH=$PATH:mypath"
 
-#: src/oozie/models2.py:1612
+#: src/oozie/models2.py:1624
 msgid "User and Host"
 msgstr "用户和主机"
 
-#: src/oozie/models2.py:1619
+#: src/oozie/models2.py:1631
 msgid "Ssh command"
 msgstr "SSH 命令"
 
-#: src/oozie/models2.py:1670
+#: src/oozie/models2.py:1682
 msgid "Deletes recursively all content."
 msgstr "递归删除所有内容。"
 
-#: src/oozie/models2.py:1677
+#: src/oozie/models2.py:1689
 msgid "Sub directories are created if needed."
 msgstr "创建子目录（如有必要）。"
 
-#: src/oozie/models2.py:1682
+#: src/oozie/models2.py:1694
 msgid "Move file or directory"
 msgstr "移动文件或目录"
 
-#: src/oozie/models2.py:1684
+#: src/oozie/models2.py:1696
 msgid "Destination."
 msgstr "目标。"
 
-#: src/oozie/models2.py:1691 src/oozie/models2.py:1705
+#: src/oozie/models2.py:1703 src/oozie/models2.py:1717
 msgid "File or directory."
 msgstr "文件或目录。"
 
-#: src/oozie/models2.py:1698
+#: src/oozie/models2.py:1710
 msgid "Or update its modification date."
 msgstr "或更新它的修改日期。"
 
-#: src/oozie/models2.py:1703
+#: src/oozie/models2.py:1715
 msgid "Change the group"
 msgstr "更改组"
 
-#: src/oozie/models2.py:1735
+#: src/oozie/models2.py:1747
 msgid "To addresses"
 msgstr "接收地址"
 
-#: src/oozie/models2.py:1737 src/oozie/models2.py:1744
-#: src/oozie/models2.py:1751
+#: src/oozie/models2.py:1749 src/oozie/models2.py:1756
+#: src/oozie/models2.py:1763
 msgid "Comma-separated values"
 msgstr "用逗号分开的值"
 
-#: src/oozie/models2.py:1742
+#: src/oozie/models2.py:1754
 msgid "cc"
 msgstr "cc"
 
-#: src/oozie/models2.py:1749
+#: src/oozie/models2.py:1761
 msgid "bcc"
 msgstr "bcc"
 
-#: src/oozie/models2.py:1758 src/oozie/models2.py:1765
+#: src/oozie/models2.py:1770 src/oozie/models2.py:1777
 msgid "Plain-text"
 msgstr "纯文本"
 
-#: src/oozie/models2.py:1770
+#: src/oozie/models2.py:1782
 msgid "Attachment"
 msgstr "附件"
 
-#: src/oozie/models2.py:1772
+#: src/oozie/models2.py:1784
 msgid "Comma separated list of HDFS files."
 msgstr "HDFS 文件逗号隔离的列表。"
 
-#: src/oozie/models2.py:1777
+#: src/oozie/models2.py:1789
 msgid "Content-type"
 msgstr "内容类型"
 
-#: src/oozie/models2.py:1779
+#: src/oozie/models2.py:1791
 msgid "Default is text/plain"
 msgstr "默认为文本/纯文本"
 
-#: src/oozie/models2.py:1880
+#: src/oozie/models2.py:1892
 msgid "Options first, then source / destination paths"
 msgstr "首先是选项，然后是来源/目标路径"
 
-#: src/oozie/models2.py:1928 src/oozie/models2.py:2268
+#: src/oozie/models2.py:1940 src/oozie/models2.py:2280
 msgid "Spark Master"
 msgstr "Spark Master"
 
-#: src/oozie/models2.py:1930 src/oozie/models2.py:2270
+#: src/oozie/models2.py:1942 src/oozie/models2.py:2282
 msgid "Ex: spark://host:port, mesos://host:port, yarn, or local."
 msgstr "Ex: spark://host:port、mesos://host:port、yarn 或本地。"
 
-#: src/oozie/models2.py:1935 src/oozie/models2.py:2275
+#: src/oozie/models2.py:1947 src/oozie/models2.py:2287
 msgid "Mode"
 msgstr "模式"
 
-#: src/oozie/models2.py:1937 src/oozie/models2.py:2277
+#: src/oozie/models2.py:1949 src/oozie/models2.py:2289
 msgid "e.g. Client cluster"
 msgstr "例如客户端集群"
 
-#: src/oozie/models2.py:1942
+#: src/oozie/models2.py:1954
 msgid "App name"
 msgstr "应用程序名称"
 
-#: src/oozie/models2.py:1944
+#: src/oozie/models2.py:1956
 msgid "The name of the spark application"
 msgstr "spark 应用程序的名称"
 
-#: src/oozie/models2.py:1951 src/oozie/models2.py:2284
+#: src/oozie/models2.py:1963 src/oozie/models2.py:2296
 msgid "Path to file to put in the running directory."
 msgstr "要放入运行目录的文件的路径。"
 
-#: src/oozie/models2.py:1958
+#: src/oozie/models2.py:1970
 msgid "Only if using jars, e.g. org.apache.spark.examples.mllib.JavaALS"
 msgstr "仅限在使用 jar 时，例如 org.apache.spark.examples.mllib.JavaALS"
 
-#: src/oozie/models2.py:1963
+#: src/oozie/models2.py:1975
 msgid "Jar/py name"
 msgstr "Jar/py 名称"
 
-#: src/oozie/models2.py:1965
+#: src/oozie/models2.py:1977
 msgid "Name of main file added in Files."
 msgstr "在文件中添加的主文件的名称。"
 
-#: src/oozie/models2.py:1970
+#: src/oozie/models2.py:1982
 msgid "Options list"
 msgstr "选项列表"
 
-#: src/oozie/models2.py:1972
+#: src/oozie/models2.py:1984
 msgid "Ex: --executor-memory 20G --num-executors 50"
 msgstr "Ex: --executor-memory 20G --num-executors 50"
 
-#: src/oozie/models2.py:1979 src/oozie/models2.py:2291
+#: src/oozie/models2.py:1991 src/oozie/models2.py:2303
 msgid "Arguments, one by one, e.g. 1000, /path/a."
 msgstr "逐个参数，例如，1000, /path/a。"
 
-#: src/oozie/models2.py:2027
-#: src/oozie/templates/editor2/common_workflow.mako:343
+#: src/oozie/models2.py:2039
+#: src/oozie/templates/editor2/common_workflow.mako:350
 msgid "Message"
 msgstr "消息"
 
-#: src/oozie/models2.py:2029
+#: src/oozie/models2.py:2041
 msgid "Message to display when the workflow fails. Can contain some EL functions."
 msgstr "workflow 失败时显示的消息。可以包含一些 EL 函数。"
 
-#: src/oozie/models2.py:2053
+#: src/oozie/models2.py:2065
 msgid "XML of the action"
 msgstr "操作 XML"
 
-#: src/oozie/models2.py:2055
+#: src/oozie/models2.py:2067
 msgid "Insert verbatim the XML of the action to insert into the workflow."
 msgstr "逐字插入操作 XML 以插入到 Workflow。"
 
-#: src/oozie/models2.py:2080
+#: src/oozie/models2.py:2092
 msgid "Hive query"
 msgstr "Hive 查询"
 
-#: src/oozie/models2.py:2082
+#: src/oozie/models2.py:2094
 msgid "Select a saved Hive query you want to schedule."
 msgstr "选择您想要计划的已保存 Hive 查询。"
 
-#: src/oozie/models2.py:2169
+#: src/oozie/models2.py:2181
 #: src/oozie/templates/editor2/workflow_editor.mako:208
 msgid "Java program"
 msgstr "Java 程序"
 
-#: src/oozie/models2.py:2171
+#: src/oozie/models2.py:2183
 msgid "Select a saved Java program you want to schedule."
 msgstr "选择您想要计划的已保存 Java 程序。"
 
-#: src/oozie/models2.py:2261 src/oozie/models2.py:2346
+#: src/oozie/models2.py:2273 src/oozie/models2.py:2358
 #: src/oozie/templates/editor2/workflow_editor.mako:201
 msgid "Spark program"
 msgstr "Spark 程序"
 
-#: src/oozie/models2.py:2263 src/oozie/models2.py:2348
+#: src/oozie/models2.py:2275 src/oozie/models2.py:2360
 msgid "Select a saved Spark program you want to schedule."
 msgstr "选择您想要计划的已保存 Spark 程序。"
 
-#: src/oozie/models2.py:2413
+#: src/oozie/models2.py:2425
 msgid "Sqoop program"
 msgstr "Sqoop 程序"
 
-#: src/oozie/models2.py:2415
+#: src/oozie/models2.py:2427
 msgid "Select a saved Sqoop program you want to schedule."
 msgstr "选择您想要计划的已保存 Sqoop 程序。"
 
-#: src/oozie/models2.py:2487
+#: src/oozie/models2.py:2499
 msgid "DistCp program"
 msgstr "DistCp 程序"
 
-#: src/oozie/models2.py:2489
+#: src/oozie/models2.py:2501
 msgid "Select a saved DistCp program you want to schedule."
 msgstr "选择您想要计划的已保存 DistCp 程序。"
 
-#: src/oozie/models2.py:2544
+#: src/oozie/models2.py:2556
 msgid "Shell program"
 msgstr "Shell 程序"
 
-#: src/oozie/models2.py:2546
+#: src/oozie/models2.py:2558
 msgid "Select a saved Shell program you want to schedule."
 msgstr "选择您想要计划的已保存 Shell 程序。"
 
-#: src/oozie/models2.py:2618
+#: src/oozie/models2.py:2630
 msgid "MapReduce program"
 msgstr "MapReduce 程序"
 
-#: src/oozie/models2.py:2620
+#: src/oozie/models2.py:2632
 msgid "Select a saved MapReduce program you want to schedule."
 msgstr "选择您想要计划的已保存 MapReduce 程序。"
 
-#: src/oozie/models2.py:3125
+#: src/oozie/models2.py:3137
 #, python-format
 msgid "%s for %s"
 msgstr "%s 的 %s"
 
-#: src/oozie/models2.py:3239
+#: src/oozie/models2.py:3251
 msgid "Cannot return workflow since document attribute is None."
 msgstr "由于文档属性为无，无法返回 Workflow。"
 
-#: src/oozie/models2.py:3283
+#: src/oozie/models2.py:3296
 #, python-format
 msgid ""
 "The frequency of the workflow parameter \"%s\" cannot be guessed from the"
 " frequency of the coordinator. It so needs to be specified manually."
 msgstr "无法从 Coordinator 的频率猜测 Workflow 参数 \"%s\" 的频率。它还需要手动指定。"
 
-#: src/oozie/models2.py:3539 src/oozie/models2.py:3573
+#: src/oozie/models2.py:3552 src/oozie/models2.py:3586
 msgid "Schedule of "
 msgstr "计划 "
 
-#: src/oozie/models2.py:3559 src/oozie/models2.py:3583
+#: src/oozie/models2.py:3572 src/oozie/models2.py:3596
 #, python-format
 msgid "Snippet type %s is not supported in batch execution."
 msgstr "批处理执行不支持代码段类型 %s。"
@@ -1680,7 +1681,7 @@ msgid "invalid frequency: %s"
 msgstr "无效的频率：%s"
 
 #: src/oozie/importlib/bundles.py:100 src/oozie/importlib/coordinators.py:164
-#: src/oozie/importlib/workflows.py:650
+#: src/oozie/importlib/workflows.py:651
 #, python-format
 msgid ""
 "Tag with namespace %(namespace)s is not valid. Please use one of the "
@@ -1695,80 +1696,80 @@ msgstr "在 Bundle 定义中找不到任何节点。是否有格式错误？"
 msgid "Could not find any nodes in Coordinator definition. Maybe it's malformed?"
 msgstr "在 Coordinator 定义中找不到任何节点。是否有格式错误？"
 
-#: src/oozie/importlib/workflows.py:159
+#: src/oozie/importlib/workflows.py:160
 #, python-format
 msgid "Node with name %s for workflow %s does not exist."
 msgstr "Workflow %s 不存在名为 %s 的节点。"
 
-#: src/oozie/importlib/workflows.py:189 src/oozie/importlib/workflows.py:213
-#: src/oozie/importlib/workflows.py:242 src/oozie/importlib/workflows.py:284
+#: src/oozie/importlib/workflows.py:190 src/oozie/importlib/workflows.py:214
+#: src/oozie/importlib/workflows.py:243 src/oozie/importlib/workflows.py:285
 #, python-format
 msgid "Node %s has a link that is missing 'to' attribute."
 msgstr "节点 %s 具有缺少“目标”属性的链接。"
 
-#: src/oozie/importlib/workflows.py:197 src/oozie/importlib/workflows.py:220
-#: src/oozie/importlib/workflows.py:248
+#: src/oozie/importlib/workflows.py:198 src/oozie/importlib/workflows.py:221
+#: src/oozie/importlib/workflows.py:249
 #, python-format
 msgid "Node %s has not been defined."
 msgstr "未定义节点 %s。"
 
-#: src/oozie/importlib/workflows.py:278
+#: src/oozie/importlib/workflows.py:279
 #, python-format
 msgid "Node %s has a link that is missing 'start' attribute."
 msgstr "节点 %s 具有缺少“起点”属性的链接。"
 
-#: src/oozie/importlib/workflows.py:293
+#: src/oozie/importlib/workflows.py:294
 #, python-format
 msgid "Node %s has not been defined"
 msgstr "未定义节点 %s"
 
-#: src/oozie/importlib/workflows.py:301
+#: src/oozie/importlib/workflows.py:302
 msgid "Workflow start has not been created."
 msgstr "未创建 Workflow 起点。"
 
-#: src/oozie/importlib/workflows.py:304
+#: src/oozie/importlib/workflows.py:305
 msgid "Workflow end has not been created."
 msgstr "未创建 Workflow 终点。"
 
-#: src/oozie/importlib/workflows.py:382
+#: src/oozie/importlib/workflows.py:383
 msgid ""
 "Cannot import workflows that have decision DAG leaf nodes with multiple "
 "children or no children."
 msgstr "无法导入具有决策 DAG 叶节点（带多个子级或无子级）的 workflow。"
 
-#: src/oozie/importlib/workflows.py:418 src/oozie/importlib/workflows.py:446
+#: src/oozie/importlib/workflows.py:419 src/oozie/importlib/workflows.py:447
 msgid ""
 "Cannot import workflows that have decisions paths with multiple terminal "
 "nodes that converge on a single terminal node."
 msgstr "无法导入具有决策路径（带多个终端节点）的 workflow，这些节点可汇聚到单个终端节点中。"
 
-#: src/oozie/importlib/workflows.py:448
+#: src/oozie/importlib/workflows.py:449
 msgid "Cannot import workflows that have decisions paths that never end."
 msgstr "无法导入具有无终点的决策路径的 workflow。"
 
-#: src/oozie/importlib/workflows.py:478
+#: src/oozie/importlib/workflows.py:479
 msgid "Different ends found in fork."
 msgstr "在分岔处找到不同的终端。"
 
-#: src/oozie/importlib/workflows.py:571
+#: src/oozie/importlib/workflows.py:572
 msgid "No hadoop file system to operate on."
 msgstr "没有要在其上操作的 hadoop 文件系统。"
 
-#: src/oozie/importlib/workflows.py:586
+#: src/oozie/importlib/workflows.py:587
 msgid "Could not find workflow name when resolving subworkflow."
 msgstr "解析子工作流时找不到工作流名称。"
 
-#: src/oozie/importlib/workflows.py:588
+#: src/oozie/importlib/workflows.py:589
 #, python-format
 msgid "Could not find workflow with name %s extracted from subworkflow path %s"
 msgstr "找不到名称为 %s 且从子 Workflow 路径中提取的 Workflow %s"
 
-#: src/oozie/importlib/workflows.py:590
+#: src/oozie/importlib/workflows.py:591
 #, python-format
 msgid "Could not find workflow at path %s: %s"
 msgstr "在路径 %s 中找不到 Workflow：%s"
 
-#: src/oozie/importlib/workflows.py:685
+#: src/oozie/importlib/workflows.py:686
 msgid "Could not find any nodes in Workflow definition. Maybe it's malformed?"
 msgstr "在 Workflow 定义中找不到任何节点。是否有格式错误？"
 
@@ -1852,7 +1853,7 @@ msgstr "Coordinator"
 #: src/oozie/templates/navigation-bar.mako:81
 #: src/oozie/templates/navigation-bar.mako:85
 #: src/oozie/templates/editor/list_bundles.mako:27
-#: src/oozie/templates/editor2/list_editor_bundles.mako:25
+#: src/oozie/templates/editor2/list_editor_bundles.mako:26
 msgid "Bundles"
 msgstr "Bundles"
 
@@ -1862,29 +1863,29 @@ msgstr "Bundles"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:25
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:162
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:313
-#: src/oozie/templates/editor2/common_workflow.mako:700
-#: src/oozie/templates/editor2/common_workflow.mako:753
-#: src/oozie/templates/editor2/common_workflow.mako:832
-#: src/oozie/templates/editor2/common_workflow.mako:870
-#: src/oozie/templates/editor2/common_workflow.mako:958
-#: src/oozie/templates/editor2/common_workflow.mako:1010
-#: src/oozie/templates/editor2/common_workflow.mako:1074
-#: src/oozie/templates/editor2/common_workflow.mako:1105
-#: src/oozie/templates/editor2/common_workflow.mako:1150
-#: src/oozie/templates/editor2/common_workflow.mako:1231
-#: src/oozie/templates/editor2/common_workflow.mako:1303
-#: src/oozie/templates/editor2/common_workflow.mako:1339
-#: src/oozie/templates/editor2/common_workflow.mako:1402
-#: src/oozie/templates/editor2/common_workflow.mako:1479
-#: src/oozie/templates/editor2/common_workflow.mako:1554
-#: src/oozie/templates/editor2/common_workflow.mako:1605
-#: src/oozie/templates/editor2/common_workflow.mako:1659
-#: src/oozie/templates/editor2/common_workflow.mako:1715
-#: src/oozie/templates/editor2/common_workflow.mako:1873
-#: src/oozie/templates/editor2/common_workflow.mako:2000
-#: src/oozie/templates/editor2/common_workflow.mako:2061
-#: src/oozie/templates/editor2/common_workflow.mako:2128
-#: src/oozie/templates/editor2/common_workflow.mako:2203
+#: src/oozie/templates/editor2/common_workflow.mako:712
+#: src/oozie/templates/editor2/common_workflow.mako:765
+#: src/oozie/templates/editor2/common_workflow.mako:844
+#: src/oozie/templates/editor2/common_workflow.mako:882
+#: src/oozie/templates/editor2/common_workflow.mako:970
+#: src/oozie/templates/editor2/common_workflow.mako:1022
+#: src/oozie/templates/editor2/common_workflow.mako:1086
+#: src/oozie/templates/editor2/common_workflow.mako:1117
+#: src/oozie/templates/editor2/common_workflow.mako:1162
+#: src/oozie/templates/editor2/common_workflow.mako:1243
+#: src/oozie/templates/editor2/common_workflow.mako:1315
+#: src/oozie/templates/editor2/common_workflow.mako:1351
+#: src/oozie/templates/editor2/common_workflow.mako:1414
+#: src/oozie/templates/editor2/common_workflow.mako:1491
+#: src/oozie/templates/editor2/common_workflow.mako:1566
+#: src/oozie/templates/editor2/common_workflow.mako:1617
+#: src/oozie/templates/editor2/common_workflow.mako:1671
+#: src/oozie/templates/editor2/common_workflow.mako:1727
+#: src/oozie/templates/editor2/common_workflow.mako:1885
+#: src/oozie/templates/editor2/common_workflow.mako:2012
+#: src/oozie/templates/editor2/common_workflow.mako:2073
+#: src/oozie/templates/editor2/common_workflow.mako:2140
+#: src/oozie/templates/editor2/common_workflow.mako:2215
 msgid "SLA"
 msgstr "SLA"
 
@@ -2146,7 +2147,7 @@ msgstr "是否确定要停止所选作业？"
 #: src/oozie/templates/editor/list_trashed_workflows.mako:139
 #: src/oozie/templates/editor/list_workflows.mako:140
 #: src/oozie/templates/editor/list_workflows.mako:157
-#: src/oozie/templates/editor2/list_editor_bundles.mako:128
+#: src/oozie/templates/editor2/list_editor_bundles.mako:129
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:128
 #: src/oozie/templates/editor2/list_editor_workflows.mako:129
 msgid "No"
@@ -2177,7 +2178,7 @@ msgstr "否"
 #: src/oozie/templates/editor/list_trashed_workflows.mako:140
 #: src/oozie/templates/editor/list_workflows.mako:141
 #: src/oozie/templates/editor/list_workflows.mako:158
-#: src/oozie/templates/editor2/list_editor_bundles.mako:129
+#: src/oozie/templates/editor2/list_editor_bundles.mako:130
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:129
 #: src/oozie/templates/editor2/list_editor_workflows.mako:130
 msgid "Yes"
@@ -2260,7 +2261,7 @@ msgid "Progress"
 msgstr "进度"
 
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:61
-#: src/oozie/templates/editor2/bundle_editor.mako:181
+#: src/oozie/templates/editor2/bundle_editor.mako:183
 msgid "Kick off time"
 msgstr "启动时间"
 
@@ -2497,9 +2498,9 @@ msgstr "问题： "
 
 #: src/oozie/templates/dashboard/list_oozie_bundle.mako:410
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:679
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:592
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:608
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:624
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:590
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:606
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:622
 msgid "Error: "
 msgstr "错误： "
 
@@ -2622,9 +2623,9 @@ msgstr "创建时间"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:246
 #: src/oozie/templates/editor/list_trashed_workflows.mako:245
 #: src/oozie/templates/editor/list_workflows.mako:307
-#: src/oozie/templates/editor2/list_editor_bundles.mako:268
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:266
-#: src/oozie/templates/editor2/list_editor_workflows.mako:268
+#: src/oozie/templates/editor2/list_editor_bundles.mako:274
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:271
+#: src/oozie/templates/editor2/list_editor_workflows.mako:273
 msgid "Previous"
 msgstr "上一页"
 
@@ -2646,9 +2647,9 @@ msgstr "上一页"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:245
 #: src/oozie/templates/editor/list_trashed_workflows.mako:244
 #: src/oozie/templates/editor/list_workflows.mako:306
-#: src/oozie/templates/editor2/list_editor_bundles.mako:267
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:265
-#: src/oozie/templates/editor2/list_editor_workflows.mako:267
+#: src/oozie/templates/editor2/list_editor_bundles.mako:273
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:270
+#: src/oozie/templates/editor2/list_editor_workflows.mako:272
 msgid "Next"
 msgstr "下一页"
 
@@ -2709,7 +2710,7 @@ msgstr " 条目中筛选）"
 #: src/oozie/templates/dashboard/list_oozie_info.mako:256
 #: src/oozie/templates/dashboard/list_oozie_info.mako:278
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:276
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:529
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:527
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:263
 #: src/oozie/templates/dashboard/list_oozie_workflows.mako:291
 #: src/oozie/templates/editor/list_bundles.mako:284
@@ -2719,9 +2720,9 @@ msgstr " 条目中筛选）"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:241
 #: src/oozie/templates/editor/list_trashed_workflows.mako:240
 #: src/oozie/templates/editor/list_workflows.mako:302
-#: src/oozie/templates/editor2/list_editor_bundles.mako:263
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:261
-#: src/oozie/templates/editor2/list_editor_workflows.mako:263
+#: src/oozie/templates/editor2/list_editor_bundles.mako:269
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:266
+#: src/oozie/templates/editor2/list_editor_workflows.mako:268
 msgid "No matching records"
 msgstr "没有匹配记录"
 
@@ -2784,7 +2785,7 @@ msgstr "是否确定要恢复此作业？"
 #: src/oozie/templates/editor/edit_workflow.mako:515
 #: src/oozie/templates/editor/edit_workflow.mako:533
 #: src/oozie/templates/editor/edit_workflow.mako:569
-#: src/oozie/templates/editor2/bundle_editor.mako:42
+#: src/oozie/templates/editor2/bundle_editor.mako:41
 #: src/oozie/templates/editor2/coordinator_editor.mako:44
 #: src/oozie/templates/editor2/workflow_editor.mako:43
 msgid "Edit"
@@ -2807,7 +2808,7 @@ msgid "Sync Workflow"
 msgstr "同步 Workflow"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:179
-#: src/oozie/templates/editor2/bundle_editor.mako:241
+#: src/oozie/templates/editor2/bundle_editor.mako:243
 #: src/oozie/templates/editor2/submit_job_popup.mako:65
 msgid "Calendar"
 msgstr "日历"
@@ -2859,7 +2860,7 @@ msgstr "数量"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:137
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:218
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:306
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:482
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:480
 msgid "Nominal Time"
 msgstr "标定时间"
 
@@ -2889,7 +2890,7 @@ msgstr "缺少相关项"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:66
 #: src/oozie/templates/editor/list_trashed_workflows.mako:65
 #: src/oozie/templates/editor/list_workflows.mako:77
-#: src/oozie/templates/editor2/list_editor_bundles.mako:83
+#: src/oozie/templates/editor2/list_editor_bundles.mako:84
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:83
 #: src/oozie/templates/editor2/list_editor_workflows.mako:84
 msgid "Last Modified"
@@ -2924,9 +2925,9 @@ msgstr "暂停时间"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:244
 #: src/oozie/templates/editor/list_trashed_workflows.mako:243
 #: src/oozie/templates/editor/list_workflows.mako:305
-#: src/oozie/templates/editor2/list_editor_bundles.mako:266
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:264
-#: src/oozie/templates/editor2/list_editor_workflows.mako:266
+#: src/oozie/templates/editor2/list_editor_bundles.mako:272
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:269
+#: src/oozie/templates/editor2/list_editor_workflows.mako:271
 msgid "Last"
 msgstr "最后一个"
 
@@ -2983,7 +2984,7 @@ msgstr "自标定时间的起的时间（分钟）"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:138
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:219
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:307
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:483
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:481
 msgid "Expected Start"
 msgstr "预期开始时间"
 
@@ -2992,7 +2993,7 @@ msgstr "预期开始时间"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:139
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:220
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:308
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:484
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:482
 msgid "Actual Start"
 msgstr "实际开始时间"
 
@@ -3001,7 +3002,7 @@ msgstr "实际开始时间"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:140
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:221
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:309
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:485
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:483
 msgid "Expected End"
 msgstr "预期结束时间"
 
@@ -3010,7 +3011,7 @@ msgstr "预期结束时间"
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:141
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:222
 #: src/oozie/templates/dashboard/list_oozie_workflow.mako:310
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:486
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:484
 msgid "Actual End"
 msgstr "实际结束时间"
 
@@ -3043,7 +3044,7 @@ msgid "Update"
 msgstr "更新"
 
 #: src/oozie/templates/dashboard/list_oozie_coordinator.mako:528
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:487
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:485
 msgid "click for the SLA dashboard"
 msgstr "单击获取 SLA 控制面板"
 
@@ -3052,7 +3053,7 @@ msgstr "单击获取 SLA 控制面板"
 #: src/oozie/templates/dashboard/list_oozie_info.mako:255
 #: src/oozie/templates/dashboard/list_oozie_info.mako:277
 #: src/oozie/templates/dashboard/list_oozie_sla.mako:275
-#: src/oozie/templates/dashboard/list_oozie_workflow.mako:528
+#: src/oozie/templates/dashboard/list_oozie_workflow.mako:526
 #: src/oozie/templates/editor/list_bundles.mako:280
 #: src/oozie/templates/editor/list_coordinators.mako:292
 #: src/oozie/templates/editor/list_history.mako:88
@@ -3060,9 +3061,9 @@ msgstr "单击获取 SLA 控制面板"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:237
 #: src/oozie/templates/editor/list_trashed_workflows.mako:236
 #: src/oozie/templates/editor/list_workflows.mako:298
-#: src/oozie/templates/editor2/list_editor_bundles.mako:259
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:257
-#: src/oozie/templates/editor2/list_editor_workflows.mako:259
+#: src/oozie/templates/editor2/list_editor_bundles.mako:265
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:262
+#: src/oozie/templates/editor2/list_editor_workflows.mako:264
 msgid "No data available"
 msgstr "没有可用数据"
 
@@ -3319,9 +3320,9 @@ msgstr "选择要重新运行的 Coordinator"
 #: src/oozie/templates/editor/list_coordinators.mako:49
 #: src/oozie/templates/editor/list_workflows.mako:46
 #: src/oozie/templates/editor/submit_job_popup.mako:66
-#: src/oozie/templates/editor2/bundle_editor.mako:36
-#: src/oozie/templates/editor2/coordinator_editor.mako:38
-#: src/oozie/templates/editor2/list_editor_bundles.mako:42
+#: src/oozie/templates/editor2/bundle_editor.mako:37
+#: src/oozie/templates/editor2/coordinator_editor.mako:40
+#: src/oozie/templates/editor2/list_editor_bundles.mako:43
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:42
 #: src/oozie/templates/editor2/list_editor_workflows.mako:43
 #: src/oozie/templates/editor2/submit_job_popup.mako:103
@@ -3369,29 +3370,29 @@ msgid "Advanced"
 msgstr "高级"
 
 #: src/oozie/templates/editor/action_utils.mako:89
-#: src/oozie/templates/editor2/common_workflow.mako:701
-#: src/oozie/templates/editor2/common_workflow.mako:754
-#: src/oozie/templates/editor2/common_workflow.mako:833
-#: src/oozie/templates/editor2/common_workflow.mako:871
-#: src/oozie/templates/editor2/common_workflow.mako:959
-#: src/oozie/templates/editor2/common_workflow.mako:1011
-#: src/oozie/templates/editor2/common_workflow.mako:1075
-#: src/oozie/templates/editor2/common_workflow.mako:1106
-#: src/oozie/templates/editor2/common_workflow.mako:1151
-#: src/oozie/templates/editor2/common_workflow.mako:1232
-#: src/oozie/templates/editor2/common_workflow.mako:1304
-#: src/oozie/templates/editor2/common_workflow.mako:1340
-#: src/oozie/templates/editor2/common_workflow.mako:1403
-#: src/oozie/templates/editor2/common_workflow.mako:1480
-#: src/oozie/templates/editor2/common_workflow.mako:1555
-#: src/oozie/templates/editor2/common_workflow.mako:1606
-#: src/oozie/templates/editor2/common_workflow.mako:1660
-#: src/oozie/templates/editor2/common_workflow.mako:1716
-#: src/oozie/templates/editor2/common_workflow.mako:1874
-#: src/oozie/templates/editor2/common_workflow.mako:2001
-#: src/oozie/templates/editor2/common_workflow.mako:2062
-#: src/oozie/templates/editor2/common_workflow.mako:2129
-#: src/oozie/templates/editor2/common_workflow.mako:2204
+#: src/oozie/templates/editor2/common_workflow.mako:713
+#: src/oozie/templates/editor2/common_workflow.mako:766
+#: src/oozie/templates/editor2/common_workflow.mako:845
+#: src/oozie/templates/editor2/common_workflow.mako:883
+#: src/oozie/templates/editor2/common_workflow.mako:971
+#: src/oozie/templates/editor2/common_workflow.mako:1023
+#: src/oozie/templates/editor2/common_workflow.mako:1087
+#: src/oozie/templates/editor2/common_workflow.mako:1118
+#: src/oozie/templates/editor2/common_workflow.mako:1163
+#: src/oozie/templates/editor2/common_workflow.mako:1244
+#: src/oozie/templates/editor2/common_workflow.mako:1316
+#: src/oozie/templates/editor2/common_workflow.mako:1352
+#: src/oozie/templates/editor2/common_workflow.mako:1415
+#: src/oozie/templates/editor2/common_workflow.mako:1492
+#: src/oozie/templates/editor2/common_workflow.mako:1567
+#: src/oozie/templates/editor2/common_workflow.mako:1618
+#: src/oozie/templates/editor2/common_workflow.mako:1672
+#: src/oozie/templates/editor2/common_workflow.mako:1728
+#: src/oozie/templates/editor2/common_workflow.mako:1886
+#: src/oozie/templates/editor2/common_workflow.mako:2013
+#: src/oozie/templates/editor2/common_workflow.mako:2074
+#: src/oozie/templates/editor2/common_workflow.mako:2141
+#: src/oozie/templates/editor2/common_workflow.mako:2216
 msgid "Credentials"
 msgstr "凭据"
 
@@ -3479,11 +3480,11 @@ msgstr "添加自变量"
 #: src/oozie/templates/editor/edit_workflow.mako:509
 #: src/oozie/templates/editor/job_action_properties.mako:41
 #: src/oozie/templates/editor/workflow_utils.mako:40
-#: src/oozie/templates/editor2/common_workflow.mako:411
-#: src/oozie/templates/editor2/common_workflow.mako:1424
-#: src/oozie/templates/editor2/common_workflow.mako:2150
-#: src/oozie/templates/editor2/common_workflow.mako:2225
-#: src/oozie/templates/editor2/list_editor_bundles.mako:58
+#: src/oozie/templates/editor2/common_workflow.mako:418
+#: src/oozie/templates/editor2/common_workflow.mako:1436
+#: src/oozie/templates/editor2/common_workflow.mako:2162
+#: src/oozie/templates/editor2/common_workflow.mako:2237
+#: src/oozie/templates/editor2/list_editor_bundles.mako:59
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:58
 #: src/oozie/templates/editor2/list_editor_workflows.mako:59
 msgid "Delete"
@@ -3554,10 +3555,10 @@ msgid "label"
 msgstr "标签"
 
 #: src/oozie/templates/editor/action_utils.mako:537
-#: src/oozie/templates/editor2/common_workflow.mako:396
-#: src/oozie/templates/editor2/common_workflow.mako:1409
-#: src/oozie/templates/editor2/common_workflow.mako:2135
-#: src/oozie/templates/editor2/common_workflow.mako:2210
+#: src/oozie/templates/editor2/common_workflow.mako:403
+#: src/oozie/templates/editor2/common_workflow.mako:1421
+#: src/oozie/templates/editor2/common_workflow.mako:2147
+#: src/oozie/templates/editor2/common_workflow.mako:2222
 msgid "Prepare"
 msgstr "准备"
 
@@ -3566,7 +3567,7 @@ msgid "Convert this fork into a decision?"
 msgstr "将此分叉转换为判定？"
 
 #: src/oozie/templates/editor/control_utils.mako:125
-#: src/oozie/templates/editor2/common_workflow.mako:304
+#: src/oozie/templates/editor2/common_workflow.mako:311
 msgid "Examples of predicates:"
 msgstr "属性词示例："
 
@@ -3580,7 +3581,7 @@ msgstr "属性词"
 
 #: src/oozie/templates/editor/control_utils.mako:150
 #: src/oozie/templates/editor/control_utils.mako:170
-#: src/oozie/templates/editor2/common_workflow.mako:315
+#: src/oozie/templates/editor2/common_workflow.mako:322
 msgid "go to"
 msgstr "转至"
 
@@ -3643,33 +3644,33 @@ msgstr "创建 Bundle"
 #: src/oozie/templates/editor/edit_coordinator.mako:56
 #: src/oozie/templates/editor/edit_workflow.mako:45
 #: src/oozie/templates/editor/list_history_record.mako:83
-#: src/oozie/templates/editor2/common_workflow.mako:421
-#: src/oozie/templates/editor2/common_workflow.mako:699
-#: src/oozie/templates/editor2/common_workflow.mako:752
-#: src/oozie/templates/editor2/common_workflow.mako:831
-#: src/oozie/templates/editor2/common_workflow.mako:869
-#: src/oozie/templates/editor2/common_workflow.mako:957
-#: src/oozie/templates/editor2/common_workflow.mako:1009
-#: src/oozie/templates/editor2/common_workflow.mako:1104
-#: src/oozie/templates/editor2/common_workflow.mako:1149
-#: src/oozie/templates/editor2/common_workflow.mako:1230
-#: src/oozie/templates/editor2/common_workflow.mako:1302
-#: src/oozie/templates/editor2/common_workflow.mako:1338
-#: src/oozie/templates/editor2/common_workflow.mako:1377
-#: src/oozie/templates/editor2/common_workflow.mako:1401
-#: src/oozie/templates/editor2/common_workflow.mako:1478
-#: src/oozie/templates/editor2/common_workflow.mako:1520
-#: src/oozie/templates/editor2/common_workflow.mako:1553
-#: src/oozie/templates/editor2/common_workflow.mako:1604
-#: src/oozie/templates/editor2/common_workflow.mako:1658
-#: src/oozie/templates/editor2/common_workflow.mako:1714
-#: src/oozie/templates/editor2/common_workflow.mako:1872
-#: src/oozie/templates/editor2/common_workflow.mako:1999
-#: src/oozie/templates/editor2/common_workflow.mako:2060
-#: src/oozie/templates/editor2/common_workflow.mako:2127
-#: src/oozie/templates/editor2/common_workflow.mako:2155
-#: src/oozie/templates/editor2/common_workflow.mako:2202
-#: src/oozie/templates/editor2/common_workflow.mako:2230
+#: src/oozie/templates/editor2/common_workflow.mako:428
+#: src/oozie/templates/editor2/common_workflow.mako:711
+#: src/oozie/templates/editor2/common_workflow.mako:764
+#: src/oozie/templates/editor2/common_workflow.mako:843
+#: src/oozie/templates/editor2/common_workflow.mako:881
+#: src/oozie/templates/editor2/common_workflow.mako:969
+#: src/oozie/templates/editor2/common_workflow.mako:1021
+#: src/oozie/templates/editor2/common_workflow.mako:1116
+#: src/oozie/templates/editor2/common_workflow.mako:1161
+#: src/oozie/templates/editor2/common_workflow.mako:1242
+#: src/oozie/templates/editor2/common_workflow.mako:1314
+#: src/oozie/templates/editor2/common_workflow.mako:1350
+#: src/oozie/templates/editor2/common_workflow.mako:1389
+#: src/oozie/templates/editor2/common_workflow.mako:1413
+#: src/oozie/templates/editor2/common_workflow.mako:1490
+#: src/oozie/templates/editor2/common_workflow.mako:1532
+#: src/oozie/templates/editor2/common_workflow.mako:1565
+#: src/oozie/templates/editor2/common_workflow.mako:1616
+#: src/oozie/templates/editor2/common_workflow.mako:1670
+#: src/oozie/templates/editor2/common_workflow.mako:1726
+#: src/oozie/templates/editor2/common_workflow.mako:1884
+#: src/oozie/templates/editor2/common_workflow.mako:2011
+#: src/oozie/templates/editor2/common_workflow.mako:2072
+#: src/oozie/templates/editor2/common_workflow.mako:2139
+#: src/oozie/templates/editor2/common_workflow.mako:2167
+#: src/oozie/templates/editor2/common_workflow.mako:2214
+#: src/oozie/templates/editor2/common_workflow.mako:2242
 msgid "Properties"
 msgstr "属性"
 
@@ -3690,10 +3691,10 @@ msgstr "Bundle 数据"
 #: src/oozie/templates/editor/edit_bundle.mako:205
 #: src/oozie/templates/editor/edit_bundled_coordinator.mako:34
 #: src/oozie/templates/editor/edit_workflow.mako:396
-#: src/oozie/templates/editor2/bundle_editor.mako:54
+#: src/oozie/templates/editor2/bundle_editor.mako:49
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:374
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:376
-#: src/oozie/templates/editor2/coordinator_editor.mako:56
+#: src/oozie/templates/editor2/coordinator_editor.mako:52
 #: src/oozie/templates/editor2/workflow_editor.mako:75
 msgid "Save"
 msgstr "保存"
@@ -3707,7 +3708,7 @@ msgid "Create Coordinator"
 msgstr "创建 Coordinator"
 
 #: src/oozie/templates/editor/create_coordinator.mako:57
-#: src/oozie/templates/editor2/coordinator_editor.mako:27
+#: src/oozie/templates/editor2/coordinator_editor.mako:28
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:32
 msgid "Coordinator Editor"
 msgstr "Coordinator 编辑器"
@@ -3845,7 +3846,7 @@ msgstr "复制此 bundle"
 #: src/oozie/templates/editor/list_bundles.mako:48
 #: src/oozie/templates/editor/list_coordinators.mako:50
 #: src/oozie/templates/editor/list_workflows.mako:48
-#: src/oozie/templates/editor2/list_editor_bundles.mako:54
+#: src/oozie/templates/editor2/list_editor_bundles.mako:55
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:54
 #: src/oozie/templates/editor2/list_editor_workflows.mako:55
 msgid "Copy"
@@ -4025,8 +4026,8 @@ msgid "Edit Workflow"
 msgstr "编辑 Workflow"
 
 #: src/oozie/templates/editor/edit_workflow.mako:36
-#: src/oozie/templates/editor2/bundle_editor.mako:33
-#: src/oozie/templates/editor2/coordinator_editor.mako:35
+#: src/oozie/templates/editor2/bundle_editor.mako:34
+#: src/oozie/templates/editor2/coordinator_editor.mako:37
 #: src/oozie/templates/editor2/workflow_editor.mako:40
 msgid "Unsaved"
 msgstr "未保存"
@@ -4076,7 +4077,7 @@ msgstr "导出此 workflow"
 
 #: src/oozie/templates/editor/edit_workflow.mako:76
 #: src/oozie/templates/editor/list_workflows.mako:49
-#: src/oozie/templates/editor2/list_editor_bundles.mako:62
+#: src/oozie/templates/editor2/list_editor_bundles.mako:63
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:62
 #: src/oozie/templates/editor2/list_editor_workflows.mako:63
 msgid "Export"
@@ -4156,7 +4157,7 @@ msgid "Save and submit"
 msgstr "保存并提交"
 
 #: src/oozie/templates/editor/edit_workflow.mako:534
-#: src/oozie/templates/editor2/common_workflow.mako:281
+#: src/oozie/templates/editor2/common_workflow.mako:288
 msgid "Convert to Decision"
 msgstr "转换为决策"
 
@@ -4231,7 +4232,7 @@ msgstr "受支持的 Coordinator 版本是 0.2。其他版本是否受支持视�
 #: src/oozie/templates/editor/import_workflow.mako:79
 #: src/oozie/templates/editor/list_coordinators.mako:65
 #: src/oozie/templates/editor/list_workflows.mako:64
-#: src/oozie/templates/editor2/list_editor_bundles.mako:71
+#: src/oozie/templates/editor2/list_editor_bundles.mako:72
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:71
 #: src/oozie/templates/editor2/list_editor_workflows.mako:72
 msgid "Import"
@@ -4264,7 +4265,7 @@ msgstr "Bundle 管理器"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:36
 #: src/oozie/templates/editor/list_trashed_workflows.mako:36
 #: src/oozie/templates/editor/list_workflows.mako:41
-#: src/oozie/templates/editor2/list_editor_bundles.mako:36
+#: src/oozie/templates/editor2/list_editor_bundles.mako:37
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:36
 #: src/oozie/templates/editor2/list_editor_workflows.mako:37
 msgid "Search for name, description, etc..."
@@ -4288,7 +4289,7 @@ msgstr "永久删除"
 #: src/oozie/templates/editor/list_bundles.mako:62
 #: src/oozie/templates/editor/list_coordinators.mako:64
 #: src/oozie/templates/editor/list_workflows.mako:63
-#: src/oozie/templates/editor2/list_editor_bundles.mako:68
+#: src/oozie/templates/editor2/list_editor_bundles.mako:69
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:68
 #: src/oozie/templates/editor2/list_editor_workflows.mako:69
 msgid "Create"
@@ -4320,9 +4321,9 @@ msgstr "删除所选 bundle？"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:238
 #: src/oozie/templates/editor/list_trashed_workflows.mako:237
 #: src/oozie/templates/editor/list_workflows.mako:299
-#: src/oozie/templates/editor2/list_editor_bundles.mako:260
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:258
-#: src/oozie/templates/editor2/list_editor_workflows.mako:260
+#: src/oozie/templates/editor2/list_editor_bundles.mako:266
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:263
+#: src/oozie/templates/editor2/list_editor_workflows.mako:265
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
 
@@ -4333,9 +4334,9 @@ msgstr "显示 _START_ - _END_，共 _TOTAL_ 个条目"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:239
 #: src/oozie/templates/editor/list_trashed_workflows.mako:238
 #: src/oozie/templates/editor/list_workflows.mako:300
-#: src/oozie/templates/editor2/list_editor_bundles.mako:261
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:259
-#: src/oozie/templates/editor2/list_editor_workflows.mako:261
+#: src/oozie/templates/editor2/list_editor_bundles.mako:267
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:264
+#: src/oozie/templates/editor2/list_editor_workflows.mako:266
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "显示 0－0，共 0 个条目"
 
@@ -4346,9 +4347,9 @@ msgstr "显示 0－0，共 0 个条目"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:240
 #: src/oozie/templates/editor/list_trashed_workflows.mako:239
 #: src/oozie/templates/editor/list_workflows.mako:301
-#: src/oozie/templates/editor2/list_editor_bundles.mako:262
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:260
-#: src/oozie/templates/editor2/list_editor_workflows.mako:262
+#: src/oozie/templates/editor2/list_editor_bundles.mako:268
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:265
+#: src/oozie/templates/editor2/list_editor_workflows.mako:267
 msgid "(filtered from _MAX_ total entries)"
 msgstr "（已从 _MAX_ 个总条目中过滤）"
 
@@ -4359,9 +4360,9 @@ msgstr "（已从 _MAX_ 个总条目中过滤）"
 #: src/oozie/templates/editor/list_trashed_coordinators.mako:243
 #: src/oozie/templates/editor/list_trashed_workflows.mako:242
 #: src/oozie/templates/editor/list_workflows.mako:304
-#: src/oozie/templates/editor2/list_editor_bundles.mako:265
-#: src/oozie/templates/editor2/list_editor_coordinators.mako:263
-#: src/oozie/templates/editor2/list_editor_workflows.mako:265
+#: src/oozie/templates/editor2/list_editor_bundles.mako:271
+#: src/oozie/templates/editor2/list_editor_coordinators.mako:268
+#: src/oozie/templates/editor2/list_editor_workflows.mako:270
 msgid "First"
 msgstr "第一个"
 
@@ -4504,7 +4505,7 @@ msgstr "步骤"
 
 #: src/oozie/templates/editor/list_trashed_workflows.mako:102
 #: src/oozie/templates/editor/list_workflows.mako:154
-#: src/oozie/templates/editor2/list_editor_bundles.mako:125
+#: src/oozie/templates/editor2/list_editor_bundles.mako:126
 #: src/oozie/templates/editor2/list_editor_workflows.mako:126
 msgid "Delete the selected workflow(s)?"
 msgstr "删除所选 Workflow？"
@@ -4538,66 +4539,71 @@ msgid "Do a dryrun before submitting the job?"
 msgstr "是否要在提交作业前试运行？"
 
 #: src/oozie/templates/editor/gen/workflow-graph-status.xml.mako:54
-#: src/oozie/templates/editor2/common_workflow.mako:234
+#: src/oozie/templates/editor2/common_workflow.mako:237
+#: src/oozie/templates/editor2/common_workflow.mako:240
 #: src/oozie/templates/editor2/gen/workflow-graph-status.xml.mako:53
 msgid "View workflow action"
 msgstr "查看 Workflow 操作"
 
 #: src/oozie/templates/editor2/bundle_editor.mako:25
-#: src/oozie/templates/editor2/list_editor_bundles.mako:32
+#: src/oozie/templates/editor2/list_editor_bundles.mako:33
 msgid "Bundle Editor"
 msgstr "Bundle 编辑器"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:48
-#: src/oozie/templates/editor2/bundle_editor.mako:178
-#: src/oozie/templates/editor2/coordinator_editor.mako:50
+#: src/oozie/templates/editor2/bundle_editor.mako:45
+#: src/oozie/templates/editor2/bundle_editor.mako:180
+#: src/oozie/templates/editor2/coordinator_editor.mako:48
 #: src/oozie/templates/editor2/workflow_editor.mako:59
 msgid "Settings"
 msgstr "设置"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:54
+#: src/oozie/templates/editor2/bundle_editor.mako:49
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:374
-#: src/oozie/templates/editor2/coordinator_editor.mako:56
+#: src/oozie/templates/editor2/coordinator_editor.mako:52
 #: src/oozie/templates/editor2/workflow_editor.mako:75
 msgid "Saving..."
 msgstr "正在保存..."
 
-#: src/oozie/templates/editor2/bundle_editor.mako:67
-#: src/oozie/templates/editor2/coordinator_editor.mako:70
+#: src/oozie/templates/editor2/bundle_editor.mako:60
+#: src/oozie/templates/editor2/coordinator_editor.mako:64
 #: src/oozie/templates/editor2/workflow_editor.mako:88
 msgid "New"
 msgstr "新建"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:97
+#: src/oozie/templates/editor2/bundle_editor.mako:89
 msgid "Which schedules to bundle?"
 msgstr "要包含哪些计划？"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:100
+#: src/oozie/templates/editor2/bundle_editor.mako:92
 msgid "This bundle has no defined coordinators."
 msgstr "此 Bundle 未定义 Coordinator。"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:102
+#: src/oozie/templates/editor2/bundle_editor.mako:94
 msgid "Add a coordinator"
 msgstr "添加 Coordinator"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:111
+#: src/oozie/templates/editor2/bundle_editor.mako:103
 #: src/oozie/templates/editor2/bundle_editor.mako:161
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:46
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:52
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:403
-#: src/oozie/templates/editor2/common_workflow.mako:612
-#: src/oozie/templates/editor2/common_workflow.mako:638
-#: src/oozie/templates/editor2/common_workflow.mako:654
-#: src/oozie/templates/editor2/common_workflow.mako:1513
-#: src/oozie/templates/editor2/common_workflow.mako:1544
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:411
+#: src/oozie/templates/editor2/common_workflow.mako:619
+#: src/oozie/templates/editor2/common_workflow.mako:645
+#: src/oozie/templates/editor2/common_workflow.mako:661
+#: src/oozie/templates/editor2/common_workflow.mako:1525
+#: src/oozie/templates/editor2/common_workflow.mako:1556
 #: src/oozie/templates/editor2/workflow_editor.mako:343
 #: src/oozie/templates/editor2/workflow_editor.mako:368
 msgid "Open"
 msgstr "打开"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:138
+#: src/oozie/templates/editor2/bundle_editor.mako:130
 msgid "Add a parameter"
 msgstr "添加参数"
+
+#: src/oozie/templates/editor2/bundle_editor.mako:145
+msgid "Choose a coordinator"
+msgstr "选择 Coordinator"
 
 #: src/oozie/templates/editor2/bundle_editor.mako:153
 msgid "Filter coordinators"
@@ -4607,26 +4613,26 @@ msgstr "筛选 Coordinator"
 msgid "There are no coordinators matching your search term."
 msgstr "没有符合您的搜索词的 coordinator。"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:187
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:422
+#: src/oozie/templates/editor2/bundle_editor.mako:189
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:432
 msgid "Submission Parameters"
 msgstr "提交参数"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:204
+#: src/oozie/templates/editor2/bundle_editor.mako:206
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:364
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:435
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:445
 #: src/oozie/templates/editor2/workflow_editor.mako:401
 msgid "Add parameter"
 msgstr "添加参数"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:218
-#: src/oozie/templates/editor2/coordinator_editor.mako:96
+#: src/oozie/templates/editor2/bundle_editor.mako:220
+#: src/oozie/templates/editor2/coordinator_editor.mako:90
 #: src/oozie/templates/editor2/submit_job_popup.mako:110
 #: src/oozie/templates/editor2/workflow_editor.mako:491
 msgid "Choose a file"
 msgstr "选择文件"
 
-#: src/oozie/templates/editor2/bundle_editor.mako:238
+#: src/oozie/templates/editor2/bundle_editor.mako:240
 #: src/oozie/templates/editor2/submit_job_popup.mako:62
 msgid "Now"
 msgstr "现在"
@@ -4660,7 +4666,7 @@ msgid "From"
 msgstr "自"
 
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:145
-#: src/oozie/templates/editor2/common_workflow.mako:1990
+#: src/oozie/templates/editor2/common_workflow.mako:2002
 msgid "To"
 msgstr "至"
 
@@ -4700,18 +4706,22 @@ msgid "Same timezone"
 msgstr "相同时区"
 
 #: src/oozie/templates/editor2/common_scheduler.inc.mako:394
+msgid "Choose a workflow"
+msgstr "选择 Workflow"
+
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:402
 msgid "Filter workflows"
 msgstr "筛选 Workflow"
 
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:409
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:417
 msgid "There are no workflows matching your search term."
 msgstr "没有符合您的搜索词的 workflow。"
 
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:419
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:429
 msgid "Coordinator Settings"
 msgstr "Coordinator 设置"
 
-#: src/oozie/templates/editor2/common_scheduler.inc.mako:446
+#: src/oozie/templates/editor2/common_scheduler.inc.mako:456
 msgid "FIFO (oldest first)"
 msgstr "FIFO（先进先出）"
 
@@ -4729,180 +4739,181 @@ msgstr "在旧编辑器中打开它。"
 msgid "Drop your action here"
 msgstr "将您的操作拖到此处"
 
-#: src/oozie/templates/editor2/common_workflow.mako:163
+#: src/oozie/templates/editor2/common_workflow.mako:165
 msgid "Move node"
 msgstr "移动节点"
 
-#: src/oozie/templates/editor2/common_workflow.mako:165
+#: src/oozie/templates/editor2/common_workflow.mako:167
 msgid "Copy node"
 msgstr "复制节点"
 
-#: src/oozie/templates/editor2/common_workflow.mako:309
+#: src/oozie/templates/editor2/common_workflow.mako:316
 msgid "Click for more"
 msgstr "单击获取更多信息"
 
-#: src/oozie/templates/editor2/common_workflow.mako:310
+#: src/oozie/templates/editor2/common_workflow.mako:317
 msgid "Click for more info"
 msgstr "单击获取更多信息"
 
-#: src/oozie/templates/editor2/common_workflow.mako:314
+#: src/oozie/templates/editor2/common_workflow.mako:321
 msgid "If"
 msgstr "如果"
 
-#: src/oozie/templates/editor2/common_workflow.mako:328
+#: src/oozie/templates/editor2/common_workflow.mako:335
 msgid "Jump to another node"
 msgstr "跳转到另一节点"
 
-#: src/oozie/templates/editor2/common_workflow.mako:339
+#: src/oozie/templates/editor2/common_workflow.mako:346
 msgid "It is where we finish if failure!"
 msgstr "这是失败时我们的完成位置！"
 
-#: src/oozie/templates/editor2/common_workflow.mako:346
+#: src/oozie/templates/editor2/common_workflow.mako:353
 msgid "Email on error"
 msgstr "电子邮件错误"
 
-#: src/oozie/templates/editor2/common_workflow.mako:379
+#: src/oozie/templates/editor2/common_workflow.mako:386
 msgid "It is where we start!"
 msgstr "这是我们的起始位置！"
 
-#: src/oozie/templates/editor2/common_workflow.mako:388
+#: src/oozie/templates/editor2/common_workflow.mako:395
 msgid "It is where we successfully finish!"
 msgstr "这是我们成功完成的位置！"
 
-#: src/oozie/templates/editor2/common_workflow.mako:408
-#: src/oozie/templates/editor2/common_workflow.mako:1421
-#: src/oozie/templates/editor2/common_workflow.mako:2147
-#: src/oozie/templates/editor2/common_workflow.mako:2222
+#: src/oozie/templates/editor2/common_workflow.mako:415
+#: src/oozie/templates/editor2/common_workflow.mako:1433
+#: src/oozie/templates/editor2/common_workflow.mako:2159
+#: src/oozie/templates/editor2/common_workflow.mako:2234
 msgid "Directory"
 msgstr "目录"
 
-#: src/oozie/templates/editor2/common_workflow.mako:426
-#: src/oozie/templates/editor2/common_workflow.mako:1382
-#: src/oozie/templates/editor2/common_workflow.mako:2160
-#: src/oozie/templates/editor2/common_workflow.mako:2235
+#: src/oozie/templates/editor2/common_workflow.mako:433
+#: src/oozie/templates/editor2/common_workflow.mako:1394
+#: src/oozie/templates/editor2/common_workflow.mako:2172
+#: src/oozie/templates/editor2/common_workflow.mako:2247
 msgid "name, e.g. mapred.job.queue.name"
 msgstr "名称，例如 mapred.job.queue.name"
 
-#: src/oozie/templates/editor2/common_workflow.mako:433
-#: src/oozie/templates/editor2/common_workflow.mako:1535
-#: src/oozie/templates/editor2/common_workflow.mako:2167
-#: src/oozie/templates/editor2/common_workflow.mako:2242
+#: src/oozie/templates/editor2/common_workflow.mako:440
+#: src/oozie/templates/editor2/common_workflow.mako:1547
+#: src/oozie/templates/editor2/common_workflow.mako:2179
+#: src/oozie/templates/editor2/common_workflow.mako:2254
 msgid "No properties defined."
 msgstr "未定义属性。"
 
-#: src/oozie/templates/editor2/common_workflow.mako:450
-#: src/oozie/templates/editor2/common_workflow.mako:1446
+#: src/oozie/templates/editor2/common_workflow.mako:457
+#: src/oozie/templates/editor2/common_workflow.mako:1458
 msgid "No archives defined."
 msgstr "未定义存档。"
 
-#: src/oozie/templates/editor2/common_workflow.mako:459
+#: src/oozie/templates/editor2/common_workflow.mako:466
 msgid "Retry "
 msgstr "重试 "
 
-#: src/oozie/templates/editor2/common_workflow.mako:461
-#: src/oozie/templates/editor2/common_workflow.mako:469
+#: src/oozie/templates/editor2/common_workflow.mako:468
+#: src/oozie/templates/editor2/common_workflow.mako:476
 msgid "Max"
 msgstr "最大"
 
-#: src/oozie/templates/editor2/common_workflow.mako:464
-#: src/oozie/templates/editor2/common_workflow.mako:477
+#: src/oozie/templates/editor2/common_workflow.mako:471
+#: src/oozie/templates/editor2/common_workflow.mako:484
 msgid "Interval"
 msgstr "间隔"
 
-#: src/oozie/templates/editor2/common_workflow.mako:500
-#: src/oozie/templates/editor2/common_workflow.mako:781
-#: src/oozie/templates/editor2/common_workflow.mako:943
+#: src/oozie/templates/editor2/common_workflow.mako:507
+#: src/oozie/templates/editor2/common_workflow.mako:793
+#: src/oozie/templates/editor2/common_workflow.mako:955
 msgid "No arguments defined."
 msgstr "未定义参数。"
 
-#: src/oozie/templates/editor2/common_workflow.mako:583
+#: src/oozie/templates/editor2/common_workflow.mako:590
 msgid "No available credentials."
 msgstr "无可用凭据。"
 
-#: src/oozie/templates/editor2/common_workflow.mako:591
+#: src/oozie/templates/editor2/common_workflow.mako:598
 msgid "Requires hbase-site.xml in job path"
 msgstr "作业路径中需要 hbase-site.xml"
 
-#: src/oozie/templates/editor2/common_workflow.mako:635
+#: src/oozie/templates/editor2/common_workflow.mako:642
 #: src/oozie/templates/editor2/workflow_editor.mako:340
 msgid "Search your documents..."
 msgstr "搜索文档..."
 
-#: src/oozie/templates/editor2/common_workflow.mako:663
+#: src/oozie/templates/editor2/common_workflow.mako:671
+#: src/oozie/templates/editor2/common_workflow.mako:674
 msgid "View logs"
 msgstr "查看日志"
 
-#: src/oozie/templates/editor2/common_workflow.mako:666
+#: src/oozie/templates/editor2/common_workflow.mako:678
 msgid "View the workflow"
 msgstr "查看 Workflow"
 
-#: src/oozie/templates/editor2/common_workflow.mako:702
-#: src/oozie/templates/editor2/common_workflow.mako:755
-#: src/oozie/templates/editor2/common_workflow.mako:834
-#: src/oozie/templates/editor2/common_workflow.mako:872
-#: src/oozie/templates/editor2/common_workflow.mako:960
-#: src/oozie/templates/editor2/common_workflow.mako:1012
-#: src/oozie/templates/editor2/common_workflow.mako:1076
-#: src/oozie/templates/editor2/common_workflow.mako:1107
-#: src/oozie/templates/editor2/common_workflow.mako:1152
-#: src/oozie/templates/editor2/common_workflow.mako:1233
-#: src/oozie/templates/editor2/common_workflow.mako:1305
-#: src/oozie/templates/editor2/common_workflow.mako:1341
-#: src/oozie/templates/editor2/common_workflow.mako:1404
-#: src/oozie/templates/editor2/common_workflow.mako:1481
-#: src/oozie/templates/editor2/common_workflow.mako:1556
-#: src/oozie/templates/editor2/common_workflow.mako:1607
-#: src/oozie/templates/editor2/common_workflow.mako:1661
-#: src/oozie/templates/editor2/common_workflow.mako:1717
-#: src/oozie/templates/editor2/common_workflow.mako:1875
-#: src/oozie/templates/editor2/common_workflow.mako:2002
-#: src/oozie/templates/editor2/common_workflow.mako:2063
-#: src/oozie/templates/editor2/common_workflow.mako:2130
-#: src/oozie/templates/editor2/common_workflow.mako:2205
+#: src/oozie/templates/editor2/common_workflow.mako:714
+#: src/oozie/templates/editor2/common_workflow.mako:767
+#: src/oozie/templates/editor2/common_workflow.mako:846
+#: src/oozie/templates/editor2/common_workflow.mako:884
+#: src/oozie/templates/editor2/common_workflow.mako:972
+#: src/oozie/templates/editor2/common_workflow.mako:1024
+#: src/oozie/templates/editor2/common_workflow.mako:1088
+#: src/oozie/templates/editor2/common_workflow.mako:1119
+#: src/oozie/templates/editor2/common_workflow.mako:1164
+#: src/oozie/templates/editor2/common_workflow.mako:1245
+#: src/oozie/templates/editor2/common_workflow.mako:1317
+#: src/oozie/templates/editor2/common_workflow.mako:1353
+#: src/oozie/templates/editor2/common_workflow.mako:1416
+#: src/oozie/templates/editor2/common_workflow.mako:1493
+#: src/oozie/templates/editor2/common_workflow.mako:1568
+#: src/oozie/templates/editor2/common_workflow.mako:1619
+#: src/oozie/templates/editor2/common_workflow.mako:1673
+#: src/oozie/templates/editor2/common_workflow.mako:1729
+#: src/oozie/templates/editor2/common_workflow.mako:1887
+#: src/oozie/templates/editor2/common_workflow.mako:2014
+#: src/oozie/templates/editor2/common_workflow.mako:2075
+#: src/oozie/templates/editor2/common_workflow.mako:2142
+#: src/oozie/templates/editor2/common_workflow.mako:2217
 msgid "Transitions"
 msgstr "转换"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1525
+#: src/oozie/templates/editor2/common_workflow.mako:1537
 msgid "Name, e.g. input"
 msgstr "名称，例如，输入"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1772
-#: src/oozie/templates/editor2/common_workflow.mako:1781
+#: src/oozie/templates/editor2/common_workflow.mako:1784
 #: src/oozie/templates/editor2/common_workflow.mako:1793
+#: src/oozie/templates/editor2/common_workflow.mako:1805
 msgid "to"
 msgstr "至"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1857
+#: src/oozie/templates/editor2/common_workflow.mako:1869
 msgid "Source path"
 msgstr "来源路径"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1860
+#: src/oozie/templates/editor2/common_workflow.mako:1872
 msgid "New destination path"
 msgstr "新目标路径"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1890
+#: src/oozie/templates/editor2/common_workflow.mako:1902
 msgid "755, -rwxrw-rw-"
 msgstr "755, -rwxrw-rw-"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1891
-#: src/oozie/templates/editor2/common_workflow.mako:1912
+#: src/oozie/templates/editor2/common_workflow.mako:1903
+#: src/oozie/templates/editor2/common_workflow.mako:1924
 msgid "Only for directories"
 msgstr "仅限目录"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1893
-#: src/oozie/templates/editor2/common_workflow.mako:1914
+#: src/oozie/templates/editor2/common_workflow.mako:1905
+#: src/oozie/templates/editor2/common_workflow.mako:1926
 msgid "Recursive to sub directories"
 msgstr "递归到子目录"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1911
+#: src/oozie/templates/editor2/common_workflow.mako:1923
 msgid "e.g. newgroup"
 msgstr "例如，新组"
 
-#: src/oozie/templates/editor2/common_workflow.mako:1993
+#: src/oozie/templates/editor2/common_workflow.mako:2005
 msgid "About"
 msgstr "关于"
 
-#: src/oozie/templates/editor2/list_editor_bundles.mako:50
+#: src/oozie/templates/editor2/list_editor_bundles.mako:51
 #: src/oozie/templates/editor2/list_editor_coordinators.mako:50
 #: src/oozie/templates/editor2/list_editor_workflows.mako:51
 msgid "Share"
@@ -5129,103 +5140,103 @@ msgstr "必须是 POST 请求。"
 msgid "Must be GET request."
 msgstr "必须是 GET 请求。"
 
-#: src/oozie/views/dashboard.py:96
+#: src/oozie/views/dashboard.py:97
 msgid "Use a POST request to manage an Oozie job."
 msgstr "使用 POST 请求以管理 Oozie 作业。"
 
-#: src/oozie/views/dashboard.py:146
+#: src/oozie/views/dashboard.py:147
 msgid "Use a POST request to manage the Oozie jobs."
 msgstr "使用 POST 请求以管理 Oozie 作业。"
 
-#: src/oozie/views/dashboard.py:179 src/oozie/views/dashboard.py:913
+#: src/oozie/views/dashboard.py:180 src/oozie/views/dashboard.py:933
 #: src/oozie/views/editor.py:377 src/oozie/views/editor2.py:450
 msgid "The Oozie server is not running"
 msgstr "Oozie 服务器未运行"
 
-#: src/oozie/views/dashboard.py:180
+#: src/oozie/views/dashboard.py:181
 msgid "An error occurred with Oozie."
 msgstr "Oozie 发生错误。"
 
-#: src/oozie/views/dashboard.py:520
+#: src/oozie/views/dashboard.py:540
 #, python-format
 msgid "Error accessing Oozie action %s."
 msgstr "访问 Oozie 操作 %s 时出错。"
 
-#: src/oozie/views/dashboard.py:697
+#: src/oozie/views/dashboard.py:717
 msgid "Successfully updated Workflow definition"
 msgstr "成功更新 Workflow 定义"
 
-#: src/oozie/views/dashboard.py:700 src/oozie/views/dashboard.py:801
-#: src/oozie/views/dashboard.py:866 src/oozie/views/dashboard.py:923
+#: src/oozie/views/dashboard.py:720 src/oozie/views/dashboard.py:821
+#: src/oozie/views/dashboard.py:886 src/oozie/views/dashboard.py:943
 #: src/oozie/views/editor.py:355 src/oozie/views/editor.py:653
 #: src/oozie/views/editor.py:862 src/oozie/views/editor2.py:415
-#: src/oozie/views/editor2.py:673 src/oozie/views/editor2.py:844
+#: src/oozie/views/editor2.py:681 src/oozie/views/editor2.py:853
 #, python-format
 msgid "Invalid submission form: %s"
 msgstr "提交格式无效：%s"
 
-#: src/oozie/views/dashboard.py:714 src/oozie/views/dashboard.py:931
+#: src/oozie/views/dashboard.py:734 src/oozie/views/dashboard.py:951
 msgid "Job"
 msgstr "作业"
 
-#: src/oozie/views/dashboard.py:715
+#: src/oozie/views/dashboard.py:735
 msgid "Sync Workflow definition?"
 msgstr "同步 Workflow 定义？"
 
-#: src/oozie/views/dashboard.py:743
+#: src/oozie/views/dashboard.py:763
 msgid "Workflow re-running."
 msgstr "重新运行 Workflow。"
 
-#: src/oozie/views/dashboard.py:746
+#: src/oozie/views/dashboard.py:766
 #, python-format
 msgid "Invalid submission form: %s %s"
 msgstr "提交格式无效：%s %s"
 
-#: src/oozie/views/dashboard.py:767
+#: src/oozie/views/dashboard.py:787
 #, python-format
 msgid "Error re-running workflow %s."
 msgstr "重新运行 Workflow %s 时出错。"
 
-#: src/oozie/views/dashboard.py:798
+#: src/oozie/views/dashboard.py:818
 msgid "Coordinator re-running."
 msgstr "重新运行 Coordinator。"
 
-#: src/oozie/views/dashboard.py:823
+#: src/oozie/views/dashboard.py:843
 #, python-format
 msgid "Error re-running coordinator %s."
 msgstr "重新运行 Coordinator %s 时出错。"
 
-#: src/oozie/views/dashboard.py:863
+#: src/oozie/views/dashboard.py:883
 msgid "Bundle re-running."
 msgstr "重新运行 Bundle。"
 
-#: src/oozie/views/dashboard.py:888
+#: src/oozie/views/dashboard.py:908
 #, python-format
 msgid "Error re-running bundle %s."
 msgstr "重新运行 Bundle %s 时出错。"
 
-#: src/oozie/views/dashboard.py:917
+#: src/oozie/views/dashboard.py:937
 #, python-format
 msgid "Error submitting job %s"
 msgstr "提交作业 %s 时出错"
 
-#: src/oozie/views/dashboard.py:919
+#: src/oozie/views/dashboard.py:939
 msgid "Oozie job submitted"
 msgstr "已提交 Oozie 作业"
 
-#: src/oozie/views/dashboard.py:1123
+#: src/oozie/views/dashboard.py:1143
 #, python-format
 msgid "Error accessing Oozie job %s."
 msgstr "访问 Oozie 作业 %s 时出错。"
 
-#: src/oozie/views/dashboard.py:1132
+#: src/oozie/views/dashboard.py:1152
 #, python-format
 msgid ""
 "Permission denied. %(username)s does not have the permissions to access "
 "job %(id)s."
 msgstr "权限被拒绝。%(username)s 不具备访问作业 %(id)s 的权限。"
 
-#: src/oozie/views/dashboard.py:1142
+#: src/oozie/views/dashboard.py:1162
 #, python-format
 msgid ""
 "Permission denied. %(username)s does not have the permissions to modify "
@@ -5279,7 +5290,7 @@ msgstr "格式错误"
 #: src/oozie/views/editor.py:708 src/oozie/views/editor.py:728
 #: src/oozie/views/editor.py:839 src/oozie/views/editor.py:933
 #: src/oozie/views/editor2.py:144 src/oozie/views/editor2.py:175
-#: src/oozie/views/editor2.py:558 src/oozie/views/editor2.py:801
+#: src/oozie/views/editor2.py:560 src/oozie/views/editor2.py:810
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
@@ -5342,11 +5353,11 @@ msgstr "小心：数据集开始日期晚于 Coordinator 开始日期。"
 msgid "Coordinator data created"
 msgstr "已创建 Coordinator 数据"
 
-#: src/oozie/views/editor.py:650 src/oozie/views/editor2.py:670
+#: src/oozie/views/editor.py:650 src/oozie/views/editor2.py:678
 msgid "Coordinator submitted."
 msgstr "已提交 Coordinator。"
 
-#: src/oozie/views/editor.py:680 src/oozie/views/editor2.py:703
+#: src/oozie/views/editor.py:680 src/oozie/views/editor2.py:711
 #, python-format
 msgid "Error submitting coordinator %s"
 msgstr "提交 Coordinator %s 时出错"
@@ -5371,11 +5382,11 @@ msgstr "Coordinator 已添加至 Bundle！"
 msgid "Bundled coordinator updated!"
 msgstr "已更新 Bundled Coordinator！"
 
-#: src/oozie/views/editor.py:859 src/oozie/views/editor2.py:841
+#: src/oozie/views/editor.py:859 src/oozie/views/editor2.py:850
 msgid "Bundle submitted."
 msgstr "已提交 Bundle。"
 
-#: src/oozie/views/editor.py:893 src/oozie/views/editor2.py:888
+#: src/oozie/views/editor.py:893 src/oozie/views/editor2.py:897
 #, python-format
 msgid "Error submitting bundle %s"
 msgstr "提交 Bundle %s 时出错"
@@ -5413,347 +5424,22 @@ msgstr "您没有此 Coordinator 的 Workflow 或文档的访问权限。"
 msgid "You don't have access to the workflow of this coordinator."
 msgstr "您没有此 Coordinator 的 Workflow 的访问权限。"
 
-#: src/oozie/views/editor2.py:580
+#: src/oozie/views/editor2.py:582
 msgid "Coordinator copied."
 msgstr "Coordinator 已复制。"
 
-#: src/oozie/views/editor2.py:614
+#: src/oozie/views/editor2.py:622
 msgid "Saved!"
 msgstr "已保存！"
 
-#: src/oozie/views/editor2.py:614
+#: src/oozie/views/editor2.py:622
 msgid "Updated!"
 msgstr "已更新！"
 
-#: src/oozie/views/editor2.py:792
+#: src/oozie/views/editor2.py:801
 msgid "Saved !"
 msgstr "已保存！"
 
-#: src/oozie/views/editor2.py:823
+#: src/oozie/views/editor2.py:832
 msgid "Bundle copied."
 msgstr "已复制 Bundle。"
-
-#~ msgid "Location on HDFS where the Oozie workflows are stored."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Share workflows and coordinators information"
-#~ " with all users. If set to "
-#~ "false, they will be visible only "
-#~ "to the owner and administrators."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Maximum number of Oozie workflows or "
-#~ "coodinators to retrieve in one API "
-#~ "call."
-#~ msgstr ""
-
-#~ msgid "The sub-workflow could not be found: %s"
-#~ msgstr ""
-
-#~ msgid "Error links cannot point to an ordinary node."
-#~ msgstr ""
-
-#~ msgid "Could not find app-path for subworkflow %s"
-#~ msgstr ""
-
-#~ msgid "Could not find subworkflow with deployment directory: %s"
-#~ msgstr ""
-
-#~ msgid "Could not find workflow at path %s"
-#~ msgstr ""
-
-#~ msgid "Subworkflow is not owned by %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Permission denied. %(username)s don't have "
-#~ "the permissions to access job %(id)s"
-#~ msgstr ""
-
-#~ msgid "job %(id)s not exist"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Command-line parameters used to start"
-#~ " the JVM that will execute the "
-#~ "Java application. Using this element is"
-#~ " equivalent to use the "
-#~ "mapred.child.java.opts configuration property. E.g."
-#~ " -Dexample-property=hue"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The %(type)s parameters of the script."
-#~ " E.g. \"-param\", \"INPUT=${inputDir}\""
-#~ msgstr ""
-
-#~ msgid ""
-#~ "List of absolute paths to delete "
-#~ "then to create before starting the "
-#~ "application. This should be used "
-#~ "exclusively for directory cleanup."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Refer to a Hive hive-site.xml file"
-#~ " bundled in the workflow deployment "
-#~ "directory. "
-#~ msgstr ""
-
-#~ msgid "The arguments of the %(type)s command"
-#~ msgstr ""
-
-#~ msgid "The path of the Shell command to execute"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The sub workflow application to include."
-#~ " You must own all the sub-"
-#~ "workflows."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "This will be inserted verbatim in "
-#~ "the action %(action)s. e.g. all the "
-#~ "XML content like %(xml_action)s will be"
-#~ " inserted into the action and produce"
-#~ " %(full_action)s"
-#~ msgstr ""
-
-#~ msgid "The timezone of the coordinator."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "How long in minutes the coordinator "
-#~ "action will be in WAITING or READY"
-#~ " status before giving up on its "
-#~ "execution."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "How many coordinator actions are allowed"
-#~ " to run concurrently (RUNNING status) "
-#~ "before the coordinator engine starts "
-#~ "throttling them."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The materialization or creation throttle "
-#~ "value for its coordinator actions. How"
-#~ " many maximum coordinator actions are "
-#~ "allowed to be in WAITING state "
-#~ "concurrently."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Configuration properties to transmit to "
-#~ "the workflow (e.g. limit=100, "
-#~ "username=${coord:user()})"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Permission denied. %(username)s don't have "
-#~ "the permissions to access dataset %(id)s"
-#~ msgstr ""
-
-#~ msgid "The timezone of the dataset."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "The done file for the data set."
-#~ " If Done flag is not specified, "
-#~ "then Oozie configures Hadoop to create"
-#~ " a _SUCCESS file in the output "
-#~ "directory. If Done flag is set to"
-#~ " empty, then Coordinator looks for "
-#~ "the existence of the directory itself."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Optional: shift the frequency for "
-#~ "gettting past/future end dates or enter"
-#~ " verbatim the Oozie end instance"
-#~ msgstr ""
-
-#~ msgid "Dashboard"
-#~ msgstr ""
-
-#~ msgid "Documentation"
-#~ msgstr ""
-
-#~ msgid "Oozie App"
-#~ msgstr ""
-
-#~ msgid "Filter:"
-#~ msgstr ""
-
-#~ msgid "Killed"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to kill bundle "
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to suspend bundle "
-#~ msgstr ""
-
-#~ msgid "The bundle was suspended!"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to resume bundle "
-#~ msgstr ""
-
-#~ msgid "The bundle was resumed!"
-#~ msgstr ""
-
-#~ msgid "Comment"
-#~ msgstr ""
-
-#~ msgid "Missing"
-#~ msgstr ""
-
-#~ msgid "Last Modified Time"
-#~ msgstr ""
-
-#~ msgid "Next submission"
-#~ msgstr ""
-
-#~ msgid "Time unit"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to kill coordinator "
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to suspend coordinator "
-#~ msgstr ""
-
-#~ msgid "The coordinator was suspended!"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to resume coordinator "
-#~ msgstr ""
-
-#~ msgid "The coordinator was resumed!"
-#~ msgstr ""
-
-#~ msgid "Filter: "
-#~ msgstr ""
-
-#~ msgid "Retries"
-#~ msgstr ""
-
-#~ msgid "Last Modification time"
-#~ msgstr ""
-
-#~ msgid "Created"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to kill workflow "
-#~ msgstr ""
-
-#~ msgid "The workflow was killed!"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to suspend workflow "
-#~ msgstr ""
-
-#~ msgid "The workflow was suspended!"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to resume workflow "
-#~ msgstr ""
-
-#~ msgid "The workflow was resumed!"
-#~ msgstr ""
-
-#~ msgid "Rerun this job?"
-#~ msgstr ""
-
-#~ msgid "Import Action"
-#~ msgstr ""
-
-#~ msgid "Edit Node: "
-#~ msgstr ""
-
-#~ msgid "The ssh server requires passwordless login"
-#~ msgstr ""
-
-#~ msgid "Coordinator data"
-#~ msgstr ""
-
-#~ msgid "Workflow Editor : "
-#~ msgstr ""
-
-#~ msgid "Click to import a Job Designer action and add it to the end of the flow"
-#~ msgstr ""
-
-#~ msgid "Upload additional files and libraries to the deployment directory"
-#~ msgstr ""
-
-#~ msgid "Upload"
-#~ msgstr ""
-
-#~ msgid "Received invalid response from server: "
-#~ msgstr ""
-
-#~ msgid "Imported Job Designer workflow as node."
-#~ msgstr ""
-
-#~ msgid "Could not import Job Designer workflow as node."
-#~ msgstr ""
-
-#~ msgid "Empty"
-#~ msgstr ""
-
-#~ msgid "Got to workflow manager"
-#~ msgstr ""
-
-#~ msgid "Last Modification"
-#~ msgstr ""
-
-#~ msgid "Must be GET or POST request."
-#~ msgstr ""
-
-#~ msgid "Job Designer design does not exist."
-#~ msgstr ""
-
-#~ msgid "Could not convert Job Designer design."
-#~ msgstr ""
-
-#~ msgid "Error importing node from Job Designer"
-#~ msgstr ""
-
-#~ msgid "Error performing %s on Oozie job %s: %s."
-#~ msgstr ""
-
-#~ msgid "An error with Oozie occurred."
-#~ msgstr ""
-
-#~ msgid "Workflow re-running!"
-#~ msgstr ""
-
-#~ msgid "Error re-running workflow %s"
-#~ msgstr ""
-
-#~ msgid "Coordinator re-running!"
-#~ msgstr ""
-
-#~ msgid "Error re-running coordinator %s"
-#~ msgstr ""
-
-#~ msgid "Bundle re-running!"
-#~ msgstr ""
-
-#~ msgid "Error re-running bundle %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Permission denied. %(username)s don't have "
-#~ "the permissions to access job %(id)s."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Permission denied. %(username)s don't have "
-#~ "the permissions to modify job %(id)s."
-#~ msgstr ""

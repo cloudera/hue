@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -882,42 +882,3 @@ msgstr "Nachname"
 #: src/useradmin/templates/view_user.mako:38
 msgid "Email"
 msgstr "E-Mail"
-
-#~ msgid "Password"
-#~ msgstr ""
-
-#~ msgid "Too long: 30 characters or fewer and not %s"
-#~ msgstr ""
-
-#~ msgid "Required. 80 characters or fewer."
-#~ msgstr ""
-
-#~ msgid "80 characters or fewer."
-#~ msgstr ""
-
-#~ msgid "The group was deleted."
-#~ msgstr ""
-
-#~ msgid "Could not get LDAP details for users with pattern %s"
-#~ msgstr ""
-
-#~ msgid ""
-#~ "There was a naming conflict while "
-#~ "importing user %(username)s in pattern "
-#~ "%(username_pattern)s"
-#~ msgstr ""
-
-#~ msgid "Could not get LDAP details for group pattern %s"
-#~ msgstr ""
-
-#~ msgid "Are you sure you want to delete"
-#~ msgstr ""
-
-#~ msgid "?"
-#~ msgstr ""
-
-#~ msgid "Step 1: Credentials (required)"
-#~ msgstr ""
-
-#~ msgid "Step 2: Names and Groups"
-#~ msgstr ""
