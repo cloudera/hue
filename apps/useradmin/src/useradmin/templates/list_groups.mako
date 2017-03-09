@@ -22,10 +22,12 @@ from useradmin.models import group_permissions
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+%if not is_embeddable:
 ${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+%endif
 ${layout.menubar(section='groups')}
 
-<div class="container-fluid">
+<div id="groupsComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Groups')}</h1>
 
@@ -134,7 +136,7 @@ ${layout.menubar(section='groups')}
 
   $(document).ready(function () {
 
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#groupsComponents')[0]);
 
     mainDataTable = $(".datatables").dataTable({
       "sPaginationType":"bootstrap",
@@ -208,4 +210,6 @@ ${layout.menubar(section='groups')}
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
