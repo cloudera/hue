@@ -392,13 +392,13 @@ ${ assist.assistPanel() }
       <h3 class="card-heading simple">${_('Source')}</h3>
       <div class="card-body">
         <div>
-          <div class="control-group" data-bind="visible: !createWizard.prefill.target_type || !createWizard.prefill.target_type() || createWizard.prefill.source_type() == 'all'">
+          <div class="control-group" data-bind="visible: createWizard.prefill.target_type().length == 0 || createWizard.prefill.source_type() == 'all'">
             <label for="sourceType" class="control-label"><div>${ _('Type') }</div>
               <select id="sourceType" data-bind="selectize: createWizard.source.inputFormats, value: createWizard.source.inputFormat, optionsText: 'name', optionsValue: 'value'"></select>
             </label>
           </div>
 
-          <div class="control-group" data-bind="visible: createWizard.prefill.target_type && createWizard.prefill.target_type() == 'database'">
+          <div class="control-group" data-bind="visible: createWizard.prefill.target_type() == 'database'">
             <label for="sourceType" class="control-label">${ _('No source is needed for creating a database.') }</label>
           </div>
 
@@ -436,7 +436,7 @@ ${ assist.assistPanel() }
       <!-- ko ifnot: createWizard.isGuessingFormat -->
       <h3 class="card-heading simple">${_('Format')}</h3>
       <div class="card-body">
-        <label data-bind="visible: (! createWizard.prefill.source_type) && createWizard.source.inputFormat() != 'table'">
+        <label data-bind="visible: createWizard.prefill.source_type().length == 0 && createWizard.source.inputFormat() != 'table'">
           <div>${_('File Type')}</div>
           <select data-bind="selectize: $root.createWizard.fileTypes, value: $root.createWizard.fileTypeName, optionsText: 'description', optionsValue: 'name'"></select>
         </label>
@@ -496,7 +496,7 @@ ${ assist.assistPanel() }
         <h3 class="card-heading simple">${_('Destination')}</h3>
         <div class="card-body">
           <div class="control-group">
-            <label for="destinationType" class="control-label" data-bind="visible: ! $parent.createWizard.prefill.target_type"><div>${ _('Type') }</div>
+            <label for="destinationType" class="control-label" data-bind="visible: $parent.createWizard.prefill.target_type().length == 0"><div>${ _('Type') }</div>
               <select id="destinationType" data-bind="selectize: outputFormats, value: outputFormat, optionsValue: 'value', optionsText: 'name'"></select>
             </label>
           </div>
@@ -1156,7 +1156,7 @@ ${ assist.assistPanel() }
           ##{'value': 'dbms', 'name': 'DBMS'},
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
-      if (wizard.prefill.source_type) {
+      if (wizard.prefill.source_type().length > 0) {
         self.inputFormats([
             {'value': 'file', 'name': 'File'},
             {'value': 'manual', 'name': 'Manually'},
@@ -1233,7 +1233,7 @@ ${ assist.assistPanel() }
         var name = ''
 
         if (self.inputFormat() == 'file') {
-          name = wizard.prefill.target_path ? wizard.prefill.target_path() : 'default';
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() : 'default';
 
           if (self.path()) {
             name += '.' + self.path().split('/').pop().split('.')[0];
@@ -1247,7 +1247,7 @@ ${ assist.assistPanel() }
             name = self.name();
           }
         } else if (self.inputFormat() == 'manual') {
-          name = wizard.prefill.target_path ? wizard.prefill.target_path() + '.' : '';
+          name = wizard.prefill.target_path().length > 0 ? wizard.prefill.target_path() + '.' : '';
         }
 
         return name.replace(/ /g, '_').toLowerCase();
@@ -1338,7 +1338,7 @@ ${ assist.assistPanel() }
           return true;
         })
       });
-      if (wizard.prefill.target_type) {
+      if (wizard.prefill.target_type().length > 0) {
         self.outputFormat(wizard.prefill.target_type());
         if (wizard.prefill.target_type() == 'database') {
           vm.currentStep(2);

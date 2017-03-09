@@ -85,8 +85,11 @@ HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
 
 def importer(request):
   prefill = {
+    'source_type': '',
+    'target_type': '',
+    'target_path': ''
   }
-  
+
   return _importer(request, prefill)
 
 

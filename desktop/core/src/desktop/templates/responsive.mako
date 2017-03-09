@@ -673,6 +673,14 @@ ${ assist.assistPanel() }
             self.getActiveAppViewModel(function (metastoreViewModel) {
               metastoreViewModel.loadURL();
             });
+          } else if (href.startsWith('/indexer/importer/prefill')){
+              self.currentApp('importer');
+              self.getActiveAppViewModel(function (viewModel) {
+                var arguments = href.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)/);
+                viewModel.createWizard.prefill.source_type(arguments[1] ? arguments[1] : '');
+                viewModel.createWizard.prefill.target_type(arguments[2] ? arguments[2] : '');
+                viewModel.createWizard.prefill.target_path(arguments[3] ? arguments[3] : '');
+              })
           } else if (href.startsWith('/notebook')){
             self.currentApp('notebook');
           } else if (href.startsWith('/pig')){
