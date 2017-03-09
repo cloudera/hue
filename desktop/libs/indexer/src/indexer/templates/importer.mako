@@ -257,7 +257,7 @@ ${ assist.assistPanel() }
   }
 
   .columns-form {
-    margin-bottom: 100px;
+    margin-bottom: 200px;
   }
 
 </style>
@@ -671,8 +671,8 @@ ${ assist.assistPanel() }
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
-            <div class="card-body no-margin-top">
-              <form class="form-inline inline-table columns-form" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel', disableNiceScroll: true }">
+            <div class="card-body no-margin-top columns-form">
+              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel', disableNiceScroll: true }">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
                   <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
                   <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
