@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: fr <LL@li.org>\n"
@@ -61,42 +61,41 @@ msgstr "Ce champ ne prend pas en charge les statistiques"
 #: src/dashboard/api.py:290
 #, python-format
 msgid "Could not download search results: %s"
-msgstr "Impossible de télécharger les résultats de la recherche : %s"
+msgstr "Impossible de télécharger les résultats de la recherche : %s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "Activez le lien Tableau de bord dans le menu."
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "index (Solr)"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "table (%s)"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"Nom de l'interface à utiliser comme moteur de requêtes pour le tableau de bord, par exemple "
+"solr, sql."
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "Prise en charge des facettes d'analyse : oui/non."
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "Documents imbriqués"
+msgstr "Prise en charge des documents imbriqués : oui/non."
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
 msgid "Dashboard does not exist or you don't have the permission to access it."
-msgstr ""
-"Le tableau de bord n'existe pas ou vous n'avez pas l'autorisation d'y "
-"accéder."
+msgstr "Le tableau de bord n'existe pas ou vous n'avez pas l'autorisation d'y accéder."
 
 #: src/dashboard/models.py:610
 msgid ""
@@ -108,16 +107,15 @@ msgstr ""
 
 #: src/dashboard/views.py:212
 msgid "Page saved !"
-msgstr "Page enregistrée !"
+msgstr "Page enregistrée !"
 
 #: src/dashboard/templates/admin_collections.mako:25
 #: src/dashboard/templates/admin_collections_m.mako:24
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
-msgstr "Tableaux de bord"
+msgstr "Tableau de bord"
 
 #: src/dashboard/templates/common_admin_collections.mako:30
 #: src/dashboard/templates/common_admin_collections.mako:43
@@ -131,7 +129,7 @@ msgstr "Index"
 
 #: src/dashboard/templates/common_admin_collections.mako:51
 msgid "Filter dashboards..."
-msgstr "Filtrer les tableaux de bord..."
+msgstr "Filtrer les tableaux de bord…"
 
 #: src/dashboard/templates/common_admin_collections.mako:57
 msgid "Copy"
@@ -169,11 +167,11 @@ msgstr "Il n'existe actuellement aucun tableau de bord défini."
 
 #: src/dashboard/templates/common_admin_collections.mako:96
 msgid "Click here to add"
-msgstr "Cliquer ici pour ajouter"
+msgstr "Cliquez ici pour en ajouter"
 
 #: src/dashboard/templates/common_admin_collections.mako:96
 msgid "one or more."
-msgstr "une ou plusieurs."
+msgstr "un ou plusieurs."
 
 #: src/dashboard/templates/common_admin_collections.mako:115
 msgid "Name"
@@ -201,9 +199,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "Voulez-vous vraiment supprimer les tableaux de bord sélectionnés ?"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "France"
+msgstr "Annuler"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -231,7 +228,7 @@ msgstr "Enregistrer"
 
 #: src/dashboard/templates/common_search.mako:59
 msgid "Saving..."
-msgstr "Enregistrement en cours..."
+msgstr "Enregistrement en cours…"
 
 #: src/dashboard/templates/common_search.mako:63
 msgid "Player mode"
@@ -247,17 +244,15 @@ msgstr "Définitions de requêtes"
 
 #: src/dashboard/templates/common_search.mako:78
 msgid "New"
-msgstr "Nouveau"
+msgstr "Nouveau "
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "sélectionné"
+msgstr "Sélectionner un"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "nouvel index"
+msgstr "index"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
@@ -266,7 +261,7 @@ msgstr "Afficher les cœurs"
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "Nom de la table ou <base de données>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -315,7 +310,7 @@ msgstr "Graphique"
 
 #: src/dashboard/templates/common_search.mako:280
 msgid "Line Chart"
-msgstr "Courbe"
+msgstr "Graphique en courbes"
 
 #: src/dashboard/templates/common_search.mako:289
 #: src/dashboard/templates/common_search.mako:298
@@ -324,7 +319,7 @@ msgstr "Arborescence"
 
 #: src/dashboard/templates/common_search.mako:308
 msgid "Heatmap"
-msgstr "Carte thermique"
+msgstr "Heatmap"
 
 #: src/dashboard/templates/common_search.mako:317
 #: src/dashboard/templates/common_search.mako:326
@@ -336,7 +331,7 @@ msgstr "Chronologie"
 #: src/dashboard/templates/common_search.mako:344
 #: src/dashboard/templates/common_search.mako:1453
 msgid "Gradient Map"
-msgstr "Carte de dégradés"
+msgstr "Map de dégradés"
 
 #: src/dashboard/templates/common_search.mako:374
 msgid "This is an empty widget."
@@ -484,7 +479,7 @@ msgstr "Royaume-Uni"
 #: src/dashboard/templates/common_search.mako:463
 #: src/dashboard/templates/common_search.mako:674
 msgid "USA"
-msgstr "Etats-Unis"
+msgstr "États-Unis"
 
 #: src/dashboard/templates/common_search.mako:474
 msgid "Add a dimension"
@@ -534,7 +529,7 @@ msgstr "Exclure cette valeur"
 #: src/dashboard/templates/common_search.mako:759
 #: src/dashboard/templates/common_search.mako:863
 msgid "Show more..."
-msgstr "Afficher plus..."
+msgstr "Afficher plus…"
 
 #: src/dashboard/templates/common_search.mako:764
 #: src/dashboard/templates/common_search.mako:868
@@ -544,11 +539,11 @@ msgstr "Afficher plus"
 #: src/dashboard/templates/common_search.mako:768
 #: src/dashboard/templates/common_search.mako:872
 msgid "less..."
-msgstr "moins..."
+msgstr "moins…"
 
 #: src/dashboard/templates/common_search.mako:945
 msgid "x-axis"
-msgstr "Axe x"
+msgstr "Axe X"
 
 #: src/dashboard/templates/common_search.mako:946
 msgid "region"
@@ -564,7 +559,7 @@ msgstr "légende"
 
 #: src/dashboard/templates/common_search.mako:955
 msgid "y-axis"
-msgstr "Axe y"
+msgstr "Axe Y"
 
 #: src/dashboard/templates/common_search.mako:956
 msgid "longitude"
@@ -596,7 +591,7 @@ msgstr "Tri descendant"
 
 #: src/dashboard/templates/common_search.mako:993
 msgid "Editor"
-msgstr "Editeur"
+msgstr "Éditeur"
 
 #: src/dashboard/templates/common_search.mako:995
 msgid "CSS & JS"
@@ -619,7 +614,7 @@ msgstr "Fonctions disponibles"
 
 #: src/dashboard/templates/common_search.mako:1015
 msgid "Formats date or timestamp in DD-MM-YYYY"
-msgstr "Affiche une date ou un horodatage au format DD-MM-AAAA"
+msgstr "Affiche une date ou un horodatage au format JJ-MM-AAAA"
 
 #: src/dashboard/templates/common_search.mako:1016
 msgid "Formats date or timestamp in HH:mm:ss"
@@ -627,7 +622,7 @@ msgstr "Affiche une date ou un horodatage au format HH:mm:ss"
 
 #: src/dashboard/templates/common_search.mako:1017
 msgid "Formats date or timestamp in DD-MM-YYYY HH:mm:ss"
-msgstr "Affiche une date ou un horodatage au format DD-MM-AAAA HH:mm:ss"
+msgstr "Affiche une date ou un horodatage au format JJ-MM-AAAA HH:mm:ss"
 
 #: src/dashboard/templates/common_search.mako:1018
 #: src/dashboard/templates/common_search.mako:1052
@@ -641,7 +636,7 @@ msgstr "Affiche une date sous forme d'horodatage Unix"
 
 #: src/dashboard/templates/common_search.mako:1020
 msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "Formate un horodatage Unix sous la forme \"Il y a Ns, Nmin, Njours...\""
+msgstr "Formate un horodatage Unix sous la forme \"Il y a Ns, Nmin, Njours…\""
 
 #: src/dashboard/templates/common_search.mako:1021
 #: src/dashboard/templates/common_search.mako:1055
@@ -680,7 +675,7 @@ msgstr "Cliquer sur ce bouton pour ajouter la fonction"
 
 #: src/dashboard/templates/common_search.mako:1049
 msgid "Formats a date in the DD-MM-YYYY format"
-msgstr "Affiche une date au format DD-MM-AAAA"
+msgstr "Affiche une date au format JJ-MM-AAAA"
 
 #: src/dashboard/templates/common_search.mako:1050
 msgid "Formats a date in the HH:mm:ss format"
@@ -688,7 +683,7 @@ msgstr "Affiche une date au format HH:mm:ss"
 
 #: src/dashboard/templates/common_search.mako:1051
 msgid "Formats a date in the DD-MM-YYYY HH:mm:ss format"
-msgstr "Affiche une date au format DD-MM-AAAA HH:mm:ss"
+msgstr "Affiche une date au format JJ-MM-AAAA HH:mm:ss"
 
 #: src/dashboard/templates/common_search.mako:1054
 msgid "Shows the relative time"
@@ -738,7 +733,7 @@ msgstr "Précédent"
 
 #: src/dashboard/templates/common_search.mako:1230
 msgid "Showing"
-msgstr "Affichage de "
+msgstr "Affichage de"
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
@@ -810,7 +805,7 @@ msgstr "Lignes"
 
 #: src/dashboard/templates/common_search.mako:1440
 msgid "Pie"
-msgstr "Diagramme"
+msgstr "Circulaire"
 
 #: src/dashboard/templates/common_search.mako:1493
 #: src/dashboard/templates/common_search.mako:1503
@@ -840,9 +835,8 @@ msgid "Field Name"
 msgstr "Nom du champ"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "Annuler les modifications"
+msgstr "Aucune correspondance."
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -898,15 +892,15 @@ msgstr "Longitude"
 
 #: src/dashboard/templates/common_search.mako:2349
 msgid "Label"
-msgstr "Etiquette"
+msgstr "Étiquette"
 
 #: src/dashboard/templates/common_search.mako:2372
 msgid "Prefix filter..."
-msgstr "Filtre de préfixe..."
+msgstr "Filtre de préfixe…"
 
 #: src/dashboard/templates/common_search.mako:2373
 msgid "Field name..."
-msgstr "Nom du champ..."
+msgstr "Nom du champ…"
 
 #: src/dashboard/templates/common_search.mako:2376
 msgid "Terms"
@@ -975,9 +969,7 @@ msgstr "Ajouter la requête actuelle comme…"
 
 #: src/dashboard/templates/common_search.mako:2563
 msgid "Click on this button to add the currenty query as a new definition"
-msgstr ""
-"Cliquez sur ce bouton pour ajouter la requête courante comme nouvelle "
-"définition"
+msgstr "Cliquez sur ce bouton pour ajouter la requête active comme nouvelle définition"
 
 #: src/dashboard/templates/common_search.mako:2581
 msgid "There are currently no query definitions."
@@ -1141,13 +1133,13 @@ msgid ""
 "Result highlighting is unavailable: the collection does not have an index"
 " field"
 msgstr ""
-"La mise en surbrillance des résultats n'est pas disponible : la "
+"La mise en surbrillance des résultats n'est pas disponible : la "
 "collection ne possède pas de champ d'index"
 
 #: src/dashboard/templates/macros.mako:200
 #, python-format
 msgid "Retweeted %s times"
-msgstr "Retweeté %s fois"
+msgstr "Retweeté %s fois"
 
 #: src/dashboard/templates/macros.mako:210
 msgid "Reply"
@@ -1159,7 +1151,7 @@ msgstr "Retweeter"
 
 #: src/dashboard/templates/no_collections.mako:45
 msgid "It seems there is nothing to search on ..."
-msgstr "Il semble qu'il n'y ait pas d'éléments sur lesquels baser la recherche..."
+msgstr "Il semble qu'il n'y ait pas d'éléments sur lesquels baser la recherche…"
 
 #: src/dashboard/templates/no_collections.mako:48
 msgid "What about creating a"
@@ -1168,52 +1160,3 @@ msgstr "Nous vous invitons à créer un"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "nouvel index"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "URL du serveur Solr."
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "Requête envoyée lorsqu'aucun terme n'est saisi."
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr ""
-#~ "Indique si Solr a besoin du client"
-#~ " pour effectuer une authentification "
-#~ "Kerberos."
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "Utilisez les toutes dernières fonctionnalités Solr 5.2+."
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "Nom d'index Solr pointant vers"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "Nom plus amical dans IU"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "Collection avec données de cœurs"
-
-#~ msgid "Solr json"
-#~ msgstr "json Solr"
-
-#~ msgid "Properties"
-#~ msgstr "Propriétés"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Propriétés Hue (par ex., les résultats par numéro de page)"
-
-#~ msgid "User who created the job."
-#~ msgstr "Utilisateur qui a créé le job."
-
-#~ msgid "You must be a superuser."
-#~ msgstr "Vous devez être un superutilisateur."
-
-#~ msgid "A POST request is required."
-#~ msgstr "Requête POST requise."
-
-#~ msgid "No"
-#~ msgstr "Non"
-
-#~ msgid "Select a search index"
-#~ msgstr "Sélectionner un index de recherche"
-

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -36,23 +36,3 @@ msgstr "正在其上运行 Sentry 服务的端口。"
 #: src/libsentry/conf.py:43
 msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr "Sentry 配置目录，即 sentry-site.xml 的所在位置。"
-
-#~ msgid "Host of the Impala Server."
-#~ msgstr ""
-
-#~ msgid "Port of the Impala Server."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Beeswax or Hive Server 2 Thrift "
-#~ "API used. Choices are: 'beeswax' or "
-#~ "'hiveserver2'."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Kerberos principal name for Impala. "
-#~ "Typically 'impala/hostname.foo.com'."
-#~ msgstr ""
-
-#~ msgid "A POST request is required."
-#~ msgstr ""

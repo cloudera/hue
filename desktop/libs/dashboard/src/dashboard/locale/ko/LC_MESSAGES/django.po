@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -40,7 +40,7 @@ msgstr "이 문서에는 인덱스 ID가 없습니다."
 
 #: src/dashboard/api.py:179
 msgid "Permission to edit the document denied"
-msgstr "거부된 문서를 편집할 권한"
+msgstr "문서를 편집할 권한 거부됨"
 
 #: src/dashboard/api.py:200
 msgid "Document successfully updated."
@@ -65,31 +65,32 @@ msgstr "검색 결과를 다운로드할 수 없음: %s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "메뉴에서 대시보드 링크를 활성화합니다."
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "인덱스(Solr)"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "테이블(%s)"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"대시보드에 대한 쿼리 엔진으로 사용할 인터페이스의 이름입니다(예: "
+"solr, sql)."
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "분석 패싯을 지원하거나 지원하지 않습니다."
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "중첩된 문서"
+msgstr "중첩된 문서를 지원하거나 지원하지 않습니다."
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
@@ -100,7 +101,9 @@ msgstr "대시보드가 존재하지 않거나 액세스 권한이 없습니다.
 msgid ""
 "The Solr schema requires an id field for performing the result "
 "highlighting"
-msgstr "결과를 강조 표시하려면 Solr 스키마에 id 필드가 필요합니다."
+msgstr ""
+"결과를 강조 표시하려면 Solr 스키마에 id 필드가 필요합니다."
+""
 
 #: src/dashboard/views.py:212
 msgid "Page saved !"
@@ -111,7 +114,6 @@ msgstr "페이지가 저장되었습니다!"
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
 msgstr "대시보드"
 
@@ -165,7 +167,7 @@ msgstr "현재 정의된 대시보드가 없습니다."
 
 #: src/dashboard/templates/common_admin_collections.mako:96
 msgid "Click here to add"
-msgstr "추가하려면 여기 클릭"
+msgstr "추가하려면 여기를 클릭"
 
 #: src/dashboard/templates/common_admin_collections.mako:96
 msgid "one or more."
@@ -197,9 +199,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "선택한 대시보드를 삭제하시겠습니까?"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "프랑스"
+msgstr "취소"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -246,14 +247,12 @@ msgid "New"
 msgstr "새로 만들기"
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "선택됨"
+msgstr "하나 선택"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "새 인덱스"
+msgstr "인덱스"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
@@ -262,7 +261,7 @@ msgstr "코어 표시"
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "테이블 이름 또는 <database>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -285,7 +284,7 @@ msgstr "필터 막대"
 #: src/dashboard/templates/common_search.mako:200
 #: src/dashboard/templates/common_search.mako:1459
 msgid "Marker Map"
-msgstr "Marker Map"
+msgstr "표식 Map"
 
 #: src/dashboard/templates/common_search.mako:211
 msgid "Counter"
@@ -504,7 +503,7 @@ msgstr "도메인"
 
 #: src/dashboard/templates/common_search.mako:583
 msgid "Parent"
-msgstr "상위"
+msgstr "상위 항목"
 
 #: src/dashboard/templates/common_search.mako:585
 msgid "Children"
@@ -637,7 +636,7 @@ msgstr "Unix 타임스탬프로 날짜 형식 지정"
 
 #: src/dashboard/templates/common_search.mako:1020
 msgid "Formats a Unix timestamp as Ns, Nmin, Ndays... ago"
-msgstr "Unix 타임스탬프를 Ns, Nmin, Ndays... 전으로 형식 지정"
+msgstr "Unix 타임스탬프를 N초, N분, N일... 전으로 형식 지정"
 
 #: src/dashboard/templates/common_search.mako:1021
 #: src/dashboard/templates/common_search.mako:1055
@@ -738,7 +737,7 @@ msgstr "표시 중 "
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
-msgstr "->"
+msgstr " -> "
 
 #: src/dashboard/templates/common_search.mako:1234
 msgid "of"
@@ -836,9 +835,8 @@ msgid "Field Name"
 msgstr "필드 이름"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "변경 내용 취소"
+msgstr "일치 항목이 없습니다."
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -859,7 +857,7 @@ msgstr "선택한 치수"
 
 #: src/dashboard/templates/common_search.mako:2121
 msgid "Add formula operation"
-msgstr "수식 작업 추가"
+msgstr "수식 추가 작업"
 
 #: src/dashboard/templates/common_search.mako:2134
 msgid "There are currently no filters applied."
@@ -1134,7 +1132,9 @@ msgstr "합계"
 msgid ""
 "Result highlighting is unavailable: the collection does not have an index"
 " field"
-msgstr "결과 강조 표시를 사용할 수 없습니다(컬렉션에 인덱스 필드가 없음)"
+msgstr ""
+"결과 강조 표시를 사용할 수 없습니다(컬렉션에 인덱스 필드가 없음)"
+""
 
 #: src/dashboard/templates/macros.mako:200
 #, python-format
@@ -1160,49 +1160,3 @@ msgstr "다음을 생성하시겠습니까?"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "새 인덱스"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "Solr Server의 URL입니다."
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "기간을 입력하지 않은 경우 보낸 쿼리입니다."
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr "Solr에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "최신 Solr 5.2+ 기능을 사용합니다."
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "가리키는 Solr 인덱스 이름"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "친숙한 UI 이름"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "코어 데이터가 있는 컬렉션"
-
-#~ msgid "Solr json"
-#~ msgstr "Solr json"
-
-#~ msgid "Properties"
-#~ msgstr "속성"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Hue 속성(예: 페이지 번호별 결과)"
-
-#~ msgid "User who created the job."
-#~ msgstr "Job을 생성한 사용자입니다."
-
-#~ msgid "You must be a superuser."
-#~ msgstr "superuser여야 합니다."
-
-#~ msgid "A POST request is required."
-#~ msgstr "POST 요청이 필요합니다."
-
-#~ msgid "No"
-#~ msgstr "아니요"
-
-#~ msgid "Select a search index"
-#~ msgstr "검색 인덱스 선택"
-

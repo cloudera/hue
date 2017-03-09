@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -457,70 +457,4 @@ msgstr ""
 #: src/sqoop/templates/app.mako:1157
 msgid "Untitled Job"
 msgstr ""
-
-#~ msgid "Could not get connections."
-#~ msgstr ""
-
-#~ msgid "Error saving connection"
-#~ msgstr ""
-
-#~ msgid "Could not create connection."
-#~ msgstr ""
-
-#~ msgid "Could not update connection."
-#~ msgstr ""
-
-#~ msgid "Could not clone connection."
-#~ msgstr ""
-
-#~ msgid "Could not delete connection."
-#~ msgstr ""
-
-#~ msgid "Could not get connection."
-#~ msgstr ""
-
-#~ msgid "Could not get framework."
-#~ msgstr ""
-
-#~ msgid "Please click on \"New Job\" to add one."
-#~ msgstr ""
-
-#~ msgid "Create a job"
-#~ msgstr ""
-
-#~ msgid "Previous"
-#~ msgstr ""
-
-#~ msgid "Back to job"
-#~ msgstr ""
-
-#~ msgid "Create a connection"
-#~ msgstr ""
-
-#~ msgid "Back to editing a job"
-#~ msgstr ""
-
-#~ msgid "Select job type"
-#~ msgstr ""
-
-#~ msgid "Select connection"
-#~ msgstr ""
-
-#~ msgid "Step 1: Job info"
-#~ msgstr ""
-
-#~ msgid "Step 2: Sqoop specific"
-#~ msgstr ""
-
-#~ msgid "Step 1: Manage connections"
-#~ msgstr ""
-
-#~ msgid "Step 2: Job info"
-#~ msgstr ""
-
-#~ msgid "Step 3: Sqoop specific job info"
-#~ msgstr ""
-
-#~ msgid "Could not start job: "
-#~ msgstr ""
 

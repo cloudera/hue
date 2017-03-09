@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -203,18 +203,3 @@ msgstr "구성"
 #: src/about/templates/header.mako:33
 msgid "Server Logs"
 msgstr "서버 로그"
-
-#~ msgid "Go !"
-#~ msgstr ""
-
-#~ msgid "Check your current configuration"
-#~ msgstr ""
-
-#~ msgid "Install or re-install the application examples"
-#~ msgstr ""
-
-#~ msgid "Go create or import users"
-#~ msgstr ""
-
-#~ msgid "Go use the apps"
-#~ msgstr ""

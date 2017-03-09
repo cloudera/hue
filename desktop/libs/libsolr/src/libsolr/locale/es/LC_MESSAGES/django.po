@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,18 +17,18 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsolr/api.py:287 src/libsolr/api.py:299 src/libsolr/api.py:310
-#: src/libsolr/api.py:321 src/libsolr/api.py:333 src/libsolr/api.py:348
-#: src/libsolr/api.py:368 src/libsolr/api.py:390 src/libsolr/api.py:407
-#: src/libsolr/api.py:423 src/libsolr/api.py:441 src/libsolr/api.py:459
-#: src/libsolr/api.py:466 src/libsolr/api.py:475 src/libsolr/api.py:485
-#: src/libsolr/api.py:495 src/libsolr/api.py:508 src/libsolr/api.py:518
-#: src/libsolr/api.py:528 src/libsolr/api.py:550 src/libsolr/api.py:566
-#: src/libsolr/api.py:584 src/libsolr/api.py:595 src/libsolr/api.py:850
+#: src/libsolr/api.py:307 src/libsolr/api.py:319 src/libsolr/api.py:330
+#: src/libsolr/api.py:341 src/libsolr/api.py:353 src/libsolr/api.py:368
+#: src/libsolr/api.py:388 src/libsolr/api.py:410 src/libsolr/api.py:427
+#: src/libsolr/api.py:443 src/libsolr/api.py:461 src/libsolr/api.py:479
+#: src/libsolr/api.py:486 src/libsolr/api.py:495 src/libsolr/api.py:505
+#: src/libsolr/api.py:515 src/libsolr/api.py:528 src/libsolr/api.py:538
+#: src/libsolr/api.py:548 src/libsolr/api.py:570 src/libsolr/api.py:586
+#: src/libsolr/api.py:604 src/libsolr/api.py:616 src/libsolr/api.py:790
 msgid "Error while accessing Solr"
 msgstr "Error al acceder a Solr"
 
-#: src/libsolr/api.py:403
+#: src/libsolr/api.py:423
 #, python-format
 msgid ""
 "Could not create or edit alias. Check response:\n"
@@ -37,7 +37,7 @@ msgstr ""
 "No se puede crear o editar el alias. Compruebe la respuesta:\n"
 "%s"
 
-#: src/libsolr/api.py:419
+#: src/libsolr/api.py:439
 #, python-format
 msgid ""
 "Could not delete alias. Check response:\n"
@@ -57,23 +57,3 @@ msgstr ""
 #: src/libsolr/conf.py:33
 msgid "Default path to Solr in ZooKeeper"
 msgstr "Ruta predeterminada a Solr en ZooKeeper"
-
-#~ msgid "Host of the Impala Server."
-#~ msgstr ""
-
-#~ msgid "Port of the Impala Server."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Beeswax or Hive Server 2 Thrift "
-#~ "API used. Choices are: 'beeswax' or "
-#~ "'hiveserver2'."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Kerberos principal name for Impala. "
-#~ "Typically 'impala/hostname.foo.com'."
-#~ msgstr ""
-
-#~ msgid "A POST request is required."
-#~ msgstr ""

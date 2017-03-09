@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -65,31 +65,32 @@ msgstr "検索結果をダウンロードできませんでした：%s"
 
 #: src/dashboard/conf.py:28
 msgid "Activate the Dashboard link in the menu."
-msgstr ""
+msgstr "メニューのダッシュボードリンクをアクティブ化します。"
 
 #: src/dashboard/conf.py:63
 msgid "index (Solr)"
-msgstr ""
+msgstr "インデックス（Solr）"
 
 #: src/dashboard/conf.py:71
 #, python-format
 msgid "table (%s)"
-msgstr ""
+msgstr "テーブル（%s）"
 
 #: src/dashboard/conf.py:88
 msgid ""
 "Name of the interface to use as query engine for the dashboard, e.g. "
 "solr, sql."
 msgstr ""
+"ダッシュボードのクエリエンジンとして使用するインターフェイスの名前、例: "
+"solr、sql"
 
 #: src/dashboard/conf.py:92
 msgid "Support analytics facets or not."
-msgstr ""
+msgstr "分析用ファセットをサポートするかどうか。"
 
 #: src/dashboard/conf.py:98
-#, fuzzy
 msgid "Support nested documents or not."
-msgstr "ネストされたドキュメント"
+msgstr "ネストされたドキュメントをサポートするかどうか。"
 
 #: src/dashboard/decorators.py:45 src/dashboard/decorators.py:65
 #: src/dashboard/views.py:69
@@ -111,7 +112,6 @@ msgstr "ページが保存されました。"
 #: src/dashboard/templates/no_collections.mako:24
 #: src/dashboard/templates/search.mako:27
 #: src/dashboard/templates/search_m.mako:27
-#, fuzzy
 msgid "Dashboard"
 msgstr "ダッシュボード"
 
@@ -197,9 +197,8 @@ msgid "Are you sure you want to delete the selected dashboards?"
 msgstr "選択したダッシュボードを削除してもよろしいですか？"
 
 #: src/dashboard/templates/common_admin_collections.mako:154
-#, fuzzy
 msgid "Cancel"
-msgstr "フランス"
+msgstr "キャンセル"
 
 #: src/dashboard/templates/common_admin_collections.mako:155
 msgid "Yes"
@@ -246,14 +245,12 @@ msgid "New"
 msgstr "新規"
 
 #: src/dashboard/templates/common_search.mako:87
-#, fuzzy
 msgid "Select one"
-msgstr "選択済み"
+msgstr "1 つ選択してください"
 
 #: src/dashboard/templates/common_search.mako:92
-#, fuzzy
 msgid "index"
-msgstr "作成することをお勧めします"
+msgstr "インデックス"
 
 #: src/dashboard/templates/common_search.mako:100
 msgid "Show cores"
@@ -262,7 +259,7 @@ msgstr "コアを表示"
 #: src/dashboard/templates/common_search.mako:108
 #: src/dashboard/templates/common_search.mako:2503
 msgid "Table name or <database>.<table>"
-msgstr ""
+msgstr "テーブル名または <database>.<table>"
 
 #: src/dashboard/templates/common_search.mako:122
 msgid "Search"
@@ -592,7 +589,7 @@ msgstr "降順でソート"
 
 #: src/dashboard/templates/common_search.mako:993
 msgid "Editor"
-msgstr "エディター"
+msgstr "エディターー"
 
 #: src/dashboard/templates/common_search.mako:995
 msgid "CSS & JS"
@@ -734,7 +731,7 @@ msgstr "前"
 
 #: src/dashboard/templates/common_search.mako:1230
 msgid "Showing"
-msgstr "表示しています "
+msgstr "表示しています"
 
 #: src/dashboard/templates/common_search.mako:1232
 msgid "to"
@@ -746,7 +743,7 @@ msgstr "／"
 
 #: src/dashboard/templates/common_search.mako:1236
 msgid " results"
-msgstr " 結果"
+msgstr "結果"
 
 #: src/dashboard/templates/common_search.mako:1239
 msgid "Show"
@@ -836,9 +833,8 @@ msgid "Field Name"
 msgstr "フィールド名"
 
 #: src/dashboard/templates/common_search.mako:1544
-#, fuzzy
 msgid "No matches."
-msgstr "変更を取り消し"
+msgstr "一致する名前がありません。"
 
 #: src/dashboard/templates/common_search.mako:1575
 msgid "Document"
@@ -863,7 +859,7 @@ msgstr "数式を追加"
 
 #: src/dashboard/templates/common_search.mako:2134
 msgid "There are currently no filters applied."
-msgstr "現在適用されているフィルターはありません。"
+msgstr "現在適用されているフィルタはありません。"
 
 #: src/dashboard/templates/common_search.mako:2147
 #: src/dashboard/templates/common_search.mako:2170
@@ -1160,49 +1156,3 @@ msgstr "新しいインデックスを"
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr "作成することをお勧めします"
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr "Solr サーバーの URL です。"
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr "用語が入力されずにクエリが送信されました。"
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr "Solr が Kerberos 認証の実行をクライアントに要求するかどうかの指定です。"
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr "最新の Solr 5.2+ 機能を使用します。"
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr "Solr インデックス名が指している先"
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr "UI のわかりやすい名前"
-
-#~ msgid "Collection with cores data"
-#~ msgstr "コアデータを含むコレクション"
-
-#~ msgid "Solr json"
-#~ msgstr "Solr JSON"
-
-#~ msgid "Properties"
-#~ msgstr "プロパティ"
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr "Hue プロパティ（例：ページ番号による結果）"
-
-#~ msgid "User who created the job."
-#~ msgstr "ジョブを作成したユーザーです。"
-
-#~ msgid "You must be a superuser."
-#~ msgstr "スーパーユーザーであることが必要です。"
-
-#~ msgid "A POST request is required."
-#~ msgstr "POST 要求が必要です。"
-
-#~ msgid "No"
-#~ msgstr "いいえ"
-
-#~ msgid "Select a search index"
-#~ msgstr "検索インデックスを選択"
-

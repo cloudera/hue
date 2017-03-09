@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,75 +17,83 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/metadata/conf.py:71
+#: src/metadata/conf.py:67
 msgid "Configuration options for Optimizer API"
 msgstr "优化器 API 的配置选项"
 
-#: src/metadata/conf.py:75
+#: src/metadata/conf.py:72
+msgid ""
+"The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
+"to 0 to disable the cache."
+msgstr ""
+"用于 assist/autocomplete/ 等调用的缓存 TTL（以毫秒为单位）。设置为 "
+"0 将禁用缓存。"
+
+#: src/metadata/conf.py:77
 msgid "Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)"
 msgstr "优化器 API 的基本 URL（例如 - https://alpha.optimizer.cloudera.com/）"
 
-#: src/metadata/conf.py:80
+#: src/metadata/conf.py:82
 msgid ""
 "The name of the product or group which will have API access to the emails"
 " associated with it."
 msgstr "对与其相关电子邮件具有 API 访问权限的产品或组的名称。"
 
-#: src/metadata/conf.py:85 src/metadata/conf.py:96
+#: src/metadata/conf.py:87 src/metadata/conf.py:98
 msgid "A secret passphrase associated with the productName."
 msgstr "与产品名称相关的机密密码。"
 
-#: src/metadata/conf.py:90 src/metadata/conf.py:101
+#: src/metadata/conf.py:92 src/metadata/conf.py:103
 msgid ""
 "Execute this script to produce the product secret. This will be used when"
 " `product_secret` is not set."
 msgstr "执行此脚本以生成产品机密。这将用于未设置 `product_secret` 的情况。"
 
-#: src/metadata/conf.py:108
+#: src/metadata/conf.py:110
 msgid "The email of the Optimizer account you want to associate with the Product."
 msgstr "您想要与产品关联的优化器帐户的电子邮件。"
 
-#: src/metadata/conf.py:113
+#: src/metadata/conf.py:115
 msgid ""
 "The password associated with the Optimizer account you to associate with "
 "the Product."
 msgstr "与产品相关联的优化器帐户相关密码。"
 
-#: src/metadata/conf.py:118
+#: src/metadata/conf.py:120
 msgid ""
 "Execute this script to produce the email password. This will be used when"
 " `email_password` is not set."
 msgstr "执行此脚本以生成电子邮件密码。这将用于未设置 `email_password` 的情况。"
 
-#: src/metadata/conf.py:125
+#: src/metadata/conf.py:127
 msgid ""
 "In secure mode (HTTPS), if Optimizer SSL certificates have to be verified"
 " against certificate authority"
 msgstr "在安全模式 (HTTPS) 下，是否必须验证优化器 SSL 证书的证书颁发机构"
 
-#: src/metadata/conf.py:135
+#: src/metadata/conf.py:149
 msgid "Configuration options for Navigator API"
 msgstr "Navigator API 的配置选项"
 
-#: src/metadata/conf.py:139
+#: src/metadata/conf.py:153
 msgid "Base URL to Navigator API."
 msgstr "Navigator API 的基本 URL。"
 
-#: src/metadata/conf.py:143
+#: src/metadata/conf.py:157
 msgid "Auth username of the hue user used for authentications."
 msgstr "用于身份验证的 Hue 用户的身份验证用户名。"
 
-#: src/metadata/conf.py:147
+#: src/metadata/conf.py:161
 msgid "LDAP/PAM/.. password of the hue user used for authentications."
 msgstr "Hue 用户用于身份验证的 LDAP/PAM/.. 密码。"
 
-#: src/metadata/conf.py:152
+#: src/metadata/conf.py:166
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr "执行此脚本以生成身份验证密码。这将用于未设置 `auth_password` 的情况。"
 
-#: src/metadata/conf.py:158
+#: src/metadata/conf.py:172
 msgid ""
 "Navigator configuration directory, where navigator.client.properties is "
 "located."
@@ -93,33 +101,44 @@ msgstr ""
 "navigator.client.properties 所在的 Navigator "
 "配置目录。"
 
-#: src/metadata/conf.py:163
-msgid "Perform Sentry privilege filtering."
-msgstr "执行 Sentry 权限筛选。"
+#: src/metadata/conf.py:177
+msgid ""
+"Perform Sentry privilege filtering. Default to true automatically if the "
+"cluster is secure."
+msgstr ""
+"执行 Sentry 权限筛选。如果"
+"群集是安全的，则自动默认为 true。"
 
-#: src/metadata/navigator_api.py:388 src/metadata/navigator_api.py:406
+#: src/metadata/conf.py:183
+msgid "Max number of items to fetch in one call in object search."
+msgstr "在对象搜索中一次调用可获取的最大项数。"
+
+#: src/metadata/conf.py:189
+msgid "Max number of items to fetch in one call in object search autocomplete."
+msgstr "在对象搜索自动完成中一次调用可获取的最大项数。"
+
+#: src/metadata/navigator_api.py:399 src/metadata/navigator_api.py:425
 msgid ""
 "add_tags requires an 'id' parameter and 'tags' parameter that is a non-"
 "empty list of tags"
 msgstr "add_tags 需要一个 'id' 参数和 'tags' 参数，即，标记的非空列表"
 
-#: src/metadata/navigator_api.py:424
+#: src/metadata/navigator_api.py:451
 msgid ""
 "update_properties requires an 'id' parameter and 'properties' parameter "
 "that is a non-empty dict"
 msgstr "update_properties 需要一个 'id' 参数和 'properties' 参数，即，非空目录"
 
-#: src/metadata/navigator_api.py:442
+#: src/metadata/navigator_api.py:477
 msgid ""
 "update_properties requires an 'id' parameter and 'keys' parameter that is"
 " a non-empty list"
 msgstr "update_properties 需要一个 'id' 参数和 'keys' 参数，即，非空列表"
 
-#: src/metadata/optimizer_client.py:96 src/metadata/optimizer_client.py:120
-#: src/metadata/optimizer_client.py:131 src/metadata/optimizer_client.py:142
-#: src/metadata/optimizer_client.py:174
+#: src/metadata/optimizer_client.py:84 src/metadata/optimizer_client.py:95
+#: src/metadata/optimizer_client.py:147
 msgid "Error while accessing Optimizer"
 msgstr "访问优化器时出错"
 
-#~ msgid "Base URL to Navigator API (e.g. - http://localhost:7187/api/v2)"
+#~ msgid "Perform Sentry privilege filtering."
 #~ msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -1154,49 +1154,4 @@ msgstr ""
 #: src/dashboard/templates/no_collections.mako:49
 msgid "new index"
 msgstr ""
-
-#~ msgid "URL of the Solr Server."
-#~ msgstr ""
-
-#~ msgid "Query sent when no term is entered."
-#~ msgstr ""
-
-#~ msgid "Whether Solr requires client to perform Kerberos authentication."
-#~ msgstr ""
-
-#~ msgid "Use latest Solr 5.2+ features."
-#~ msgstr ""
-
-#~ msgid "Solr index name pointing to"
-#~ msgstr ""
-
-#~ msgid "Friendlier name in UI"
-#~ msgstr ""
-
-#~ msgid "Collection with cores data"
-#~ msgstr ""
-
-#~ msgid "Solr json"
-#~ msgstr ""
-
-#~ msgid "Properties"
-#~ msgstr ""
-
-#~ msgid "Hue properties (e.g. results by pages number)"
-#~ msgstr ""
-
-#~ msgid "User who created the job."
-#~ msgstr ""
-
-#~ msgid "You must be a superuser."
-#~ msgstr ""
-
-#~ msgid "A POST request is required."
-#~ msgstr ""
-
-#~ msgid "No"
-#~ msgstr ""
-
-#~ msgid "Select a search index"
-#~ msgstr ""
 

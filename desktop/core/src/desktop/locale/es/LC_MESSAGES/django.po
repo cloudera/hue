@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -52,31 +52,35 @@ msgstr ""
 "Valor no válido para permisos. Los valores aceptables son: en propiedad, "
 "compartido, ambos."
 
-#: src/desktop/api2.py:266
+#: src/desktop/api2.py:265
 msgid "move_document requires source_doc_uuid and destination_doc_uuid"
 msgstr "move_document requiere source_doc_uuid y destination_doc_uuid"
 
-#: src/desktop/api2.py:286
+#: src/desktop/api2.py:285
 msgid "create_directory requires parent_uuid and name"
 msgstr "create_directory requiere parent_uuid y nombre"
 
-#: src/desktop/api2.py:304
+#: src/desktop/api2.py:303
 msgid "update_document requires uuid"
 msgstr "update_document requiere uuid"
 
-#: src/desktop/api2.py:339
+#: src/desktop/api2.py:338
 msgid "delete_document requires uuid"
 msgstr "delete_document requiere uuid"
 
-#: src/desktop/api2.py:365
+#: src/desktop/api2.py:362
+msgid "restore_document requires comma separated uuids"
+msgstr "restore_document requiere UUID separados por comas"
+
+#: src/desktop/api2.py:385
 msgid "share_document requires uuid and perms_dict"
 msgstr "share_document requiere uuid y perms_dict"
 
-#: src/desktop/api2.py:452
+#: src/desktop/api2.py:476
 msgid "Failed to import documents, the file does not contain valid JSON."
 msgstr "Error al importar documentos, el archivo no contiene JSON válido."
 
-#: src/desktop/api2.py:456
+#: src/desktop/api2.py:480
 msgid ""
 "Failed to import documents, the file does not contain the expected JSON "
 "schema for Hue documents."
@@ -84,7 +88,7 @@ msgstr ""
 "Error al importar documentos, el archivo no contiene el esquema "
 "JSON esperado para documentos Hue."
 
-#: src/desktop/api2.py:686
+#: src/desktop/api2.py:712
 #, python-format
 msgid "Cannot import document, dependency with UUID: %s not found."
 msgstr ""
@@ -95,43 +99,43 @@ msgstr ""
 msgid "load_apps has already been called."
 msgstr "Ya se ha llamado a load_apps."
 
-#: src/desktop/conf.py:97
+#: src/desktop/conf.py:109
 msgid "HTTP host to bind to."
 msgstr "Host HTTP al que vincular."
 
-#: src/desktop/conf.py:103
+#: src/desktop/conf.py:115
 msgid "HTTP port to bind to."
 msgstr "Puerto HTTP al que vincular."
 
-#: src/desktop/conf.py:109
+#: src/desktop/conf.py:121
 msgid "HTTP methods the server will be allowed to service."
 msgstr "Métodos HTTP que podrá facilitar el servidor."
 
-#: src/desktop/conf.py:116
+#: src/desktop/conf.py:128
 msgid "X-Frame-Options HTTP header value."
 msgstr "Valor de cabecera HTTP de X-Frame-Options."
 
-#: src/desktop/conf.py:122
+#: src/desktop/conf.py:134
 msgid "Filename of SSL Certificate"
 msgstr "Nombre de archivo del certificado SSL"
 
-#: src/desktop/conf.py:128
+#: src/desktop/conf.py:140
 msgid "Filename of SSL RSA Private Key"
 msgstr "Nombre de archivo de la clave privada SSL RSA"
 
-#: src/desktop/conf.py:134
+#: src/desktop/conf.py:146
 msgid "Filename of SSL Certificate Chain"
 msgstr "Nombre de archivo de la cadena del certificado SSL"
 
-#: src/desktop/conf.py:140
+#: src/desktop/conf.py:152
 msgid "List of allowed and disallowed ciphers"
 msgstr "Lista de cifrados permitidos y no permitidos"
 
-#: src/desktop/conf.py:162
+#: src/desktop/conf.py:174
 msgid "SSL password of the certificate"
 msgstr "Contraseña SSL del certificado"
 
-#: src/desktop/conf.py:167
+#: src/desktop/conf.py:179
 msgid ""
 "Execute this script to produce the SSL password. This will be used when "
 "`ssl_password` is not set."
@@ -139,15 +143,15 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña SSL. Se "
 "utilizará cuando `ssl_password` no esté definido."
 
-#: src/desktop/conf.py:173
+#: src/desktop/conf.py:185
 msgid "Path to default Certificate Authority certificates."
 msgstr "Ruta a los certificados predeterminados de la autoridad certificadora."
 
-#: src/desktop/conf.py:179
+#: src/desktop/conf.py:191
 msgid "Choose whether Hue should validate certificates received from the server."
 msgstr "Elija si Hue debe validar los certificados que reciba del servidor."
 
-#: src/desktop/conf.py:185
+#: src/desktop/conf.py:197
 msgid ""
 "Strict-Transport-Security: max-age=31536000 This is a HTTP response "
 "header, Once a supported browser receives this header that browser will "
@@ -159,7 +163,7 @@ msgstr ""
 "impedirá que cualquier comunicación se envíe a través de HTTP al dominio "
 "especificado y enviará en su lugar todas las comunicaciones a través de HTTPS."
 
-#: src/desktop/conf.py:191
+#: src/desktop/conf.py:203
 msgid ""
 "Strict-Transport-Security: This is a HTTP response header, Once a "
 "supported browser receives this header that browser will prevent any "
@@ -171,7 +175,7 @@ msgstr ""
 "comunicación se envíe a través de HTTP al dominio especificado y enviará "
 "en su lugar todas las comunicaciones a través de HTTPS."
 
-#: src/desktop/conf.py:197 src/desktop/conf.py:209
+#: src/desktop/conf.py:209 src/desktop/conf.py:221
 msgid ""
 "X-Content-Type-Options: nosniff This is a HTTP response header feature "
 "that helps prevent attacks based on MIME-type confusion."
@@ -179,7 +183,7 @@ msgstr ""
 "X-Content-Type-Options: nosniff Esta es una función de cabecera de respuesta HTTP "
 "que ayuda a evitar ataques basados en la confusión de tipos MIME."
 
-#: src/desktop/conf.py:203
+#: src/desktop/conf.py:215
 msgid ""
 "X-Xss-Protection: \"1; mode=block\" This is a HTTP response header "
 "feature to force XSS protection."
@@ -187,15 +191,15 @@ msgstr ""
 "X-Xss-Protection: \"1; mode=block\" Esta es una función de cabecera de respuesta "
 "HTTP que fuerza la protección XSS."
 
-#: src/desktop/conf.py:220
+#: src/desktop/conf.py:232
 msgid "If all non-SSL requests should be permanently redirected to SSL."
 msgstr "Si todas las solicitudes no SSL deberían redirigirse permanentemente a SSL."
 
-#: src/desktop/conf.py:226
+#: src/desktop/conf.py:238
 msgid "If all non-SSL requests should be permanently redirected to this SSL host."
 msgstr "Si todas las solicitudes no SSL deberían redirigirse permanentemente a este host SSL."
 
-#: src/desktop/conf.py:232
+#: src/desktop/conf.py:244
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can not serve https."
@@ -203,7 +207,7 @@ msgstr ""
 "Lista de cadenas separadas por comas que representan los nombres de "
 "host/dominio que Hue Server no puede servir a HTTPS."
 
-#: src/desktop/conf.py:239
+#: src/desktop/conf.py:251
 msgid ""
 "LDAP password of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
@@ -212,7 +216,7 @@ msgstr ""
 "autenticaciones de LDAP. Por ejemplo, la autenticación de LDAP con "
 "HiveServer2/Impala."
 
-#: src/desktop/conf.py:246
+#: src/desktop/conf.py:258
 msgid ""
 "Execute this script to produce the LDAP password. This will be used when "
 "`ldap_password` is not set."
@@ -220,7 +224,7 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña LDAP. Se "
 "utilizará cuando `ldap_password` no esté definido."
 
-#: src/desktop/conf.py:254
+#: src/desktop/conf.py:266
 msgid ""
 "LDAP username of the hue user used for LDAP authentications. For example "
 "for LDAP Authentication with HiveServer2/Impala."
@@ -229,7 +233,7 @@ msgstr ""
 "autenticaciones de LDAP. Por ejemplo, la autenticación de LDAP con "
 "HiveServer2/Impala."
 
-#: src/desktop/conf.py:264
+#: src/desktop/conf.py:276
 msgid ""
 "Auth username of the hue user used for authentications. For example for "
 "LDAP Authentication with HiveServer2/Impala."
@@ -238,7 +242,7 @@ msgstr ""
 "las autenticaciones. Por ejemplo, la autenticación de LDAP con "
 "HiveServer2/Impala."
 
-#: src/desktop/conf.py:290
+#: src/desktop/conf.py:302
 msgid ""
 "LDAP/PAM/.. password of the hue user used for authentications. Inactive "
 "if empty. For example for LDAP Authentication with HiveServer2/Impala."
@@ -247,7 +251,7 @@ msgstr ""
 "autenticaciones. Por ejemplo, la autenticación de LDAP con "
 "HiveServer2/Impala."
 
-#: src/desktop/conf.py:296
+#: src/desktop/conf.py:308
 msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
@@ -255,7 +259,7 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña de "
 "autenticación. Se utilizará cuando `auth_password` no esté definido."
 
-#: src/desktop/conf.py:303
+#: src/desktop/conf.py:315
 msgid ""
 "If set to false, runcpserver will not actually start the web server.  "
 "Used if Apache is being used as a WSGI container."
@@ -263,15 +267,15 @@ msgstr ""
 "Si se establece en false, runcpserver no iniciará realmente el servidor "
 "web. Se utiliza si se emplea Apache como contenedor WSGI."
 
-#: src/desktop/conf.py:309
+#: src/desktop/conf.py:321
 msgid "Number of threads used by the CherryPy web server."
 msgstr "Número de subprocesos usados por el servidor web CherryPy."
 
-#: src/desktop/conf.py:315
+#: src/desktop/conf.py:327
 msgid "Used in hashing algorithms for sessions."
 msgstr "Se utiliza en los algoritmos de hash para las sesiones."
 
-#: src/desktop/conf.py:320
+#: src/desktop/conf.py:332
 msgid ""
 "Execute this script to produce the Django secret key. This will be used "
 "when `secret_key` is not set."
@@ -279,11 +283,11 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la clave secreta de "
 "Django. Se utilizará cuando `secret_key` no esté definido."
 
-#: src/desktop/conf.py:327
+#: src/desktop/conf.py:339
 msgid "Number of user access to remember per view per user."
 msgstr "Número de acceso de usuario para recordar por vista y por usuario."
 
-#: src/desktop/conf.py:333
+#: src/desktop/conf.py:345
 msgid ""
 "Help improve Hue with anonymous usage analytics.Use Google Analytics to "
 "see how many times an application or specific section of an application "
@@ -293,7 +297,7 @@ msgstr ""
 "para conocer cuántas veces se utiliza una aplicación o una sección "
 "específica, así de fácil."
 
-#: src/desktop/conf.py:340
+#: src/desktop/conf.py:352
 msgid ""
 "Tile layer server URL for the Leaflet map charts. Read more on "
 "http://leafletjs.com/reference.html#tilelayer. Make sure you add the tile"
@@ -305,15 +309,15 @@ msgstr ""
 "Tile a la sección img-src del parámetro de configuración 'secure_content_security_policy' "
 "."
 
-#: src/desktop/conf.py:346
+#: src/desktop/conf.py:358
 msgid "The copyright message for the specified Leaflet maps Tile Layer"
 msgstr "El mensaje de copyright de la capa de Tile de maps de Leaflet especificada"
 
-#: src/desktop/conf.py:351
+#: src/desktop/conf.py:363
 msgid "Use poll(2) in Hue thrift pool."
 msgstr "Utilizar poll(2) en pool Thrift de Hue."
 
-#: src/desktop/conf.py:358
+#: src/desktop/conf.py:370
 msgid ""
 "Comma-separated list of Django middleware classes to use. See "
 "https://docs.djangoproject.com/en/1.4/ref/middleware/ for more details on"
@@ -323,7 +327,7 @@ msgstr ""
 "utilizar. Consulte https://docs.djangoproject.com/en/1.4/ref/middleware/ "
 "para obtener más información sobre los middlewares de Django."
 
-#: src/desktop/conf.py:366
+#: src/desktop/conf.py:378
 msgid ""
 "Comma-separated list of regular expressions, which match the redirect "
 "URL.For example, to restrict to your local domain and FQDN, the following"
@@ -334,13 +338,13 @@ msgstr ""
 "y FQDN, puede utilizarse el siguiente valor: "
 "^\\/.*$,^http:\\/\\/www.mydomain.com\\/.*$"
 
-#: src/desktop/conf.py:374
+#: src/desktop/conf.py:386
 msgid "Enable X-Forwarded-Host header if the load balancer requires it."
 msgstr ""
 "Activa la cabecera del host enviado a X si el balancer de carga lo "
 "requiere."
 
-#: src/desktop/conf.py:380
+#: src/desktop/conf.py:392
 msgid ""
 "Support for HTTPS termination at the load-balancer level with "
 "SECURE_PROXY_SSL_HEADER."
@@ -348,23 +352,23 @@ msgstr ""
 "Compatibilidad para la terminación HTTPS en el nivel del equilibrador de "
 "carga con SECURE_PROXY_SSL_HEADER."
 
-#: src/desktop/conf.py:388
+#: src/desktop/conf.py:400
 msgid "Comma separated list of apps to not load at server startup."
 msgstr ""
 "Lista separada por comas de las aplicaciones que no se deben cargar al "
 "iniciarse el servidor."
 
-#: src/desktop/conf.py:393
+#: src/desktop/conf.py:405
 msgid "To set to true in combination when using Hue demo backend."
 msgstr ""
 "Para configurar a true en combinación al usar el Back-End de la "
 "demostración de Hue."
 
-#: src/desktop/conf.py:400
+#: src/desktop/conf.py:412
 msgid "Use this file to parse and redact log message."
 msgstr "Use este archivo para analizar y redactar un mensaje de registro."
 
-#: src/desktop/conf.py:408
+#: src/desktop/conf.py:420
 msgid ""
 "Comma separated list of strings representing the host/domain names that "
 "the Hue server can serve."
@@ -372,27 +376,43 @@ msgstr ""
 "Lista separada por comas de cadenas que representan los nombres de "
 "host/dominio que Hue Server puede servir."
 
-#: src/desktop/conf.py:455
+#: src/desktop/conf.py:432
+msgid "Base URL to Interface Remote Server"
+msgstr "URL de base para el servidor remoto de la interfaz"
+
+#: src/desktop/conf.py:438
+msgid "Base URL to Interface API"
+msgstr "URL de base para la API de la interfaz"
+
+#: src/desktop/conf.py:444
+msgid "The Client ID of the Interface application."
+msgstr "El ID de cliente de la aplicación de interfaz."
+
+#: src/desktop/conf.py:450
+msgid "The Client Secret of the Interface application."
+msgstr "El secreto de cliente de la aplicación de interfaz."
+
+#: src/desktop/conf.py:503
 msgid "Configuration options for connecting to an external SMTP server."
 msgstr "Opciones de configuración para conectarse a un servidor SMTP externo."
 
-#: src/desktop/conf.py:459
+#: src/desktop/conf.py:507
 msgid "The SMTP server for email notification delivery."
 msgstr "Servidor SMTP para el envío de notificaciones por correo electrónico."
 
-#: src/desktop/conf.py:466
+#: src/desktop/conf.py:514
 msgid "The SMTP server port."
 msgstr "Puerto del servidor SMTP."
 
-#: src/desktop/conf.py:473
+#: src/desktop/conf.py:521
 msgid "The username for the SMTP host."
 msgstr "Nombre de usuario para el host SMTP."
 
-#: src/desktop/conf.py:480
+#: src/desktop/conf.py:528
 msgid "The password for the SMTP user."
 msgstr "Contraseña del usuario de SMTP."
 
-#: src/desktop/conf.py:488
+#: src/desktop/conf.py:536
 msgid ""
 "Execute this script to produce the SMTP user password. This will be used "
 "when the SMTP `password` is not set."
@@ -400,37 +420,37 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña de usuario "
 "de SMTP. Se utilizará cuando `password` de SMTP no esté definido."
 
-#: src/desktop/conf.py:496
+#: src/desktop/conf.py:544
 msgid "Whether to use a TLS (secure) connection when talking to the SMTP server."
 msgstr ""
 "Indica si se debe utilizar una conexión TLS (segura) al hablar con el "
 "servidor SMTP."
 
-#: src/desktop/conf.py:503
+#: src/desktop/conf.py:551
 msgid "Default email address to use for various automated notifications from Hue."
 msgstr ""
 "Dirección de correo electrónico predeterminada que utilizar para varias "
 "notificaciones automatizadas de Hue."
 
-#: src/desktop/conf.py:512
+#: src/desktop/conf.py:560
 msgid "Configuration options for metrics"
 msgstr "Opciones de configuración de métricas"
 
-#: src/desktop/conf.py:516
+#: src/desktop/conf.py:564
 msgid "Enable metrics URL \"desktop/metrics\""
 msgstr "Activa la URL \"desktop/metrics\" de las métricas"
 
-#: src/desktop/conf.py:521
+#: src/desktop/conf.py:569
 msgid "If specified, Hue will write metrics to this file"
 msgstr "Si se especifica, Hue escribirá las métricas en este archivo"
 
-#: src/desktop/conf.py:525
+#: src/desktop/conf.py:573
 msgid "Time in milliseconds on how frequently to collect metrics"
 msgstr ""
 "El tiempo en milisegundos de la frecuencia con la que se recopilan las "
 "métricas"
 
-#: src/desktop/conf.py:533
+#: src/desktop/conf.py:581
 msgid ""
 "Configuration options for specifying the Desktop Database.\n"
 "          For more info, see "
@@ -440,25 +460,33 @@ msgstr ""
 "          Para más información, consulte "
 "http://docs.djangoproject.com/en/1.4/ref/settings/#database-engine"
 
-#: src/desktop/conf.py:538
+#: src/desktop/conf.py:586
 msgid "Database engine, such as postgresql_psycopg2, mysql, or sqlite3."
 msgstr "Motor de base de datos, como postgresql_psycopg2, mysql o sqlite3."
 
-#: src/desktop/conf.py:544
+#: src/desktop/conf.py:592
 msgid "Database name, or path to DB if using sqlite3."
 msgstr ""
 "Nombre de la base de datos o ruta a la base de datos si se utiliza "
 "sqlite3."
 
-#: src/desktop/conf.py:550
+#: src/desktop/conf.py:598
 msgid "Database username."
 msgstr "Nombre de usuario de la base de datos."
 
-#: src/desktop/conf.py:556
+#: src/desktop/conf.py:604
+msgid ""
+"Database schema, to be used only when public schema is revoked in "
+"postgres."
+msgstr ""
+"Esquema de base de datos que solo se utiliza cuando el esquema público se revoca en "
+"postgres."
+
+#: src/desktop/conf.py:610
 msgid "Database password."
 msgstr "Contraseña de la base de datos."
 
-#: src/desktop/conf.py:563
+#: src/desktop/conf.py:617
 msgid ""
 "Execute this script to produce the database password. This will be used "
 "when `password` is not set."
@@ -466,19 +494,19 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña de la base "
 "de datos. Se utilizará cuando `password` no esté definido."
 
-#: src/desktop/conf.py:570
+#: src/desktop/conf.py:624
 msgid "Database host."
 msgstr "Host de la base de datos."
 
-#: src/desktop/conf.py:576
+#: src/desktop/conf.py:630
 msgid "Database port."
 msgstr "Puerto de la base de datos."
 
-#: src/desktop/conf.py:582
+#: src/desktop/conf.py:636
 msgid "Database options to send to the server when connecting."
 msgstr "Opciones de base de datos que enviar al servidor al conectar."
 
-#: src/desktop/conf.py:591
+#: src/desktop/conf.py:645
 msgid ""
 "Configuration options for specifying the Desktop session.\n"
 "          For more info, see "
@@ -488,7 +516,7 @@ msgstr ""
 "          Para más información, consulte "
 "https://docs.djangoproject.com/en/1.4/topics/http/sessions/"
 
-#: src/desktop/conf.py:596
+#: src/desktop/conf.py:650
 msgid ""
 "The cookie containing the users' session ID will expire after this amount"
 " of time in seconds."
@@ -496,7 +524,7 @@ msgstr ""
 "La cookie que contiene el ID de sesión del usuario caducará después de "
 "esta cantidad de tiempo en segundos."
 
-#: src/desktop/conf.py:602
+#: src/desktop/conf.py:656
 msgid ""
 "The cookie containing the users' session ID will be secure. This should "
 "only be enabled with HTTPS."
@@ -504,13 +532,13 @@ msgstr ""
 "La cookie que contiene el ID de sesión de los usuarios será segura. Solo "
 "se debe activar con HTTPS."
 
-#: src/desktop/conf.py:608
+#: src/desktop/conf.py:662
 msgid "The cookie containing the users' session ID will use the HTTP only flag."
 msgstr ""
 "La cookie que contiene el ID de sesión de los usuarios utilizará la marca"
 " de solo HTTP."
 
-#: src/desktop/conf.py:614
+#: src/desktop/conf.py:668
 msgid ""
 "Use session-length cookies. Logs out the user when she closes the browser"
 " window."
@@ -518,7 +546,7 @@ msgstr ""
 "Utilizar cookies de sesión. Cierra la sesión del usuario cuando cierra la"
 " ventana del explorador."
 
-#: src/desktop/conf.py:623
+#: src/desktop/conf.py:677
 msgid ""
 "Configuration options for specifying Hue's Kerberos integration for\n"
 "          secured Hadoop clusters."
@@ -526,31 +554,31 @@ msgstr ""
 "Opciones de configuración para especificar la integración de Kerberos de Hue para\n"
 "           clústeres de Hadoop seguros."
 
-#: src/desktop/conf.py:628
+#: src/desktop/conf.py:682
 msgid "Path to a Kerberos keytab file containing Hue's service credentials."
 msgstr ""
 "Ruta a un archivo keytab de Kerberos que contiene las credenciales del "
 "servicio de Hue."
 
-#: src/desktop/conf.py:633
+#: src/desktop/conf.py:687
 msgid "Kerberos principal name for Hue. Typically 'hue/hostname.foo.com'."
 msgstr ""
 "Nombre de la entidad de seguridad de Kerberos para Hue. Normalmente "
 "'hue/hostname.foo.com'."
 
-#: src/desktop/conf.py:638
+#: src/desktop/conf.py:692
 msgid "Frequency in seconds with which Hue will renew its keytab."
 msgstr "Frecuencia en segundos con la que Hue renovará su keytab."
 
-#: src/desktop/conf.py:643
+#: src/desktop/conf.py:697
 msgid "Path to keep Kerberos credentials cached."
 msgstr "Ruta para mantener las credenciales de Kerberos en caché."
 
-#: src/desktop/conf.py:650
+#: src/desktop/conf.py:704
 msgid "Path to Kerberos 'kinit' command."
 msgstr "Ruta al comando 'kinit' de Kerberos."
 
-#: src/desktop/conf.py:659
+#: src/desktop/conf.py:713
 msgid ""
 "This property specifies the maximum size of the receive buffer in bytes "
 "in thrift sasl communication."
@@ -558,35 +586,35 @@ msgstr ""
 "Esta propiedad especifica el tamaño máximo del búfer de recepción en bytes "
 "en la comunicación de sasl Thrift."
 
-#: src/desktop/conf.py:667
+#: src/desktop/conf.py:721
 msgid "Time zone name."
 msgstr "Nombre de la zona horaria."
 
-#: src/desktop/conf.py:674
+#: src/desktop/conf.py:728
 msgid "Default system-wide unicode encoding."
 msgstr "Codificación Unicode predeterminada de todo el sistema."
 
-#: src/desktop/conf.py:681
+#: src/desktop/conf.py:735
 msgid "Username to run servers as."
 msgstr "Nombre de usuario con el que ejecutar servidores."
 
-#: src/desktop/conf.py:687
+#: src/desktop/conf.py:741
 msgid "Group to run servers as."
 msgstr "Grupo con el que ejecutar servidores."
 
-#: src/desktop/conf.py:693
+#: src/desktop/conf.py:747
 msgid "This should be the user running hue webserver"
 msgstr "Esto debería ser el usuario que ejecute el servidor web Hue"
 
-#: src/desktop/conf.py:699
+#: src/desktop/conf.py:753
 msgid "This should be the hdfs super user"
 msgstr "Esto debería ser el superusuario HDFS"
 
-#: src/desktop/conf.py:705
+#: src/desktop/conf.py:759
 msgid "Customizations to the UI."
 msgstr "Personalizaciones de la UI."
 
-#: src/desktop/conf.py:709
+#: src/desktop/conf.py:763
 msgid ""
 "Top banner HTML code. This code will be placed in the navigation bar so "
 "that it will reside at the top of the page in a fixed position. One "
@@ -597,7 +625,7 @@ msgstr ""
 "superior de la página. Un valor común es `<img "
 "src=\"http://www.example.com/example.gif\" />`"
 
-#: src/desktop/conf.py:714
+#: src/desktop/conf.py:768
 msgid ""
 "The login splash HTML code. This code will be placed in the login page, "
 "useful for security warning messages."
@@ -606,7 +634,7 @@ msgstr ""
 "en la página de inicio de sesión y resulta útil para los mensajes de "
 "advertencia de seguridad."
 
-#: src/desktop/conf.py:719
+#: src/desktop/conf.py:773
 msgid ""
 "The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set "
 "to 0 it disables the cache."
@@ -614,13 +642,17 @@ msgstr ""
 "El TTL de caché en milisegundos de las llamadas de "
 "asistencia/autocompletado/etc. Si se define en 0, desactiva el caché."
 
-#: src/desktop/conf.py:724
+#: src/desktop/conf.py:776
+msgid "SVG code to replace the default Hue logo in the top bar and sign in screen"
+msgstr "Código SVG para sustituir el logotipo de Hue predeterminado en la barra superior y en la pantalla de inicio de sesión"
+
+#: src/desktop/conf.py:781
 msgid "Configuration options for user authentication into the web application."
 msgstr ""
 "Opciones de configuración para la autenticación de usuarios en la "
 "aplicación web."
 
-#: src/desktop/conf.py:729
+#: src/desktop/conf.py:786
 msgid ""
 "Authentication backend.  Common settings are "
 "django.contrib.auth.backends.ModelBackend (fully Django backend), "
@@ -637,13 +669,13 @@ msgstr ""
 "sesión). Los back-end múltiples de autenticación se admiten si se "
 "especifica una lista separada por comas en orden de prioridad."
 
-#: src/desktop/conf.py:736
+#: src/desktop/conf.py:793
 msgid "Class which defines extra accessor methods for User objects."
 msgstr ""
 "Clase que define métodos del descriptor de acceso adicionales para "
 "objetos de usuario."
 
-#: src/desktop/conf.py:739
+#: src/desktop/conf.py:796
 msgid ""
 "The service to use when querying PAM. The service usually corresponds to "
 "a single filename in /etc/pam.d"
@@ -651,7 +683,7 @@ msgstr ""
 "El servicio que se debe utilizar al consultar PAM. El servicio suele "
 "corresponder con un nombre de archivo único en /etc/pam.d"
 
-#: src/desktop/conf.py:743
+#: src/desktop/conf.py:800
 msgid ""
 "When using the desktop.auth.backend.RemoteUserDjangoBackend, this sets "
 "the normalized name of the header that contains the remote user. The HTTP"
@@ -668,21 +700,21 @@ msgstr ""
 "por ejemplo, si la cabecera se llama Remote-User, quedaría configurada "
 "como HTTP_REMOTE_USER"
 
-#: src/desktop/conf.py:750 src/desktop/conf.py:849
+#: src/desktop/conf.py:807 src/desktop/conf.py:906
 msgid "Ignore the case of usernames when searching for existing users in Hue."
 msgstr ""
 "No distinguir entre mayúsculas y minúsculas en los nombres de usuario al "
 "buscar usuarios existentes en Hue."
 
-#: src/desktop/conf.py:754
+#: src/desktop/conf.py:811
 msgid "Force usernames to lowercase when creating new users."
 msgstr "Forzar nombres de usuario con minúscula al crear nuevos usuarios."
 
-#: src/desktop/conf.py:758
+#: src/desktop/conf.py:815
 msgid "Force usernames to uppercase when creating new users."
 msgstr "Forzar nombres de usuario con mayúscula al crear nuevos usuarios."
 
-#: src/desktop/conf.py:762
+#: src/desktop/conf.py:819
 msgid ""
 "Users will expire after they have not logged in for 'n' amount of "
 "seconds.A negative number means that users will never expire."
@@ -690,11 +722,11 @@ msgstr ""
 "Los usuarios caducarán cuando no hayan iniciado sesión durante \"n\" "
 "segundos. Un número negativo indica que el usuario nunca expirará."
 
-#: src/desktop/conf.py:767
+#: src/desktop/conf.py:824
 msgid "Apply 'expires_after' to superusers."
 msgstr "Aplicar 'expires_after' a los superusuarios."
 
-#: src/desktop/conf.py:771
+#: src/desktop/conf.py:828
 msgid ""
 "Users will automatically be logged out after 'n' seconds of inactivity.A "
 "negative number means that idle sessions will not be timed out."
@@ -703,7 +735,7 @@ msgstr ""
 "inactividad. Un número negativo significa que el tiempo de espera de las "
 "sesiones inactivas no se agotará."
 
-#: src/desktop/conf.py:777
+#: src/desktop/conf.py:834
 msgid ""
 "When set to true this will allow you to specify a password for the user "
 "when you create the user and then force them to change their password "
@@ -713,7 +745,7 @@ msgstr ""
 "usuario cuando lo cree y después obligarle a cambiar la contraseña la "
 "primera vez que inicie sesión.  El valor predeterminado es false."
 
-#: src/desktop/conf.py:785
+#: src/desktop/conf.py:842
 msgid ""
 "Number of login attempts allowed before a record is created for failed "
 "logins"
@@ -721,7 +753,7 @@ msgstr ""
 "Número de intentos de inicio de sesión que permitido antes de que crear "
 "un registro de inicios de sesión fallidos"
 
-#: src/desktop/conf.py:791
+#: src/desktop/conf.py:848
 msgid ""
 "After number of allowed login attempts are exceeded, do we lock out this "
 "IP and optionally user agent?"
@@ -729,7 +761,7 @@ msgstr ""
 "¿Cuántos intentos de inicio de sesión se permiten antes de bloquear esta "
 "IP y, de manera opcional, el agente del usuario?"
 
-#: src/desktop/conf.py:797
+#: src/desktop/conf.py:854
 msgid ""
 "If set, defines period of inactivity in seconds after which failed logins"
 " will be forgotten"
@@ -737,13 +769,13 @@ msgstr ""
 "Si se establece, define el periodo de inactividad en segundos después del"
 " que los inicios de sesión fallidos se olvidarán"
 
-#: src/desktop/conf.py:804
+#: src/desktop/conf.py:861
 msgid "If True, lock out based on IP and browser user agent"
 msgstr ""
 "Si se establece en True, se bloqueará según la IP y el agente de usuario "
 "del explorador"
 
-#: src/desktop/conf.py:810
+#: src/desktop/conf.py:867
 msgid ""
 "If True, lock out based on an IP address AND a user agent.This means "
 "requests from different user agents but from the same IP are treated "
@@ -753,11 +785,11 @@ msgstr ""
 "de usuario. Esto significa que las solicitudes de otros agentes de "
 "usuario se tratarán de manera distinta, aunque sean de la misma IP."
 
-#: src/desktop/conf.py:817
+#: src/desktop/conf.py:874
 msgid "If True, lock out based on IP and user"
 msgstr "Si se establece en True, se bloqueará según la IP y el usuario"
 
-#: src/desktop/conf.py:823
+#: src/desktop/conf.py:880
 msgid ""
 "If True, it will look for the IP address from the header defined at "
 "reverse_proxy_header."
@@ -765,7 +797,7 @@ msgstr ""
 "Si está establecido en True, buscará la dirección IP de la cabecera definida en "
 "reverse_proxy_header."
 
-#: src/desktop/conf.py:829
+#: src/desktop/conf.py:886
 msgid ""
 "If behind_reverse_proxy is True, it will look for the IP address from "
 "this header. Default: HTTP_X_FORWARDED_FOR"
@@ -773,51 +805,51 @@ msgstr ""
 "Si behind_reverse_proxy está establecido en True, buscará la dirección IP de "
 "esta cabecera. Predeterminado: HTTP_X_FORWARDED_FOR"
 
-#: src/desktop/conf.py:838
+#: src/desktop/conf.py:895
 msgid "Configuration options for LDAP connectivity."
 msgstr "Opciones de configuración para la conectividad LDAP."
 
-#: src/desktop/conf.py:841
+#: src/desktop/conf.py:898
 msgid "Create users when they login with their LDAP credentials."
 msgstr "Crear usuarios al iniciar sesión con las credenciales LDAP."
 
-#: src/desktop/conf.py:845
+#: src/desktop/conf.py:902
 msgid "Synchronize a users groups when they login."
 msgstr "Sincronizar grupos de usuarios al iniciar sesión."
 
-#: src/desktop/conf.py:853
+#: src/desktop/conf.py:910
 msgid "Force usernames to lowercase when creating new users from LDAP."
 msgstr "Forzar nombres de usuario con minúscula al crear nuevos usuarios de LDAP."
 
-#: src/desktop/conf.py:857
+#: src/desktop/conf.py:914
 msgid "Force usernames to uppercase when creating new users from LDAP."
 msgstr "Forzar nombres de usuario con mayúscula al crear nuevos usuarios de LDAP."
 
-#: src/desktop/conf.py:861
+#: src/desktop/conf.py:918
 msgid ""
 "Choose which kind of subgrouping to use: nested or suboordinate "
 "(deprecated)."
 msgstr "Escoja el tipo de subgrupo a utilizar: anidado o subordinado (obsoleto)."
 
-#: src/desktop/conf.py:865
+#: src/desktop/conf.py:922
 msgid "Define the number of levels to search for nested members."
 msgstr "Definir el número de niveles para buscar miembros anidados."
 
-#: src/desktop/conf.py:869 src/desktop/conf.py:928
+#: src/desktop/conf.py:926 src/desktop/conf.py:985
 msgid "Whether or not to follow referrals."
 msgstr "Si se deben seguir o no las recomendaciones."
 
-#: src/desktop/conf.py:876 src/desktop/conf.py:935
+#: src/desktop/conf.py:933 src/desktop/conf.py:992
 msgid "Set to a value to enable python-ldap debugging."
 msgstr "Se establece en un valor que activa la depuración python-ldap."
 
-#: src/desktop/conf.py:880 src/desktop/conf.py:939
+#: src/desktop/conf.py:937 src/desktop/conf.py:996
 msgid "Sets the debug level within the underlying LDAP C lib."
 msgstr ""
 "Establece el nivel de depuración dentro de la biblioteca C de LDAP "
 "subyacente."
 
-#: src/desktop/conf.py:884 src/desktop/conf.py:943
+#: src/desktop/conf.py:941 src/desktop/conf.py:1000
 msgid ""
 "Possible values for trace_level are 0 for no logging, 1 for only logging "
 "the method calls with arguments,2 for logging the method calls with "
@@ -829,27 +861,27 @@ msgstr ""
 "llamadas a método con argumentos y los resultados completos, y 9 para "
 "registrar también el trazado histórico de las llamadas a método."
 
-#: src/desktop/conf.py:889
+#: src/desktop/conf.py:946
 msgid "LDAP server record."
 msgstr "Registro del servidor LDAP."
 
-#: src/desktop/conf.py:894 src/desktop/conf.py:981
+#: src/desktop/conf.py:951 src/desktop/conf.py:1038
 msgid "The base LDAP distinguished name to use for LDAP search."
 msgstr "Nombre distintivo de LDAP base que utilizar para la búsqueda de LDAP."
 
-#: src/desktop/conf.py:897 src/desktop/conf.py:984
+#: src/desktop/conf.py:954 src/desktop/conf.py:1041
 msgid "The NT domain used for LDAP authentication."
 msgstr "Dominio NT utilizado para la autenticación de LDAP."
 
-#: src/desktop/conf.py:900 src/desktop/conf.py:987
+#: src/desktop/conf.py:957 src/desktop/conf.py:1044
 msgid "The LDAP URL to connect to."
 msgstr "URL de LDAP a la que conectar."
 
-#: src/desktop/conf.py:904 src/desktop/conf.py:991
+#: src/desktop/conf.py:961 src/desktop/conf.py:1048
 msgid "Use StartTLS when communicating with LDAP server."
 msgstr "Utilizar StartTLS al comunicar con el servidor LDAP."
 
-#: src/desktop/conf.py:907 src/desktop/conf.py:994
+#: src/desktop/conf.py:964 src/desktop/conf.py:1051
 msgid ""
 "A PEM-format file containing certificates for the CA's that Hue will "
 "trust for authentication over TLS. The certificate for the CA that signed"
@@ -861,19 +893,19 @@ msgstr ""
 "de servidor LDAP se debe incluir entre estos certificados. Obtenga más "
 "información en http://www.openldap.org/doc/admin24/tls.html."
 
-#: src/desktop/conf.py:910 src/desktop/conf.py:997
+#: src/desktop/conf.py:967 src/desktop/conf.py:1054
 msgid "A pattern to use for constructing LDAP usernames."
 msgstr "Patrón que utilizar para construir nombres de usuario LDAP."
 
-#: src/desktop/conf.py:913 src/desktop/conf.py:1000
+#: src/desktop/conf.py:970 src/desktop/conf.py:1057
 msgid "The distinguished name to bind as, when importing from LDAP."
 msgstr "Nombre distintivo con el que vincular al importar desde LDAP."
 
-#: src/desktop/conf.py:917 src/desktop/conf.py:1004
+#: src/desktop/conf.py:974 src/desktop/conf.py:1061
 msgid "The password for the bind user."
 msgstr "Contraseña para el usuario vinculado."
 
-#: src/desktop/conf.py:922 src/desktop/conf.py:1009
+#: src/desktop/conf.py:979 src/desktop/conf.py:1066
 msgid ""
 "Execute this script to produce the LDAP bind user password. This will be "
 "used when `bind_password` is not set."
@@ -881,19 +913,19 @@ msgstr ""
 "Ejecute esta secuencia de comandos para generar la contraseña de usuario "
 "vinculada a LDAP. Se utilizará cuando `bind_password` no esté definido."
 
-#: src/desktop/conf.py:926 src/desktop/conf.py:1013
+#: src/desktop/conf.py:983 src/desktop/conf.py:1070
 msgid "Use search bind authentication."
 msgstr "Utilice la autenticación Buscar/Vincular."
 
-#: src/desktop/conf.py:948 src/desktop/conf.py:1017
+#: src/desktop/conf.py:1005 src/desktop/conf.py:1074
 msgid "Configuration for LDAP user schema and search."
 msgstr "Configuración para la búsqueda y el esquema de usuario LDAP."
 
-#: src/desktop/conf.py:952 src/desktop/conf.py:1021
+#: src/desktop/conf.py:1009 src/desktop/conf.py:1078
 msgid "A base filter for use when searching for users."
 msgstr "Filtro base para la búsqueda de usuarios."
 
-#: src/desktop/conf.py:955 src/desktop/conf.py:1024
+#: src/desktop/conf.py:1012 src/desktop/conf.py:1081
 msgid ""
 "The username attribute in the LDAP schema. Typically, this is "
 "'sAMAccountName' for AD and 'uid' for other LDAP systems."
@@ -901,87 +933,87 @@ msgstr ""
 "Atributo de nombre del usuario en el esquema LDAP. Normalmente, es "
 "'sAMAccountName' para AD y 'uid' para otros sistemas LDAP."
 
-#: src/desktop/conf.py:963 src/desktop/conf.py:1031
+#: src/desktop/conf.py:1020 src/desktop/conf.py:1088
 msgid "Configuration for LDAP group schema and search."
 msgstr "Configuración para la búsqueda y el esquema de grupo LDAP."
 
-#: src/desktop/conf.py:967 src/desktop/conf.py:1035
+#: src/desktop/conf.py:1024 src/desktop/conf.py:1092
 msgid "A base filter for use when searching for groups."
 msgstr "Filtro base para la búsqueda de grupos."
 
-#: src/desktop/conf.py:970 src/desktop/conf.py:1038
+#: src/desktop/conf.py:1027 src/desktop/conf.py:1095
 msgid "The group name attribute in the LDAP schema. Typically, this is 'cn'."
 msgstr "Atributo del nombre del grupo en el esquema LDAP. Normalmente, es 'cn'."
 
-#: src/desktop/conf.py:974 src/desktop/conf.py:1042
+#: src/desktop/conf.py:1031 src/desktop/conf.py:1099
 msgid "The LDAP attribute which specifies the members of a group."
 msgstr "Atributo de LDAP que especifica los miembros de un grupo."
 
-#: src/desktop/conf.py:1049
+#: src/desktop/conf.py:1106
 msgid "Configuration options for Oauth 1.0 authentication"
 msgstr "Opciones de configuración para la autenticación de Oauth 1.0"
 
-#: src/desktop/conf.py:1053
+#: src/desktop/conf.py:1110
 msgid "The Consumer key of the application."
 msgstr "La clave de consumidor de la aplicación."
 
-#: src/desktop/conf.py:1060
+#: src/desktop/conf.py:1117
 msgid "The Consumer secret of the application."
 msgstr "El secreto de consumidor de la aplicación."
 
-#: src/desktop/conf.py:1067
+#: src/desktop/conf.py:1124
 msgid "The Request token URL."
 msgstr "La URL del token de la solicitud."
 
-#: src/desktop/conf.py:1074
+#: src/desktop/conf.py:1131
 msgid "The Access token URL."
 msgstr "La URL del token de acceso."
 
-#: src/desktop/conf.py:1081
+#: src/desktop/conf.py:1138
 msgid "The Authorize URL."
 msgstr "La URL autorizada."
 
-#: src/desktop/conf.py:1092
+#: src/desktop/conf.py:1149
 msgid "Paths on the local file system that users should be able to browse."
 msgstr ""
 "Rutas en el sistema de archivos local que los usuarios deben poder "
 "explorar."
 
-#: src/desktop/conf.py:1097
+#: src/desktop/conf.py:1154
 msgid "The path on the local filesystem."
 msgstr "La ruta del sistema de archivos local."
 
-#: src/desktop/conf.py:1106
+#: src/desktop/conf.py:1163
 msgid "Link for 'feedback' tab."
 msgstr "Enlace para la pestaña 'Comentarios'."
 
-#: src/desktop/conf.py:1113
+#: src/desktop/conf.py:1170
 msgid "Whether to send debug messages from JavaScript to the server logs."
 msgstr ""
 "Indica si se debe enviar mensajes de depuración desde JavaScript a los "
 "registros del servidor."
 
-#: src/desktop/conf.py:1120
+#: src/desktop/conf.py:1177
 msgid "Enable or disable database debug mode."
 msgstr "Activar o desactivar modo de depuración de base de datos."
 
-#: src/desktop/conf.py:1127
+#: src/desktop/conf.py:1184
 msgid "Administrators that should receive error emails."
 msgstr "Administradores que deben recibir correos electrónicos de error."
 
-#: src/desktop/conf.py:1132
+#: src/desktop/conf.py:1189
 msgid "The full name of the admin."
 msgstr "El nombre completo del administrador."
 
-#: src/desktop/conf.py:1135
+#: src/desktop/conf.py:1192
 msgid "The email address of the admin."
 msgstr "La dirección de correo electrónico del administrador."
 
-#: src/desktop/conf.py:1139
+#: src/desktop/conf.py:1196
 msgid "Enable or disable Django debug mode."
 msgstr "Activar o desactivar modo de depuración de Django."
 
-#: src/desktop/conf.py:1146
+#: src/desktop/conf.py:1203
 msgid ""
 "Enable or disable debugging information in the 500 internal server error "
 "response. Note that the debugging information may contain sensitive data."
@@ -992,11 +1024,11 @@ msgstr ""
 "depuración puede contener datos confidenciales. Si django_debug_mode es "
 "True, se activa automáticamente."
 
-#: src/desktop/conf.py:1155
+#: src/desktop/conf.py:1212
 msgid "Enable or disable memory profiling."
 msgstr "Activar o desactivar la generación de perfiles de memoria."
 
-#: src/desktop/conf.py:1162
+#: src/desktop/conf.py:1219
 msgid ""
 "The directory where to store the auditing logs. Auditing is disable if "
 "the value is empty."
@@ -1004,25 +1036,25 @@ msgstr ""
 "El directorio donde se almacenan los registros de auditoría. La auditoría"
 " se desactiva si el valor está vacío."
 
-#: src/desktop/conf.py:1169
+#: src/desktop/conf.py:1226
 msgid "Size in KB/MB/GB for audit log to rollover."
 msgstr "Tamaño en KB/MB/GB para indicar el registro de auditoría."
 
-#: src/desktop/conf.py:1176
+#: src/desktop/conf.py:1233
 msgid "Email address that internal error messages should send as."
 msgstr ""
 "Dirección de correo electrónico a la que se deben enviar los mensajes de "
 "error interno."
 
-#: src/desktop/conf.py:1182
+#: src/desktop/conf.py:1239
 msgid "The email backend to use."
 msgstr "El back-end del correo electrónico que se va a utilizar."
 
-#: src/desktop/conf.py:1191
-msgid "Enable the new editor SQL autocompleter"
-msgstr "Activa la nueva función de autocompletado del editor SQL"
+#: src/desktop/conf.py:1248
+msgid "Enable the improved editor autocomplete dropdown"
+msgstr "Habilitar la lista desplegable mejorada de autocompletación del editor"
 
-#: src/desktop/conf.py:1198
+#: src/desktop/conf.py:1255
 msgid ""
 "Timeout value in ms for autocomplete of columns, tables, values etc. 0 = "
 "disabled"
@@ -1030,39 +1062,39 @@ msgstr ""
 "El valor de tiempo máximo de espera de sesión en ms para autocompletar "
 "columnas, tablas, valores, etc. 0 = desactivado"
 
-#: src/desktop/conf.py:1205
+#: src/desktop/conf.py:1262
 msgid "Choose whether to show the new SQL editor."
 msgstr "Elige si se debe mostrar o no el nuevo editor SQL."
 
-#: src/desktop/conf.py:1212
+#: src/desktop/conf.py:1274
 msgid "Choose whether to show extended left and right panels."
 msgstr "Seleccione si desea mostrar los paneles derecho e izquierdo ampliados."
 
-#: src/desktop/conf.py:1219
+#: src/desktop/conf.py:1281
 msgid "Enable saved default configurations for Hive, Impala, Spark, and Oozie."
 msgstr ""
 "Activa las configuraciones predeterminadas guardadas de Hive, Impala, "
 "Spark y Oozie."
 
-#: src/desktop/conf.py:1226
+#: src/desktop/conf.py:1289
 msgid "Choose whether to enable the new interface."
 msgstr "Seleccione si desea habilitar la nueva interfaz."
 
-#: src/desktop/conf.py:1241
+#: src/desktop/conf.py:1304
 msgid "If you set bind_password, then you must set bind_dn."
 msgstr "Si establece bind_password, debe establecer bind_dn."
 
-#: src/desktop/conf.py:1244
+#: src/desktop/conf.py:1307
 msgid "If you set bind_dn, then you must set bind_password."
 msgstr "Si establece bind_dn, debe establecer bind_password."
 
-#: src/desktop/conf.py:1250
+#: src/desktop/conf.py:1313
 msgid "LDAP is only partially configured. An LDAP URL must be provided."
 msgstr ""
 "LDAP solo está configurado parcialmente. Se debe proporcionar una URL de "
 "LDAP."
 
-#: src/desktop/conf.py:1256
+#: src/desktop/conf.py:1319
 msgid ""
 "LDAP is only partially configured. An NT Domain or username search "
 "pattern must be provided."
@@ -1070,7 +1102,7 @@ msgstr ""
 "LDAP solo está configurado parcialmente. Se debe proporcionar un dominio "
 "NT o un patrón de búsqueda de nombre de usuario."
 
-#: src/desktop/conf.py:1262
+#: src/desktop/conf.py:1325
 msgid ""
 "The LDAP username pattern should contain the special<username> "
 "replacement string for authentication."
@@ -1078,7 +1110,7 @@ msgstr ""
 "El patrón del nombre de usuario LDAP debe incluir la cadena de reemplazo "
 "especial <username> para la autenticación."
 
-#: src/desktop/conf.py:1289
+#: src/desktop/conf.py:1352
 msgid ""
 "We recommend MySQL InnoDB engine over\n"
 "                                                        MyISAM which does"
@@ -1088,17 +1120,17 @@ msgstr ""
 "                                                        MyISAM, que no "
 "admite transacciones."
 
-#: src/desktop/conf.py:1293
+#: src/desktop/conf.py:1356
 msgid ""
 "All tables in the database must be of the same\n"
 "                                                        storage engine "
 "type (preferably InnoDB)."
 msgstr ""
-"Todas las tablas de la base de datos deben ser del mismo"
+"Todas las tablas de la base de datos deben ser del mismo\n"
 "                                                        tipo de motor de "
 "almacenamiento (preferiblemente InnoDB)."
 
-#: src/desktop/conf.py:1298
+#: src/desktop/conf.py:1361
 msgid ""
 "SQLite is only recommended for development environments. It might cause "
 "the \"Database is locked\" error. Migrating to MySQL, Oracle or "
@@ -1108,7 +1140,7 @@ msgstr ""
 "error \"La base de datos está bloqueada\". Se recomienda encarecidamente "
 "la migración a MySQL, Oracle o PostgreSQL."
 
-#: src/desktop/conf.py:1313
+#: src/desktop/conf.py:1376
 msgid ""
 "Secret key should be configured as a random string. All sessions will be "
 "lost on restart"
@@ -1116,20 +1148,20 @@ msgstr ""
 "La clave secreta se debe configurar como cadena aleatoria. Todas las "
 "sesiones se perderán al reiniciar"
 
-#: src/desktop/conf.py:1319
+#: src/desktop/conf.py:1382
 msgid "SSL private key file should be set to enable HTTPS."
 msgstr "Se debe establecer el archivo de clave privada SSL para activar HTTPS."
 
-#: src/desktop/conf.py:1325
+#: src/desktop/conf.py:1388
 msgid "Encoding not supported."
 msgstr "Codificación no compatible."
 
-#: src/desktop/conf.py:1334
+#: src/desktop/conf.py:1397
 #, python-format
 msgid "Keytab should have 0600 permissions (has %o)."
 msgstr "Keytab debe tener los permisos 0600 (tiene %o)."
 
-#: src/desktop/conf.py:1353
+#: src/desktop/conf.py:1416
 msgid ""
 "Email notifications is disabled for Workflows and Jobs as SMTP server is "
 "localhost."
@@ -1137,7 +1169,7 @@ msgstr ""
 "Las notificaciones de correo electrónico están deshabilitadas para workflows y jobs, ya que el servidor SMTP es "
 "localhost."
 
-#: src/desktop/converters.py:236
+#: src/desktop/converters.py:246
 #, python-format
 msgid "Failed to convert Document object: %s"
 msgstr "Error al convertir el objeto Documento: %s"
@@ -1156,22 +1188,22 @@ msgstr "Para realizar esta operación, debe ser un superusuario."
 msgid "Job %(id)s does not exist"
 msgstr "El job %(id)s no existe"
 
-#: src/desktop/middleware.py:231
+#: src/desktop/middleware.py:232
 #, python-format
 msgid "%(module)s isn't a middleware module."
 msgstr "El %(module)s no es un módulo de middleware."
 
-#: src/desktop/middleware.py:236
+#: src/desktop/middleware.py:237
 #, python-format
 msgid "Error importing middleware %(module)s: \"%(error)s\"."
 msgstr "Error al importar el %(module)s de middleware: \"%(error)s\"."
 
-#: src/desktop/middleware.py:240
+#: src/desktop/middleware.py:241
 #, python-format
 msgid "Middleware module \"%(module)s\" does not define a \"%(class)s\" class."
 msgstr "El módulo de middleware \"%(module)s\" no define una clase \"%(class)s\"."
 
-#: src/desktop/middleware.py:252
+#: src/desktop/middleware.py:253
 #, python-format
 msgid ""
 "AppSpecificMiddleware module \"%(module)s\" has a process_request "
@@ -1180,12 +1212,12 @@ msgstr ""
 "El módulo de AppSpecificMiddleware \"%(module)s\" tiene una función "
 "process_request que es imposible."
 
-#: src/desktop/middleware.py:313
+#: src/desktop/middleware.py:314
 #, python-format
 msgid "You do not have permission to access the %(app_name)s application."
 msgstr "No tiene permiso para acceder a la aplicación %(app_name)s."
 
-#: src/desktop/middleware.py:677
+#: src/desktop/middleware.py:650
 #, python-format
 msgid "Redirect to %s is not allowed."
 msgstr "No se permite la redirección a %s."
@@ -1222,11 +1254,11 @@ msgstr ""
 msgid "Document %(id)s does not exist"
 msgstr "El documento %(id)s no existe."
 
-#: src/desktop/models.py:579 src/desktop/models.py:1026
-#: src/desktop/templates/assist.mako:779
+#: src/desktop/models.py:579 src/desktop/models.py:1037
+#: src/desktop/templates/assist.mako:472
 #: src/desktop/templates/common_import_export.mako:75
-#: src/desktop/templates/document_browser.mako:483
-#: src/desktop/templates/document_browser.mako:676
+#: src/desktop/templates/document_browser.mako:484
+#: src/desktop/templates/document_browser.mako:696
 #: src/desktop/templates/sql_context_popover.mako:182
 msgid "Owner"
 msgstr "Propietario"
@@ -1244,7 +1276,7 @@ msgid "Schema version"
 msgstr "Versión del esquema"
 
 #: src/desktop/models.py:651 src/desktop/models.py:657
-#: src/desktop/models.py:1239 src/desktop/models.py:1250
+#: src/desktop/models.py:1265 src/desktop/models.py:1276
 msgid "Document does not exist or you don't have the permission to access it."
 msgstr "El documento no existe o no tiene permiso para acceder a él."
 
@@ -1257,58 +1289,62 @@ msgstr "El método de copia de documento necesita el argumento content_object."
 msgid "Only %s permissions are supported, not %s."
 msgstr "Solo se admiten los permisos de %s, no de %s."
 
-#: src/desktop/models.py:949
+#: src/desktop/models.py:947
 #, python-format
 msgid "Document with UUID %s not found."
 msgstr "Documento con UUID %s no encontrado."
 
-#: src/desktop/models.py:982
+#: src/desktop/models.py:993
 #, python-format
 msgid "Requested invalid path for user %s: %s"
 msgstr "La ruta solicitada para el usuario %s no es válida: %s"
 
-#: src/desktop/models.py:984
+#: src/desktop/models.py:995
 #, python-format
 msgid "Duplicate documents found for user %s at path: %s"
 msgstr "Se han encontrado documentos duplicados para el usuario %s en la ruta: %s"
 
-#: src/desktop/models.py:1026
+#: src/desktop/models.py:1037
 msgid "Creator."
 msgstr "Creador."
 
-#: src/desktop/models.py:1030
+#: src/desktop/models.py:1041
 msgid "Type of document, e.g. Hive query, Oozie workflow, Search Dashboard..."
 msgstr ""
 "Tipo de documento, p. ej., consulta de Hive, workflow de Oozie, panel de "
 "búsqueda..."
 
-#: src/desktop/models.py:1034
+#: src/desktop/models.py:1045
 msgid "Searchable text for the document."
 msgstr "Texto que se puede buscar en el documento."
 
-#: src/desktop/models.py:1037
+#: src/desktop/models.py:1048
 msgid "Time last modified"
 msgstr "Hora de última modificación"
 
-#: src/desktop/models.py:1038
+#: src/desktop/models.py:1049
 msgid "Document version"
 msgstr "Versión del documento"
 
-#: src/desktop/models.py:1040
+#: src/desktop/models.py:1051
 msgid "If managed under the cover by Hue and never by the user"
 msgstr "Si lo gestiona Hue de forma encubierta y nunca el usuario"
 
-#: src/desktop/models.py:1194
+#: src/desktop/models.py:1052
+msgid "True if trashed"
+msgstr "True si se envía a la papelera"
+
+#: src/desktop/models.py:1201
 #, python-format
 msgid "Document %s contains some special characters: %s"
 msgstr "El documento %s contiene caracteres especiales: %s"
 
-#: src/desktop/models.py:1199
+#: src/desktop/models.py:1206
 #, python-format
 msgid "Cannot create or modify directory with name: %s"
 msgstr "No se puede crear ni modificar el directorio con el nombre: %s"
 
-#: src/desktop/models.py:1203
+#: src/desktop/models.py:1210
 #, python-format
 msgid ""
 "Cannot save document %s under parent directory %s due to circular "
@@ -1317,17 +1353,17 @@ msgstr ""
 "No se puede guardar el documento %s bajo el directorio principal %s "
 "debido a la dependencia circular"
 
-#: src/desktop/models.py:1216
+#: src/desktop/models.py:1223
 #, python-format
 msgid "Target with UUID %s is not a directory"
 msgstr "El destino con UUID %s no es un directorio"
 
-#: src/desktop/models.py:1266
+#: src/desktop/models.py:1292
 #, python-format
 msgid "Failed to share document: %s"
 msgstr "Error al compartir documento: %s"
 
-#: src/desktop/models.py:1277
+#: src/desktop/models.py:1303
 #, python-format
 msgid "Invalid permission type: %s"
 msgstr "Tipo de permiso no válido: %s"
@@ -1368,26 +1404,26 @@ msgstr "Portugués brasileño"
 msgid "Simplified Chinese"
 msgstr "Chino simplificado"
 
-#: src/desktop/settings.py:487
+#: src/desktop/settings.py:489
 #, python-format
 msgid "SSL Certificate pointed by REQUESTS_CA_BUNDLE does not exist: %s"
 msgstr "El certificado SSL al que apunta REQUESTS_CA_BUNDLE no existe: %s"
 
-#: src/desktop/views.py:132 src/desktop/views.py:148 src/desktop/views.py:258
-#: src/desktop/views.py:277 src/desktop/views.py:288 src/desktop/views.py:551
-#: src/desktop/views.py:586 src/desktop/views.py:596
+#: src/desktop/views.py:145 src/desktop/views.py:161 src/desktop/views.py:271
+#: src/desktop/views.py:290 src/desktop/views.py:301 src/desktop/views.py:566
+#: src/desktop/views.py:601 src/desktop/views.py:611
 msgid "You must be a superuser."
 msgstr "Debe ser un superusuario."
 
-#: src/desktop/views.py:140
+#: src/desktop/views.py:153
 msgid "No logs found!"
 msgstr "No se ha encontrado ningún registro."
 
-#: src/desktop/views.py:181
+#: src/desktop/views.py:194
 msgid "No logs found."
 msgstr "No se ha encontrado ningún registro."
 
-#: src/desktop/views.py:291
+#: src/desktop/views.py:304
 msgid ""
 "You must enable the memory profiler via the memory_profiler config in the"
 " hue.ini."
@@ -1569,6 +1605,30 @@ msgstr "No se puede sustituir el patrón de %s porque el host es nulo."
 #: src/desktop/lib/thrift_util.py:388
 msgid "Increase the sasl_max_buffer value in hue.ini"
 msgstr "Aumentar el valor de sasl_max_buffer en hue.ini"
+
+#: src/desktop/lib/tasks/compress_files/compress_utils.py:36
+#, python-format
+msgid "HDFS Compression to %(upload_path)s/hue_compressed.zip"
+msgstr "Compresión de HDFS en %(upload_path)s/hue_compressed.zip"
+
+#: src/desktop/lib/tasks/extract_archive/extract_utils.py:33
+#, python-format
+msgid "HDFS Extraction of %(upload_path)s/%(file_name)s"
+msgstr "Extracción de HDFS de %(upload_path)s/%(file_name)s"
+
+#: src/desktop/lib/vcs/apis/base_api.py:40
+#, python-format
+msgid "Interface %s is unknown"
+msgstr "Interfaz %s desconocida"
+
+#: src/desktop/lib/vcs/apis/github_api.py:53
+#: src/desktop/lib/vcs/apis/github_readonly_api.py:70
+msgid "url param is required"
+msgstr "Se necesita el parámetro URL"
+
+#: src/desktop/lib/vcs/apis/github_api.py:62
+msgid "User is already authenticated to GitHub."
+msgstr "El usuario ya se ha autenticado en GitHub."
 
 #: src/desktop/management/commands/config_dump.py:39
 msgid "Dumping configuration..."
@@ -1810,8 +1870,8 @@ msgid "Function Name"
 msgstr "Nombre de función"
 
 #: src/desktop/templates/about_layout.mako:36
-#: src/desktop/templates/common_header.mako:543
-#: src/desktop/templates/responsive.mako:180
+#: src/desktop/templates/common_header.mako:275
+#: src/desktop/templates/responsive.mako:204
 msgid "About Hue"
 msgstr "Acerca de Hue"
 
@@ -1830,388 +1890,455 @@ msgid "Server Logs"
 msgstr "Registros del servidor"
 
 #: src/desktop/templates/actionbar.mako:31
-#: src/desktop/templates/assist.mako:1153
+#: src/desktop/templates/assist.mako:854
+#: src/desktop/templates/common_notebook_ko_components.mako:458
 msgid "Search..."
 msgstr "Buscar..."
 
-#: src/desktop/templates/assist.mako:435
+#: src/desktop/templates/assist.mako:58
 msgid "The database has no tables"
 msgstr "La base de datos no tiene tablas"
 
-#: src/desktop/templates/assist.mako:443
+#: src/desktop/templates/assist.mako:66
 msgid "The table has no columns"
 msgstr "La tabla no tiene columnas"
 
-#: src/desktop/templates/assist.mako:450 src/desktop/templates/assist.mako:456
-#: src/desktop/templates/assist.mako:510 src/desktop/templates/assist.mako:525
+#: src/desktop/templates/assist.mako:73 src/desktop/templates/assist.mako:79
+#: src/desktop/templates/assist.mako:136 src/desktop/templates/assist.mako:151
 msgid "Show details"
 msgstr "Mostrar detalles"
 
-#: src/desktop/templates/assist.mako:451 src/desktop/templates/assist.mako:511
-#: src/desktop/templates/document_browser.mako:711
+#: src/desktop/templates/assist.mako:74 src/desktop/templates/assist.mako:137
+#: src/desktop/templates/document_browser.mako:732
 msgid "Open"
 msgstr "Abrir"
 
-#: src/desktop/templates/assist.mako:457
+#: src/desktop/templates/assist.mako:80
 msgid "Insert at cursor"
 msgstr "Insertar en posición de cursor"
 
-#: src/desktop/templates/assist.mako:468 src/desktop/templates/home.mako:193
+#: src/desktop/templates/assist.mako:82
+msgid "Open in Metastore"
+msgstr "Abrir en Metastore"
+
+#: src/desktop/templates/assist.mako:94 src/desktop/templates/home.mako:193
 msgid "Project"
 msgstr "Proyecto"
 
-#: src/desktop/templates/assist.mako:470
+#: src/desktop/templates/assist.mako:96
 msgid "Select"
 msgstr "Seleccionar"
 
-#: src/desktop/templates/assist.mako:471
+#: src/desktop/templates/assist.mako:97
 msgid "Select distinct"
 msgstr "Seleccionar distinto"
 
-#: src/desktop/templates/assist.mako:476
+#: src/desktop/templates/assist.mako:102
 msgid "Aggregate"
 msgstr "Agregar"
 
-#: src/desktop/templates/assist.mako:478
+#: src/desktop/templates/assist.mako:104
 #, fuzzy
 msgid "Count"
 msgstr "Recuento"
 
-#: src/desktop/templates/assist.mako:479
+#: src/desktop/templates/assist.mako:105
 msgid "Count distinct"
 msgstr "Contar distinto"
 
-#: src/desktop/templates/assist.mako:480
+#: src/desktop/templates/assist.mako:106
 msgid "Sum"
 msgstr "Suma"
 
-#: src/desktop/templates/assist.mako:481
+#: src/desktop/templates/assist.mako:107
 #, fuzzy
 msgid "Minimum"
 msgstr "Mínimo"
 
-#: src/desktop/templates/assist.mako:482
+#: src/desktop/templates/assist.mako:108
 msgid "Maximum"
 msgstr "Máximo"
 
-#: src/desktop/templates/assist.mako:483
+#: src/desktop/templates/assist.mako:109
 msgid "Average"
 msgstr "Promedio"
 
-#: src/desktop/templates/assist.mako:488 src/desktop/templates/assist.mako:790
-#: src/desktop/templates/assist.mako:869 src/desktop/templates/assist.mako:1023
-#: src/desktop/templates/assist.mako:2045
+#: src/desktop/templates/assist.mako:114 src/desktop/templates/assist.mako:483
+#: src/desktop/templates/assist.mako:550 src/desktop/templates/assist.mako:714
+#: src/desktop/templates/assist.mako:1829
 msgid "Filter"
 msgstr "Filtro"
 
-#: src/desktop/templates/assist.mako:490
+#: src/desktop/templates/assist.mako:116
 msgid "Is null"
 msgstr "Es nulo"
 
-#: src/desktop/templates/assist.mako:491
+#: src/desktop/templates/assist.mako:117
 msgid "Is not null"
 msgstr "No es nulo"
 
-#: src/desktop/templates/assist.mako:492
+#: src/desktop/templates/assist.mako:118
 msgid "Equal to"
 msgstr "Igual a"
 
-#: src/desktop/templates/assist.mako:493
+#: src/desktop/templates/assist.mako:119
 msgid "Not equal to"
 msgstr "Diferente de"
 
-#: src/desktop/templates/assist.mako:494
+#: src/desktop/templates/assist.mako:120
 msgid "Greater than"
 msgstr "Mayor que"
 
-#: src/desktop/templates/assist.mako:495
+#: src/desktop/templates/assist.mako:121
 msgid "Less than"
 msgstr "Menor que"
 
-#: src/desktop/templates/assist.mako:499
+#: src/desktop/templates/assist.mako:125
 msgid "Order"
 msgstr "Orden"
 
-#: src/desktop/templates/assist.mako:501
+#: src/desktop/templates/assist.mako:127
 msgid "Ascending"
 msgstr "Ascendente"
 
-#: src/desktop/templates/assist.mako:502
+#: src/desktop/templates/assist.mako:128
 msgid "Descending"
 msgstr "Descendente"
 
-#: src/desktop/templates/assist.mako:545 src/desktop/templates/assist.mako:1051
+#: src/desktop/templates/assist.mako:141 src/desktop/templates/assist.mako:160
+#: src/desktop/templates/common_header_footer_components.mako:102
+msgid "Popular"
+msgstr "Popular"
+
+#: src/desktop/templates/assist.mako:171 src/desktop/templates/assist.mako:752
 msgid "No results found"
 msgstr "No se han encontrado resultados"
 
-#: src/desktop/templates/assist.mako:559
+#: src/desktop/templates/assist.mako:185
 msgid "Error loading columns."
 msgstr "Error al cargar columnas."
 
-#: src/desktop/templates/assist.mako:562
+#: src/desktop/templates/assist.mako:188
 msgid "Error loading fields."
 msgstr "Error al cargar campos."
 
-#: src/desktop/templates/assist.mako:612 src/desktop/templates/assist.mako:692
+#: src/desktop/templates/assist.mako:238 src/desktop/templates/assist.mako:385
 msgid "Size"
 msgstr "Tamaño"
 
-#: src/desktop/templates/assist.mako:613 src/desktop/templates/assist.mako:697
+#: src/desktop/templates/assist.mako:239 src/desktop/templates/assist.mako:390
 msgid "Permissions"
 msgstr "Permisos"
 
-#: src/desktop/templates/assist.mako:624 src/desktop/templates/assist.mako:709
-#: src/desktop/templates/assist.mako:791 src/desktop/templates/assist.mako:870
-#: src/desktop/templates/assist.mako:919
+#: src/desktop/templates/assist.mako:250 src/desktop/templates/assist.mako:322
+#: src/desktop/templates/assist.mako:402 src/desktop/templates/assist.mako:484
+#: src/desktop/templates/assist.mako:551 src/desktop/templates/assist.mako:600
 msgid "Manual refresh"
 msgstr "Actualización manual"
 
-#: src/desktop/templates/assist.mako:655 src/desktop/templates/assist.mako:740
-#: src/desktop/templates/assist.mako:826
+#: src/desktop/templates/assist.mako:281 src/desktop/templates/assist.mako:433
+#: src/desktop/templates/assist.mako:514
 #: src/desktop/templates/sql_context_popover.mako:564
 #: src/desktop/templates/sql_context_popover.mako:574
 #: src/desktop/templates/sql_context_popover.mako:592
-#: src/desktop/templates/sql_context_popover.mako:901
-#: src/desktop/templates/sql_context_popover.mako:929
-#: src/desktop/templates/sql_context_popover.mako:943
+#: src/desktop/templates/sql_context_popover.mako:906
+#: src/desktop/templates/sql_context_popover.mako:934
+#: src/desktop/templates/sql_context_popover.mako:948
 msgid "Details"
 msgstr "Detalles"
 
-#: src/desktop/templates/assist.mako:672 src/desktop/templates/assist.mako:757
-#: src/desktop/templates/assist.mako:842
+#: src/desktop/templates/assist.mako:298 src/desktop/templates/assist.mako:365
+#: src/desktop/templates/assist.mako:450 src/desktop/templates/assist.mako:530
 msgid "Empty directory"
 msgstr "Directorio vacío"
 
-#: src/desktop/templates/assist.mako:678 src/desktop/templates/assist.mako:763
-#: src/desktop/templates/assist.mako:849 src/desktop/templates/assist.mako:906
-#: src/desktop/templates/assist.mako:971
+#: src/desktop/templates/assist.mako:304 src/desktop/templates/assist.mako:371
+#: src/desktop/templates/assist.mako:456 src/desktop/templates/assist.mako:537
+#: src/desktop/templates/assist.mako:587 src/desktop/templates/assist.mako:652
 msgid "Error loading contents."
 msgstr "Error al cargar contenido."
 
-#: src/desktop/templates/assist.mako:694
+#: src/desktop/templates/assist.mako:387
 msgid "User"
 msgstr "Usuario"
 
-#: src/desktop/templates/assist.mako:695
+#: src/desktop/templates/assist.mako:388
 #: src/desktop/templates/common_share.mako:35
 #: src/desktop/templates/common_share.mako:46
 #: src/desktop/templates/common_share2.mako:35
 #: src/desktop/templates/common_share2.mako:46
-#: src/desktop/templates/document_browser.mako:372
-#: src/desktop/templates/document_browser.mako:387
+#: src/desktop/templates/document_browser.mako:373
+#: src/desktop/templates/document_browser.mako:388
 msgid "Group"
 msgstr "Grupo"
 
-#: src/desktop/templates/assist.mako:698
+#: src/desktop/templates/assist.mako:391
 msgid "Date"
 msgstr "Fecha"
 
-#: src/desktop/templates/assist.mako:777 src/desktop/templates/home.mako:191
+#: src/desktop/templates/assist.mako:470 src/desktop/templates/home.mako:191
 msgid "Description"
 msgstr "Descripción"
 
-#: src/desktop/templates/assist.mako:778
+#: src/desktop/templates/assist.mako:471
 msgid "Modified"
 msgstr "Modificado"
 
-#: src/desktop/templates/assist.mako:879 src/desktop/templates/assist.mako:1781
+#: src/desktop/templates/assist.mako:560 src/desktop/templates/assist.mako:1536
 msgid "Collections"
 msgstr "Recopilaciones"
 
-#: src/desktop/templates/assist.mako:884
+#: src/desktop/templates/assist.mako:565
 msgid "Show cores"
 msgstr "Mostrar núcleos"
 
-#: src/desktop/templates/assist.mako:886
+#: src/desktop/templates/assist.mako:567
 msgid "Collection name..."
 msgstr "Nombre de recopilación..."
 
-#: src/desktop/templates/assist.mako:900
+#: src/desktop/templates/assist.mako:581
 msgid "No collections available."
 msgstr "No hay recopilaciones disponibles."
 
-#: src/desktop/templates/assist.mako:936
+#: src/desktop/templates/assist.mako:617
 msgid "Clusters"
 msgstr "Clústeres"
 
-#: src/desktop/templates/assist.mako:960
+#: src/desktop/templates/assist.mako:641
 msgid "No clusters available."
 msgstr "No hay clústeres disponibles."
 
-#: src/desktop/templates/assist.mako:963
+#: src/desktop/templates/assist.mako:644
 msgid "No tables available."
 msgstr "No hay tablas disponibles."
 
-#: src/desktop/templates/assist.mako:985
+#: src/desktop/templates/assist.mako:666
 msgid "Sources"
 msgstr "Orígenes"
 
-#: src/desktop/templates/assist.mako:1004
+#: src/desktop/templates/assist.mako:685
 msgid "Clear cache"
 msgstr "Borrar caché"
 
-#: src/desktop/templates/assist.mako:1008
+#: src/desktop/templates/assist.mako:689
 msgid "Perform incremental metadata update"
 msgstr "Realizar actualización de metadatos en incrementos"
 
-#: src/desktop/templates/assist.mako:1010
+#: src/desktop/templates/assist.mako:691
 msgid "This will sync missing tables in Hive."
 msgstr "Esta operación sincronizará las tablas que faltan en Hive."
 
-#: src/desktop/templates/assist.mako:1013
+#: src/desktop/templates/assist.mako:694
 msgid "Invalidate all metadata and rebuild index"
 msgstr "Invalidar todos los metadatos y reconstruir índice"
 
-#: src/desktop/templates/assist.mako:1015
+#: src/desktop/templates/assist.mako:696
 msgid "WARNING: This can be both resource and time-intensive."
 msgstr "AVISO: Esta operación puede consumir muchos recursos y tiempo."
 
-#: src/desktop/templates/assist.mako:1016
+#: src/desktop/templates/assist.mako:697
 msgid "Refresh"
 msgstr "Actualizar"
 
-#: src/desktop/templates/assist.mako:1025
-#: src/desktop/templates/assist.mako:1028
-#: src/desktop/templates/assist.mako:1033
+#: src/desktop/templates/assist.mako:705
+msgid "Sort"
+msgstr "Clasificar"
+
+#: src/desktop/templates/assist.mako:707
+msgid "Default"
+msgstr "Predeterminado"
+
+#: src/desktop/templates/assist.mako:708
+msgid "Alphabetical"
+msgstr "Alfabético"
+
+#: src/desktop/templates/assist.mako:710
+msgid "Popularity"
+msgstr "Popularidad"
+
+#: src/desktop/templates/assist.mako:718
+msgid "Create table"
+msgstr "Crear tabla"
+
+#: src/desktop/templates/assist.mako:721
+msgid "Create database"
+msgstr "Crear base de datos"
+
+#: src/desktop/templates/assist.mako:726 src/desktop/templates/assist.mako:729
+#: src/desktop/templates/assist.mako:734
 msgid "Manually refresh the table list"
 msgstr "Actualizar manualmente la lista de tablas"
 
-#: src/desktop/templates/assist.mako:1032
+#: src/desktop/templates/assist.mako:733
 msgid "Filter tables"
 msgstr "Filtrar tablas"
 
-#: src/desktop/templates/assist.mako:1041
+#: src/desktop/templates/assist.mako:742
+#: src/desktop/templates/common_header_footer_components.mako:99
 msgid "Databases"
 msgstr "Bases de datos"
 
-#: src/desktop/templates/assist.mako:1046
+#: src/desktop/templates/assist.mako:747
 msgid "Database name..."
 msgstr "Nombre de base de datos..."
 
-#: src/desktop/templates/assist.mako:1065
+#: src/desktop/templates/assist.mako:766
 msgid "Error loading databases."
 msgstr "Error al cargar bases de datos."
 
-#: src/desktop/templates/assist.mako:1068
+#: src/desktop/templates/assist.mako:769
 msgid "No databases found."
 msgstr "No se han encontrado bases de datos."
 
-#: src/desktop/templates/assist.mako:1075
-#: src/desktop/templates/assist.mako:1081
+#: src/desktop/templates/assist.mako:776 src/desktop/templates/assist.mako:782
+#: src/desktop/templates/assist.mako:1966
+#: src/desktop/templates/common_header_footer_components.mako:104
 msgid "Tables"
 msgstr "Tablas"
 
-#: src/desktop/templates/assist.mako:1082
+#: src/desktop/templates/assist.mako:783
 msgid "Views"
 msgstr "Vistas"
 
-#: src/desktop/templates/assist.mako:1083
+#: src/desktop/templates/assist.mako:784
 msgid "Active"
 msgstr "Activar"
 
-#: src/desktop/templates/assist.mako:1085
+#: src/desktop/templates/assist.mako:786
 msgid "Table name..."
 msgstr "Nombre de tabla..."
 
-#: src/desktop/templates/assist.mako:1094
+#: src/desktop/templates/assist.mako:795
 msgid "Error loading tables."
 msgstr "Error al cargar tablas."
 
-#: src/desktop/templates/assist.mako:1146
+#: src/desktop/templates/assist.mako:847
 msgid "No recent match found"
 msgstr "No se encontraron coincidencias recientes"
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 #, fuzzy
 msgid "Search "
 msgstr "Buscar "
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 msgid " tables"
 msgstr " tablas"
 
-#: src/desktop/templates/assist.mako:1166
+#: src/desktop/templates/assist.mako:869
 msgid " files"
 msgstr " archivos"
 
-#: src/desktop/templates/assist.mako:1203
+#: src/desktop/templates/assist.mako:906
 msgid "Search result"
 msgstr "Resultado de búsqueda"
 
-#: src/desktop/templates/assist.mako:1206
+#: src/desktop/templates/assist.mako:909
 #: src/desktop/templates/common_import_export.mako:90
-#: src/desktop/templates/document_browser.mako:414
-#: src/desktop/templates/document_browser.mako:441
-#: src/desktop/templates/document_browser.mako:498
-#: src/desktop/templates/document_browser.mako:573
+#: src/desktop/templates/common_notebook_ko_components.mako:74
+#: src/desktop/templates/common_notebook_ko_components.mako:309
+#: src/desktop/templates/document_browser.mako:415
+#: src/desktop/templates/document_browser.mako:442
+#: src/desktop/templates/document_browser.mako:499
+#: src/desktop/templates/document_browser.mako:593
 msgid "Close"
 msgstr "Cerrar"
 
-#: src/desktop/templates/assist.mako:1212
+#: src/desktop/templates/assist.mako:915
 msgid "No result found."
 msgstr "No se ha encontrado ningún resultado."
 
-#: src/desktop/templates/assist.mako:1710
-#: src/desktop/templates/assist_m.mako:119
-#: src/desktop/templates/common_header.mako:161
-#: src/desktop/templates/common_header_m.mako:118
-#: src/desktop/templates/responsive.mako:74
-#: src/desktop/templates/responsive.mako:351
+#: src/desktop/templates/assist.mako:1462
+#: src/desktop/templates/assist_m.mako:118
+#: src/desktop/templates/common_header_footer_components.mako:87
+#: src/desktop/templates/common_header_m.mako:127
+#: src/desktop/templates/responsive.mako:558
 msgid "There was a problem loading the databases"
 msgstr "Se ha producido un problema al cargar las bases de datos."
 
-#: src/desktop/templates/assist.mako:1711
-#: src/desktop/templates/assist_m.mako:120
+#: src/desktop/templates/assist.mako:1463
+#: src/desktop/templates/assist_m.mako:119
 msgid "There was a problem loading the table preview."
 msgstr "Se ha producido un problema al cargar la vista previa de la tabla."
 
-#: src/desktop/templates/assist.mako:1713
-#: src/desktop/templates/document_browser.mako:621
-#: src/desktop/templates/document_browser.mako:758
+#: src/desktop/templates/assist.mako:1465
+#: src/desktop/templates/document_browser.mako:641
+#: src/desktop/templates/document_browser.mako:779
 #: src/desktop/templates/home.mako:125
+#: src/desktop/templates/responsive.mako:115
+#: src/desktop/templates/responsive.mako:121
 msgid "Hive Query"
 msgstr "Consulta de Hive"
 
-#: src/desktop/templates/assist.mako:1714
+#: src/desktop/templates/assist.mako:1466
+#: src/desktop/templates/responsive.mako:113
 msgid "Query"
 msgstr "Consulta"
 
-#: src/desktop/templates/assist.mako:1715
-#: src/desktop/templates/common_header.mako:599
-#: src/desktop/templates/common_header.mako:603
-#: src/desktop/templates/common_header.mako:607
-#: src/desktop/templates/document_browser.mako:633
-#: src/desktop/templates/document_browser.mako:754
+#: src/desktop/templates/assist.mako:1467
+#: src/desktop/templates/common_header.mako:335
+#: src/desktop/templates/common_header.mako:339
+#: src/desktop/templates/common_header.mako:343
+#: src/desktop/templates/document_browser.mako:653
+#: src/desktop/templates/document_browser.mako:775
 msgid "Notebook"
 msgstr "Bloc de notas"
 
-#: src/desktop/templates/assist.mako:1743
+#: src/desktop/templates/assist.mako:1499
 msgid "SQL"
 msgstr "SQL"
 
-#: src/desktop/templates/assist.mako:1756
+#: src/desktop/templates/assist.mako:1512
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/desktop/templates/assist.mako:1768
+#: src/desktop/templates/assist.mako:1524
 msgid "S3"
 msgstr "S3"
 
-#: src/desktop/templates/assist.mako:1793
-#: src/desktop/templates/common_header.mako:633
+#: src/desktop/templates/assist.mako:1548
+#: src/desktop/templates/common_header.mako:369
 msgid "HBase"
 msgstr "HBase"
 
-#: src/desktop/templates/assist.mako:1807
+#: src/desktop/templates/assist.mako:1562
 msgid "Documents"
 msgstr "Documentos"
 
-#: src/desktop/templates/assist.mako:1908
+#: src/desktop/templates/assist.mako:1576
+msgid "GIT"
+msgstr "GIT"
+
+#: src/desktop/templates/assist.mako:1678
 msgid "Cluster"
 msgstr "Clúster"
 
+#: src/desktop/templates/assist.mako:1705
+msgid "Region"
+msgstr "Región"
+
+#: src/desktop/templates/assist.mako:1968
+msgid "Load table and columns stats in order to improve recommendations"
+msgstr "Cargar estadísticas de tablas y columnas para mejorar las recomendaciones"
+
+#: src/desktop/templates/assist.mako:1982
+msgid "Fields"
+msgstr "Campos"
+
+#: src/desktop/templates/assist.mako:1998
+msgid "Suggestions"
+msgstr "Sugerencias"
+
+#: src/desktop/templates/assist.mako:2015
+msgid "Load past query history in order to improve recommendations"
+msgstr "Cargar historial de consultas anteriores para mejorar las recomendaciones"
+
+#: src/desktop/templates/assist.mako:2016
+msgid "Upload workload"
+msgstr "Cargar carga de trabajo"
+
 #: src/desktop/templates/assist_m.mako:24
-#: src/desktop/templates/common_header_m.mako:291
+#: src/desktop/templates/common_header_m.mako:314
 #: src/desktop/templates/sql_context_popover.mako:152
 msgid "Assist"
 msgstr "Asistir"
@@ -2319,395 +2446,1091 @@ msgstr "p. ej."
 msgid "Read more..."
 msgstr "Leer más..."
 
-#: src/desktop/templates/common_footer.mako:94
-#: src/desktop/templates/responsive.mako:719
-msgid "You have signed in successfully!"
-msgstr "Ha iniciado sesión correctamente."
-
-#: src/desktop/templates/common_header.mako:116
-#: src/desktop/templates/common_header_m.mako:73
-#: src/desktop/templates/error.mako:40
-msgid "Back"
-msgstr "Volver"
-
-#: src/desktop/templates/common_header.mako:117
-#: src/desktop/templates/common_header_m.mako:74
-msgid "Select this folder"
-msgstr "Seleccione esta carpeta"
-
-#: src/desktop/templates/common_header.mako:118
-#: src/desktop/templates/common_header.mako:130
-#: src/desktop/templates/common_header_m.mako:75
-#: src/desktop/templates/common_header_m.mako:87
-msgid "Create folder"
-msgstr "Crear carpeta"
-
-#: src/desktop/templates/common_header.mako:119
-#: src/desktop/templates/common_header.mako:131
-#: src/desktop/templates/common_header_m.mako:76
-#: src/desktop/templates/common_header_m.mako:88
-msgid "Folder name"
-msgstr "Nombre de carpeta"
-
-#: src/desktop/templates/common_header.mako:120
-#: src/desktop/templates/common_header.mako:132
-#: src/desktop/templates/common_header_m.mako:77
-#: src/desktop/templates/common_header_m.mako:89
-#: src/desktop/templates/common_import_export.mako:37
-#: src/desktop/templates/document_browser.mako:437
-#: src/desktop/templates/document_browser.mako:514
-#: src/desktop/templates/document_browser.mako:532
-#: src/desktop/templates/document_browser.mako:576
-#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
-msgid "Cancel"
-msgstr "Cancelar"
-
-#: src/desktop/templates/common_header.mako:121
-#: src/desktop/templates/common_header_m.mako:78
-msgid "The file has not been found"
-msgstr "No se ha encontrado el archivo"
-
-#: src/desktop/templates/common_header.mako:122
-#: src/desktop/templates/common_header_m.mako:79
-msgid "Upload a file"
-msgstr "Cargar un archivo"
-
-#: src/desktop/templates/common_header.mako:123
-#: src/desktop/templates/common_header_m.mako:80
-msgid "Failed"
-msgstr "Erróneos"
-
-#: src/desktop/templates/common_header.mako:138
-#: src/desktop/templates/common_header_m.mako:95
-msgid "Go to column:"
-msgstr "Ir a columna:"
-
-#: src/desktop/templates/common_header.mako:139
-#: src/desktop/templates/common_header_m.mako:96
-msgid "column name..."
-msgstr "nombre de columna..."
-
-#: src/desktop/templates/common_header.mako:140
-#: src/desktop/templates/common_header_m.mako:97
-msgid "Click to lock this row"
-msgstr "Haga clic para bloquear esta fila"
-
-#: src/desktop/templates/common_header.mako:141
-#: src/desktop/templates/common_header_m.mako:98
-msgid "Click to unlock this row"
-msgstr "Haga clic para desbloquear esta fila"
-
-#: src/desktop/templates/common_header.mako:147
-#: src/desktop/templates/common_header_m.mako:104
-msgid "Available tours"
-msgstr "Recorridos disponibles"
-
-#: src/desktop/templates/common_header.mako:148
-#: src/desktop/templates/common_header_m.mako:105
-msgid "None for this page."
-msgstr "Ninguno para esta página."
-
-#: src/desktop/templates/common_header.mako:149
-#: src/desktop/templates/common_header_m.mako:106
-msgid "Read more about it..."
-msgstr "Lea más datos sobre el tema..."
-
-#: src/desktop/templates/common_header.mako:150
-#: src/desktop/templates/common_header_m.mako:107
-msgid "Demo tutorials"
-msgstr "Tutoriales de demostración"
-
-#: src/desktop/templates/common_header.mako:162
-#: src/desktop/templates/common_header_m.mako:119
-#: src/desktop/templates/responsive.mako:75
-msgid "There was a problem loading the preview"
-msgstr "Se ha producido un problema al cargar la vista previa"
-
-#: src/desktop/templates/common_header.mako:460
+#: src/desktop/templates/common_header.mako:192
 msgid "Manage HDFS"
 msgstr "Gestionar HDFS"
 
-#: src/desktop/templates/common_header.mako:461
+#: src/desktop/templates/common_header.mako:193
 #: src/desktop/templates/sql_context_popover.mako:155
 msgid "File Browser"
 msgstr "Explorador de archivos"
 
-#: src/desktop/templates/common_header.mako:466
-#: src/desktop/templates/common_header.mako:467
+#: src/desktop/templates/common_header.mako:198
+#: src/desktop/templates/common_header.mako:199
 msgid "File Browsers"
 msgstr "Exploradores de archivos"
 
-#: src/desktop/templates/common_header.mako:471
-#: src/desktop/templates/common_header.mako:480
+#: src/desktop/templates/common_header.mako:203
+#: src/desktop/templates/common_header.mako:212
 msgid "HDFS Browser"
 msgstr "Explorador HDFS"
 
-#: src/desktop/templates/common_header.mako:474
-#: src/desktop/templates/common_header.mako:486
+#: src/desktop/templates/common_header.mako:206
+#: src/desktop/templates/common_header.mako:218
 msgid "S3 Browser"
 msgstr "Explorador S3"
 
-#: src/desktop/templates/common_header.mako:493
-#: src/desktop/templates/common_header.mako:497
+#: src/desktop/templates/common_header.mako:225
+#: src/desktop/templates/common_header.mako:229
 msgid "Manage jobs"
 msgstr "Gestionar jobs"
 
-#: src/desktop/templates/common_header.mako:493
-#: src/desktop/templates/common_header.mako:494
+#: src/desktop/templates/common_header.mako:225
+#: src/desktop/templates/common_header.mako:226
 msgid "Job Browser"
 msgstr "Job Browser"
 
-#: src/desktop/templates/common_header.mako:498
-#: src/desktop/templates/common_header.mako:500
+#: src/desktop/templates/common_header.mako:230
+#: src/desktop/templates/common_header.mako:232
 msgid "Job Browser 2"
 msgstr "Job Browser 2"
 
-#: src/desktop/templates/common_header.mako:507
+#: src/desktop/templates/common_header.mako:240
 msgid "Administration"
 msgstr "Administración"
 
-#: src/desktop/templates/common_header.mako:518
+#: src/desktop/templates/common_header.mako:248
+#: src/desktop/templates/responsive.mako:191
 msgid "View Profile"
 msgstr "Ver perfil"
 
-#: src/desktop/templates/common_header.mako:520
+#: src/desktop/templates/common_header.mako:250
+#: src/desktop/templates/responsive.mako:191
 msgid "Edit Profile"
 msgstr "Editar perfil"
 
-#: src/desktop/templates/common_header.mako:525
-#: src/desktop/templates/responsive.mako:177
+#: src/desktop/templates/common_header.mako:255
+#: src/desktop/templates/responsive.mako:201
 msgid "Manage Users"
 msgstr "Gestionar usuarios"
 
-#: src/desktop/templates/common_header.mako:531
+#: src/desktop/templates/common_header.mako:263
 msgid "Documentation"
 msgstr "Documentación"
 
-#: src/desktop/templates/common_header.mako:534
-#: src/desktop/templates/common_header_m.mako:305
-#: src/desktop/templates/responsive.mako:182
+#: src/desktop/templates/common_header.mako:266
+#: src/desktop/templates/common_header_m.mako:328
+#: src/desktop/templates/responsive.mako:206
 msgid "Sign out"
 msgstr "Cerrar sesión"
 
-#: src/desktop/templates/common_header.mako:546
-#: src/desktop/templates/document_browser.mako:589
-#: src/desktop/templates/document_browser.mako:597
-#: src/desktop/templates/home.mako:94 src/desktop/templates/home2.mako:178
+#: src/desktop/templates/common_header.mako:282
+#: src/desktop/templates/common_home.mako:48
+#: src/desktop/templates/document_browser.mako:609
+#: src/desktop/templates/document_browser.mako:617
+#: src/desktop/templates/home.mako:94
 msgid "My documents"
 msgstr "Mis documentos"
 
-#: src/desktop/templates/common_header.mako:552
-#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
+#: src/desktop/templates/common_header.mako:288
+#: src/desktop/templates/common_home.mako:159
+#: src/desktop/templates/home.mako:562
 msgid "Query data"
 msgstr "Consultar datos"
 
-#: src/desktop/templates/common_header.mako:556
-#: src/desktop/templates/common_header.mako:558
-#: src/desktop/templates/common_header_m.mako:294
-#: src/desktop/templates/responsive.mako:107
+#: src/desktop/templates/common_header.mako:292
+#: src/desktop/templates/common_header.mako:294
+#: src/desktop/templates/common_header_m.mako:317
 msgid "Hive"
 msgstr "Hive"
 
-#: src/desktop/templates/common_header.mako:563
-#: src/desktop/templates/common_header.mako:565
-#: src/desktop/templates/common_header_m.mako:299
-#: src/desktop/templates/responsive.mako:110
+#: src/desktop/templates/common_header.mako:299
+#: src/desktop/templates/common_header.mako:301
+#: src/desktop/templates/common_header_m.mako:322
 msgid "Impala"
 msgstr "Impala"
 
-#: src/desktop/templates/common_header.mako:570
-#: src/desktop/templates/common_header.mako:572
+#: src/desktop/templates/common_header.mako:306
+#: src/desktop/templates/common_header.mako:308
 msgid "DB Query"
 msgstr "Consulta de base de datos"
 
-#: src/desktop/templates/common_header.mako:577
-#: src/desktop/templates/common_header.mako:579
+#: src/desktop/templates/common_header.mako:313
+#: src/desktop/templates/common_header.mako:315
 msgid "Pig"
 msgstr "Pig"
 
-#: src/desktop/templates/common_header.mako:583
+#: src/desktop/templates/common_header.mako:319
 msgid "Job Designer"
 msgstr "Job Designer"
 
-#: src/desktop/templates/common_header.mako:599
-#: src/desktop/templates/common_header.mako:604
-#: src/desktop/templates/common_header.mako:608
+#: src/desktop/templates/common_header.mako:335
+#: src/desktop/templates/common_header.mako:340
+#: src/desktop/templates/common_header.mako:344
 msgid "Notebooks"
 msgstr "Blocs de notas"
 
-#: src/desktop/templates/common_header.mako:627
+#: src/desktop/templates/common_header.mako:363
 msgid "Manage data"
 msgstr "Gestionar datos"
 
-#: src/desktop/templates/common_header.mako:630
+#: src/desktop/templates/common_header.mako:366
 msgid "Metastore Tables"
 msgstr "Tablas de Metastore"
 
-#: src/desktop/templates/common_header.mako:636
+#: src/desktop/templates/common_header.mako:372
 msgid "Sqoop Transfer"
 msgstr "Transferencia de Sqoop"
 
-#: src/desktop/templates/common_header.mako:639
+#: src/desktop/templates/common_header.mako:375
 msgid "ZooKeeper"
 msgstr "ZooKeeper"
 
-#: src/desktop/templates/common_header.mako:648
-#: src/desktop/templates/responsive.mako:118
+#: src/desktop/templates/common_header.mako:384
+#: src/desktop/templates/responsive.mako:133
 msgid "Schedule with Oozie"
 msgstr "Programar con Oozie"
 
-#: src/desktop/templates/common_header.mako:651
-#: src/desktop/templates/common_header.mako:700
+#: src/desktop/templates/common_header.mako:387
+#: src/desktop/templates/common_header.mako:436
 msgid "Dashboards"
 msgstr "Paneles"
 
-#: src/desktop/templates/common_header.mako:653
-#: src/desktop/templates/common_header.mako:664
-#: src/desktop/templates/common_header.mako:673
-#: src/desktop/templates/responsive.mako:118
-#: src/desktop/templates/responsive.mako:120
-#: src/desktop/templates/responsive.mako:194
+#: src/desktop/templates/common_header.mako:389
+#: src/desktop/templates/common_header.mako:400
+#: src/desktop/templates/common_header.mako:409
+#: src/desktop/templates/responsive.mako:292
 msgid "Workflows"
 msgstr "Workflows"
 
-#: src/desktop/templates/common_header.mako:654
-#: src/desktop/templates/common_header.mako:665
-#: src/desktop/templates/common_header.mako:674
-#: src/desktop/templates/responsive.mako:121
+#: src/desktop/templates/common_header.mako:390
+#: src/desktop/templates/common_header.mako:401
+#: src/desktop/templates/common_header.mako:410
 msgid "Coordinators"
 msgstr "Coordinators"
 
-#: src/desktop/templates/common_header.mako:655
-#: src/desktop/templates/common_header.mako:666
-#: src/desktop/templates/common_header.mako:675
-#: src/desktop/templates/responsive.mako:122
+#: src/desktop/templates/common_header.mako:391
+#: src/desktop/templates/common_header.mako:402
+#: src/desktop/templates/common_header.mako:411
 msgid "Bundles"
 msgstr "Bundles"
 
-#: src/desktop/templates/common_header.mako:662
-#: src/desktop/templates/common_header.mako:671
+#: src/desktop/templates/common_header.mako:398
+#: src/desktop/templates/common_header.mako:407
 msgid "Editors"
 msgstr "Editores"
 
-#: src/desktop/templates/common_header.mako:689
-#: src/desktop/templates/common_header.mako:693
-#: src/desktop/templates/document_browser.mako:641
+#: src/desktop/templates/common_header.mako:425
+#: src/desktop/templates/common_header.mako:429
+#: src/desktop/templates/document_browser.mako:661
 msgid "Solr Search"
 msgstr "Búsqueda de Solr"
 
-#: src/desktop/templates/common_header.mako:689
-#: src/desktop/templates/common_header.mako:694
-#: src/desktop/templates/common_header_m.mako:303
+#: src/desktop/templates/common_header.mako:425
+#: src/desktop/templates/common_header.mako:430
+#: src/desktop/templates/common_header_m.mako:326
 #: src/desktop/templates/config_ko_components.mako:108
-#: src/desktop/templates/document_browser.mako:614
+#: src/desktop/templates/document_browser.mako:634
 #, fuzzy
 msgid "Search"
 msgstr "Buscar"
 
-#: src/desktop/templates/common_header.mako:699
-#: src/desktop/templates/responsive.mako:113
+#: src/desktop/templates/common_header.mako:435
+#: src/desktop/templates/common_notebook_ko_components.mako:196
+#: src/desktop/templates/common_notebook_ko_components.mako:268
+#: src/desktop/templates/responsive.mako:127
 msgid "Dashboard"
 msgstr "Panel"
 
-#: src/desktop/templates/common_header.mako:703
+#: src/desktop/templates/common_header.mako:439
 msgid "Indexes"
 msgstr "Índices"
 
-#: src/desktop/templates/common_header.mako:708
+#: src/desktop/templates/common_header.mako:444
 msgid "Index"
 msgstr "Índice"
 
-#: src/desktop/templates/common_header.mako:727
+#: src/desktop/templates/common_header.mako:463
 msgid "Hadoop Security"
 msgstr "Seguridad con Hadoop"
 
-#: src/desktop/templates/common_header.mako:730
+#: src/desktop/templates/common_header.mako:466
 msgid "Hive Tables"
 msgstr "Tablas Hive"
 
-#: src/desktop/templates/common_header.mako:733
+#: src/desktop/templates/common_header.mako:469
 msgid "Hive Tables v2"
 msgstr "Tablas Hive v2"
 
-#: src/desktop/templates/common_header.mako:736
+#: src/desktop/templates/common_header.mako:472
 msgid "Solr Collections"
 msgstr "Colecciones Solr"
 
-#: src/desktop/templates/common_header.mako:738
+#: src/desktop/templates/common_header.mako:474
 msgid "File ACLs"
 msgstr "ACL de archivo"
 
-#: src/desktop/templates/common_header.mako:744
+#: src/desktop/templates/common_header.mako:480
 msgid "Other apps"
 msgstr "Otras aplicaciones"
 
-#: src/desktop/templates/common_header.mako:760
+#: src/desktop/templates/common_header.mako:496
+#: src/desktop/templates/responsive.mako:65
 msgid "Feedback"
 msgstr "Comentarios"
 
+#: src/desktop/templates/common_header_footer_components.mako:42
+#: src/desktop/templates/common_header_m.mako:82
+#: src/desktop/templates/error.mako:40
+msgid "Back"
+msgstr "Volver"
+
+#: src/desktop/templates/common_header_footer_components.mako:43
+#: src/desktop/templates/common_header_m.mako:83
+msgid "Select this folder"
+msgstr "Seleccione esta carpeta"
+
+#: src/desktop/templates/common_header_footer_components.mako:44
+#: src/desktop/templates/common_header_footer_components.mako:56
+#: src/desktop/templates/common_header_m.mako:84
+#: src/desktop/templates/common_header_m.mako:96
+msgid "Create folder"
+msgstr "Crear carpeta"
+
+#: src/desktop/templates/common_header_footer_components.mako:45
+#: src/desktop/templates/common_header_footer_components.mako:57
+#: src/desktop/templates/common_header_m.mako:85
+#: src/desktop/templates/common_header_m.mako:97
+msgid "Folder name"
+msgstr "Nombre de carpeta"
+
+#: src/desktop/templates/common_header_footer_components.mako:46
+#: src/desktop/templates/common_header_footer_components.mako:58
+#: src/desktop/templates/common_header_m.mako:86
+#: src/desktop/templates/common_header_m.mako:98
+#: src/desktop/templates/common_import_export.mako:37
+#: src/desktop/templates/common_notebook_ko_components.mako:280
+#: src/desktop/templates/document_browser.mako:438
+#: src/desktop/templates/document_browser.mako:515
+#: src/desktop/templates/document_browser.mako:533
+#: src/desktop/templates/document_browser.mako:553
+#: src/desktop/templates/document_browser.mako:596
+#: src/desktop/templates/home.mako:247 src/desktop/templates/home.mako:317
+msgid "Cancel"
+msgstr "Cancelar"
+
+#: src/desktop/templates/common_header_footer_components.mako:47
+#: src/desktop/templates/common_header_m.mako:87
+msgid "The file has not been found"
+msgstr "No se ha encontrado el archivo"
+
+#: src/desktop/templates/common_header_footer_components.mako:48
+#: src/desktop/templates/common_header_m.mako:88
+msgid "Upload a file"
+msgstr "Cargar un archivo"
+
+#: src/desktop/templates/common_header_footer_components.mako:49
+#: src/desktop/templates/common_header_m.mako:89
+msgid "Failed"
+msgstr "Erróneos"
+
+#: src/desktop/templates/common_header_footer_components.mako:64
+#: src/desktop/templates/common_header_m.mako:104
+msgid "Go to column:"
+msgstr "Ir a columna:"
+
+#: src/desktop/templates/common_header_footer_components.mako:65
+#: src/desktop/templates/common_header_m.mako:105
+msgid "column name..."
+msgstr "nombre de columna..."
+
+#: src/desktop/templates/common_header_footer_components.mako:66
+#: src/desktop/templates/common_header_m.mako:106
+msgid "Click to lock this row"
+msgstr "Haga clic para bloquear esta fila"
+
+#: src/desktop/templates/common_header_footer_components.mako:67
+#: src/desktop/templates/common_header_m.mako:107
+msgid "Click to unlock this row"
+msgstr "Haga clic para desbloquear esta fila"
+
+#: src/desktop/templates/common_header_footer_components.mako:73
+#: src/desktop/templates/common_header_m.mako:113
+msgid "Available tours"
+msgstr "Recorridos disponibles"
+
+#: src/desktop/templates/common_header_footer_components.mako:74
+#: src/desktop/templates/common_header_m.mako:114
+msgid "None for this page."
+msgstr "Ninguno para esta página."
+
+#: src/desktop/templates/common_header_footer_components.mako:75
+#: src/desktop/templates/common_header_m.mako:115
+msgid "Read more about it..."
+msgstr "Lea más datos sobre el tema..."
+
+#: src/desktop/templates/common_header_footer_components.mako:76
+#: src/desktop/templates/common_header_m.mako:116
+msgid "Demo tutorials"
+msgstr "Tutoriales de demostración"
+
+#: src/desktop/templates/common_header_footer_components.mako:88
+#: src/desktop/templates/common_header_m.mako:128
+msgid "There was a problem loading the preview"
+msgstr "Se ha producido un problema al cargar la vista previa"
+
+#: src/desktop/templates/common_header_footer_components.mako:96
+msgid "All"
+msgstr "Todos"
+
+#: src/desktop/templates/common_header_footer_components.mako:97
+#: src/desktop/templates/sql_context_popover.mako:328
+#: src/desktop/templates/sql_context_popover.mako:584
+#: src/desktop/templates/sql_context_popover.mako:1313
+msgid "Columns"
+msgstr "Columnas"
+
+#: src/desktop/templates/common_header_footer_components.mako:98
+msgid "CTEs"
+msgstr "CTE"
+
+#: src/desktop/templates/common_header_footer_components.mako:100
+msgid "Identifiers"
+msgstr "Identificadores"
+
+#: src/desktop/templates/common_header_footer_components.mako:101
+msgid "Keywords"
+msgstr "Palabras clave"
+
+#: src/desktop/templates/common_header_footer_components.mako:103
+msgid "Samples"
+msgstr "Ejemplos"
+
+#: src/desktop/templates/common_header_footer_components.mako:105
+msgid "UDFs"
+msgstr "UDF"
+
+#: src/desktop/templates/common_header_footer_components.mako:106
+msgid "Variables"
+msgstr "Variables"
+
+#: src/desktop/templates/common_header_footer_components.mako:109
+msgid "aggregate"
+msgstr "agregado"
+
+#: src/desktop/templates/common_header_footer_components.mako:110
+msgid "alias"
+msgstr "alias"
+
+#: src/desktop/templates/common_header_footer_components.mako:111
+msgid "cte"
+msgstr "CTE"
+
+#: src/desktop/templates/common_header_footer_components.mako:112
+msgid "database"
+msgstr "base de datos"
+
+#: src/desktop/templates/common_header_footer_components.mako:113
+msgid "filter"
+msgstr "filtrar"
+
+#: src/desktop/templates/common_header_footer_components.mako:114
+msgid "group by"
+msgstr "agrupar por"
+
+#: src/desktop/templates/common_header_footer_components.mako:115
+msgid "join"
+msgstr "unión"
+
+#: src/desktop/templates/common_header_footer_components.mako:116
+msgid "condition"
+msgstr "condición"
+
+#: src/desktop/templates/common_header_footer_components.mako:117
+msgid "keyword"
+msgstr "palabra clave"
+
+#: src/desktop/templates/common_header_footer_components.mako:118
+msgid "order by"
+msgstr "ordenar por"
+
+#: src/desktop/templates/common_header_footer_components.mako:119
+msgid "table"
+msgstr "tabla"
+
+#: src/desktop/templates/common_header_footer_components.mako:120
+msgid "value"
+msgstr "valor"
+
+#: src/desktop/templates/common_header_footer_components.mako:121
+msgid "variable"
+msgstr "variable"
+
+#: src/desktop/templates/common_header_footer_components.mako:122
+msgid "view"
+msgstr "vista"
+
+#: src/desktop/templates/common_header_footer_components.mako:123
+msgid "virtual"
+msgstr "virtual"
+
+#: src/desktop/templates/common_header_footer_components.mako:428
+msgid "You have signed in successfully!"
+msgstr "Ha iniciado sesión correctamente."
+
+#: src/desktop/templates/common_home.mako:82
+msgid "An error occurred fetching the table details. Please try again."
+msgstr ""
+"Se ha producido un error al capturar los detalles de la tabla. Inténtelo "
+"de nuevo."
+
+#: src/desktop/templates/common_home.mako:83
+msgid "An error occurred fetching the table fields. Please try again."
+msgstr ""
+"Se ha producido un error al capturar los campos de la tabla. Inténtelo de"
+" nuevo."
+
+#: src/desktop/templates/common_home.mako:84
+msgid "An error occurred fetching the table sample. Please try again."
+msgstr ""
+"Se ha producido un error al capturar el ejemplo de la tabla. Inténtelo de"
+" nuevo."
+
+#: src/desktop/templates/common_home.mako:85
+msgid "An error occurred refreshing the table stats. Please try again."
+msgstr ""
+"Se ha producido un error al actualizar las estadísticas de la tabla. "
+"Inténtelo de nuevo."
+
+#: src/desktop/templates/common_home.mako:86
+msgid "There was a problem loading the databases. Please try again."
+msgstr ""
+"Se ha producido un problema al cargar las bases de datos. Inténtelo de "
+"nuevo."
+
+#: src/desktop/templates/common_home.mako:87
+msgid "There was a problem loading the table preview. Please try again."
+msgstr ""
+"Se ha producido un problema al cargar la vista previa de la tabla. "
+"Inténtelo de nuevo."
+
+#: src/desktop/templates/common_home.mako:154
+#: src/desktop/templates/home.mako:555
+msgid "Did you know?"
+msgstr "¿Lo sabía?"
+
+#: src/desktop/templates/common_home.mako:158
+#: src/desktop/templates/home.mako:561
+msgid "Step 1:"
+msgstr "Paso 1:"
+
+#: src/desktop/templates/common_home.mako:158
+#: src/desktop/templates/home.mako:561
+msgid "Add data"
+msgstr "Añadir datos"
+
+#: src/desktop/templates/common_home.mako:159
+#: src/desktop/templates/home.mako:562
+msgid "Step 2:"
+msgstr "Paso 2:"
+
+#: src/desktop/templates/common_home.mako:160
+#: src/desktop/templates/home.mako:563
+msgid "Step 3:"
+msgstr "Paso 3:"
+
+#: src/desktop/templates/common_home.mako:160
+#: src/desktop/templates/home.mako:563
+msgid "Do more!"
+msgstr "¡Haga más tareas!"
+
+#: src/desktop/templates/common_home.mako:168
+#: src/desktop/templates/home.mako:572
+msgid "With"
+msgstr "Con"
+
+#: src/desktop/templates/common_home.mako:169
+#: src/desktop/templates/home.mako:573
+msgid "and the apps in the"
+msgstr "y las aplicaciones en"
+
+#: src/desktop/templates/common_home.mako:169
+#: src/desktop/templates/home.mako:573
+msgid "section, upload, view your data and create tables."
+msgstr "sección, cargar, ver los datos y crear tablas."
+
+#: src/desktop/templates/common_home.mako:172
+#: src/desktop/templates/home.mako:576
+msgid "Pre-installed samples are also already there."
+msgstr "Los ejemplos preinstalados ya están ahí."
+
+#: src/desktop/templates/common_home.mako:181
+#: src/desktop/templates/home.mako:585
+msgid "Then query and visualize the data with the"
+msgstr "A continuación, consulte y visualice los datos con"
+
+#: src/desktop/templates/common_home.mako:182
+#: src/desktop/templates/document_browser.mako:581
+#: src/desktop/templates/document_browser.mako:583
+#: src/desktop/templates/home.mako:586
+msgid "and"
+msgstr "y"
+
+#: src/desktop/templates/common_home.mako:192
+#: src/desktop/templates/home.mako:596
+msgid "Tours were created to guide you around."
+msgstr "Las visitas se crearon para guiarle."
+
+#: src/desktop/templates/common_home.mako:193
+#: src/desktop/templates/home.mako:597
+msgid "You can see the list of tours by clicking on the checkered flag icon"
+msgstr ""
+"Haga clic en el icono de la bandera de cuadros para ver la lista de "
+"recorridos"
+
+#: src/desktop/templates/common_home.mako:198
+#: src/desktop/templates/home.mako:602
+msgid "Additional documentation is available at"
+msgstr "Documentación adicional disponible en"
+
+#: src/desktop/templates/common_home.mako:205
+#: src/desktop/templates/home.mako:609
+msgid "Do not show this dialog again"
+msgstr "No volver a mostrar este cuadro de diálogo"
+
+#: src/desktop/templates/common_home.mako:206
+msgid "Got it!"
+msgstr "¡Listo!"
+
 #: src/desktop/templates/common_import_export.mako:33
-#: src/desktop/templates/document_browser.mako:425
+#: src/desktop/templates/document_browser.mako:426
 msgid "Import Hue documents"
 msgstr "Importar documentos de Hue"
 
 #: src/desktop/templates/common_import_export.mako:38
-#: src/desktop/templates/document_browser.mako:438
+#: src/desktop/templates/document_browser.mako:439
 msgid "Import"
 msgstr "Importar"
 
 #: src/desktop/templates/common_import_export.mako:42
-#: src/desktop/templates/document_browser.mako:447
+#: src/desktop/templates/document_browser.mako:448
 msgid "Select json file"
 msgstr "Seleccionar archivo JSON"
 
 #: src/desktop/templates/common_import_export.mako:43
-#: src/desktop/templates/document_browser.mako:448
+#: src/desktop/templates/document_browser.mako:449
 msgid "Change"
 msgstr "Cambiar"
 
 #: src/desktop/templates/common_import_export.mako:60
-#: src/desktop/templates/document_browser.mako:468
+#: src/desktop/templates/document_browser.mako:469
 msgid "Document Summary"
 msgstr "Resumen de documentos"
 
 #: src/desktop/templates/common_import_export.mako:62
-#: src/desktop/templates/document_browser.mako:470
+#: src/desktop/templates/document_browser.mako:471
 msgid "Imported: "
 msgstr "Importados: "
 
 #: src/desktop/templates/common_import_export.mako:63
-#: src/desktop/templates/document_browser.mako:471
+#: src/desktop/templates/document_browser.mako:472
 msgid "Created: "
 msgstr "Creados: "
 
 #: src/desktop/templates/common_import_export.mako:64
-#: src/desktop/templates/document_browser.mako:472
+#: src/desktop/templates/document_browser.mako:473
 msgid "Updated: "
 msgstr "Actualizados: "
 
 #: src/desktop/templates/common_import_export.mako:67
-#: src/desktop/templates/document_browser.mako:475
+#: src/desktop/templates/document_browser.mako:476
 msgid "Show Details"
 msgstr "Mostrar detalles"
 
 #: src/desktop/templates/common_import_export.mako:73
 #: src/desktop/templates/config_ko_components.mako:492
 #: src/desktop/templates/config_ko_components.mako:497
-#: src/desktop/templates/document_browser.mako:481
-#: src/desktop/templates/document_browser.mako:673
+#: src/desktop/templates/document_browser.mako:482
+#: src/desktop/templates/document_browser.mako:693
 #: src/desktop/templates/home.mako:190
 #: src/desktop/templates/sql_context_popover.mako:335
-#: src/desktop/templates/sql_context_popover.mako:1319
-#: src/desktop/templates/sql_context_popover.mako:1322
+#: src/desktop/templates/sql_context_popover.mako:1324
+#: src/desktop/templates/sql_context_popover.mako:1327
 msgid "Name"
 msgstr "Nombre"
 
 #: src/desktop/templates/common_import_export.mako:74
-#: src/desktop/templates/document_browser.mako:482
-#: src/desktop/templates/document_browser.mako:675
-#: src/desktop/templates/sql_context_popover.mako:1325
+#: src/desktop/templates/document_browser.mako:483
+#: src/desktop/templates/document_browser.mako:695
+#: src/desktop/templates/sql_context_popover.mako:1330
 msgid "Type"
 msgstr "Tipo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:40
+msgid "Add a new snippet"
+msgstr "Añadir un nuevo fragmento"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:41
+msgid "Select snippet"
+msgstr "Seleccionar fragmento de código"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:56
+msgid "Add Snippet"
+msgstr "Añadir fragmento de código"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:173
+msgid "Export results"
+msgstr "Exportar resultados"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:184
+#, python-format
+msgid "Download first %s rows as CSV"
+msgstr "Descargar primeras %s filas como CSV"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:185
+msgid "CSV"
+msgstr "CSV"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:189
+#, python-format
+msgid "Download first %s rows as XLS"
+msgstr "Descargar primeras %s filas como XLS"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:190
+msgid "Excel"
+msgstr "Excel"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:195
+msgid "Explore result in a dashboard"
+msgstr "Explorar resultado en un panel"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:201
+msgid "Save the result in a file, a new table..."
+msgstr "Guardar el resultado en un archivo, una nueva tabla..."
+
+#: src/desktop/templates/common_notebook_ko_components.mako:202
+#: src/desktop/templates/common_notebook_ko_components.mako:281
+msgid "Save"
+msgstr "Guardar"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:217
+msgid "Save query result in a"
+msgstr "Guardar resultado de la consulta en"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:227
+#, python-format
+msgid "File (first %s rows)"
+msgstr "Archivo (primeras %s filas)"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:230
+msgid "Path to CSV file"
+msgstr "Ruta al archivo CSV"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:234
+#: src/desktop/templates/common_notebook_ko_components.mako:578
+msgid "Overwrite"
+msgstr "Sobrescribir"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:242
+#: src/desktop/templates/document_browser.mako:772
+msgid "Directory"
+msgstr "Directorio"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:245
+msgid "Path to empty directory"
+msgstr "Ruta a directorio vacío"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:256
+#: src/desktop/templates/sql_context_popover.mako:1328
+msgid "Table"
+msgstr "Tabla"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:259
+msgid "Only alphanumeric and underscore characters"
+msgstr "Solo caracteres alfanuméricos y guiones bajos"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:259
+msgid "Table name or <database>.<table>"
+msgstr "Nombre de tabla o <database>.<table>"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:271
+msgid "Index name"
+msgstr "Nombre de índice"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:288
+msgid "Your download is being prepared"
+msgstr "Se está preparando la descarga"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:291
+msgid "Your downloaded results have been truncated"
+msgstr "Se han truncado los resultados de la descarga"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:296
+msgid "Please wait, it might take a while..."
+msgstr "Espere, podría llevar un tiempo..."
+
+#: src/desktop/templates/common_notebook_ko_components.mako:299
+msgid ""
+"The number of resulting rows was too big to be downloaded and the "
+"resulting file has been truncated to"
+msgstr ""
+"El número de filas resultante era demasiado alto para descargarlo y el "
+"archivo resultante se ha truncado en"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:301
+msgid "rows."
+msgstr "filas."
+
+#: src/desktop/templates/common_notebook_ko_components.mako:306
+msgid "Cancel Download"
+msgstr "Cancelar descarga"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:468
+msgid "Windows/Linux"
+msgstr "Windows/Linux"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:469
+msgid "Mac"
+msgstr "Mac"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:470
+msgid "Action"
+msgstr "Acción"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:493
+msgid "Line Operations"
+msgstr "Operaciones de línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:494
+msgid "Remove line"
+msgstr "Eliminar línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:495
+msgid "Copy lines down"
+msgstr "Copiar líneas debajo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:496
+msgid "Copy lines up"
+msgstr "Copiar líneas arriba"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:497
+msgid "Move lines down"
+msgstr "Bajar líneas"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:498
+msgid "Move lines up"
+msgstr "Subir líneas"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:499
+msgid "Remove to line end"
+msgstr "Eliminar al final de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:500
+msgid "Remove to line start"
+msgstr "Eliminar al inicio de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:501
+msgid "Remove word left"
+msgstr "Eliminar palabra a la izquierda"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:502
+msgid "Remove word right"
+msgstr "Eliminar palabra a la derecha"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:503
+msgid "Split line"
+msgstr "Dividir línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:505
+#, fuzzy
+msgid "Selection"
+msgstr "Selección"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:506
+#: src/desktop/templates/config_ko_components.mako:109
+msgid "Select all"
+msgstr "Seleccionar todo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:507
+msgid "Select left"
+msgstr "Seleccionar izquierda"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:508
+msgid "Select right"
+msgstr "Seleccionar derecha"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:509
+msgid "Select word left"
+msgstr "Seleccionar palabra a la izquierda"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:510
+msgid "Select word right"
+msgstr "Seleccionar palabra a la derecha"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:511
+msgid "Select line start"
+msgstr "Seleccionar inicio de línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:512
+msgid "Select line end"
+msgstr "Seleccionar final de línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:513
+msgid "Select to line end"
+msgstr "Seleccionar al final de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:514
+msgid "Select to line start"
+msgstr "Seleccionar al inicio de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:515
+msgid "Select up"
+msgstr "Seleccionar arriba"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:516
+msgid "Select down"
+msgstr "Seleccionar abajo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:517
+msgid "Select page up"
+msgstr "Seleccionar Re Pág"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:518
+msgid "Select page down"
+msgstr "Seleccionar Av Pág"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:519
+msgid "Select to start"
+msgstr "Seleccionar al inicio"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:520
+#, fuzzy
+msgid "Select to end"
+msgstr "Seleccionar al final"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:521
+msgid "Duplicate selection"
+msgstr "Duplicar selección"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:522
+msgid "Select to matching bracket"
+msgstr "Seleccionar hasta que coincidan los paréntesis"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:524
+msgid "Multi-cursor"
+msgstr "Multicursor"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:525
+msgid "Add multi-cursor above"
+msgstr "Añadir muticursor arriba"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:526
+msgid "Add multi-cursor below"
+msgstr "Añadir muticursor abajo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:527
+msgid "Add next occurrence to multi-selection"
+msgstr "Añadir repetición siguiente a selección múltiple"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:528
+msgid "Add previous occurrence to multi-selection"
+msgstr "Añadir repetición anterior a selección múltiple"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:529
+msgid "Move multicursor from current line to the line above"
+msgstr "Mover multicursor de la línea actual a la línea superior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:530
+msgid "Move multicursor from current line to the line below"
+msgstr "Mover multicursor de la línea actual a la línea inferior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:531
+msgid "Remove current occurrence from multi-selection and move to next"
+msgstr "Eliminar repetición actual de la selección múltiple y pasar a la siguiente"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:532
+msgid "Remove current occurrence from multi-selection and move to previous"
+msgstr "Eliminar repetición actual de la selección múltiple y pasar a la anterior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:533
+msgid "Select all from multi-selection"
+msgstr "Seleccionar todo en la selección múltiple"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:535
+msgid "Go to"
+msgstr "Ir a"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:536
+msgid "Go to left"
+msgstr "Ir a la izquierda"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:537
+msgid "Go to right"
+msgstr "Ir a la derecha"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:538
+msgid "Go to word left"
+msgstr "Ir a la palabra izquierda"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:539
+msgid "Go to word right"
+msgstr "Ir a la palabra derecha"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:540
+msgid "Go line up"
+msgstr "Ir a la línea superior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:541
+msgid "Go line down"
+msgstr "Ir a la línea inferior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:542
+msgid "Go to line start"
+msgstr "Ir al inicio de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:543
+msgid "Go to line end"
+msgstr "Ir al final de la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:544
+msgid "Go to page up"
+msgstr "Ir a Re Pág"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:545
+msgid "Go to page down"
+msgstr "Ir a Av Pág"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:546
+msgid "Go to start"
+msgstr "Ir al inicio"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:547
+msgid "Go to end"
+msgstr "Ir al final"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:548
+msgid "Go to line"
+msgstr "Ir a la línea"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:549
+msgid "Scroll line down"
+msgstr "Desplazar línea hacia abajo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:550
+msgid "Scroll line up"
+msgstr "Desplazar línea hacia arriba"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:551
+msgid "Go to matching bracket"
+msgstr "Ir a paréntesis coincidente"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:552
+msgid "Scroll page down"
+msgstr "Desplazar página hacia abajo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:553
+msgid "Scroll page up"
+msgstr "Desplazar página hacia arriba"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:555
+msgid "Find/Replace"
+msgstr "Buscar y reemplazar"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:556
+msgid "Find"
+msgstr "Buscar"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:557
+msgid "Replace"
+msgstr "Sustituir"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:558
+msgid "Find next"
+msgstr "Buscar siguiente"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:559
+msgid "Find previous"
+msgstr "Buscar anterior"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:561
+msgid "Folding"
+msgstr "Plegado"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:562
+msgid "Fold selection"
+msgstr "Plegar selección"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:563
+msgid "Unfold"
+msgstr "Desplegar"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:564
+msgid "Fold all"
+msgstr "Plegar todo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:565
+msgid "Unfold all"
+msgstr "Desplegar todo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:567
+#, fuzzy
+msgid "Other"
+msgstr "Otro"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:568
+msgid "Autocomplete when Live Autocompletion is off"
+msgstr "Autocompletar cuando Live Autocompletion está desactivado"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:569
+msgid "Format selection or all"
+msgstr "Dar formato a selección o a todo"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:570
+msgid "Indent"
+msgstr "Aplicar sangría"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:571
+msgid "Outdent"
+msgstr "Anular sangría"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:572
+msgid "Undo"
+msgstr "Deshacer"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:573
+msgid "Redo"
+msgstr "Rehacer"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:574
+msgid "Toggle comment"
+msgstr "Alternar comentario"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:575
+msgid "Transpose letters"
+msgstr "Transponer letras"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:576
+msgid "Change to lower case"
+msgstr "Cambiar a minúsculas"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:577
+msgid "Change to upper case"
+msgstr "Cambiar a mayúsculas"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:579
+msgid "Macros replay"
+msgstr "Reproducción de macros"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:580
+msgid "Macros recording"
+msgstr "Registro de macros"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:581
+#: src/desktop/templates/document_browser.mako:725
+msgid "Delete"
+msgstr "Eliminar"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:582
+msgid "Center selection"
+msgstr "Centrar selección"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:585
+msgid "Settings"
+msgstr "Ajustes"
+
+#: src/desktop/templates/common_notebook_ko_components.mako:586
+msgid "Show the settings menu"
+msgstr "Mostrar el menú Ajustes"
 
 #: src/desktop/templates/common_share.mako:24
 #: src/desktop/templates/common_share2.mako:24
@@ -2718,15 +3541,15 @@ msgstr "Ajustes para compartir"
 #: src/desktop/templates/common_share.mako:61
 #: src/desktop/templates/common_share2.mako:29
 #: src/desktop/templates/common_share2.mako:61
-#: src/desktop/templates/document_browser.mako:363
-#: src/desktop/templates/document_browser.mako:403
-#: src/desktop/templates/document_browser.mako:406
+#: src/desktop/templates/document_browser.mako:364
+#: src/desktop/templates/document_browser.mako:404
+#: src/desktop/templates/document_browser.mako:407
 msgid "Read"
 msgstr "Leer"
 
 #: src/desktop/templates/common_share.mako:30
 #: src/desktop/templates/common_share2.mako:30
-#: src/desktop/templates/document_browser.mako:364
+#: src/desktop/templates/document_browser.mako:365
 msgid "The document is not shared for read."
 msgstr "No se ha compartido el documento para su lectura."
 
@@ -2744,7 +3567,7 @@ msgstr "El documento no está compartido para lectura y modificación."
 
 #: src/desktop/templates/common_share.mako:54
 #: src/desktop/templates/common_share2.mako:54
-#: src/desktop/templates/document_browser.mako:401
+#: src/desktop/templates/document_browser.mako:402
 msgid "Type a username or a group name"
 msgstr "Escriba un nombre de usuario o de grupo"
 
@@ -2764,10 +3587,6 @@ msgstr "Se ha detectado un error de configuración"
 #: src/desktop/templates/config_ko_components.mako:78
 msgid "Remove"
 msgstr "Quitar"
-
-#: src/desktop/templates/config_ko_components.mako:109
-msgid "Select all"
-msgstr "Seleccionar todo"
 
 #: src/desktop/templates/config_ko_components.mako:319
 #: src/desktop/templates/config_ko_components.mako:419
@@ -2800,184 +3619,186 @@ msgstr "Clase, p.ej. org.hue.Bar"
 msgid "Path to the file, e.g. hdfs://localhost:8020/user/hue/file.hue"
 msgstr "Ruta al archivo, p. ej., hdfs://localhost:8020/user/hue/file.hue"
 
-#: src/desktop/templates/document_browser.mako:357
+#: src/desktop/templates/document_browser.mako:358
 #: src/desktop/templates/home.mako:194
 msgid "Sharing"
 msgstr "Compartir"
 
-#: src/desktop/templates/document_browser.mako:378
-#: src/desktop/templates/document_browser.mako:403
-#: src/desktop/templates/document_browser.mako:407
+#: src/desktop/templates/document_browser.mako:379
+#: src/desktop/templates/document_browser.mako:404
+#: src/desktop/templates/document_browser.mako:408
 msgid "Modify"
 msgstr "Modificar"
 
-#: src/desktop/templates/document_browser.mako:379
+#: src/desktop/templates/document_browser.mako:380
 msgid "The document is not shared for modify."
 msgstr "No se ha compartido el documento para su modificación."
 
-#: src/desktop/templates/document_browser.mako:397
+#: src/desktop/templates/document_browser.mako:398
 msgid "There was an error loading the document."
 msgstr "Se ha producido un error al cargar el documento."
 
-#: src/desktop/templates/document_browser.mako:430
+#: src/desktop/templates/document_browser.mako:431
 msgid "Importing..."
 msgstr "Importando..."
 
-#: src/desktop/templates/document_browser.mako:431
+#: src/desktop/templates/document_browser.mako:432
 msgid "Import complete!"
 msgstr "¡Importación completada!"
 
-#: src/desktop/templates/document_browser.mako:432
+#: src/desktop/templates/document_browser.mako:433
 msgid "Import failed!"
 msgstr "¡Error al importar!"
 
-#: src/desktop/templates/document_browser.mako:508
+#: src/desktop/templates/document_browser.mako:509
 msgid "Create Directory"
 msgstr "Crear directorio"
 
-#: src/desktop/templates/document_browser.mako:511
-#: src/desktop/templates/document_browser.mako:529
+#: src/desktop/templates/document_browser.mako:512
+#: src/desktop/templates/document_browser.mako:530
 msgid "Directory name"
 msgstr "Nombre de directorio"
 
-#: src/desktop/templates/document_browser.mako:515
+#: src/desktop/templates/document_browser.mako:516
 msgid "Create"
 msgstr "Crear"
 
-#: src/desktop/templates/document_browser.mako:526
+#: src/desktop/templates/document_browser.mako:527
 msgid "Rename Directory"
 msgstr "Cambiar nombre del directorio"
 
-#: src/desktop/templates/document_browser.mako:533
-#: src/desktop/templates/document_browser.mako:709
+#: src/desktop/templates/document_browser.mako:534
+#: src/desktop/templates/document_browser.mako:730
 msgid "Rename"
 msgstr "Cambiar nombre"
 
 #: src/desktop/templates/document_browser.mako:544
-#: src/desktop/templates/document_browser.mako:686
+msgid "Restore these document(s) to Home directory?"
+msgstr "¿Desea restaurar los documentos en el directorio de inicio?"
+
+#: src/desktop/templates/document_browser.mako:554
+#: src/desktop/templates/document_browser.mako:597
+#: src/desktop/templates/home.mako:333
+#: src/desktop/templates/responsive.mako:447
+msgid "Yes"
+msgstr "Sí"
+
+#: src/desktop/templates/document_browser.mako:564
+#: src/desktop/templates/document_browser.mako:706
 msgid "The trash is empty"
 msgstr "La papelera está vacía"
 
-#: src/desktop/templates/document_browser.mako:547
+#: src/desktop/templates/document_browser.mako:567
 msgid "Do you really want to delete the following document(s)?"
 msgstr "¿Está seguro de que desea eliminar los siguientes documentos?"
 
-#: src/desktop/templates/document_browser.mako:558
+#: src/desktop/templates/document_browser.mako:578
 msgid "used by"
 msgstr "usado por"
 
-#: src/desktop/templates/document_browser.mako:561
-#: src/desktop/templates/document_browser.mako:563
-#: src/desktop/templates/home.mako:586 src/desktop/templates/home2.mako:349
-msgid "and"
-msgstr "y"
-
-#: src/desktop/templates/document_browser.mako:563
+#: src/desktop/templates/document_browser.mako:583
 #, fuzzy
 msgid "other"
 msgstr "otro"
 
-#: src/desktop/templates/document_browser.mako:577
-#: src/desktop/templates/home.mako:333
-msgid "Yes"
-msgstr "Sí"
-
-#: src/desktop/templates/document_browser.mako:593
+#: src/desktop/templates/document_browser.mako:613
 msgid "Result for"
 msgstr "Resultado de"
 
-#: src/desktop/templates/document_browser.mako:597
-#: src/desktop/templates/document_browser.mako:601
+#: src/desktop/templates/document_browser.mako:617
+#: src/desktop/templates/document_browser.mako:621
 msgid "Trash"
 msgstr "Papelera"
 
-#: src/desktop/templates/document_browser.mako:609
+#: src/desktop/templates/document_browser.mako:629
 msgid "Search for name, description, etc..."
 msgstr "Buscar nombre, descripción, etc."
 
-#: src/desktop/templates/document_browser.mako:618
+#: src/desktop/templates/document_browser.mako:638
 #: src/desktop/templates/home.mako:122
 msgid "New document"
 msgstr "Nuevo documento"
 
-#: src/desktop/templates/document_browser.mako:624
-#: src/desktop/templates/document_browser.mako:759
+#: src/desktop/templates/document_browser.mako:644
+#: src/desktop/templates/document_browser.mako:780
 #: src/desktop/templates/home.mako:128
+#: src/desktop/templates/responsive.mako:116
+#: src/desktop/templates/responsive.mako:124
 msgid "Impala Query"
 msgstr "Consulta de Impala"
 
-#: src/desktop/templates/document_browser.mako:627
-#: src/desktop/templates/document_browser.mako:752
+#: src/desktop/templates/document_browser.mako:647
+#: src/desktop/templates/document_browser.mako:773
 #: src/desktop/templates/home.mako:131
 msgid "Pig Script"
 msgstr "Secuencia de comandos de Pig"
 
-#: src/desktop/templates/document_browser.mako:636
-#: src/desktop/templates/document_browser.mako:757
+#: src/desktop/templates/document_browser.mako:656
+#: src/desktop/templates/document_browser.mako:778
 msgid "Oozie Workflow"
 msgstr "Workflow de Oozie"
 
-#: src/desktop/templates/document_browser.mako:637
-#: src/desktop/templates/document_browser.mako:756
+#: src/desktop/templates/document_browser.mako:657
+#: src/desktop/templates/document_browser.mako:777
 msgid "Oozie Coordinator"
 msgstr "Coordinator de Oozie"
 
-#: src/desktop/templates/document_browser.mako:638
-#: src/desktop/templates/document_browser.mako:755
+#: src/desktop/templates/document_browser.mako:658
+#: src/desktop/templates/document_browser.mako:776
 msgid "Oozie Bundle"
 msgstr "Bundle de Oozie"
 
-#: src/desktop/templates/document_browser.mako:641
-#: src/desktop/templates/document_browser.mako:760
+#: src/desktop/templates/document_browser.mako:661
+#: src/desktop/templates/document_browser.mako:781
 msgid "Search Dashboard"
 msgstr "Panel de búsqueda"
 
-#: src/desktop/templates/document_browser.mako:647
+#: src/desktop/templates/document_browser.mako:667
 msgid "New folder"
 msgstr "Nueva carpeta"
 
-#: src/desktop/templates/document_browser.mako:648
+#: src/desktop/templates/document_browser.mako:668
 msgid "Rename folder"
 msgstr "Cambiar nombre de la carpeta"
 
-#: src/desktop/templates/document_browser.mako:650
-#: src/desktop/templates/document_browser.mako:714
+#: src/desktop/templates/document_browser.mako:670
+#: src/desktop/templates/document_browser.mako:735
 msgid "Delete forever"
 msgstr "Eliminar permanentemente"
 
-#: src/desktop/templates/document_browser.mako:650
-#: src/desktop/templates/document_browser.mako:713
+#: src/desktop/templates/document_browser.mako:670
+#: src/desktop/templates/document_browser.mako:734
 msgid "Move to trash"
 msgstr "Mover a papelera"
 
-#: src/desktop/templates/document_browser.mako:652
-#: src/desktop/templates/document_browser.mako:715
+#: src/desktop/templates/document_browser.mako:672
+#: src/desktop/templates/document_browser.mako:736
 msgid "Share"
 msgstr "Compartir"
 
-#: src/desktop/templates/document_browser.mako:654
-#: src/desktop/templates/document_browser.mako:712
+#: src/desktop/templates/document_browser.mako:674
+#: src/desktop/templates/document_browser.mako:733
 msgid "Download"
 msgstr "Descargar"
 
-#: src/desktop/templates/document_browser.mako:655
+#: src/desktop/templates/document_browser.mako:675
 msgid "Upload"
 msgstr "Cargar"
 
-#: src/desktop/templates/document_browser.mako:658
+#: src/desktop/templates/document_browser.mako:678
 msgid "Show trash"
 msgstr "Mostrar papelera"
 
-#: src/desktop/templates/document_browser.mako:662
+#: src/desktop/templates/document_browser.mako:682
 msgid "Empty trash"
 msgstr "Vaciar papelera"
 
-#: src/desktop/templates/document_browser.mako:677
+#: src/desktop/templates/document_browser.mako:697
 #: src/desktop/templates/home.mako:192
 msgid "Last Modified"
 msgstr "Última modificación"
 
-#: src/desktop/templates/document_browser.mako:683
+#: src/desktop/templates/document_browser.mako:703
 msgid ""
 "The current folder is empty, you can add a new document or folder form "
 "the top right menu"
@@ -2985,32 +3806,28 @@ msgstr ""
 "La carpeta actual está vacía. Puede añadir un nuevo documento o carpeta desde el"
 "menú de la parte superior derecha"
 
-#: src/desktop/templates/document_browser.mako:689
+#: src/desktop/templates/document_browser.mako:709
 msgid "No documents found matching your query"
 msgstr "No se han encontrado documentos que coincidan con su consulta"
 
-#: src/desktop/templates/document_browser.mako:692
+#: src/desktop/templates/document_browser.mako:712
 msgid "There was an error loading the documents"
 msgstr "Se ha producido un error al cargar los documentos"
 
-#: src/desktop/templates/document_browser.mako:705
-msgid "Delete"
-msgstr "Eliminar"
+#: src/desktop/templates/document_browser.mako:726
+msgid "Restore to Home"
+msgstr "Restaurar en página de inicio"
 
-#: src/desktop/templates/document_browser.mako:751
-msgid "Directory"
-msgstr "Directorio"
-
-#: src/desktop/templates/document_browser.mako:753
+#: src/desktop/templates/document_browser.mako:774
 msgid "Job Design"
 msgstr "Diseño de job"
 
-#: src/desktop/templates/document_browser.mako:904
-#: src/desktop/templates/document_browser.mako:907
+#: src/desktop/templates/document_browser.mako:927
+#: src/desktop/templates/document_browser.mako:930
 msgid "selected"
 msgstr "seleccionado"
 
-#: src/desktop/templates/document_browser.mako:904
+#: src/desktop/templates/document_browser.mako:927
 msgid "shared ignored"
 msgstr "compartido ignorado"
 
@@ -3060,6 +3877,8 @@ msgid "Oozie Scheduler"
 msgstr "Programador de Oozie"
 
 #: src/desktop/templates/home.mako:140
+#: src/desktop/templates/responsive.mako:133
+#: src/desktop/templates/responsive.mako:135
 msgid "Workflow"
 msgstr "Workflow"
 
@@ -3068,6 +3887,7 @@ msgid "Coordinator"
 msgstr "Coordinator"
 
 #: src/desktop/templates/home.mako:142
+#: src/desktop/templates/responsive.mako:137
 msgid "Bundle"
 msgstr "Bundle"
 
@@ -3102,7 +3922,7 @@ msgid "Page"
 msgstr "Página"
 
 #: src/desktop/templates/home.mako:203
-#: src/desktop/templates/sql_context_popover.mako:741
+#: src/desktop/templates/sql_context_popover.mako:746
 msgid "of"
 msgstr "de"
 
@@ -3147,6 +3967,7 @@ msgid "All its documents will be moved to the default tag."
 msgstr "Todos sus documentos se moverán a la etiqueta predeterminada."
 
 #: src/desktop/templates/home.mako:332
+#: src/desktop/templates/responsive.mako:446
 msgid "No"
 msgstr "No"
 
@@ -3172,115 +3993,13 @@ msgstr "Se ha producido un error al procesar la acción: "
 msgid "Project updated successfully."
 msgstr "Proyecto actualizado con éxito."
 
-#: src/desktop/templates/home.mako:555 src/desktop/templates/home2.mako:321
-msgid "Did you know?"
-msgstr "¿Lo sabía?"
-
-#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
-msgid "Step 1:"
-msgstr "Paso 1:"
-
-#: src/desktop/templates/home.mako:561 src/desktop/templates/home2.mako:325
-msgid "Add data"
-msgstr "Añadir datos"
-
-#: src/desktop/templates/home.mako:562 src/desktop/templates/home2.mako:326
-msgid "Step 2:"
-msgstr "Paso 2:"
-
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
-msgid "Step 3:"
-msgstr "Paso 3:"
-
-#: src/desktop/templates/home.mako:563 src/desktop/templates/home2.mako:327
-msgid "Do more!"
-msgstr "¡Haga más tareas!"
-
-#: src/desktop/templates/home.mako:572 src/desktop/templates/home2.mako:335
-msgid "With"
-msgstr "Con"
-
-#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
-msgid "and the apps in the"
-msgstr "y las aplicaciones en"
-
-#: src/desktop/templates/home.mako:573 src/desktop/templates/home2.mako:336
-msgid "section, upload, view your data and create tables."
-msgstr "sección, cargar, ver los datos y crear tablas."
-
-#: src/desktop/templates/home.mako:576 src/desktop/templates/home2.mako:339
-msgid "Pre-installed samples are also already there."
-msgstr "Los ejemplos preinstalados ya están ahí."
-
-#: src/desktop/templates/home.mako:585 src/desktop/templates/home2.mako:348
-msgid "Then query and visualize the data with the"
-msgstr "A continuación, consulte y visualice los datos con"
-
-#: src/desktop/templates/home.mako:596 src/desktop/templates/home2.mako:359
-msgid "Tours were created to guide you around."
-msgstr "Las visitas se crearon para guiarle."
-
-#: src/desktop/templates/home.mako:597 src/desktop/templates/home2.mako:360
-msgid "You can see the list of tours by clicking on the checkered flag icon"
-msgstr ""
-"Haga clic en el icono de la bandera de cuadros para ver la lista de "
-"recorridos"
-
-#: src/desktop/templates/home.mako:602 src/desktop/templates/home2.mako:365
-msgid "Additional documentation is available at"
-msgstr "Documentación adicional disponible en"
-
-#: src/desktop/templates/home.mako:609 src/desktop/templates/home2.mako:372
-msgid "Do not show this dialog again"
-msgstr "No volver a mostrar este cuadro de diálogo"
-
 #: src/desktop/templates/home.mako:610
 msgid "Got it, prof!"
 msgstr "Listo."
 
-#: src/desktop/templates/home2.mako:196
+#: src/desktop/templates/home2.mako:175
 msgid "Toggle Assist"
 msgstr "Activar/desactivar ayuda"
-
-#: src/desktop/templates/home2.mako:253
-msgid "An error occurred fetching the table details. Please try again."
-msgstr ""
-"Se ha producido un error al capturar los detalles de la tabla. Inténtelo "
-"de nuevo."
-
-#: src/desktop/templates/home2.mako:254
-msgid "An error occurred fetching the table fields. Please try again."
-msgstr ""
-"Se ha producido un error al capturar los campos de la tabla. Inténtelo de"
-" nuevo."
-
-#: src/desktop/templates/home2.mako:255
-msgid "An error occurred fetching the table sample. Please try again."
-msgstr ""
-"Se ha producido un error al capturar el ejemplo de la tabla. Inténtelo de"
-" nuevo."
-
-#: src/desktop/templates/home2.mako:256
-msgid "An error occurred refreshing the table stats. Please try again."
-msgstr ""
-"Se ha producido un error al actualizar las estadísticas de la tabla. "
-"Inténtelo de nuevo."
-
-#: src/desktop/templates/home2.mako:257
-msgid "There was a problem loading the databases. Please try again."
-msgstr ""
-"Se ha producido un problema al cargar las bases de datos. Inténtelo de "
-"nuevo."
-
-#: src/desktop/templates/home2.mako:258
-msgid "There was a problem loading the table preview. Please try again."
-msgstr ""
-"Se ha producido un problema al cargar la vista previa de la tabla. "
-"Inténtelo de nuevo."
-
-#: src/desktop/templates/home2.mako:373
-msgid "Got it!"
-msgstr "¡Listo!"
 
 #: src/desktop/templates/ko_components.mako:61
 msgid "Selected entry"
@@ -3294,15 +4013,15 @@ msgstr "Soy editor"
 msgid "I'm a metastore"
 msgstr "Soy Metastore"
 
-#: src/desktop/templates/login.mako:24
+#: src/desktop/templates/login.mako:26
 msgid "Welcome to Hue"
 msgstr "Bienvenido a Hue"
 
-#: src/desktop/templates/login.mako:47
+#: src/desktop/templates/login.mako:51
 msgid "Go to gethue.com"
 msgstr "Vaya a gethue.com"
 
-#: src/desktop/templates/login.mako:64
+#: src/desktop/templates/login.mako:79
 msgid ""
 "Since this is your first time logging in, pick any username and password."
 " Be sure to remember these, as"
@@ -3310,33 +4029,45 @@ msgstr ""
 "Puesto que esta es la primera vez que inicia sesión, seleccione un nombre"
 " de usuario y una contraseña. Asegúrese de recordarlos, ya que"
 
-#: src/desktop/templates/login.mako:65
+#: src/desktop/templates/login.mako:80
 msgid "they will become your Hue superuser credentials."
 msgstr "serán sus credenciales de superusuario para Hue."
 
-#: src/desktop/templates/login.mako:113
+#: src/desktop/templates/login.mako:128
 msgid "Create Account"
 msgstr "Crear cuenta"
 
-#: src/desktop/templates/login.mako:115
+#: src/desktop/templates/login.mako:130
 msgid "Sign In"
 msgstr "Iniciar sesión"
 
-#: src/desktop/templates/login.mako:130
+#: src/desktop/templates/login.mako:146
+msgid "Powered by"
+msgstr "Con tecnología de"
+
+#: src/desktop/templates/login.mako:148
 msgid "Hue and the Hue logo are trademarks of Cloudera, Inc."
 msgstr "Hue y el logotipo de Hue son marcas comerciales de Cloudera, Inc."
 
-#: src/desktop/templates/login_modal.mako:32
-msgid "Your session has expired."
-msgstr "La sesión ha caducado."
+#: src/desktop/templates/login_modal.mako:33
+msgid "Your session expired and your current action requires to"
+msgstr "La sesión ha caducado y la acción actual requiere"
 
-#: src/desktop/templates/login_modal.mako:36
-msgid "Reload this page to sign in again"
-msgstr "Vuelva a cargar esta página para iniciar sesión de nuevo."
+#: src/desktop/templates/login_modal.mako:35
+msgid "reload this page"
+msgstr "volver a cargar esta página"
 
 #: src/desktop/templates/login_modal.mako:39
-msgid "Please reload this page"
-msgstr "Vuelva a cargar esta página."
+msgid "We did not hear from you for about"
+msgstr "No sabemos de usted desde hace"
+
+#: src/desktop/templates/login_modal.mako:39
+msgid "and for security reasons Hue logged you out"
+msgstr "y, por razones de seguridad, Hue ha cerrado su sesión"
+
+#: src/desktop/templates/login_modal.mako:42
+msgid "Please reload this page to continue"
+msgstr "Vuelva a cargar esta página para continuar"
 
 #: src/desktop/templates/logs.mako:68
 msgid "Search in the logs"
@@ -3367,80 +4098,143 @@ msgstr "Más información"
 msgid "View Logs"
 msgstr "Ver registros"
 
-#: src/desktop/templates/responsive.mako:94
+#: src/desktop/templates/responsive.mako:99
 msgid "Homepage"
 msgstr "Página de inicio"
 
-#: src/desktop/templates/responsive.mako:100
+#: src/desktop/templates/responsive.mako:105
+msgid "Open editor"
+msgstr "Abrir editor"
+
+#: src/desktop/templates/responsive.mako:105
 msgid "Compose"
 msgstr "Escribir"
 
-#: src/desktop/templates/responsive.mako:130
+#: src/desktop/templates/responsive.mako:113
+msgid "Query editor"
+msgstr "Editor de consultas"
+
+#: src/desktop/templates/responsive.mako:129
+msgid "Presentation"
+msgstr "Presentación"
+
+#: src/desktop/templates/responsive.mako:136
+#: src/desktop/templates/responsive.mako:398
+msgid "Schedule"
+msgstr "Programa"
+
+#: src/desktop/templates/responsive.mako:145
 msgid "More..."
 msgstr "Más..."
 
-#: src/desktop/templates/responsive.mako:130
+#: src/desktop/templates/responsive.mako:145
 msgid "More"
 msgstr "Más"
 
-#: src/desktop/templates/responsive.mako:139
+#: src/desktop/templates/responsive.mako:154
 msgid "Add more..."
 msgstr "Añadir más..."
 
-#: src/desktop/templates/responsive.mako:149
+#: src/desktop/templates/responsive.mako:164
 msgid "Search all data and saved documents..."
 msgstr "Buscar todos los datos y documentos guardados..."
 
-#: src/desktop/templates/responsive.mako:178
+#: src/desktop/templates/responsive.mako:202
 msgid "Set Permissions"
 msgstr "Establecer permisos"
 
-#: src/desktop/templates/responsive.mako:179
+#: src/desktop/templates/responsive.mako:203
 msgid "Help"
 msgstr "Ayuda"
 
-#: src/desktop/templates/responsive.mako:188
+#: src/desktop/templates/responsive.mako:212
+msgid "Submission history"
+msgstr "Historial de envíos"
+
+#: src/desktop/templates/responsive.mako:235
+msgid "No logs available at this moment."
+msgstr "En este momento, no hay registros disponibles."
+
+#: src/desktop/templates/responsive.mako:244
+msgid "No history to be shown."
+msgstr "No hay ningún historial para mostrar."
+
+#: src/desktop/templates/responsive.mako:248
+msgid "History"
+msgstr "Historial"
+
+#: src/desktop/templates/responsive.mako:249
+msgid "Clear the query history"
+msgstr "Borrar el historial de consultas"
+
+#: src/desktop/templates/responsive.mako:286
 msgid "Running jobs and workflows"
 msgstr "Jobs y workflows en ejecución"
 
-#: src/desktop/templates/responsive.mako:188
+#: src/desktop/templates/responsive.mako:286
+#: src/desktop/templates/responsive.mako:292
 msgid "Jobs"
 msgstr "Jobs"
 
-#: src/desktop/templates/responsive.mako:203
-msgid "Applications"
-msgstr "Aplicaciones"
+#: src/desktop/templates/responsive.mako:292
+msgid "Schedules"
+msgstr "Programas"
 
-#: src/desktop/templates/responsive.mako:213
+#: src/desktop/templates/responsive.mako:301
+msgid "Analyse"
+msgstr "Analizar"
+
+#: src/desktop/templates/responsive.mako:308
 #: src/desktop/templates/sql_context_popover.mako:355
 msgid "Browse"
 msgstr "Explorar"
 
-#: src/desktop/templates/responsive.mako:222
-msgid "Drop files here"
-msgstr "Soltar archivos aquí"
+#: src/desktop/templates/responsive.mako:318
+msgid "Apps"
+msgstr "Aplicaciones"
 
-#: src/desktop/templates/responsive.mako:227
-#: src/desktop/templates/responsive.mako:277
+#: src/desktop/templates/responsive.mako:323
+msgid "Import data wizard"
+msgstr "Asistente para importar datos"
+
+#: src/desktop/templates/responsive.mako:324
+msgid "Drop files or click"
+msgstr "Soltar archivos o hacer clic"
+
+#: src/desktop/templates/responsive.mako:330
+#: src/desktop/templates/responsive.mako:391
 msgid "Show Assist"
 msgstr "Mostrar ayuda"
 
-#: src/desktop/templates/responsive.mako:228
-#: src/desktop/templates/responsive.mako:278
+#: src/desktop/templates/responsive.mako:331
+#: src/desktop/templates/responsive.mako:392
 msgid "Hide Assist"
 msgstr "Ocultar ayuda"
 
-#: src/desktop/templates/responsive.mako:282
+#: src/desktop/templates/responsive.mako:396
 msgid "Assistant"
 msgstr "Asistente"
 
-#: src/desktop/templates/responsive.mako:283
+#: src/desktop/templates/responsive.mako:397
 msgid "Functions"
 msgstr "Funciones"
 
-#: src/desktop/templates/responsive.mako:284
-msgid "Schedules"
-msgstr "Programas"
+#: src/desktop/templates/responsive.mako:420
+msgid "Sessions"
+msgstr "Sesiones"
+
+#: src/desktop/templates/responsive.mako:440
+msgid "Confirm History Clear"
+msgstr "Confirmar borrado de historial"
+
+#: src/desktop/templates/responsive.mako:443
+msgid "Are you sure you want to clear the query history?"
+msgstr "¿Está seguro de que desea borrar el historial de consultas?"
+
+#: src/desktop/templates/responsive.mako:985
+#: src/desktop/templates/responsive.mako:991
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "Ejemplo: SELECT * FROM nombre de tabla o pulse CTRL + espacio"
 
 #: src/desktop/templates/sql_context_popover.mako:152
 msgid "Show in Assist..."
@@ -3503,19 +4297,13 @@ msgstr "Comentario"
 #: src/desktop/templates/sql_context_popover.mako:201
 #: src/desktop/templates/sql_context_popover.mako:217
 #: src/desktop/templates/sql_context_popover.mako:290
-#: src/desktop/templates/sql_context_popover.mako:796
+#: src/desktop/templates/sql_context_popover.mako:801
 msgid "Tags"
 msgstr "Etiquetas"
 
 #: src/desktop/templates/sql_context_popover.mako:237
 msgid "The selected table has no data."
 msgstr "La tabla seleccionada no tiene datos."
-
-#: src/desktop/templates/sql_context_popover.mako:328
-#: src/desktop/templates/sql_context_popover.mako:584
-#: src/desktop/templates/sql_context_popover.mako:1308
-msgid "Columns"
-msgstr "Columnas"
 
 #: src/desktop/templates/sql_context_popover.mako:347
 #: src/desktop/templates/sql_context_popover.mako:637
@@ -3582,177 +4370,75 @@ msgstr "Hubo un problema al cargar el análisis de la tabla."
 msgid "There was a problem loading the table partitions."
 msgstr "Hubo un problema al cargar las particiones de la tabla."
 
-#: src/desktop/templates/sql_context_popover.mako:740
+#: src/desktop/templates/sql_context_popover.mako:745
 msgid "No results found."
 msgstr "No se han encontrado resultados."
 
-#: src/desktop/templates/sql_context_popover.mako:1310
+#: src/desktop/templates/sql_context_popover.mako:1315
 msgid "Filter columns..."
 msgstr "Filtrar columnas..."
 
-#: src/desktop/templates/sql_context_popover.mako:1323
-msgid "Table"
-msgstr "Tabla"
-
-#: src/desktop/templates/sql_context_popover.mako:1342
+#: src/desktop/templates/sql_context_popover.mako:1347
 msgid "Show sample"
 msgstr "Mostrar ejemplo"
 
-#: src/desktop/templates/sql_context_popover.mako:1356
+#: src/desktop/templates/sql_context_popover.mako:1361
 msgid "No columns found"
 msgstr "No se han encontrado columnas"
 
-#: src/desktop/templates/tours.mako:23
-msgid "Get started!"
-msgstr "Empiece."
-
-#: src/desktop/templates/tours.mako:24
-msgid "Your new home."
-msgstr "La nueva página de inicio."
-
-#: src/desktop/templates/tours.mako:24
-msgid ""
-"This is where you can access all your documents and you can tag them per "
-"project. Your home is always reachable from any part of Hue, just click "
-"on the house icon on the top navigator bar."
-msgstr ""
-"Desde aquí puede acceder a todos sus documentos y etiquetarlos por "
-"proyecto. A esta página de inicio se puede llegar desde cualquier parte "
-"de Hue y en cualquier momento con solo hacer clic en el icono de la casa "
-"de la barra del navegador superior."
-
 #: src/desktop/templates/tours.mako:25
-msgid "Actions and projects"
-msgstr "Acciones y proyectos"
-
-#: src/desktop/templates/tours.mako:25
-msgid ""
-"From here you can create new documents or see a specific project or any "
-"trashed document for instance."
-msgstr ""
-"Desde aquí puede, por ejemplo, crear nuevos documentos, ver un proyecto "
-"específico o ver cualquier documento enviado a la papelera."
-
-#: src/desktop/templates/tours.mako:26
-msgid "Organize!"
-msgstr "Organícese."
-
-#: src/desktop/templates/tours.mako:26
-msgid ""
-"You can organize your documents in projects and filter them out in this "
-"area. It's a smart and fast way to focus on a specific project you are "
-"currently tackling."
-msgstr ""
-"En esta área puede organizar los documentos en proyectos y filtrarlos. Es"
-" una forma práctica y rápida de centrarse en un proyecto específico que "
-"tenga actualmente entre manos."
-
-#: src/desktop/templates/tours.mako:27
-msgid "Your documents"
-msgstr "Nuevo documento"
-
-#: src/desktop/templates/tours.mako:27
-msgid ""
-"You can always have a glance at your hard work. This is the list of all "
-"your documents, The first column tells you the kind of document that is, "
-"then you can find its name, a description and some other fields."
-msgstr ""
-"Siempre puede echar un vistazo a su duro trabajo. Se trata de una lista "
-"con todos sus documentos. La primera columna indica la clase de "
-"documento, después puede ver el nombre, la descripción y otros campos."
-
-#: src/desktop/templates/tours.mako:28
-msgid "Projects"
-msgstr "Proyectos"
-
-#: src/desktop/templates/tours.mako:28
-msgid ""
-"You can assign one or more projects to a document just by clicking in "
-"this cell."
-msgstr ""
-"Puede asignar uno o varios proyectos a un documento haciendo clic en esta"
-" celda."
-
-#: src/desktop/templates/tours.mako:29
-msgid "Share your documents"
-msgstr "Comparta sus documentos"
-
-#: src/desktop/templates/tours.mako:29
-msgid ""
-"You can also share a document you have worked on with a specific user or "
-"a group of users. Just click on the icon in this column on every document"
-" you want to share and choose users and groups from the popup."
-msgstr ""
-"También puede compartir un documento en el que ha trabajado con un "
-"usuario específico o con un grupo de usuarios. Solo tiene que hacer clic "
-"en el icono de esta columna en cada documento que desee compartir y "
-"seleccionar los usuarios y los grupos en la ventana emergente."
-
-#: src/desktop/templates/tours.mako:30
-msgid "Search your documents"
-msgstr "Busque sus documentos"
-
-#: src/desktop/templates/tours.mako:30
-msgid ""
-"You can always filter out the documents by name, description or even "
-"owner. Enjoy your new home!"
-msgstr ""
-"Siempre podrá filtrar los documentos por nombre, descripción o, incluso, "
-"propietario. ¡Disfrute de la nueva página de inicio!"
-
-#: src/desktop/templates/tours.mako:35
 msgid "Read more on the Hue blog"
 msgstr "Para obtener más información, visite el blog de Hue"
 
-#: src/desktop/templates/tours.mako:42
+#: src/desktop/templates/tours.mako:32
 msgid "Hue blog: Hive"
 msgstr "Blog de Hue: Hive"
 
-#: src/desktop/templates/tours.mako:49
+#: src/desktop/templates/tours.mako:39
 msgid "Hue blog: Impala"
 msgstr "Blog de Hue: Impala"
 
-#: src/desktop/templates/tours.mako:56
+#: src/desktop/templates/tours.mako:46
 msgid "Hue blog: DB Query"
 msgstr "Blog de Hue: consulta de base de datos"
 
-#: src/desktop/templates/tours.mako:63
+#: src/desktop/templates/tours.mako:53
 msgid "Hue blog: Pig"
 msgstr "Blog de Hue: Pig"
 
-#: src/desktop/templates/tours.mako:70
+#: src/desktop/templates/tours.mako:60
 msgid "Hue blog: Spark"
 msgstr "Blog de Hue: Spark"
 
-#: src/desktop/templates/tours.mako:77
+#: src/desktop/templates/tours.mako:67
 msgid "Hue blog: HBase"
 msgstr "Blog de Hue: HBase"
 
-#: src/desktop/templates/tours.mako:84
+#: src/desktop/templates/tours.mako:74
 msgid "Hue blog: Sqoop"
 msgstr "Blog de Hue: Sqoop"
 
-#: src/desktop/templates/tours.mako:91
+#: src/desktop/templates/tours.mako:81
 msgid "Hue blog: Zookeeper"
 msgstr "Blog de Hue: ZooKeeper"
 
-#: src/desktop/templates/tours.mako:98
+#: src/desktop/templates/tours.mako:88
 msgid "Hue blog: Oozie"
 msgstr "Blog de Hue: Oozie"
 
-#: src/desktop/templates/tours.mako:105
+#: src/desktop/templates/tours.mako:95
 msgid "Hue blog: Search"
 msgstr "Blog de Hue: búsqueda"
 
-#: src/desktop/templates/tours.mako:112
+#: src/desktop/templates/tours.mako:102
 msgid "Hue blog: Security"
 msgstr "Blog de Hue: seguridad"
 
-#: src/desktop/templates/tours.mako:119
+#: src/desktop/templates/tours.mako:109
 msgid "Hue blog: HDFS"
 msgstr "Blog de Hue: HDFS"
 
-#: src/desktop/templates/tours.mako:126
+#: src/desktop/templates/tours.mako:116
 msgid "Hue blog: Job Browser"
 msgstr "Blog de Hue: Job Browser"
 
@@ -3768,91 +4454,99 @@ msgstr ""
 "Parece que está ejecutando un explorador más antiguo. ¿Desea actualizar a"
 " la versión más reciente?"
 
-#~ msgid ""
-#~ "If set to true, CherryPy will be"
-#~ " used. Otherwise, Spawning will be "
-#~ "used as the webserver."
+#~ msgid "Enable the new editor SQL autocompleter"
+#~ msgstr ""
+
+#~ msgid "Your session has expired."
+#~ msgstr ""
+
+#~ msgid "Reload this page to sign in again"
+#~ msgstr ""
+
+#~ msgid "Please reload this page"
+#~ msgstr ""
+
+#~ msgid "Applications"
+#~ msgstr ""
+
+#~ msgid "Drop files here"
+#~ msgstr ""
+
+#~ msgid "Get started!"
+#~ msgstr ""
+
+#~ msgid "Your new home."
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Configuration options for specifying the Desktop Database.\n"
-#~ "          For more info, see "
-#~ "http://docs.djangoproject.com/en/1.1/ref/settings/#database-"
-#~ "engine"
+#~ "This is where you can access all"
+#~ " your documents and you can tag "
+#~ "them per project. Your home is "
+#~ "always reachable from any part of "
+#~ "Hue, just click on the house icon"
+#~ " on the top navigator bar."
+#~ msgstr ""
+
+#~ msgid "Actions and projects"
 #~ msgstr ""
 
 #~ msgid ""
-#~ "Authentication backend.  Common settings are"
-#~ " django.contrib.auth.backends.ModelBackend (fully "
-#~ "Django backend), desktop.auth.backend.AllowAllBackend "
-#~ "(allows everyone), "
-#~ "desktop.auth.backend.AllowFirstUserDjangoBackend (relies "
-#~ "on Django and user manager, after "
-#~ "the first login). "
+#~ "From here you can create new "
+#~ "documents or see a specific project "
+#~ "or any trashed document for instance."
 #~ msgstr ""
 
-#~ msgid "If true, log all database requests."
+#~ msgid "Organize!"
 #~ msgstr ""
 
-#~ msgid "Secret key should be configured as a random string."
+#~ msgid ""
+#~ "You can organize your documents in "
+#~ "projects and filter them out in "
+#~ "this area. It's a smart and fast"
+#~ " way to focus on a specific "
+#~ "project you are currently tackling."
 #~ msgstr ""
 
-#~ msgid "Cannot find HDFS called \"%(fs_ref)s\"."
+#~ msgid "Your documents"
 #~ msgstr ""
 
-#~ msgid "Could not create home directory."
+#~ msgid ""
+#~ "You can always have a glance at"
+#~ " your hard work. This is the "
+#~ "list of all your documents, The "
+#~ "first column tells you the kind of"
+#~ " document that is, then you can "
+#~ "find its name, a description and "
+#~ "some other fields."
 #~ msgstr ""
 
-#~ msgid "starting server with options %(options)s"
+#~ msgid "Projects"
 #~ msgstr ""
 
-#~ msgid "Spawning Server for Hue."
+#~ msgid ""
+#~ "You can assign one or more "
+#~ "projects to a document just by "
+#~ "clicking in this cell."
 #~ msgstr ""
 
-#~ msgid "Not Found"
+#~ msgid "Share your documents"
 #~ msgstr ""
 
-#~ msgid "Page not found"
+#~ msgid ""
+#~ "You can also share a document you"
+#~ " have worked on with a specific "
+#~ "user or a group of users. Just "
+#~ "click on the icon in this column"
+#~ " on every document you want to "
+#~ "share and choose users and groups "
+#~ "from the popup."
 #~ msgstr ""
 
-#~ msgid "Server Error (500)"
+#~ msgid "Search your documents"
 #~ msgstr ""
 
-#~ msgid "Profile"
-#~ msgstr ""
-
-#~ msgid "Sign Out"
-#~ msgstr ""
-
-#~ msgid "Welcome Home."
-#~ msgstr ""
-
-#~ msgid "Hue is a Web UI for Apache Hadoop. Please select an application below."
-#~ msgstr ""
-
-#~ msgid "Shell"
-#~ msgstr ""
-
-#~ msgid "Hadoop"
-#~ msgstr ""
-
-#~ msgid "Designs"
-#~ msgstr ""
-
-#~ msgid "Editor"
-#~ msgstr ""
-
-#~ msgid "Hue - Sign up"
-#~ msgstr ""
-
-#~ msgid "Hue - Sign in"
-#~ msgstr ""
-
-#~ msgid "Invalid username or password."
-#~ msgstr ""
-
-#~ msgid "Sign up"
-#~ msgstr ""
-
-#~ msgid "Sign in"
+#~ msgid ""
+#~ "You can always filter out the "
+#~ "documents by name, description or even"
+#~ " owner. Enjoy your new home!"
 #~ msgstr ""
