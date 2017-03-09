@@ -32,6 +32,15 @@ var inject_binding = function (allBindings, key, value) {
   };
 }
 
+ko.bindingHandlers.browserAwareSelectize = {
+  init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+    (window.isIE11 ? ko.bindingHandlers.options : ko.bindingHandlers.selectize).init.apply(null, arguments);
+  },
+  update: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
+    (window.isIE11 ? ko.bindingHandlers.options : ko.bindingHandlers.selectize).update.apply(null, arguments);
+  }
+}
+
 ko.bindingHandlers.selectize = {
   init: function (element, valueAccessor, allBindingsAccessor, viewModel, bindingContext) {
     if (typeof allBindingsAccessor.get('optionsCaption') == 'undefined')
