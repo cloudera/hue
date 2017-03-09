@@ -148,6 +148,7 @@ class NavigatorApi(object):
     default_entity_types, entity_types = self._get_types_from_sources(sources)
 
     try:
+      query_s = query_s.replace('{', '\\{').replace('}', '\\}').replace('(', '\\(').replace(')', '\\)').replace('[', '\\[').replace(']', '\\]')
       params = self.__params
 
       search_terms = [term for term in query_s.strip().split()]
