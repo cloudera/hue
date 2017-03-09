@@ -370,43 +370,43 @@
 'ROLE'                                     { return 'ROLE'; }
 
 // --- UDFs ---
-'AVG'                                      { addFunctionLocation(yylloc, 'avg'); return 'AVG'; }
-'CAST'                                     { addFunctionLocation(yylloc, 'cast'); return 'CAST'; }
-'COUNT'                                    { addFunctionLocation(yylloc, 'count'); return 'COUNT'; }
-'MAX'                                      { addFunctionLocation(yylloc, 'max'); return 'MAX'; }
-'MIN'                                      { addFunctionLocation(yylloc, 'min'); return 'MIN'; }
-'STDDEV_POP'                               { addFunctionLocation(yylloc, 'stddev_pop'); return 'STDDEV_POP'; }
-'STDDEV_SAMP'                              { addFunctionLocation(yylloc, 'stddev_samp'); return 'STDDEV_SAMP'; }
-'SUM'                                      { addFunctionLocation(yylloc, 'sum'); return 'SUM'; }
-'VARIANCE'                                 { addFunctionLocation(yylloc, 'variance'); return 'VARIANCE'; }
-'VAR_POP'                                  { addFunctionLocation(yylloc, 'var_pop'); return 'VAR_POP'; }
-'VAR_SAMP'                                 { addFunctionLocation(yylloc, 'var_samp'); return 'VAR_SAMP'; }
-<hive>'COLLECT_SET'                        { addFunctionLocation(yylloc, 'collect_set'); return '<hive>COLLECT_SET'; }
-<hive>'COLLECT_LIST'                       { addFunctionLocation(yylloc, 'collect_list'); return '<hive>COLLECT_LIST'; }
-<hive>'CORR'                               { addFunctionLocation(yylloc, 'corr'); return '<hive>CORR'; }
-<hive>'COVAR_POP'                          { addFunctionLocation(yylloc, 'covar_pop'); return '<hive>COVAR_POP'; }
-<hive>'COVAR_SAMP'                         { addFunctionLocation(yylloc, 'covar_samp'); return '<hive>COVAR_SAMP'; }
-<hive>'HISTOGRAM_NUMERIC'                  { addFunctionLocation(yylloc, 'histogram_numeric'); return '<hive>HISTOGRAM_NUMERIC'; }
-<hive>'NTILE'                              { addFunctionLocation(yylloc, 'ntile'); return '<hive>NTILE'; }
-<hive>'PERCENTILE'                         { addFunctionLocation(yylloc, 'percentile'); return '<hive>PERCENTILE'; }
-<hive>'PERCENTILE_APPROX'                  { addFunctionLocation(yylloc, 'percentile_approx'); return '<hive>PERCENTILE_APPROX'; }
-<impala>'APPX_MEDIAN'                      { addFunctionLocation(yylloc, 'appx_median'); return '<impala>APPX_MEDIAN'; }
-<impala>'EXTRACT'                          { addFunctionLocation(yylloc, 'extract'); return '<impala>EXTRACT'; }
-<impala>'GROUP_CONCAT'                     { addFunctionLocation(yylloc, 'group_concat'); return '<impala>GROUP_CONCAT'; }
-<impala>'STDDEV'                           { addFunctionLocation(yylloc, 'stddev'); return '<impala>STDDEV'; }
-<impala>'VARIANCE_POP'                     { addFunctionLocation(yylloc, 'variance_pop'); return '<impala>VARIANCE_POP'; }
-<impala>'VARIANCE_SAMP'                    { addFunctionLocation(yylloc, 'variance_samp'); return '<impala>VARIANCE_SAMP'; }
+AVG\s*\(                                    { yy.lexer.unput('('); yytext = 'avg'; addFunctionLocation(yylloc, yytext); return 'AVG'; }
+CAST\s*\(                                  { yy.lexer.unput('('); yytext = 'cast'; addFunctionLocation(yylloc, yytext); return 'CAST'; }
+COUNT\s*\(                                 { yy.lexer.unput('('); yytext = 'count'; addFunctionLocation(yylloc, yytext); return 'COUNT'; }
+MAX\s*\(                                   { yy.lexer.unput('('); yytext = 'max'; addFunctionLocation(yylloc, yytext); return 'MAX'; }
+MIN\s*\(                                   { yy.lexer.unput('('); yytext = 'min'; addFunctionLocation(yylloc, yytext); return 'MIN'; }
+STDDEV_POP\s*\(                            { yy.lexer.unput('('); yytext = 'stddev_pop'; addFunctionLocation(yylloc, yytext); return 'STDDEV_POP'; }
+STDDEV_SAMP\s*\(                           { yy.lexer.unput('('); yytext = 'stddev_samp'; addFunctionLocation(yylloc, yytext); return 'STDDEV_SAMP'; }
+SUM\s*\(                                   { yy.lexer.unput('('); yytext = 'sum'; addFunctionLocation(yylloc, yytext); return 'SUM'; }
+VARIANCE\s*\(                              { yy.lexer.unput('('); yytext = 'variance'; addFunctionLocation(yylloc, yytext); return 'VARIANCE'; }
+VAR_POP\s*\(                               { yy.lexer.unput('('); yytext = 'var_pop'; addFunctionLocation(yylloc, yytext); return 'VAR_POP'; }
+VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_samp'; addFunctionLocation(yylloc, yytext); return 'VAR_SAMP'; }
+<hive>COLLECT_SET\s*\(                     { yy.lexer.unput('('); yytext = 'collect_set'; addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_SET'; }
+<hive>COLLECT_LIST\s*\(                    { yy.lexer.unput('('); yytext = 'collect_list'; addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_LIST'; }
+<hive>CORR\s*\(                            { yy.lexer.unput('('); yytext = 'corr'; addFunctionLocation(yylloc, yytext); return '<hive>CORR'; }
+<hive>COVAR_POP\s*\(                       { yy.lexer.unput('('); yytext = 'covar_pop'; addFunctionLocation(yylloc, yytext); return '<hive>COVAR_POP'; }
+<hive>COVAR_SAMP\s*\(                      { yy.lexer.unput('('); yytext = 'covar_samp'; addFunctionLocation(yylloc, yytext); return '<hive>COVAR_SAMP'; }
+<hive>HISTOGRAM_NUMERIC\s*\(               { yy.lexer.unput('('); yytext = 'histogram_numeric'; addFunctionLocation(yylloc, yytext); return '<hive>HISTOGRAM_NUMERIC'; }
+<hive>NTILE\s*\(                           { yy.lexer.unput('('); yytext = 'ntile'; addFunctionLocation(yylloc, yytext); return '<hive>NTILE'; }
+<hive>PERCENTILE\s*\(                      { yy.lexer.unput('('); yytext = 'percentile'; addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE'; }
+<hive>PERCENTILE_APPROX\s*\(               { yy.lexer.unput('('); yytext = 'percentile_approx'; addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE_APPROX'; }
+<impala>APPX_MEDIAN\s*\(                   { yy.lexer.unput('('); yytext = 'appx_median'; addFunctionLocation(yylloc, yytext); return '<impala>APPX_MEDIAN'; }
+<impala>EXTRACT\s*\(                       { yy.lexer.unput('('); yytext = 'extract'; addFunctionLocation(yylloc, yytext); return '<impala>EXTRACT'; }
+<impala>GROUP_CONCAT\s*\(                  { yy.lexer.unput('('); yytext = 'group_concat'; addFunctionLocation(yylloc, yytext); return '<impala>GROUP_CONCAT'; }
+<impala>STDDEV\s*\(                        { yy.lexer.unput('('); yytext = 'stddev'; addFunctionLocation(yylloc, yytext); return '<impala>STDDEV'; }
+<impala>VARIANCE_POP\s*\(                  { yy.lexer.unput('('); yytext = 'variance_pop'; addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_POP'; }
+<impala>VARIANCE_SAMP\s*\(                 { yy.lexer.unput('('); yytext = 'variance_samp'; addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_SAMP'; }
 
 // Analytical functions
-'DENSE_RANK'                               { addFunctionLocation(yylloc, 'dense_rank'); return 'ANALYTIC'; }
-'FIRST_VALUE'                              { addFunctionLocation(yylloc, 'first_value'); return 'ANALYTIC'; }
-'LAG'                                      { addFunctionLocation(yylloc, 'lag'); return 'ANALYTIC'; }
-'LAST_VALUE'                               { addFunctionLocation(yylloc, 'last_value'); return 'ANALYTIC'; }
-'LEAD'                                     { addFunctionLocation(yylloc, 'lead'); return 'ANALYTIC'; }
-'RANK'                                     { addFunctionLocation(yylloc, 'rank'); return 'ANALYTIC'; }
-'ROW_NUMBER'                               { addFunctionLocation(yylloc, 'row_number'); return 'ANALYTIC'; }
-<hive>'CUME_DIST'                          { addFunctionLocation(yylloc, 'cume_dist'); return 'ANALYTIC'; }
-<hive>'PERCENT_RANK'                       { addFunctionLocation(yylloc, 'percent_rank'); return 'ANALYTIC'; }
+DENSE_RANK\s*\(                            { yy.lexer.unput('('); yytext = 'dense_rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+FIRST_VALUE\s*\(                           { yy.lexer.unput('('); yytext = 'first_value'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAG\s*\(                                   { yy.lexer.unput('('); yytext = 'lag'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAST_VALUE\s*\(                            { yy.lexer.unput('('); yytext = 'last_value'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LEAD\s*\(                                  { yy.lexer.unput('('); yytext = 'lead'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+RANK\s*\(                                  { yy.lexer.unput('('); yytext = 'rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_number'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+<hive>CUME_DIST\s*\(                       { yy.lexer.unput('('); yytext = 'cume_dist'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+<hive>PERCENT_RANK\s*\(                    { yy.lexer.unput('('); yytext = 'percent_rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
