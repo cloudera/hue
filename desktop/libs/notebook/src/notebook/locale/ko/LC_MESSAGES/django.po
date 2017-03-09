@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -17,75 +17,85 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/notebook/api.py:363
+#: src/notebook/api.py:364
 msgid "Query saved successfully"
 msgstr "쿼리가 저장됨"
 
-#: src/notebook/api.py:363
+#: src/notebook/api.py:364
 msgid "Notebook saved successfully"
 msgstr "노트북을 저장함"
 
-#: src/notebook/api.py:450
+#: src/notebook/api.py:455
 msgid "History fetched"
 msgstr "가져온 기록"
 
-#: src/notebook/api.py:468
+#: src/notebook/api.py:473
 msgid "History cleared !"
 msgstr "기록을 지웠습니다!"
 
-#: src/notebook/api.py:485
+#: src/notebook/api.py:490
 msgid "Notebook loaded successfully"
 msgstr "노트북을 로드함"
 
-#: src/notebook/api.py:515
+#: src/notebook/api.py:520
 msgid "Notebook closed successfully"
 msgstr "노트북을 닫음"
 
-#: src/notebook/api.py:535
+#: src/notebook/api.py:540
 msgid "Statement closed !"
 msgstr "명령문을 닫았습니다!"
 
-#: src/notebook/api.py:623
-msgid "url param is required"
-msgstr "url 매개변수가 필요함"
-
-#: src/notebook/api.py:634
-msgid "User is already authenticated to GitHub."
-msgstr "사용자가 이미 GitHub에 대해 인증되었습니다."
-
-#: src/notebook/api.py:666
+#: src/notebook/api.py:613
 msgid "Exporting result failed."
 msgstr "결과를 내보낼 수 없습니다."
 
-#: src/notebook/conf.py:51
+#: src/notebook/conf.py:38
 msgid "Show the notebook menu or not"
 msgstr "노트북 메뉴 표시 또는 숨기기"
 
-#: src/notebook/conf.py:60
+#: src/notebook/conf.py:73
 msgid "Define the name and how to connect and execute the language."
 msgstr "이름 및 언어를 연결하고 실행하는 방법을 정의합니다."
 
-#: src/notebook/conf.py:64
+#: src/notebook/conf.py:77
 msgid "The name of the snippet."
 msgstr "스니펫 이름입니다."
 
-#: src/notebook/conf.py:76
+#: src/notebook/conf.py:89
 msgid "Specific options for connecting to the server."
 msgstr "서버에 연결할 때 사용할 특정 옵션입니다."
 
-#: src/notebook/conf.py:86
+#: src/notebook/conf.py:99
+msgid ""
+"Comma separated list of interpreters that should be shown on the wheel. "
+"This list takes precedence over the order in which the interpreter "
+"entries appear. Only the first 5 interpreters will appear on the wheel."
+msgstr ""
+"휠에 표시될 쉼표로 구분된 인터프리터 목록입니다. "
+"이 목록은 인터프리터 항목이 나타나는 순서보다 높은 우선 순위를 "
+"가집니다. 처음 5개의 인터프리터만 휠에 나타납니다."
+
+#: src/notebook/conf.py:108
 msgid "Main flag to override the automatic starting of the DBProxy server."
 msgstr "DBProxy 서버의 자동 시작을 재정의하는 메인 플래그입니다."
 
-#: src/notebook/conf.py:93
+#: src/notebook/conf.py:115
+msgid ""
+"Additional classes to put on the dbproxy classpath when starting. Values "
+"separated by ':'"
+msgstr ""
+"시작할 때 dbproxy 클래스 경로에 넣을 추가 클래스입니다. ':'로 구분되는 "
+"값입니다."
+
+#: src/notebook/conf.py:122
 msgid "Flag to enable the SQL query builder of the table assist."
 msgstr "테이블 지원의 SQL 쿼리 빌더를 사용하는 플래그입니다."
 
-#: src/notebook/conf.py:100
+#: src/notebook/conf.py:129
 msgid "Flag to enable the creation of a coordinator for the current SQL query."
 msgstr "현재 SQL 쿼리에 대한 Coordinator의 생성을 허용하는 플래그입니다."
 
-#: src/notebook/conf.py:107
+#: src/notebook/conf.py:136
 msgid ""
 "Flag to enable the bulk submission of queries as a background task "
 "through Oozie."
@@ -93,132 +103,115 @@ msgstr ""
 "Oozie를 통해 백그라운드 작업으로 쿼리의 대량 제출을 "
 "허용하는 플래그입니다."
 
-#: src/notebook/conf.py:115
-msgid "Base URL to GitHub Remote Server"
-msgstr "GitHub 원격 서버에 대한 기본 URL"
-
-#: src/notebook/conf.py:122
-msgid "Base URL to GitHub API"
-msgstr "GitHub API에 대한 기본 URL"
-
-#: src/notebook/conf.py:129
-msgid "The Client ID of the GitHub application."
-msgstr "GitHub 애플리케이션의 클라이언트 ID입니다."
-
-#: src/notebook/conf.py:136
-msgid "The Client Secret of the GitHub application."
-msgstr "GitHub 애플리케이션의 클라이언트 암호입니다."
-
 #: src/notebook/decorators.py:53 src/notebook/decorators.py:70
 #, python-format
 msgid "Document %(id)s does not exist"
 msgstr "%(id)s 문서가 존재하지 않음"
 
-#: src/notebook/views.py:194
+#: src/notebook/views.py:220
 #, python-format
 msgid "Action %s is unknown"
 msgstr "작업 %s을(를) 알 수 없음"
 
-#: src/notebook/views.py:220
+#: src/notebook/views.py:246
 #, python-format
 msgid "Trashed %d notebook(s)"
 msgstr "%d개의 노트북이 휴지통으로 이동됨"
 
-#: src/notebook/views.py:259
+#: src/notebook/views.py:285
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
-#: src/notebook/connectors/base.py:51
+#: src/notebook/connectors/base.py:52
 msgid "No error message, please check the logs."
 msgstr "오류 메시지가 없습니다. 로그를 확인하십시오."
 
-#: src/notebook/connectors/base.py:202
+#: src/notebook/connectors/base.py:209
 #, python-format
 msgid "Snippet type %(type)s is not configured in hue.ini"
 msgstr "스니펫 유형 %(type)s이(가) hue.ini에 구성되지 않음"
 
-#: src/notebook/connectors/base.py:225
+#: src/notebook/connectors/base.py:232
 #, python-format
 msgid "Notebook connector interface not recognized: %s"
 msgstr "노트북 커넥터 인터페이스가 인식되지 않음: %s"
 
-#: src/notebook/connectors/hiveserver2.py:111
-#: src/notebook/connectors/spark_shell.py:60
+#: src/notebook/connectors/hiveserver2.py:113
+#: src/notebook/connectors/spark_shell.py:70
 msgid "Files"
 msgstr "파일"
 
-#: src/notebook/connectors/hiveserver2.py:113
+#: src/notebook/connectors/hiveserver2.py:115
 msgid "Add one or more files, jars, or archives to the list of resources."
 msgstr "리소스 목록에 하나 이상의 파일, Jar 또는 아카이브를 추가합니다."
 
-#: src/notebook/connectors/hiveserver2.py:119
+#: src/notebook/connectors/hiveserver2.py:121
 msgid "Functions"
 msgstr "함수"
 
-#: src/notebook/connectors/hiveserver2.py:121
+#: src/notebook/connectors/hiveserver2.py:123
 msgid ""
 "Add one or more registered UDFs (requires function name and fully-"
 "qualified class name)."
 msgstr "하나 이상의 등록된 UDF를 추가합니다(함수 이름 및 완전한 클래스 이름이 필요함)."
 
-#: src/notebook/connectors/hiveserver2.py:127
-#: src/notebook/connectors/hiveserver2.py:144
-#: src/notebook/templates/editor_components.mako:442
-#: src/notebook/templates/editor_components.mako:1536
+#: src/notebook/connectors/hiveserver2.py:129
+#: src/notebook/connectors/hiveserver2.py:146
+#: src/notebook/templates/editor_components.mako:1002
 msgid "Settings"
 msgstr "설정"
 
-#: src/notebook/connectors/hiveserver2.py:129
+#: src/notebook/connectors/hiveserver2.py:131
 msgid "Hive and Hadoop configuration properties."
 msgstr "Hive 및 Hadoop 구성 속성입니다."
 
-#: src/notebook/connectors/hiveserver2.py:146
+#: src/notebook/connectors/hiveserver2.py:148
 msgid "Impala configuration properties."
 msgstr "Impala 구성 속성입니다."
 
-#: src/notebook/connectors/hiveserver2.py:209
+#: src/notebook/connectors/hiveserver2.py:211
 msgid ""
 "Session does not exist or you do not have permissions to close the "
 "session."
 msgstr "세션이 없거나 세션을 닫을 권한이 없습니다."
 
-#: src/notebook/connectors/hiveserver2.py:214
+#: src/notebook/connectors/hiveserver2.py:216
 msgid "Session successfully closed."
 msgstr "세션을 성공적으로 닫았습니다."
 
-#: src/notebook/connectors/hiveserver2.py:301
+#: src/notebook/connectors/hiveserver2.py:303
 msgid "Result status is not available"
 msgstr "결과 상태를 사용할 수 없음"
 
-#: src/notebook/connectors/hiveserver2.py:304
+#: src/notebook/connectors/hiveserver2.py:306
 #, python-format
 msgid "Cannot fetch result metadata for snippet type: %s"
 msgstr "스니펫 유형에 대한 결과 메타데이터를 가져올 수 없음: %s"
 
-#: src/notebook/connectors/hiveserver2.py:366
+#: src/notebook/connectors/hiveserver2.py:365
 msgid "Increase the sasl_max_buffer value in hue.ini"
 msgstr "hue.ini에서 sasl_max_buffer 값 늘리기"
 
-#: src/notebook/connectors/hiveserver2.py:465
-#: src/notebook/connectors/hiveserver2.py:489
+#: src/notebook/connectors/hiveserver2.py:464
+#: src/notebook/connectors/hiveserver2.py:488
 #, python-format
 msgid "Only SELECT statements can be saved. Provided statement: %(query)s"
 msgstr "SELECT 문만 저장할 수 있습니다. 제공된 명령문: %(query)s"
 
-#: src/notebook/connectors/hiveserver2.py:692
+#: src/notebook/connectors/hiveserver2.py:736
 msgid "Failed to get job details or job does not contain counters data."
 msgstr "Job 세부 정보를 가져올 수 없거나 Job에 카운터 데이터가 포함되지 않습니다."
 
-#: src/notebook/connectors/hiveserver2.py:725
+#: src/notebook/connectors/hiveserver2.py:769
 msgid "Hive query did not execute any jobs."
 msgstr "Hive 쿼리가 Job을 실행하지 않았습니다."
 
-#: src/notebook/connectors/hiveserver2.py:791
+#: src/notebook/connectors/hiveserver2.py:835
 #, python-format
 msgid "Failed to get query profile from Impala Daemon server: %s"
 msgstr "Impala Daemon 서버에서 쿼리 프로파일을 가져오지 못함: %s"
 
-#: src/notebook/connectors/hiveserver2.py:794
+#: src/notebook/connectors/hiveserver2.py:838
 msgid ""
 "Could not find profile in query profile response from Impala Daemon "
 "Server."
@@ -231,7 +224,7 @@ msgstr ""
 msgid "%s: is the DB Proxy server running?"
 msgstr "%s: DB 프록시 서버가 실행 중입니까?"
 
-#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:152
+#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:153
 #: src/notebook/connectors/solr.py:176 src/notebook/connectors/solr.py:214
 msgid "Failed to get sample data."
 msgstr "샘플 데이터를 가져올 수 없습니다."
@@ -258,1287 +251,974 @@ msgid "Job was %s"
 msgstr "Job은 %s"
 
 #: src/notebook/connectors/spark_shell.py:51
+msgid "Spark Conf"
+msgstr "Spark Conf"
+
+#: src/notebook/connectors/spark_shell.py:52
+msgid "Add one or more Spark conf properties to the session."
+msgstr "세션에 하나 이상의 Spark conf 속성을 추가합니다."
+
+#: src/notebook/connectors/spark_shell.py:61
 msgid "Jars"
 msgstr "Jar"
 
-#: src/notebook/connectors/spark_shell.py:52
+#: src/notebook/connectors/spark_shell.py:62
 msgid "Add one or more JAR files to the list of resources."
 msgstr "리소스 목록에 하나 이상의 JAR 파일을 추가합니다."
 
-#: src/notebook/connectors/spark_shell.py:61
+#: src/notebook/connectors/spark_shell.py:71
 msgid "Files to be placed in the working directory of each executor."
 msgstr "각 실행기의 작업 디렉토리에 넣을 파일입니다."
 
-#: src/notebook/connectors/spark_shell.py:69
+#: src/notebook/connectors/spark_shell.py:79
 msgid "pyFiles"
 msgstr "pyFiles"
 
-#: src/notebook/connectors/spark_shell.py:70
+#: src/notebook/connectors/spark_shell.py:80
 msgid "Python files to be placed in the working directory of each executor."
 msgstr "각 실행기의 작업 디렉토리에 넣을 Python 파일입니다."
 
-#: src/notebook/connectors/spark_shell.py:78
+#: src/notebook/connectors/spark_shell.py:88
 msgid "Driver Memory"
 msgstr "드라이버 메모리"
 
-#: src/notebook/connectors/spark_shell.py:79
+#: src/notebook/connectors/spark_shell.py:89
 msgid "Amount of memory to use for the driver process in GB. (Default: 1). "
 msgstr "드라이버 프로세스에서 사용할 메모리 크기(GB)입니다(기본값: 1). "
 
-#: src/notebook/connectors/spark_shell.py:89
+#: src/notebook/connectors/spark_shell.py:99
 msgid "Driver Cores"
 msgstr "드라이버 코어"
 
-#: src/notebook/connectors/spark_shell.py:90
-#: src/notebook/connectors/spark_shell.py:108
+#: src/notebook/connectors/spark_shell.py:100
+#: src/notebook/connectors/spark_shell.py:118
 msgid "Number of cores used by the driver, only in cluster mode (Default: 1)"
 msgstr "드라이버가 사용하는 코어 수(클러스터 모드 전용, 기본값: 1)"
 
-#: src/notebook/connectors/spark_shell.py:98
+#: src/notebook/connectors/spark_shell.py:108
 msgid "Executor Memory"
 msgstr "실행기 메모리"
 
-#: src/notebook/connectors/spark_shell.py:99
+#: src/notebook/connectors/spark_shell.py:109
 msgid "Amount of memory to use per executor process in GB. (Default: 1)"
 msgstr "실행기 프로세스당 사용할 메모리 크기(GB)입니다(기본값: 1)."
 
-#: src/notebook/connectors/spark_shell.py:107
+#: src/notebook/connectors/spark_shell.py:117
 msgid "Executor Cores"
 msgstr "실행기 코어"
 
-#: src/notebook/connectors/spark_shell.py:116
+#: src/notebook/connectors/spark_shell.py:126
 msgid "Queue"
 msgstr "대기열"
 
-#: src/notebook/connectors/spark_shell.py:117
+#: src/notebook/connectors/spark_shell.py:127
 msgid "The YARN queue to submit to, only in cluster mode (Default: default)"
 msgstr "제출할 YARN 대기열(클러스터 모드 전용, 기본값: default)"
 
-#: src/notebook/connectors/spark_shell.py:125
+#: src/notebook/connectors/spark_shell.py:135
 msgid "Archives"
 msgstr "아카이브"
 
-#: src/notebook/connectors/spark_shell.py:126
+#: src/notebook/connectors/spark_shell.py:136
 msgid ""
 "Archives to be extracted into the working directory of each executor, "
 "only in cluster mode."
 msgstr "각 실행기의 작업 디렉토리로 압축 해제할 아카이브입니다(클러스터 모드 전용)."
 
-#: src/notebook/connectors/spark_shell.py:206
+#: src/notebook/connectors/spark_shell.py:227
 #, python-format
 msgid "The Spark session could not be created in the cluster: %s"
 msgstr "Spark 세션을 클러스터에서 생성할 수 없음: %s"
 
-#: src/notebook/templates/editor.mako:27
+#: src/notebook/templates/editor.mako:28
 msgid "Editor"
 msgstr "편집기"
 
-#: src/notebook/templates/editor_components.mako:232
+#: src/notebook/templates/editor_components.mako:219
 msgid "Saving..."
 msgstr "저장하는 중..."
 
-#: src/notebook/templates/editor_components.mako:239
+#: src/notebook/templates/editor_components.mako:226
 msgid "Save as..."
 msgstr "다른 이름으로 저장..."
 
-#: src/notebook/templates/editor_components.mako:254
+#: src/notebook/templates/editor_components.mako:241
 msgid "Player mode"
 msgstr "플레이어 모드"
 
-#: src/notebook/templates/editor_components.mako:259
+#: src/notebook/templates/editor_components.mako:246
 msgid "Execute all snippets"
 msgstr "모든 스니펫 실행"
 
-#: src/notebook/templates/editor_components.mako:264
+#: src/notebook/templates/editor_components.mako:251
 msgid "Clear all results"
 msgstr "모든 결과 지우기"
 
-#: src/notebook/templates/editor_components.mako:269
+#: src/notebook/templates/editor_components.mako:256
 msgid "Display all Notebook content"
 msgstr "모든 노트북 콘텐츠 표시"
 
-#: src/notebook/templates/editor_components.mako:274
-#: src/notebook/templates/editor_components.mako:958
+#: src/notebook/templates/editor_components.mako:261
+#: src/notebook/templates/editor_components.mako:438
 msgid "Import from Github"
 msgstr "Github에서 가져오기"
 
-#: src/notebook/templates/editor_components.mako:279
+#: src/notebook/templates/editor_components.mako:266
 msgid "Export to Jupyter"
 msgstr "Jupyter로 내보내기"
 
-#: src/notebook/templates/editor_components.mako:289
+#: src/notebook/templates/editor_components.mako:274
 msgid "New "
 msgstr "새로 만들기 "
 
-#: src/notebook/templates/editor_components.mako:289
+#: src/notebook/templates/editor_components.mako:274
 msgid "Query"
 msgstr "쿼리"
 
-#: src/notebook/templates/editor_components.mako:294
+#: src/notebook/templates/editor_components.mako:279
 msgid "New Notebook"
 msgstr "새 노트북"
 
-#: src/notebook/templates/editor_components.mako:299
+#: src/notebook/templates/editor_components.mako:284
 msgid "Queries"
 msgstr "쿼리"
 
-#: src/notebook/templates/editor_components.mako:299
+#: src/notebook/templates/editor_components.mako:284
 #: src/notebook/templates/notebooks.mako:23
 #: src/notebook/templates/notebooks.mako:47
 msgid "Notebooks"
 msgstr "노트북"
 
-#: src/notebook/templates/editor_components.mako:305
+#: src/notebook/templates/editor_components.mako:288
 msgid "Context"
 msgstr "컨텍스트"
 
-#: src/notebook/templates/editor_components.mako:314
+#: src/notebook/templates/editor_components.mako:297
 msgid " Editor"
 msgstr " 편집기"
 
-#: src/notebook/templates/editor_components.mako:372
+#: src/notebook/templates/editor_components.mako:355
 msgid "This is a history query"
 msgstr "기록 쿼리입니다."
 
-#: src/notebook/templates/editor_components.mako:375
+#: src/notebook/templates/editor_components.mako:358
 msgid "Open directory of this query"
 msgstr "이 쿼리의 디렉토리 열기"
 
-#: src/notebook/templates/editor_components.mako:378
+#: src/notebook/templates/editor_components.mako:361
 msgid "Click to open original saved query"
 msgstr "원래 저장된 쿼리를 열려면 클릭"
 
-#: src/notebook/templates/editor_components.mako:383
+#: src/notebook/templates/editor_components.mako:366
 msgid "This is a saved query"
 msgstr "저장된 쿼리입니다."
 
-#: src/notebook/templates/editor_components.mako:417
+#: src/notebook/templates/editor_components.mako:400
 msgid "Row details"
 msgstr "행 세부 정보"
 
-#: src/notebook/templates/editor_components.mako:430
+#: src/notebook/templates/editor_components.mako:412
 msgid "Editor keyboard shortcuts"
 msgstr "편집기 키보드 단축키"
 
-#: src/notebook/templates/editor_components.mako:435
-msgid "Line Operations"
-msgstr "줄 작업"
-
-#: src/notebook/templates/editor_components.mako:436
-msgid "Selection"
-msgstr "선택 항목"
-
-#: src/notebook/templates/editor_components.mako:437
-msgid "Multicursor"
-msgstr "다중 커서"
-
-#: src/notebook/templates/editor_components.mako:438
-msgid "Go to"
-msgstr "이동"
-
-#: src/notebook/templates/editor_components.mako:439
-msgid "Find/Replace"
-msgstr "찾기/바꾸기"
-
-#: src/notebook/templates/editor_components.mako:440
-msgid "Folding"
-msgstr "접는 중"
-
-#: src/notebook/templates/editor_components.mako:441
-msgid "Other"
-msgstr "기타"
-
-#: src/notebook/templates/editor_components.mako:452
-#: src/notebook/templates/editor_components.mako:515
-#: src/notebook/templates/editor_components.mako:613
-#: src/notebook/templates/editor_components.mako:671
-#: src/notebook/templates/editor_components.mako:774
-#: src/notebook/templates/editor_components.mako:807
-#: src/notebook/templates/editor_components.mako:840
-#: src/notebook/templates/editor_components.mako:923
-msgid "Action"
-msgstr "작업"
-
-#: src/notebook/templates/editor_components.mako:459
-msgid "Remove line"
-msgstr "줄 제거"
-
-#: src/notebook/templates/editor_components.mako:464
-msgid "Copy lines down"
-msgstr "아래로 줄 복사"
-
-#: src/notebook/templates/editor_components.mako:469
-msgid "Copy lines up"
-msgstr "위로 줄 복사"
-
-#: src/notebook/templates/editor_components.mako:474
-msgid "Move lines down"
-msgstr "줄 아래로 이동"
-
-#: src/notebook/templates/editor_components.mako:479
-msgid "Move lines up"
-msgstr "줄 위로 이동"
-
-#: src/notebook/templates/editor_components.mako:484
-msgid "Remove to line end"
-msgstr "줄 끝까지 제거"
-
-#: src/notebook/templates/editor_components.mako:489
-msgid "Remove to line start"
-msgstr "줄 시작까지 제거"
-
-#: src/notebook/templates/editor_components.mako:494
-msgid "Remove word left"
-msgstr "단어 왼쪽 제거"
-
-#: src/notebook/templates/editor_components.mako:499
-msgid "Remove word right"
-msgstr "단어 오른쪽 제거"
-
-#: src/notebook/templates/editor_components.mako:504
-msgid "Split line"
-msgstr "분할선"
-
-#: src/notebook/templates/editor_components.mako:522
-msgid "Select all"
-msgstr "모두 선택"
-
-#: src/notebook/templates/editor_components.mako:527
-msgid "Select left"
-msgstr "왼쪽 선택"
-
-#: src/notebook/templates/editor_components.mako:532
-msgid "Select right"
-msgstr "오른쪽 선택"
-
-#: src/notebook/templates/editor_components.mako:537
-msgid "Select word left"
-msgstr "단어 왼쪽 선택"
-
-#: src/notebook/templates/editor_components.mako:542
-msgid "Select word right"
-msgstr "단어 오른쪽 선택"
-
-#: src/notebook/templates/editor_components.mako:547
-msgid "Select line start"
-msgstr "줄 시작 선택"
-
-#: src/notebook/templates/editor_components.mako:552
-msgid "Select line end"
-msgstr "줄 끝 선택"
-
-#: src/notebook/templates/editor_components.mako:557
-msgid "Select to line end"
-msgstr "줄 끝까지 선택"
-
-#: src/notebook/templates/editor_components.mako:562
-msgid "Select to line start"
-msgstr "줄 시작까지 선택"
-
-#: src/notebook/templates/editor_components.mako:567
-msgid "Select up"
-msgstr "위로 선택"
-
-#: src/notebook/templates/editor_components.mako:572
-msgid "Select down"
-msgstr "아래 선택"
-
-#: src/notebook/templates/editor_components.mako:577
-msgid "Select page up"
-msgstr "페이지 위 선택"
-
-#: src/notebook/templates/editor_components.mako:582
-msgid "Select page down"
-msgstr "페이지 아래 선택"
-
-#: src/notebook/templates/editor_components.mako:587
-msgid "Select to start"
-msgstr "시작까지 선택"
-
-#: src/notebook/templates/editor_components.mako:592
-msgid "Select to end"
-msgstr "끝까지 선택"
-
-#: src/notebook/templates/editor_components.mako:597
-msgid "Duplicate selection"
-msgstr "중복 선택"
-
-#: src/notebook/templates/editor_components.mako:602
-msgid "Select to matching bracket"
-msgstr "일치하는 괄호까지 선택"
-
-#: src/notebook/templates/editor_components.mako:620
-msgid "Add multi-cursor above"
-msgstr "위에 다중 커서 추가"
-
-#: src/notebook/templates/editor_components.mako:625
-msgid "Add multi-cursor below"
-msgstr "아래에 다중 커서 추가"
-
-#: src/notebook/templates/editor_components.mako:630
-msgid "Add next occurrence to multi-selection"
-msgstr "다중 선택에 다음 항목 추가"
-
-#: src/notebook/templates/editor_components.mako:635
-msgid "Add previous occurrence to multi-selection"
-msgstr "다중 선택에 이전 항목 추가"
-
-#: src/notebook/templates/editor_components.mako:640
-msgid "Move multicursor from current line to the line above"
-msgstr "현재 줄에서 윗줄로 다중 커서 이동"
-
-#: src/notebook/templates/editor_components.mako:645
-msgid "Move multicursor from current line to the line below"
-msgstr "현재 줄에서 아랫줄로 다중 커서 이동"
-
-#: src/notebook/templates/editor_components.mako:650
-msgid "Remove current occurrence from multi-selection and move to next"
-msgstr "다중 선택에서 현재 항목을 제거하고 다음으로 이동"
-
-#: src/notebook/templates/editor_components.mako:655
-msgid "Remove current occurrence from multi-selection and move to previous"
-msgstr "다중 선택에서 현재 항목을 제거하고 이전으로 이동"
-
-#: src/notebook/templates/editor_components.mako:660
-msgid "Select all from multi-selection"
-msgstr "다중 선택에서 모두 선택"
-
-#: src/notebook/templates/editor_components.mako:678
-msgid "Go to left"
-msgstr "왼쪽으로 이동"
-
-#: src/notebook/templates/editor_components.mako:683
-msgid "Go to right"
-msgstr "오른쪽으로 이동"
-
-#: src/notebook/templates/editor_components.mako:688
-msgid "Go to word left"
-msgstr "단어 왼쪽으로 이동"
-
-#: src/notebook/templates/editor_components.mako:693
-msgid "Go to word right"
-msgstr "단어 오른쪽으로 이동"
-
-#: src/notebook/templates/editor_components.mako:698
-msgid "Go line up"
-msgstr "한 줄 위 이동"
-
-#: src/notebook/templates/editor_components.mako:703
-msgid "Go line down"
-msgstr "한 줄 아래 이동"
-
-#: src/notebook/templates/editor_components.mako:708
-msgid "Go to line start"
-msgstr "줄 시작으로 이동"
-
-#: src/notebook/templates/editor_components.mako:713
-msgid "Go to line end"
-msgstr "줄 끝으로 이동"
-
-#: src/notebook/templates/editor_components.mako:718
-msgid "Go to page up"
-msgstr "한 페이지 위로 이동"
-
-#: src/notebook/templates/editor_components.mako:723
-msgid "Go to page down"
-msgstr "한 페이지 아래 이동"
-
-#: src/notebook/templates/editor_components.mako:728
-msgid "Go to start"
-msgstr "시작으로 이동"
-
-#: src/notebook/templates/editor_components.mako:733
-msgid "Go to end"
-msgstr "끝으로 이동"
-
-#: src/notebook/templates/editor_components.mako:738
-msgid "Go to line"
-msgstr "줄로 이동"
-
-#: src/notebook/templates/editor_components.mako:743
-msgid "Scroll line down"
-msgstr "한 줄 아래로 스크롤"
-
-#: src/notebook/templates/editor_components.mako:748
-msgid "Scroll line up"
-msgstr "한 줄 위로 스크롤"
-
-#: src/notebook/templates/editor_components.mako:753
-msgid "Go to matching bracket"
-msgstr "일치하는 괄호로 이동"
-
-#: src/notebook/templates/editor_components.mako:758
-msgid "Scroll page down"
-msgstr "한 페이지 아래로 이동"
-
-#: src/notebook/templates/editor_components.mako:763
-msgid "Scroll page up"
-msgstr "한 페이지 위로 이동"
-
-#: src/notebook/templates/editor_components.mako:781
-msgid "Find"
-msgstr "찾기"
-
-#: src/notebook/templates/editor_components.mako:786
-msgid "Replace"
-msgstr "교체"
-
-#: src/notebook/templates/editor_components.mako:791
-msgid "Find next"
-msgstr "다음 찾기"
-
-#: src/notebook/templates/editor_components.mako:796
-msgid "Find previous"
-msgstr "이전 찾기"
-
-#: src/notebook/templates/editor_components.mako:814
-msgid "Fold selection"
-msgstr "선택 항목 접기"
-
-#: src/notebook/templates/editor_components.mako:819
-msgid "Unfold"
-msgstr "Unfold"
-
-#: src/notebook/templates/editor_components.mako:824
-msgid "Fold all"
-msgstr "모두 접기"
-
-#: src/notebook/templates/editor_components.mako:829
-msgid "Unfold all"
-msgstr "모두 Unfold"
-
-#: src/notebook/templates/editor_components.mako:847
-msgid "Autocomplete when Live Autocompletion is off"
-msgstr "라이브 자동 완성이 해제된 경우 자동 완성"
-
-#: src/notebook/templates/editor_components.mako:852
-msgid "Indent"
-msgstr "들여쓰기"
-
-#: src/notebook/templates/editor_components.mako:857
-msgid "Outdent"
-msgstr "내어쓰기"
-
-#: src/notebook/templates/editor_components.mako:862
-msgid "Undo"
-msgstr "실행 취소"
-
-#: src/notebook/templates/editor_components.mako:867
-msgid "Redo"
-msgstr "다시 실행"
-
-#: src/notebook/templates/editor_components.mako:872
-msgid "Toggle comment"
-msgstr "설명 전환"
-
-#: src/notebook/templates/editor_components.mako:877
-msgid "Transpose letters"
-msgstr "문자 바꿈"
-
-#: src/notebook/templates/editor_components.mako:882
-msgid "Change to lower case"
-msgstr "소문자로 변경"
-
-#: src/notebook/templates/editor_components.mako:887
-msgid "Change to upper case"
-msgstr "대문자로 변경"
-
-#: src/notebook/templates/editor_components.mako:892
-#: src/notebook/templates/notebook_ko_components.mako:227
-msgid "Overwrite"
-msgstr "덮어쓰기"
-
-#: src/notebook/templates/editor_components.mako:897
-msgid "Macros replay"
-msgstr "매크로 다시 재생"
-
-#: src/notebook/templates/editor_components.mako:902
-msgid "Macros recording"
-msgstr "매크로 기록"
-
-#: src/notebook/templates/editor_components.mako:907
-#: src/notebook/templates/notebooks.mako:74
-msgid "Delete"
-msgstr "삭제"
-
-#: src/notebook/templates/editor_components.mako:912
-msgid "Center selection"
-msgstr "가운데 선택"
-
-#: src/notebook/templates/editor_components.mako:930
-msgid "Show the settings menu"
-msgstr "설정 메뉴 표시"
-
-#: src/notebook/templates/editor_components.mako:938
-#: src/notebook/templates/editor_components.mako:951
-#: src/notebook/templates/editor_components.mako:967
-#: src/notebook/templates/editor_components.mako:982
-#: src/notebook/templates/editor_components.mako:1143
-#: src/notebook/templates/notebook_ko_components.mako:74
-#: src/notebook/templates/notebook_ko_components.mako:302
+#: src/notebook/templates/editor_components.mako:418
+#: src/notebook/templates/editor_components.mako:431
+#: src/notebook/templates/editor_components.mako:447
+#: src/notebook/templates/editor_components.mako:462
+#: src/notebook/templates/editor_components.mako:633
 msgid "Close"
 msgstr "닫기"
 
-#: src/notebook/templates/editor_components.mako:945
+#: src/notebook/templates/editor_components.mako:425
 msgid "All Notebook content"
 msgstr "모든 노트북 콘텐츠"
 
-#: src/notebook/templates/editor_components.mako:968
+#: src/notebook/templates/editor_components.mako:448
 #: src/notebook/templates/notebooks.mako:98
 msgid "Import"
 msgstr "가져오기"
 
-#: src/notebook/templates/editor_components.mako:976
+#: src/notebook/templates/editor_components.mako:456
 msgid "Invalid Query"
 msgstr "올바르지 않은 쿼리"
 
-#: src/notebook/templates/editor_components.mako:979
+#: src/notebook/templates/editor_components.mako:459
 msgid "Query requires a select or an aggregate."
 msgstr "쿼리에 선택 또는 집계가 필요합니다."
 
-#: src/notebook/templates/editor_components.mako:988
-#: src/notebook/templates/editor_components.mako:1006
+#: src/notebook/templates/editor_components.mako:468
+#: src/notebook/templates/editor_components.mako:486
 msgid "Toggle Assist"
 msgstr "지원 전환"
 
-#: src/notebook/templates/editor_components.mako:1087
+#: src/notebook/templates/editor_components.mako:567
 msgid "Assistant"
 msgstr "도우미"
 
-#: src/notebook/templates/editor_components.mako:1089
+#: src/notebook/templates/editor_components.mako:569
 msgid "Sessions"
 msgstr "세션"
 
-#: src/notebook/templates/editor_components.mako:1092
+#: src/notebook/templates/editor_components.mako:572
 msgid "Schedule"
 msgstr "예약"
 
-#: src/notebook/templates/editor_components.mako:1104
-msgid "Active tables"
-msgstr "활성 테이블"
-
-#: src/notebook/templates/editor_components.mako:1113
-msgid "Suggestions"
-msgstr "추천"
-
-#: src/notebook/templates/editor_components.mako:1137
-msgid "There are currently no active sessions, please reload the page."
-msgstr "현재 활성 세션이 없습니다. 페이지를 다시 로드하십시오."
-
-#: src/notebook/templates/editor_components.mako:1142
-msgid "Recreate session"
-msgstr "세션 다시 생성"
-
-#: src/notebook/templates/editor_components.mako:1142
-msgid "Recreate"
-msgstr "다시 생성"
-
-#: src/notebook/templates/editor_components.mako:1143
-msgid "Close session"
-msgstr "세션 닫기"
-
-#: src/notebook/templates/editor_components.mako:1145
-msgid "Save session settings as default"
-msgstr "세션 설정 기본값으로 저장"
-
-#: src/notebook/templates/editor_components.mako:1145
-msgid "Set as default settings"
-msgstr "기본 설정으로 구성"
-
-#: src/notebook/templates/editor_components.mako:1185
+#: src/notebook/templates/editor_components.mako:602
 msgid "Changes not saved"
 msgstr "변경 내용이 저장되지 않음"
 
-#: src/notebook/templates/editor_components.mako:1188
+#: src/notebook/templates/editor_components.mako:605
 msgid "Start"
 msgstr "시작"
 
-#: src/notebook/templates/editor_components.mako:1197
+#: src/notebook/templates/editor_components.mako:613
 msgid "Query needs to be saved first."
 msgstr "먼저 쿼리를 저장해야 합니다."
 
-#: src/notebook/templates/editor_components.mako:1231
+#: src/notebook/templates/editor_components.mako:627
+msgid "There are currently no active sessions, please reload the page."
+msgstr "현재 활성 세션이 없습니다. 페이지를 다시 로드하십시오."
+
+#: src/notebook/templates/editor_components.mako:632
+msgid "Recreate session"
+msgstr "세션 다시 생성"
+
+#: src/notebook/templates/editor_components.mako:632
+msgid "Recreate"
+msgstr "다시 생성"
+
+#: src/notebook/templates/editor_components.mako:633
+msgid "Close session"
+msgstr "세션 닫기"
+
+#: src/notebook/templates/editor_components.mako:635
+msgid "Save session settings as default"
+msgstr "세션 설정 기본값으로 저장"
+
+#: src/notebook/templates/editor_components.mako:635
+msgid "Set as default settings"
+msgstr "기본 설정으로 구성"
+
+#: src/notebook/templates/editor_components.mako:689
 msgid "No logs available at this moment."
 msgstr "현재 사용 가능한 로그가 없습니다."
 
-#: src/notebook/templates/editor_components.mako:1240
+#: src/notebook/templates/editor_components.mako:698
 msgid "Success."
 msgstr "성공."
 
-#: src/notebook/templates/editor_components.mako:1244
+#: src/notebook/templates/editor_components.mako:702
 msgid "Done. 0 results."
 msgstr "완료했습니다. 결과: 0개."
 
-#: src/notebook/templates/editor_components.mako:1248
-#: src/notebook/templates/editor_components.mako:1918
+#: src/notebook/templates/editor_components.mako:706
+#: src/notebook/templates/editor_components.mako:1399
 #: src/notebook/templates/editor_m.mako:115
 msgid "Results have expired, rerun the query if needed."
 msgstr "결과가 만료되었습니다. 필요한 경우 쿼리를 다시 실행하십시오."
 
-#: src/notebook/templates/editor_components.mako:1252
+#: src/notebook/templates/editor_components.mako:710
 msgid "Loading..."
 msgstr "로드 중..."
 
-#: src/notebook/templates/editor_components.mako:1262
+#: src/notebook/templates/editor_components.mako:720
 msgid "Query History"
 msgstr "쿼리 기록"
 
-#: src/notebook/templates/editor_components.mako:1263
+#: src/notebook/templates/editor_components.mako:721
 msgid "Search the query history"
 msgstr "쿼리 기록 검색"
 
-#: src/notebook/templates/editor_components.mako:1264
-#: src/notebook/templates/editor_components.mako:1271
+#: src/notebook/templates/editor_components.mako:722
+#: src/notebook/templates/editor_components.mako:729
 msgid "Search..."
 msgstr "검색..."
 
-#: src/notebook/templates/editor_components.mako:1265
+#: src/notebook/templates/editor_components.mako:723
 msgid "Clear the query history"
 msgstr "쿼리 기록 지우기"
 
-#: src/notebook/templates/editor_components.mako:1269
+#: src/notebook/templates/editor_components.mako:727
 msgid "Saved Queries"
 msgstr "저장된 쿼리"
 
-#: src/notebook/templates/editor_components.mako:1270
+#: src/notebook/templates/editor_components.mako:728
 msgid "Search the saved queries"
 msgstr "저장된 쿼리 검색"
 
-#: src/notebook/templates/editor_components.mako:1275
+#: src/notebook/templates/editor_components.mako:733
 msgid "Query Builder"
 msgstr "쿼리 빌더"
 
-#: src/notebook/templates/editor_components.mako:1279
+#: src/notebook/templates/editor_components.mako:737
 msgid "Results"
 msgstr "결과"
 
-#: src/notebook/templates/editor_components.mako:1281
+#: src/notebook/templates/editor_components.mako:739
 msgid "Number of rows"
 msgstr "행 수"
 
-#: src/notebook/templates/editor_components.mako:1283
+#: src/notebook/templates/editor_components.mako:741
 msgid "Search the results"
 msgstr "결과 검색"
 
-#: src/notebook/templates/editor_components.mako:1284
+#: src/notebook/templates/editor_components.mako:742
 msgid "Expand results"
 msgstr "결과 확장"
 
-#: src/notebook/templates/editor_components.mako:1285
-#: src/notebook/templates/editor_components.mako:1477
+#: src/notebook/templates/editor_components.mako:743
+#: src/notebook/templates/editor_components.mako:943
 msgid "Collapse results"
 msgstr "결과 접기"
 
-#: src/notebook/templates/editor_components.mako:1290
-#: src/notebook/templates/editor_components.mako:2193
+#: src/notebook/templates/editor_components.mako:748
+#: src/notebook/templates/editor_components.mako:1684
 msgid "Explain"
 msgstr "설명"
 
-#: src/notebook/templates/editor_components.mako:1312
+#: src/notebook/templates/editor_components.mako:770
 msgid "No queries to be shown."
 msgstr "표시할 쿼리가 없습니다."
 
-#: src/notebook/templates/editor_components.mako:1315
-#: src/notebook/templates/editor_components.mako:1364
+#: src/notebook/templates/editor_components.mako:773
+#: src/notebook/templates/editor_components.mako:822
 msgid "No queries found for"
 msgstr "다음에 대한 쿼리를 찾을 수 없음"
 
-#: src/notebook/templates/editor_components.mako:1358
+#: src/notebook/templates/editor_components.mako:816
 msgid "Error loading my queries"
 msgstr "내 쿼리 로드 중 오류가 발생했습니다."
 
-#: src/notebook/templates/editor_components.mako:1361
+#: src/notebook/templates/editor_components.mako:819
 msgid "You don't have any saved query."
 msgstr "저장한 쿼리가 없습니다."
 
-#: src/notebook/templates/editor_components.mako:1370
-#: src/notebook/templates/editor_components.mako:2364
+#: src/notebook/templates/editor_components.mako:828
+#: src/notebook/templates/editor_components.mako:1870
 #: src/notebook/templates/notebooks.mako:108
 msgid "Name"
 msgstr "이름"
 
-#: src/notebook/templates/editor_components.mako:1371
-#: src/notebook/templates/editor_components.mako:2370
+#: src/notebook/templates/editor_components.mako:829
+#: src/notebook/templates/editor_components.mako:1876
 #: src/notebook/templates/notebooks.mako:109
 msgid "Description"
 msgstr "설명"
 
-#: src/notebook/templates/editor_components.mako:1372
+#: src/notebook/templates/editor_components.mako:830
 #: src/notebook/templates/notebooks.mako:110
 msgid "Owner"
 msgstr "소유자"
 
-#: src/notebook/templates/editor_components.mako:1373
+#: src/notebook/templates/editor_components.mako:831
 #: src/notebook/templates/notebooks.mako:111
 msgid "Last Modified"
 msgstr "최종 수정 날짜"
 
-#: src/notebook/templates/editor_components.mako:1388
+#: src/notebook/templates/editor_components.mako:846
 msgid "Prev"
 msgstr "이전"
 
-#: src/notebook/templates/editor_components.mako:1390
+#: src/notebook/templates/editor_components.mako:848
 #: src/notebook/templates/notebooks.mako:280
 msgid "Next"
 msgstr "다음"
 
-#: src/notebook/templates/editor_components.mako:1397
+#: src/notebook/templates/editor_components.mako:855
 msgid ""
 "There are currently no rules defined. To get started, right click on any "
 "table column in the SQL Assist panel."
 msgstr "현재 정의된 규칙이 없습니다. 시작하려면 SQL Assist 패널에서 테이블 열을 우클릭하십시오."
 
-#: src/notebook/templates/editor_components.mako:1401
+#: src/notebook/templates/editor_components.mako:859
 msgid "Table"
 msgstr "테이블"
 
-#: src/notebook/templates/editor_components.mako:1402
+#: src/notebook/templates/editor_components.mako:860
 msgid "Column"
 msgstr "열"
 
-#: src/notebook/templates/editor_components.mako:1403
+#: src/notebook/templates/editor_components.mako:861
 msgid "Operation"
 msgstr "작업"
 
-#: src/notebook/templates/editor_components.mako:1409
+#: src/notebook/templates/editor_components.mako:867
 msgid "Build query"
 msgstr "쿼리 빌드"
 
-#: src/notebook/templates/editor_components.mako:1443
-msgid "The operation in the server is taking longer than expected"
-msgstr "서버에서 작업이 예상보다 오래 걸림"
+#: src/notebook/templates/editor_components.mako:901
+msgid "The query is hanging and taking longer than expected."
+msgstr "쿼리가 중지되어 예상보다 오래 걸리고 있습니다."
 
-#: src/notebook/templates/editor_components.mako:1452
-#: src/notebook/templates/editor_components.mako:1473
-msgid "Show Logs"
-msgstr "로그 표시"
-
-#: src/notebook/templates/editor_components.mako:1453
-#: src/notebook/templates/editor_components.mako:1466
-msgid "Execution time"
-msgstr "실행 시간"
-
-#: src/notebook/templates/editor_components.mako:1458
-#: src/notebook/templates/editor_components.mako:1474
-msgid "Settings and properties"
-msgstr "설정 및 속성"
-
-#: src/notebook/templates/editor_components.mako:1475
-msgid "Show editor shortcuts"
-msgstr "편집기 단축키 표시"
-
-#: src/notebook/templates/editor_components.mako:1568
+#: src/notebook/templates/editor_components.mako:907
 msgid "The current query has been redacted to hide sensitive information."
 msgstr "현재 쿼리가 기밀 정보를 숨기도록 수정되었습니다."
 
-#: src/notebook/templates/editor_components.mako:1581
-msgid "No risks were detected in this query."
-msgstr "이 쿼리에서 위험이 감지되지 않았습니다."
+#: src/notebook/templates/editor_components.mako:917
+#: src/notebook/templates/editor_components.mako:939
+msgid "Show Logs"
+msgstr "로그 표시"
 
-#: src/notebook/templates/editor_components.mako:1601
-msgid "The query is compatible!"
-msgstr "쿼리가 호환 가능합니다!"
+#: src/notebook/templates/editor_components.mako:918
+#: src/notebook/templates/editor_components.mako:932
+msgid "Execution time"
+msgstr "실행 시간"
 
-#: src/notebook/templates/editor_components.mako:1601
-msgid "Execute with Impala?"
-msgstr "Impala에서 실행하시겠습니까?"
+#: src/notebook/templates/editor_components.mako:923
+#: src/notebook/templates/editor_components.mako:940
+msgid "Settings and properties"
+msgstr "설정 및 속성"
 
-#: src/notebook/templates/editor_components.mako:1604
-msgid "Query is not compatible with Impala."
-msgstr "쿼리가 Impala와 호환되지 않습니다."
+#: src/notebook/templates/editor_components.mako:941
+msgid "Show editor shortcuts"
+msgstr "편집기 단축키 표시"
 
-#: src/notebook/templates/editor_components.mako:1624
+#: src/notebook/templates/editor_components.mako:1029
+msgid "Query Validator"
+msgstr "쿼리 확인기"
+
+#: src/notebook/templates/editor_components.mako:1043
+msgid "The query has a parse error."
+msgstr "쿼리에 구문 분석 오류가 있습니다."
+
+#: src/notebook/templates/editor_components.mako:1052
+msgid "The query is compatible with Impala."
+msgstr "쿼리가 Impala와 호환됩니다."
+
+#: src/notebook/templates/editor_components.mako:1052
+msgid "Execute it now in Impala!"
+msgstr "이제 Impala에서 실행하십시오."
+
+#: src/notebook/templates/editor_components.mako:1060
+msgid "This query is not compatible with Impala."
+msgstr "이 쿼리는 Impala와 호환되지 않습니다."
+
+#: src/notebook/templates/editor_components.mako:1072
+msgid "Query validated."
+msgstr "쿼리가 확인되었습니다."
+
+#: src/notebook/templates/editor_components.mako:1093
 msgid "Query File"
 msgstr "쿼리 파일"
 
-#: src/notebook/templates/editor_components.mako:1625
+#: src/notebook/templates/editor_components.mako:1094
 msgid "Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql"
 msgstr "파일 경로, 예: /user/hue/sample.sql, s3a://hue/sample.sql"
 
-#: src/notebook/templates/editor_components.mako:1628
-#: src/notebook/templates/editor_components.mako:1648
+#: src/notebook/templates/editor_components.mako:1097
+#: src/notebook/templates/editor_components.mako:1117
 msgid "Open in new tab"
 msgstr "새 탭에서 열기"
 
-#: src/notebook/templates/editor_components.mako:1642
+#: src/notebook/templates/editor_components.mako:1111
 msgid "Document"
 msgstr "문서"
 
-#: src/notebook/templates/editor_components.mako:1644
+#: src/notebook/templates/editor_components.mako:1113
 msgid "Search your documents..."
 msgstr "문서 검색..."
 
-#: src/notebook/templates/editor_components.mako:1688
+#: src/notebook/templates/editor_components.mako:1162
 msgid "Variable value"
 msgstr "변수 값"
 
-#: src/notebook/templates/editor_components.mako:1700
-#: src/notebook/templates/editor_components.mako:1760
+#: src/notebook/templates/editor_components.mako:1174
+#: src/notebook/templates/editor_components.mako:1241
 msgid "type"
 msgstr "유형"
 
-#: src/notebook/templates/editor_components.mako:1704
-#: src/notebook/templates/editor_components.mako:2237
-#: src/notebook/templates/editor_components.mako:2252
+#: src/notebook/templates/editor_components.mako:1178
+#: src/notebook/templates/editor_components.mako:1743
+#: src/notebook/templates/editor_components.mako:1758
 msgid "Bars"
 msgstr "막대"
 
-#: src/notebook/templates/editor_components.mako:1705
-#: src/notebook/templates/editor_components.mako:2238
-#: src/notebook/templates/editor_components.mako:2257
+#: src/notebook/templates/editor_components.mako:1179
+#: src/notebook/templates/editor_components.mako:1744
+#: src/notebook/templates/editor_components.mako:1763
 msgid "Lines"
 msgstr "줄"
 
-#: src/notebook/templates/editor_components.mako:1712
-#: src/notebook/templates/editor_components.mako:1737
+#: src/notebook/templates/editor_components.mako:1186
+#: src/notebook/templates/editor_components.mako:1211
 msgid "value"
 msgstr "값"
 
-#: src/notebook/templates/editor_components.mako:1718
+#: src/notebook/templates/editor_components.mako:1192
 msgid "legend"
 msgstr "범례"
 
-#: src/notebook/templates/editor_components.mako:1727
+#: src/notebook/templates/editor_components.mako:1201
 msgid "x-axis"
 msgstr "X축"
 
-#: src/notebook/templates/editor_components.mako:1728
+#: src/notebook/templates/editor_components.mako:1202
 msgid "region"
 msgstr "영역"
 
-#: src/notebook/templates/editor_components.mako:1729
+#: src/notebook/templates/editor_components.mako:1203
 msgid "latitude"
 msgstr "위도"
 
-#: src/notebook/templates/editor_components.mako:1736
+#: src/notebook/templates/editor_components.mako:1210
 msgid "y-axis"
 msgstr "Y축"
 
-#: src/notebook/templates/editor_components.mako:1738
+#: src/notebook/templates/editor_components.mako:1212
 msgid "longitude"
 msgstr "경도"
 
-#: src/notebook/templates/editor_components.mako:1752
+#: src/notebook/templates/editor_components.mako:1226
 msgid "group"
 msgstr "그룹"
 
-#: src/notebook/templates/editor_components.mako:1764
+#: src/notebook/templates/editor_components.mako:1233
+msgid "limit"
+msgstr "제한"
+
+#: src/notebook/templates/editor_components.mako:1245
 msgid "Markers"
 msgstr "Marker"
 
-#: src/notebook/templates/editor_components.mako:1765
+#: src/notebook/templates/editor_components.mako:1246
 msgid "Heatmap"
 msgstr "Heatmap"
 
-#: src/notebook/templates/editor_components.mako:1771
+#: src/notebook/templates/editor_components.mako:1252
 msgid "label"
 msgstr "레이블"
 
-#: src/notebook/templates/editor_components.mako:1780
+#: src/notebook/templates/editor_components.mako:1261
 msgid "intensity"
 msgstr "강도"
 
-#: src/notebook/templates/editor_components.mako:1789
+#: src/notebook/templates/editor_components.mako:1270
 msgid "scatter size"
 msgstr "크기 분산"
 
-#: src/notebook/templates/editor_components.mako:1796
+#: src/notebook/templates/editor_components.mako:1277
 msgid "scatter group"
 msgstr "그룹 분산"
 
-#: src/notebook/templates/editor_components.mako:1804
+#: src/notebook/templates/editor_components.mako:1285
 msgid "scope"
 msgstr "범위"
 
-#: src/notebook/templates/editor_components.mako:1808
+#: src/notebook/templates/editor_components.mako:1289
 msgid "World"
 msgstr "세계"
 
-#: src/notebook/templates/editor_components.mako:1809
+#: src/notebook/templates/editor_components.mako:1290
 msgid "Europe"
 msgstr "유럽"
 
-#: src/notebook/templates/editor_components.mako:1810
+#: src/notebook/templates/editor_components.mako:1291
 msgid "Australia"
 msgstr "오스트레일리아"
 
-#: src/notebook/templates/editor_components.mako:1811
+#: src/notebook/templates/editor_components.mako:1292
 msgid "Brazil"
 msgstr "브라질"
 
-#: src/notebook/templates/editor_components.mako:1812
+#: src/notebook/templates/editor_components.mako:1293
 msgid "Canada"
 msgstr "캐나다"
 
-#: src/notebook/templates/editor_components.mako:1813
+#: src/notebook/templates/editor_components.mako:1294
 msgid "China"
 msgstr "중국"
 
-#: src/notebook/templates/editor_components.mako:1814
+#: src/notebook/templates/editor_components.mako:1295
 msgid "France"
 msgstr "프랑스"
 
-#: src/notebook/templates/editor_components.mako:1815
+#: src/notebook/templates/editor_components.mako:1296
 msgid "Germany"
 msgstr "독일"
 
-#: src/notebook/templates/editor_components.mako:1816
+#: src/notebook/templates/editor_components.mako:1297
 msgid "Italy"
 msgstr "이탈리아"
 
-#: src/notebook/templates/editor_components.mako:1817
+#: src/notebook/templates/editor_components.mako:1298
 msgid "Japan"
 msgstr "일본"
 
-#: src/notebook/templates/editor_components.mako:1818
+#: src/notebook/templates/editor_components.mako:1299
 msgid "UK"
 msgstr "영국"
 
-#: src/notebook/templates/editor_components.mako:1819
+#: src/notebook/templates/editor_components.mako:1300
 msgid "USA"
 msgstr "미국"
 
-#: src/notebook/templates/editor_components.mako:1825
+#: src/notebook/templates/editor_components.mako:1306
 msgid "sorting"
 msgstr "정렬"
 
-#: src/notebook/templates/editor_components.mako:1828
+#: src/notebook/templates/editor_components.mako:1309
 msgid "No sorting"
 msgstr "정렬되지 않음"
 
-#: src/notebook/templates/editor_components.mako:1829
+#: src/notebook/templates/editor_components.mako:1310
 msgid "Sort ascending"
 msgstr "오름차순으로 정렬"
 
-#: src/notebook/templates/editor_components.mako:1830
+#: src/notebook/templates/editor_components.mako:1311
 msgid "Sort descending"
 msgstr "내림차순으로 정렬"
 
-#: src/notebook/templates/editor_components.mako:1844
+#: src/notebook/templates/editor_components.mako:1325
 msgid "columns"
 msgstr "열"
 
-#: src/notebook/templates/editor_components.mako:1846
+#: src/notebook/templates/editor_components.mako:1327
 msgid "Search"
 msgstr "검색"
 
-#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:1331
 msgid "Filter columns..."
 msgstr "열 필터링..."
 
-#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:1331
 msgid "Type column:xxx or type:yyy for specific filters."
 msgstr "특정 필터에 대해 column:xxx 또는 type:yyy 입력."
 
-#: src/notebook/templates/editor_components.mako:1864
+#: src/notebook/templates/editor_components.mako:1345
 msgid "No results found"
 msgstr "결과를 찾을 수 없음"
 
-#: src/notebook/templates/editor_components.mako:1888
+#: src/notebook/templates/editor_components.mako:1369
 msgid "Done."
 msgstr "완료했습니다."
 
-#: src/notebook/templates/editor_components.mako:1923
+#: src/notebook/templates/editor_components.mako:1404
 msgid "Select the chart parameters on the left"
 msgstr "왼쪽에서 차트 매개변수 선택"
 
-#: src/notebook/templates/editor_components.mako:1971
+#: src/notebook/templates/editor_components.mako:1452
 msgid "Type your text here, select some text to format it"
 msgstr "여기에 텍스트를 입력하고 일부 텍스트를 선택하여 서식 지정"
 
-#: src/notebook/templates/editor_components.mako:2000
+#: src/notebook/templates/editor_components.mako:1481
 msgid "Source"
 msgstr "소스"
 
-#: src/notebook/templates/editor_components.mako:2002
+#: src/notebook/templates/editor_components.mako:1483
 msgid "Source path to copy, e.g. ${nameNode1}/path/to/input.txt"
 msgstr "복사할 소스 경로, 예: ${nameNode1}/path/to/input.txt"
 
-#: src/notebook/templates/editor_components.mako:2006
+#: src/notebook/templates/editor_components.mako:1487
 msgid "Destination"
 msgstr "대상"
 
-#: src/notebook/templates/editor_components.mako:2008
+#: src/notebook/templates/editor_components.mako:1489
 msgid "Destination path, e.g. ${nameNode2}/path/to/output.txt"
 msgstr "대상 경로, 예: ${nameNode2}/path/to/output.txt"
 
-#: src/notebook/templates/editor_components.mako:2014
+#: src/notebook/templates/editor_components.mako:1495
 msgid "Script path"
 msgstr "스크립트 경로"
 
-#: src/notebook/templates/editor_components.mako:2016
+#: src/notebook/templates/editor_components.mako:1497
 msgid "Source path to the command"
 msgstr "명령에 대한 소스 경로"
 
-#: src/notebook/templates/editor_components.mako:2020
+#: src/notebook/templates/editor_components.mako:1501
 msgid "Environment variables"
 msgstr "환경 변수"
 
-#: src/notebook/templates/editor_components.mako:2028
+#: src/notebook/templates/editor_components.mako:1509
 msgid "Jar path"
 msgstr "Jar 경로"
 
-#: src/notebook/templates/editor_components.mako:2030
+#: src/notebook/templates/editor_components.mako:1511
 msgid "Source path to the main MapReduce jar"
 msgstr "주 MapReduce jar에 대한 소스 경로"
 
-#: src/notebook/templates/editor_components.mako:2034
+#: src/notebook/templates/editor_components.mako:1515
 msgid "Hadoop properties"
 msgstr "Hadoop 속성"
 
-#: src/notebook/templates/editor_components.mako:2042
-#: src/notebook/templates/editor_components.mako:2056
+#: src/notebook/templates/editor_components.mako:1523
+#: src/notebook/templates/editor_components.mako:1537
 msgid "Path"
 msgstr "경로"
 
-#: src/notebook/templates/editor_components.mako:2044
+#: src/notebook/templates/editor_components.mako:1525
 msgid ""
 "Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-"
 "examples.jar"
 msgstr "애플리케이션 Jar에 대한 경로(예: hdfs://localhost:8020/user/hue/oozie-examples.jar)"
 
-#: src/notebook/templates/editor_components.mako:2048
-#: src/notebook/templates/editor_components.mako:2069
+#: src/notebook/templates/editor_components.mako:1529
+#: src/notebook/templates/editor_components.mako:1550
 msgid "Class"
 msgstr "클래스"
 
-#: src/notebook/templates/editor_components.mako:2050
-#: src/notebook/templates/editor_components.mako:2072
+#: src/notebook/templates/editor_components.mako:1531
+#: src/notebook/templates/editor_components.mako:1553
 msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
 msgstr "애플리케이션의 클래스 이름(예: org.apache.oozie.example.SparkFileCopy)"
 
-#: src/notebook/templates/editor_components.mako:2058
+#: src/notebook/templates/editor_components.mako:1539
 msgid "Path to python file, e.g. script.py"
 msgstr "python 파일에 대한 경로(예: script.py)"
 
-#: src/notebook/templates/editor_components.mako:2102
+#: src/notebook/templates/editor_components.mako:1591
+msgid "Click to hide"
+msgstr "숨기려면 클릭"
+
+#: src/notebook/templates/editor_components.mako:1593
 msgid "The statement was canceled."
 msgstr "명령문이 취소되었습니다."
 
-#: src/notebook/templates/editor_components.mako:2131
+#: src/notebook/templates/editor_components.mako:1622
 msgid "Creating session"
 msgstr "세션 생성 중"
 
-#: src/notebook/templates/editor_components.mako:2134
+#: src/notebook/templates/editor_components.mako:1625
 msgid "Restart from the first statement"
 msgstr "첫 번째 명령문에서 다시 시작"
 
-#: src/notebook/templates/editor_components.mako:2141
+#: src/notebook/templates/editor_components.mako:1632
 #: src/notebook/templates/editor_m.mako:95
 msgid "Cancel operation"
 msgstr "작업 취소"
 
-#: src/notebook/templates/editor_components.mako:2146
+#: src/notebook/templates/editor_components.mako:1637
 msgid "Canceling operation..."
 msgstr "작업 취소 중..."
 
-#: src/notebook/templates/editor_components.mako:2152
-#: src/notebook/templates/editor_components.mako:2173
+#: src/notebook/templates/editor_components.mako:1643
+#: src/notebook/templates/editor_components.mako:1664
 msgid "Submit all the queries as a background batch job."
 msgstr "배경 배치 Job으로 모든 쿼리를 제출합니다."
 
-#: src/notebook/templates/editor_components.mako:2168
+#: src/notebook/templates/editor_components.mako:1659
 msgid "Execute interactively the current statement"
 msgstr "대화식으로 현재 명령문 실행"
 
-#: src/notebook/templates/editor_components.mako:2169
+#: src/notebook/templates/editor_components.mako:1660
 #: src/notebook/templates/editor_m.mako:92
 msgid "Execute"
 msgstr "실행"
 
-#: src/notebook/templates/editor_components.mako:2174
+#: src/notebook/templates/editor_components.mako:1665
 msgid "Batch"
 msgstr "배치"
 
-#: src/notebook/templates/editor_components.mako:2184
-#: src/notebook/templates/editor_components.mako:2192
+#: src/notebook/templates/editor_components.mako:1675
+#: src/notebook/templates/editor_components.mako:1683
 msgid "Explain the current SQL query"
 msgstr "현재 SQL 쿼리 설명"
 
-#: src/notebook/templates/editor_components.mako:2198
+#: src/notebook/templates/editor_components.mako:1689
 msgid "Format the current SQL query"
 msgstr "현재 SQL 쿼리 형식 지정"
 
-#: src/notebook/templates/editor_components.mako:2199
+#: src/notebook/templates/editor_components.mako:1690
 msgid "Format"
 msgstr "형식"
 
-#: src/notebook/templates/editor_components.mako:2204
+#: src/notebook/templates/editor_components.mako:1695
 msgid "Clear the current editor"
 msgstr "현재 편집기 지우기"
 
-#: src/notebook/templates/editor_components.mako:2205
+#: src/notebook/templates/editor_components.mako:1696
 msgid "Clear"
 msgstr "지우기"
 
-#: src/notebook/templates/editor_components.mako:2211
-msgid "Get Impala compatibility hints"
-msgstr "Impala 호환성 힌트 가져오기"
+#: src/notebook/templates/editor_components.mako:1702
+msgid "Get syntax checks"
+msgstr "구문 확인하기"
 
-#: src/notebook/templates/editor_components.mako:2212
-msgid "Check Impala compatibility"
-msgstr "Impala 호환성 검사"
+#: src/notebook/templates/editor_components.mako:1703
+msgid "Check syntax"
+msgstr "구문 확인"
 
-#: src/notebook/templates/editor_components.mako:2216
+#: src/notebook/templates/editor_components.mako:1707
 msgid "Get recommendations on query risks and optimizations"
 msgstr "쿼리 위험 및 최적화에 대한 권장사항 가져오기"
 
-#: src/notebook/templates/editor_components.mako:2217
+#: src/notebook/templates/editor_components.mako:1708
 msgid "Check complexity"
 msgstr "복잡도 확인"
 
-#: src/notebook/templates/editor_components.mako:2230
+#: src/notebook/templates/editor_components.mako:1712
+msgid "Get Impala compatibility hints"
+msgstr "Impala 호환성 힌트 가져오기"
+
+#: src/notebook/templates/editor_components.mako:1713
+msgid "Check Impala compatibility"
+msgstr "Impala 호환성 검사"
+
+#: src/notebook/templates/editor_components.mako:1717
+msgid "Expand query with similar queries suggestions"
+msgstr "유사 쿼리 추천으로 쿼리를 확장"
+
+#: src/notebook/templates/editor_components.mako:1718
+msgid "Show similarities"
+msgstr "유사성 표시"
+
+#: src/notebook/templates/editor_components.mako:1722
+msgid "Load past query history in order to improve recommendations"
+msgstr "권장사항 향상을 위해 지난 쿼리 기록 로드"
+
+#: src/notebook/templates/editor_components.mako:1723
+msgid "Upload workload"
+msgstr "워크로드 업로드"
+
+#: src/notebook/templates/editor_components.mako:1736
 msgid "Grid"
 msgstr "눈금선"
 
-#: src/notebook/templates/editor_components.mako:2239
-#: src/notebook/templates/editor_components.mako:2262
+#: src/notebook/templates/editor_components.mako:1745
+#: src/notebook/templates/editor_components.mako:1768
 msgid "Time"
 msgstr "시간"
 
-#: src/notebook/templates/editor_components.mako:2240
-#: src/notebook/templates/editor_components.mako:2267
+#: src/notebook/templates/editor_components.mako:1746
+#: src/notebook/templates/editor_components.mako:1773
 msgid "Pie"
 msgstr "파이"
 
-#: src/notebook/templates/editor_components.mako:2241
-#: src/notebook/templates/editor_components.mako:2272
+#: src/notebook/templates/editor_components.mako:1747
+#: src/notebook/templates/editor_components.mako:1778
 msgid "Scatter"
 msgstr "분산"
 
-#: src/notebook/templates/editor_components.mako:2242
-#: src/notebook/templates/editor_components.mako:2277
+#: src/notebook/templates/editor_components.mako:1748
+#: src/notebook/templates/editor_components.mako:1783
 msgid "Marker Map"
 msgstr "Marker Map"
 
-#: src/notebook/templates/editor_components.mako:2243
-#: src/notebook/templates/editor_components.mako:2282
+#: src/notebook/templates/editor_components.mako:1749
+#: src/notebook/templates/editor_components.mako:1788
 msgid "Gradient Map"
 msgstr "경사도 Map"
 
-#: src/notebook/templates/editor_components.mako:2289
+#: src/notebook/templates/editor_components.mako:1795
 msgid "Columns"
 msgstr "열"
 
-#: src/notebook/templates/editor_components.mako:2306
+#: src/notebook/templates/editor_components.mako:1812
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/notebook/templates/editor_components.mako:2327
+#: src/notebook/templates/editor_components.mako:1833
 msgid "Confirm Remove"
 msgstr "제거 확인"
 
-#: src/notebook/templates/editor_components.mako:2330
+#: src/notebook/templates/editor_components.mako:1836
 msgid "Are you sure you want to remove this snippet?"
 msgstr "이 스니펫을 제거하시겠습니까?"
 
-#: src/notebook/templates/editor_components.mako:2333
-#: src/notebook/templates/editor_components.mako:2422
-#: src/notebook/templates/editor_components.mako:2437
+#: src/notebook/templates/editor_components.mako:1839
+#: src/notebook/templates/editor_components.mako:1928
+#: src/notebook/templates/editor_components.mako:1943
 #: src/notebook/templates/notebooks.mako:162
 msgid "No"
 msgstr "아니요"
 
-#: src/notebook/templates/editor_components.mako:2334
-#: src/notebook/templates/editor_components.mako:2423
+#: src/notebook/templates/editor_components.mako:1840
+#: src/notebook/templates/editor_components.mako:1929
 #: src/notebook/templates/notebooks.mako:163
 msgid "Yes"
 msgstr "예"
 
-#: src/notebook/templates/editor_components.mako:2341
-#: src/notebook/templates/editor_components.mako:2498
+#: src/notebook/templates/editor_components.mako:1847
+#: src/notebook/templates/editor_components.mako:2007
 msgid "Drop a SQL file here"
 msgstr "SQL 파일 여기 두기"
 
-#: src/notebook/templates/editor_components.mako:2344
-#: src/notebook/templates/editor_components.mako:2500
+#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:2009
 msgid "Drop iPython/Zeppelin notebooks here"
 msgstr "iPython/Zeppelin 노트북 여기 두기"
 
-#: src/notebook/templates/editor_components.mako:2353
+#: src/notebook/templates/editor_components.mako:1859
 msgid "Save query as..."
 msgstr "쿼리를 다른 이름으로 저장..."
 
-#: src/notebook/templates/editor_components.mako:2356
+#: src/notebook/templates/editor_components.mako:1862
 msgid "Save notebook as..."
 msgstr "노트북을 다른 이름으로 저장..."
 
-#: src/notebook/templates/editor_components.mako:2372
+#: src/notebook/templates/editor_components.mako:1878
 msgid "(optional)"
 msgstr "(선택 사항)"
 
-#: src/notebook/templates/editor_components.mako:2378
-#: src/notebook/templates/editor_components.mako:2407
+#: src/notebook/templates/editor_components.mako:1884
+#: src/notebook/templates/editor_components.mako:1913
 #: src/notebook/templates/editor_m.mako:96
-#: src/notebook/templates/notebook_ko_components.mako:273
 msgid "Cancel"
 msgstr "취소"
 
-#: src/notebook/templates/editor_components.mako:2379
-#: src/notebook/templates/notebook_ko_components.mako:274
+#: src/notebook/templates/editor_components.mako:1885
 msgid "Save"
 msgstr "저장"
 
-#: src/notebook/templates/editor_components.mako:2388
+#: src/notebook/templates/editor_components.mako:1894
 msgid "Connect to the data source"
 msgstr "데이터 소스에 연결"
 
-#: src/notebook/templates/editor_components.mako:2395
+#: src/notebook/templates/editor_components.mako:1901
 msgid "Username"
 msgstr "사용자 이름"
 
-#: src/notebook/templates/editor_components.mako:2401
+#: src/notebook/templates/editor_components.mako:1907
 msgid "Password"
 msgstr "암호"
 
-#: src/notebook/templates/editor_components.mako:2408
+#: src/notebook/templates/editor_components.mako:1914
 msgid "Connect"
 msgstr "연결"
 
-#: src/notebook/templates/editor_components.mako:2416
+#: src/notebook/templates/editor_components.mako:1922
 msgid "Confirm History Clear"
 msgstr "기록 지우기 확인"
 
-#: src/notebook/templates/editor_components.mako:2419
+#: src/notebook/templates/editor_components.mako:1925
 msgid "Are you sure you want to clear the query history?"
 msgstr "쿼리 기록을 지우시겠습니까?"
 
-#: src/notebook/templates/editor_components.mako:2431
+#: src/notebook/templates/editor_components.mako:1937
 msgid "Operation timed out"
 msgstr "작업 시간 초과됨"
 
-#: src/notebook/templates/editor_components.mako:2434
+#: src/notebook/templates/editor_components.mako:1940
 msgid "The operation timed out. Do you want to retry?"
 msgstr "작업 시간이 초과되었습니다. 재시도하시겠습니까?"
 
-#: src/notebook/templates/editor_components.mako:2438
+#: src/notebook/templates/editor_components.mako:1944
 msgid "Yes, retry"
 msgstr "예, 재시도"
 
-#: src/notebook/templates/editor_components.mako:2487
+#: src/notebook/templates/editor_components.mako:1993
 msgid "Failed to load"
 msgstr "로드할 수 없음"
 
-#: src/notebook/templates/editor_components.mako:2552
+#: src/notebook/templates/editor_components.mako:2061
 msgid "No results found."
 msgstr "결과를 찾을 수 없습니다."
 
-#: src/notebook/templates/editor_components.mako:2553
+#: src/notebook/templates/editor_components.mako:2062
 msgid "of"
 msgstr "/"
 
-#: src/notebook/templates/editor_components.mako:3099
+#: src/notebook/templates/editor_components.mako:2657
 msgid "Distribution"
 msgstr "배포"
 
-#: src/notebook/templates/editor_components.mako:3133
-#: src/notebook/templates/editor_components.mako:3143
-#: src/notebook/templates/editor_components.mako:3149
-#: src/notebook/templates/editor_components.mako:3158
-#: src/notebook/templates/editor_components.mako:3164
-#: src/notebook/templates/editor_components.mako:3170
-#: src/notebook/templates/editor_components.mako:3181
-#: src/notebook/templates/editor_components.mako:3234
+#: src/notebook/templates/editor_components.mako:2691
+#: src/notebook/templates/editor_components.mako:2701
+#: src/notebook/templates/editor_components.mako:2707
+#: src/notebook/templates/editor_components.mako:2716
+#: src/notebook/templates/editor_components.mako:2722
+#: src/notebook/templates/editor_components.mako:2728
+#: src/notebook/templates/editor_components.mako:2739
+#: src/notebook/templates/editor_components.mako:2793
 #: src/notebook/templates/editor_m.mako:201
 #: src/notebook/templates/editor_m.mako:211
 #: src/notebook/templates/editor_m.mako:217
@@ -1550,12 +1230,12 @@ msgstr "배포"
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 
-#: src/notebook/templates/editor_components.mako:3139
-#: src/notebook/templates/editor_components.mako:3176
-#: src/notebook/templates/editor_components.mako:3199
-#: src/notebook/templates/editor_components.mako:3204
-#: src/notebook/templates/editor_components.mako:3209
-#: src/notebook/templates/editor_components.mako:3214
+#: src/notebook/templates/editor_components.mako:2697
+#: src/notebook/templates/editor_components.mako:2734
+#: src/notebook/templates/editor_components.mako:2757
+#: src/notebook/templates/editor_components.mako:2762
+#: src/notebook/templates/editor_components.mako:2767
+#: src/notebook/templates/editor_components.mako:2772
 #: src/notebook/templates/editor_m.mako:207
 #: src/notebook/templates/editor_m.mako:244
 #: src/notebook/templates/editor_m.mako:267
@@ -1565,152 +1245,82 @@ msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 msgid "Example: 1 + 1, or press CTRL + space"
 msgstr "예: 1 + 1, 또는 CTRL + Space를 누름"
 
-#: src/notebook/templates/editor_components.mako:3187
+#: src/notebook/templates/editor_components.mako:2745
 #: src/notebook/templates/editor_m.mako:255
 msgid "Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space"
 msgstr "예: SELECT fieldA, FieldB FROM collectionname 또는 CTRL + Space 누름"
 
-#: src/notebook/templates/editor_components.mako:3240
+#: src/notebook/templates/editor_components.mako:2786
+msgid ""
+"Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
+msgstr ""
+"예: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
+
+#: src/notebook/templates/editor_components.mako:2799
 #: src/notebook/templates/editor_m.mako:293
 msgid "Type your text here"
 msgstr "여기에 텍스트 입력"
 
-#: src/notebook/templates/editor_components.mako:3245
+#: src/notebook/templates/editor_components.mako:2804
 #: src/notebook/templates/editor_m.mako:298
 msgid "Type your markdown here"
 msgstr "여기에 마크다운 입력"
 
-#: src/notebook/templates/editor_components.mako:3576
+#: src/notebook/templates/editor_components.mako:3135
 msgid "User successfully authenticated to GitHub."
 msgstr "사용자가 GitHub에 대해 인증되었습니다."
 
-#: src/notebook/templates/editor_components.mako:3580
+#: src/notebook/templates/editor_components.mako:3139
 msgid "Could not decode Github file content to JSON."
 msgstr "Github 파일 콘텐츠를 JSON으로 디코딩할 수 없습니다."
 
-#: src/notebook/templates/editor_components.mako:3949
+#: src/notebook/templates/editor_components.mako:3512
 msgid "Coordinator submitted."
 msgstr "Coordinator를 제출했습니다."
 
-#: src/notebook/templates/notebook.mako:27
+#: src/notebook/templates/hue_ace_autocompleter.mako:99
+msgid "Primary key"
+msgstr "기본 키"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:128
+msgid "Popular join"
+msgstr "인기 가입"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:142
+msgid "Popular join condition"
+msgstr "인기 가입 조건"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:156
+msgid "Popular aggregate"
+msgstr "인기 집계"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:180
+msgid "Popular group by"
+msgstr "인기 그룹 기준"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:194
+msgid "Popular order by"
+msgstr "인기 순서 기준"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:208
+msgid "Popular filter"
+msgstr "인기 필터"
+
+#: src/notebook/templates/notebook.mako:28
 msgid "Notebook"
 msgstr "노트북"
 
-#: src/notebook/templates/notebook.mako:33
+#: src/notebook/templates/notebook.mako:35
+#: src/notebook/templates/notebook_embeddable.mako:33
 msgid "There are no snippets configured."
 msgstr "구성된 스니펫이 없습니다."
 
-#: src/notebook/templates/notebook.mako:36
+#: src/notebook/templates/notebook.mako:38
+#: src/notebook/templates/notebook_embeddable.mako:36
 msgid "Add a snippet to start your new notebook"
 msgstr "스니펫을 추가하여 새 노트북 시작"
-
-#: src/notebook/templates/notebook_ko_components.mako:40
-msgid "Add a new snippet"
-msgstr "새 스니펫 추가"
-
-#: src/notebook/templates/notebook_ko_components.mako:41
-msgid "Select snippet"
-msgstr "스니펫 선택"
-
-#: src/notebook/templates/notebook_ko_components.mako:56
-msgid "Add Snippet"
-msgstr "스니펫 추가"
-
-#: src/notebook/templates/notebook_ko_components.mako:173
-msgid "Get results"
-msgstr "결과 가져오기"
-
-#: src/notebook/templates/notebook_ko_components.mako:184
-#, python-format
-msgid "Download first %s cells as CSV"
-msgstr "첫 %s 셀을 CSV로 다운로드"
-
-#: src/notebook/templates/notebook_ko_components.mako:185
-msgid "CSV"
-msgstr "CSV"
-
-#: src/notebook/templates/notebook_ko_components.mako:189
-#, python-format
-msgid "Download first %s cells as XLS"
-msgstr "첫 %s 셀을 XLS로 다운로드"
-
-#: src/notebook/templates/notebook_ko_components.mako:190
-msgid "Excel"
-msgstr "Excel"
-
-#: src/notebook/templates/notebook_ko_components.mako:194
-msgid "Save the results to a large file or a new table"
-msgstr "큰 파일 또는 새 테이블에 결과 저장"
-
-#: src/notebook/templates/notebook_ko_components.mako:195
-#: src/notebook/templates/notebooks.mako:84
-msgid "Export"
-msgstr "내보내기"
-
-#: src/notebook/templates/notebook_ko_components.mako:210
-msgid "Save query result in"
-msgstr "쿼리 결과 저장 위치"
-
-#: src/notebook/templates/notebook_ko_components.mako:220
-#, python-format
-msgid "A file (max %s cells)"
-msgstr "파일(최대 %s 셀)"
-
-#: src/notebook/templates/notebook_ko_components.mako:223
-msgid "Path to CSV file"
-msgstr "CSV 파일 경로"
-
-#: src/notebook/templates/notebook_ko_components.mako:235
-msgid "A file (large result)"
-msgstr "파일(큰 결과)"
-
-#: src/notebook/templates/notebook_ko_components.mako:238
-msgid "Path to empty directory"
-msgstr "빈 디렉토리 경로"
-
-#: src/notebook/templates/notebook_ko_components.mako:249
-msgid "A new table"
-msgstr "새 테이블"
-
-#: src/notebook/templates/notebook_ko_components.mako:252
-msgid "Table name or <database>.<table>"
-msgstr "테이블 이름 또는 <database>.<table>"
-
-#: src/notebook/templates/notebook_ko_components.mako:261
-msgid "A search dashboard"
-msgstr "검색 대시보드"
-
-#: src/notebook/templates/notebook_ko_components.mako:264
-msgid "Index name"
-msgstr "인덱스 이름"
-
-#: src/notebook/templates/notebook_ko_components.mako:281
-msgid "Your download is being prepared"
-msgstr "다운로드를 준비 중임"
-
-#: src/notebook/templates/notebook_ko_components.mako:284
-msgid "Your downloaded results have been truncated"
-msgstr "다운로드 결과가 잘렸음"
-
-#: src/notebook/templates/notebook_ko_components.mako:289
-msgid "Please wait, it might take a while..."
-msgstr "기다려 주십시오. 시간이 걸릴 수 있습니다..."
-
-#: src/notebook/templates/notebook_ko_components.mako:292
-msgid ""
-"The number of resulting rows was too big to be downloaded and the "
-"resulting file has been truncated to"
-msgstr ""
-"결과 행의 수가 다운로드하기에 너무 크고 "
-"결과 파일이"
-
-#: src/notebook/templates/notebook_ko_components.mako:294
-msgid "rows."
-msgstr "행으로 잘렸습니다."
-
-#: src/notebook/templates/notebook_ko_components.mako:299
-msgid "Cancel Download"
-msgstr "다운로드 취소"
 
 #: src/notebook/templates/notebooks.mako:32
 #, python-format
@@ -1741,9 +1351,17 @@ msgstr "이름, 설명 등을 검색합니다."
 msgid "Copy"
 msgstr "복사"
 
+#: src/notebook/templates/notebooks.mako:74
+msgid "Delete"
+msgstr "삭제"
+
 #: src/notebook/templates/notebooks.mako:80
 msgid "Share"
 msgstr "공유"
+
+#: src/notebook/templates/notebooks.mako:84
+msgid "Export"
+msgstr "내보내기"
 
 #: src/notebook/templates/notebooks.mako:95
 msgid "Create"
@@ -1797,185 +1415,368 @@ msgstr "마지막"
 msgid "Previous"
 msgstr "이전"
 
-#~ msgid "Requires a POST"
+#~ msgid "url param is required"
 #~ msgstr ""
 
-#~ msgid "Requires a DELETE"
+#~ msgid "User is already authenticated to GitHub."
 #~ msgstr ""
 
-#~ msgid "There was an error with your query: %s"
+#~ msgid "Base URL to GitHub Remote Server"
 #~ msgstr ""
 
-#~ msgid "A GET request is required."
+#~ msgid "Base URL to GitHub API"
 #~ msgstr ""
 
-#~ msgid "Missing application jar list."
+#~ msgid "The Client ID of the GitHub application."
 #~ msgstr ""
 
-#~ msgid "URL of the Spark Job Server."
+#~ msgid "The Client Secret of the GitHub application."
 #~ msgstr ""
 
-#~ msgid "The app won't work without a running Job Server"
+#~ msgid "Line Operations"
 #~ msgstr ""
 
-#~ msgid "An error happened with the Spark Server"
+#~ msgid "Selection"
 #~ msgstr ""
 
-#~ msgid "Script parameters"
+#~ msgid "Multicursor"
 #~ msgstr ""
 
-#~ msgid "Class path"
+#~ msgid "Go to"
 #~ msgstr ""
 
-#~ msgid "Delete context(s)?"
+#~ msgid "Find/Replace"
 #~ msgstr ""
 
-#~ msgid "Spark Igniter"
+#~ msgid "Folding"
 #~ msgstr ""
 
-#~ msgid "Applications"
+#~ msgid "Other"
 #~ msgstr ""
 
-#~ msgid "Dashboard"
+#~ msgid "Action"
 #~ msgstr ""
 
-#~ msgid "Contexts"
+#~ msgid "Remove line"
 #~ msgstr ""
 
-#~ msgid "Uploads"
+#~ msgid "Copy lines down"
 #~ msgstr ""
 
-#~ msgid "Create context"
+#~ msgid "Copy lines up"
 #~ msgstr ""
 
-#~ msgid "Num cpu cores"
+#~ msgid "Move lines down"
 #~ msgstr ""
 
-#~ msgid "Memory per node"
+#~ msgid "Move lines up"
 #~ msgstr ""
 
-#~ msgid "Upload application"
+#~ msgid "Remove to line end"
 #~ msgstr ""
 
-#~ msgid "One class of the jar should implement SparkJob."
+#~ msgid "Remove to line start"
 #~ msgstr ""
 
-#~ msgid "Local jar file"
+#~ msgid "Remove word left"
 #~ msgstr ""
 
-#~ msgid "App name"
+#~ msgid "Remove word right"
 #~ msgstr ""
 
-#~ msgid "Upload"
+#~ msgid "Split line"
 #~ msgstr ""
 
-#~ msgid "Application name"
+#~ msgid "Select all"
 #~ msgstr ""
 
-#~ msgid "Application description"
+#~ msgid "Select left"
 #~ msgstr ""
 
-#~ msgid "Upload app"
+#~ msgid "Select right"
 #~ msgstr ""
 
-#~ msgid "Missing, add one?"
+#~ msgid "Select word left"
 #~ msgstr ""
 
-#~ msgid "Automatic"
+#~ msgid "Select word right"
 #~ msgstr ""
 
-#~ msgid "Create one?"
+#~ msgid "Select line start"
 #~ msgstr ""
 
-#~ msgid "Parameters"
+#~ msgid "Select line end"
 #~ msgstr ""
 
-#~ msgid "Your application has the following error(s):"
+#~ msgid "Select to line end"
 #~ msgstr ""
 
-#~ msgid "No parameters defined yet."
+#~ msgid "Select to line start"
 #~ msgstr ""
 
-#~ msgid "Value"
+#~ msgid "Select up"
 #~ msgstr ""
 
-#~ msgid "Add"
+#~ msgid "Select down"
 #~ msgstr ""
 
-#~ msgid "Executing..."
+#~ msgid "Select page up"
 #~ msgstr ""
 
-#~ msgid "or create a"
+#~ msgid "Select page down"
 #~ msgstr ""
 
-#~ msgid "New application"
+#~ msgid "Select to start"
 #~ msgstr ""
 
-#~ msgid "Download"
+#~ msgid "Select to end"
 #~ msgstr ""
 
-#~ msgid "Key"
+#~ msgid "Duplicate selection"
 #~ msgstr ""
 
-#~ msgid "The server returned no results."
+#~ msgid "Select to matching bracket"
 #~ msgstr ""
 
-#~ msgid "Save your query"
+#~ msgid "Add multi-cursor above"
 #~ msgstr ""
 
-#~ msgid "Did you know?"
+#~ msgid "Add multi-cursor below"
 #~ msgstr ""
 
-#~ msgid "This field is required."
+#~ msgid "Add next occurrence to multi-selection"
 #~ msgstr ""
 
-#~ msgid "Empty description"
+#~ msgid "Add previous occurrence to multi-selection"
 #~ msgstr ""
 
-#~ msgid "Application saved successfully!"
+#~ msgid "Move multicursor from current line to the line above"
 #~ msgstr ""
 
-#~ msgid "Server error occured: "
+#~ msgid "Move multicursor from current line to the line below"
 #~ msgstr ""
 
-#~ msgid "Unmanageable server error occured: "
+#~ msgid "Remove current occurrence from multi-selection and move to next"
 #~ msgstr ""
 
-#~ msgid "Search for name"
+#~ msgid "Remove current occurrence from multi-selection and move to previous"
 #~ msgstr ""
 
-#~ msgid "Upload time"
+#~ msgid "Select all from multi-selection"
 #~ msgstr ""
 
-#~ msgid "Click to open and execute"
+#~ msgid "Go to left"
 #~ msgstr ""
 
-#~ msgid "Delete forever"
+#~ msgid "Go to right"
 #~ msgstr ""
 
-#~ msgid "Delete selected"
+#~ msgid "Go to word left"
 #~ msgstr ""
 
-#~ msgid "Confirm action"
+#~ msgid "Go to word right"
 #~ msgstr ""
 
-#~ msgid "Delete the selected contexts?"
+#~ msgid "Go line up"
 #~ msgstr ""
 
-#~ msgid "Jobs"
+#~ msgid "Go line down"
 #~ msgstr ""
 
-#~ msgid "Status"
+#~ msgid "Go to line start"
 #~ msgstr ""
 
-#~ msgid "Job id"
+#~ msgid "Go to line end"
 #~ msgstr ""
 
-#~ msgid "Start time"
+#~ msgid "Go to page up"
 #~ msgstr ""
 
-#~ msgid "Duration"
+#~ msgid "Go to page down"
 #~ msgstr ""
 
-#~ msgid "Click to open"
+#~ msgid "Go to start"
+#~ msgstr ""
+
+#~ msgid "Go to end"
+#~ msgstr ""
+
+#~ msgid "Go to line"
+#~ msgstr ""
+
+#~ msgid "Scroll line down"
+#~ msgstr ""
+
+#~ msgid "Scroll line up"
+#~ msgstr ""
+
+#~ msgid "Go to matching bracket"
+#~ msgstr ""
+
+#~ msgid "Scroll page down"
+#~ msgstr ""
+
+#~ msgid "Scroll page up"
+#~ msgstr ""
+
+#~ msgid "Find"
+#~ msgstr ""
+
+#~ msgid "Replace"
+#~ msgstr ""
+
+#~ msgid "Find next"
+#~ msgstr ""
+
+#~ msgid "Find previous"
+#~ msgstr ""
+
+#~ msgid "Fold selection"
+#~ msgstr ""
+
+#~ msgid "Unfold"
+#~ msgstr ""
+
+#~ msgid "Fold all"
+#~ msgstr ""
+
+#~ msgid "Unfold all"
+#~ msgstr ""
+
+#~ msgid "Autocomplete when Live Autocompletion is off"
+#~ msgstr ""
+
+#~ msgid "Indent"
+#~ msgstr ""
+
+#~ msgid "Outdent"
+#~ msgstr ""
+
+#~ msgid "Undo"
+#~ msgstr ""
+
+#~ msgid "Redo"
+#~ msgstr ""
+
+#~ msgid "Toggle comment"
+#~ msgstr ""
+
+#~ msgid "Transpose letters"
+#~ msgstr ""
+
+#~ msgid "Change to lower case"
+#~ msgstr ""
+
+#~ msgid "Change to upper case"
+#~ msgstr ""
+
+#~ msgid "Overwrite"
+#~ msgstr ""
+
+#~ msgid "Macros replay"
+#~ msgstr ""
+
+#~ msgid "Macros recording"
+#~ msgstr ""
+
+#~ msgid "Center selection"
+#~ msgstr ""
+
+#~ msgid "Show the settings menu"
+#~ msgstr ""
+
+#~ msgid "Active tables"
+#~ msgstr ""
+
+#~ msgid "Suggestions"
+#~ msgstr ""
+
+#~ msgid "The operation in the server is taking longer than expected"
+#~ msgstr ""
+
+#~ msgid "No risks were detected in this query."
+#~ msgstr ""
+
+#~ msgid "The query is compatible!"
+#~ msgstr ""
+
+#~ msgid "Execute with Impala?"
+#~ msgstr ""
+
+#~ msgid "Query is not compatible with Impala."
+#~ msgstr ""
+
+#~ msgid "Add a new snippet"
+#~ msgstr ""
+
+#~ msgid "Select snippet"
+#~ msgstr ""
+
+#~ msgid "Add Snippet"
+#~ msgstr ""
+
+#~ msgid "Get results"
+#~ msgstr ""
+
+#~ msgid "Download first %s cells as CSV"
+#~ msgstr ""
+
+#~ msgid "CSV"
+#~ msgstr ""
+
+#~ msgid "Download first %s cells as XLS"
+#~ msgstr ""
+
+#~ msgid "Excel"
+#~ msgstr ""
+
+#~ msgid "Save the results to a large file or a new table"
+#~ msgstr ""
+
+#~ msgid "Save query result in"
+#~ msgstr ""
+
+#~ msgid "A file (max %s cells)"
+#~ msgstr ""
+
+#~ msgid "Path to CSV file"
+#~ msgstr ""
+
+#~ msgid "A file (large result)"
+#~ msgstr ""
+
+#~ msgid "Path to empty directory"
+#~ msgstr ""
+
+#~ msgid "A new table"
+#~ msgstr ""
+
+#~ msgid "Table name or <database>.<table>"
+#~ msgstr ""
+
+#~ msgid "A search dashboard"
+#~ msgstr ""
+
+#~ msgid "Index name"
+#~ msgstr ""
+
+#~ msgid "Your download is being prepared"
+#~ msgstr ""
+
+#~ msgid "Your downloaded results have been truncated"
+#~ msgstr ""
+
+#~ msgid "Please wait, it might take a while..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The number of resulting rows was "
+#~ "too big to be downloaded and the"
+#~ " resulting file has been truncated to"
+#~ msgstr ""
+
+#~ msgid "rows."
+#~ msgstr ""
+
+#~ msgid "Cancel Download"
 #~ msgstr ""

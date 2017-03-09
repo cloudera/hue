@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:55-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -169,7 +169,7 @@ msgstr "Añadir una familia de columnas adicional"
 
 #: src/hbase/templates/app.mako:203 src/hbase/templates/app.mako:334
 #: src/hbase/templates/app.mako:357 src/hbase/templates/app.mako:399
-#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:439
+#: src/hbase/templates/app.mako:404 src/hbase/templates/app.mako:440
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -313,110 +313,98 @@ msgstr "Guardar"
 msgid "Revert"
 msgstr "Revertir"
 
-#: src/hbase/templates/app.mako:440 src/hbase/templates/app.mako:458
+#: src/hbase/templates/app.mako:441 src/hbase/templates/app.mako:459
 msgid "Confirm"
 msgstr "Confirmar"
 
-#: src/hbase/templates/app.mako:452
+#: src/hbase/templates/app.mako:453
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
 
-#: src/hbase/templates/app.mako:453
+#: src/hbase/templates/app.mako:454
 msgid "Delete row "
 msgstr "Eliminar fila "
 
-#: src/hbase/templates/app.mako:454
+#: src/hbase/templates/app.mako:455
 msgid "? (This cannot be undone)"
 msgstr "? (No se puede deshacer)"
 
-#: src/hbase/templates/app.mako:455
+#: src/hbase/templates/app.mako:456
 msgid "Are you sure you want to drop this column?"
 msgstr "¿Está seguro de que desea descartar esta columna?"
 
-#: src/hbase/templates/app.mako:456
+#: src/hbase/templates/app.mako:457
 msgid "enable"
 msgstr "activar"
 
-#: src/hbase/templates/app.mako:457
+#: src/hbase/templates/app.mako:458
 msgid "disable"
 msgstr "desactivar"
 
-#: src/hbase/templates/app.mako:459
+#: src/hbase/templates/app.mako:460
 msgid "Are you sure you want to"
 msgstr "¿Está seguro de que desea"
 
-#: src/hbase/templates/app.mako:460
+#: src/hbase/templates/app.mako:461
 msgid "this table?"
 msgstr "esta tabla?"
 
-#: src/hbase/templates/app.mako:461
+#: src/hbase/templates/app.mako:462
 msgid "End Query"
 msgstr "Finalizar consulta"
 
-#: src/hbase/templates/app.mako:462
+#: src/hbase/templates/app.mako:463
 msgid "Prefix Scan"
 msgstr "Análisis de prefijos"
 
-#: src/hbase/templates/app.mako:463
+#: src/hbase/templates/app.mako:464
 msgid "Start Scan"
 msgstr "Iniciar examen"
 
-#: src/hbase/templates/app.mako:464
+#: src/hbase/templates/app.mako:465
 msgid "Start Select Columns"
 msgstr "Iniciar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:465
+#: src/hbase/templates/app.mako:466
 msgid "End Column/Family"
 msgstr "Finalizar columna/familia"
 
-#: src/hbase/templates/app.mako:466
+#: src/hbase/templates/app.mako:467
 msgid "End Select Columns"
 msgstr "Finalizar columnas seleccionadas"
 
-#: src/hbase/templates/app.mako:467
+#: src/hbase/templates/app.mako:468
 msgid "Start FilterString"
 msgstr "Iniciar FilterString"
 
-#: src/hbase/templates/app.mako:468
+#: src/hbase/templates/app.mako:469
 msgid "End FilterString"
 msgstr "Finalizar FilterString"
 
-#: src/hbase/templates/app.mako:469
+#: src/hbase/templates/app.mako:470
 msgid "Row Key Value"
 msgstr "Valor de clave de fila"
 
-#: src/hbase/templates/app.mako:470
+#: src/hbase/templates/app.mako:471
 msgid "Length of Scan or Row Key"
 msgstr "Longitud de examen o clave de fila"
 
-#: src/hbase/templates/app.mako:471
+#: src/hbase/templates/app.mako:472
 msgid "Column Family: Column Name"
 msgstr "Familia de columnas: nombre de columna"
 
-#: src/hbase/templates/app.mako:472
+#: src/hbase/templates/app.mako:473
 msgid "Rows starting with"
 msgstr "Filas que empiezan por"
 
-#: src/hbase/templates/app.mako:473
+#: src/hbase/templates/app.mako:474
 msgid "String"
 msgstr "Cadena"
 
-#: src/hbase/templates/app.mako:474
+#: src/hbase/templates/app.mako:475
 msgid "Integer"
 msgstr "Entero"
 
-#: src/hbase/templates/app.mako:475
+#: src/hbase/templates/app.mako:476
 msgid "Column Range"
 msgstr "Intervalo de columnas"
-
-#~ msgid "About Hue"
-#~ msgstr ""
-
-#~ msgid "Configuration"
-#~ msgstr ""
-
-#~ msgid "Check for misconfiguration"
-#~ msgstr ""
-
-#~ msgid "Server Logs"
-#~ msgstr ""

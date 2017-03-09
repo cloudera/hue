@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:53-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -71,113 +71,113 @@ msgstr "HDFS가 없음"
 msgid "User %s does not have permissions to write to path \"%s\"."
 msgstr "사용자 %s에게 경로 \"%s\"에 쓸 권한이 없습니다."
 
-#: src/hadoop/fs/webhdfs.py:250 src/hadoop/fs/webhdfs.py:286
+#: src/hadoop/fs/webhdfs.py:251 src/hadoop/fs/webhdfs.py:287
 #, python-format
 msgid "File %s not found"
 msgstr "파일 %s을(를) 찾을 수 없음"
 
-#: src/hadoop/fs/webhdfs.py:289
+#: src/hadoop/fs/webhdfs.py:290
 #, python-format
 msgid "File %s is a directory"
 msgstr "파일 %s이(가) 디렉토리임"
 
-#: src/hadoop/fs/webhdfs.py:292
+#: src/hadoop/fs/webhdfs.py:293
 #, python-format
 msgid "File %s is already trashed"
 msgstr "파일 %s이(가) 이미 휴지통으로 이동됨"
 
-#: src/hadoop/fs/webhdfs.py:319
+#: src/hadoop/fs/webhdfs.py:320
 #, python-format
 msgid "Delete failed: %s"
 msgstr "삭제하지 못함: %s"
 
-#: src/hadoop/fs/webhdfs.py:348
+#: src/hadoop/fs/webhdfs.py:349
 #, python-format
 msgid "File %s is not in trash"
 msgstr "파일 %s이(가) 휴지통에 없음"
 
-#: src/hadoop/fs/webhdfs.py:362
+#: src/hadoop/fs/webhdfs.py:363
 #, python-format
 msgid "Path %s already exists."
 msgstr "경로 %s이(가) 이미 존재합니다."
 
-#: src/hadoop/fs/webhdfs.py:390
+#: src/hadoop/fs/webhdfs.py:391
 #, python-format
 msgid "Mkdir failed: %s"
 msgstr "Mkdir 실패: %s"
 
-#: src/hadoop/fs/webhdfs.py:404
+#: src/hadoop/fs/webhdfs.py:405
 #, python-format
 msgid "Rename failed: %s -> %s"
 msgstr "이름을 바꾸지 못함: %s -> %s"
 
-#: src/hadoop/fs/webhdfs.py:410 src/hadoop/fs/webhdfs.py:414
+#: src/hadoop/fs/webhdfs.py:411 src/hadoop/fs/webhdfs.py:415
 #, python-format
 msgid "'%s' is not a directory"
 msgstr "'%s'이(가) 디렉토리가 아님"
 
-#: src/hadoop/fs/webhdfs.py:599
+#: src/hadoop/fs/webhdfs.py:608
 #, python-format
 msgid "Copy src '%s' does not exist"
 msgstr "복사 소스 '%s'이(가) 존재하지 않음"
 
-#: src/hadoop/fs/webhdfs.py:601
+#: src/hadoop/fs/webhdfs.py:610
 #, python-format
 msgid "Copy src '%s' is a directory"
 msgstr "복사 소스 '%s'이(가) 디렉토리임"
 
-#: src/hadoop/fs/webhdfs.py:603
+#: src/hadoop/fs/webhdfs.py:612
 #, python-format
 msgid "Copy dst '%s' is a directory"
 msgstr "복사 대상 '%s'이(가) 디렉토리임"
 
-#: src/hadoop/fs/webhdfs.py:684
+#: src/hadoop/fs/webhdfs.py:693
 #, python-format
 msgid "File not found: %s"
 msgstr "파일을 찾을 수 없음: %s"
 
-#: src/hadoop/fs/webhdfs.py:700
+#: src/hadoop/fs/webhdfs.py:709
 #, python-format
 msgid "Destination file %s exists and is not a directory."
 msgstr "대상 파일 %s이(가) 존재하며 디렉토리가 아닙니다."
 
-#: src/hadoop/fs/webhdfs.py:742
+#: src/hadoop/fs/webhdfs.py:751
 #, python-format
 msgid "Failed to create '%s'. HDFS did not return a redirect"
 msgstr "'%s'을(를) 생성하지 못했습니다. HDFS는 리디렉션을 리턴하지 않습니다."
 
-#: src/hadoop/fs/webhdfs.py:808
+#: src/hadoop/fs/webhdfs.py:817
 msgid "Failed to upload file. WebHdfs requires a valid username to upload files."
 msgstr "파일을 업로드할 수 없습니다. 파일을 업로드하려면 WebHdfs에 올바른 사용자 이름이 필요합니다."
 
-#: src/hadoop/fs/webhdfs.py:832
+#: src/hadoop/fs/webhdfs.py:841
 #, python-format
 msgid "Is a directory: '%s'"
 msgstr "디렉토리임: '%s'"
 
-#: src/hadoop/fs/webhdfs.py:850
+#: src/hadoop/fs/webhdfs.py:859
 msgid "Invalid argument to seek for whence"
 msgstr "위치를 찾는 올바르지 않은 인수"
 
-#: src/hadoop/fs/webhdfs.py:870
+#: src/hadoop/fs/webhdfs.py:879
 msgid "File not open for writing"
 msgstr "쓰기 위해 파일을 열 수 없음"
 
-#: src/hadoop/fs/webhdfs.py:916
+#: src/hadoop/fs/webhdfs.py:925
 #, python-format
 msgid "Filesystem root '/' should be owned by '%s'"
 msgstr "파일 시스템 루트 '/'는 '%s'에서 소유해야 함"
 
-#: src/hadoop/fs/webhdfs.py:919
+#: src/hadoop/fs/webhdfs.py:928
 msgid "Failed to access filesystem root"
 msgstr "파일 시스템 루트에 액세스하지 못함"
 
-#: src/hadoop/fs/webhdfs.py:927
+#: src/hadoop/fs/webhdfs.py:936
 #, python-format
 msgid "Failed to create temporary file \"%s\""
 msgstr "임시 파일 \"%s\"을(를) 생성하지 못함"
 
-#: src/hadoop/fs/webhdfs.py:943
+#: src/hadoop/fs/webhdfs.py:952
 #, python-format
 msgid "Failed to remove temporary file \"%s\""
 msgstr "임시 파일 \"%s\"을(를) 제거하지 못함"
@@ -203,9 +203,3 @@ msgstr "YARN RM에서 실패한 응답을 리턴함: %s"
 #: src/hadoop/yarn/spark_history_server_api.py:47
 msgid "No Spark History Server is available."
 msgstr "사용 가능한 Spark History 서버가 없습니다."
-
-#~ msgid "Trash is not enabled."
-#~ msgstr ""
-
-#~ msgid "Filesystem root '/' should be owned by 'hdfs'"
-#~ msgstr ""

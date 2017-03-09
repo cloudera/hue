@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:57-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,75 +17,85 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/notebook/api.py:363
+#: src/notebook/api.py:364
 msgid "Query saved successfully"
 msgstr "查询已成功保存"
 
-#: src/notebook/api.py:363
+#: src/notebook/api.py:364
 msgid "Notebook saved successfully"
 msgstr "已成功保存笔记本"
 
-#: src/notebook/api.py:450
+#: src/notebook/api.py:455
 msgid "History fetched"
 msgstr "获取的历史记录"
 
-#: src/notebook/api.py:468
+#: src/notebook/api.py:473
 msgid "History cleared !"
 msgstr "清除的历史记录！"
 
-#: src/notebook/api.py:485
+#: src/notebook/api.py:490
 msgid "Notebook loaded successfully"
 msgstr "已成功加载笔记本"
 
-#: src/notebook/api.py:515
+#: src/notebook/api.py:520
 msgid "Notebook closed successfully"
 msgstr "已成功关闭笔记本"
 
-#: src/notebook/api.py:535
+#: src/notebook/api.py:540
 msgid "Statement closed !"
 msgstr "语句已关闭！"
 
-#: src/notebook/api.py:623
-msgid "url param is required"
-msgstr "需要 url 参数"
-
-#: src/notebook/api.py:634
-msgid "User is already authenticated to GitHub."
-msgstr "用户已经 GitHub 验证。"
-
-#: src/notebook/api.py:666
+#: src/notebook/api.py:613
 msgid "Exporting result failed."
 msgstr "导出结果失败。"
 
-#: src/notebook/conf.py:51
+#: src/notebook/conf.py:38
 msgid "Show the notebook menu or not"
 msgstr "显示或不显示笔记本菜单"
 
-#: src/notebook/conf.py:60
+#: src/notebook/conf.py:73
 msgid "Define the name and how to connect and execute the language."
 msgstr "定义名称和如何连接并执行语言。"
 
-#: src/notebook/conf.py:64
+#: src/notebook/conf.py:77
 msgid "The name of the snippet."
 msgstr "代码段的名称。"
 
-#: src/notebook/conf.py:76
+#: src/notebook/conf.py:89
 msgid "Specific options for connecting to the server."
 msgstr "连接到服务器的特定选项。"
 
-#: src/notebook/conf.py:86
+#: src/notebook/conf.py:99
+msgid ""
+"Comma separated list of interpreters that should be shown on the wheel. "
+"This list takes precedence over the order in which the interpreter "
+"entries appear. Only the first 5 interpreters will appear on the wheel."
+msgstr ""
+"以逗号分隔的解释器列表，此列表应显示在转盘上。"
+"此列表优先于解释器"
+"条目的显示顺序。转盘上只显示前 5 个解释器。"
+
+#: src/notebook/conf.py:108
 msgid "Main flag to override the automatic starting of the DBProxy server."
 msgstr "替代自动启动 DBProxy 服务器的主标记。"
 
-#: src/notebook/conf.py:93
+#: src/notebook/conf.py:115
+msgid ""
+"Additional classes to put on the dbproxy classpath when starting. Values "
+"separated by ':'"
+msgstr ""
+"要在启动时置于 dbproxy 类路径中的其他类。值"
+"以“:”分隔"
+
+#: src/notebook/conf.py:122
 msgid "Flag to enable the SQL query builder of the table assist."
 msgstr "启用表帮助 SQL 查询生成器的标记。"
 
-#: src/notebook/conf.py:100
+#: src/notebook/conf.py:129
 msgid "Flag to enable the creation of a coordinator for the current SQL query."
 msgstr "启用当前 SQL 查询 Coordinator 创建的标记。"
 
-#: src/notebook/conf.py:107
+#: src/notebook/conf.py:136
 msgid ""
 "Flag to enable the bulk submission of queries as a background task "
 "through Oozie."
@@ -93,132 +103,115 @@ msgstr ""
 "此标记用于通过 Oozie 以后台任务的形式"
 "批量提交查询。"
 
-#: src/notebook/conf.py:115
-msgid "Base URL to GitHub Remote Server"
-msgstr "GitHub 远程服务器的基本 URL"
-
-#: src/notebook/conf.py:122
-msgid "Base URL to GitHub API"
-msgstr "GitHub API 的基本 URL"
-
-#: src/notebook/conf.py:129
-msgid "The Client ID of the GitHub application."
-msgstr "GitHub 应用程序的客户端 ID。"
-
-#: src/notebook/conf.py:136
-msgid "The Client Secret of the GitHub application."
-msgstr "GitHub 应用程序的客户端机密。"
-
 #: src/notebook/decorators.py:53 src/notebook/decorators.py:70
 #, python-format
 msgid "Document %(id)s does not exist"
 msgstr "文档 %(id)s 不存在"
 
-#: src/notebook/views.py:194
+#: src/notebook/views.py:220
 #, python-format
 msgid "Action %s is unknown"
 msgstr "操作 %s 未知"
 
-#: src/notebook/views.py:220
+#: src/notebook/views.py:246
 #, python-format
 msgid "Trashed %d notebook(s)"
 msgstr "已将 %d 个笔记本移至垃圾桶"
 
-#: src/notebook/views.py:259
+#: src/notebook/views.py:285
 msgid "A POST request is required."
 msgstr "需要 POST 请求。"
 
-#: src/notebook/connectors/base.py:51
+#: src/notebook/connectors/base.py:52
 msgid "No error message, please check the logs."
 msgstr "无错误消息，请检查日志。"
 
-#: src/notebook/connectors/base.py:202
+#: src/notebook/connectors/base.py:209
 #, python-format
 msgid "Snippet type %(type)s is not configured in hue.ini"
 msgstr "未在 hue.ini 中配置代码段类型 %(type)s"
 
-#: src/notebook/connectors/base.py:225
+#: src/notebook/connectors/base.py:232
 #, python-format
 msgid "Notebook connector interface not recognized: %s"
 msgstr "未识别笔记本连接器接口：%s"
 
-#: src/notebook/connectors/hiveserver2.py:111
-#: src/notebook/connectors/spark_shell.py:60
+#: src/notebook/connectors/hiveserver2.py:113
+#: src/notebook/connectors/spark_shell.py:70
 msgid "Files"
 msgstr "文件"
 
-#: src/notebook/connectors/hiveserver2.py:113
+#: src/notebook/connectors/hiveserver2.py:115
 msgid "Add one or more files, jars, or archives to the list of resources."
 msgstr "将一个或多个文件、jar 或存档添加到资源列表。"
 
-#: src/notebook/connectors/hiveserver2.py:119
+#: src/notebook/connectors/hiveserver2.py:121
 msgid "Functions"
 msgstr "功能"
 
-#: src/notebook/connectors/hiveserver2.py:121
+#: src/notebook/connectors/hiveserver2.py:123
 msgid ""
 "Add one or more registered UDFs (requires function name and fully-"
 "qualified class name)."
 msgstr "添加一个或多个注册的 UDF（需要函数名和完全限定的类名）。"
 
-#: src/notebook/connectors/hiveserver2.py:127
-#: src/notebook/connectors/hiveserver2.py:144
-#: src/notebook/templates/editor_components.mako:442
-#: src/notebook/templates/editor_components.mako:1536
+#: src/notebook/connectors/hiveserver2.py:129
+#: src/notebook/connectors/hiveserver2.py:146
+#: src/notebook/templates/editor_components.mako:1002
 msgid "Settings"
 msgstr "设置"
 
-#: src/notebook/connectors/hiveserver2.py:129
+#: src/notebook/connectors/hiveserver2.py:131
 msgid "Hive and Hadoop configuration properties."
 msgstr "Hive 和 Hadoop 配置属性。"
 
-#: src/notebook/connectors/hiveserver2.py:146
+#: src/notebook/connectors/hiveserver2.py:148
 msgid "Impala configuration properties."
 msgstr "Impala 配置属性。"
 
-#: src/notebook/connectors/hiveserver2.py:209
+#: src/notebook/connectors/hiveserver2.py:211
 msgid ""
 "Session does not exist or you do not have permissions to close the "
 "session."
 msgstr "会话不存在或您没有关闭会话的权限。"
 
-#: src/notebook/connectors/hiveserver2.py:214
+#: src/notebook/connectors/hiveserver2.py:216
 msgid "Session successfully closed."
 msgstr "会话已成功关闭。"
 
-#: src/notebook/connectors/hiveserver2.py:301
+#: src/notebook/connectors/hiveserver2.py:303
 msgid "Result status is not available"
 msgstr "结果状态不可用"
 
-#: src/notebook/connectors/hiveserver2.py:304
+#: src/notebook/connectors/hiveserver2.py:306
 #, python-format
 msgid "Cannot fetch result metadata for snippet type: %s"
 msgstr "无法获取以下代码段类型的结果元数据: %s"
 
-#: src/notebook/connectors/hiveserver2.py:366
+#: src/notebook/connectors/hiveserver2.py:365
 msgid "Increase the sasl_max_buffer value in hue.ini"
 msgstr "增加 hue.ini 中的 sasl_max_buffer 值"
 
-#: src/notebook/connectors/hiveserver2.py:465
-#: src/notebook/connectors/hiveserver2.py:489
+#: src/notebook/connectors/hiveserver2.py:464
+#: src/notebook/connectors/hiveserver2.py:488
 #, python-format
 msgid "Only SELECT statements can be saved. Provided statement: %(query)s"
 msgstr "仅可保存 SELECT 语句。提供的语句：%(query)s"
 
-#: src/notebook/connectors/hiveserver2.py:692
+#: src/notebook/connectors/hiveserver2.py:736
 msgid "Failed to get job details or job does not contain counters data."
 msgstr "无法获取作业详细信息或作业不包含计数器数据。"
 
-#: src/notebook/connectors/hiveserver2.py:725
+#: src/notebook/connectors/hiveserver2.py:769
 msgid "Hive query did not execute any jobs."
 msgstr "Hive 查询未执行任何作业。"
 
-#: src/notebook/connectors/hiveserver2.py:791
+#: src/notebook/connectors/hiveserver2.py:835
 #, python-format
 msgid "Failed to get query profile from Impala Daemon server: %s"
 msgstr "无法从 Impala Daemon 服务器获取查询配置文件：%s"
 
-#: src/notebook/connectors/hiveserver2.py:794
+#: src/notebook/connectors/hiveserver2.py:838
 msgid ""
 "Could not find profile in query profile response from Impala Daemon "
 "Server."
@@ -231,7 +224,7 @@ msgstr ""
 msgid "%s: is the DB Proxy server running?"
 msgstr "%s：DB Proxy 服务器是否正在运行？"
 
-#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:152
+#: src/notebook/connectors/jdbc.py:171 src/notebook/connectors/rdbms.py:153
 #: src/notebook/connectors/solr.py:176 src/notebook/connectors/solr.py:214
 msgid "Failed to get sample data."
 msgstr "无法获取示例数据"
@@ -258,1287 +251,974 @@ msgid "Job was %s"
 msgstr "作业为 %s"
 
 #: src/notebook/connectors/spark_shell.py:51
+msgid "Spark Conf"
+msgstr "Spark 配置"
+
+#: src/notebook/connectors/spark_shell.py:52
+msgid "Add one or more Spark conf properties to the session."
+msgstr "向会话中添加一个或多个 Spark 配置属性。"
+
+#: src/notebook/connectors/spark_shell.py:61
 msgid "Jars"
 msgstr "Jar"
 
-#: src/notebook/connectors/spark_shell.py:52
+#: src/notebook/connectors/spark_shell.py:62
 msgid "Add one or more JAR files to the list of resources."
 msgstr "将一个或多个 JAR 文件添加到资源列表。"
 
-#: src/notebook/connectors/spark_shell.py:61
+#: src/notebook/connectors/spark_shell.py:71
 msgid "Files to be placed in the working directory of each executor."
 msgstr "要放置到每个执行器工作目录中的文件。"
 
-#: src/notebook/connectors/spark_shell.py:69
+#: src/notebook/connectors/spark_shell.py:79
 msgid "pyFiles"
 msgstr "py 文件"
 
-#: src/notebook/connectors/spark_shell.py:70
+#: src/notebook/connectors/spark_shell.py:80
 msgid "Python files to be placed in the working directory of each executor."
 msgstr "要放置到每个执行器工作目录中的 Python 文件。"
 
-#: src/notebook/connectors/spark_shell.py:78
+#: src/notebook/connectors/spark_shell.py:88
 msgid "Driver Memory"
 msgstr "驱动程序内存"
 
-#: src/notebook/connectors/spark_shell.py:79
+#: src/notebook/connectors/spark_shell.py:89
 msgid "Amount of memory to use for the driver process in GB. (Default: 1). "
 msgstr "用于驱动流程的内存量（以 GB 为单位）。（默认：1） "
 
-#: src/notebook/connectors/spark_shell.py:89
+#: src/notebook/connectors/spark_shell.py:99
 msgid "Driver Cores"
 msgstr "驱动程序内核"
 
-#: src/notebook/connectors/spark_shell.py:90
-#: src/notebook/connectors/spark_shell.py:108
+#: src/notebook/connectors/spark_shell.py:100
+#: src/notebook/connectors/spark_shell.py:118
 msgid "Number of cores used by the driver, only in cluster mode (Default: 1)"
 msgstr "驱动程序仅在群集模式下使用的内核数（默认：1）。"
 
-#: src/notebook/connectors/spark_shell.py:98
+#: src/notebook/connectors/spark_shell.py:108
 msgid "Executor Memory"
 msgstr "执行程序内存"
 
-#: src/notebook/connectors/spark_shell.py:99
+#: src/notebook/connectors/spark_shell.py:109
 msgid "Amount of memory to use per executor process in GB. (Default: 1)"
 msgstr "每个执行程序流程使用的内存量（以 GB 为单位）。（默认：1）"
 
-#: src/notebook/connectors/spark_shell.py:107
+#: src/notebook/connectors/spark_shell.py:117
 msgid "Executor Cores"
 msgstr "执行程序内核"
 
-#: src/notebook/connectors/spark_shell.py:116
+#: src/notebook/connectors/spark_shell.py:126
 msgid "Queue"
 msgstr "队列"
 
-#: src/notebook/connectors/spark_shell.py:117
+#: src/notebook/connectors/spark_shell.py:127
 msgid "The YARN queue to submit to, only in cluster mode (Default: default)"
 msgstr "仅在群集模式下提交的 YARN 队列（默认：默认）"
 
-#: src/notebook/connectors/spark_shell.py:125
+#: src/notebook/connectors/spark_shell.py:135
 msgid "Archives"
 msgstr "存档"
 
-#: src/notebook/connectors/spark_shell.py:126
+#: src/notebook/connectors/spark_shell.py:136
 msgid ""
 "Archives to be extracted into the working directory of each executor, "
 "only in cluster mode."
 msgstr "仅在群集模式下提取到每个执行程序工作目录中的存档。"
 
-#: src/notebook/connectors/spark_shell.py:206
+#: src/notebook/connectors/spark_shell.py:227
 #, python-format
 msgid "The Spark session could not be created in the cluster: %s"
 msgstr "无法在群集中创建 Spark 会话：%s"
 
-#: src/notebook/templates/editor.mako:27
+#: src/notebook/templates/editor.mako:28
 msgid "Editor"
 msgstr "编辑器"
 
-#: src/notebook/templates/editor_components.mako:232
+#: src/notebook/templates/editor_components.mako:219
 msgid "Saving..."
 msgstr "正在保存..."
 
-#: src/notebook/templates/editor_components.mako:239
+#: src/notebook/templates/editor_components.mako:226
 msgid "Save as..."
 msgstr "另存为..."
 
-#: src/notebook/templates/editor_components.mako:254
+#: src/notebook/templates/editor_components.mako:241
 msgid "Player mode"
 msgstr "播放机模式"
 
-#: src/notebook/templates/editor_components.mako:259
+#: src/notebook/templates/editor_components.mako:246
 msgid "Execute all snippets"
 msgstr "执行所有代码段"
 
-#: src/notebook/templates/editor_components.mako:264
+#: src/notebook/templates/editor_components.mako:251
 msgid "Clear all results"
 msgstr "清除所有结果"
 
-#: src/notebook/templates/editor_components.mako:269
+#: src/notebook/templates/editor_components.mako:256
 msgid "Display all Notebook content"
 msgstr "显示所有笔记本内容"
 
-#: src/notebook/templates/editor_components.mako:274
-#: src/notebook/templates/editor_components.mako:958
+#: src/notebook/templates/editor_components.mako:261
+#: src/notebook/templates/editor_components.mako:438
 msgid "Import from Github"
 msgstr "从 Github 导入"
 
-#: src/notebook/templates/editor_components.mako:279
+#: src/notebook/templates/editor_components.mako:266
 msgid "Export to Jupyter"
 msgstr "导出到 Jupyter"
 
-#: src/notebook/templates/editor_components.mako:289
+#: src/notebook/templates/editor_components.mako:274
 msgid "New "
 msgstr "新建 "
 
-#: src/notebook/templates/editor_components.mako:289
+#: src/notebook/templates/editor_components.mako:274
 msgid "Query"
 msgstr "查询"
 
-#: src/notebook/templates/editor_components.mako:294
+#: src/notebook/templates/editor_components.mako:279
 msgid "New Notebook"
 msgstr "新笔记本"
 
-#: src/notebook/templates/editor_components.mako:299
+#: src/notebook/templates/editor_components.mako:284
 msgid "Queries"
 msgstr "查询"
 
-#: src/notebook/templates/editor_components.mako:299
+#: src/notebook/templates/editor_components.mako:284
 #: src/notebook/templates/notebooks.mako:23
 #: src/notebook/templates/notebooks.mako:47
 msgid "Notebooks"
 msgstr "笔记本"
 
-#: src/notebook/templates/editor_components.mako:305
+#: src/notebook/templates/editor_components.mako:288
 msgid "Context"
 msgstr "上下文"
 
-#: src/notebook/templates/editor_components.mako:314
+#: src/notebook/templates/editor_components.mako:297
 msgid " Editor"
 msgstr " 编辑器"
 
-#: src/notebook/templates/editor_components.mako:372
+#: src/notebook/templates/editor_components.mako:355
 msgid "This is a history query"
 msgstr "这是历史记录查询"
 
-#: src/notebook/templates/editor_components.mako:375
+#: src/notebook/templates/editor_components.mako:358
 msgid "Open directory of this query"
 msgstr "打开此查询的目录"
 
-#: src/notebook/templates/editor_components.mako:378
+#: src/notebook/templates/editor_components.mako:361
 msgid "Click to open original saved query"
 msgstr "单击以打开原始保存的查询"
 
-#: src/notebook/templates/editor_components.mako:383
+#: src/notebook/templates/editor_components.mako:366
 msgid "This is a saved query"
 msgstr "这是已保存的查询"
 
-#: src/notebook/templates/editor_components.mako:417
+#: src/notebook/templates/editor_components.mako:400
 msgid "Row details"
 msgstr "行详细信息"
 
-#: src/notebook/templates/editor_components.mako:430
+#: src/notebook/templates/editor_components.mako:412
 msgid "Editor keyboard shortcuts"
 msgstr "编辑器键盘快捷方式"
 
-#: src/notebook/templates/editor_components.mako:435
-msgid "Line Operations"
-msgstr "行操作"
-
-#: src/notebook/templates/editor_components.mako:436
-msgid "Selection"
-msgstr "选择"
-
-#: src/notebook/templates/editor_components.mako:437
-msgid "Multicursor"
-msgstr "Multicursor"
-
-#: src/notebook/templates/editor_components.mako:438
-msgid "Go to"
-msgstr "转至"
-
-#: src/notebook/templates/editor_components.mako:439
-msgid "Find/Replace"
-msgstr "查找/替换"
-
-#: src/notebook/templates/editor_components.mako:440
-msgid "Folding"
-msgstr "折叠"
-
-#: src/notebook/templates/editor_components.mako:441
-msgid "Other"
-msgstr "其他"
-
-#: src/notebook/templates/editor_components.mako:452
-#: src/notebook/templates/editor_components.mako:515
-#: src/notebook/templates/editor_components.mako:613
-#: src/notebook/templates/editor_components.mako:671
-#: src/notebook/templates/editor_components.mako:774
-#: src/notebook/templates/editor_components.mako:807
-#: src/notebook/templates/editor_components.mako:840
-#: src/notebook/templates/editor_components.mako:923
-msgid "Action"
-msgstr "操作"
-
-#: src/notebook/templates/editor_components.mako:459
-msgid "Remove line"
-msgstr "删除行"
-
-#: src/notebook/templates/editor_components.mako:464
-msgid "Copy lines down"
-msgstr "向下复制行"
-
-#: src/notebook/templates/editor_components.mako:469
-msgid "Copy lines up"
-msgstr "向上复制行"
-
-#: src/notebook/templates/editor_components.mako:474
-msgid "Move lines down"
-msgstr "下移行"
-
-#: src/notebook/templates/editor_components.mako:479
-msgid "Move lines up"
-msgstr "上移行"
-
-#: src/notebook/templates/editor_components.mako:484
-msgid "Remove to line end"
-msgstr "删除到行尾"
-
-#: src/notebook/templates/editor_components.mako:489
-msgid "Remove to line start"
-msgstr "删除到行首"
-
-#: src/notebook/templates/editor_components.mako:494
-msgid "Remove word left"
-msgstr "删除左移单词"
-
-#: src/notebook/templates/editor_components.mako:499
-msgid "Remove word right"
-msgstr "删除右移单词"
-
-#: src/notebook/templates/editor_components.mako:504
-msgid "Split line"
-msgstr "分解行"
-
-#: src/notebook/templates/editor_components.mako:522
-msgid "Select all"
-msgstr "全选"
-
-#: src/notebook/templates/editor_components.mako:527
-msgid "Select left"
-msgstr "选择左侧"
-
-#: src/notebook/templates/editor_components.mako:532
-msgid "Select right"
-msgstr "选择右侧"
-
-#: src/notebook/templates/editor_components.mako:537
-msgid "Select word left"
-msgstr "选择左移单词"
-
-#: src/notebook/templates/editor_components.mako:542
-msgid "Select word right"
-msgstr "选择右移单词"
-
-#: src/notebook/templates/editor_components.mako:547
-msgid "Select line start"
-msgstr "选择行首"
-
-#: src/notebook/templates/editor_components.mako:552
-msgid "Select line end"
-msgstr "选择行尾"
-
-#: src/notebook/templates/editor_components.mako:557
-msgid "Select to line end"
-msgstr "选择到行尾"
-
-#: src/notebook/templates/editor_components.mako:562
-msgid "Select to line start"
-msgstr "选择到行首"
-
-#: src/notebook/templates/editor_components.mako:567
-msgid "Select up"
-msgstr "向上选择"
-
-#: src/notebook/templates/editor_components.mako:572
-msgid "Select down"
-msgstr "向下选择"
-
-#: src/notebook/templates/editor_components.mako:577
-msgid "Select page up"
-msgstr "选择页上移"
-
-#: src/notebook/templates/editor_components.mako:582
-msgid "Select page down"
-msgstr "选择页下移"
-
-#: src/notebook/templates/editor_components.mako:587
-msgid "Select to start"
-msgstr "选择开始"
-
-#: src/notebook/templates/editor_components.mako:592
-msgid "Select to end"
-msgstr "选择结束"
-
-#: src/notebook/templates/editor_components.mako:597
-msgid "Duplicate selection"
-msgstr "复制选择"
-
-#: src/notebook/templates/editor_components.mako:602
-msgid "Select to matching bracket"
-msgstr "选择匹配的括号"
-
-#: src/notebook/templates/editor_components.mako:620
-msgid "Add multi-cursor above"
-msgstr "在上方添加 multi-cursor"
-
-#: src/notebook/templates/editor_components.mako:625
-msgid "Add multi-cursor below"
-msgstr "将下方添加 multi-cursor"
-
-#: src/notebook/templates/editor_components.mako:630
-msgid "Add next occurrence to multi-selection"
-msgstr "将下一个匹配项添加到多项选择"
-
-#: src/notebook/templates/editor_components.mako:635
-msgid "Add previous occurrence to multi-selection"
-msgstr "将上一个匹配项添加到多项选择"
-
-#: src/notebook/templates/editor_components.mako:640
-msgid "Move multicursor from current line to the line above"
-msgstr "将 multicursor 从当前行移至上方行"
-
-#: src/notebook/templates/editor_components.mako:645
-msgid "Move multicursor from current line to the line below"
-msgstr "将 multicursor 从当前行移至下方行"
-
-#: src/notebook/templates/editor_components.mako:650
-msgid "Remove current occurrence from multi-selection and move to next"
-msgstr "从多项选择删除当前匹配项并移至下一个匹配项"
-
-#: src/notebook/templates/editor_components.mako:655
-msgid "Remove current occurrence from multi-selection and move to previous"
-msgstr "从多项选择删除当前匹配项并移至上一个匹配项"
-
-#: src/notebook/templates/editor_components.mako:660
-msgid "Select all from multi-selection"
-msgstr "从多项选择中选择所有"
-
-#: src/notebook/templates/editor_components.mako:678
-msgid "Go to left"
-msgstr "转至左侧"
-
-#: src/notebook/templates/editor_components.mako:683
-msgid "Go to right"
-msgstr "转至右侧"
-
-#: src/notebook/templates/editor_components.mako:688
-msgid "Go to word left"
-msgstr "转至左移单词"
-
-#: src/notebook/templates/editor_components.mako:693
-msgid "Go to word right"
-msgstr "转至右移单词"
-
-#: src/notebook/templates/editor_components.mako:698
-msgid "Go line up"
-msgstr "转至向上行"
-
-#: src/notebook/templates/editor_components.mako:703
-msgid "Go line down"
-msgstr "转至向下行"
-
-#: src/notebook/templates/editor_components.mako:708
-msgid "Go to line start"
-msgstr "装置行首"
-
-#: src/notebook/templates/editor_components.mako:713
-msgid "Go to line end"
-msgstr "转至行尾"
-
-#: src/notebook/templates/editor_components.mako:718
-msgid "Go to page up"
-msgstr "转至页上移"
-
-#: src/notebook/templates/editor_components.mako:723
-msgid "Go to page down"
-msgstr "转至页下移"
-
-#: src/notebook/templates/editor_components.mako:728
-msgid "Go to start"
-msgstr "转至开始"
-
-#: src/notebook/templates/editor_components.mako:733
-msgid "Go to end"
-msgstr "转至结束"
-
-#: src/notebook/templates/editor_components.mako:738
-msgid "Go to line"
-msgstr "转至行"
-
-#: src/notebook/templates/editor_components.mako:743
-msgid "Scroll line down"
-msgstr "向下滚动行"
-
-#: src/notebook/templates/editor_components.mako:748
-msgid "Scroll line up"
-msgstr "向上滚动行"
-
-#: src/notebook/templates/editor_components.mako:753
-msgid "Go to matching bracket"
-msgstr "转至匹配的括号"
-
-#: src/notebook/templates/editor_components.mako:758
-msgid "Scroll page down"
-msgstr "向下滚动页面"
-
-#: src/notebook/templates/editor_components.mako:763
-msgid "Scroll page up"
-msgstr "向上滚动页面"
-
-#: src/notebook/templates/editor_components.mako:781
-msgid "Find"
-msgstr "查找"
-
-#: src/notebook/templates/editor_components.mako:786
-msgid "Replace"
-msgstr "替换"
-
-#: src/notebook/templates/editor_components.mako:791
-msgid "Find next"
-msgstr "查找下一项"
-
-#: src/notebook/templates/editor_components.mako:796
-msgid "Find previous"
-msgstr "查找上一项"
-
-#: src/notebook/templates/editor_components.mako:814
-msgid "Fold selection"
-msgstr "折叠选择"
-
-#: src/notebook/templates/editor_components.mako:819
-msgid "Unfold"
-msgstr "展开"
-
-#: src/notebook/templates/editor_components.mako:824
-msgid "Fold all"
-msgstr "折叠全部"
-
-#: src/notebook/templates/editor_components.mako:829
-msgid "Unfold all"
-msgstr "展开全部"
-
-#: src/notebook/templates/editor_components.mako:847
-msgid "Autocomplete when Live Autocompletion is off"
-msgstr "实时自动填写处于关闭状态时自动填写"
-
-#: src/notebook/templates/editor_components.mako:852
-msgid "Indent"
-msgstr "缩进"
-
-#: src/notebook/templates/editor_components.mako:857
-msgid "Outdent"
-msgstr "升级"
-
-#: src/notebook/templates/editor_components.mako:862
-msgid "Undo"
-msgstr "撤消"
-
-#: src/notebook/templates/editor_components.mako:867
-msgid "Redo"
-msgstr "重做"
-
-#: src/notebook/templates/editor_components.mako:872
-msgid "Toggle comment"
-msgstr "切换注释"
-
-#: src/notebook/templates/editor_components.mako:877
-msgid "Transpose letters"
-msgstr "转置字母"
-
-#: src/notebook/templates/editor_components.mako:882
-msgid "Change to lower case"
-msgstr "更改为小写"
-
-#: src/notebook/templates/editor_components.mako:887
-msgid "Change to upper case"
-msgstr "更改为大写"
-
-#: src/notebook/templates/editor_components.mako:892
-#: src/notebook/templates/notebook_ko_components.mako:227
-msgid "Overwrite"
-msgstr "覆盖"
-
-#: src/notebook/templates/editor_components.mako:897
-msgid "Macros replay"
-msgstr "宏重播"
-
-#: src/notebook/templates/editor_components.mako:902
-msgid "Macros recording"
-msgstr "宏录制"
-
-#: src/notebook/templates/editor_components.mako:907
-#: src/notebook/templates/notebooks.mako:74
-msgid "Delete"
-msgstr "删除"
-
-#: src/notebook/templates/editor_components.mako:912
-msgid "Center selection"
-msgstr "将选定内容居中"
-
-#: src/notebook/templates/editor_components.mako:930
-msgid "Show the settings menu"
-msgstr "显示设置菜单"
-
-#: src/notebook/templates/editor_components.mako:938
-#: src/notebook/templates/editor_components.mako:951
-#: src/notebook/templates/editor_components.mako:967
-#: src/notebook/templates/editor_components.mako:982
-#: src/notebook/templates/editor_components.mako:1143
-#: src/notebook/templates/notebook_ko_components.mako:74
-#: src/notebook/templates/notebook_ko_components.mako:302
+#: src/notebook/templates/editor_components.mako:418
+#: src/notebook/templates/editor_components.mako:431
+#: src/notebook/templates/editor_components.mako:447
+#: src/notebook/templates/editor_components.mako:462
+#: src/notebook/templates/editor_components.mako:633
 msgid "Close"
 msgstr "关闭"
 
-#: src/notebook/templates/editor_components.mako:945
+#: src/notebook/templates/editor_components.mako:425
 msgid "All Notebook content"
 msgstr "所有笔记本内容"
 
-#: src/notebook/templates/editor_components.mako:968
+#: src/notebook/templates/editor_components.mako:448
 #: src/notebook/templates/notebooks.mako:98
 msgid "Import"
 msgstr "导入"
 
-#: src/notebook/templates/editor_components.mako:976
+#: src/notebook/templates/editor_components.mako:456
 msgid "Invalid Query"
 msgstr "查询无效"
 
-#: src/notebook/templates/editor_components.mako:979
+#: src/notebook/templates/editor_components.mako:459
 msgid "Query requires a select or an aggregate."
 msgstr "查询需要选择或聚合。"
 
-#: src/notebook/templates/editor_components.mako:988
-#: src/notebook/templates/editor_components.mako:1006
+#: src/notebook/templates/editor_components.mako:468
+#: src/notebook/templates/editor_components.mako:486
 msgid "Toggle Assist"
 msgstr "切换帮助"
 
-#: src/notebook/templates/editor_components.mako:1087
+#: src/notebook/templates/editor_components.mako:567
 msgid "Assistant"
 msgstr "助手"
 
-#: src/notebook/templates/editor_components.mako:1089
+#: src/notebook/templates/editor_components.mako:569
 msgid "Sessions"
 msgstr "会话"
 
-#: src/notebook/templates/editor_components.mako:1092
+#: src/notebook/templates/editor_components.mako:572
 msgid "Schedule"
 msgstr "计划"
 
-#: src/notebook/templates/editor_components.mako:1104
-msgid "Active tables"
-msgstr "活动表"
-
-#: src/notebook/templates/editor_components.mako:1113
-msgid "Suggestions"
-msgstr "建议"
-
-#: src/notebook/templates/editor_components.mako:1137
-msgid "There are currently no active sessions, please reload the page."
-msgstr "当前无活动会话，请重新加载此页面。"
-
-#: src/notebook/templates/editor_components.mako:1142
-msgid "Recreate session"
-msgstr "重新创建会话"
-
-#: src/notebook/templates/editor_components.mako:1142
-msgid "Recreate"
-msgstr "重新创建"
-
-#: src/notebook/templates/editor_components.mako:1143
-msgid "Close session"
-msgstr "关闭会话"
-
-#: src/notebook/templates/editor_components.mako:1145
-msgid "Save session settings as default"
-msgstr "默认情况下，保存会话设置"
-
-#: src/notebook/templates/editor_components.mako:1145
-msgid "Set as default settings"
-msgstr "设置为默认设置"
-
-#: src/notebook/templates/editor_components.mako:1185
+#: src/notebook/templates/editor_components.mako:602
 msgid "Changes not saved"
 msgstr "未保存更改"
 
-#: src/notebook/templates/editor_components.mako:1188
+#: src/notebook/templates/editor_components.mako:605
 msgid "Start"
 msgstr "开始"
 
-#: src/notebook/templates/editor_components.mako:1197
+#: src/notebook/templates/editor_components.mako:613
 msgid "Query needs to be saved first."
 msgstr "需要首先保存查询。"
 
-#: src/notebook/templates/editor_components.mako:1231
+#: src/notebook/templates/editor_components.mako:627
+msgid "There are currently no active sessions, please reload the page."
+msgstr "当前无活动会话，请重新加载此页面。"
+
+#: src/notebook/templates/editor_components.mako:632
+msgid "Recreate session"
+msgstr "重新创建会话"
+
+#: src/notebook/templates/editor_components.mako:632
+msgid "Recreate"
+msgstr "重新创建"
+
+#: src/notebook/templates/editor_components.mako:633
+msgid "Close session"
+msgstr "关闭会话"
+
+#: src/notebook/templates/editor_components.mako:635
+msgid "Save session settings as default"
+msgstr "默认情况下，保存会话设置"
+
+#: src/notebook/templates/editor_components.mako:635
+msgid "Set as default settings"
+msgstr "设置为默认设置"
+
+#: src/notebook/templates/editor_components.mako:689
 msgid "No logs available at this moment."
 msgstr "此时无可用日志。"
 
-#: src/notebook/templates/editor_components.mako:1240
+#: src/notebook/templates/editor_components.mako:698
 msgid "Success."
 msgstr "成功。"
 
-#: src/notebook/templates/editor_components.mako:1244
+#: src/notebook/templates/editor_components.mako:702
 msgid "Done. 0 results."
 msgstr "完成。0 条结果。"
 
-#: src/notebook/templates/editor_components.mako:1248
-#: src/notebook/templates/editor_components.mako:1918
+#: src/notebook/templates/editor_components.mako:706
+#: src/notebook/templates/editor_components.mako:1399
 #: src/notebook/templates/editor_m.mako:115
 msgid "Results have expired, rerun the query if needed."
 msgstr "结果已过期，如果需要，重新运行查询。"
 
-#: src/notebook/templates/editor_components.mako:1252
+#: src/notebook/templates/editor_components.mako:710
 msgid "Loading..."
 msgstr "正在加载..."
 
-#: src/notebook/templates/editor_components.mako:1262
+#: src/notebook/templates/editor_components.mako:720
 msgid "Query History"
 msgstr "查询历史记录"
 
-#: src/notebook/templates/editor_components.mako:1263
+#: src/notebook/templates/editor_components.mako:721
 msgid "Search the query history"
 msgstr "搜索查询历史记录"
 
-#: src/notebook/templates/editor_components.mako:1264
-#: src/notebook/templates/editor_components.mako:1271
+#: src/notebook/templates/editor_components.mako:722
+#: src/notebook/templates/editor_components.mako:729
 msgid "Search..."
 msgstr "搜索..."
 
-#: src/notebook/templates/editor_components.mako:1265
+#: src/notebook/templates/editor_components.mako:723
 msgid "Clear the query history"
 msgstr "清除查询历史记录"
 
-#: src/notebook/templates/editor_components.mako:1269
+#: src/notebook/templates/editor_components.mako:727
 msgid "Saved Queries"
 msgstr "保存的查询"
 
-#: src/notebook/templates/editor_components.mako:1270
+#: src/notebook/templates/editor_components.mako:728
 msgid "Search the saved queries"
 msgstr "搜索保存的查询"
 
-#: src/notebook/templates/editor_components.mako:1275
+#: src/notebook/templates/editor_components.mako:733
 msgid "Query Builder"
 msgstr "查询生成器"
 
-#: src/notebook/templates/editor_components.mako:1279
+#: src/notebook/templates/editor_components.mako:737
 msgid "Results"
 msgstr "结果"
 
-#: src/notebook/templates/editor_components.mako:1281
+#: src/notebook/templates/editor_components.mako:739
 msgid "Number of rows"
 msgstr "行数"
 
-#: src/notebook/templates/editor_components.mako:1283
+#: src/notebook/templates/editor_components.mako:741
 msgid "Search the results"
 msgstr "对结果执行搜索"
 
-#: src/notebook/templates/editor_components.mako:1284
+#: src/notebook/templates/editor_components.mako:742
 msgid "Expand results"
 msgstr "扩展结果"
 
-#: src/notebook/templates/editor_components.mako:1285
-#: src/notebook/templates/editor_components.mako:1477
+#: src/notebook/templates/editor_components.mako:743
+#: src/notebook/templates/editor_components.mako:943
 msgid "Collapse results"
 msgstr "折叠结果"
 
-#: src/notebook/templates/editor_components.mako:1290
-#: src/notebook/templates/editor_components.mako:2193
+#: src/notebook/templates/editor_components.mako:748
+#: src/notebook/templates/editor_components.mako:1684
 msgid "Explain"
 msgstr "解释"
 
-#: src/notebook/templates/editor_components.mako:1312
+#: src/notebook/templates/editor_components.mako:770
 msgid "No queries to be shown."
 msgstr "无显示查询。"
 
-#: src/notebook/templates/editor_components.mako:1315
-#: src/notebook/templates/editor_components.mako:1364
+#: src/notebook/templates/editor_components.mako:773
+#: src/notebook/templates/editor_components.mako:822
 msgid "No queries found for"
 msgstr "未找到查询"
 
-#: src/notebook/templates/editor_components.mako:1358
+#: src/notebook/templates/editor_components.mako:816
 msgid "Error loading my queries"
 msgstr "加载我的查询时出错"
 
-#: src/notebook/templates/editor_components.mako:1361
+#: src/notebook/templates/editor_components.mako:819
 msgid "You don't have any saved query."
 msgstr "您没有保存的查询。"
 
-#: src/notebook/templates/editor_components.mako:1370
-#: src/notebook/templates/editor_components.mako:2364
+#: src/notebook/templates/editor_components.mako:828
+#: src/notebook/templates/editor_components.mako:1870
 #: src/notebook/templates/notebooks.mako:108
 msgid "Name"
 msgstr "名称"
 
-#: src/notebook/templates/editor_components.mako:1371
-#: src/notebook/templates/editor_components.mako:2370
+#: src/notebook/templates/editor_components.mako:829
+#: src/notebook/templates/editor_components.mako:1876
 #: src/notebook/templates/notebooks.mako:109
 msgid "Description"
 msgstr "描述"
 
-#: src/notebook/templates/editor_components.mako:1372
+#: src/notebook/templates/editor_components.mako:830
 #: src/notebook/templates/notebooks.mako:110
 msgid "Owner"
 msgstr "所有者"
 
-#: src/notebook/templates/editor_components.mako:1373
+#: src/notebook/templates/editor_components.mako:831
 #: src/notebook/templates/notebooks.mako:111
 msgid "Last Modified"
 msgstr "上次修改"
 
-#: src/notebook/templates/editor_components.mako:1388
+#: src/notebook/templates/editor_components.mako:846
 msgid "Prev"
 msgstr "上一个"
 
-#: src/notebook/templates/editor_components.mako:1390
+#: src/notebook/templates/editor_components.mako:848
 #: src/notebook/templates/notebooks.mako:280
 msgid "Next"
 msgstr "下一页"
 
-#: src/notebook/templates/editor_components.mako:1397
+#: src/notebook/templates/editor_components.mako:855
 msgid ""
 "There are currently no rules defined. To get started, right click on any "
 "table column in the SQL Assist panel."
 msgstr "当前无定义的规则。要开始，请右键单击 SQL 帮助面板中的任何表列。"
 
-#: src/notebook/templates/editor_components.mako:1401
+#: src/notebook/templates/editor_components.mako:859
 msgid "Table"
 msgstr "表"
 
-#: src/notebook/templates/editor_components.mako:1402
+#: src/notebook/templates/editor_components.mako:860
 msgid "Column"
 msgstr "列"
 
-#: src/notebook/templates/editor_components.mako:1403
+#: src/notebook/templates/editor_components.mako:861
 msgid "Operation"
 msgstr "操作"
 
-#: src/notebook/templates/editor_components.mako:1409
+#: src/notebook/templates/editor_components.mako:867
 msgid "Build query"
 msgstr "生成查询"
 
-#: src/notebook/templates/editor_components.mako:1443
-msgid "The operation in the server is taking longer than expected"
-msgstr "服务器操作时间比预期时间长。"
+#: src/notebook/templates/editor_components.mako:901
+msgid "The query is hanging and taking longer than expected."
+msgstr "查询处于挂起状态，用时超过预期。"
 
-#: src/notebook/templates/editor_components.mako:1452
-#: src/notebook/templates/editor_components.mako:1473
-msgid "Show Logs"
-msgstr "显示日志"
-
-#: src/notebook/templates/editor_components.mako:1453
-#: src/notebook/templates/editor_components.mako:1466
-msgid "Execution time"
-msgstr "执行时间"
-
-#: src/notebook/templates/editor_components.mako:1458
-#: src/notebook/templates/editor_components.mako:1474
-msgid "Settings and properties"
-msgstr "设置和属性"
-
-#: src/notebook/templates/editor_components.mako:1475
-msgid "Show editor shortcuts"
-msgstr "显示编辑器快捷方式"
-
-#: src/notebook/templates/editor_components.mako:1568
+#: src/notebook/templates/editor_components.mako:907
 msgid "The current query has been redacted to hide sensitive information."
 msgstr "当前查询已编写，以便隐藏敏感信息。"
 
-#: src/notebook/templates/editor_components.mako:1581
-msgid "No risks were detected in this query."
-msgstr "在此查询中未检测到风险。"
+#: src/notebook/templates/editor_components.mako:917
+#: src/notebook/templates/editor_components.mako:939
+msgid "Show Logs"
+msgstr "显示日志"
 
-#: src/notebook/templates/editor_components.mako:1601
-msgid "The query is compatible!"
-msgstr "此查询兼容！"
+#: src/notebook/templates/editor_components.mako:918
+#: src/notebook/templates/editor_components.mako:932
+msgid "Execution time"
+msgstr "执行时间"
 
-#: src/notebook/templates/editor_components.mako:1601
-msgid "Execute with Impala?"
-msgstr "使用 Impala 执行？"
+#: src/notebook/templates/editor_components.mako:923
+#: src/notebook/templates/editor_components.mako:940
+msgid "Settings and properties"
+msgstr "设置和属性"
 
-#: src/notebook/templates/editor_components.mako:1604
-msgid "Query is not compatible with Impala."
-msgstr "查询与 Impala 不兼容"
+#: src/notebook/templates/editor_components.mako:941
+msgid "Show editor shortcuts"
+msgstr "显示编辑器快捷方式"
 
-#: src/notebook/templates/editor_components.mako:1624
+#: src/notebook/templates/editor_components.mako:1029
+msgid "Query Validator"
+msgstr "查询验证器"
+
+#: src/notebook/templates/editor_components.mako:1043
+msgid "The query has a parse error."
+msgstr "查询出现解析错误。"
+
+#: src/notebook/templates/editor_components.mako:1052
+msgid "The query is compatible with Impala."
+msgstr "查询与 Impala 兼容。"
+
+#: src/notebook/templates/editor_components.mako:1052
+msgid "Execute it now in Impala!"
+msgstr "立即在 Impala 中执行！"
+
+#: src/notebook/templates/editor_components.mako:1060
+msgid "This query is not compatible with Impala."
+msgstr "此查询与 Impala 不兼容。"
+
+#: src/notebook/templates/editor_components.mako:1072
+msgid "Query validated."
+msgstr "已验证查询。"
+
+#: src/notebook/templates/editor_components.mako:1093
 msgid "Query File"
 msgstr "查询文件"
 
-#: src/notebook/templates/editor_components.mako:1625
+#: src/notebook/templates/editor_components.mako:1094
 msgid "Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql"
 msgstr "文件路径，例如 /user/hue/sample.sql, s3a://hue/sample.sql"
 
-#: src/notebook/templates/editor_components.mako:1628
-#: src/notebook/templates/editor_components.mako:1648
+#: src/notebook/templates/editor_components.mako:1097
+#: src/notebook/templates/editor_components.mako:1117
 msgid "Open in new tab"
 msgstr "在新选项卡中打开"
 
-#: src/notebook/templates/editor_components.mako:1642
+#: src/notebook/templates/editor_components.mako:1111
 msgid "Document"
 msgstr "文档"
 
-#: src/notebook/templates/editor_components.mako:1644
+#: src/notebook/templates/editor_components.mako:1113
 msgid "Search your documents..."
 msgstr "搜索文档..."
 
-#: src/notebook/templates/editor_components.mako:1688
+#: src/notebook/templates/editor_components.mako:1162
 msgid "Variable value"
 msgstr "变量值"
 
-#: src/notebook/templates/editor_components.mako:1700
-#: src/notebook/templates/editor_components.mako:1760
+#: src/notebook/templates/editor_components.mako:1174
+#: src/notebook/templates/editor_components.mako:1241
 msgid "type"
 msgstr "类型"
 
-#: src/notebook/templates/editor_components.mako:1704
-#: src/notebook/templates/editor_components.mako:2237
-#: src/notebook/templates/editor_components.mako:2252
+#: src/notebook/templates/editor_components.mako:1178
+#: src/notebook/templates/editor_components.mako:1743
+#: src/notebook/templates/editor_components.mako:1758
 msgid "Bars"
 msgstr "条"
 
-#: src/notebook/templates/editor_components.mako:1705
-#: src/notebook/templates/editor_components.mako:2238
-#: src/notebook/templates/editor_components.mako:2257
+#: src/notebook/templates/editor_components.mako:1179
+#: src/notebook/templates/editor_components.mako:1744
+#: src/notebook/templates/editor_components.mako:1763
 msgid "Lines"
 msgstr "线"
 
-#: src/notebook/templates/editor_components.mako:1712
-#: src/notebook/templates/editor_components.mako:1737
+#: src/notebook/templates/editor_components.mako:1186
+#: src/notebook/templates/editor_components.mako:1211
 msgid "value"
 msgstr "值"
 
-#: src/notebook/templates/editor_components.mako:1718
+#: src/notebook/templates/editor_components.mako:1192
 msgid "legend"
 msgstr "图例"
 
-#: src/notebook/templates/editor_components.mako:1727
+#: src/notebook/templates/editor_components.mako:1201
 msgid "x-axis"
 msgstr "X 轴"
 
-#: src/notebook/templates/editor_components.mako:1728
+#: src/notebook/templates/editor_components.mako:1202
 msgid "region"
 msgstr "区域"
 
-#: src/notebook/templates/editor_components.mako:1729
+#: src/notebook/templates/editor_components.mako:1203
 msgid "latitude"
 msgstr "纬度"
 
-#: src/notebook/templates/editor_components.mako:1736
+#: src/notebook/templates/editor_components.mako:1210
 msgid "y-axis"
 msgstr "Y 轴"
 
-#: src/notebook/templates/editor_components.mako:1738
+#: src/notebook/templates/editor_components.mako:1212
 msgid "longitude"
 msgstr "经度"
 
-#: src/notebook/templates/editor_components.mako:1752
+#: src/notebook/templates/editor_components.mako:1226
 msgid "group"
 msgstr "组"
 
-#: src/notebook/templates/editor_components.mako:1764
+#: src/notebook/templates/editor_components.mako:1233
+msgid "limit"
+msgstr "限制"
+
+#: src/notebook/templates/editor_components.mako:1245
 msgid "Markers"
 msgstr "标记"
 
-#: src/notebook/templates/editor_components.mako:1765
+#: src/notebook/templates/editor_components.mako:1246
 msgid "Heatmap"
 msgstr "热图"
 
-#: src/notebook/templates/editor_components.mako:1771
+#: src/notebook/templates/editor_components.mako:1252
 msgid "label"
 msgstr "标签"
 
-#: src/notebook/templates/editor_components.mako:1780
+#: src/notebook/templates/editor_components.mako:1261
 msgid "intensity"
 msgstr "强度"
 
-#: src/notebook/templates/editor_components.mako:1789
+#: src/notebook/templates/editor_components.mako:1270
 msgid "scatter size"
 msgstr "散点图大小"
 
-#: src/notebook/templates/editor_components.mako:1796
+#: src/notebook/templates/editor_components.mako:1277
 msgid "scatter group"
 msgstr "散点图组"
 
-#: src/notebook/templates/editor_components.mako:1804
+#: src/notebook/templates/editor_components.mako:1285
 msgid "scope"
 msgstr "范围"
 
-#: src/notebook/templates/editor_components.mako:1808
+#: src/notebook/templates/editor_components.mako:1289
 msgid "World"
 msgstr "世界"
 
-#: src/notebook/templates/editor_components.mako:1809
+#: src/notebook/templates/editor_components.mako:1290
 msgid "Europe"
 msgstr "欧洲"
 
-#: src/notebook/templates/editor_components.mako:1810
+#: src/notebook/templates/editor_components.mako:1291
 msgid "Australia"
 msgstr "澳大利亚"
 
-#: src/notebook/templates/editor_components.mako:1811
+#: src/notebook/templates/editor_components.mako:1292
 msgid "Brazil"
 msgstr "巴西"
 
-#: src/notebook/templates/editor_components.mako:1812
+#: src/notebook/templates/editor_components.mako:1293
 msgid "Canada"
 msgstr "加拿大"
 
-#: src/notebook/templates/editor_components.mako:1813
+#: src/notebook/templates/editor_components.mako:1294
 msgid "China"
 msgstr "中国"
 
-#: src/notebook/templates/editor_components.mako:1814
+#: src/notebook/templates/editor_components.mako:1295
 msgid "France"
 msgstr "法国"
 
-#: src/notebook/templates/editor_components.mako:1815
+#: src/notebook/templates/editor_components.mako:1296
 msgid "Germany"
 msgstr "德国"
 
-#: src/notebook/templates/editor_components.mako:1816
+#: src/notebook/templates/editor_components.mako:1297
 msgid "Italy"
 msgstr "意大利"
 
-#: src/notebook/templates/editor_components.mako:1817
+#: src/notebook/templates/editor_components.mako:1298
 msgid "Japan"
 msgstr "日本"
 
-#: src/notebook/templates/editor_components.mako:1818
+#: src/notebook/templates/editor_components.mako:1299
 msgid "UK"
 msgstr "英国"
 
-#: src/notebook/templates/editor_components.mako:1819
+#: src/notebook/templates/editor_components.mako:1300
 msgid "USA"
 msgstr "美国"
 
-#: src/notebook/templates/editor_components.mako:1825
+#: src/notebook/templates/editor_components.mako:1306
 msgid "sorting"
 msgstr "排序"
 
-#: src/notebook/templates/editor_components.mako:1828
+#: src/notebook/templates/editor_components.mako:1309
 msgid "No sorting"
 msgstr "不排序"
 
-#: src/notebook/templates/editor_components.mako:1829
+#: src/notebook/templates/editor_components.mako:1310
 msgid "Sort ascending"
 msgstr "升序"
 
-#: src/notebook/templates/editor_components.mako:1830
+#: src/notebook/templates/editor_components.mako:1311
 msgid "Sort descending"
 msgstr "降序"
 
-#: src/notebook/templates/editor_components.mako:1844
+#: src/notebook/templates/editor_components.mako:1325
 msgid "columns"
 msgstr "列"
 
-#: src/notebook/templates/editor_components.mako:1846
+#: src/notebook/templates/editor_components.mako:1327
 msgid "Search"
 msgstr "搜索"
 
-#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:1331
 msgid "Filter columns..."
 msgstr "筛选列..."
 
-#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:1331
 msgid "Type column:xxx or type:yyy for specific filters."
 msgstr "对于特定筛选器，键入 column:xxx 或 type:yyy。"
 
-#: src/notebook/templates/editor_components.mako:1864
+#: src/notebook/templates/editor_components.mako:1345
 msgid "No results found"
 msgstr "未找到结果"
 
-#: src/notebook/templates/editor_components.mako:1888
+#: src/notebook/templates/editor_components.mako:1369
 msgid "Done."
 msgstr "完成。"
 
-#: src/notebook/templates/editor_components.mako:1923
+#: src/notebook/templates/editor_components.mako:1404
 msgid "Select the chart parameters on the left"
 msgstr "选择左侧的图表参数"
 
-#: src/notebook/templates/editor_components.mako:1971
+#: src/notebook/templates/editor_components.mako:1452
 msgid "Type your text here, select some text to format it"
 msgstr "在此处键入文本，选择要对其进行格式化的某些文本"
 
-#: src/notebook/templates/editor_components.mako:2000
+#: src/notebook/templates/editor_components.mako:1481
 msgid "Source"
 msgstr "源"
 
-#: src/notebook/templates/editor_components.mako:2002
+#: src/notebook/templates/editor_components.mako:1483
 msgid "Source path to copy, e.g. ${nameNode1}/path/to/input.txt"
 msgstr "要复制的源路径，例如 ${nameNode1}/path/to/input.txt"
 
-#: src/notebook/templates/editor_components.mako:2006
+#: src/notebook/templates/editor_components.mako:1487
 msgid "Destination"
 msgstr "目标"
 
-#: src/notebook/templates/editor_components.mako:2008
+#: src/notebook/templates/editor_components.mako:1489
 msgid "Destination path, e.g. ${nameNode2}/path/to/output.txt"
 msgstr "目标路径，例如 ${nameNode2}/path/to/output.txt"
 
-#: src/notebook/templates/editor_components.mako:2014
+#: src/notebook/templates/editor_components.mako:1495
 msgid "Script path"
 msgstr "脚本路径"
 
-#: src/notebook/templates/editor_components.mako:2016
+#: src/notebook/templates/editor_components.mako:1497
 msgid "Source path to the command"
 msgstr "此命令的源路径"
 
-#: src/notebook/templates/editor_components.mako:2020
+#: src/notebook/templates/editor_components.mako:1501
 msgid "Environment variables"
 msgstr "环境变量"
 
-#: src/notebook/templates/editor_components.mako:2028
+#: src/notebook/templates/editor_components.mako:1509
 msgid "Jar path"
 msgstr "Jar 路径"
 
-#: src/notebook/templates/editor_components.mako:2030
+#: src/notebook/templates/editor_components.mako:1511
 msgid "Source path to the main MapReduce jar"
 msgstr "主 MapReduce jar 的源路径"
 
-#: src/notebook/templates/editor_components.mako:2034
+#: src/notebook/templates/editor_components.mako:1515
 msgid "Hadoop properties"
 msgstr "Hadoop 属性"
 
-#: src/notebook/templates/editor_components.mako:2042
-#: src/notebook/templates/editor_components.mako:2056
+#: src/notebook/templates/editor_components.mako:1523
+#: src/notebook/templates/editor_components.mako:1537
 msgid "Path"
 msgstr "路径"
 
-#: src/notebook/templates/editor_components.mako:2044
+#: src/notebook/templates/editor_components.mako:1525
 msgid ""
 "Path to application jar, e.g. hdfs://localhost:8020/user/hue/oozie-"
 "examples.jar"
 msgstr "应用程序 jar 的路径，例如 hdfs://localhost:8020/user/hue/oozie-examples.jar"
 
-#: src/notebook/templates/editor_components.mako:2048
-#: src/notebook/templates/editor_components.mako:2069
+#: src/notebook/templates/editor_components.mako:1529
+#: src/notebook/templates/editor_components.mako:1550
 msgid "Class"
 msgstr "类"
 
-#: src/notebook/templates/editor_components.mako:2050
-#: src/notebook/templates/editor_components.mako:2072
+#: src/notebook/templates/editor_components.mako:1531
+#: src/notebook/templates/editor_components.mako:1553
 msgid "Class name of application, e.g. org.apache.oozie.example.SparkFileCopy"
 msgstr "应用程序的类名，例如 org.apache.oozie.example.SparkFileCopy"
 
-#: src/notebook/templates/editor_components.mako:2058
+#: src/notebook/templates/editor_components.mako:1539
 msgid "Path to python file, e.g. script.py"
 msgstr "python 文件的路径，例如 script.py"
 
-#: src/notebook/templates/editor_components.mako:2102
+#: src/notebook/templates/editor_components.mako:1591
+msgid "Click to hide"
+msgstr "单击以隐藏"
+
+#: src/notebook/templates/editor_components.mako:1593
 msgid "The statement was canceled."
 msgstr "语句已取消。"
 
-#: src/notebook/templates/editor_components.mako:2131
+#: src/notebook/templates/editor_components.mako:1622
 msgid "Creating session"
 msgstr "创建会话"
 
-#: src/notebook/templates/editor_components.mako:2134
+#: src/notebook/templates/editor_components.mako:1625
 msgid "Restart from the first statement"
 msgstr "从第一个语句重新开始"
 
-#: src/notebook/templates/editor_components.mako:2141
+#: src/notebook/templates/editor_components.mako:1632
 #: src/notebook/templates/editor_m.mako:95
 msgid "Cancel operation"
 msgstr "取消操作"
 
-#: src/notebook/templates/editor_components.mako:2146
+#: src/notebook/templates/editor_components.mako:1637
 msgid "Canceling operation..."
 msgstr "正在取消操作..."
 
-#: src/notebook/templates/editor_components.mako:2152
-#: src/notebook/templates/editor_components.mako:2173
+#: src/notebook/templates/editor_components.mako:1643
+#: src/notebook/templates/editor_components.mako:1664
 msgid "Submit all the queries as a background batch job."
 msgstr "作为背景批作业提交所有查询。"
 
-#: src/notebook/templates/editor_components.mako:2168
+#: src/notebook/templates/editor_components.mako:1659
 msgid "Execute interactively the current statement"
 msgstr "交互执行当前语句"
 
-#: src/notebook/templates/editor_components.mako:2169
+#: src/notebook/templates/editor_components.mako:1660
 #: src/notebook/templates/editor_m.mako:92
 msgid "Execute"
 msgstr "执行"
 
-#: src/notebook/templates/editor_components.mako:2174
+#: src/notebook/templates/editor_components.mako:1665
 msgid "Batch"
 msgstr "批处理"
 
-#: src/notebook/templates/editor_components.mako:2184
-#: src/notebook/templates/editor_components.mako:2192
+#: src/notebook/templates/editor_components.mako:1675
+#: src/notebook/templates/editor_components.mako:1683
 msgid "Explain the current SQL query"
 msgstr "解释当前 SQL 查询"
 
-#: src/notebook/templates/editor_components.mako:2198
+#: src/notebook/templates/editor_components.mako:1689
 msgid "Format the current SQL query"
 msgstr "对当前 SQL 查询进行格式化"
 
-#: src/notebook/templates/editor_components.mako:2199
+#: src/notebook/templates/editor_components.mako:1690
 msgid "Format"
 msgstr "格式"
 
-#: src/notebook/templates/editor_components.mako:2204
+#: src/notebook/templates/editor_components.mako:1695
 msgid "Clear the current editor"
 msgstr "清除当前编辑器"
 
-#: src/notebook/templates/editor_components.mako:2205
+#: src/notebook/templates/editor_components.mako:1696
 msgid "Clear"
 msgstr "清除"
 
-#: src/notebook/templates/editor_components.mako:2211
-msgid "Get Impala compatibility hints"
-msgstr "获取 Impala 兼容性提示"
+#: src/notebook/templates/editor_components.mako:1702
+msgid "Get syntax checks"
+msgstr "获取语法检查"
 
-#: src/notebook/templates/editor_components.mako:2212
-msgid "Check Impala compatibility"
-msgstr "检查 Impala 兼容性。"
+#: src/notebook/templates/editor_components.mako:1703
+msgid "Check syntax"
+msgstr "检查语法"
 
-#: src/notebook/templates/editor_components.mako:2216
+#: src/notebook/templates/editor_components.mako:1707
 msgid "Get recommendations on query risks and optimizations"
 msgstr "获取有关查询风险和优化的建议"
 
-#: src/notebook/templates/editor_components.mako:2217
+#: src/notebook/templates/editor_components.mako:1708
 msgid "Check complexity"
 msgstr "检查复杂性"
 
-#: src/notebook/templates/editor_components.mako:2230
+#: src/notebook/templates/editor_components.mako:1712
+msgid "Get Impala compatibility hints"
+msgstr "获取 Impala 兼容性提示"
+
+#: src/notebook/templates/editor_components.mako:1713
+msgid "Check Impala compatibility"
+msgstr "检查 Impala 兼容性。"
+
+#: src/notebook/templates/editor_components.mako:1717
+msgid "Expand query with similar queries suggestions"
+msgstr "使用类似查询建议扩展查询"
+
+#: src/notebook/templates/editor_components.mako:1718
+msgid "Show similarities"
+msgstr "显示相似点"
+
+#: src/notebook/templates/editor_components.mako:1722
+msgid "Load past query history in order to improve recommendations"
+msgstr "加载过去的查询历史记录以改进建议"
+
+#: src/notebook/templates/editor_components.mako:1723
+msgid "Upload workload"
+msgstr "上传工作负载"
+
+#: src/notebook/templates/editor_components.mako:1736
 msgid "Grid"
 msgstr "网格"
 
-#: src/notebook/templates/editor_components.mako:2239
-#: src/notebook/templates/editor_components.mako:2262
+#: src/notebook/templates/editor_components.mako:1745
+#: src/notebook/templates/editor_components.mako:1768
 msgid "Time"
 msgstr "时间"
 
-#: src/notebook/templates/editor_components.mako:2240
-#: src/notebook/templates/editor_components.mako:2267
+#: src/notebook/templates/editor_components.mako:1746
+#: src/notebook/templates/editor_components.mako:1773
 msgid "Pie"
 msgstr "圆形"
 
-#: src/notebook/templates/editor_components.mako:2241
-#: src/notebook/templates/editor_components.mako:2272
+#: src/notebook/templates/editor_components.mako:1747
+#: src/notebook/templates/editor_components.mako:1778
 msgid "Scatter"
 msgstr "散点图"
 
-#: src/notebook/templates/editor_components.mako:2242
-#: src/notebook/templates/editor_components.mako:2277
+#: src/notebook/templates/editor_components.mako:1748
+#: src/notebook/templates/editor_components.mako:1783
 msgid "Marker Map"
 msgstr "Marker Map"
 
-#: src/notebook/templates/editor_components.mako:2243
-#: src/notebook/templates/editor_components.mako:2282
+#: src/notebook/templates/editor_components.mako:1749
+#: src/notebook/templates/editor_components.mako:1788
 msgid "Gradient Map"
 msgstr "Gradient Map"
 
-#: src/notebook/templates/editor_components.mako:2289
+#: src/notebook/templates/editor_components.mako:1795
 msgid "Columns"
 msgstr "列"
 
-#: src/notebook/templates/editor_components.mako:2306
+#: src/notebook/templates/editor_components.mako:1812
 msgid "Choose a file"
 msgstr "选择文件"
 
-#: src/notebook/templates/editor_components.mako:2327
+#: src/notebook/templates/editor_components.mako:1833
 msgid "Confirm Remove"
 msgstr "确认删除"
 
-#: src/notebook/templates/editor_components.mako:2330
+#: src/notebook/templates/editor_components.mako:1836
 msgid "Are you sure you want to remove this snippet?"
 msgstr "是否确定要删除此代码段？"
 
-#: src/notebook/templates/editor_components.mako:2333
-#: src/notebook/templates/editor_components.mako:2422
-#: src/notebook/templates/editor_components.mako:2437
+#: src/notebook/templates/editor_components.mako:1839
+#: src/notebook/templates/editor_components.mako:1928
+#: src/notebook/templates/editor_components.mako:1943
 #: src/notebook/templates/notebooks.mako:162
 msgid "No"
 msgstr "否"
 
-#: src/notebook/templates/editor_components.mako:2334
-#: src/notebook/templates/editor_components.mako:2423
+#: src/notebook/templates/editor_components.mako:1840
+#: src/notebook/templates/editor_components.mako:1929
 #: src/notebook/templates/notebooks.mako:163
 msgid "Yes"
 msgstr "是"
 
-#: src/notebook/templates/editor_components.mako:2341
-#: src/notebook/templates/editor_components.mako:2498
+#: src/notebook/templates/editor_components.mako:1847
+#: src/notebook/templates/editor_components.mako:2007
 msgid "Drop a SQL file here"
 msgstr "在此处拖放 SQL 文件"
 
-#: src/notebook/templates/editor_components.mako:2344
-#: src/notebook/templates/editor_components.mako:2500
+#: src/notebook/templates/editor_components.mako:1850
+#: src/notebook/templates/editor_components.mako:2009
 msgid "Drop iPython/Zeppelin notebooks here"
 msgstr "在此处拖放 iPython/Zeppelin 笔记本"
 
-#: src/notebook/templates/editor_components.mako:2353
+#: src/notebook/templates/editor_components.mako:1859
 msgid "Save query as..."
 msgstr "将查询另存为..."
 
-#: src/notebook/templates/editor_components.mako:2356
+#: src/notebook/templates/editor_components.mako:1862
 msgid "Save notebook as..."
 msgstr "将笔记本另存为..."
 
-#: src/notebook/templates/editor_components.mako:2372
+#: src/notebook/templates/editor_components.mako:1878
 msgid "(optional)"
 msgstr "（可选）"
 
-#: src/notebook/templates/editor_components.mako:2378
-#: src/notebook/templates/editor_components.mako:2407
+#: src/notebook/templates/editor_components.mako:1884
+#: src/notebook/templates/editor_components.mako:1913
 #: src/notebook/templates/editor_m.mako:96
-#: src/notebook/templates/notebook_ko_components.mako:273
 msgid "Cancel"
 msgstr "取消"
 
-#: src/notebook/templates/editor_components.mako:2379
-#: src/notebook/templates/notebook_ko_components.mako:274
+#: src/notebook/templates/editor_components.mako:1885
 msgid "Save"
 msgstr "保存"
 
-#: src/notebook/templates/editor_components.mako:2388
+#: src/notebook/templates/editor_components.mako:1894
 msgid "Connect to the data source"
 msgstr "连接到数据源"
 
-#: src/notebook/templates/editor_components.mako:2395
+#: src/notebook/templates/editor_components.mako:1901
 msgid "Username"
 msgstr "用户名"
 
-#: src/notebook/templates/editor_components.mako:2401
+#: src/notebook/templates/editor_components.mako:1907
 msgid "Password"
 msgstr "密码"
 
-#: src/notebook/templates/editor_components.mako:2408
+#: src/notebook/templates/editor_components.mako:1914
 msgid "Connect"
 msgstr "连接"
 
-#: src/notebook/templates/editor_components.mako:2416
+#: src/notebook/templates/editor_components.mako:1922
 msgid "Confirm History Clear"
 msgstr "确认历史记录清除"
 
-#: src/notebook/templates/editor_components.mako:2419
+#: src/notebook/templates/editor_components.mako:1925
 msgid "Are you sure you want to clear the query history?"
 msgstr "是否确定要清除查询历史记录？"
 
-#: src/notebook/templates/editor_components.mako:2431
+#: src/notebook/templates/editor_components.mako:1937
 msgid "Operation timed out"
 msgstr "操作超时"
 
-#: src/notebook/templates/editor_components.mako:2434
+#: src/notebook/templates/editor_components.mako:1940
 msgid "The operation timed out. Do you want to retry?"
 msgstr "操作超时。是否要重试？"
 
-#: src/notebook/templates/editor_components.mako:2438
+#: src/notebook/templates/editor_components.mako:1944
 msgid "Yes, retry"
 msgstr "是，重试"
 
-#: src/notebook/templates/editor_components.mako:2487
+#: src/notebook/templates/editor_components.mako:1993
 msgid "Failed to load"
 msgstr "无法加载"
 
-#: src/notebook/templates/editor_components.mako:2552
+#: src/notebook/templates/editor_components.mako:2061
 msgid "No results found."
 msgstr "未找到结果。"
 
-#: src/notebook/templates/editor_components.mako:2553
+#: src/notebook/templates/editor_components.mako:2062
 msgid "of"
 msgstr "的"
 
-#: src/notebook/templates/editor_components.mako:3099
+#: src/notebook/templates/editor_components.mako:2657
 msgid "Distribution"
 msgstr "贡献"
 
-#: src/notebook/templates/editor_components.mako:3133
-#: src/notebook/templates/editor_components.mako:3143
-#: src/notebook/templates/editor_components.mako:3149
-#: src/notebook/templates/editor_components.mako:3158
-#: src/notebook/templates/editor_components.mako:3164
-#: src/notebook/templates/editor_components.mako:3170
-#: src/notebook/templates/editor_components.mako:3181
-#: src/notebook/templates/editor_components.mako:3234
+#: src/notebook/templates/editor_components.mako:2691
+#: src/notebook/templates/editor_components.mako:2701
+#: src/notebook/templates/editor_components.mako:2707
+#: src/notebook/templates/editor_components.mako:2716
+#: src/notebook/templates/editor_components.mako:2722
+#: src/notebook/templates/editor_components.mako:2728
+#: src/notebook/templates/editor_components.mako:2739
+#: src/notebook/templates/editor_components.mako:2793
 #: src/notebook/templates/editor_m.mako:201
 #: src/notebook/templates/editor_m.mako:211
 #: src/notebook/templates/editor_m.mako:217
@@ -1550,12 +1230,12 @@ msgstr "贡献"
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/notebook/templates/editor_components.mako:3139
-#: src/notebook/templates/editor_components.mako:3176
-#: src/notebook/templates/editor_components.mako:3199
-#: src/notebook/templates/editor_components.mako:3204
-#: src/notebook/templates/editor_components.mako:3209
-#: src/notebook/templates/editor_components.mako:3214
+#: src/notebook/templates/editor_components.mako:2697
+#: src/notebook/templates/editor_components.mako:2734
+#: src/notebook/templates/editor_components.mako:2757
+#: src/notebook/templates/editor_components.mako:2762
+#: src/notebook/templates/editor_components.mako:2767
+#: src/notebook/templates/editor_components.mako:2772
 #: src/notebook/templates/editor_m.mako:207
 #: src/notebook/templates/editor_m.mako:244
 #: src/notebook/templates/editor_m.mako:267
@@ -1565,152 +1245,82 @@ msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 msgid "Example: 1 + 1, or press CTRL + space"
 msgstr "示例：1 + 1 或按 CTRL + 空格"
 
-#: src/notebook/templates/editor_components.mako:3187
+#: src/notebook/templates/editor_components.mako:2745
 #: src/notebook/templates/editor_m.mako:255
 msgid "Example: SELECT fieldA, FieldB FROM collectionname, or press CTRL + space"
 msgstr "示例：SELECT fieldA、FieldB FROM collectionname 或按 CTRL + 空格"
 
-#: src/notebook/templates/editor_components.mako:3240
+#: src/notebook/templates/editor_components.mako:2786
+msgid ""
+"Example: import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
+msgstr ""
+"示例：import  --connect jdbc:hsqldb:file:db.hsqldb --table TT "
+"--target-dir hdfs://localhost:8020/user/foo -m 1"
+
+#: src/notebook/templates/editor_components.mako:2799
 #: src/notebook/templates/editor_m.mako:293
 msgid "Type your text here"
 msgstr "在此处键入文本"
 
-#: src/notebook/templates/editor_components.mako:3245
+#: src/notebook/templates/editor_components.mako:2804
 #: src/notebook/templates/editor_m.mako:298
 msgid "Type your markdown here"
 msgstr "在此处键入标记"
 
-#: src/notebook/templates/editor_components.mako:3576
+#: src/notebook/templates/editor_components.mako:3135
 msgid "User successfully authenticated to GitHub."
 msgstr "用户已成功经 GitHub 身份验证。"
 
-#: src/notebook/templates/editor_components.mako:3580
+#: src/notebook/templates/editor_components.mako:3139
 msgid "Could not decode Github file content to JSON."
 msgstr "无法将 Github 文件内容解码到 JSON。"
 
-#: src/notebook/templates/editor_components.mako:3949
+#: src/notebook/templates/editor_components.mako:3512
 msgid "Coordinator submitted."
 msgstr "已提交 Coordinator。"
 
-#: src/notebook/templates/notebook.mako:27
+#: src/notebook/templates/hue_ace_autocompleter.mako:99
+msgid "Primary key"
+msgstr "主要密钥"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:128
+msgid "Popular join"
+msgstr "热门连接"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:142
+msgid "Popular join condition"
+msgstr "热门连接条件"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:156
+msgid "Popular aggregate"
+msgstr "热门汇总"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:180
+msgid "Popular group by"
+msgstr "热门分组依据"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:194
+msgid "Popular order by"
+msgstr "热门排序依据"
+
+#: src/notebook/templates/hue_ace_autocompleter.mako:208
+msgid "Popular filter"
+msgstr "热门筛选器"
+
+#: src/notebook/templates/notebook.mako:28
 msgid "Notebook"
 msgstr "笔记本"
 
-#: src/notebook/templates/notebook.mako:33
+#: src/notebook/templates/notebook.mako:35
+#: src/notebook/templates/notebook_embeddable.mako:33
 msgid "There are no snippets configured."
 msgstr "未配置代码段。"
 
-#: src/notebook/templates/notebook.mako:36
+#: src/notebook/templates/notebook.mako:38
+#: src/notebook/templates/notebook_embeddable.mako:36
 msgid "Add a snippet to start your new notebook"
 msgstr "添加代码段以启动您的新笔记本"
-
-#: src/notebook/templates/notebook_ko_components.mako:40
-msgid "Add a new snippet"
-msgstr "添加新代码段"
-
-#: src/notebook/templates/notebook_ko_components.mako:41
-msgid "Select snippet"
-msgstr "选择代码段"
-
-#: src/notebook/templates/notebook_ko_components.mako:56
-msgid "Add Snippet"
-msgstr "添加代码段"
-
-#: src/notebook/templates/notebook_ko_components.mako:173
-msgid "Get results"
-msgstr "获取结果"
-
-#: src/notebook/templates/notebook_ko_components.mako:184
-#, python-format
-msgid "Download first %s cells as CSV"
-msgstr "以 CSV 格式下载第一 %s 单元格"
-
-#: src/notebook/templates/notebook_ko_components.mako:185
-msgid "CSV"
-msgstr "CSV"
-
-#: src/notebook/templates/notebook_ko_components.mako:189
-#, python-format
-msgid "Download first %s cells as XLS"
-msgstr "以 XLS 格式下载第一 %s 单元格"
-
-#: src/notebook/templates/notebook_ko_components.mako:190
-msgid "Excel"
-msgstr "Excel"
-
-#: src/notebook/templates/notebook_ko_components.mako:194
-msgid "Save the results to a large file or a new table"
-msgstr "将结果保存到大文件或新表"
-
-#: src/notebook/templates/notebook_ko_components.mako:195
-#: src/notebook/templates/notebooks.mako:84
-msgid "Export"
-msgstr "导出"
-
-#: src/notebook/templates/notebook_ko_components.mako:210
-msgid "Save query result in"
-msgstr "将查询结果保存在"
-
-#: src/notebook/templates/notebook_ko_components.mako:220
-#, python-format
-msgid "A file (max %s cells)"
-msgstr "文件（最多 %s 个单元格）"
-
-#: src/notebook/templates/notebook_ko_components.mako:223
-msgid "Path to CSV file"
-msgstr "CSV 文件路径"
-
-#: src/notebook/templates/notebook_ko_components.mako:235
-msgid "A file (large result)"
-msgstr "文件（较大结果）"
-
-#: src/notebook/templates/notebook_ko_components.mako:238
-msgid "Path to empty directory"
-msgstr "空目录路径"
-
-#: src/notebook/templates/notebook_ko_components.mako:249
-msgid "A new table"
-msgstr "新表"
-
-#: src/notebook/templates/notebook_ko_components.mako:252
-msgid "Table name or <database>.<table>"
-msgstr "表名或 <database>.<table>"
-
-#: src/notebook/templates/notebook_ko_components.mako:261
-msgid "A search dashboard"
-msgstr "搜索仪表板"
-
-#: src/notebook/templates/notebook_ko_components.mako:264
-msgid "Index name"
-msgstr "索引名称"
-
-#: src/notebook/templates/notebook_ko_components.mako:281
-msgid "Your download is being prepared"
-msgstr "正在准备下载"
-
-#: src/notebook/templates/notebook_ko_components.mako:284
-msgid "Your downloaded results have been truncated"
-msgstr "您的下载结果已被截断"
-
-#: src/notebook/templates/notebook_ko_components.mako:289
-msgid "Please wait, it might take a while..."
-msgstr "请稍候，该操作可能需要一些时间..."
-
-#: src/notebook/templates/notebook_ko_components.mako:292
-msgid ""
-"The number of resulting rows was too big to be downloaded and the "
-"resulting file has been truncated to"
-msgstr ""
-"结果行数过多，无法下载，"
-"结果文件已截断为"
-
-#: src/notebook/templates/notebook_ko_components.mako:294
-msgid "rows."
-msgstr "行。"
-
-#: src/notebook/templates/notebook_ko_components.mako:299
-msgid "Cancel Download"
-msgstr "取消下载"
 
 #: src/notebook/templates/notebooks.mako:32
 #, python-format
@@ -1741,9 +1351,17 @@ msgstr "搜索名称、描述等..."
 msgid "Copy"
 msgstr "复制"
 
+#: src/notebook/templates/notebooks.mako:74
+msgid "Delete"
+msgstr "删除"
+
 #: src/notebook/templates/notebooks.mako:80
 msgid "Share"
 msgstr "共享"
+
+#: src/notebook/templates/notebooks.mako:84
+msgid "Export"
+msgstr "导出"
 
 #: src/notebook/templates/notebooks.mako:95
 msgid "Create"
@@ -1797,185 +1415,368 @@ msgstr "最后一个"
 msgid "Previous"
 msgstr "上一页"
 
-#~ msgid "Requires a POST"
+#~ msgid "url param is required"
 #~ msgstr ""
 
-#~ msgid "Requires a DELETE"
+#~ msgid "User is already authenticated to GitHub."
 #~ msgstr ""
 
-#~ msgid "There was an error with your query: %s"
+#~ msgid "Base URL to GitHub Remote Server"
 #~ msgstr ""
 
-#~ msgid "A GET request is required."
+#~ msgid "Base URL to GitHub API"
 #~ msgstr ""
 
-#~ msgid "Missing application jar list."
+#~ msgid "The Client ID of the GitHub application."
 #~ msgstr ""
 
-#~ msgid "URL of the Spark Job Server."
+#~ msgid "The Client Secret of the GitHub application."
 #~ msgstr ""
 
-#~ msgid "The app won't work without a running Job Server"
+#~ msgid "Line Operations"
 #~ msgstr ""
 
-#~ msgid "An error happened with the Spark Server"
+#~ msgid "Selection"
 #~ msgstr ""
 
-#~ msgid "Script parameters"
+#~ msgid "Multicursor"
 #~ msgstr ""
 
-#~ msgid "Class path"
+#~ msgid "Go to"
 #~ msgstr ""
 
-#~ msgid "Delete context(s)?"
+#~ msgid "Find/Replace"
 #~ msgstr ""
 
-#~ msgid "Spark Igniter"
+#~ msgid "Folding"
 #~ msgstr ""
 
-#~ msgid "Applications"
+#~ msgid "Other"
 #~ msgstr ""
 
-#~ msgid "Dashboard"
+#~ msgid "Action"
 #~ msgstr ""
 
-#~ msgid "Contexts"
+#~ msgid "Remove line"
 #~ msgstr ""
 
-#~ msgid "Uploads"
+#~ msgid "Copy lines down"
 #~ msgstr ""
 
-#~ msgid "Create context"
+#~ msgid "Copy lines up"
 #~ msgstr ""
 
-#~ msgid "Num cpu cores"
+#~ msgid "Move lines down"
 #~ msgstr ""
 
-#~ msgid "Memory per node"
+#~ msgid "Move lines up"
 #~ msgstr ""
 
-#~ msgid "Upload application"
+#~ msgid "Remove to line end"
 #~ msgstr ""
 
-#~ msgid "One class of the jar should implement SparkJob."
+#~ msgid "Remove to line start"
 #~ msgstr ""
 
-#~ msgid "Local jar file"
+#~ msgid "Remove word left"
 #~ msgstr ""
 
-#~ msgid "App name"
+#~ msgid "Remove word right"
 #~ msgstr ""
 
-#~ msgid "Upload"
+#~ msgid "Split line"
 #~ msgstr ""
 
-#~ msgid "Application name"
+#~ msgid "Select all"
 #~ msgstr ""
 
-#~ msgid "Application description"
+#~ msgid "Select left"
 #~ msgstr ""
 
-#~ msgid "Upload app"
+#~ msgid "Select right"
 #~ msgstr ""
 
-#~ msgid "Missing, add one?"
+#~ msgid "Select word left"
 #~ msgstr ""
 
-#~ msgid "Automatic"
+#~ msgid "Select word right"
 #~ msgstr ""
 
-#~ msgid "Create one?"
+#~ msgid "Select line start"
 #~ msgstr ""
 
-#~ msgid "Parameters"
+#~ msgid "Select line end"
 #~ msgstr ""
 
-#~ msgid "Your application has the following error(s):"
+#~ msgid "Select to line end"
 #~ msgstr ""
 
-#~ msgid "No parameters defined yet."
+#~ msgid "Select to line start"
 #~ msgstr ""
 
-#~ msgid "Value"
+#~ msgid "Select up"
 #~ msgstr ""
 
-#~ msgid "Add"
+#~ msgid "Select down"
 #~ msgstr ""
 
-#~ msgid "Executing..."
+#~ msgid "Select page up"
 #~ msgstr ""
 
-#~ msgid "or create a"
+#~ msgid "Select page down"
 #~ msgstr ""
 
-#~ msgid "New application"
+#~ msgid "Select to start"
 #~ msgstr ""
 
-#~ msgid "Download"
+#~ msgid "Select to end"
 #~ msgstr ""
 
-#~ msgid "Key"
+#~ msgid "Duplicate selection"
 #~ msgstr ""
 
-#~ msgid "The server returned no results."
+#~ msgid "Select to matching bracket"
 #~ msgstr ""
 
-#~ msgid "Save your query"
+#~ msgid "Add multi-cursor above"
 #~ msgstr ""
 
-#~ msgid "Did you know?"
+#~ msgid "Add multi-cursor below"
 #~ msgstr ""
 
-#~ msgid "This field is required."
+#~ msgid "Add next occurrence to multi-selection"
 #~ msgstr ""
 
-#~ msgid "Empty description"
+#~ msgid "Add previous occurrence to multi-selection"
 #~ msgstr ""
 
-#~ msgid "Application saved successfully!"
+#~ msgid "Move multicursor from current line to the line above"
 #~ msgstr ""
 
-#~ msgid "Server error occured: "
+#~ msgid "Move multicursor from current line to the line below"
 #~ msgstr ""
 
-#~ msgid "Unmanageable server error occured: "
+#~ msgid "Remove current occurrence from multi-selection and move to next"
 #~ msgstr ""
 
-#~ msgid "Search for name"
+#~ msgid "Remove current occurrence from multi-selection and move to previous"
 #~ msgstr ""
 
-#~ msgid "Upload time"
+#~ msgid "Select all from multi-selection"
 #~ msgstr ""
 
-#~ msgid "Click to open and execute"
+#~ msgid "Go to left"
 #~ msgstr ""
 
-#~ msgid "Delete forever"
+#~ msgid "Go to right"
 #~ msgstr ""
 
-#~ msgid "Delete selected"
+#~ msgid "Go to word left"
 #~ msgstr ""
 
-#~ msgid "Confirm action"
+#~ msgid "Go to word right"
 #~ msgstr ""
 
-#~ msgid "Delete the selected contexts?"
+#~ msgid "Go line up"
 #~ msgstr ""
 
-#~ msgid "Jobs"
+#~ msgid "Go line down"
 #~ msgstr ""
 
-#~ msgid "Status"
+#~ msgid "Go to line start"
 #~ msgstr ""
 
-#~ msgid "Job id"
+#~ msgid "Go to line end"
 #~ msgstr ""
 
-#~ msgid "Start time"
+#~ msgid "Go to page up"
 #~ msgstr ""
 
-#~ msgid "Duration"
+#~ msgid "Go to page down"
 #~ msgstr ""
 
-#~ msgid "Click to open"
+#~ msgid "Go to start"
+#~ msgstr ""
+
+#~ msgid "Go to end"
+#~ msgstr ""
+
+#~ msgid "Go to line"
+#~ msgstr ""
+
+#~ msgid "Scroll line down"
+#~ msgstr ""
+
+#~ msgid "Scroll line up"
+#~ msgstr ""
+
+#~ msgid "Go to matching bracket"
+#~ msgstr ""
+
+#~ msgid "Scroll page down"
+#~ msgstr ""
+
+#~ msgid "Scroll page up"
+#~ msgstr ""
+
+#~ msgid "Find"
+#~ msgstr ""
+
+#~ msgid "Replace"
+#~ msgstr ""
+
+#~ msgid "Find next"
+#~ msgstr ""
+
+#~ msgid "Find previous"
+#~ msgstr ""
+
+#~ msgid "Fold selection"
+#~ msgstr ""
+
+#~ msgid "Unfold"
+#~ msgstr ""
+
+#~ msgid "Fold all"
+#~ msgstr ""
+
+#~ msgid "Unfold all"
+#~ msgstr ""
+
+#~ msgid "Autocomplete when Live Autocompletion is off"
+#~ msgstr ""
+
+#~ msgid "Indent"
+#~ msgstr ""
+
+#~ msgid "Outdent"
+#~ msgstr ""
+
+#~ msgid "Undo"
+#~ msgstr ""
+
+#~ msgid "Redo"
+#~ msgstr ""
+
+#~ msgid "Toggle comment"
+#~ msgstr ""
+
+#~ msgid "Transpose letters"
+#~ msgstr ""
+
+#~ msgid "Change to lower case"
+#~ msgstr ""
+
+#~ msgid "Change to upper case"
+#~ msgstr ""
+
+#~ msgid "Overwrite"
+#~ msgstr ""
+
+#~ msgid "Macros replay"
+#~ msgstr ""
+
+#~ msgid "Macros recording"
+#~ msgstr ""
+
+#~ msgid "Center selection"
+#~ msgstr ""
+
+#~ msgid "Show the settings menu"
+#~ msgstr ""
+
+#~ msgid "Active tables"
+#~ msgstr ""
+
+#~ msgid "Suggestions"
+#~ msgstr ""
+
+#~ msgid "The operation in the server is taking longer than expected"
+#~ msgstr ""
+
+#~ msgid "No risks were detected in this query."
+#~ msgstr ""
+
+#~ msgid "The query is compatible!"
+#~ msgstr ""
+
+#~ msgid "Execute with Impala?"
+#~ msgstr ""
+
+#~ msgid "Query is not compatible with Impala."
+#~ msgstr ""
+
+#~ msgid "Add a new snippet"
+#~ msgstr ""
+
+#~ msgid "Select snippet"
+#~ msgstr ""
+
+#~ msgid "Add Snippet"
+#~ msgstr ""
+
+#~ msgid "Get results"
+#~ msgstr ""
+
+#~ msgid "Download first %s cells as CSV"
+#~ msgstr ""
+
+#~ msgid "CSV"
+#~ msgstr ""
+
+#~ msgid "Download first %s cells as XLS"
+#~ msgstr ""
+
+#~ msgid "Excel"
+#~ msgstr ""
+
+#~ msgid "Save the results to a large file or a new table"
+#~ msgstr ""
+
+#~ msgid "Save query result in"
+#~ msgstr ""
+
+#~ msgid "A file (max %s cells)"
+#~ msgstr ""
+
+#~ msgid "Path to CSV file"
+#~ msgstr ""
+
+#~ msgid "A file (large result)"
+#~ msgstr ""
+
+#~ msgid "Path to empty directory"
+#~ msgstr ""
+
+#~ msgid "A new table"
+#~ msgstr ""
+
+#~ msgid "Table name or <database>.<table>"
+#~ msgstr ""
+
+#~ msgid "A search dashboard"
+#~ msgstr ""
+
+#~ msgid "Index name"
+#~ msgstr ""
+
+#~ msgid "Your download is being prepared"
+#~ msgstr ""
+
+#~ msgid "Your downloaded results have been truncated"
+#~ msgstr ""
+
+#~ msgid "Please wait, it might take a while..."
+#~ msgstr ""
+
+#~ msgid ""
+#~ "The number of resulting rows was "
+#~ "too big to be downloaded and the"
+#~ " resulting file has been truncated to"
+#~ msgstr ""
+
+#~ msgid "rows."
+#~ msgstr ""
+
+#~ msgid "Cancel Download"
 #~ msgstr ""

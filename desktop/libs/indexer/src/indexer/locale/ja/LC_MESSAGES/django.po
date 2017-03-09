@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -110,107 +110,111 @@ msgstr "次のエイリアスを作成または更新できませんでした：
 msgid "Could not get index schema: %s"
 msgstr "インデックススキーマ %s を取得できませんでした"
 
-#: src/indexer/conf.py:65
-msgid "Flag to turn on the morphline based Solr indexer."
-msgstr "Morphline ベースの Solr Indexer をオンにするフラグです。"
+#: src/indexer/api3.py:196 src/indexer/api3.py:204
+msgid "The table could not be created."
+msgstr "テーブルを作成できませんでした。"
 
-#: src/indexer/conf.py:73
+#: src/indexer/conf.py:64
+msgid "Flag to turn on the new metadata importer."
+msgstr "新規のメタデータインポータをオンにするフラグです。"
+
+#: src/indexer/conf.py:71
+msgid "Flag to turn on the new Solr indexer."
+msgstr "新規の Solr Indexer をオンにするフラグです。"
+
+#: src/indexer/conf.py:80
 msgid "Batch indexer path in HDFS."
 msgstr "HDFS のバッチインデクサパス。"
 
-#: src/indexer/conf.py:79
+#: src/indexer/conf.py:86
 msgid ""
 "Local path to Hue folder where Solr instance directories will be created "
 "in non-solrcloud mode."
 msgstr "Hue フォルダーへのローカルパスです。このフォルダーでは、Solr インスタンスディレクトリが Solr クラウドではないモードで作成されます。"
 
-#: src/indexer/conf.py:85
+#: src/indexer/conf.py:92
 msgid "Default template used at collection creation."
 msgstr "Collection Manager"
 
-#: src/indexer/conf.py:91 src/indexer/conf.py:98
+#: src/indexer/conf.py:98 src/indexer/conf.py:105
 msgid "oozie workspace template for indexing:"
 msgstr "インデックス作成用の oozie ワークスペーステンプレート："
 
-#: src/indexer/conf.py:105
+#: src/indexer/conf.py:112
 msgid "Location of the solrctl binary."
 msgstr "solrctl バイナリの場所。"
 
-#: src/indexer/conf.py:112
+#: src/indexer/conf.py:119
 msgid "Zookeeper ensemble."
 msgstr "ZooKeeper アンサンブル。"
 
-#: src/indexer/controller.py:132
+#: src/indexer/controller.py:134
 #, python-format
 msgid "Could not fetch fields for collection %s."
 msgstr "コレクション %s のフィールドをフェッチできませんでした。"
 
-#: src/indexer/controller.py:133
+#: src/indexer/controller.py:135
 #, python-format
 msgid "Could not fetch fields for collection %s. See logs for more info."
 msgstr "コレクション %s のフィールドをフェッチできませんでした。詳細はログを参照してください。"
 
-#: src/indexer/controller.py:138
+#: src/indexer/controller.py:140
 #, python-format
 msgid "Could not fetch unique key for collection %s."
 msgstr "コレクション %s の一意キーをフェッチできませんでした。"
 
-#: src/indexer/controller.py:139
+#: src/indexer/controller.py:141
 #, python-format
 msgid "Could not fetch unique key for collection %s. See logs for more info."
 msgstr "コレクション %s の一意キーをフェッチできませんでした。詳細はログを参照してください。"
 
-#: src/indexer/controller.py:165
+#: src/indexer/controller.py:167
 msgid "Error in copying Solr configurations."
 msgstr "Solr 設定のコピー中にエラーが発生しました。"
 
-#: src/indexer/controller.py:176 src/indexer/controller.py:216
+#: src/indexer/controller.py:178 src/indexer/controller.py:218
 #: src/indexer/controller2.py:175
 msgid "Error in deleting Solr configurations."
 msgstr "Solr 設定の削除中にエラーが発生しました。"
 
-#: src/indexer/controller.py:177 src/indexer/controller.py:196
+#: src/indexer/controller.py:179 src/indexer/controller.py:198
 msgid "Could not create collection. Check error logs for more info."
 msgstr "コレクションを作成できませんでした。詳細はエラーログを確認してください。"
 
-#: src/indexer/controller.py:184 src/indexer/controller2.py:140
+#: src/indexer/controller.py:186 src/indexer/controller2.py:140
 #, python-format
 msgid ""
 "Instance directory %s already exists! Please remove it from the file "
 "system."
 msgstr "インスタンスディレクトリ %s はすでに存在します。このディレクトリをファイルシステムから削除してください。"
 
-#: src/indexer/controller.py:205
+#: src/indexer/controller.py:207
 msgid "Cannot remove Solr cores."
 msgstr "Solr コアを削除できません。"
 
-#: src/indexer/controller.py:218 src/indexer/controller2.py:177
+#: src/indexer/controller.py:220 src/indexer/controller2.py:177
 msgid "Could not remove collection. Check error logs for more info."
 msgstr "コレクションを削除できませんでした。詳細はエラーログを確認してください。"
 
-#: src/indexer/controller.py:247
+#: src/indexer/controller.py:249
 msgid "File size is too large to handle!"
 msgstr "ファイルサイズが大きすぎるため処理できません。"
 
-#: src/indexer/controller.py:262
+#: src/indexer/controller.py:264
 #, python-format
 msgid "Could not update index. Unknown type %s"
 msgstr "インデックスを更新できませんでした。不明なタイプ %s です"
 
-#: src/indexer/controller.py:265 src/indexer/controller.py:296
+#: src/indexer/controller.py:267 src/indexer/controller.py:291
 msgid "Could not update index. Check error logs for more info."
 msgstr "インデックスを更新できませんでした。詳細は、エラーログを確認してください。"
 
-#: src/indexer/controller.py:267 src/indexer/controller.py:302
+#: src/indexer/controller.py:269
 #, python-format
 msgid "Could not update index. Indexing strategy %s not supported."
 msgstr "インデックスを更新できませんでした。インデックス作成戦略 %s はサポートされません。"
 
-#: src/indexer/controller.py:298
-msgid "Could not update index. Could not fetch any data from Hive."
-msgstr "インデックスを更新できませんでした。Hive からデータをフェッチできませんでした。"
-
-#: src/indexer/controller.py:300
+#: src/indexer/controller.py:295
 msgid "Could not update index."
 msgstr "インデックスを更新できませんでした。"
 
@@ -232,129 +236,131 @@ msgstr "Solr クラウド以外のコアを削除できません。"
 msgid "Error in getting schema information for index '%s'"
 msgstr "インデックス %s のスキーマ情報の取得中にエラーが発生しました"
 
-#: src/indexer/file_format.py:176
+#: src/indexer/file_format.py:189
 msgid "Hue Log File"
 msgstr "Hue ログファイル"
 
-#: src/indexer/file_format.py:212
+#: src/indexer/file_format.py:225
 msgid "Combined Apache Log File"
 msgstr "combined Apache ログファイル"
 
-#: src/indexer/file_format.py:234
+#: src/indexer/file_format.py:247
 msgid "Ruby Log"
 msgstr "Ruby ログ"
 
-#: src/indexer/file_format.py:250
+#: src/indexer/file_format.py:263
 msgid "Syslog"
 msgstr "syslog"
 
-#: src/indexer/file_format.py:268
+#: src/indexer/file_format.py:281
 msgid "Parquet Table"
 msgstr "Parquet テーブル"
 
-#: src/indexer/file_format.py:273
+#: src/indexer/file_format.py:286
 msgid "CSV File"
 msgstr "CSV ファイル"
 
-#: src/indexer/operations.py:54
+#: src/indexer/operations.py:57
 msgid "Split Chararacter"
 msgstr "分割文字"
 
-#: src/indexer/operations.py:61
+#: src/indexer/operations.py:64
 msgid "Regular Expression"
 msgstr "正規表現"
 
-#: src/indexer/operations.py:68
+#: src/indexer/operations.py:71
 msgid "Date Format (eg: yyyy/MM/dd)"
 msgstr "日付形式（例：yyyy/MM/dd）"
 
-#: src/indexer/operations.py:75
+#: src/indexer/operations.py:78
 msgid "Authority"
 msgstr "権限"
 
-#: src/indexer/operations.py:76
+#: src/indexer/operations.py:79
 msgid "Fragment"
 msgstr "フラグメント"
 
-#: src/indexer/operations.py:77
+#: src/indexer/operations.py:80
 msgid "Host"
 msgstr "ホスト"
 
-#: src/indexer/operations.py:78 src/indexer/templates/indexer.mako:261
+#: src/indexer/operations.py:81 src/indexer/templates/importer.mako:396
+#: src/indexer/templates/indexer.mako:263
 #: src/indexer/templates/indexes.mako:174
 msgid "Path"
 msgstr "パス"
 
-#: src/indexer/operations.py:79
+#: src/indexer/operations.py:82
 msgid "Port"
 msgstr "ポート"
 
-#: src/indexer/operations.py:80 src/indexer/templates/indexer.mako:273
+#: src/indexer/operations.py:83 src/indexer/templates/importer.mako:413
+#: src/indexer/templates/indexer.mako:275
 msgid "Query"
 msgstr "クエリ"
 
-#: src/indexer/operations.py:81
+#: src/indexer/operations.py:84
 msgid "Scheme"
 msgstr "スキーム"
 
-#: src/indexer/operations.py:82
+#: src/indexer/operations.py:85
 msgid "Scheme Specific Path"
 msgstr "スキーム固有のパス"
 
-#: src/indexer/operations.py:83
+#: src/indexer/operations.py:86
 msgid "User Info"
 msgstr "ユーザー情報"
 
-#: src/indexer/operations.py:90
+#: src/indexer/operations.py:93
 msgid "ISO Code"
 msgstr "ISO コード"
 
-#: src/indexer/operations.py:91
+#: src/indexer/operations.py:94
 msgid "Country Name"
 msgstr "国名"
 
-#: src/indexer/operations.py:92
+#: src/indexer/operations.py:95
 msgid "Subdivisions Names"
 msgstr "下位区分の名前"
 
-#: src/indexer/operations.py:93
+#: src/indexer/operations.py:96
 msgid "Subdivisons ISO Code"
 msgstr "下位区分の ISO コード"
 
-#: src/indexer/operations.py:94
+#: src/indexer/operations.py:97
 msgid "City Name"
 msgstr "都市名"
 
-#: src/indexer/operations.py:95
+#: src/indexer/operations.py:98
 msgid "Postal Code"
 msgstr "郵便コード"
 
-#: src/indexer/operations.py:96
+#: src/indexer/operations.py:99
 msgid "Latitude"
 msgstr "緯度"
 
-#: src/indexer/operations.py:97
+#: src/indexer/operations.py:100
 msgid "Longitude"
 msgstr "経度"
 
-#: src/indexer/operations.py:105
+#: src/indexer/operations.py:108
 msgid "Mapping"
 msgstr "Mapping"
 
-#: src/indexer/operations.py:112
+#: src/indexer/operations.py:115
 msgid "Find"
 msgstr "検索"
 
-#: src/indexer/operations.py:113
+#: src/indexer/operations.py:116
 msgid "Replace"
 msgstr "置換"
 
-#: src/indexer/utils.py:131
+#: src/indexer/utils.py:135
 #, python-format
 msgid "%s is not a boolean value"
 msgstr "%s はブール値ではありません"
 
-#: src/indexer/views.py:68
+#: src/indexer/views.py:107
 msgid "A POST request is required."
 msgstr "POST 要求が必要です。"
 
@@ -382,394 +388,642 @@ msgstr "Log コレクションをインストールしています"
 msgid "Logs collection successfully installed"
 msgstr "Log コレクションが正常にインストールされました"
 
-#: src/indexer/templates/collections.mako:24
+#: src/indexer/templates/collections.mako:25
 msgid "Search Indexes"
 msgstr "検索インデックス"
 
-#: src/indexer/templates/collections.mako:61
-#: src/indexer/templates/collections.mako:186
+#: src/indexer/templates/collections.mako:64
+#: src/indexer/templates/collections.mako:193
 #: src/indexer/templates/indexes.mako:63
 msgid "Collections"
 msgstr "コレクション"
 
-#: src/indexer/templates/collections.mako:62
+#: src/indexer/templates/collections.mako:65
 msgid "Dashboards"
 msgstr "ダッシュボード"
 
-#: src/indexer/templates/collections.mako:65
-#: src/indexer/templates/collections.mako:531
-#: src/indexer/templates/indexer.mako:124
+#: src/indexer/templates/collections.mako:68
+#: src/indexer/templates/collections.mako:539
+#: src/indexer/templates/indexer.mako:125
 msgid "Indexes"
 msgstr "インデックス"
 
-#: src/indexer/templates/collections.mako:88
-#: src/indexer/templates/indexer.mako:181
+#: src/indexer/templates/collections.mako:91
+#: src/indexer/templates/importer.mako:322
+#: src/indexer/templates/indexer.mako:183
 msgid "Choose a file"
 msgstr "ファイルを選択"
 
-#: src/indexer/templates/collections.mako:102
-msgid "Delete indexes"
-msgstr "インデックスを削除"
+#: src/indexer/templates/collections.mako:105
+msgid "Do you really want to delete the following index(es)?"
+msgstr "次のインデックスを削除してもよろしいですか?"
 
-#: src/indexer/templates/collections.mako:110
-#: src/indexer/templates/collections.mako:123
+#: src/indexer/templates/collections.mako:113
+#: src/indexer/templates/collections.mako:129
+#: src/indexer/templates/importer.mako:752
 #: src/indexer/templates/indexes.mako:104
 #: src/indexer/templates/indexes.mako:122
 #: src/indexer/templates/indexes.mako:164
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: src/indexer/templates/collections.mako:111
-#: src/indexer/templates/collections.mako:124
-msgid "Confirm"
-msgstr "確認"
+#: src/indexer/templates/collections.mako:114
+#: src/indexer/templates/collections.mako:130
+#: src/indexer/templates/indexes.mako:213
+msgid "Yes"
+msgstr "はい"
 
-#: src/indexer/templates/collections.mako:119
-msgid "Delete index "
-msgstr "インデックスを削除 "
+#: src/indexer/templates/collections.mako:123
+msgid "Confirm Delete"
+msgstr "削除を確認"
 
-#: src/indexer/templates/collections.mako:155
+#: src/indexer/templates/collections.mako:126
+msgid "Are you sure you want to delete the index"
+msgstr "このインデックスを削除してもよろしいですか？"
+
+#: src/indexer/templates/collections.mako:162
 msgid "Filter indexes..."
 msgstr "インデックスのフィルタ処理..."
 
-#: src/indexer/templates/collections.mako:157
+#: src/indexer/templates/collections.mako:164
 msgid ""
 "Delete the selected indexes. These must be solr cloud collections. Cores "
 "cannot be deleted currently."
 msgstr "選択したインデックスを削除します。これらは solr クラウドコレクションである必要があります。現在、コアは削除できません。"
 
-#: src/indexer/templates/collections.mako:158
-#: src/indexer/templates/collections.mako:363
+#: src/indexer/templates/collections.mako:165
+#: src/indexer/templates/collections.mako:370
 #: src/indexer/templates/indexes.mako:38
 msgid "Delete"
 msgstr "削除"
 
-#: src/indexer/templates/collections.mako:160
+#: src/indexer/templates/collections.mako:167
 msgid "Show cores"
 msgstr "コアを表示"
 
-#: src/indexer/templates/collections.mako:166
+#: src/indexer/templates/collections.mako:173
+#: src/indexer/templates/importer.mako:374
 #: src/indexer/templates/indexes.mako:161
 msgid "Create"
 msgstr "作成"
 
-#: src/indexer/templates/collections.mako:174
+#: src/indexer/templates/collections.mako:181
 msgid "There are currently no indexes defined."
 msgstr "現在、定義されているインデックスはありません。"
 
-#: src/indexer/templates/collections.mako:174
+#: src/indexer/templates/collections.mako:181
 msgid "Click here to add"
 msgstr "ここをクリックして追加"
 
-#: src/indexer/templates/collections.mako:174
+#: src/indexer/templates/collections.mako:181
 msgid "one or more."
 msgstr "1 つまたは複数です。"
 
-#: src/indexer/templates/collections.mako:185
-#: src/indexer/templates/collections.mako:232
-#: src/indexer/templates/collections.mako:294
-#: src/indexer/templates/collections.mako:375
-#: src/indexer/templates/indexer.mako:279
-#: src/indexer/templates/indexer.mako:399 src/indexer/templates/indexes.mako:61
+#: src/indexer/templates/collections.mako:192
+#: src/indexer/templates/collections.mako:239
+#: src/indexer/templates/collections.mako:301
+#: src/indexer/templates/collections.mako:382
+#: src/indexer/templates/importer.mako:492
+#: src/indexer/templates/importer.mako:494
+#: src/indexer/templates/importer.mako:770
+#: src/indexer/templates/importer.mako:811
+#: src/indexer/templates/indexer.mako:281
+#: src/indexer/templates/indexer.mako:401 src/indexer/templates/indexes.mako:61
 #: src/indexer/templates/indexes.mako:133
 msgid "Name"
 msgstr "名前"
 
-#: src/indexer/templates/collections.mako:217
-#: src/indexer/templates/collections.mako:430
-#: src/indexer/templates/indexer.mako:355
+#: src/indexer/templates/collections.mako:224
+#: src/indexer/templates/collections.mako:437
+#: src/indexer/templates/indexer.mako:357
 #: src/indexer/templates/indexes.mako:414
 msgid "Previous"
 msgstr "前"
 
-#: src/indexer/templates/collections.mako:218
-#: src/indexer/templates/collections.mako:431
-#: src/indexer/templates/indexer.mako:360
-#: src/indexer/templates/indexer.mako:366
+#: src/indexer/templates/collections.mako:225
+#: src/indexer/templates/collections.mako:438
+#: src/indexer/templates/importer.mako:721
+#: src/indexer/templates/indexer.mako:362
+#: src/indexer/templates/indexer.mako:368
 #: src/indexer/templates/indexes.mako:413
 msgid "Next"
 msgstr "次ヘ"
 
-#: src/indexer/templates/collections.mako:219
-#: src/indexer/templates/collections.mako:432
+#: src/indexer/templates/collections.mako:226
+#: src/indexer/templates/collections.mako:439
 msgid "Finish"
 msgstr "終了"
 
-#: src/indexer/templates/collections.mako:229
+#: src/indexer/templates/collections.mako:236
 msgid "Pick a name and a CSV or Tab separated file with header to index from HDFS"
 msgstr "HDFSから名前、およびインデックスを作成するヘッダー付き CSV ファイルまたはタブ区切りファイルを選択"
 
-#: src/indexer/templates/collections.mako:234
+#: src/indexer/templates/collections.mako:241
 msgid "Name of index"
 msgstr "インデックスの名前"
 
-#: src/indexer/templates/collections.mako:239
-#: src/indexer/templates/collections.mako:444
+#: src/indexer/templates/collections.mako:246
+#: src/indexer/templates/collections.mako:451
 msgid "Files"
 msgstr "ファイル"
 
-#: src/indexer/templates/collections.mako:246
-#: src/indexer/templates/collections.mako:451
+#: src/indexer/templates/collections.mako:253
+#: src/indexer/templates/collections.mako:458
 msgid "Source type"
 msgstr "ソースタイプ"
 
-#: src/indexer/templates/collections.mako:255
-#: src/indexer/templates/collections.mako:460
+#: src/indexer/templates/collections.mako:262
+#: src/indexer/templates/collections.mako:467
 msgid "Format of the selected file to index"
 msgstr "インデックスを作成するために選択したファイルの形式"
 
-#: src/indexer/templates/collections.mako:258
-#: src/indexer/templates/collections.mako:463
+#: src/indexer/templates/collections.mako:265
+#: src/indexer/templates/collections.mako:470
 msgid "Separator"
 msgstr "区切り文字"
 
-#: src/indexer/templates/collections.mako:265
-#: src/indexer/templates/collections.mako:470
+#: src/indexer/templates/collections.mako:272
+#: src/indexer/templates/collections.mako:477
 msgid "Quote character"
 msgstr "引用文字"
 
-#: src/indexer/templates/collections.mako:274
+#: src/indexer/templates/collections.mako:281
 msgid "Morphlines config name"
 msgstr "Morphline の設定名"
 
-#: src/indexer/templates/collections.mako:282
+#: src/indexer/templates/collections.mako:289
 msgid "Morphlines config expression"
 msgstr "Morphline の設定式"
 
-#: src/indexer/templates/collections.mako:295
-#: src/indexer/templates/collections.mako:376
-#: src/indexer/templates/indexer.mako:255
-#: src/indexer/templates/indexer.mako:402 src/indexer/templates/indexes.mako:62
+#: src/indexer/templates/collections.mako:302
+#: src/indexer/templates/collections.mako:383
+#: src/indexer/templates/importer.mako:390
+#: src/indexer/templates/importer.mako:487
+#: src/indexer/templates/importer.mako:774
+#: src/indexer/templates/importer.mako:814
+#: src/indexer/templates/indexer.mako:257
+#: src/indexer/templates/indexer.mako:404 src/indexer/templates/indexes.mako:62
 msgid "Type"
 msgstr "タイプ"
 
-#: src/indexer/templates/collections.mako:296
-#: src/indexer/templates/collections.mako:377
+#: src/indexer/templates/collections.mako:303
+#: src/indexer/templates/collections.mako:384
 msgid "ID"
 msgstr "ID"
 
-#: src/indexer/templates/collections.mako:297
-#: src/indexer/templates/collections.mako:378
-#: src/indexer/templates/indexer.mako:416
+#: src/indexer/templates/collections.mako:304
+#: src/indexer/templates/collections.mako:385
+#: src/indexer/templates/importer.mako:826
+#: src/indexer/templates/indexer.mako:418
 msgid "Required"
 msgstr "必須"
 
-#: src/indexer/templates/collections.mako:298
-#: src/indexer/templates/collections.mako:379
+#: src/indexer/templates/collections.mako:305
+#: src/indexer/templates/collections.mako:386
 msgid "Indexed"
 msgstr "インデックス作成済み"
 
-#: src/indexer/templates/collections.mako:299
-#: src/indexer/templates/collections.mako:380
+#: src/indexer/templates/collections.mako:306
+#: src/indexer/templates/collections.mako:387
 msgid "Stored"
 msgstr "保存済み"
 
-#: src/indexer/templates/collections.mako:300
+#: src/indexer/templates/collections.mako:307
 msgid "Default Field"
 msgstr "デフォルトのフィールド"
 
-#: src/indexer/templates/collections.mako:346
-#: src/indexer/templates/collections.mako:409
+#: src/indexer/templates/collections.mako:353
+#: src/indexer/templates/collections.mako:416
 msgid "Add"
 msgstr "追加"
 
-#: src/indexer/templates/collections.mako:348
+#: src/indexer/templates/collections.mako:355
 msgid "Generate a random ID"
 msgstr "ランダム ID を生成"
 
-#: src/indexer/templates/collections.mako:349
+#: src/indexer/templates/collections.mako:356
 msgid "Add ID"
 msgstr "ID を追加"
 
-#: src/indexer/templates/collections.mako:360
+#: src/indexer/templates/collections.mako:367
 msgid "Actions"
 msgstr "アクション"
 
-#: src/indexer/templates/collections.mako:361
+#: src/indexer/templates/collections.mako:368
 msgid "Search"
 msgstr "検索"
 
-#: src/indexer/templates/collections.mako:362
+#: src/indexer/templates/collections.mako:369
 msgid "Index file"
 msgstr "インデックスファイル"
 
-#: src/indexer/templates/collections.mako:413
+#: src/indexer/templates/collections.mako:420
 msgid "Update"
 msgstr "更新"
 
-#: src/indexer/templates/collections.mako:441
+#: src/indexer/templates/collections.mako:448
 msgid "CSV or TSV file to index"
 msgstr "インデックスを付ける CSV または TSV ファイル"
 
-#: src/indexer/templates/collections.mako:504
+#: src/indexer/templates/collections.mako:512
 msgid "Name is missing"
 msgstr "名前が見つかりません"
 
-#: src/indexer/templates/collections.mako:505
-#: src/indexer/templates/collections.mako:547
+#: src/indexer/templates/collections.mako:513
+#: src/indexer/templates/collections.mako:555
 msgid "File path is missing"
 msgstr "ファイルパスが見つかりません"
 
-#: src/indexer/templates/collections.mako:522
+#: src/indexer/templates/collections.mako:530
 msgid "Field name is missing"
 msgstr "フィールド名が見つかりません"
 
-#: src/indexer/templates/collections.mako:523
+#: src/indexer/templates/collections.mako:531
 msgid "Field type is missing"
 msgstr "フィールドタイプが見つかりません"
 
-#: src/indexer/templates/collections.mako:532
+#: src/indexer/templates/collections.mako:540
 msgid "Upload data"
 msgstr "データをアップロード"
 
-#: src/indexer/templates/indexer.mako:26 src/indexer/templates/indexes.mako:23
-#: src/indexer/templates/indexes.mako:28
-msgid "Solr Indexes"
-msgstr "Solr インデックス"
+#: src/indexer/templates/importer.mako:30
+#: src/indexer/templates/importer.mako:264
+msgid "Importer"
+msgstr "インポータ"
 
-#: src/indexer/templates/indexer.mako:133
-#: src/indexer/templates/indexer.mako:144
+#: src/indexer/templates/importer.mako:274
+#: src/indexer/templates/importer.mako:285
+#: src/indexer/templates/indexer.mako:135
+#: src/indexer/templates/indexer.mako:146
 msgid "Toggle Assist"
 msgstr "アシストを切り替え"
 
-#: src/indexer/templates/indexer.mako:194
+#: src/indexer/templates/importer.mako:335
+#: src/indexer/templates/indexer.mako:196
 msgid "Go to Step 1"
 msgstr "手順 1 に進む"
 
-#: src/indexer/templates/indexer.mako:207
-msgid "Pick data"
-msgstr "データを選択"
+#: src/indexer/templates/importer.mako:350
+msgid "Pick data from "
+msgstr "データの選択元"
 
-#: src/indexer/templates/indexer.mako:210
+#: src/indexer/templates/importer.mako:353
+msgid "No source data"
+msgstr "ソースデータがありません"
+
+#: src/indexer/templates/importer.mako:359
+#: src/indexer/templates/indexer.mako:212
 msgid "Go to Step 2"
 msgstr "手順 2 に進む"
 
-#: src/indexer/templates/indexer.mako:223
-msgid "Get fields"
-msgstr "フィールドを取得"
+#: src/indexer/templates/importer.mako:371
+msgid "Move it to "
+msgstr "移動先"
 
-#: src/indexer/templates/indexer.mako:226
-msgid "Go to Step 3"
-msgstr "手順 3 に進む"
+#: src/indexer/templates/importer.mako:386
+msgid "Source"
+msgstr "ソース"
 
-#: src/indexer/templates/indexer.mako:242
-msgid "Index!"
-msgstr "インデックス"
+#: src/indexer/templates/importer.mako:397
+msgid "Click or drag & drop"
+msgstr "クリックまたはドラッグアンドドロップ"
 
-#: src/indexer/templates/indexer.mako:249
-msgid "Collection details"
-msgstr "コレクションの詳細"
+#: src/indexer/templates/importer.mako:400
+#: src/indexer/templates/importer.mako:732
+#: src/indexer/templates/indexer.mako:379
+#: src/indexer/templates/indexer.mako:382
+msgid "Open"
+msgstr "開く"
 
-#: src/indexer/templates/indexer.mako:267
+#: src/indexer/templates/importer.mako:407
+#: src/indexer/templates/indexer.mako:269
 #: src/indexer/templates/indexes.mako:187
 msgid "Table"
 msgstr "テーブル"
 
-#: src/indexer/templates/indexer.mako:280
-msgid "Collection name"
-msgstr "コレクション名"
+#: src/indexer/templates/importer.mako:408
+#: src/indexer/templates/importer.mako:498
+msgid "Table name or <database>.<table>"
+msgstr "テーブル名または <database>.<table>"
 
-#: src/indexer/templates/indexer.mako:281
-msgid "A new collection will be created"
-msgstr "新しいコレクションを作成"
+#: src/indexer/templates/importer.mako:414
+msgid "Search your documents..."
+msgstr "ドキュメントを検索..."
 
-#: src/indexer/templates/indexer.mako:283
-msgid "Adding data to this existing collection"
-msgstr "この既存のコレクションにデータを追加"
+#: src/indexer/templates/importer.mako:424
+msgid "Guessing format..."
+msgstr "フォーマットを推測しています..."
 
-#: src/indexer/templates/indexer.mako:295
+#: src/indexer/templates/importer.mako:427
+#: src/indexer/templates/importer.mako:524
+#: src/indexer/templates/indexer.mako:297
 msgid "Format"
 msgstr "フォーマット"
 
-#: src/indexer/templates/indexer.mako:298
+#: src/indexer/templates/importer.mako:430
+#: src/indexer/templates/indexer.mako:300
 msgid "File Type"
 msgstr "ファイルタイプ"
 
-#: src/indexer/templates/indexer.mako:308
-msgid "Fields"
-msgstr "フィールド"
+#: src/indexer/templates/importer.mako:443
+msgid "Generating preview..."
+msgstr "プレビューを生成しています..."
 
-#: src/indexer/templates/indexer.mako:322
+#: src/indexer/templates/importer.mako:446
+#: src/indexer/templates/indexer.mako:324
 msgid "Preview"
 msgstr "プレビュー"
 
-#: src/indexer/templates/indexer.mako:372
-msgid "Index it!"
-msgstr "インデックスを作成"
+#: src/indexer/templates/importer.mako:484
+msgid "Destination"
+msgstr "宛先"
 
-#: src/indexer/templates/indexer.mako:377
-#: src/indexer/templates/indexer.mako:380
-msgid "Open"
-msgstr "開く"
+#: src/indexer/templates/importer.mako:498
+msgid "Only alphanumeric and underscore characters"
+msgstr "アルファベット、数字、アンダースコアのみ使用できます"
 
-#: src/indexer/templates/indexer.mako:378
-msgid "Oozie Status"
-msgstr "Oozie ステータス"
+#: src/indexer/templates/importer.mako:502
+msgid "Create a new "
+msgstr "新規作成"
 
-#: src/indexer/templates/indexer.mako:381
-msgid "View indexing status"
-msgstr "インデックス作成ステータスを表示"
+#: src/indexer/templates/importer.mako:506
+msgid "Adding data to the existing "
+msgstr "既存のデータに追加しています。"
 
-#: src/indexer/templates/indexer.mako:384
+#: src/indexer/templates/importer.mako:509
+msgid "Already existing"
+msgstr "すでに存在しています"
+
+#: src/indexer/templates/importer.mako:521
+#: src/indexer/templates/importer.mako:691
+msgid "Properties"
+msgstr "プロパティ"
+
+#: src/indexer/templates/importer.mako:531
+msgid "Store in Default location"
+msgstr "デフォルトの場所に保存する"
+
+#: src/indexer/templates/importer.mako:536
+#: src/indexer/templates/importer.mako:701
+msgid "External location"
+msgstr "外部の場所"
+
+#: src/indexer/templates/importer.mako:542
+msgid "Extras"
+msgstr "その他"
+
+#: src/indexer/templates/importer.mako:543
+msgid "Show extra properties"
+msgstr "その他のプロパティを表示する"
+
+#: src/indexer/templates/importer.mako:552
+msgid "Import data"
+msgstr "データをインポート"
+
+#: src/indexer/templates/importer.mako:556
+#: src/indexer/templates/importer.mako:557
+#: src/indexer/templates/importer.mako:693
+#: src/indexer/templates/importer.mako:694
+msgid "Description"
+msgstr "説明"
+
+#: src/indexer/templates/importer.mako:562
+msgid "Use first row as header"
+msgstr "最初の行をヘッダとして使用"
+
+#: src/indexer/templates/importer.mako:567
+msgid "Custom char delimiters"
+msgstr "カスタムの文字区切り記号"
+
+#: src/indexer/templates/importer.mako:571
+msgid "Field"
+msgstr "フィールド"
+
+#: src/indexer/templates/importer.mako:574
+msgid "Array, Map"
+msgstr "配列、マップ"
+
+#: src/indexer/templates/importer.mako:577
+msgid "Struct"
+msgstr "構造体"
+
+#: src/indexer/templates/importer.mako:584
+msgid "Regexp"
+msgstr "Regexp"
+
+#: src/indexer/templates/importer.mako:590
+msgid "Primary keys"
+msgstr "プライマリキー"
+
+#: src/indexer/templates/importer.mako:596
+msgid "Partitions"
+msgstr "パーティション"
+
+#: src/indexer/templates/importer.mako:605
+msgid "Add Partition"
+msgstr "パーティションを追加"
+
+#: src/indexer/templates/importer.mako:605
+#: src/indexer/templates/importer.mako:652
+msgid "Add partition"
+msgstr "パーティションを追加"
+
+#: src/indexer/templates/importer.mako:640
+msgid "Add value"
+msgstr "値を追加"
+
+#: src/indexer/templates/importer.mako:646
+msgid "Add column"
+msgstr "列を追加"
+
+#: src/indexer/templates/importer.mako:663
+#: src/indexer/templates/indexer.mako:310
+msgid "Fields"
+msgstr "フィールド"
+
+#: src/indexer/templates/importer.mako:683
+msgid "Add Field"
+msgstr "フィールドを追加"
+
+#: src/indexer/templates/importer.mako:698
+msgid "Default location"
+msgstr "デフォルトの場所"
+
+#: src/indexer/templates/importer.mako:716
+msgid "Back"
+msgstr "戻る"
+
+#: src/indexer/templates/importer.mako:727
+msgid "Submit"
+msgstr "サブミット"
+
+#: src/indexer/templates/importer.mako:733
+msgid "Status"
+msgstr "ステータス"
+
+#: src/indexer/templates/importer.mako:736
+#: src/indexer/templates/indexer.mako:386
 msgid "View collection"
 msgstr "コレクションを表示"
 
-#: src/indexer/templates/indexer.mako:400
+#: src/indexer/templates/importer.mako:746
+msgid "Write or paste comma separated field names"
+msgstr "カンマで区切ったフィールド名を入力するか、貼り付けます"
+
+#: src/indexer/templates/importer.mako:749
+msgid "e.g. id, name, salary"
+msgstr "例：id, name, salary"
+
+#: src/indexer/templates/importer.mako:753
+msgid "Change field names"
+msgstr "フィールド名の変更"
+
+#: src/indexer/templates/importer.mako:771
+#: src/indexer/templates/importer.mako:812
+#: src/indexer/templates/indexer.mako:402
 msgid "Field name"
 msgstr "フィールド名"
 
-#: src/indexer/templates/indexer.mako:405
-msgid "Show indexing properties"
-msgstr "インデックス作成プロパティを表示"
+#: src/indexer/templates/importer.mako:783
+msgid "Length"
+msgstr "長さ"
 
-#: src/indexer/templates/indexer.mako:410
+#: src/indexer/templates/importer.mako:787
+#: src/indexer/templates/importer.mako:817
+msgid "Show field properties"
+msgstr "フィールドプロパティを表示"
+
+#: src/indexer/templates/importer.mako:790
+msgid "Field comment"
+msgstr "フィールドコメント"
+
+#: src/indexer/templates/importer.mako:820
+#: src/indexer/templates/indexer.mako:412
 msgid "Unique"
 msgstr "一意"
 
-#: src/indexer/templates/indexer.mako:413
+#: src/indexer/templates/importer.mako:823
+#: src/indexer/templates/indexer.mako:415
 msgid "Keep in index"
 msgstr "インデックスで保持"
 
-#: src/indexer/templates/indexer.mako:420
-#: src/indexer/templates/indexer.mako:426
+#: src/indexer/templates/importer.mako:831
+#: src/indexer/templates/importer.mako:839
+#: src/indexer/templates/indexer.mako:422
+#: src/indexer/templates/indexer.mako:428
 msgid "Add Operation"
 msgstr "操作を追加"
 
-#: src/indexer/templates/indexer.mako:420
+#: src/indexer/templates/importer.mako:831
+#: src/indexer/templates/indexer.mako:422
 msgid "Operation"
 msgstr "操作"
 
-#: src/indexer/templates/indexer.mako:426
+#: src/indexer/templates/importer.mako:839
+#: src/indexer/templates/indexer.mako:428
 msgid "Operation to"
 msgstr "操作"
 
-#: src/indexer/templates/indexer.mako:435
+#: src/indexer/templates/importer.mako:849
+#: src/indexer/templates/indexer.mako:437
 msgid "Number of expected fields"
 msgstr "想定されるフィールドの数"
 
-#: src/indexer/templates/indexer.mako:439
+#: src/indexer/templates/importer.mako:853
+#: src/indexer/templates/indexer.mako:441
 msgid "Remove"
 msgstr "削除"
 
-#: src/indexer/templates/indexer.mako:471
+#: src/indexer/templates/importer.mako:892
+#: src/indexer/templates/indexer.mako:473
 msgid "Remove Pair"
 msgstr "ペアを削除"
 
-#: src/indexer/templates/indexer.mako:474
+#: src/indexer/templates/importer.mako:895
+#: src/indexer/templates/indexer.mako:476
 msgid "Add Pair"
 msgstr "ペアを追加"
 
-#: src/indexer/templates/indexer.mako:490
+#: src/indexer/templates/importer.mako:911
+#: src/indexer/templates/indexer.mako:492
 msgid "generated"
 msgstr "生成済み"
 
-#: src/indexer/templates/indexer.mako:1001
+#: src/indexer/templates/importer.mako:1548
+#: src/indexer/templates/importer.mako:1554
+msgid "Example: SELECT * FROM tablename, or press CTRL + space"
+msgstr "例：SELECT * FROM テーブル名、または CTRL キーを押したまま Space キーを押す"
+
+#: src/indexer/templates/importer.mako:1606
+msgid "Task "
+msgstr "タスク"
+
+#: src/indexer/templates/importer.mako:1606
+msgid " submitted."
+msgstr "サブミットされました。"
+
+#: src/indexer/templates/importer.mako:1737
+#: src/indexer/templates/indexer.mako:1003
 msgid "There was a problem loading the databases"
 msgstr "データベースのロード中に問題が発生しました"
 
-#: src/indexer/templates/indexer.mako:1002
+#: src/indexer/templates/importer.mako:1738
+#: src/indexer/templates/indexer.mako:1004
 msgid "There was a problem loading the table preview."
 msgstr "テーブルプレビューをロード中に問題が発生しました。"
+
+#: src/indexer/templates/indexer.mako:27 src/indexer/templates/indexes.mako:23
+#: src/indexer/templates/indexes.mako:28
+msgid "Solr Indexes"
+msgstr "Solr インデックス"
+
+#: src/indexer/templates/indexer.mako:209
+msgid "Pick data"
+msgstr "データを選択"
+
+#: src/indexer/templates/indexer.mako:225
+msgid "Get fields"
+msgstr "フィールドを取得"
+
+#: src/indexer/templates/indexer.mako:228
+msgid "Go to Step 3"
+msgstr "手順 3 に進む"
+
+#: src/indexer/templates/indexer.mako:244
+msgid "Index!"
+msgstr "インデックス"
+
+#: src/indexer/templates/indexer.mako:251
+msgid "Collection details"
+msgstr "コレクションの詳細"
+
+#: src/indexer/templates/indexer.mako:282
+msgid "Collection name"
+msgstr "コレクション名"
+
+#: src/indexer/templates/indexer.mako:283
+msgid "A new collection will be created"
+msgstr "新しいコレクションを作成"
+
+#: src/indexer/templates/indexer.mako:285
+msgid "Adding data to this existing collection"
+msgstr "この既存のコレクションにデータを追加"
+
+#: src/indexer/templates/indexer.mako:374
+msgid "Index it!"
+msgstr "インデックスを作成"
+
+#: src/indexer/templates/indexer.mako:380
+msgid "Oozie Status"
+msgstr "Oozie ステータス"
+
+#: src/indexer/templates/indexer.mako:383
+msgid "View indexing status"
+msgstr "インデックス作成ステータスを表示"
+
+#: src/indexer/templates/indexer.mako:407
+msgid "Show indexing properties"
+msgstr "インデックス作成プロパティを表示"
 
 #: src/indexer/templates/indexes.mako:32
 msgid "Search for name, description, etc..."
@@ -815,10 +1069,6 @@ msgstr "選択したインデックスを削除しますか？"
 msgid "No"
 msgstr "いいえ"
 
-#: src/indexer/templates/indexes.mako:213
-msgid "Yes"
-msgstr "はい"
-
 #: src/indexer/templates/indexes.mako:405
 msgid "No data available"
 msgstr "利用可能なデータがありません"
@@ -847,14 +1097,17 @@ msgstr "先頭"
 msgid "Last"
 msgstr "末尾"
 
-#~ msgid "About Hue"
+#~ msgid "Flag to turn on the morphline based Solr indexer."
 #~ msgstr ""
 
-#~ msgid "Configuration"
+#~ msgid "Could not update index. Could not fetch any data from Hive."
 #~ msgstr ""
 
-#~ msgid "Check for misconfiguration"
+#~ msgid "Delete indexes"
 #~ msgstr ""
 
-#~ msgid "Server Logs"
+#~ msgid "Confirm"
+#~ msgstr ""
+
+#~ msgid "Delete index "
 #~ msgstr ""

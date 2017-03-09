@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2016-12-14 11:54-0800\n"
+"POT-Creation-Date: 2017-02-15 09:56-0800\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -68,40 +68,28 @@ msgstr "Share Lib de Oozie no instalada en la ubicación predeterminada."
 msgid "Submission already submitted (Oozie job id %s)"
 msgstr "Envío ya enviado (ID de trabajo de Oozie %s)"
 
-#: src/liboozie/submission2.py:181 src/liboozie/submittion.py:151
+#: src/liboozie/submission2.py:184 src/liboozie/submittion.py:151
 #, python-format
 msgid "Failed to create deployment directory: %s"
 msgstr "Error al crear al directorio de implementación: %s"
 
-#: src/liboozie/submission2.py:336 src/liboozie/submittion.py:252
+#: src/liboozie/submission2.py:370 src/liboozie/submittion.py:252
 #, python-format
 msgid "Path is not a directory: %s."
 msgstr "La ruta no es un directorio: %s."
 
-#: src/liboozie/submission2.py:341 src/liboozie/submittion.py:257
+#: src/liboozie/submission2.py:375 src/liboozie/submittion.py:257
 #, python-format
 msgid "Error accessing directory '%s': %s."
 msgstr "Error al acceder al directorio '%s': %s."
 
-#: src/liboozie/types.py:381
+#: src/liboozie/types.py:387
 msgid "Insufficient permission."
 msgstr "Permiso insuficiente."
 
-#: src/liboozie/types.py:382
+#: src/liboozie/types.py:388
 #, python-format
 msgid "Permission denied. User %(username)s cannot modify user %(user)s's job."
 msgstr ""
 "Permiso denegado. El usuario %(username)s no puede modificar el job del "
 "usuario %(user)s."
-
-#~ msgid "URL of Oozie server. This is required for job submission."
-#~ msgstr ""
-
-#~ msgid ""
-#~ "Location on HDFS where the "
-#~ "workflows/coordinators are deployed when "
-#~ "submitted by a non-owner."
-#~ msgstr ""
-
-#~ msgid "Failed to access deployment directory."
-#~ msgstr ""
