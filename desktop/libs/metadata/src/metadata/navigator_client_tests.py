@@ -172,6 +172,11 @@ class TestNavigatorClientTest(NavigatorClientTest):
         self.api.search_entities(query_s='type:FIELD', sources=['hive'])[0][1]
     )
 
+    assert_equal(
+        '* AND ((type:\\{\\}\\(\\)\\[\\]*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
+        self.api.search_entities(query_s='type:{}()[]*', sources=['hive'])[0][1]
+    )
+
     # type:
     # type:VIEW
     # type:VIEW ca
