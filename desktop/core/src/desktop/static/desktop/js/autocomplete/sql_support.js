@@ -1367,11 +1367,18 @@ parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
       console.log(parser.yy.errors);
     }
   }
-  linkTablePrimaries();
-  commitLocations();
+  try {
+    linkTablePrimaries();
+    commitLocations();
+    // Clean up and prioritize
+    prioritizeSuggestions();
+  } catch (err) {
+    if (debug) {
+      console.log(err);
+      console.error(err.stack);
+    }
+  }
 
-  // Clean up and prioritize
-  prioritizeSuggestions();
 
   parser.yy.allLocations.sort(function (a, b) {
     if (a.location.first_line !== b.location.first_line) {
