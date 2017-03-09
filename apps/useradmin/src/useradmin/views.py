@@ -75,9 +75,14 @@ def list_users(request):
 
 def list_groups(request):
   is_ldap_setup = bool(LDAP.LDAP_SERVERS.get()) or LDAP.LDAP_URL.get() is not None
+  groups = Group.objects.all()
+  if request.GET.get('format') == 'json':
+    return JsonResponse({'grups' : massage_groups_for_json(groups)})
+
   return render("list_groups.mako", request, {
-      'groups': Group.objects.all(),
+      'groups': groups,
       'groups_json': json.dumps(list(Group.objects.values_list('name', flat=True))),
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'is_ldap_setup': is_ldap_setup
   })
 
