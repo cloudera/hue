@@ -342,7 +342,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
     $("a.btn-status").click(function () {
       refreshPagination();
       $(this).toggleClass("active");
-      refreshTables;
+      refreshTables();
     });
 
     $("a.btn-submitted").click(function () {
