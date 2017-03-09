@@ -32,13 +32,11 @@ ${layout.menubar(section='users')}
 
     <%actionbar:render>
       <%def name="search()">
-          <input id="filterInput" type="text" class="input-xlarge search-query"
-                 placeholder="${_('Search for name, group, etc...')}">
+          <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, group, etc...')}">
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i
-                class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button id="deleteUserBtn" class="btn" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -143,18 +141,18 @@ ${layout.menubar(section='users')}
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  var $usersComponents = $('#usersComponents');
 
-  var viewModel = {
-    availableUsers: ko.observableArray(${ users_json | n,antixss }),
-    chosenUsers: ko.observableArray([])
-  };
-  var mainDataTable;
   $(document).ready(function () {
+    var $usersComponents = $('#usersComponents');
+
+    var viewModel = {
+      availableUsers: ko.observableArray(${ users_json | n,antixss }),
+      chosenUsers: ko.observableArray([])
+    };
 
     ko.applyBindings(viewModel, $usersComponents[0]);
 
-    mainDataTable = $usersComponents.find('.datatables').dataTable({
+    var dt = $usersComponents.find('.datatables').dataTable({
       "sPaginationType":"bootstrap",
       "iDisplayLength":100,
       "bLengthChange":false,
@@ -176,6 +174,16 @@ ${layout.menubar(section='users')}
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}",
       }
+    });
+
+    $usersComponents.find(".filter-input").jHueDelayedInput(function () {
+      if (dt) {
+        dt.fnFilter($usersComponents.find(".filter-input").val().toLowerCase());
+      }
+    });
+
+    $usersComponents.find('[data-rel="tooltip"]').tooltip({
+      placement: 'right'
     });
 
     $usersComponents.find(".dataTables_wrapper").css("min-height", "0");

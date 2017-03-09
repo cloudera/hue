@@ -78,19 +78,4 @@ def is_selected(section, matcher):
 
 <%def name="commons()">
   <link href="${ static('useradmin/css/useradmin.css') }" rel="stylesheet">
-
-  <script type="text/javascript">
-    $(document).ready(function () {
-
-      $("#filterInput").jHueDelayedInput(function () {
-        if (mainDataTable) {
-          mainDataTable.fnFilter($("#filterInput").val().toLowerCase());
-        }
-      });
-
-      $('[data-rel="tooltip"]').tooltip({
-        placement: 'right'
-      });
-    });
-  </script>
 </%def>
