@@ -219,7 +219,7 @@ def _get_document_helper(request, uuid, with_data, with_dependencies, path):
 
   if with_dependencies:
     response['dependencies'] = [dependency.to_dict() for dependency in document.dependencies.all()]
-    response['dependents'] = [dependent.to_dict() for dependent in document.dependents.all()]
+    response['dependents'] = [dependent.to_dict() for dependent in document.dependents.exclude(is_history=True).all()]
 
   # Get children documents if this is a directory
   if document.is_directory:
