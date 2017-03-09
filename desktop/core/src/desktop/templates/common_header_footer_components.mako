@@ -158,6 +158,9 @@ from metadata.conf import has_optimizer, OPTIMIZER
     if (document.documentMode && document.documentMode < 9){
       location.href = "${ url('desktop.views.unsupported') }";
     }
+
+    // sets a global variable to see if it's IE11 or not
+    var isIE11 = !!window.MSInputMethodContext && !!document.documentMode;
   </script>
 </%def>
 
