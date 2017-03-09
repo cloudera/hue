@@ -302,7 +302,8 @@
         });
       });
 
-      it('should handle 100k rows before and after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
+      // Enable to check performance
+      xit('should handle 100k rows before and after "SELECT * FROM foo WHERE (bar = \'bla\') AND (ble = 1);|"', function() {
         var beforeCursor = '';
         var afterCursor = ';\n';
         for (var i = 0; i < 100000; i++) {
@@ -323,6 +324,29 @@
     });
 
     describe('Select List Completion', function() {
+
+      it('should handle "select count(*), tst.count, avg (id), avg from autocomp_test tst;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'select count(*), tst.count, avg (id), avg from autocomp_test tst;',
+          afterCursor: '',
+          noErrors: true,
+          containsKeywords: ['SELECT'],
+          expectedResult: {
+            lowerCase: true,
+            locations: [
+              { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 65 } },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 12 }, function: 'count' },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 18, last_column: 21 }, identifierChain: [{ name: 'autocomp_test' }] },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 22, last_column: 27 }, identifierChain: [{ name: 'autocomp_test' }, { name: 'count' }] },
+              { type: 'function', location: { first_line: 1, last_line: 1, first_column: 29, last_column: 32 }, function: 'avg' },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 34, last_column: 36 }, identifierChain: [{ name: 'autocomp_test' }, { name: 'id' }] },
+              { type: 'column', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 42 }, identifierChain: [{ name: 'autocomp_test' }, { name: 'avg' }] },
+              { type: 'table', location: { first_line: 1, last_line: 1, first_column: 48, last_column: 61 }, identifierChain: [{ name: 'autocomp_test' }] }
+            ]
+          }
+        });
+      });
+
       it('should suggest tables for "SELECT |"', function () {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
