@@ -672,11 +672,30 @@ ${ assist.assistPanel() }
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
             <div class="card-body no-margin-top columns-form">
+              <!-- ko if: $root.createWizard.source.inputFormat() === 'manual' -->
+                <form class="form-inline inline-table" data-bind="foreach: columns">
+                  <!-- ko if: $parent.outputFormat() == 'table' -->
+                    <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
+                    <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
+                    <div class="clearfix"></div>
+                  <!-- /ko -->
+
+                  <!-- ko if: $parent.outputFormat() == 'index' -->
+                    <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field inline-block index-field"></div>
+                    <div class="clearfix"></div>
+                  <!-- /ko -->
+                </form>
+
+                <div class="clearfix"></div>
+
+                <!-- ko if: outputFormat() == 'table' -->
+                  <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
+                <!-- /ko -->
+              <!-- /ko -->
+
+              <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
               <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel', disableNiceScroll: true }">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
-                  <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' -->
-                  <a class="pointer pull-right margin-top-20" data-bind="click: function() { $parent.columns.remove($data); }"><i class="fa fa-minus"></i></a>
-                  <!-- /ko -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                   <div class="clearfix"></div>
                 <!-- /ko -->
@@ -688,10 +707,9 @@ ${ assist.assistPanel() }
               </form>
 
               <div class="clearfix"></div>
-
-              <!-- ko if: $root.createWizard.source.inputFormat() == 'manual' && outputFormat() == 'table' -->
-                <a data-bind="click: function() { columns.push($root.loadDefaultField({})); }" class="pointer" title="${_('Add Field')}"><i class="fa fa-plus"></i> ${_('Add Field')}</a>
               <!-- /ko -->
+
+
             </div>
           </div>
         <!-- /ko -->
