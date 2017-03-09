@@ -23,10 +23,18 @@ from desktop.appmanager import get_apps_dict
 from notebook.conf import get_ordered_interpreters
 
 
+
+def is_enabled():
+  """Automatic if Hue 4 or when search is enabled."""
+  apps = get_apps_dict()
+  
+  return is_hue4() or 'search' in apps 
+
+
 IS_ENABLED = Config(
   key="is_enabled",
   help=_t("Activate the Dashboard link in the menu."),
-  dynamic_default=is_hue4,
+  dynamic_default=is_enabled,
   type=coerce_bool
 )
 
