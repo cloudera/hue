@@ -33,13 +33,11 @@ ${layout.menubar(section='groups')}
 
     <%actionbar:render>
       <%def name="search()">
-          <input id="filterInput" type="text" class="input-xlarge search-query"
-                 placeholder="${_('Search for name, members, etc...')}">
+          <input type="text" class="input-xlarge search-query filter-input" placeholder="${_('Search for name, members, etc...')}">
       </%def>
       <%def name="actions()">
         %if user.is_superuser:
-            <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i
-                class="fa fa-trash-o"></i> ${_('Delete')}</button>
+            <button id="deleteGroupBtn" class="btn confirmationModal" title="${_('Delete')}" disabled="disabled"><i class="fa fa-trash-o"></i> ${_('Delete')}</button>
         %endif
       </%def>
       <%def name="creation()">
@@ -127,20 +125,18 @@ ${layout.menubar(section='groups')}
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
-  $groupsComponents = $('#groupsComponents');
-
-  var viewModel = {
-    availableGroups: ko.observableArray(${ groups_json | n,antixss }),
-    chosenGroups: ko.observableArray([])
-  };
-
-  var mainDataTable;
 
   $(document).ready(function () {
+    var $groupsComponents = $('#groupsComponents');
+
+    var viewModel = {
+      availableGroups: ko.observableArray(${ groups_json | n,antixss }),
+      chosenGroups: ko.observableArray([])
+    };
 
     ko.applyBindings(viewModel, $groupsComponents[0]);
 
-    mainDataTable = $groupsComponents.find('.datatables').dataTable({
+    var dt = $groupsComponents.find('.datatables').dataTable({
       "sPaginationType":"bootstrap",
       "iDisplayLength":100,
       "bLengthChange":false,
@@ -160,6 +156,16 @@ ${layout.menubar(section='groups')}
         "sEmptyTable": "${_('No data available')}",
         "sZeroRecords": "${_('No matching records')}",
       }
+    });
+
+    $groupsComponents.find(".filter-input").jHueDelayedInput(function () {
+      if (dt) {
+        dt.fnFilter($groupsComponents.find(".filter-input").val().toLowerCase());
+      }
+    });
+
+    $groupsComponents.find('[data-rel="tooltip"]').tooltip({
+      placement: 'right'
     });
 
     $groupsComponents.find(".dataTables_wrapper").css("min-height", "0");

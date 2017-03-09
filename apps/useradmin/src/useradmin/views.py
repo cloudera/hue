@@ -82,10 +82,15 @@ def list_groups(request):
 
 
 def list_permissions(request):
-  return render("list_permissions.mako", request, dict(permissions=HuePermission.objects.all()))
+  return render("list_permissions.mako", request, {
+    'permissions': HuePermission.objects.all(),
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
 
 def list_configurations(request):
   return render("list_configurations.mako", request, {})
+
 
 def list_for_autocomplete(request):
   if request.ajax:
