@@ -437,24 +437,26 @@
     self.fnAddData = function (mData, bRedraw) {
       var $t = self.$table;
 
-      var aoColumns = $t.data('aoColumns') || [];
-      $t.data('data', $t.data('data').concat(mData));
+      if ($t) {
+        var aoColumns = $t.data('aoColumns') || [];
+        $t.data('data', $t.data('data').concat(mData));
 
-      if (mData.length === 0) {
-        return;
-      }
+        if (mData.length === 0) {
+          return;
+        }
 
-      if (aoColumns.length === 0) {
-        mData[0].forEach(function () {
-          aoColumns.push({
-            bVisible: true
+        if (aoColumns.length === 0) {
+          mData[0].forEach(function () {
+            aoColumns.push({
+              bVisible: true
+            })
           })
-        })
-      }
-      self.fnDraw(true);
+        }
+        self.fnDraw(true);
 
-      if ($('.hue-datatable-search').is(':visible')){
-        self.fnSearch($('.hue-datatable-search').find('input').val(), true);
+        if ($('.hue-datatable-search').is(':visible')) {
+          self.fnSearch($('.hue-datatable-search').find('input').val(), true);
+        }
       }
     };
 
