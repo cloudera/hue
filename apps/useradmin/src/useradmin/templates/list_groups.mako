@@ -105,28 +105,30 @@ ${layout.menubar(section='groups')}
       </tfoot>
     </table>
   </div>
+  <div id="deleteGroup" class="modal hide fade groupModal">
+    <form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
+      ${ csrf_token(request) | n,unicode }
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
+      </div>
+      <div class="modal-footer">
+        <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
+        <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+      </div>
+      <div class="hide">
+        <select name="group_names" data-bind="options: chosenGroups, selectedOptions: chosenGroups" multiple="true"></select>
+      </div>
+    </form>
+  </div>
 </div>
 
-<div id="deleteGroup" class="modal hide fade groupModal">
-  <form id="deleteGroupForm" action="${ url('useradmin.views.delete_group') }" method="POST">
-    ${ csrf_token(request) | n,unicode }
-    <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="deleteGroupMessage">${_("Are you sure you want to delete the selected group(s)?")}</h3>
-    </div>
-    <div class="modal-footer">
-      <a href="javascript:void(0);" class="btn" data-dismiss="modal">${_('No')}</a>
-      <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
-    </div>
-    <div class="hide">
-      <select name="group_names" data-bind="options: chosenGroups, selectedOptions: chosenGroups" multiple="true"></select>
-    </div>
-  </form>
-</div>
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 <script type="text/javascript" charset="utf-8">
+  $groupsComponents = $('#groupsComponents');
+
   var viewModel = {
     availableGroups: ko.observableArray(${ groups_json | n,antixss }),
     chosenGroups: ko.observableArray([])
@@ -136,9 +138,9 @@ ${layout.menubar(section='groups')}
 
   $(document).ready(function () {
 
-    ko.applyBindings(viewModel, $('#groupsComponents')[0]);
+    ko.applyBindings(viewModel, $groupsComponents[0]);
 
-    mainDataTable = $(".datatables").dataTable({
+    mainDataTable = $groupsComponents.find('.datatables').dataTable({
       "sPaginationType":"bootstrap",
       "iDisplayLength":100,
       "bLengthChange":false,
@@ -160,22 +162,22 @@ ${layout.menubar(section='groups')}
       }
     });
 
-    $(".dataTables_wrapper").css("min-height", "0");
-    $(".dataTables_filter").hide();
+    $groupsComponents.find(".dataTables_wrapper").css("min-height", "0");
+    $groupsComponents.find(".dataTables_filter").hide();
 
-    $("#selectAll").click(function () {
+    $groupsComponents.find("#selectAll").click(function () {
       if ($(this).attr("checked")) {
         $(this).removeAttr("checked").removeClass("fa-check");
-        $(".groupCheck").removeClass("fa-check").removeAttr("checked");
+        $groupsComponents.find(".groupCheck").removeClass("fa-check").removeAttr("checked");
       }
       else {
         $(this).attr("checked", "checked").addClass("fa-check");
-        $(".groupCheck").addClass("fa-check").attr("checked", "checked");
+        $groupsComponents.find(".groupCheck").addClass("fa-check").attr("checked", "checked");
       }
       toggleActions();
     });
 
-    $(document).on('click', '.groupCheck', function () {
+    $(document).on('click', '#groupsComponents .groupCheck', function () {
       if ($(this).attr("checked")) {
         $(this).removeClass("fa-check").removeAttr("checked");
       }
@@ -186,25 +188,25 @@ ${layout.menubar(section='groups')}
     });
 
     function toggleActions() {
-      if ($(".groupCheck[checked='checked']").length > 0) {
-        $("#deleteGroupBtn").removeAttr("disabled");
+      if ($groupsComponents.find(".groupCheck[checked='checked']").length > 0) {
+        $groupsComponents.find("#deleteGroupBtn").removeAttr("disabled");
       }
       else {
-        $("#deleteGroupBtn").attr("disabled", "disabled");
+        $groupsComponents.find("#deleteGroupBtn").attr("disabled", "disabled");
       }
     }
 
-    $("#deleteGroupBtn").click(function () {
+    $groupsComponents.find("#deleteGroupBtn").click(function () {
       viewModel.chosenGroups.removeAll();
 
-      $(".hueCheckbox[checked='checked']").each(function (index) {
+      $groupsComponents.find(".hueCheckbox[checked='checked']").each(function (index) {
         viewModel.chosenGroups.push($(this).data("name").toString()); // needed for numeric group names
       });
 
-      $("#deleteGroup").modal("show");
+      $groupsComponents.find("#deleteGroup").modal("show");
     });
 
-    $("a[data-row-selector='true']").jHueRowSelector();
+    $groupsComponents.find("a[data-row-selector='true']").jHueRowSelector();
   });
 </script>
 
