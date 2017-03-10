@@ -631,7 +631,6 @@ from metadata.conf import has_navigator
               sourceType: sourceType,
               path: path
             });
-            huePubSub.publish('sql.context.popover.hide')
           }));
 
           pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function () {

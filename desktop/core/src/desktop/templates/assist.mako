@@ -920,6 +920,7 @@ from notebook.conf import get_ordered_interpreters
 
         huePubSub.subscribe('assist.db.highlight', function (location) {
           huePubSub.publish('sql.context.popover.hide');
+          huePubSub.publish('assist.hide.search');
           window.setTimeout(function () {
             var foundSource;
             $.each(self.sources(), function (idx, source) {
