@@ -280,6 +280,7 @@ var MetastoreViewModel = (function () {
     self.apiHelper = options.apiHelper;
     self.i18n = options.i18n;
 
+    self.hasErrors = ko.observable(false);
     self.loaded = ko.observable(false);
     self.loading = ko.observable(true);
 
@@ -294,10 +295,12 @@ var MetastoreViewModel = (function () {
     if (self.loaded()) {
       return;
     }
+    self.hasErrors(false);
     self.apiHelper.fetchTableSample({
       sourceType: "hive",
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
+      silenceErrors: true,
       successCallback: function (data) {
         self.rows(data.rows);
         self.headers(data.headers);
@@ -307,6 +310,7 @@ var MetastoreViewModel = (function () {
         self.loaded(true);
       },
       errorCallback: function (data) {
+        self.hasErrors(true);
         self.loading(false);
         self.loaded(true);
       }
