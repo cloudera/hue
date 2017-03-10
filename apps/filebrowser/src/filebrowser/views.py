@@ -1256,9 +1256,9 @@ def _upload_file(request):
             except Exception:
               pass
             if already_exists:
-                msg = _('Destination %(name)s already exists.')  % {'name': dest}
+                msg = _('Destination %(name)s already exists.')  % {'name': filepath}
             else:
-                msg = _('Copy to %(name)s failed: %(error)s') % {'name': dest, 'error': ex}
+                msg = _('Copy to %(name)s failed: %(error)s') % {'name': filepath, 'error': ex}
             raise PopupException(msg)
 
         response.update({
