@@ -27,8 +27,8 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest import resource
-from desktop.lib.rest.http_client import HttpClient, RestException
-
+from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
+from desktop.lib.rest.http_client import RestException
 
 from hadoop.conf import HDFS_CLUSTERS
 from libsentry.conf import PRIVILEGE_CHECKER_CACHING
@@ -110,7 +110,8 @@ class NavigatorApi(object):
     self._password = get_navigator_auth_password()
 
     self.user = user
-    self._client = HttpClient(self._api_url, logger=LOG)
+    # Navigator does not support Kerberos authentication while other components usually requires it
+    self._client = UnsecureHttpClient(self._api_url, logger=LOG)
     self._client.set_basic_auth(self._username, self._password)
     self._root = resource.Resource(self._client, urlencode=False) # For search_entities_interactive
 
