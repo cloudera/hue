@@ -97,7 +97,7 @@ def importer_prefill(request, source_type, target_type, target_path=None):
   prefill = {
     'source_type': source_type,
     'target_type': target_type,
-    'target_path': target_path
+    'target_path': target_path or ''
   }
   
   return _importer(request, prefill)

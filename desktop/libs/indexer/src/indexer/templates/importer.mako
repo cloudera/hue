@@ -1139,14 +1139,14 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable('file');
+      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
         self.sample.removeAll();
         self.path('');
         resizeElements();
       });
-      self.inputFormats = ko.observableArray([
+      self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
           % if ENABLE_NEW_INDEXER.get():
@@ -1156,15 +1156,16 @@ ${ assist.assistPanel() }
           ##{'value': 'dbms', 'name': 'DBMS'},
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
-      if (wizard.prefill.source_type().length > 0) {
-        self.inputFormats([
-            {'value': 'file', 'name': 'File'},
-            {'value': 'manual', 'name': 'Manually'},
-        ]);
+      self.inputFormatsManual = ko.observableArray([
+          {'value': 'manual', 'name': 'Manually'}
+      ]);
+      self.inputFormats = ko.pureComputed(function() {
         if (wizard.prefill.source_type() == 'manual') {
-          self.inputFormat(wizard.prefill.source_type());
+          return self.inputFormatsManual();
+        } else {
+          return self.inputFormatsAll();
         }
-      }
+      });
 
       // File
       self.path = ko.observable('');
@@ -1178,7 +1179,7 @@ ${ assist.assistPanel() }
       self.isObjectStore = ko.computed(function() {
         return self.inputFormat() == 'file' && /^s3a:\/\/.*$/.test(self.path());
       });
-      self.isObjectStore.subscribe(function(newVal) {console.log(newVal);
+      self.isObjectStore.subscribe(function(newVal) {
         vm.createWizard.destination.useDefaultLocation(! newVal);
       });
 
@@ -1314,9 +1315,9 @@ ${ assist.assistPanel() }
       self.apiHelperType = ko.observable('hive');
 
       self.description = ko.observable('');
-      self.outputFormat = ko.observable('table');
+      self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
       self.outputFormat.subscribe(function (newValue) {
-        if (newValue != 'database') {
+        if (newValue && newValue != 'database' && (newValue == 'table' && wizard.source.path().length > 0)) {
           wizard.guessFieldTypes();
           resizeElements();
         }
@@ -1338,12 +1339,14 @@ ${ assist.assistPanel() }
           return true;
         })
       });
-      if (wizard.prefill.target_type().length > 0) {
-        self.outputFormat(wizard.prefill.target_type());
-        if (wizard.prefill.target_type() == 'database') {
+      wizard.prefill.target_type.subscribe(function(newValue) {
+        self.outputFormat(newValue || 'table');
+        if (newValue == 'database') {
           vm.currentStep(2);
-        };
-      }
+        } else {
+          vm.currentStep(1);
+        }
+      });
 
       self.format = ko.observable();
       self.columns = ko.observableArray();
@@ -1475,6 +1478,10 @@ ${ assist.assistPanel() }
       self.hiveFieldTypes = ${fields_json | n}.hive;
       self.fileTypes = ${file_types_json | n};
       self.prefill = ko.mapping.fromJS(${prefill | n});
+
+      self.prefill.source_type.subscribe(function(newValue) {
+        self.source.inputFormat(newValue == 'manual' ? 'manual' : 'file');
+      });
 
       self.show = ko.observable(true);
       self.showCreate = ko.observable(false);
@@ -1773,14 +1780,16 @@ ${ assist.assistPanel() }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.loadDefaultField = loadDefaultField;
 
+      self.createWizard = new CreateWizard(self);
+
       // Wizard related
       self.wizardEnabled = ko.observable(false);
-      self.currentStep = ko.observable(1);
+      self.currentStep = ko.observable(self.createWizard.prefill.target_type() == 'database' ? 2 : 1);
       self.currentStep.subscribe(function () {
         $('.content-panel').scrollTop(0);
       });
       self.previousStepVisible = ko.pureComputed(function(){
-        return self.currentStep() > 1;
+        return self.currentStep() > 1 && self.createWizard.destination.outputFormat() != 'database';
       });
       self.nextStepVisible = ko.pureComputed(function(){
         return self.currentStep() < 3 && self.wizardEnabled();
@@ -1796,7 +1805,6 @@ ${ assist.assistPanel() }
         }
       }
 
-      self.createWizard = new CreateWizard(self);
       self.isLoading = ko.observable(false);
     };
 

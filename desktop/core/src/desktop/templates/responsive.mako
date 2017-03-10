@@ -678,7 +678,7 @@ ${ assist.assistPanel() }
           } else if (href.startsWith('/indexer/importer/prefill')){
               self.currentApp('importer');
               self.getActiveAppViewModel(function (viewModel) {
-                var arguments = href.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)/);
+                var arguments = href.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
                 if (! arguments) {
                   console.warn('Could not match ' + href)
                 }
