@@ -56,6 +56,10 @@ def escape_rows(rows, nulls_only=False):
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
                   files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
                   on_success_url=None, skip_historify=False, is_task=False):
+  '''
+  skip_historify: do not add the task to the query history. e.g. SQL Dashboard
+  isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
+  '''
   from notebook.connectors.hiveserver2 import HS2Api
 
   editor = Notebook()
@@ -98,7 +102,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
     'isSaved': is_saved,
     'onSuccessUrl': on_success_url,
     'skipHistorify': skip_historify,
-    'isTask': is_task,
+    'isManaged': is_task,
     'snippets': [
       {
          'status': status,

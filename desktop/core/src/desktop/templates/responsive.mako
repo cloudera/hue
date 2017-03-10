@@ -447,7 +447,7 @@ ${ hueIcons.symbols() }
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger disable-feedback" onclick="editorVM.selectedNotebook().clearHistory()">${_('Yes')}</a>
+    <a class="btn btn-danger disable-feedback" onclick="function() { editorVM.selectedNotebook().clearHistory(); editorVM.selectedNotebook(null); }">${_('Yes')}</a>
   </div>
 </div>
 

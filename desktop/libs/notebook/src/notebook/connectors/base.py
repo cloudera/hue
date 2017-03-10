@@ -74,11 +74,10 @@ class Notebook(object):
           'description': '',
           'type': 'notebook',
           'isSaved': False,
-          'isManaged': False,
+          'isManaged': False, # Aka isTask
+          'skipHistorify': False,
           'sessions': [],
           'snippets': [],
-          'skipHistorify': False,
-          'isTask': False,
       }
       _data.update(options)
       self.data = json.dumps(_data)
@@ -187,8 +186,6 @@ class Notebook(object):
     notebook_data = self.get_data()
     snippet = notebook_data['snippets'][0]
     snippet['wasBatchExecuted'] = batch
-    if batch:
-      notebook_data['isTask'] = True
 
     return _execute_notebook(request, notebook_data, snippet)
 

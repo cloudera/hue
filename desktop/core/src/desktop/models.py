@@ -1048,7 +1048,7 @@ class Document2(models.Model):
   last_modified = models.DateTimeField(auto_now=True, db_index=True, verbose_name=_t('Time last modified'))
   version = models.SmallIntegerField(default=1, verbose_name=_t('Document version'), db_index=True)
   is_history = models.BooleanField(default=False, db_index=True)
-  is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user'))
+  is_managed = models.BooleanField(default=False, db_index=True, verbose_name=_t('If managed under the cover by Hue and never by the user')) # Aka isTask
   is_trashed = models.NullBooleanField(default=False, db_index=True, verbose_name=_t('True if trashed'))
 
   dependencies = models.ManyToManyField('self', symmetrical=False, related_name='dependents', db_index=True)
