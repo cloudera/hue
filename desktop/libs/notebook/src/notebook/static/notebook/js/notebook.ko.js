@@ -2161,7 +2161,8 @@ var EditorViewModel = (function() {
       logGA('clearHistory');
       $.post("/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
-        doc_type: self.selectedSnippet()
+        doc_type: self.selectedSnippet(),
+        is_notification_manager: vm.isNotificationManager(),
       }, function (data) {
         self.history.removeAll();
         if (self.isHistory()) {

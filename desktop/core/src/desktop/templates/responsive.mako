@@ -246,7 +246,9 @@ ${ hueIcons.symbols() }
               <!-- ko if: history().length > 0 -->
               <div class="notification-history-title">
                 <strong>${ _('History') }</strong>
-                <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip"><i class="fa fa-calendar-times-o"></i></div>
+                <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
+                  <i class="fa fa-calendar-times-o"></i>
+                </div>
                 <div class="clearfix"></div>
               </div>
               <ul class="unstyled notification-history-list">
@@ -438,10 +440,10 @@ ${ hueIcons.symbols() }
 <div id="clearNotificationHistoryModal" class="modal hide fade">
   <div class="modal-header">
     <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm History Clear')}</h3>
+    <h3>${_('Confirm History Clearing')}</h3>
   </div>
   <div class="modal-body">
-    <p>${_('Are you sure you want to clear the query history?')}</p>
+    <p>${_('Are you sure you want to clear the task history?')}</p>
   </div>
   <div class="modal-footer">
     <a class="btn" data-dismiss="modal">${_('No')}</a>
