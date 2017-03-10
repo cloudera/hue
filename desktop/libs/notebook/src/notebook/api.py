@@ -466,8 +466,12 @@ def clear_history(request):
 
   notebook = json.loads(request.POST.get('notebook'), '{}')
   doc_type = request.POST.get('doc_type')
+  is_notification_manager = request.POST.get('is_notification_manager', 'false') == 'true'
 
-  history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
+  if is_notification_manager:
+    history = Document2.objects.get_tasks_history(user=request.user)
+  else:
+    history = Document2.objects.get_history(doc_type='query-%s' % doc_type, user=request.user)
 
   response['updated'] = history.delete()
   response['message'] = _('History cleared !')
