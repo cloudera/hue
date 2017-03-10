@@ -1052,7 +1052,6 @@ ${ assist.assistPanel() }
       self.editorVM.newNotebook();
 
       huePubSub.subscribe("notebook.task.submitted", function (history_id) {
-        // Load
         self.editorVM.openNotebook(history_id, null, true, function(){
           var notebook = self.editorVM.selectedNotebook();
           notebook.snippets()[0].progress.subscribe(function(val){
@@ -1073,11 +1072,11 @@ ${ assist.assistPanel() }
                 // TODO: Show finish notification and clicking on it does onSuccessUrl
                 // or if still on initial spinner we redirect automatically to onSuccessUrl
                 if (notebook.onSuccessUrl()) {
-                  // TODO: If we are in FB directory, also refresh FB dir
-                  window.location.href = notebook.onSuccessUrl();
-                  // TODO: switch to something like params = ko.mapping.fromJSON(notebook.onSuccessUrl())
-                  // {'app': 'metastore', 'path': 'table/%(database)s' % {'database': database}}
-                  // huePubSub.publish('open.app', {'app': 'importer', 'prefill': {'source_type: 'all', 'target_type': 'table'}, 'database': 'huedb'})
+                  if (notebook.onSuccessUrl() == 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
+                    huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
+                  } else {  
+                    huePubSub.publish('open.link', notebook.onSuccessUrl());
+                  }
                 }
               } else { // Perform last DROP statement execute
                 snippet.execute();

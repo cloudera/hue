@@ -370,31 +370,32 @@ def drop_table(request, database):
   db = dbms.get(request.user)
 
   if request.method == 'POST':
-    tables = request.POST.getlist('table_selection')
-    tables_objects = [db.get_table(database, table) for table in tables]
-    skip_trash = request.POST.get('skip_trash') == 'on'
-    
-    if request.POST.get('is_embeddable'):
-      sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
-      return make_notebook(
-          name='Execute and watch',
-          editor_type='hive',
-          statement=sql.strip(),
-          status='ready',
-          database=database,
-          on_success_url=json.dumps({'app': 'metastore', 'path': 'table/%(database)s' % {'database': database}})
-      )
-    else:    
-      try:
+    try:
+      tables = request.POST.getlist('table_selection')
+      tables_objects = [db.get_table(database, table) for table in tables]
+      skip_trash = request.POST.get('skip_trash') == 'on'
+
+      if request.POST.get('is_embeddable'):
+        sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True).hql_query
+        job = make_notebook(
+            name='Execute and watch',
+            editor_type='hive',
+            statement=sql.strip(),
+            status='ready',
+            database=database,
+            on_success_url='assist.db.refresh'
+        )
+        return JsonResponse(job.execute(request, batch=False))
+      else:
         # Can't be simpler without an important refactoring
         design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
         query_history = db.drop_tables(database, tables_objects, design, skip_trash=skip_trash)
         url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:show_tables', kwargs={'database': database})
         return redirect(url)
-      except Exception, ex:
-        error_message, log = dbms.expand_exception(ex, db)
-        error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
-        raise PopupException(error, title=_("Hive Error"), detail=log)
+    except Exception, ex:
+      error_message, log = dbms.expand_exception(ex, db)
+      error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
+      raise PopupException(error, title=_("Hive Error"), detail=log)
   else:
     title = _("Do you really want to delete the table(s)?")
     return render('confirm.mako', request, {'url': request.path, 'title': title})

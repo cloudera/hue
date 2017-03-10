@@ -906,7 +906,7 @@ from notebook.conf import get_ordered_interpreters
         if (typeof options.sourceTypes === 'undefined') {
           options.sourceTypes = [];
           % for interpreter in get_ordered_interpreters(request.user):
-            % if interpreter["interface"] in ["hiveserver2", "rdbms", "jdbc"]:
+            % if interpreter["interface"] in ["hiveserver2", "rdbms", "jdbc", "solr"]:
               options.sourceTypes.push({
                 type: '${ interpreter["type"] }',
                 name: '${ interpreter["name"] }'
