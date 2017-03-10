@@ -3883,7 +3883,7 @@
       $(document).click(function (event) {
         if ($tableDropMenu.find($(event.target)).length === 0) {
           hideDropMenu();
-        };
+        }
       });
 
       var lastMeta = {};
@@ -3972,12 +3972,12 @@
             var textBeforeCursor = editor.getTextBeforeCursor();
             var questionMarkMatch;
             if ($('.hue-ace-autocompleter').length > 0) {
-              questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]\s$/i);
+              questionMarkMatch = textBeforeCursor.match(/select\s+(\? from \S+[^.]\s$)/i);
             } else {
-              questionMarkMatch = textBeforeCursor.match(/select \? from \S+[^.]$/i);
+              questionMarkMatch = textBeforeCursor.match(/select\s+(\? from \S+[^.]$)/i);
             }
             if (questionMarkMatch && $('.ace_autocomplete:visible').length === 0) {
-              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - questionMarkMatch[0].length + 8);
+              editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - (questionMarkMatch[1].length - 1));
               editor.removeTextBeforeCursor(1);
               window.setTimeout(function () {
                 editor.execCommand("startAutocomplete");
