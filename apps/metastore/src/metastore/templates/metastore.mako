@@ -646,7 +646,7 @@ ${ components.menubar() }
   <div class="tile">
     <h4>${ _('Sample') } <i data-bind="visible: samples.loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
     <!-- ko with: samples -->
-      <!-- ko if: loaded -->
+      <!-- ko if: loaded() && !hasErrors() -->
         <!-- ko with: preview -->
         <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
         <a class="pointer" data-bind="visible: rows().length >= 3, click: function() { $('li a[href=\'#sample\']').click(); }"  style="display: none;">
@@ -655,6 +655,9 @@ ${ components.menubar() }
         <!-- /ko -->
         <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;">${ _('The view does not contain any data.') }</div>
         <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;">${ _('The table does not contain any data.') }</div>
+      <!-- /ko -->
+      <!-- ko if: hasErrors() -->
+      <div>${ _('Could not load the sample, see the server log for details.') }</div>
       <!-- /ko -->
     <!-- /ko -->
   </div>
@@ -705,10 +708,13 @@ ${ components.menubar() }
     <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i>
   </div>
   <!-- /ko -->
-  <!-- ko if: loaded -->
+  <!-- ko if: loaded() && !hasErrors() -->
   <!-- ko template: { if: rows().length, name: 'metastore-samples-table' } --><!-- /ko -->
   <div data-bind="visible: !rows().length && metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The view does not contain any data.') }</div>
   <div data-bind="visible: !rows().length && !metastoreTable.tableDetails().is_view" style="display: none;" class="empty-message">${ _('The table does not contain any data.') }</div>
+  <!-- /ko -->
+  <!-- ko if: hasErrors() -->
+  <div class="empty-message">${ _('Could not load the sample, see the server log for details.') }</div>
   <!-- /ko -->
   <!-- /ko -->
 </script>
