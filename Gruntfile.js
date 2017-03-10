@@ -44,6 +44,7 @@ module.exports = function(grunt) {
           'apps/filebrowser/src/filebrowser/static/filebrowser/css/listdir_components.css': 'apps/filebrowser/src/filebrowser/static/filebrowser/less/listdir_components.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser-embeddable.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser-embeddable.less',
+          'apps/useradmin/src/useradmin/static/useradmin/css/useradmin.css': 'apps/useradmin/src/useradmin/static/useradmin/less/useradmin.less',
         }
       }
     },
@@ -62,6 +63,8 @@ module.exports = function(grunt) {
           'apps/filebrowser/src/filebrowser/static/filebrowser/less/**/*.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/*.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/**/*.less',
+          'apps/useradmin/src/useradmin/static/useradmin/less/*.less',
+          'apps/useradmin/src/useradmin/static/useradmin/less/**/*.less',
         ],
         tasks: ['less']
       }
