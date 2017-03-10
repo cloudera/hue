@@ -607,7 +607,6 @@ ${ components.menubar() }
     % endif
     % if has_write_access:
       <a class="inactive-action" href="#dropSingleTable" data-toggle="modal" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'title' : tableDetails() && tableDetails().is_view ? '${_('Drop View')}' : '${_('Drop Table')}' }"><i class="fa fa-times fa-fw"></i></a>
-      ## 
     % endif
     <!-- ko if: tableDetails() -->
       <!-- ko if: tableDetails().partition_keys.length -->
@@ -1098,7 +1097,12 @@ ${ components.menubar() }
   </div>
 
   <div id="dropSingleTable" class="modal hide fade">
+    % if is_embeddable:
+    <form data-bind="submit: dropTables" method="POST">
+      <input type="hidden" name="is_embeddable" value="true"/>
+    % else:
     <form method="POST">
+    % endif
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
         <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -1127,10 +1131,11 @@ ${ components.menubar() }
       success: function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);
-        } else {
-          $(document).trigger("error", data.message);
+        } else if (resp && resp.message) {
+          $(document).trigger("error", resp.message);
         }
         $("#dropTable").modal('hide');
+        $("#dropSingleTable").modal('hide');
       },
       error: function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
