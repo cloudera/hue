@@ -5399,12 +5399,15 @@
         canceled: function () {
           $.jHueNotify.info(DropzoneGlobals.i18n.uploadCanceled);
         },
-        complete: function (data) {
-          if (data.xhr.response != '') {
-            var response = JSON.parse(data.xhr.response);
+        complete: function (file) {
+          if (file.xhr.response != '') {
+            var response = JSON.parse(file.xhr.response);
             if (response && response.status != null) {
               if (response.status != 0) {
                 $(document).trigger('error', response.data);
+                if (value.onError) {
+                  value.onError(file.name);
+                }
               }
               else {
                 $(document).trigger('info', response.path + ' ' + DropzoneGlobals.i18n.uploadSucceeded);

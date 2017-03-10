@@ -321,7 +321,7 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Custom App 2</a></li>
       </ul>
       <div class="left-nav-drop">
-        <div data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ onePageViewModel.currentApp('importer'); onePageViewModel.getActiveAppViewModel(function (vm) { vm.createWizard.source.path(path); })  } }" class="pointer" title="${ _('Import data wizard') }">
+        <div data-bind="dropzone: { clickable: false, url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onError: onePageViewModel.dropzoneError, onComplete: onePageViewModel.dropzoneComplete }, click: function(){ onePageViewModel.currentApp('importer')}" class="pointer" title="${ _('Import data wizard') }">
           <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files here') }</div>
         </div>
       </div>
@@ -786,6 +786,20 @@ ${ assist.assistPanel() }
           else {
             self.currentApp('editor');
           }
+        }
+
+        self.dropzoneError = function (filename) {
+          self.currentApp('importer');
+          self.getActiveAppViewModel(function (vm) {
+            vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
+          });
+        }
+
+        self.dropzoneComplete = function (path) {
+          self.currentApp('importer');
+          self.getActiveAppViewModel(function (vm) {
+            vm.createWizard.source.path(path);
+          });
         }
 
         self.loadAppState();
