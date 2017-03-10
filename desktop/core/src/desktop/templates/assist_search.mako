@@ -94,7 +94,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         <!-- ko hueSpinner: { spin: searching, center: true, size: 'large' } --><!-- /ko -->
         <!-- ko if: !searching() -->
         <!-- ko if: hasErrors() -->
+        <!-- ko if: errorMessage() !== '' -->
+        <div class="result-entry" data-bind="text: errorMessage"></div>
+        <!-- /ko -->
+        <!-- ko if: errorMessage() === '' -->
         <div class="result-entry">${ _('Error searching, see logs for details.') }</div>
+        <!-- /ko -->
         <!-- /ko -->
         <!-- ko ifnot: hasErrors() -->
         <!-- ko if: searchResult().length == 0 -->
@@ -159,6 +164,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         self.searchResult = ko.observableArray();
 
         self.hasErrors = ko.observable(false);
+        self.errorMessage = ko.observable('');
         self.searchHasFocus = ko.observable(false);
         self.searching = ko.observable(false);
         self.searchActive = ko.observable(false);
@@ -196,6 +202,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           lastQuery = self.searchInput();
           self.searching(true);
           self.hasErrors(false);
+          self.errorMessage('');
 
           var showInAssist = function (entry) {
             self.searchInput('');
@@ -264,6 +271,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             }
             if (typeof data.entities === 'undefined') {
               data.entities = [];
+            }
+            if (data.status === -2) {
+              self.hasErrors(true);
+              if (typeof data.message !== 'undefined') {
+                self.errorMessage(data.message);
+              }
+              return;
             }
             data.entities.forEach(function (entity) {
               entity.statsVisible = ko.observable(false);
