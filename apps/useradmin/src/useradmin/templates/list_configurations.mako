@@ -24,8 +24,9 @@ from django.contrib.auth.models import Group
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="configKoComponents" file="/config_ko_components.mako" />
 <%namespace name="layout" file="layout.mako" />
-
+%if not is_embeddable:
 ${commonheader(_('Configurations'), "useradmin", user, request) | n,unicode}
+%endif
 ${layout.menubar(section='configurations')}
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery-ui-1.10.4.custom.min.js') }"></script>
@@ -119,7 +120,7 @@ ${layout.menubar(section='configurations')}
   </div>
 </script>
 
-<div class="container-fluid">
+<div id="configurationsComponents" class="container-fluid">
   <!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko -->
   <h4 style="width: 100%; text-align: center; display: none;" data-bind="visible: !loading() && hasErrors()">${ _('There was an error loading the configurations') }</h4>
   <!-- ko template: { if: !loading() && !hasErrors() && !selectedApp(), name: 'app-list' } --><!-- /ko -->
@@ -296,11 +297,12 @@ ${ configKoComponents.config() }
       });
     };
 
-    ko.applyBindings(new ConfigurationsViewModel());
+    ko.applyBindings(new ConfigurationsViewModel(), $('#configurationsComponents')[0]);
 
   })();
 </script>
 
 ${layout.commons()}
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
