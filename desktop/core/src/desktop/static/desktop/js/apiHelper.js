@@ -1689,6 +1689,11 @@ var ApiHelper = (function () {
           source: 'navigator',
           message: data.message.message
         })
+      } else if (data.status === -2 && typeof data.message !== 'undefined') {
+        options.errorCallback({
+          source: 'navigator',
+          message: data.message
+        })
       } else {
         self.assistErrorCallback(options)(data);
       }
