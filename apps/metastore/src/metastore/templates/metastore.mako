@@ -638,7 +638,7 @@ ${ components.menubar() }
     <!-- ko template: "metastore-columns-table" --><!-- /ko -->
     <!-- /ko -->
 
-    <a class="pointer" data-bind="visible: columns().length >= 3, click: function() { $('li a[href=\'#columns\']').click(); }">
+    <a class="pointer" data-bind="visible: columns().length > favouriteColumns().length, click: function() { $('li a[href=\'#columns\']').click(); }">
       ${_('View more...')}
     </a>
   </div>
