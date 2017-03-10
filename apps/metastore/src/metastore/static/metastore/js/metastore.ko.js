@@ -541,9 +541,9 @@ var MetastoreViewModel = (function () {
 
     self.drop = function () {
       $.post('/tables/drop/' + self.database.name, {
-    	table_selection: ko.mapping.toJSON([self.name]),
-    	skip_trash: 'off',
-    	is_embeddable: true
+        table_selection: ko.mapping.toJSON([self.name]),
+        skip_trash: 'off',
+        is_embeddable: true
       }, function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);
