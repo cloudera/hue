@@ -544,11 +544,9 @@ var MetastoreViewModel = (function () {
     	table_selection: ko.mapping.toJSON([self.name]),
     	skip_trash: 'off',
     	is_embeddable: true
-      }, function(data) {
-        if (data && data.status == 0) {
-          self.navigatorStats().tags.push(self.addTagName());
-          self.addTagName('');
-          self.showAddTagName(false);
+      }, function(resp) {
+        if (resp.history_uuid) {
+          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
         } else {
           $(document).trigger("error", data.message);
         }

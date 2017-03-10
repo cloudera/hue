@@ -599,7 +599,10 @@ var EditorViewModel = (function() {
     self.jobs = ko.observableArray(typeof snippet.jobs != "undefined" && snippet.jobs != null ? snippet.jobs : []);
 
     self.ddlNotification = ko.observable();
-    self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+    self.delayedDDLNotification = ko.pureComputed(self.ddlNotification);
+    if (! vm.isNotificationManager()) {
+      self.delayedDDLNotification.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
+    }
     window.setTimeout(function () {
       self.delayedDDLNotification.subscribe(function (val) {
         huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
@@ -1410,7 +1413,7 @@ var EditorViewModel = (function() {
                 }
               }
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
-                window.location.href = vm.successUrl(); // Not used anymore in responsive 
+                window.location.href = vm.successUrl(); // Not used anymore in Hue 4 
               }
             }
             else if (self.status() == 'success') {

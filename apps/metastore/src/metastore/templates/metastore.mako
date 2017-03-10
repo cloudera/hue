@@ -382,7 +382,6 @@ ${ components.menubar() }
         span12
       %endif
        tile">
-
           <div class="span6 tile">
             <h4>${ _('Properties') }</h4>
             <div title="${ _('Comment') }"><i class="fa fa-fw fa-comment muted"></i>
@@ -509,7 +508,12 @@ ${ components.menubar() }
 
   % if has_write_access:
     <div id="dropTable" class="modal hide fade">
-      <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+      % if is_embeddable:
+        <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropTables" method="POST">
+          <input type="hidden" name="is_embeddable" value="true"/>
+      % else:
+        <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
+      % endif
         ${ csrf_token(request) | n,unicode }
         <div class="modal-header">
           <a href="#" class="close" data-dismiss="modal">&times;</a>
@@ -1114,23 +1118,26 @@ ${ components.menubar() }
   <div id="import-data-modal" class="modal hide fade" style="display: block;width: 640px;margin-left: -320px!important;"></div>
 </div>
 </span>
+
 <script type="text/javascript" charset="utf-8">
 
-  function pieChartDataTransformer(rawDatum) {
-    var _data = [];
-    $(rawDatum.counts).each(function (cnt, item) {
-      _data.push({
-        label: item.name,
-        value: item.popularity,
-        obj: item
-      });
+  function dropTables(formElement) {
+    $(formElement).ajaxSubmit({
+      dataType: 'json',
+      success: function(resp) {
+        if (resp.history_uuid) {
+          huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+        } else {
+          $(document).trigger("error", data.message);
+        }
+        $("#dropTable").modal('hide');
+      },
+      error: function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      }
     });
-    _data.sort(function (a, b) {
-      return a.value - b.value
-    });
-
-    return _data;
   }
+
 
   (function () {
 
