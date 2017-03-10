@@ -89,7 +89,9 @@ def list_permissions(request):
 
 
 def list_configurations(request):
-  return render("list_configurations.mako", request, {})
+  return render("list_configurations.mako", request, {
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
 
 
 def list_for_autocomplete(request):
