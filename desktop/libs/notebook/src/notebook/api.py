@@ -195,7 +195,7 @@ def check_status(request):
     else:
       status = 'failed'
 
-    if notebook['type'].startswith('query') or notebook.get('isTask'):
+    if notebook['type'].startswith('query') or notebook.get('isManaged'):
       nb_doc = Document2.objects.get(id=notebook['id'])
       if nb_doc.can_write(request.user):
         nb = Notebook(document=nb_doc).get_data()

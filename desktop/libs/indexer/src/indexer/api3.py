@@ -196,7 +196,7 @@ def create_database(request, source, destination):
   editor_type = 'hive'
   on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
 
-  notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url)
+  notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url, is_task=True)
   return notebook.execute(request, batch=False)
 
 
@@ -360,7 +360,7 @@ def _create_table_from_a_file(request, source, destination):
 
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql.strip(), status='ready', database=database, on_success_url=on_success_url)
+  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql.strip(), status='ready', database=database, on_success_url=on_success_url, is_task=True)
 
 
 def _index(request, file_format, collection_name, query=None):

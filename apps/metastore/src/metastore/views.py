@@ -383,9 +383,10 @@ def drop_table(request, database):
             statement=sql.strip(),
             status='ready',
             database=database,
-            on_success_url='assist.db.refresh'
+            on_success_url='assist.db.refresh',
+            is_task=True
         )
-        return JsonResponse(job.execute(request, batch=False))
+        return JsonResponse(job.execute(request))
       else:
         # Can't be simpler without an important refactoring
         design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
