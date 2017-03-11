@@ -229,7 +229,8 @@ class HS2Api(Api):
 
     try:
       if statement.get('statement_id') == 0:
-        db.use(query.database)
+        if query.database:
+          db.use(query.database)
       handle = db.client.query(query, withMultipleSession=True)
     except QueryServerException, ex:
       raise QueryError(ex.message, handle=statement)

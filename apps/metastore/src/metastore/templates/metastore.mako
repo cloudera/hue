@@ -323,7 +323,13 @@ ${ components.menubar() }
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
       <div id="dropDatabase" class="modal hide fade">
+
+      % if is_embeddable:
+        <form action="/metastore/databases/drop" data-bind="submit: dropAndWatch" method="POST">
+          <input type="hidden" name="is_embeddable" value="true"/>
+      % else:
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
+      % endif
           ${ csrf_token(request) | n,unicode }
           <div class="modal-header">
             <a href="#" class="close" data-dismiss="modal">&times</a>
@@ -509,7 +515,7 @@ ${ components.menubar() }
   % if has_write_access:
     <div id="dropTable" class="modal hide fade">
       % if is_embeddable:
-        <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropTables" method="POST">
+        <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
       % else:
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
@@ -1098,7 +1104,7 @@ ${ components.menubar() }
 
   <div id="dropSingleTable" class="modal hide fade">
     % if is_embeddable:
-    <form data-bind="submit: dropTables" method="POST">
+    <form data-bind="submit: dropAndWatch" method="POST">
       <input type="hidden" name="is_embeddable" value="true"/>
     % else:
     <form method="POST">
@@ -1125,7 +1131,7 @@ ${ components.menubar() }
 
 <script type="text/javascript">
 
-  function dropTables(formElement) {
+  function dropAndWatch(formElement) {
     $(formElement).ajaxSubmit({
       dataType: 'json',
       success: function(resp) {
@@ -1136,6 +1142,7 @@ ${ components.menubar() }
         }
         $("#dropTable").modal('hide');
         $("#dropSingleTable").modal('hide');
+        $("#dropDatabase").modal('hide');
       },
       error: function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
