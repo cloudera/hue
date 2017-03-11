@@ -1699,14 +1699,18 @@ ${ assist.assistPanel() }
           $(document).trigger("error", xhr.responseText);
         });
 % endif
+
+        logGA('submit/' + self.source.inputFormat() + '/' + self.destination.outputFormat());
       }
 
       self.removeOperation = function (operation, operationList) {
         operationList.remove(operation);
+        logGA('step/removeOperation');
       }
 
       self.addOperation = function (field) {
         field.operations.push(new Operation("split"));
+        logGA('step/addOperation');
       }
 
       self.load = function (state) {
@@ -1797,15 +1801,23 @@ ${ assist.assistPanel() }
       self.nextStep = function () {
         if (self.nextStepVisible()){
           self.currentStep(self.currentStep() + 1);
+          logGA('step/' + self.currentStep());
         }
       }
       self.previousStep = function () {
         if (self.previousStepVisible()){
           self.currentStep(self.currentStep() - 1);
+          logGA('step/' + self.currentStep());
         }
       }
 
       self.isLoading = ko.observable(false);
+
+      function logGA(page) {
+        if (typeof trackOnGA == 'function') {
+          trackOnGA('importer/' + page);
+        }
+      }
     };
 
     var viewModel;
