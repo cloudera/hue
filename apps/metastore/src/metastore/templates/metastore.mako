@@ -292,7 +292,14 @@ ${ components.menubar() }
           ${_('Stored in')} Kudu
         <!-- /ko -->
         <!-- ko if: details.properties.format != 'kudu' -->
-          <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          <!-- ko if: IS_HUE_4 -->
+            <a data-bind="click: function () { huePubSub.publish('open.fb.folder', hdfs_link.replace(/\/filebrowser\/view=/g, '') ); }" href="javascript:void(0)" title="${_('Open data location')}">
+              ${_('Location')}
+            </a>
+          <!-- /ko -->
+          <!-- ko if: ! IS_HUE_4 -->
+            <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          <!-- /ko -->
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
