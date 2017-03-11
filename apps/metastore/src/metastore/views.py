@@ -98,11 +98,24 @@ def drop_database(request):
     databases = request.POST.getlist('database_selection')
 
     try:
-      # Can't be simpler without an important refactoring
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-      query_history = db.drop_databases(databases, design)
-      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:databases')
-      return redirect(url)
+
+      if request.POST.get('is_embeddable'):
+        sql = db.drop_databases(databases, design, generate_ddl_only=True)
+        job = make_notebook(
+            name='Execute and watch',
+            editor_type='hive',
+            statement=sql.strip(),
+            status='ready',
+            database=None,
+            on_success_url='assist.db.refresh',
+            is_task=True
+        )
+        return JsonResponse(job.execute(request))
+      else:
+        query_history = db.drop_databases(databases, design)
+        url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + reverse('metastore:databases')
+        return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
@@ -376,7 +389,7 @@ def drop_table(request, database):
       skip_trash = request.POST.get('skip_trash') == 'on'
 
       if request.POST.get('is_embeddable'):
-        sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True).hql_query
+        sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
             name='Execute and watch',
             editor_type='hive',

@@ -570,13 +570,13 @@ class HiveServer2Dbms(object):
         hql.append(drop_query)
 
     query = hql_query(';'.join(hql), database)
-    
+
     if generate_ddl_only:
-      return query
-    else:   
+      return query.hql_query
+    else:
       design.data = query.dumps()
       design.save()
-  
+
       return self.execute_query(query, design)
 
 
@@ -584,16 +584,20 @@ class HiveServer2Dbms(object):
     return self.execute_statement("DROP DATABASE `%s`" % database)
 
 
-  def drop_databases(self, databases, design):
+  def drop_databases(self, databases, design, generate_ddl_only=False):
     hql = []
 
     for database in databases:
       hql.append("DROP DATABASE `%s` CASCADE" % database)
     query = hql_query(';'.join(hql), database)
-    design.data = query.dumps()
-    design.save()
 
-    return self.execute_query(query, design)
+    if generate_ddl_only:
+      return query.hql_query
+    else:
+      design.data = query.dumps()
+      design.save()
+
+      return self.execute_query(query, design)
 
   def _get_and_validate_select_query(self, design, query_history):
     query = design.get_query_statement(query_history.statement_number)
