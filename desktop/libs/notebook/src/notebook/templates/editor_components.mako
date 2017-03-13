@@ -206,7 +206,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </style>
 
 <div class="print-logo">
-  <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }" />
+  <img class="pull-right" src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
 </div>
 
 <div class="navbar navbar-inverse navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
@@ -295,15 +295,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
-                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon"  alt="${ _('Impala icon') }"/>
                 Impala
               <!-- /ko -->
               <!-- ko if: editorType() == 'rdbms' -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 DB Query
               <!-- /ko -->
               <!-- ko if: editorType() == 'pig' -->
-                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"  alt="${ _('Pig icon') }"/>
                 Pig
               <!-- /ko -->
               <!-- ko if: editorType() == 'java' -->
@@ -311,11 +311,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 Java
               <!-- /ko -->
               <!-- ko if: editorType() == 'spark2' -->
-                <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" />
+                <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }" />
                 Spark
               <!-- /ko -->
               <!-- ko if: editorType() == 'sqoop1' -->
-                <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" />
+                <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }" />
                 Sqoop 1
               <!-- /ko -->
               <!-- ko if: editorType() == 'distcp' -->
@@ -331,11 +331,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 MapReduce
               <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
-                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }" />
                 Hive
               <!-- /ko -->
               <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 SQL
               <!-- /ko -->
               </a>
@@ -383,7 +383,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
  <div class="player-toolbar" data-bind="visible: $root.isPlayerMode() && $root.isFullscreenMode()" style="display: none;">
     <div class="pull-right pointer" data-bind="click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); $root.isFullscreenMode(false);  }"><i class="fa fa-times"></i></div>
-    <img src="${ static('desktop/art/icon_hue_48.png') }" />
+    <img src="${ static('desktop/art/icon_hue_48.png') }"  alt="${ _('Hue logo') }"/>
     <!-- ko if: $root.selectedNotebook() -->
     <h4 data-bind="text: $root.selectedNotebook().name"></h4>
     <!-- /ko -->
@@ -670,7 +670,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="snippetIcon">
   <!-- ko if: viewSettings().snippetImage -->
-  <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }">
+  <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }" alt="${ _('Snippet icon') }">
   <!-- /ko -->
   <!-- ko if: viewSettings().snippetIcon -->
   <i class="fa snippet-icon" data-bind="css: viewSettings().snippetIcon"></i>
@@ -1398,7 +1398,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- ko if: result.images().length != 0 -->
         <ul class="unstyled results-images" data-bind="foreach: result.images()">
           <li>
-            <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10" />
+            <img data-bind="attr: {'src': 'data:image/png;base64,' + $data}" class="margin-bottom-10"  alt="${ _('Result image') }"/>
           </li>
         </ul>
         <!-- /ko -->

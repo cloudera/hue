@@ -291,34 +291,34 @@ ${ hueIcons.symbols() }
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
-             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive')}</a></li>
              % else:
-             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive')}</a></li>
+             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive')}</a></li>
              % endif
            % endif
            % if 'impala' in apps:
              % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
-             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala')}</a></li>
              % else:
-             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala')}</a></li>
+             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala')}</a></li>
              % endif
            % endif
            % if 'rdbms' in apps:
              % if USE_NEW_EDITOR.get():
-             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon" alt="${ _('DBQuery icon') }"/> ${_('DB Query')}</a></li>
              % else:
-             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon"/> ${_('DB Query')}</a></li>
+             <li><a href="/${apps['rdbms'].display_name}"><img src="${ static(apps['rdbms'].icon_path) }" class="app-icon" alt="${ _('DBQuery icon') }"/> ${_('DB Query')}</a></li>
              % endif
            % endif
            % if 'pig' in apps:
              % if USE_NEW_EDITOR.get() and False:
-             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig')}</a></li>
              % else:
-             <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig')}</a></li>
+             <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig')}</a></li>
              % endif
            % endif
            % if 'jobsub' in apps:
-             <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon"/> ${_('Job Designer')}</a></li>
+             <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon" alt="${ _('Job designer icon') }"/> ${_('Job Designer')}</a></li>
            % endif
          </ul>
        </li>
@@ -365,16 +365,16 @@ ${ hueIcons.symbols() }
          <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-database inline-block hideMoreThan950"></i><span class="hide950">Data Browsers</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
-             <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon"/> ${_('Metastore Tables')}</a></li>
+             <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon" alt="${ _('Metastore icon') }"/> ${_('Metastore Tables')}</a></li>
            % endif
            % if 'hbase' in apps:
-             <li><a href="/${apps['hbase'].display_name}"><img src="${ static(apps['hbase'].icon_path) }" class="app-icon"/> ${_('HBase')}</a></li>
+             <li><a href="/${apps['hbase'].display_name}"><img src="${ static(apps['hbase'].icon_path) }" class="app-icon" alt="${ _('HBase icon') }"/> ${_('HBase')}</a></li>
            % endif
            % if 'sqoop' in apps:
-             <li><a href="/${apps['sqoop'].display_name}"><img src="${ static(apps['sqoop'].icon_path) }" class="app-icon"/> ${_('Sqoop Transfer')}</a></li>
+             <li><a href="/${apps['sqoop'].display_name}"><img src="${ static(apps['sqoop'].icon_path) }" class="app-icon" alt="${ _('Sqoop icon') }"/> ${_('Sqoop Transfer')}</a></li>
            % endif
            % if 'zookeeper' in apps:
-             <li><a href="/${apps['zookeeper'].display_name}"><img src="${ static(apps['zookeeper'].icon_path) }" class="app-icon"/> ${_('ZooKeeper')}</a></li>
+             <li><a href="/${apps['zookeeper'].display_name}"><img src="${ static(apps['zookeeper'].icon_path) }" class="app-icon" alt="${ _('ZooKeeper icon') }"/> ${_('ZooKeeper')}</a></li>
            % endif
          </ul>
        </li>
@@ -386,31 +386,31 @@ ${ hueIcons.symbols() }
          <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-random inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${_('Dashboards')}</a>
+             <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon"  alt="${ _('Oozie dashboard icon') }"/> ${_('Dashboards')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_oozie_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_oozie_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_oozie_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_oozie_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_oozie_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundles icon') }" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
            <% from oozie.conf import ENABLE_V2 %>
            % if not ENABLE_V2.get():
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:list_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
+             <a href="${ url('oozie:list_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }" /> ${_('Editors')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            % else:
            <li class="dropdown-submenu">
-             <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${_('Editors')}</a>
+             <a href="${ url('oozie:list_editor_workflows') }"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }" /> ${_('Editors')}</a>
              <ul class="dropdown-menu">
-               <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflows')}</a></li>
-               <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" /> ${_('Coordinators')}</a></li>
-               <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" /> ${_('Bundles')}</a></li>
+               <li><a href="${url('oozie:list_editor_workflows')}"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflows')}</a></li>
+               <li><a href="${url('oozie:list_editor_coordinators')}"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Coordinators')}</a></li>
+               <li><a href="${url('oozie:list_editor_bundles')}"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundles')}</a></li>
              </ul>
            </li>
            % endif
@@ -445,7 +445,7 @@ ${ hueIcons.symbols() }
                % for collection in collections:
                  <li>
                    <a href="${ url('search:index') }?collection=${ collection.id }">
-                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon"/> ${ collection.name }
+                     <img src="${ static(controller.get_icon(collection.name)) }" class="app-icon" alt="${ _('Collection icon') }"/> ${ collection.name }
                    </a>
                  </li>
                % endfor
@@ -459,10 +459,10 @@ ${ hueIcons.symbols() }
            <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-unlock inline-block hideMoreThan950"></i><span class="hide950">Security</span> <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">
              % if HIVE_V1.get():
-             <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"> ${_('Hive Tables')}</a></li>
+             <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon" alt="${ _('Metastore icon') }"> ${_('Hive Tables')}</a></li>
              % endif
              % if HIVE_V2.get():
-             <li><a href="${ url('security:hive2') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon"> ${_('Hive Tables v2')}</a></li>
+             <li><a href="${ url('security:hive2') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon" alt="${ _('Metastore icon') }"> ${_('Hive Tables v2')}</a></li>
              % endif
              % if SOLR_V2.get():
              <li><a href="${ url('security:solr') }">&nbsp;<i class="fa fa-database"></i>&nbsp;${_('Solr Collections')}</a></li>
@@ -476,7 +476,7 @@ ${ hueIcons.symbols() }
          <a href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-tasks inline-block hideMoreThan950"></i><span class="hide950">${_('Other apps')}</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % for other in other_apps:
-             <li><a href="/${ other.display_name }"><img src="${ static(other.icon_path) }" class="app-icon"/> ${ other.nice_name }</a></li>
+             <li><a href="/${ other.display_name }"><img src="${ static(other.icon_path) }" class="app-icon" alt="${ _('App icon') }"/> ${ other.nice_name }</a></li>
            % endfor
          </ul>
        </li>

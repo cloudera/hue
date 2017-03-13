@@ -85,12 +85,12 @@
 <%def name="layout_skeleton()">
   <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow.png') }" />
+    <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
   </div>
 
   <div id="emptyDashboardEditing" data-bind="fadeVisible: isEditing() && columns().length == 0 && previewColumns() == ''">
     <div style="float:right; padding-top: 90px; margin-left: 20px; text-align: center; width: 260px">${ _('Pick an index and Click on a layout to start your dashboard!') }</div>
-    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" />
+    <img src="${ static('desktop/art/hint_arrow_horiz_flipped.png') }" alt="${ _('Hint arrow') }" />
   </div>
 
 
@@ -158,7 +158,7 @@
 
 <script type="text/html" id="row-template">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
-    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px"/>
+    <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px" alt="${ _('Hint arrow') }"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
     <div class="clearfix"></div>
   </div>

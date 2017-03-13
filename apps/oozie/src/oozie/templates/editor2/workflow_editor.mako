@@ -152,7 +152,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     % if ENABLE_IMPALA_ACTION.get():
@@ -160,7 +160,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableImpalaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaDocumentAction());}}}"
          title="${_('Impala query')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }"></a>
       </div>
     % endif
 
@@ -175,14 +175,14 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableSparkDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSparkDocumentAction());}}}"
          title="${_('Saved Spark program')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggablePigDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggablePigDocumentAction());}}}"
          title="${_('Saved Pig script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -196,7 +196,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableSqoopDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSqoopDocumentAction());}}}"
          title="${_('Saved Sqoop command')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -224,7 +224,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
     % endif
 
@@ -232,14 +232,14 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableHiveAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveAction());}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHive2Action(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHive2Action());}}}"
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     % if ENABLE_IMPALA_ACTION.get():
@@ -247,7 +247,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableImpalaAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaAction());}}}"
          title="${_('Impala Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }"></a>
     </div>
     % endif
 
@@ -255,14 +255,14 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggablePigAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggablePigAction());}}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSparkAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSparkAction());}}}"
          title="${_('Spark program')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },
@@ -276,7 +276,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
                     draggable: {data: draggableSqoopAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSqoopAction());}}}"
          title="${_('Sqoop 1')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon"></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }"></a>
     </div>
 
     <div data-bind="css: { 'draggable-widget': true },

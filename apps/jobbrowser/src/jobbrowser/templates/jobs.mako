@@ -34,7 +34,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
     <%def name="search()">
       ${_('Username')} <input id="userFilter" type="text" class="input-medium search-query" placeholder="${_('Search for username')}" value="${ user_filter or '' }">
       &nbsp;&nbsp;${_('Text')} <input id="textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Search for text')}" value="${ text_filter or '' }">
-      <img id="loading" src="${ static('desktop/art/spinner.gif') }" />
+        <i class="fa fa-spinner fa-spin" id="loading"></i>
     </%def>
 
     <%def name="creation()">

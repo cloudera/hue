@@ -31,19 +31,19 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
           <li class="currentApp">
               <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
               % if editor_type == 'impala':
-                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" />
+                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }" />
                 ${ _('Impala Queries') }
               % elif editor_type == 'rdbms':
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('SQL Queries') }
               % elif editor_type == 'pig':
-                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" />
+                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }" />
                 ${ _('Pig Scripts') }
               % elif editor_type in ('beeswax', 'hive'):
-                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" />
+                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }" />
                 ${ _('Hive Queries') }
               % else:
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('Notebooks') }
               % endif
               </a>

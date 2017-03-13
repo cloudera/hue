@@ -237,7 +237,7 @@
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon"/>
+                  <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                   ${ _('Job Browser') }
                 </a>
               </li>

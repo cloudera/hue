@@ -31,7 +31,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
         <ul class="nav">
           <li class="currentApp">
             <a href="/${app_name}">
-              <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" />
+              <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" alt="${ _('HBase icon') }" />
               ${ _('HBase Browser') }
             </a>
           </li>
@@ -68,7 +68,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 <%def name="smartview(datasource)">
   <div class="smartview" data-bind="foreach: ${datasource}.items(), css: { 'gridView': ${datasource}.showGrid() }">
     <div class="smartview-row" data-bind="css:{selected:$data.isSelected()}, visible: $data.items().length > 0 || $data.isLoading()">
-      <h5 data-bind="click: lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="fa fa-check-square" data-bind="visible:$data.isSelected()"></i> <img data-bind="visible: $data.isLoading()" src="${ static('desktop/art/spinner.gif') }" />
+      <h5 data-bind="click: lockClickOrigin($data.select, $element)"><code class="row_key" data-bind="text: $data.row.slice(0, 100) + ($data.row.length > 100 ? '...' : '')"></code> <i class="fa fa-check-square" data-bind="visible:$data.isSelected()"></i> <i class="fa fa-spinner fa-spin" data-bind="visible: $data.isLoading()"></i>
         <span class="smartview-row-controls controls-hover-bottom">
           <button class="btn" data-bind="click: $data.reload, clickBubble: false" data-toggle="tooltip" title="${_('Refresh Row')}"><i class="fa fa-refresh"></i></button>
           % if can_write:
@@ -100,7 +100,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
               <pre data-bind="text: ($data.value().length > 146 ? $data.value().substring(0, 144) + '...' : $data.value()).replace(/(\r\n|\n|\r)/gm,''), click: editCell.bind(null, $data), clickBubble: false, visible: ! $data.isLoading() && ! $data.editing()"></pre>
               <textarea data-bind="visible: editing, hasFocus: editing, disable: ! app.views.tabledata.canWrite(), value: value, click: function() {}, clickBubble: false"></textarea>
             </div>
-            <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $data.isLoading()" style="display: none;" />
+            <i class="fa fa-spinner fa-spin" data-bind="visible: $data.isLoading()" style="display: none;"></i>
           </div>
         </li>
         <!-- /ko -->
@@ -387,7 +387,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
                 <!-- ko foreach: $data.content.history.items() -->
                   <li data-bind="css: { 'active': $data.timestamp == $parent.timestamp() }"><a data-bind="click: function() { $root.switchToHistorical($data) }, text: formatTimestamp($data.timestamp)" class="pointer"></a></li>
                 <!-- /ko -->
-                <li data-bind="visible: $data.content.history.loading()"><img src="${ static('desktop/art/spinner.gif') }" /></li>
+                <li data-bind="visible: $data.content.history.loading()"><i class="fa fa-spinner fa-spin"></i></li>
               </ul>
             </div>
           </div>
@@ -407,7 +407,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </script>
 
     <script id="cell_image_template" type="text/html">
-      <img data-bind="attr: { src: 'data:' + $data.mime() + ';base64,' + value()}"/>
+      <img data-bind="attr: { src: 'data:' + $data.mime() + ';base64,' + value()}" alt="${ _('Cell image') }"/>
       <input type="hidden" data-bind="value: value"/>
     </script>
 

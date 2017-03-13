@@ -27,7 +27,7 @@
 
   <div class="login-container">
       <a href="#" class="close logged-out link-message" data-dismiss="modal" style="display: none; margin: 10px">&times;</a>
-      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70"></div>
+      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }"></div>
       <h4 class="muted" style="margin-bottom: 50px; padding: 30px">
         <span class="logged-out link-message" style="display: none">
           ${ _('Your session expired and your current action requires to') }

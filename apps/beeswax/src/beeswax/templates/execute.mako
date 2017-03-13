@@ -441,7 +441,7 @@ ${ layout.menubar(section='query') }
               <ul data-bind="foreach: $root.design.watch.jobUrls" class="unstyled jobs-overlay">
                 <li><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a></li>
               </ul>
-              <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $root.design.isRunning()"/></pre>
+              <pre data-bind="visible: $root.design.watch.logs().length == 0">${_('There are currently no logs to visualize.')} <img src="${ static('desktop/art/spinner.gif') }" alt="${ _('Spinner') }" data-bind="visible: $root.design.isRunning()"/></pre>
               <pre data-bind="visible: $root.design.watch.logs().length > 0, text: $root.design.watch.logs().join('\n')"></pre>
             </div>
           </div>

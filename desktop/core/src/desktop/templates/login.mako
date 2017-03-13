@@ -70,7 +70,7 @@ ${ hueIcons.symbols() }
     </div>
     % else:
     <div class="logo">
-      <img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70">
+      <img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }">
     </div>
     % endif
 
@@ -143,7 +143,7 @@ ${ hueIcons.symbols() }
 
 <div class="trademark center muted">
   % if conf.CUSTOM.LOGO_SVG.get():
-    ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: text-top;"> -
+    ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: text-top;"  alt="${ _('Hue logo') }"> -
   % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
 </div>

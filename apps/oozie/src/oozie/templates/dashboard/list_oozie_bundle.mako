@@ -164,7 +164,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           <tfoot>
             <tr data-bind="visible: isLoading()">
               <td colspan="3" class="left">
-                <img src="${ static('desktop/art/spinner.gif') }" />
+                <i class="fa fa-spinner fa-spin"></i>
               </td>
             </tr>
             <tr data-bind="visible: actions().length == 0 && !isLoading()">
@@ -222,7 +222,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
           <tfoot>
           <tr data-bind="visible: isLoading()">
             <td colspan="10" class="left">
-              <img src="${ static('desktop/art/spinner.gif') }" />
+              <i class="fa fa-spinner fa-spin"></i>
             </td>
           </tr>
           <tr data-bind="visible: !isLoading() && actions().length == 0">
