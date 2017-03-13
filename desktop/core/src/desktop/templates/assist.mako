@@ -506,8 +506,7 @@ from notebook.conf import get_ordered_interpreters
         <span style="font-style: italic;">${_('Empty directory')}</span>
       </div>
       <div class="center" data-bind="visible: loading() && ! hasErrors()">
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+        <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
       </div>
       <div class="assist-errors" data-bind="visible: ! loading() && hasErrors()">
         <span>${ _('Error loading contents.') }</span>

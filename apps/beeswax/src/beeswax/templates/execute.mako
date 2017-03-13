@@ -211,8 +211,7 @@ ${ layout.menubar(section='query') }
           <div class="card-body">
             <!-- ko if: $root.fetchingImpalaSession() -->
             <div style="margin: 5px">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
             </div>
             <!-- /ko -->
 
@@ -390,8 +389,7 @@ ${ layout.menubar(section='query') }
         <div class="tab-content">
           <div class="active tab-pane" id="recentTab">
             <div id="recentLoader">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i>
             </div>
             <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
@@ -697,8 +695,7 @@ ${ layout.menubar(section='query') }
   <div id="saveResultsModal" class="modal hide fade">
     <div class="loader">
       <div class="overlay"></div>
-      <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-      <!--[if IE]><img class="spinner" src="${ static('desktop/art/spinner-big-inverted.gif') }"/><![endif]-->
+      <i class="fa fa-spinner fa-spin"></i>
     </div>
 
     <div class="modal-header">
