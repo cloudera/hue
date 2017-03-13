@@ -140,12 +140,13 @@ def new(request):
   return notebook(request)
 
 
-def browse(request, database, table):
+def browse(request, database, table, partition_spec=None):
   snippet = {'type': 'hive'}
-  sql_select = get_api(request, snippet).get_select_star_query(snippet, database, table)
+
+  statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
 
   editor_type = snippet['type']
-  editor = make_notebook(name='Browse', editor_type=editor_type, statement=sql_select, status='ready-execute')
+  editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
 
   return render('editor.mako', request, {
       'notebooks_json': json.dumps([editor.get_data()]),

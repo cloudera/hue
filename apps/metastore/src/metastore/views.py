@@ -532,6 +532,11 @@ def _massage_partition(database, table, partition):
         'database': database,
         'table': table.name,
         'partition_spec': urllib.quote(partition.partition_spec)
+    }),
+   'notebookUrl': reverse('notebook:browse', kwargs={
+        'database': database,
+        'table': table.name,
+        'partition_spec': urllib.quote(partition.partition_spec)
     })
   }
 

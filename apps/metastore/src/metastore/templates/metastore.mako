@@ -197,18 +197,24 @@ ${ components.menubar() }
       <tbody>
       <!-- ko foreach: values -->
       <tr>
-        <td data-bind="text: $index()+1"></td>
-        <td><a data-bind="attr: {'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a></td>
+        <td data-bind="text: $index() + 1"></td>
+        <td>
+          <!-- ko if: !IS_HUE_4 -->
+            <a data-bind="click: function() { browsePartition(notebookUrl, 'query'); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
+          <!-- /ko -->
+          <!-- ko if:  IS_HUE_4 -->
+            <a data-bind="attr: {'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
+          <!-- /ko -->
+        </td>
         <td data-bind="text: partitionSpec"></td>
         <td>
-          <a data-bind="attr: {'href': readUrl }"><i class="fa fa-th"></i> ${_('Data')}</a>
           <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function () { browsePartitionFiles(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
-              <i class="fa fa-file-o"></i> ${_('Files')}
+            <a data-bind="click: function () { browsePartition(browseUrl, 'files'); }" href="javascript:void(0)" title="${_('Browse partition files')}">
+              ${_('Files')}
             </a>
           <!-- /ko -->
           <!-- ko if: ! IS_HUE_4 -->
-            <a data-bind="attr: {'href': browseUrl }" title="${_('Browse partition files')}"><i class="fa fa-file-o"></i> ${_('Files')}</a>
+            <a data-bind="attr: {'href': browseUrl }" title="${_('Browse partition files')}">${_('Files')}</a>
           <!-- /ko -->
         </td>
       </tr>
@@ -231,7 +237,7 @@ ${ components.menubar() }
     <tbody>
       <!-- ko foreach: rows -->
         <tr>
-          <td data-bind="text: $index()+1"></td>
+          <td data-bind="text: $index() + 1"></td>
           <!-- ko foreach: $data -->
             <td data-bind="text: $data"></td>
           <!-- /ko -->
@@ -1164,12 +1170,16 @@ ${ components.menubar() }
     });
   }
 
-  function browsePartitionFiles(url) {
+  function browsePartition(url, type) {
     $.get(url, {
       format: "json"
     },function(resp) {
       if (resp.uri_path) {
-        huePubSub.publish('open.fb.folder', resp.uri_path.replace(/\/filebrowser\/view=/g, '') );
+        if (type == 'file') {
+          huePubSub.publish('open.fb.folder', resp.uri_path.replace(/\/filebrowser\/view=/g, '') );
+        } else {
+          huePubSub.publish('open.link', resp.uri_path);
+        }
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }
