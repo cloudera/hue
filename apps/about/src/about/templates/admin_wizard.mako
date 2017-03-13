@@ -58,8 +58,7 @@ ${ header.menubar() }
               <div class="card-body">
                 <div id="check-config-section" style="margin-bottom:20px">
                   <div class="spinner">
-                    <!--[if !IE]> --><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!-- <![endif]-->
-                    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                    <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
                   </div>
                   <div class="info hide"></div>
                 </div>
