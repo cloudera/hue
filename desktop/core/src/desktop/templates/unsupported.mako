@@ -81,7 +81,7 @@
 
 <body>
 <div class="header">
-  <img src="${ static('desktop/art/hue-logo-mini-white.png') }"/>
+  <img src="${ static('desktop/art/hue-logo-mini-white.png') }" alt="${ _('Hue logo') }"/>
 </div>
 
 <div class="footer"></div>

@@ -98,7 +98,7 @@ from aws import get_client
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" />
+                  <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" alt="${ _('File browser icon') }" />
                   ${ _('File Browser') }
                 </a>
               </li>

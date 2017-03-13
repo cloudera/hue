@@ -61,10 +61,10 @@
 
                 % if dashboard:
                 <a title="${ _('Switch to the editor') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
-                  <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" /> ${ _('Oozie Dashboard') }
+                  <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" alt="${ _('Oozie dashboard icon') }" /> ${ _('Oozie Dashboard') }
                 % else:
                 <a title="${ _('Switch to the dashboard') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
-                  <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" /> ${ _('Oozie Editor') }
+                  <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }" /> ${ _('Oozie Editor') }
                 % endif
                 </a>
                </li>

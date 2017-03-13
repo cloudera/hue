@@ -23,7 +23,7 @@
           <ul class="nav">
             <li class="currentApp">
               <a href="/rdbms">
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 ${ _('DB Query') }
               </a>
             </li>

@@ -90,7 +90,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
         <ul class="nav">
           <li class="currentApp">
             <a href="${ url('desktop.views.home') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('My documents') }
             </a>
            </li>
@@ -101,7 +101,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
         <ul class="nav">
           <li class="currentApp">
             <a href="${ url('desktop.views.home2') }">
-              <img src="${ static('desktop/art/home.png') }" class="app-icon" />
+              <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('New Home') }
             </a>
            </li>
@@ -122,24 +122,24 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
               <a href="#" data-toggle="dropdown"><i class="fa fa-plus-circle"></i> ${_('New document')}</a>
               <ul class="dropdown-menu" role="menu">
                 % if 'beeswax' in apps:
-                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon"/> ${_('Hive Query')}</a></li>
+                  <li><a href="${ url('beeswax:index') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                 % endif
                 % if 'impala' in apps:
-                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon"/> ${_('Impala Query')}</a></li>
+                  <li><a href="${ url('impala:index') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
                 % endif
                 % if 'pig' in apps:
-                  <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon"/> ${_('Pig Script')}</a></li>
+                  <li><a href="${ url('pig:index') }"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig Script')}</a></li>
                 % endif
                 % if 'spark' in apps:
-                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon"/> ${_('Spark Job')}</a></li>
+                  <li><a href="${ url('notebook:index') }"><img src="${ static(apps['spark'].icon_path) }" class="app-icon" alt="${ _('Spark icon') }"/> ${_('Spark Job')}</a></li>
                 % endif
                 % if 'oozie' in apps:
                 <li class="dropdown-submenu">
-                  <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon"/> ${_('Oozie Scheduler')}</a>
+                  <a href="#"><img src="${ static(apps['oozie'].icon_path) }" class="app-icon" alt="${ _('Oozie icon') }"/> ${_('Oozie Scheduler')}</a>
                   <ul class="dropdown-menu">
-                    <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/> ${_('Workflow')}</a></li>
-                    <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/> ${_('Coordinator')}</a></li>
-                    <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/> ${_('Bundle')}</a></li>
+                    <li><a href="${ url('oozie:new_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
+                    <li><a href="${ url('oozie:new_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator')}</a></li>
+                    <li><a href="${ url('oozie:new_bundle') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle')}</a></li>
                   </ul>
                 </li>
                 % endif
@@ -275,7 +275,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <script type="text/html" id="document-template">
   <tr>
-    <td style="width: 26px"><img data-bind="attr: { src: icon }" class="app-icon"></td>
+    <td style="width: 26px"><img data-bind="attr: { src: icon }" class="app-icon" alt="${ _('Document icon') }"></td>
     <td><a data-bind="attr: { href: url }, html: name"></a></td>
     <td data-bind="html: description"></td>
     <td data-bind="text: lastModified"></td>

@@ -13,6 +13,9 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+${'<%!'}
+from django.utils.translation import ugettext as _
+${'%>'}
 
 ${'<%!'}
 def is_selected(section, matcher):
@@ -30,7 +33,7 @@ ${'<%'}def name="menubar(section='')">
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon" />
+                <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon"  alt="${ _('App icon') }"/>
                 ${" ".join(word.capitalize() for word in app_name.split("_"))}
               </a>
              </li>

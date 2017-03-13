@@ -351,7 +351,7 @@ from desktop.views import commonheader, commonfooter, _ko
 
 <div class="player-toolbar" data-bind="visible: $root.isPlayerMode">
   <div class="pull-right pointer" data-bind="visible: $root.isPlayerMode, click: function(){ hueUtils.exitFullScreen(); $root.isPlayerMode(false); }"><i class="fa fa-times"></i></div>
-  <img src="${ static('desktop/art/icon_hue_48.png') }" />
+  <img src="${ static('desktop/art/icon_hue_48.png') }" alt="${ _('Hue logo') }" />
   <h4 data-bind="text: collection.label"></h4>
   <form class="form-search" data-bind="submit: searchBtn">
   <span data-bind="foreach: query.qs">

@@ -306,7 +306,7 @@ if USE_NEW_EDITOR.get():
         <span class="icon-bar"></span>
       </button>
       <a class="brand" href="#">
-        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" />
+        <img src="${ static('desktop/art/hue-logo-mini-white.png') }" alt="${ _('Hue logo') }" />
         ${get_title(title)}
       </a>
       <div class="nav-collapse collapse">

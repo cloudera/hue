@@ -77,7 +77,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <ul class="nav">
             <li class="currentApp">
               <a href="/${app_name}">
-                <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon"/>
+                <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                 ${ _('Job Browser') }
               </a>
             </li>
@@ -218,16 +218,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="breadcrumbs-icons">
 <!-- ko switch: type -->
   <!-- ko case: 'workflow' -->
-    <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon"/>
+    <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/>
   <!-- /ko -->
   <!-- ko case: 'workflow-action' -->
     <i class="fa fa-fw fa-code-fork"></i>
   <!-- /ko -->
   <!-- ko case: 'schedule' -->
-    <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon"/>
+    <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/>
   <!-- /ko -->
   <!-- ko case: 'bundle' -->
-    <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon"/>
+    <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/>
   <!-- /ko -->
 <!-- /ko -->
 </script>

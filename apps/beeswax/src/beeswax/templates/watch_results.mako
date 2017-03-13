@@ -199,7 +199,7 @@ ${layout.menubar(section='query')}
              <div style="text-align: center; padding: 5px; height: 30px">
                <span class="noMore hide"
                      style="color:#999999">${ _('You have reached the last record for this query.') }</span><img
-                     src="${ static('desktop/art/spinner.gif') }"
+                     src="${ static('desktop/art/spinner.gif') }" alt="${ _('Spinner') }"
                      class="spinner"
                      style="display: none;"/>
              </div>

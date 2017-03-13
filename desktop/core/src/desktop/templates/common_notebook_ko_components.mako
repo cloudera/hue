@@ -60,7 +60,7 @@ except ImportError, e:
           <li data-bind="click: function() { $parent.addNewSnippet($data) }">
             <div style="width: 30px; display:inline-block;">
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetImage -->
-            <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }">
+            <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }"  alt="${ _('Snippet icon') }">
             <!-- /ko -->
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetIcon -->
             <i style="margin-left: 2px; color: #338bb8;" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>

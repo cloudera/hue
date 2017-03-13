@@ -169,19 +169,19 @@
       </span>
 
       <!-- ko if: widgetType() == 'hive-widget' -->
-      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'hive2-widget' || widgetType() == 'hive-document-widget' -->
-      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px">2</sup>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'impala-widget' || widgetType() == 'impala-document-widget' -->
-      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_impala_48.png') }" class="widget-icon" alt="${ _('Impala icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'pig-widget' || widgetType() == 'pig-document-widget'  -->
-      <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_pig_48.png') }" class="widget-icon" alt="${ _('Pig icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'java-widget' || widgetType() == 'java-document-widget' -->
@@ -189,7 +189,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'sqoop-widget' || widgetType() == 'sqoop-document-widget' -->
-      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="widget-icon" alt="${ _('Sqoop icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'mapreduce-widget' || widgetType() == 'mapreduce-document-widget' -->
@@ -225,7 +225,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'spark-widget' || widgetType() == 'spark-document-widget' -->
-      <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon">
+      <img src="${ static('oozie/art/icon_spark_48.png') }" class="widget-icon" alt="${ _('Spark icon') }">
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'generic-widget' -->
@@ -687,7 +687,7 @@
     <!-- /ko -->
   <!-- /ko -->
   <!-- ko if: $parent.widgetType() == 'subworkflow-widget' && $parent.externalIdUrl()-->
-    <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon"/></a>
+    <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
   <!-- /ko -->
 </script>
 

@@ -30,7 +30,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
             <ul class="nav">
               <li class="currentApp">
                 <a href="/${app_name}">
-                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"/>
+                  <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"/>
                   ${ _('Pig Editor') }
                 </a>
               </li>
@@ -79,7 +79,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <tfoot>
           <tr data-bind="visible: isLoading()">
             <td colspan="3" class="left">
-              <img src="${ static('desktop/art/spinner.gif') }" />
+              <i class="fa fa-spinner fa-spin"></i>
             </td>
           </tr>
           <tr data-bind="visible: filteredScripts().length == 0 && !isLoading()">
@@ -532,7 +532,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
                 </div>
               </div>
             </script>
-            <pre id="withoutLogs">${ _('No available logs.') } <img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: currentScript().isRunning()"/></pre>
+            <pre id="withoutLogs">${ _('No available logs.') } <i class="fa fa-spinner fa-spin" data-bind="visible: currentScript().isRunning()"></i></pre>
             <pre id="withLogs" class="hide scroll"></pre>
           </div>
         </div>
@@ -639,7 +639,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
       <h3>${_('Logs')}</h3>
     </div>
     <div class="modal-body">
-      <img src="${ static('desktop/art/spinner.gif') }" class="hide" />
+      <i class="fa fa-spinner fa-spin" class="hide"></i>
       <pre class="scroll hide"></pre>
     </div>
     <div class="modal-footer">
