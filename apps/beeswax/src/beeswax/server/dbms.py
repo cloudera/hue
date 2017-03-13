@@ -813,7 +813,7 @@ class HiveServer2Dbms(object):
     return self.client.get_partitions(db_name, table.name, partition_spec, max_parts=max_parts, reverse_sort=reverse_sort)
 
 
-  def get_partition(self, db_name, table_name, partition_spec):
+  def get_partition(self, db_name, table_name, partition_spec, generate_ddl_only=False):
     table = self.get_table(db_name, table_name)
     partitions = self.get_partitions(db_name, table, partition_spec=partition_spec)
 
@@ -825,7 +825,10 @@ class HiveServer2Dbms(object):
 
     hql = "SELECT * FROM `%s`.`%s` WHERE %s" % (db_name, table_name, partition_query)
 
-    return self.execute_statement(hql)
+    if generate_ddl_only:
+      return hql
+    else:
+      return self.execute_statement(hql)
 
 
   def describe_partition(self, db_name, table_name, partition_spec):

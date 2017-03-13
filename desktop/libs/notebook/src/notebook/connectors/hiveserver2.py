@@ -23,6 +23,7 @@ import logging
 import re
 import StringIO
 import struct
+import urllib
 
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
@@ -704,14 +705,18 @@ DROP TABLE IF EXISTS `%(table)s`;
     )
 
 
-  def get_select_star_query(self, snippet, database, table):
+  def get_browse_query(self, snippet, database, table, partition_spec=None):
     db = self._get_db(snippet)
     table = db.get_table(database, table)
     if table.is_impala_only:
       snippet['type'] = 'impala'
       db = self._get_db(snippet)
 
-    return db.get_select_star_query(database, table, limit=100)
+    if partition_spec is not None:
+      decoded_spec = urllib.unquote(partition_spec)
+      return db.get_partition(database, table.name, decoded_spec, generate_ddl_only=True)
+    else:
+      return db.get_select_star_query(database, table, limit=100)
 
 
   def _get_handle(self, snippet):
