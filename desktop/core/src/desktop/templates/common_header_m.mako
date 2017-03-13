@@ -306,7 +306,7 @@ if USE_NEW_EDITOR.get():
       </a>
       <div class="nav-collapse collapse">
         <ul class="nav">
-          <li><a title="${_('Assist')}" rel="navigator-tooltip" href="${ url('desktop.views.assist_m') }">${_('Assist')}</a></li>
+          <li><a title="${_('Assist')}" data-rel="navigator-tooltip" href="${ url('desktop.views.assist_m') }">${_('Assist')}</a></li>
           % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
              <li><a href="${ url('notebook:editor_m') }?type=hive">${_('Hive')}</a></li>
