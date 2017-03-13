@@ -476,6 +476,7 @@ class HiveServerClient:
   DEFAULT_TABLE_TYPES = [
     'TABLE',
     'VIEW',
+    'EXTERNAL_TABLE',
   ]
 
   def __init__(self, query_server, user):
