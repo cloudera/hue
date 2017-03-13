@@ -814,7 +814,7 @@ from notebook.conf import get_ordered_interpreters
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       ko.bindingHandlers.assistFileDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {
@@ -1529,7 +1529,7 @@ from notebook.conf import get_ordered_interpreters
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function FunctionsPanel(params) {
         var self = this;
@@ -1687,7 +1687,7 @@ from notebook.conf import get_ordered_interpreters
     <!-- /ko -->
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function AssistantPanel(params) {
         var self = this;

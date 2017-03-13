@@ -799,7 +799,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   (function () {
 

@@ -121,7 +121,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function MultiGroupAlternative(alt, params, initiallyChecked) {
         var self = this;
@@ -212,7 +212,7 @@ from desktop.views import _ko
     })();
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function PropertySelectorViewModel(params) {
@@ -375,7 +375,7 @@ from desktop.views import _ko
     <input type="text" class="input-small" data-bind="numericTextInput: { value: value, precision: 0, allowEmpty: true }" /> <select class="input-mini" data-bind="options: units, value: selectedUnit" />
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       var JVM_MEM_PATTERN = /([0-9]+)([MG])$/;
       var UNITS = {'MB': 'M', 'GB': 'G'};
@@ -437,7 +437,7 @@ from desktop.views import _ko
     <div class="clearfix"></div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function KeyValueListInputViewModel(params) {
@@ -509,7 +509,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function NameValueListInputViewModel(params) {
@@ -574,7 +574,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function FunctionListInputViewModel(params) {
@@ -627,7 +627,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       var identifyType = function (path) {
@@ -706,7 +706,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       function CsvListInputViewModel(params) {
         this.valueObservable = params.value;

@@ -127,7 +127,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     var NavigatorSearch = (function () {
 

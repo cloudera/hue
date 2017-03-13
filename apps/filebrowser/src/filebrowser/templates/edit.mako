@@ -96,7 +96,7 @@ ${ fb_components.menubar() }
     </form>
 </div>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     $(document).ready(function () {
       $("#saveAsBtn").click(function () {
         $("#saveAsModal").modal({

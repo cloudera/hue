@@ -339,7 +339,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/home.vm.js') }"></script>
 <script src="${ static('desktop/js/share.vm.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var viewModel, shareViewModel, JSON_USERS_GROUPS;
 
   var JSON_TAGS = ${ json_tags | n,unicode };
@@ -506,7 +506,7 @@ ${ commonshare() | n,unicode }
 
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 $(document).ready(function(){
   var currentStep = "tourStep1";
 

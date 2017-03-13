@@ -171,7 +171,7 @@ ${ assist.assistPanel() }
 </div>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   (function () {
     ko.options.deferUpdates = true;
 

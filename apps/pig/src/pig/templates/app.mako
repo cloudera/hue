@@ -752,7 +752,7 @@ ${ commonshare() | n,unicode }
   }
 </style>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var LABELS = {
     KILL_ERROR: "${ _('The Pig job could not be killed.') }",
     TOOLTIP_PLAY: "${ _('Run this Pig script.') }",

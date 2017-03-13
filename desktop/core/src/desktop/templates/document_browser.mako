@@ -796,7 +796,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       ko.bindingHandlers.trashDroppable = {
         init: function(element, valueAccessor, allBindings, boundEntry) {

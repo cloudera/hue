@@ -337,7 +337,7 @@
     </div>
   </div>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     $(document).ready(function(){
 
       $("*").on("focusin", false); //fixes an infinite loop on Firefox
@@ -428,7 +428,7 @@
   <script src="${ static('desktop/ext/js/bootstrap-datepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
   <script src="${ static('desktop/ext/js/bootstrap-timepicker.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     var DATE_FORMAT = "MM/DD/YYYY";
     var TIME_FORMAT = "hh:mm A";

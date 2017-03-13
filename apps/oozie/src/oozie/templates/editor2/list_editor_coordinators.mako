@@ -144,7 +144,7 @@ ${ commonimportexport(request) | n,unicode }
 <script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var Editor = function () {
     var self = this;
 

@@ -87,7 +87,7 @@ from django.utils.translation import ugettext as _
    }
 </style>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $(".fileChooserBtn").click(function (e) {
       e.preventDefault();

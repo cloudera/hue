@@ -156,7 +156,7 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     var IS_HUE_4 = false;
   </script>
 

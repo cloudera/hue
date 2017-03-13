@@ -61,7 +61,7 @@ ${layout.menubar(section='permissions')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("#id_groups").jHueSelector({
       selectAllLabel: "${_('Select all')}",

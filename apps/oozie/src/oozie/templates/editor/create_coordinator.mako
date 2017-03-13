@@ -140,7 +140,7 @@ ${ layout.menubar(section='coordinators') }
 <script type="text/javascript" src="${ static('oozie/js/coordinator.js') }"></script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
 
     % if enable_cron_scheduling:

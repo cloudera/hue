@@ -76,7 +76,7 @@ except ImportError, e:
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       var WHEEL_RADIUS = 75;
       var PLUS_ICON_RADIUS = 27.859; // FA-5X
@@ -312,7 +312,7 @@ except ImportError, e:
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function DownloadResultsViewModel (params, element) {
@@ -489,7 +489,7 @@ except ImportError, e:
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function AceKeyboardShortcutsViewModel () {

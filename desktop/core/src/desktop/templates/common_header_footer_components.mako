@@ -24,7 +24,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
 <%def name="header_i18n_redirection(user, is_s3_enabled, apps)">
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     var LOGGED_USERNAME = '${ user.username }';
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';

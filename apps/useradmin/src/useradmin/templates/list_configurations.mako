@@ -129,7 +129,7 @@ ${layout.menubar(section='configurations')}
 
 ${ configKoComponents.config() }
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   (function () {
     var GroupOverride = function (group, allGroups) {
       var self = this;

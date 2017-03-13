@@ -302,7 +302,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 //// Contexts
 // Context matches up with jobsub.templates.js and various templates defined there.
 // If there is an update to any of the templates,

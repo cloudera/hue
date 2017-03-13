@@ -67,7 +67,7 @@ ${ layout.menubar(section='users') }
 
 <script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
 $(document).ready(function(){
  var currentStep = "step1";

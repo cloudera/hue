@@ -107,7 +107,7 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   $(document).ready(function () {
 
