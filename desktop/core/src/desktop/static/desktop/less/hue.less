@@ -39,10 +39,8 @@ body {
 
 .main-page {
   position: relative;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
+  .display-flex;
+  .flex-direction(column);
   height: 100%;
   width: 100%;
   margin: 0;
@@ -51,22 +49,17 @@ body {
 }
 
 .content-wrapper {
-  -ms-flex: 1 1 100%;
-  flex: 1 1 100%;
+  .flex(1 1 100%);
+  .display-flex;
+  .flex-direction(row);
   position: relative;
-  display: -ms-flexbox;
-  display: flex;
   width: 100%;
-  -ms-flex-direction: column;
-  flex-direction: row;
   background-color: @cui-white;
 }
 
 .top-nav {
-  -ms-flex: 0 0 50px;
-  flex: 0 0 50px;
-  display: -ms-flexbox;
-  display: flex;
+  .flex(0 0 50px);
+  .display-flex;
   position: relative;
   background-color: @hue-primary-color-dark;
   width: 100%;
@@ -74,20 +67,17 @@ body {
 }
 
 .top-nav-left {
-  -ms-flex: 0 0 300px;
-  flex: 0 0 300px;
+  .flex(0 0 300px);
   line-height: 45px;
 }
 
 .top-nav-middle {
-  -ms-flex: 1;
-  flex: 1;
+  .flex(1);
   width: 100%;
 }
 
 .top-nav-right {
-  -ms-flex: 0 0 300px;
-  flex: 0 0 300px;
+  .flex(0 0 300px);
 }
 
 .top-nav-right .compose-action {
@@ -120,7 +110,7 @@ body {
 }
 
 .notification-history-title {
-  background-color: #F1F1F1;
+  background-color: @cui-gray-050;
   padding: 4px;
 }
 
@@ -141,7 +131,7 @@ body {
 }
 
 .compose-action .btn {
-  color: #f9f9f9;
+  color: @cui-gray-050;
   border: 1px solid transparent;
   background-color: transparent;
   background-image: none;
@@ -157,7 +147,7 @@ body {
 
 .jobs-badge {
   color: @hue-primary-color-dark;
-  background-color: #f9f9f9;
+  background-color: @cui-gray-050;
   float: right;
   margin-left: 4px;
   padding: 1px 5px;
@@ -236,34 +226,32 @@ body {
 }
 
 .search-container {
-  display: -ms-flexbox;
-  display: flex;
+  .display-flex;
+  .flex(1 1 29px);
   position: relative;
-  -ms-flex: 1 1 29px;
-  flex: 1 1 29px;
   padding: 10px;
 }
 
 .search-container > input {
+  .flex(1 1 100%);
   border-bottom-left-radius: 4px;
   border-top-left-radius: 4px;
-  border: 1px solid #DDD;
+  border: 1px solid @cui-gray-300;
   border-right: none;
-  flex: 1 1 100%;
   height: 27px;
   box-shadow: none;
 }
 
 .search-container > a {
+  .flex(0 0 31px);
   cursor: pointer;
-  flex: 0 0 31px;
   border-bottom-right-radius: 4px;
   border-top-right-radius: 4px;
-  border: 1px solid #DDD;
+  border: 1px solid @cui-gray-300;
   box-shadow: none;
   font-size: 15px;
   line-height: 29px;
-  background-color: #f9f9f9;
+  background-color: @cui-gray-050;
   width: 31px;
   height: 29px;
 }
@@ -274,8 +262,7 @@ body {
 
 .left-panel,
 .right-panel {
-  -ms-flex: 0;
-  flex: 0;
+  .flex(0);
   position: relative;
   background-color: @cui-white;
   min-width: 250px;
@@ -283,11 +270,12 @@ body {
 
 .side-panel-closed {
   min-width: 0;
+  .flex-basis(0) !important;
+  width: 0 !important;
 }
 
 .resizer {
-  -ms-flex: 0;
-  flex: 0;
+  .flex(0);
   height: 100%;
   min-width: 4px;
   cursor: col-resize;
@@ -297,14 +285,13 @@ body {
   position: absolute;
   height: 100%;
   width: 2px;
-  background-color: #F1F1F1;
+  background-color: @cui-gray-050;
 }
 
 .page-content {
-  -ms-flex: 1;
-  flex: 1;
+  .flex(1);
   position: relative;
-  overflow-x: hidden!important;
+  overflow-x: hidden !important;
 }
 
 .page-content .content-panel {
@@ -315,7 +302,7 @@ body {
 .left-nav {
   position:absolute;
   background-color: @hue-primary-color-dark;
-  color: #f9f9f9;
+  color: @cui-gray-050;
   z-index: 1048;
   top: 0;
   left: 0;
@@ -323,10 +310,7 @@ body {
   width: 0;
   overflow-x: hidden;
   white-space: nowrap;
-  -webkit-transition: 0.2s width;
-  -moz-transition: 0.2s width;
-  -ms-transition: 0.2s width;
-  transition: 0.2s width;
+  .hue-ease-transition(width);
 }
 
 .left-nav-menu {
@@ -359,12 +343,12 @@ body {
 .left-nav-menu li a {
   font-size: 14px;
   letter-spacing: 1px;
-  color: #f9f9f9;
+  color: @cui-gray-050;
   .hue-ease-transition(color);
 }
 
 .left-nav-menu li:not(.header):hover a {
-  color: #003F6C;
+  color: @cui-blue-900;
 }
 
 .left-nav-menu li a:hover {
@@ -393,17 +377,14 @@ body {
 }
 
 .left-nav-visible .left-nav-drop {
-  -webkit-transition: 0.4s width;
-  -moz-transition: 0.4s width;
-  -ms-transition: 0.4s width;
-  transition: 0.4s width;
   width: 200px;
   position: fixed;
+  .hue-ease-transition(width);
 }
 
 .inactive-action,
 .inactive-action a {
-  color: #999;
+  color: @cui-gray-600;
   .hue-ease-transition(color);
 }
 
@@ -412,7 +393,7 @@ body {
 }
 
 .inactive-action.disabled {
-  color: #eee !important;
+  color: @hue-disabled-color !important;
   cursor: default !important;
 }
 
@@ -422,7 +403,7 @@ body {
 }
 
 .inactive-action:focus {
-  color: #999;
+  color: @cui-gray-600;
 }
 
 .blue {
@@ -430,14 +411,14 @@ body {
 }
 
 .black-link {
-  color: #444;
+  color: @cui-gray-800;
   .hue-ease-transition(color);
 }
 
 .black-link:active,
 .black-link:focus,
 .black-link:visited {
-  color: #444;
+  color: @cui-gray-800;
 }
 
 .black-link:hover {
@@ -582,11 +563,9 @@ a:visited {
 }
 
 .hue-popover {
+  .display-flex;
   position: absolute;
-  display: -ms-flexbox;
-  display: flex;
-  -ms-flex-direction: column;
-  flex-direction: column;
+  .flex-direction(column);
   top: 0;
   left: 0;
   z-index: 1060;
@@ -678,8 +657,7 @@ a:visited {
 }
 
 .hue-popover-title {
-  -ms-flex: 0 1 auto;
-  flex: 0 1 auto;
+  .flex(0 1 auto);
   padding: 6px 10px;
   margin: 0;
   font-size: 0.9rem;
@@ -731,7 +709,7 @@ a:visited {
 .hue-inner-drop-down > li,
 .hue-context-menu > li {
   min-width: 170px;
-  color: #e5e5e5;
+  color: @cui-gray-200;
 }
 
 .hue-inner-drop-down > li > a {
@@ -743,7 +721,7 @@ a:visited {
   vertical-align: middle;
   padding: 6px 16px 6px 16px;
 
-  color: #333;
+  color: @cui-gray-800;
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
@@ -758,7 +736,7 @@ a:visited {
   line-height: 22px;
   vertical-align: middle;
   padding: 6px 16px 6px 38px;
-  color: #333;
+  color: @cui-gray-800;
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
@@ -774,7 +752,7 @@ a:visited {
   vertical-align: middle;
   padding: 6px 16px 6px 38px;
   cursor: default;
-  color: #CCC;
+  color: @cui-gray-400;
   text-decoration: none;
   font-weight: 400;
   white-space: nowrap;
@@ -793,7 +771,7 @@ a:visited {
   left: 13px;
   right: auto;
   top: 6px;
-  color: #CCC;
+  color: @cui-gray-400;
   font-size: 17px;
   line-height: 22px;
   vertical-align: middle;
@@ -806,7 +784,7 @@ a:visited {
   right: auto;
   line-height: 22px;
   height: 24px;
-  color: #555;
+  color: @cui-gray-800;
   font-size: 17px;
   vertical-align: middle;
 }
@@ -819,7 +797,7 @@ a:visited {
   line-height: 22px;
   height: 24px;
 
-  color: #555;
+  color: @cui-gray-800;
   font-size: 12px;
   vertical-align: middle;
 }
@@ -828,7 +806,7 @@ a:visited {
   height: 1px;
   margin: 9px 0;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background-color: @cui-gray-200;
 }
 
 #sqlContextPopover .hue-popover {
@@ -841,7 +819,7 @@ a:visited {
   margin: 10px 10px 0 10px;
   background-color: transparent;
   border: none;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid @cui-gray-050;
   padding-bottom: 8px;
 }
 
@@ -950,7 +928,7 @@ a:visited {
 }
 
 .uploadstatus {
-  border: 1px solid #d8d8d8;
+  border: 1px solid @cui-gray-300;
   border-bottom: none;
   bottom: 0;
   right: 60px;
@@ -966,7 +944,7 @@ a:visited {
 }
 
 .uploadstatusbar {
-  background-color: #d9edf7;
+  background-color: @hue-primary-color-light;
   height: 4px;
   bottom: 0;
   left: 0;
@@ -976,7 +954,7 @@ a:visited {
 }
 
 .uploadstatusbar div {
-  background-color: #338bb8;
+  background-color: @hue-primary-color-dark;
   height: 4px;
   width: 30%;
 }
@@ -987,26 +965,26 @@ a:visited {
 
 .progress-row-bar {
   height: 1px;
-  background-color: #338BB8;
+  background-color: @hue-primary-color-dark;
   width: 0;
   margin-top: 3px;
 }
 
 .progress .bar-upload {
-  background-color: #338BB8!important;
+  background-color: @hue-primary-color-dark !important;
 }
 
 #importerComponents {
   .step-indicator-fixed {
-    position: initial!important;
+    position: initial !important;
   }
   .vertical-spacer {
-    height: 0!important;
+    height: 0 !important;
   }
 }
 
 .help-inline.muted {
-  color: #999;
+  color: @cui-gray-600;
 }
 
 .vertical-align-top {
@@ -1014,6 +992,6 @@ a:visited {
 }
 
 .form-actions {
-  width: initial!important;
-  position: initial!important;
+  width: initial !important;
+  position: initial !important;
 }
