@@ -191,13 +191,13 @@ ${ hueIcons.symbols() }
     % if 'filebrowser' in apps:
       % if not is_s3_enabled:
       <li class="hide1380">
-        <a title="${_('Manage HDFS')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
+        <a title="${_('Manage HDFS')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
           <i class="fa fa-file"></i>&nbsp;${_('File Browser')}&nbsp;
         </a>
       </li>
       % else:
         <li class="dropdown hide1380">
-          <a title="${_('File Browsers')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+          <a title="${_('File Browsers')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
             <i class="fa fa-file"></i>&nbsp;${_('File Browsers')} <b class="caret"></b>
           </a>
           <ul role="menu" class="dropdown-menu">
@@ -211,27 +211,27 @@ ${ hueIcons.symbols() }
         </li>
       % endif
       <li class="hideMoreThan1380">
-        <a title="${_('HDFS Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
+        <a title="${_('HDFS Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}">
           <i class="fa fa-file"></i>
         </a>
       </li>
       <li class="hideMoreThan1380">
         % if is_s3_enabled:
-          <a title="${_('S3 Browser')}" rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
+          <a title="${_('S3 Browser')}" data-rel="navigator-tooltip" href="/${apps['filebrowser'].display_name}/view=S3A://">
             <i class="fa fa-cubes"></i>
           </a>
         % endif
       </li>
     % endif
     % if 'jobbrowser' in apps:
-      <li class="hide1380"><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
-      <li class="hideMoreThan1380"><a title="${_('Job Browser')}" rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
+      <li class="hide1380"><a title="${_('Manage jobs')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a></li>
+      <li class="hideMoreThan1380"><a title="${_('Job Browser')}" data-rel="navigator-tooltip" href="/${apps['jobbrowser'].display_name}"><i class="fa fa-list-alt"></i></a></li>
       <% from jobbrowser.conf import ENABLE_V2 %>
       % if ENABLE_V2.get():
-        <li class="hide1380"><a title="${_('Manage jobs')}" rel="navigator-tooltip" href="/jobbrowser/apps">
+        <li class="hide1380"><a title="${_('Manage jobs')}" data-rel="navigator-tooltip" href="/jobbrowser/apps">
           <i class="fa fa-list-alt"></i>&nbsp;${_('Job Browser 2')}&nbsp;<span id="jobBrowserCount" class="badge badge-warning hide" style="padding-top:0;padding-bottom: 0"></span></a>
         </li>
-        <li class="hideMoreThan1380"><a title="${_('Job Browser 2')}" rel="navigator-tooltip" href="/jobbrowser/apps"><i class="fa fa-list-alt"></i></a></li>
+        <li class="hideMoreThan1380"><a title="${_('Job Browser 2')}" data-rel="navigator-tooltip" href="/jobbrowser/apps"><i class="fa fa-list-alt"></i></a></li>
       % endif
     % endif
     <%
@@ -239,7 +239,7 @@ ${ hueIcons.symbols() }
     %>
     % if view_profile:
       <li class="dropdown">
-        <a title="${ _('Administration') }" href="#" rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
+        <a title="${ _('Administration') }" href="#" data-rel="navigator-tooltip" data-toggle="dropdown" class="dropdown-toggle">
           <i class="fa fa-cogs"></i>&nbsp;${user.username}&nbsp;
           <b class="caret"></b>
         </a>
@@ -259,13 +259,13 @@ ${ hueIcons.symbols() }
         </ul>
       </li>
     % else:
-      <li><a title="" rel="navigator-tooltip" href="#"><i class="fa fa-user"></i>&nbsp;${user.username}</a></li>
+      <li><a title="" data-rel="navigator-tooltip" href="#"><i class="fa fa-user"></i>&nbsp;${user.username}</a></li>
     % endif
     % if 'help' in apps:
-    <li><a title="${_('Documentation')}" rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
+    <li><a title="${_('Documentation')}" data-rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
     % endif
     <li id="jHueTourFlagPlaceholder"></li>
-    <li><a title="${_('Sign out')}" rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
+    <li><a title="${_('Sign out')}" data-rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
   </ul>
   % else:
   <ul class="nav nav-pills" style="margin-right: 40px">
@@ -274,20 +274,20 @@ ${ hueIcons.symbols() }
   % endif
 
   </div>
-    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" rel="navigator-tooltip" href="/about">
+    <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" data-rel="navigator-tooltip" href="/about">
       <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
         <use xlink:href="#hue-logo"></use>
       </svg>
     </a>
     % if user.is_authenticated() and section != 'login':
      <ul class="nav nav-pills pull-left">
-       <li><a title="${_('My documents')}" rel="navigator-tooltip" href="${ home_url }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
+       <li><a title="${_('My documents')}" data-rel="navigator-tooltip" href="${ home_url }" style="padding-bottom:2px!important"><i class="fa fa-home" style="font-size: 19px"></i></a></li>
        <%
          query_apps = count_apps(apps, ['beeswax', 'impala', 'rdbms', 'pig', 'jobsub', 'spark']);
        %>
        % if query_apps[1] > 1:
        <li class="dropdown oozie">
-         <a title="${_('Query data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-terminal inline-block hideMoreThan950"></i><span class="hide950">Query Editors</span> <b class="caret"></b></a>
+         <a title="${_('Query data')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-terminal inline-block hideMoreThan950"></i><span class="hide950">Query Editors</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
@@ -334,11 +334,11 @@ ${ hueIcons.symbols() }
          <% notebooks = [d.content_object.to_dict() for d in Document.objects.get_docs(user, Document2, extra='notebook') if not d.content_object.is_history] %>
          % if not notebooks:
            <li>
-             <a title="${_('Notebook')}" rel="navigator-tooltip" href="${ url('notebook:new') }"><i class="fa fa-files-o hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span></a>
+             <a title="${_('Notebook')}" data-rel="navigator-tooltip" href="${ url('notebook:new') }"><i class="fa fa-files-o hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span></a>
            </li>
          % else:
            <li class="dropdown">
-             <a title="${_('Notebook')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+             <a title="${_('Notebook')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
                <i class="fa fa-files-o inline-block hideMoreThan950"></i><span class="hide950">${_('Notebooks')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
@@ -362,7 +362,7 @@ ${ hueIcons.symbols() }
        %>
        % if data_apps[1] > 1:
        <li class="dropdown">
-         <a title="${_('Manage data')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-database inline-block hideMoreThan950"></i><span class="hide950">Data Browsers</span> <b class="caret"></b></a>
+         <a title="${_('Manage data')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-database inline-block hideMoreThan950"></i><span class="hide950">Data Browsers</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            % if 'metastore' in apps:
              <li><a href="/${apps['metastore'].display_name}"><img src="${ static(apps['metastore'].icon_path) }" class="app-icon" alt="${ _('Metastore icon') }"/> ${_('Metastore Tables')}</a></li>
@@ -383,7 +383,7 @@ ${ hueIcons.symbols() }
        % endif
        % if 'oozie' in apps:
        <li class="dropdown oozie">
-         <a title="${_('Schedule with Oozie')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-random inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
+         <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-random inline-block hideMoreThan950"></i><span class="hide950">Workflows</span> <b class="caret"></b></a>
          <ul role="menu" class="dropdown-menu">
            <li class="dropdown-submenu">
              <a href="${ url('oozie:index') }"><img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon"  alt="${ _('Oozie dashboard icon') }"/> ${_('Dashboards')}</a>
@@ -424,11 +424,11 @@ ${ hueIcons.symbols() }
          <% collections = controller.get_shared_search_collections() %>
          % if not collections:
            <li>
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
+             <a title="${_('Solr Search')}" data-rel="navigator-tooltip" href="${ url('search:index') }">${_('Search')}</a>
            </li>
          % else:
            <li class="dropdown">
-             <a title="${_('Solr Search')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
+             <a title="${_('Solr Search')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle">
                <i class="fa fa-search inline-block hideMoreThan950"></i><span class="hide950">${_('Search')}</span> <b class="caret"></b>
              </a>
              <ul role="menu" class="dropdown-menu">
@@ -456,7 +456,7 @@ ${ hueIcons.symbols() }
        % if 'security' in apps:
          <% from security.conf import HIVE_V1, HIVE_V2, SOLR_V2 %>
          <li class="dropdown">
-           <a title="${_('Hadoop Security')}" rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-unlock inline-block hideMoreThan950"></i><span class="hide950">Security</span> <b class="caret"></b></a>
+           <a title="${_('Hadoop Security')}" data-rel="navigator-tooltip" href="#" data-toggle="dropdown" class="dropdown-toggle"><i class="fa fa-unlock inline-block hideMoreThan950"></i><span class="hide950">Security</span> <b class="caret"></b></a>
            <ul role="menu" class="dropdown-menu">
              % if HIVE_V1.get():
              <li><a href="${ url('security:hive') }">&nbsp;<img src="/static/metastore/art/icon_metastore_48.png" class="app-icon" alt="${ _('Metastore icon') }"> ${_('Hive Tables')}</a></li>

@@ -253,7 +253,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         placement: "bottom"
       });
 
-      $("[rel='navigator-tooltip']").tooltip({
+      $("[data-rel='navigator-tooltip']").tooltip({
         delay: 0,
         placement: "bottom"
       });
@@ -300,7 +300,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         openTimeout = window.setTimeout(function () {
           $(".navigator li.open").removeClass("open");
           $(".navigator .nav-pills li.dropdown > ul.dropdown-menu").hide();
-          $("[rel='navigator-tooltip']").tooltip("hide");
+          $("[data-rel='navigator-tooltip']").tooltip("hide");
           _this.find("ul.dropdown-menu:eq(0)").show();
         }, _timeout);
       }

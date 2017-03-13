@@ -48,7 +48,7 @@ ${ hueIcons.symbols() }
   <div class="pull-right">
 
   <ul class="nav nav-pills">
-    <li><a href="http://gethue.com" target="_blank" title="${_('Go to gethue.com')}" rel="navigator-tooltip" data-placement="left"><i class="fa fa-globe"></i></a></li>
+    <li><a href="http://gethue.com" target="_blank" title="${_('Go to gethue.com')}" data-rel="navigator-tooltip" data-placement="left"><i class="fa fa-globe"></i></a></li>
   </ul>
 
   </div>
