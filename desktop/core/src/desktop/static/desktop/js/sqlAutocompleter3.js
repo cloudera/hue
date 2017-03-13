@@ -56,34 +56,6 @@ var AutocompleteResults = (function () {
 
   var POPULAR_CATEGORIES = [CATEGORIES.POPULAR_AGGREGATE, CATEGORIES.POPULAR_GROUP_BY, CATEGORIES.POPULAR_ORDER_BY, CATEGORIES.POPULAR_FILTER, CATEGORIES.POPULAR_ACTIVE_JOIN, CATEGORIES.POPULAR_JOIN_CONDITION, CATEGORIES.POPULAR_JOIN];
 
-  var hiveReservedKeywords = {
-    ALL: true, ALTER: true, AND: true, ARRAY: true, AS: true, AUTHORIZATION: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BOTH: true, BY: true, CASE: true, CAST: true,
-    CHAR: true, COLUMN: true, CONF: true, CREATE: true, CROSS: true, CUBE: true, CURRENT: true, CURRENT_DATE: true, CURRENT_TIMESTAMP: true, CURSOR: true,
-    DATABASE: true, DATE: true, DECIMAL: true, DELETE: true, DESCRIBE: true, DISTINCT: true, DOUBLE: true, DROP: true, ELSE: true, END: true, EXCHANGE: true, EXISTS: true,
-    EXTENDED: true, EXTERNAL: true, FALSE: true, FETCH: true, FLOAT: true, FOLLOWING: true, FOR: true, FROM: true, FULL: true, FUNCTION: true, GRANT: true, GROUP: true,
-    GROUPING: true, HAVING: true, IF: true, IMPORT: true, IN: true, INNER: true, INSERT: true, INT: true, INTERSECT: true, INTERVAL: true, INTO: true, IS: true, JOIN: true, LATERAL: true,
-    LEFT: true, LESS: true, LIKE: true, LOCAL: true, MACRO: true, MAP: true, MORE: true, NONE: true, NOT: true, NULL: true, OF: true, ON: true, OR: true, ORDER: true, OUT: true, OUTER: true, OVER: true,
-    PARTIALSCAN: true, PARTITION: true, PERCENT: true, PRECEDING: true, PRESERVE: true, PROCEDURE: true, RANGE: true, READS: true, REDUCE: true,
-    REGEXP: true, REVOKE: true, RIGHT: true, RLIKE: true, ROLLUP: true, ROW: true, ROWS: true,
-    SELECT: true, SET: true, SMALLINT: true, TABLE: true, TABLESAMPLE: true, THEN: true, TIMESTAMP: true, TO: true, TRANSFORM: true, TRIGGER: true, TRUE: true,
-    TRUNCATE: true, UNBOUNDED: true, UNION: true, UNIQUEJOIN: true, UPDATE: true, USER: true, USING: true, VALUES: true, VARCHAR: true, WHEN: true, WHERE: true,
-    WINDOW: true, WITH: true
-  };
-
-  var extraHiveReservedKeywords = {
-    ASC: true, CLUSTER: true, DESC: true, DISTRIBUTE: true, FORMATTED: true, FUNCTION: true, INDEX: true, INDEXES: true, LIMIT: true, LOCK: true, SCHEMA: true, SORT: true
-  };
-
-  var impalaReservedKeywords = {
-    ADD: true, AGGREGATE: true, ALL: true, ALTER: true, AND: true, API_VERSION: true, AS: true, ASC: true, AVRO: true, BETWEEN: true, BIGINT: true, BINARY: true, BOOLEAN: true, BY: true, CACHED: true, CASE: true, CAST: true, CHANGE: true, CHAR: true, CLASS: true, CLOSE_FN: true,
-    COLUMN: true, COLUMNS: true, COMMENT: true, COMPUTE: true, CREATE: true, CROSS: true, DATA: true, DATABASE: true, DATABASES: true, DATE: true, DATETIME: true, DECIMAL: true, DELIMITED: true, DESC: true, DESCRIBE: true, DISTINCT: true, DIV: true, DOUBLE: true, DROP: true, ELSE: true, END: true,
-    ESCAPED: true, EXISTS: true, EXPLAIN: true, EXTERNAL: true, FALSE: true, FIELDS: true, FILEFORMAT: true, FINALIZE_FN: true, FIRST: true, FLOAT: true, FORMAT: true, FORMATTED: true, FROM: true, FULL: true, FUNCTION: true, FUNCTIONS: true, GROUP: true, HAVING: true, IF: true, IN: true, INCREMENTAL: true,
-    INIT_FN: true, INNER: true, INPATH: true, INSERT: true, INT: true, INTEGER: true, INTERMEDIATE: true, INTERVAL: true, INTO: true, INVALIDATE: true, IS: true, JOIN: true, KEY: true, KUDU: true, LAST: true, LEFT: true, LIKE: true, LIMIT: true, LINES: true, LOAD: true, LOCATION: true, MERGE_FN: true, METADATA: true,
-    NOT: true, NULL: true, NULLS: true, OFFSET: true, ON: true, OR: true, ORDER: true, OUTER: true, OVERWRITE: true, PARQUET: true, PARQUETFILE: true, PARTITION: true, PARTITIONED: true, PARTITIONS: true, PREPARE_FN: true, PRIMARY: true, PRODUCED: true, RCFILE: true, REAL: true, REFRESH: true, REGEXP: true, RENAME: true,
-    REPLACE: true, RETURNS: true, RIGHT: true, RLIKE: true, ROW: true, SCHEMA: true, SCHEMAS: true, SELECT: true, SEMI: true, SEQUENCEFILE: true, SERDEPROPERTIES: true, SERIALIZE_FN: true, SET: true, SHOW: true, SMALLINT: true, STATS: true, STORED: true, STRAIGHT_JOIN: true, STRING: true, SYMBOL: true, TABLE: true,
-    TABLES: true, TBLPROPERTIES: true, TERMINATED: true, TEXTFILE: true, THEN: true, TIMESTAMP: true, TINYINT: true, TO: true, TRUE: true, UNCACHED: true, UNION: true, UPDATE_FN: true, USE: true, USING: true, VALUES: true, VIEW: true, WHEN: true, WHERE: true, WITH: true
-  };
-
   var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
     suggestions.forEach(function (suggestion) {
       suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
@@ -264,24 +236,6 @@ var AutocompleteResults = (function () {
       return result;
     }).extend({ rateLimit: 200 });
   }
-
-  AutocompleteResults.prototype.backTickIfNeeded = function (text) {
-    var self = this;
-    if (text.indexOf('`') === 0) {
-      return text;
-    }
-    var upperText = text.toUpperCase();
-    if (self.snippet.type() === 'hive' && (hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText])) {
-      return '`' + text + '`';
-    } else if (self.snippet.type() === 'impala' && impalaReservedKeywords[upperText]) {
-      return '`' + text + '`';
-    } else if (impalaReservedKeywords[upperText] || hiveReservedKeywords[upperText] || extraHiveReservedKeywords[upperText]) {
-      return '`' + text + '`';
-    } else if (!/^[A-Za-z][A-Za-z0-9_]*$/.test(text)) {
-      return '`' + text + '`';
-    }
-    return text;
-  };
 
   AutocompleteResults.prototype.update = function (parseResult) {
     var self = this;
@@ -566,7 +520,7 @@ var AutocompleteResults = (function () {
       databasesDeferred.done(function (dbs) {
         dbs.forEach(function (db) {
           databaseSuggestions.push({
-            value: prefix + self.backTickIfNeeded(db) + (suggestDatabases.appendDot ? '.' : ''),
+            value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), db) + (suggestDatabases.appendDot ? '.' : ''),
             filterValue: db,
             meta: AutocompleterGlobals.i18n.meta.database,
             category: CATEGORIES.DATABASE,
@@ -608,7 +562,7 @@ var AutocompleteResults = (function () {
               var details = tableMeta;
               details.database = database;
               tableSuggestions.push({
-                value: prefix + self.backTickIfNeeded(tableMeta.name),
+                value: prefix + SqlUtils.backTickIfNeeded(self.snippet.type(), tableMeta.name),
                 filterValue: tableMeta.name,
                 tableName: tableMeta.name,
                 meta: AutocompleterGlobals.i18n.meta[tableMeta.type.toLowerCase()],
@@ -716,7 +670,7 @@ var AutocompleteResults = (function () {
               var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
               if (typeof column.alias !== 'undefined') {
                 columnSuggestions.push({
-                  value: self.backTickIfNeeded(column.alias),
+                  value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
                   filterValue: column.alias,
                   meta: type,
                   category: CATEGORIES.COLUMN,
@@ -726,7 +680,7 @@ var AutocompleteResults = (function () {
                 })
               } else if (typeof column.identifierChain !== 'undefined' && column.identifierChain.length > 0 && typeof column.identifierChain[column.identifierChain.length - 1].name !== 'undefined') {
                 columnSuggestions.push({
-                  value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
+                  value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
                   filterValue: column.identifierChain[column.identifierChain.length - 1].name,
                   meta: type,
                   category: CATEGORIES.COLUMN,
@@ -752,7 +706,7 @@ var AutocompleteResults = (function () {
             var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
             if (column.alias) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.alias),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.alias),
                 filterValue: column.alias,
                 meta: type,
                 category: CATEGORIES.COLUMN,
@@ -762,7 +716,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.identifierChain && column.identifierChain.length > 0) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.identifierChain[column.identifierChain.length - 1].name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.identifierChain[column.identifierChain.length - 1].name),
                 filterValue: column.identifierChain[column.identifierChain.length - 1].name,
                 meta: type,
                 category: CATEGORIES.COLUMN,
@@ -792,7 +746,7 @@ var AutocompleteResults = (function () {
             column.identifierChain = data.identifierChain;
             if (column.type.indexOf('map') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name) + '[]',
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name) + '[]',
                 filterValue: column.name,
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
@@ -802,7 +756,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.type.indexOf('map') === 0) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name),
                 filterValue: column.name,
                 meta: 'map',
                 category: CATEGORIES.COLUMN,
@@ -812,7 +766,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.type.indexOf('struct') === 0) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name),
                 filterValue: column.name,
                 meta: 'struct',
                 category: CATEGORIES.COLUMN,
@@ -822,7 +776,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.type.indexOf('array') === 0 && self.snippet.type() === 'hive') {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name) + '[]',
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name) + '[]',
                 filterValue: column.name,
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
@@ -832,7 +786,7 @@ var AutocompleteResults = (function () {
               })
             } else if (column.type.indexOf('array') === 0) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name),
                 filterValue: column.name,
                 meta: 'array',
                 category: CATEGORIES.COLUMN,
@@ -842,7 +796,7 @@ var AutocompleteResults = (function () {
               })
             } else if (types[0].toUpperCase() !== 'T' && types.filter(function (type) { return type.toUpperCase() === column.type.toUpperCase() }).length > 0) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name),
                 filterValue: column.name,
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
@@ -854,7 +808,7 @@ var AutocompleteResults = (function () {
             } else if (SqlFunctions.matchesType(self.snippet.type(), types, [column.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [column.type.toUpperCase()], types)) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(column.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), column.name),
                 filterValue: column.name,
                 meta: column.type,
                 category: CATEGORIES.COLUMN,
@@ -870,7 +824,7 @@ var AutocompleteResults = (function () {
             column.table = data.table;
             column.identifierChain = data.identifierChain;
             columnSuggestions.push({
-              value: self.backTickIfNeeded(column),
+              value: SqlUtils.backTickIfNeeded(self.snippet.type(), column),
               filterValue: column,
               meta: 'column',
               category: CATEGORIES.COLUMN,
@@ -905,7 +859,7 @@ var AutocompleteResults = (function () {
             field.identifierChain = data.identifierChain;
 
             columnSuggestions.push({
-              value: self.backTickIfNeeded(field.name),
+              value: SqlUtils.backTickIfNeeded(self.snippet.type(), field.name),
               filterValue: field.name,
               meta: field.type,
               category: CATEGORIES.COLUMN,
@@ -923,7 +877,7 @@ var AutocompleteResults = (function () {
             if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                 SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
               columnSuggestions.push({
-                value: self.backTickIfNeeded(field.name),
+                value: SqlUtils.backTickIfNeeded(self.snippet.type(), field.name),
                 filterValue: field.name,
                 meta: field.type,
                 category: CATEGORIES.COLUMN,
@@ -943,7 +897,7 @@ var AutocompleteResults = (function () {
               if ((field.type === 'array' || field.type === 'map')) {
                 if (self.snippet.type() === 'hive') {
                   columnSuggestions.push({
-                    value: self.backTickIfNeeded(field.name) + '[]',
+                    value: SqlUtils.backTickIfNeeded(self.snippet.type(), field.name) + '[]',
                     filterValue: field.name,
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
@@ -953,7 +907,7 @@ var AutocompleteResults = (function () {
                   });
                 } else {
                   columnSuggestions.push({
-                    value: self.backTickIfNeeded(field.name),
+                    value: SqlUtils.backTickIfNeeded(self.snippet.type(), field.name),
                     filterValue: field.name,
                     meta: field.type,
                     category: CATEGORIES.COLUMN,
@@ -965,7 +919,7 @@ var AutocompleteResults = (function () {
               } else if (SqlFunctions.matchesType(self.snippet.type(), types, [field.type.toUpperCase()]) ||
                   SqlFunctions.matchesType(self.snippet.type(), [field.type.toUpperCase()], types)) {
                 columnSuggestions.push({
-                  value: self.backTickIfNeeded(field.name),
+                  value: SqlUtils.backTickIfNeeded(self.snippet.type(), field.name),
                   filterValue: field.name,
                   meta: field.type,
                   category: CATEGORIES.COLUMN,

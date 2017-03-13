@@ -183,7 +183,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
         return mTime;
       }
       return mTime;
-    }
+    };
 
     //Add CSRF Token to all XHR Requests
     var xrhsend = XMLHttpRequest.prototype.send;
@@ -195,7 +195,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     %endif
 
       return xrhsend.apply(this, arguments);
-    }
+    };
 
     $.fn.dataTableExt.sErrMode = "throw";
 

@@ -126,32 +126,58 @@ var AssistDbEntry = (function () {
 
     self.editorText = ko.pureComputed(function () {
       if (self.definition.isTable || self.definition.isView) {
-        return self.definition.name;
+        return self.getTableName();
       }
       if (self.definition.isColumn) {
-        return self.definition.name + ", ";
+        return self.getColumnName() + ', ';
       }
-      var parts = [];
-      var entry = self;
-      while (entry != null) {
-        if (entry.definition.isTable || self.definition.isView) {
-          break;
-        }
-        if (entry.definition.isArray || entry.definition.isMapValue) {
-          if (self.assistDbSource.sourceType === 'hive') {
-            parts.push("[]");
-          }
-        } else {
-          parts.push(entry.definition.name);
-          parts.push(".");
-        }
-        entry = entry.parent;
-      }
-      parts.reverse();
-      parts.push(", ");
-      return parts.slice(1).join("");
+      return self.getComplexName() + ', ';
     });
   }
+
+  var findNameInHierarchy = function (entry, searchCondition) {
+    var sourceType = entry.sourceType;
+    while (entry && !searchCondition(entry)) {
+      entry = entry.parent;
+    }
+    if (entry) {
+      return SqlUtils.backTickIfNeeded(sourceType, entry.definition.name);
+    }
+  };
+
+  AssistDbEntry.prototype.getDatabaseName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isDatabase });
+  };
+
+  AssistDbEntry.prototype.getTableName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isTable || entry.definition.isView });
+  };
+
+  AssistDbEntry.prototype.getColumnName = function () {
+    return findNameInHierarchy(this, function (entry) { return entry.definition.isColumn });
+  };
+
+  AssistDbEntry.prototype.getComplexName = function () {
+    var entry = self;
+    var sourceType = self.sourceType;
+    var parts = [];
+    while (entry != null) {
+      if (entry.definition.isTable || entry.definition.isView) {
+        break;
+      }
+      if (entry.definition.isArray || entry.definition.isMapValue) {
+        if (sourceType === 'hive') {
+          parts.push("[]");
+        }
+      } else {
+        parts.push(SqlUtils.backTickIfNeeded(sourceType, entry.definition.name));
+        parts.push(".");
+      }
+      entry = entry.parent;
+    }
+    parts.reverse();
+    return parts.slice(1).join("");
+  };
 
   AssistDbEntry.prototype.showContextPopover = function (entry, event, positionAdjustment) {
     var self = this;
@@ -450,7 +476,13 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.dblClick = function () {
     var self = this;
-    huePubSub.publish('assist.dblClickDbItem', self);
+    if (self.definition.isTable || self.definition.isView) {
+      huePubSub.publish('editor.insert.table.at.cursor', { name: self.getTableName(), database: self.getDatabaseName() });
+    } else if (self.definition.isColumn) {
+      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getColumnName(), table: self.getTableName(), database: self.getDatabaseName() });
+    } else {
+      huePubSub.publish('editor.insert.column.at.cursor', { name: self.getComplexName(), table: self.getTableName(), database: self.getDatabaseName() });
+    }
   };
 
   AssistDbEntry.prototype.openInMetastore = function () {
