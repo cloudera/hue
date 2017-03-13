@@ -55,8 +55,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
             <div id="navigatorNoTables" style="margin-top: 20px">${_('The selected database has no tables.')}</div>
             <ul id="navigatorTables" class="unstyled"></ul>
             <div id="navigatorLoader">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i>
             </div>
           </div>
         </div>
@@ -161,8 +160,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
           <div class="card card-small scrollable">
             <div class="row-fluid">
               <div class="span10 offset1 center" style="padding: 30px">
-                <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i><!--<![endif]-->
-                <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+                <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
               </div>
             </div>
           </div>

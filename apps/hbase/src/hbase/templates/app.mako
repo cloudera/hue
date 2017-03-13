@@ -109,8 +109,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   </div>
   <br/>
   <center data-bind="visible: ${datasource}.isLoading()">
-  <!--[if !IE]><!--><i class="fa fa-spinner fa-spin loader-main"></i><!--<![endif]-->
-  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin loader-main"></i>
   </center>
   <div class="alert" data-bind="visible: ${datasource}.items().length == 0 && !${datasource}.isLoading()">
       ${_('No rows to display.')}

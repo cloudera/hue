@@ -721,8 +721,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="facet-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -824,8 +823,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="text-facet-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1115,8 +1113,7 @@ ${ dashboard.layout_skeleton() }
       </table>
 
       <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
-        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+        <i class="fa fa-spinner fa-spin"></i>
       </div>
     </div>
   <!-- /ko -->
@@ -1125,8 +1122,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="document-details">
   <!-- ko if: $data.details().length == 0 -->
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   <!-- /ko -->
   <!-- ko if: $data.details().length > 0 -->
     <div class="document-details-actions pull-left" data-bind="visible: ${ 'true' if can_edit_index else 'false' } || externalLink()">
@@ -1256,8 +1252,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="histogram-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1306,8 +1301,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="timeline-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1347,8 +1341,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="bar-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1551,8 +1544,7 @@ ${ dashboard.layout_skeleton() }
     </span>
 
       <div class="widget-spinner" data-bind="visible: ! $parent.hasRetrievedResults() || ! $parent.response().response">
-        <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-        <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+        <i class="fa fa-spinner fa-spin"></i>
       </div>
 
       <div data-bind="visible: $parent.hasRetrievedResults() && $parent.results().length == 0 && $parent.response().response">
@@ -1741,8 +1733,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="bucket-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1803,8 +1794,7 @@ ${ dashboard.layout_skeleton() }
 
 <script type="text/html" id="line-widget">
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -1869,8 +1859,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -1890,8 +1879,7 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -1960,8 +1948,7 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -1992,8 +1979,7 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -2061,16 +2047,14 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
 
 <script type="text/html" id="hit-widget">
   <div class="widget-spinner" data-bind="visible: ! $root.hasRetrievedResults()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 
   <!-- ko if: $root.getFacetFromQuery(id()).has_data() -->
@@ -2225,8 +2209,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <div class="clearfix"></div>
   <div class="widget-spinner" data-bind="visible: isLoading() &&  $root.query.fqs().length > 0">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -2300,8 +2283,7 @@ ${ dashboard.layout_skeleton() }
   </div>
   <!-- /ko -->
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -2329,8 +2311,7 @@ ${ dashboard.layout_skeleton() }
   <!-- /ko -->
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -2359,8 +2340,7 @@ ${ dashboard.layout_skeleton() }
   </div>
 
   <div class="widget-spinner" data-bind="visible: isLoading()">
-    <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-    <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+    <i class="fa fa-spinner fa-spin"></i>
   </div>
 </script>
 
@@ -2379,8 +2359,7 @@ ${ dashboard.layout_skeleton() }
     <div class="tab-content" style="max-height: 370px; height: 370px">
       <div class="tab-pane active" id="analysis-terms" data-bind="with: terms">
         <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
-          <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+          <i class="fa fa-spinner fa-spin"></i>
         </div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
         <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table-striped">
@@ -2405,8 +2384,7 @@ ${ dashboard.layout_skeleton() }
       </div>
       <div class="tab-pane" id="analysis-stats" data-bind="with: stats">
         <div class="widget-spinner" data-bind="visible: $parent.isLoading()">
-          <!--[if !IE]> --><i class="fa fa-spinner fa-spin"></i><!-- <![endif]-->
-          <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" /><![endif]-->
+          <i class="fa fa-spinner fa-spin"></i>
         </div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
