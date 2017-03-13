@@ -344,7 +344,7 @@
                 $t.data('plugin_jHueTableExtender').drawFirstColumn();
               }
               if ($t.data('plugin_jHueTableExtender2')) {
-                $t.data('plugin_jHueTableExtender2').drawFirstColumn();
+                $t.data('plugin_jHueTableExtender2').drawFirstColumn(true);
               }
             }
             else {
@@ -382,7 +382,7 @@
                 $t.data('plugin_jHueTableExtender').drawFirstColumn();
               }
               if ($t.data('plugin_jHueTableExtender2')) {
-                $t.data('plugin_jHueTableExtender2').drawFirstColumn();
+                $t.data('plugin_jHueTableExtender2').drawFirstColumn(true);
               }
             }
 
@@ -426,6 +426,9 @@
             if ($t.data('plugin_jHueTableExtender')) {
               $t.data('plugin_jHueTableExtender').drawHeader(typeof force === 'undefined');
               $t.data('plugin_jHueTableExtender').drawLockedRows();
+            }
+            if ($t.data('plugin_jHueTableExtender2')) {
+              $t.data('plugin_jHueTableExtender2').drawLockedRows();
             }
           }
           $t.data('fnDraws', $t.data('fnDraws') + 1);
@@ -528,6 +531,10 @@
         else {
           $cell.addClass('sorting_asc');
           self.fnSortColumn(obj, -1);
+        }
+        if (self.$table.data('plugin_jHueTableExtender2')) {
+          self.$table.data('plugin_jHueTableExtender2').drawHeader();
+          self.$table.data('plugin_jHueTableExtender2').drawLockedRows();
         }
       });
 
