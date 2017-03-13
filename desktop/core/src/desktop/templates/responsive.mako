@@ -502,6 +502,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 <script src="${ static('desktop/js/ko.switch-case.js') }"></script>
 <script src="${ static('desktop/js/ko.hue-bindings.js') }"></script>
+<script src="${ static('desktop/js/sqlUtils.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
 <script src="${ static('desktop/js/jquery.tour.js') }"></script>

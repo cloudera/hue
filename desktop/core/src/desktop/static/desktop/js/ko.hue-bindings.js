@@ -3830,18 +3830,30 @@
         exec: editor.commands.commands['gotoline'].exec
       });
 
-      huePubSub.subscribe("assist.dblClickDbItem", function(assistDbEntry) {
-        if ($el.data("last-active-editor")) {
-          var text = assistDbEntry.editorText();
-          if (editor.getValue() == "") {
-            if (assistDbEntry.definition.isTable) {
-              text = "SELECT * FROM " + assistDbEntry.editorText() + " LIMIT 100";
-            }
-            else if (assistDbEntry.definition.isColumn) {
-              text = "SELECT " + assistDbEntry.editorText().split(",")[0] + " FROM " + assistDbEntry.parent.editorText() + " LIMIT 100";
-            }
+
+      var isNewStatement = function () {
+        return /^\s*$/.test(editor.getValue()) || /^.*;\s*$/.test(editor.getTextBeforeCursor());
+      };
+
+      huePubSub.subscribe('editor.insert.table.at.cursor', function(details) {
+        if ($el.data('last-active-editor')) {
+          var qualifiedName = snippet.database() == details.database ? details.name : details.database + '.' + details.name;
+          if (isNewStatement()) {
+            editor.session.insert(editor.getCursorPosition(), 'SELECT * FROM ' + qualifiedName + ' LIMIT 100;');
+          } else {
+            editor.session.insert(editor.getCursorPosition(), ' ' + qualifiedName + ' ');
           }
-          editor.session.insert(editor.getCursorPosition(), text);
+        }
+      });
+
+      huePubSub.subscribe('editor.insert.column.at.cursor', function(details) {
+        if ($el.data('last-active-editor')) {
+          if (isNewStatement()) {
+            var qualifiedFromName = snippet.database() == details.database ? details.table : details.database + '.' + details.table;
+            editor.session.insert(editor.getCursorPosition(), 'SELECT '  + details.name + ' FROM ' + qualifiedFromName + ' LIMIT 100;');
+          } else {
+            editor.session.insert(editor.getCursorPosition(), ' ' + details.name + ' ');
+          }
         }
       });
 

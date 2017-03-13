@@ -85,7 +85,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="sql-context-items">
     <!-- ko if: typeof definition !== 'undefined' -->
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
-    <!-- ko if: definition.isView || definition.isTable -->
+    <!-- ko if: !definition.isDatabase -->
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
@@ -174,7 +174,7 @@ from notebook.conf import get_ordered_interpreters
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="event: { dblClick: dblClick }, attr: {'title': definition.title }">
+      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
@@ -1256,10 +1256,6 @@ from notebook.conf import get_ordered_interpreters
           });
           self.showCores(currentEntry.hasOnlyCores());
         };
-
-        huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
-
-        });
 
         huePubSub.subscribe('assist.dblClickCollectionItem', function (entry) {
           window.open('/indexer/#edit/' + entry.definition.name);
