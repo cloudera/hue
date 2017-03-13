@@ -83,9 +83,12 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="sql-context-items">
+    <!-- ko if: typeof definition !== 'undefined' -->
     <li><a href="javascript:void(0);" data-bind="click: function (data) { showContextPopover(data, { target: $parentContext.$contextSourceElement }, { left: 4, top: 2 }); }"><i class="fa fa-fw fa-info"></i> ${ _('Show details') }</a></li>
+    <!-- ko if: definition.isView || definition.isTable -->
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
-    <!-- ko if: definition.isTable || definition.isDatabase -->
+    <!-- /ko -->
+    <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
     <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Metastore') }</a></li>
     <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
@@ -94,6 +97,7 @@ from notebook.conf import get_ordered_interpreters
     <!-- ko template: { name: 'query-builder-context-items' } --><!-- /ko -->
     <!-- /ko -->
     %endif
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="query-builder-context-items">
@@ -134,6 +138,13 @@ from notebook.conf import get_ordered_interpreters
         <li><a href="javascript:void(0);" data-bind="click: function () { var descendingRule = QueryBuilder.getRule(databaseName, tableName, columnName, 'Descending'); if (descendingRule.length) { descendingRule.attr('rule', 'Ascending'); descendingRule.find('.rule').text('Ascending'); } else { QueryBuilder.addRule(databaseName, tableName, columnName, 'Ascending', 'Order', '{0}.{1} ASC', false, false); } }">${ _('Ascending') }</a></li>
         <li><a href="javascript:void(0);" data-bind="click: function () { var ascendingRule = QueryBuilder.getRule(databaseName, tableName, columnName, 'Ascending'); if (ascendingRule.length) { ascendingRule.attr('rule', 'Descending'); ascendingRule.find('.rule').text('Descending'); } else { QueryBuilder.addRule(databaseName, tableName, columnName, 'Descending', 'Order', '{0}.{1} DESC', false, false); } }">${ _('Descending') }</a></li>
       </ul>
+    </li>
+  </script>
+
+  <script type="text/html" id="assist-database-entry">
+    <li class="assist-table" data-bind="templateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
+      <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
+      <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: definition.name, css: { 'highlight': highlight() }"></span></a>
     </li>
   </script>
 
@@ -708,10 +719,7 @@ from notebook.conf import get_ordered_interpreters
       </ul>
       <!-- /ko -->
       <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
-        <li class="assist-table" data-bind="visibleOnHover: { selector: '.database-actions' }">
-          <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
-          <a class="assist-table-link" href="javascript: void(0);" data-bind="click: function () { $parent.selectedDatabase($data); $parent.selectedDatabaseChanged(); }"><i class="fa fa-fw fa-database muted valign-middle"></i> <span class="highlightable" data-bind="text: definition.name, css: { 'highlight': highlight() }"></span></a>
-        </li>
+        <!-- ko template: { name: 'assist-database-entry' } --><!-- /ko -->
       </ul>
     </div>
     <div class="assist-flex-fill" data-bind="visible: loading">
@@ -738,30 +746,28 @@ from notebook.conf import get_ordered_interpreters
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
         <!-- ko if: $parent.activeSort -->
-        <span class="margin-left-10" style="position: absolute">
-          <a class="inactive-action" data-toggle="dropdown" href="javascript:void(0)">
-            <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
-          </a>
-          <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
-                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
-              </a>
-            </li>
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
-                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
-              </a>
-            </li>
-            <!-- ko if: HAS_OPTIMIZER -->
-            <li>
-              <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
-                <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
-              </a>
-            </li>
-            <!-- /ko -->
-          </ul>
-        </span>
+        <a class="margin-left-10 inactive-action" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
+          <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
+        </a>
+        <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
+          <li>
+            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
+              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
+            </a>
+          </li>
+          <li>
+            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('alpha'); }">
+              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'alpha' }"></i> ${ _('Alphabetical') }
+            </a>
+          </li>
+          <!-- ko if: HAS_OPTIMIZER -->
+          <li>
+            <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('popular'); }">
+              <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'popular' }"></i> ${ _('Popularity') }
+            </a>
+          </li>
+          <!-- /ko -->
+        </ul>
         <!-- /ko -->
       </div>
       <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Table name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>

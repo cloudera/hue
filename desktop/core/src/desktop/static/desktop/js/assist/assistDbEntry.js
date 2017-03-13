@@ -455,16 +455,19 @@ var AssistDbEntry = (function () {
 
   AssistDbEntry.prototype.openInMetastore = function () {
     var self = this;
-
-    // TODO: Enable metastore links for databases
-    var path = [];
-    path.push(self.parent.definition.name);
-    path.push(self.definition.name);
+    var url;
+    if (self.definition.isDatabase) {
+      url = '/metastore/tables/' + self.definition.name;
+    } else if (self.definition.isTable || self.definition.isView) {
+      url = '/metastore/table/' + self.parent.definition.name + '/' + self.definition.name;
+    } else {
+      return;
+    }
 
     if (IS_HUE_4) {
-      huePubSub.publish('open.link', '/metastore/table/' + path.join('/'));
+      huePubSub.publish('open.link', url);
     } else {
-      window.open('/metastore/table/' + path.join('/'), '_blank');
+      window.open(url, '_blank');
     }
   };
 
