@@ -138,11 +138,10 @@ from desktop.views import commonheader, commonfooter, _ko
 
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
-        <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
+        <i class="fa fa-spinner fa-spin" data-bind="visible: isRetrievingResults()"></i>
         <!-- ko if: $root.collection.async() -->
           <i class="fa fa-stop" clas="red" data-bind="click: cancelAsync, visible: isRetrievingResults()"></i>
         <!-- /ko -->
-        <!--[if IE]><img src="${ static('desktop/art/spinner-inverted.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
       </button>
 
     </div>
@@ -362,8 +361,7 @@ from desktop.views import commonheader, commonfooter, _ko
   </span>
   <div class="pointer muted link" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></div>
   <div class="pointer muted link" data-bind="click: $root.searchBtn"><i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i></div>
-  <!--[if !IE]> --><i class="fa fa-spinner fa-spin muted" data-bind="visible: isRetrievingResults()"></i><!-- <![endif]-->
-  <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: isRetrievingResults()"/><![endif]-->
+  <i class="fa fa-spinner fa-spin muted" data-bind="visible: isRetrievingResults()"></i>
   </form>
 </div>
 
@@ -379,8 +377,7 @@ ${ dashboard.layout_skeleton() }
   <div class="facet-field-tile">
     <div class="facet-field-cnt">
       <span class="facet-field-label facet-field-label-fixed-width facet-field-label-fixed-width-double facet-field-label-title">${ _('Settings') }</span>
-      <!--[if !IE]> --><i class="fa fa-spinner fa-spin" data-bind="visible: $root.isRetrievingResults()"></i><!-- <![endif]-->
-      <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }" data-bind="visible: $root.isRetrievingResults()"/><![endif]-->
+      <i class="fa fa-spinner fa-spin" data-bind="visible: $root.isRetrievingResults()"></i>
     </div>
 
     <div class="facet-field-cnt" data-bind="visible: properties.canRange">

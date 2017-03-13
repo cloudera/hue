@@ -208,8 +208,7 @@ except ImportError, e:
     <div id="saveResultsModal" class="modal hide fade">
       <div class="loader hide">
         <div class="overlay"></div>
-        <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-        <!--[if IE]><img class="spinner" src="${ static('desktop/art/spinner-big-inverted.gif') }"/><![endif]-->
+        <i class="fa fa-spinner fa-spin"></i>
       </div>
 
       <div class="modal-header">

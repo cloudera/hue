@@ -57,8 +57,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       <tfoot>
         <tr data-bind="visible: ${datasource}.isLoading() || ${datasource}.isReLoading()">
             <td colspan="8" class="left">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+              <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
             </td>
         </tr>
       </tfoot>

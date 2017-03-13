@@ -145,8 +145,7 @@ ${ fb_components.menubar() }
               <!-- /ko -->
             <!-- /ko -->
             <div id="loader" data-bind="visible: isLoading">
-              <!--[if !IE]><!--><i class="fa fa-spinner fa-spin"></i><!--<![endif]-->
-              <!--[if IE]><img src="${ static('desktop/art/spinner.gif') }"/><![endif]-->
+              <i class="fa fa-spinner fa-spin"></i>
             </div>
             <!-- ko if: $root.isViewing -->
             <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()">
