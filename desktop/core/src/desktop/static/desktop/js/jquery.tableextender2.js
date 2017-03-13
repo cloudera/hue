@@ -359,7 +359,7 @@
     self.$mainScrollable.trigger('scroll');
   };
 
-  Plugin.prototype.drawFirstColumn = function () {
+  Plugin.prototype.drawFirstColumn = function (repositionHeader) {
     var self = this;
     if (!self.options.fixedFirstColumn) {
       self.firstColumnInner = $();
@@ -454,6 +454,10 @@
     self.firstColumnInner = firstColumnInner;
     self.firstColumnTopCell = firstColumnTopCell;
     self.firstColumn = firstColumn;
+
+    if (repositionHeader) {
+      self.repositionHeader();
+    }
   };
 
   Plugin.prototype.drawLockedRows = function (force) {
