@@ -323,7 +323,14 @@ ${ hueIcons.symbols() }
         <li><a href="javascript: void(0);">Custom App 2</a></li>
       </ul>
       <div class="left-nav-drop">
-        <div data-bind="dropzone: { clickable: false, url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onError: onePageViewModel.dropzoneError, onComplete: onePageViewModel.dropzoneComplete }, click: function(){ onePageViewModel.currentApp('importer')}" class="pointer" title="${ _('Import data wizard') }">
+        <div data-bind="dropzone: {
+            clickable: false,
+            url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir,
+            params: { dest: DropzoneGlobals.homeDir },
+            paramName: 'hdfs_file',
+            onError: onePageViewModel.dropzoneError,
+            onComplete: onePageViewModel.dropzoneComplete },
+            click: function(){ onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">
           <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files here') }</div>
         </div>
       </div>
