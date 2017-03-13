@@ -202,7 +202,14 @@ ${ components.menubar() }
         <td data-bind="text: partitionSpec"></td>
         <td>
           <a data-bind="attr: {'href': readUrl }"><i class="fa fa-th"></i> ${_('Data')}</a>
-          <a data-bind="attr: {'href': browseUrl }"><i class="fa fa-file-o"></i> ${_('Files')}</a>
+          <!-- ko if: IS_HUE_4 -->
+            <a data-bind="click: function () { browsePartitionFiles(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
+              <i class="fa fa-file-o"></i> ${_('Files')}
+            </a>
+          <!-- /ko -->
+          <!-- ko if: ! IS_HUE_4 -->
+            <a data-bind="attr: {'href': browseUrl }" title="${_('Browse partition files')}"><i class="fa fa-file-o"></i> ${_('Files')}</a>
+          <!-- /ko -->
         </td>
       </tr>
       <!-- /ko -->
@@ -1154,6 +1161,20 @@ ${ components.menubar() }
       error: function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
       }
+    });
+  }
+
+  function browsePartitionFiles(url) {
+    $.get(url, {
+      format: "json"
+    },function(resp) {
+      if (resp.uri_path) {
+        huePubSub.publish('open.fb.folder', resp.uri_path.replace(/\/filebrowser\/view=/g, '') );
+      } else if (resp.message) {
+        $(document).trigger("error", resp.message);
+      }
+    }).fail(function (xhr) {
+      $(document).trigger("error", xhr.responseText);
     });
   }
 

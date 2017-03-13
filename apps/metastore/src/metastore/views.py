@@ -542,7 +542,10 @@ def browse_partition(request, database, table, partition_spec):
     decoded_spec = urllib.unquote(partition_spec)
     partition_table = db.describe_partition(database, table, decoded_spec)
     uri_path = location_to_url(partition_table.path_location)
-    return redirect(uri_path)
+    if request.REQUEST.get("format", "html") == "json":
+      return JsonResponse({'uri_path': uri_path})
+    else:
+      return redirect(uri_path)
   except Exception, e:
     raise PopupException(_('Cannot browse partition'), detail=e.message)
 
