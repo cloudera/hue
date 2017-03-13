@@ -469,7 +469,7 @@ ${ layout.menubar(section='coordinators') }
     }
   </style>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
 
     /**
      * Initial state is used to define when to display the "initial state" of a table.

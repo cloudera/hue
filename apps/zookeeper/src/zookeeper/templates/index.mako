@@ -86,7 +86,7 @@ ${ shared.footer() }
 %endif
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("a[data-row-selector='true']").jHueRowSelector();
   });

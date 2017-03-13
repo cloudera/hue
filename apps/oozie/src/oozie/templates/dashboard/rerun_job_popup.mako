@@ -84,7 +84,7 @@
   </div>
 </form>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
     $(document).ready(function(){
         $("#id_skip_nodes").jHueSelector({
             selectAllLabel: "${_('Select all')}",

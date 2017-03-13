@@ -622,7 +622,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script src="${ static('desktop/js/jquery.filechooser.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
     function deletePrivilegeModal(role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {

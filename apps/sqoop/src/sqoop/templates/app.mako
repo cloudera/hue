@@ -708,7 +708,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 % endif
 </style>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
 var FB_STAT = '${reverse('filebrowser.views.stat', kwargs={'path': '/'})}';
 

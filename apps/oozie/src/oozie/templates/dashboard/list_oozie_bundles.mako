@@ -156,7 +156,7 @@ ${layout.menubar(section='bundles', dashboard=True)}
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var Bundle = function (bundle) {
     return {
       id: bundle.id,

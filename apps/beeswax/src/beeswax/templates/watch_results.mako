@@ -345,7 +345,7 @@ ${layout.menubar(section='query')}
 <script src="${ static('desktop/ext/js/leaflet/leaflet.markercluster.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.blueprint.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 $(document).ready(function () {
 
   var dataTable = $(".resultTable").dataTable({

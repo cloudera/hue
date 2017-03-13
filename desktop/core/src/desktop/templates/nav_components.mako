@@ -42,7 +42,7 @@ from django.utils.translation import ugettext as _
      </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       /**
        * @param {object} params

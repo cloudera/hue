@@ -169,7 +169,7 @@ ${ fb_components.menubar() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.visible.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 (function () {
   <%
     MAX_ALLOWED_PAGES_PER_REQUEST = 255

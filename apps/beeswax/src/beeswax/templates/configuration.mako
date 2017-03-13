@@ -54,7 +54,7 @@ ${layout.menubar(section='configuration')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 	$(document).ready(function(){
 		$(".datatables").dataTable({
 			"bPaginate": false,

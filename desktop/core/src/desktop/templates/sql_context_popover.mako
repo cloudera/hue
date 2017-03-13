@@ -312,7 +312,7 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       var HALF_SIZE_LIMIT_X = 130;
@@ -1305,7 +1305,7 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       function SqlColumnsTable(params) {

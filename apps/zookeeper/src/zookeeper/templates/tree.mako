@@ -127,7 +127,7 @@ ${ shared.footer() }
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
   %if znode.get('dataLength', 0) != 0:
     var txt = Base64.decode($("#textarea64").val());

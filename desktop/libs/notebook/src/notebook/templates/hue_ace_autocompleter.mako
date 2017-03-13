@@ -238,7 +238,7 @@ from desktop.views import _ko
   </script>
 
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
 
       var aceUtil = ace.require('ace/autocomplete/util');

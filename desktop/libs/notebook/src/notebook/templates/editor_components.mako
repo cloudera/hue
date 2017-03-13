@@ -1963,7 +1963,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <%def name="commonJS(is_embeddable=False, bindableElement='editorComponents')">
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   % if is_embeddable:
   var MAIN_SCROLLABLE = '.page-content';
   % else:

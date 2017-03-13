@@ -81,7 +81,7 @@ ${layout.menubar(section='groups')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("#id_members").jHueSelector({
       selectAllLabel: "${_('Select all')}",

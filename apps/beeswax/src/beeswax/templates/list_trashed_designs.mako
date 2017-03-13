@@ -126,7 +126,7 @@ ${layout.menubar(section='saved queries')}
   </form>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     var viewModel = {
         availableSavedQueries : ko.observableArray(${ designs_json | n }),

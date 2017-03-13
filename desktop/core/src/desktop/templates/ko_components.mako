@@ -49,7 +49,7 @@ from desktop.views import _ko
     </div>
   </script>
 
-  <script type="text/javascript" charset="utf-8">
+  <script type="text/javascript">
     (function () {
       var HueDropDown = function (params, element) {
         var self = this;

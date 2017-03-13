@@ -106,7 +106,7 @@ from django.utils.translation import ugettext as _
   });
 </script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   var ImportDocument = function () {
     var self = this;
     self.fileData = new FormData();

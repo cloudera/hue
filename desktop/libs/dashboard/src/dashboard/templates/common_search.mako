@@ -2804,7 +2804,7 @@ ${ dashboard.import_charts() }
 % endif
 </style>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
 var viewModel;
 

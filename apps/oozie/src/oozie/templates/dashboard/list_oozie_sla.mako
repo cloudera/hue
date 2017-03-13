@@ -171,7 +171,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.flot.time.min.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/jquery.blueprint.js') }"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   function performSearch(id) {
     if ((id != null || $("input[name='job_name']").val().trim()) != "" && slaTable) {
@@ -302,7 +302,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
 
 ${ utils.decorate_datetime_fields() }
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("input[name='start_0']").parent().datepicker().on("changeDate", function () {
       performSearch();

@@ -557,7 +557,7 @@ ${ comps.menubar() }
 
 <script src="${ static('jobbrowser/js/utils.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 $(document).ready(function () {
   $(".taskTable").dataTable({
     "bPaginate": false,

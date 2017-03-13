@@ -1166,7 +1166,7 @@ ${ assist.assistPanel() }
 ${ dashboard.import_charts() }
 
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
 // avoid blinking of the panels
 var leftPanelWidth = $.totalStorage("${app_name}_left_panel_width") != null ? $.totalStorage("${app_name}_left_panel_width") : 250;

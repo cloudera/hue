@@ -74,7 +74,7 @@ ${layout.menubar(section='query')}
   </div>
 </div>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
   $(document).ready(function () {
     $("input[name='target_dir']").after(getFileBrowseButton($("input[name='target_dir']")));
 

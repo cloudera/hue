@@ -1123,7 +1123,7 @@ ${ components.menubar() }
 </div>
 </span>
 
-<script type="text/javascript" charset="utf-8">
+<script type="text/javascript">
 
   function dropTables(formElement) {
     $(formElement).ajaxSubmit({
