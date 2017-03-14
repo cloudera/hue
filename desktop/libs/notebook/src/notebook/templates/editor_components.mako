@@ -2004,7 +2004,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   }
 
   var isLeftNavOpen = false;
-  huePubSub.subscribe('responsive.left.nav.toggle', function(val) {
+  huePubSub.subscribe('left.nav.open.toggle', function(val) {
     isLeftNavOpen = val;
   });
 
