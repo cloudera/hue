@@ -26,6 +26,7 @@ from django.utils.translation import ugettext as _
       <h2 class="modal-title">${_('Import Data')}</h2>
     </div>
     <div class="modal-body">
+        <input id="load_data_is_embeddable" type="hidden" name="is_embeddable" value="false">
 
         <div class="control-group">
             ${comps.bootstrapLabel(load_form["path"])}
@@ -47,7 +48,7 @@ from django.utils.translation import ugettext as _
 
         <div class="control-group">
           <div class="controls">
-            <label class="checkbox">
+            <label class="checkbox inline-block">
                 <input type="checkbox" name="overwrite"/> ${_('Overwrite existing data')}
               </label>
             </div>
@@ -130,22 +131,32 @@ from django.utils.translation import ugettext as _
     }
 
     $("#load-data-submit-btn").click(function (e) {
+      if (IS_HUE_4) {
+        $("#load_data_is_embeddable").val("true");
+      }
       $.post("${ url('metastore:load_table', database=database, table=table.name) }",
-              $("#load-data-form").serialize(),
-              function (response) {
-                $("#load-data-submit-btn").button('reset');
-                if (response['status'] != 0) {
-                  if (response['status'] == 1) {
-                    $('#load-data-error').html(response['data']);
-                    $('#load-data-error').show();
-                  } else {
-                    $('#import-data-modal').html(response['data']);
-                  }
-                } else {
-                  window.location.replace(response['data']);
-                }
-              }
-      );
+        $("#load-data-form").serialize(),
+        function (response) {
+          if (response['status'] != 0) {
+            if (response['status'] == 1) {
+              $('#load-data-error').html(response['data']);
+              $('#load-data-error').show();
+            } else {
+              $('#import-data-modal').html(response['data']);
+            }
+          } else {
+            if (IS_HUE_4) {
+              huePubSub.publish('notebook.task.submitted', response.history_uuid);
+              $("#import-data-modal").modal("hide");
+            } else {
+              window.location.replace(response['data']);
+            }
+          }
+        }
+      ).always(function () {
+        $("#load-data-submit-btn").button('reset');
+        $("#load-data-submit-btn").removeAttr("disabled");
+      });
     });
   });
 </script>
