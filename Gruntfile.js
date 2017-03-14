@@ -45,6 +45,7 @@ module.exports = function(grunt) {
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser.less',
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/css/jobbrowser-embeddable.css': 'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/jobbrowser-embeddable.less',
           'apps/useradmin/src/useradmin/static/useradmin/css/useradmin.css': 'apps/useradmin/src/useradmin/static/useradmin/less/useradmin.less',
+          'apps/hbase/src/hbase/static/hbase/css/hbase.css': 'apps/hbase/src/hbase/static/hbase/less/hbase.less',
         }
       }
     },
@@ -65,6 +66,8 @@ module.exports = function(grunt) {
           'apps/jobbrowser/src/jobbrowser/static/jobbrowser/less/**/*.less',
           'apps/useradmin/src/useradmin/static/useradmin/less/*.less',
           'apps/useradmin/src/useradmin/static/useradmin/less/**/*.less',
+          'apps/hbase/src/hbase/static/hbase/less/*.less',
+          'apps/hbase/src/hbase/static/hbase/less/**/*.less',
         ],
         tasks: ['less']
       }

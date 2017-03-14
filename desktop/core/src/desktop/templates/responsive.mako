@@ -233,7 +233,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
         <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);">Users</a></li>
-        <li><a href="javascript: void(0);">HBase</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('hbase') }"><a href="javascript: void(0);">HBase</a></li>
         <li><a href="javascript: void(0);">Security</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
@@ -306,6 +306,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_permissions" class="embeddable"></div>
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
+      <div id="embeddable_hbase" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -486,7 +487,8 @@ ${ assist.assistPanel() }
         useradmin_groups: '/useradmin/groups?is_embeddable=true',
         useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
         useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
-        useradmin_newuser: 'useradmin/users/new?is_embeddable=true',
+        useradmin_newuser: '/useradmin/users/new?is_embeddable=true',
+        hbase: '/hbase/?is_embeddable=true',
       };
 
       var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
