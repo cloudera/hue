@@ -208,81 +208,7 @@ ${ hueIcons.symbols() }
           % endif
         </div>
 
-        <div class="compose-action btn-group">
-          <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">5</div></button>
-        </div>
-        <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
-          <a class="pointer pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-times"></i></a>
-          <!-- ko if: editorVM.selectedNotebook() -->
-          <!-- ko with: editorVM.selectedNotebook() -->
-            <div>
-              Showing
-              <span data-bind="text: uuid"></span>
-              <a href="javascript:void(0)" data-bind="attr: { href: onSuccessUrl() }, text: onSuccessUrl" target="_blank"></a>
-              <!-- ko if: selectedSnippet -->
-                <!-- ko if: selectedSnippet().progress -->
-                <div class="snippet-progress-container">
-                  <div class="progress-snippet progress active" data-bind="css: {
-                    'progress-starting': progress() == 0 && status() == 'running',
-                    'progress-warning': progress() > 0 && progress() < 100,
-                    'progress-success': progress() == 100,
-                    'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
-                    <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
-                  </div>
-                </div>
-                <!-- /ko -->
-                <!-- ko if: selectedSnippet().result -->
-                <pre data-bind="visible: selectedSnippet().result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-                <pre data-bind="visible: selectedSnippet().result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
-                <!-- /ko -->
-              <!-- /ko -->
-            </div>
-            <!-- ko if: history -->
-            <hr>
-            <div class="notification-history margin-bottom-10" data-bind="niceScroll">
-              <!-- ko if: history().length == 0 -->
-              <span style="font-style: italic">${ _('No history to be shown.') }</span>
-              <!-- /ko -->
-              <!-- ko if: history().length > 0 -->
-              <div class="notification-history-title">
-                <strong>${ _('History') }</strong>
-                <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
-                  <i class="fa fa-calendar-times-o"></i>
-                </div>
-                <div class="clearfix"></div>
-              </div>
-              <ul class="unstyled notification-history-list">
-                <!-- ko foreach: history -->
-                  <li data-bind="click: function() { editorVM.openNotebook(uuid()); }">
-                    <div class="muted pull-left" data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></div>
-                    <div class="pull-right muted">
-                      <!-- ko switch: status -->
-                      <!-- ko case: 'running' -->
-                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query running") }', placement: 'bottom' }"><i class="fa fa-fighter-jet fa-fw"></i></div>
-                      <!-- /ko -->
-                      <!-- ko case: 'failed' -->
-                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Query failed") }', placement: 'bottom' }"><i class="fa fa-exclamation fa-fw"></i></div>
-                      <!-- /ko -->
-                      <!-- ko case: 'available' -->
-                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result available") }', placement: 'bottom' }"><i class="fa fa-check fa-fw"></i></div>
-                      <!-- /ko -->
-                      <!-- ko case: 'expired' -->
-                      <div class="history-status" data-bind="tooltip: { title: '${ _ko("Result expired") }', placement: 'bottom' }"><i class="fa fa-unlink fa-fw"></i></div>
-                      <!-- /ko -->
-                      <!-- /ko -->
-                    </div>
-                    <div class="clearfix"></div>
-                    <strong data-bind="text: name, attr: { title: uuid }"></strong>
-                    <div data-bind="highlight: { value: 'statement' }"></div>
-                  </li>
-                <!-- /ko -->
-              </ul>
-              <!-- /ko -->
-            </div>
-          <!-- /ko -->
-          <!-- /ko -->
-          <!-- /ko -->
-        </div>
+        <!-- ko component: 'hue-history-panel' --><!-- /ko -->
 
         <div class="compose-action btn-group">
           <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" style="display:none;">0</div></button>
@@ -445,21 +371,6 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
-<div id="clearNotificationHistoryModal" class="modal hide fade">
-  <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm History Clearing')}</h3>
-  </div>
-  <div class="modal-body">
-    <p>${_('Are you sure you want to clear the task history?')}</p>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('No')}</a>
-    <a class="btn btn-danger disable-feedback" onclick="function() { editorVM.selectedNotebook().clearHistory(); editorVM.selectedNotebook(null); }">${_('Yes')}</a>
-  </div>
-</div>
-
-
 <script src="${ static('desktop/js/cui-bundle.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
@@ -531,12 +442,14 @@ ${ hueIcons.symbols() }
 
 <script type="text/javascript">
 (function () {
-    var proxiedKORegister = ko.components.register;
-    var LOADED_COMPONENTS = [];
+    var proxiedKoRegister = ko.components.register;
+    var registeredComponents = [];
     ko.components.register = function () {
-      if (LOADED_COMPONENTS.indexOf(arguments[0]) === -1) {
-        LOADED_COMPONENTS.push(arguments[0]);
-        return proxiedKORegister.apply(this, arguments);
+      // This guarantees a ko component is only registered once
+      // Some currently get registered twice when switching between notebook and editor
+      if (registeredComponents.indexOf(arguments[0]) === -1) {
+        registeredComponents.push(arguments[0]);
+        return proxiedKoRegister.apply(this, arguments);
       }
     };
   })();
@@ -554,59 +467,45 @@ ${ assist.assistPanel() }
 <script type="text/javascript">
 
   $(document).ready(function () {
-    var options = {
-      user: '${ user.username }',
-      i18n: {
-        errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
-      }
-    };
-
     $(document).on('hideHistoryModal', function (e) {
       $('#clearNotificationHistoryModal').modal('hide');
     });
 
     var onePageViewModel = (function () {
-      var LOADED_JS = [];
-      var LOADED_CSS = [];
 
-      $('script[src]').each(function(){
-        LOADED_JS.push($(this).attr('src'));
-      });
+      var EMBEDDABLE_PAGE_URLS = {
+        editor: '/notebook/editor_embeddable',
+        notebook: '/notebook/notebook_embeddable',
+        metastore: '/metastore/tables/?is_embeddable=true',
+        dashboard: '/dashboard/embeddable/new_search',
+        oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
+        oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
+        oozie_bundle: '/oozie/editor/bundle/new/?is_embeddable=true',
+        jobbrowser: '/jobbrowser/apps?is_embeddable=true',
+        filebrowser: '/filebrowser/?is_embeddable=true',
+        filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
+        fileviewer: 'filebrowser/view=',
+        home: '/home_embeddable',
+        indexer: '/indexer/indexer/?is_embeddable=true',
+        collections: '/dashboard/admin/collections?is_embeddable=true',
+        indexes: '/indexer/?is_embeddable=true',
+        importer: '/indexer/importer/?is_embeddable=true',
+        useradmin_users: '/useradmin/users?is_embeddable=true',
+        useradmin_groups: '/useradmin/groups?is_embeddable=true',
+        useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
+        useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
+        useradmin_newuser: 'useradmin/users/new?is_embeddable=true',
+      };
 
-      $('link[href]').each(function(){
-        LOADED_CSS.push($(this).attr('href'));
-      });
+      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
 
       var OnePageViewModel = function () {
         var self = this;
 
-        self.EMBEDDABLE_PAGE_URLS = {
-          editor: '/notebook/editor_embeddable',
-          notebook: '/notebook/notebook_embeddable',
-          metastore: '/metastore/tables/?is_embeddable=true',
-          dashboard: '/dashboard/embeddable/new_search',
-          oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
-          oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
-          oozie_bundle: '/oozie/editor/bundle/new/?is_embeddable=true',
-          jobbrowser: '/jobbrowser/apps?is_embeddable=true',
-          filebrowser: '/filebrowser/?is_embeddable=true',
-          filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
-          fileviewer: 'filebrowser/view=',
-          home: '/home_embeddable',
-          indexer: '/indexer/indexer/?is_embeddable=true',
-          collections: '/dashboard/admin/collections?is_embeddable=true',
-          indexes: '/indexer/?is_embeddable=true',
-          importer: '/indexer/importer/?is_embeddable=true',
-          useradmin_users: '/useradmin/users?is_embeddable=true',
-          useradmin_groups: '/useradmin/groups?is_embeddable=true',
-          useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
-          useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
-          useradmin_newuser: 'useradmin/users/new?is_embeddable=true',
-        };
-
-        self.SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
-
         self.embeddable_cache = {};
+        self.currentApp = ko.observable();
+        self.isLoadingEmbeddable = ko.observable(false);
+        self.extraEmbeddableURLParams = ko.observable('');
 
         self.getActiveAppViewModel = function (callback) {
           var checkInterval = window.setInterval(function () {
@@ -618,7 +517,17 @@ ${ assist.assistPanel() }
           }, 25);
         }
 
-        self.currentApp = ko.observable();
+        self.changeEditorType = function (type) {
+          self.extraEmbeddableURLParams('?type=' + type);
+          hueUtils.changeURLParameter('type', type);
+          self.getActiveAppViewModel(function (viewModel) {
+            if (viewModel && viewModel.selectedNotebook && viewModel.selectedNotebook()) {
+              viewModel.selectedNotebook().selectedSnippet(type);
+              viewModel.editorType(type);
+              viewModel.newNotebook();
+            }
+          })
+        }
 
         self.currentApp.subscribe(function (newApp) {
           huePubSub.publish('set.current.app.name', newApp);
@@ -636,22 +545,6 @@ ${ assist.assistPanel() }
         huePubSub.subscribe('get.current.app.name', function () {
           huePubSub.publish('set.current.app.name', self.currentApp());
         });
-
-        self.isLoadingEmbeddable = ko.observable(false);
-
-        self.extraEmbeddableURLParams = ko.observable('');
-
-        self.changeEditorType = function (type) {
-          self.extraEmbeddableURLParams('?type=' + type);
-          hueUtils.changeURLParameter('type', type);
-          self.getActiveAppViewModel(function (viewModel) {
-            if (viewModel && viewModel.selectedNotebook && viewModel.selectedNotebook()) {
-              viewModel.selectedNotebook().selectedSnippet(type);
-              viewModel.editorType(type);
-              viewModel.newNotebook();
-            }
-          })
-        }
 
         huePubSub.subscribe('open.fb.file', function (path) {
           self.extraEmbeddableURLParams(path + '?is_embeddable=true');
@@ -734,24 +627,35 @@ ${ assist.assistPanel() }
           }
         });
 
-        function processHeaders(response){
+        var loadedJs = [];
+        var loadedCss = [];
+
+        $('script[src]').each(function(){
+          loadedJs.push($(this).attr('src'));
+        });
+
+        $('link[href]').each(function(){
+          loadedCss.push($(this).attr('href'));
+        });
+
+        // Only load CSS and JS files that are not loaded before
+        var processHeaders = function(response){
           var r = $('<span>').html(response);
           r.find('link').each(function () {
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
           });
-          // load just CSS and JS files that are not loaded before
           r.find('script[src]').each(function () {
             var jsFile = $(this).attr('src').split('?')[0];
-            if (LOADED_JS.indexOf(jsFile) === -1) {
-              LOADED_JS.push(jsFile);
+            if (loadedJs.indexOf(jsFile) === -1) {
+              loadedJs.push(jsFile);
               $(this).clone().appendTo($('head'));
             }
             $(this).remove();
           });
           r.find('link[href]').each(function () {
             var cssFile = $(this).attr('href').split('?')[0];
-            if (LOADED_CSS.indexOf(cssFile) === -1) {
-              LOADED_CSS.push(cssFile);
+            if (loadedCss.indexOf(cssFile) === -1) {
+              loadedCss.push(cssFile);
               $(this).clone().appendTo($('head'));
             }
             $(this).remove();
@@ -768,7 +672,7 @@ ${ assist.assistPanel() }
           self.isLoadingEmbeddable(true);
           if (typeof self.embeddable_cache[newVal] === 'undefined') {
             $.ajax({
-              url: self.EMBEDDABLE_PAGE_URLS[newVal] + self.extraEmbeddableURLParams(),
+              url: EMBEDDABLE_PAGE_URLS[newVal] + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
@@ -776,7 +680,7 @@ ${ assist.assistPanel() }
               success: function (response) {
                 self.extraEmbeddableURLParams('');
                 var r = processHeaders(response);
-                if (self.SKIP_CACHE.indexOf(newVal) === -1) {
+                if (SKIP_CACHE.indexOf(newVal) === -1) {
                   self.embeddable_cache[newVal] = r;
                 }
                 $('#embeddable_' + newVal).html(r);
@@ -790,8 +694,8 @@ ${ assist.assistPanel() }
           $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
         });
 
-        self.loadAppState = function () {
-          if (window.location.getParameter('app') !== '' && self.EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
+        var loadAppState = function () {
+          if (window.location.getParameter('app') !== '' && EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
             var app = window.location.getParameter('app');
             switch (app) {
               case 'fileviewer':
@@ -837,10 +741,10 @@ ${ assist.assistPanel() }
           });
         }
 
-        self.loadAppState();
+        loadAppState();
 
         window.onpopstate = function (event) {
-          self.loadAppState();
+          loadAppState();
         };
 
         huePubSub.subscribe('switch.app', function (name) {
@@ -928,12 +832,32 @@ ${ assist.assistPanel() }
     })();
 
     var topNavViewModel = (function (onePageViewModel) {
+
+      // TODO: Extract to common module (shared with nav search autocomplete)
+      var SEARCH_FACET_ICON = 'fa-tags';
+      var SEARCH_TYPE_ICONS = {
+        'DATABASE': 'fa-database',
+        'TABLE': 'fa-table',
+        'VIEW': 'fa-eye',
+        'FIELD': 'fa-columns',
+        'PARTITION': 'fa-th',
+        'SOURCE': 'fa-server',
+        'OPERATION': 'fa-cogs',
+        'OPERATION_EXECUTION': 'fa-cog',
+        'DIRECTORY': 'fa-folder-o',
+        'FILE': 'fa-file-o',
+        'SUB_OPERATION': 'fa-code-fork',
+        'COLLECTION': 'fa-search',
+        'HBASE': 'fa-th-large',
+        'HUE': 'fa-file-o'
+      };
+
       function TopNavViewModel () {
         var self = this;
         self.onePageViewModel = onePageViewModel;
         self.leftNavVisible = ko.observable(false);
         self.leftNavVisible.subscribe(function (val) {
-          huePubSub.publish('responsive.left.nav.toggle', val);
+          huePubSub.publish('left.nav.open.toggle', val);
         });
 
         self.onePageViewModel.currentApp.subscribe(function () {
@@ -946,25 +870,6 @@ ${ assist.assistPanel() }
         self.searchInput = ko.observable();
         self.jobsPanelVisible = ko.observable(false);
         self.historyPanelVisible = ko.observable(false);
-
-        // TODO: Extract to common module (shared with nav search autocomplete)
-        var SEARCH_FACET_ICON = 'fa-tags';
-        var SEARCH_TYPE_ICONS = {
-          'DATABASE': 'fa-database',
-          'TABLE': 'fa-table',
-          'VIEW': 'fa-eye',
-          'FIELD': 'fa-columns',
-          'PARTITION': 'fa-th',
-          'SOURCE': 'fa-server',
-          'OPERATION': 'fa-cogs',
-          'OPERATION_EXECUTION': 'fa-cog',
-          'DIRECTORY': 'fa-folder-o',
-          'FILE': 'fa-file-o',
-          'SUB_OPERATION': 'fa-code-fork',
-          'COLLECTION': 'fa-search',
-          'HBASE': 'fa-th-large',
-          'HUE': 'fa-file-o'
-        };
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
@@ -1045,89 +950,6 @@ ${ assist.assistPanel() }
 
       TopNavViewModel.prototype.performSearch = function () {
       };
-
-      self.editorVM = new EditorViewModel(null, '', {
-        user: '${ user.username }',
-        userId: ${ user.id },
-        languages: [{name: "Java", type: "java"}, {name: "Hive SQL", type: "hive"}], // TODO reuse
-        snippetViewSettings: {
-          java : {
-            snippetIcon: 'fa-file-archive-o '
-          },
-          hive: {
-            placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-            aceMode: 'ace/mode/hive',
-            snippetImage: '${ static("beeswax/art/icon_beeswax_48.png") }',
-            sqlDialect: true
-          },
-          impala: {
-            placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-            aceMode: 'ace/mode/impala',
-            snippetImage: '${ static("impala/art/icon_impala_48.png") }',
-            sqlDialect: true
-          },
-          java : {
-            snippetIcon: 'fa-file-code-o'
-          },
-          shell: {
-            snippetIcon: 'fa-terminal'
-          }
-        }
-      });
-      self.editorVM.editorMode(true);
-      self.editorVM.isNotificationManager(true);
-      self.editorVM.newNotebook();
-
-      huePubSub.subscribe("notebook.task.submitted", function (history_id) {
-        self.editorVM.openNotebook(history_id, null, true, function(){
-          var notebook = self.editorVM.selectedNotebook();
-          notebook.snippets()[0].progress.subscribe(function(val){
-            if (val == 100){
-              //self.indexingStarted(false);
-              //self.isIndexing(false);
-              //self.indexingSuccess(true);
-            }
-          });
-          notebook.snippets()[0].status.subscribe(function(val){
-            if (val == 'failed'){
-              //self.isIndexing(false);
-              //self.indexingStarted(false);
-              //self.indexingError(true);
-            } else if (val == 'available') {
-              var snippet = notebook.snippets()[0];
-              if (! snippet.result.handle().has_more_statements) {
-                // TODO: Show finish notification and clicking on it does onSuccessUrl
-                // or if still on initial spinner we redirect automatically to onSuccessUrl
-                if (notebook.onSuccessUrl()) {
-                  if (notebook.onSuccessUrl() == 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
-                    huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
-                  } else {
-                    huePubSub.publish('open.link', notebook.onSuccessUrl());
-                  }
-                }
-              } else { // Perform last DROP statement execute
-                snippet.execute();
-              }
-            }
-          });
-          notebook.snippets()[0].checkStatus();
-          
-          // Add to history
-          notebook.history.unshift(
-            notebook._makeHistoryRecord(
-              notebook.onSuccessUrl(),
-              notebook.snippets()[0].result.handle().statement || '',
-              notebook.snippets()[0].lastExecuted(),
-              notebook.snippets()[0].status(),
-              notebook.name(),
-              notebook.uuid()
-            )
-          );
-        });
-
-        topNavViewModel.historyPanelVisible(true);
-      });
-
 
       var topNavViewModel = new TopNavViewModel();
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
