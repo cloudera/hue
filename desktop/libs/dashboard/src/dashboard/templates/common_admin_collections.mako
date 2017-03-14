@@ -75,7 +75,7 @@
 
       <%def name="creation()">
         %if not is_mobile:
-        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ url('dashboard:new_search') }" title="${ _('Create a new dashboard') }">
+        <a data-bind="visible: collections().length > 0 && !isLoading()" class="btn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:new_search') + "')" or url('dashboard:new_search') }" title="${ _('Create a new dashboard') }">
           <i class="fa fa-plus-circle"></i> ${ _('Create') }
         </a>
         <a data-bind="visible: !isLoading(), click: function() { $('#import-documents').modal('show'); }" class="btn">
