@@ -35,7 +35,7 @@
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
     % if user.has_hue_permission(action="access", app='indexer'):
-    <a class="btn importBtn" href="${ url('indexer:collections') }">
+    <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('indexer:collections') + "')" or url('indexer:collections') }" title="${ _('Indexes') }">
       <i class="fa fa-database"></i> ${ _('Indexes') }
     </a>
     % endif
