@@ -353,9 +353,17 @@ def edit_user(request, username=None):
       form.fields.pop("password_old")
 
   if require_change_password(userprofile):
-    return render('change_password.mako', request, dict(form=form, username=username))
+    return render('change_password.mako', request, {
+      'form': form,
+      'username': username,
+      'is_embeddable': request.GET.get('is_embeddable', False),
+    })
   else:
-    return render('edit_user.mako', request, dict(form=form, username=username))
+    return render('edit_user.mako', request, {
+      'form': form,
+      'username': username,
+      'is_embeddable': request.GET.get('is_embeddable', False),
+    })
 
 
 def view_user(request, username):  

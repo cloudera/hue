@@ -387,6 +387,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_groups" class="embeddable"></div>
       <div id="embeddable_useradmin_permissions" class="embeddable"></div>
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
+      <div id="embeddable_useradmin_newuser" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
@@ -600,9 +601,10 @@ ${ assist.assistPanel() }
           useradmin_groups: '/useradmin/groups?is_embeddable=true',
           useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
           useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
+          useradmin_newuser: 'useradmin/users/new?is_embeddable=true',
         };
 
-        self.SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations'];
+        self.SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
 
         self.embeddable_cache = {};
 
@@ -714,13 +716,15 @@ ${ assist.assistPanel() }
             self.currentApp('oozie_bundle');
           } else if (href.startsWith('/filebrowser')){
             self.currentApp('filebrowser');
+          } else if (href.startsWith('/useradmin/users/new')){
+            self.currentApp('useradmin_newuser');
           } else if (href.startsWith('/useradmin/users')){
             self.currentApp('useradmin_users');
           } else if (href.startsWith('/useradmin/groups')){
             self.currentApp('useradmin_groups');
           } else if (href.startsWith('/useradmin/permissions')){
             self.currentApp('useradmin_permissions');
-          } else if (href.startsWith('/useradmin/configurations')){
+          } else if (href.startsWith('/useradmin/configurations')) {
             self.currentApp('useradmin_configurations');
           }
         });
