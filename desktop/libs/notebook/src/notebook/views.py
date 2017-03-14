@@ -146,17 +146,22 @@ def browse(request, database, table, partition_spec=None):
   statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
 
   editor_type = snippet['type']
-  editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
 
-  return render('editor.mako', request, {
-      'notebooks_json': json.dumps([editor.get_data()]),
-      'options_json': json.dumps({
-          'languages': get_ordered_interpreters(request.user),
-          'mode': 'editor',
-          'editor_type': editor_type
-      }),
-      'editor_type': editor_type,
-  })
+  if request.method == 'POST':
+    notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=statement, status='ready-execute', is_task=True)
+    return JsonResponse(notebook.execute(request, batch=False))
+  else:
+    editor = make_notebook(name='Browse', editor_type=editor_type, statement=statement, status='ready-execute')
+
+    return render('editor.mako', request, {
+        'notebooks_json': json.dumps([editor.get_data()]),
+        'options_json': json.dumps({
+            'languages': get_ordered_interpreters(request.user),
+            'mode': 'editor',
+            'editor_type': editor_type
+        }),
+        'editor_type': editor_type,
+    })
 
 
 @check_document_access_permission()
