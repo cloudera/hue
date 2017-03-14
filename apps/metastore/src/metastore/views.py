@@ -37,7 +37,7 @@ from beeswax.server import dbms
 from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
-from notebook.connectors.base import Notebook
+from notebook.connectors.base import Notebook, QueryError
 from notebook.models import make_notebook
 
 from metastore.forms import LoadDataForm, DbForm
@@ -439,12 +439,28 @@ def load_table(request, database, table):
 
     if load_form.is_valid():
       on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table.name})
+      generate_ddl_only = request.POST.get('is_embeddable', 'false') == 'true'
       try:
         design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-        query_history = db.load_data(database, table, load_form, design)
-        url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + on_success_url
-        response['status'] = 0
-        response['data'] = url
+        query_history = db.load_data(database, table, load_form, design, generate_ddl_only=generate_ddl_only)
+        if generate_ddl_only:
+          job = make_notebook(
+            name='Execute and watch',
+            editor_type='hive',
+            statement=query_history.strip(),
+            status='ready',
+            database=database,
+            on_success_url='assist.db.refresh',
+            is_task=True
+          )
+          response = job.execute(request)
+        else:
+          url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + on_success_url
+          response['status'] = 0
+          response['data'] = url
+      except QueryError, ex:
+        response['status'] = 1
+        response['data'] = _("Can't load the data: ") + ex.message
       except Exception, e:
         response['status'] = 1
         response['data'] = _("Can't load the data: ") + str(e)

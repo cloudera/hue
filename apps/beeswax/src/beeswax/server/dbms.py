@@ -536,7 +536,7 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
-  def load_data(self, database, table, form, design):
+  def load_data(self, database, table, form, design, generate_ddl_only=False):
     hql = "LOAD DATA INPATH"
     hql += " '%s'" % form.cleaned_data['path']
     if form.cleaned_data['overwrite']:
@@ -551,11 +551,14 @@ class HiveServer2Dbms(object):
       hql += ", ".join(vals)
       hql += ")"
 
-    query = hql_query(hql, database)
-    design.data = query.dumps()
-    design.save()
+    if generate_ddl_only:
+      return hql
+    else:
+      query = hql_query(hql, database)
+      design.data = query.dumps()
+      design.save()
 
-    return self.execute_query(query, design)
+      return self.execute_query(query, design)
 
 
   def drop_tables(self, database, tables, design, skip_trash=False, generate_ddl_only=False):
