@@ -61,7 +61,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div class="search-bar" style="height: 30px">
   <div class="pull-right">
-    <a class="btn importBtn" href="${ url('search:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+    <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:admin_collections') + "')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i> ${ _('Dashboards') }
     </a>
   </div>

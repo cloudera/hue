@@ -700,8 +700,10 @@ ${ assist.assistPanel() }
           } else if (href.startsWith('/pig')){
             self.changeEditorType('pig');
             self.currentApp('editor');
-          } else if (href.startsWith('/dashboard')){
+          } else if (href.startsWith('/dashboard/embeddable')){
             self.currentApp('dashboard');
+          } else if (href.startsWith('/dashboard/admin/collections')){
+            self.currentApp('collections');
           } else if (href.startsWith('/oozie/editor/workflow/new')){
             self.currentApp('oozie_workflow');
           } else if (href.startsWith('/oozie/editor/coordinator/new')){
