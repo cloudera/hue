@@ -620,7 +620,8 @@ ${ assist.assistPanel() }
 
         self.currentApp = ko.observable();
 
-        self.currentApp.subscribe(function () {
+        self.currentApp.subscribe(function (newApp) {
+          huePubSub.publish('set.current.app.name', newApp);
           self.getActiveAppViewModel(function (viewModel) {
             huePubSub.publish('set.current.app.view.model', viewModel);
           })
@@ -631,6 +632,10 @@ ${ assist.assistPanel() }
             huePubSub.publish('set.current.app.view.model', viewModel);
           })
         })
+
+        huePubSub.subscribe('get.current.app.name', function () {
+          huePubSub.publish('set.current.app.name', self.currentApp());
+        });
 
         self.isLoadingEmbeddable = ko.observable(false);
 

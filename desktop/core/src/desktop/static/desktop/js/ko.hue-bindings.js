@@ -825,6 +825,15 @@
     }
   };
 
+  ko.bindingHandlers.appAwareTemplateContextMenu = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      viewModel.$currentApp = ko.observable('');
+      huePubSub.subscribe('set.current.app.name', viewModel.$currentApp);
+      huePubSub.publish('get.current.app.name');
+      ko.bindingHandlers.templateContextMenu.init(element, valueAccessor, allBindings, viewModel, bindingContext);
+    }
+  };
+
   ko.bindingHandlers.templateContextMenu = {
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       var options = valueAccessor();
