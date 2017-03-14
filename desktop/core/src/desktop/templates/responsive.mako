@@ -209,17 +209,9 @@ ${ hueIcons.symbols() }
         </div>
 
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
-
-        <div class="compose-action btn-group">
-          <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" style="display:none;">0</div></button>
-          <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
-            <span class="caret"></span>
-          </button>
-        </div>
-        <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
-          <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
-          <div id="mini_jobbrowser"></div>
-        </div>
+        % if 'jobbrowser' in apps:
+        <!-- ko component: { name: 'hue-job-browser-panel', params: { processHeaders: onePageViewModel.processHeaders }} --><!-- /ko -->
+        % endif
       % endif
     </div>
   </div>
@@ -639,7 +631,7 @@ ${ assist.assistPanel() }
         });
 
         // Only load CSS and JS files that are not loaded before
-        var processHeaders = function(response){
+        self.processHeaders = function(response){
           var r = $('<span>').html(response);
           r.find('link').each(function () {
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
@@ -679,7 +671,7 @@ ${ assist.assistPanel() }
               dataType: 'html',
               success: function (response) {
                 self.extraEmbeddableURLParams('');
-                var r = processHeaders(response);
+                var r = self.processHeaders(response);
                 if (SKIP_CACHE.indexOf(newVal) === -1) {
                   self.embeddable_cache[newVal] = r;
                 }
@@ -749,19 +741,6 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
-        });
-
-        // load the mini jobbrowser
-        $.ajax({
-          url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
-          beforeSend: function (xhr) {
-            xhr.setRequestHeader('X-Requested-With', 'Hue');
-          },
-          dataType: 'html',
-          success: function (response) {
-            var r = processHeaders(response);
-            $('#mini_jobbrowser').html(r);
-          }
         });
 
       };
@@ -957,38 +936,6 @@ ${ assist.assistPanel() }
 
       return topNavViewModel;
     })(onePageViewModel);
-
-    % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
-      var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
-      var lastJobBrowserRequest = null;
-
-      function checkJobBrowserStatus(){
-        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
-          return;
-        }
-        window.clearTimeout(checkJobBrowserStatusIdx);
-        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
-            "format": "json",
-            "state": "running",
-            "user": "${user.username}"
-          },
-          function(data) {
-            if (data != null && data.jobs != null) {
-              huePubSub.publish('jobbrowser.data', data.jobs);
-              if (data.jobs.length > 0){
-                $("#jobBrowserCount").show().text(data.jobs.length);
-              } else {
-                $("#jobBrowserCount").hide();
-              }
-            }
-          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
-        }).fail(function () {
-          window.clearTimeout(checkJobBrowserStatusIdx);
-        });
-      }
-      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
-    % endif
 
     window.hueDebug = {
       viewModel: function (element) {

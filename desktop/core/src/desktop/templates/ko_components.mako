@@ -247,7 +247,7 @@ from desktop.views import _ko
       </div>
       <div class="modal-footer">
         <a class="btn" data-dismiss="modal">${_('No')}</a>
-        <a class="btn btn-danger disable-feedback" onclick="function() { editorViewModel.selectedNotebook().clearHistory(); editorViewModel.selectedNotebook(null); }">${_('Yes')}</a>
+        <a class="btn btn-danger disable-feedback" data-bind="click: function() { editorViewModel.selectedNotebook().clearHistory(); editorViewModel.selectedNotebook(null); }">${_('Yes')}</a>
       </div>
     </div>
   </script>
@@ -341,6 +341,81 @@ from desktop.views import _ko
       ko.components.register('hue-history-panel', {
         viewModel: HistoryPanel,
         template: { element: 'hue-history-panel-template' }
+      });
+    })();
+  </script>
+
+  <script type="text/html" id="hue-job-browser-panel-template">
+    <div class="compose-action btn-group">
+      <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount">0</div></button>
+      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
+        <span class="caret"></span>
+      </button>
+    </div>
+    <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
+      <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
+      <div id="mini_jobbrowser"></div>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+
+      var JobBrowserPanel = function (params) {
+        var self = this;
+
+        self.jobsPanelVisible = ko.observable(false);
+        self.jobCount = ko.observable(0);
+
+        var lastJobBrowserRequest = null;
+
+        var checkJobBrowserStatus = function() {
+          if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+            return;
+          }
+          window.clearTimeout(checkJobBrowserStatusIdx);
+          lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
+              "format": "json",
+              "state": "running",
+              "user": "${user.username}"
+            },
+            function(data) {
+              if (data != null && data.jobs != null) {
+                huePubSub.publish('jobbrowser.data', data.jobs);
+                if (data.jobs.length > 0){
+                  $("#jobBrowserCount").show().text(data.jobs.length);
+                } else {
+                  $("#jobBrowserCount").hide();
+                }
+              }
+              checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+            }).fail(function () {
+            window.clearTimeout(checkJobBrowserStatusIdx);
+          });
+
+          // load the mini jobbrowser
+          $.ajax({
+            url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('X-Requested-With', 'Hue');
+            },
+            dataType: 'html',
+            success: function (response) {
+              var r = params.processHeaders(response);
+              $('#mini_jobbrowser').html(r);
+            }
+          });
+        };
+
+        var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+
+        huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
+      };
+
+      ko.components.register('hue-job-browser-panel', {
+        viewModel: JobBrowserPanel,
+        template: { element: 'hue-job-browser-panel-template' }
       });
     })();
   </script>
