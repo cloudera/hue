@@ -308,7 +308,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
     </div>
 
-    <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible(), splitFlexDraggable : {
+    <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
       containerSelector: '.content-wrapper',
       sidePanelSelector: '.right-panel',
       sidePanelVisible: rightAssistVisible,
@@ -316,11 +316,11 @@ ${ hueIcons.symbols() }
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
-    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() }, visibleOnHover: { selector: '.hide-right-side-panel' }">
-      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible, toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
+    <div class="right-panel" data-bind="css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }">
+      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible() && rightAssistAvailable(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
-      <div data-bind="visible: rightAssistVisible" style="display: none; height: 100%; width: 100%; position: relative;">
+      <div data-bind="visible: rightAssistVisible() && rightAssistAvailable()" style="display: none; height: 100%; width: 100%; position: relative;">
         <ul class="right-panel-tabs nav nav-pills">
           <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
           <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
@@ -756,9 +756,16 @@ ${ assist.assistPanel() }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.rightAssistVisible = ko.observable();
+        self.rightAssistAvailable = ko.observable(false);
         self.assistantAvailable = ko.observable(false);
         self.activeRightTab = ko.observable();
         self.activeAppViewModel = ko.observable();
+
+        huePubSub.subscribe('set.current.app.name', function (appName) {
+          self.rightAssistAvailable(appName === 'editor' || appName === 'notebook');
+        });
+        huePubSub.publish('get.current.app.name');
+
 
         self.contextPanelVisible = ko.observable(false);
         self.sessionsAvailable = ko.observable(false);
@@ -768,7 +775,6 @@ ${ assist.assistPanel() }
         })
 
         huePubSub.subscribe('context.panel.visible', function (visible) {
-          console.log(visible);
           self.contextPanelVisible(visible);
         })
 
@@ -807,6 +813,7 @@ ${ assist.assistPanel() }
       ko.applyBindings(sidePanelViewModel, $('#rightResizer')[0]);
       ko.applyBindings(sidePanelViewModel, $('.right-panel')[0]);
       ko.applyBindings(sidePanelViewModel, $('.context-panel')[0]);
+
       return sidePanelViewModel;
     })();
 
