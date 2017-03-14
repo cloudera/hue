@@ -702,7 +702,7 @@ ${ assist.assistPanel() }
             self.currentApp('editor');
           } else if (href.startsWith('/indexer')){
             self.currentApp('indexes');
-          } else if (href.startsWith('/dashboard/embeddable')){
+          } else if (href.startsWith('/dashboard/embeddable') || href.startsWith('/dashboard/new_search')){
             self.currentApp('dashboard');
           } else if (href.startsWith('/dashboard/admin/collections')){
             self.currentApp('collections');
