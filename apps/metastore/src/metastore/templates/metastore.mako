@@ -453,8 +453,8 @@ ${ components.menubar() }
         <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
-          <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
-            <i class="fa fa-pencil-square-o"></i> ${_('Query')}
+          <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + name + '/' + selectedTables()[0].name + '/') : location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
+            <i class="fa fa-play fa-fw"></i> ${_('Query')}
           </button>
           % if has_write_access:
             <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
@@ -617,17 +617,21 @@ ${ components.menubar() }
     <!-- ko with: database -->
     <!-- ko with: table -->
     % if USE_NEW_EDITOR.get():
+    <!-- ko if: IS_HUE_4 -->
+      <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { queryAndWatch('/notebook/browse/' + database.name + '/' + name + '/'); }" title="${_('Query the table')}" href="javascript:void(0)"><i class="fa fa-play fa-fw"></i></a>
+    <!-- /ko -->
+    <!-- ko if: ! IS_HUE_4 -->
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/notebook/browse/' + database.name + '/' + name }" title="${_('Query the table')}"><i class="fa fa-play fa-fw"></i></a>
+    <!-- /ko -->
     % else:
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if user.is_superuser:
     <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
       <a class="inactive-action" title="${_('View in Optimizer')}" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas fa-fw"></i></a>
     <!-- /ko -->
     % endif
-##     <a class="inactive-action margin-left-10" href="javascript: void(0);"><i class="fa fa-star"></i></a>
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
