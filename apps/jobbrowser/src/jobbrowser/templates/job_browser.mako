@@ -1108,11 +1108,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             viewModel.interface(h);
             break;
           default:
+            var isJob = true;
             if (/oozie-oozi-W/.test(h)) { viewModel.interface('workflows'); }
             else if (/oozie-oozi-C/.test(h)) { viewModel.interface('schedules'); }
             else if (/oozie-oozi-B/.test(h)) { viewModel.interface('bundles'); }
-
-            new Job(viewModel, {id: h}).fetchJob();
+            else { isJob = false; }
+            if (isJob) {
+              new Job(viewModel, {id: h}).fetchJob();
+            }
         }
       }
 
