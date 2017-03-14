@@ -700,6 +700,8 @@ ${ assist.assistPanel() }
           } else if (href.startsWith('/pig')){
             self.changeEditorType('pig');
             self.currentApp('editor');
+          } else if (href.startsWith('/indexer')){
+            self.currentApp('indexes');
           } else if (href.startsWith('/dashboard/embeddable')){
             self.currentApp('dashboard');
           } else if (href.startsWith('/dashboard/admin/collections')){
