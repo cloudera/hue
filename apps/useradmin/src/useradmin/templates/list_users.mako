@@ -42,7 +42,7 @@ ${layout.menubar(section='users')}
       <%def name="creation()">
         %if user.is_superuser:
             % if not is_ldap_setup:
-                <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+              <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('useradmin.views.edit_user') + "')" or url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
 
             % if is_ldap_setup:
