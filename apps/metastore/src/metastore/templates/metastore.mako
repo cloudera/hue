@@ -198,18 +198,18 @@ ${ components.menubar() }
       <!-- ko foreach: values -->
       <tr>
         <td data-bind="text: $index() + 1"></td>
-        <td>
-          <!-- ko if: !IS_HUE_4 -->
-            <a data-bind="click: function() { browsePartition(notebookUrl, 'query'); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
+        <td title="${_('Query partition data')}">
+          <!-- ko if: IS_HUE_4 -->
+            <a data-bind="click: function() { queryAndWatch(notebookUrl); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
           <!-- /ko -->
-          <!-- ko if:  IS_HUE_4 -->
+          <!-- ko if: ! IS_HUE_4 -->
             <a data-bind="attr: {'href': readUrl }, text: '[\'' + columns.join('\',\'') + '\']'"></a>
           <!-- /ko -->
         </td>
         <td data-bind="text: partitionSpec"></td>
         <td>
           <!-- ko if: IS_HUE_4 -->
-            <a data-bind="click: function () { browsePartition(browseUrl, 'files'); }" href="javascript:void(0)" title="${_('Browse partition files')}">
+            <a data-bind="click: function () { browsePartitionFolder(browseUrl); }" href="javascript:void(0)" title="${_('Browse partition files')}">
               ${_('Files')}
             </a>
           <!-- /ko -->
@@ -1170,16 +1170,26 @@ ${ components.menubar() }
     });
   }
 
-  function browsePartition(url, type) {
+  function browsePartitionFolder(url) {
     $.get(url, {
       format: "json"
     },function(resp) {
       if (resp.uri_path) {
-        if (type == 'file') {
-          huePubSub.publish('open.fb.folder', resp.uri_path.replace(/\/filebrowser\/view=/g, '') );
-        } else {
-          huePubSub.publish('open.link', resp.uri_path);
-        }
+        huePubSub.publish('open.fb.folder', resp.uri_path.replace(/\/filebrowser\/view=/g, '') );
+      } else if (resp.message) {
+        $(document).trigger("error", resp.message);
+      }
+    }).fail(function (xhr) {
+      $(document).trigger("error", xhr.responseText);
+    });
+  }
+
+  function queryAndWatch(url) {
+    $.post(url, {
+      format: "json"
+    },function(resp) {
+      if (resp.history_uuid) {
+        huePubSub.publish('open.editor.query', resp.history_uuid);
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }

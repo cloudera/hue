@@ -550,6 +550,13 @@ ${ assist.assistPanel() }
           window.location.hash = path;
         });
 
+        huePubSub.subscribe('open.editor.query', function (uuid) {
+          self.currentApp('editor');
+          self.getActiveAppViewModel(function (viewModel) {
+            viewModel.openNotebook(uuid);
+          })
+        });
+
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/notebook/editor')){
             if (hueUtils.getSearchParameter(href, 'editor') !== '') {
