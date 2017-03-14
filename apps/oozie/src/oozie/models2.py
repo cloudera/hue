@@ -599,8 +599,6 @@ def _dig_nodes(nodes, adj_list, user, wf_nodes):
       elif node['node_type'] == 'email':
         properties['to'] = node.get('email').get('to')
         properties['subject'] = node.get('email').get('subject')
-        #TBD: body doesn't show up
-        properties['body'] = node.get('email').get('body')
       elif node['node_type'] == 'streaming':
         properties['mapper'] = node.get('streaming').get('mapper')
         properties['reducer'] = node.get('streaming').get('reducer')
