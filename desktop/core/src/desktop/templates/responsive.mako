@@ -464,6 +464,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
 <script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
