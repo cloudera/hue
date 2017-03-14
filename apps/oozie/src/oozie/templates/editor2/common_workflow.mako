@@ -518,7 +518,7 @@
       ${ _('Arguments') } <i class="fa fa-plus"></i>
     </a>
   </h6>
-  <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0,  sortable: { data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
+  <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0,  sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
     <li style="margin-bottom: 3px">
       <span class="muted move-widget">
         <i class="fa fa-arrows"></i>
@@ -799,7 +799,7 @@
             ${ _('Arguments') } <i class="fa fa-plus"></i>
           </a>
           <div class="row-fluid">
-            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
+            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.arguments().length > 0, sortable: { allowDrop: false, data: properties.arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
@@ -966,7 +966,7 @@
 
         <div class="row-fluid">
           <div>
-            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.spark_arguments().length > 0, sortable: { data: properties.spark_arguments, options: { axis: 'y', containment: 'parent' }}">
+            <ul class="unstyled white sortable-arguments" data-bind="visible: properties.spark_arguments().length > 0, sortable: { allowDrop: false, data: properties.spark_arguments, options: { axis: 'y', containment: 'parent' }}">
               <li>
                 <span class="muted move-widget">
                   <i class="fa fa-arrows"></i>
@@ -2148,7 +2148,7 @@
             <span data-bind="text: $root.workflow_properties.distcp_parameters.label"></span> <i class="fa fa-plus"></i>
           </a>
         </h6>
-        <ul class="unstyled white sortable-arguments" data-bind="sortable: { data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
+        <ul class="unstyled white sortable-arguments" data-bind="sortable: { allowDrop: false, data: properties.distcp_parameters, options: { axis: 'y', containment: 'parent' }}">
           <li>
             <span class="muted move-widget">
               <i class="fa fa-arrows"></i>
