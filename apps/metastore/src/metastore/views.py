@@ -442,7 +442,12 @@ def load_table(request, database, table):
       generate_ddl_only = request.POST.get('is_embeddable', 'false') == 'true'
       try:
         design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-        query_history = db.load_data(database, table, load_form, design, generate_ddl_only=generate_ddl_only)
+        form_data = {
+          'path': load_form.cleaned_data['path'],
+          'overwrite': load_form.cleaned_data['overwrite'],
+          'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.cleaned_data['partition_columns'].iteritems()],
+        }
+        query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
         if generate_ddl_only:
           job = make_notebook(
             name='Execute and watch',

@@ -57,7 +57,7 @@ COMMENT "${col["comment"]|n}" \
 % if table.get('primary_keys'):
 , PRIMARY KEY (${ ', '.join(table['primary_keys']) })
 % endif
-) \
+)\
 </%def>\
 
 <%def name="kudu_partition(partition)">
