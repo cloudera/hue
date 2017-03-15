@@ -98,7 +98,7 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="brand" href="/" title="${_('Hue home')}">
+        <a class="brand" data-bind="click: function () { onePageViewModel.currentApp('home') }" href="javascript: void(0);" title="${_('Homepage')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hue-logo"></use></svg>
         </a>
 
