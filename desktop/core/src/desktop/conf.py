@@ -230,7 +230,7 @@ SECURE_CONTENT_SECURITY_POLICY = Config(
   type=str,
   default="script-src 'self' 'unsafe-inline' 'unsafe-eval' *.google-analytics.com *.doubleclick.net *.mathjax.org data:;"+
           "img-src 'self' *.google-analytics.com *.doubleclick.net http://*.tile.osm.org *.tile.osm.org *.gstatic.com data:;"+
-          "style-src 'self' 'unsafe-inline';"+
+          "style-src 'self' 'unsafe-inline' fonts.googleapis.com;"+
           "connect-src 'self';"+
           "child-src 'self' data:;"+
           "object-src 'none'")
