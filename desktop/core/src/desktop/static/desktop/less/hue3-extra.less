@@ -50,11 +50,6 @@
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
-  border-width: 0 0 1px;
-  border-bottom: 1px solid #DDD;
-  -webkit-box-shadow: 0 1px 10px rgba(0,0,0,.1);
-  -moz-box-shadow: 0 1px 10px rgba(0,0,0,.1);
-  box-shadow: 0 1px 10px rgba(0,0,0,.1);
 }
 
 
@@ -97,12 +92,16 @@
 
 // Hue 3 CUI overrides
 
-.nav > li > a:hover,
-.nav > li > a:focus {
+.navigator .nav > li > a:hover,
+.navigator .nav > li > a:focus {
   background-color: transparent !important;
 }
 
 .nav .dropdown-toggle .caret {
   border-top-color: @hue-primary-color-light !important;
   border-bottom-color: @hue-primary-color-light !important;
+}
+
+.vertical-full.container-fluid {
+  padding-top: 0;
 }
