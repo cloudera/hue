@@ -226,7 +226,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
   <div id="documentMoveModal" class="modal fade hide">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Move to a project')}</h2>
     </div>
     <div class="modal-body">
@@ -300,7 +300,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 <div id="addTagModal" class="modal hide fade">
   <form class="form-inline form-padding-fix" onsubmit="javascript:{return false;}">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Create project')}</h2>
     </div>
     <div class="modal-body">
@@ -322,7 +322,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
 <div id="removeTagModal" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Confirm Delete')}</h2>
   </div>
   <div class="modal-body">
@@ -551,7 +551,7 @@ $(document).ready(function(){
 
   <div id="jHueTourModal" class="modal hide fade" tabindex="-1">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Did you know?')}</h2>
     </div>
     <div class="modal-body">

@@ -144,7 +144,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
   <form id="deleteNotebookForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
 
       % if editor_type == 'pig':
       <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected script(s)?') }</h2>

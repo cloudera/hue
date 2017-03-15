@@ -211,7 +211,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="trashWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="trashWfMessage" class="modal-title">${_('Move the selected designs to trash?')}</h2>
     </div>
     <div class="modal-footer">
@@ -225,7 +225,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="destroyWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="destroyWfMessage" class="modal-title">${_('Delete selected designs?')}</h2>
     </div>
     <div class="modal-footer">
@@ -239,7 +239,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="purgeWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="purgeWfMessage" class="modal-title">${_('Delete all trashed designs?')}</h2>
     </div>
     <div class="modal-footer">
@@ -253,7 +253,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   <form id="restoreWfForm" action="#" method="POST" style="margin:0">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="restoreWfMessage" class="modal-title">${_('Restore selected designs?')}</h2>
     </div>
     <div class="modal-footer">
@@ -265,7 +265,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
@@ -278,7 +278,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="chooseDirectory" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a directory')}</h2>
   </div>
   <div class="modal-body">
@@ -291,7 +291,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 
 <div id="choosePath" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a path')}</h2>
   </div>
   <div class="modal-body">

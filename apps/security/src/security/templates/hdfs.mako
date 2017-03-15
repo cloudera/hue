@@ -200,7 +200,7 @@ ${ layout.menubar(section='hdfs') }
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Select one operation')}</h2>
   </div>
   <div class="modal-body" style="overflow-x: hidden">

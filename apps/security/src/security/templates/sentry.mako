@@ -430,7 +430,7 @@ ${ layout.menubar(section=component) }
 
 <div id="createRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title" data-bind="visible: ! $root.role().isEditing()">${ _('Add or select a role') }</h2>
     <h2 class="modal-title" data-bind="visible: $root.role().isEditing()">${ _('Edit role') }</h2>
   </div>
@@ -464,7 +464,7 @@ ${ layout.menubar(section=component) }
 
 <div id="grantPrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Grant privilege') }</h2>
   </div>
   <div class="modal-body">
@@ -488,7 +488,7 @@ ${ layout.menubar(section=component) }
 
 <div id="deleteRoleModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Do you really want to delete the selected role(s)?') }</h2>
   </div>
   <div class="modal-footer">
@@ -500,7 +500,7 @@ ${ layout.menubar(section=component) }
 
 <div id="deletePrivilegeModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Confirm the deletion?') }</h2>
   </div>
   <div class="modal-body">
@@ -515,7 +515,7 @@ ${ layout.menubar(section=component) }
 
 <div id="bulkActionsModal" class="modal hide fade in" role="dialog">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Select one operation') }</h2>
   </div>
   <div class="modal-body" style="overflow-x: hidden">
@@ -584,7 +584,7 @@ ${ layout.menubar(section=component) }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">

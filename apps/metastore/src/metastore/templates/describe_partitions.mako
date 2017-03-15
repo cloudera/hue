@@ -159,7 +159,7 @@ ${ assist.assistPanel() }
   <form id="dropPartitionForm" action="${ url('metastore:drop_partition', database=database, table=table.name) }" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="dropPartitionMessage" class="modal-title">${_('Confirm action')}</h2>
     </div>
     <div class="modal-footer">

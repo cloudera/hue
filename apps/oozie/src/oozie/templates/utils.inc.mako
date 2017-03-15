@@ -326,7 +326,7 @@
 <%def name="path_chooser_libs(select_folder=False, skip_init=False)">
   <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Choose a') } ${ if_true(select_folder, _('folder'), _('file')) }</h2>
     </div>
     <div class="modal-body">
@@ -584,7 +584,7 @@ function renderCrons() {
 
 <div id="bulkConfirmation" class="modal hide">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Do you really want to kill the selected jobs?') }</h2>
   </div>
   <div class="modal-footer">

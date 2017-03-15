@@ -30,7 +30,7 @@
     <form class="form-horizontal" id="${node_type}-convert-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h2>
       </div>
 
@@ -64,7 +64,7 @@
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h2>
       </div>
 
@@ -104,7 +104,7 @@
     <form class="form-horizontal" id="${node_type}-action-form" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title message" data-bind="text: '${_ko('Edit Node: ')}' + name()"></h2>
       </div>
 

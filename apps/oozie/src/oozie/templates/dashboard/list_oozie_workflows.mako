@@ -156,7 +156,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title message"></h2>
   </div>
   <div class="modal-footer">

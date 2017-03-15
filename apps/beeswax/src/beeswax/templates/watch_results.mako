@@ -300,7 +300,7 @@ ${layout.menubar(section='query')}
         class="form form-inline form-padding-fix">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Save Query Results') }</h2>
     </div>
     <div class="modal-body">

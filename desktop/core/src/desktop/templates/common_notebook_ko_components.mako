@@ -52,7 +52,7 @@ except ImportError, e:
 
     <div id="addSnippetModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${ _('Add Snippet') }</h2>
       </div>
       <div class="modal-body" style="min-height: 100px">
@@ -212,7 +212,7 @@ except ImportError, e:
       </div>
 
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Save query result in a')}</h2>
       </div>
       <div class="modal-body" style="padding: 4px">

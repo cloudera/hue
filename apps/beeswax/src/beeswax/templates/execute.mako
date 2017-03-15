@@ -625,7 +625,7 @@ ${ layout.menubar(section='query') }
 
   <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Choose a file') }</h2>
     </div>
     <div class="modal-body">
@@ -638,7 +638,7 @@ ${ layout.menubar(section='query') }
 
   <div id="chooseFolder" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Select a directory') }</h2>
     </div>
     <div class="modal-body">
@@ -651,7 +651,7 @@ ${ layout.menubar(section='query') }
 
   <div id="choosePath" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Select a file or directory') }</h2>
     </div>
     <div class="modal-body">
@@ -665,7 +665,7 @@ ${ layout.menubar(section='query') }
 
   <div id="saveAs" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Choose a name') }</h2>
     </div>
     <form class="form-horizontal">
@@ -698,7 +698,7 @@ ${ layout.menubar(section='query') }
     </div>
 
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Save Query Results') }</h2>
     </div>
     <div class="modal-body" style="padding: 4px">
@@ -772,7 +772,7 @@ ${ layout.menubar(section='query') }
 
 <div id="clearHistoryModal" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Confirm History Clear') }</h2>
   </div>
   <div class="modal-body">
@@ -787,7 +787,7 @@ ${ layout.menubar(section='query') }
 %if ENABLE_QUERY_BUILDER.get():
 <div id="invalidQueryBuilder" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Invalid Query') }</h2>
   </div>
   <div class="modal-body">

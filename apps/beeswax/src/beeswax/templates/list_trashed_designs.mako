@@ -113,7 +113,7 @@ ${layout.menubar(section='saved queries')}
     ${ csrf_token(request) | n,unicode }
     <input type="hidden" name="skipTrash" id="skipTrash" value="true"/>
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="deleteQueryMessage" class="modal-title">${ _('Confirm action') }</h2>
     </div>
     <div class="modal-footer">
