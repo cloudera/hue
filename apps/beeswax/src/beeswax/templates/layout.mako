@@ -25,7 +25,7 @@ def is_selected(section, matcher):
 %>
 
 <%def name="menubar(section='')">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
@@ -56,7 +56,7 @@ def is_selected(section, matcher):
 </%def>
 
 <%def name="metastore_menubar()">
-  <div class="navbar navbar-inverse navbar-fixed-top">
+  <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
