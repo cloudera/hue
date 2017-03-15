@@ -462,21 +462,26 @@ from desktop.views import _ko
 
     <div id="importDocumentData" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
+      <div class="modal-header">
+        <a href="#" class="close" data-dismiss="modal">&times;</a>
+        <h3>${_('Import Hue documents')}</h3>
+      </div>
       <div class="modal-body">
-        <div class="center animated" style="display: none;" data-bind="visible: importedDocumentCount() == 0">
+        <div class="center" style="display: none;" data-bind="visible: importedDocumentCount() == 0">
           <i class="fa fa-spinner fa-spin fa-2x"></i>
         </div>
         <!-- ko if: importedDocumentCount() > 0 -->
-          <h3> ${_('Document Summary')} </h3>
           <ul>
             <li> ${_('Imported: ')} <span data-bind="text: importedDocSummary()['count']"></span></li>
             <li> ${_('Created: ')} <span data-bind="text: importedDocSummary()['created_count']"></span></li>
             <li> ${_('Updated: ')} <span data-bind="text: importedDocSummary()['updated_count']"></span></li>
           </ul>
 
-          ${_('Show Details')}
-          <button id="show-details-caret" class="btn toolbarBtn" data-bind="click: toggleShowTable"><span class="caret"></span></button>
+          <!-- ko ifnot: showTable() -->
+          <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: toggleShowTable">${_('Show Details')} <i class="fa fa-caret-down"></i></a>
+          <!-- /ko -->
           <!-- ko if: showTable() -->
+          <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: toggleShowTable">${_('Hide Details')} <i class="fa fa-caret-up"></i></a>
             <table class="table table-striped table-condensed">
               <thead>
                 <tr>
@@ -497,7 +502,7 @@ from desktop.views import _ko
         <!-- /ko -->
       </div>
       <div class="modal-footer">
-        <input id="import-document-data-close" data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: closeUploadModal"/>
+        <input data-dismiss="modal" type="button" class="btn" value="${ _('Close') }" data-bind="click: closeUploadModal"/>
       </div>
       <!-- /ko -->
     </div>
