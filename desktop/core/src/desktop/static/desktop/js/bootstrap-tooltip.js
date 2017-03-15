@@ -93,9 +93,9 @@
       this.timeout = setTimeout(function () {
         if (self.hoverState == 'in') self.show()
       }, self.options.delay.show)
-    }
+    },
 
-    , leave: function (e) {
+    leave: function (e) {
       var self = $(e.currentTarget)[this.type](this._options).data(this.type)
 
       if (this.timeout) clearTimeout(this.timeout)
@@ -108,13 +108,13 @@
     },
 
     show: function () {
-      var $tip
-        , pos
-        , actualWidth
-        , actualHeight
-        , placement
-        , tp
-        , e = $.Event('show')
+      var $tip,
+        pos,
+        actualWidth,
+        actualHeight,
+        placement,
+        tp,
+        e = $.Event('show')
 
       if (!this.$element.is(':visible')) {
         return;
@@ -346,7 +346,7 @@
     title: '',
     delay: 0,
     html: false,
-    container: false
+    container: 'body'
   }
 
 
