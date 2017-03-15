@@ -212,7 +212,7 @@ ${ hueIcons.symbols() }
 
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
         % if 'jobbrowser' in apps:
-        <!-- ko component: { name: 'hue-job-browser-panel', params: { processHeaders: onePageViewModel.processHeaders }} --><!-- /ko -->
+        <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         % endif
         % endif
       </div>

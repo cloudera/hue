@@ -367,6 +367,7 @@ from desktop.views import _ko
 
         self.jobsPanelVisible = ko.observable(false);
         self.jobCount = ko.observable(0);
+        self.onePageViewModel = params.onePageViewModel;
 
         var lastJobBrowserRequest = null;
 
@@ -402,7 +403,7 @@ from desktop.views import _ko
             },
             dataType: 'html',
             success: function (response) {
-              var r = params.processHeaders(response);
+              var r = params.onePageViewModel.processHeaders(response);
               $('#mini_jobbrowser').html(r);
             }
           });
