@@ -59,18 +59,22 @@ body {
   background-color: @cui-white;
 }
 
+.svg-hue-logo-main {
+  fill: @hue-primary-color-dark;
+}
+
+.svg-hue-logo-trunk {
+  fill: #D7B9EB;
+}
+
 .top-nav {
-  .flex(0 0 50px);
   .display-flex;
   position: relative;
-  background-color: @hue-primary-color-dark;
-  width: 100%;
   z-index: 1049;
 }
 
 .top-nav-left {
   .flex(0 0 300px);
-  line-height: 45px;
 }
 
 .top-nav-middle {
@@ -80,15 +84,6 @@ body {
 
 .top-nav-right {
   .flex(0 0 300px);
-}
-
-.top-nav-right .compose-action {
-  float: right;
-  margin-right: 15px;
-}
-
-.top-nav-right .dropdown-menu {
-  margin-left: -80px;
 }
 
 .jobs-panel {
@@ -121,7 +116,6 @@ body {
 }
 
 .compose-action {
-  float: right;
   margin-top: 10px;
   z-index: 999999;
   line-height: 20px;
@@ -133,7 +127,7 @@ body {
 }
 
 .compose-action .btn {
-  color: @cui-gray-050;
+  color: @hue-primary-color-dark;
   border: 1px solid transparent;
   background-color: transparent;
   background-image: none;
@@ -231,7 +225,6 @@ body {
   .display-flex;
   .flex(1 1 29px);
   position: relative;
-  padding: 10px;
 }
 
 .search-container > input {
@@ -240,7 +233,6 @@ body {
   border-top-left-radius: 4px;
   border: 1px solid @cui-gray-300;
   border-right: none;
-  height: 27px;
   box-shadow: none;
 }
 
@@ -255,7 +247,6 @@ body {
   line-height: 29px;
   background-color: @cui-gray-050;
   width: 31px;
-  height: 29px;
 }
 
 .search-container > a > i {
@@ -466,7 +457,7 @@ a:visited {
  * @link https://github.com/jonsuh/hamburgers
  */
 .hamburger {
-  padding: 9px 12px 0 15px;
+  padding: 18px 8px 0 0;
   display: inline-block;
   cursor: pointer;
   transition-property: opacity, -webkit-filter;
@@ -509,7 +500,7 @@ a:visited {
 .hamburger-inner::before, .hamburger-inner::after {
   width: 24px;
   height: 3px;
-  background-color: @cui-white;
+  background-color: @hue-primary-color-dark;
   border-radius: 4px;
   position: absolute;
   transition-property: -webkit-transform;

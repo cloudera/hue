@@ -85,7 +85,7 @@ if USE_NEW_EDITOR.get():
       .navigator {
         top: 30px!important;
       }
-      .navbar-fixed-top {
+      .hue3-navbar-fixed-top {
         top: 58px!important;
       }
       % if current_app == "sqoop":

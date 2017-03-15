@@ -37,7 +37,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <script src="${ static('jobsub/js/jobsub.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-<div class="navbar navbar-fixed-top nokids">
+<div class="navbar hue3-navbar-fixed-top nokids">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">
