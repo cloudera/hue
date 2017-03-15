@@ -103,7 +103,7 @@ ${ hueIcons.symbols() }
         </a>
 
         <div class="compose-action btn-group">
-          <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Open editor') }">${ _('Compose') }</button>
+          <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Hive editor') }">${ _('Compose') }</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -111,23 +111,38 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             % if 'beeswax' in apps and 'impala' in apps:
               <li class="dropdown-submenu">
-                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Query') }</a>
+                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  % if 'impala' in apps:
                   <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                  % endif
+                  % if 'beeswax' in apps:
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  % endif
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
+                  % if len(interpreters) > 0:
+                  <li class="divider"></li>
+                  <li class="dropdown-submenu">
+                    <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
+                    <ul class="dropdown-menu">
+                      % for interpreter in interpreters:
+                        % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
+                        <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                        % endif
+                      % endfor
+                      % if user.is_superuser:
+                        <li class="divider"></li>
+                        <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
+                      % endif
+                    </ul>
+                  </li>
+                  % endif
                 </ul>
               </li>
-            % endif
-            % if 'beeswax' in apps and 'impala' not in apps:
-              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
-            % endif
-            % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
-              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
             % endif
             % if IS_DASHBOARD_ENABLED.get():
               <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
             % endif
-            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Presentation') }</a></li>
             % if 'oozie' in apps:
             % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
               <li class="dropdown-submenu">
@@ -139,23 +154,6 @@ ${ hueIcons.symbols() }
                 </ul>
               </li>
             % endif
-            % endif
-            % if len(interpreters) > 0:
-            <li class="divider"></li>
-            <li class="dropdown-submenu">
-              <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
-              <ul class="dropdown-menu">
-                % for interpreter in interpreters:
-                  % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                  <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
-                  % endif
-                % endfor
-                % if user.is_superuser:
-                  <li class="divider"></li>
-                  <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
-                % endif
-              </ul>
-            </li>
             % endif
           </ul>
         </div>
