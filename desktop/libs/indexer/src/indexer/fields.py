@@ -66,6 +66,7 @@ class Field(object):
       'length': 100,
       'keyType': 'string',
       'isPartition': False,
+      'partitionValue': '',
       'comment': ''
     }
 

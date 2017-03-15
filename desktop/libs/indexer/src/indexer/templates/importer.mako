@@ -802,6 +802,12 @@ ${ assist.assistPanel() }
       <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
     </label>
 
+    <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && typeof isPartition !== 'undefined' && isPartition() -->
+      <label class="margin-left-5">${ _('Value') }&nbsp;
+        <input type="text" class="input-medium margin-left-5" placeholder="${ _('Partition value') }" data-bind="value: partitionValue">
+      </label>
+    <!-- /ko -->
+
     <span data-bind="visible: level() == 0 || ($parent.type() != 'array' && $parent.type() != 'map')">
       <a href="javascript:void(0)" title="${ _('Show field properties') }" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }"><i class="fa fa-sliders"></i></a>
 
@@ -1509,9 +1515,13 @@ ${ assist.assistPanel() }
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
         var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
-        var validTableColumns = self.destination.outputFormat() != 'table' || $.grep(self.destination.columns(), function(column) {
-          return column.name().length == 0;
-        }).length == 0;
+        var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
+            return column.name().length == 0;
+          }).length == 0
+          && $.grep(self.destination.partitionColumns(), function(column) {
+            return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
+          }).length == 0
+        );
         var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
