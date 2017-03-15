@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
   <meta name="description" content="">
   <meta name="author" content="">
 
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-3.3.7/bootstrap.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3-extra.css') }" rel="stylesheet">

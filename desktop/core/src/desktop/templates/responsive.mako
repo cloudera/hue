@@ -41,8 +41,8 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
-##   TODO: Get rid of bootplus and hue3.css
-  <link href="${ static('desktop/ext/css/bootplus.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-3.3.7/bootstrap.css') }" rel="stylesheet">
+##   TODO: Get rid of hue3.css
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
@@ -367,7 +367,7 @@ ${ hueIcons.symbols() }
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-3.3.7/bootstrap.min.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
