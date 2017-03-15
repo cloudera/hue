@@ -92,8 +92,8 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
 
 <div id="killModal" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Kill')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Confirm Kill')}</h2>
   </div>
   <div class="modal-body">
     <p>${_('Are you sure you want to kill this job?')}</p>

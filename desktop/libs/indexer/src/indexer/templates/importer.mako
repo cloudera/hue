@@ -324,8 +324,8 @@ ${ assist.assistPanel() }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
     <div id="filechooser"></div>
@@ -768,8 +768,8 @@ ${ assist.assistPanel() }
 
   <div id="fieldsBulkEditor" class="modal hide fade">
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${ _('Write or paste comma separated field names') }</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 class="modal-title">${ _('Write or paste comma separated field names') }</h2>
     </div>
     <div class="modal-body">
       <input type="text" class="input-xxlarge" placeholder="${ _('e.g. id, name, salary') }" data-bind="textInput: createWizard.destination.bulkColumnNames">

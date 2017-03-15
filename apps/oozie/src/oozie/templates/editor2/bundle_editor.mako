@@ -141,8 +141,8 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 <div id="chooseCoordinatorDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="false">
   %if is_embeddable:
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3>${ _('Choose a coordinator') }</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 class="modal-title">${ _('Choose a coordinator') }</h2>
     </div>
   %endif
   <div class="modal-body">
@@ -175,9 +175,9 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 
 <div id="settingsModal" class="modal hide fade">
-  <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-    <h3 id="myModalLabel">${ _('Settings') }</h3>
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 id="myModalLabel" class="modal-title">${ _('Settings') }</h2>
   </div>
   <div class="modal-body">
       <h4>${ _('Kick off time') }</h4>
@@ -216,8 +216,8 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
 
 <div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 id="myModalLabel" class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
       <div id="filechooser">

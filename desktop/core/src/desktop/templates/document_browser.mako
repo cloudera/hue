@@ -355,8 +355,8 @@ from desktop.views import _ko
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-        <h3>${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h2>
       </div>
       <div class="modal-body" style="overflow-y: visible">
         <!-- ko with: definition -->
@@ -423,8 +423,8 @@ from desktop.views import _ko
     <div id="importDocumentsModal" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <a href="#" class="close" data-clear="importDocumentsForm" data-bind="click: closeUploadModal">&times;</a>
-        <h3>${_('Import Hue documents')}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Import Hue documents')}</h2>
       </div>
         <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
           <div class="modal-body">
@@ -463,8 +463,8 @@ from desktop.views import _ko
     <div id="importDocumentData" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Import Hue documents')}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Import Hue documents')}</h2>
       </div>
       <div class="modal-body">
         <div class="center" style="display: none;" data-bind="visible: importedDocumentCount() == 0">
@@ -511,8 +511,8 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" data-bind="click: function () { $('#newDirectoryName').val(null) }" aria-hidden="true">&times;</button>
-          <h3>${_('Create Directory')}</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <h2 class="modal-title">${_('Create Directory')}</h2>
         </div>
         <div class="modal-body ">
           <input id="newDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
@@ -529,8 +529,8 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" data-bind="click: function () { $('#renameDirectoryName').val(null) }" aria-hidden="true">&times;</button>
-          <h3>${_('Rename Directory')}</h3>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <h2 class="modal-title">${_('Rename Directory')}</h2>
         </div>
         <div class="modal-body ">
           <input id="renameDirectoryName" class="input large-as-modal" type="text" placeholder="${ _('Directory name') }" />
@@ -546,8 +546,9 @@ from desktop.views import _ko
     <div id="restoreFromTrashModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
         <!-- ko if: selectedEntries().length > 0 -->
-        <h3> ${ _('Restore these document(s) to Home directory?') } </h3>
+        <h2 class="modal-title">${ _('Restore these document(s) to Home directory?') }</h2>
         <!-- /ko -->
       </div>
       <div class="modal-body">
@@ -565,12 +566,12 @@ from desktop.views import _ko
     <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times</a>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
         <!-- ko if: entriesToDelete().length === 0 -->
-        <h3>${ _('The trash is empty') }</h3>
+        <h2 class="modal-title">${ _('The trash is empty') }</h2>
         <!-- /ko -->
         <!-- ko if: entriesToDelete().length > 0 -->
-        <h3> ${ _('Do you really want to delete the following document(s)?') } </h3>
+        <h2 class="modal-title"> ${ _('Do you really want to delete the following document(s)?') } </h2>
         <!-- /ko -->
       </div>
       <div class="modal-body">

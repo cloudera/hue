@@ -62,7 +62,7 @@
         "<div class='bootstrap-wysihtml5-insert-link-modal modal hide fade'>" +
         "<div class='modal-header'>" +
         "<a class='close' data-dismiss='modal'>&times;</a>" +
-        "<h3>" + locale.link.insert + "</h3>" +
+        "<h2 class='modal-title'>" + locale.link.insert + "</h2>" +
         "</div>" +
         "<div class='modal-body'>" +
         "<input value='http://' class='bootstrap-wysihtml5-insert-link-url input-xlarge'>" +
@@ -82,7 +82,7 @@
         "<div class='bootstrap-wysihtml5-insert-image-modal modal hide fade'>" +
         "<div class='modal-header'>" +
         "<a class='close' data-dismiss='modal'>&times;</a>" +
-        "<h3>" + locale.image.insert + "</h3>" +
+        "<h2 class='modal-title'>" + locale.image.insert + "</h2>" +
         "</div>" +
         "<div class='modal-body'>" +
         "<input value='http://' class='bootstrap-wysihtml5-insert-image-url input-xlarge'>" +

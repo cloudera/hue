@@ -52,8 +52,8 @@ except ImportError, e:
 
     <div id="addSnippetModal" class="modal hide fade">
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${ _('Add Snippet') }</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${ _('Add Snippet') }</h2>
       </div>
       <div class="modal-body" style="min-height: 100px">
         <ul class="snippet-list-alts" data-bind="foreach: availableSnippets">
@@ -212,8 +212,8 @@ except ImportError, e:
       </div>
 
       <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Save query result in a')}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Save query result in a')}</h2>
       </div>
       <div class="modal-body" style="padding: 4px">
         <form id="saveResultsForm" method="POST" class="form form-inline">
@@ -284,10 +284,10 @@ except ImportError, e:
     <div id="downloadProgressModal" class="modal hide fade">
       <div class="modal-header">
         <!-- ko if: isDownloading -->
-        <h3>${_('Your download is being prepared')}</h3>
+        <h2 class="modal-title">${_('Your download is being prepared')}</h2>
         <!-- /ko -->
         <!-- ko if: downloadTruncated -->
-        <h3>${_('Your downloaded results have been truncated')}</h3>
+        <h2 class="modal-title">${_('Your downloaded results have been truncated')}</h2>
         <!-- /ko -->
       </div>
       <div class="modal-body" style="padding: 4px">

@@ -25,11 +25,11 @@
 <form action="${ action }" method="POST" class="form submit-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
     % if header:
-      <h3>${header}</h3>
+      <h2 class="modal-title">${header}</h2>
     % else:
-      <h3>${ _('Submit %(job)s?') % {'job': name} }</h3>
+      <h2 class="modal-title">${ _('Submit %(job)s?') % {'job': name} }</h2>
     % endif
   </div>
   <div class="modal-body">
@@ -106,12 +106,12 @@
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3>${_('Choose a file')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
-      <div id="filechooser">
-      </div>
+    <div id="filechooser">
+    </div>
   </div>
   <div class="modal-footer">
   </div>

@@ -1151,7 +1151,6 @@ div.locked {
   color: #bce8f1;
 }
 
-
 .empty-wrapper {
   margin-top: 50px;
   color: #BBB;
@@ -1230,10 +1229,6 @@ a#advanced-btn:hover {
 
 .hue-uncheck::before {
   line-height: 16px;
-}
-
-.modal form {
-  margin: 0;
 }
 
 /*
@@ -1568,11 +1563,6 @@ a#advanced-btn:hover {
 
 .input-append.date .add-on i, .input-prepend.date .add-on i {
     line-height: 28px;
-}
-
-.modal {
-  padding: 25px 20px!important;
-  margin-left: -290px!important;
 }
 
 #jHueTourVideoPlayer {
@@ -2053,11 +2043,6 @@ input.no-margin, select.no-margin {
 
 .jHueHdfsTree a.selected {
   font-weight: bold;
-}
-
-.modal-header .close {
-  position: inherit;
-  margin-top: -10px;
 }
 
 .margin-top-5 {
