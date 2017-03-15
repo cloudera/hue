@@ -445,7 +445,7 @@ def load_table(request, database, table):
         form_data = {
           'path': load_form.cleaned_data['path'],
           'overwrite': load_form.cleaned_data['overwrite'],
-          'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.cleaned_data['partition_columns'].iteritems()],
+          'partition_columns': [(column_name, load_form.cleaned_data[key]) for key, column_name in load_form.partition_columns.iteritems()],
         }
         query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
         if generate_ddl_only:
@@ -463,6 +463,7 @@ def load_table(request, database, table):
           url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + on_success_url
           response['status'] = 0
           response['data'] = url
+          response['query_history_id'] = query_history.id
       except QueryError, ex:
         response['status'] = 1
         response['data'] = _("Can't load the data: ") + ex.message
