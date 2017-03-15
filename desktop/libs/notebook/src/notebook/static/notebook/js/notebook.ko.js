@@ -480,7 +480,7 @@ var EditorViewModel = (function() {
       }
       else {
         self.statement_raw('');
-          self.ace().setValue('', 1);
+        self.ace().setValue('', 1);
       }
     });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
@@ -2603,7 +2603,7 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.newNotebook = function () {
+    self.newNotebook = function (callback) {
       $.post("/notebook/api/create_notebook", {
         type: options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
@@ -2639,6 +2639,10 @@ var EditorViewModel = (function() {
           else {
             self.changeURL('/notebook/notebook');
           }
+        }
+
+        if (typeof callback !== 'undefined'){
+          callback();
         }
       });
     };
