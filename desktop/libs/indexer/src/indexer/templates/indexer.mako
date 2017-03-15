@@ -119,7 +119,7 @@ ${ assist.assistPanel() }
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="/indexer/indexer">
               <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
             </a>

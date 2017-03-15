@@ -235,7 +235,7 @@
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
                   <img src="${ static('jobbrowser/art/icon_jobbrowser_48.png') }" class="app-icon" alt="${ _('Job browser icon') }"/>
                   ${ _('Job Browser') }

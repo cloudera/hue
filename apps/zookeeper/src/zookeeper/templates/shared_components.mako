@@ -75,7 +75,7 @@
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
                   <img src="${ static('zookeeper/art/icon_zookeeper_48.png') }" class="app-icon" alt="${ _('Zookeeper icon') }"/>
                   ${ _('ZooKeeper Browser') }

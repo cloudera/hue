@@ -291,7 +291,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       <div class="nav-collapse">
         <ul class="nav editor-nav">
-          <li class="currentApp">
+          <li class="app-header">
             <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->

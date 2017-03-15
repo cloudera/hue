@@ -41,7 +41,7 @@
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="${ url('desktop.views.home2') }">
               <img src="${ static('desktop/art/home.png') }" class="app-icon" alt="${ _('Home icon') }" />
               ${ _('My documents') }

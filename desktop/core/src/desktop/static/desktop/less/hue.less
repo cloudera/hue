@@ -18,9 +18,10 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-attributes.less";
 
-@import "hue-assist.less";
-@import "hue-autocomplete.less";
+@import "hue-assist";
+@import "hue-autocomplete";
 @import "hue-cui-overrides.less";
+@import "hue-cross-version.less";
 
 html {
   height: 100%;
@@ -921,11 +922,6 @@ a:visited {
   input.search-query {
     width: 70px;
   }
-}
-
-.selectize-error {
-  color: @hue-error-color;
-  font-size: 12px;
 }
 
 .uploadstatus {

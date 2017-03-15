@@ -30,7 +30,7 @@ def is_selected(section, matcher):
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
                 % if app_name == 'impala':
                   <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }" />
@@ -61,7 +61,7 @@ def is_selected(section, matcher):
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/metastore">
                   <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" alt="${ _('Metastore icon') }" />
                   ${ _('Metastore Manager') }

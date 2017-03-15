@@ -59,7 +59,7 @@ def is_selected(section, matcher):
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}">
                   <i class="fa fa-lock"></i>
                   ${ _('Hadoop Security') }
