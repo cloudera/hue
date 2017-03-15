@@ -23,6 +23,7 @@
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from metadata.conf import has_optimizer, OPTIMIZER
+  from notebook.conf import SHOW_NOTEBOOKS
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -119,8 +120,10 @@ ${ hueIcons.symbols() }
                   % if 'beeswax' in apps:
                   <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                   % endif
+                  % if SHOW_NOTEBOOKS.get():
                   <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
-                  % if len(interpreters) > 0:
+                  % endif
+                  % if interpreters:
                   <li class="divider"></li>
                   <li class="dropdown-submenu">
                     <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
@@ -198,9 +201,12 @@ ${ hueIcons.symbols() }
               <span class="caret"></span>
             </button>
             <ul class="dropdown-menu" >
-              <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
-              <li><a href="${ url('useradmin.views.list_permissions') }"><i class="fa fa-key"></i> ${_('Set Permissions')}</a></li>
-              <li><a href="/about"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+              <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i> ${_('Profile')}</a></li>
+              % if user.is_superuser:
+              <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+              % endif
+              <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+              % if user.is_superuser:
               <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
               <li class="divider"></li>
               <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
@@ -222,24 +228,52 @@ ${ hueIcons.symbols() }
       <ul class="left-nav-menu">
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
+        % if interpreters:
         <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
+        % endif
+        % if IS_DASHBOARD_ENABLED.get():
         <li data-bind="click: function () { onePageViewModel.currentApp('dashboard') }"><a href="javascript: void(0);">Dashboard</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Report</a></li>
+        % endif
+        % if SHOW_NOTEBOOKS.get():
+        <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Notebook</a></li>
+        % endif
+        % if 'oozie' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
+        % endif
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
+        % if 'filebrowser' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
+        % endif
+        % if is_s3_enabled:
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }"><a href="javascript: void(0);">S3</a></li>
+        % endif
+        % if 'metastore' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
+        % endif
+        % if 'search' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
+        % endif
+        % if 'jobbrowser' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
-        <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);">Users</a></li>
+        % endif
+        % if 'hbase' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('hbase') }"><a href="javascript: void(0);">HBase</a></li>
+        % endif
+        % if 'security' in apps:
         <li><a href="javascript: void(0);">Security</a></li>
+        % endif
+        % if 'sqoop' in apps:
+        <li><a href="/${apps['sqoop'].display_name}">${_('Sqoop')}</a></li>
+        % endif
+        % if other_apps:
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
-        <li><a href="javascript: void(0);">Custom App 1</a></li>
-        <li><a href="javascript: void(0);">Custom App 2</a></li>
+          % for other in other_apps:
+            <li><a href="/${ other.display_name }">${ other.nice_name }</a></li>
+          % endfor
+        </li>
+        % endif
       </ul>
       <div class="left-nav-drop">
         <div data-bind="dropzone: {
