@@ -31,7 +31,7 @@ from desktop.lib.django_test_util import make_logged_in_client, assert_equal_mod
 from desktop.lib.test_utils import add_permission, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from metastore import parser
-from useradmin.models import HuePermission, GroupPermission, group_has_permission
+from useradmin.models import HuePermission, GroupPermission
 
 from beeswax.conf import LIST_PARTITIONS_LIMIT
 from beeswax.views import collapse_whitespace
@@ -313,11 +313,15 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get("/metastore/table/%s/test/load" % self.db_name, follow=True)
     assert_true('Path' in resp.content)
 
-    data_path = '%(prefix)s/tmp/foo' % {'prefix': self.cluster.fs_prefix}
+    data_dir = '%(prefix)s/tmp' % {'prefix': self.cluster.fs_prefix}
+    data_path = data_dir + '/foo'
+    self.cluster.fs.mkdir(data_dir)
+    self.cluster.fs.create(data_path, data='123')
 
     # Try the submission
-    self.client.post("/metastore/table/%s/test/load" % self.db_name, {'path': data_path, 'overwrite': True}, follow=True)
-    query = QueryHistory.objects.latest('id')
+    response = self.client.post("/metastore/table/%s/test/load" % self.db_name, {'path': data_path, 'overwrite': True}, follow=True)
+    data = json.loads(response.content)
+    query = QueryHistory.objects.get(id=data['query_history_id'])
 
     assert_equal_mod_whitespace("LOAD DATA INPATH '%(data_path)s' OVERWRITE INTO TABLE `%(db)s`.`test`" % {'data_path': data_path, 'db': self.db_name}, query.query)
 
