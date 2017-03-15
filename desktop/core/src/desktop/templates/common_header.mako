@@ -165,7 +165,7 @@ if USE_NEW_EDITOR.get():
 
     huePubSub.subscribe('get.current.app.name', function () {
       var appName = '';
-      if ('${ 'metastore' in apps }' === 'True' && location.href.indexOf('${apps['metastore'].display_name}') !== -1) {
+      if ('${ 'metastore' in apps }' === 'True' && location.href.indexOf('${"metastore" in apps and apps["metastore"].display_name}') !== -1) {
         appName = 'metastore';
       } else if (location.href.indexOf('${ url('notebook:editor') }') !== -1) {
         appName = 'editor'
