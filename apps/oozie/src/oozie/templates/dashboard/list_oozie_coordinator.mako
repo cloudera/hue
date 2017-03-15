@@ -463,7 +463,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title confirmation_header"></h2>
   </div>
   <div id="update-coord" class="span10">

@@ -286,7 +286,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a folder')}</h2>
   </div>
   <div class="modal-body">
@@ -297,7 +297,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <script type="text/html" id="delete-job-modal">
 <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+  <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
   <h2 class="modal-title">${_("Are you sure you'd like to delete this job?") }</h2>
 </div>
 <div class="modal-body"></div>
@@ -309,7 +309,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <script type="text/html" id="delete-link-modal">
 <div class="modal-header">
-  <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+  <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
   <h2 class="modal-title">${_("Are you sure you'd like to delete this link?") }</h2>
 </div>
 <div class="modal-body"></div>

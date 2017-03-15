@@ -390,7 +390,7 @@ from django.utils.translation import ugettext as _
 <div id="chooseWorkflowDemiModal" class="${ is_embeddable and 'modal' or 'demi-modal' } fade" data-backdrop="false">
   %if is_embeddable:
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 id="myModalLabel" class="modal-title">${_('Choose a workflow')}</h2>
   </div>
   %endif
@@ -425,7 +425,7 @@ from django.utils.translation import ugettext as _
 
 <div id="settingsModal" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 id="myModalLabel" class="modal-title">${_('Coordinator Settings')}</h2>
   </div>
   <div class="modal-body">

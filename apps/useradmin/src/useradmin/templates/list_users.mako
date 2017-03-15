@@ -121,7 +121,7 @@ ${layout.menubar(section='users')}
     <form action="${ url('useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${ _("Are you sure you want to delete the selected user(s)?") }</h2>
       </div>
       <div class="modal-footer">

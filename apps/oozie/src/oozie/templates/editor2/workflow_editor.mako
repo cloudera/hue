@@ -453,7 +453,7 @@ ${ workflow.render() }
 
 <div id="settingsModal" class="modal fade hide">
   <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Workflow Settings') }</h2>
   </div>
   <div class="modal-body">
@@ -509,7 +509,7 @@ ${ workflow.render() }
 
 <div id="historyModal" class="modal fade hide">
   <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${ _('Submission History') }</h2>
   </div>
   <div class="modal-body">
@@ -557,7 +557,7 @@ ${ workflow.render() }
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">

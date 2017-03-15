@@ -620,7 +620,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Confirm Delete')}</h2>
     </div>
     <div class="modal-body">
@@ -635,7 +635,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="logsModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Logs')}</h2>
     </div>
     <div class="modal-body">
@@ -649,7 +649,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="submitModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Run Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h2>
     </div>
     <div class="modal-body" data-bind="visible: submissionVariables().length > 0">
@@ -669,7 +669,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="stopModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Stop Script')} '<span data-bind="text: currentScript().name"></span>' ${_('?')}</h2>
     </div>
     <div class="modal-footer">
@@ -680,7 +680,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="chooseFile" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Choose a file')}</h2>
     </div>
     <div class="modal-body">
@@ -693,7 +693,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="confirmModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Are you sure?')}</h2>
     </div>
     <div class="modal-body">
@@ -709,7 +709,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
 
   <div id="nameModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Save script')}</h2>
     </div>
     <div class="modal-body">

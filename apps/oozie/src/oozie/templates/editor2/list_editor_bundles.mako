@@ -122,7 +122,7 @@ ${ layout.menubar(section='bundles', is_editor=True) }
   <form id="deleteWfForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 id="deleteWfMessage" class="modal-title">${ _('Delete the selected workflow(s)?') }</h2>
     </div>
     <div class="modal-footer">

@@ -101,7 +101,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- extract modal -->
   <div id="confirmExtractModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Extract Archive') }</h2>
     </div>
     <!-- ko if: selectedFile -->
@@ -123,7 +123,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- compress modal -->
   <div id="confirmCompressModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Compress Files') }</h2>
     </div>
     <!-- ko if: selectedFiles -->
@@ -145,7 +145,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- delete modal -->
   <div id="deleteModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Confirm Delete') }</h2>
     </div>
     <div class="modal-body">
@@ -182,7 +182,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- restore modal -->
   <div id="restoreTrashModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Confirm Restore') }</h2>
     </div>
     <div class="modal-body">
@@ -200,7 +200,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- purge modal -->
   <div id="purgeTrashModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Confirm empty trash') }</h2>
     </div>
 
@@ -222,7 +222,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="renameModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Renaming:')} <span id="renameFileName">file name</span></h2>
       </div>
       <div class="modal-body">
@@ -247,7 +247,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="setReplicationModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Setting replication factor for :')} <span id="setReplFileName">file name</span></h2>
       </div>
       <div class="modal-body">
@@ -273,7 +273,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       select_filter = is_fs_superuser and 'SelectWithOther' or ''
     %>
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Change Owner/Group')}</h2>
       </div>
 
@@ -305,7 +305,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="changePermissionModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Change Permissions')}</h2>
       </div>
       <div class="modal-body table-margin">
@@ -369,7 +369,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="moveModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Move to')}</h2>
       </div>
       <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
@@ -391,7 +391,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="copyModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Copy to')}</h2>
       </div>
       <div class="modal-body" style="max-height: 400px; height: 340px; overflow-x:hidden">
@@ -411,7 +411,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- upload file modal -->
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
@@ -427,7 +427,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- upload archive modal -->
   <div id="uploadArchiveModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
@@ -445,7 +445,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="createDirectoryModal" class="modal hide fade">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <!-- ko if: !isS3() || (isS3() && !isS3Root()) -->
         <h2 class="modal-title">${_('Create Directory')}</h2>
         <!-- /ko -->
@@ -482,7 +482,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     ${ csrf_token(request) | n,unicode }
     <div id="createFileModal" class="modal hide fade">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
           <h2 class="modal-title">${_('Create File')}</h2>
         </div>
         <div class="modal-body">
@@ -505,7 +505,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <!-- content summary modal -->
   <div id="contentSummaryModal" class="modal hide fade">
     <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <!-- ko if: selectedFile -->
       <h2 class="modal-title" style="word-break: break-all">${_('Summary for')} <span data-bind="text: selectedFile().path"></span></h2>
       <!--/ko -->

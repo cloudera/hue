@@ -355,7 +355,7 @@ from desktop.views import _ko
       <!-- ko with: selectedEntry -->
       <!-- ko with: document -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Sharing')} - <span data-bind="text: $parent.definition().name"></span></h2>
       </div>
       <div class="modal-body" style="overflow-y: visible">
@@ -423,7 +423,7 @@ from desktop.views import _ko
     <div id="importDocumentsModal" data-keyboard="true" class="modal hide fade fileupload-modal" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Import Hue documents')}</h2>
       </div>
         <form id="importDocumentsForm" class="form-horizontal" style="display: inline" enctype="multipart/form-data">
@@ -463,7 +463,7 @@ from desktop.views import _ko
     <div id="importDocumentData" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Import Hue documents')}</h2>
       </div>
       <div class="modal-body">
@@ -511,7 +511,7 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
           <h2 class="modal-title">${_('Create Directory')}</h2>
         </div>
         <div class="modal-body ">
@@ -529,7 +529,7 @@ from desktop.views import _ko
       <!-- ko with: activeEntry -->
       <form class="form-horizontal">
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
           <h2 class="modal-title">${_('Rename Directory')}</h2>
         </div>
         <div class="modal-body ">
@@ -546,7 +546,7 @@ from desktop.views import _ko
     <div id="restoreFromTrashModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <!-- ko if: selectedEntries().length > 0 -->
         <h2 class="modal-title">${ _('Restore these document(s) to Home directory?') }</h2>
         <!-- /ko -->
@@ -566,7 +566,7 @@ from desktop.views import _ko
     <div id="deleteEntriesModal" data-keyboard="true" class="modal hide fade" tabindex="-1">
       <!-- ko with: activeEntry -->
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <!-- ko if: entriesToDelete().length === 0 -->
         <h2 class="modal-title">${ _('The trash is empty') }</h2>
         <!-- /ko -->

@@ -87,7 +87,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
@@ -101,7 +101,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Do you really want to delete the following index(es)?')}</h2>
   </div>
   <div class="modal-body">
@@ -119,7 +119,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 <div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
   <!-- ko if: collection() -->
   <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Confirm Delete')}</h2>
   </div>
   <div class="modal-body">

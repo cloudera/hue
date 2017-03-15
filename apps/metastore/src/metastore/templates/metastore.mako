@@ -352,7 +352,7 @@ ${ components.menubar() }
       % endif
           ${ csrf_token(request) | n,unicode }
           <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+            <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
             <h2 id="dropDatabaseMessage" class="modal-title">${ _('Do you really want to delete the following database(s)?') }</h2>
           </div>
           <div class="modal-body">
@@ -542,7 +542,7 @@ ${ components.menubar() }
       % endif
         ${ csrf_token(request) | n,unicode }
         <div class="modal-header">
-          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+          <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
           <h2 id="dropTableMessage" class="modal-title">${_('Do you really want to drop the selected table(s)?')}</h2>
         </div>
         <div class="modal-body">
@@ -1135,7 +1135,7 @@ ${ components.menubar() }
     % endif
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Drop Table')}</h2>
       </div>
       <div class="modal-body">
