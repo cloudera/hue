@@ -160,7 +160,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-history-panel-template">
-    <div class="compose-action btn-group">
+    <div class="compose-action btn-group  pull-right">
       <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">5</div></button>
     </div>
 
@@ -346,7 +346,7 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-job-browser-panel-template">
-    <div class="compose-action btn-group">
+    <div class="compose-action btn-group pull-right">
       <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount">0</div></button>
       <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
         <span class="caret"></span>
