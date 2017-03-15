@@ -536,18 +536,16 @@ class HiveServer2Dbms(object):
     return self.execute_statement(hql)
 
 
-  def load_data(self, database, table, form, design, generate_ddl_only=False):
+  def load_data(self, database, table, form_data, design, generate_ddl_only=False):
     hql = "LOAD DATA INPATH"
-    hql += " '%s'" % form.cleaned_data['path']
-    if form.cleaned_data['overwrite']:
+    hql += " '%(path)s'" % form_data
+    if form_data['overwrite']:
       hql += " OVERWRITE"
     hql += " INTO TABLE "
-    hql += "`%s`.`%s`" % (database, table.name,)
-    if form.partition_columns:
+    hql += "`%s`.`%s`" % (database, table)
+    if form_data['partition_columns']:
       hql += " PARTITION ("
-      vals = []
-      for key, column_name in form.partition_columns.iteritems():
-        vals.append("%s='%s'" % (column_name, form.cleaned_data[key]))
+      vals = ["%s='%s'" % (column_name, column_value) for column_name, column_value in form_data['partition_columns']]
       hql += ", ".join(vals)
       hql += ")"
 

@@ -323,9 +323,13 @@ def _create_table_from_a_file(request, source, destination):
   )
 
   if table_format in ('text', 'json', 'csv', 'regexp') and not external and load_data:
-    sql += "\n\nLOAD DATA INPATH '%s' INTO TABLE `%s`.`%s`;" % (source_path, database, table_name)
-    # TODO partition_columns
-    # cf metastore load_data
+    form_data = {
+      'path': source_path,
+      'overwrite': False,
+      'partition_columns': [(partition['name'], partition['partitionValue']) for partition in partition_columns],
+    }
+    db = dbms.get(request.user)
+    sql += "\n\n%s;" % db.load_data(database, table_name, form_data, None, generate_ddl_only=True)
 
   if load_data and table_format in ('parquet', 'kudu'):
     file_format = table_format
