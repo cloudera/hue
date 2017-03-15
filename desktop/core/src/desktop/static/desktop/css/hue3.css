@@ -1644,10 +1644,6 @@ a#advanced-btn:hover {
   }
 }
 
-.navbar-fixed-top {
-  top: 28px;
-}
-
 .navigator .dropdown-menu {
   z-index: 20000;
   box-shadow: none;
@@ -1696,10 +1692,6 @@ a#advanced-btn:hover {
 
 .navigator .nav-pills .open .dropdown-toggle, .navigator .nav > li.dropdown.open.active > a:hover, .navigator .nav > li.dropdown.open.active > a:focus {
   color: #FFFFFF;
-}
-
-.navbar-fixed-top.nokids .navbar-inner {
-  height: 45px;
 }
 
 a, a:hover, a:active, a:focus {
@@ -2413,11 +2405,6 @@ body {
 .card, .sidebar-nav .nav-list {
   border-radius: 0;
   border: none;
-}
-
-.navbar-fixed-top .navbar-inner {
-  box-shadow: none;
-  border-bottom: 1px solid #DDD;
 }
 
 .hue-drop-down-input {
@@ -3420,43 +3407,6 @@ input[type='password']::-ms-reveal {
   top: 8px;
   right: 8px;
   font-size: 15px;
-}
-
-.search-container {
-  display: -ms-flexbox;
-  display: flex;
-  position: relative;
-  -ms-flex: 1 1 36px;
-  flex: 1 1 36px;
-  padding: 10px 10px 5px 10px;
-}
-
-.search-container > input {
-  border-bottom-left-radius: 4px;
-  border-top-left-radius: 4px;
-  border: 1px solid #DDD;
-  border-right: none;
-  flex: 1 1 100%;
-  height: 27px;
-  box-shadow: none;
-}
-
-.search-container > a {
-  cursor: pointer;
-  flex: 0 0 31px;
-  border-bottom-right-radius: 4px;
-  border-top-right-radius: 4px;
-  border: 1px solid #DDD;
-  box-shadow: none;
-  font-size: 15px;
-  line-height: 29px;
-  background-color: #f9f9f9;
-  width: 31px;
-  height: 29px;
-}
-
-.search-container > a > i {
-  margin-left: 8px;
 }
 
 .selectize-wrapper {

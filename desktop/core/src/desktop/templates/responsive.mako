@@ -91,98 +91,98 @@
 ${ hueIcons.symbols() }
 
 <div class="main-page">
-  <div class="top-nav">
-    <div class="top-nav-left">
-      <a class="hamburger hamburger-hue pull-left" type="button" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
-      <span class="hamburger-box">
-        <span class="hamburger-inner"></span>
-      </span>
-      </a>
-      <a class="nav-tooltip pull-left" title="${_('Homepage')}" data-rel="navigator-tooltip"  href="#" data-bind="click: function(){ onePageViewModel.currentApp('home') }">
-        <svg style="margin-top:12px;margin-left:8px;height: 24px;width:120px;display: inline-block;">
-          <use xlink:href="#hue-logo"></use>
-        </svg>
-      </a>
-      <div class="compose-action btn-group">
-        <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Open editor') }">${ _('Compose') }</button>
-        <button class="btn dropdown-toggle" data-toggle="dropdown">
-          <span class="caret"></span>
-        </button>
+  <nav class="navbar">
+    <div class="navbar-inner top-nav">
+      <div class="top-nav-left">
+        <a class="hamburger hamburger-hue pull-left" type="button" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+          <span class="hamburger-box"><span class="hamburger-inner"></span></span>
+        </a>
 
-        <ul class="dropdown-menu">
-          % if 'beeswax' in apps and 'impala' in apps:
+        <a class="brand" href="/" title="${_('Hue home')}">
+          <svg style="height: 24px; width: 120px;"><use xlink:href="#hue-logo"></use></svg>
+        </a>
+
+        <div class="compose-action btn-group">
+          <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Open editor') }">${ _('Compose') }</button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu">
+            % if 'beeswax' in apps and 'impala' in apps:
+              <li class="dropdown-submenu">
+                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Query') }</a>
+                <ul class="dropdown-menu">
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                </ul>
+              </li>
+            % endif
+            % if 'beeswax' in apps and 'impala' not in apps:
+              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+            % endif
+            % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
+              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+            % endif
+            % if IS_DASHBOARD_ENABLED.get():
+              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
+            % endif
+            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Presentation') }</a></li>
+            % if 'oozie' in apps:
+            % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+              <li class="dropdown-submenu">
+                <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon"  alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
+                <ul class="dropdown-menu">
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
+                </ul>
+              </li>
+            % endif
+            % endif
+            % if len(interpreters) > 0:
+            <li class="divider"></li>
             <li class="dropdown-submenu">
-              <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Query') }</a>
+              <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
               <ul class="dropdown-menu">
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
-              </ul>
-            </li>
-          % endif
-          % if 'beeswax' in apps and 'impala' not in apps:
-            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
-          % endif
-          % if 'impala' in apps and 'beeswax' not in apps: ## impala requires beeswax anyway
-            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
-          % endif
-          % if IS_DASHBOARD_ENABLED.get():
-            <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
-          % endif
-          <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Presentation') }</a></li>
-          % if 'oozie' in apps:
-          % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
-            <li class="dropdown-submenu">
-              <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon"  alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
-              <ul class="dropdown-menu">
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
-                <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
-              </ul>
-            </li>
-          % endif
-          % endif
-          % if len(interpreters) > 0:
-          <li class="divider"></li>
-          <li class="dropdown-submenu">
-            <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
-            <ul class="dropdown-menu">
-              % for interpreter in interpreters:
-                % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                % for interpreter in interpreters:
+                  % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
+                  <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                  % endif
+                % endfor
+                % if user.is_superuser:
+                  <li class="divider"></li>
+                  <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
                 % endif
-              % endfor
-              % if user.is_superuser:
-                <li class="divider"></li>
-                <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
-              % endif
-            </ul>
-          </li>
-          % endif
-        </ul>
+              </ul>
+            </li>
+            % endif
+          </ul>
+        </div>
       </div>
-    </div>
-    <div class="top-nav-middle">
-      <div class="search-container">
-        <input placeholder="${ _('Search all data and saved documents...') }" type="text"
-          data-bind="autocomplete: {
-              source: searchAutocompleteSource,
-              itemTemplate: 'nav-search-autocomp-item',
-              noMatchTemplate: 'nav-search-autocomp-no-match',
-              classPrefix: 'nav-',
-              showOnFocus: true,
-              onEnter: performSearch,
-              reopenPattern: /.*:$/
-            },
-            hasFocus: searchHasFocus,
-            clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
-            textInput: searchInput,
-            valueUpdate: 'afterkeydown'"
-        >
-        <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
+
+      <div class="top-nav-middle">
+        <div class="search-container">
+          <input placeholder="${ _('Search all data and saved documents...') }" type="text"
+            data-bind="autocomplete: {
+                source: searchAutocompleteSource,
+                itemTemplate: 'nav-search-autocomp-item',
+                noMatchTemplate: 'nav-search-autocomp-no-match',
+                classPrefix: 'nav-',
+                showOnFocus: true,
+                onEnter: performSearch,
+                reopenPattern: /.*:$/
+              },
+              hasFocus: searchHasFocus,
+              clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
+              textInput: searchInput,
+              valueUpdate: 'afterkeydown'">
+          <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
+        </div>
       </div>
-    </div>
-    <div class="top-nav-right">
-      % if user.is_authenticated() and section != 'login':
+
+      <div class="top-nav-right">
+        % if user.is_authenticated() and section != 'login':
         <div class="compose-action btn-group">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
@@ -214,9 +214,10 @@ ${ hueIcons.symbols() }
         % if 'jobbrowser' in apps:
         <!-- ko component: { name: 'hue-job-browser-panel', params: { processHeaders: onePageViewModel.processHeaders }} --><!-- /ko -->
         % endif
-      % endif
+        % endif
+      </div>
     </div>
-  </div>
+  </nav>
 
   <div class="content-wrapper">
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">

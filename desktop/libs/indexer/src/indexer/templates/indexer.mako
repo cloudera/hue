@@ -114,7 +114,7 @@ ${ assist.assistPanel() }
 </style>
 
 <span id="indexerComponents" class="notebook">
-<div class="navbar navbar-fixed-top">
+<div class="navbar hue3-navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">

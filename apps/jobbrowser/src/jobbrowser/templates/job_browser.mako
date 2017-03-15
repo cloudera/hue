@@ -70,7 +70,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 % if not is_mini:
-<div class="navbar navbar-fixed-top">
+<div class="navbar hue3-navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
         <div class="nav-collapse">

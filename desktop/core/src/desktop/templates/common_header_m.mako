@@ -299,7 +299,7 @@ if USE_NEW_EDITOR.get():
        count += 1
     return found_app, count
 %>
-<div class="navbar navbar-fixed-top">
+<div class="navbar hue3-navbar-fixed-top">
   <div class="navbar-inner">
     <div class="container">
       <button type="button" class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
