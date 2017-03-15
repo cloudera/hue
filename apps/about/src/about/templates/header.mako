@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
         <div class="container-fluid">
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <a href="/${app_name}"><img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon" alt="${ _('Hue Logo') }" />
                 ${ _('About Hue') }</a>
                </li>

@@ -1698,31 +1698,6 @@ a#advanced-btn:hover {
   color: #FFFFFF;
 }
 
-.currentApp {
-  font-size: 20px;
-  padding-top: 13px;
-  padding-left: 0;
-  color: #338BB8;
-  cursor: pointer;
-}
-
-.currentApp a {
-  font-size: 20px !important;
-  color: #338BB8 !important;
-  padding: 0 !important;
-  margin-top: -4px !important;
-  border: none !important;
-  max-width: none!important;
-}
-
-.currentApp a:focus, .currentApp a:hover {
-  color: #338BB8 !important;
-}
-
-.currentApp img {
-  margin-top: -3px;
-}
-
 .navbar-fixed-top.nokids .navbar-inner {
   height: 45px;
 }

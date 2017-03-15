@@ -30,7 +30,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="currentApp">
+          <li class="app-header">
             <a href="/${app_name}">
               <img src="${ static('hbase/art/icon_hbase_48.png') }" class="app-icon" alt="${ _('HBase icon') }" />
               ${ _('HBase Browser') }

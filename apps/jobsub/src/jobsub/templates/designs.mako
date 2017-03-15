@@ -42,7 +42,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
       <div class="container-fluid">
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="currentApp">
+            <li class="app-header">
               <a href="/${app_name}">
                 <img src="${ static('jobsub/art/icon_jobsub_48.png') }" class="app-icon" alt="${ _('Job Designer icon') }" />
                 ${ _('Job Designer') }

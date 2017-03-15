@@ -31,7 +31,7 @@
           %endif
           <div class="nav-collapse">
             <ul class="nav">
-              <li class="currentApp">
+              <li class="app-header">
                 <%def name="getURL(section, dashboard, is_v2)">
                 <%
                   if dashboard:

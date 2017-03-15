@@ -31,7 +31,7 @@ ${'<%'}def name="menubar(section='')">
       <div class="container-fluid">
         <div class="nav-collapse">
           <ul class="nav">
-            <li class="currentApp">
+            <li class="app-header">
               <a href="/${app_name}">
                 <img src="${"${"} static('${app_name}/art/icon_${app_name}_48.png') }" class="app-icon"  alt="${ _('App icon') }"/>
                 ${" ".join(word.capitalize() for word in app_name.split("_"))}

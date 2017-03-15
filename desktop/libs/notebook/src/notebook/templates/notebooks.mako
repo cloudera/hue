@@ -28,7 +28,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
     <div class="container-fluid">
       <div class="nav-collapse">
         <ul class="nav editor-nav">
-          <li class="currentApp">
+          <li class="app-header">
               <a href="${ url('notebook:editor') }?type=${ editor_type }" title="${ _('%s Editor') % editor_type.title() }" style="cursor: pointer">
               % if editor_type == 'impala':
                 <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }" />
