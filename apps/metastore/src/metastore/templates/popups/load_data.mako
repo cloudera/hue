@@ -22,8 +22,8 @@ from django.utils.translation import ugettext as _
 <form method="POST" class="form-horizontal" id="load-data-form" onsubmit="return false;">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-        <a href="#" class="close" data-dismiss="modal">&times;</a>
-        <h3>${_('Import data')}</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 class="modal-title">${_('Import Data')}</h2>
     </div>
     <div class="modal-body">
 

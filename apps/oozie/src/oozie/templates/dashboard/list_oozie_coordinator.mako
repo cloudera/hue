@@ -463,8 +463,8 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 
 <div id="confirmation" class="modal hide">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3 class="confirmation_header"></h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title confirmation_header"></h2>
   </div>
   <div id="update-coord" class="span10">
     ${ utils.render_field_no_popover(update_coord_form['endTime'], show_label=True) }

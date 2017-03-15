@@ -133,8 +133,8 @@ ${ layout.menubar(section='workflows') }
   <form id="trashWfForm" action="${ url('oozie:delete_workflow') }" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="trashWfMessage">${ _('Move the selected workflow(s) to trash?') }</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 id="trashWfMessage" class="modal-title">${ _('Move the selected workflow(s) to trash?') }</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>
@@ -150,8 +150,8 @@ ${ layout.menubar(section='workflows') }
   <form id="destroyWfForm" action="${ url('oozie:delete_workflow') }?skip_trash=true" method="POST">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
-      <h3 id="destroyWfMessage">${ _('Delete the selected workflow(s)?') }</h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 id="destroyWfMessage" class="modal-title">${ _('Delete the selected workflow(s)?') }</h2>
     </div>
     <div class="modal-footer">
       <a href="#" class="btn" data-dismiss="modal">${ _('No') }</a>

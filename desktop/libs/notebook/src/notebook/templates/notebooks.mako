@@ -144,18 +144,19 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
   <form id="deleteNotebookForm" method="POST" data-bind="submit: delete2">
     ${ csrf_token(request) | n,unicode }
     <div class="modal-header">
-      <a href="#" class="close" data-dismiss="modal">&times;</a>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+
       % if editor_type == 'pig':
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected script(s)?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected script(s)?') }</h2>
       % elif editor_type in ('beeswax', 'hive', 'rdbms', 'impala'):
       <!-- ko if: selectedJobs().length == 1 -->
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected query?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected query?') }</h2>
       <!-- /ko -->
       <!-- ko if: selectedJobs().length >1 -->
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected queries?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected queries?') }</h2>
       <!-- /ko -->
       % else:
-      <h3 id="deleteNotebookMessage">${ _('Delete the selected notebook(s)?') }</h3>
+      <h2 id="deleteNotebookMessage" class="modal-title">${ _('Delete the selected notebook(s)?') }</h2>
       % endif
     </div>
     <div class="modal-footer">

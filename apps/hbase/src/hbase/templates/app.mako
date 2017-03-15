@@ -188,8 +188,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     <form id="new_table_modal" action="createTable" method="POST" class="modal hide fade ajaxSubmit" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
       ${ csrf_token(request) | n,unicode }
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Create New Table')}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Create New Table')}</h2>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:hbaseApp.cluster"/>
@@ -317,8 +317,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </form>
     <script id="new_row_modal_template" type="text/html">
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Insert New Row')}</h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Insert New Row')}</h2>
       </div>
       <div class="modal-body controls">
         <input type="hidden" name="cluster" data-bind="value:hbaseApp.cluster"/>
@@ -340,23 +340,23 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
     </form>
     <script id="new_column_modal_template" type="text/html">
       <div class="modal-header">
-          <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-          <h3>${_('Create New Column')}</h3>
-        </div>
-        <div class="modal-body controls">
-          <input type="hidden" data-bind="value: hbaseApp.cluster"/>
-          <input type="hidden" data-bind="value: hbaseApp.views.tabledata.name"/>
-          <input type="hidden" data-bind="value: $data.row"/>
-          <label class="control-label">${_('Column Name')}</label>
-          <input id="new_column_name" type="text" placeholder = "family:column_name">
-          <label class="control-label">${_('Cell Value')}</label>
-          <textarea placeholder = "${_('Cell Value')}"></textarea>
-        </div>
-        <div class="modal-footer">
-          <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
-          <a id="column-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
-          <input type="submit" class="btn btn-primary" value="Submit">
-        </div>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Create New Column')}</h2>
+      </div>
+      <div class="modal-body controls">
+        <input type="hidden" data-bind="value: hbaseApp.cluster"/>
+        <input type="hidden" data-bind="value: hbaseApp.views.tabledata.name"/>
+        <input type="hidden" data-bind="value: $data.row"/>
+        <label class="control-label">${_('Column Name')}</label>
+        <input id="new_column_name" type="text" placeholder = "family:column_name">
+        <label class="control-label">${_('Cell Value')}</label>
+        <textarea placeholder = "${_('Cell Value')}"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" data-dismiss="modal" aria-hidden="true">${_('Cancel')}</button>
+        <a id="column-upload-btn" class="btn fileChooserBtn" aria-hidden="true"><i class="fa fa-upload"></i> ${_('Upload')}</a>
+        <input type="submit" class="btn btn-primary" value="Submit">
+      </div>
     </script>
 
     <!-- Cell Edit Modal -->
@@ -365,8 +365,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
     <script id="cell_edit_modal_template" type="text/html">
       <div class="modal-header">
-        <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-        <h3>${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(timestamp())"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp(timestamp())"></span></small></h3>
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+        <h2 class="modal-title">${_('Edit Cell')} - <span data-bind="text: content.name || formatTimestamp(timestamp())"></span> <code data-bind="text: mime, visible: mime !== 'type/null'"></code> <small><i class="fa fa-clock-o"></i> <span data-bind="text: formatTimestamp(timestamp())"></span></small></h2>
       </div>
       <div class="modal-body container-fluid">
           <div class="row-fluid">
@@ -430,8 +430,8 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <div id="confirm-modal" action="createTable" method="POST" class="modal hide fade"></div>
   <script id="confirm_template" type="text/html">
     <div class="modal-header">
-      <a class="close pointer" data-dismiss="modal" aria-hidden="true">&times;</a>
-      <h3 data-bind="text: title"></h3>
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+      <h2 class="modal-title" data-bind="text: title"></h2>
     </div>
     <div class="modal-body" data-bind="text: text">
     </div>

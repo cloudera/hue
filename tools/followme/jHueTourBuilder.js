@@ -51,7 +51,7 @@ $("<style type='text/css'> .tooltip {z-index: 30000} .tourBuilder td { vertical-
      var _managerHtml = "<div id='tbToursModal' class='modal hide fade'>" +
              "<div class='modal-header'>" +
              "<button type='button' class='close' data-dismiss='modal' aria-hidden='true'>&times;</button>" +
-             "<h3>Available tours</h3>" +
+             "<h2 class='modal-title'>Available tours</h2>" +
              "</div>" +
              "<div class='modal-body'>" +
              "<p><span id='tbTourList'></span><br/><h4>Content for tours.mako</h4><textarea id='tbAvailableContent' style='width:90%'></textarea><br/><a href='javascript:void(0)' id='tbLoadToursJson' class='btn btn-mini'>Load from JSON</a></p>" +

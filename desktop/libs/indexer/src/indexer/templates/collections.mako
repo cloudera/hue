@@ -87,8 +87,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div id="chooseFile" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Choose a file')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Choose a file')}</h2>
   </div>
   <div class="modal-body">
     <div id="filechooser">
@@ -101,8 +101,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <div data-bind="with: manage" id="deleteCollections" class="modal hide fade">
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Do you really want to delete the following index(es)?')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Do you really want to delete the following index(es)?')}</h2>
   </div>
   <div class="modal-body">
     <ul data-bind="foreach: selectedCloudCollections">
@@ -119,8 +119,8 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 <div data-bind="with: edit" id="deleteCollection" class="modal hide fade">
   <!-- ko if: collection() -->
   <div class="modal-header">
-    <a href="#" class="close" data-dismiss="modal">&times;</a>
-    <h3>${_('Confirm Delete')}</h3>
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">×</span></button>
+    <h2 class="modal-title">${_('Confirm Delete')}</h2>
   </div>
   <div class="modal-body">
     ${ _('Are you sure you want to delete the index')} <strong data-bind="text: collection().name"></strong> ?

@@ -379,7 +379,7 @@
       if ($("#jHueTourVideoPlayer").length == 0) {
         var _playerHTML = '<div class="modal-header">' +
             '<button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>' +
-            '<h3>' + _this.currentTour.desc + '</h3>' +
+            '<h2 class="modal-title">' + _this.currentTour.desc + '</h2>' +
             '</div>' +
             '<div class="modal-body">' +
             '<iframe id="jHueTourVideoFrame" src="' + _this.currentTour.video + '?autoplay=1" width="700" height="350" frameborder="0" webkitallowfullscreen="" mozallowfullscreen="" allowfullscreen="" style="height:360px;width:640px"></iframe><div class="moreInfo">' +
