@@ -603,6 +603,16 @@ ${ assist.assistPanel() }
           })
         });
 
+        huePubSub.subscribe('open.editor.query.external', function (statementOptions) {
+          self.currentApp('editor');
+          self.getActiveAppViewModel(function (viewModel) {
+            viewModel.newNotebook(function() { // Uses default type of Editor
+              viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
+              viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
+            });
+          })
+        });
+
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/notebook/editor')){
             if (hueUtils.getSearchParameter(href, 'editor') !== '') {
