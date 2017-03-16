@@ -148,7 +148,7 @@
 }
 
 .draggable-widget {
-  width: 60px;
+  width: 40px;
   text-align: center;
   float: left;
   border: 1px solid #CCC;
@@ -162,35 +162,14 @@
 }
 
 .draggable-widget a {
-  font-size: 28px;
-  line-height: 46px;
+  font-size: 20px;
+  line-height: 40px;
 }
 
 .draggable-widget.disabled a {
   cursor: default;
   color: #CCC;
 }
-
-@media (max-width: 1438px) {
-  .draggable-widget {
-    width: 50px;
-  }
-
-  .draggable-widget a {
-    font-size: 24px;
-  }
-}
-
-@media (max-width: 1300px) {
-  .draggable-widget {
-    width: 40px;
-  }
-
-  .draggable-widget a {
-    font-size: 20px;
-  }
-}
-
 
 .layout-container {
   width: 100px;
