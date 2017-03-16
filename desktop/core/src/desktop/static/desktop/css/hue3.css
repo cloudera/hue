@@ -1717,14 +1717,6 @@ a, a:hover, a:active, a:focus {
   opacity: 0.80;
 }
 
-.btn.active, .btn:active {
-  border-color: rgba(0, 0, 0, 0.1);
-  outline: 0;
-  -webkit-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3) inset;
-  -moz-box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3) inset;
-  box-shadow: 0 0 5px 1px rgba(0, 0, 0, 0.3) inset;
-}
-
 .side-labels {
   -webkit-transform: rotate(-90deg);
   -moz-transform: rotate(-90deg);
