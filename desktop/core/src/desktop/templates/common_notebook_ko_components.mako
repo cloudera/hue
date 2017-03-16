@@ -358,13 +358,26 @@ except ImportError, e:
             snippet: ko.mapping.toJSON(self.snippet.getContext()),
             format: ko.mapping.toJSON(self.saveTarget()),
             destination: ko.mapping.toJSON(self.savePath()),
-            overwrite: ko.mapping.toJSON(self.saveOverwrite())
+            overwrite: ko.mapping.toJSON(self.saveOverwrite()),
+            is_embedded: ko.mapping.toJSON(IS_HUE_4),
           },
-          function(data) {
-            if (data.status == 0) {
-              window.location.href = data.watch_url;
+          function(resp) {
+            if (resp.status == 0) {
+              if (IS_HUE_4) {
+                if (self.saveTarget() == '') {
+                  huePubSub.publish('open.fb.folder', resp.watch_url.replace(/\/filebrowser\/view=/g, ''));
+                } else {
+                  if (resp.history_uuid) {
+                    huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+                  } else if (resp && resp.message) {
+                    $(document).trigger("error", resp.message);
+                  }
+                }
+              } else {
+                window.location.href = resp.watch_url;
+              }
             } else {
-              $(document).trigger('error', data.message);
+              $(document).trigger('error', resp.message);
             }
           }).fail(function (xhr, textStatus, errorThrown) {
             $(document).trigger("error", xhr.responseText);

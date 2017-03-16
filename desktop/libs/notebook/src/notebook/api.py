@@ -31,7 +31,7 @@ from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
-from notebook.models import escape_rows
+from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
 
 
@@ -622,10 +622,11 @@ def export_result(request):
   data_format = json.loads(request.POST.get('format', 'hdfs-file'))
   destination = json.loads(request.POST.get('destination', ''))
   overwrite = json.loads(request.POST.get('overwrite', False))
+  is_embedded = json.loads(request.POST.get('is_embedded', False))
 
   api = get_api(request, snippet)
 
-  if data_format == 'hdfs-file':
+  if data_format == 'hdfs-file': # Blocking operation, like downloading
     if request.fs.isdir(destination):
       if notebook.get('name'):
         destination += '/%(name)s.csv' % notebook
@@ -640,9 +641,23 @@ def export_result(request):
     response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
     response['status'] = 0
   elif data_format == 'hdfs-directory':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
+
+      task = make_notebook(
+        name='Execute and watch',
+        editor_type=snippet['type'],
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url,
+        is_task=True
+      )
+      response = task.execute(request)
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
   elif data_format == 'search-index':
     notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
     response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
