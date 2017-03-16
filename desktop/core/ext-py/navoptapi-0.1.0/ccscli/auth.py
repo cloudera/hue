@@ -17,13 +17,12 @@ from base64 import urlsafe_b64encode
 from email.utils import formatdate
 import logging
 
+from asn1crypto import keys, pem
 from ccscli.compat import json
 from ccscli.compat import OrderedDict
 from ccscli.compat import urlsplit
 from ccscli.exceptions import NoCredentialsError
-from Crypto.Hash import SHA256
-from Crypto.PublicKey import RSA
-from Crypto.Signature import PKCS1_v1_5
+import rsa
 
 
 LOG = logging.getLogger('ccscli.auth')
@@ -43,10 +42,18 @@ class RSAv1Auth(BaseSigner):
     def __init__(self, credentials):
         self.credentials = credentials
 
-    def sign_string(self, string_to_sign):
+    def _sign_string(self, string_to_sign):
         try:
             # We expect the private key to be the an PKCS8 pem formatted string.
-            key = RSA.importKey(self.credentials.private_key)
+            pem_bytes = self.credentials.private_key.encode('utf-8')
+            if pem.detect(pem_bytes):
+                _, _, der_bytes = pem.unarmor(pem_bytes)
+                # In PKCS8 the key is wrapped in a container that describes it
+                info = keys.PrivateKeyInfo.load(der_bytes, strict=True)
+                # The unwrapped key is equivalent to pkcs1 contents
+                key = rsa.PrivateKey.load_pkcs1(info.unwrap().dump(), 'DER')
+            else:
+                raise Exception('Not a PEM file')
         except:
             message = \
                 "Failed to import private key from: '%s'. The private key is " \
@@ -60,11 +67,10 @@ class RSAv1Auth(BaseSigner):
             LOG.debug(message, exc_info=True)
             raise Exception(message)
         # We sign the hash.
-        h = SHA256.new(string_to_sign.encode('utf-8'))
-        signer = PKCS1_v1_5.new(key)
-        return urlsafe_b64encode(signer.sign(h)).strip().decode('utf-8')
+        signature = rsa.sign(string_to_sign.encode('utf-8'), key, 'SHA-256')
+        return urlsafe_b64encode(signature).strip().decode('utf-8')
 
-    def canonical_standard_headers(self, headers):
+    def _canonical_standard_headers(self, headers):
         interesting_headers = ['content-type', 'x-ccs-date']
         hoi = []
         if 'x-ccs-date' in headers:
@@ -81,17 +87,17 @@ class RSAv1Auth(BaseSigner):
                 hoi.append('')
         return '\n'.join(hoi)
 
-    def canonical_string(self, method, split, headers):
+    def _canonical_string(self, method, split, headers):
         cs = method.upper() + '\n'
-        cs += self.canonical_standard_headers(headers) + '\n'
+        cs += self._canonical_standard_headers(headers) + '\n'
         cs += split.path + '\n'
         cs += RSAv1Auth.AUTH_METHOD_NAME
         return cs
 
-    def get_signature(self, method, split, headers):
-        string_to_sign = self.canonical_string(method, split, headers)
+    def _get_signature(self, method, split, headers):
+        string_to_sign = self._canonical_string(method, split, headers)
         LOG.debug('StringToSign:\n%s', string_to_sign)
-        return self.sign_string(string_to_sign)
+        return self._sign_string(string_to_sign)
 
     def add_auth(self, request):
         if self.credentials is None:
@@ -99,9 +105,9 @@ class RSAv1Auth(BaseSigner):
         LOG.debug("Calculating signature using RSAv1Auth.")
         LOG.debug('HTTP request method: %s', request.method)
         split = urlsplit(request.url)
-        signature = self.get_signature(request.method,
-                                       split,
-                                       request.headers)
+        signature = self._get_signature(request.method,
+                                        split,
+                                        request.headers)
         self._inject_signature(request, signature)
 
     def _get_date(self):
