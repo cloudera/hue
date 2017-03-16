@@ -262,7 +262,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('hbase') }"><a href="javascript: void(0);">HBase</a></li>
         % endif
         % if 'security' in apps:
-        <li><a href="javascript: void(0);">Security</a></li>
+          <li data-bind="click: function () { onePageViewModel.currentApp('security_hive') }"><a href="javascript: void(0);">Security</a></li>
         % endif
         % if 'sqoop' in apps:
         <li><a href="/${apps['sqoop'].display_name}">${_('Sqoop')}</a></li>
@@ -343,6 +343,10 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
       <div id="embeddable_hbase" class="embeddable"></div>
+      <div id="embeddable_security_hive" class="embeddable"></div>
+      <div id="embeddable_security_hdfs" class="embeddable"></div>
+      <div id="embeddable_security_hive2" class="embeddable"></div>
+      <div id="embeddable_security_solr" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -525,6 +529,10 @@ ${ assist.assistPanel() }
         useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
         useradmin_newuser: '/useradmin/users/new?is_embeddable=true',
         hbase: '/hbase/?is_embeddable=true',
+        security_hive: '/security/hive?is_embeddable=true',
+        security_hdfs: '/security/hdfs?is_embeddable=true',
+        security_hive2: '/security/hive2?is_embeddable=true',
+        security_solr: '/security/solr?is_embeddable=true',
       };
 
       var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
@@ -661,6 +669,14 @@ ${ assist.assistPanel() }
             self.currentApp('useradmin_permissions');
           } else if (href.startsWith('/useradmin/configurations')) {
             self.currentApp('useradmin_configurations');
+          } else if (href.startsWith('/security/hive2')) {
+            self.currentApp('security_hive2');
+          } else if (href.startsWith('/security/hive')) {
+            self.currentApp('security_hive');
+          } else if (href.startsWith('/security/solr')) {
+            self.currentApp('security_solr');
+          } else if (href.startsWith('/security/hdfs')) {
+            self.currentApp('security_hdfs');
           }
         });
 
