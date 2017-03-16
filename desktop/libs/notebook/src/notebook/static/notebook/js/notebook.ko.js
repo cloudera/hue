@@ -1070,7 +1070,7 @@ var EditorViewModel = (function() {
           self.result.hasResultset(data.handle.has_result_set);
           if (data.handle.sync) {
             self.loadData(data.result, 100);
-            self.status('success');
+            self.status('available');
             self.progress(100);
           } else {
             if (! notebook.unloaded()) { self.checkStatus(); };

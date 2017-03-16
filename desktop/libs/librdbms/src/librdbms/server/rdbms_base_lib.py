@@ -45,6 +45,9 @@ class BaseRDBMSDataTable(object):
       self.next = list(self.cursor.fetchmany(self.fetchSize))
     return bool(self.next)
 
+  def cols(self):
+    return self.columns
+
   def rows(self):
     while self.has_more:
       yield self.next.pop(0)

@@ -15,14 +15,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
 
-from desktop.lib.exceptions_renderable import PopupException
+from desktop.lib import export_csvxls
 from desktop.lib.i18n import force_unicode
 
+from beeswax import data_export
 from librdbms.server import dbms
 
-from notebook.connectors.base import Api, QueryError, QueryExpired
+from notebook.connectors.base import Api, QueryError, QueryExpired, _get_snippet_name
 
 
 LOG = logging.getLogger(__name__)
@@ -43,14 +45,18 @@ def query_error_handler(func):
 
 class RdbmsApi(Api):
 
-  @query_error_handler
-  def execute(self, notebook, snippet):
+  def _execute(self, notebook, snippet):
     query_server = dbms.get_query_server_config(server=self.interpreter)
     db = dbms.get(self.user, query_server)
 
-    db.use(snippet['database']) # TODO: only do the use on the first statement in a multi query
+    db.use(snippet['database'])  # TODO: only do the use on the first statement in a multi query
     table = db.execute_statement(snippet['statement'])  # TODO: execute statement stub in Rdbms
 
+    return table
+
+  @query_error_handler
+  def execute(self, notebook, snippet):
+    table = self._execute(notebook, snippet)
     data = list(table.rows())
     has_result_set = data is not None
     print table.columns
@@ -102,8 +108,14 @@ class RdbmsApi(Api):
     return 'No logs'
 
 
+  @query_error_handler
   def download(self, notebook, snippet, format):
-    raise PopupException('Downloading is not supported yet')
+
+    file_name = _get_snippet_name(notebook)
+    results = self._execute(notebook, snippet)
+    db = FixedResult(results)
+
+    return data_export.download(None, format, db, id=snippet['id'], file_name=file_name)
 
 
   @query_error_handler
@@ -176,3 +188,13 @@ class Assist():
 
   def get_sample_data(self, database, table, column=None):
     return self.db.get_sample_data(database, table, column)
+
+
+class FixedResult():
+
+  def __init__(self, result):
+    self.result = result
+    self.has_more = False
+
+  def fetch(self, handle=None, start_over=None, rows=None):
+    return self.result
