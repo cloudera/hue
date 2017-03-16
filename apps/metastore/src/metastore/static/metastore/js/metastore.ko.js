@@ -709,7 +709,7 @@ var MetastoreViewModel = (function () {
     self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
     self.apiHelper = ApiHelper.getInstance(options);
-    self.isResponsive = ko.observable(options.responsive);
+    self.isHue4 = ko.observable(options.hue4);
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
@@ -802,7 +802,7 @@ var MetastoreViewModel = (function () {
 
     huePubSub.subscribe('metastore.url.change', function () {
       var prefix = '/metastore/';
-      if (self.isResponsive()){
+      if (self.isHue4()){
         prefix = '?app=metastore&path=';
       }
       if (self.database() && self.database().table()) {

@@ -67,10 +67,10 @@ def is_alive(request):
   return HttpResponse('')
 
 
-def responsive(request):
+def hue(request):
   apps = appmanager.get_apps_dict(request.user)
 
-  return render('responsive.mako', request, {
+  return render('hue.mako', request, {
     'apps': apps,
     'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
     'interpreters': get_ordered_interpreters(request.user),
@@ -349,7 +349,7 @@ def index(request):
     return redirect(reverse('about:index'))
   else:
     if IS_HUE_4.get():
-      return responsive(request)
+      return hue(request)
     elif USE_NEW_EDITOR.get():
       return home2(request)
     else:

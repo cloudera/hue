@@ -2695,7 +2695,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       user: '${ user.username }',
       userId: ${ user.id },
       % if is_embeddable:
-      responsive: true,
+      hue4: true,
       % endif
       assistAvailable: true,
       % if conf.USE_NEW_AUTOCOMPLETER.get():

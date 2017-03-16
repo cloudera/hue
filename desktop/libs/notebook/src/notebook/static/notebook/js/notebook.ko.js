@@ -295,7 +295,7 @@ var EditorViewModel = (function() {
       }
     });
 
-    // TODO: It should only publish if this belongs to the currently active app in responsive
+    // TODO: It should only publish if this belongs to the currently active app in Hue 4
     huePubSub.subscribe('get.active.snippet.type', function () {
       if (self.inFocus() || notebook.snippets().length === 1) {
         huePubSub.publish('set.active.snippet.type', self.type());
@@ -1055,8 +1055,8 @@ var EditorViewModel = (function() {
 
         if (vm.editorMode() && data.history_id && ! vm.isNotificationManager()) {
           var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
-          if (vm.isResponsive()){
-            url = vm.URLS.responsive + '&editor=' + data.history_id;
+          if (vm.isHue4()){
+            url = vm.URLS.hue4 + '&editor=' + data.history_id;
           }
           vm.changeURL(url);
           notebook.id(data.history_id);
@@ -1977,16 +1977,16 @@ var EditorViewModel = (function() {
               self.schedulerViewModel.coordinator.refreshParameters();
             }
 
-            if (vm.isResponsive()){
-              vm.changeURL(vm.URLS.responsive + '&editor=' + data.id);
+            if (vm.isHue4()){
+              vm.changeURL(vm.URLS.hue4 + '&editor=' + data.id);
             }
             else {
               vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
             }
           }
           else {
-            if (vm.isResponsive()){
-              vm.changeURL(vm.URLS.responsive_notebook + '&notebook=' + data.id);
+            if (vm.isHue4()){
+              vm.changeURL(vm.URLS.hue4_notebook + '&notebook=' + data.id);
             }
             else {
               vm.changeURL('/notebook/notebook?notebook=' + data.id);
@@ -2168,8 +2168,8 @@ var EditorViewModel = (function() {
         if (self.isHistory()) {
           self.id(null);
           self.uuid(UUID());
-          if (vm.isResponsive()) {
-            vm.changeURL(vm.URLS.responsive + '&type=' + vm.editorType());
+          if (vm.isHue4()) {
+            vm.changeURL(vm.URLS.hue4 + '&type=' + vm.editorType());
           }
           else {
             vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?type=' + vm.editorType());
@@ -2319,14 +2319,14 @@ var EditorViewModel = (function() {
       editor: '/notebook/editor',
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
-      responsive: '/responsive?app=editor',
-      responsive_notebook: '/responsive?app=notebook'
+      hue4: '/hue?app=editor',
+      hue4_notebook: '/hue?app=notebook'
     }
 
     self.user = options.user;
     self.userId = options.userId;
     self.isMobile = ko.observable(options.mobile);
-    self.isResponsive = ko.observable(options.responsive);
+    self.isHue4 = ko.observable(options.hue4);
     self.isNotificationManager = ko.observable(options.is_notification_manager || false);
     self.editorType = ko.observable(options.editor_type);
     self.editorType.subscribe(function(newVal) {
@@ -2576,16 +2576,16 @@ var EditorViewModel = (function() {
           self.loadNotebook(notebook, queryTab);
           if (typeof skipUrlChange === 'undefined' && ! self.isNotificationManager()){
             if (self.editorMode()) {
-              if (self.isResponsive()){
-                self.changeURL(self.URLS.responsive + '&editor=' + data.document.id);
+              if (self.isHue4()){
+                self.changeURL(self.URLS.hue4 + '&editor=' + data.document.id);
               }
               else {
                 self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
               }
             }
             else {
-              if (self.isResponsive()){
-                self.changeURL(self.URLS.responsive_notebook + '&notebook=' + data.document.id);
+              if (self.isHue4()){
+                self.changeURL(self.URLS.hue4_notebook + '&notebook=' + data.document.id);
               }
               else {
                 self.changeURL(self.URLS.notebook + '&notebook=' + data.document.id);
@@ -2618,23 +2618,23 @@ var EditorViewModel = (function() {
             $.totalStorage('hue.notebook.lastWrittenSnippet.' + self.user +  '.' + window.location.getParameter('type'), '');
           }
           if (window.location.getParameter('type')) {
-            if (self.isResponsive()){
-              self.changeURL(self.URLS.responsive + '&type=' + window.location.getParameter('type'));
+            if (self.isHue4()){
+              self.changeURL(self.URLS.hue4 + '&type=' + window.location.getParameter('type'));
             }
             else {
               self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + window.location.getParameter('type'));
             }
           } else {
-            if (self.isResponsive()){
-              self.changeURL(self.URLS.responsive + '&type=' + self.editorType());
+            if (self.isHue4()){
+              self.changeURL(self.URLS.hue4 + '&type=' + self.editorType());
             }
             else {
               self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?type=' + self.editorType());
             }
           }
         } else {
-          if (self.isResponsive()){
-            self.changeURL(self.URLS.responsive_notebook);
+          if (self.isHue4()){
+            self.changeURL(self.URLS.hue4_notebook);
           }
           else {
             self.changeURL('/notebook/notebook');

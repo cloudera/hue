@@ -511,7 +511,7 @@ var HueFileEntry = (function () {
     location.href = $(event.target).attr('href');
   };
 
-  HueFileEntry.prototype.openResponsiveLink = function (entry, event) {
+  HueFileEntry.prototype.openHue4Link = function (entry, event) {
     event.preventDefault();
     huePubSub.publish('open.link', $(event.target).attr('href'));
   };

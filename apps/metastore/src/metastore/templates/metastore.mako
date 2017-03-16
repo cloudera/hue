@@ -1211,7 +1211,7 @@ ${ components.menubar() }
       var options = {
         user: '${ user.username }',
         % if is_embeddable:
-        responsive: true,
+        hue4: true,
         % endif
         i18n: {
           errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
