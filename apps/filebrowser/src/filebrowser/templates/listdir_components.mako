@@ -115,7 +115,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${_('No')}</a>
-      <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: extractSelectedArchive"/>
+      <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: extractSelectedArchive"/>
     </div>
     <!-- /ko -->
   </div>
@@ -137,7 +137,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal">${_('No')}</a>
-      <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: compressSelectedFiles"/>
+      <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: compressSelectedFiles"/>
     </div>
     <!-- /ko -->
   </div>
