@@ -46,6 +46,7 @@ ${layout.menubar(section='log_view')}
   #logs {
     overflow: auto;
     background-color: #F5F5F5;
+    width: 100%;
   }
 
   #logs pre:first-child {
