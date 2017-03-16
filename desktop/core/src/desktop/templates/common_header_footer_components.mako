@@ -30,6 +30,36 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var IS_S3_ENABLED = '${ is_s3_enabled }' === 'True';
     var HAS_OPTIMIZER = '${ has_optimizer() }' === 'True';
 
+    var BOOTSTRAP_RATIOS = {
+      SPAN3: function () {
+        var _w = $(window).width();
+        if (_w >= 1200) {
+          return 23.07692308;
+        }
+        else if (_w >= 768 && _w <= 979) {
+          return 22.9281768;
+        }
+        else {
+          return 23.17073171;
+        }
+      },
+      SPAN9: function () {
+        var _w = $(window).width();
+        if (_w >= 1200) {
+          return 74.35897436;
+        }
+        else if (_w >= 768 && _w <= 979) {
+          return 74.30939227;
+        }
+        else {
+          return 74.3902439;
+        }
+      },
+      MARGIN: function () {
+        return 2.56410256;
+      }
+    };
+
     var CACHEABLE_TTL = {
       default: ${ conf.CUSTOM.CACHEABLE_TTL.get() },
       optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }

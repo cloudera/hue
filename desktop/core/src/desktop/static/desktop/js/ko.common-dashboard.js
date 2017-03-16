@@ -69,7 +69,7 @@ var Row = function (widgets, vm, columns) {
   self.columns = ko.observableArray(columns ? columns : []);
   self.columns.subscribe(function (val) {
     self.columns().forEach(function (col) {
-      col.percWidth((100 - self.columns().length * 2.127659574468085) / self.columns().length);
+      col.percWidth((100 - self.columns().length * BOOTSTRAP_RATIOS.MARGIN()) / self.columns().length);
     });
   });
 
