@@ -219,6 +219,7 @@ ${ hueIcons.symbols() }
         <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         % endif
         % endif
+        % endif
       </div>
     </div>
   </nav>
