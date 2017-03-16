@@ -1416,7 +1416,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <table class="table table-condensed table-striped resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
-                  <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>
+                  <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : '', 'height': $index() == 0 ? '32px' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>
                 </tr>
                 </thead>
                 <tbody>
