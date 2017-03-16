@@ -1676,7 +1676,7 @@ var AutocompleteResults = (function () {
     // For Hive it could be either:
     // SELECT col.struct FROM db.tbl -or- SELECT col.struct FROM tbl
     if (self.snippet.type() === 'impala' || self.snippet.type() === 'hive') {
-      if (identifierChain.length > 1 && !identifierChain.subQuery) {
+      if (identifierChain.length > 1 && $.grep(identifierChain, function (e) { return e.subQuery; }).length == 0) {
         self.apiHelper.loadDatabases({
           sourceType: self.snippet.type(),
           timeout: AUTOCOMPLETE_TIMEOUT,
