@@ -17,7 +17,13 @@
 import os
 import re
 
-VERSION = "0.1.0"
+from ._version import get_versions
+
+
+__version__ = get_versions()['version']
+del get_versions
+
+VERSION = __version__
 
 CCSCLI_ROOT = os.path.dirname(os.path.abspath(__file__))
 
@@ -46,6 +52,12 @@ COMPLEX_TYPES = set([OBJECT_TYPE,
 DEFAULT_PROFILE_NAME = 'default'
 CCS_ACCESS_KEY_ID_KEY_NAME = 'ccs_access_key_id'
 CCS_PRIVATE_KEY_KEY_NAME = 'ccs_private_key'
+# Python argparse has a bug in which '-' are not parsed correctly if they appear
+# as values for other arguments, see: http://bugs.python.org/issue9334 for more
+# details. This defines special encoding for dash that we will "decode" and
+# replace with a dash. The reason we are using \\ is that there is a non zero
+# chance that customers can discover this themselves.
+ARGPARSE_DASH_ENCODING = '\\-'
 
 # Prepopulate the cache with special cases that don't match our regular
 # transformation.

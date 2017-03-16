@@ -218,7 +218,7 @@ ${ hueIcons.symbols() }
         % if 'jobbrowser' in apps:
         <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         % endif
-        % endif
+
         % endif
       </div>
     </div>

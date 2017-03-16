@@ -277,6 +277,7 @@ class SharedCredentialProvider(CredentialProvider):
         try:
             available_creds = raw_config_parse(self._creds_filename)
         except ConfigNotFound:
+            LOG.debug("Credentials file at %s does not exist!" % self._creds_filename)
             return None
         if self._profile_name in available_creds:
             config = available_creds[self._profile_name]

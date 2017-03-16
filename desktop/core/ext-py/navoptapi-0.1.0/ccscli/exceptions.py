@@ -177,3 +177,75 @@ class ConfigParseError(CCSCLIError):
     The configuration file could not be parsed.
     """
     fmt = 'Unable to parse config file: {path}'
+
+
+class ClusterTerminatingError(CCSCLIError):
+
+    """
+    The cluster is terminating or has already terminated.
+    """
+    fmt = 'Cluster {cluster_name} is terminating.'
+
+
+class ClusterStartingError(CCSCLIError):
+
+    """
+    The cluster is starting.
+    """
+    fmt = 'Cluster {cluster_name} is starting.'
+
+
+class ClusterFailedError(CCSCLIError):
+
+    """
+    The cluster failed to start.
+    """
+    fmt = 'Cluster {cluster_name} failed to start.'
+
+
+class ClusterDoesNotExistError(CCSCLIError):
+
+    """
+    Cluster with the given name does not exist.
+    """
+    fmt = 'Cluster {cluster_name} does not exist.'
+
+
+class ClusterStatusNotFound(CCSCLIError):
+
+    """
+    Unable to find cluster status.
+    """
+    fmt = 'Unable to find {cluster_name}\'s status.'
+
+
+class ClusterEndpointNotFound(CCSCLIError):
+
+    """
+    Unable to find cluster's Cloudera Manager Endpoint.
+    """
+    fmt = 'Unable to find {cluster_name}\'s Cloudera Manager Endpoint.'
+
+
+class MultipleClustersExist(CCSCLIError):
+
+    """
+    Multiple clusters exist, expected single cluster.
+    """
+    fmt = 'Multiple clusters exist, expected single cluster.'
+
+
+class SSHNotFoundError(CCSCLIError):
+
+    """
+    SSH or Putty not available.
+    """
+    fmt = 'SSH or Putty not available.'
+
+
+class WrongPuttyKeyError(CCSCLIError):
+
+    """
+    A wrong key has been used with a compatible program.
+    """
+    fmt = 'Key file file format is incorrect. Putty expects a ppk file.'

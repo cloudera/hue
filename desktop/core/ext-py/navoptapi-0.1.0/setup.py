@@ -17,6 +17,8 @@ with open(path.join(here, 'README.rst'), encoding='utf-8') as f:
 requirements = ["python-dateutil>=2.1,<3.0.0",
                 "docutils>=0.10",
                 "pyyaml>=3.11",
+                "asn1crypto>=0.21.1",
+                "rsa>=3.4.2",
                 "colorama>=0.2.5,<=0.3.3",
                 "pycrypto>=2.6.1",
                 "requests>=2.9.1"]
