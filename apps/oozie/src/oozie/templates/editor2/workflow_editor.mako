@@ -839,19 +839,10 @@ ${ dashboard.import_bindings() }
     });
 
     function resizeToolbar() {
-      $('.draggable-widget').css('width', '');
-      $('.draggable-widget img').css({
-        'width': '',
-        'height': ''
-      });
-      $('.draggable-widget .draggable-icon').css('fontSize', '');
+      $('.card-toolbar-content').width(100).css('marginLeft', '0');
       if ($('.card-toolbar').height() > 60) {
-        var width = $('.draggable-widget').width();
         while ($('.card-toolbar').height() > 60) {
-          width -= 1;
-          $('.draggable-widget').width(width);
-          $('.draggable-widget img').width(width / 2).height(width / 2);
-          $('.draggable-widget .draggable-icon').css('fontSize', width / 2);
+          $('.card-toolbar-content').width($('.card-toolbar-content').width() + 10);
         }
       }
       var marginLeft = $('.card-toolbar').width() / 2 - $('.card-toolbar-content').width() / 2;
