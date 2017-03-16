@@ -133,7 +133,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
       </div>
     </div>
 
-    <div class="span10" style="margin-left: 2.127659574468085%;">
+    <div class="span10" style="margin-left: 2.56410256%;">
       <h1 class="card-heading simple card-heading-nopadding card-heading-noborder card-heading-blue" style="margin-bottom: 10px">
         % if oozie_bundle:
           ${ _('Bundle') } <a href="${ oozie_bundle.get_absolute_url() }">${ oozie_bundle.appName }</a> :

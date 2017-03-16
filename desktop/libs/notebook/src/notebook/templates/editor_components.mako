@@ -3332,12 +3332,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       }
 
       function resetResultsResizer(snippet) {
-        var span3Width = 23.404255319148934;
-        var span9Width = 74.46808510638297;
-
-        $("#snippet_" + snippet.id()).find('.table-results .column-side').width(span3Width + '%').data('newWidth', span3Width);
+        $("#snippet_" + snippet.id()).find('.table-results .column-side').width(BOOTSTRAP_RATIOS.SPAN3() + '%').data('newWidth', BOOTSTRAP_RATIOS.SPAN3());
         if (snippet.isResultSettingsVisible()){
-          $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', span9Width).width(span9Width + '%');
+          $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', BOOTSTRAP_RATIOS.SPAN9()).width(BOOTSTRAP_RATIOS.SPAN9() + '%');
         }
         else {
           $("#snippet_" + snippet.id()).find('.table-results .grid-side').data('newWidth', 100).width('100%');
@@ -3355,7 +3352,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           containment: $("#snippet_" + snippet.id()).find('.table-results'),
           create: function (event, ui) {
             initialPosition = $("#snippet_" + snippet.id()).find('.resize-bar').position().left;
-            $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth', span3Width);
+            $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth', BOOTSTRAP_RATIOS.SPAN3());
             $("#snippet_" + snippet.id()).find('.meta-filter').width($("#snippet_" + snippet.id()).find('.table-results .column-side').width() - 28)
           },
           drag: function (event, ui) {
@@ -3363,8 +3360,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               initialPosition = $("#snippet_" + snippet.id()).find('.resize-bar').position().left;
             }
             ui.position.left = Math.max(150, ui.position.left);
-            var newSpan3Width = ui.position.left * span3Width / initialPosition;
-            var newSpan9Width = 100 - newSpan3Width - 2.127659574468085;
+            var newSpan3Width = ui.position.left * BOOTSTRAP_RATIOS.SPAN3() / initialPosition;
+            var newSpan9Width = 100 - newSpan3Width - BOOTSTRAP_RATIOS.MARGIN();
             $("#snippet_" + snippet.id()).find('.table-results .column-side').width(newSpan3Width + '%').data('newWidth', newSpan3Width);
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width(newSpan9Width + '%').data('newWidth', newSpan9Width);
             $("#snippet_" + snippet.id()).find('.meta-filter').width($("#snippet_" + snippet.id()).find('.table-results .column-side').width() - 28)
@@ -3384,7 +3381,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             scrollInertia: 0
           });
           if (snippet.isResultSettingsVisible()){
-            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - 2.127659574468085) + '%');
+            $("#snippet_" + snippet.id()).find('.table-results .grid-side').width((100 - $("#snippet_" + snippet.id()).find('.table-results .column-side').data('newWidth') - BOOTSTRAP_RATIOS.MARGIN()) + '%');
           }
           else {
             $("#snippet_" + snippet.id()).find('.table-results .grid-side').width('100%');
