@@ -16,6 +16,7 @@
  limitations under the License.
 */
 @import (reference) "cui/colors.less";
+@import (reference) "cui/extra-variables.less";
 @import (reference) "hue-attributes.less";
 
 .assist-panel {
@@ -43,7 +44,7 @@
 
 .right-panel-tabs {
   margin-top: 8px;
-  border-bottom: 1px solid #F1F1F1;
+  border-bottom: 1px solid @cui-default-border-color;
   padding-left: 14px;
 }
 
@@ -174,8 +175,8 @@
   .flex(1);
   color: @hue-primary-color-dark;
   background-color: #f9f9f9;
-  border-top: 1px solid #f1f1f1;
-  border-bottom: 1px solid #f1f1f1;
+  border-top: 1px solid @cui-default-border-color;
+  border-bottom: 1px solid @cui-default-border-color;
   font-weight: bold;
   letter-spacing: 0.035em;
   font-size: 0.975em;
@@ -228,7 +229,7 @@
 .assist-panel-switches {
   padding-left: 12px;
   height: 40px;
-  border-bottom: 1px solid #f1f1f1;
+  border-bottom: 1px solid @cui-default-border-color;
   padding-right: 15px;
 }
 
@@ -546,12 +547,12 @@
   width: 100%;
 
   border-radius: 4px;
-  border: 1px solid #DDD;
+  border: 1px solid @input-border;
   box-shadow: none;
 }
 
 .assist-function-details {
-  border-top: 2px solid #F1F1F1;
+  border-top: 2px solid @cui-default-border-color;
   margin-top: 5px;
   margin-right:10px;
   padding: 10px;
@@ -631,7 +632,7 @@
 
   .nav-autocomplete-divider {
     height: 2px;
-    border-top: 1px solid #dddddd;
+    border-top: 1px solid @cui-default-border-color;
   }
 
   .nav-autocomplete-empty {
@@ -681,7 +682,7 @@
 
 .sql-context-tabs {
   .flex(0 1 auto);
-  border-bottom: 1px solid #ebebeb;
+  border-bottom: 1px solid @cui-default-border-color;
   margin-left: -1px;
   margin-right: -1px;
   padding-left: 15px;
@@ -725,7 +726,7 @@
 
 .sql-context-flex-bottom-links {
   .flex(0 0 35px);
-  border-top: 1px solid #ebebeb;
+  border-top: 1px solid @cui-default-border-color;
   z-index: 100;
   background-color: #FFF;
 }
