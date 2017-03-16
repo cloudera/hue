@@ -602,7 +602,7 @@ table.display td.center {
 
 .sorting {
   cursor: pointer;
-  border-top: 3px solid #FFFFFF !important;
+  border-top: 1px solid #DCDCDC !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -614,7 +614,7 @@ table.display td.center {
 .sorting_asc {
   cursor: pointer;
   background: url('../art/datatables/sort_asc.png') no-repeat center right;
-  border-top: 3px solid #FFFFFF !important;
+  border-top: 1px solid #DCDCDC !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -626,7 +626,7 @@ table.display td.center {
 .sorting_desc {
   cursor: pointer;
   background: url('../art/datatables/sort_desc.png') no-repeat center right;
-  border-top: 3px solid #FFFFFF !important;
+  border-top: 1px solid #DCDCDC !important;
   padding-right: 20px !important;
   vertical-align: middle!important;
 }
@@ -648,7 +648,7 @@ table.display td.center {
 }
 
 .sorting:hover, .sorting_asc:hover, .sorting_desc:hover {
-  border-top: 3px solid #EEEEEE !important;
+  border-top: 1px solid #29A7DE !important;
 }
 
 .table-huedatatable th.sorting:hover {
