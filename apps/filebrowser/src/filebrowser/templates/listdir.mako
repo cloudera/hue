@@ -136,6 +136,12 @@ ${ fb_components.menubar() }
               </button>
             % endif
           % endif
+          % if 'beeswax' in apps:
+            <a class="btn" title="${_('Open in Editor')}"
+              data-bind="visible: selectedFiles().length == 1 && isSelectedFileSql(), click: openFileInEditor">
+              ${_('Open in Editor')}
+            </a>
+          % endif
         </div>
       </%def>
 
