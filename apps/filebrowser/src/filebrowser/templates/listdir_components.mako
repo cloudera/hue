@@ -1101,6 +1101,14 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         return self.selectedFiles()[0];
       }, self).extend({ rateLimit: { timeout: 500, method: "notifyWhenChangesStop" } });
 
+      self.isSelectedFileSql = ko.pureComputed(function() {
+        return self.selectedFile().name.endsWith('.sql') || self.selectedFile().name.endsWith('.hql');
+      });
+
+      self.openFileInEditor = function() {
+        huePubSub.publish('open.editor.query.external', {'statementType': 'file', 'statementPath': self.selectedFile().path});
+      };
+
       self.currentPath = ko.observable(currentDirPath);
       self.currentPath.subscribe(function (path) {
         $(document).trigger('currPathLoaded', { path: path });
