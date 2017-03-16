@@ -23,9 +23,10 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
+%endif
 ${ layout.menubar(section='hive1') }
-
 
 <script type="text/html" id="role">
   <div class="acl-block-title">
@@ -123,7 +124,7 @@ ${ layout.menubar(section='hive1') }
 </div>
 </script>
 
-<div class="container-fluid">
+<div id="securityHiveComponents" class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -583,7 +584,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     }
 
     var viewModel = new HiveViewModel(${ initial | n,unicode });
-    ko.applyBindings(viewModel);
+    ko.applyBindings(viewModel, $('#securityHiveComponents')[0]);
 
     $(document).ready(function () {
       var _initialPath = viewModel.getPathHash();
@@ -795,4 +796,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

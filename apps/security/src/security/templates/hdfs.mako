@@ -23,7 +23,9 @@ from django.utils.translation import ugettext as _
 <%namespace name="layout" file="layout.mako" />
 <%namespace name="tree" file="common_tree.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
+%endif
 ${ layout.menubar(section='hdfs') }
 
 
@@ -79,7 +81,7 @@ ${ layout.menubar(section='hdfs') }
   </div>
 </script>
 
-<div class="container-fluid">
+<div id="securityHdfsComponents" class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
       <div class="card card-small">
@@ -294,7 +296,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script type="text/javascript">
 
   var viewModel = new HdfsViewModel(${ initial | n,unicode });
-  ko.applyBindings(viewModel);
+  ko.applyBindings(viewModel, $('#securityHdfsComponents')[0]);
 
   $(document).ready(function () {
 
@@ -378,5 +380,6 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
   });
 </script>
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
