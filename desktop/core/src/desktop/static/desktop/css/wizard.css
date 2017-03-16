@@ -24,6 +24,10 @@
   padding-top: 10px;
 }
 
+.step-indicator-fixed ol {
+  margin: 0;
+}
+
 .vertical-spacer {
   height: 80px;
 }

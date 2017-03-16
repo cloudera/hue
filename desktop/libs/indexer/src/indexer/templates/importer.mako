@@ -227,10 +227,6 @@ ${ assist.assistPanel() }
     margin-bottom: 100px;
   }
 
-  .fileChooserBtn {
-    height: 29px;
-  }
-
   .form-control.path {
     vertical-align: top;
   }
@@ -402,7 +398,7 @@ ${ assist.assistPanel() }
             <label for="sourceType" class="control-label">${ _('No source is needed for creating a database.') }</label>
           </div>
 
-          <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'file'">
+          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'file'">
             <label for="path" class="control-label"><div>${ _('Path') }</div>
               <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
             </label>

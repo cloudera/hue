@@ -2950,64 +2950,60 @@
 
   ko.bindingHandlers.filechooser = {
     init: function (element, valueAccessor, allBindingsAccessor, vm) {
-      var self = $(element);
+      var $element = $(element);
       var options = ko.unwrap(allBindingsAccessor());
-      self.attr("autocomplete", "off");
+      $element.attr("autocomplete", "off");
       if (typeof valueAccessor() == "function" || typeof valueAccessor().value == "function") {
-        self.val(valueAccessor().value ? valueAccessor().value(): valueAccessor()());
-        self.data("fullPath", self.val());
-        self.attr("data-original-title", self.val());
+        $element.val(valueAccessor().value ? valueAccessor().value(): valueAccessor()());
+        $element.data("fullPath", $element.val());
+        $element.attr("data-original-title", $element.val());
         if (valueAccessor().displayJustLastBit){
-          var _val = self.val();
-          self.val(_val.split("/")[_val.split("/").length - 1]);
+          var _val = $element.val();
+          $element.val(_val.split("/")[_val.split("/").length - 1]);
         }
-        self.on("blur", function () {
+        $element.on("blur", function () {
           if (valueAccessor().value){
             if (valueAccessor().displayJustLastBit){
-              var _val = self.data("fullPath");
-              valueAccessor().value(_val.substr(0, _val.lastIndexOf("/")) + "/" + self.val());
+              var _val = $element.data("fullPath");
+              valueAccessor().value(_val.substr(0, _val.lastIndexOf("/")) + "/" + $element.val());
+            } else {
+              valueAccessor().value($element.val());
             }
-            else {
-              valueAccessor().value(self.val());
-            }
-            self.data("fullPath", valueAccessor().value());
+            $element.data("fullPath", valueAccessor().value());
+          } else {
+            valueAccessor()($element.val());
+            $element.data("fullPath", valueAccessor()());
           }
-          else {
-            valueAccessor()(self.val());
-            self.data("fullPath", valueAccessor()());
-          }
-          self.attr("data-original-title", self.data("fullPath"));
+          $element.attr("data-original-title", $element.data("fullPath"));
         });
 
         if (options.valueUpdate && options.valueUpdate === 'afterkeydown') {
-          self.on('keyup', function () {
+          $element.on('keyup', function () {
             if (valueAccessor().value){
-              valueAccessor().value(self.val());
-            }
-            else {
-              valueAccessor()(self.val());
+              valueAccessor().value($element.val());
+            } else {
+              valueAccessor()($element.val());
             }
           });
         }
-      }
-      else {
-        self.val(valueAccessor());
-        self.on("blur", function () {
-          valueAccessor(self.val());
+      } else {
+        $element.val(valueAccessor());
+        $element.on("blur", function () {
+          valueAccessor($element.val());
         });
         if (options.valueUpdate && options.valueUpdate === 'afterkeydown') {
-          self.on('keyup', function () {
-            valueAccessor(self.val());
+          $element.on('keyup', function () {
+            valueAccessor($element.val());
           });
         }
       }
 
-      self.after(getFileBrowseButton(self, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal, allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.linkMarkup));
+      $element.after(getFileBrowseButton($element, true, valueAccessor, true, allBindingsAccessor, valueAccessor().isAddon, valueAccessor().isNestedModal, allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.linkMarkup));
 
       if (allBindingsAccessor && allBindingsAccessor().filechooserOptions && allBindingsAccessor().filechooserOptions.openOnFocus) {
-        self.on('focus', function () {
-          if (self.val() === '') {
-            self.siblings('.filechooser-clickable').click();
+        $element.on('focus', function () {
+          if ($element.val() === '') {
+            $element.siblings('.filechooser-clickable').click();
           }
         });
       }
@@ -3019,11 +3015,9 @@
     var _btn;
     if (isAddon) {
       _btn = $("<span>").addClass("add-on muted pointer filechooser-clickable").text("..");
-    }
-    else if (linkMarkup) {
+    } else if (linkMarkup) {
       _btn = $("<a>").addClass("btn").addClass("fileChooserBtn filechooser-clickable").text("..");
-    }
-    else {
+    } else {
       _btn = $("<button>").addClass("btn").addClass("fileChooserBtn filechooser-clickable").text("..");
     }
     _btn.click(function (e) {
