@@ -561,6 +561,9 @@ parser.identifyPartials = function (beforeCursor, afterCursor) {
 };
 
 parser.expandLateralViews = function (lateralViews, originalIdentifierChain, columnSuggestion) {
+  if (!originalIdentifierChain) {
+    return undefined;
+  }
   var identifierChain = originalIdentifierChain.concat(); // Clone in case it's re-used
   var firstIdentifier = identifierChain[0];
   if (typeof lateralViews !== 'undefined') {
