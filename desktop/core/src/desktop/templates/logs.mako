@@ -23,8 +23,9 @@ import re
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="about_layout.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_('Server Logs'), "about", user, request) | n,unicode }
+%endif
 ${layout.menubar(section='log_view')}
 
 <style type="text/css">
@@ -62,11 +63,11 @@ ${layout.menubar(section='log_view')}
   }
 </style>
 
-<div class="container-fluid">
+<div id="logsComponents" class="container-fluid">
   <div class="card card-small">
     <%actionbar:render>
       <%def name="search()">
-        <input type="text" class="input-xxlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
+        <input type="text" class="input-xlarge search-query" placeholder="${_('Search in the logs')}" value="${query}">
       </%def>
       <%def name="creation()">
         <form class="form-inline">
@@ -131,11 +132,9 @@ ${layout.menubar(section='log_view')}
     };
   }
 
-  var viewModel;
-
   $(document).ready(function () {
-    viewModel = new LiveDebugging();
-    ko.applyBindings(viewModel, $(".action-main-bar")[0]);
+    var viewModel = new LiveDebugging();
+    ko.applyBindings(viewModel, $("#logsComponents")[0]);
 
     viewModel.getDebugLevel();
 
@@ -205,4 +204,6 @@ ${layout.menubar(section='log_view')}
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

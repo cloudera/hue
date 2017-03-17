@@ -148,9 +148,9 @@ def log_view(request):
   l = logging.getLogger()
   for h in l.handlers:
     if isinstance(h, desktop.log.log_buffer.FixedBufferHandler):
-      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", ""), hostname=hostname))
+      return render('logs.mako', request, dict(log=[l for l in h.buf], query=request.GET.get("q", ""), hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
 
-  return render('logs.mako', request, dict(log=[_("No logs found!")], query='', hostname=hostname))
+  return render('logs.mako', request, dict(log=[_("No logs found!")], query='', hostname=hostname, is_embeddable=request.GET.get('is_embeddable', False)))
 
 @access_log_level(logging.WARN)
 def download_log_view(request):
@@ -191,7 +191,7 @@ def download_log_view(request):
         LOG.exception("Couldn't construct zip file to write logs")
         return log_view(request)
 
-  return render_to_response("logs.mako", dict(log=[_("No logs found.")]))
+  return render_to_response("logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 @access_log_level(logging.DEBUG)
