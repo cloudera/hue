@@ -354,7 +354,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
-            <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }" class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i></a>
+            <!-- ko if: IS_HUE_4 -->
+              <a title="${ _('Open directory of this query') }" data-bind="click: function() { huePubSub.publish('open.link', '/home?uuid=' + directoryUuid()) }"
+                class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
+              </a>
+            <!-- /ko -->
+            <!-- ko if: ! IS_HUE_4 -->
+              <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }"
+                class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i>
+              </a>
+            <!-- /ko -->
           </li>
           <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
@@ -601,7 +610,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <a data-bind="click: $root.saveNotebook">${ _('Save changes') }</a>
         <!-- /ko -->
         <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
-          <a data-bind="click: showSubmitPopup">${ _('Start') }</a>
+          <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
         <!-- /ko -->
         <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
           <a data-bind="click: showSubmitPopup">${ _('View') }</a>

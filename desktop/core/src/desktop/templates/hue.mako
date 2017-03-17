@@ -13,6 +13,7 @@
 ## WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
+
 <%!
   from django.utils.translation import ugettext as _
 
@@ -230,16 +231,14 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
       <ul class="left-nav-menu">
-        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
+        <li class="header">&nbsp;</li>
+        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         % if interpreters:
         <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
         % endif
         % if IS_DASHBOARD_ENABLED.get():
         <li data-bind="click: function () { onePageViewModel.currentApp('dashboard') }"><a href="javascript: void(0);">Dashboard</a></li>
-        % endif
-        % if SHOW_NOTEBOOKS.get():
-        <li data-bind="click: function () { onePageViewModel.currentApp('notebook') }"><a href="javascript: void(0);">Notebook</a></li>
         % endif
         % if 'oozie' in apps:
         <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
@@ -616,12 +615,19 @@ ${ assist.assistPanel() }
           })
         });
 
-        huePubSub.subscribe('open.editor.query.external', function (statementOptions) {
+        huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
           self.currentApp('editor');
+
           self.getActiveAppViewModel(function (viewModel) {
-            viewModel.newNotebook(function() { // Uses default type of Editor
-              viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
-              viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
+            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
+            viewModel.newNotebook(editorType, function() {
+              if (statementOptions['statementType']) {
+                viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
+                viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
+              }
+              if (statementOptions['directoryUuid']) {
+                viewModel.selectedNotebook().directoryUuid(statementOptions['directoryUuid']);
+              }
             });
           })
         });
@@ -670,6 +676,11 @@ ${ assist.assistPanel() }
             self.currentApp('editor');
           } else if (href.startsWith('/indexer')){
             self.currentApp('indexes');
+          } else if (href.startsWith('/home')){
+            self.currentApp('home');
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.openUuid(hueUtils.getSearchParameter(href, 'uuid'));
+            });
           } else if (href.startsWith('/dashboard/embeddable') || href.startsWith('/dashboard/new_search')){
             self.currentApp('dashboard');
           } else if (href.startsWith('/dashboard/admin/collections')){

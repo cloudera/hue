@@ -61,7 +61,7 @@ var HomeViewModel = (function () {
     var self = this;
     var entry = self.activeEntry().createNewEntry({
       definition: {
-        uuid: location.getParameter('uuid'),
+        uuid: uuid || location.getParameter('uuid'),
         name: 'unknown',
         type: 'directory',
         path: '/unknown'
