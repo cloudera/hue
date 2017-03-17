@@ -21,8 +21,9 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="about_layout.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_('Configuration'), "about", user, request, "70px") | n,unicode }
+%endif
 ${ layout.menubar(section='dump_config') }
 
 <style type="text/css">
@@ -151,4 +152,6 @@ ${ layout.menubar(section='dump_config') }
 
 </div>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
