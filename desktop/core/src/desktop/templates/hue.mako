@@ -348,6 +348,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_security_hive2" class="embeddable"></div>
       <div id="embeddable_security_solr" class="embeddable"></div>
       <div id="embeddable_help" class="embeddable"></div>
+      <div id="embeddable_admin_wizard" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -535,6 +536,7 @@ ${ assist.assistPanel() }
         security_hive2: '/security/hive2?is_embeddable=true',
         security_solr: '/security/solr?is_embeddable=true',
         help: '/help/?is_embeddable=true',
+        admin_wizard: '/about/admin_wizard?is_embeddable=true',
       };
 
       var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
@@ -691,6 +693,8 @@ ${ assist.assistPanel() }
             self.currentApp('security_hdfs');
           } else if (href.startsWith('/help')) {
             self.currentApp('help');
+          } else if (href.startsWith('/about/admin_wizard')) {
+            self.currentApp('admin_wizard');
           }
         });
 

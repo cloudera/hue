@@ -22,8 +22,9 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="header" file="header.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_('Quick Start'), "quickstart", user, request) | n,unicode }
+%endif
 ${ header.menubar() }
 
 <div class="container-fluid">
@@ -402,4 +403,6 @@ $(document).ready(function(){
 </script>
 % endif
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

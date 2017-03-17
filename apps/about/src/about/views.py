@@ -43,6 +43,7 @@ def admin_wizard(request):
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
       'tours_and_tutorials': tours_and_tutorials,
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'collect_usage': collect_usage(),
   })
 
