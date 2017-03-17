@@ -1048,7 +1048,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
-              <span class="icon-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
+              <span class="optimizer-explanation alert-error alert-neutral">${ _('The query has a parse error.') }</span>
             <!-- /ko -->
           <!-- /ko -->
           ## Oracle, MySQL compatibility... as they return a parseError and not encounteredString.
@@ -1057,7 +1057,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <i class="fa fa-exclamation"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
-              <span class="icon-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+              <span class="optimizer-explanation alert-warning alert-neutral">${ _('This ') } <span data-bind="text: $parent.compatibilitySourcePlatform"></span> ${ _(' query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
             <!-- /ko -->
           <!-- /ko -->
         <!-- /ko -->
@@ -1067,7 +1067,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <i class="fa fa-check"></i>
             </div>
             <!-- ko if: $parent.showOptimizer -->
-            <span class="icon-explanation alert-success alert-neutral">
+            <span class="optimizer-explanation alert-success alert-neutral">
               ${ _('The ') } <select data-bind="options: $parent.compatibilitySourcePlatforms, optionsText: 'name', value: $parent.compatibilitySourcePlatform, optionsValue: 'value'" class="input-medium"></select>
               <!-- ko if: $parent.compatibilitySourcePlatform() == $parent.type() -->
                 ${ _(' query is compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.
@@ -1084,7 +1084,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <i class="fa fa-exclamation"></i>
           </div>
           <!-- ko if: $parent.showOptimizer -->
-            <span class="icon-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
+            <span class="optimizer-explanation alert-warning alert-neutral">${ _('This query is not compatible with ') } <span data-bind="text: $parent.compatibilityTargetPlatform"></span>.</span>
           <!-- /ko -->
         <!-- /ko -->
       <!-- /ko -->
@@ -1096,7 +1096,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <i class="fa fa-check"></i>
         </div>
         <!-- ko if: showOptimizer -->
-        <span class="icon-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
+        <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: complexity() && complexity().risk() && complexity().risk() === 'high' -->
@@ -1104,7 +1104,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
-        <span class="icon-explanation alert-error alert-neutral"><strong data-bind="text: complexity().riskAnalysis"></strong> <span data-bind="text: complexity().riskRecommendation"></span></span>
+        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity().riskAnalysis"></strong> <span data-bind="text: complexity().riskRecommendation"></span></span>
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
