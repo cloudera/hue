@@ -210,15 +210,31 @@ var HueFileEntry = (function () {
     });
   }
 
+  HueFileEntry.prototype.getDirectory = function () {
+    var self = this;
+
+    if (! self.definition() || self.isRoot()) {
+      return null;
+    }
+    else {
+      return self.definition().uuid;
+    }
+  };
+
   HueFileEntry.prototype.addDirectoryParamToUrl = function (url) {
     var self = this;
-    if (! self.definition() || self.isRoot()) {
+
+    var directoryId = self.getDirectory();
+
+    if (! directoryId) {
       return url;
     }
-    if (url.indexOf('?') !== -1) {
+    else if (url.indexOf('?') !== -1) {
       return url + '&directory_uuid=' + self.definition().uuid;
     }
-    return url + '?directory_uuid=' + self.definition().uuid;
+    else {
+      return url + '?directory_uuid=' + self.definition().uuid;
+    }
   };
 
   HueFileEntry.prototype.beforeContextOpen = function () {

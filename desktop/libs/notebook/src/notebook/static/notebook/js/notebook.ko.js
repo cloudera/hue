@@ -2603,9 +2603,9 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.newNotebook = function (callback) {
+    self.newNotebook = function (editorType, callback) {
       $.post("/notebook/api/create_notebook", {
-        type: options.editor_type,
+        type: options.editor_type || editorType || 'hive',
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
