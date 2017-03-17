@@ -281,6 +281,7 @@ def dump_config(request):
     show_private=show_private,
     top_level=top_level,
     conf_dir=conf_dir,
+    is_embeddable=request.GET.get('is_embeddable', False),
     apps=apps))
 
 @access_log_level(logging.WARN)
