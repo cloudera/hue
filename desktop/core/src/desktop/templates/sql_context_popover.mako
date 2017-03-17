@@ -280,7 +280,7 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-contents">
     <div class="sql-context-popover-content">
       <!-- ko with: contents -->
-      <ul class="nav nav-pills sql-context-tabs" data-bind="foreach: tabs">
+      <ul class="nav nav-tabs sql-context-tabs" data-bind="foreach: tabs">
         <li data-bind="click: function () { $parent.activeTab(id); }, css: { 'active' : $parent.activeTab() === id }">
           <a class="sql-context-tab" data-toggle="tab" data-bind="text: label, attr: { href: '#' + id }"></a>
         </li>
