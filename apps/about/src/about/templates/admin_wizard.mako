@@ -20,12 +20,11 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 %>
-
-<%namespace name="header" file="header.mako" />
+<%namespace name="layout" file="/about_layout.mako" />
 %if not is_embeddable:
 ${ commonheader(_('Quick Start'), "quickstart", user, request) | n,unicode }
 %endif
-${ header.menubar() }
+${ layout.menubar(section='quick_start') }
 
 <div class="container-fluid">
   <div class="row-fluid" style="margin-bottom: 100px;">
