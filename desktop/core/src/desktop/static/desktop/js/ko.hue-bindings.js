@@ -4572,9 +4572,8 @@
         }
         lastScrollTop = $container.scrollTop();
 
-        var lastEndIndex = endIndex;
         setStartAndEndFromScrollTop();
-        if (typeof options.fetchMore !== 'undefined' && endIndex !== lastEndIndex && endIndex === allEntries.length - 1) {
+        if (typeof options.fetchMore !== 'undefined' && endIndex === allEntries.length - 1) {
           options.fetchMore();
         }
 
