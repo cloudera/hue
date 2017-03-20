@@ -158,8 +158,8 @@ var AssistDbEntry = (function () {
   };
 
   AssistDbEntry.prototype.getComplexName = function () {
-    var entry = self;
-    var sourceType = self.sourceType;
+    var entry = this;
+    var sourceType = entry.sourceType;
     var parts = [];
     while (entry != null) {
       if (entry.definition.isTable || entry.definition.isView) {
