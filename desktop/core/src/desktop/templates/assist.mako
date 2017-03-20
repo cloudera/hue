@@ -42,8 +42,12 @@ from notebook.conf import get_ordered_interpreters
 
 <%def name="assistPanel(is_s3_enabled=False)">
   <%
-    home_dir = user.get_home_directory()
-    if not request.fs.isdir(home_dir):
+    # TODO remove
+    try:
+      home_dir = user.get_home_directory()
+      if not request.fs.isdir(home_dir):
+        home_dir = '/'
+    except:
       home_dir = '/'
   %>
 
