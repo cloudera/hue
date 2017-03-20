@@ -16,6 +16,10 @@
  limitations under the License.
 */
 
+@import (reference) "cui/colors.less";
+@import (reference) "cui/extra-variables.less";
+@import (reference) "hue-attributes.less";
+
 #hbaseComponents {
 
   .hbase-page {
@@ -292,72 +296,63 @@
     cursor: pointer;
   }
 
-  #searchbar-main {
-    display: inline;
-    background: #fff;
-    line-height: 1em;
-    margin-right: 10px;
-    -webkit-appearance: none;
+  .searchbar-main {
+    display: inline-block;
+    background-color: @cui-white;
+
+    height: 32px;
+    margin: 0;
+    padding: 4px 6px;
+
+    line-height: 22px;
+
+    color: #555;
+    cursor: auto;
+
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-size: 18px;
+
+    box-shadow: rgba(0, 0, 0, 0.0745098) 0 1px 1px 0 inset;
     -webkit-box-shadow: rgba(0, 0, 0, 0.0745098) 0 1px 1px 0 inset;
+
+    -webkit-appearance: none;
     -webkit-rtl-ordering: logical;
-    -webkit-transition-delay: 0s, 0s;
-    -webkit-transition-duration: 0.2s, 0.2s;
-    -webkit-transition-property: border, box-shadow;
-    -webkit-transition-timing-function: linear, linear;
     -webkit-user-select: text;
     -webkit-writing-mode: horizontal-tb;
-    background-color: rgb(255, 255, 255);
-    border-bottom-color: rgb(204, 204, 204);
-    border-bottom-left-radius: 3px;
-    border-bottom-style: solid;
-    border-bottom-width: 1px;
+
+    .hue-ease-transition(~"border, box-shadow");
+
+    border-left: 1px solid #CCC;
+    border-top: 1px solid #CCC;
+    border-bottom: 1px solid #CCC;
+    border-radius: 3px 0 0 3px;
+
     border-image-outset: 0;
     border-image-repeat: stretch;
     border-image-slice: 100%;
     border-image-source: none;
     border-image-width: 1;
-    border-left-color: rgb(204, 204, 204);
-    border-left-style: solid;
-    border-left-width: 1px;
-    border-right-color: rgb(204, 204, 204);
-    border-right-style: solid;
-    border-right-width: 1px;
-    border-top-color: rgb(204, 204, 204);
-    border-top-left-radius: 3px;
-    border-top-style: solid;
-    border-top-width: 1px;
-    box-shadow: rgba(0, 0, 0, 0.0745098) 0 1px 1px 0 inset;
-    color: rgb(85, 85, 85);
-    cursor: auto;
-    display: inline-block;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    font-size: 14px;
-    font-weight: normal;
-    height: 20px;
-    letter-spacing: normal;
-    line-height: 25px;
-    margin-bottom: 0;
-    margin-left: 0;
-    margin-right: 0;
-    margin-top: 0;
-    padding-bottom: 4px;
-    padding-left: 6px;
-    padding-right: 6px;
-    padding-top: 4px;
+
     text-align: start;
     text-indent: 0;
     text-shadow: rgba(0, 0, 0, 0) 0 0 1px;
     text-transform: none;
-    transition-delay: 0s, 0s;
-    transition-duration: 0.2s, 0.2s;
-    transition-property: border, box-shadow;
-    transition-timing-function: linear, linear;
     vertical-align: middle;
-    height: 36px;
-    font-size: 18px;
     white-space: nowrap;
     position: relative;
     overflow: hidden;
+  }
+
+
+  .add-on {
+    border: 1px solid @hue-primary-color-dark;
+    border-radius: 0 4px 4px 0;
+    display: inline-block;
+    padding: 5px 10px;
+  }
+
+  .add-on i {
+    font-size: 16px;
   }
 
   #search-tags {
@@ -465,7 +460,7 @@
     font-weight: bold;
   }
 
-  #searchbar-main input[type=text].tag-searchbar {
+  .searchbar-main input[type=text].tag-searchbar {
     border: 0;
     background: transparent;
     box-shadow: none;
@@ -478,18 +473,18 @@
     width: 100%;
   }
 
-  #searchbar-main input[type=text].tag-searchbar.active {
+  .searchbar-main input[type=text].tag-searchbar.active {
     color: #fff;
     width: 1px;
     background: #fff;
     opacity: .1;
   }
 
-  #searchbar-main small {
+  .searchbar-main small {
     color: #bbb;
   }
 
-  #searchbar-main i.tagIndicator {
+  .searchbar-main i.tagIndicator {
     color: #000;
     padding: 0 !important;
     border: 0;
@@ -566,19 +561,6 @@
     margin: 0;
   }
 
-  .add-on {
-    border-radius: 1.5em;
-    border-bottom-left-radius: 0;
-    border-top-left-radius: 0;
-    height: auto;
-    display: inline-block;
-    padding: 8px 12px 9px 8px;
-  }
-
-  .add-on i {
-    font-size: 17px;
-  }
-
   .search-remove {
     text-decoration: none;
     cursor: pointer;
@@ -628,5 +610,9 @@
     border-radius: 0;
     min-height: 400px;
     background-color: #FFFFFF;
+  }
+
+  .hbase-subnav {
+    padding: 2px 10px 0 10px;
   }
 }
