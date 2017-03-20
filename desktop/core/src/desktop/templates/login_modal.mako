@@ -23,26 +23,25 @@
 
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
 
-<div id="login-modal" class="modal fade hide" style="padding: 0px!important;box-shadow: none;background: transparent;">
-
+<div id="login-modal" class="modal fade hide">
   <div class="login-container">
-      <a href="#" class="close logged-out link-message" data-dismiss="modal" style="display: none; margin: 10px">&times;</a>
-      <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }"></div>
-      <h4 class="muted" style="margin-bottom: 50px; padding: 30px">
-        <span class="logged-out link-message" style="display: none">
-          ${ _('Your session expired and your current action requires to') }
-          <a class="reload pointer">
-            ${ _('reload this page') }
-          </a>
-        </span>
-        <span class="auto-logged-out link-message" style="display: none">
-          ${ _('We did not hear from you for about') } <strong class="time">${ conf.AUTH.IDLE_SESSION_TIMEOUT.get() }</strong> ${ _('and for security reasons Hue logged you out') }
-          <div class="margin-top-30"></div>
-          <a class="reload pointer">
-            ${ _('Please reload this page to continue') }
-          </a>
-        </span>
-      </h4>
+    <a href="#" class="close logged-out link-message" data-dismiss="modal" style="display: none; margin: 10px">&times;</a>
+    <div class="logo"><img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }"></div>
+    <h4 class="muted" style="margin-bottom: 50px; padding: 30px">
+      <span class="logged-out link-message" style="display: none">
+        ${ _('Your session expired and your current action requires to') }
+        <a class="reload pointer">
+          ${ _('reload this page') }
+        </a>
+      </span>
+      <span class="auto-logged-out link-message" style="display: none">
+        ${ _('We did not hear from you for about') } <strong class="time">${ conf.AUTH.IDLE_SESSION_TIMEOUT.get() }</strong> ${ _('and for security reasons Hue logged you out') }
+        <div class="margin-top-30"></div>
+        <a class="reload pointer">
+          ${ _('Please reload this page to continue') }
+        </a>
+      </span>
+    </h4>
   </div>
 </div>
 
