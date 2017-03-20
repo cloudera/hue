@@ -138,7 +138,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       <span class="dropdown">
         <a class="dropdown-toggle btn" id="dLabel" data-toggle="dropdown">
           ${_('Switch Cluster')}
-          <b class="caret" style="margin-top: 0"></b>
+          <b class="caret"></b>
         </a>
         <ul id="cluster-menu" class="dropdown-menu" role="menu" aria-labelledby="dLabel" data-bind="foreach: hbaseApp.clusters()">
           <li><a data-bind="text: $data.name, click: function(){ routie($data.name); }"></a></li>
@@ -238,9 +238,9 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
   <!-- Table View Page -->
   <div id="hbase-page-dataview" class="hbase-page">
     <div class="subnav sticky">
-      <div class="container-fluid">
+      <div class="hbase-subnav">
         <div class="row-fluid">
-          <div id="searchbar-main" class="span5" data-bind="click: search.clickTagBar">
+          <div class="searchbar-main span5" data-bind="click: search.clickTagBar">
             <a class="search-remove" data-bind="visible: search.cur_input() != '', click: function(){ hbaseApp.search.cur_input(''); hbaseApp.search.focused(true) }"><i class="fa fa-times-circle"></i></a>
             <div id="search-tags" contenteditable="true" data-bind="editableText: search.cur_input, hasfocus: search.focused, css: { 'active': search.cur_input() != '' }, event: { 'keydown': search.onKeyDown, click: search.updateMenu.bind(null) }" data-placeholder="${_('row_key, row_prefix* +scan_len [col1, family:col2, fam3:, col_prefix* +3, fam: col2 to col3] {Filter1() AND Filter2()}')}">
             </div>
@@ -285,7 +285,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
     <br/><br/><br/><br/>
     <div class="subnav navbar-fixed-bottom well-small">
-        <div class="container-fluid">
+        <div class="hbase-subnav">
           <div class="footer-slider">
             <span data-bind="visible: !hbaseApp.views.tabledata.isLoading()">
               ${_('Fetched')}
