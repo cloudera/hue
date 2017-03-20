@@ -1,94 +1,17 @@
-#definitionEditor {
-  min-height: 250px;
-  margin-bottom: 10px;
-}
+/*!
+Licensed to Cloudera, Inc. under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  Cloudera, Inc. licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
 
-.tooltip-inner {
-  max-width: 350px;
-}
+http://www.apache.org/licenses/LICENSE-2.0
 
-#sla th {
-  vertical-align: middle !important;
-}
-
-#yAxisLabel {
-  -webkit-transform: rotate(270deg);
-  -moz-transform: rotate(270deg);
-  -o-transform: rotate(270deg);
-  writing-mode: lr-tb;
-  margin-left: -110px;
-  margin-top: 130px;
-  position: absolute;
-}
-
-#slaTable {
-  margin-top: 20px;
-}
-
-.disabled {
-  cursor: default;
-}
-
-.nav.nav-list {
-  background: transparent;
-  border: none;
-  border-radius: 0;
-}
-
-.nav-list > li.white {
-  padding: 9px 15px;
-}
-
-.manage {
-  padding: 0;
-}
-
-.search-query {
-   margin-right: .75em;
-}
-
-.settings-overlay {
-  background-color: #FFF;
-  opacity: 0.95;
-  position: absolute;
-  top: 10px;
-  right: 15px;
-}
-
-.settings-overlay li {
-  padding: 5px;
-}
-
-.settings-overlay:hover {
-  opacity: 1;
-}
-
-.spinner-overlay {
-  opacity: 0.95;
-  position: absolute;
-  top: 10px;
-  left: 15px;
-  font-size: 24px;
-  color: #DDD;
-}
-
-
-div.spinedit .fa-chevron-up {
-  top: -6px!important;
-}
-
-div.spinedit .fa-chevron-down {
-  top: 5px!important;;
-}
-
-.label-ignored {
-  background-color: #ccc;
-}
-
-label.spinedit {
-  display: inline;
-}
-
-label.spinedit input {
-  margin-bottom: 0;
-}
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+ */#definitionEditor{min-height:250px;margin-bottom:10px}.tooltip-inner{max-width:350px}#sla th{vertical-align:middle !important}#yAxisLabel{-webkit-transform:rotate(270deg);-moz-transform:rotate(270deg);-o-transform:rotate(270deg);writing-mode:lr-tb;margin-left:-110px;margin-top:130px;position:absolute}#slaTable{margin-top:20px}.disabled{cursor:default}.nav.nav-list{background:transparent;border:none;border-radius:0}.nav-list>li.white{padding:9px 15px}.manage{padding:0}.search-query{margin-right:.75em}.settings-overlay{background-color:#FFF;opacity:.95;position:absolute;top:10px;right:15px}.settings-overlay li{padding:5px}.settings-overlay:hover{opacity:1}.spinner-overlay{opacity:.95;position:absolute;top:10px;left:15px;font-size:24px;color:#DDD}div.spinedit .fa-chevron-up{top:-6px !important}div.spinedit .fa-chevron-down{top:5px !important}.label-ignored{background-color:#ccc}label.spinedit{display:inline}label.spinedit input{margin-bottom:0}
