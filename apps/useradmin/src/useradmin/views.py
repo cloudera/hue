@@ -530,11 +530,14 @@ def add_ldap_users(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        return redirect(reverse(list_users))
+        if request.GET.get('is_embeddable', False):
+          return JsonResponse({'status': 0})
+        else:
+          return redirect(reverse(list_users))
   else:
     form = AddLdapUsersForm()
 
-  return render('add_ldap_users.mako', request, dict(form=form))
+  return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 def add_ldap_groups(request):
