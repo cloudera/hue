@@ -120,8 +120,8 @@ from metadata.conf import has_navigator
   </script>
 
   <script type="text/html" id="sql-context-table-and-column-sample">
-    <div class="sql-context-flex-fill" data-bind="with: fetchedData">
-      <div class="context-sample sample-scroll" style="text-align: left; padding: 3px; overflow: hidden; height: 100%">
+    <div class="sql-context-flex-fill context-sample-container" data-bind="with: fetchedData">
+      <div class="context-sample sample-scroll">
         <!-- ko if: rows.length == 0 -->
         <div class="alert">${ _('The selected table has no data.') }</div>
         <!-- /ko -->
