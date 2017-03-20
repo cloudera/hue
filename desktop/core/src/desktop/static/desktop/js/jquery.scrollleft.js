@@ -67,9 +67,10 @@
     }
 
     function positionOtherAnchors() {
-      var right = -30;
+      var upPosition = $('#jHueScrollUpAnchor').css('right').replace(/px/ig, '')*1;
+      var right = upPosition - 30;
       if ($('#jHueScrollUpAnchor').is(':visible')){
-        right = 20;
+        right = upPosition;
       }
 
       if ($('#jHueScrollLeftAnchor').is(':visible')){
@@ -79,7 +80,6 @@
 
       $('.hue-datatable-search').css('right', (right + 50) + 'px');
     }
-
 
     function setScrollBehavior(scrolled, scrollable) {
       scrolled.scroll(function () {
