@@ -150,7 +150,7 @@ ${ hueIcons.symbols() }
               <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
             % endif
             % if 'oozie' in apps:
-            % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+              % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
               <li class="dropdown-submenu">
                 <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon"  alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
                 <ul class="dropdown-menu">
@@ -159,7 +159,7 @@ ${ hueIcons.symbols() }
                   <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
                 </ul>
               </li>
-            % endif
+              % endif
             % endif
           </ul>
         </div>
@@ -193,36 +193,34 @@ ${ hueIcons.symbols() }
           %>
           <button class="btn"
           % if view_profile:
-            ### <a href="${ url('useradmin.views.edit_user', username=user.username) }"
-            data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
+            data-bind="click: function(){ onePageViewModel.currentApp('home') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
           % endif
           >
           ${ user.username }
           </button>
-          % if user.is_superuser:
-            <button class="btn dropdown-toggle" data-toggle="dropdown">
-              <span class="caret"></span>
-            </button>
-            <ul class="dropdown-menu" >
-              <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i> ${_('Profile')}</a></li>
-              % if user.is_superuser:
-              <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
-              % endif
-              <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
-              % if user.is_superuser:
-              <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
-              % endif
-              <li class="divider"></li>
-              <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
-            </ul>
-          % endif
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            % if view_profile:
+            <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i> ${_('Profile')}</a></li>
+            % endif
+            % if user.is_superuser:
+            <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+            % endif
+            <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+            % if user.is_superuser:
+            <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
+            % endif
+            <li class="divider"></li>
+            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
+          </ul>
         </div>
+        % endif
 
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
         % if 'jobbrowser' in apps:
-        <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
-        % endif
-
+          <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         % endif
       </div>
     </div>
