@@ -86,6 +86,10 @@ class TSSLSocket(TSocket.TSocket):
         sock_family, sock_type = res[0:2]
         ip_port = res[4]
         plain_sock = socket.socket(sock_family, sock_type)
+        # check and turn on TCP Keepalive
+        sockprops = plain_sock.getsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE)
+        if (sockprops == 0):
+          sockprops = plain_sock.setsockopt(socket.SOL_SOCKET, socket.SO_KEEPALIVE, 1)
         self.handle = ssl.wrap_socket(plain_sock,
                                       ssl_version=self.SSL_VERSION,
                                       do_handshake_on_connect=True,
