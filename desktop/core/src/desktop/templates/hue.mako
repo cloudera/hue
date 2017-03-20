@@ -847,6 +847,11 @@ ${ assist.assistPanel() }
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
         self.rightAssistVisible = ko.observable();
+        self.rightAssistVisible.subscribe(function () {
+          window.setTimeout(function () {
+            huePubSub.publish('reposition.scroll.anchor.up')
+          }, 0);
+        });
         self.rightAssistAvailable = ko.observable(false);
         self.assistantAvailable = ko.observable(false);
         self.activeRightTab = ko.observable();
