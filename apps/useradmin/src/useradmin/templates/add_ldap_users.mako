@@ -21,50 +21,63 @@ from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="layout" file="layout.mako" />
-
+%if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
-${ layout.menubar(section='users') }
+%endif
 
+${ layout.menubar(section='users') }
 
 <div class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-  <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
-    ${ csrf_token(request) | n,unicode }
-    <fieldset>
-          % for field in form.fields:
-                  % if form[field].is_hidden:
-                      ${ form[field] }
-                  % else:
-                      ${ layout.render_field(form[field]) }
-                  % endif
-          % endfor
-    </fieldset>
-    <br/>
-    <div class="form-actions">
-      % if username:
-        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-      % else:
+    <form id="syncForm" method="POST" class="form form-horizontal" autocomplete="off">
+      ${ csrf_token(request) | n,unicode }
+      <fieldset>
+        % for field in form.fields:
+          % if form[field].is_hidden:
+            ${ form[field] }
+          % else:
+            ${ layout.render_field(form[field]) }
+          % endif
+        % endfor
+      </fieldset>
+      <br/>
+      <div class="form-actions">
+        % if username:
+          <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+        % else:
           <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
-      % endif
-      <a href="${url('useradmin.views.list_users')}" class="btn">${_('Cancel')}</a>
-    </div>
-  </form>
-</div>
+        % endif
+        <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('useradmin.views.list_users') + "')" or url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
+      </div>
+    </form>
   </div>
+</div>
 
 <script type="text/javascript">
-  $(document).ready(function(){
+  $(document).ready(function () {
     $("#id_groups").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
-            width:618,
-            height:240
-        });
+      selectAllLabel: "${_('Select all')}",
+      searchPlaceholder: "${_('Search')}",
+      noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
+      width: 618,
+      height: 240
+    });
+    %if is_embeddable:
+    $('#syncForm').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.status === 0){
+          huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
+        }
+      }
+    });
+    %endif
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

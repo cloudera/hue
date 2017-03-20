@@ -342,6 +342,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_permissions" class="embeddable"></div>
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
+      <div id="embeddable_useradmin_addldap" class="embeddable"></div>
       <div id="embeddable_hbase" class="embeddable"></div>
       <div id="embeddable_security_hive" class="embeddable"></div>
       <div id="embeddable_security_hdfs" class="embeddable"></div>
@@ -532,6 +533,7 @@ ${ assist.assistPanel() }
         useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
         useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
         useradmin_newuser: '/useradmin/users/new?is_embeddable=true',
+        useradmin_addldap: 'useradmin/users/add_ldap_users?is_embeddable=true',
         hbase: '/hbase/?is_embeddable=true',
         security_hive: '/security/hive?is_embeddable=true',
         security_hdfs: '/security/hdfs?is_embeddable=true',
@@ -543,7 +545,7 @@ ${ assist.assistPanel() }
         dump_config: '/desktop/dump_config?is_embeddable=true',
       };
 
-      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser'];
+      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -677,6 +679,8 @@ ${ assist.assistPanel() }
             self.currentApp('oozie_bundle');
           } else if (href.startsWith('/filebrowser')){
             self.currentApp('filebrowser');
+          } else if (href.startsWith('/useradmin/users/add_ldap_users')){
+            self.currentApp('useradmin_addldap');
           } else if (href.startsWith('/useradmin/users/new')){
             self.currentApp('useradmin_newuser');
           } else if (href.startsWith('/useradmin/users')){
