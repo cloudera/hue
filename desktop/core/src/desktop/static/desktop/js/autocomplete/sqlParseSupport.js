@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var SqlParseSupport = (function() {
+var SqlParseSupport = (function () {
 
   var initSqlParser = function (parser) {
 
@@ -191,9 +191,9 @@ var SqlParseSupport = (function() {
       if (selectListEdit.cursorAtStart) {
         var keywords = [];
         if (hasDistinctOrAll) {
-          keywords = [{ value: '*', weight: 1000 }];
+          keywords = [{value: '*', weight: 1000}];
         } else {
-          keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
+          keywords = [{value: '*', weight: 1000}, 'ALL', 'DISTINCT'];
         }
         if (parser.isImpala()) {
           keywords.push('STRAIGHT_JOIN');
@@ -333,7 +333,7 @@ var SqlParseSupport = (function() {
                 });
                 if (found.length > 0) {
                   location.type = 'subQuery';
-                  location.identifierChain = [{ subQuery: found[0].alias }];
+                  location.identifierChain = [{subQuery: found[0].alias}];
                 }
               }
             }
@@ -353,6 +353,10 @@ var SqlParseSupport = (function() {
           }
         }
 
+        if (location.type === 'table' && (typeof location.identifierChain === 'undefined' || location.identifierChain.length === 0)) {
+          parser.yy.locations.splice(i, 1);
+        }
+
         if (location.type === 'unknown') {
           location.type = 'column';
         }
@@ -361,12 +365,7 @@ var SqlParseSupport = (function() {
             location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
           }
           parser.expandIdentifierChain(location, true);
-        }
 
-        if (location.type === 'table' && (typeof location.identifierChain === 'undefined' || location.identifierChain.length === 0)) {
-          parser.yy.locations.splice(i, 1);
-        }
-        if (location.type === 'column') {
           if (typeof location.identifierChain === 'undefined') {
             parser.yy.locations.splice(i, 1);
           } else if (location.identifierChain.length < 2) {
@@ -445,7 +444,7 @@ var SqlParseSupport = (function() {
               parser.yy.result.suggestTables = suggestColumns;
               delete parser.yy.result.suggestColumns
             } else {
-              suggestColumns.tables = [{ identifierChain: suggestColumns.identifierChain }];
+              suggestColumns.tables = [{identifierChain: suggestColumns.identifierChain}];
               delete suggestColumns.identifierChain;
             }
           } else {
@@ -483,7 +482,7 @@ var SqlParseSupport = (function() {
       if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
         var ctes = [];
         parser.yy.latestCommonTableExpressions.forEach(function (cte) {
-          var suggestion = { name: cte.alias };
+          var suggestion = {name: cte.alias};
           if (parser.yy.result.suggestTables.prependFrom) {
             suggestion.prependFrom = true
           }
@@ -609,9 +608,9 @@ var SqlParseSupport = (function() {
 
     var addCleanTablePrimary = function (tables, tablePrimary) {
       if (tablePrimary.alias) {
-        tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
+        tables.push({alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain});
       } else {
-        tables.push({ identifierChain: tablePrimary.identifierChain });
+        tables.push({identifierChain: tablePrimary.identifierChain});
       }
     };
 
@@ -643,7 +642,7 @@ var SqlParseSupport = (function() {
             }
           } else {
             if (tablePrimary.subQueryAlias) {
-              tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]});
+              tables.push({identifierChain: [{subQuery: tablePrimary.subQueryAlias}]});
             } else {
               addCleanTablePrimary(tables, tablePrimary);
             }
@@ -719,19 +718,19 @@ var SqlParseSupport = (function() {
 
       if (foundPrimary) {
         if (foundPrimary.subQueryAlias) {
-          identifierChain.unshift({ subQuery: foundPrimary.subQueryAlias });
+          identifierChain.unshift({subQuery: foundPrimary.subQueryAlias});
         } else {
           identifierChain = foundPrimary.identifierChain.concat(identifierChain);
         }
         if (wrapper.tables) {
-          wrapper.tables.push({ identifierChain: identifierChain });
+          wrapper.tables.push({identifierChain: identifierChain});
           delete wrapper.identifierChain;
         } else {
           wrapper.identifierChain = identifierChain;
         }
       } else {
         tablePrimaries.forEach(function (tablePrimary) {
-          var targetTable = { identifierChain: tablePrimary.identifierChain };
+          var targetTable = tablePrimary.subQueryAlias ? { subQuery: tablePrimary.subQueryAlias } : { identifierChain: tablePrimary.identifierChain } ;
           if (tablePrimary.alias) {
             targetTable.alias = tablePrimary.alias;
           }
@@ -782,12 +781,12 @@ var SqlParseSupport = (function() {
       var identifiers = [];
       tablePrimaries.forEach(function (tablePrimary) {
         if (tablePrimary.identifierChain && tablePrimary.identifierChain.length > 0) {
-          var table = { identifierChain: tablePrimary.identifierChain };
+          var table = {identifierChain: tablePrimary.identifierChain};
           if (tablePrimary.alias) {
             table.alias = tablePrimary.alias;
-            identifiers.push({ name: table.alias + '.', type: 'alias' });
+            identifiers.push({name: table.alias + '.', type: 'alias'});
             if (parser.isImpala()) {
-              var testForImpalaAlias = [{ name: table.alias }];
+              var testForImpalaAlias = [{name: table.alias}];
               var result = parser.expandImpalaIdentifierChain(tablePrimaries, testForImpalaAlias);
               if (result.length > 1) {
                 // Continue if it's a reference to a complex type
@@ -797,15 +796,15 @@ var SqlParseSupport = (function() {
           } else {
             var lastIdentifier = tablePrimary.identifierChain[tablePrimary.identifierChain.length - 1];
             if (typeof lastIdentifier.name !== 'undefined') {
-              identifiers.push({ name: lastIdentifier.name + '.', type: 'table' });
+              identifiers.push({name: lastIdentifier.name + '.', type: 'table'});
             } else if (typeof lastIdentifier.subQuery !== 'undefined') {
-              identifiers.push({ name: lastIdentifier.subQuery + '.', type: 'sub-query' });
+              identifiers.push({name: lastIdentifier.subQuery + '.', type: 'sub-query'});
             }
           }
           tables.push(table);
         } else if (tablePrimary.subQueryAlias) {
-          identifiers.push({ name: tablePrimary.subQueryAlias + '.', type: 'sub-query' });
-          tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }] });
+          identifiers.push({name: tablePrimary.subQueryAlias + '.', type: 'sub-query'});
+          tables.push({identifierChain: [{subQuery: tablePrimary.subQueryAlias}]});
         }
       });
       if (identifiers.length > 0) {
@@ -832,7 +831,10 @@ var SqlParseSupport = (function() {
           parser.yy.result[suggestionType].tables = [];
           parser.yy.result[suggestionType].tablePrimaries.forEach(function (tablePrimary) {
             if (!tablePrimary.subQueryAlias) {
-              parser.yy.result[suggestionType].tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
+              parser.yy.result[suggestionType].tables.push(tablePrimary.alias ? {
+                identifierChain: tablePrimary.identifierChain.concat(),
+                alias: tablePrimary.alias
+              } : {identifierChain: tablePrimary.identifierChain.concat()});
             }
           });
           delete parser.yy.result[suggestionType].tablePrimaries;
@@ -1013,7 +1015,7 @@ var SqlParseSupport = (function() {
           keyword.weight = weight + (keyword.weight / 10);
           result.push(keyword);
         } else {
-          result.push({value: keyword, weight: weight });
+          result.push({value: keyword, weight: weight});
         }
       });
       return result;
@@ -1028,7 +1030,7 @@ var SqlParseSupport = (function() {
         if (typeof keyword.weight !== 'undefined') {
           weightedKeywords.push(keyword);
         } else {
-          weightedKeywords.push({ value: keyword, weight: -1 })
+          weightedKeywords.push({value: keyword, weight: -1})
         }
       });
       weightedKeywords.sort(function (a, b) {
@@ -1046,16 +1048,16 @@ var SqlParseSupport = (function() {
 
     parser.suggestTablesOrColumns = function (identifier) {
       if (typeof parser.yy.latestTablePrimaries == 'undefined') {
-        parser.suggestTables({ identifierChain: [{ name: identifier }] });
+        parser.suggestTables({identifierChain: [{name: identifier}]});
         return;
       }
       var tableRef = parser.yy.latestTablePrimaries.filter(function (tablePrimary) {
         return tablePrimary.alias === identifier;
       });
       if (tableRef.length > 0) {
-        parser.suggestColumns({identifierChain: [{ name: identifier }]});
+        parser.suggestColumns({identifierChain: [{name: identifier}]});
       } else {
-        parser.suggestTables({ identifierChain: [{ name: identifier }] });
+        parser.suggestTables({identifierChain: [{name: identifier}]});
       }
     };
 
@@ -1075,7 +1077,7 @@ var SqlParseSupport = (function() {
           primaries.push(primary);
         }
       });
-      parser.yy.result.suggestAggregateFunctions = { tablePrimaries: primaries };
+      parser.yy.result.suggestAggregateFunctions = {tablePrimaries: primaries};
     };
 
     parser.suggestAnalyticFunctions = function () {
@@ -1242,7 +1244,7 @@ var SqlParseSupport = (function() {
       }
     };
 
-    parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
+    parser.handleQuotedValueWithCursor = function (lexer, yytext, yylloc, quoteChar) {
       if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
         parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
         var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
@@ -1254,7 +1256,7 @@ var SqlParseSupport = (function() {
         };
         var remainder = yytext.substring(cursorIndex + 1);
         var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
-        if (remainingQuotes > 0 && remainingQuotes & 1  != 0) {
+        if (remainingQuotes > 0 && remainingQuotes & 1 != 0) {
           parser.yy.missingEndQuote = false;
           lexer.input();
         } else {
