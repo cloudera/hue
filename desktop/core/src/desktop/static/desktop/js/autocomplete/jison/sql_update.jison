@@ -33,19 +33,19 @@ UpdateStatement_EDIT
  | 'UPDATE' TargetTable 'SET' SetClauseList OptionalWhereClause 'CURSOR'
    {
      if (!$5) {
-       suggestKeywords([ 'WHERE' ]);
+       parser.suggestKeywords([ 'WHERE' ]);
      }
    }
  | 'UPDATE' TargetTable 'CURSOR'
    {
-     suggestKeywords([ 'SET' ]);
+     parser.suggestKeywords([ 'SET' ]);
    }
  | 'UPDATE' TargetTable_EDIT
  | 'UPDATE' TargetTable
  | 'UPDATE' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  ;
 
@@ -60,7 +60,7 @@ TargetTable_EDIT
 TableName
  : LocalOrSchemaQualifiedName
    {
-     addTablePrimary($1);
+     parser.addTablePrimary($1);
    }
  ;
 
@@ -88,11 +88,11 @@ SetClause_EDIT
  : SetTarget '=' UpdateSource_EDIT
  | SetTarget 'CURSOR'
    {
-     suggestKeywords([ '=' ]);
+     parser.suggestKeywords([ '=' ]);
    }
  | 'CURSOR'
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  ;
 

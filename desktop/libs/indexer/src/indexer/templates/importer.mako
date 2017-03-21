@@ -30,6 +30,7 @@
 ${ commonheader(_("Importer"), "indexer", user, request, "60px") | n,unicode }
 
 ## TODO lot of those re-imported
+<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>

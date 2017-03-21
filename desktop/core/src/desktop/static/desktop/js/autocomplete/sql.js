@@ -99,7 +99,7 @@ var $0 = $$.length - 1;
 switch (yystate) {
 case 115:
 
-     prepareNewStatement();
+     parser.prepareNewStatement();
    
 break;
 case 116: case 117:
@@ -109,52 +109,52 @@ case 116: case 117:
 break;
 case 119: case 123: case 125:
 
-     addStatementLocation(_$[$0]);
+     parser.addStatementLocation(_$[$0]);
    
 break;
 case 124: case 126:
 
-     addStatementLocation(_$[$0-3]);
+     parser.addStatementLocation(_$[$0-3]);
    
 break;
 case 134: case 146:
 
-     if (isHive()) {
-       suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
-     } else if (isImpala()) {
-       suggestDdlAndDmlKeywords(['EXPLAIN']);
+     if (parser.isHive()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
+     } else if (parser.isImpala()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
      } else {
-       suggestDdlAndDmlKeywords();
+       parser.suggestDdlAndDmlKeywords();
      }
    
 break;
 case 135:
 
-     if (isHive() || isImpala()) {
-       suggestKeywords(['INSERT', 'SELECT']);
+     if (parser.isHive() || parser.isImpala()) {
+       parser.suggestKeywords(['INSERT', 'SELECT']);
      } else {
-       suggestKeywords(['SELECT']);
+       parser.suggestKeywords(['SELECT']);
      }
    
 break;
 case 160:
 
      if (!$$[$0-1]) {
-       suggestDdlAndDmlKeywords([{ value: 'AUTHORIZATION', weight: 2 }, { value: 'DEPENDENCY', weight: 2 }, { value: 'EXTENDED', weight: 2 }]);
+       parser.suggestDdlAndDmlKeywords([{ value: 'AUTHORIZATION', weight: 2 }, { value: 'DEPENDENCY', weight: 2 }, { value: 'EXTENDED', weight: 2 }]);
      } else {
-       suggestDdlAndDmlKeywords();
+       parser.suggestDdlAndDmlKeywords();
      }
    
 break;
 case 161:
 
-     suggestDdlAndDmlKeywords();
+     parser.suggestDdlAndDmlKeywords();
    
 break;
 case 493:
 
-     if (isHive()) {
-       suggestKeywords(['ROLE']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ROLE']);
      }
    
 break;
@@ -166,12 +166,12 @@ this.$ = '';
 break;
 case 590:
 
-     suggestKeywords(['INDEX', 'INDEXES']);
+     parser.suggestKeywords(['INDEX', 'INDEXES']);
    
 break;
 case 591:
 
-     suggestKeywords(['FORMATTED']);
+     parser.suggestKeywords(['FORMATTED']);
    
 break;
 case 601: case 604:
@@ -181,29 +181,29 @@ case 601: case 604:
 break;
 case 602: case 606:
 
-     suggestKeywords(['EXISTS']);
+     parser.suggestKeywords(['EXISTS']);
    
 break;
 case 605:
 
-     suggestKeywords(['NOT EXISTS']);
+     parser.suggestKeywords(['NOT EXISTS']);
    
 break;
 case 633: case 637: case 641: case 677: case 678: case 707: case 710: case 914: case 983: case 1704: case 1723: case 1768: case 1770: case 2084: case 2335: case 2982:
 
-     suggestColumns();
+     parser.suggestColumns();
    
 break;
 case 645: case 682:
 
-     addTableLocation(_$[$0], [ { name: $$[$0] } ]);
+     parser.addTableLocation(_$[$0], [ { name: $$[$0] } ]);
      this.$ = { identifierChain: [ { name: $$[$0] } ] };
    
 break;
 case 646: case 683:
 
-     addDatabaseLocation(_$[$0-2], [ { name: $$[$0-2] } ]);
-     addTableLocation(_$[$0], [ { name: $$[$0-2] }, { name: $$[$0] } ]);
+     parser.addDatabaseLocation(_$[$0-2], [ { name: $$[$0-2] } ]);
+     parser.addTableLocation(_$[$0], [ { name: $$[$0-2] }, { name: $$[$0] } ]);
      this.$ = { identifierChain: [ { name: $$[$0-2] }, { name: $$[$0] } ] };
    
 break;
@@ -215,20 +215,20 @@ case 647:
 break;
 case 648: case 1585: case 1682: case 1828: case 1833: case 1839: case 1845: case 2308: case 2332: case 2429: case 2434: case 2449: case 2463: case 2469: case 2517: case 2525: case 2741: case 2772: case 2775: case 2781: case 2968:
 
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 649: case 663:
 
-     suggestDatabases();
+     parser.suggestDatabases();
      this.$ = { identifierChain: [{ name: $$[$0-2] }] };
    
 break;
 case 650:
 
      // In Impala you can have statements like 'SELECT ... FROM testTable t, t.|'
-     suggestTablesOrColumns($$[$0-2]);
+     parser.suggestTablesOrColumns($$[$0-2]);
    
 break;
 case 651:
@@ -236,7 +236,7 @@ case 651:
      // TODO: switch to suggestColumns, it's currently handled in sqlAutocompleter2.js
      // Issue is that suggestColumns is deleted if no tables are defined and this is
      // Impala only cases like "SELECT | FROM db.table.col"
-     suggestTables({ identifierChain: [{ name: $$[$0-3] }, { name: $$[$0-1] }].concat($$[$0]) });
+     parser.suggestTables({ identifierChain: [{ name: $$[$0-3] }, { name: $$[$0-1] }].concat($$[$0]) });
    
 break;
 case 652: case 812:
@@ -258,28 +258,28 @@ this.$ = { name: $$[$0] };
 break;
 case 662: case 1790:
 
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 666: case 2516: case 2524: case 2849: case 2899: case 2913: case 2989:
 
-     suggestDatabases();
+     parser.suggestDatabases();
    
 break;
 case 676: case 919: case 920: case 926: case 927: case 1276: case 1362:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
    
 break;
 case 684: case 2958:
 
-     suggestTables();
-     suggestDatabases({ prependDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ prependDot: true });
    
 break;
 case 685:
 
-     suggestTablesOrColumns($$[$0-2]);
+     parser.suggestTablesOrColumns($$[$0-2]);
    
 break;
 case 687:
@@ -292,42 +292,42 @@ case 690:
 break;
 case 691:
 
-     addAsteriskLocation(_$[$0], $$[$0-2].concat({ asterisk: true }));
+     parser.addAsteriskLocation(_$[$0], $$[$0-2].concat({ asterisk: true }));
    
 break;
 case 693:
 
      this.$ = [$$[$0]];
-     addUnknownLocation(_$[$0], [$$[$0]]);
+     parser.addUnknownLocation(_$[$0], [$$[$0]]);
    
 break;
 case 694:
 
      $$[$0-2].push($$[$0]);
-     addUnknownLocation(_$[$0], $$[$0-2].concat());
+     parser.addUnknownLocation(_$[$0], $$[$0-2].concat());
    
 break;
 case 695: case 703:
 
      if ($$[$0].insideKey) {
-       suggestKeyValues({ identifierChain: [{ name: $$[$0].name }] });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: [{ name: $$[$0].name }] });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    
 break;
 case 696: case 704:
 
      if ($$[$0].insideKey) {
-       suggestKeyValues({ identifierChain: $$[$0-2].concat({ name: $$[$0].name }) });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: $$[$0-2].concat({ name: $$[$0].name }) });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    
 break;
 case 699:
 
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: $$[$0-2]
      });
      this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
@@ -335,7 +335,7 @@ case 699:
 break;
 case 700:
 
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: $$[$0-4]
      });
      this.$ = { suggestKeywords: [{ value: '*', weight: 10000 }] };
@@ -352,29 +352,29 @@ break;
 case 705:
 
      if ($$[$0-2].insideKey) {
-       suggestKeyValues({ identifierChain: $$[$0-4].concat({ name: $$[$0-2].name }) });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: $$[$0-4].concat({ name: $$[$0-2].name }) });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    
 break;
 case 706:
 
      if ($$[$0-2].insideKey) {
-       suggestKeyValues({ identifierChain: [{ name: $$[$0-2].name }] });
-       suggestColumns();
-       suggestFunctions();
+       parser.suggestKeyValues({ identifierChain: [{ name: $$[$0-2].name }] });
+       parser.suggestColumns();
+       parser.suggestFunctions();
      }
    
 break;
 case 708:
 
-     suggestColumns({ identifierChain: $$[$0-2] });
+     parser.suggestColumns({ identifierChain: $$[$0-2] });
    
 break;
 case 709:
 
-     suggestColumns({ identifierChain: $$[$0-4] });
+     parser.suggestColumns({ identifierChain: $$[$0-4] });
    
 break;
 case 711:
@@ -398,109 +398,109 @@ case 713:
 break;
 case 747:
 
-     addTablePrimary($$[$0-1]);
-     addColumnLocation(_$[$0], $$[$0]);
+     parser.addTablePrimary($$[$0-1]);
+     parser.addColumnLocation(_$[$0], $$[$0]);
    
 break;
 case 748: case 761: case 1706: case 1791: case 1794: case 1827: case 1831: case 1836: case 2304: case 2427: case 2439: case 2445: case 2455: case 2459: case 2514: case 2515: case 2521: case 2777: case 2836: case 2852: case 2901: case 2914: case 2916: case 2956: case 2971:
 
-     addTablePrimary($$[$0]);
+     parser.addTablePrimary($$[$0]);
    
 break;
 case 749: case 762:
 
-     addDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
+     parser.addDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
    
 break;
 case 752: case 1587: case 1805: case 1837: case 1848: case 2428: case 2438: case 2461: case 2466: case 2467: case 2472: case 2735: case 2744: case 2745: case 2774: case 2784: case 2902: case 2903: case 2915:
 
-     addTablePrimary($$[$0-1]);
+     parser.addTablePrimary($$[$0-1]);
    
 break;
 case 753:
 
      if (!$$[$0-3]) {
-       suggestKeywords(['EXTENDED', 'FORMATTED']);
+       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
      }
    
 break;
 case 754:
 
      if (!$$[$0-2]) {
-       suggestKeywords(['EXTENDED', 'FORMATTED']);
+       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
      }
    
 break;
 case 755:
 
-     addTablePrimary($$[$0-1]);
-     suggestColumns();
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestColumns();
    
 break;
 case 756:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
+       parser.suggestKeywords(['DATABASE', 'EXTENDED', 'FORMATTED', 'FUNCTION', 'SCHEMA']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
     
 break;
 case 757: case 759:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['EXTENDED']);
+       parser.suggestKeywords(['EXTENDED']);
      }
    
 break;
 case 758: case 760:
 
       if (!$$[$0-2]) {
-        suggestKeywords(['EXTENDED']);
+        parser.suggestKeywords(['EXTENDED']);
       }
     
 break;
 case 763:
 
      if (!$$[$0-1]) {
-       suggestKeywords([{ value: 'DATABASE', weight: 2 }, { value: 'EXTENDED', weight: 1 }, { value: 'FORMATTED', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'DATABASE', weight: 2 }, { value: 'EXTENDED', weight: 1 }, { value: 'FORMATTED', weight: 1 }]);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 765:
 
-     addTablePrimary($$[$0]);
+     parser.addTablePrimary($$[$0]);
      if (!$$[$0-2]) {
-       suggestKeywords([{ value: 'DATABASE', weight: 2 }, { value: 'EXTENDED', weight: 1 }, { value: 'FORMATTED', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'DATABASE', weight: 2 }, { value: 'EXTENDED', weight: 1 }, { value: 'FORMATTED', weight: 1 }]);
      }
    
 break;
 case 766:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['EXTENDED', 'FORMATTED']);
+       parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
      }
-     suggestDatabases();
+     parser.suggestDatabases();
    
 break;
 case 767:
 
       if (!$$[$0-2]) {
-        suggestKeywords(['EXTENDED', 'FORMATTED']);
+        parser.suggestKeywords(['EXTENDED', 'FORMATTED']);
       }
-      addDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
+      parser.addDatabaseLocation(_$[$0], [{ name: $$[$0] }]);
     
 break;
 case 773:
 
-     addCommonTableExpressions($$[$0-3]);
+     parser.addCommonTableExpressions($$[$0-3]);
    
 break;
 case 774: case 775: case 815:
 
-     addCommonTableExpressions($$[$0-2]);
+     parser.addCommonTableExpressions($$[$0-2]);
    
 break;
 case 783: case 2695:
@@ -511,12 +511,12 @@ this.$ = { selectList: $$[$0-1], tableExpression: $$[$0] };
 break;
 case 797:
 
-     suggestKeywords(['ALL', 'DISTINCT', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'DISTINCT', 'SELECT']);
    
 break;
 case 798:
 
-     suggestKeywords(['ALL', 'DISTINCT']);
+     parser.suggestKeywords(['ALL', 'DISTINCT']);
    
 break;
 case 800:
@@ -528,28 +528,28 @@ case 800:
        } else {
          keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
        }
-       if (isImpala()) {
+       if (parser.isImpala()) {
          keywords.push('STRAIGHT_JOIN');
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      } else {
-       checkForSelectListKeywords($$[$0]);
+       parser.checkForSelectListKeywords($$[$0]);
      }
      if ($$[$0].suggestFunctions) {
-       suggestFunctions();
+       parser.suggestFunctions();
      }
      if ($$[$0].suggestColumns) {
-       suggestColumns({ identifierChain: [], source: 'select' });
+       parser.suggestColumns({ identifierChain: [], source: 'select' });
      }
      if ($$[$0].suggestTables) {
-       suggestTables({ prependQuestionMark: true, prependFrom: true });
+       parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
      }
      if ($$[$0].suggestDatabases) {
-       suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+       parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
      }
      if ($$[$0].suggestAggregateFunctions && (!$$[$0-1] || $$[$0-1] === 'ALL')) {
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
    
 break;
@@ -559,27 +559,27 @@ case 801:
      if ($$[$0-1]) {
        keywords = [{ value: '*', weight: 10000 }];
        if ($$[$0-1] === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns({ identifierChain: [], source: 'select' });
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns({ identifierChain: [], source: 'select' });
+     parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
+     parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
 case 803:
 
-     selectListNoTableSuggest($$[$0-1], $$[$0-2]);
+     parser.selectListNoTableSuggest($$[$0-1], $$[$0-2]);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'select';
      }
@@ -591,44 +591,44 @@ case 804:
      if ($$[$0-2]) {
        keywords = [{ value: '*', weight: 10000 }];
        if ($$[$0-2] === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns({ identifierChain: [], source: 'select' });
-     suggestTables({ prependQuestionMark: true, prependFrom: true });
-     suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns({ identifierChain: [], source: 'select' });
+     parser.suggestTables({ prependQuestionMark: true, prependFrom: true });
+     parser.suggestDatabases({ prependQuestionMark: true, prependFrom: true, appendDot: true });
    
 break;
 case 805: case 1175:
 
-     checkForSelectListKeywords($$[$0-2]);
+     parser.checkForSelectListKeywords($$[$0-2]);
    
 break;
 case 806: case 1176:
 
-     checkForSelectListKeywords($$[$0-3]);
+     parser.checkForSelectListKeywords($$[$0-3]);
    
 break;
 case 807:
 
-     checkForSelectListKeywords($$[$0-1]);
-     suggestTables({ prependFrom: true });
-     suggestDatabases({ prependFrom: true, appendDot: true });
+     parser.checkForSelectListKeywords($$[$0-1]);
+     parser.suggestTables({ prependFrom: true });
+     parser.suggestDatabases({ prependFrom: true, appendDot: true });
    
 break;
 case 808:
 
-     selectListNoTableSuggest($$[$0-1], $$[$0-2]);
+     parser.selectListNoTableSuggest($$[$0-1], $$[$0-2]);
    
 break;
 case 810: case 886: case 917: case 930: case 934: case 972: case 976: case 981: case 1001: case 1023: case 1024: case 1100: case 1102: case 1104: case 1168: case 1178: case 1191: case 1203: case 1302: case 1360: case 1532: case 1533: case 1558: case 1559: case 1560: case 1751: case 1904: case 1918: case 1919:
@@ -639,7 +639,7 @@ this.$ = $$[$0-2].concat([$$[$0]]);;
 break;
 case 817:
 
-     addCommonTableExpressions($$[$0-4]);
+     parser.addCommonTableExpressions($$[$0-4]);
    
 break;
 case 818:
@@ -650,12 +650,12 @@ case 818:
 break;
 case 819: case 1410: case 2104: case 2163: case 2242: case 2246: case 2311:
 
-     suggestKeywords(['AS']);
+     parser.suggestKeywords(['AS']);
    
 break;
 case 820: case 1283: case 1787: case 2177: case 2189:
 
-     suggestKeywords(['SELECT']);
+     parser.suggestKeywords(['SELECT']);
    
 break;
 case 828:
@@ -665,21 +665,21 @@ case 828:
      if ($$[$0-3]) {
        if (!$$[$0-3].hasLateralViews && typeof $$[$0-3].tableReferenceList.hasJoinCondition !== 'undefined' && !$$[$0-3].tableReferenceList.hasJoinCondition) {
          keywords.push({ value: 'ON', weight: 3 });
-         if (isImpala()) {
+         if (parser.isImpala()) {
            keywords.push({ value: 'USING', weight: 3 });
          }
        }
        if ($$[$0-3].suggestKeywords) {
-         keywords = createWeightedKeywords($$[$0-3].suggestKeywords, 3);
+         keywords = parser.createWeightedKeywords($$[$0-3].suggestKeywords, 3);
        }
        if ($$[$0-3].tableReferenceList.suggestJoinConditions) {
-         suggestJoinConditions($$[$0-3].tableReferenceList.suggestJoinConditions);
+         parser.suggestJoinConditions($$[$0-3].tableReferenceList.suggestJoinConditions);
        }
        if ($$[$0-3].tableReferenceList.suggestJoins) {
-         suggestJoins($$[$0-3].tableReferenceList.suggestJoins);
+         parser.suggestJoins($$[$0-3].tableReferenceList.suggestJoins);
        }
        if (!$$[$0-3].hasLateralViews && $$[$0-3].tableReferenceList.suggestKeywords) {
-         keywords = keywords.concat(createWeightedKeywords($$[$0-3].tableReferenceList.suggestKeywords, 3));
+         keywords = keywords.concat(parser.createWeightedKeywords($$[$0-3].tableReferenceList.suggestKeywords, 3));
        }
 
        // Lower the weights for 'TABLESAMPLE' and 'LATERAL VIEW'
@@ -690,40 +690,40 @@ case 828:
        });
 
        if (!$$[$0-3].hasLateralViews && $$[$0-3].tableReferenceList.types) {
-         var veKeywords = getValueExpressionKeywords($$[$0-3].tableReferenceList);
+         var veKeywords = parser.getValueExpressionKeywords($$[$0-3].tableReferenceList);
          keywords = keywords.concat(veKeywords.suggestKeywords);
          if (veKeywords.suggestColRefKeywords) {
-           suggestColRefKeywords(veKeywords.suggestColRefKeywords);
-           addColRefIfExists($$[$0-3].tableReferenceList);
+           parser.suggestColRefKeywords(veKeywords.suggestColRefKeywords);
+           parser.addColRefIfExists($$[$0-3].tableReferenceList);
          }
        }
      }
 
      if ($$[$0-1].empty && $$[$0] && $$[$0].joinType.toUpperCase() === 'JOIN') {
        keywords = keywords.concat(['FULL', 'FULL OUTER', 'LEFT', 'LEFT OUTER', 'RIGHT', 'RIGHT OUTER']);
-       if (isHive()) {
+       if (parser.isHive()) {
          keywords = keywords.concat(['CROSS', 'LEFT SEMI']);
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = keywords.concat(['INNER', 'LEFT ANTI', 'LEFT SEMI', 'RIGHT ANTI', 'RIGHT SEMI']);
        } else {
          keywords.push('INNER');
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
        return;
      }
 
      if ($$[$0-1].suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-1].suggestKeywords, 2));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2));
      }
 
      if ($$[$0-1].suggestFilters) {
-       suggestFilters($$[$0-1].suggestFilters);
+       parser.suggestFilters($$[$0-1].suggestFilters);
      }
      if ($$[$0-1].suggestGroupBys) {
-       suggestGroupBys($$[$0-1].suggestGroupBys);
+       parser.suggestGroupBys($$[$0-1].suggestGroupBys);
      }
      if ($$[$0-1].suggestOrderBys) {
-       suggestOrderBys($$[$0-1].suggestOrderBys);
+       parser.suggestOrderBys($$[$0-1].suggestOrderBys);
      }
 
      if ($$[$0-1].empty) {
@@ -731,14 +731,14 @@ case 828:
      }
 
      keywords = keywords.concat([{ value: 'FULL JOIN', weight: 1 }, { value: 'FULL OUTER JOIN', weight: 1 }, { value: 'JOIN', weight: 1 }, { value: 'LEFT JOIN', weight: 1 }, { value: 'LEFT OUTER JOIN', weight: 1 }, { value: 'RIGHT JOIN', weight: 1 }, { value: 'RIGHT OUTER JOIN', weight: 1 }]);
-     if (isHive()) {
+     if (parser.isHive()) {
        keywords = keywords.concat([{ value: 'CROSS JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }]);
-     } else if (isImpala()) {
+     } else if (parser.isImpala()) {
        keywords = keywords.concat([{ value: 'INNER JOIN', weight: 1 },  { value: 'LEFT ANTI JOIN', weight: 1 }, { value: 'LEFT SEMI JOIN', weight: 1 }, { value: 'RIGHT ANTI JOIN', weight: 1 }, { value: 'RIGHT SEMI JOIN', weight: 1 }]);
      } else {
        keywords.push({ value: 'INNER JOIN', weight: 1 });
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
   
 break;
 case 829:
@@ -756,28 +756,28 @@ case 829:
      var keywords = [];
 
      if ($$[$0-1].suggestColRefKeywords) {
-       suggestColRefKeywords($$[$0-1].suggestColRefKeywords);
-       addColRefIfExists($$[$0-1]);
+       parser.suggestColRefKeywords($$[$0-1].suggestColRefKeywords);
+       parser.addColRefIfExists($$[$0-1]);
      }
 
      if ($$[$0-1].suggestKeywords && $$[$0-1].suggestKeywords.length) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-1].suggestKeywords, 2));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2));
      }
 
      if ($$[$0-1].cursorAtEnd) {
        keywords.push({ value: 'UNION', weight: 2.11 });
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
    
 break;
 case 833:
 
-     if (isHive()) {
+     if (parser.isHive()) {
        this.$ = { tableReferenceList : $$[$0-1], suggestKeywords: ['LATERAL VIEW'] }
      } else {
        this.$ = { tableReferenceList : $$[$0-1] }
      }
-     if (isHive() && $$[$0]) {
+     if (parser.isHive() && $$[$0]) {
        parser.yy.lateralViews = $$[$0].lateralViews;
        this.$.hasLateralViews = true;
        if ($$[$0].suggestKeywords) {
@@ -788,8 +788,8 @@ case 833:
 break;
 case 834: case 1196:
 
-       suggestTables();
-       suggestDatabases({ appendDot: true });
+       parser.suggestTables();
+       parser.suggestDatabases({ appendDot: true });
    
 break;
 case 835:
@@ -801,10 +801,10 @@ case 835:
 break;
 case 837:
 
-     var keywords = getKeywordsForOptionalsLR(
+     var keywords = parser.getKeywordsForOptionalsLR(
        [$$[$0-7], $$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
        [{ value: 'WHERE', weight: 9 }, { value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
+       [true, true, true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$$[$0-3], true, parser.isImpala()]);
 
      if (keywords.length > 0) {
        this.$ = { suggestKeywords: keywords, empty: !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
@@ -829,7 +829,7 @@ case 838:
        parser.yy.result.suggestColumns.source = 'where';
      }
      if ($$[$0-7].emptyFilter) {
-       suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
@@ -849,95 +849,95 @@ case 842:
 break;
 case 846:
 
-     var keywords = getKeywordsForOptionalsLR(
+     var keywords = parser.getKeywordsForOptionalsLR(
        [$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
        [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
+       [true, true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$$[$0-3], true, parser.isImpala()]);
      if ($$[$0-8].suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-8].suggestKeywords, 1));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-8].suggestKeywords, 1));
      }
-     this.$ = getValueExpressionKeywords($$[$0-8], keywords);
+     this.$ = parser.getValueExpressionKeywords($$[$0-8], keywords);
      this.$.cursorAtEnd = !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0];
      if ($$[$0-8].columnReference) {
        this.$.columnReference = $$[$0-8].columnReference;
      }
      if (!$$[$0-6]) {
-       suggestGroupBys({ prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestGroupBys({ prefix: 'GROUP BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
      if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
-       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
 case 847:
 
-     var keywords = getKeywordsForOptionalsLR(
+     var keywords = parser.getKeywordsForOptionalsLR(
        [$$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
        [{ value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [true, isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
+       [true, parser.isHive(), true, parser.isHive(), parser.isHive() && !$$[$0-3], true, parser.isImpala()]);
      if ($$[$0-7].suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-7].suggestKeywords, 8));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-7].suggestKeywords, 8));
      }
-     this.$ = getValueExpressionKeywords($$[$0-7], keywords);
+     this.$ = parser.getValueExpressionKeywords($$[$0-7], keywords);
      if ($$[$0-7].columnReference) {
        this.$.columnReference = $$[$0-7].columnReference;
      }
      this.$.cursorAtEnd = !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0];
      if (!$$[$0-5] && !$$[$0-4] && !$$[$0-3]) {
-       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
 case 848:
 
-     var keywords = getKeywordsForOptionalsLR(
+     var keywords = parser.getKeywordsForOptionalsLR(
        [$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-2], $$[$0-1], $$[$0]],
        [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'SORT BY', weight: 4 }, { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }],
-       [isHive(), true, isHive(), isHive() && !$$[$0-3], true, isImpala()]);
+       [parser.isHive(), true, parser.isHive(), parser.isHive() && !$$[$0-3], true, parser.isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
      if (!$$[$0-4] && !$$[$0-3]) {
-       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
 case 849:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0] };
      if (!$$[$0-3]) {
-       suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestOrderBys({ prefix: 'ORDER BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
 
    
 break;
 case 850:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]);
      if ($$[$0-4].suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-4].suggestKeywords, 5));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-4].suggestKeywords, 5));
      }
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-2] && !$$[$0-1] && !$$[$0] };
    
 break;
 case 851:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isImpala()]);
      if ($$[$0-3].suggestKeywords) {
-       keywords = keywords.concat(createWeightedKeywords($$[$0-3].suggestKeywords, 4));
+       keywords = keywords.concat(parser.createWeightedKeywords($$[$0-3].suggestKeywords, 4));
      }
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0-1] && !$$[$0] };
    
 break;
 case 852:
 
-     var keywords = getKeywordsForOptionalsLR([$$[$0]], [{ value: 'OFFSET', weight: 2 }], [isImpala()]);
+     var keywords = parser.getKeywordsForOptionalsLR([$$[$0]], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]);
      this.$ = { suggestKeywords: keywords, cursorAtEnd: !$$[$0] };
    
 break;
 case 853:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-6], $$[$0-5], $$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, parser.isHive(), true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]
      };
    
@@ -945,7 +945,7 @@ break;
 case 854:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-4], $$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]
      }
    
@@ -953,7 +953,7 @@ break;
 case 855:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-3], $$[$0-2], $$[$0-1], $$[$0]], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]
      }
    
@@ -961,7 +961,7 @@ break;
 case 856:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$$[$0-2] && !$$[$0-1] && !$$[$0]
      }
    
@@ -969,7 +969,7 @@ break;
 case 857:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isImpala()]),
        cursorAtEnd: !$$[$0-1] && !$$[$0]
      }
    
@@ -977,16 +977,16 @@ break;
 case 858:
 
      this.$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$$[$0]], [{ value: 'OFFSET', weight: 2 }], [isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$$[$0]], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]),
        cursorAtEnd: !$$[$0]
      }
    
 break;
 case 888:
 
-     suggestFunctions();
-     suggestColumns();
-     suggestKeywords(['EXISTS', 'NOT EXISTS']);
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.suggestKeywords(['EXISTS', 'NOT EXISTS']);
      this.$ = { emptyFilter: true }
    
 break;
@@ -994,7 +994,7 @@ case 891:
 
      if (!$$[$0]) {
        this.$ = $$[$0-1];
-       if (isHive()) {
+       if (parser.isHive()) {
          if (!this.$.suggestKeywords) {
            this.$.suggestKeywords = [];
          }
@@ -1007,67 +1007,67 @@ case 891:
 break;
 case 892: case 941: case 967: case 971: case 974:
 
-     suggestSelectListAliases();
+     parser.suggestSelectListAliases();
    
 break;
 case 893:
 
-     valueExpressionSuggest();
-     suggestSelectListAliases();
-     suggestGroupBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     parser.valueExpressionSuggest();
+     parser.suggestSelectListAliases();
+     parser.suggestGroupBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
 case 894:
 
-     suggestKeywords(['BY']);
-     suggestGroupBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     parser.suggestKeywords(['BY']);
+     parser.suggestGroupBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
 case 901:
 
-     if (isHive()) {
-       suggestKeywords(['CUBE', 'ROLLUP']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['CUBE', 'ROLLUP']);
      }
    
 break;
 case 903:
 
-     suggestKeywords(['SETS']);
+     parser.suggestKeywords(['SETS']);
    
 break;
 case 931:
 
      if ($$[$0].emptyOrderBy) {
-       suggestOrderBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+       parser.suggestOrderBys({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
      }
    
 break;
 case 932:
 
-     suggestKeywords(['BY']);
-     suggestOrderBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     parser.suggestKeywords(['BY']);
+     parser.suggestOrderBys({ prefix: 'BY', tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
 case 936:
 
      this.$ = { emptyOrderBy: false }
-     valueExpressionSuggest();
-     suggestAnalyticFunctions();
-     suggestSelectListAliases();
+     parser.valueExpressionSuggest();
+     parser.suggestAnalyticFunctions();
+     parser.suggestSelectListAliases();
    
 break;
 case 937: case 938: case 939:
 this.$ = { emptyOrderBy: false };
 break;
 case 940:
-this.$ = mergeSuggestKeywords($$[$0-1], $$[$0]);
+this.$ = parser.mergeSuggestKeywords($$[$0-1], $$[$0]);
 break;
 case 943:
 
      this.$ = { emptyOrderBy: true }
-     valueExpressionSuggest();
-     suggestAnalyticFunctions();
-     suggestSelectListAliases();
+     parser.valueExpressionSuggest();
+     parser.suggestAnalyticFunctions();
+     parser.suggestSelectListAliases();
    
 break;
 case 944:
@@ -1077,7 +1077,7 @@ case 944:
 break;
 case 949:
 
-    if (isImpala()) {
+    if (parser.isImpala()) {
       this.$ = { suggestKeywords: ['NULLS FIRST', 'NULLS LAST'] };
     } else {
       this.$ = {};
@@ -1086,7 +1086,7 @@ case 949:
 break;
 case 952:
 
-     suggestKeywords(['FIRST', 'LAST']);
+     parser.suggestKeywords(['FIRST', 'LAST']);
    
 break;
 case 956:
@@ -1099,13 +1099,13 @@ case 965: case 969: case 973:
 break;
 case 966: case 970:
 
-     suggestColumns();
-     suggestSelectListAliases();
+     parser.suggestColumns();
+     parser.suggestSelectListAliases();
    
 break;
 case 989: case 994:
 
-     suggestFunctions({ types: ['BIGINT'] });
+     parser.suggestFunctions({ types: ['BIGINT'] });
    
 break;
 case 990: case 995:
@@ -1152,22 +1152,22 @@ case 1018: case 1019: case 1020:
 break;
 case 1026:
 
-     suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
+     parser.suggestKeywords(['BETWEEN', 'EXISTS', 'IN', 'LIKE']);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1028:
 
-     suggestFunctions();
-     suggestColumns();
-     suggestKeywords(['EXISTS']);
+     parser.suggestFunctions();
+     parser.suggestColumns();
+     parser.suggestKeywords(['EXISTS']);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1030:
 
-     suggestFunctions({ types: [ 'BOOLEAN' ] });
-     suggestColumns({ types: [ 'BOOLEAN' ] });
+     parser.suggestFunctions({ types: [ 'BOOLEAN' ] });
+     parser.suggestColumns({ types: [ 'BOOLEAN' ] });
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
@@ -1176,41 +1176,41 @@ this.$ = { types: [ 'T' ] };
 break;
 case 1032:
 
-     suggestFunctions();
-     suggestColumns();
+     parser.suggestFunctions();
+     parser.suggestColumns();
      this.$ = { types: [ 'T' ] };
    
 break;
 case 1033:
 
      if (!$$[$0].typeSet) {
-       applyTypeToSuggestions('NUMBER');
+       parser.applyTypeToSuggestions('NUMBER');
      }
      this.$ = { types: [ 'NUMBER' ] };
    
 break;
 case 1034:
 
-     suggestFunctions({ types: [ 'NUMBER' ] });
-     suggestColumns({ types: [ 'NUMBER' ] });
+     parser.suggestFunctions({ types: [ 'NUMBER' ] });
+     parser.suggestColumns({ types: [ 'NUMBER' ] });
      this.$ = { types: [ 'NUMBER' ] };
    
 break;
 case 1035:
 
-      suggestKeywords(['NULL']);
+      parser.suggestKeywords(['NULL']);
       this.$ = { types: [ 'BOOLEAN' ] };
     
 break;
 case 1036:
 
-     suggestKeywords(['NOT NULL', 'NULL']);
+     parser.suggestKeywords(['NOT NULL', 'NULL']);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1037:
 
-     suggestKeywords(['NOT']);
+     parser.suggestKeywords(['NOT']);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
@@ -1221,59 +1221,59 @@ case 1039:
 break;
 case 1040:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { types: ['T'], typeSet: true };
    
 break;
 case 1041:
 
-     valueExpressionSuggest($$[$0], $$[$0-1]);
-     applyTypeToSuggestions($$[$0].types);
+     parser.valueExpressionSuggest($$[$0], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1042: case 1043: case 1044:
 
-     valueExpressionSuggest($$[$0], $$[$0-1]);
-     applyTypeToSuggestions($$[$0].types);
+     parser.valueExpressionSuggest($$[$0], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1045: case 1046: case 1047: case 1048:
 
      if (!$$[$0-2].typeSet) {
-       applyTypeToSuggestions($$[$0].types);
-       addColRefIfExists($$[$0]);
+       parser.applyTypeToSuggestions($$[$0].types);
+       parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 1049: case 1051:
 
-     valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     applyTypeToSuggestions($$[$0-2].types);
+     parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0-2].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1050:
 
-     valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     applyTypeToSuggestions($$[$0-2].types);
+     parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0-2].types);
      this.$ = { types: [ 'BOOLEAN' ] , typeSet: true, endsWithLessThanOrEqual: true };
    
 break;
 case 1052:
 
-     valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     applyTypeToSuggestions($$[$0-2].types);
+     parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0-2].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true, endsWithLessThanOrEqual: $$[$0-1] === '<='  };
    
 break;
 case 1053: case 1054: case 1055: case 1056:
 
      if (!$$[$0].typeSet) {
-       applyTypeToSuggestions($$[$0-2].types);
-       addColRefIfExists($$[$0-2]);
+       parser.applyTypeToSuggestions($$[$0-2].types);
+       parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'BOOLEAN' ] }
    
@@ -1281,11 +1281,11 @@ break;
 case 1057:
 
      if ($$[$0].inValueEdit) {
-       valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
-       applyTypeToSuggestions($$[$0-3].types);
+       parser.valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
+       parser.applyTypeToSuggestions($$[$0-3].types);
      }
      if ($$[$0].cursorAtStart) {
-       suggestKeywords(['SELECT']);
+       parser.suggestKeywords(['SELECT']);
      }
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
@@ -1293,11 +1293,11 @@ break;
 case 1058:
 
      if ($$[$0].inValueEdit) {
-       valueExpressionSuggest($$[$0-2], $$[$0-1]);
-       applyTypeToSuggestions($$[$0-2].types);
+       parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
+       parser.applyTypeToSuggestions($$[$0-2].types);
      }
      if ($$[$0].cursorAtStart) {
-       suggestKeywords(['SELECT']);
+       parser.suggestKeywords(['SELECT']);
      }
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
@@ -1305,7 +1305,7 @@ break;
 case 1063:
 
      if ($$[$0-2].types[0] === $$[$0].types[0] && !$$[$0-5].typeSet) {
-       applyTypeToSuggestions($$[$0-2].types);
+       parser.applyTypeToSuggestions($$[$0-2].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -1313,7 +1313,7 @@ break;
 case 1064:
 
      if ($$[$0-5].types[0] === $$[$0].types[0] && !$$[$0-2].typeSet) {
-       applyTypeToSuggestions($$[$0-5].types);
+       parser.applyTypeToSuggestions($$[$0-5].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -1321,33 +1321,33 @@ break;
 case 1065:
 
      if ($$[$0-5].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
-       applyTypeToSuggestions($$[$0-5].types);
+       parser.applyTypeToSuggestions($$[$0-5].types);
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1066:
 
-     valueExpressionSuggest($$[$0-5], $$[$0-1]);
+     parser.valueExpressionSuggest($$[$0-5], $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1067: case 1073:
 
-     suggestValueExpressionKeywords($$[$0-1], ['AND']);
+     parser.suggestValueExpressionKeywords($$[$0-1], ['AND']);
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1068:
 
-     valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
+     parser.valueExpressionSuggest($$[$0-3], $$[$0-2] + ' ' + $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1069:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-4].typeSet) {
-       applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4].types)
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -1355,7 +1355,7 @@ break;
 case 1070:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-2].typeSet) {
-       applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4].types)
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
@@ -1363,105 +1363,105 @@ break;
 case 1071:
 
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
-       applyTypeToSuggestions($$[$0-4].types)
+       parser.applyTypeToSuggestions($$[$0-4].types)
      }
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
 case 1072:
 
-     valueExpressionSuggest($$[$0-4], $$[$0-1]);
-     applyTypeToSuggestions($$[$0-4].types);
+     parser.valueExpressionSuggest($$[$0-4], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0-4].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1074:
 
-     valueExpressionSuggest($$[$0-2], $$[$0-1]);
-     applyTypeToSuggestions($$[$0-2].types);
+     parser.valueExpressionSuggest($$[$0-2], $$[$0-1]);
+     parser.applyTypeToSuggestions($$[$0-2].types);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1075: case 1077: case 1081:
 
-     valueExpressionSuggest(undefined, $$[$0-1]);
+     parser.valueExpressionSuggest(undefined, $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
 case 1076: case 1080:
 
-     addColRefIfExists($$[$0]);
+     parser.addColRefIfExists($$[$0]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 1078: case 1082:
 
-     addColRefIfExists($$[$0-2]);
+     parser.addColRefIfExists($$[$0-2]);
      this.$ = { types: [ 'BOOLEAN' ] }
    
 break;
 case 1079:
 
-     valueExpressionSuggest(undefined, $$[$0-1]);
+     parser.valueExpressionSuggest(undefined, $$[$0-1]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1083: case 1084:
 
-     valueExpressionSuggest(undefined, $$[$0-1]);
-     applyTypeToSuggestions([ 'NUMBER' ]);
+     parser.valueExpressionSuggest(undefined, $$[$0-1]);
+     parser.applyTypeToSuggestions([ 'NUMBER' ]);
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 1085: case 1086: case 1087:
 
      if (!$$[$0-2].typeSet) {
-       applyTypeToSuggestions(['NUMBER']);
-       addColRefIfExists($$[$0]);
+       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.addColRefIfExists($$[$0]);
      }
      this.$ = { types: [ 'NUMBER' ] }
    
 break;
 case 1088: case 1089: case 1090:
 
-     valueExpressionSuggest(undefined, $$[$0-1]);
-     applyTypeToSuggestions(['NUMBER']);
+     parser.valueExpressionSuggest(undefined, $$[$0-1]);
+     parser.applyTypeToSuggestions(['NUMBER']);
      this.$ = { types: [ 'NUMBER' ], typeSet: true };
    
 break;
 case 1091: case 1092: case 1093:
 
      if (!$$[$0].typeSet) {
-       applyTypeToSuggestions(['NUMBER']);
-       addColRefIfExists($$[$0-2]);
+       parser.applyTypeToSuggestions(['NUMBER']);
+       parser.addColRefIfExists($$[$0-2]);
      }
      this.$ = { types: [ 'NUMBER' ] };
    
 break;
 case 1098:
 
-     valueExpressionSuggest(undefined, $$[$0]);
-     applyTypeToSuggestions([ 'STRING' ]);
+     parser.valueExpressionSuggest(undefined, $$[$0]);
+     parser.applyTypeToSuggestions([ 'STRING' ]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1099:
 
-     valueExpressionSuggest(undefined, $$[$0-1] + ' ' + $$[$0]);
-     applyTypeToSuggestions([ 'STRING' ]);
+     parser.valueExpressionSuggest(undefined, $$[$0-1] + ' ' + $$[$0]);
+     parser.applyTypeToSuggestions([ 'STRING' ]);
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
 case 1101:
 
-     valueExpressionSuggest();
-     suggestKeywords(['WHEN']);
+     parser.valueExpressionSuggest();
+     parser.suggestKeywords(['WHEN']);
      this.$ = { types: [ 'T' ], typeSet: true };
    
 break;
 case 1103:
 
-     suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
+     parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
      this.$ = { types: [ 'T' ], typeSet: true };
    
 break;
@@ -1495,30 +1495,30 @@ case 1112:
 break;
 case 1113:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$[$0-2].position += 1;
    
 break;
 case 1114:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      $$[$0-4].position += 1;
    
 break;
 case 1115:
 
-     suggestValueExpressionKeywords($$[$0-3]);
+     parser.suggestValueExpressionKeywords($$[$0-3]);
    
 break;
 case 1116: case 1117:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { cursorAtStart : true, position: 1 };
    
 break;
 case 1118: case 1119:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { position: 2 };
    
 break;
@@ -1542,12 +1542,12 @@ case 1133:
 break;
 case 1137:
 
-     suggestKeywords(['DAYS', 'HOURS', 'MICROSECONDS', 'MILLISECONDS', 'MINUTES', 'MONTHS', 'NANOSECONDS', 'SECONDS', 'WEEKS', 'YEARS']);
+     parser.suggestKeywords(['DAYS', 'HOURS', 'MICROSECONDS', 'MILLISECONDS', 'MINUTES', 'MONTHS', 'NANOSECONDS', 'SECONDS', 'WEEKS', 'YEARS']);
    
 break;
 case 1142:
 
-     suggestValues($$[$0]);
+     parser.suggestValues($$[$0]);
    
 break;
 case 1143:
@@ -1581,14 +1581,14 @@ case 1164:
 break;
 case 1165:
 
-     addAsteriskLocation(_$[$0], [{ asterisk: true }]);
+     parser.addAsteriskLocation(_$[$0], [{ asterisk: true }]);
      this.$ = { asterisk: true }
    
 break;
 case 1167:
 
-     suggestFunctions();
-     suggestColumns();
+     parser.suggestFunctions();
+     parser.suggestColumns();
      this.$ = { suggestAggregateFunctions: true };
    
 break;
@@ -1609,17 +1609,17 @@ case 1179: case 1180: case 1182:
 break;
 case 1184:
 
-     addColumnLocation(_$[$0], [$$[$0]]);
+     parser.addColumnLocation(_$[$0], [$$[$0]]);
    
 break;
 case 1185:
 
-     addColumnLocation(_$[$0-2], [$$[$0-2]]);
+     parser.addColumnLocation(_$[$0-2], [$$[$0-2]]);
    
 break;
 case 1186:
 
-     addColumnLocation(_$[$0-1], [$$[$0-2]].concat($$[$0]));
+     parser.addColumnLocation(_$[$0-1], [$$[$0-2]].concat($$[$0]));
    
 break;
 case 1187:
@@ -1628,7 +1628,7 @@ case 1187:
      if (typeof $$[$0-2].key === 'undefined') {
        parser.yy.result.suggestStar = true;
      }
-     suggestColumns({
+     parser.suggestColumns({
        identifierChain: [ $$[$0-2] ]
      });
    
@@ -1636,7 +1636,7 @@ break;
 case 1188: case 1189:
 
       $$[$0-2].unshift($$[$0-4]);
-      suggestColumns({
+      parser.suggestColumns({
         identifierChain: $$[$0-2]
       });
     
@@ -1705,8 +1705,8 @@ this.$ = { joinType: $$[$0-2] };
 break;
 case 1217:
 
-     if (!$$[$0-2] && isImpala()) {
-       suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
+     if (!$$[$0-2] && parser.isImpala()) {
+       parser.suggestKeywords(['[BROADCAST]', '[SHUFFLE]']);
      }
      if (!$$[$0-2]) {
        var idx = parser.yy.latestTablePrimaries.length - 1;
@@ -1720,15 +1720,15 @@ case 1217:
        } while (idx >= 0 && tablePrimary.join && !tablePrimary.subQueryAlias)
 
        if (tables.length > 0) {
-         suggestJoins({
+         parser.suggestJoins({
            prependJoin: false,
            joinType: $$[$0-3],
            tables: tables
          })
        }
      }
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    
@@ -1774,61 +1774,61 @@ this.$ = 'RIGHT SEMI JOIN';
 break;
 case 1235: case 1236: case 1237: case 1239: case 1240: case 1241: case 1243: case 1244: case 1245:
 
-     suggestKeywords(['JOIN']);
+     parser.suggestKeywords(['JOIN']);
    
 break;
 case 1238:
 
-     suggestKeywords(['OUTER']);
+     parser.suggestKeywords(['OUTER']);
    
 break;
 case 1242:
 
-     if (isImpala()) {
-       suggestKeywords(['ANTI', 'OUTER', 'SEMI']);
-     } else if (isHive()) {
-       suggestKeywords(['OUTER', 'SEMI']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI', 'OUTER', 'SEMI']);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['OUTER', 'SEMI']);
      } else {
-       suggestKeywords(['OUTER']);
+       parser.suggestKeywords(['OUTER']);
      }
    
 break;
 case 1246:
 
-     if (isImpala()) {
-       suggestKeywords(['ANTI', 'SEMI', 'OUTER']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI', 'SEMI', 'OUTER']);
      } else {
-       suggestKeywords(['OUTER']);
+       parser.suggestKeywords(['OUTER']);
      }
    
 break;
 case 1247:
 
-     suggestKeywords(['JOIN', 'OUTER JOIN']);
+     parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
    
 break;
 case 1248:
 
-     if (isHive()) {
-       suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
    
 break;
 case 1249:
 
-     if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
    
 break;
 case 1250:
-this.$ = { noJoinCondition: true, suggestKeywords: isImpala() ? ['ON', 'USING'] : ['ON'] };
+this.$ = { noJoinCondition: true, suggestKeywords: parser.isImpala() ? ['ON', 'USING'] : ['ON'] };
 break;
 case 1251:
 this.$ = { valueExpression: $$[$0] };
@@ -1838,8 +1838,8 @@ this.$ = {};
 break;
 case 1256:
 
-     valueExpressionSuggest();
-     suggestJoinConditions({ prependOn: false });
+     parser.valueExpressionSuggest();
+     parser.suggestJoinConditions({ prependOn: false });
    
 break;
 case 1257:
@@ -1848,17 +1848,17 @@ case 1257:
        if ($$[$0]) {
          $$[$0-2].alias = $$[$0]
        }
-       addTablePrimary($$[$0-2]);
+       parser.addTablePrimary($$[$0-2]);
      }
      // Right-to-left for cursor after TablePrimary
-     this.$.suggestKeywords = getKeywordsForOptionalsLR([$$[$0], $$[$0-1]], [{ value: 'AS', weight: 1 }, { value: 'TABLESAMPLE', weight: 2 }], [true, isHive()]);
+     this.$.suggestKeywords = parser.getKeywordsForOptionalsLR([$$[$0], $$[$0-1]], [{ value: 'AS', weight: 1 }, { value: 'TABLESAMPLE', weight: 2 }], [true, parser.isHive()]);
    
 break;
 case 1258:
 
      if ($$[$0]) {
        $$[$0-1].alias = $$[$0];
-       addTablePrimary({ subQueryAlias: $$[$0] });
+       parser.addTablePrimary({ subQueryAlias: $$[$0] });
      } else {
        this.$.suggestKeywords = [{ value: 'AS', weight: 1 }];
      }
@@ -1869,65 +1869,65 @@ case 1260:
      if ($$[$0]) {
        $$[$0-2].alias = $$[$0];
      }
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
    
 break;
 case 1261:
 
      if ($$[$0]) {
-       addTablePrimary({ subQueryAlias: $$[$0] });
+       parser.addTablePrimary({ subQueryAlias: $$[$0] });
      }
    
 break;
 case 1269:
 
-     suggestKeywords(['BUCKET']);
+     parser.suggestKeywords(['BUCKET']);
    
 break;
 case 1270:
 
-     suggestKeywords(['OUT OF']);
+     parser.suggestKeywords(['OUT OF']);
    
 break;
 case 1271:
 
-     suggestKeywords(['OF']);
+     parser.suggestKeywords(['OF']);
    
 break;
 case 1272:
 
      if (!$$[$0-2]) {
-       suggestKeywords(['ON']);
+       parser.suggestKeywords(['ON']);
      }
    
 break;
 case 1278:
 
-     pushQueryState();
+     parser.pushQueryState();
    
 break;
 case 1279:
 
-     popQueryState();
+     parser.popQueryState();
    
 break;
 case 1281:
 
      if ($$[$0-1]) {
        $$[$0-2].alias = $$[$0-1];
-       addTablePrimary({ subQueryAlias: $$[$0-1] });
+       parser.addTablePrimary({ subQueryAlias: $$[$0-1] });
      }
      this.$ = $$[$0-2];
    
 break;
 case 1284:
 
-     var subQuery = getSubQuery($$[$0]);
+     var subQuery = parser.getSubQuery($$[$0]);
      subQuery.columns.forEach(function (column) {
-       expandIdentifierChain(column);
+       parser.expandIdentifierChain(column);
        delete column.linked;
      });
-     popQueryState(subQuery);
+     parser.popQueryState(subQuery);
      this.$ = subQuery;
    
 break;
@@ -1953,26 +1953,26 @@ case 1310:
 break;
 case 1319:
 
-     suggestKeywords(['OVER']);
+     parser.suggestKeywords(['OVER']);
    
 break;
 case 1323: case 1324:
 
-     addFunctionLocation(_$[$0-1], $$[$0-1]);
+     parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
      if ($$[$0].expression) {
-       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], expression: $$[$0].expression, types: parser.findReturnTypes($$[$0-1]) }
      } else {
-       this.$ = { function: $$[$0-1], types: findReturnTypes($$[$0-1]) }
+       this.$ = { function: $$[$0-1], types: parser.findReturnTypes($$[$0-1]) }
      }
    
 break;
 case 1325: case 1326:
 
-     addFunctionLocation(_$[$0-1], $$[$0-1]);
+     parser.addFunctionLocation(_$[$0-1], $$[$0-1]);
      if ($$[$0].position) {
-       applyArgumentTypesToSuggestions($$[$0-1], $$[$0].position);
+       parser.applyArgumentTypesToSuggestions($$[$0-1], $$[$0].position);
      }
-     this.$ = { types: findReturnTypes($$[$0-1]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-1]) };
    
 break;
 case 1332:
@@ -1980,61 +1980,61 @@ this.$ = { expression: $$[$0-1] };
 break;
 case 1333:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { position: 1 }
    
 break;
 case 1334:
 
-     suggestValueExpressionKeywords($$[$0-1]);
+     parser.suggestValueExpressionKeywords($$[$0-1]);
    
 break;
 case 1342: case 1425: case 1474:
-this.$ = { types: findReturnTypes($$[$0-2]) };
+this.$ = { types: parser.findReturnTypes($$[$0-2]) };
 break;
 case 1343:
-this.$ = { function: $$[$0-3], expression: $$[$0-2], types: findReturnTypes($$[$0-3]) };
+this.$ = { function: $$[$0-3], expression: $$[$0-2], types: parser.findReturnTypes($$[$0-3]) };
 break;
 case 1344:
 
-     valueExpressionSuggest();
-     applyArgumentTypesToSuggestions($$[$0-3], 1);
-     this.$ = { types: findReturnTypes($$[$0-3]) };
+     parser.valueExpressionSuggest();
+     parser.applyArgumentTypesToSuggestions($$[$0-3], 1);
+     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
    
 break;
 case 1345:
 
-     suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     parser.suggestValueExpressionKeywords($$[$0-2]);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1346:
 
-     applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
-     this.$ = { types: findReturnTypes($$[$0-3]) };
+     parser.applyArgumentTypesToSuggestions($$[$0-3], $$[$0-1].position);
+     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
    
 break;
 case 1356:
 
      if (!$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'PARTITION BY', weight: 2 }, { value: 'ORDER BY', weight: 1 }]);
      } else if (!$$[$0-2]) {
-       suggestKeywords(['PARTITION BY']);
+       parser.suggestKeywords(['PARTITION BY']);
      }
    
 break;
 case 1357:
 
       if (!$$[$0-1]) {
-        suggestValueExpressionKeywords($$[$0-3], [{ value: 'ORDER BY', weight: 2 }]);
+        parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'ORDER BY', weight: 2 }]);
       } else {
-        suggestValueExpressionKeywords($$[$0-3]);
+        parser.suggestValueExpressionKeywords($$[$0-3]);
       }
     
 break;
 case 1361: case 1642: case 2019: case 2020: case 2023: case 2062: case 2071: case 2089: case 2144: case 2145: case 2150: case 2155: case 2159:
 
-     suggestKeywords(['BY']);
+     parser.suggestKeywords(['BY']);
    
 break;
 case 1366:
@@ -2047,25 +2047,25 @@ case 1367:
 
       var keywords = [];
       if ($$[$0-2].suggestKeywords) {
-        keywords = createWeightedKeywords($$[$0-2].suggestKeywords, 2);
+        keywords = parser.createWeightedKeywords($$[$0-2].suggestKeywords, 2);
       }
       if (!$$[$0]) {
         keywords = keywords.concat([{ value: 'RANGE BETWEEN', weight: 1 }, { value: 'ROWS BETWEEN', weight: 1 }]);
       }
-      suggestKeywords(keywords);
+      parser.suggestKeywords(keywords);
     
 break;
 case 1372:
 
-     suggestKeywords(['BETWEEN']);
+     parser.suggestKeywords(['BETWEEN']);
    
 break;
 case 1373:
 
      if (!$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
+       parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED PRECEDING']);
      } else if (!$$[$0-1]) {
-       suggestKeywords(['AND']);
+       parser.suggestKeywords(['AND']);
      }
    
 break;
@@ -2081,60 +2081,60 @@ case 1377:
 break;
 case 1379:
 
-      suggestHdfs({ path: $$[$0-3] });
+      parser.suggestHdfs({ path: $$[$0-3] });
     
 break;
 case 1380:
 
-     suggestHdfs({ path: $$[$0-2] });
+     parser.suggestHdfs({ path: $$[$0-2] });
    
 break;
 case 1381:
 
-      suggestHdfs({ path: $$[$0-1] });
+      parser.suggestHdfs({ path: $$[$0-1] });
     
 break;
 case 1382:
 
-     suggestHdfs({ path: '' });
+     parser.suggestHdfs({ path: '' });
    
 break;
 case 1383:
 
-      suggestHdfs({ path: '' });
+      parser.suggestHdfs({ path: '' });
     
 break;
 case 1389:
 
-     suggestKeywords(['PRECEDING']);
+     parser.suggestKeywords(['PRECEDING']);
    
 break;
 case 1390: case 1398:
 
-     suggestKeywords(['ROW']);
+     parser.suggestKeywords(['ROW']);
    
 break;
 case 1397:
 
-     suggestKeywords(['CURRENT ROW', 'UNBOUNDED FOLLOWING']);
+     parser.suggestKeywords(['CURRENT ROW', 'UNBOUNDED FOLLOWING']);
    
 break;
 case 1399:
 
-     suggestKeywords(['FOLLOWING']);
+     parser.suggestKeywords(['FOLLOWING']);
    
 break;
 case 1405:
 
-     valueExpressionSuggest();
-     suggestAggregateFunctions();
-     suggestSelectListAliases(true);
+     parser.valueExpressionSuggest();
+     parser.suggestAggregateFunctions();
+     parser.suggestSelectListAliases(true);
    
 break;
 case 1406:
 
-     suggestAggregateFunctions();
-     suggestSelectListAliases(true);
+     parser.suggestAggregateFunctions();
+     parser.suggestSelectListAliases(true);
    
 break;
 case 1412: case 1417:
@@ -2142,79 +2142,79 @@ this.$ = { types: [ $$[$0-1].toUpperCase() ] };
 break;
 case 1414:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { types: [ $$[$0-1].toUpperCase() ] };
    
 break;
 case 1415: case 1416:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { types: [ 'T' ] };
    
 break;
 case 1420:
 
-     suggestValueExpressionKeywords($$[$0-3], [{ value: 'AS', weight: 2 }]);
+     parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'AS', weight: 2 }]);
      this.$ =  { types: [ $$[$0-1].toUpperCase() ] };
    
 break;
 case 1421:
 
-     suggestValueExpressionKeywords($$[$0-2], [{ value: 'AS', weight: 2 }]);
+     parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'AS', weight: 2 }]);
      this.$ = { types: [ 'T' ] };
    
 break;
 case 1422: case 1423:
 
-     suggestKeywords(getTypeKeywords());
+     parser.suggestKeywords(parser.getTypeKeywords());
      this.$ = { types: [ 'T' ] };
    
 break;
 case 1424: case 1430:
-this.$ = { types: findReturnTypes($$[$0-3]) };
+this.$ = { types: parser.findReturnTypes($$[$0-3]) };
 break;
 case 1426: case 1431: case 1473:
-this.$ = { types: findReturnTypes($$[$0-4]) };
+this.$ = { types: parser.findReturnTypes($$[$0-4]) };
 break;
 case 1427:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      if (!$$[$0-2]) {
-       var keywords = isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
+       var keywords = parser.isImpala() ? [{ value: '*', weight: 10000 }, 'ALL', 'DISTINCT'] : [{ value: '*', weight: 10000 }, 'DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1428: case 1433: case 1476:
 
-     suggestValueExpressionKeywords($$[$0-2]);
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     parser.suggestValueExpressionKeywords($$[$0-2]);
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1429:
 
      if ($$[$0-1].cursorAtStart && !$$[$0-2]) {
-       if (isImpala()) {
-         suggestKeywords(['ALL', 'DISTINCT']);
+       if (parser.isImpala()) {
+         parser.suggestKeywords(['ALL', 'DISTINCT']);
        } else {
-         suggestKeywords(['DISTINCT']);
+         parser.suggestKeywords(['DISTINCT']);
        }
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1432:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      if (!$$[$0-2]) {
        var keywords = [];
        if ($$[$0-4].toLowerCase() === 'group_concat') {
          keywords = ['ALL'];
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = ['ALL', 'DISTINCT'];
        } else {
          keywords = ['DISTINCT'];
@@ -2222,10 +2222,10 @@ case 1432:
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     applyArgumentTypesToSuggestions($$[$0-4], 1);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1434:
@@ -2234,7 +2234,7 @@ case 1434:
        var keywords = [];
        if ($$[$0-4].toLowerCase() === 'group_concat') {
          keywords = ['ALL'];
-       } else if (isImpala()) {
+       } else if (parser.isImpala()) {
          keywords = ['ALL', 'DISTINCT'];
        } else {
          keywords = ['DISTINCT'];
@@ -2242,119 +2242,119 @@ case 1434:
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
      if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-       applyArgumentTypesToSuggestions($$[$0-4], $$[$0-1].position);
+       parser.applyArgumentTypesToSuggestions($$[$0-4], $$[$0-1].position);
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1459:
 
-     valueExpressionSuggest();
-     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1460:
 
-     valueExpressionSuggest();
-     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1461:
 
-     valueExpressionSuggest();
-     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-3]) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
    
 break;
 case 1462:
 
-     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1463:
 
-     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['STRING'] : ['TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1464:
 
-     applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
-     this.$ = { types: findReturnTypes($$[$0-3]) };
+     parser.applyTypeToSuggestions(['STRING', 'TIMESTAMP']);
+     this.$ = { types: parser.findReturnTypes($$[$0-3]) };
    
 break;
 case 1465:
 
-     valueExpressionSuggest();
-     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1466:
 
-     valueExpressionSuggest();
-     applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     parser.valueExpressionSuggest();
+     parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1467:
 
-     applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     parser.applyTypeToSuggestions($$[$0-2].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1468:
 
-    applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+    parser.applyTypeToSuggestions($$[$0-1].toLowerCase() === 'from' ? ['TIMESTAMP'] : ['STRING']);
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1469:
 
      if ($$[$0-3].types[0] === 'STRING') {
-       suggestValueExpressionKeywords($$[$0-3], ['FROM']);
+       parser.suggestValueExpressionKeywords($$[$0-3], ['FROM']);
      } else {
-       suggestValueExpressionKeywords($$[$0-3]);
+       parser.suggestValueExpressionKeywords($$[$0-3]);
      }
-     this.$ = { types: findReturnTypes($$[$0-5]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-5]) };
    
 break;
 case 1470:
 
      if ($$[$0-2].types[0] === 'STRING') {
-       suggestValueExpressionKeywords($$[$0-2], ['FROM']);
+       parser.suggestValueExpressionKeywords($$[$0-2], ['FROM']);
      } else {
-       suggestValueExpressionKeywords($$[$0-2]);
+       parser.suggestValueExpressionKeywords($$[$0-2]);
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1475:
 
-     valueExpressionSuggest();
-     applyArgumentTypesToSuggestions($$[$0-4], 1);
+     parser.valueExpressionSuggest();
+     parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      if (!$$[$0-2]) {
-       var keywords = isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
+       var keywords = parser.isImpala() ? ['ALL', 'DISTINCT'] : ['DISTINCT'];
        if (parser.yy.result.suggestKeywords) {
          keywords = parser.yy.result.suggestKeywords.concat(keywords);
        }
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1477:
 
      if (parser.yy.result.suggestFunctions && ! parser.yy.result.suggestFunctions.types) {
-       applyArgumentTypesToSuggestions($$[$0-4], 1);
+       parser.applyArgumentTypesToSuggestions($$[$0-4], 1);
      }
-     this.$ = { types: findReturnTypes($$[$0-4]) };
+     this.$ = { types: parser.findReturnTypes($$[$0-4]) };
    
 break;
 case 1478:
@@ -2380,15 +2380,15 @@ break;
 case 1491:
 
      if (!$$[$0-1]) {
-       suggestKeywords([{ value: 'OUTER', weight: 2 }, { value: 'explode', weight: 1 }, { value: 'posexplode', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'OUTER', weight: 2 }, { value: 'explode', weight: 1 }, { value: 'posexplode', weight: 1 }]);
      } else {
-       suggestKeywords(['explode', 'posexplode']);
+       parser.suggestKeywords(['explode', 'posexplode']);
      }
    
 break;
 case 1492:
 
-     suggestKeywords(['VIEW']);
+     parser.suggestKeywords(['VIEW']);
    
 break;
 case 1496:
@@ -2405,73 +2405,73 @@ this.$ = { suggestKeywords: ['NOT'] };
 break;
 case 1508: case 1509: case 1510:
 
-     suggestFunctions({ types: [ 'STRING' ] });
-     suggestColumns({ types: [ 'STRING' ] });
+     parser.suggestFunctions({ types: [ 'STRING' ] });
+     parser.suggestColumns({ types: [ 'STRING' ] });
      this.$ = { types: ['BOOLEAN'] }
    
 break;
 case 1511: case 1513:
-this.$ = findCaseType($$[$0-1]);
+this.$ = parser.findCaseType($$[$0-1]);
 break;
 case 1512: case 1515: case 1519:
 
      $$[$0-3].caseTypes.push($$[$0-1]);
-     this.$ = findCaseType($$[$0-3]);
+     this.$ = parser.findCaseType($$[$0-3]);
    
 break;
 case 1514:
 
-     suggestValueExpressionKeywords($$[$0-1], ['END']);
+     parser.suggestValueExpressionKeywords($$[$0-1], ['END']);
      $$[$0-3].caseTypes.push($$[$0-1]);
-     this.$ = findCaseType($$[$0-3]);
+     this.$ = parser.findCaseType($$[$0-3]);
    
 break;
 case 1516:
-this.$ = findCaseType($$[$0-2]);
+this.$ = parser.findCaseType($$[$0-2]);
 break;
 case 1517:
 
      if ($$[$0].toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($$[$0-3], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
+       parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($$[$0-3], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
+       parser.suggestValueExpressionKeywords($$[$0-3], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
-     this.$ = findCaseType($$[$0-3]);
+     this.$ = parser.findCaseType($$[$0-3]);
    
 break;
 case 1518:
 
      if ($$[$0].toLowerCase() !== 'end') {
-       suggestValueExpressionKeywords($$[$0-2], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
+       parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'END', weight: 3 }, { value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      } else {
-       suggestValueExpressionKeywords($$[$0-2], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
+       parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
-     this.$ = findCaseType($$[$0-2]);
+     this.$ = parser.findCaseType($$[$0-2]);
    
 break;
 case 1520:
 
-     valueExpressionSuggest();
-     this.$ = findCaseType($$[$0-3]);
+     parser.valueExpressionSuggest();
+     this.$ = parser.findCaseType($$[$0-3]);
    
 break;
 case 1521:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { types: [ 'T' ], typeSet: true };
    
 break;
 case 1522:
 
-     valueExpressionSuggest();
-     suggestKeywords(['WHEN']);
+     parser.valueExpressionSuggest();
+     parser.suggestKeywords(['WHEN']);
      this.$ = $$[$0-1];
    
 break;
 case 1523:
 
-     valueExpressionSuggest();
-     suggestKeywords(['WHEN']);
+     parser.valueExpressionSuggest();
+     parser.suggestKeywords(['WHEN']);
      this.$ = { types: [ 'T' ] };
    
 break;
@@ -2486,7 +2486,7 @@ case 1527:
 break;
 case 1531:
 
-     suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
+     parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
    
 break;
 case 1534: case 1535:
@@ -2497,58 +2497,58 @@ this.$ = { caseTypes: [$$[$0]] };
 break;
 case 1539:
 
-     suggestKeywords(['WHEN']);
+     parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
 case 1540:
 
-     suggestKeywords(['WHEN']);
+     parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [$$[$0]] };
    
 break;
 case 1541:
 
-     valueExpressionSuggest();
-     suggestKeywords(['WHEN']);
+     parser.valueExpressionSuggest();
+     parser.suggestKeywords(['WHEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
 case 1542:
 
-      valueExpressionSuggest();
-      suggestKeywords(['WHEN']);
+      parser.valueExpressionSuggest();
+      parser.suggestKeywords(['WHEN']);
       this.$ = { caseTypes: [{ types: ['T'] }] };
     
 break;
 case 1543: case 1545: case 1549: case 1550: case 1551: case 1552:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
 case 1544:
 
-     valueExpressionSuggest();
-     suggestKeywords(['THEN']);
+     parser.valueExpressionSuggest();
+     parser.suggestKeywords(['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
 case 1546:
 
-     valueExpressionSuggest();
+     parser.valueExpressionSuggest();
      this.$ = { caseTypes: [$$[$0]] };
    
 break;
 case 1547:
 
-     suggestValueExpressionKeywords($$[$0-1], ['THEN']);
+     parser.suggestValueExpressionKeywords($$[$0-1], ['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
 case 1548:
 
-     suggestValueExpressionKeywords($$[$0-2], ['THEN']);
+     parser.suggestValueExpressionKeywords($$[$0-2], ['THEN']);
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;
@@ -2560,89 +2560,89 @@ break;
 case 1567: case 1891:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
    
 break;
 case 1569:
 
      if (!$$[$0-2]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
    
 break;
 case 1582:
 
-     if (isHive()) {
-       suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
      } else {
-       suggestKeywords(['TABLE', 'VIEW']);
+       parser.suggestKeywords(['TABLE', 'VIEW']);
      }
    
 break;
 case 1583: case 2904:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
    
 break;
 case 1584: case 1645: case 2090: case 2448: case 2878: case 2894: case 2896:
 
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    
 break;
 case 1588:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1]) {
-       suggestKeywords(['PARTITION', 'REBUILD']);
+       parser.suggestKeywords(['PARTITION', 'REBUILD']);
      } else {
-       suggestKeywords(['REBUILD']);
+       parser.suggestKeywords(['REBUILD']);
      }
    
 break;
 case 1602:
 
-     if (isHive()) {
+     if (parser.isHive()) {
        if (!$$[$0-1]) {
-         suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+         parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
        } else {
-         suggestKeywords(['PARTITION']);
+         parser.suggestKeywords(['PARTITION']);
        }
-     } else if (isImpala()) {
-       suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      }
    
 break;
 case 1603: case 1614: case 1820:
 
-     suggestKeywords(['COLUMNS']);
+     parser.suggestKeywords(['COLUMNS']);
    
 break;
 case 1607:
 
-     if (isHive()) {
+     if (parser.isHive()) {
        if (!$$[$0-2] && !$$[$0-1]) {
-         suggestKeywords(['LOCATION', 'PARTITION']);
+         parser.suggestKeywords(['LOCATION', 'PARTITION']);
        } else if ($$[$0-1] && $$[$0-1].suggestKeywords) {
-         var keywords = createWeightedKeywords($$[$0-1].suggestKeywords, 2);
+         var keywords = parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2);
          keywords.push({ value: 'PARTITION', weight: 1 });
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        } else {
-         suggestKeywords(['PARTITION']);
+         parser.suggestKeywords(['PARTITION']);
        }
      }
    
 break;
 case 1612:
 
-     if (isHive()) {
-       suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
          'CLUSTERED BY', 'CONCATENATE', 'COMPACT', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP', 'ENABLE NO_DROP',
          'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES', 'PARTITION',
          'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
          'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
-     } else if (isImpala()) {
-       suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION',
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION',
          'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES',
          'SET TBLPROPERTIES', 'SET UNCACHED']);
      }
@@ -2650,175 +2650,175 @@ case 1612:
 break;
 case 1613:
 
-     if (isHive()) {
-       suggestKeywords(['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
          'ENABLE NO_DROP', 'ENABLE OFFLINE', 'RENAME TO PARTITION', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION',
          'SET SERDE', 'SET SERDEPROPERTIES']);
-     } else if (isImpala()) {
-       suggestKeywords(['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES',
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES',
          'SET UNCACHED']);
      }
    
 break;
 case 1615:
 
-      if (isHive()) {
-        suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
-      } else if (isImpala()) {
-        suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
+      } else if (parser.isImpala()) {
+        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
       }
     
 break;
 case 1616:
 
-      if (isHive()) {
-        suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
-      } else if (isImpala()) {
-        suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+      } else if (parser.isImpala()) {
+        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
       }
     
 break;
 case 1618: case 1789: case 2487: case 2503:
 
-     suggestKeywords(['TO']);
+     parser.suggestKeywords(['TO']);
    
 break;
 case 1630: case 1638: case 1648: case 1679: case 2947:
 
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    
 break;
 case 1634:
 
-     if (isHive()) {
-       suggestKeywords(['SKEWED', 'STORED AS DIRECTORIES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['SKEWED', 'STORED AS DIRECTORIES']);
      }
    
 break;
 case 1635: case 1775:
 
-     suggestKeywords(['AS DIRECTORIES']);
+     parser.suggestKeywords(['AS DIRECTORIES']);
    
 break;
 case 1636: case 1776:
 
-     suggestKeywords(['DIRECTORIES']);
+     parser.suggestKeywords(['DIRECTORIES']);
    
 break;
 case 1637:
 
-     suggestKeywords(['TO PARTITION']);
+     parser.suggestKeywords(['TO PARTITION']);
    
 break;
 case 1639: case 2028:
 
-     suggestKeywords(['PARTITIONS']);
+     parser.suggestKeywords(['PARTITIONS']);
    
 break;
 case 1640: case 2204: case 2223:
 
-     suggestKeywords(['LOCATION']);
+     parser.suggestKeywords(['LOCATION']);
    
 break;
 case 1646:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['STORED AS DIRECTORIES']);
+       parser.suggestKeywords(['STORED AS DIRECTORIES']);
      }
    
 break;
 case 1663:
 
-     if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['COLUMN']);
+     if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords(['COLUMN']);
      }
-     suggestColumns();
+     parser.suggestColumns();
    
 break;
 case 1665:
 
-     if (isHive() && !$$[$0-2] && !$$[$0-1]) {
+     if (parser.isHive() && !$$[$0-2] && !$$[$0-1]) {
        if ($$[$0-3].suggestKeywords) {
-         var keywords = createWeightedKeywords($$[$0-3].suggestKeywords, 3);
+         var keywords = parser.createWeightedKeywords($$[$0-3].suggestKeywords, 3);
          keywords = keywords.concat([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        } else {
-         suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
+         parser.suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
        }
-     } else if (isHive() && $$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     } else if (parser.isHive() && $$[$0-2] && !$$[$0-1]) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    
 break;
 case 1667:
 
-     suggestKeywords(['NO_DROP', 'OFFLINE']);
+     parser.suggestKeywords(['NO_DROP', 'OFFLINE']);
    
 break;
 case 1668: case 2110:
 
-     suggestFileFormats();
+     parser.suggestFileFormats();
    
 break;
 case 1671:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['WITH SERDEPROPERTIES']);
+       parser.suggestKeywords(['WITH SERDEPROPERTIES']);
      }
    
 break;
 case 1675:
 
-     if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    
 break;
 case 1680:
 
-     suggestKeywords(['WITH TABLE']);
+     parser.suggestKeywords(['WITH TABLE']);
    
 break;
 case 1681: case 1796: case 1802: case 2307: case 2331: case 2462: case 2771: case 2780: case 2853: case 2882:
 
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    
 break;
 case 1696:
 
-     if (isHive()) {
-       suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
-     } else if (isImpala()) {
-       suggestKeywords(['COLUMN', 'PARTITION']);
-       suggestColumns();
+     if (parser.isHive()) {
+       parser.suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['COLUMN', 'PARTITION']);
+       parser.suggestColumns();
      }
    
 break;
 case 1698:
 
-     if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['PURGE']);
+     if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords(['PURGE']);
      }
    
 break;
 case 1699:
 
-     if (isHive()) {
-       suggestKeywords(['EXISTS']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['EXISTS']);
      }
    
 break;
 case 1700:
 
-      if (isHive()) {
-        suggestKeywords(['PARTITION']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['PARTITION']);
       }
     
 break;
 case 1702:
 
-     if (isHive() && !$$[$0-3]) {
-       suggestKeywords(['PURGE']);
+     if (parser.isHive() && !$$[$0-3]) {
+       parser.suggestKeywords(['PURGE']);
      }
    
 break;
@@ -2831,14 +2831,14 @@ case 1707: case 1804: case 2442:
 break;
 case 1708: case 1797: case 1803:
 
-     suggestTables({ onlyTables: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 1740: case 1741: case 1742:
 
-     if (isHive()) {
-       suggestKeywords(['PARTITION']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
@@ -2851,19 +2851,19 @@ case 1758:
 break;
 case 1785:
 
-     if (isHive()) {
-       suggestKeywords(['AS', 'SET TBLPROPERTIES']);
-     } else if (isImpala()) {
-       suggestKeywords(['AS', 'RENAME TO']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['AS', 'SET TBLPROPERTIES']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AS', 'RENAME TO']);
      } else {
-       suggestKeywords(['AS']);
+       parser.suggestKeywords(['AS']);
      }
    
 break;
 case 1786:
 
-     if (isHive()) {
-       suggestKeywords(['TBLPROPERTIES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['TBLPROPERTIES']);
      }
    
 break;
@@ -2876,139 +2876,139 @@ case 1792: case 1798: case 2460:
 break;
 case 1793:
 
-     suggestTables({ onlyViews: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 1795:
 
-     suggestKeywords(['REPAIR TABLE']);
+     parser.suggestKeywords(['REPAIR TABLE']);
    
 break;
 case 1800: case 2215: case 2414:
 
-     suggestKeywords(['FUNCTION']);
+     parser.suggestKeywords(['FUNCTION']);
    
 break;
 case 1801:
 
-     addTablePrimary($$[$0-6]);
+     parser.addTablePrimary($$[$0-6]);
    
 break;
 case 1806:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1]) {
-       suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'COMPUTE STATISTICS', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'PARTITION', weight: 2 }, { value: 'COMPUTE STATISTICS', weight: 1 }]);
      } else {
-       suggestKeywords(['COMPUTE STATISTICS']);
+       parser.suggestKeywords(['COMPUTE STATISTICS']);
      }
    
 break;
 case 1807:
 
-     addTablePrimary($$[$0-3]);
-     suggestKeywords(['STATISTICS']);
+     parser.addTablePrimary($$[$0-3]);
+     parser.suggestKeywords(['STATISTICS']);
    
 break;
 case 1808:
 
-     addTablePrimary($$[$0-7]);
-     suggestKeywords(getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [{ value: 'FOR COLUMNS', weight: 3 }, { value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
+     parser.addTablePrimary($$[$0-7]);
+     parser.suggestKeywords(parser.getKeywordsForOptionalsLR([$$[$0-2], $$[$0-1], $$[$0]], [{ value: 'FOR COLUMNS', weight: 3 }, { value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
    
 break;
 case 1809:
 
-     addTablePrimary($$[$0-7]);
-     suggestKeywords(getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
+     parser.addTablePrimary($$[$0-7]);
+     parser.suggestKeywords(parser.getKeywordsForOptionalsLR([$$[$0-1], $$[$0]], [{ value: 'CACHE METADATA', weight: 2 }, { value: 'NOSCAN', weight: 1 }]));
    
 break;
 case 1810:
 
-     addTablePrimary($$[$0-7]);
-     suggestKeywords(getKeywordsForOptionalsLR([$$[$0]], [{ value: 'NOSCAN', weight: 1 }]));
+     parser.addTablePrimary($$[$0-7]);
+     parser.suggestKeywords(parser.getKeywordsForOptionalsLR([$$[$0]], [{ value: 'NOSCAN', weight: 1 }]));
    
 break;
 case 1811:
 
-     suggestKeywords(['TABLE']);
-     addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['TABLE']);
+     parser.addTablePrimary($$[$0-1]);
    
 break;
 case 1812:
 
-     suggestKeywords(['TABLE']);
-     addTablePrimary($$[$0-6]);
+     parser.suggestKeywords(['TABLE']);
+     parser.addTablePrimary($$[$0-6]);
    
 break;
 case 1824: case 1832:
 
-     suggestKeywords(['METADATA']);
+     parser.suggestKeywords(['METADATA']);
    
 break;
 case 1835:
 
-     addTablePrimary($$[$0]);
-     suggestKeywords(['METADATA']);
+     parser.addTablePrimary($$[$0]);
+     parser.suggestKeywords(['METADATA']);
    
 break;
 case 1838:
 
-     suggestKeywords(['STATS', 'INCREMENTAL STATS']);
+     parser.suggestKeywords(['STATS', 'INCREMENTAL STATS']);
    
 break;
 case 1841:
 
-     addTablePrimary($$[$0-1]);
-     suggestKeywords(['STATS', 'INCREMENTAL STATS']);
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['STATS', 'INCREMENTAL STATS']);
    
 break;
 case 1842: case 2432:
 
-     addTablePrimary($$[$0-1]);
-     suggestKeywords(['INCREMENTAL']);
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['INCREMENTAL']);
    
 break;
 case 1843: case 2433: case 2837: case 2948:
 
-     suggestKeywords(['STATS']);
+     parser.suggestKeywords(['STATS']);
    
 break;
 case 1844:
 
-     addTablePrimary($$[$0-1]);
-     suggestKeywords(['STATS']);
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['STATS']);
    
 break;
 case 1847:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0]) {
-       suggestKeywords(['PARTITION']);
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 1862:
 
      if ($$[$0-1]) {
-       suggestKeywords(['TABLE']);
-     } else if (isHive()) {
+       parser.suggestKeywords(['TABLE']);
+     } else if (parser.isHive()) {
        if ($$[$0-2]) {
-         suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
+         parser.suggestKeywords(['EXTERNAL TABLE', 'FUNCTION', 'MACRO', 'TABLE']);
        } else {
-         suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'VIEW']);
+         parser.suggestKeywords(['DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY EXTERNAL TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'TEMPORARY TABLE', 'VIEW']);
        }
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'EXTERNAL TABLE', 'FUNCTION', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
      } else {
-       suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
+       parser.suggestKeywords(['DATABASE', 'ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
      }
    
 break;
 case 1865:
 
      var keywords = [];
-     if (!$$[$0] && isHive()) {
+     if (!$$[$0] && parser.isHive()) {
        keywords.push('WITH DBPROPERTIES');
      }
      if (!$$[$0-1] && !$$[$0]) {
@@ -3018,13 +3018,13 @@ case 1865:
        keywords.push('COMMENT');
      }
      if (keywords.length > 0) {
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
    
 break;
 case 1884:
 
-     suggestKeywords(['DBPROPERTIES']);
+     parser.suggestKeywords(['DBPROPERTIES']);
    
 break;
 case 1903:
@@ -3033,7 +3033,7 @@ case 1903:
      var keywords = [];
      if (!$$[$0-10] && !$$[$0-9] && !$$[$0-8] && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
        keywords.push({ value: 'LIKE', weight: 1 });
-       if (isImpala()) {
+       if (parser.isImpala()) {
          keywords.push({ value: 'LIKE PARQUET', weight: 1 });
        }
      } else {
@@ -3042,29 +3042,29 @@ case 1903:
        }
        if (!$$[$0-8] && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'PARTITIONED BY', weight: 9 });
-         if (isImpala()) {
+         if (parser.isImpala()) {
            keywords.push({ value: 'PARTITION BY', weight: 9 });
          }
        }
-       if (isImpala() && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
+       if (parser.isImpala() && !$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'WITH SERDEPROPERTIES', weight: 8 });
        }
-       if (isHive() && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
+       if (parser.isHive() && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'CLUSTERED BY', weight: 7 });
        }
-       if (isHive() && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
+       if (parser.isHive() && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'SKEWED BY', weight: 6 });
-       } else if (isHive() && $$[$0-5] && $$[$0-5].suggestKeywords && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords = keywords.concat(createWeightedKeywords($$[$0-5].suggestKeywords, 6)); // Get the last optional from SKEWED BY
+       } else if (parser.isHive() && $$[$0-5] && $$[$0-5].suggestKeywords && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
+         keywords = keywords.concat(parser.createWeightedKeywords($$[$0-5].suggestKeywords, 6)); // Get the last optional from SKEWED BY
        }
        if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'ROW FORMAT', weight: 5 });
          keywords.push({ value: 'STORED AS', weight: 5 });
-         if (isHive()) {
+         if (parser.isHive()) {
            keywords.push({ value: 'STORED BY', weight: 5 });
          }
        } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-         keywords = keywords.concat(createWeightedKeywords($$[$0-4].suggestKeywords, 5));
+         keywords = keywords.concat(parser.createWeightedKeywords($$[$0-4].suggestKeywords, 5));
        }
        if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'LOCATION', weight: 4 });
@@ -3072,47 +3072,47 @@ case 1903:
        if (!$$[$0-2] && !$$[$0-1]) {
          keywords.push({ value: 'TBLPROPERTIES', weight: 3 });
        }
-       if (isImpala() && !$$[$0-1]) {
+       if (parser.isImpala() && !$$[$0-1]) {
          keywords.push({ value: 'CACHED IN', weight: 2 });
        }
        keywords.push({ value: 'AS', weight: 1 });
      }
 
      if (keywords.length > 0) {
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
    
 break;
 case 1913:
 
-     suggestTables();
-     suggestDatabases({ appendDot: true });
-     if (isImpala()) {
-       suggestKeywords(['PARQUET']);
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['PARQUET']);
      }
    
 break;
 case 1925:
 
-     if (isImpala()) {
-       suggestKeywords(['PRIMARY KEY']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['PRIMARY KEY']);
      }
    
 break;
 case 1926: case 1928: case 2082:
 
-     checkForKeywords($$[$0-1]);
+     parser.checkForKeywords($$[$0-1]);
    
 break;
 case 1927: case 1929:
 
-     checkForKeywords($$[$0-3]);
+     parser.checkForKeywords($$[$0-3]);
    
 break;
 case 1930:
 
      var keywords = [];
-     if (isImpala()) {
+     if (parser.isImpala()) {
        if (!$$[$0]['primary']) {
          keywords.push('PRIMARY KEY');
        }
@@ -3143,7 +3143,7 @@ case 1930:
 break;
 case 1931: case 1967: case 1973: case 1974: case 1987: case 1990: case 2002: case 2004: case 2357:
 
-     suggestKeywords(getColumnDataTypeKeywords());
+     parser.suggestKeywords(parser.getColumnDataTypeKeywords());
    
 break;
 case 1936:
@@ -3180,95 +3180,95 @@ this.$ = 'comment';
 break;
 case 1951:
 
-     if (isImpala()) {
-       suggestKeywords(['NULL']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['NULL']);
      }
    
 break;
 case 1972: case 2249: case 2260:
 
-     suggestKeywords(getTypeKeywords());
+     parser.suggestKeywords(parser.getTypeKeywords());
    
 break;
 case 1986: case 1989:
 
-     suggestKeywords(['COMMENT']);
+     parser.suggestKeywords(['COMMENT']);
    
 break;
 case 2013:
 
-     suggestKeywords(['KEY']);
+     parser.suggestKeywords(['KEY']);
    
 break;
 case 2024:
 
-     suggestKeywords(['HASH', 'RANGE']);
+     parser.suggestKeywords(['HASH', 'RANGE']);
    
 break;
 case 2031: case 2036: case 2037:
 
-     if (isImpala()) {
-       suggestKeywords(['PARTITION']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 2044:
 
-     if (isImpala()) {
-       suggestKeywords(['VALUE', 'VALUES']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['VALUE', 'VALUES']);
      }
    
 break;
 case 2045:
 
-     suggestKeywords(['=']);
+     parser.suggestKeywords(['=']);
    
 break;
 case 2046: case 2345: case 2733:
 
-     suggestFunctions();
+     parser.suggestFunctions();
    
 break;
 case 2047:
 
-     if ($$[$0].endsWithLessThanOrEqual && isImpala()) {
-      suggestKeywords(['VALUES']);
+     if ($$[$0].endsWithLessThanOrEqual && parser.isImpala()) {
+      parser.suggestKeywords(['VALUES']);
      }
    
 break;
 case 2048: case 2051: case 2054:
 
-     if (isImpala()) {
-       suggestKeywords(['<', '<=']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['<', '<=']);
      }
    
 break;
 case 2049:
 
-    if (isImpala()) {
-      suggestKeywords(['VALUES']);
+    if (parser.isImpala()) {
+      parser.suggestKeywords(['VALUES']);
     }
    
 break;
 case 2052: case 2055:
 
-     if (isImpala()) {
-      suggestFunctions();
+     if (parser.isImpala()) {
+      parser.suggestFunctions();
      }
    
 break;
 case 2065:
 
      if (!$$[$0-1]) {
-       suggestKeywords([{ value: 'INTO', weight: 1 }, { value: 'SORTED BY', weight: 2 }]);
+       parser.suggestKeywords([{ value: 'INTO', weight: 1 }, { value: 'SORTED BY', weight: 2 }]);
      } else {
-       suggestKeywords(['INTO']);
+       parser.suggestKeywords(['INTO']);
      }
    
 break;
 case 2066:
 
-     suggestKeywords(['BUCKETS']);
+     parser.suggestKeywords(['BUCKETS']);
    
 break;
 case 2087:
@@ -3276,7 +3276,7 @@ this.$ = { suggestKeywords: ['STORED AS DIRECTORIES'] };
 break;
 case 2097:
 
-     this.$ = mergeSuggestKeywords($$[$0-1], $$[$0])
+     this.$ = parser.mergeSuggestKeywords($$[$0-1], $$[$0])
    
 break;
 case 2098:
@@ -3288,24 +3288,24 @@ case 2098:
 break;
 case 2099:
 
-     if (isHive()) {
-       suggestKeywords(['AS', 'BY']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['AS', 'BY']);
      } else {
-       suggestKeywords(['AS']);
+       parser.suggestKeywords(['AS']);
      }
    
 break;
 case 2101:
 
-     suggestKeywords(['FORMAT']);
+     parser.suggestKeywords(['FORMAT']);
    
 break;
 case 2102:
 
-     if (isHive()) {
-       suggestKeywords(['DELIMITED', 'SERDE']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['DELIMITED', 'SERDE']);
      } else {
-       suggestKeywords(['DELIMITED']);
+       parser.suggestKeywords(['DELIMITED']);
      }
    
 break;
@@ -3324,7 +3324,7 @@ case 2131:
      if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 5 }, { value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]};
      } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
-       this.$ = { suggestKeywords: createWeightedKeywords($$[$0-4].suggestKeywords, 5).concat([{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]) };
+       this.$ = { suggestKeywords: parser.createWeightedKeywords($$[$0-4].suggestKeywords, 5).concat([{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }]) };
      } else if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: [{ value: 'COLLECTION ITEMS TERMINATED BY', weight: 4 }, { value: 'MAP KEYS TERMINATED BY', weight: 3 }, { value: 'LINES TERMINATED BY', weight: 2 }, { value: 'NULL DEFINED AS', weight: 1 }] };
      } else if (!$$[$0-2] && !$$[$0-1] && !$$[$0]) {
@@ -3341,7 +3341,7 @@ case 2137:
      if (!$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: [{ value: 'FIELDS TERMINATED BY', weight: 2 }, { value: 'LINES TERMINATED BY', weight: 1 }] };
      } else if ($$[$0-1] && $$[$0-1].suggestKeywords && !$$[$0]) {
-       this.$ = { suggestKeywords: createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat(['LINES TERMINATED BY']) };
+       this.$ = { suggestKeywords: parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat(['LINES TERMINATED BY']) };
      } else if (!$$[$0]) {
        this.$ = { suggestKeywords: [{ value: 'LINES TERMINATED BY', weight: 1 }] };
      }
@@ -3352,395 +3352,395 @@ this.$ = { suggestKeywords: ['ESCAPED BY'] };
 break;
 case 2143: case 2149: case 2154: case 2158:
 
-     suggestKeywords(['TERMINATED BY']);
+     parser.suggestKeywords(['TERMINATED BY']);
    
 break;
 case 2148:
 
-     suggestKeywords(['ITEMS TERMINATED BY']);
+     parser.suggestKeywords(['ITEMS TERMINATED BY']);
    
 break;
 case 2153:
 
-     suggestKeywords(['KEYS TERMINATED BY']);
+     parser.suggestKeywords(['KEYS TERMINATED BY']);
    
 break;
 case 2162:
 
-     suggestKeywords(['DEFINED AS']);
+     parser.suggestKeywords(['DEFINED AS']);
    
 break;
 case 2168: case 2169:
 
-     suggestKeywords(['SERDEPROPERTIES']);
+     parser.suggestKeywords(['SERDEPROPERTIES']);
    
 break;
 case 2179:
 
-     commitLocations();
+     parser.commitLocations();
    
 break;
 case 2183:
 
-     suggestKeywords(['IN']);
+     parser.suggestKeywords(['IN']);
    
 break;
 case 2185: case 2201: case 2217:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 2186:
 
      if (!$$[$0-7]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
    
 break;
 case 2188:
 
-     if (isHive() && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
-     } else if (isHive() && !$$[$0-1]) {
-       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
+     if (parser.isHive() && !$$[$0-2] && !$$[$0-1]) {
+       parser.suggestKeywords([{ value: 'COMMENT', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
+     } else if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, {value: 'AS', weight: 1 }]);
      } else {
-       suggestKeywords([{value: 'AS', weight: 1 }]);
+       parser.suggestKeywords([{value: 'AS', weight: 1 }]);
      }
    
 break;
 case 2202:
 
      if (!$$[$0-6]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
    
 break;
 case 2203: case 2222:
 
-     suggestKeywords(['RETURNS']);
+     parser.suggestKeywords(['RETURNS']);
    
 break;
 case 2205:
 
-     suggestKeywords(['SYMBOL']);
+     parser.suggestKeywords(['SYMBOL']);
    
 break;
 case 2216:
 
      if (!$$[$0-12]) {
-       suggestKeywords(['IF NOT EXISTS']);
+       parser.suggestKeywords(['IF NOT EXISTS']);
      }
    
 break;
 case 2224:
 
      if (!$$[$0-1]) {
-       suggestKeywords([{value: 'INIT_FN', weight: 2 }, {value: 'UPDATE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'INIT_FN', weight: 2 }, {value: 'UPDATE_FN', weight: 1 }]);
      } else {
-       suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'UPDATE_FN', weight: 1 }]);
      }
    
 break;
 case 2225:
 
-     suggestKeywords(['MERGE_FN']);
+     parser.suggestKeywords(['MERGE_FN']);
    
 break;
 case 2226:
 
      if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{value: 'PREPARE_FN', weight: 4 }, {value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'PREPARE_FN', weight: 4 }, {value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'CLOSE_FN', weight: 3 }, {value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'SERIALIZE_FN', weight: 2 }, {value: 'FINALIZE_FN', weight: 1 }]);
      } else if ($$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{value: 'FINALIZE_FN', weight: 1 }]);
+       parser.suggestKeywords([{value: 'FINALIZE_FN', weight: 1 }]);
      }
    
 break;
 case 2244:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['USING']);
+       parser.suggestKeywords(['USING']);
      } else {
-       suggestKeywords(['ARCHIVE', 'FILE', 'JAR']);
+       parser.suggestKeywords(['ARCHIVE', 'FILE', 'JAR']);
      }
    
 break;
 case 2250:
 
-     suggestKeywords(['...']);
+     parser.suggestKeywords(['...']);
    
 break;
 case 2282:
 
-     suggestFunctions();
-     suggestAggregateFunctions();
-     suggestAnalyticFunctions();
+     parser.suggestFunctions();
+     parser.suggestAggregateFunctions();
+     parser.suggestAnalyticFunctions();
    
 break;
 case 2285:
 
-     suggestKeywords(['ARCHIVE', 'FILE', 'JAR']);
+     parser.suggestKeywords(['ARCHIVE', 'FILE', 'JAR']);
    
 break;
 case 2306:
 
-     suggestKeywords(['ON TABLE']);
+     parser.suggestKeywords(['ON TABLE']);
    
 break;
 case 2312: case 2322:
 
-     suggestKeywords(['\'BITMAP\'', '\'COMPACT\'']);
+     parser.suggestKeywords(['\'BITMAP\'', '\'COMPACT\'']);
    
 break;
 case 2320:
 
      if (!$$[$0-7] && !$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'WITH DEFERRED REBUILD', weight: 7 }, { value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'WITH DEFERRED REBUILD', weight: 7 }, { value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-6] && !$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IDXPROPERTIES', weight: 6 }, { value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-5] && !$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IN TABLE', weight: 5 }, { value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-4] && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'ROW FORMAT', weight: 4 }, { value: 'STORED AS', weight: 4 }, { value: 'STORED BY', weight: 4 }, { value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if ($$[$0-4] && $$[$0-4].suggestKeywords && !$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords(createWeightedKeywords($$[$0-4].suggestKeywords, 4).concat([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]));
+       parser.suggestKeywords(parser.createWeightedKeywords($$[$0-4].suggestKeywords, 4).concat([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]));
      } else if (!$$[$0-3] && !$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'LOCATION', weight: 3 }, { value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-2] && !$$[$0-1]) {
-       suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'TBLPROPERTIES', weight: 2 }, { value: 'COMMENT', weight: 1 }]);
      } else if (!$$[$0-1]) {
-       suggestKeywords([{ value: 'COMMENT', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'COMMENT', weight: 1 }]);
      }
    
 break;
 case 2325:
 
-     suggestKeywords(['DEFERRED REBUILD']);
+     parser.suggestKeywords(['DEFERRED REBUILD']);
    
 break;
 case 2326:
 
-     suggestKeywords(['REBUILD']);
+     parser.suggestKeywords(['REBUILD']);
    
 break;
 case 2369: case 2371:
 
-     addCommonTableExpressions($$[$0-1]);
+     parser.addCommonTableExpressions($$[$0-1]);
    
 break;
 case 2394:
 
-     if (isHive()) {
-       suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['DATABASE', 'FUNCTION', 'INDEX', 'ROLE', 'SCHEMA', 'TABLE', 'TEMPORARY FUNCTION', 'TEMPORARY MACRO', 'VIEW']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTION', 'DATABASE', 'FUNCTION', 'INCREMENTAL STATS', 'ROLE', 'SCHEMA', 'STATS', 'TABLE', 'VIEW']);
      } else {
-       suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
+       parser.suggestKeywords(['ROLE', 'SCHEMA', 'TABLE', 'VIEW']);
      }
    
 break;
 case 2398:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestDatabases();
+     parser.suggestDatabases();
    
 break;
 case 2399:
 
-     if (isHive()) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    
 break;
 case 2401: case 2410: case 2415:
 
      if (!$$[$0-3]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    
 break;
 case 2408: case 2409:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 2412:
 
-     suggestKeywords(['AGGREGATE']);
+     parser.suggestKeywords(['AGGREGATE']);
    
 break;
 case 2421: case 2453:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    
 break;
 case 2422:
 
      if (!$$[$0-2]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    
 break;
 case 2431:
 
-     addTablePrimary($$[$0]);
-     suggestKeywords(['INCREMENTAL']);
+     parser.addTablePrimary($$[$0]);
+     parser.suggestKeywords(['INCREMENTAL']);
    
 break;
 case 2437: case 2919:
 
-     addTablePrimary($$[$0-1]);
-     suggestKeywords(['PARTITION']);
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['PARTITION']);
    
 break;
 case 2441:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestTables({ onlyTables: true });
-     suggestDatabases({
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({
        appendDot: true
      });
    
 break;
 case 2444:
 
-     addTablePrimary($$[$0-1]);
-     if (isHive()) {
-       suggestKeywords(['PURGE']);
+     parser.addTablePrimary($$[$0-1]);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PURGE']);
      }
    
 break;
 case 2446:
 
-     suggestKeywords(['IF EXISTS']);
+     parser.suggestKeywords(['IF EXISTS']);
    
 break;
 case 2452:
 
-     suggestKeywords(['MACRO']);
+     parser.suggestKeywords(['MACRO']);
    
 break;
 case 2456:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
-     suggestTables({ onlyViews: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 2457:
 
-     addTablePrimary($$[$0]);
+     parser.addTablePrimary($$[$0]);
      if (!$$[$0-2]) {
-       suggestKeywords(['IF EXISTS']);
+       parser.suggestKeywords(['IF EXISTS']);
      }
    
 break;
 case 2465:
 
-     addTablePrimary($$[$0-2]);
-     if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['PARTITION']);
+     parser.addTablePrimary($$[$0-2]);
+     if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 2468: case 2600: case 2605: case 2608: case 2612: case 2620:
 
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    
 break;
 case 2470:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0]) {
-       suggestKeywords(['WHERE']);
+       parser.suggestKeywords(['WHERE']);
      }
    
 break;
 case 2479:
 
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
    
 break;
 case 2482:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['ON', 'TO']);
+       parser.suggestKeywords(['ON', 'TO']);
      } else {
-       suggestKeywords(['TO']);
+       parser.suggestKeywords(['TO']);
      }
    
 break;
 case 2483: case 2488: case 2492: case 2555: case 2556: case 2557: case 2587: case 2595: case 2598: case 2601: case 2606: case 2609:
 
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    
 break;
 case 2485: case 2505: case 2507:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['WITH GRANT OPTION']);
+       parser.suggestKeywords(['WITH GRANT OPTION']);
      }
    
 break;
 case 2490: case 2494:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['WITH ADMIN OPTION']);
+       parser.suggestKeywords(['WITH ADMIN OPTION']);
      }
    
 break;
 case 2496: case 2613:
 
-     suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
    
 break;
 case 2497:
 
-     suggestKeywords(['TO GROUP']);
+     parser.suggestKeywords(['TO GROUP']);
    
 break;
 case 2498: case 2615: case 2930: case 2931:
 
-     suggestKeywords(['GROUP']);
+     parser.suggestKeywords(['GROUP']);
    
 break;
 case 2500: case 2617:
 
-     suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
    
 break;
 case 2501: case 2618:
 
-     suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
    
 break;
 case 2504: case 2604: case 2621: case 2883:
 
-     suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['ROLE']);
    
 break;
 case 2511:
 
-     suggestKeywords(['DATABASE', 'TABLE']);
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestKeywords(['DATABASE', 'TABLE']);
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 2527:
@@ -3752,80 +3752,80 @@ case 2527:
 break;
 case 2533: case 2534: case 2535: case 2591:
 
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
    
 break;
 case 2566:
 
-     suggestKeywords(['GRANT OPTION']);
+     parser.suggestKeywords(['GRANT OPTION']);
    
 break;
 case 2567: case 2568: case 2572: case 2624:
 
-     suggestKeywords(['OPTION']);
+     parser.suggestKeywords(['OPTION']);
    
 break;
 case 2571:
 
-     suggestKeywords(['ADMIN OPTION']);
+     parser.suggestKeywords(['ADMIN OPTION']);
    
 break;
 case 2583:
 
-     suggestKeywords(['ADMIN OPTION FOR', 'ALL', 'ALL GRANT OPTION FROM', 'ALL PRIVILEGES FROM', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'GRANT OPTION FOR', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
+     parser.suggestKeywords(['ADMIN OPTION FOR', 'ALL', 'ALL GRANT OPTION FROM', 'ALL PRIVILEGES FROM', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'GRANT OPTION FOR', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
    
 break;
 case 2586:
 
      if (!$$[$0-1]) {
        if ($$[$0-2].singleAll) {
-         suggestKeywords(['FROM', 'GRANT OPTION', 'ON', 'PRIVILEGES FROM']);
+         parser.suggestKeywords(['FROM', 'GRANT OPTION', 'ON', 'PRIVILEGES FROM']);
        } else {
-         suggestKeywords(['FROM', 'ON']);
+         parser.suggestKeywords(['FROM', 'ON']);
        }
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    
 break;
 case 2589:
 
-     suggestKeywords(['OPTION FOR']);
+     parser.suggestKeywords(['OPTION FOR']);
    
 break;
 case 2590: case 2603:
 
-     suggestKeywords(['FOR']);
+     parser.suggestKeywords(['FOR']);
    
 break;
 case 2594:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['FROM', 'ON']);
+       parser.suggestKeywords(['FROM', 'ON']);
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    
 break;
 case 2597:
 
      if ($$[$0-1].toUpperCase() === 'ADMIN') {
-       suggestKeywords(['FROM', 'OPTION FOR']);
+       parser.suggestKeywords(['FROM', 'OPTION FOR']);
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    
 break;
 case 2614:
 
-     suggestKeywords(['FROM GROUP']);
+     parser.suggestKeywords(['FROM GROUP']);
    
 break;
 case 2634:
 
      var keywords = [];
      if ($$[$0-1].suggestKeywords) {
-       keywords = createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]);
+       keywords = parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]);
      } else {
        keywords = ['SELECT'];
      }
@@ -3833,7 +3833,7 @@ case 2634:
        keywords.push({ weight: 1.1, value: 'VALUES' });
      }
      if (keywords.length > 0) {
-       suggestKeywords(keywords);
+       parser.suggestKeywords(keywords);
      }
    
 break;
@@ -3847,19 +3847,19 @@ case 2637:
 break;
 case 2641:
 
-     suggestKeywords(['INSERT INTO', 'INSERT OVERWRITE', 'SELECT']);
+     parser.suggestKeywords(['INSERT INTO', 'INSERT OVERWRITE', 'SELECT']);
    
 break;
 case 2642:
 
      if ($$[$0-1].cursorAtEnd) {
-       checkForSelectListKeywords($$[$0-1]);
+       parser.checkForSelectListKeywords($$[$0-1]);
        var keywords = parser.yy.result.suggestKeywords || [];
        if ($$[$0].suggestKeywords) {
          keywords = keywords.concat($$[$0].suggestKeywords);
        }
        if (keywords.length > 0) {
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        }
      }
      delete parser.yy.result.suggestTables;
@@ -3869,14 +3869,14 @@ break;
 case 2643:
 
      if ($$[$0].cursorAtStart) {
-       checkForSelectListKeywords($$[$0-1].tableExpression);
+       parser.checkForSelectListKeywords($$[$0-1].tableExpression);
      }
    
 break;
 case 2644:
 
      $$[$0-2].owner = 'insert';
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: ['PARTITION'] }
      } else if (!$$[$0]) {
@@ -3905,7 +3905,7 @@ break;
 case 2647:
 
      $$[$0-2].owner = 'insert';
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1] && !$$[$0]) {
        this.$ = { suggestKeywords: ['PARTITION'], addValues: true };
      } else if (!$$[$0]) {
@@ -3915,16 +3915,16 @@ case 2647:
 break;
 case 2648:
 
-     suggestKeywords(['OVERWRITE', 'INTO']);
+     parser.suggestKeywords(['OVERWRITE', 'INTO']);
    
 break;
 case 2649:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE']);
+       parser.suggestKeywords(['DIRECTORY', 'LOCAL DIRECTORY', 'TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
      this.$ = { keepTables: true }
    
 break;
@@ -3936,7 +3936,7 @@ break;
 case 2651: case 2662: case 2663: case 2717: case 2718:
 
      $$[$0-2].owner = 'insert';
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.owner = 'insert';
      }
@@ -3945,43 +3945,43 @@ break;
 case 2652: case 2677:
 
      $$[$0-2].owner = 'insert';
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
    
 break;
 case 2653:
 
-     suggestKeywords(['DIRECTORY']);
+     parser.suggestKeywords(['DIRECTORY']);
    
 break;
 case 2660:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
      this.$ = { keepTables: true }
    
 break;
 case 2673:
 
      if ($$[$0-1].suggestKeywords) {
-       suggestKeywords(createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]));
+       parser.suggestKeywords(parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat([{ value: 'SELECT', weight: 1}]));
      } else {
-       suggestKeywords(['SELECT']);
+       parser.suggestKeywords(['SELECT']);
      }
    
 break;
 case 2674:
 
      if ($$[$0-1].cursorAtEnd) {
-       checkForSelectListKeywords($$[$0-1]);
+       parser.checkForSelectListKeywords($$[$0-1]);
        var keywords = parser.yy.result.suggestKeywords || [];
        if ($$[$0].suggestKeywords) {
          keywords = keywords.concat($$[$0].suggestKeywords);
        }
        if (keywords.length > 0) {
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        }
      }
    
@@ -3989,38 +3989,38 @@ break;
 case 2676:
 
      $$[$0-3].owner = 'insert';
-     addTablePrimary($$[$0-3]);
+     parser.addTablePrimary($$[$0-3]);
    
 break;
 case 2678:
 
-     suggestKeywords(['INTO']);
+     parser.suggestKeywords(['INTO']);
    
 break;
 case 2679: case 2714:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    
 break;
 case 2681:
 
      $$[$0-1].owner = 'insert';
-     addTablePrimary($$[$0-1]);
-     suggestKeywords(['VALUES']);
+     parser.addTablePrimary($$[$0-1]);
+     parser.suggestKeywords(['VALUES']);
    
 break;
 case 2692:
 
-     suggestKeywords(['FORMAT DELIMITED']);
+     parser.suggestKeywords(['FORMAT DELIMITED']);
    
 break;
 case 2693:
 
-     suggestKeywords(['DELIMITED']);
+     parser.suggestKeywords(['DELIMITED']);
    
 break;
 case 2696:
@@ -4031,7 +4031,7 @@ case 2696:
 break;
 case 2697:
 
-     selectListNoTableSuggest($$[$0], $$[$0-1]);
+     parser.selectListNoTableSuggest($$[$0], $$[$0-1]);
    
 break;
 case 2698:
@@ -4040,37 +4040,37 @@ case 2698:
      if ($$[$0-1]) {
        keywords = [{ value: '*', weight: 1000 }];
        if ($$[$0-1] === 'ALL') {
-         suggestAggregateFunctions();
-         suggestAnalyticFunctions();
+         parser.suggestAggregateFunctions();
+         parser.suggestAnalyticFunctions();
        }
      } else {
        keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-       suggestAggregateFunctions();
-       suggestAnalyticFunctions();
+       parser.suggestAggregateFunctions();
+       parser.suggestAnalyticFunctions();
      }
-     if (isImpala()) {
+     if (parser.isImpala()) {
        keywords.push('STRAIGHT_JOIN');
      }
-     suggestKeywords(keywords);
-     suggestFunctions();
-     suggestColumns();
+     parser.suggestKeywords(keywords);
+     parser.suggestFunctions();
+     parser.suggestColumns();
    
 break;
 case 2706:
 
-     var keywords = $$[$0-2].suggestKeywords && !$$[$0-1] ? createWeightedKeywords($$[$0-2].suggestKeywords, 2) : [];
+     var keywords = $$[$0-2].suggestKeywords && !$$[$0-1] ? parser.createWeightedKeywords($$[$0-2].suggestKeywords, 2) : [];
      if (!$$[$0-1]) {
        keywords = keywords.concat(['[NOSHUFFLE]', '[SHUFFLE]', 'SELECT', 'VALUES'])
      } else {
        keywords = keywords.concat(['SELECT'])
      }
-     suggestKeywords(keywords);
+     parser.suggestKeywords(keywords);
    
 break;
 case 2712:
 
      $$[$0-2].owner = 'insert';
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0]) {
        this.$ = { suggestKeywords: ['PARTITION'] };
      }
@@ -4078,100 +4078,100 @@ case 2712:
 break;
 case 2713:
 
-     suggestKeywords(['INTO', 'OVERWRITE']);
+     parser.suggestKeywords(['INTO', 'OVERWRITE']);
    
 break;
 case 2715:
 
      if (!$$[$0-4]) {
-       suggestKeywords(['TABLE']);
+       parser.suggestKeywords(['TABLE']);
      }
    
 break;
 case 2736:
 
-     if (isHive()) {
-       suggestKeywords(['DATA LOCAL INPATH', 'DATA INPATH']);
-     } else if (isImpala()) {
-       suggestKeywords(['DATA INPATH']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['DATA LOCAL INPATH', 'DATA INPATH']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['DATA INPATH']);
      }
    
 break;
 case 2737:
 
-     if (isHive() && !$$[$0-1]) {
-       suggestKeywords(['INPATH', 'LOCAL INPATH']);
+     if (parser.isHive() && !$$[$0-1]) {
+       parser.suggestKeywords(['INPATH', 'LOCAL INPATH']);
      } else {
-       suggestKeywords(['INPATH']);
+       parser.suggestKeywords(['INPATH']);
      }
    
 break;
 case 2739:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['OVERWRITE INTO TABLE', 'INTO TABLE']);
+       parser.suggestKeywords(['OVERWRITE INTO TABLE', 'INTO TABLE']);
      } else {
-       suggestKeywords(['INTO TABLE']);
+       parser.suggestKeywords(['INTO TABLE']);
      }
    
 break;
 case 2740:
 
-     suggestKeywords([ 'TABLE' ]);
+     parser.suggestKeywords([ 'TABLE' ]);
    
 break;
 case 2743:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1]) {
-       suggestKeywords(['PARTITION']);
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 2758:
 
      if (!$$[$0]) {
-       suggestKeywords(['EXTERNAL TABLE', 'FROM', 'TABLE']);
+       parser.suggestKeywords(['EXTERNAL TABLE', 'FROM', 'TABLE']);
      } else if (!$$[$0].hasExternal) {
-       suggestKeywords(['EXTERNAL']);
+       parser.suggestKeywords(['EXTERNAL']);
      }
    
 break;
 case 2759:
 
      if ($$[$0-1].suggestKeywords) {
-        suggestKeywords(createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat(['FROM']));
+        parser.suggestKeywords(parser.createWeightedKeywords($$[$0-1].suggestKeywords, 2).concat(['FROM']));
       } else {
-        suggestKeywords(['FROM']);
+        parser.suggestKeywords(['FROM']);
       }
    
 break;
 case 2763:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['LOCATION']);
+       parser.suggestKeywords(['LOCATION']);
      }
    
 break;
 case 2764:
 
      if (!$$[$0-4]) {
-       suggestKeywords(['EXTERNAL TABLE', 'TABLE']);
+       parser.suggestKeywords(['EXTERNAL TABLE', 'TABLE']);
      } else if (!$$[$0-4].hasExternal) {
-       suggestKeywords(['EXTERNAL']);
+       parser.suggestKeywords(['EXTERNAL']);
      }
    
 break;
 case 2766:
 
       if ($$[$0-5].suggestKeywords) {
-        suggestKeywords(createWeightedKeywords($$[$0-5].suggestKeywords, 2).concat(['FROM']));
+        parser.suggestKeywords(parser.createWeightedKeywords($$[$0-5].suggestKeywords, 2).concat(['FROM']));
       }
     
 break;
 case 2769:
 
-     addTablePrimary($$[$0-1]);
+     parser.addTablePrimary($$[$0-1]);
      if (!$$[$0]) {
        this.$ = { hasExternal: true, suggestKeywords: ['PARTITION'] };
      } else {
@@ -4181,7 +4181,7 @@ case 2769:
 break;
 case 2770:
 
-     addTablePrimary($$[$0-1]);
+     parser.addTablePrimary($$[$0-1]);
      if (!$$[$0]) {
        this.$ = { suggestKeywords: ['PARTITION'] };
      }
@@ -4189,65 +4189,65 @@ case 2770:
 break;
 case 2778: case 2785: case 2792:
 
-     addTablePrimary($$[$0-4]);
+     parser.addTablePrimary($$[$0-4]);
    
 break;
 case 2779: case 2793: case 2794:
 
-     addTablePrimary($$[$0-9]);
+     parser.addTablePrimary($$[$0-9]);
    
 break;
 case 2783:
 
-     addTablePrimary($$[$0-2]);
+     parser.addTablePrimary($$[$0-2]);
      if (!$$[$0-1]) {
-       suggestKeywords([{ weight: 2, value: 'PARTITION' }, { weight: 1, value: 'TO' }]);
+       parser.suggestKeywords([{ weight: 2, value: 'PARTITION' }, { weight: 1, value: 'TO' }]);
      } else {
-       suggestKeywords([ 'TO' ]);
+       parser.suggestKeywords([ 'TO' ]);
      }
    
 break;
 case 2786:
 
-     addTablePrimary($$[$0-5]);
-     suggestKeywords(['FOR replication()']);
+     parser.addTablePrimary($$[$0-5]);
+     parser.suggestKeywords(['FOR replication()']);
    
 break;
 case 2787:
 
-     addTablePrimary($$[$0-6]);
-     suggestKeywords(['replication()']);
+     parser.addTablePrimary($$[$0-6]);
+     parser.suggestKeywords(['replication()']);
    
 break;
 case 2790:
 
-     addTablePrimary($$[$0-5]);
+     parser.addTablePrimary($$[$0-5]);
      if (!$$[$0-4]) {
-       suggestKeywords(['PARTITION']);
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 2791:
 
-     addTablePrimary($$[$0-10]);
+     parser.addTablePrimary($$[$0-10]);
      if (!$$[$0-9]) {
-       suggestKeywords(['PARTITION']);
+       parser.suggestKeywords(['PARTITION']);
      }
    
 break;
 case 2798:
 
-     suggestKeywords(['ALL', 'NONE']);
+     parser.suggestKeywords(['ALL', 'NONE']);
    
 break;
 case 2819:
 
-     if (isHive()) {
-       suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
      } else {
-       suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
+       parser.suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
      }
    
 break;
@@ -4255,180 +4255,180 @@ case 2820:
 
      // ROLES is considered a non-reserved keywords so we can't match it in ShowCurrentRolesStatement_EDIT
      if ($$[$0].identifierChain && $$[$0].identifierChain.length === 1 && $$[$0].identifierChain[0].name.toLowerCase() === 'roles') {
-       suggestKeywords(['CURRENT']);
+       parser.suggestKeywords(['CURRENT']);
        parser.yy.locations.pop();
      } else {
-       addTablePrimary($$[$0]);
-       if (isImpala()) {
-         suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
+       parser.addTablePrimary($$[$0]);
+       if (parser.isImpala()) {
+         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
        }
      }
    
 break;
 case 2821:
 
-     if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
-     } else if (isHive()) {
-       suggestKeywords(['DATABASES', 'SCHEMAS', 'TABLE EXTENDED']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['DATABASES', 'SCHEMAS', 'TABLE EXTENDED']);
      }
    
 break;
 case 2838: case 2854: case 2917: case 2921: case 2949:
 
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    
 break;
 case 2842: case 2843: case 2847: case 2848: case 2897: case 2898:
 
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    
 break;
 case 2844: case 2845: case 2846: case 2881: case 2895:
 
-     suggestTables();
+     parser.suggestTables();
    
 break;
 case 2856:
 
-     addTablePrimary($$[$0]);
-     suggestKeywords(['TABLE']);
+     parser.addTablePrimary($$[$0]);
+     parser.suggestKeywords(['TABLE']);
    
 break;
 case 2859: case 2860:
 
-     suggestKeywords([ 'ROLES' ]);
+     parser.suggestKeywords([ 'ROLES' ]);
    
 break;
 case 2863: case 2946:
 
-     suggestKeywords(['LIKE']);
+     parser.suggestKeywords(['LIKE']);
    
 break;
 case 2868: case 2871:
 
-     suggestKeywords(['FUNCTIONS']);
+     parser.suggestKeywords(['FUNCTIONS']);
    
 break;
 case 2869: case 2872:
 
-     suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
+     parser.suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
    
 break;
 case 2870: case 2955:
 
      if (!$$[$0-1]) {
-       suggestKeywords(['IN', 'LIKE']);
+       parser.suggestKeywords(['IN', 'LIKE']);
      } else {
-       suggestKeywords(['LIKE']);
+       parser.suggestKeywords(['LIKE']);
      }
    
 break;
 case 2873:
 
      if (!$$[$0-2]) {
-       suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
      } else {
-       suggestKeywords(['LIKE']);
+       parser.suggestKeywords(['LIKE']);
      }
    
 break;
 case 2880:
 
-     suggestKeywords(['ALL', 'TABLE']);
-     suggestTables();
+     parser.suggestKeywords(['ALL', 'TABLE']);
+     parser.suggestTables();
    
 break;
 case 2900:
 
-     suggestTables({identifierChain: [{name: $$[$0]}]});
+     parser.suggestTables({identifierChain: [{name: $$[$0]}]});
    
 break;
 case 2906:
 
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
-     suggestKeywords(['DATABASE', 'SCHEMA']);
+     parser.suggestKeywords(['DATABASE', 'SCHEMA']);
    
 break;
 case 2908:
 
-      addTablePrimary($$[$0-1]);
-      suggestKeywords(['EXTENDED', 'PARTITION']);
+      parser.addTablePrimary($$[$0-1]);
+      parser.suggestKeywords(['EXTENDED', 'PARTITION']);
     
 break;
 case 2911:
 
-     addTablePrimary($$[$0-2]);
-     suggestKeywords(['EXTENDED']);
+     parser.addTablePrimary($$[$0-2]);
+     parser.suggestKeywords(['EXTENDED']);
    
 break;
 case 2925: case 2926: case 2927:
 
-     suggestKeywords(['GRANT']);
+     parser.suggestKeywords(['GRANT']);
    
 break;
 case 2928: case 2929:
 
-     suggestKeywords(['ROLE', 'USER']);
+     parser.suggestKeywords(['ROLE', 'USER']);
    
 break;
 case 2936: case 2945:
 
-     suggestKeywords(['EXTENDED']);
+     parser.suggestKeywords(['EXTENDED']);
    
 break;
 case 2939:
 
       if ($$[$0-1]) {
-        suggestKeywords(['LIKE']);
+        parser.suggestKeywords(['LIKE']);
       } else {
-        suggestKeywords(['FROM', 'IN', 'LIKE']);
+        parser.suggestKeywords(['FROM', 'IN', 'LIKE']);
       }
     
 break;
 case 2941:
 
-      if (isHive()) {
-        suggestKeywords(['EXTENDED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['EXTENDED']);
       }
     
 break;
 case 2942:
 
-      suggestKeywords(['LIKE']);
+      parser.suggestKeywords(['LIKE']);
     
 break;
 case 2943:
 
-      suggestKeywords(['PARTITION']);
+      parser.suggestKeywords(['PARTITION']);
     
 break;
 case 2950:
 
-      addTablePrimary($$[$0]);
+      parser.addTablePrimary($$[$0]);
     
 break;
 case 2964:
 
      if (!$$[$0-1]) {
-       suggestKeywords([ 'WHERE' ]);
+       parser.suggestKeywords([ 'WHERE' ]);
      }
    
 break;
 case 2965:
 
-     suggestKeywords([ 'SET' ]);
+     parser.suggestKeywords([ 'SET' ]);
    
 break;
 case 2981:
 
-     suggestKeywords([ '=' ]);
+     parser.suggestKeywords([ '=' ]);
    
 break;
 case 2988:
@@ -4694,1453 +4694,8 @@ _handle_error:
     return true;
 }};
 
-// Licensed to Cloudera, Inc. under one
-// or more contributor license agreements.  See the NOTICE file
-// distributed with this work for additional information
-// regarding copyright ownership.  Cloudera, Inc. licenses this file
-// to you under the Apache License, Version 2.0 (the
-// "License"); you may not use this file except in compliance
-// with the License.  You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
 
-var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestAggregateFunctions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
-
-var prepareNewStatement = function () {
-  linkTablePrimaries();
-  commitLocations();
-
-  delete parser.yy.lateralViews;
-  delete parser.yy.latestCommonTableExpressions;
-  delete parser.yy.correlatedSubQuery;
-  parser.yy.subQueries = [];
-  parser.yy.selectListAliases = [];
-  parser.yy.latestTablePrimaries = [];
-
-  parser.parseError = function (message, error) {
-    parser.yy.errors.push(error);
-    return message;
-  };
-};
-
-var addCommonTableExpressions = function (identifiers) {
-  parser.yy.result.commonTableExpressions = identifiers;
-  parser.yy.latestCommonTableExpressions = identifiers;
-};
-
-var pushQueryState = function () {
-  parser.yy.resultStack.push(parser.yy.result);
-  parser.yy.locationsStack.push(parser.yy.locations);
-  parser.yy.lateralViewsStack.push(parser.yy.lateralViews);
-  parser.yy.selectListAliasesStack.push(parser.yy.selectListAliases);
-  parser.yy.primariesStack.push(parser.yy.latestTablePrimaries);
-  parser.yy.subQueriesStack.push(parser.yy.subQueries);
-
-  parser.yy.result = {};
-  parser.yy.locations = [];
-  parser.yy.selectListAliases = []; // Not allowed in correlated sub-queries
-  parser.yy.lateralViews = []; // Not allowed in correlated sub-queries
-
-  if (parser.yy.correlatedSubQuery) {
-    parser.yy.latestTablePrimaries = parser.yy.latestTablePrimaries.concat();
-    parser.yy.subQueries = parser.yy.subQueries.concat();
-  } else {
-    parser.yy.latestTablePrimaries = [];
-    parser.yy.subQueries = [];
-  }
-};
-
-var popQueryState = function (subQuery) {
-  linkTablePrimaries();
-  commitLocations();
-
-  if (Object.keys(parser.yy.result).length === 0) {
-    parser.yy.result = parser.yy.resultStack.pop();
-  } else {
-    parser.yy.resultStack.pop();
-  }
-  var oldSubQueries = parser.yy.subQueries;
-  parser.yy.subQueries = parser.yy.subQueriesStack.pop();
-  if (subQuery) {
-    if (oldSubQueries.length > 0) {
-      subQuery.subQueries = oldSubQueries;
-    }
-    parser.yy.subQueries.push(subQuery);
-  }
-
-  parser.yy.lateralViews = parser.yy.lateralViewsStack.pop();
-  parser.yy.latestTablePrimaries = parser.yy.primariesStack.pop();
-  parser.yy.locations = parser.yy.locationsStack.pop();
-  parser.yy.selectListAliases = parser.yy.selectListAliasesStack.pop();
-};
-
-var suggestSelectListAliases = function () {
-  if (parser.yy.selectListAliases && parser.yy.selectListAliases.length > 0 && parser.yy.result.suggestColumns
-      && (typeof parser.yy.result.suggestColumns.identifierChain === 'undefined' || parser.yy.result.suggestColumns.identifierChain.length === 0)) {
-    parser.yy.result.suggestColumnAliases = parser.yy.selectListAliases;
-  }
-};
-
-var isHive = function () {
-  return parser.yy.activeDialect === 'hive';
-};
-
-var isImpala = function () {
-  return parser.yy.activeDialect === 'impala';
-};
-
-var mergeSuggestKeywords = function () {
-  var result = [];
-  Array.prototype.slice.call(arguments).forEach(function (suggestion) {
-    if (typeof suggestion !== 'undefined' && typeof suggestion.suggestKeywords !== 'undefined') {
-      result = result.concat(suggestion.suggestKeywords);
-    }
-  });
-  if (result.length > 0) {
-    return {suggestKeywords: result};
-  }
-  return {};
-};
-
-var suggestValueExpressionKeywords = function (valueExpression, extras) {
-  var expressionKeywords = getValueExpressionKeywords(valueExpression, extras);
-  suggestKeywords(expressionKeywords.suggestKeywords);
-  if (expressionKeywords.suggestColRefKeywords) {
-    suggestColRefKeywords(expressionKeywords.suggestColRefKeywords);
-  }
-  if (valueExpression.lastType) {
-    addColRefIfExists(valueExpression.lastType);
-  } else {
-    addColRefIfExists(valueExpression);
-  }
-};
-
-var getValueExpressionKeywords = function (valueExpression, extras) {
-  var types = valueExpression.lastType ? valueExpression.lastType.types : valueExpression.types;
-  // We could have valueExpression.columnReference to suggest based on column type
-  var keywords = ['<', '<=', '<>', '=', '>', '>=', 'BETWEEN', 'IN', 'IS NOT NULL', 'IS NULL', 'NOT BETWEEN', 'NOT IN'];
-  if (isHive()) {
-    keywords.push('<=>');
-  }
-  if (extras) {
-    keywords = keywords.concat(extras);
-  }
-  if (valueExpression.suggestKeywords) {
-    keywords = keywords.concat(valueExpression.suggestKeywords);
-  }
-  if (types.length === 1 && types[0] === 'COLREF') {
-    return {
-      suggestKeywords: keywords,
-      suggestColRefKeywords: {
-        BOOLEAN: ['AND', 'OR'],
-        NUMBER: ['+', '-', '*', '/', '%'],
-        STRING: ['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']
-      }
-    }
-  }
-  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['BOOLEAN'], types)) {
-    keywords = keywords.concat(['AND', 'OR']);
-  }
-  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['NUMBER'], types)) {
-    keywords = keywords.concat(['+', '-', '*', '/', '%']);
-  }
-  if (SqlFunctions.matchesType(parser.yy.activeDialect, ['STRING'], types)) {
-    keywords = keywords.concat(['LIKE', 'NOT LIKE', 'REGEX', 'RLIKE']);
-  }
-  return {suggestKeywords: keywords};
-};
-
-var getTypeKeywords = function () {
-  if (isHive()) {
-    return ['BIGINT', 'BINARY', 'BOOLEAN', 'CHAR', 'DATE', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR'];
-  }
-  if (isImpala()) {
-    return ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'REAL', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR'];
-  }
-  return ['BIGINT', 'BOOLEAN', 'CHAR', 'DECIMAL', 'DOUBLE', 'FLOAT', 'INT', 'SMALLINT', 'TIMESTAMP', 'STRING', 'TINYINT', 'VARCHAR'];
-};
-
-var getColumnDataTypeKeywords = function () {
-  if (isHive()) {
-    return getTypeKeywords().concat(['ARRAY<>', 'MAP<>', 'STRUCT<>', 'UNIONTYPE<>']);
-  }
-  return getTypeKeywords();
-};
-
-var addColRefIfExists = function (valueExpression) {
-  if (valueExpression.columnReference) {
-    parser.yy.result.colRef = {identifierChain: valueExpression.columnReference};
-  }
-};
-
-var selectListNoTableSuggest = function (selectListEdit, hasDistinctOrAll) {
-  if (selectListEdit.cursorAtStart) {
-    var keywords = [];
-    if (hasDistinctOrAll) {
-      keywords = [{ value: '*', weight: 1000 }];
-    } else {
-      keywords = [{ value: '*', weight: 1000 }, 'ALL', 'DISTINCT'];
-    }
-    if (isImpala()) {
-      keywords.push('STRAIGHT_JOIN');
-    }
-    suggestKeywords(keywords);
-  } else {
-    checkForKeywords(selectListEdit);
-  }
-  if (selectListEdit.suggestFunctions) {
-    suggestFunctions();
-  }
-  if (selectListEdit.suggestColumns) {
-    suggestColumns();
-  }
-  if (selectListEdit.suggestAggregateFunctions && (!hasDistinctOrAll || hasDistinctOrAll === 'ALL')) {
-    suggestAggregateFunctions();
-    suggestAnalyticFunctions();
-  }
-};
-
-var suggestJoinConditions = function (details) {
-  parser.yy.result.suggestJoinConditions = details || {};
-  if (parser.yy.latestTablePrimaries && !parser.yy.result.suggestJoinConditions.tablePrimaries) {
-    parser.yy.result.suggestJoinConditions.tablePrimaries = parser.yy.latestTablePrimaries.concat();
-  }
-};
-
-var suggestJoins = function (details) {
-  parser.yy.result.suggestJoins = details || {};
-};
-
-var valueExpressionSuggest = function (oppositeValueExpression, operator) {
-  if (oppositeValueExpression && oppositeValueExpression.columnReference) {
-    suggestValues();
-    parser.yy.result.colRef = {identifierChain: oppositeValueExpression.columnReference};
-  }
-  suggestColumns();
-  suggestFunctions();
-  var keywords = ['CASE'];
-  if (isHive() || typeof oppositeValueExpression === 'undefined' || typeof operator === 'undefined') {
-    keywords = keywords.concat(['EXISTS', 'NOT']);
-  }
-  if (oppositeValueExpression && oppositeValueExpression.types[0] === 'NUMBER') {
-    applyTypeToSuggestions(['NUMBER']);
-  } else if (isImpala() && (typeof operator === 'undefined' || operator === '-' || operator === '+')) {
-    keywords.push('INTERVAL');
-  }
-  suggestKeywords(keywords);
-};
-
-var applyTypeToSuggestions = function (types) {
-  if (types[0] === 'BOOLEAN') {
-    return;
-  }
-  if (parser.yy.result.suggestFunctions && !parser.yy.result.suggestFunctions.types) {
-    parser.yy.result.suggestFunctions.types = types;
-  }
-  if (parser.yy.result.suggestColumns && !parser.yy.result.suggestColumns.types) {
-    parser.yy.result.suggestColumns.types = types;
-  }
-};
-
-var findCaseType = function (whenThenList) {
-  var types = {};
-  whenThenList.caseTypes.forEach(function (valueExpression) {
-    valueExpression.types.forEach(function (type) {
-      types[type] = true;
-    });
-  });
-  if (Object.keys(types).length === 1) {
-    return {types: [Object.keys(types)[0]]};
-  }
-  return {types: ['T']};
-};
-
-findReturnTypes = function (functionName) {
-  return SqlFunctions.getReturnTypes(parser.yy.activeDialect, functionName.toLowerCase());
-};
-
-var applyArgumentTypesToSuggestions = function (functionName, position) {
-  var foundArguments = SqlFunctions.getArgumentTypes(parser.yy.activeDialect, functionName.toLowerCase(), position);
-  if (foundArguments.length == 0 && parser.yy.result.suggestColumns) {
-    delete parser.yy.result.suggestColumns;
-    delete parser.yy.result.suggestKeyValues;
-    delete parser.yy.result.suggestValues;
-    delete parser.yy.result.suggestFunctions;
-    delete parser.yy.result.suggestIdentifiers;
-    delete parser.yy.result.suggestKeywords;
-  } else {
-    applyTypeToSuggestions(foundArguments);
-  }
-};
-
-var commitLocations = function () {
-  var i = parser.yy.locations.length;
-  while (i--) {
-    var location = parser.yy.locations[i];
-
-    // Impala can have references to previous tables after FROM, i.e. FROM testTable t, t.testArray
-    // In this testArray would be marked a type table so we need to switch it to column.
-    if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 1 && parser.yy.latestTablePrimaries) {
-      var found = parser.yy.latestTablePrimaries.filter(function (primary) {
-        return primary.alias === location.identifierChain[0].name;
-      });
-      if (found.length > 0) {
-        location.type = 'column';
-      }
-    }
-
-    if (location.type === 'database' && parser.yy.latestTablePrimaries) {
-      var foundAlias = parser.yy.latestTablePrimaries.filter(function (primary) {
-        return primary.alias === location.identifierChain[0].name;
-      });
-      if (foundAlias.length > 0) {
-        // Impala complex reference in FROM clause, i.e. FROM testTable t, t.testMap tm
-        location.type = 'table';
-        expandIdentifierChain(location, true);
-      }
-    }
-
-    if (location.type === 'unknown') {
-      if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
-        var found = parser.yy.latestTablePrimaries.filter(function (primary) {
-          return primary.alias === location.identifierChain[0].name || (primary.identifierChain && primary.identifierChain[0].name === location.identifierChain[0].name);
-        });
-        if (found.length > 0) {
-          if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && found[0].identifierChain[0].name === location.identifierChain[0].name) {
-            location.type = 'database';
-          } else {
-            location.type = 'table';
-            expandIdentifierChain(location, true);
-          }
-        } else {
-          if (parser.yy.subQueries) {
-            found = parser.yy.subQueries.filter(function (subQuery) {
-              return subQuery.alias === location.identifierChain[0].name;
-            });
-            if (found.length > 0) {
-              location.type = 'subQuery';
-              location.identifierChain = [{ subQuery: found[0].alias }];
-            }
-          }
-        }
-      }
-    }
-
-    if (location.type === 'asterisk' && !location.linked) {
-      if (parser.yy.latestTablePrimaries && parser.yy.latestTablePrimaries.length > 0) {
-        location.tables = [];
-        location.linked = false;
-        expandIdentifierChain(location, true);
-        if (location.tables.length === 0) {
-          parser.yy.locations.splice(i, 1);
-        }
-      } else {
-        parser.yy.locations.splice(i, 1);
-      }
-    }
-
-    if (location.type === 'unknown') {
-      location.type = 'column';
-    }
-    if (location.type === 'column') {
-      if (isHive() && !location.linked) {
-        location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
-      }
-      expandIdentifierChain(location, true);
-    }
-
-    if (location.type === 'table' && (typeof location.identifierChain === 'undefined' || location.identifierChain.length === 0)) {
-      parser.yy.locations.splice(i, 1);
-    }
-    if (location.type === 'column') {
-      if (typeof location.identifierChain === 'undefined') {
-        parser.yy.locations.splice(i, 1);
-      } else if (location.identifierChain.length < 2) {
-        location.tables = [];
-        location.linked = false;
-        expandIdentifierChain(location, true);
-        if (location.tables.length === 0) {
-          parser.yy.locations.splice(i, 1);
-        }
-      }
-    }
-  }
-  if (parser.yy.locations.length > 0) {
-    parser.yy.allLocations = parser.yy.allLocations.concat(parser.yy.locations);
-    parser.yy.locations = [];
-  }
-};
-
-var prioritizeSuggestions = function () {
-  parser.yy.result.lowerCase = parser.yy.lowerCase || false;
-
-  var cteIndex = {};
-
-  if (typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
-    parser.yy.latestCommonTableExpressions.forEach(function (cte) {
-      cteIndex[cte.alias.toLowerCase()] = cte;
-    })
-  }
-
-  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
-    if (suggestionType !== 'suggestAggregateFunctions' && typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tables.length === 0) {
-      delete parser.yy.result[suggestionType];
-    } else if (typeof parser.yy.result[suggestionType] !== 'undefined' && typeof parser.yy.result[suggestionType].tables !== 'undefined') {
-      for (var i = parser.yy.result[suggestionType].tables.length - 1; i >= 0; i--) {
-        var table = parser.yy.result[suggestionType].tables[i];
-        if (table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined' && typeof cteIndex[table.identifierChain[0].name] !== 'undefined') {
-          parser.yy.result[suggestionType].tables.splice(i, 1);
-        }
-      }
-    }
-  });
-
-  if (typeof parser.yy.result.colRef !== 'undefined') {
-    if (!parser.yy.result.colRef.linked || typeof parser.yy.result.colRef.identifierChain === 'undefined' || parser.yy.result.colRef.identifierChain.length === 0) {
-      delete parser.yy.result.colRef;
-      if (typeof parser.yy.result.suggestColRefKeywords !== 'undefined') {
-        Object.keys(parser.yy.result.suggestColRefKeywords).forEach(function (type) {
-          parser.yy.result.suggestKeywords = parser.yy.result.suggestKeywords.concat(createWeightedKeywords(parser.yy.result.suggestColRefKeywords[type], -1));
-        });
-        delete parser.yy.result.suggestColRefKeywords;
-      }
-      if (parser.yy.result.suggestColumns && parser.yy.result.suggestColumns.types.length === 1 && parser.yy.result.suggestColumns.types[0] === 'COLREF') {
-        parser.yy.result.suggestColumns.types = ['T'];
-      }
-      delete parser.yy.result.suggestValues;
-    }
-  }
-
-  if (typeof parser.yy.result.colRef !== 'undefined') {
-    if (!parser.yy.result.suggestValues && !parser.yy.result.suggestColRefKeywords &&
-        (!parser.yy.result.suggestColumns ||
-        parser.yy.result.suggestColumns.types[0] !== 'COLREF')) {
-      delete parser.yy.result.colRef;
-    }
-  }
-  if (typeof parser.yy.result.suggestIdentifiers !== 'undefined' && parser.yy.result.suggestIdentifiers.length > 0) {
-    delete parser.yy.result.suggestTables;
-    delete parser.yy.result.suggestDatabases;
-  }
-  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-    var suggestColumns = parser.yy.result.suggestColumns;
-    if (typeof suggestColumns.tables === 'undefined' || suggestColumns.tables.length === 0) {
-      // Impala supports statements like SELECT * FROM tbl1, tbl2 WHERE db.tbl1.col = tbl2.bla
-      if (parser.yy.result.suggestColumns.linked && isImpala() && typeof suggestColumns.identifierChain !== 'undefined' && suggestColumns.identifierChain.length > 0) {
-        if (suggestColumns.identifierChain.length === 1) {
-          parser.yy.result.suggestTables = suggestColumns;
-          delete parser.yy.result.suggestColumns
-        } else {
-          suggestColumns.tables = [{ identifierChain: suggestColumns.identifierChain }];
-          delete suggestColumns.identifierChain;
-        }
-      } else {
-        delete parser.yy.result.suggestColumns;
-        delete parser.yy.result.subQueries;
-      }
-    } else {
-      delete parser.yy.result.suggestTables;
-      delete parser.yy.result.suggestDatabases;
-
-      suggestColumns.tables.forEach(function (table) {
-        if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined') {
-          var cte = cteIndex[table.identifierChain[0].name.toLowerCase()];
-          if (typeof cte !== 'undefined') {
-            delete table.identifierChain[0].name;
-            table.identifierChain[0].cte = cte.alias;
-          }
-        }
-      });
-
-      if (typeof suggestColumns.identifierChain !== 'undefined') {
-        delete suggestColumns.identifierChain;
-      }
-    }
-  } else {
-    delete parser.yy.result.subQueries;
-  }
-
-  if (typeof parser.yy.result.suggestJoinConditions !== 'undefined') {
-    if (typeof parser.yy.result.suggestJoinConditions.tables === 'undefined' || parser.yy.result.suggestJoinConditions.tables.length === 0) {
-      delete parser.yy.result.suggestJoinConditions;
-    }
-  }
-
-  if (typeof parser.yy.result.suggestTables !== 'undefined' && typeof parser.yy.latestCommonTableExpressions !== 'undefined') {
-    var ctes = [];
-    parser.yy.latestCommonTableExpressions.forEach(function (cte) {
-      var suggestion = { name: cte.alias };
-      if (parser.yy.result.suggestTables.prependFrom) {
-        suggestion.prependFrom = true
-      }
-      if (parser.yy.result.suggestTables.prependQuestionMark) {
-        suggestion.prependQuestionMark = true;
-      }
-      ctes.push(suggestion);
-    });
-    if (ctes.length > 0) {
-      parser.yy.result.suggestCommonTableExpressions = ctes;
-    }
-  }
-};
-
-/**
- * Impala supports referencing maps and arrays in the the table reference list i.e.
- *
- *  SELECT m['foo'].bar.| FROM someDb.someTable t, t.someMap m;
- *
- * From this the tablePrimaries would look like:
- *
- * [ { alias: 't', identifierChain: [ { name: 'someDb' }, { name: 'someTable' } ] },
- *   { alias: 'm', identifierChain: [ { name: 't' }, { name: 'someMap' } ] } ]
- *
- * with an identifierChain from the select list:
- *
- * [ { name: 'm', keySet: true }, { name: 'bar' } ]
- *
- * Calling this would return an expanded identifierChain, given the above it would be:
- *
- * [ { name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' } ]
- */
-parser.expandImpalaIdentifierChain = function (tablePrimaries, identifierChain) {
-  var expandedChain = identifierChain.concat(); // Clone in case it's called multiple times.
-  if (typeof expandedChain === 'undefined' || expandedChain.length === 0) {
-    return identifierChain;
-  }
-  var expand = function (identifier, expandedChain) {
-    var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
-      return tablePrimary.alias === identifier;
-    });
-
-    if (foundPrimary.length === 1 && foundPrimary[0].identifierChain) {
-      var parentPrimary = tablePrimaries.filter(function (tablePrimary) {
-        return tablePrimary.alias === foundPrimary[0].identifierChain[0].name;
-      });
-      if (parentPrimary.length === 1) {
-        var keySet = expandedChain[0].keySet;
-        var secondPart = expandedChain.slice(1);
-        var firstPart = [];
-        // Clone to make sure we don't add keySet to the primaries
-        foundPrimary[0].identifierChain.forEach(function (identifier) {
-          firstPart.push({name: identifier.name});
-        });
-        if (keySet && firstPart.length > 0) {
-          firstPart[firstPart.length - 1].keySet = true;
-        }
-
-        if (firstPart.length === 0 || typeof secondPart === 'undefined' || secondPart.length === 0) {
-          return firstPart;
-        }
-        var result = firstPart.concat(secondPart);
-        if (result.length > 0) {
-          return expand(firstPart[0].name, result);
-        } else {
-          return result;
-        }
-      }
-    }
-    return expandedChain;
-  };
-  return expand(expandedChain[0].name, expandedChain);
-};
-
-parser.identifyPartials = function (beforeCursor, afterCursor) {
-  var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-  var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
-  return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
-};
-
-parser.expandLateralViews = function (lateralViews, originalIdentifierChain, columnSuggestion) {
-  var identifierChain = originalIdentifierChain.concat(); // Clone in case it's re-used
-  var firstIdentifier = identifierChain[0];
-  if (typeof lateralViews !== 'undefined') {
-    lateralViews.concat().reverse().forEach(function (lateralView) {
-      if (!lateralView.udtf.expression.columnReference) {
-        return;
-      }
-      if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
-        identifierChain.shift();
-        firstIdentifier = identifierChain[0];
-        if (columnSuggestion) {
-          delete parser.yy.result.suggestKeywords;
-        }
-      } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
-        if (columnSuggestion) {
-          if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-            parser.yy.result.suggestIdentifiers = [];
-          }
-          lateralView.columnAliases.forEach(function (columnAlias) {
-            parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
-          });
-          delete parser.yy.result.suggestColumns;
-          delete parser.yy.result.suggestKeywords;
-        }
-        return identifierChain;
-      }
-      if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
-        if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[0]) {
-          identifierChain[0] = {name: 'key'};
-        } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[1]) {
-          identifierChain[0] = {name: 'value'};
-        } else {
-          identifierChain[0] = {name: 'item'};
-        }
-        identifierChain = lateralView.udtf.expression.columnReference.concat(identifierChain);
-        firstIdentifier = identifierChain[0];
-      }
-    });
-  }
-  return identifierChain;
-};
-
-var addCleanTablePrimary = function (tables, tablePrimary) {
-  if (tablePrimary.alias) {
-    tables.push({ alias: tablePrimary.alias, identifierChain: tablePrimary.identifierChain });
-  } else {
-    tables.push({ identifierChain: tablePrimary.identifierChain });
-  }
-};
-
-var expandIdentifierChain = function (wrapper, anyOwner) {
-  if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
-    return;
-  }
-
-  var identifierChain = wrapper.identifierChain.concat();
-  var tablePrimaries = parser.yy.latestTablePrimaries;
-
-  if (tablePrimaries.length === 0) {
-    delete wrapper.identifierChain;
-    return;
-  }
-
-  if (identifierChain.length > 0 && identifierChain[identifierChain.length - 1].asterisk) {
-    var tables = [];
-    tablePrimaries.forEach(function (tablePrimary) {
-      if (identifierChain.length > 1 && !tablePrimary.subQueryAlias) {
-        if (identifierChain.length === 2 && tablePrimary.alias === identifierChain[0].name) {
-          addCleanTablePrimary(tables, tablePrimary);
-        } else if (identifierChain.length === 2 && tablePrimary.identifierChain[0].name === identifierChain[0].name) {
-          addCleanTablePrimary(tables, tablePrimary);
-        } else if (identifierChain.length === 3 && tablePrimary.identifierChain.length > 1 &&
-            tablePrimary.identifierChain[0].name === identifierChain[0].name &&
-            tablePrimary.identifierChain[1].name === identifierChain[1].name) {
-          addCleanTablePrimary(tables, tablePrimary);
-        }
-      } else {
-        if (tablePrimary.subQueryAlias) {
-          tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }]});
-        } else {
-          addCleanTablePrimary(tables, tablePrimary);
-        }
-      }
-    });
-    // Possible Joins
-    if (tables.length > 0) {
-      wrapper.tables = tables;
-      delete wrapper.identifierChain;
-      return;
-    }
-  }
-
-  if (!anyOwner) {
-    tablePrimaries = filterTablePrimariesForOwner(wrapper.owner);
-  }
-  // Impala can have references to maps or array, i.e. FROM table t, t.map m
-  // We need to replace those in the identifierChain
-  if (isImpala()) {
-    var lengthBefore = identifierChain.length;
-    identifierChain = parser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
-    // Change type of any locations marked as table
-    if (wrapper.type === 'table' && identifierChain.length > lengthBefore) {
-      wrapper.type = 'column';
-    }
-    wrapper.identifierChain = identifierChain;
-  }
-  // Expand exploded views in the identifier chain
-  if (isHive() && identifierChain.length > 0) {
-    identifierChain = parser.expandLateralViews(parser.yy.lateralViews, identifierChain);
-    wrapper.identifierChain = identifierChain;
-  }
-
-  // IdentifierChain contains a possibly started identifier or empty, example: a.b.c = ['a', 'b', 'c']
-  // Reduce the tablePrimaries to the one that matches the first identifier if found
-  var foundPrimary;
-  var doubleMatch = false;
-  if (identifierChain.length > 0) {
-    for (var i = 0; i < tablePrimaries.length; i++) {
-      if (tablePrimaries[i].subQueryAlias) {
-        if (tablePrimaries[i].subQueryAlias === identifierChain[0].name) {
-          foundPrimary = tablePrimaries[i];
-        }
-      } else if (tablePrimaries[i].alias === identifierChain[0].name) {
-        foundPrimary = tablePrimaries[i];
-        break;
-      } else if (tablePrimaries[i].identifierChain.length > 1 && identifierChain.length > 1 &&
-          tablePrimaries[i].identifierChain[0].name === identifierChain[0].name &&
-          tablePrimaries[i].identifierChain[1].name === identifierChain[1].name) {
-        foundPrimary = tablePrimaries[i];
-        doubleMatch = true;
-        break;
-      } else if (!foundPrimary && tablePrimaries[i].identifierChain[0].name === identifierChain[0].name) {
-        foundPrimary = tablePrimaries[i];
-        // No break as first two can still match.
-      } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1
-          && tablePrimaries[i].identifierChain[tablePrimaries[i].identifierChain.length - 1].name === identifierChain[0].name) {
-        // This is for the case SELECT baa. FROM bla.baa, blo.boo;
-        foundPrimary = tablePrimaries[i];
-        break;
-      }
-    }
-  }
-
-  if (foundPrimary) {
-    identifierChain.shift();
-    if (doubleMatch) {
-      identifierChain.shift();
-    }
-  } else if (tablePrimaries.length === 1) {
-    foundPrimary = tablePrimaries[0];
-  }
-
-  if (foundPrimary) {
-    if (foundPrimary.subQueryAlias) {
-      identifierChain.unshift({ subQuery: foundPrimary.subQueryAlias });
-    } else {
-      identifierChain = foundPrimary.identifierChain.concat(identifierChain);
-    }
-    if (wrapper.tables) {
-      wrapper.tables.push({ identifierChain: identifierChain });
-      delete wrapper.identifierChain;
-    } else {
-      wrapper.identifierChain = identifierChain;
-    }
-  } else {
-    tablePrimaries.forEach(function (tablePrimary) {
-      var targetTable = { identifierChain: tablePrimary.identifierChain };
-      if (tablePrimary.alias) {
-        targetTable.alias = tablePrimary.alias;
-      }
-      if (wrapper.tables) {
-        wrapper.tables.push(targetTable)
-      }
-    });
-  }
-
-  delete wrapper.owner;
-  wrapper.linked = true;
-};
-
-var suggestLateralViewAliasesAsIdentifiers = function () {
-  if (typeof parser.yy.lateralViews === 'undefined' || parser.yy.lateralViews.length === 0) {
-    return;
-  }
-  if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-    parser.yy.result.suggestIdentifiers = [];
-  }
-  parser.yy.lateralViews.forEach(function (lateralView) {
-    if (typeof lateralView.tableAlias !== 'undefined') {
-      parser.yy.result.suggestIdentifiers.push({name: lateralView.tableAlias + '.', type: 'alias'});
-    }
-    lateralView.columnAliases.forEach(function (columnAlias) {
-      parser.yy.result.suggestIdentifiers.push({name: columnAlias, type: 'alias'});
-    });
-  });
-  if (parser.yy.result.suggestIdentifiers.length === 0) {
-    delete parser.yy.result.suggestIdentifiers;
-  }
-};
-
-var filterTablePrimariesForOwner = function (owner) {
-  var result = [];
-  parser.yy.latestTablePrimaries.forEach(function (primary) {
-    if (typeof owner === 'undefined' && typeof primary.owner === 'undefined') {
-      result.push(primary);
-    } else if (owner === primary.owner) {
-      result.push(primary);
-    }
-  });
-  return result;
-};
-
-var convertTablePrimariesToSuggestions = function (tablePrimaries) {
-  var tables = [];
-  var identifiers = [];
-  tablePrimaries.forEach(function (tablePrimary) {
-    if (tablePrimary.identifierChain && tablePrimary.identifierChain.length > 0) {
-      var table = { identifierChain: tablePrimary.identifierChain };
-      if (tablePrimary.alias) {
-        table.alias = tablePrimary.alias;
-        identifiers.push({ name: table.alias + '.', type: 'alias' });
-        if (isImpala()) {
-          var testForImpalaAlias = [{ name: table.alias }];
-          var result = parser.expandImpalaIdentifierChain(tablePrimaries, testForImpalaAlias);
-          if (result.length > 1) {
-            // Continue if it's a reference to a complex type
-            return;
-          }
-        }
-      } else {
-        var lastIdentifier = tablePrimary.identifierChain[tablePrimary.identifierChain.length - 1];
-        if (typeof lastIdentifier.name !== 'undefined') {
-          identifiers.push({ name: lastIdentifier.name + '.', type: 'table' });
-        } else if (typeof lastIdentifier.subQuery !== 'undefined') {
-          identifiers.push({ name: lastIdentifier.subQuery + '.', type: 'sub-query' });
-        }
-      }
-      tables.push(table);
-    } else if (tablePrimary.subQueryAlias) {
-      identifiers.push({ name: tablePrimary.subQueryAlias + '.', type: 'sub-query' });
-      tables.push({ identifierChain: [{ subQuery: tablePrimary.subQueryAlias }] });
-    }
-  });
-  if (identifiers.length > 0) {
-    if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
-      parser.yy.result.suggestIdentifiers = identifiers;
-    } else {
-      parser.yy.result.suggestIdentifiers = identifiers.concat(parser.yy.result.suggestIdentifiers);
-    }
-  }
-  parser.yy.result.suggestColumns.tables = tables;
-  if (parser.yy.result.suggestColumns.identifierChain && parser.yy.result.suggestColumns.identifierChain.length == 0) {
-    delete parser.yy.result.suggestColumns.identifierChain;
-  }
-  parser.yy.result.suggestColumns.linked = true;
-};
-
-var linkTablePrimaries = function () {
-  if (!parser.yy.cursorFound || typeof parser.yy.latestTablePrimaries === 'undefined') {
-    return;
-  }
-
-  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
-    if (typeof parser.yy.result[suggestionType] !== 'undefined' && parser.yy.result[suggestionType].tablePrimaries && !parser.yy.result[suggestionType].linked) {
-      parser.yy.result[suggestionType].tables = [];
-      parser.yy.result[suggestionType].tablePrimaries.forEach(function (tablePrimary) {
-        if (!tablePrimary.subQueryAlias) {
-          parser.yy.result[suggestionType].tables.push(tablePrimary.alias ? { identifierChain: tablePrimary.identifierChain.concat(), alias: tablePrimary.alias } : { identifierChain: tablePrimary.identifierChain.concat() });
-        }
-      });
-      delete parser.yy.result[suggestionType].tablePrimaries;
-      parser.yy.result[suggestionType].linked = true;
-    }
-  });
-
-  if (typeof parser.yy.result.suggestColumns !== 'undefined' && !parser.yy.result.suggestColumns.linked) {
-    var tablePrimaries = filterTablePrimariesForOwner(parser.yy.result.suggestColumns.owner);
-    if (!parser.yy.result.suggestColumns.tables) {
-      parser.yy.result.suggestColumns.tables = [];
-    }
-    if (parser.yy.subQueries.length > 0) {
-      parser.yy.result.subQueries = parser.yy.subQueries;
-    }
-    if (typeof parser.yy.result.suggestColumns.identifierChain === 'undefined' || parser.yy.result.suggestColumns.identifierChain.length === 0) {
-      if (tablePrimaries.length > 1) {
-        convertTablePrimariesToSuggestions(tablePrimaries);
-      } else {
-        suggestLateralViewAliasesAsIdentifiers();
-        if (tablePrimaries.length == 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
-          convertTablePrimariesToSuggestions(tablePrimaries);
-        }
-        expandIdentifierChain(parser.yy.result.suggestColumns);
-      }
-    } else {
-      // Expand exploded views in the identifier chain
-      if (isHive() && !parser.yy.result.suggestColumns.linked) {
-        var originalLength = parser.yy.result.suggestColumns.identifierChain.length;
-        parser.yy.result.suggestColumns.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, parser.yy.result.suggestColumns.identifierChain, true);
-        // Drop '*' keyword for lateral views
-        if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-          if (parser.yy.result.suggestColumns.identifierChain.length > originalLength &&
-              typeof parser.yy.result.suggestKeywords !== 'undefined' &&
-              parser.yy.result.suggestKeywords.length === 1 &&
-              parser.yy.result.suggestKeywords[0].value === '*') {
-            delete parser.yy.result.suggestKeywords;
-          }
-          expandIdentifierChain(parser.yy.result.suggestColumns);
-        }
-      } else {
-        expandIdentifierChain(parser.yy.result.suggestColumns);
-      }
-    }
-  }
-
-  if (typeof parser.yy.result.colRef !== 'undefined' && !parser.yy.result.colRef.linked) {
-    expandIdentifierChain(parser.yy.result.colRef);
-
-    var primaries = filterTablePrimariesForOwner();
-    if (primaries.length === 0 || (primaries.length > 1 && parser.yy.result.colRef.identifierChain.length === 1)) {
-      parser.yy.result.colRef.identifierChain = [];
-    }
-  }
-  if (typeof parser.yy.result.suggestKeyValues !== 'undefined' && !parser.yy.result.suggestKeyValues.linked) {
-    expandIdentifierChain(parser.yy.result.suggestKeyValues);
-  }
-};
-
-var getSubQuery = function (cols) {
-  var columns = [];
-  cols.selectList.forEach(function (col) {
-    var result = {};
-    if (col.alias) {
-      result.alias = col.alias;
-    }
-    if (col.valueExpression && col.valueExpression.columnReference) {
-      result.identifierChain = col.valueExpression.columnReference
-    } else if (col.asterisk) {
-      result.identifierChain = [{asterisk: true}];
-    }
-    if (col.valueExpression && col.valueExpression.types && col.valueExpression.types.length === 1) {
-      result.type = col.valueExpression.types[0];
-    }
-
-    columns.push(result);
-  });
-
-  return {
-    columns: columns
-  };
-};
-
-var addTablePrimary = function (ref) {
-  if (typeof parser.yy.latestTablePrimaries === 'undefined') {
-    parser.yy.latestTablePrimaries = [];
-  }
-  parser.yy.latestTablePrimaries.push(ref);
-};
-
-var suggestNumbers = function (numbers) {
-  parser.yy.result.suggestNumbers = numbers;
-};
-
-var suggestFileFormats = function () {
-  if (isHive()) {
-    suggestKeywords(['AVRO', 'INPUTFORMAT', 'ORC', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
-  } else {
-    suggestKeywords(['AVRO', 'KUDU', 'PARQUET', 'RCFILE', 'SEQUENCEFILE', 'TEXTFILE']);
-  }
-};
-
-var getKeywordsForOptionalsLR = function (optionals, keywords, override) {
-  var result = [];
-
-  for (var i = 0; i < optionals.length; i++) {
-    if (!optionals[i] && (typeof override === 'undefined' || override[i])) {
-      if (keywords[i] instanceof Array) {
-        result = result.concat(keywords[i]);
-      } else {
-        result.push(keywords[i]);
-      }
-    } else if (optionals[i]) {
-      break;
-    }
-  }
-  return result;
-};
-
-var suggestDdlAndDmlKeywords = function (extraKeywords) {
-  var keywords = ['ALTER', 'CREATE', 'DESCRIBE', 'DROP', 'GRANT', 'INSERT', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH'];
-
-  if (extraKeywords) {
-    keywords = keywords.concat(extraKeywords);
-  }
-
-  if (isHive()) {
-    keywords = keywords.concat(['ANALYZE TABLE', 'DELETE', 'EXPORT', 'IMPORT', 'LOAD', 'MSCK', 'RELOAD FUNCTION', 'RESET']);
-  }
-
-  if (isImpala()) {
-    keywords = keywords.concat(['COMPUTE', 'INVALIDATE METADATA', 'LOAD', 'REFRESH']);
-  }
-
-  suggestKeywords(keywords);
-};
-
-var checkForSelectListKeywords = function (selectList) {
-  if (selectList.length === 0) {
-    return;
-  }
-  var last = selectList[selectList.length - 1];
-  if (!last || !last.valueExpression) {
-    return;
-  }
-  var valueExpressionKeywords = getValueExpressionKeywords(last.valueExpression);
-  var keywords = [];
-  if (last.suggestKeywords) {
-    keywords = keywords.concat(last.suggestKeywords);
-  }
-  if (valueExpressionKeywords.suggestKeywords) {
-    keywords = keywords.concat(valueExpressionKeywords.suggestKeywords);
-  }
-  if (valueExpressionKeywords.suggestColRefKeywords) {
-    suggestColRefKeywords(valueExpressionKeywords.suggestColRefKeywords);
-    addColRefIfExists(last.valueExpression);
-  }
-  if (!last.alias) {
-    keywords.push('AS');
-  }
-  if (keywords.length > 0) {
-    suggestKeywords(keywords);
-  }
-};
-
-var checkForKeywords = function (expression) {
-  if (expression) {
-    if (expression.suggestKeywords && expression.suggestKeywords.length > 0) {
-      suggestKeywords(expression.suggestKeywords);
-    }
-    if (expression.suggestColRefKeywords) {
-      suggestColRefKeywords(expression.suggestColRefKeywords);
-      addColRefIfExists(expression);
-    }
-  }
-};
-
-var createWeightedKeywords = function (keywords, weight) {
-  var result = [];
-  keywords.forEach(function (keyword) {
-    if (typeof keyword.weight !== 'undefined') {
-      keyword.weight = weight + (keyword.weight / 10);
-      result.push(keyword);
-    } else {
-      result.push({value: keyword, weight: weight });
-    }
-  });
-  return result;
-};
-
-var suggestKeywords = function (keywords) {
-  var weightedKeywords = [];
-  if (keywords.length == 0) {
-    return;
-  }
-  keywords.forEach(function (keyword) {
-    if (typeof keyword.weight !== 'undefined') {
-      weightedKeywords.push(keyword);
-    } else {
-      weightedKeywords.push({ value: keyword, weight: -1 })
-    }
-  });
-  weightedKeywords.sort(function (a, b) {
-    if (a.weight !== b.weight) {
-      return b.weight - a.weight;
-    }
-    return a.value.localeCompare(b.value);
-  });
-  parser.yy.result.suggestKeywords = weightedKeywords;
-};
-
-var suggestColRefKeywords = function (colRefKeywords) {
-  parser.yy.result.suggestColRefKeywords = colRefKeywords;
-};
-
-var suggestTablesOrColumns = function (identifier) {
-  if (typeof parser.yy.latestTablePrimaries == 'undefined') {
-    suggestTables({ identifierChain: [{ name: identifier }] });
-    return;
-  }
-  var tableRef = parser.yy.latestTablePrimaries.filter(function (tablePrimary) {
-    return tablePrimary.alias === identifier;
-  });
-  if (tableRef.length > 0) {
-    suggestColumns({identifierChain: [{ name: identifier }]});
-  } else {
-    suggestTables({ identifierChain: [{ name: identifier }] });
-  }
-};
-
-var suggestFunctions = function (details) {
-  parser.yy.result.suggestFunctions = details || {};
-};
-
-var suggestAggregateFunctions = function () {
-  var primaries = [];
-  var aliases = {};
-  parser.yy.latestTablePrimaries.forEach(function (primary) {
-    if (typeof primary.alias !== 'undefined') {
-      aliases[primary.alias] = true;
-    }
-    // Drop if the first one refers to a table alias (...FROM tbl t, t.map tm ...)
-    if (typeof primary.identifierChain !== 'undefined' && !aliases[primary.identifierChain[0].name] && typeof primary.owner === 'undefined') {
-      primaries.push(primary);
-    }
-  });
-  parser.yy.result.suggestAggregateFunctions = { tablePrimaries: primaries };
-};
-
-var suggestAnalyticFunctions = function () {
-  parser.yy.result.suggestAnalyticFunctions = true;
-};
-
-var suggestColumns = function (details) {
-  if (typeof details === 'undefined') {
-    details = {identifierChain: []};
-  } else if (typeof details.identifierChain === 'undefined') {
-    details.identifierChain = [];
-  }
-  parser.yy.result.suggestColumns = details;
-};
-
-var suggestGroupBys = function (details) {
-  parser.yy.result.suggestGroupBys = details || {};
-};
-
-var suggestOrderBys = function (details) {
-  parser.yy.result.suggestOrderBys = details || {};
-};
-
-var suggestFilters = function (details) {
-  parser.yy.result.suggestFilters = details || {};
-};
-
-var suggestKeyValues = function (details) {
-  parser.yy.result.suggestKeyValues = details || {};
-};
-
-var suggestTables = function (details) {
-  parser.yy.result.suggestTables = details || {};
-};
-
-var adjustLocationForCursor = function (location) {
-  // columns are 0-based and lines not, so add 1 to cols
-  var newLocation = {
-    first_line: location.first_line,
-    last_line: location.last_line,
-    first_column: location.first_column + 1,
-    last_column: location.last_column + 1
-  };
-  if (parser.yy.cursorFound) {
-    if (parser.yy.cursorFound.first_line === newLocation.first_line && parser.yy.cursorFound.last_column <= newLocation.first_column) {
-      var additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
-      additionalSpace -= parser.yy.partialCursor ? 1 : 3; // For some reason the normal cursor eats 3 positions.
-      newLocation.first_column = newLocation.first_column + additionalSpace;
-      newLocation.last_column = newLocation.last_column + additionalSpace;
-    }
-  }
-  return newLocation;
-};
-
-var addFunctionLocation = function (location, functionName) {
-  // Remove trailing '(' from location
-  var adjustedLocation = {
-    first_line: location.first_line,
-    last_line: location.last_line,
-    first_column: location.first_column,
-    last_column: location.last_column - 1
-  };
-  parser.yy.locations.push({
-    type: 'function',
-    location: adjustLocationForCursor(adjustedLocation),
-    function: functionName.toLowerCase()
-  });
-};
-
-var addStatementLocation = function (location) {
-  // Don't report lonely cursor as a statement
-  if (location.first_line === location.last_line && Math.abs(location.last_column - location.first_column) === 1) {
-    return;
-  }
-  var adjustedLocation;
-  if (parser.yy.cursorFound && parser.yy.cursorFound.last_line === location.last_line &&
-      parser.yy.cursorFound.first_column >= location.first_column && parser.yy.cursorFound.last_column <= location.last_column) {
-    var additionalSpace = parser.yy.partialLengths.left + parser.yy.partialLengths.right;
-    adjustedLocation = {
-      first_line: location.first_line,
-      last_line: location.last_line,
-      first_column: location.first_column + 1,
-      last_column: location.last_column + additionalSpace - (parser.yy.partialCursor ? 0 : 2)
-    }
-  } else {
-    adjustedLocation = {
-      first_line: location.first_line,
-      last_line: location.last_line,
-      first_column: location.first_column + 1,
-      last_column: location.last_column + 1
-    }
-  }
-
-  parser.yy.locations.push({
-    type: 'statement',
-    location: adjustedLocation
-  });
-};
-
-var addHdfsLocation = function (location, path) {
-  parser.yy.locations.push({
-    type: 'hdfs',
-    location: adjustLocationForCursor(location),
-    path: path
-  });
-};
-
-var addDatabaseLocation = function (location, identifierChain) {
-  parser.yy.locations.push({
-    type: 'database',
-    location: adjustLocationForCursor(location),
-    identifierChain: identifierChain
-  });
-};
-
-var addTableLocation = function (location, identifierChain) {
-  parser.yy.locations.push({
-    type: 'table',
-    location: adjustLocationForCursor(location),
-    identifierChain: identifierChain
-  });
-};
-
-var addAsteriskLocation = function (location, identifierChain) {
-  parser.yy.locations.push({
-    type: 'asterisk',
-    location: adjustLocationForCursor(location),
-    identifierChain: identifierChain
-  });
-};
-
-var addColumnLocation = function (location, identifierChain) {
-  parser.yy.locations.push({
-    type: 'column',
-    location: adjustLocationForCursor(location),
-    identifierChain: identifierChain
-  });
-};
-
-var addUnknownLocation = function (location, identifierChain) {
-  parser.yy.locations.push({
-    type: 'unknown',
-    location: adjustLocationForCursor(location),
-    identifierChain: identifierChain
-  });
-};
-
-var suggestDatabases = function (details) {
-  parser.yy.result.suggestDatabases = details || {};
-};
-
-var suggestHdfs = function (details) {
-  parser.yy.result.suggestHdfs = details || {};
-};
-
-var suggestValues = function (details) {
-  parser.yy.result.suggestValues = details || {};
-};
-
-var determineCase = function (text) {
-  if (!parser.yy.caseDetermined) {
-    parser.yy.lowerCase = text.toLowerCase() === text;
-    parser.yy.caseDetermined = true;
-  }
-};
-
-parser.handleQuotedValueWithCursor = function(lexer, yytext, yylloc, quoteChar) {
-  if (yytext.indexOf('\u2020') !== -1 || yytext.indexOf('\u2021') !== -1) {
-    parser.yy.partialCursor = yytext.indexOf('\u2021') !== -1;
-    var cursorIndex = parser.yy.partialCursor ? yytext.indexOf('\u2021') : yytext.indexOf('\u2020');
-    parser.yy.cursorFound = {
-      first_line: yylloc.first_line,
-      last_line: yylloc.last_line,
-      first_column: yylloc.first_column + cursorIndex,
-      last_column: yylloc.first_column + cursorIndex + 1
-    };
-    var remainder = yytext.substring(cursorIndex + 1);
-    var remainingQuotes = (lexer.upcomingInput().match(new RegExp(quoteChar, 'g')) || []).length;
-    if (remainingQuotes > 0 && remainingQuotes & 1  != 0) {
-      parser.yy.missingEndQuote = false;
-      lexer.input();
-    } else {
-      parser.yy.missingEndQuote = true;
-      lexer.unput(remainder);
-    }
-    lexer.popState();
-    return true;
-  }
-  return false;
-};
-
-var lexerModified = false;
-
-/**
- * Main parser function
- */
-parser.parseSql = function (beforeCursor, afterCursor, dialect, debug) {
-  // Jison counts CRLF as two lines in the locations
-  beforeCursor = beforeCursor.replace(/\r\n|\n\r/gm, '\n');
-  afterCursor = afterCursor.replace(/\r\n|\n\r/gm, '\n');
-  parser.yy.result = {locations: []};
-  parser.yy.lowerCase = false;
-  parser.yy.locations = [];
-  parser.yy.allLocations = [];
-  parser.yy.subQueries = [];
-  parser.yy.errors = [];
-  parser.yy.selectListAliases = [];
-
-  parser.yy.locationsStack = [];
-  parser.yy.primariesStack = [];
-  parser.yy.lateralViewsStack = [];
-  parser.yy.subQueriesStack = [];
-  parser.yy.resultStack = [];
-  parser.yy.selectListAliasesStack = [];
-
-  delete parser.yy.caseDetermined;
-  delete parser.yy.cursorFound;
-  delete parser.yy.partialCursor;
-
-  prepareNewStatement();
-
-  var REASONABLE_SURROUNDING_LENGTH = 150000; // About 3000 lines before and after
-
-  if (beforeCursor.length > REASONABLE_SURROUNDING_LENGTH) {
-    if ((beforeCursor.length - beforeCursor.lastIndexOf(';')) > REASONABLE_SURROUNDING_LENGTH) {
-      // Bail out if the last complete statement is more than 150000 chars before
-      return {};
-    }
-    // Cut it at the first statement found within 150000 chars before
-    var lastReasonableChunk = beforeCursor.substring(beforeCursor.length - REASONABLE_SURROUNDING_LENGTH);
-    beforeCursor = lastReasonableChunk.substring(lastReasonableChunk.indexOf(';') + 1);
-  }
-
-  if (afterCursor.length > REASONABLE_SURROUNDING_LENGTH) {
-    if ((afterCursor.length - afterCursor.indexOf(';')) > REASONABLE_SURROUNDING_LENGTH) {
-      // No need to bail out for what's comes after, we can still get keyword completion
-      afterCursor = '';
-    } else {
-      // Cut it at the last statement found within 150000 chars after
-      var firstReasonableChunk = afterCursor.substring(0, REASONABLE_SURROUNDING_LENGTH);
-      afterCursor = firstReasonableChunk.substring(0, firstReasonableChunk.lastIndexOf(';'));
-    }
-  }
-
-  parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
-
-  if (parser.yy.partialLengths.left > 0) {
-    beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
-  }
-
-  if (parser.yy.partialLengths.right > 0) {
-    afterCursor = afterCursor.substring(parser.yy.partialLengths.right);
-  }
-
-  parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
-
-  // Hack to set the inital state of the lexer without first having to hit a token
-  // has to be done as the first token found can be dependant on dialect
-  if (!lexerModified) {
-    var originalSetInput = parser.lexer.setInput;
-    parser.lexer.setInput = function (input, yy) {
-      var lexer = originalSetInput.bind(parser.lexer)(input, yy);
-      if (typeof parser.yy.activeDialect !== 'undefined') {
-        lexer.begin(parser.yy.activeDialect);
-      }
-      return lexer;
-    };
-    lexerModified = true;
-  }
-
-  var result;
-  try {
-    // Add |CURSOR| or |PARTIAL_CURSOR| to represent the different cursor states in the lexer
-    result = parser.parse(beforeCursor + (beforeCursor.length == 0 || /[\s\(]$$/.test(beforeCursor) ? ' \u2020 ' : '\u2021') + afterCursor);
-  } catch (err) {
-    // On any error try to at least return any existing result
-    if (typeof parser.yy.result === 'undefined') {
-      throw err;
-    }
-    if (debug) {
-      console.log(err);
-      console.error(err.stack);
-    }
-    result = parser.yy.result;
-  }
-  if (parser.yy.errors.length > 0) {
-    parser.yy.result.errors = parser.yy.errors;
-    if (debug) {
-      console.log(parser.yy.errors);
-    }
-  }
-  try {
-    linkTablePrimaries();
-    commitLocations();
-    // Clean up and prioritize
-    prioritizeSuggestions();
-  } catch (err) {
-    if (debug) {
-      console.log(err);
-      console.error(err.stack);
-    }
-  }
-
-
-  parser.yy.allLocations.sort(function (a, b) {
-    if (a.location.first_line !== b.location.first_line) {
-      return a.location.first_line - b.location.first_line;
-    }
-    return a.location.first_column - b.location.first_column;
-  });
-  parser.yy.result.locations = parser.yy.allLocations;
-
-  parser.yy.result.locations.forEach(function (location) {
-    delete location.linked;
-  });
-  if (typeof parser.yy.result.suggestColumns !== 'undefined') {
-    delete parser.yy.result.suggestColumns.linked;
-  }
-
-  SIMPLE_TABLE_REF_SUGGESTIONS.forEach(function (suggestionType) {
-    if (typeof parser.yy.result[suggestionType] !== 'undefined') {
-      delete parser.yy.result[suggestionType].linked;
-    }
-  });
-
-  if (typeof parser.yy.result.colRef !== 'undefined') {
-    delete parser.yy.result.colRef.linked;
-  }
-  if (typeof parser.yy.result.suggestKeyValues !== 'undefined') {
-    delete parser.yy.result.suggestKeyValues.linked;
-  }
-
-  if (typeof result.error !== 'undefined' && typeof result.error.expected !== 'undefined') {
-    // Remove any expected tokens from other dialects, jison doesn't remove tokens from other lexer states.
-    var actualExpected = {};
-    result.error.expected.forEach(function (expected) {
-      var match = expected.match(/\<([a-z]+)\>(.*)/);
-      if (match !== null) {
-        if (typeof parser.yy.activeDialect !== 'undefined' && parser.yy.activeDialect === match[1]) {
-          actualExpected[("'" + match[2])] = true;
-        }
-      } else if (expected.indexOf('CURSOR') == -1) {
-        actualExpected[expected] = true;
-      }
-    });
-    result.error.expected = Object.keys(actualExpected);
-  }
-
-  if (typeof result.error !== 'undefined' && result.error.recoverable) {
-    delete result.error;
-  }
-
-  // Adjust all the statement locations to include white space surrounding them
-  var lastStatementLocation = null;
-  result.locations.forEach(function (location) {
-    if (location.type === 'statement') {
-      if (lastStatementLocation === null) {
-        location.location.first_line = 1;
-        location.location.first_column = 1;
-      } else {
-        location.location.first_line = lastStatementLocation.location.last_line;
-        location.location.first_column = lastStatementLocation.location.last_column + 1;
-      }
-      lastStatementLocation = location;
-    }
-  });
-
-  return result;
-};/* generated by jison-lex 0.3.4 */
+SqlParseSupport.initSqlParser(parser);/* generated by jison-lex 0.3.4 */
 var lexer = (function(){
 var lexer = ({
 
@@ -6492,7 +5047,7 @@ case 10: return 780;
 break;
 case 11: return 158; 
 break;
-case 12: determineCase(yy_.yytext); return 400; 
+case 12: parser.determineCase(yy_.yytext); return 400; 
 break;
 case 13: return 159; 
 break;
@@ -6502,9 +5057,9 @@ case 15: return 161;
 break;
 case 16: return 162; 
 break;
-case 17: determineCase(yy_.yytext); return 1064; 
+case 17: parser.determineCase(yy_.yytext); return 1064; 
 break;
-case 18: determineCase(yy_.yytext); return 510; 
+case 18: parser.determineCase(yy_.yytext); return 510; 
 break;
 case 19: return 152; 
 break;
@@ -6518,9 +5073,9 @@ case 23: return 168;
 break;
 case 24: return 169; 
 break;
-case 25: determineCase(yy_.yytext); return 1130; 
+case 25: parser.determineCase(yy_.yytext); return 1130; 
 break;
-case 26: determineCase(yy_.yytext); return 1085; 
+case 26: parser.determineCase(yy_.yytext); return 1085; 
 break;
 case 27: return 170; 
 break;
@@ -6552,7 +5107,7 @@ case 40: return 5;
 break;
 case 41: return 6; 
 break;
-case 42: determineCase(yy_.yytext); return 7; 
+case 42: parser.determineCase(yy_.yytext); return 7; 
 break;
 case 43: return 8; 
 break;
@@ -6614,9 +5169,9 @@ case 71: return 31;
 break;
 case 72: return 33; 
 break;
-case 73: determineCase(yy_.yytext); return 34; 
+case 73: parser.determineCase(yy_.yytext); return 34; 
 break;
-case 74: determineCase(yy_.yytext); return 35; 
+case 74: parser.determineCase(yy_.yytext); return 35; 
 break;
 case 75: return 36; 
 break;
@@ -6652,7 +5207,7 @@ case 90: return 47;
 break;
 case 91: return 48; 
 break;
-case 92: determineCase(yy_.yytext); return 49; 
+case 92: parser.determineCase(yy_.yytext); return 49; 
 break;
 case 93: this.begin('hdfs'); return 50; 
 break;
@@ -6692,7 +5247,7 @@ case 110: return 65;
 break;
 case 111: return 66; 
 break;
-case 112: determineCase(yy_.yytext); return 67; 
+case 112: parser.determineCase(yy_.yytext); return 67; 
 break;
 case 113: return 68; 
 break;
@@ -6722,7 +5277,7 @@ case 125: return 79;
 break;
 case 126: return 80; 
 break;
-case 127: determineCase(yy_.yytext); return 81; 
+case 127: parser.determineCase(yy_.yytext); return 81; 
 break;
 case 128: return 176; 
 break;
@@ -6766,7 +5321,7 @@ case 147: return 96;
 break;
 case 148: return 97; 
 break;
-case 149: determineCase(yy_.yytext); return 98; 
+case 149: parser.determineCase(yy_.yytext); return 98; 
 break;
 case 150: return 99; 
 break;
@@ -6796,9 +5351,9 @@ case 162: return 807;
 break;
 case 163: return 201; 
 break;
-case 164: determineCase(yy_.yytext); return 844; 
+case 164: parser.determineCase(yy_.yytext); return 844; 
 break;
-case 165: determineCase(yy_.yytext); return 401; 
+case 165: parser.determineCase(yy_.yytext); return 401; 
 break;
 case 166: return 202; 
 break;
@@ -6806,11 +5361,11 @@ case 167: return 203;
 break;
 case 168: return 204; 
 break;
-case 169: determineCase(yy_.yytext); return 511; 
+case 169: parser.determineCase(yy_.yytext); return 511; 
 break;
 case 170: return 205; 
 break;
-case 171: determineCase(yy_.yytext); return 150; 
+case 171: parser.determineCase(yy_.yytext); return 150; 
 break;
 case 172: return 207; 
 break;
@@ -6838,13 +5393,13 @@ case 183: return 216;
 break;
 case 184: return 217; 
 break;
-case 185: determineCase(yy_.yytext); return 1087; 
+case 185: parser.determineCase(yy_.yytext); return 1087; 
 break;
 case 186: return 218; 
 break;
 case 187: return 219; 
 break;
-case 188: determineCase(yy_.yytext); return 842; 
+case 188: parser.determineCase(yy_.yytext); return 842; 
 break;
 case 189: this.begin('hdfs'); return 220; 
 break;
@@ -6860,7 +5415,7 @@ case 194: return 223;
 break;
 case 195: return 224; 
 break;
-case 196: determineCase(yy_.yytext); return 1129; 
+case 196: parser.determineCase(yy_.yytext); return 1129; 
 break;
 case 197: this.begin('hdfs'); return 225; 
 break;
@@ -6888,7 +5443,7 @@ case 208: return 244;
 break;
 case 209: return 231; 
 break;
-case 210: determineCase(yy_.yytext); return 841; 
+case 210: parser.determineCase(yy_.yytext); return 841; 
 break;
 case 211: return 821; 
 break;
@@ -6974,7 +5529,7 @@ case 251: this.popState(); return 609;
 break;
 case 252: return 258; 
 break;
-case 253: determineCase(yy_.yytext); return 754; 
+case 253: parser.determineCase(yy_.yytext); return 754; 
 break;
 case 254: return 350; 
 break;
@@ -6994,7 +5549,7 @@ case 261: return 265;
 break;
 case 262: return 266; 
 break;
-case 263: determineCase(yy_.yytext); return 399; 
+case 263: parser.determineCase(yy_.yytext); return 399; 
 break;
 case 264: return 267; 
 break;
@@ -7008,7 +5563,7 @@ case 268: return 271;
 break;
 case 269: return 272; 
 break;
-case 270: determineCase(yy_.yytext); return 812; 
+case 270: parser.determineCase(yy_.yytext); return 812; 
 break;
 case 271: return 273; 
 break;
@@ -7022,7 +5577,7 @@ case 275: return 276;
 break;
 case 276: return 277; 
 break;
-case 277: determineCase(yy_.yytext); return 278; 
+case 277: parser.determineCase(yy_.yytext); return 278; 
 break;
 case 278: return 279; 
 break;
@@ -7084,13 +5639,13 @@ case 306: return 305;
 break;
 case 307: return 306; 
 break;
-case 308: determineCase(yy_.yytext); return 519; 
+case 308: parser.determineCase(yy_.yytext); return 519; 
 break;
 case 309: return 307; 
 break;
-case 310: determineCase(yy_.yytext); return 139; 
+case 310: parser.determineCase(yy_.yytext); return 139; 
 break;
-case 311: determineCase(yy_.yytext); return 1153; 
+case 311: parser.determineCase(yy_.yytext); return 1153; 
 break;
 case 312: return 308; 
 break;
@@ -7108,13 +5663,13 @@ case 318: return 760;
 break;
 case 319: return 146; 
 break;
-case 320: determineCase(yy_.yytext); return 1063; 
+case 320: parser.determineCase(yy_.yytext); return 1063; 
 break;
 case 321: return 728; 
 break;
-case 322: determineCase(yy_.yytext); return 1086; 
+case 322: parser.determineCase(yy_.yytext); return 1086; 
 break;
-case 323: determineCase(yy_.yytext); return 1183; 
+case 323: parser.determineCase(yy_.yytext); return 1183; 
 break;
 case 324: return 314; 
 break;
@@ -7128,81 +5683,81 @@ case 328: return 317;
 break;
 case 329: return 318; 
 break;
-case 330: determineCase(yy_.yytext); return 319; 
+case 330: parser.determineCase(yy_.yytext); return 319; 
 break;
 case 331: return 297; 
 break;
 case 332: return 113; 
 break;
-case 333: yy.lexer.unput('('); yy_.yytext = 'avg'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 320; 
+case 333: yy.lexer.unput('('); yy_.yytext = 'avg'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 320; 
 break;
-case 334: yy.lexer.unput('('); yy_.yytext = 'cast'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 321; 
+case 334: yy.lexer.unput('('); yy_.yytext = 'cast'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 321; 
 break;
-case 335: yy.lexer.unput('('); yy_.yytext = 'count'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 322; 
+case 335: yy.lexer.unput('('); yy_.yytext = 'count'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 322; 
 break;
-case 336: yy.lexer.unput('('); yy_.yytext = 'max'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 323; 
+case 336: yy.lexer.unput('('); yy_.yytext = 'max'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 323; 
 break;
-case 337: yy.lexer.unput('('); yy_.yytext = 'min'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 324; 
+case 337: yy.lexer.unput('('); yy_.yytext = 'min'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 324; 
 break;
-case 338: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 325; 
+case 338: yy.lexer.unput('('); yy_.yytext = 'stddev_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 325; 
 break;
-case 339: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 326; 
+case 339: yy.lexer.unput('('); yy_.yytext = 'stddev_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 326; 
 break;
-case 340: yy.lexer.unput('('); yy_.yytext = 'sum'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 327; 
+case 340: yy.lexer.unput('('); yy_.yytext = 'sum'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 327; 
 break;
-case 341: yy.lexer.unput('('); yy_.yytext = 'variance'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 328; 
+case 341: yy.lexer.unput('('); yy_.yytext = 'variance'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 328; 
 break;
-case 342: yy.lexer.unput('('); yy_.yytext = 'var_pop'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 329; 
+case 342: yy.lexer.unput('('); yy_.yytext = 'var_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 329; 
 break;
-case 343: yy.lexer.unput('('); yy_.yytext = 'var_samp'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 330; 
+case 343: yy.lexer.unput('('); yy_.yytext = 'var_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 330; 
 break;
-case 344: yy.lexer.unput('('); yy_.yytext = 'collect_set'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 331; 
+case 344: yy.lexer.unput('('); yy_.yytext = 'collect_set'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 331; 
 break;
-case 345: yy.lexer.unput('('); yy_.yytext = 'collect_list'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 332; 
+case 345: yy.lexer.unput('('); yy_.yytext = 'collect_list'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 332; 
 break;
-case 346: yy.lexer.unput('('); yy_.yytext = 'corr'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 333; 
+case 346: yy.lexer.unput('('); yy_.yytext = 'corr'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 333; 
 break;
-case 347: yy.lexer.unput('('); yy_.yytext = 'covar_pop'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 334; 
+case 347: yy.lexer.unput('('); yy_.yytext = 'covar_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 334; 
 break;
-case 348: yy.lexer.unput('('); yy_.yytext = 'covar_samp'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 335; 
+case 348: yy.lexer.unput('('); yy_.yytext = 'covar_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 335; 
 break;
-case 349: yy.lexer.unput('('); yy_.yytext = 'histogram_numeric'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 336; 
+case 349: yy.lexer.unput('('); yy_.yytext = 'histogram_numeric'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 336; 
 break;
-case 350: yy.lexer.unput('('); yy_.yytext = 'ntile'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 337; 
+case 350: yy.lexer.unput('('); yy_.yytext = 'ntile'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 337; 
 break;
-case 351: yy.lexer.unput('('); yy_.yytext = 'percentile'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 338; 
+case 351: yy.lexer.unput('('); yy_.yytext = 'percentile'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 338; 
 break;
-case 352: yy.lexer.unput('('); yy_.yytext = 'percentile_approx'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 339; 
+case 352: yy.lexer.unput('('); yy_.yytext = 'percentile_approx'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 339; 
 break;
-case 353: yy.lexer.unput('('); yy_.yytext = 'appx_median'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 340; 
+case 353: yy.lexer.unput('('); yy_.yytext = 'appx_median'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 340; 
 break;
-case 354: yy.lexer.unput('('); yy_.yytext = 'extract'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 341; 
+case 354: yy.lexer.unput('('); yy_.yytext = 'extract'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 341; 
 break;
-case 355: yy.lexer.unput('('); yy_.yytext = 'group_concat'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 342; 
+case 355: yy.lexer.unput('('); yy_.yytext = 'group_concat'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 342; 
 break;
-case 356: yy.lexer.unput('('); yy_.yytext = 'stddev'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 343; 
+case 356: yy.lexer.unput('('); yy_.yytext = 'stddev'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 343; 
 break;
-case 357: yy.lexer.unput('('); yy_.yytext = 'variance_pop'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 344; 
+case 357: yy.lexer.unput('('); yy_.yytext = 'variance_pop'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 344; 
 break;
-case 358: yy.lexer.unput('('); yy_.yytext = 'variance_samp'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 345; 
+case 358: yy.lexer.unput('('); yy_.yytext = 'variance_samp'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 345; 
 break;
-case 359: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 359: yy.lexer.unput('('); yy_.yytext = 'dense_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 360: yy.lexer.unput('('); yy_.yytext = 'first_value'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 360: yy.lexer.unput('('); yy_.yytext = 'first_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 361: yy.lexer.unput('('); yy_.yytext = 'lag'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 361: yy.lexer.unput('('); yy_.yytext = 'lag'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 362: yy.lexer.unput('('); yy_.yytext = 'last_value'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 362: yy.lexer.unput('('); yy_.yytext = 'last_value'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 363: yy.lexer.unput('('); yy_.yytext = 'lead'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 363: yy.lexer.unput('('); yy_.yytext = 'lead'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 364: yy.lexer.unput('('); yy_.yytext = 'rank'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 364: yy.lexer.unput('('); yy_.yytext = 'rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 365: yy.lexer.unput('('); yy_.yytext = 'row_number'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 365: yy.lexer.unput('('); yy_.yytext = 'row_number'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 366: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 366: yy.lexer.unput('('); yy_.yytext = 'cume_dist'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
-case 367: yy.lexer.unput('('); yy_.yytext = 'percent_rank'; addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
+case 367: yy.lexer.unput('('); yy_.yytext = 'percent_rank'; parser.addFunctionLocation(yy_.yylloc, yy_.yytext); return 346; 
 break;
 case 368: return 347; 
 break;
@@ -7218,7 +5773,7 @@ case 373: parser.yy.cursorFound = true; return 402;
 break;
 case 374: return 349; 
 break;
-case 375: addHdfsLocation(yy_.yylloc, yy_.yytext); return 723; 
+case 375: parser.addHdfsLocation(yy_.yylloc, yy_.yytext); return 723; 
 break;
 case 376: this.popState(); return 724; 
 break;
