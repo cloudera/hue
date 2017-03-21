@@ -51,33 +51,33 @@ AnyShow
 ShowStatement_EDIT
  : AnyShow 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
-     } else if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['COLUMNS', 'COMPACTIONS', 'CONF', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FORMATTED', 'FUNCTIONS', 'GRANT', 'INDEX', 'INDEXES', 'LOCKS', 'PARTITIONS', 'PRINCIPALS', 'ROLE GRANT', 'ROLES', 'SCHEMAS', 'TABLE EXTENDED', 'TABLES', 'TBLPROPERTIES', 'TRANSACTIONS']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'COLUMN STATS', 'CREATE TABLE', 'CURRENT ROLES', 'DATABASES', 'FUNCTIONS', 'GRANT ROLE', 'PARTITIONS', 'ROLE GRANT GROUP', 'ROLES', 'SCHEMAS', 'TABLE STATS', 'TABLES']);
      } else {
-       suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
+       parser.suggestKeywords(['COLUMNS', 'DATABASES', 'TABLES']);
      }
    }
  | AnyShow 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
      // ROLES is considered a non-reserved keywords so we can't match it in ShowCurrentRolesStatement_EDIT
      if ($3.identifierChain && $3.identifierChain.length === 1 && $3.identifierChain[0].name.toLowerCase() === 'roles') {
-       suggestKeywords(['CURRENT']);
+       parser.suggestKeywords(['CURRENT']);
        parser.yy.locations.pop();
      } else {
-       addTablePrimary($3);
-       if (isImpala()) {
-         suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
+       parser.addTablePrimary($3);
+       if (parser.isImpala()) {
+         parser.suggestKeywords(['COLUMN STATS', 'CREATE TABLE', 'PARTITIONS', 'TABLE STATS']);
        }
      }
    }
  | AnyShow 'CURSOR' LIKE SingleQuotedValue
    {
-     if (isImpala()) {
-       suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
-     } else if (isHive()) {
-       suggestKeywords(['DATABASES', 'SCHEMAS', 'TABLE EXTENDED']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['AGGREGATE FUNCTIONS', 'ANALYTIC FUNCTIONS', 'DATABASES', 'FUNCTIONS', 'SCHEMAS', 'TABLES']);
+     } else if (parser.isHive()) {
+       parser.suggestKeywords(['DATABASES', 'SCHEMAS', 'TABLE EXTENDED']);
      }
    }
  | ShowColumnStatsStatement_EDIT
@@ -99,19 +99,19 @@ ShowStatement_EDIT
 ShowColumnStatsStatement
  : AnyShow '<impala>COLUMN' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 ShowColumnStatsStatement_EDIT
  : AnyShow '<impala>COLUMN' 'CURSOR'
    {
-     suggestKeywords(['STATS']);
+     parser.suggestKeywords(['STATS']);
    }
  | AnyShow '<impala>COLUMN' '<impala>STATS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
@@ -126,35 +126,35 @@ ShowColumnsStatement
 ShowColumnsStatement_EDIT
  : AnyShow '<hive>COLUMNS' 'CURSOR'
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow '<hive>COLUMNS' 'CURSOR' RegularOrBacktickedIdentifier
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR'
    {
-     suggestTables();
+     parser.suggestTables();
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR' AnyFromOrIn
    {
-     suggestTables();
+     parser.suggestTables();
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
    {
-     suggestTables();
+     parser.suggestTables();
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow '<hive>COLUMNS' AnyFromOrIn RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  ;
 
@@ -169,27 +169,27 @@ ShowConfStatement
 ShowCreateTableStatement
  : AnyShow HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 ShowCreateTableStatement_EDIT
  : AnyShow HiveOrImpalaCreate 'CURSOR'
    {
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    }
  | AnyShow HiveOrImpalaCreate AnyTable 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
  | AnyShow HiveOrImpalaCreate AnyTable RegularOrBackTickedSchemaQualifiedName_EDIT
  | AnyShow HiveOrImpalaCreate 'CURSOR' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($4);
-     suggestKeywords(['TABLE']);
+     parser.addTablePrimary($4);
+     parser.suggestKeywords(['TABLE']);
    }
  ;
 
@@ -201,11 +201,11 @@ ShowCurrentRolesStatement
 ShowCurrentRolesStatement_EDIT
  : AnyShow '<hive>CURRENT' 'CURSOR'
    {
-     suggestKeywords([ 'ROLES' ]);
+     parser.suggestKeywords([ 'ROLES' ]);
    }
  | AnyShow '<impala>CURRENT' 'CURSOR'
    {
-     suggestKeywords([ 'ROLES' ]);
+     parser.suggestKeywords([ 'ROLES' ]);
    }
  ;
 
@@ -217,7 +217,7 @@ ShowDatabasesStatement
 ShowDatabasesStatement_EDIT
  : AnyShow HiveOrImpalaDatabasesOrSchemas 'CURSOR'
    {
-     suggestKeywords(['LIKE']);
+     parser.suggestKeywords(['LIKE']);
    }
  ;
 
@@ -231,34 +231,34 @@ ShowFunctionsStatement
 ShowFunctionsStatement_EDIT
  : AnyShow AggregateOrAnalytic 'CURSOR'
    {
-     suggestKeywords(['FUNCTIONS']);
+     parser.suggestKeywords(['FUNCTIONS']);
    }
  | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase
    {
-     suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
+     parser.suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
    }
  | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'CURSOR'
    {
      if (!$4) {
-       suggestKeywords(['IN', 'LIKE']);
+       parser.suggestKeywords(['IN', 'LIKE']);
      } else {
-       suggestKeywords(['LIKE']);
+       parser.suggestKeywords(['LIKE']);
      }
    }
  | AnyShow AggregateOrAnalytic 'CURSOR' OptionalInDatabase 'LIKE' SingleQuoteValue
    {
-     suggestKeywords(['FUNCTIONS']);
+     parser.suggestKeywords(['FUNCTIONS']);
    }
  | AnyShow 'CURSOR' '<impala>FUNCTIONS' OptionalInDatabase 'LIKE' SingleQuoteValue
    {
-     suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
+     parser.suggestKeywords(['AGGREGATE', 'ANALYTICAL']);
    }
  | AnyShow OptionalAggregateOrAnalytic '<impala>FUNCTIONS' OptionalInDatabase 'CURSOR' SingleQuoteValue
    {
      if (!$4) {
-       suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
+       parser.suggestKeywords([{ value: 'IN', weight: 2 }, { value: 'LIKE', weight: 1 }]);
      } else {
-       suggestKeywords(['LIKE']);
+       parser.suggestKeywords(['LIKE']);
      }
    }
  ;
@@ -273,25 +273,25 @@ ShowGrantStatement
 ShowGrantStatement_EDIT
  : AnyShow '<hive>GRANT' OptionalPrincipalName_EDIT
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | AnyShow '<hive>GRANT' OptionalPrincipalName_EDIT 'ON' '<hive>ALL'
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'TABLE']);
-     suggestTables();
+     parser.suggestKeywords(['ALL', 'TABLE']);
+     parser.suggestTables();
    }
  | AnyShow  '<hive>GRANT' OptionalPrincipalName 'ON' AnyTable 'CURSOR'
    {
-     suggestTables();
+     parser.suggestTables();
    }
  | AnyShow '<hive>GRANT' OptionalPrincipalName 'ON' 'CURSOR' RegularOrBacktickedIdentifier
    {
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    }
  | AnyShow '<impala>GRANT' 'CURSOR'
    {
-     suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['ROLE']);
    }
  ;
 
@@ -317,50 +317,50 @@ ShowIndexStatement_EDIT
  | AnyShow OptionallyFormattedIndex_EDIT 'ON' RegularOrBacktickedIdentifier AnyFromOrIn RegularOrBacktickedIdentifier
  | AnyShow OptionallyFormattedIndex 'CURSOR'
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | AnyShow OptionallyFormattedIndex 'ON' 'CURSOR'
    {
-     suggestTables();
+     parser.suggestTables();
    }
  | AnyShow OptionallyFormattedIndex 'CURSOR' RegularOrBacktickedIdentifier
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier 'CURSOR' RegularOrBacktickedIdentifier
    {
-     suggestKeywords(['FROM', 'IN']);
+     parser.suggestKeywords(['FROM', 'IN']);
    }
  | AnyShow OptionallyFormattedIndex 'ON' RegularOrBacktickedIdentifier AnyFromOrIn 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  | AnyShow OptionallyFormattedIndex 'ON' 'CURSOR' AnyFromOrIn RegularOrBacktickedIdentifier
    {
-     suggestTables({identifierChain: [{name: $6}]});
+     parser.suggestTables({identifierChain: [{name: $6}]});
    }
  ;
 
 ShowLocksStatement
  : AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName '<hive>EXTENDED'
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec '<hive>EXTENDED'
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<hive>LOCKS' DatabaseOrSchema RegularOrBacktickedIdentifier
  ;
@@ -368,66 +368,66 @@ ShowLocksStatement
 ShowLocksStatement_EDIT
  : AnyShow '<hive>LOCKS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
-     suggestKeywords(['DATABASE', 'SCHEMA']);
+     parser.suggestKeywords(['DATABASE', 'SCHEMA']);
    }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName 'CURSOR'
     {
-      addTablePrimary($3);
-      suggestKeywords(['EXTENDED', 'PARTITION']);
+      parser.addTablePrimary($3);
+      parser.suggestKeywords(['EXTENDED', 'PARTITION']);
     }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT '<hive>EXTENDED'
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName PartitionSpec 'CURSOR'
    {
-     addTablePrimary($3);
-     suggestKeywords(['EXTENDED']);
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['EXTENDED']);
    }
  | AnyShow '<hive>LOCKS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec '<hive>EXTENDED'
  | AnyShow '<hive>LOCKS' DatabaseOrSchema 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  ;
 
 ShowPartitionsStatement
  : AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName PartitionSpec
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  | AnyShow '<impala>PARTITIONS' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
 ShowPartitionsStatement_EDIT
  : AnyShow '<hive>PARTITIONS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
  | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT
  | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName 'CURSOR'
    {
-     addTablePrimary($3);
-     suggestKeywords(['PARTITION']);
+     parser.addTablePrimary($3);
+     parser.suggestKeywords(['PARTITION']);
    }
  | AnyShow '<hive>PARTITIONS' RegularOrBackTickedSchemaQualifiedName_EDIT PartitionSpec
  | AnyShow '<impala>PARTITIONS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
@@ -442,31 +442,31 @@ ShowRoleStatement
 ShowRoleStatement_EDIT
  : AnyShow '<hive>ROLE' 'CURSOR'
    {
-     suggestKeywords(['GRANT']);
+     parser.suggestKeywords(['GRANT']);
    }
  | AnyShow '<impala>ROLE' 'CURSOR'
    {
-     suggestKeywords(['GRANT']);
+     parser.suggestKeywords(['GRANT']);
    }
  | AnyShow '<hive>ROLE' 'CURSOR' HiveRoleOrUser RegularIdentifier
    {
-     suggestKeywords(['GRANT']);
+     parser.suggestKeywords(['GRANT']);
    }
  | AnyShow '<hive>ROLE' '<hive>GRANT' 'CURSOR'
    {
-     suggestKeywords(['ROLE', 'USER']);
+     parser.suggestKeywords(['ROLE', 'USER']);
    }
  | AnyShow '<hive>ROLE' '<hive>GRANT' 'CURSOR' RegularIdentifier
    {
-     suggestKeywords(['ROLE', 'USER']);
+     parser.suggestKeywords(['ROLE', 'USER']);
    }
  | AnyShow '<impala>ROLE' '<impala>GRANT' 'CURSOR'
    {
-     suggestKeywords(['GROUP']);
+     parser.suggestKeywords(['GROUP']);
    }
  | AnyShow '<impala>ROLE' '<impala>GRANT' 'CURSOR' RegularIdentifier
    {
-     suggestKeywords(['GROUP']);
+     parser.suggestKeywords(['GROUP']);
    }
  ;
 
@@ -483,60 +483,60 @@ ShowTableStatement
 ShowTableStatement_EDIT
  : AnyShow '<hive>TABLE' 'CURSOR'
    {
-     suggestKeywords(['EXTENDED']);
+     parser.suggestKeywords(['EXTENDED']);
    }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR'
     {
       if ($4) {
-        suggestKeywords(['LIKE']);
+        parser.suggestKeywords(['LIKE']);
       } else {
-        suggestKeywords(['FROM', 'IN', 'LIKE']);
+        parser.suggestKeywords(['FROM', 'IN', 'LIKE']);
       }
     }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue
  | AnyShow '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue
     {
-      if (isHive()) {
-        suggestKeywords(['EXTENDED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['EXTENDED']);
       }
     }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue
     {
-      suggestKeywords(['LIKE']);
+      parser.suggestKeywords(['LIKE']);
     }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue 'CURSOR'
     {
-      suggestKeywords(['PARTITION']);
+      parser.suggestKeywords(['PARTITION']);
     }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase_EDIT 'LIKE' SingleQuotedValue PartitionSpec
  | AnyShow '<hive>TABLE' 'CURSOR' OptionalFromDatabase 'LIKE' SingleQuotedValue PartitionSpec
    {
-     suggestKeywords(['EXTENDED']);
+     parser.suggestKeywords(['EXTENDED']);
    }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'CURSOR' SingleQuotedValue PartitionSpec
    {
-     suggestKeywords(['LIKE']);
+     parser.suggestKeywords(['LIKE']);
    }
  | AnyShow '<hive>TABLE' '<hive>EXTENDED' OptionalFromDatabase 'LIKE' SingleQuotedValue 'CURSOR' PartitionSpecList
    {
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    }
  | AnyShow '<impala>TABLE' 'CURSOR'
    {
-     suggestKeywords(['STATS']);
+     parser.suggestKeywords(['STATS']);
    }
  | AnyShow '<impala>TABLE' '<impala>STATS' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({
+     parser.suggestTables();
+     parser.suggestDatabases({
        appendDot: true
      });
    }
  | AnyShow '<impala>TABLE' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName
     {
-      addTablePrimary($4);
+      parser.addTablePrimary($4);
     }
  | AnyShow '<impala>TABLE' '<impala>STATS' RegularOrBackTickedSchemaQualifiedName_EDIT
  ;
@@ -551,9 +551,9 @@ ShowTablesStatement_EDIT
  : AnyShow HiveOrImpalaTables OptionalInDatabase 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['IN', 'LIKE']);
+       parser.suggestKeywords(['IN', 'LIKE']);
      } else {
-       suggestKeywords(['LIKE']);
+       parser.suggestKeywords(['LIKE']);
      }
    }
  ;
@@ -561,7 +561,7 @@ ShowTablesStatement_EDIT
 ShowTblPropertiesStatement
  : AnyShow '<hive>TBLPROPERTIES' RegularOrBackTickedSchemaQualifiedName
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
@@ -569,8 +569,8 @@ ShowTblPropertiesStatement_EDIT
  : AnyShow '<hive>TBLPROPERTIES' RegularOrBackTickedSchemaQualifiedName_EDIT
  | AnyShow '<hive>TBLPROPERTIES' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ prependDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ prependDot: true });
    }
  ;
 

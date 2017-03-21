@@ -38,10 +38,10 @@ AlterStatement_EDIT
  | ReloadFunction_EDIT
  | 'ALTER' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['INDEX', 'TABLE', 'VIEW']);
      } else {
-       suggestKeywords(['TABLE', 'VIEW']);
+       parser.suggestKeywords(['TABLE', 'VIEW']);
      }
    }
  ;
@@ -49,32 +49,32 @@ AlterStatement_EDIT
 AlterIndex
  : 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec '<hive>REBUILD'
    {
-     addTablePrimary($5);
+     parser.addTablePrimary($5);
    }
  ;
 
 AlterIndex_EDIT
  : 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier_EDIT
  | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec_EDIT
    {
-     addTablePrimary($5);
+     parser.addTablePrimary($5);
    }
  | 'ALTER' '<hive>INDEX' RegularOrBacktickedIdentifier 'ON' SchemaQualifiedTableIdentifier OptionalPartitionSpec 'CURSOR'
    {
-     addTablePrimary($5);
+     parser.addTablePrimary($5);
      if (!$6) {
-       suggestKeywords(['PARTITION', 'REBUILD']);
+       parser.suggestKeywords(['PARTITION', 'REBUILD']);
      } else {
-       suggestKeywords(['REBUILD']);
+       parser.suggestKeywords(['REBUILD']);
      }
    }
  ;
@@ -98,34 +98,34 @@ AlterTable_EDIT
  | AlterTableLeftSide_EDIT PartitionSpec OptionalPartitionOperations
  | AlterTableLeftSide AnyAdd OptionalIfNotExists 'CURSOR'
    {
-     if (isHive()) {
+     if (parser.isHive()) {
        if (!$3) {
-         suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+         parser.suggestKeywords([{ value: 'IF NOT EXISTS', weight: 3 }, { value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
        } else {
-         suggestKeywords(['PARTITION']);
+         parser.suggestKeywords(['PARTITION']);
        }
-     } else if (isImpala()) {
-       suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords([{ value: 'COLUMNS', weight: 2 }, { value: 'PARTITION', weight: 1 }]);
      }
    }
  | AlterTableLeftSide AnyReplace 'CURSOR'
    {
-     suggestKeywords(['COLUMNS']);
+     parser.suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide AnyAdd OptionalIfNotExists_EDIT
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec HdfsLocation_EDIT OptionalPartitionSpecs
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs_EDIT
  | AlterTableLeftSide AnyAdd OptionalIfNotExists PartitionSpec OptionalHdfsLocation OptionalPartitionSpecs 'CURSOR'
    {
-     if (isHive()) {
+     if (parser.isHive()) {
        if (!$5 && !$6) {
-         suggestKeywords(['LOCATION', 'PARTITION']);
+         parser.suggestKeywords(['LOCATION', 'PARTITION']);
        } else if ($6 && $6.suggestKeywords) {
-         var keywords = createWeightedKeywords($6.suggestKeywords, 2);
+         var keywords = parser.createWeightedKeywords($6.suggestKeywords, 2);
          keywords.push({ value: 'PARTITION', weight: 1 });
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        } else {
-         suggestKeywords(['PARTITION']);
+         parser.suggestKeywords(['PARTITION']);
        }
      }
    }
@@ -135,53 +135,53 @@ AlterTable_EDIT
  | AlterTableLeftSide DropOperations_EDIT
  | AlterTableLeftSide 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD IF NOT EXISTS', 'ADD PARTITION', 'ARCHIVE PARTITION', 'CHANGE',
          'CLUSTERED BY', 'CONCATENATE', 'COMPACT', 'DISABLE NO_DROP', 'DISABLE OFFLINE', 'DROP', 'ENABLE NO_DROP',
          'ENABLE OFFLINE', 'EXCHANGE PARTITION', 'NOT SKEWED', 'NOT STORED AS DIRECTORIES', 'PARTITION',
          'RECOVER PARTITIONS', 'RENAME TO', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDE',
          'SET SERDEPROPERTIES', 'SET SKEWED LOCATION', 'SET TBLPROPERTIES', 'SKEWED BY', 'TOUCH', 'UNARCHIVE PARTITION']);
-     } else if (isImpala()) {
-       suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION',
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'ADD PARTITION', 'CHANGE', 'DROP COLUMN', 'DROP PARTITION', 'PARTITION',
          'RENAME TO', 'REPLACE COLUMNS', 'SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES',
          'SET TBLPROPERTIES', 'SET UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
+     if (parser.isHive()) {
+       parser.suggestKeywords(['ADD COLUMNS', 'CHANGE', 'COMPACT', 'CONCATENATE', 'DISABLE NO_DROP', 'DISABLE OFFLINE',
          'ENABLE NO_DROP', 'ENABLE OFFLINE', 'RENAME TO PARTITION', 'REPLACE COLUMNS', 'SET FILEFORMAT', 'SET LOCATION',
          'SET SERDE', 'SET SERDEPROPERTIES']);
-     } else if (isImpala()) {
-       suggestKeywords(['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES',
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['SET CACHED IN', 'SET FILEFORMAT', 'SET LOCATION', 'SET SERDEPROPERTIES', 'SET TBLPROPERTIES',
          'SET UNCACHED']);
      }
    }
  | AlterTableLeftSide PartitionSpec AddOrReplace 'CURSOR'
    {
-     suggestKeywords(['COLUMNS']);
+     parser.suggestKeywords(['COLUMNS']);
    }
  | AlterTableLeftSide PartitionSpec 'SET' 'CURSOR'
     {
-      if (isHive()) {
-        suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
-      } else if (isImpala()) {
-        suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES']);
+      } else if (parser.isImpala()) {
+        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES','TBLPROPERTIES', 'UNCACHED']);
       }
     }
  | AlterTableLeftSide 'SET' 'CURSOR'
     {
-      if (isHive()) {
-        suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
-      } else if (isImpala()) {
-        suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['FILEFORMAT', 'LOCATION', 'SERDE', 'SERDEPROPERTIES', 'SKEWED LOCATION', 'TBLPROPERTIES']);
+      } else if (parser.isImpala()) {
+        parser.suggestKeywords(['CACHED IN', 'FILEFORMAT', 'LOCATION', 'SERDEPROPERTIES', 'TBLPROPERTIES', 'UNCACHED']);
       }
     }
  | AlterTableLeftSide PartitionSpec OptionalPartitionOperations_EDIT
  | AlterTableLeftSide AnyRename 'CURSOR'
    {
-     suggestKeywords(['TO']);
+     parser.suggestKeywords(['TO']);
    }
  ;
 
@@ -202,62 +202,62 @@ HiveSpecificOperations
 HiveSpecificOperations_EDIT
  : HiveArchiveOrUnArchive 'CURSOR'
    {
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    }
  | HiveArchiveOrUnArchive PartitionSpec_EDIT
  | ClusteredBy_EDIT
  | HiveExchange_EDIT
  | 'NOT' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['SKEWED', 'STORED AS DIRECTORIES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['SKEWED', 'STORED AS DIRECTORIES']);
      }
    }
  | 'NOT' '<hive>STORED' 'CURSOR'
    {
-     suggestKeywords(['AS DIRECTORIES']);
+     parser.suggestKeywords(['AS DIRECTORIES']);
    }
  | 'NOT' '<hive>STORED' '<hive>AS' 'CURSOR'
    {
-     suggestKeywords(['DIRECTORIES']);
+     parser.suggestKeywords(['DIRECTORIES']);
    }
  | PartitionSpec '<hive>RENAME' 'CURSOR'
    {
-     suggestKeywords(['TO PARTITION']);
+     parser.suggestKeywords(['TO PARTITION']);
    }
  | PartitionSpec '<hive>RENAME' 'TO' 'CURSOR'
    {
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    }
  | '<hive>RECOVER' 'CURSOR'
    {
-     suggestKeywords(['PARTITIONS']);
+     parser.suggestKeywords(['PARTITIONS']);
    }
  | 'SET' '<hive>SKEWED' 'CURSOR'
    {
-     suggestKeywords(['LOCATION']);
+     parser.suggestKeywords(['LOCATION']);
    }
  | 'SET' '<hive>SKEWED_LOCATION' ParenthesizedSkewedLocationList_EDIT
  | '<hive>SKEWED' 'CURSOR'
    {
-     suggestKeywords(['BY']);
+     parser.suggestKeywords(['BY']);
    }
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList_EDIT
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList_EDIT 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList 'CURSOR'
    {
-     suggestKeywords(['ON']);
+     parser.suggestKeywords(['ON']);
    }
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories 'CURSOR'
    {
      if (!$6) {
-       suggestKeywords(['STORED AS DIRECTORIES']);
+       parser.suggestKeywords(['STORED AS DIRECTORIES']);
      }
    }
  | '<hive>SKEWED' 'BY' ParenthesizedColumnList 'ON' ParenthesizedSkewedValueList OptionalStoredAsDirectories_EDIT
  | '<hive>TOUCH' 'CURSOR'
    {
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    }
  | '<hive>TOUCH' OptionalPartitionSpec_EDIT
  ;
@@ -281,41 +281,41 @@ OptionalPartitionOperations_EDIT
  : AddReplaceColumns_EDIT
  | AnyChange OptionalHiveColumn 'CURSOR'
    {
-     if (isHive() && !$2) {
-       suggestKeywords(['COLUMN']);
+     if (parser.isHive() && !$2) {
+       parser.suggestKeywords(['COLUMN']);
      }
-     suggestColumns();
+     parser.suggestColumns();
    }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification_EDIT OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter OptionalHiveCascadeOrRestrict 'CURSOR'
    {
-     if (isHive() && !$5 && !$6) {
+     if (parser.isHive() && !$5 && !$6) {
        if ($4.suggestKeywords) {
-         var keywords = createWeightedKeywords($4.suggestKeywords, 3);
+         var keywords = parser.createWeightedKeywords($4.suggestKeywords, 3);
          keywords = keywords.concat([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
-         suggestKeywords(keywords);
+         parser.suggestKeywords(keywords);
        } else {
-         suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
+         parser.suggestKeywords([{ value: 'AFTER', weight: 2 }, { value: 'FIRST', weight: 2 }, { value: 'CASCADE', weight: 1 }, { value: 'RESTRICT', weight: 1 }]);
        }
-     } else if (isHive() && $5 && !$6) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     } else if (parser.isHive() && $5 && !$6) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
  | AnyChange OptionalHiveColumn ColumnIdentifier ColumnSpecification OptionalHiveFirstOrAfter_EDIT OptionalHiveCascadeOrRestrict
  | HiveEnableOrDisable 'CURSOR'
    {
-     suggestKeywords(['NO_DROP', 'OFFLINE']);
+     parser.suggestKeywords(['NO_DROP', 'OFFLINE']);
    }
  | 'SET' AnyFileFormat 'CURSOR'
    {
-     suggestFileFormats();
+     parser.suggestFileFormats();
    }
  | 'SET' HdfsLocation_EDIT
  | 'SET' CachedIn_EDIT
  | 'SET' '<hive>SERDE' QuotedValue OptionalWithSerdeproperties 'CURSOR'
    {
      if (!$4) {
-       suggestKeywords(['WITH SERDEPROPERTIES']);
+       parser.suggestKeywords(['WITH SERDEPROPERTIES']);
      }
    }
  | 'SET' '<hive>SERDE' QuotedValue WithSerdeproperties_EDIT
@@ -329,8 +329,8 @@ AddReplaceColumns_EDIT
  : AddOrReplace AnyColumns ParenthesizedColumnSpecificationList_EDIT OptionalHiveCascadeOrRestrict
  | AddOrReplace AnyColumns ParenthesizedColumnSpecificationList OptionalHiveCascadeOrRestrict 'CURSOR'
    {
-     if (isHive() && !$4) {
-       suggestKeywords(['CASCADE', 'RESTRICT']);
+     if (parser.isHive() && !$4) {
+       parser.suggestKeywords(['CASCADE', 'RESTRICT']);
      }
    }
  ;
@@ -347,20 +347,20 @@ HiveExchange
 HiveExchange_EDIT
  : '<hive>EXCHANGE' 'CURSOR'
    {
-     suggestKeywords(['PARTITION']);
+     parser.suggestKeywords(['PARTITION']);
    }
  | '<hive>EXCHANGE' ExchangePartitionSpec 'CURSOR'
    {
-     suggestKeywords(['WITH TABLE']);
+     parser.suggestKeywords(['WITH TABLE']);
    }
  | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' 'CURSOR'
    {
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    }
  | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<hive>EXCHANGE' ExchangePartitionSpec 'WITH' '<hive>TABLE' RegularOrBackTickedSchemaQualifiedName_EDIT
  | '<hive>EXCHANGE' ExchangePartitionSpec_EDIT
@@ -395,43 +395,43 @@ DropOperations
 DropOperations
  : 'DROP' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
-     } else if (isImpala()) {
-       suggestKeywords(['COLUMN', 'PARTITION']);
-       suggestColumns();
+     if (parser.isHive()) {
+       parser.suggestKeywords([{ value: 'PARTITION', weight: 1}, { value: 'IF EXISTS', weight: 2 }]);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['COLUMN', 'PARTITION']);
+       parser.suggestColumns();
      }
    }
  | 'DROP' OneOrMorePartitionSpecs_EDIT OptionalHivePurge
  | 'DROP' OneOrMorePartitionSpecs OptionalHivePurge 'CURSOR'
    {
-     if (isHive() && !$3) {
-       suggestKeywords(['PURGE']);
+     if (parser.isHive() && !$3) {
+       parser.suggestKeywords(['PURGE']);
      }
    }
  | 'DROP' 'IF' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['EXISTS']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['EXISTS']);
      }
    }
  | 'DROP' 'IF' 'EXISTS' 'CURSOR'
     {
-      if (isHive()) {
-        suggestKeywords(['PARTITION']);
+      if (parser.isHive()) {
+        parser.suggestKeywords(['PARTITION']);
       }
     }
  | 'DROP' 'IF' 'EXISTS' OneOrMorePartitionSpecs_EDIT OptionalHivePurge
  | 'DROP' 'IF' 'EXISTS' OneOrMorePartitionSpecs OptionalHivePurge 'CURSOR'
    {
-     if (isHive() && !$3) {
-       suggestKeywords(['PURGE']);
+     if (parser.isHive() && !$3) {
+       parser.suggestKeywords(['PURGE']);
      }
    }
  | 'DROP' ColumnIdentifier_EDIT
  | 'DROP' '<impala>COLUMN' 'CURSOR'
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | 'DROP' '<impala>COLUMN' ColumnIdentifier_EDIT
  ;
@@ -439,7 +439,7 @@ DropOperations
 AlterTableLeftSide
  : 'ALTER' AnyTable SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
@@ -452,8 +452,8 @@ AlterTableLeftSide_EDIT
    }
  | 'ALTER' AnyTable 'CURSOR'
    {
-     suggestTables({ onlyTables: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  ;
 
@@ -495,7 +495,7 @@ HiveAfterOrFirst
 OptionalHiveFirstOrAfter_EDIT
  : HiveAfterOrFirst 'CURSOR'
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | HiveAfterOrFirst ColumnIdentifier_EDIT
  ;
@@ -539,20 +539,20 @@ OneOrMorePartitionSpecs_EDIT
  : PartitionSpec_EDIT
  | OneOrMorePartitionSpecs ',' AnyCursor
    {
-     if (isHive()) {
-       suggestKeywords(['PARTITION']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | OneOrMorePartitionSpecs ',' AnyCursor ',' OneOrMorePartitionSpecs
    {
-     if (isHive()) {
-       suggestKeywords(['PARTITION']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | AnyCursor ',' OneOrMorePartitionSpecs
    {
-     if (isHive()) {
-       suggestKeywords(['PARTITION']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['PARTITION']);
      }
    }
  | OneOrMorePartitionSpecs ',' PartitionSpec_EDIT
@@ -623,12 +623,12 @@ SkewedLocation
 SkewedLocation_EDIT
  : AnyCursor
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | ColumnReference_EDIT
  | AnyCursor '=' QuotedValue
    {
-     suggestColumns();
+     parser.suggestColumns();
    }
  | ColumnReference_EDIT '=' QuotedValue
  | ColumnReferences '=' QuotedValue
@@ -642,11 +642,11 @@ OptionalStoredAsDirectories
 OptionalStoredAsDirectories_EDIT
  : '<hive>STORED' 'CURSOR'
    {
-     suggestKeywords(['AS DIRECTORIES']);
+     parser.suggestKeywords(['AS DIRECTORIES']);
    }
  | '<hive>STORED' '<hive>AS' 'CURSOR'
    {
-     suggestKeywords(['DIRECTORIES']);
+     parser.suggestKeywords(['DIRECTORIES']);
    }
  ;
 
@@ -667,32 +667,32 @@ AlterView_EDIT
  : AlterViewLeftSide_EDIT
  | AlterViewLeftSide 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['AS', 'SET TBLPROPERTIES']);
-     } else if (isImpala()) {
-       suggestKeywords(['AS', 'RENAME TO']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['AS', 'SET TBLPROPERTIES']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['AS', 'RENAME TO']);
      } else {
-       suggestKeywords(['AS']);
+       parser.suggestKeywords(['AS']);
      }
    }
  | AlterViewLeftSide 'SET' 'CURSOR'
    {
-     if (isHive()) {
-       suggestKeywords(['TBLPROPERTIES']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['TBLPROPERTIES']);
      }
    }
  | AlterViewLeftSide AnyAs 'CURSOR'
    {
-     suggestKeywords(['SELECT']);
+     parser.suggestKeywords(['SELECT']);
    }
  | AlterViewLeftSide AnyAs QuerySpecification_EDIT
  | AlterViewLeftSide '<impala>RENAME' 'CURSOR'
    {
-     suggestKeywords(['TO']);
+     parser.suggestKeywords(['TO']);
    }
  | AlterViewLeftSide '<impala>RENAME' 'TO' 'CURSOR'
    {
-     suggestDatabases({ appendDot: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  ;
 
@@ -700,7 +700,7 @@ AlterView_EDIT
 AlterViewLeftSide
  : 'ALTER' AnyView SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($3);
+     parser.addTablePrimary($3);
    }
  ;
 
@@ -713,31 +713,31 @@ AlterViewLeftSide_EDIT
    }
  | 'ALTER' AnyView 'CURSOR'
    {
-     suggestTables({ onlyViews: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyViews: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  ;
 
 Msck
  : '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($4);
+     parser.addTablePrimary($4);
    }
  ;
 
 Msck_EDIT
  : '<hive>MSCK' 'CURSOR'
    {
-     suggestKeywords(['REPAIR TABLE']);
+     parser.suggestKeywords(['REPAIR TABLE']);
    }
  | '<hive>MSCK' '<hive>REPAIR' 'CURSOR'
    {
-     suggestKeywords(['TABLE']);
+     parser.suggestKeywords(['TABLE']);
    }
  | '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' 'CURSOR'
    {
-     suggestTables({ onlyTables: true });
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables({ onlyTables: true });
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<hive>MSCK' '<hive>REPAIR' '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT
    {
@@ -754,6 +754,6 @@ ReloadFunction
 ReloadFunction_EDIT
  : '<hive>RELOAD' 'CURSOR'
    {
-     suggestKeywords(['FUNCTION']);
+     parser.suggestKeywords(['FUNCTION']);
    }
  ;

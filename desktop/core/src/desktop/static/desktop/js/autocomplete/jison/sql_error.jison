@@ -22,12 +22,12 @@ SqlStatements
 SqlStatement_EDIT
  : AnyCursor error
    {
-     if (isHive()) {
-       suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
-     } else if (isImpala()) {
-       suggestDdlAndDmlKeywords(['EXPLAIN']);
+     if (parser.isHive()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
+     } else if (parser.isImpala()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
      } else {
-       suggestDdlAndDmlKeywords();
+       parser.suggestDdlAndDmlKeywords();
      }
    }
  ;
@@ -40,7 +40,7 @@ SelectStatement
 SelectStatement_EDIT
  : 'SELECT' OptionalAllOrDistinct SelectList_ERROR_EDIT TableExpression
    {
-     selectListNoTableSuggest($3, $2);
+     parser.selectListNoTableSuggest($3, $2);
    }
  | 'SELECT' OptionalAllOrDistinct SelectList_ERROR TableExpression_EDIT
  ;
@@ -90,24 +90,24 @@ LateralView
 JoinType_EDIT
  : 'FULL' 'CURSOR' error
    {
-     suggestKeywords(['JOIN', 'OUTER JOIN']);
+     parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
    }
  | 'LEFT' 'CURSOR' error
    {
-     if (isHive()) {
-       suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
-     } else if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     if (parser.isHive()) {
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     } else if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
    }
  | 'RIGHT' 'CURSOR' error
    {
-     if (isImpala()) {
-       suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
+     if (parser.isImpala()) {
+       parser.suggestKeywords(['ANTI JOIN', 'JOIN', 'OUTER JOIN', 'SEMI JOIN']);
      } else {
-       suggestKeywords(['JOIN', 'OUTER JOIN']);
+       parser.suggestKeywords(['JOIN', 'OUTER JOIN']);
      }
    }
  ;
@@ -116,42 +116,42 @@ OptionalSelectConditions_EDIT
  : WhereClause error 'CURSOR' OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9, $10], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, isHive(), true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$4, $5, $6, $7, $8, $9, $10], [{ value: 'GROUP BY', weight: 8 }, { value: 'HAVING', weight: 7 }, { value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, true, parser.isHive(), true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$4 && !$5 && !$6 && !$7 && !$8 && !$9 && !$10
      };
    }
  | OptionalWhereClause OptionalGroupByClause HavingClause error 'CURSOR' OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$6, $7, $8, $9, $10], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$6, $7, $8, $9, $10], [{ value: 'WINDOW', weight: 6 }, { value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$6 && !$7 && !$8 && !$9 && !$10
      }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause WindowClause error 'CURSOR' OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$7, $8, $9, $10], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$7, $8, $9, $10], [{ value: 'ORDER BY', weight: 5 }, [{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$7 && !$8 && !$9 && !$10
      }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OrderByClause error 'CURSOR' OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$8, $9, $10], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [isHive(), true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$8, $9, $10], [[{ value: 'CLUSTER BY', weight: 4 }, { value: 'DISTRIBUTE BY', weight: 4 }, { value: 'SORT BY', weight: 4 }], { value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [parser.isHive(), true, parser.isImpala()]),
        cursorAtEnd: !$8 && !$9 && !$10
      }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause ClusterOrDistributeBy error 'CURSOR' OptionalLimitClause OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$9, $10], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$9, $10], [{ value: 'LIMIT', weight: 3 }, { value: 'OFFSET', weight: 2 }], [true, parser.isImpala()]),
        cursorAtEnd: !$9 && !$10
      }
    }
  | OptionalWhereClause OptionalGroupByClause OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy LimitClause error 'CURSOR' OptionalOffsetClause
    {
      $$ = {
-       suggestKeywords: getKeywordsForOptionalsLR([$10], [{ value: 'OFFSET', weight: 2 }], [isImpala()]),
+       suggestKeywords: parser.getKeywordsForOptionalsLR([$10], [{ value: 'OFFSET', weight: 2 }], [parser.isImpala()]),
        cursorAtEnd: !$10
      }
    }

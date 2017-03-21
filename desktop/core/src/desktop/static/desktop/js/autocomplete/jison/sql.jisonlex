@@ -34,21 +34,21 @@
 <hive>'BINARY'                             { return '<hive>BINARY'; }
 <hive>'COLUMN'                             { return '<hive>COLUMN'; }
 <hive>'CONF'                               { return '<hive>CONF'; }
-<hive>'CREATE'                             { determineCase(yytext); return '<hive>CREATE'; }
+<hive>'CREATE'                             { parser.determineCase(yytext); return '<hive>CREATE'; }
 <hive>'CROSS'                              { return '<hive>CROSS'; }
 <hive>'CUBE'                               { return '<hive>CUBE'; }
 <hive>'CURRENT'                            { return '<hive>CURRENT'; }
 <hive>'DATE'                               { return '<hive>DATE'; }
-<hive>'DELETE'                             { determineCase(yytext); return '<hive>DELETE'; }
-<hive>'DESCRIBE'                           { determineCase(yytext); return '<hive>DESCRIBE'; }
+<hive>'DELETE'                             { parser.determineCase(yytext); return '<hive>DELETE'; }
+<hive>'DESCRIBE'                           { parser.determineCase(yytext); return '<hive>DESCRIBE'; }
 <hive>'EXTENDED'                           { return '<hive>EXTENDED'; }
 <hive>'EXTERNAL'                           { return '<hive>EXTERNAL'; }
 <hive>'FOR'                                { return '<hive>FOR'; }
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'GRANT'                              { return '<hive>GRANT'; }
 <hive>'GROUPING'                           { return '<hive>GROUPING'; }
-<hive>'IMPORT'                             { determineCase(yytext); return '<hive>IMPORT'; }
-<hive>'INSERT'                             { determineCase(yytext); return '<hive>INSERT'; }
+<hive>'IMPORT'                             { parser.determineCase(yytext); return '<hive>IMPORT'; }
+<hive>'INSERT'                             { parser.determineCase(yytext); return '<hive>INSERT'; }
 <hive>'LATERAL'                            { return '<hive>LATERAL'; }
 <hive>'LOCAL'                              { return '<hive>LOCAL'; }
 <hive>'MACRO'                              { return '<hive>MACRO'; }
@@ -66,7 +66,7 @@
 <hive>'ADD'                                { return '<hive>ADD'; }
 <hive>'ADMIN'                              { return '<hive>ADMIN'; }
 <hive>'AFTER'                              { return '<hive>AFTER'; }
-<hive>'ANALYZE'                            { determineCase(yytext); return '<hive>ANALYZE'; }
+<hive>'ANALYZE'                            { parser.determineCase(yytext); return '<hive>ANALYZE'; }
 <hive>'ARCHIVE'                            { return '<hive>ARCHIVE'; }
 <hive>'ASC'                                { return '<hive>ASC'; }
 <hive>'AVRO'                               { return '<hive>AVRO'; }
@@ -97,8 +97,8 @@
 <hive>'ESCAPED'                            { return '<hive>ESCAPED'; }
 <hive>'ENABLE'                             { return '<hive>ENABLE'; }
 <hive>'EXCHANGE'                           { return '<hive>EXCHANGE'; }
-<hive>'EXPLAIN'                            { determineCase(yytext); return '<hive>EXPLAIN'; }
-<hive>'EXPORT'                             { determineCase(yytext); return '<hive>EXPORT'; }
+<hive>'EXPLAIN'                            { parser.determineCase(yytext); return '<hive>EXPLAIN'; }
+<hive>'EXPORT'                             { parser.determineCase(yytext); return '<hive>EXPORT'; }
 <hive>'FIELDS'                             { return '<hive>FIELDS'; }
 <hive>'FILE'                               { return '<hive>FILE'; }
 <hive>'FILEFORMAT'                         { return '<hive>FILEFORMAT'; }
@@ -116,7 +116,7 @@
 <hive>'JAR'                                { return '<hive>JAR'; }
 <hive>'KEYS'                               { return '<hive>KEYS'; }
 <hive>'LINES'                              { return '<hive>LINES'; }
-<hive>'LOAD'                               { determineCase(yytext); return '<hive>LOAD'; }
+<hive>'LOAD'                               { parser.determineCase(yytext); return '<hive>LOAD'; }
 <hive>'LOCATION'                           { this.begin('hdfs'); return '<hive>LOCATION'; }
 <hive>'LOCK'                               { return '<hive>LOCK'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
@@ -136,7 +136,7 @@
 <hive>'PURGE'                              { return '<hive>PURGE'; }
 <hive>'RCFILE'                             { return '<hive>RCFILE'; }
 <hive>'REBUILD'                            { return '<hive>REBUILD'; }
-<hive>'RELOAD'                             { determineCase(yytext); return '<hive>RELOAD'; }
+<hive>'RELOAD'                             { parser.determineCase(yytext); return '<hive>RELOAD'; }
 <hive>'REPAIR'                             { return '<hive>REPAIR'; }
 <hive>'REPLICATION'                        { return '<hive>REPLICATION'; }
 <hive>'RECOVER'                            { return '<hive>RECOVER'; }
@@ -151,7 +151,7 @@
 <hive>'SERDE'                              { return '<hive>SERDE'; }
 <hive>'SERDEPROPERTIES'                    { return '<hive>SERDEPROPERTIES'; }
 <hive>'SETS'                               { return '<hive>SETS'; }
-<hive>'SHOW'                               { determineCase(yytext); return '<hive>SHOW'; }
+<hive>'SHOW'                               { parser.determineCase(yytext); return '<hive>SHOW'; }
 <hive>'SHOW_DATABASE'                      { return '<hive>SHOW_DATABASE'; }
 <hive>'SKEWED'                             { return '<hive>SKEWED'; }
 <hive>'SKEWED LOCATION'                    { return '<hive>SKEWED_LOCATION'; } // Hack to prevent hdfs lexer state
@@ -173,7 +173,7 @@
 <hive>'TRANSACTIONS'                       { return '<hive>TRANSACTIONS'; }
 <hive>'UNARCHIVE'                          { return '<hive>UNARCHIVE'; }
 <hive>'UNIONTYPE'                          { return '<hive>UNIONTYPE'; }
-<hive>'USE'                                { determineCase(yytext); return '<hive>USE'; }
+<hive>'USE'                                { parser.determineCase(yytext); return '<hive>USE'; }
 <hive>'VIEW'                               { return '<hive>VIEW'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
 
@@ -191,14 +191,14 @@
 <impala>'COLUMN'                           { return '<impala>COLUMN'; }
 <impala>'COLUMNS'                          { return '<impala>COLUMNS'; }
 <impala>'COMMENT'                          { return '<impala>COMMENT'; }
-<impala>'COMPUTE'                          { determineCase(yytext); return '<impala>COMPUTE'; }
-<impala>'CREATE'                           { determineCase(yytext); return '<impala>CREATE'; }
+<impala>'COMPUTE'                          { parser.determineCase(yytext); return '<impala>COMPUTE'; }
+<impala>'CREATE'                           { parser.determineCase(yytext); return '<impala>CREATE'; }
 <impala>'DATA'                             { return '<impala>DATA'; }
 <impala>'DATABASES'                        { return '<impala>DATABASES'; }
 <impala>'DELIMITED'                        { return '<impala>DELIMITED'; }
-<impala>'DESCRIBE'                         { determineCase(yytext); return '<impala>DESCRIBE'; }
+<impala>'DESCRIBE'                         { parser.determineCase(yytext); return '<impala>DESCRIBE'; }
 <impala>'ESCAPED'                          { return '<impala>ESCAPED'; }
-<impala>'EXPLAIN'                          { determineCase(yytext); return '<impala>EXPLAIN'; }
+<impala>'EXPLAIN'                          { parser.determineCase(yytext); return '<impala>EXPLAIN'; }
 <impala>'EXTERNAL'                         { return '<impala>EXTERNAL'; }
 <impala>'EXTENDED'                         { return '<impala>EXTENDED'; }
 <impala>'FIELDS'                           { return '<impala>FIELDS'; }
@@ -212,10 +212,10 @@
 <impala>'GROUP'                            { return '<impala>GROUP'; }
 <impala>'HASH'                             { return '<impala>HASH'; }
 <impala>'INCREMENTAL'                      { return '<impala>INCREMENTAL'; }
-<impala>'INSERT'                           { determineCase(yytext); return '<impala>INSERT'; }
+<impala>'INSERT'                           { parser.determineCase(yytext); return '<impala>INSERT'; }
 <impala>'INTERVAL'                         { return '<impala>INTERVAL'; }
 <impala>'INIT_FN'                          { return '<impala>INIT_FN'; }
-<impala>'INVALIDATE'                       { determineCase(yytext); return '<impala>INVALIDATE'; }
+<impala>'INVALIDATE'                       { parser.determineCase(yytext); return '<impala>INVALIDATE'; }
 <impala>'INPATH'                           { this.begin('hdfs'); return '<impala>INPATH'; }
 <impala>'KEY'                              { return '<impala>KEY'; }
 <impala>'KUDU'                             { return '<impala>KUDU'; }
@@ -223,7 +223,7 @@
 <impala>LIKE\s+PARQUET                     { this.begin('hdfs'); return '<impala>LIKE_PARQUET'; }
 <impala>'LIMIT'                            { return '<impala>LIMIT'; }
 <impala>'LINES'                            { return '<impala>LINES'; }
-<impala>'LOAD'                             { determineCase(yytext); return '<impala>LOAD'; }
+<impala>'LOAD'                             { parser.determineCase(yytext); return '<impala>LOAD'; }
 <impala>'LOCATION'                         { this.begin('hdfs'); return '<impala>LOCATION'; }
 <impala>'MERGE_FN'                         { return '<impala>MERGE_FN'; }
 <impala>'METADATA'                         { return '<impala>METADATA'; }
@@ -237,7 +237,7 @@
 <impala>'PRIMARY'                          { return '<impala>PRIMARY'; }
 <impala>'RCFILE'                           { return '<impala>RCFILE'; }
 <impala>'REAL'                             { return '<impala>REAL'; }
-<impala>'REFRESH'                          { determineCase(yytext); return '<impala>REFRESH'; }
+<impala>'REFRESH'                          { parser.determineCase(yytext); return '<impala>REFRESH'; }
 <impala>'RENAME'                           { return '<impala>RENAME'; }
 <impala>'REPLACE'                          { return '<impala>REPLACE'; }
 <impala>'RETURNS'                          { return '<impala>RETURNS'; }
@@ -286,7 +286,7 @@
 
 // Reserved Keywords
 'ALL'                                      { return 'ALL'; }
-'ALTER'                                    { determineCase(yytext); return 'ALTER'; }
+'ALTER'                                    { parser.determineCase(yytext); return 'ALTER'; }
 'AND'                                      { return 'AND'; }
 'AS'                                       { return 'AS'; }
 'ASC'                                      { return 'ASC'; }
@@ -296,21 +296,21 @@
 'BY'                                       { return 'BY'; }
 'CASE'                                     { return 'CASE'; }
 'CHAR'                                     { return 'CHAR'; }
-'CREATE'                                   { determineCase(yytext); return 'CREATE'; }
+'CREATE'                                   { parser.determineCase(yytext); return 'CREATE'; }
 'CURRENT'                                  { return 'CURRENT'; }
 'DATABASE'                                 { return 'DATABASE'; }
 'DECIMAL'                                  { return 'DECIMAL'; }
 'DISTINCT'                                 { return 'DISTINCT'; }
 'DOUBLE'                                   { return 'DOUBLE'; }
 'DESC'                                     { return 'DESC'; }
-'DROP'                                     { determineCase(yytext); return 'DROP'; }
+'DROP'                                     { parser.determineCase(yytext); return 'DROP'; }
 'ELSE'                                     { return 'ELSE'; }
 'END'                                      { return 'END'; }
 'EXISTS'                                   { parser.yy.correlatedSubQuery = true; return 'EXISTS'; }
 'FALSE'                                    { return 'FALSE'; }
 'FLOAT'                                    { return 'FLOAT'; }
 'FOLLOWING'                                { return 'FOLLOWING'; }
-'FROM'                                     { determineCase(yytext); return 'FROM'; }
+'FROM'                                     { parser.determineCase(yytext); return 'FROM'; }
 'FULL'                                     { return 'FULL'; }
 'GROUP'                                    { return 'GROUP'; }
 'HAVING'                                   { return 'HAVING'; }
@@ -341,10 +341,10 @@
 'ROW'                                      { return 'ROW'; }
 'ROWS'                                     { return 'ROWS'; }
 'SCHEMA'                                   { return 'SCHEMA'; }
-'SELECT'                                   { determineCase(yytext); return 'SELECT'; }
+'SELECT'                                   { parser.determineCase(yytext); return 'SELECT'; }
 'SEMI'                                     { return 'SEMI'; }
-'SET'                                      { determineCase(yytext); return 'SET'; }
-'SHOW'                                     { determineCase(yytext); return 'SHOW'; }
+'SET'                                      { parser.determineCase(yytext); return 'SET'; }
+'SHOW'                                     { parser.determineCase(yytext); return 'SHOW'; }
 'SMALLINT'                                 { return 'SMALLINT'; }
 'STRING'                                   { return 'STRING'; }
 'TABLE'                                    { return 'TABLE'; }
@@ -353,60 +353,60 @@
 'TINYINT'                                  { return 'TINYINT'; }
 'TO'                                       { return 'TO'; }
 'TRUE'                                     { return 'TRUE'; }
-'TRUNCATE'                                 { determineCase(yytext); return 'TRUNCATE'; }
+'TRUNCATE'                                 { parser.determineCase(yytext); return 'TRUNCATE'; }
 'UNBOUNDED'                                { return 'UNBOUNDED'; }
-'UPDATE'                                   { determineCase(yytext); return 'UPDATE'; }
-'USE'                                      { determineCase(yytext); return 'USE'; }
+'UPDATE'                                   { parser.determineCase(yytext); return 'UPDATE'; }
+'USE'                                      { parser.determineCase(yytext); return 'USE'; }
 'UNION'                                    { return 'UNION'; }
 'VIEW'                                     { return 'VIEW'; }
 'VARCHAR'                                  { return 'VARCHAR'; } // Not in Impala
 'VALUES'                                   { return 'VALUES'; }
 'WHEN'                                     { return 'WHEN'; }
 'WHERE'                                    { return 'WHERE'; }
-'WITH'                                     { determineCase(yytext); return 'WITH'; }
+'WITH'                                     { parser.determineCase(yytext); return 'WITH'; }
 
 // Non-reserved Keywords
 'OVER'                                     { return 'OVER'; }
 'ROLE'                                     { return 'ROLE'; }
 
 // --- UDFs ---
-AVG\s*\(                                    { yy.lexer.unput('('); yytext = 'avg'; addFunctionLocation(yylloc, yytext); return 'AVG'; }
-CAST\s*\(                                  { yy.lexer.unput('('); yytext = 'cast'; addFunctionLocation(yylloc, yytext); return 'CAST'; }
-COUNT\s*\(                                 { yy.lexer.unput('('); yytext = 'count'; addFunctionLocation(yylloc, yytext); return 'COUNT'; }
-MAX\s*\(                                   { yy.lexer.unput('('); yytext = 'max'; addFunctionLocation(yylloc, yytext); return 'MAX'; }
-MIN\s*\(                                   { yy.lexer.unput('('); yytext = 'min'; addFunctionLocation(yylloc, yytext); return 'MIN'; }
-STDDEV_POP\s*\(                            { yy.lexer.unput('('); yytext = 'stddev_pop'; addFunctionLocation(yylloc, yytext); return 'STDDEV_POP'; }
-STDDEV_SAMP\s*\(                           { yy.lexer.unput('('); yytext = 'stddev_samp'; addFunctionLocation(yylloc, yytext); return 'STDDEV_SAMP'; }
-SUM\s*\(                                   { yy.lexer.unput('('); yytext = 'sum'; addFunctionLocation(yylloc, yytext); return 'SUM'; }
-VARIANCE\s*\(                              { yy.lexer.unput('('); yytext = 'variance'; addFunctionLocation(yylloc, yytext); return 'VARIANCE'; }
-VAR_POP\s*\(                               { yy.lexer.unput('('); yytext = 'var_pop'; addFunctionLocation(yylloc, yytext); return 'VAR_POP'; }
-VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_samp'; addFunctionLocation(yylloc, yytext); return 'VAR_SAMP'; }
-<hive>COLLECT_SET\s*\(                     { yy.lexer.unput('('); yytext = 'collect_set'; addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_SET'; }
-<hive>COLLECT_LIST\s*\(                    { yy.lexer.unput('('); yytext = 'collect_list'; addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_LIST'; }
-<hive>CORR\s*\(                            { yy.lexer.unput('('); yytext = 'corr'; addFunctionLocation(yylloc, yytext); return '<hive>CORR'; }
-<hive>COVAR_POP\s*\(                       { yy.lexer.unput('('); yytext = 'covar_pop'; addFunctionLocation(yylloc, yytext); return '<hive>COVAR_POP'; }
-<hive>COVAR_SAMP\s*\(                      { yy.lexer.unput('('); yytext = 'covar_samp'; addFunctionLocation(yylloc, yytext); return '<hive>COVAR_SAMP'; }
-<hive>HISTOGRAM_NUMERIC\s*\(               { yy.lexer.unput('('); yytext = 'histogram_numeric'; addFunctionLocation(yylloc, yytext); return '<hive>HISTOGRAM_NUMERIC'; }
-<hive>NTILE\s*\(                           { yy.lexer.unput('('); yytext = 'ntile'; addFunctionLocation(yylloc, yytext); return '<hive>NTILE'; }
-<hive>PERCENTILE\s*\(                      { yy.lexer.unput('('); yytext = 'percentile'; addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE'; }
-<hive>PERCENTILE_APPROX\s*\(               { yy.lexer.unput('('); yytext = 'percentile_approx'; addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE_APPROX'; }
-<impala>APPX_MEDIAN\s*\(                   { yy.lexer.unput('('); yytext = 'appx_median'; addFunctionLocation(yylloc, yytext); return '<impala>APPX_MEDIAN'; }
-<impala>EXTRACT\s*\(                       { yy.lexer.unput('('); yytext = 'extract'; addFunctionLocation(yylloc, yytext); return '<impala>EXTRACT'; }
-<impala>GROUP_CONCAT\s*\(                  { yy.lexer.unput('('); yytext = 'group_concat'; addFunctionLocation(yylloc, yytext); return '<impala>GROUP_CONCAT'; }
-<impala>STDDEV\s*\(                        { yy.lexer.unput('('); yytext = 'stddev'; addFunctionLocation(yylloc, yytext); return '<impala>STDDEV'; }
-<impala>VARIANCE_POP\s*\(                  { yy.lexer.unput('('); yytext = 'variance_pop'; addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_POP'; }
-<impala>VARIANCE_SAMP\s*\(                 { yy.lexer.unput('('); yytext = 'variance_samp'; addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_SAMP'; }
+AVG\s*\(                                   { yy.lexer.unput('('); yytext = 'avg'; parser.addFunctionLocation(yylloc, yytext); return 'AVG'; }
+CAST\s*\(                                  { yy.lexer.unput('('); yytext = 'cast'; parser.addFunctionLocation(yylloc, yytext); return 'CAST'; }
+COUNT\s*\(                                 { yy.lexer.unput('('); yytext = 'count'; parser.addFunctionLocation(yylloc, yytext); return 'COUNT'; }
+MAX\s*\(                                   { yy.lexer.unput('('); yytext = 'max'; parser.addFunctionLocation(yylloc, yytext); return 'MAX'; }
+MIN\s*\(                                   { yy.lexer.unput('('); yytext = 'min'; parser.addFunctionLocation(yylloc, yytext); return 'MIN'; }
+STDDEV_POP\s*\(                            { yy.lexer.unput('('); yytext = 'stddev_pop'; parser.addFunctionLocation(yylloc, yytext); return 'STDDEV_POP'; }
+STDDEV_SAMP\s*\(                           { yy.lexer.unput('('); yytext = 'stddev_samp'; parser.addFunctionLocation(yylloc, yytext); return 'STDDEV_SAMP'; }
+SUM\s*\(                                   { yy.lexer.unput('('); yytext = 'sum'; parser.addFunctionLocation(yylloc, yytext); return 'SUM'; }
+VARIANCE\s*\(                              { yy.lexer.unput('('); yytext = 'variance'; parser.addFunctionLocation(yylloc, yytext); return 'VARIANCE'; }
+VAR_POP\s*\(                               { yy.lexer.unput('('); yytext = 'var_pop'; parser.addFunctionLocation(yylloc, yytext); return 'VAR_POP'; }
+VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_samp'; parser.addFunctionLocation(yylloc, yytext); return 'VAR_SAMP'; }
+<hive>COLLECT_SET\s*\(                     { yy.lexer.unput('('); yytext = 'collect_set'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_SET'; }
+<hive>COLLECT_LIST\s*\(                    { yy.lexer.unput('('); yytext = 'collect_list'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COLLECT_LIST'; }
+<hive>CORR\s*\(                            { yy.lexer.unput('('); yytext = 'corr'; parser.addFunctionLocation(yylloc, yytext); return '<hive>CORR'; }
+<hive>COVAR_POP\s*\(                       { yy.lexer.unput('('); yytext = 'covar_pop'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COVAR_POP'; }
+<hive>COVAR_SAMP\s*\(                      { yy.lexer.unput('('); yytext = 'covar_samp'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COVAR_SAMP'; }
+<hive>HISTOGRAM_NUMERIC\s*\(               { yy.lexer.unput('('); yytext = 'histogram_numeric'; parser.addFunctionLocation(yylloc, yytext); return '<hive>HISTOGRAM_NUMERIC'; }
+<hive>NTILE\s*\(                           { yy.lexer.unput('('); yytext = 'ntile'; parser.addFunctionLocation(yylloc, yytext); return '<hive>NTILE'; }
+<hive>PERCENTILE\s*\(                      { yy.lexer.unput('('); yytext = 'percentile'; parser.addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE'; }
+<hive>PERCENTILE_APPROX\s*\(               { yy.lexer.unput('('); yytext = 'percentile_approx'; parser.addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE_APPROX'; }
+<impala>APPX_MEDIAN\s*\(                   { yy.lexer.unput('('); yytext = 'appx_median'; parser.addFunctionLocation(yylloc, yytext); return '<impala>APPX_MEDIAN'; }
+<impala>EXTRACT\s*\(                       { yy.lexer.unput('('); yytext = 'extract'; parser.addFunctionLocation(yylloc, yytext); return '<impala>EXTRACT'; }
+<impala>GROUP_CONCAT\s*\(                  { yy.lexer.unput('('); yytext = 'group_concat'; parser.addFunctionLocation(yylloc, yytext); return '<impala>GROUP_CONCAT'; }
+<impala>STDDEV\s*\(                        { yy.lexer.unput('('); yytext = 'stddev'; parser.addFunctionLocation(yylloc, yytext); return '<impala>STDDEV'; }
+<impala>VARIANCE_POP\s*\(                  { yy.lexer.unput('('); yytext = 'variance_pop'; parser.addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_POP'; }
+<impala>VARIANCE_SAMP\s*\(                 { yy.lexer.unput('('); yytext = 'variance_samp'; parser.addFunctionLocation(yylloc, yytext); return '<impala>VARIANCE_SAMP'; }
 
 // Analytical functions
-DENSE_RANK\s*\(                            { yy.lexer.unput('('); yytext = 'dense_rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-FIRST_VALUE\s*\(                           { yy.lexer.unput('('); yytext = 'first_value'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-LAG\s*\(                                   { yy.lexer.unput('('); yytext = 'lag'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-LAST_VALUE\s*\(                            { yy.lexer.unput('('); yytext = 'last_value'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-LEAD\s*\(                                  { yy.lexer.unput('('); yytext = 'lead'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-RANK\s*\(                                  { yy.lexer.unput('('); yytext = 'rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_number'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-<hive>CUME_DIST\s*\(                       { yy.lexer.unput('('); yytext = 'cume_dist'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
-<hive>PERCENT_RANK\s*\(                    { yy.lexer.unput('('); yytext = 'percent_rank'; addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+DENSE_RANK\s*\(                            { yy.lexer.unput('('); yytext = 'dense_rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+FIRST_VALUE\s*\(                           { yy.lexer.unput('('); yytext = 'first_value'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAG\s*\(                                   { yy.lexer.unput('('); yytext = 'lag'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LAST_VALUE\s*\(                            { yy.lexer.unput('('); yytext = 'last_value'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+LEAD\s*\(                                  { yy.lexer.unput('('); yytext = 'lead'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+RANK\s*\(                                  { yy.lexer.unput('('); yytext = 'rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_number'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+<hive>CUME_DIST\s*\(                       { yy.lexer.unput('('); yytext = 'cume_dist'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
+<hive>PERCENT_RANK\s*\(                    { yy.lexer.unput('('); yytext = 'percent_rank'; parser.addFunctionLocation(yylloc, yytext); return 'ANALYTIC'; }
 
 [0-9]+                                     { return 'UNSIGNED_INTEGER'; }
 [0-9]+(?:[YSL]|BD)?                        { return 'UNSIGNED_INTEGER'; }
@@ -416,7 +416,7 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <hdfs>'\u2020'                             { parser.yy.cursorFound = true; return 'CURSOR'; }
 <hdfs>'\u2021'                             { parser.yy.cursorFound = true; return 'PARTIAL_CURSOR'; }
 <hdfs>\s+[']                               { return 'HDFS_START_QUOTE'; }
-<hdfs>[^'\u2020\u2021]+                    { addHdfsLocation(yylloc, yytext); return 'HDFS_PATH'; }
+<hdfs>[^'\u2020\u2021]+                    { parser.addHdfsLocation(yylloc, yytext); return 'HDFS_PATH'; }
 <hdfs>[']                                  { this.popState(); return 'HDFS_END_QUOTE'; }
 <hdfs><<EOF>>                              { return 'EOF'; }
 

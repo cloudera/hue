@@ -36,99 +36,99 @@ GrantStatement
 GrantStatement_EDIT
  : '<hive>GRANT' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
    }
  | '<hive>GRANT' HivePrivilegeTypeList_EDIT OptionalOnSpecification
  | '<hive>GRANT' HivePrivilegeTypeList OnSpecification_EDIT
  | '<hive>GRANT' HivePrivilegeTypeList OptionalOnSpecification 'CURSOR'
    {
      if (!$3) {
-       suggestKeywords(['ON', 'TO']);
+       parser.suggestKeywords(['ON', 'TO']);
      } else {
-       suggestKeywords(['TO']);
+       parser.suggestKeywords(['TO']);
      }
    }
  | '<hive>GRANT' HivePrivilegeTypeList OptionalOnSpecification 'TO' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>GRANT' HivePrivilegeTypeList OptionalOnSpecification 'TO' PrincipalSpecificationList_EDIT
  | '<hive>GRANT' HivePrivilegeTypeList OptionalOnSpecification 'TO' PrincipalSpecificationList OptionalWithGrantOption 'CURSOR'
    {
      if (!$6) {
-       suggestKeywords(['WITH GRANT OPTION']);
+       parser.suggestKeywords(['WITH GRANT OPTION']);
      }
    }
  | '<hive>GRANT' HivePrivilegeTypeList OptionalOnSpecification 'TO' PrincipalSpecificationList WithGrantOption_EDIT
  | '<hive>GRANT' UserOrRoleList 'CURSOR'
    {
-     suggestKeywords(['TO']);
+     parser.suggestKeywords(['TO']);
    }
  | '<hive>GRANT' UserOrRoleList 'TO' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>GRANT' UserOrRoleList 'TO' PrincipalSpecificationList_EDIT
  | '<hive>GRANT' UserOrRoleList 'TO' PrincipalSpecificationList OptionalWithAdminOption 'CURSOR'
    {
      if (!$5) {
-       suggestKeywords(['WITH ADMIN OPTION']);
+       parser.suggestKeywords(['WITH ADMIN OPTION']);
      }
    }
  | '<hive>GRANT' UserOrRoleList 'TO' PrincipalSpecificationList WithAdminOption_EDIT
  | '<hive>GRANT' '<hive>ROLE' UserOrRoleList 'TO' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>GRANT' '<hive>ROLE' UserOrRoleList 'TO' PrincipalSpecificationList_EDIT
  | '<hive>GRANT' '<hive>ROLE' UserOrRoleList 'TO' PrincipalSpecificationList OptionalWithAdminOption 'CURSOR'
    {
      if (!$6) {
-       suggestKeywords(['WITH ADMIN OPTION']);
+       parser.suggestKeywords(['WITH ADMIN OPTION']);
      }
    }
  | '<hive>GRANT' '<hive>ROLE' UserOrRoleList 'TO' PrincipalSpecificationList WithAdminOption_EDIT
  | '<impala>GRANT' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
    }
  | '<impala>GRANT' '<impala>ROLE' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['TO GROUP']);
+     parser.suggestKeywords(['TO GROUP']);
    }
  | '<impala>GRANT' '<impala>ROLE' RegularOrBacktickedIdentifier 'TO' 'CURSOR'
    {
-     suggestKeywords(['GROUP']);
+     parser.suggestKeywords(['GROUP']);
    }
  | '<impala>GRANT' ImpalaPrivilegeType_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType 'CURSOR'
    {
-     suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' 'CURSOR'
    {
-     suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'CURSOR'
    {
-     suggestKeywords(['TO']);
+     parser.suggestKeywords(['TO']);
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'TO' 'CURSOR'
    {
-     suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['ROLE']);
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'TO' RegularOrBacktickedIdentifier OptionalWithGrantOption 'CURSOR'
    {
      if (!$7) {
-       suggestKeywords(['WITH GRANT OPTION']);
+       parser.suggestKeywords(['WITH GRANT OPTION']);
      }
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'TO' RegularOrBacktickedIdentifier WithGrantOption_EDIT
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'TO' '<impala>ROLE' RegularOrBacktickedIdentifier OptionalWithGrantOption 'CURSOR'
    {
      if (!$8) {
-       suggestKeywords(['WITH GRANT OPTION']);
+       parser.suggestKeywords(['WITH GRANT OPTION']);
      }
    }
  | '<impala>GRANT' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'TO' '<impala>ROLE' RegularOrBacktickedIdentifier WithGrantOption_EDIT
@@ -142,9 +142,9 @@ OptionalOnSpecification
 OnSpecification_EDIT
  : 'ON' 'CURSOR'
    {
-     suggestKeywords(['DATABASE', 'TABLE']);
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestKeywords(['DATABASE', 'TABLE']);
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | 'ON' HiveObjectSpecification_EDIT
  ;
@@ -153,23 +153,23 @@ HiveObjectSpecification
  : 'DATABASE' RegularOrBacktickedIdentifier
  | '<hive>TABLE' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($2);
+     parser.addTablePrimary($2);
    }
  | SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($1);
+     parser.addTablePrimary($1);
    }
  ;
 
 HiveObjectSpecification_EDIT
  : 'DATABASE' 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  | '<hive>TABLE' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<hive>TABLE' SchemaQualifiedTableIdentifier_EDIT
  | SchemaQualifiedTableIdentifier_EDIT
@@ -179,7 +179,7 @@ ImpalaObjectSpecification
  : 'DATABASE' RegularOrBacktickedIdentifier
  | '<impala>TABLE' SchemaQualifiedTableIdentifier
    {
-     addTablePrimary($2);
+     parser.addTablePrimary($2);
    }
  | '<impala>SERVER' RegularOrBacktickedIdentifier
  | '<impala>URI' RegularOrBacktickedIdentifier
@@ -188,12 +188,12 @@ ImpalaObjectSpecification
 ImpalaObjectSpecification_EDIT
  : 'DATABASE' 'CURSOR'
    {
-     suggestDatabases();
+     parser.suggestDatabases();
    }
  | '<impala>TABLE' 'CURSOR'
    {
-     suggestTables();
-     suggestDatabases({ appendDot: true });
+     parser.suggestTables();
+     parser.suggestDatabases({ appendDot: true });
    }
  | '<impala>TABLE' SchemaQualifiedTableIdentifier_EDIT
  ;
@@ -215,15 +215,15 @@ HivePrivilegeTypeList_EDIT
  | HivePrivilegeTypeList ',' HivePrivilegeTypeWithOptionalColumn_EDIT ',' HivePrivilegeTypeList
  | 'CURSOR' ',' HivePrivilegeTypeList
    {
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
    }
  | HivePrivilegeTypeList ',' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
    }
  | HivePrivilegeTypeList ',' 'CURSOR' ',' HivePrivilegeTypeList
    {
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
    }
  ;
 
@@ -267,15 +267,15 @@ PrincipalSpecificationList
 PrincipalSpecificationList_EDIT
  : PrincipalSpecificationList ',' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | 'CURSOR' ',' PrincipalSpecificationList
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | PrincipalSpecificationList ',' 'CURSOR' ',' PrincipalSpecificationList
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  ;
 
@@ -299,15 +299,15 @@ OptionalWithGrantOption
 WithGrantOption_EDIT
  : 'WITH' 'CURSOR'
    {
-     suggestKeywords(['GRANT OPTION']);
+     parser.suggestKeywords(['GRANT OPTION']);
    }
  | 'WITH' '<hive>GRANT' 'CURSOR'
    {
-     suggestKeywords(['OPTION']);
+     parser.suggestKeywords(['OPTION']);
    }
  | 'WITH' '<impala>GRANT' 'CURSOR'
    {
-     suggestKeywords(['OPTION']);
+     parser.suggestKeywords(['OPTION']);
    }
  ;
 
@@ -319,11 +319,11 @@ OptionalWithAdminOption
 WithAdminOption_EDIT
  : 'WITH' 'CURSOR'
    {
-     suggestKeywords(['ADMIN OPTION']);
+     parser.suggestKeywords(['ADMIN OPTION']);
    }
  | 'WITH' '<hive>ADMIN' 'CURSOR'
    {
-     suggestKeywords(['OPTION']);
+     parser.suggestKeywords(['OPTION']);
    }
  ;
 
@@ -343,7 +343,7 @@ RevokeStatement
 RevokeStatement_EDIT
  : '<hive>REVOKE' 'CURSOR'
    {
-     suggestKeywords(['ADMIN OPTION FOR', 'ALL', 'ALL GRANT OPTION FROM', 'ALL PRIVILEGES FROM', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'GRANT OPTION FOR', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
+     parser.suggestKeywords(['ADMIN OPTION FOR', 'ALL', 'ALL GRANT OPTION FROM', 'ALL PRIVILEGES FROM', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'GRANT OPTION FOR', 'INDEX', 'INSERT', 'LOCK', 'ROLE', 'SELECT', 'UPDATE']);
    }
  | '<hive>REVOKE' HivePrivilegeTypeList_EDIT
  | '<hive>REVOKE' HivePrivilegeTypeList OnSpecification_EDIT
@@ -351,129 +351,129 @@ RevokeStatement_EDIT
    {
      if (!$3) {
        if ($2.singleAll) {
-         suggestKeywords(['FROM', 'GRANT OPTION', 'ON', 'PRIVILEGES FROM']);
+         parser.suggestKeywords(['FROM', 'GRANT OPTION', 'ON', 'PRIVILEGES FROM']);
        } else {
-         suggestKeywords(['FROM', 'ON']);
+         parser.suggestKeywords(['FROM', 'ON']);
        }
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    }
  | '<hive>REVOKE' HivePrivilegeTypeList OptionalOnSpecification 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' HivePrivilegeTypeList OptionalOnSpecification 'FROM' PrincipalSpecificationList_EDIT
  | '<hive>REVOKE' '<hive>GRANT' 'CURSOR'
    {
-     suggestKeywords(['OPTION FOR']);
+     parser.suggestKeywords(['OPTION FOR']);
    }
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' 'CURSOR'
    {
-     suggestKeywords(['FOR']);
+     parser.suggestKeywords(['FOR']);
    }
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
+     parser.suggestKeywords(['ALL', 'ALTER', 'CREATE', 'DELETE', 'DROP', 'INDEX', 'INSERT', 'LOCK', 'SELECT', 'SHOW_DATABASE', 'UPDATE']);
    }
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' HivePrivilegeTypeList_EDIT
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' HivePrivilegeTypeList OnSpecification_EDIT
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' HivePrivilegeTypeList OptionalOnSpecification 'CURSOR'
    {
      if (!$6) {
-       suggestKeywords(['FROM', 'ON']);
+       parser.suggestKeywords(['FROM', 'ON']);
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    }
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' HivePrivilegeTypeList OptionalOnSpecification 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' '<hive>GRANT' 'OPTION' '<hive>FOR' HivePrivilegeTypeList OptionalOnSpecification 'FROM' PrincipalSpecificationList_EDIT
  | '<hive>REVOKE' UserOrRoleList 'CURSOR'
    {
      if ($2.toUpperCase() === 'ADMIN') {
-       suggestKeywords(['FROM', 'OPTION FOR']);
+       parser.suggestKeywords(['FROM', 'OPTION FOR']);
      } else {
-       suggestKeywords(['FROM']);
+       parser.suggestKeywords(['FROM']);
      }
    }
  | '<hive>REVOKE' UserOrRoleList 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' UserOrRoleList 'FROM' PrincipalSpecificationList_EDIT
  | '<hive>REVOKE' '<hive>ROLE' UserOrRoleList 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<hive>REVOKE' '<hive>ROLE' UserOrRoleList 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' '<hive>ROLE' UserOrRoleList 'FROM' PrincipalSpecificationList_EDIT
 
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' 'CURSOR'
    {
-     suggestKeywords(['FOR']);
+     parser.suggestKeywords(['FOR']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' 'CURSOR'
    {
-     suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['ROLE']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' UserOrRoleList 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' UserOrRoleList 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' UserOrRoleList 'FROM' PrincipalSpecificationList_EDIT
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' '<hive>ROLE' UserOrRoleList 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' '<hive>ROLE' UserOrRoleList 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP', 'ROLE', 'USER']);
+     parser.suggestKeywords(['GROUP', 'ROLE', 'USER']);
    }
  | '<hive>REVOKE' '<hive>ADMIN' 'OPTION' '<hive>FOR' '<hive>ROLE' UserOrRoleList 'FROM' PrincipalSpecificationList_EDIT
  | '<hive>REVOKE' '<hive>ALL' PrivilegesOrGrantOption_EDIT
  | '<hive>REVOKE' '<hive>ALL' PrivilegesOrGrantOption 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<impala>REVOKE' 'CURSOR'
    {
-     suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
+     parser.suggestKeywords(['ALL', 'INSERT', 'ROLE', 'SELECT']);
    }
  | '<impala>REVOKE' '<impala>ROLE' RegularOrBacktickedIdentifier 'CURSOR'
    {
-     suggestKeywords(['FROM GROUP']);
+     parser.suggestKeywords(['FROM GROUP']);
    }
  | '<impala>REVOKE' '<impala>ROLE' RegularOrBacktickedIdentifier 'FROM' 'CURSOR'
    {
-     suggestKeywords(['GROUP']);
+     parser.suggestKeywords(['GROUP']);
    }
  | '<impala>REVOKE' ImpalaPrivilegeType_EDIT
  | '<impala>REVOKE' ImpalaPrivilegeType 'CURSOR'
    {
-     suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
+     parser.suggestKeywords(['ON DATABASE', 'ON SERVER', 'ON TABLE', 'ON URI']);
    }
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' 'CURSOR'
    {
-     suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
+     parser.suggestKeywords(['DATABASE', 'SERVER', 'TABLE', 'URI']);
    }
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification_EDIT
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'CURSOR'
    {
-     suggestKeywords(['FROM']);
+     parser.suggestKeywords(['FROM']);
    }
  | '<impala>REVOKE' ImpalaPrivilegeType 'ON' ImpalaObjectSpecification 'FROM' 'CURSOR'
    {
-     suggestKeywords(['ROLE']);
+     parser.suggestKeywords(['ROLE']);
    }
  ;
 
@@ -485,6 +485,6 @@ PrivilegesOrGrantOption
 PrivilegesOrGrantOption_EDIT
  : '<hive>GRANT' 'CURSOR'
    {
-     suggestKeywords(['OPTION']);
+     parser.suggestKeywords(['OPTION']);
    }
  ;

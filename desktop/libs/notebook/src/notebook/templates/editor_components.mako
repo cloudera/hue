@@ -61,6 +61,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script src="${ static('desktop/js/ko.selectize.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
