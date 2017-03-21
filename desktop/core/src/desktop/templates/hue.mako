@@ -208,6 +208,7 @@ ${ hueIcons.symbols() }
               <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
               % if user.is_superuser:
               <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
+              % endif
               <li class="divider"></li>
               <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
             </ul>
