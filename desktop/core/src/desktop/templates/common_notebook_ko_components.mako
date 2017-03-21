@@ -440,7 +440,7 @@ except ImportError, e:
             }
           }
           timesChecked++;
-        }, 500);
+        }, 500, 'editor');
 
         self.notebook.avoidClosing = true;
         self.$downloadForm.submit();

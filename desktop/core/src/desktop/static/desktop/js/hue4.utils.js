@@ -21,6 +21,16 @@
   var hueIntervals = [];
 
   /**
+   * @param {string} [app] - context for the intervals
+   */
+  window.getIntervals = function(app) {
+    if (app) {
+      return hueIntervals.filter(function(obj){ return obj.app == app; });
+    }
+    return hueIntervals;
+  }
+
+  /**
    * @param {Function} fn - the function to be called at intervals
    * @param {Number} timeout - timeout in milliseconds
    * @param {string} [app] - context for the interval
@@ -28,7 +38,9 @@
   window.setInterval = function (fn, timeout, app) {
     var id = originalSetInterval(fn, timeout);
     hueIntervals.push({
-      args: arguments,
+      fn: fn,
+      timeout: timeout,
+      app: app,
       id: id,
       originalId: id,
       status: 'running'
@@ -60,7 +72,7 @@
    */
   window.pauseAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.args[2] && interval.args[2] === app) {
+      if (interval.app == app) {
         interval.status = 'paused';
         originalClearInterval(interval.id);
       }
@@ -72,9 +84,9 @@
    */
   window.resumeAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.args[2] && interval.args[2] === app && interval.status === 'paused') {
+      if (interval.app == app && interval.status === 'paused') {
         interval.status = 'running';
-        var id = originalSetInterval(interval.args[0], interval.args[1]);
+        var id = originalSetInterval(interval.fn, interval.timeout);
         interval.id = id;
       }
     });
@@ -85,7 +97,7 @@
    */
   window.clearAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.args[2] && interval.args[2] === app) {
+      if (interval.app == app) {
         window.clearInterval(interval.originalId);
       }
     });

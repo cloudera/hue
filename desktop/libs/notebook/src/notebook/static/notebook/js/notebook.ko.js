@@ -2023,7 +2023,7 @@ var EditorViewModel = (function() {
 
       var index = 0;
       self.snippets()[index].execute();
-      var clock = setInterval(next, 100);
+      var clock = window.setInterval(next, 100, 'editor');
 
       function next() {
         if (self.snippets()[index].status() == 'available' || self.snippets()[index].status() == 'failed') {
@@ -2031,7 +2031,7 @@ var EditorViewModel = (function() {
           if (self.snippets().length > index) {
             self.snippets()[index].execute();
           } else {
-            clearInterval(clock);
+            window.clearInterval(clock);
           }
         }
       }
