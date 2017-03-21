@@ -28,6 +28,7 @@
     classToRemove: 'resultTable',
     hintElement: null,
     mainScrollable: window,
+    app: null,
     stickToTopPosition: -1,
     labels: {
       GO_TO_COLUMN: "Go to column:",
@@ -154,7 +155,7 @@
       }
     };
     adjustSizes();
-    var sizeInterval = window.setInterval(adjustSizes, 300);
+    var sizeInterval = window.setInterval(adjustSizes, 300, self.options.app);
     self.disposeFunctions.push(function () {
       window.clearInterval(sizeInterval);
     });

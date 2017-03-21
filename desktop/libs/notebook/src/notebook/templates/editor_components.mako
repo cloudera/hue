@@ -110,7 +110,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       $('#queryBuilder').hide();
       $('#queryBuilderAlert').show();
     }
-  }, 500);
+  }, 500, 'editor');
 
 </script>
 <!-- End query builder imports -->
@@ -2124,14 +2124,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 + bannerTopHeight },
           % endif
           parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "fixed"
+          clonedContainerPosition: 'fixed',
+          app: 'editor'
         });
         $(el).jHueHorizontalScrollbar();
       } else {
         $(el).jHueTableExtender2({
           mainScrollable: $(el).parents('.dataTables_wrapper')[0],
           parentId: 'snippet_' + snippet.id(),
-          clonedContainerPosition: "absolute"
+          clonedContainerPosition: 'absolute',
+          app: 'editor'
         });
       }
     }, 0);

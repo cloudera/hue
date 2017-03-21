@@ -33,6 +33,7 @@
       includeNavigator: true,
       mainScrollable: window,
       stickToTopPosition: -1,
+      app: null,
       labels: {
         GO_TO_COLUMN: "Go to column:",
         PLACEHOLDER: "column name...",
@@ -347,7 +348,7 @@
         clonedTableVisibleContainer.height($pluginElement.parent().height());
         $pluginElement.parent().data("h", clonedTableVisibleContainer.height());
       }
-    }, 250);
+    }, 250, plugin.options.app);
     $pluginElement.data('firstcol_interval', firstColInt);
 
     $pluginElement.parent().resize(function () {
@@ -484,7 +485,7 @@
             clonedTable.find("thead>tr th:eq(" + i + ")").width($(this).width()).css("background-color", "#FFFFFF");
           });
         }
-      }, 250);
+      }, 250, plugin.options.app);
       $pluginElement.data('header_interval', headerInt);
 
       $pluginElement.parent().resize(function () {

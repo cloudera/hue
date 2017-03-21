@@ -1026,7 +1026,7 @@ $(document).ready(function () {
     }
   });
 
-  window.setInterval(checkModelDirtiness, 500);
+  window.setInterval(checkModelDirtiness, 500, 'oozie_workflow');
   $('#clone-btn').on('click', function () {
     var _url = $(this).data('clone-url');
     $.post(_url, function (data) {

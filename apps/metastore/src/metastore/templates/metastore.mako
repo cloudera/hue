@@ -1263,7 +1263,8 @@ ${ components.menubar() }
                     classToRemove: 'sample-table',
                     mainScrollable: '.content-panel',
                     stickToTopPosition: 73,
-                    clonedContainerPosition: "fixed"
+                    clonedContainerPosition: 'fixed',
+                    app: 'metastore'
                   });
                   $(selector).jHueHorizontalScrollbar();
                 },

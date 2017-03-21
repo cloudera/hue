@@ -3742,7 +3742,7 @@ function newSearch() {
             window.clearInterval(_widgetDropInterval);
             row.autosizeWidgets();
           }
-        }, 100)
+        }, 100, 'search')
       }
       else {
         row.autosizeWidgets();
