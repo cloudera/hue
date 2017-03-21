@@ -26,7 +26,7 @@ def get_client(identifier='default'):
   global CLIENT_CACHE
   _init_clients()
   if identifier not in CLIENT_CACHE:
-    raise ValueError('Unknown AWS client: %s, check you configuration' % identifier)
+    raise ValueError('Unknown AWS client: %s, check your configuration' % identifier)
   return CLIENT_CACHE[identifier]
 
 
