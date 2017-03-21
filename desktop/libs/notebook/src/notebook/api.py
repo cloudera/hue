@@ -621,8 +621,8 @@ def export_result(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   data_format = json.loads(request.POST.get('format', 'hdfs-file'))
   destination = json.loads(request.POST.get('destination', ''))
-  overwrite = json.loads(request.POST.get('overwrite', False))
-  is_embedded = json.loads(request.POST.get('is_embedded', False))
+  overwrite = json.loads(request.POST.get('overwrite', 'false'))
+  is_embedded = json.loads(request.POST.get('is_embedded', 'false'))
 
   api = get_api(request, snippet)
 
