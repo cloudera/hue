@@ -286,8 +286,7 @@ var Workflow = function (vm, workflow) {
             callback(widget, sourceNode);
           }
         }
-      },
-      async: false
+      }
     });
     logGA('new_node/' + widget.widgetType());
   };
