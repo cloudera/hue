@@ -3420,22 +3420,26 @@
 
                 var findIdentifierChainInTable = function (tablesToGo) {
                   var nextTable = tablesToGo.shift();
-                  apiHelper.fetchAutocomplete({
-                    sourceType: snippet.type(),
-                    defaultDatabase: snippet.database(),
-                    identifierChain: nextTable.identifierChain,
-                    silenceErrors: true,
-                    successCallback: function (data) {
-                      if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
-                        location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                        delete location.tables;
-                        token.parseLocation = location;
-                        activeTokens.push(token);
-                      } else if (tablesToGo.length > 0) {
-                        findIdentifierChainInTable(tablesToGo);
+                  if (typeof nextTable.subQuery === 'undefined') {
+                    apiHelper.fetchAutocomplete({
+                      sourceType: snippet.type(),
+                      defaultDatabase: snippet.database(),
+                      identifierChain: nextTable.identifierChain,
+                      silenceErrors: true,
+                      successCallback: function (data) {
+                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
+                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                          delete location.tables;
+                          token.parseLocation = location;
+                          activeTokens.push(token);
+                        } else if (tablesToGo.length > 0) {
+                          findIdentifierChainInTable(tablesToGo);
+                        }
                       }
-                    }
-                  })
+                    })
+                  } else if (tablesToGo.length > 0) {
+                    findIdentifierChainInTable(tablesToGo);
+                  }
                 };
 
                 findIdentifierChainInTable(location.tables.concat());

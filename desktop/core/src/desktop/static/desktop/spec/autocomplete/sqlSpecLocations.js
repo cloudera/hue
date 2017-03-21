@@ -168,6 +168,20 @@
       });
     });
 
+    it('should handle "select bl from blablabla join (select * from blablabla) s1;', function () {
+      assertLocations({
+        beforeCursor: 'select bl from blablabla join (select * from blablabla) s1;',
+        afterCursor: '',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 59 } },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 10 }, identifierChain: [{ name: 'bl' }], tables: [{ identifierChain: [{ name: 'blablabla' }] }, { subQuery: 's1' }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 25 }, identifierChain: [{ name: 'blablabla' }] },
+          { type: 'asterisk', location: { first_line: 1, last_line: 1, first_column: 39, last_column: 40 }, tables: [{ identifierChain: [{ name: 'blablabla' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 46, last_column: 55 }, identifierChain: [{ name: 'blablabla' }] }]
+
+      });
+    });
+
     it('should report locations for "SELECT CASE cos(boo.a) > baa.boo \\n' +
         '\\tWHEN baa.b THEN true \\n' +
         '\\tWHEN boo.c THEN false \\n' +
