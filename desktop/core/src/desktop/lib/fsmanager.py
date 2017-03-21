@@ -63,7 +63,7 @@ def _make_fs(name):
       else:
         logging.warn('Can not get filesystem called "%s" for "%s" schema' % (name, schema))
     except Exception, e:
-      logging.warn(e)
+      logging.error('Failed to get filesystem called "%s" for "%s" schema: %s' % (name, schema, e))
   return ProxyFS(fs_dict, DEFAULT_SCHEMA)
 
 
