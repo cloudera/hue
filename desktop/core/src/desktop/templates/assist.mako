@@ -1375,6 +1375,7 @@ from notebook.conf import get_ordered_interpreters
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
         self.availablePanels = [
+        % if interpreters:
           new AssistInnerPanel({
             panelData: new AssistDbPanel($.extend({
               apiHelper: self.apiHelper,
@@ -1387,8 +1388,10 @@ from notebook.conf import get_ordered_interpreters
             minHeight: 75
           })
         ];
+        % endif
 
         if (self.tabsEnabled) {
+          % if 'filebrowser' in apps:
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistHdfsPanel({
               apiHelper: self.apiHelper
@@ -1399,6 +1402,7 @@ from notebook.conf import get_ordered_interpreters
             icon: 'fa-folder-o',
             minHeight: 50
           }));
+          % endif
 
           if (window.IS_S3_ENABLED) { // coming from common_header.mako
             self.availablePanels.push(new AssistInnerPanel({
@@ -1413,6 +1417,7 @@ from notebook.conf import get_ordered_interpreters
             }));
           }
 
+          % if 'search' in apps:
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistCollectionsPanel({
               apiHelper: self.apiHelper
@@ -1424,7 +1429,9 @@ from notebook.conf import get_ordered_interpreters
             minHeight: 50,
             showNavSearch: false
           }));
+          % endif
 
+          % if 'hbase' in apps:
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistHBasePanel({
               apiHelper: self.apiHelper
@@ -1436,6 +1443,7 @@ from notebook.conf import get_ordered_interpreters
             minHeight: 50,
             showNavSearch: false
           }));
+          % endif
 
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistDocumentsPanel({
