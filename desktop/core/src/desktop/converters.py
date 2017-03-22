@@ -17,15 +17,13 @@
 
 import json
 import logging
-import re
 import time
 
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
-  DOC2_NAME_INVALID_CHARS
+from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
 from notebook.api import _historify
 from notebook.models import import_saved_beeswax_query
 
@@ -218,7 +216,6 @@ class DocumentConverter(object):
     try:
       with transaction.atomic():
         name = name if name else document.name
-        name = re.sub(DOC2_NAME_INVALID_CHARS, '', name)
 
         document2 = Document2.objects.create(
           owner=self.user,
