@@ -193,7 +193,7 @@ ${ hueIcons.symbols() }
           %>
           <button class="btn"
           % if view_profile:
-            data-bind="click: function(){ page('/home') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
+            data-bind="click: function(){ page('/useradmin/users/') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
           % endif
           >
           ${ user.username }
@@ -571,7 +571,7 @@ ${ assist.assistPanel() }
               hueUtils.waitForObservable(viewModel.selectedNotebook, function(){
                 viewModel.selectedNotebook().selectedSnippet(type);
                 viewModel.editorType(type);
-                viewModel.newNotebook();
+                viewModel.newNotebook(type);
               });
             }
           })

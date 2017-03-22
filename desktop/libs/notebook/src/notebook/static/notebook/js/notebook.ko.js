@@ -2606,7 +2606,7 @@ var EditorViewModel = (function() {
 
     self.newNotebook = function (editorType, callback) {
       $.post("/notebook/api/create_notebook", {
-        type: options.editor_type || editorType || 'hive',
+        type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
