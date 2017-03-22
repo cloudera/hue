@@ -18,6 +18,8 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-attributes.less";
 
+@import "hue-tables.less";
+
 .app-header {
   font-size: 20px;
   padding-top: 13px;
@@ -45,4 +47,69 @@
 
 .table-huedatatable {
   border: none;
+}
+
+.clear {
+  clear: both;
+}
+
+.right {
+  text-align: right !important;
+}
+
+.center {
+  text-align: center !important;
+}
+
+.left {
+  text-align: left !important;
+}
+
+.nowrap, .no-wrap {
+  white-space: nowrap;
+}
+
+.no-padding {
+  padding: 0;
+}
+
+
+// Hue Checkbox
+
+.hueCheckbox {
+  width: 15px;
+  height: 15px;
+  border: 1px solid #CCCCCC;
+  margin-top: 2px !important;
+  padding: 0 !important;
+  display: block !important;
+  cursor: default;
+}
+
+.hueCheckbox.disabled {
+  border: 1px solid #DDDDDD;
+  background-color: #FEFEFE;
+  cursor: not-allowed;
+}
+
+.hueCheckbox:hover {
+  border-color: #999999;
+}
+
+.hueCheckbox.disabled:hover {
+  border-color: #DDDDDD;
+}
+
+.hueCheckboxText {
+  left: 3px;
+  position: relative;
+  top: -3px;
+}
+
+.hueCheckbox.hide {
+  display: none!important;
+}
+
+.hue-uncheck::before {
+  line-height: 16px;
 }

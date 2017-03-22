@@ -31,6 +31,94 @@
   fill: #D7B9EB;
 }
 
+.subnav {
+  background-color: #EEEEEE;
+  background-image: -moz-linear-gradient(center top, #F5F5F5 0%, #EEEEEE 100%);
+  background-repeat: repeat-x;
+  border: 1px solid #E5E5E5;
+  border-radius: 4px;
+  -webkit-border-radius: 4px;
+  -moz-border-radius: 4px;
+  height: 36px;
+  width: 100%;
+}
+
+.subnav .nav {
+  margin-bottom: 0;
+}
+
+.subnav .nav > li > a {
+  border-left: 1px solid #F5F5F5;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-right: 1px solid #E5E5E5;
+  margin: 0;
+  padding-bottom: 11px;
+  padding-top: 11px;
+}
+
+.subnav .nav > li > a:hover {
+  border-right: 1px solid #E5E5E5;
+  border-left: 1px solid #F5F5F5;
+}
+
+.subnav .nav > .active > a, .subnav .nav > .active > a:hover {
+  background-color: #E9E9E9;
+  border-left: 0 none;
+  border-right-color: #DDDDDD;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.05) inset;
+  color: #777777;
+  padding-left: 13px;
+}
+
+.subnav .nav > .active > a .caret, .subnav .nav > .active > a:hover .caret {
+  border-top-color: #777777;
+}
+
+.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+  border-left: 0 none;
+  border-radius: 4px 0 0 4px;
+  -webkit-border-radius: 4px 0 0 4px;
+  -moz-border-radius: 4px 0 0 4px;
+  padding-left: 12px;
+}
+
+.subnav .nav > li:last-child > a {
+  border-right: 0 none;
+}
+
+.subnav .dropdown-menu {
+  border-radius: 0 0 4px 4px;
+  -webkit-border-radius: 0 0 4px 4px;
+  -moz-border-radius: 0 0 4px 4px;
+}
+
+.subnav-fixed {
+  border-color: #D5D5D5;
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+  border-width: 0 0 1px;
+  box-shadow: 0 1px 0 #FFFFFF inset, 0 1px 5px rgba(0, 0, 0, 0.1);
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 48px;
+  z-index: 1020;
+}
+
+.subnav-fixed .nav {
+  margin: 0 auto;
+  padding: 0 1px;
+}
+
+.subnav .nav > li:first-child > a, .subnav .nav > li:first-child > a:hover {
+  border-radius: 0;
+  -webkit-border-radius: 0;
+  -moz-border-radius: 0;
+}
+
 .hue3-navbar-fixed-top {
   position: fixed;
   right: 0;
