@@ -64,7 +64,7 @@ def search_entities(request):
   response = {'status': -1}
 
   api = NavigatorApi()
-  
+
   query_s = request.POST.get('query_s')
   offset = request.POST.get('offset', 0)
   limit = request.POST.get('limit', 100)

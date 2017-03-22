@@ -293,15 +293,6 @@ class TestDocument2(object):
     assert_equal(Document2.TRASH_DIR, data['children'][0]['name'])
 
 
-  def test_validate_name(self):
-    # Test invalid names
-    invalid_name = '/invalid'
-    response = self.client.post('/desktop/api2/doc/mkdir', {'parent_uuid': json.dumps(self.home_dir.uuid), 'name': json.dumps(invalid_name)})
-    data = json.loads(response.content)
-    assert_equal(-1, data['status'], data)
-    assert_true("contains some special characters: /" in data['message'])
-
-
   def test_validate_immutable_user_directories(self):
     # Test that home and Trash directories cannot be recreated or modified
     test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)

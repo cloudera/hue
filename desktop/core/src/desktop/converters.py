@@ -206,6 +206,8 @@ class DocumentConverter(object):
   def _create_doc2(self, document, doctype, name=None, description=None, data=None):
     try:
       with transaction.atomic():
+        name = name if name else document.name
+
         document2 = Document2.objects.create(
           owner=self.user,
           parent_directory=self._get_parent_directory(document),
