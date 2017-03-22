@@ -54,4 +54,6 @@ ${ hueAceAutocompleter.hueAceAutocompleter() }
 ${ editorComponents.commonJS(is_embeddable) }
 </span>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

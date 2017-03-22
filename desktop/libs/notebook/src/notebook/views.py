@@ -73,13 +73,10 @@ def notebook(request, is_embeddable=False):
   except:
     LOG.exception('Spark is not enabled')
 
-  template = 'notebook.mako'
-  if is_embeddable:
-    template = 'notebook_embeddable.mako'
-
-  return render(template, request, {
+  return render('notebook.mako', request, {
       'editor_id': notebook_id or None,
       'notebooks_json': '{}',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'options_json': json.dumps({
           'languages': get_ordered_interpreters(request.user),
           'session_properties': SparkApi.get_properties(),
