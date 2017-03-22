@@ -25,10 +25,12 @@
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 <%namespace name="hueAceAutocompleter" file="hue_ace_autocompleter.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
+%endif
 
 <span id="editorComponents" class="editorComponents notebook">
-${ editorComponents.includes() }
+${ editorComponents.includes(is_embeddable) }
 
 <style type="text/css">
   .snippet {
@@ -37,16 +39,19 @@ ${ editorComponents.includes() }
 </style>
 
 ${ editorComponents.topBar() }
-${ editorComponents.commonHTML() }
+${ editorComponents.commonHTML(is_embeddable) }
 
+%if not is_embeddable:
 ${ assist.assistPanel() }
 ${ assist.assistJSModels() }
+%endif
+
 ${ configKoComponents.config() }
 ${ notebookKoComponents.aceKeyboardShortcuts() }
 ${ notebookKoComponents.downloadSnippetResults() }
 ${ hueAceAutocompleter.hueAceAutocompleter() }
 
-${ editorComponents.commonJS() }
+${ editorComponents.commonJS(is_embeddable) }
 </span>
 
 ${ commonfooter(request, messages) | n,unicode }

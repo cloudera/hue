@@ -108,12 +108,11 @@ def editor(request, is_mobile=False, is_embeddable=False):
   template = 'editor.mako'
   if is_mobile:
     template = 'editor_m.mako'
-  if is_embeddable:
-    template = 'editor_embeddable.mako'
 
   return render(template, request, {
       'editor_id': editor_id or None,
       'notebooks_json': '{}',
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'editor_type': editor_type,
       'options_json': json.dumps({
         'languages': get_ordered_interpreters(request.user),
