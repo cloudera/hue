@@ -8,14 +8,6 @@ var jqueryShim = new webpack.ProvidePlugin({
   'window.jQuery': 'jquery'
 });
 
-var PROD = JSON.parse(process.env.PROD_ENV || '0');
-
-var plugins = [];
-
-if (PROD) {
-  plugins.push(new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }));
-}
-
 // Note that since we are using 'npm install' and stopped using --legacy-bundling,
 // we are not ensured which version is installed and where. We will try cloudera-ui
 // first, and if it is not there we will let 'require' resolve it. The latter means
@@ -46,15 +38,16 @@ module.exports = {
       _: 'lodash',
       komapping: 'knockout.mapping',
       'query-command-supported': 'query-command-supported/src/queryCommandSupported',
-      pubsub: 'pubsub.js/pubsub'
+      pubsub: 'pubsub.js/pubsub',
+      page: 'page'
     }
   },
   entry: {
-    cui: ['./desktop/core/src/desktop/static/desktop/js/cui.js']
+    cui: ['./desktop/core/src/desktop/static/desktop/js/hue.js']
   },
   output: {
     path: './desktop/core/src/desktop/static/desktop/js',
-    filename: 'cui-bundle.js'
+    filename: 'hue-bundle.js'
   },
   module: {
     loaders: [
@@ -80,5 +73,8 @@ module.exports = {
     ]
   },
 
-  plugins: plugins
+  plugins: [
+    new webpack.optimize.UglifyJsPlugin({ compress: { warnings: false } }),
+    new webpack.BannerPlugin('\nLicensed to Cloudera, Inc. under one\nor more contributor license agreements.  See the NOTICE file\ndistributed with this work for additional information\nregarding copyright ownership.  Cloudera, Inc. licenses this file\nto you under the Apache License, Version 2.0 (the\n"License"); you may not use this file except in compliance\nwith the License.  You may obtain a copy of the License at\n\nhttp://www.apache.org/licenses/LICENSE-2.0\n\nUnless required by applicable law or agreed to in writing, software\ndistributed under the License is distributed on an "AS IS" BASIS,\nWITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.\nSee the License for the specific language governing permissions and\nlimitations under the License.\n'),
+  ]
 };
