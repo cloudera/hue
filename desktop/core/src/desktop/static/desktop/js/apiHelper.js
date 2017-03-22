@@ -63,6 +63,7 @@ var ApiHelper = (function () {
   var CONFIG_APPS_API = '/desktop/api/configurations';
   var SOLR_COLLECTIONS_API = '/indexer/api/collections/';
   var HBASE_API_PREFIX = '/hbase/api/';
+  var SAVE_TO_FILE = '/filebrowser/save';
 
   var NAV_URLS = {
     ADD_TAGS: '/metadata/api/navigator/add_tags',
@@ -310,6 +311,20 @@ var ApiHelper = (function () {
       }
     })
     .fail(self.assistErrorCallback(options));
+  };
+
+  /**
+   * @param {Object} data
+   * @param {Object} options
+   * @param {function} [options.successCallback]
+   */
+  ApiHelper.prototype.saveSnippetToFile = function (data, options) {
+    var self = this;
+    $.post(SAVE_TO_FILE, data, function (result) {
+      if (typeof options.successCallback !== 'undefined') {
+        options.successCallback(result);
+      }
+    }, dataType='json').fail(self.assistErrorCallback(options));
   };
 
   /**

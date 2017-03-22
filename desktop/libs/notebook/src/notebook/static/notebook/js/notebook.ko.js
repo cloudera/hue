@@ -347,6 +347,24 @@ var EditorViewModel = (function() {
       }
     });
 
+    huePubSub.subscribe('save.snippet.to.file', function() {
+      var data = {
+        path: self.statementPath(),
+        contents: self.statement()
+      }
+      var options = {
+        successCallback: function(result) {
+          if (result && result.exists) {
+            $(document).trigger("info", result.path + ' saved successfully.');
+          } else {
+            self._ajaxError(result);
+          }
+        }
+      }
+      var apiHelper = ApiHelper.getInstance();
+      apiHelper.saveSnippetToFile(data, options);
+    });
+
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
     self.pinnedContextTabs = ko.observableArray(typeof snippet.pinnedContextTabs != "undefined" && snippet.pinnedContextTabs != null ? snippet.pinnedContextTabs : []);
