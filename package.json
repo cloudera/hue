@@ -26,7 +26,8 @@
     "knockout.mapping": "2.4.3",
     "less": "2.6.1",
     "lodash": "3.10.1",
-    "pubsub.js": "1.4.3"
+    "pubsub.js": "1.4.3",
+    "page": "^1.7.1"
   },
   "devDependencies": {
     "babel-core": "6.22.1",

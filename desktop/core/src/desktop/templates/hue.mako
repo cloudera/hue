@@ -61,7 +61,6 @@
   </script>
 
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
-  <script src="${ static('desktop/ext/js/page.js') }"></script>
 
 </head>
 
@@ -411,7 +410,7 @@ ${ hueIcons.symbols() }
   </div>
 </div>
 
-<script src="${ static('desktop/js/cui-bundle.js') }"></script>
+<script src="${ static('desktop/js/hue-bundle.js') }"></script>
 
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
