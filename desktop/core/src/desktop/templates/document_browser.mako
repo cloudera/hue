@@ -650,7 +650,7 @@ from desktop.views import _ko
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'hive', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
                     % else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive')}"
+                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=hive') }, click: openExternalLink"
                     % endif
                     >
                       <img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}
@@ -662,8 +662,8 @@ from desktop.views import _ko
                     <a title="${_('Impala Query')}"
                     % if is_embeddable:
                       data-bind="click: function() { huePubSub.publish('open.editor.new.query', {type: 'impala', 'directoryUuid': getDirectory()}); }" href="javascript:void(0);"
-                    else:
-                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }"
+                    % else:
+                      data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:editor') }?type=impala') }, click: openExternalLink"
                     % endif
                     >
                       <img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}
