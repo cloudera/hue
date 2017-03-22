@@ -526,7 +526,7 @@ ${ assist.assistPanel() }
         filebrowser: '/filebrowser/?is_embeddable=true',
         filebrowser_s3: '/filebrowser/view=S3A://?is_embeddable=true',
         fileviewer: 'filebrowser/view=',
-        home: '/home_embeddable',
+        home: '/home?is_embeddable=true',
         indexer: '/indexer/indexer/?is_embeddable=true',
         collections: '/dashboard/admin/collections?is_embeddable=true',
         indexes: '/indexer/?is_embeddable=true',
@@ -909,6 +909,10 @@ ${ assist.assistPanel() }
 
         page('/notebook/notebook', function(ctx){
           self.currentApp('notebook');
+        });
+
+        page('/home', function(ctx){
+          self.currentApp('home');
         });
 
         page('/', function(ctx){

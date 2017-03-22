@@ -22,13 +22,36 @@
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="common_home" file="/common_home.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
-
 ${ assist.assistJSModels() }
-
-${ common_home.homeJSModels() }
-
 ${ assist.assistPanel() }
+%endif
+
+${ common_home.homeJSModels(is_embeddable) }
+
+%if is_embeddable:
+
+<style type="text/css">
+
+  .step-icon {
+    color: #DDDDDD;
+    font-size: 116px;
+    margin: 10px;
+    margin-right: 20px;
+    width: 130px;
+  }
+
+  .nav-tabs > li.active {
+    padding: 0;
+  }
+
+  svg.hi {
+    width: 24px;
+  }
+</style>
+
+%else:
 
 <style type="text/css">
   html {
@@ -160,8 +183,26 @@ ${ assist.assistPanel() }
   }
 </style>
 
-
 ${ common_home.navbar() }
+%endif
+
+%if is_embeddable:
+  <div id="homeComponents" class="main-content">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+    <div class="vertical-full row-fluid panel-container">
+      <div class="content-panel home-container" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '8px' : '0' }">
+        <div class="doc-browser" data-bind="component: {
+          name: 'doc-browser',
+          params: {
+            activeEntry: activeEntry
+          }
+        }"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+%else :
 
 <div id="homeComponents" class="main-content">
 ##   Uncomment to enable the assist panel
@@ -202,8 +243,11 @@ ${ common_home.navbar() }
   </div>
 </div>
 
-${ common_home.vm() }
+%endif
+
+${ common_home.vm(is_embeddable) }
 ${ common_home.tour() }
 
-
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

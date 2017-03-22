@@ -121,13 +121,10 @@ def home2(request, is_embeddable=False):
 
   apps = appmanager.get_apps_dict(request.user)
 
-  template = 'home2.mako'
-  if is_embeddable:
-    template = 'home_embeddable.mako'
-
-  return render(template, request, {
+  return render('home2.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
+    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
+    'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
 def home_embeddable(request):
