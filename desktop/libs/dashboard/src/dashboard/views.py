@@ -51,7 +51,7 @@ DEFAULT_LAYOUT = [
 ]
 
 
-def index(request, is_mobile=False, is_embeddable=False):
+def index(request, is_mobile=False):
   hue_collections = DashboardController(request.user).get_search_collections()
   collection_id = request.GET.get('collection')
 
@@ -79,8 +79,6 @@ def index(request, is_mobile=False, is_embeddable=False):
   template = 'search.mako'
   if is_mobile:
     template = 'search_m.mako'
-  if is_embeddable:
-    template = 'search_embeddable.mako'
 
   return render(template, request, {
     'collection': collection,
@@ -93,16 +91,14 @@ def index(request, is_mobile=False, is_embeddable=False):
     }),
     'is_owner': collection_doc.doc.get().can_write(request.user),
     'can_edit_index': can_edit_index(request.user),
+    'is_embeddable': request.GET.get('is_embeddable', False),
     'mobile': is_mobile,
   })
 
 def index_m(request):
   return index(request, True)
 
-def index_embeddable(request):
-  return index(request, False, True)
-
-def new_search(request, is_embeddable=False):
+def new_search(request):
   engine = request.GET.get('engine', 'solr')
   collections = get_engine(request.user, engine).datasets()
   if not collections:
@@ -110,10 +106,6 @@ def new_search(request, is_embeddable=False):
 
   collection = Collection2(user=request.user, name=collections[0], engine=engine)
   query = {'qs': [{'q': ''}], 'fqs': [], 'start': 0}
-
-  template = 'search.mako'
-  if is_embeddable:
-    template = 'search_embeddable.mako'
 
   if request.GET.get('format', 'plain') == 'json':
     return JsonResponse({
@@ -127,7 +119,7 @@ def new_search(request, is_embeddable=False):
        }
      })
   else:
-    return render(template, request, {
+    return render('search.mako', request, {
       'collection': collection,
       'query': query,
       'initial': json.dumps({
@@ -137,11 +129,9 @@ def new_search(request, is_embeddable=False):
           'engines': get_engines(request.user)
        }),
       'is_owner': True,
+      'is_embeddable': request.GET.get('is_embeddable', False),
       'can_edit_index': can_edit_index(request.user)
     })
-
-def new_search_embeddable(request):
-  return new_search(request, True)
 
 def browse(request, name, is_mobile=False):
   engine = request.GET.get('engine', 'solr')

@@ -518,7 +518,7 @@ ${ assist.assistPanel() }
         editor: '/notebook/editor?is_embeddable=true',
         notebook: '/notebook/notebook?is_embeddable=true',
         metastore: '/metastore/tables/?is_embeddable=true',
-        dashboard: '/dashboard/embeddable/new_search',
+        dashboard: '/dashboard/new_search?is_embeddable=true',
         oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
         oozie_coordinator: '/oozie/editor/coordinator/new/?is_embeddable=true',
         oozie_bundle: '/oozie/editor/bundle/new/?is_embeddable=true',
@@ -913,6 +913,10 @@ ${ assist.assistPanel() }
 
         page('/home', function(ctx){
           self.currentApp('home');
+        });
+
+        page('/dashboard/new_search', function(ctx){
+          self.currentApp('dashboard');
         });
 
         page('/', function(ctx){

@@ -24,12 +24,15 @@ from desktop import conf
 <%namespace name="common_search" file="common_search.mako" />
 <%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Dashboard'), "dashboard", user, request, "80px") | n,unicode }
-
 ${ notebookKoComponents.downloadSnippetResults() }
+%endif
 
 <div id="searchComponents">
-${ common_search.page_structure() }
+${ common_search.page_structure(is_embeddable) }
 </div>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

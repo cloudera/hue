@@ -20,10 +20,8 @@ from django.conf.urls import patterns, url
 urlpatterns = patterns('dashboard.views',
   url(r'^$', 'index', name='index'),
   url(r'^m$', 'index_m', name='index_m'),
-  url(r'^embeddable$', 'index_embeddable', name='index_embeddable'),
   url(r'^save$', 'save', name='save'),
   url(r'^new_search', 'new_search', name='new_search'),
-  url(r'^embeddable/new_search', 'new_search_embeddable', name='new_search_embeddable'),
   url(r'^browse/(?P<name>.+)', 'browse', name='browse'),
   url(r'^browse_m/(?P<name>.+)', 'browse_m', name='browse_m'),
 
