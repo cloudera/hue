@@ -39,11 +39,10 @@ module.exports = {
       komapping: 'knockout.mapping',
       'query-command-supported': 'query-command-supported/src/queryCommandSupported',
       pubsub: 'pubsub.js/pubsub',
-      page: 'page'
     }
   },
   entry: {
-    cui: ['./desktop/core/src/desktop/static/desktop/js/hue.js']
+    hue: ['./desktop/core/src/desktop/static/desktop/js/hue.js']
   },
   output: {
     path: './desktop/core/src/desktop/static/desktop/js',
