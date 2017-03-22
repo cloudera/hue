@@ -23,7 +23,7 @@
 ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 
 
-<div class="navbar hue3-navbar-fixed-top" data-bind="visible: ! $root.isPlayerMode()">
+<div class="navbar hue-title-bar" data-bind="visible: ! $root.isPlayerMode()">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">
