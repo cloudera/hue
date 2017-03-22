@@ -19,7 +19,7 @@ import calendar
 import json
 import logging
 import os
-import re
+import urllib
 import uuid
 
 from itertools import chain
@@ -52,8 +52,6 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 HUE_VERSION = None
-
-DOC2_NAME_INVALID_CHARS = "[<>/~`]"
 
 
 def uuid_default():
@@ -1076,10 +1074,11 @@ class Document2(models.Model):
 
   @property
   def path(self):
+    quoted_name = urllib.quote(self.name)
     if self.parent_directory:
-      return '%s/%s' % (self.parent_directory.path, self.name)
+      return '%s/%s' % (self.parent_directory.path, quoted_name)
     else:
-      return self.name
+      return quoted_name
 
   @property
   def dirname(self):
@@ -1195,11 +1194,6 @@ class Document2(models.Model):
     self.inherit_permissions()
 
   def validate(self):
-    # Validate document name
-    invalid_chars = re.findall(re.compile(DOC2_NAME_INVALID_CHARS), self.name)
-    if invalid_chars:
-      raise FilesystemException(_('Document %s contains some special characters: %s') % (self.name, ', '.join(invalid_chars)))
-
     # Validate home and Trash directories are only created once per user and cannot be created or modified after
     if self.name in [Document2.HOME_DIR, Document2.TRASH_DIR] and self.type == 'directory' and \
           Document2.objects.filter(name=self.name, owner=self.owner, type='directory').exists():

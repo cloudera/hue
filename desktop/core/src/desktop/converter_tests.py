@@ -159,7 +159,7 @@ class TestDocumentConverter(object):
       query.delete()
       query2.delete()
 
-  def test_convert_hive_query_with_invalid_name(self):
+  def test_convert_hive_query_with_special_chars(self):
     sql = 'SELECT * FROM sample_07'
     settings = [
       {'key': 'hive.exec.scratchdir', 'value': '/tmp/mydir'},
@@ -188,8 +188,12 @@ class TestDocumentConverter(object):
       assert_equal(1, Document2.objects.filter(owner=self.user, type='query-hive').count())
 
       doc2 = Document2.objects.get(owner=self.user, type='query-hive', is_history=False)
-      # Verify Document2 name is stripped of invalid chars
-      assert_equal('Test  Hive query', doc2.data_dict['name'])
+
+      # Verify name is maintained
+      assert_equal('Test / Hive query', doc2.name)
+
+      # Verify Document2 path is stripped of invalid chars
+      assert_equal('/Test%20/%20Hive%20query', doc2.path)
     finally:
       query.delete()
 
