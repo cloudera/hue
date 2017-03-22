@@ -18,13 +18,11 @@
 import json
 import math
 import numbers
-import re
 import uuid
 
 from django.utils.html import escape
 
 from desktop.lib.i18n import smart_unicode
-from desktop.models import DOC2_NAME_INVALID_CHARS
 
 from notebook.connectors.base import Notebook
 
@@ -192,7 +190,7 @@ def import_saved_beeswax_query(bquery):
   design = bquery.get_design()
 
   return make_notebook(
-      name=re.sub(DOC2_NAME_INVALID_CHARS, '', bquery.name),
+      name=bquery.name,
       description=bquery.desc,
       editor_type=_convert_type(bquery.type, bquery.data),
       statement=design.hql_query,
