@@ -344,6 +344,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
       <div id="embeddable_useradmin_addldap" class="embeddable"></div>
+      <div id="embeddable_useradmin_edituser" class="embeddable"></div>
       <div id="embeddable_hbase" class="embeddable"></div>
       <div id="embeddable_security_hive" class="embeddable"></div>
       <div id="embeddable_security_hdfs" class="embeddable"></div>
@@ -535,7 +536,8 @@ ${ assist.assistPanel() }
         useradmin_permissions: '/useradmin/permissions?is_embeddable=true',
         useradmin_configurations: '/useradmin/configurations?is_embeddable=true',
         useradmin_newuser: '/useradmin/users/new?is_embeddable=true',
-        useradmin_addldap: 'useradmin/users/add_ldap_users?is_embeddable=true',
+        useradmin_addldap: '/useradmin/users/add_ldap_users?is_embeddable=true',
+        useradmin_edituser: '/useradmin/users/edit/:user?is_embeddable=true',
         hbase: '/hbase/?is_embeddable=true',
         security_hive: '/security/hive?is_embeddable=true',
         security_hdfs: '/security/hdfs?is_embeddable=true',
@@ -547,13 +549,14 @@ ${ assist.assistPanel() }
         dump_config: '/desktop/dump_config?is_embeddable=true',
       };
 
-      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap'];
+      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
 
         self.embeddable_cache = {};
         self.currentApp = ko.observable();
+        self.currentContextParams = ko.observable(null);
         self.isLoadingEmbeddable = ko.observable(false);
         self.extraEmbeddableURLParams = ko.observable('');
 
@@ -633,6 +636,13 @@ ${ assist.assistPanel() }
         });
 
         huePubSub.subscribe('open.link', function (href) {
+          if (href.startsWith('/') && !href.startsWith('/hue')){
+            page('/hue' + href);
+          }
+          else {
+            page(href);
+          }
+
           if (href.startsWith('/notebook/editor')){
             if (hueUtils.getSearchParameter(href, 'editor') !== '') {
               hueUtils.changeURLParameter('editor', hueUtils.getSearchParameter(href, 'editor'));
@@ -693,18 +703,6 @@ ${ assist.assistPanel() }
             self.currentApp('oozie_bundle');
           } else if (href.startsWith('/filebrowser')){
             self.currentApp('filebrowser');
-          } else if (href.startsWith('/useradmin/users/add_ldap_users')){
-            self.currentApp('useradmin_addldap');
-          } else if (href.startsWith('/useradmin/users/new')){
-            self.currentApp('useradmin_newuser');
-          } else if (href.startsWith('/useradmin/users')){
-            self.currentApp('useradmin_users');
-          } else if (href.startsWith('/useradmin/groups')){
-            self.currentApp('useradmin_groups');
-          } else if (href.startsWith('/useradmin/permissions')){
-            self.currentApp('useradmin_permissions');
-          } else if (href.startsWith('/useradmin/configurations')) {
-            self.currentApp('useradmin_configurations');
           } else if (href.startsWith('/security/hive2')) {
             self.currentApp('security_hive2');
           } else if (href.startsWith('/security/hive')) {
@@ -758,6 +756,13 @@ ${ assist.assistPanel() }
             }
             $(this).remove();
           });
+          r.find('a[href]').each(function () {
+            var link = $(this).attr('href');
+            if (link.startsWith('/') && !link.startsWith('/hue')){
+              link = '/hue' + link;
+            }
+            $(this).attr('href', link);
+          });
           r.unwrap('<span>');
           return r;
         }
@@ -775,8 +780,16 @@ ${ assist.assistPanel() }
             if (loadedApps.indexOf(newVal) == -1){
               loadedApps.push(newVal);
             }
+            var baseURL = EMBEDDABLE_PAGE_URLS[newVal];
+            if (self.currentContextParams() !== null) {
+              var route = new page.Route(baseURL);
+              route.keys.forEach(function (key) {
+                baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
+              });
+              self.currentContextParams(null);
+            }
             $.ajax({
-              url: EMBEDDABLE_PAGE_URLS[newVal] + self.extraEmbeddableURLParams(),
+              url: baseURL + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
@@ -846,15 +859,58 @@ ${ assist.assistPanel() }
           });
         }
 
-        loadAppState();
-
-        window.onpopstate = function (event) {
-          loadAppState();
-        };
-
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
         });
+
+        // prepend /hue to all the link on this page
+        $('a[href]').each(function () {
+          var link = $(this).attr('href');
+          if (link.startsWith('/') && !link.startsWith('/hue')){
+            link = '/hue' + link;
+          }
+          $(this).attr('href', link);
+        });
+
+        page.base('/hue');
+
+        page('/useradmin/users/add_ldap_users', function(ctx){
+          self.currentApp('useradmin_addldap');
+        });
+
+        page('/useradmin/users/new', function(ctx){
+          self.currentApp('useradmin_newuser');
+        });
+
+        page('/useradmin/users/edit/:user', function(ctx){
+          self.currentContextParams(ctx.params);
+          self.currentApp('useradmin_edituser');
+        });
+
+        page('/useradmin/users/', function(ctx){
+          self.currentApp('useradmin_users');
+        });
+
+        page('/useradmin/groups/', function(ctx){
+          self.currentApp('useradmin_groups');
+        });
+
+        page('/useradmin/permissions/', function(ctx){
+          self.currentApp('useradmin_permissions');
+        });
+
+        page('/useradmin/configurations/', function(ctx){
+          self.currentApp('useradmin_configurations');
+        });
+
+        page('/', function(ctx){
+        });
+
+        page('*', function(ctx){
+          console.error('Route not found', ctx);
+        });
+
+        page();
 
       };
 

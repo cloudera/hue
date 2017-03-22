@@ -32,7 +32,7 @@ ${ layout.menubar(section='users') }
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
-    <form id="syncForm" method="POST" class="form form-horizontal" autocomplete="off">
+    <form id="syncForm" action="${ url('useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
         % for field in form.fields:
@@ -50,7 +50,7 @@ ${ layout.menubar(section='users') }
         % else:
           <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
         % endif
-        <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('useradmin.views.list_users') + "')" or url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
+        <a href="${ url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
       </div>
     </form>
   </div>
