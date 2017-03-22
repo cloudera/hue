@@ -1619,7 +1619,7 @@ from notebook.conf import get_ordered_interpreters
             filteredFunctions: ko.pureComputed(function () {
               if (self.query()) {
                 return koCategory.functions.filter(function (fn) {
-                  return fn.signature.toLowerCase().indexOf(self.query().toLowerCase()) !== -1 || fn.description.toLowerCase().indexOf(self.query().toLowerCase()) !== -1;
+                  return fn.signature.toLowerCase().indexOf(self.query().toLowerCase()) !== -1 || (fn.description && fn.description.toLowerCase().indexOf(self.query().toLowerCase()) !== -1);
                 });
               } else {
                 return koCategory.functions;
