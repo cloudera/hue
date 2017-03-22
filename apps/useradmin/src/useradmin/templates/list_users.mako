@@ -42,11 +42,11 @@ ${layout.menubar(section='users')}
       <%def name="creation()">
         %if user.is_superuser:
             % if not is_ldap_setup:
-              <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('useradmin.views.edit_user') + "')" or url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
+              <a href="${ url('useradmin.views.edit_user') }" class="btn"><i class="fa fa-user"></i> ${_('Add user')}</a>
             %endif
 
             % if is_ldap_setup:
-            <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('useradmin.views.add_ldap_users') + "')" or url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
+            <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
             <a href="javascript:void(0)" class="btn confirmationModal"
                data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i
                 class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
