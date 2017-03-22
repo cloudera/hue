@@ -336,7 +336,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 Hive
               <!-- /ko -->
               <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
+                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('SQL') }" />
                 SQL
               <!-- /ko -->
               </a>
@@ -2819,7 +2819,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         },
         sqlite: {
           placeHolder: '${ _("Example: SELECT * FROM tablename, or press CTRL + space") }',
-          aceMode: 'ace/mode/sqlite',
+          aceMode: 'ace/mode/sql',
           snippetIcon: 'fa-database',
           sqlDialect: true
         },
