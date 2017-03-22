@@ -124,7 +124,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
     <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
       <div class="sidebar-nav span2" data-bind="visible: $root.job().persisted">
-        <form id="advanced-settings" method="POST" class="form form-horizontal noPadding">
+        <form id="advanced-settings" method="POST" class="form form-horizontal no-padding">
           ${ csrf_token(request) | n,unicode }
           <ul class="nav nav-list">
             <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
@@ -196,7 +196,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
             </li>
           </ul>
 
-          <form method="POST" class="form form-horizontal noPadding" data-bind="with: page">
+          <form method="POST" class="form form-horizontal no-padding" data-bind="with: page">
             ${ csrf_token(request) | n,unicode }
             <div class="alert alert-info"><h3 data-bind="text: description"></h3></div>
             <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
@@ -245,7 +245,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
     <div id="link-editor" class="row-fluid section hide" data-bind="with: link">
       <div id="link-forms" class="span12">
         <div class="card">
-          <form method="POST" class="form form-horizontal noPadding">
+          <form method="POST" class="form form-horizontal no-padding">
             ${ csrf_token(request) | n,unicode }
             <div data-bind="template: {'name': 'link-editor-form-error', 'data': {'name': ko.observable('linkConfig')}}" class=""></div>
             <div class="control-group">
