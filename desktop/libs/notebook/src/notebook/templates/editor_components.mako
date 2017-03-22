@@ -1128,13 +1128,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- ko if: statementType() == 'file' -->
         <div class="margin-top-10">
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;">${_('Query File')}</label>
-          <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql, s3a://hue/sample.sql') }"/>
+          <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
           <!-- ko if: statementPath() -->
           <div class="inline-block" style="margin-top: 4px">
             <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </div>
+          <a class="btn" data-bind="tooltip: { placement: 'bottom', title: 'Save content back to file' }, click: function() { huePubSub.publish('show.saveToFile.modal'); }"><i class="fa fa-save"></i></a>
           <!-- /ko -->
         </div>
         <div class="clearfix margin-bottom-20"></div>
@@ -1903,6 +1904,18 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: saveAsNotebook, enable: $root.selectedNotebook().name().length > 0"/>
   </div>
   <!-- /ko -->
+</div>
+
+<div id="saveToFileModal" class="modal hide fade">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Are you sure you want to save back to File?')}</h2>
+  </div>
+
+  <div class="modal-footer">
+    <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+    <input type="button" class="btn btn-primary disable-feedback" value="${_('Save')}" data-dismiss="modal" data-bind="click: function() { huePubSub.publish('save.snippet.to.file'); }"/>
+  </div>
 </div>
 
 
@@ -2912,6 +2925,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     huePubSub.subscribe('redraw.fixed.headers', function () {
       hideFixedHeaders();
       redrawFixedHeaders(200);
+    });
+
+    huePubSub.subscribe('show.saveToFile.modal', function () {
+      $('#saveToFileModal').modal('show');
     });
 
     huePubSub.subscribe('tab.switched', function (tab) {
