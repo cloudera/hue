@@ -350,7 +350,7 @@ def index(request):
     return redirect(reverse('about:index'))
   else:
     if IS_HUE_4.get():
-      return hue(request)
+      return redirect('desktop.views.hue')
     elif USE_NEW_EDITOR.get():
       return home2(request)
     else:
