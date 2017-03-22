@@ -916,6 +916,7 @@ ${ assist.assistPanel() }
         });
 
         page('/', function(ctx){
+          self.currentApp('editor');
         });
 
         page('*', function(ctx){
