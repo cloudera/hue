@@ -261,7 +261,7 @@ ${ assist.assistPanel() }
 
 <span id="importerComponents" class="notebook" data-bind="dropzone: { url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir, params: {dest: DropzoneGlobals.homeDir}, paramName: 'hdfs_file', onComplete: function(path){ createWizard.source.path(path); } }">
 <div class="dz-message" data-dz-message></div>
-<div class="navbar hue3-navbar-fixed-top">
+<div class="navbar hue-title-bar">
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="nav-collapse">

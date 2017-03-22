@@ -273,7 +273,7 @@ body {
 .resizer {
   .flex(0);
   height: 100%;
-  min-width: 4px;
+  min-width: 2px;
   cursor: col-resize;
 }
 
@@ -293,6 +293,20 @@ body {
 .page-content .content-panel {
   overflow-y: auto;
   overflow-x: hidden;
+}
+
+.hue-title-bar {
+  border-bottom: 1px solid #DCDCDC;
+  background-color:#F8F8F8;
+  -webkit-box-shadow:inset 0 -1px #DCDCDC;
+  box-shadow:inset 0 -1px #DCDCDC;
+
+  .navbar-inner {
+    background-color: transparent !important;
+    margin: 0 !important;
+    padding-top: 8px;
+    background: none;
+  }
 }
 
 .left-nav {
@@ -816,7 +830,7 @@ a:visited {
   background-color: transparent;
   border: none;
   border-bottom: 1px solid @cui-gray-050;
-  padding-bottom: 8px;
+  padding-bottom: 6px;
 }
 
 .page-content .navbar.navbar-inverse.navbar-fixed-top {

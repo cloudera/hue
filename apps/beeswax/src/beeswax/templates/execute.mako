@@ -2641,7 +2641,7 @@ $(document).ready(function () {
     $('#queryContainer').show();
     $('#resizePanel').show();
     $('a[href="#query"]').parent().show();
-    $('.hue3-navbar-fixed-top').show();
+    $('.hue-title-bar').show();
     $('.resultsContainer').css('marginTop', '20px');
   }
 
@@ -2654,7 +2654,7 @@ $(document).ready(function () {
     $('a[href="#query"]').parent().hide();
     $('a[href="#recentTab"]').parent().hide();
     $('a[href="#queryBuilderTab"]').parent().hide();
-    $('.hue3-navbar-fixed-top').hide();
+    $('.hue-title-bar').hide();
     $('.resultsContainer').css('marginTop', '-50px');
   }
 

@@ -23,7 +23,7 @@
 
 
 <%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
-    <div class="navbar hue3-navbar-fixed-top">
+    <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
           %if pullright:

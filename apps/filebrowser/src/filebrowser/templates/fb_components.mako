@@ -91,7 +91,7 @@ from aws import get_client
 
 
 <%def name="menubar()">
-  <div class="navbar hue3-navbar-fixed-top nokids">
+  <div class="navbar hue-title-bar nokids">
       <div class="navbar-inner">
         <div class="container-fluid">
           <div class="nav-collapse">
