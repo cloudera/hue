@@ -61,6 +61,7 @@
   </script>
 
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
+  <script src="${ static('desktop/ext/js/page.js') }"></script>
 
 </head>
 
