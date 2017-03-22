@@ -40,8 +40,11 @@ class Client(object):
     self._calling_format = DEFAULT_CALLING_FORMAT if calling_format is None else calling_format
     self._is_secure = is_secure
 
-    boto.config.add_section('Boto')
-    boto.config.set('Boto', 'http_socket_timeout', str(self._timeout))
+    if not boto.config.has_section('Boto'):
+      boto.config.add_section('Boto')
+
+    if not boto.config.get('Boto', 'http_socket_timeout'):
+      boto.config.set('Boto', 'http_socket_timeout', str(self._timeout))
 
   @classmethod
   def from_config(cls, conf):
