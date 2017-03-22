@@ -515,7 +515,7 @@ ${ assist.assistPanel() }
     var onePageViewModel = (function () {
 
       var EMBEDDABLE_PAGE_URLS = {
-        editor: '/notebook/editor_embeddable',
+        editor: '/notebook/editor?is_embeddable=true',
         notebook: '/notebook/notebook_embeddable',
         metastore: '/metastore/tables/?is_embeddable=true',
         dashboard: '/dashboard/embeddable/new_search',
@@ -901,6 +901,10 @@ ${ assist.assistPanel() }
 
         page('/useradmin/configurations/', function(ctx){
           self.currentApp('useradmin_configurations');
+        });
+
+        page('/notebook/editor', function(ctx){
+          self.currentApp('editor');
         });
 
         page('/', function(ctx){
