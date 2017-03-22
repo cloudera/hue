@@ -516,7 +516,7 @@ ${ assist.assistPanel() }
 
       var EMBEDDABLE_PAGE_URLS = {
         editor: '/notebook/editor?is_embeddable=true',
-        notebook: '/notebook/notebook_embeddable',
+        notebook: '/notebook/notebook?is_embeddable=true',
         metastore: '/metastore/tables/?is_embeddable=true',
         dashboard: '/dashboard/embeddable/new_search',
         oozie_workflow: '/oozie/editor/workflow/new/?is_embeddable=true',
@@ -905,6 +905,10 @@ ${ assist.assistPanel() }
 
         page('/notebook/editor', function(ctx){
           self.currentApp('editor');
+        });
+
+        page('/notebook/notebook', function(ctx){
+          self.currentApp('notebook');
         });
 
         page('/', function(ctx){
