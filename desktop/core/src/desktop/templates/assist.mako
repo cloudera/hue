@@ -17,6 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from desktop import appmanager
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
@@ -1375,7 +1376,7 @@ from notebook.conf import get_ordered_interpreters
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
         self.availablePanels = [
-        % if interpreters:
+        % if get_ordered_interpreters():
           new AssistInnerPanel({
             panelData: new AssistDbPanel($.extend({
               apiHelper: self.apiHelper,
@@ -1391,6 +1392,12 @@ from notebook.conf import get_ordered_interpreters
         % endif
 
         if (self.tabsEnabled) {
+          <%
+            try:
+              apps
+            except NameError:
+              apps = appmanager.get_apps_dict(user)
+          %>
           % if 'filebrowser' in apps:
           self.availablePanels.push(new AssistInnerPanel({
             panelData: new AssistHdfsPanel({
