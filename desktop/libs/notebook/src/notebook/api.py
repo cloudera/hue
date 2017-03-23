@@ -675,9 +675,44 @@ def export_result(request):
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
   elif data_format == 'search-index':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      if destination == '__hue__':
+        destination = _get_snippet_name(notebook, unique=True, table_format=True)
+        live_indexing = True
+      else:
+        # Unsupported currently
+        live_indexing = False
+        sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
+
+      sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
+
+      from indexer.api3 import _index # Will be moved to the lib
+      from indexer.file_format import HiveFormat
+      from indexer.fields import Field
+
+      file_format = {
+          'name': 'col',
+          'inputFormat': 'query',
+          'format': {'quoteChar': '"', 'recordSeparator': '\n', 'type': 'csv', 'hasHeader': False, 'fieldSeparator': '\u0001'},
+          "sample": '',
+          "columns": [
+              Field(col['name'].rsplit('.')[-1], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+              for col in sample['meta']
+          ]
+      }
+
+      if live_indexing:
+        file_format['inputFormat'] = 'hs2_handle'
+        file_format['fetch_handle'] = lambda rows, start_over: get_api(request, snippet).fetch_result(notebook, snippet, rows=rows, start_over=start_over)
+        response['rowcount'] = _index(request, file_format, destination, query=notebook['uuid'])
+        response['watch_url'] = reverse('search:browse', kwargs={'name': destination})
+        response['status'] = 0
+      else:
+        response = _index(request, file_format, destination, query=notebook['uuid'])
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
 
   return JsonResponse(response)
 

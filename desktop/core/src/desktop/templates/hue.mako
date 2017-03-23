@@ -229,7 +229,7 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
       <ul class="left-nav-menu">
-        <li data-bind="click: function () { page('/home') }"><a href="javascript: void(0);">Home</a></li>
+        <li data-bind="click: function () { page('/home') }"><a href="javascript: void(0);">Documents</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         % if interpreters:
