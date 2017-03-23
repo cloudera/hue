@@ -287,9 +287,12 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       callback(observable);
     }
     else {
-      window.setTimeout(function () {
-        hueUtils.waitForObservable(observable, callback);
-      }, timeout || 100)
+      var subscription = observable.subscribe(function(newValue) {
+        if (newValue) {
+          subscription.remove();
+          callback(observable);
+        }
+      });
     }
   }
 

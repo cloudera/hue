@@ -910,9 +910,7 @@ ${ assist.assistPanel() }
 
         page();
 
-        huePubSub.subscribe('page.route', function (path) {
-          page(path);
-        });
+        huePubSub.subscribe('page.route', page);
 
       };
 
