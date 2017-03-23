@@ -1086,7 +1086,7 @@ var EditorViewModel = (function() {
             notebook.history.unshift(
               notebook._makeHistoryRecord(
                 url,
-                data.handle.statement,
+                vm.isNotificationManager() ? notebook.description() : data.handle.statement,
                 self.lastExecuted(),
                 self.status(),
                 notebook.name(),

@@ -29,7 +29,7 @@ from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
-from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError
+from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
@@ -435,7 +435,7 @@ def get_history(request):
   for doc in docs.order_by('-last_modified')[:limit]:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
-      statement = _get_statement(notebook)
+      statement = notebook['description'] if is_notification_manager else _get_statement(notebook)
       history.append({
         'name': doc.name,
         'id': doc.id,
@@ -645,7 +645,8 @@ def export_result(request):
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 
       task = make_notebook(
-        name='Execute and watch',
+        name=_('Export %s to directory') % snippet['type'],
+        description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
         editor_type=snippet['type'],
         statement=sql,
         status='ready-execute',
