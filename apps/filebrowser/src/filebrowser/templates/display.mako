@@ -125,7 +125,7 @@ ${ fb_components.menubar() }
           </div>
         <!-- /ko -->
         % if breadcrumbs:
-          ${fb_components.breadcrumbs(path, breadcrumbs, is_embeddable=is_embeddable)}
+          ${fb_components.breadcrumbs(path, breadcrumbs)}
         %endif
         <div class="card-body" style="padding: 0">
             <!-- ko if: $root.file() && $root.file().stats.size() === 0 && $root.isViewing() -->
