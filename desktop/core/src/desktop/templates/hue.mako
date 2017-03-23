@@ -107,7 +107,7 @@ ${ hueIcons.symbols() }
         </a>
 
         <div class="compose-action btn-group">
-          <button class="btn" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }" title="${ _('Hive editor') }">${ _('Compose') }</button>
+          <button class="btn" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -115,13 +115,13 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             % if 'beeswax' in apps and 'impala' in apps:
               <li class="dropdown-submenu">
-                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
+                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
                   % if 'impala' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('impala'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
                   % endif
                   % if 'beeswax' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                   % endif
                   % if SHOW_NOTEBOOKS.get():
                   <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
@@ -133,7 +133,7 @@ ${ hueIcons.symbols() }
                     <ul class="dropdown-menu">
                       % for interpreter in interpreters:
                         % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                        <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.changeEditorType('${ interpreter['type'] }'); onePageViewModel.currentApp('editor') }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                        <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
                         % endif
                       % endfor
                       % if user.is_superuser:
@@ -233,7 +233,7 @@ ${ hueIcons.symbols() }
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         % if interpreters:
-        <li data-bind="click: function () { onePageViewModel.changeEditorType('hive'); onePageViewModel.currentApp('editor') }"><a href="javascript: void(0);">Editor</a></li>
+        <li data-bind="click: function () { onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
         % endif
         % if IS_DASHBOARD_ENABLED.get():
         <li data-bind="click: function () { onePageViewModel.currentApp('dashboard') }"><a href="javascript: void(0);">Dashboard</a></li>
@@ -569,14 +569,14 @@ ${ assist.assistPanel() }
           }, 25);
         }
 
-        self.changeEditorType = function (type) {
-          self.extraEmbeddableURLParams('?type=' + type);
-          hueUtils.changeURLParameter('type', type);
+        self.changeEditorType = function (type, changeURL) {
           self.getActiveAppViewModel(function (viewModel) {
-            if (viewModel && viewModel.selectedNotebook && viewModel.selectedNotebook()) {
-              viewModel.selectedNotebook().selectedSnippet(type);
-              viewModel.editorType(type);
-              viewModel.newNotebook();
+            if (viewModel && viewModel.selectedNotebook) {
+              hueUtils.waitForObservable(viewModel.selectedNotebook, function(){
+                viewModel.selectedNotebook().selectedSnippet(type);
+                viewModel.editorType(type);
+                viewModel.newNotebook();
+              });
             }
           })
         }
@@ -600,12 +600,12 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('open.fb.file', function (path) {
           self.extraEmbeddableURLParams(path + '?is_embeddable=true');
-          hueUtils.changeURLParameter('path', path);
+          //hueUtils.changeURLParameter('path', path);
           self.currentApp('fileviewer');
         });
 
         huePubSub.subscribe('open.fb.folder', function (path) {
-          hueUtils.removeURLParameter('path');
+          //hueUtils.removeURLParameter('path');
           self.currentApp('filebrowser');
           window.location.hash = path;
         });
@@ -644,7 +644,7 @@ ${ assist.assistPanel() }
 
           if (href.startsWith('/notebook/editor')){
             if (hueUtils.getSearchParameter(href, 'editor') !== '') {
-              hueUtils.changeURLParameter('editor', hueUtils.getSearchParameter(href, 'editor'));
+              //hueUtils.changeURLParameter('editor', hueUtils.getSearchParameter(href, 'editor'));
               self.currentApp('editor')
               self.getActiveAppViewModel(function (viewModel) {
                 viewModel.openNotebook(hueUtils.getSearchParameter(href, 'editor'));
@@ -663,7 +663,7 @@ ${ assist.assistPanel() }
             }
           } else if (href.startsWith('/metastore')){
             self.currentApp('metastore');
-            hueUtils.changeURLParameter('path', href.substring('/metastore'.length + 1));
+            //hueUtils.changeURLParameter('path', href.substring('/metastore'.length + 1));
             self.getActiveAppViewModel(function (metastoreViewModel) {
               metastoreViewModel.loadURL();
             });
@@ -767,9 +767,9 @@ ${ assist.assistPanel() }
         }
 
         self.currentApp.subscribe(function (newVal) {
-          hueUtils.changeURLParameter('app', newVal);
+          //hueUtils.changeURLParameter('app', newVal);
           if (newVal !== 'editor') {
-            hueUtils.removeURLParameter('type');
+            //hueUtils.removeURLParameter('type');
           }
           self.isLoadingEmbeddable(true);
           loadedApps.forEach(function (app) {
@@ -902,8 +902,16 @@ ${ assist.assistPanel() }
           self.currentApp('useradmin_configurations');
         });
 
-        page('/notebook/editor', function(ctx){
-          self.currentApp('editor');
+        page('/notebook/editor', function (ctx) {
+          self.currentApp('editor')
+          if (window.location.getParameter('editor') !== '') {
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.openNotebook(window.location.getParameter('editor'));
+            });
+          }
+          else if (window.location.getParameter('type') !== '') {
+            self.changeEditorType(window.location.getParameter('type'));
+          }
         });
 
         page('/notebook/notebook', function(ctx){
@@ -919,7 +927,7 @@ ${ assist.assistPanel() }
         });
 
         page('/', function(ctx){
-          self.currentApp('editor');
+          page('/notebook/editor');
         });
 
         page('*', function(ctx){
