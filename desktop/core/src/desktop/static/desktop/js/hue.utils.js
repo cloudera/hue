@@ -289,7 +289,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     else {
       var subscription = observable.subscribe(function(newValue) {
         if (newValue) {
-          subscription.remove();
+          subscription.dispose();
           callback(observable);
         }
       });
