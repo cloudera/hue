@@ -138,7 +138,7 @@ ${ hueIcons.symbols() }
                       % endfor
                       % if user.is_superuser:
                         <li class="divider"></li>
-                        <li><a href="gethue.com" class="dropdown-no-icon">${ _('Add more...') }</a></li>
+                        <li><a href="gethue.com"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
                       % endif
                     </ul>
                   </li>
@@ -156,7 +156,7 @@ ${ hueIcons.symbols() }
                 <ul class="dropdown-menu">
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
                 </ul>
               </li>
               % endif
@@ -563,7 +563,7 @@ ${ assist.assistPanel() }
               callback(ko.dataFor($koElement[0]));
             }
           }, 25);
-        }
+        };
 
         self.changeEditorType = function (type, changeURL) {
           self.getActiveAppViewModel(function (viewModel) {
@@ -575,20 +575,20 @@ ${ assist.assistPanel() }
               });
             }
           })
-        }
+        };
 
         self.currentApp.subscribe(function (newApp) {
           huePubSub.publish('set.current.app.name', newApp);
           self.getActiveAppViewModel(function (viewModel) {
             huePubSub.publish('set.current.app.view.model', viewModel);
           })
-        })
+        });
 
         huePubSub.subscribe('get.current.app.view.model', function () {
           self.getActiveAppViewModel(function (viewModel) {
             huePubSub.publish('set.current.app.view.model', viewModel);
           })
-        })
+        });
 
         huePubSub.subscribe('get.current.app.name', function () {
           huePubSub.publish('set.current.app.name', self.currentApp());
@@ -670,7 +670,7 @@ ${ assist.assistPanel() }
           });
           r.unwrap('<span>');
           return r;
-        }
+        };
 
         self.currentApp.subscribe(function (newVal) {
           self.isLoadingEmbeddable(true);
@@ -723,14 +723,14 @@ ${ assist.assistPanel() }
           self.getActiveAppViewModel(function (vm) {
             vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
           });
-        }
+        };
 
         self.dropzoneComplete = function (path) {
           self.currentApp('importer');
           self.getActiveAppViewModel(function (vm) {
             vm.createWizard.source.path(path);
           });
-        }
+        };
 
         huePubSub.subscribe('switch.app', function (name) {
           self.currentApp(name);
@@ -802,7 +802,7 @@ ${ assist.assistPanel() }
         });
 
         page('/notebook/editor', function (ctx) {
-          self.currentApp('editor')
+          self.currentApp('editor');
           if (window.location.getParameter('editor') !== '') {
             self.getActiveAppViewModel(function (viewModel) {
               viewModel.openNotebook(window.location.getParameter('editor'));
@@ -946,11 +946,11 @@ ${ assist.assistPanel() }
 
         self.activeAppViewModel.subscribe(function (viewModel) {
           self.sessionsAvailable(typeof viewModel.selectedNotebook !== 'undefined');
-        })
+        });
 
         huePubSub.subscribe('context.panel.visible', function (visible) {
           self.contextPanelVisible(visible);
-        })
+        });
 
         huePubSub.subscribe('active.snippet.type.changed', function (type) {
           if (type === 'hive' || type === 'impala') {
