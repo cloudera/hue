@@ -294,6 +294,23 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
   }
 
   /**
+   * @param {Function} variable
+   * @param {Function} callback
+   * @param {number} [timeout]
+   * @constructor
+   */
+  hueUtils.waitForVariable = function (variable, callback, timeout) {
+    if (variable) {
+      callback(variable);
+    }
+    else {
+      window.setTimeout(function () {
+        hueUtils.waitForVariable(variable, callback);
+      }, timeout || 100)
+    }
+  }
+
+  /**
    * @constructor
    */
   hueUtils.scrollbarWidth = function () {
