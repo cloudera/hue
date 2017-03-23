@@ -284,7 +284,7 @@ from desktop.views import _ko
             },
             shell: {
               snippetIcon: 'fa-terminal'
-            }
+            },
           }
         });
         self.editorViewModel.editorMode(true);
