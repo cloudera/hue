@@ -625,84 +625,6 @@ ${ assist.assistPanel() }
           else {
             page(href);
           }
-
-          if (href.startsWith('/notebook/editor')){
-            if (hueUtils.getSearchParameter(href, 'editor') !== '') {
-              //hueUtils.changeURLParameter('editor', hueUtils.getSearchParameter(href, 'editor'));
-              self.currentApp('editor')
-              self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(hueUtils.getSearchParameter(href, 'editor'));
-              })
-            } else if (location.getParameter('type') !== ''){
-              if (hueUtils.getSearchParameter(href, 'type') !== '' && hueUtils.getSearchParameter(href, 'type') !== location.getParameter('type')) {
-                self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
-              }
-            } else {
-              if (hueUtils.getSearchParameter(href, 'type') !== ''){
-                self.changeEditorType(hueUtils.getSearchParameter(href, 'type'));
-              } else {
-                self.changeEditorType('hive');
-              }
-              self.currentApp('editor')
-            }
-          } else if (href.startsWith('/metastore')){
-            self.currentApp('metastore');
-            //hueUtils.changeURLParameter('path', href.substring('/metastore'.length + 1));
-            self.getActiveAppViewModel(function (metastoreViewModel) {
-              metastoreViewModel.loadURL();
-            });
-          } else if (href.startsWith('/indexer/importer/prefill')){
-              self.currentApp('importer');
-              self.getActiveAppViewModel(function (viewModel) {
-                var arguments = href.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
-                if (! arguments) {
-                  console.warn('Could not match ' + href)
-                }
-                viewModel.createWizard.prefill.source_type(arguments && arguments[1] ? arguments[1] : '');
-                viewModel.createWizard.prefill.target_type(arguments && arguments[2] ? arguments[2] : '');
-                viewModel.createWizard.prefill.target_path(arguments && arguments[3] ? arguments[3] : '');
-              })
-          } else if (href.startsWith('/notebook')){
-            self.currentApp('notebook');
-          } else if (href.startsWith('/pig')){
-            self.changeEditorType('pig');
-            self.currentApp('editor');
-          } else if (href.startsWith('/indexer')){
-            self.currentApp('indexes');
-          } else if (href.startsWith('/home')){
-            self.currentApp('home');
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.openUuid(hueUtils.getSearchParameter(href, 'uuid'));
-            });
-          } else if (href.startsWith('/dashboard/embeddable') || href.startsWith('/dashboard/new_search')){
-            self.currentApp('dashboard');
-          } else if (href.startsWith('/dashboard/admin/collections')){
-            self.currentApp('collections');
-          } else if (href.startsWith('/oozie/editor/workflow/new')){
-            self.currentApp('oozie_workflow');
-          } else if (href.startsWith('/oozie/editor/coordinator/new')){
-            self.currentApp('oozie_coordinator');
-          } else if (href.startsWith('/oozie/editor/bundle/new')){
-            self.currentApp('oozie_bundle');
-          } else if (href.startsWith('/filebrowser')){
-            self.currentApp('filebrowser');
-          } else if (href.startsWith('/security/hive2')) {
-            self.currentApp('security_hive2');
-          } else if (href.startsWith('/security/hive')) {
-            self.currentApp('security_hive');
-          } else if (href.startsWith('/security/solr')) {
-            self.currentApp('security_solr');
-          } else if (href.startsWith('/security/hdfs')) {
-            self.currentApp('security_hdfs');
-          } else if (href.startsWith('/help')) {
-            self.currentApp('help');
-          } else if (href.startsWith('/about/admin_wizard')) {
-            self.currentApp('admin_wizard');
-          } else if (href.startsWith('/logs')) {
-            self.currentApp('logs');
-          } else if (href.startsWith('/desktop/dump_config')) {
-            self.currentApp('dump_config');
-          }
         });
 
         var loadedJs = [];
@@ -825,9 +747,29 @@ ${ assist.assistPanel() }
 
         page.base('/hue');
 
+        page('/help', function(ctx){
+          self.currentApp('help');
+        });
+
+        page('/about/admin_wizard', function(ctx){
+          self.currentApp('admin_wizard');
+        });
+
+        page('/logs', function(ctx){
+          self.currentApp('logs');
+        });
+
+        page('/desktop/dump_config', function(ctx){
+          self.currentApp('dump_config');
+        });
+
         page('/filebrowser/view=*', function(ctx){
           self.currentContextParams(ctx.params);
           self.currentApp('filebrowser');
+        });
+
+        page('/dashboard/admin/collections', function(ctx){
+          self.currentApp('collections');
         });
 
         page('/useradmin/users/add_ldap_users', function(ctx){
@@ -871,12 +813,22 @@ ${ assist.assistPanel() }
           }
         });
 
+        page('/pig', function (ctx) {
+          self.currentApp('editor');
+          self.changeEditorType('pig');
+        });
+
         page('/notebook/notebook', function(ctx){
           self.currentApp('notebook');
         });
 
         page('/home', function(ctx){
           self.currentApp('home');
+          if (window.location.getParameter('uuid') !== '') {
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.openUuid(window.location.getParameter('uuid'));
+            });
+          }
         });
 
         page('/dashboard/new_search', function(ctx){
@@ -899,6 +851,23 @@ ${ assist.assistPanel() }
           self.currentApp('metastore');
         });
 
+        page('/indexer/importer/prefill/*', function(ctx){
+          self.currentApp('indexer');
+          self.getActiveAppViewModel(function (viewModel) {
+            var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
+            if (! arguments) {
+              console.warn('Could not match ' + href)
+            }
+            hueUtils.waitForVariable(viewModel.createWizard, function(){
+              hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
+                viewModel.createWizard.prefill.source_type(arguments && arguments[1] ? arguments[1] : '');
+                viewModel.createWizard.prefill.target_type(arguments && arguments[2] ? arguments[2] : '');
+                viewModel.createWizard.prefill.target_path(arguments && arguments[3] ? arguments[3] : '');
+              });
+            });
+          })
+        });
+
         page('/indexer/', function(ctx){
           self.currentApp('indexes');
         });
@@ -911,8 +880,20 @@ ${ assist.assistPanel() }
           self.currentApp('hbase');
         });
 
+        page('/security/hive2', function(ctx){
+          self.currentApp('security_hive2');
+        });
+
         page('/security/hive', function(ctx){
           self.currentApp('security_hive');
+        });
+
+        page('/security/solr', function(ctx){
+          self.currentApp('security_solr');
+        });
+
+        page('/security/hdfs', function(ctx){
+          self.currentApp('security_hdfs');
         });
 
         page('/indexer/importer/', function(ctx){
