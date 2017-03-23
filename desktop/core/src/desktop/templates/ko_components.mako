@@ -331,7 +331,7 @@ from desktop.views import _ko
                     if (notebook.onSuccessUrl() == 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
                       huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
                     } else {
-                      huePubSub.publish('open.link', notebook.onSuccessUrl()); // TODO support FB
+                      huePubSub.publish('page.route', notebook.onSuccessUrl());
                     }
                   }
                 } else { // Perform last DROP statement execute
@@ -345,7 +345,7 @@ from desktop.views import _ko
             notebook.history.unshift(
                 notebook._makeHistoryRecord(
                     notebook.onSuccessUrl(),
-                    notebook.snippets()[0].result.handle().statement || '',
+                    notebook.description(),
                     notebook.snippets()[0].lastExecuted(),
                     notebook.snippets()[0].status(),
                     notebook.name(),

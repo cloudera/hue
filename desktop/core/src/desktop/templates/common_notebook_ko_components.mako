@@ -215,7 +215,7 @@ except ImportError, e:
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Save query result in a')}</h2>
       </div>
-      <div class="modal-body" style="padding: 4px">
+      <div class="modal-body" style="padding-left: 30px">
         <form id="saveResultsForm" method="POST" class="form form-inline">
           ${ csrf_token(request) | n,unicode }
           <fieldset>

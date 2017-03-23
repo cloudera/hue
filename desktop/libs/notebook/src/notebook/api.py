@@ -637,15 +637,30 @@ def export_result(request):
     response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
     response['status'] = 0
   elif data_format == 'hive-table':
-    notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
-    response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
-    response['status'] = 0
+    if is_embedded:
+      sql, success_url = api.export_data_as_table(notebook, snippet, destination)
+
+      task = make_notebook(
+        name=_('Export %s query to table %s') % (snippet['type'], destination),
+        description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
+        editor_type=snippet['type'],
+        statement=sql,
+        status='ready-execute',
+        database=snippet['database'],
+        on_success_url=success_url,
+        is_task=True
+      )
+      response = task.execute(request)
+    else:
+      notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
+      response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
+      response['status'] = 0
   elif data_format == 'hdfs-directory':
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
 
       task = make_notebook(
-        name=_('Export %s to directory') % snippet['type'],
+        name=_('Export %s query to directory') % snippet['type'],
         description=_('Query %s to %s') % (_get_snippet_name(notebook), success_url),
         editor_type=snippet['type'],
         statement=sql,
