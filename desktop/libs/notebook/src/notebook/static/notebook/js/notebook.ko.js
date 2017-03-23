@@ -1073,7 +1073,9 @@ var EditorViewModel = (function() {
             self.status('available');
             self.progress(100);
           } else {
-            if (! notebook.unloaded()) { self.checkStatus(); };
+            if (! notebook.unloaded()) {
+              self.checkStatus();
+            };
           }
         } else {
           self._ajaxError(data, self.execute);
@@ -1689,6 +1691,7 @@ var EditorViewModel = (function() {
     self.type = ko.observable(typeof notebook.type != "undefined" && notebook.type != null ? notebook.type : 'notebook');
     self.coordinatorUuid = ko.observable(typeof notebook.coordinatorUuid != "undefined" && notebook.coordinatorUuid != null ? notebook.coordinatorUuid : null);
     self.isHistory = ko.observable(typeof notebook.is_history != "undefined" && notebook.is_history != null ? notebook.is_history : false);
+    self.isManaged = ko.observable(typeof notebook.isManaged != "undefined" && notebook.isManaged != null ? notebook.isManaged : false);
     self.parentSavedQueryUuid = ko.observable(typeof notebook.parentSavedQueryUuid != "undefined" && notebook.parentSavedQueryUuid != null ? notebook.parentSavedQueryUuid : null); // History parent
     self.isSaved = ko.observable(typeof notebook.isSaved != "undefined" && notebook.isSaved != null ? notebook.isSaved : false);
     self.canWrite = ko.observable(typeof notebook.can_write != "undefined" && notebook.can_write != null ? notebook.can_write : true);

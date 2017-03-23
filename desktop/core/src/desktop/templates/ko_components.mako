@@ -331,7 +331,7 @@ from desktop.views import _ko
                     if (notebook.onSuccessUrl() == 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
                       huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
                     } else {
-                      huePubSub.publish('open.link', notebook.onSuccessUrl());
+                      huePubSub.publish('open.link', notebook.onSuccessUrl()); // TODO support FB
                     }
                   }
                 } else { // Perform last DROP statement execute
