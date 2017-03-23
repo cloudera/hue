@@ -23,6 +23,8 @@
 
 ${ commonheader_m(_('Dashboard'), "dashboard", user, request, "29px") | n,unicode }
 
+<div class="dashboard-admin">
 ${ common_admin_collections.page_structure(True) }
+</div>
 
 ${ commonfooter_m(request, messages) | n,unicode }
