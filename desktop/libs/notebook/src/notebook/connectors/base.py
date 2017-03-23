@@ -262,7 +262,7 @@ class Api(object):
     pass
 
   def fetch_result_size(self, notebook, snippet):
-    pass
+    raise OperationNotSupported()
 
   def download(self, notebook, snippet, format):
     pass
