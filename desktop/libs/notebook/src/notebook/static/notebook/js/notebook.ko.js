@@ -1730,7 +1730,7 @@ var EditorViewModel = (function() {
     if (self.dependentsCoordinator().length > 0 && ! self.coordinatorUuid()) {
       self.coordinatorUuid(self.dependentsCoordinator()[0].uuid());
     }
-    self.history = ko.observableArray(vm.selectedNotebook() ? vm.selectedNotebook().history() : []);
+    self.history = ko.observableArray(vm.selectedNotebook() && vm.selectedNotebook().type() == self.type() ? vm.selectedNotebook().history() : []);
     self.history.subscribe(function(val) {
       if (self.id() == null && val.length == 0 && self.historyFilter() === '' && ! vm.isNotificationManager()) {
         self.snippets()[0].currentQueryTab('savedQueries');
