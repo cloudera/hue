@@ -365,7 +365,7 @@ except ImportError, e:
             if (resp.status == 0) {
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
-                if (self.saveTarget() == 'hdfs-file') {
+                if (self.saveTarget() == 'hdfs-file' || (self.saveTarget() == 'search-index' && typeof resp.rowcount !== 'undefined')) {
                   huePubSub.publish('page.route', resp.watch_url);
                 } else {
                   if (resp.history_uuid) {

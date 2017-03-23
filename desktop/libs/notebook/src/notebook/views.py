@@ -159,7 +159,7 @@ def browse(request, database, table, partition_spec=None):
         'editor_type': editor_type,
     })
 
-# Deprecated from Hue 4
+# Deprecated in Hue 4
 @check_document_access_permission()
 def execute_and_watch(request):
   notebook_id = request.GET.get('editor', request.GET.get('notebook'))
