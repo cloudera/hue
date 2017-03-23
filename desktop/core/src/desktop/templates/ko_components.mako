@@ -161,7 +161,11 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-history-panel-template">
     <div class="compose-action btn-group  pull-right">
-      <button class="btn" title="${_('Submission history')}" data-bind="toggle: historyPanelVisible"><i class="fa fa-history"></i>  <div class="jobs-badge">5</div></button>
+      <button class="btn" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
+        <i class="fa fa-history"></i>
+          <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
+          <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
+      </button>
     </div>
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
@@ -287,6 +291,22 @@ from desktop.views import _ko
         self.editorViewModel.isNotificationManager(true);
         self.editorViewModel.newNotebook();
 
+        self.historyRunningJobs = ko.computed(function() {
+          if (self.editorViewModel.selectedNotebook()) {
+            return $.grep(self.editorViewModel.selectedNotebook().history(), function(task) { return task.status() == 'running'; });
+          } else {
+            return [];
+          }
+        });
+        self.historyFinishedJobs = ko.computed(function() {
+          if (self.editorViewModel.selectedNotebook()) {
+            return $.grep(self.editorViewModel.selectedNotebook().history(), function(task) { return task.status() == 'available' || task.status() == 'failed'; });
+          } else {
+            return [];
+          }
+        });
+
+
         huePubSub.subscribe("notebook.task.submitted", function (history_id) {
           self.editorViewModel.openNotebook(history_id, null, true, function(){
             var notebook = self.editorViewModel.selectedNotebook();
@@ -347,7 +367,7 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-panel-template">
     <div class="compose-action btn-group pull-right">
-      <button class="btn" title="${_('Running jobs and workflows')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount">0</div></button>
+      <button class="btn" title="${_('Running jobs')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount">0</div></button>
       <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
         <span class="caret"></span>
       </button>
