@@ -141,6 +141,10 @@ dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api/search/entities_interactive/?$', 'search_entities_interactive'),
 )
 
+dynamic_patterns += patterns('notebook.views',
+  (r'^editor', 'editor'),
+)
+
 # Default Configurations
 dynamic_patterns += patterns('desktop.configuration.api',
   (r'^desktop/api/configurations/?$', 'default_configurations'),
