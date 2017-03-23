@@ -107,7 +107,7 @@ ${ hueIcons.symbols() }
         </a>
 
         <div class="compose-action btn-group">
-          <button class="btn" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
+          <button class="btn" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -115,16 +115,16 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             % if 'beeswax' in apps and 'impala' in apps:
               <li class="dropdown-submenu">
-                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
+                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
                   % if 'impala' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
                   % endif
                   % if 'beeswax' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                   % endif
                   % if SHOW_NOTEBOOKS.get():
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ opage('/notebook/notebook'); }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook'); }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
                   % endif
                   % if interpreters:
                   <li class="divider"></li>
@@ -133,7 +133,7 @@ ${ hueIcons.symbols() }
                     <ul class="dropdown-menu">
                       % for interpreter in interpreters:
                         % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                        <li><a  href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                        <li><a  href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
                         % endif
                       % endfor
                       % if user.is_superuser:
@@ -233,7 +233,7 @@ ${ hueIcons.symbols() }
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         % if interpreters:
-        <li data-bind="click: function () { page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
+        <li data-bind="click: function () { page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
         % endif
         % if IS_DASHBOARD_ENABLED.get():
         <li data-bind="click: function () { page('/dashboard/new_search') }"><a href="javascript: void(0);">Dashboard</a></li>
@@ -512,8 +512,8 @@ ${ assist.assistPanel() }
     var onePageViewModel = (function () {
 
       var EMBEDDABLE_PAGE_URLS = {
-        editor: '/notebook/editor',
-        notebook: '/notebook/notebook',
+        editor: '/editor',
+        notebook: '/notebook',
         metastore: '/metastore/tables/',
         dashboard: '/dashboard/new_search',
         oozie_workflow: '/oozie/editor/workflow/new/',
@@ -801,7 +801,7 @@ ${ assist.assistPanel() }
           self.currentApp('useradmin_configurations');
         });
 
-        page('/notebook/editor', function (ctx) {
+        page('/editor', function (ctx) {
           self.currentApp('editor');
           if (window.location.getParameter('editor') !== '') {
             self.getActiveAppViewModel(function (viewModel) {
@@ -818,8 +818,17 @@ ${ assist.assistPanel() }
           self.changeEditorType('pig');
         });
 
-        page('/notebook/notebook', function(ctx){
+        page('/notebook', function(ctx){
           self.currentApp('notebook');
+          if (window.location.getParameter('notebook') !== '') {
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.openNotebook(window.location.getParameter('notebook'));
+            });
+          } else {
+            self.getActiveAppViewModel(function (viewModel) {
+              viewModel.newNotebook('notebook');
+            });
+          }
         });
 
         page('/home', function(ctx){
@@ -901,7 +910,7 @@ ${ assist.assistPanel() }
         });
 
         page('/', function(ctx){
-          page('/notebook/editor');
+          page('/editor');
         });
 
         page('*', function(ctx){

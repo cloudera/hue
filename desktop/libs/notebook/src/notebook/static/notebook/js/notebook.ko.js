@@ -2322,8 +2322,8 @@ var EditorViewModel = (function() {
       editor: '/notebook/editor',
       editorMobile: '/notebook/editor_m',
       notebook: '/notebook/notebook',
-      hue4: '/hue/notebook/editor',
-      hue4_notebook: '/hue/notebook/notebook'
+      hue4: '/hue/editor',
+      hue4_notebook: '/hue/notebook'
     }
 
     self.user = options.user;

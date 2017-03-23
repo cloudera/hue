@@ -64,7 +64,7 @@ def notebooks(request):
 
 @check_document_access_permission()
 def notebook(request, is_embeddable=False):
-  notebook_id = request.GET.get('notebook')
+  notebook_id = request.GET.get('notebook', request.GET.get('editor'))
 
   is_yarn_mode = False
   try:
@@ -97,6 +97,9 @@ def notebook_embeddable(request):
 def editor(request, is_mobile=False, is_embeddable=False):
   editor_id = request.GET.get('editor')
   editor_type = request.GET.get('type', 'hive')
+
+  if editor_type == 'notebook' or request.GET.get('notebook'):
+    return notebook(request)
 
   if editor_id:  # Open existing saved editor document
     document = Document2.objects.get(id=editor_id)
