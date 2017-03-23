@@ -365,7 +365,7 @@ except ImportError, e:
             if (resp.status == 0) {
               if (IS_HUE_4) {
                 if (self.saveTarget() == '') {
-                  huePubSub.publish('open.fb.folder', resp.watch_url.replace(/\/filebrowser\/view=/g, ''));
+                  huePubSub.publish('page.route', resp.watch_url);
                 } else {
                   if (resp.history_uuid) {
                     huePubSub.publish('notebook.task.submitted', resp.history_uuid);

@@ -1347,7 +1347,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           location.hash = stripHashes(file.path);
         } else {
           %if is_embeddable:
-          huePubSub.publish('open.fb.file', file.path);
+          huePubSub.publish('page.route', file.url);
           %else:
           location.href = file.url;
           %endif

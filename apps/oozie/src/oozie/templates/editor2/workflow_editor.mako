@@ -64,13 +64,9 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       <i class="fa fa-fw fa-history"></i>
     </a>
 
-    <a title="${ _('Workspace') }" target="_blank" rel="tooltip" data-placement="right"
+    <a title="${ _('Workspace') }" ${ not is_embeddable and 'target="_blank"' or ''} rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
-       %if is_embeddable:
-        href="javascript: void(0)" data-bind="css: {'btn': true}, click: function() { huePubSub.publish('open.fb.folder', $root.workflow.properties.deployment_dir()) }"
-       %else:
-        data-bind="css: {'btn': true}, attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }"
-       %endif
+        data-bind="css: {'btn': true}, attr: { href: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir() }"
       >
       <i class="fa fa-fw fa-folder-open"></i>
     </a>

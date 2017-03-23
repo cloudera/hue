@@ -244,10 +244,10 @@ ${ hueIcons.symbols() }
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         % if 'filebrowser' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser') }"><a href="javascript: void(0);">Files</a></li>
+        <li data-bind="click: function () { page('/filebrowser/view=') }"><a href="javascript: void(0);">Files</a></li>
         % endif
         % if is_s3_enabled:
-        <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }"><a href="javascript: void(0);">S3</a></li>
+        <li data-bind="click: function () { page('/filebrowser/view=S3A://') }"><a href="javascript: void(0);">S3</a></li>
         % endif
         % if 'metastore' in apps:
         <li data-bind="click: function () { page('/metastore/tables/') }"><a href="javascript: void(0);">Tables</a></li>
@@ -330,8 +330,6 @@ ${ hueIcons.symbols() }
       <div id="embeddable_oozie_bundle" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
-      <div id="embeddable_filebrowser_s3" class="embeddable"></div>
-      <div id="embeddable_fileviewer" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
       <div id="embeddable_indexer" class="embeddable"></div>
       <div id="embeddable_importer" class="embeddable"></div>
@@ -522,9 +520,7 @@ ${ assist.assistPanel() }
         oozie_coordinator: '/oozie/editor/coordinator/new/',
         oozie_bundle: '/oozie/editor/bundle/new/',
         jobbrowser: '/jobbrowser/apps',
-        filebrowser: '/filebrowser/',
-        filebrowser_s3: '/filebrowser/view=S3A://',
-        fileviewer: 'filebrowser/view=',
+        filebrowser: '/filebrowser/view=*',
         home: '/home',
         indexer: '/indexer/indexer/',
         collections: '/dashboard/admin/collections',
@@ -548,7 +544,7 @@ ${ assist.assistPanel() }
         dump_config: '/desktop/dump_config',
       };
 
-      var SKIP_CACHE = ['fileviewer', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = ['filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -596,18 +592,6 @@ ${ assist.assistPanel() }
 
         huePubSub.subscribe('get.current.app.name', function () {
           huePubSub.publish('set.current.app.name', self.currentApp());
-        });
-
-        huePubSub.subscribe('open.fb.file', function (path) {
-          self.extraEmbeddableURLParams(path + '?is_embeddable=true');
-          //hueUtils.changeURLParameter('path', path);
-          self.currentApp('fileviewer');
-        });
-
-        huePubSub.subscribe('open.fb.folder', function (path) {
-          //hueUtils.removeURLParameter('path');
-          self.currentApp('filebrowser');
-          window.location.hash = path;
         });
 
         huePubSub.subscribe('open.editor.query', function (uuid) {
@@ -767,10 +751,6 @@ ${ assist.assistPanel() }
         }
 
         self.currentApp.subscribe(function (newVal) {
-          //hueUtils.changeURLParameter('app', newVal);
-          if (newVal !== 'editor') {
-            //hueUtils.removeURLParameter('type');
-          }
           self.isLoadingEmbeddable(true);
           loadedApps.forEach(function (app) {
             window.pauseAppIntervals(app);
@@ -783,7 +763,12 @@ ${ assist.assistPanel() }
             if (self.currentContextParams() !== null) {
               var route = new page.Route(baseURL);
               route.keys.forEach(function (key) {
-                baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
+                if (key.name === 0){
+                  baseURL = baseURL.replace('*', self.currentContextParams()[key.name]);
+                }
+                else {
+                  baseURL = baseURL.replace(':' + key.name, self.currentContextParams()[key.name]);
+                }
               });
               self.currentContextParams(null);
             }
@@ -810,39 +795,6 @@ ${ assist.assistPanel() }
           $('.embeddable').hide();
           $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
         });
-
-        var loadAppState = function () {
-          if (window.location.getParameter('app') !== '' && EMBEDDABLE_PAGE_URLS[window.location.getParameter('app')]) {
-            var app = window.location.getParameter('app');
-            switch (app) {
-              case 'fileviewer':
-                if (window.location.getParameter('path') !== '') {
-                  self.extraEmbeddableURLParams(window.location.getParameter('path') + '?is_embeddable=true');
-                  self.currentApp(app);
-                }
-                else {
-                  self.currentApp('filebrowser');
-                }
-                break;
-              case 'filebrowser':
-                var previousHash = window.location.hash;
-                self.currentApp(app);
-                window.location.hash = previousHash;
-                break;
-              case 'editor':
-                if (window.location.getParameter('type') !== '') {
-                  self.changeEditorType(window.location.getParameter('type'));
-                }
-                self.currentApp(app);
-                break;
-              default:
-                self.currentApp(app);
-            }
-          }
-          else {
-            self.currentApp('editor');
-          }
-        }
 
         self.dropzoneError = function (filename) {
           self.currentApp('importer');
@@ -872,6 +824,11 @@ ${ assist.assistPanel() }
         });
 
         page.base('/hue');
+
+        page('/filebrowser/view=*', function(ctx){
+          self.currentContextParams(ctx.params);
+          self.currentApp('filebrowser');
+        });
 
         page('/useradmin/users/add_ldap_users', function(ctx){
           self.currentApp('useradmin_addldap');
@@ -971,6 +928,10 @@ ${ assist.assistPanel() }
         });
 
         page();
+
+        huePubSub.subscribe('page.route', function (path) {
+          page(path);
+        });
 
       };
 
