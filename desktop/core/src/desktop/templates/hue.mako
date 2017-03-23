@@ -102,12 +102,12 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="brand" data-bind="click: function () { onePageViewModel.currentApp('home') }" href="javascript: void(0);" title="${_('Homepage')}">
+        <a class="brand" data-bind="click: function () { page('/home') }" href="javascript: void(0);" title="${_('Homepage')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hue-logo"></use></svg>
         </a>
 
         <div class="compose-action btn-group">
-          <button class="btn" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
+          <button class="btn" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -115,16 +115,16 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             % if 'beeswax' in apps and 'impala' in apps:
               <li class="dropdown-submenu">
-                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
+                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
                   % if 'impala' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
                   % endif
                   % if 'beeswax' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
                   % endif
                   % if SHOW_NOTEBOOKS.get():
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('notebook') }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ opage('/notebook/notebook'); }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
                   % endif
                   % if interpreters:
                   <li class="divider"></li>
@@ -133,7 +133,7 @@ ${ hueIcons.symbols() }
                     <ul class="dropdown-menu">
                       % for interpreter in interpreters:
                         % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                        <li><a  href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
+                        <li><a  href="javascript: void(0)" data-bind="click: function(){ page('/notebook/editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
                         % endif
                       % endfor
                       % if user.is_superuser:
@@ -147,16 +147,16 @@ ${ hueIcons.symbols() }
               </li>
             % endif
             % if IS_DASHBOARD_ENABLED.get():
-              <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('dashboard') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
+              <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
             % endif
             % if 'oozie' in apps:
               % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
               <li class="dropdown-submenu">
                 <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon"  alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
                 <ul class="dropdown-menu">
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_workflow') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_coordinator') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ onePageViewModel.currentApp('oozie_bundle') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"/><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
                 </ul>
               </li>
               % endif
@@ -193,7 +193,7 @@ ${ hueIcons.symbols() }
           %>
           <button class="btn"
           % if view_profile:
-            data-bind="click: function(){ onePageViewModel.currentApp('home') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
+            data-bind="click: function(){ page('/home') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
           % endif
           >
           ${ user.username }
@@ -206,7 +206,7 @@ ${ hueIcons.symbols() }
             <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i> ${_('Profile')}</a></li>
             % endif
             % if user.is_superuser:
-            <li data-bind="click: function () { onePageViewModel.currentApp('useradmin_users') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+            <li data-bind="click: function () { page('/useradmin/users/') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             % if user.is_superuser:
@@ -229,17 +229,17 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
     <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
       <ul class="left-nav-menu">
-        <li data-bind="click: function () { onePageViewModel.currentApp('home') }"><a href="javascript: void(0);">Home</a></li>
+        <li data-bind="click: function () { page('/home') }"><a href="javascript: void(0);">Home</a></li>
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
         % if interpreters:
-        <li data-bind="click: function () { onePageViewModel.currentApp('editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
+        <li data-bind="click: function () { page('/notebook/editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
         % endif
         % if IS_DASHBOARD_ENABLED.get():
-        <li data-bind="click: function () { onePageViewModel.currentApp('dashboard') }"><a href="javascript: void(0);">Dashboard</a></li>
+        <li data-bind="click: function () { page('/dashboard/new_search') }"><a href="javascript: void(0);">Dashboard</a></li>
         % endif
         % if 'oozie' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('oozie_workflow') }"><a href="javascript: void(0);">Workflows</a></li>
+        <li data-bind="click: function () { page('/oozie/editor/workflow/new/') }"><a href="javascript: void(0);">Workflows</a></li>
         % endif
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
@@ -250,19 +250,19 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { onePageViewModel.currentApp('filebrowser_s3') }"><a href="javascript: void(0);">S3</a></li>
         % endif
         % if 'metastore' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('metastore') }"><a href="javascript: void(0);">Tables</a></li>
+        <li data-bind="click: function () { page('/metastore/tables/') }"><a href="javascript: void(0);">Tables</a></li>
         % endif
         % if 'search' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('indexes') }"><a href="javascript: void(0);">Indexes</a></li>
+        <li data-bind="click: function () { page('/indexer/') }"><a href="javascript: void(0);">Indexes</a></li>
         % endif
         % if 'jobbrowser' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('jobbrowser') }"><a href="javascript: void(0);">Jobs</a></li>
+        <li data-bind="click: function () { page('/jobbrowser/apps') }"><a href="javascript: void(0);">Jobs</a></li>
         % endif
         % if 'hbase' in apps:
-        <li data-bind="click: function () { onePageViewModel.currentApp('hbase') }"><a href="javascript: void(0);">HBase</a></li>
+        <li data-bind="click: function () { page('/hbase/') }"><a href="javascript: void(0);">HBase</a></li>
         % endif
         % if 'security' in apps:
-          <li data-bind="click: function () { onePageViewModel.currentApp('security_hive') }"><a href="javascript: void(0);">Security</a></li>
+          <li data-bind="click: function () { page('/security/hive') }"><a href="javascript: void(0);">Security</a></li>
         % endif
         % if 'sqoop' in apps:
         <li><a href="/${apps['sqoop'].display_name}">${_('Sqoop')}</a></li>
@@ -284,7 +284,7 @@ ${ hueIcons.symbols() }
             paramName: 'hdfs_file',
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
-            click: function(){ onePageViewModel.currentApp('importer') }" class="pointer" title="${ _('Import data wizard') }">
+            click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
           <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files here') }</div>
         </div>
       </div>
@@ -924,6 +924,42 @@ ${ assist.assistPanel() }
 
         page('/dashboard/new_search', function(ctx){
           self.currentApp('dashboard');
+        });
+
+        page('/oozie/editor/workflow/new/', function(ctx){
+          self.currentApp('oozie_workflow');
+        });
+
+        page('/oozie/editor/coordinator/new/', function(ctx){
+          self.currentApp('oozie_coordinator');
+        });
+
+        page('/oozie/editor/bundle/new/', function(ctx){
+          self.currentApp('oozie_bundle');
+        });
+
+        page('/metastore/tables/', function(ctx){
+          self.currentApp('metastore');
+        });
+
+        page('/indexer/', function(ctx){
+          self.currentApp('indexes');
+        });
+
+        page('/jobbrowser/apps', function(ctx){
+          self.currentApp('jobbrowser');
+        });
+
+        page('/hbase/', function(ctx){
+          self.currentApp('hbase');
+        });
+
+        page('/security/hive', function(ctx){
+          self.currentApp('security_hive');
+        });
+
+        page('/indexer/importer/', function(ctx){
+          self.currentApp('importer');
         });
 
         page('/', function(ctx){
