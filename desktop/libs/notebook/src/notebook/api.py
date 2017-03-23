@@ -680,9 +680,7 @@ def export_result(request):
         destination = _get_snippet_name(notebook, unique=True, table_format=True)
         live_indexing = True
       else:
-        # Unsupported currently
         live_indexing = False
-        sql, success_url = api.export_data_as_table(notebook, snippet, destination, is_temporary=True, location='')
 
       sample = get_api(request, snippet).fetch_result(notebook, snippet, 0, start_over=True)
 

@@ -106,7 +106,7 @@ class Notebook(object):
        'status': 'running',
        'statement_raw': sql,
        'statement': sql,
-       'type': 'query-hive',
+       'type': 'hive',
        'properties': {
             'files': [],
             'functions': [],
@@ -114,7 +114,7 @@ class Notebook(object):
        },
        'database': database,
     }))
-    self._add_session(_data, 'query-hive')
+    self._add_session(_data, 'hive')
 
     self.data = json.dumps(_data)
 

@@ -3690,9 +3690,9 @@ class WorkflowBuilder():
     for snippet in notebook['snippets']:
       if snippet['type'] == 'java':
         node = self.get_java_snippet_node(snippet)
-      elif snippet['type'] == 'query-hive':
+      elif snippet['type'] == 'hive':
         node = self.get_hive_snippet_node(snippet, user)
-      elif snippet['type'] == 'query-impala':
+      elif snippet['type'] == 'impala':
         node = self.get_impala_snippet_node(snippet, user)
       elif snippet['type'] == 'shell':
         node = self.get_shell_snippet_node(snippet)
