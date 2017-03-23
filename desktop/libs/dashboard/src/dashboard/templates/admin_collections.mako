@@ -25,7 +25,9 @@
 ${ commonheader(_('Dashboard'), "dashboard", user, request, "29px") | n,unicode }
 %endif
 
+<div class="dashboard-admin">
 ${ common_admin_collections.page_structure() }
+</div>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }

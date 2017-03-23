@@ -26,7 +26,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 %>
 
 <%def name="includes(is_embeddable=False)">
-<link rel="stylesheet" href="${ static('desktop/css/common_dashboard.css') }">
+<link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
 % if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 % endif
