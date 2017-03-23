@@ -230,7 +230,7 @@ from desktop.views import _ko
             </div>
             <div class="clearfix"></div>
             <strong data-bind="text: name, attr: { title: uuid }"></strong>
-            <div data-bind="highlight: { value: 'statement' }"></div>
+            <div data-bind="highlight: { value: query }"></div>
           </li>
           <!-- /ko -->
         </ul>

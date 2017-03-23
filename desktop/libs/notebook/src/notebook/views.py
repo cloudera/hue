@@ -23,7 +23,7 @@ from django.db.models import Q
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
+from desktop.conf import USE_NEW_EDITOR
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
