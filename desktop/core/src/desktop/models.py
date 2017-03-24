@@ -1203,6 +1203,14 @@ class Document2(models.Model):
       raise FilesystemException(_('Cannot save document %s under parent directory %s due to circular dependency') %
                                 (self.name, self.parent_directory.uuid))
 
+    # Validate against duplicate directory names on same level (except within TRASH_DIR)
+    if self.type == 'directory' and \
+       self.parent_directory is not None and \
+       self.parent_directory.name != Document2.TRASH_DIR and \
+       Document2.objects.filter(name=self.name, owner=self.owner, type='directory',
+                               parent_directory=self.parent_directory).exists():
+      raise FilesystemException(_('A directory with the name "%s" already exists at this location.') % self.name)
+
 
   def inherit_permissions(self):
     if self.parent_directory is not None:
@@ -1413,6 +1421,8 @@ class Directory(Document2):
     """
     Returns the children documents for a given directory, excluding history documents
     """
+    self._find_and_merge_duplicate_directories()
+
     documents = self.children.filter(is_history=False).filter(is_managed=False)  # TODO: perms
     return documents
 
@@ -1420,6 +1430,8 @@ class Directory(Document2):
     """
     Returns the children and shared documents for a given directory, excluding history documents
     """
+    self._find_and_merge_duplicate_directories()
+
     # Get documents that are direct children, or shared with but not owned by the current user
     documents = Document2.objects.filter(
         Q(parent_directory=self) |
@@ -1447,6 +1459,45 @@ class Directory(Document2):
   def save(self, *args, **kwargs):
     self.type = 'directory'
     super(Directory, self).save(*args, **kwargs)
+
+
+  def _find_and_merge_duplicate_directories(self):
+    """
+    Merges any existing duplicate directories together by consolidating their children documents under the same parent.
+
+    Start off by first finding all duplicate directories within the given directory's children. Ideally we'd do this in
+    one pass, but Django's aggregates don't seem to support doing a GROUP BY without grouping all the selected fields
+    together.
+
+    So instead, we will do an initial query to find duplicates, map the children of the duplicates to the first
+    duplicated directory found for a given owner/parent/name combination, and then repeat for all distinct group of
+    duplicate directories found within the set of children for the given directory.
+    """
+    duplicate_children_directories = self.children.filter(type='directory') \
+      .values('name') \
+      .annotate(name_count=models.Count('name')) \
+      .filter(name_count__gt=1)
+
+    if duplicate_children_directories.exists():
+      logging.info('Found some duplicate directories within the directory %s at path: %s, attempting to merge.' %
+                   (self.uuid, self.path))
+      for record in duplicate_children_directories:
+        # We found some duplicates, now actually fetch the duplicated directories for these values.
+        merge_dirs = self.children.filter(name=record['name'])
+
+        # Grab all but the first directory, which we're preserving as the canonical directory.
+        canonical_dir = merge_dirs[0]
+        merge_dirs = list(merge_dirs[1:])
+
+        logging.info('Merging directories for these duplicated directories %s' % [dir.id for dir in merge_dirs])
+
+        # Update all these directories so that their children is mapped to the first directory.
+        for dir in merge_dirs:
+          # Doing the update will skip the save hook validation on duplicates, which is good because we could get stuck
+          # in a state where directory contents can't be merged b/c it would result in duplicate directories
+          dir.children.update(parent_directory=canonical_dir)
+          # Once all children are re-mapped, we can delete the duplicate dir
+          dir.delete()
 
 
 class Document2Permission(models.Model):

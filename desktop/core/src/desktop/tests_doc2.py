@@ -197,13 +197,12 @@ class TestDocument2(object):
 
   def test_directory_children(self):
     # Creates 2 directories and 2 queries and saves to home directory
-    dir1 = Directory.objects.create(name='test_dir1', owner=self.user)
-    dir2 = Directory.objects.create(name='test_dir2', owner=self.user)
-    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, search='foobar')
-    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, search='barfoo')
-    children = [dir1, dir2, query1, query2]
-
-    self.home_dir.children.add(*children)
+    dir1 = Directory.objects.create(name='test_dir1', owner=self.user, parent_directory=self.home_dir)
+    dir2 = Directory.objects.create(name='test_dir2', owner=self.user, parent_directory=self.home_dir)
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, search='foobar',
+                                      parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={}, search='barfoo',
+                                      parent_directory=self.home_dir)
 
     # Test that all children directories and documents are returned
     response = self.client.get('/desktop/api2/doc', {'path': '/'})
@@ -376,6 +375,72 @@ class TestDocument2(object):
     assert_true('circular dependency' in data['message'], data)
 
 
+  def test_validate_duplicate_directories(self):
+    # Test that duplicate directories cannot be created
+    response = self.client.post('/desktop/api2/doc/mkdir', {
+      'parent_uuid': json.dumps(self.home_dir.uuid),
+      'name': json.dumps('test_dir')
+    })
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+
+    response = self.client.post('/desktop/api2/doc/mkdir', {
+      'parent_uuid': json.dumps(self.home_dir.uuid),
+      'name': json.dumps('test_dir')
+    })
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_equal('A directory with the name "test_dir" already exists at this location.', data['message'])
+
+    # Test that even a rename does not allow duplicates
+    other_dir = Directory.objects.create(name='other_dir', owner=self.user, parent_directory=self.home_dir)
+
+    response = self.client.post('/desktop/api2/doc/update', {'uuid': json.dumps(other_dir.uuid),
+                                                             'name': 'test_dir'})
+    data = json.loads(response.content)
+    assert_equal(-1, data['status'], data)
+    assert_equal('A directory with the name "test_dir" already exists at this location.', data['message'])
+
+
+  def test_merge_duplicate_directories(self):
+    # Test that when a directory is entered, any duplicate directories in the children are merged
+    test_dir = Directory.objects.create(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    test_dir_sub = Directory.objects.create(name='sub_dir', owner=self.user, parent_directory=test_dir)
+    test_doc = Document2.objects.create(name='test_doc_1', owner=self.user, parent_directory=test_dir_sub)
+    test_dir_2 = Directory.objects.create(name='temp_dir', owner=self.user, parent_directory=self.home_dir)
+    test_dir_sub_2 = Directory.objects.create(name='sub_dir', owner=self.user, parent_directory=test_dir_2)
+    test_doc_2 = Document2.objects.create(name='test_doc_2', owner=self.user, parent_directory=test_dir_sub_2)
+    # Have to use update to rename test_dir_2 to test_dir to avoid save hook validation
+    Document2.objects.filter(pk=test_dir_2.pk).update(name='test_dir')
+
+    # Verify that home directory contains 2 child directories with name test_dir
+    assert_equal(2, Directory.objects.filter(owner=self.user, name='test_dir', parent_directory=self.home_dir).count())
+    # Verify that each test_dir contains 1 child directory called sub_dir
+    assert_equal(1, Directory.objects.filter(owner=self.user, name='sub_dir', parent_directory=test_dir).count())
+    assert_equal(1, Directory.objects.filter(owner=self.user, name='sub_dir', parent_directory=test_dir_2).count())
+
+    # Verify that after accessing home directory, there is 1 test_dir with merged contents
+    response = self.client.get('/desktop/api2/doc/', {
+      'uuid': self.home_dir.uuid,
+    })
+    assert_equal(1, Directory.objects.filter(owner=self.user, name='test_dir', parent_directory=self.home_dir).count())
+    test_dir = Directory.objects.get(name='test_dir', owner=self.user, parent_directory=self.home_dir)
+    assert_equal(2, Directory.objects.filter(owner=self.user, name='sub_dir', parent_directory=test_dir).count())
+
+    response = self.client.get('/desktop/api2/doc/', {
+      'uuid': test_dir.uuid,
+    })
+    assert_equal(1, Directory.objects.filter(owner=self.user, name='sub_dir', parent_directory=test_dir).count())
+    test_dir_sub = Directory.objects.get(name='sub_dir', owner=self.user, parent_directory=test_dir)
+
+    response = self.client.get('/desktop/api2/doc/', {
+      'uuid': test_dir_sub.uuid,
+    })
+    children = test_dir_sub.children.all()
+    assert_true(test_doc in children)
+    assert_true(test_doc_2 in children)
+
+
   def test_api_get_data(self):
     doc_data = {'info': 'hello', 'is_history': False}
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data=json.dumps(doc_data))
@@ -397,6 +462,7 @@ class TestDocument2(object):
 
     assert_true('data' in data, data)
     assert_equal(data['data'], doc_data)
+
 
   def test_is_trashed_migration(self):
 
