@@ -81,11 +81,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-            <li data-bind="css: {'active': interface() === 'jobs'}"><a class="pointer" data-bind="click: function(){ interface('jobs'); resetBreadcrumbs(); }">${ _('Jobs') }</a></li>
-            <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ interface('workflows'); resetBreadcrumbs(); }">${ _('Workflows') }</a></li>
-            <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ interface('schedules'); resetBreadcrumbs(); }">${ _('Schedules') }</a></li>
-            <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ interface('bundles'); resetBreadcrumbs(); }">${ _('Bundles') }</a></li>
-            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ interface('slas'); resetBreadcrumbs(); }">${ _('SLAs') }</a></li>
+            <li data-bind="css: {'active': interface() === 'jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('jobs'); }">${ _('Jobs') }</a></li>
+            <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ selectInterface('workflows'); }">${ _('Workflows') }</a></li>
+            <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ selectInterface('schedules'); }">${ _('Schedules') }</a></li>
+            <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ selectInterface('bundles'); }">${ _('Bundles') }</a></li>
+            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ selectInterface('slas'); }">${ _('SLAs') }</a></li>
             </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right alert alert-warning" style="margin-top: 4px">${ _("Hive jobs are running as the 'hive' user") }</div>
@@ -253,7 +253,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <!-- /ko -->
 
       <!-- ko if: $index() == 0 -->
-        <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.interface(name); $parent.breadcrumbs([{'id': '', 'name': name, 'type': type}]); $root.job(null); }" style="text-transform: capitalize"></a>
+        <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.selectInterface(name); }" style="text-transform: capitalize"></a>
       <!-- /ko -->
       <!-- ko if: $index() != 0 -->
         <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
@@ -1183,6 +1183,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         hueUtils.changeURL('#!' + val);
         self.jobs.fetchJobs();
       });
+      self.selectInterface = function(interface) {
+        self.interface(interface);
+        self.resetBreadcrumbs();
+        self.job(null);
+      };
       self.breadcrumbs = ko.observableArray([]);
       self.resetBreadcrumbs = function() {
         self.breadcrumbs([{'id': '', 'name': self.interface(), 'type': self.interface()}]);
