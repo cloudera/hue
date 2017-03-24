@@ -1104,7 +1104,7 @@ class TestModelAPI(OozieMockBase):
          'status': 'running',
          'statement_raw': 'SHOW TABLES',
          'statement': 'SHOW TABLES',
-         'type': 'query-hive',
+         'type': 'hive',
          'properties': {
          },
          'database': 'default',
