@@ -915,6 +915,8 @@ ${ assist.assistPanel() }
 
         page('*', function(ctx){
           console.error('Route not found', ctx);
+          // force to editor
+          page('/editor');
         });
 
         page();
