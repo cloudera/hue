@@ -803,6 +803,54 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   (function () {
 
+/**
+    var Workflow = function(vm, job) {
+      
+            var lastPosition = {
+              top: 0,
+              left: 0
+            }
+
+            var updateArrowPosition = function () {
+              huePubSub.publish('draw.graph.arrows');
+              if ($('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
+                lastPosition = $('canvas').position();
+                window.setTimeout(updateArrowPosition, 100);
+              }
+            }
+
+            var arrowsPolling = function () {
+              if ($('#workflow-page-graph').is(':visible')){
+                window.setTimeout(arrowsPolling, 100);
+              }
+              else {
+                $('canvas').remove();
+              }
+            }
+
+            $('canvas').remove();
+
+            if (vm.job().type() === 'workflow') {
+              $('#workflow-page-graph').empty();
+              $.ajax({
+                url: "/oozie/list_oozie_workflow/" + vm.job().id(),
+                data: {
+                  'graph': true,
+                  'element': 'workflow-page-graph'
+                },
+                beforeSend: function (xhr) {
+                  xhr.setRequestHeader("X-Requested-With", "Hue");
+                },
+                dataType: "html",
+                success: function (response) {
+                  $('#workflow-page-graph').html(response);
+                  updateArrowPosition();
+                  arrowsPolling();
+                }
+              });
+            }
+    }
+*/
     var Job = function (vm, job) {
       var self = this;
 
@@ -855,53 +903,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.job().fetchLogs();
             vm.job().fetchStatus();
 
-            var lastPosition = {
-              top: 0,
-              left: 0
-            }
-
-            var updateArrowPosition = function () {
-              huePubSub.publish('draw.graph.arrows');
-              if ($('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
-                lastPosition = $('canvas').position();
-                window.setTimeout(updateArrowPosition, 100);
-              }
-            }
-
-            var arrowsPolling = function () {
-              if ($('#workflow-page-graph').is(':visible')){
-                window.setTimeout(arrowsPolling, 100);
-              }
-              else {
-                $('canvas').remove();
-              }
-            }
-
-            $('canvas').remove();
-
-            if (vm.job().type() === 'workflow') {
-              $('#workflow-page-graph').empty();
-              $.ajax({
-                url: "/oozie/list_oozie_workflow/" + vm.job().id(),
-                data: {
-                  'graph': true,
-                  'element': 'workflow-page-graph'
-                },
-                beforeSend: function (xhr) {
-                  xhr.setRequestHeader("X-Requested-With", "Hue");
-                },
-                dataType: "html",
-                success: function (response) {
-                  $('#workflow-page-graph').html(response);
-                  updateArrowPosition();
-                  arrowsPolling();
-                }
-              });
-            }
-
-            if (self.mainType() == 'schedules') {
+            //if (self.mainType() == 'schedules') {
               //vm.job().coordVM.setActions(data.app.actions);
-            }
+            //}
           } else {
             $(document).trigger("error", data.message);
           }
