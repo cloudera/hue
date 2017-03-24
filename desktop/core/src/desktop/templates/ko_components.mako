@@ -346,7 +346,7 @@ from desktop.views import _ko
                 notebook._makeHistoryRecord(
                     notebook.onSuccessUrl(),
                     notebook.description(),
-                    notebook.snippets()[0].lastExecuted(),
+                    (new Date()).getTime(),
                     notebook.snippets()[0].status(),
                     notebook.name(),
                     notebook.uuid()

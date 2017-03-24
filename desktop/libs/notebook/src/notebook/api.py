@@ -348,6 +348,7 @@ def _save_notebook(notebook, user):
 
   return notebook_doc, save_as
 
+
 @api_error_handler
 @require_POST
 @check_document_modify_permission()
@@ -369,14 +370,18 @@ def save_notebook(request):
 def _historify(notebook, user):
   query_type = notebook['type']
   name = notebook['name'] if (notebook['name'] and notebook['name'].strip() != '') else DEFAULT_HISTORY_NAME
+  is_managed = notebook.get('isManaged') == True  # Prevents None
 
-  history_doc = Document2.objects.create(
-    name=name,
-    type=query_type,
-    owner=user,
-    is_history=True,
-    is_managed=notebook.get('isManaged') == True # No None
-  )
+  if is_managed and Document2.objects.filter(uuid=notebook['uuid']).exists():
+    history_doc = Document2.objects.get(uuid=notebook['uuid'])
+  else:
+    history_doc = Document2.objects.create(
+      name=name,
+      type=query_type,
+      owner=user,
+      is_history=True,
+      is_managed=is_managed
+    )
 
   # Link history of saved query
   if notebook['isSaved']:
@@ -384,13 +389,14 @@ def _historify(notebook, user):
     notebook['parentSavedQueryUuid'] = parent_doc.uuid
     history_doc.dependencies.add(parent_doc)
 
-  Document.objects.link(
-    history_doc,
-    name=history_doc.name,
-    owner=history_doc.owner,
-    description=history_doc.description,
-    extra=query_type
-  )
+  if not is_managed:
+    Document.objects.link(
+      history_doc,
+      name=history_doc.name,
+      owner=history_doc.owner,
+      description=history_doc.description,
+      extra=query_type
+    )
 
   notebook['uuid'] = history_doc.uuid
   history_doc.update_data(notebook)

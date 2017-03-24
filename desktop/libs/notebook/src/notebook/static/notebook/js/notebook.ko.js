@@ -1071,12 +1071,14 @@ var EditorViewModel = (function() {
         self.statusForButtons('executed');
         stopLongOperationTimeout();
 
-        if (vm.editorMode() && data.history_id && ! vm.isNotificationManager()) {
-          var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
-          if (vm.isHue4()){
-            url = vm.URLS.hue4 + '?editor=' + data.history_id;
+        if (vm.editorMode() && data.history_id) {
+          if (! vm.isNotificationManager()) {
+            var url = '/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.history_id;
+            if (vm.isHue4()){
+              url = vm.URLS.hue4 + '?editor=' + data.history_id;
+            }
+            vm.changeURL(url);
           }
-          vm.changeURL(url);
           notebook.id(data.history_id);
           notebook.uuid(data.history_uuid);
           notebook.isHistory(true);
@@ -1101,16 +1103,23 @@ var EditorViewModel = (function() {
 
         if (data.handle) {
           if (vm.editorMode()) {
-            notebook.history.unshift(
-              notebook._makeHistoryRecord(
-                url,
-                vm.isNotificationManager() ? notebook.description() : data.handle.statement,
-                self.lastExecuted(),
-                self.status(),
-                notebook.name(),
-                notebook.uuid()
-              )
-            );
+            if (vm.isNotificationManager()) { // Update task status
+              var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
+              if (tasks.length == 1) {
+                tasks[0].status(self.status()); console.log(tasks[0].uuid());
+              }
+            } else {
+              notebook.history.unshift(
+                notebook._makeHistoryRecord(
+                  url,
+                  data.handle.statement,
+                  self.lastExecuted(),
+                  self.status(),
+                  notebook.name(),
+                  notebook.uuid()
+                )
+              );
+            }
           }
 
           if (data.handle.statements_count != null) {
@@ -1432,7 +1441,7 @@ var EditorViewModel = (function() {
                 }
               }
               if (! self.result.handle().has_more_statements && vm.successUrl()) {
-                window.location.href = vm.successUrl(); // Not used anymore in Hue 4 
+                window.location.href = vm.successUrl(); // Not used anymore in Hue 4
               }
             }
             else if (self.status() == 'success') {
