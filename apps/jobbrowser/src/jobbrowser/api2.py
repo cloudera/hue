@@ -95,8 +95,9 @@ def logs(request):
   interface = json.loads(request.POST.get('interface'))
   app_id = json.loads(request.POST.get('app_id'))
   app_type = json.loads(request.POST.get('type'))
+  log_name = json.loads(request.POST.get('name'))
 
-  response['logs'] = get_api(request.user, interface).logs(app_id, app_type)
+  response['logs'] = get_api(request.user, interface).logs(app_id, app_type, log_name)
   response['status'] = 0
 
   return JsonResponse(response)
