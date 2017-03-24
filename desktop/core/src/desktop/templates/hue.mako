@@ -244,7 +244,7 @@ ${ hueIcons.symbols() }
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
         % if 'filebrowser' in apps:
-        <li data-bind="click: function () { page('/filebrowser/view=') }"><a href="javascript: void(0);">Files</a></li>
+        <li data-bind="click: function () { page('/filebrowser/') }"><a href="javascript: void(0);">Files</a></li>
         % endif
         % if is_s3_enabled:
         <li data-bind="click: function () { page('/filebrowser/view=S3A://') }"><a href="javascript: void(0);">S3</a></li>
@@ -595,14 +595,14 @@ ${ assist.assistPanel() }
         });
 
         huePubSub.subscribe('open.editor.query', function (uuid) {
-          self.currentApp('editor');
+          self.loadApp('editor');
           self.getActiveAppViewModel(function (viewModel) {
             viewModel.openNotebook(uuid);
           })
         });
 
         huePubSub.subscribe('open.editor.new.query', function (statementOptions) {
-          self.currentApp('editor');
+          self.loadApp('editor');
 
           self.getActiveAppViewModel(function (viewModel) {
             var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
@@ -672,16 +672,17 @@ ${ assist.assistPanel() }
           return r;
         };
 
-        self.currentApp.subscribe(function (newVal) {
+        self.loadApp = function(app){
+          self.currentApp(app);
           self.isLoadingEmbeddable(true);
-          loadedApps.forEach(function (app) {
-            window.pauseAppIntervals(app);
+          loadedApps.forEach(function (loadedApp) {
+            window.pauseAppIntervals(loadedApp);
           });
-          if (typeof self.embeddable_cache[newVal] === 'undefined') {
-            if (loadedApps.indexOf(newVal) == -1){
-              loadedApps.push(newVal);
+          if (typeof self.embeddable_cache[app] === 'undefined') {
+            if (loadedApps.indexOf(app) == -1){
+              loadedApps.push(app);
             }
-            var baseURL = EMBEDDABLE_PAGE_URLS[newVal];
+            var baseURL = EMBEDDABLE_PAGE_URLS[app];
             if (self.currentContextParams() !== null) {
               var route = new page.Route(baseURL);
               route.keys.forEach(function (key) {
@@ -695,7 +696,7 @@ ${ assist.assistPanel() }
               self.currentContextParams(null);
             }
             $.ajax({
-              url: baseURL + '?is_embeddable=true' + self.extraEmbeddableURLParams(),
+              url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
               beforeSend: function (xhr) {
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
@@ -703,30 +704,30 @@ ${ assist.assistPanel() }
               success: function (response) {
                 self.extraEmbeddableURLParams('');
                 var r = self.processHeaders(response);
-                if (SKIP_CACHE.indexOf(newVal) === -1) {
-                  self.embeddable_cache[newVal] = r;
+                if (SKIP_CACHE.indexOf(app) === -1) {
+                  self.embeddable_cache[app] = r;
                 }
-                $('#embeddable_' + newVal).html(r);
+                $('#embeddable_' + app).html(r);
                 self.isLoadingEmbeddable(false);
               }
             });
           } else {
             self.isLoadingEmbeddable(false);
           }
-          window.resumeAppIntervals(newVal);
+          window.resumeAppIntervals(app);
           $('.embeddable').hide();
-          $('#embeddable_' + newVal).insertBefore($('.embeddable:first')).show();
-        });
+          $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
+        }
 
         self.dropzoneError = function (filename) {
-          self.currentApp('importer');
+          self.loadApp('importer');
           self.getActiveAppViewModel(function (vm) {
             vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
           });
         };
 
         self.dropzoneComplete = function (path) {
-          self.currentApp('importer');
+          self.loadApp('importer');
           self.getActiveAppViewModel(function (vm) {
             vm.createWizard.source.path(path);
           });
@@ -748,61 +749,65 @@ ${ assist.assistPanel() }
         page.base('/hue');
 
         page('/help', function(ctx){
-          self.currentApp('help');
+          self.loadApp('help');
         });
 
         page('/about/admin_wizard', function(ctx){
-          self.currentApp('admin_wizard');
+          self.loadApp('admin_wizard');
         });
 
         page('/logs', function(ctx){
-          self.currentApp('logs');
+          self.loadApp('logs');
         });
 
         page('/desktop/dump_config', function(ctx){
-          self.currentApp('dump_config');
+          self.loadApp('dump_config');
         });
 
         page('/filebrowser/view=*', function(ctx){
           self.currentContextParams(ctx.params);
-          self.currentApp('filebrowser');
+          self.loadApp('filebrowser');
+        });
+
+        page('/filebrowser/*', function(ctx){
+          page('/filebrowser/view=' + DropzoneGlobals.homeDir);
         });
 
         page('/dashboard/admin/collections', function(ctx){
-          self.currentApp('collections');
+          self.loadApp('collections');
         });
 
         page('/useradmin/users/add_ldap_users', function(ctx){
-          self.currentApp('useradmin_addldap');
+          self.loadApp('useradmin_addldap');
         });
 
         page('/useradmin/users/new', function(ctx){
-          self.currentApp('useradmin_newuser');
+          self.loadApp('useradmin_newuser');
         });
 
         page('/useradmin/users/edit/:user', function(ctx){
           self.currentContextParams(ctx.params);
-          self.currentApp('useradmin_edituser');
+          self.loadApp('useradmin_edituser');
         });
 
         page('/useradmin/users/', function(ctx){
-          self.currentApp('useradmin_users');
+          self.loadApp('useradmin_users');
         });
 
         page('/useradmin/groups/', function(ctx){
-          self.currentApp('useradmin_groups');
+          self.loadApp('useradmin_groups');
         });
 
         page('/useradmin/permissions/', function(ctx){
-          self.currentApp('useradmin_permissions');
+          self.loadApp('useradmin_permissions');
         });
 
         page('/useradmin/configurations/', function(ctx){
-          self.currentApp('useradmin_configurations');
+          self.loadApp('useradmin_configurations');
         });
 
         page('/editor', function (ctx) {
-          self.currentApp('editor');
+          self.loadApp('editor');
           if (window.location.getParameter('editor') !== '') {
             self.getActiveAppViewModel(function (viewModel) {
               viewModel.openNotebook(window.location.getParameter('editor'));
@@ -814,12 +819,12 @@ ${ assist.assistPanel() }
         });
 
         page('/pig', function (ctx) {
-          self.currentApp('editor');
+          self.loadApp('editor');
           self.changeEditorType('pig');
         });
 
         page('/notebook', function(ctx){
-          self.currentApp('notebook');
+          self.loadApp('notebook');
           if (window.location.getParameter('notebook') !== '') {
             self.getActiveAppViewModel(function (viewModel) {
               viewModel.openNotebook(window.location.getParameter('notebook'));
@@ -832,7 +837,7 @@ ${ assist.assistPanel() }
         });
 
         page('/home', function(ctx){
-          self.currentApp('home');
+          self.loadApp('home');
           if (window.location.getParameter('uuid') !== '') {
             self.getActiveAppViewModel(function (viewModel) {
               viewModel.openUuid(window.location.getParameter('uuid'));
@@ -841,27 +846,27 @@ ${ assist.assistPanel() }
         });
 
         page('/dashboard/new_search', function(ctx){
-          self.currentApp('dashboard');
+          self.loadApp('dashboard');
         });
 
         page('/oozie/editor/workflow/new/', function(ctx){
-          self.currentApp('oozie_workflow');
+          self.loadApp('oozie_workflow');
         });
 
         page('/oozie/editor/coordinator/new/', function(ctx){
-          self.currentApp('oozie_coordinator');
+          self.loadApp('oozie_coordinator');
         });
 
         page('/oozie/editor/bundle/new/', function(ctx){
-          self.currentApp('oozie_bundle');
+          self.loadApp('oozie_bundle');
         });
 
         page('/metastore/tables/', function(ctx){
-          self.currentApp('metastore');
+          self.loadApp('metastore');
         });
 
         page('/indexer/importer/prefill/*', function(ctx){
-          self.currentApp('indexer');
+          self.loadApp('indexer');
           self.getActiveAppViewModel(function (viewModel) {
             var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
             if (! arguments) {
@@ -878,35 +883,35 @@ ${ assist.assistPanel() }
         });
 
         page('/indexer/', function(ctx){
-          self.currentApp('indexes');
+          self.loadApp('indexes');
         });
 
         page('/jobbrowser/apps', function(ctx){
-          self.currentApp('jobbrowser');
+          self.loadApp('jobbrowser');
         });
 
         page('/hbase/', function(ctx){
-          self.currentApp('hbase');
+          self.loadApp('hbase');
         });
 
         page('/security/hive2', function(ctx){
-          self.currentApp('security_hive2');
+          self.loadApp('security_hive2');
         });
 
         page('/security/hive', function(ctx){
-          self.currentApp('security_hive');
+          self.loadApp('security_hive');
         });
 
         page('/security/solr', function(ctx){
-          self.currentApp('security_solr');
+          self.loadApp('security_solr');
         });
 
         page('/security/hdfs', function(ctx){
-          self.currentApp('security_hdfs');
+          self.loadApp('security_hdfs');
         });
 
         page('/indexer/importer/', function(ctx){
-          self.currentApp('importer');
+          self.loadApp('importer');
         });
 
         page('/', function(ctx){
