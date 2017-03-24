@@ -135,6 +135,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
             </div>
 
+            ${_('in the last')} <input id="timeValue" class="input-mini no-margin" type="number" value="7" min="1" max="3650">
+            <select id="timeUnit" class="input-small no-margin">
+              <option value="days">${_('days')}</option>
+              <option value="hours">${_('hours')}</option>
+              <option value="minutes">${_('minutes')}</option>
+            </select>
+
             <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
               <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
               <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
@@ -147,6 +154,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span>
               </button>
             </div>
+
 
             <div class="card card-small">
               <table id="jobsTable" class="datatables table table-condensed">
