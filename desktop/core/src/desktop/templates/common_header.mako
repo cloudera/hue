@@ -290,7 +290,7 @@ ${ hueIcons.symbols() }
   </div>
     <a class="brand nav-tooltip pull-left" title="${_('About Hue')}" data-rel="navigator-tooltip" href="/about">
       <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
-        <use xlink:href="#hue-logo"></use>
+        <use xlink:href="#hi-logo"></use>
       </svg>
     </a>
     % if user.is_authenticated() and section != 'login':
