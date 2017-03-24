@@ -95,6 +95,7 @@ dynamic_patterns += patterns('desktop.views',
   (r'^assist_m', 'assist_m'),
   # Hue 4
   (r'^hue.*/$', 'hue'),
+  (r'^404$', 'not_found'),
 
   # KO components, change to doc?name=ko_editor or similar
   (r'^ko_editor', 'ko_editor'),

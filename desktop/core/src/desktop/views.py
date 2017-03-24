@@ -130,6 +130,11 @@ def home2(request, is_embeddable=False):
 def home_embeddable(request):
   return home2(request, True)
 
+def not_found(request):
+  return render('404.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
 
 @access_log_level(logging.WARN)
 def log_view(request):
