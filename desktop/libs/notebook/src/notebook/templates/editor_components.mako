@@ -296,7 +296,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
               <!-- ko if: editorType() == 'impala' -->
-                <img src="${ static('impala/art/icon_impala_48.png') }" class="app-icon"  alt="${ _('Impala icon') }"/>
+                <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-impala"></use></svg>
                 Impala
               <!-- /ko -->
               <!-- ko if: editorType() == 'rdbms' -->
@@ -332,7 +332,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 MapReduce
               <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
-                <img src="${ static('beeswax/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }" />
+                <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-hive"></use></svg>
                 Hive
               <!-- /ko -->
               <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->

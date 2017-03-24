@@ -103,7 +103,7 @@ ${ hueIcons.symbols() }
         </a>
 
         <a class="brand" data-bind="click: function () { page('/home') }" href="javascript: void(0);" title="${_('Documents')}">
-          <svg style="height: 24px; width: 120px;"><use xlink:href="#hue-logo"></use></svg>
+          <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
         <div class="compose-action btn-group">
@@ -118,10 +118,10 @@ ${ hueIcons.symbols() }
                 <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
                   % if 'impala' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('impala', true); }"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('impala', true); }"><svg style="display: inline-block;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-impala"></use></svg> ${_('Impala Query')}</a></li>
                   % endif
                   % if 'beeswax' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive Query')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-hive"></use></svg> ${_('Hive Query')}</a></li>
                   % endif
                   % if SHOW_NOTEBOOKS.get():
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook'); }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>

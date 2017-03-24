@@ -54,7 +54,7 @@ ${ hueIcons.symbols() }
   </div>
   <a class="brand pull-left" href="/">
     <svg style="margin-top: 2px; margin-left:8px;width: 60px;height: 16px;display: inline-block;">
-      <use xlink:href="#hue-logo"></use>
+      <use xlink:href="#hi-logo"></use>
     </svg>
   </a>
 </div>
