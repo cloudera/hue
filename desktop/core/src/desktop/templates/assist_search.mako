@@ -107,7 +107,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER
         <!-- /ko -->
         <div data-bind="foreach: searchResult">
           <div class="result-entry" data-bind="visibleOnHover: { override: statsVisible, selector: '.table-actions' }, event: { mouseover: showNavContextPopoverDelayed, mouseout: clearNavContextPopoverDelay }">
-            <div class="icon-col">
+            <div class="left-col">
               <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
             </div>
             <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
