@@ -32,7 +32,6 @@ from django.core.urlresolvers import reverse, NoReverseMatch
 from django.db import connection, models, transaction
 from django.db.models import Q
 from django.db.models.query import QuerySet
-from django.template.defaultfilters import urlencode
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from settings import HUE_DESKTOP_VERSION
@@ -1074,7 +1073,7 @@ class Document2(models.Model):
 
   @property
   def path(self):
-    quoted_name = urllib.quote(self.name)
+    quoted_name = urllib.quote(self.name.encode('utf-8'))
     if self.parent_directory:
       return '%s/%s' % (self.parent_directory.path, quoted_name)
     else:
@@ -1146,7 +1145,7 @@ class Document2(models.Model):
     return {
       'owner': self.owner.username,
       'name': self.name,
-      'path': urlencode(self.path or '/'),
+      'path': self.path or '/',
       'description': self.description,
       'uuid': self.uuid,
       'id': self.id,
