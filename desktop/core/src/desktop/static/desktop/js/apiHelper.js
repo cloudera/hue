@@ -1346,54 +1346,62 @@ var ApiHelper = (function () {
     var clonedIdentifierChain = options.identifierChain.concat();
 
     var hierarchy = '';
-    if (! self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-      hierarchy = options.defaultDatabase;
-    } else {
-      hierarchy = clonedIdentifierChain.shift().name
-    }
-    hierarchy += '/' + clonedIdentifierChain.shift().name;
-    if (clonedIdentifierChain.length > 0) {
-      hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
-    }
 
-    var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
-
-    var fetchFunction = function (storeInCache) {
-      if (options.timeout === 0) {
-        self.assistErrorCallback(options)({ status: -1 });
-        return;
-      }
-      $.ajax({
-        url: url,
-        data: {
-          "format" : 'json'
-        },
-        beforeSend: function (xhr) {
-          xhr.setRequestHeader("X-Requested-With", "Hue");
-        },
-        timeout: options.timeout
-      }).done(function (data) {
-        if (! self.successResponseIsError(data)) {
-          if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
-            storeInCache(data);
-          }
-          options.successCallback(data);
+    self.loadDatabases({
+      sourceType: options.sourceType,
+      successCallback: function () {
+        if (! self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
+          hierarchy = options.defaultDatabase;
         } else {
-          self.assistErrorCallback(options)(data);
+          hierarchy = clonedIdentifierChain.shift().name
         }
-      })
-      .fail(self.assistErrorCallback(options))
-      .always(function () {
-        if (typeof options.editor !== 'undefined' && options.editor !== null) {
-          options.editor.hideSpinner();
+        hierarchy += '/' + clonedIdentifierChain.shift().name;
+        if (clonedIdentifierChain.length > 0) {
+          hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
         }
-      });
-    };
 
-    fetchCached.bind(self)($.extend({}, options, {
-      url: url,
-      fetchFunction: fetchFunction
-    }));
+        var url = "/" + (options.sourceType == "hive" ? "beeswax" : options.sourceType) + "/api/table/" + hierarchy;
+
+        var fetchFunction = function (storeInCache) {
+          if (options.timeout === 0) {
+            self.assistErrorCallback(options)({ status: -1 });
+            return;
+          }
+          $.ajax({
+            url: url,
+            data: {
+              "format" : 'json'
+            },
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader("X-Requested-With", "Hue");
+            },
+            timeout: options.timeout
+          }).done(function (data) {
+            if (! self.successResponseIsError(data)) {
+              if ((typeof data.cols !== 'undefined' && data.cols.length > 0) || typeof data.sample !== 'undefined') {
+                storeInCache(data);
+              }
+              options.successCallback(data);
+            } else {
+              self.assistErrorCallback(options)(data);
+            }
+          })
+            .fail(self.assistErrorCallback(options))
+            .always(function () {
+              if (typeof options.editor !== 'undefined' && options.editor !== null) {
+                options.editor.hideSpinner();
+              }
+            });
+        };
+
+        fetchCached.bind(self)($.extend({}, options, {
+          url: url,
+          fetchFunction: fetchFunction
+        }));
+      },
+      silenceErrors: options.silenceErrors,
+      errorCallback: options.errorCallback
+    });
   };
 
   /**
