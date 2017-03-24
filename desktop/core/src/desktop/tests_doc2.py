@@ -879,6 +879,23 @@ class TestDocument2Permissions(object):
     assert_true('history.sql' in doc_names)
 
 
+  def test_unicode_name(self):
+    doc = Document2.objects.create(name='My Bundle a voté « non » à l’accord', type='oozie-workflow2', owner=self.user,
+                                   data={}, parent_directory=self.home_dir)
+
+    # Verify that home directory contents return correctly
+    response = self.client.get('/desktop/api2/doc/', {'uuid': self.home_dir.uuid})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+
+    # Verify that the doc's path is escaped
+    response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'])
+    path = data['document']['path']
+    assert_equal('/My%20Bundle%20a%20vot%C3%A9%20%C2%AB%20non%20%C2%BB%20%C3%A0%20l%E2%80%99accord', path)
+
+
 class TestDocument2ImportExport(object):
 
   def setUp(self):
