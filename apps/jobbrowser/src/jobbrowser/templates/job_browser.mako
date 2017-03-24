@@ -362,11 +362,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div class="tab-content">
     <div class="tab-pane active" id="job-mapreduce-page-logs">
       % for name in ['stdout', 'stderr', 'syslog']:
-        <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+        <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
       % endfor
       <br>
 
-      <pre data-bind="html: logs['default']"></pre>
+      <pre data-bind="html: logs"></pre>
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
@@ -454,11 +454,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div class="tab-content">
     <div class="tab-pane active" id="job-mapreduce-task-page-logs">
       % for name in ['stdout', 'stderr', 'syslog']:
-        <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+        <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
       % endfor
       <br>
 
-      <pre data-bind="html: logs['default']"></pre>
+      <pre data-bind="html: logs"></pre>
     </div>
 
     <div class="tab-pane" id="job-mapreduce-task-page-attempts">
@@ -555,18 +555,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs-attempts">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
           % endfor
           <br>
-          <pre data-bind="html: logs['default']"></pre>
+          <pre data-bind="html: logs"></pre>
         </div>
 
         <div class="tab-pane" id="job-mapreduce-task-attempt-page-logs-container">
           % for name in ['container-stdout', 'container-stderr', 'container-syslog']:
-            <a href="javascript:void(0)" data-bind="click: fetchLogs, text: '${ name }'"></a>
+            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
           % endfor
           <br>
-          <pre data-bind="html: logs['default']"></pre>
+          <pre data-bind="html: logs"></pre>
         </div>
       </div>
     </div>
@@ -641,7 +641,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="workflow-page-logs">
-      <pre data-bind="html: logs['default']"></pre>
+      <pre data-bind="html: logs"></pre>
     </div>
 
     <div class="tab-pane" id="workflow-page-tasks">
@@ -750,7 +750,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="schedule-page-logs">
-      <pre data-bind="html: logs['default']"></pre>
+      <pre data-bind="html: logs"></pre>
     </div>
 
     <div class="tab-pane" id="schedule-page-tasks">
@@ -991,7 +991,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);
 
-      self.logs = ko.mapping.fromJS({'default': ''});
+      self.logs = ko.observable('');
 
       //self.coordVM = new RunningCoordinatorModel([]);
 
@@ -1042,10 +1042,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           type: ko.mapping.toJSON(self.type),
-          name: name ? name : 'default'
+          name: ko.mapping.toJSON(name ? name : 'default')
         }, function (data) {
           if (data.status == 0) {
-            self.logs['default'](data.logs.logs['default'])
+            self.logs(data.logs.logs)
           } else {
             $(document).trigger("error", data.message);
           }

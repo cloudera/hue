@@ -90,14 +90,14 @@ class WorkflowApi(Api):
     return json.loads(response.content)
 
 
-  def logs(self, appid, app_type):
+  def logs(self, appid, app_type, log_name=None):
     if '@' in appid:
       return WorkflowActionApi(self.user).logs(appid, app_type)
 
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
-    return {'logs': {'default': json.loads(data.content)['log']}}
+    return {'logs': json.loads(data.content)['log']}
 
 
   def profile(self, appid, app_type, app_property):
@@ -142,5 +142,5 @@ class WorkflowActionApi(Api):
     return common
 
 
-  def logs(self, appid, app_type):
-    return {'progress': 0, 'logs': {'default': ''}}
+  def logs(self, appid, app_type, log_name=None):
+    return {'progress': 0, 'logs': ''}

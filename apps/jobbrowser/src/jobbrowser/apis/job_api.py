@@ -53,8 +53,8 @@ class JobApi(Api):
   def action(self, appid, operation):
     return self._get_api(appid).action(operation, appid)
 
-  def logs(self, appid, app_type):
-    return self._get_api(appid).logs(appid, app_type)
+  def logs(self, appid, app_type, log_name):
+    return self._get_api(appid).logs(appid, app_type, log_name)
 
   def profile(self, appid, app_type, app_property):
     return self._get_api(appid).profile(appid, app_type, app_property)
@@ -131,13 +131,16 @@ class YarnApi(Api):
       return {}
 
 
-  def logs(self, appid, app_type):
+  def logs(self, appid, app_type, log_name):
+    if log_name == 'default':
+      log_name = 'syslog'
+
     if app_type == 'MAPREDUCE':
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid)
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
       logs = json.loads(response.content)['log']
     else:
       logs = None
-    return {'logs': {'default': logs}}
+    return {'logs': logs}
 
 
   def profile(self, appid, app_type, app_property):
@@ -185,11 +188,11 @@ class YarnMapReduceTaskApi(Api):
     return common
 
 
-  def logs(self, appid, app_type):
-    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id)
+  def logs(self, appid, app_type, log_name):
+    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
     logs = json.loads(response.content)['log']
 
-    return {'progress': 0, 'logs': {'default': logs}}
+    return {'progress': 0, 'logs': logs}
 
 
   def profile(self, appid, app_type, app_property):
@@ -240,11 +243,11 @@ class YarnMapReduceTaskAttemptApi(Api):
     return common
 
 
-  def logs(self, appid, app_type):
+  def logs(self, appid, app_type, log_name):
     task = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id)
     stdout, stderr, syslog = task.get_task_log()
 
-    return {'progress': 0, 'logs': {'default': stdout, 'stdout': stdout, 'stderr': stderr, 'syslog': syslog}}
+    return {'progress': 0, 'logs': syslog if log_name == 'syslog' else stderr if log_name == 'stderr' else stdout}
 
 
   def profile(self, appid, app_type, app_property):

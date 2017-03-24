@@ -57,7 +57,7 @@ class Api(object):
 
   def action(self, appid, operation): return {}
 
-  def logs(self, appid, app_type): return {'progress': 0, 'logs': {'default': ''}}
+  def logs(self, appid, app_type, log_name): return {'progress': 0, 'logs': ''}
 
   def profile(self, appid, app_type, app_property): return {} # Tasks, XML, counters...
 

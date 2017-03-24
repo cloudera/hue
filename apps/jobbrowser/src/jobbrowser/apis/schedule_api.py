@@ -79,11 +79,11 @@ class ScheduleApi(Api):
 
     return common
 
-  def logs(self, appid, app_type):
+  def logs(self, appid, app_type, log_name=None):
     request = MockDjangoRequest(self.user)
     data = get_oozie_job_log(request, job_id=appid)
 
-    return {'logs': {'default': json.loads(data.content)['log']}}
+    return {'logs': json.loads(data.content)['log']}
 
 
   def profile(self, appid, app_type, app_property):
