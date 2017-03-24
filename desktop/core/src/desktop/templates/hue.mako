@@ -351,6 +351,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_admin_wizard" class="embeddable"></div>
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
+      <div id="embeddable_404" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -512,6 +513,7 @@ ${ assist.assistPanel() }
     var onePageViewModel = (function () {
 
       var EMBEDDABLE_PAGE_URLS = {
+        404: '/404',
         editor: '/editor',
         notebook: '/notebook',
         metastore: '/metastore/tables/',
@@ -920,8 +922,7 @@ ${ assist.assistPanel() }
 
         page('*', function(ctx){
           console.error('Route not found', ctx);
-          // force to editor
-          page('/editor');
+          self.loadApp('404');
         });
 
         page();
