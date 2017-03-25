@@ -1135,6 +1135,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <i class="fa fa-external-link-square"></i>
             </a>
           </div>
+          <a class="btn" data-bind="click: function() { getExternalStatement(); }"> <i class="fa fa-lg fa-refresh"/> </a>
           <a class="btn" data-bind="tooltip: { placement: 'bottom', title: 'Save content back to file' }, click: function() { huePubSub.publish('show.saveToFile.modal'); }"><i class="fa fa-save"></i></a>
           <!-- /ko -->
         </div>
@@ -1169,7 +1170,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         onBlur: saveTemporarySnippet,
         highlightedRange: result.statement_range,
         useNewAutocompleter: $root.useNewAutocompleter,
-        readOnly: statementType() !== 'text',
         aceOptions: {
           showLineNumbers: $root.editorMode(),
           showGutter: $root.editorMode(),
