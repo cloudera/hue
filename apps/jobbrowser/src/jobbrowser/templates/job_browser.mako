@@ -209,7 +209,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: mainType() == 'bundles' -->
               <div data-bind="template: { name: 'bundle-page' }"></div>
             <!-- /ko -->
-            
+
             <!-- ko if: mainType() == 'sla' -->
               <div data-bind="template: { name: 'sla-page' }"></div>
             <!-- /ko -->
@@ -243,6 +243,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="breadcrumbs">
   <h3>
@@ -1114,27 +1115,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.apps = ko.observableArray();
       self.loadingJobs = ko.observable(false);
-      self.username = ko.observable('${ user.username }');
-      self.textFilter = ko.observable('${ user.username }').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
-
-      self.filters = [{'text': self.textFilter}];
-
+      self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
       self.textFilter.subscribe(function(value) {
         self.fetchJobs();
         // TBD: refreshPagination()
       });
 
+      self.filters = ko.computed(function() {
+        return [{'text': self.textFilter()}];
+      });
+
+
       self.fetchJobs = function () {
         self.loadingJobs(true);
         vm.job(null);
 
-        url_data = {
-          username: ko.mapping.toJSON(self.username),
+        $.post("/jobbrowser/api/jobs", {
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
-        }
-
-        $.post("/jobbrowser/api/jobs", url_data, function (data) {
+        }, function (data) {
           if (data.status == 0) {
             var apps = [];
             if (data && data.apps) {
