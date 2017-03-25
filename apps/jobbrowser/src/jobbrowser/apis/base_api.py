@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import re
 
 from django.utils.translation import ugettext as _
 
@@ -29,6 +30,7 @@ def get_api(user, interface):
   from jobbrowser.apis.bundle_api import BundleApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
+  from jobbrowser.apis.slas_api import SlaApi
   from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'jobs':
@@ -40,7 +42,7 @@ def get_api(user, interface):
   elif interface == 'bundles':
     return BundleApi(user)
   elif interface == 'slas':
-    return BundleApi(user)  
+    return SlaApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
@@ -73,3 +75,17 @@ class MockDjangoRequest():
     self.GET = get if get is not None else {'format': 'json'}
     self.POST = post if post is not None else {}
     self.method = "POST"
+
+
+def _extract_query_params(filters):
+  filter_params = {}
+
+  for name, value in filters:
+    if name == 'text':
+      filter_params['text'] = value
+      user_filter = re.search('((user):([^ ]+))', value)
+      if user_filter:
+        filter_params['username'] = user_filter.group(3)
+        filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '')
+
+  return filter_params

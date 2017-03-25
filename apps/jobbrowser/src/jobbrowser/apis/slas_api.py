@@ -42,13 +42,13 @@ class SlaApi(Api):
     params = {}
 
     job_name = filters.POST.get('job_name')
- 
+
     if re.match('.*-oozie-oozi-[WCB]', job_name):
       params['id'] = job_name
       params['parent_id'] = job_name
     else:
       params['app_name'] = job_name
- 
+
 #     if 'useDates' in request.POST:
 #       if request.POST.get('start'):
 #         params['nominal_start'] = request.POST.get('start')

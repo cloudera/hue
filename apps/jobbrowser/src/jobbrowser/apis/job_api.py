@@ -20,7 +20,7 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api, MockDjangoRequest
+from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
 from jobbrowser.views import job_attempt_logs_json, kill_job
 
 
@@ -42,7 +42,7 @@ class JobApi(Api):
     self.request = None
 
   def apps(self, filters):
-    jobs = self.yarn_api.apps()
+    jobs = self.yarn_api.apps(filters)
     # += Impala
     # += Sqoop2
     return jobs
@@ -74,8 +74,15 @@ class JobApi(Api):
 class YarnApi(Api):
   """YARN, MR, Spark"""
 
-  def apps(self):
-    jobs = NativeYarnApi(self.user).get_jobs(self.user, username=self.user.username, state='all', text='')
+  def apps(self, filters):
+    filter_params = {
+      'username': '',
+      'text': ''
+    }
+
+    filter_params.update(_extract_query_params(filters))
+
+    jobs = NativeYarnApi(self.user).get_jobs(self.user, username=filter_params['username'], state='all', text=filter_params['text'])
     return [{
         'id': app.jobId,
         'name': app.name,
@@ -87,7 +94,6 @@ class YarnApi(Api):
         'duration': 10 * 3600,
         'submitted': 10 * 3600
     } for app in jobs]
-
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
