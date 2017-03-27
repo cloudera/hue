@@ -16,7 +16,7 @@
  limitations under the License.
 */
 @import (reference) "cui/colors.less";
-@import (reference) "hue-attributes.less";
+@import (reference) "hue-mixins.less";
 
 @import "hue-assist";
 @import "hue-autocomplete";
@@ -411,10 +411,6 @@ body {
   color: @cui-gray-600;
 }
 
-.blue {
-  color: @hue-primary-color-dark !important;
-}
-
 .black-link {
   color: @cui-gray-800;
   .hue-ease-transition(color);
@@ -428,30 +424,6 @@ body {
 
 .black-link:hover {
   color: @hue-primary-color-dark;
-}
-
-h1 {
-  font-size: 3rem;
-}
-
-h2 {
-  font-size: 2.25rem;
-}
-
-h3 {
-  font-size: 1.5rem;
-}
-
-h4 {
-  font-size: 1.313rem;
-}
-
-h5 {
-  font-size: 1.125rem;
-}
-
-h6 {
-  font-size: 1rem;
 }
 
 a:hover,
@@ -990,10 +962,6 @@ a:visited {
 
 .help-inline.muted {
   color: @cui-gray-600;
-}
-
-.vertical-align-top {
-  vertical-align: top;
 }
 
 .form-actions {
