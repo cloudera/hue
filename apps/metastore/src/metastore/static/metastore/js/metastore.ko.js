@@ -803,7 +803,7 @@ var MetastoreViewModel = (function () {
     huePubSub.subscribe('metastore.url.change', function () {
       var prefix = '/metastore/';
       if (self.isHue4()){
-        prefix = '?app=metastore&path=';
+        prefix = '/hue' + prefix;
       }
       if (self.database() && self.database().table()) {
         hueUtils.changeURL(prefix + 'table/' + self.database().name + '/' + self.database().table().name);
@@ -956,7 +956,7 @@ var MetastoreViewModel = (function () {
   MetastoreViewModel.prototype.loadURL = function () {
     var self = this;
 
-    var path = (IS_HUE_4 ? window.location.getParameter('path', true) : window.location.pathname);
+    var path = (IS_HUE_4 ? window.location.pathname.substr(4) : window.location.pathname);
     if (!path) {
       path = '/metastore/tables';
     }

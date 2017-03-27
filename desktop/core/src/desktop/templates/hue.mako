@@ -522,7 +522,7 @@ ${ assist.assistPanel() }
         500: '/500',
         editor: '/editor',
         notebook: '/notebook',
-        metastore: '/metastore/tables/',
+        metastore: '/metastore/*',
         dashboard: '/dashboard/new_search',
         oozie_workflow: '/oozie/editor/workflow/new/',
         oozie_coordinator: '/oozie/editor/coordinator/new/',
@@ -873,7 +873,8 @@ ${ assist.assistPanel() }
           self.loadApp('oozie_bundle');
         });
 
-        page('/metastore/tables/', function(ctx){
+        page('/metastore/*', function(ctx){
+          self.currentContextParams(ctx.params);
           self.loadApp('metastore');
         });
 
