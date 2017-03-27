@@ -472,7 +472,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
-# Task History
+## Task History
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
