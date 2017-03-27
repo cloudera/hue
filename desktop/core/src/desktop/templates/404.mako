@@ -32,15 +32,15 @@ ${ commonheader(_('404 - Page not found'), "", user, request) | n,unicode }
   </div>
   <div class="row-fluid">
     <div class="span6 offset3 center error-box">
-      <h1>${_('Page not found.')}</h1>
+      <h1>${_('Page not found')}</h1>
 
-      <p>${_("We're sorry, but the requested page could not be found")}
+      <p>${_("We're sorry, but the requested page could not be found.")}
         %if uri:
         <code>${uri}</code>
         %endif
       </p>
       <br/>
-      <a href="/home">${ _('Go to My documents') }</a>
+      <a href="javascript:history.back();">${_('Try to go back')}</a> ${_('or')} <a href="/home">${ _('go to My documents') }</a>
     </div>
   </div>
 </div>
