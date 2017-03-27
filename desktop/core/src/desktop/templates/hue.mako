@@ -141,7 +141,7 @@ ${ hueIcons.symbols() }
                       % endfor
                       % if user.is_superuser:
                         <li class="divider"></li>
-                        <li><a href="gethue.com"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
+                        <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
                       % endif
                     </ul>
                   </li>
@@ -211,7 +211,7 @@ ${ hueIcons.symbols() }
             % if user.is_superuser:
             <li data-bind="click: function () { page('/useradmin/users/') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
-            <li><a href="http://gethue.com"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+            <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             % if user.is_superuser:
             <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
             % endif
