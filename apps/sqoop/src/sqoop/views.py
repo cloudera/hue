@@ -24,4 +24,6 @@ LOG = logging.getLogger(__name__)
 
 
 def app(request):
-  return render('app.mako', request, {})
+  return render('app.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False),
+  })
