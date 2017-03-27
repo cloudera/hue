@@ -94,6 +94,12 @@
 
 ${ hueIcons.symbols() }
 
+% if conf.CUSTOM.BANNER_TOP_HTML.get():
+<div class="banner">
+  ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
+</div>
+% endif
+
 <div class="main-page">
   <nav class="navbar">
     <div class="navbar-inner top-nav">

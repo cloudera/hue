@@ -180,7 +180,7 @@ if USE_NEW_EDITOR.get():
 ${ hueIcons.symbols() }
 
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
-  <div id="banner-top" class="banner">
+  <div class="banner">
     ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
   </div>
 % endif
