@@ -29,7 +29,7 @@ ${ commonheader(_('Dashboard'), "dashboard", user, request, "80px") | n,unicode 
 ${ notebookKoComponents.downloadSnippetResults() }
 %endif
 
-<div id="searchComponents" class="dashboard-search">
+<div id="searchComponents" class="dashboard-container">
 ${ common_search.page_structure(False, is_embeddable) }
 </div>
 
