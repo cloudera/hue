@@ -52,6 +52,10 @@ class WorkflowApi(Api):
     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
       kwargs['filters'].extend([('text', text_filters.get('text'))])
 
+    if filters['pagination']:
+      kwargs['offset'] = filters['pagination']['offset']
+      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT.get())
+
     if filters.get('states'):
       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
       for _state in filters.get('states'):
@@ -62,7 +66,8 @@ class WorkflowApi(Api):
 
     wf_list = oozie_api.get_workflows(**kwargs)
 
-    return [{
+    return {
+      'apps':[{
         'id': app.id,
         'name': app.appName,
         'status': app.status,
@@ -72,7 +77,9 @@ class WorkflowApi(Api):
         'progress': app.get_progress(),
         'duration': 10 * 3600,
         'submitted': 10 * 3600
-    } for app in wf_list.jobs]
+      } for app in wf_list.jobs],
+      'total': wf_list.total
+    }
 
 
   def app(self, appid):

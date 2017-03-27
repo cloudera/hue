@@ -1232,6 +1232,7 @@ var EditorViewModel = (function() {
 
       logGA('compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
+      self.hasSuggestion(null);
 
       lastCompatibilityRequest = $.post("/notebook/api/optimizer/statement/compatibility", {
         notebook: ko.mapping.toJSON(notebook.getContext()),

@@ -94,7 +94,8 @@ class YarnApi(Api):
 
     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
 
-    return [{
+    return {
+      'apps': [{
         'id': app.jobId,
         'name': app.name,
         'type': app.applicationType,
@@ -104,7 +105,9 @@ class YarnApi(Api):
         'progress': app.progress,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
-    } for app in jobs]
+      } for app in jobs],
+      'total': None
+    }
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
@@ -188,7 +191,10 @@ class YarnMapReduceTaskApi(Api):
 
 
   def apps(self):
-    return [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(jobid=self.app_id, pagenum=1)]
+    return {
+      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(jobid=self.app_id, pagenum=1)],
+      'total': None
+    }
 
 
   def app(self, appid):
@@ -246,7 +252,10 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def apps(self):
-    return [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts]
+    return {
+      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts],
+      'total': None
+    }
 
 
   def app(self, appid):

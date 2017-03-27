@@ -68,7 +68,8 @@ class SlaApi(Api):
 #   configuration = oozie_api.get_configuration()
 #   show_slas_hint = 'org.apache.oozie.sla.service.SLAService' not in configuration.get('oozie.services.ext', '')
 
-    return [{
+    return {
+      'apps': [{
         'id': app.id,
         'name': app.appName,
         'status': app.status,
@@ -77,7 +78,9 @@ class SlaApi(Api):
         'progress': 100,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
-    } for app in wf_list.jobs]
+      } for app in wf_list.jobs],
+      'total': None
+    }
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
