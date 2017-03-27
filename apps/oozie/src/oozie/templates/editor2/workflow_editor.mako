@@ -678,7 +678,7 @@ ${ dashboard.import_bindings() }
       "left": lastSeenPosition.left + "px",
       "width": 450
     });
-    $("#addActionDemiModal").width(_el.width()).css("top", _el.offset().top + 25).css("left", _el.offset().left).modal("show");
+    $("#addActionDemiModal").width(_el.width()).css("top", _el.position().top + 25).css("left", _el.position().left).modal("show");
     $("html, body").animate({
       scrollTop: $("#addActionDemiModal").offset().top - 200
     }, 200);
