@@ -79,10 +79,14 @@ class YarnApi(Api):
       'user': self.user,
       'username': '',
       'text': '',
-      'state': 'all'
+      'state': 'all',
+      'states': ''
     }
 
     filter_params.update(_extract_query_params(filters))
+
+    if filters.get('states'):
+      filter_params['states'] = filters['states']
 
     if 'time' in filters:
       filter_params['time_value'] = int(filters['time']['time_value'])
