@@ -135,6 +135,11 @@ def not_found(request):
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
+def server_error(request):
+  return render('500.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
 
 @access_log_level(logging.WARN)
 def log_view(request):
