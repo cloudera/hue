@@ -523,7 +523,7 @@ ${ assist.assistPanel() }
         editor: '/editor',
         notebook: '/notebook',
         metastore: '/metastore/*',
-        dashboard: '/dashboard/new_search',
+        dashboard: '/dashboard/*',
         oozie_workflow: '/oozie/editor/workflow/new/',
         oozie_coordinator: '/oozie/editor/coordinator/new/',
         oozie_bundle: '/oozie/editor/bundle/new/',
@@ -553,7 +553,7 @@ ${ assist.assistPanel() }
         sqoop: '/sqoop',
       };
 
-      var SKIP_CACHE = ['filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = ['dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -561,6 +561,7 @@ ${ assist.assistPanel() }
         self.embeddable_cache = {};
         self.currentApp = ko.observable();
         self.currentContextParams = ko.observable(null);
+        self.currentQueryString = ko.observable(null);
         self.isLoadingEmbeddable = ko.observable(false);
         self.extraEmbeddableURLParams = ko.observable('');
 
@@ -703,6 +704,10 @@ ${ assist.assistPanel() }
                 }
               });
               self.currentContextParams(null);
+            }
+            if (self.currentQueryString() !== null) {
+              baseURL += (baseURL.indexOf('?') > -1 ? '&' : '?') + self.currentQueryString();
+              self.currentQueryString(null);
             }
             $.ajax({
               url: baseURL + (baseURL.indexOf('?') > -1 ? '&' : '?') +'is_embeddable=true' + self.extraEmbeddableURLParams(),
@@ -857,7 +862,15 @@ ${ assist.assistPanel() }
           }
         });
 
-        page('/dashboard/new_search', function(ctx){
+        page('/dashboard/*', function(ctx){
+          self.currentContextParams(ctx.params);
+          self.currentQueryString(ctx.querystring);
+          self.loadApp('dashboard');
+        });
+
+        page('/search/*', function(ctx){
+          self.currentContextParams(ctx.params);
+          self.currentQueryString(ctx.querystring);
           self.loadApp('dashboard');
         });
 
