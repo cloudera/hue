@@ -259,7 +259,7 @@ ${ hueIcons.symbols() }
         <li data-bind="click: function () { page('/indexer/') }"><a href="javascript: void(0);">Indexes</a></li>
         % endif
         % if 'jobbrowser' in apps:
-        <li data-bind="click: function () { page('/jobbrowser/apps') }"><a href="javascript: void(0);">Jobs</a></li>
+        <li data-bind="click: function () { page('/jobbrowser/') }"><a href="javascript: void(0);">Jobs</a></li>
         % endif
         % if 'hbase' in apps:
         <li data-bind="click: function () { page('/hbase/') }"><a href="javascript: void(0);">HBase</a></li>
@@ -860,7 +860,7 @@ ${ assist.assistPanel() }
             % elif IS_DASHBOARD_ENABLED.get():
               page('/dashboard/new_search');
             % elif 'jobbrowser' in apps:
-              page('/jobbrowser/apps');
+              page('/jobbrowser/');
             % else:
               page('/home');
             % endif
