@@ -707,7 +707,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
-  .top-bar {
+  #sqoopComponents .top-bar {
     top: 58px!important;
   }
 % endif
