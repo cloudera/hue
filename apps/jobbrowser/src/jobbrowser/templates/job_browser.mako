@@ -614,7 +614,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="job-mapreduce-task-attempt-page-logs-container">
-          % for name in ['container-stdout', 'container-stderr', 'container-syslog']:
+          % for name in ['stdout', 'stderr', 'syslog']:
             <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
           % endfor
           <br>
@@ -1057,7 +1057,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
 
         var interface = vm.interface();
-        if (/oozie-oozi-W/.test(self.id())) { interface = 'workflows'; };
+        if (/oozie-oozi-W/.test(self.id())) {
+          interface = 'workflows';
+        };
 
         $.post("/jobbrowser/api/job", {
           app_id: ko.mapping.toJSON(self.id),
@@ -1068,7 +1070,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.job(new Job(vm, data.app));
 
             hueUtils.changeURL('#!' + vm.job().id());
-            vm.breadcrumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+            var crumbs = [];
+
+            if (/^attempt_/.test(vm.job().id())) {
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+              crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().properties['task_id'], 'type': 'task'});
+            }
+            if (/^task_/.test(vm.job().id())) {
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+            }
+            crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
+            vm.resetBreadcrumbs(crumbs);
 
             vm.job().fetchLogs();
             vm.job().fetchStatus();
@@ -1203,6 +1215,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.paginationResultCounts = ko.computed(function() {
         return self.apps().length;
       });
+      self.pagination = ko.computed(function() {
+        var pagination = [];
+        pagination.push({'paginationPage': self.paginationPage()});
+        pagination.push({'paginationOffset': self.paginationOffset()});
+        pagination.push({'paginationResultPage': self.paginationResultPage()});
+        return pagination;
+      });
 
       self.previousPage = function() {
       };
@@ -1259,22 +1278,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
       self.interface = ko.observable('jobs');
-      self.interface.subscribe(function (val) {
-        hueUtils.changeURL('#!' + val);
-        self.jobs.fetchJobs();
-      });
       self.selectInterface = function(interface) {
         self.interface(interface);
         self.resetBreadcrumbs();
+        hueUtils.changeURL('#!' + interface);
+        self.jobs.fetchJobs();
         self.job(null);
       };
-                                                                           
+
       self.jobs = new Jobs(self);
       self.job = ko.observable();
 
       self.breadcrumbs = ko.observableArray([]);
-      self.resetBreadcrumbs = function() {
-        self.breadcrumbs([{'id': '', 'name': self.interface(), 'type': self.interface()}]);
+      self.resetBreadcrumbs = function(extraCrumbs) {
+        var crumbs = [{'id': '', 'name': self.interface(), 'type': self.interface()}]
+        if (extraCrumbs) {
+          crumbs = crumbs.concat(extraCrumbs);
+        }
+        self.breadcrumbs(crumbs);
       }
       self.resetBreadcrumbs();
     };
@@ -1304,6 +1325,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if (h.indexOf('#!') === 0) {
           h = h.substr(2);
         }
+
         switch (h) {
           case '':
            break;
@@ -1311,24 +1333,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'workflows':
           case 'schedules':
           case 'bundles':
-            viewModel.interface(h);
+            viewModel.selectInterface(h);
             break;
           default:
-            var isJob = true;
-            if (/oozie-oozi-W/.test(h)) {
-              viewModel.interface('workflows');
-            } else if (/oozie-oozi-C/.test(h)) {
-              viewModel.interface('schedules')
-            } else if (/oozie-oozi-B/.test(h)) {
-              viewModel.interface('bundles');
-            } else if (/job_/.test(h)) {
-              viewModel.interface('jobs');
-            } else {
-              isJob = false;
-            }
-            if (isJob) {
-              new Job(viewModel, {id: h}).fetchJob();
-            }
+            new Job(viewModel, {id: h}).fetchJob();
         }
       };
 
@@ -1336,8 +1344,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         loadHash();
       }
       loadHash();
-
-      viewModel.jobs.fetchJobs();
     });
   })();
 </script>

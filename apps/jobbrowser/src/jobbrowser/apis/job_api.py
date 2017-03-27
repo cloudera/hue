@@ -225,6 +225,7 @@ class YarnMapReduceTaskApi(Api):
   def _massage_task(self, task):
     return {
         'id': task.id,
+        "app_id": self.app_id,
         'type': task.type,
         'elapsedTime': task.elapsedTime,
         'progress': task.progress,
@@ -242,6 +243,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     self.app_id = '_'.join(app_id.replace('task_', 'application_').replace('attempt_', 'application_').split('_')[:3])
     self.task_id = '_'.join(app_id.replace('attempt_', 'task_').split('_')[:5])
     self.attempt_id = app_id
+
 
   def apps(self):
     return [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts]
@@ -289,7 +291,9 @@ class YarnMapReduceTaskAttemptApi(Api):
         "type" : task.type + '_ATTEMPT',
         "startTime" : task.startTime,
         "id" : task.id,
-        "finishTime" : task.finishTime
+        "finishTime" : task.finishTime,
+        "app_id": self.app_id,
+        "task_id": self.task_id
     }
 
 
