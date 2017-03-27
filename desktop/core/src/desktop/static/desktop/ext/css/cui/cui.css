@@ -44,7 +44,7 @@
 }
 .cui-nav-logo {
   float: left;
-  padding: 14px 6px;
+  padding: 14px 12px;
   font-size: 18px;
   line-height: 20px;
   height: 48px;
@@ -61,7 +61,7 @@
   .cui-navbar > .container-fluid .navbar-brand,
   .navbar > .container .cui-nav-logo,
   .navbar > .container-fluid .cui-nav-logo {
-    margin-left: -6px;
+    margin-left: -12px;
   }
 }
 @media (max-width: 767px) {
@@ -108,7 +108,6 @@
 .cui-navbar .container,
 .cui-navbar .container-fluid {
   background: transparent;
-  border-width: 0;
   padding: 0;
 }
 .cui-navbar .container .navbar-brand,
@@ -118,12 +117,6 @@
 .navbar .container .cui-nav-logo,
 .navbar .container-fluid .cui-nav-logo {
   margin-left: 0;
-}
-.cui-navbar .container {
-  margin-bottom: 0;
-}
-.cui-navbar .container-fluid {
-  margin: 0;
 }
 .cui-navbar .navbar-header .navbar-brand,
 .navbar .navbar-header .cui-nav-logo {
@@ -153,7 +146,6 @@
   display: inline-block;
   min-width: 64px;
   vertical-align: top;
-  padding-left: 2px;
 }
 .cui-add-remove-list .add-remove-controls .cui-btn-circle {
   float: left;
@@ -171,8 +163,8 @@
   padding: 0;
 }
 .cui-card {
-  margin-bottom: 12px;
   border: 1px solid #DCDCDC;
+  padding: 19px 23px 19px 23px;
 }
 .cui-card > :first-child {
   margin-top: 0;
@@ -209,17 +201,8 @@
 .cui-card-danger {
   box-shadow: 0 -6px #D0021B;
 }
-.cui-messages {
-  position: fixed;
-  top: 48px;
-  right: 24px;
-  z-index: 200;
-}
-.cui-messages .cui-message {
-  width: 424px;
-}
 .cui-message {
-  margin-bottom: 4px;
+  margin-bottom: 12px;
   background-color: #FFFFFF;
   border: 1px solid #DCDCDC;
 }
@@ -241,7 +224,6 @@
   position: relative;
   left: 6px;
   padding: 19px 23px 19px 17px;
-  margin-bottom: 12px;
 }
 .cui-message-success {
   box-shadow: -6px 0 #69AC13;
@@ -298,7 +280,7 @@ textarea + .cui-copy-to-clipboard {
   margin-left: 24px;
   margin-right: 24px;
   margin-bottom: 24px;
-  margin-top: 12px;
+  margin-top: 24px;
 }
 cui-file-text-chooser .file-controls {
   position: relative;
@@ -348,6 +330,10 @@ cui-file-text-chooser .file-controls input[type="text"] {
 .cui-pagination > .pagination {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+}
+.cui-flex-align-center {
+  display: flex;
   align-items: center;
 }
 @font-face {
@@ -404,6 +390,18 @@ span + cui-help-icon > .cui-help-icon,
 label + .cui-help-icon,
 span + .cui-help-icon {
   margin-left: 12px;
+}
+/* Copyright (c) 2017 Cloudera, Inc. All rights reserved. */
+.cui-name-value-list {
+  list-style: none;
+  padding-left: 0;
+}
+.cui-name-value-list .input-row {
+  display: flex;
+}
+.cui-name-value-list .input-row .input-col {
+  flex-grow: 1;
+  padding-right: 12px;
 }
 .cui-navbar {
   margin-right: auto;
@@ -649,20 +647,75 @@ span + .cui-help-icon {
   left: 50%;
   margin-left: -32px;
 }
+.cui-system-feedback {
+  position: fixed;
+  top: 48px;
+  right: 24px;
+  z-index: 200;
+}
+.cui-system-feedback .cui-message {
+  width: 424px;
+}
+table.cui-table-scrollable {
+  border-top: 0;
+}
 table.cui-table-scrollable tbody {
   display: block;
   overflow: auto;
   width: 100%;
 }
+table.cui-table-scrollable tr:first-child > td {
+  border-top: 0;
+}
 table.cui-table-scrollable-header {
   margin-bottom: 0;
+  border-collapse: initial;
 }
 table.cui-table-scrollable-header th:last-of-type {
   border-right: 15px solid transparent;
 }
+/* If you want to use this less file, you are required to set @font-awesome to point to your font-awesome source */
+.cui-sortable,
+th.cui-sortable {
+  font-weight: bold;
+  cursor: pointer;
+}
+.cui-sortable.cui-sort-up,
+th.cui-sortable.cui-sort-up,
+.cui-sortable.cui-sort-down,
+th.cui-sortable.cui-sort-down {
+  background-color: #DCDCDC;
+}
+/* This class goes on an inline-block element to the right of the sorting header text */
+.cui-sort-icon {
+  color: #DCDCDC;
+  display: inline-block;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-transform: scale(0.75, 1);
+  -ms-transform: scale(0.75, 1);
+  -o-transform: scale(0.75, 1);
+  transform: scale(0.75, 1);
+}
+.cui-sort-icon:before {
+  content: "\f0de";
+}
+.cui-sort-icon:after {
+  content: "\f0dd";
+  margin-left: -8px;
+}
+/* These classes highlight either the up arrow or the down arrow */
+.cui-sort-up .cui-sort-icon:before,
+.cui-sort-down .cui-sort-icon:after {
+  color: #186485;
+}
 .cui-title-bar {
   padding: 0 24px;
   margin: 0;
+  min-height: 44px;
   background-color: #F8F8F8;
   border-bottom-width: 0;
   -webkit-box-shadow: inset 0 -1px #DCDCDC;
@@ -670,7 +723,7 @@ table.cui-table-scrollable-header th:last-of-type {
 }
 .cui-user-feedback {
   position: fixed;
-  bottom: 60px;
+  bottom: 100px;
   right: -28px;
   transform: rotate(-90deg);
   z-index: 100;
