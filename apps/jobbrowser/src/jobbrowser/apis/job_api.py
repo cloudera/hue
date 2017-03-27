@@ -76,13 +76,20 @@ class YarnApi(Api):
 
   def apps(self, filters):
     filter_params = {
+      'user': self.user,
       'username': '',
-      'text': ''
+      'text': '',
+      'state': 'all'
     }
 
     filter_params.update(_extract_query_params(filters))
 
-    jobs = NativeYarnApi(self.user).get_jobs(self.user, username=filter_params['username'], state='all', text=filter_params['text'])
+    if 'time' in filters:
+      filter_params['time_value'] = int(filters['time']['time_value'])
+      filter_params['time_unit'] = filters['time']['time_unit']
+
+    jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
+
     return [{
         'id': app.jobId,
         'name': app.name,

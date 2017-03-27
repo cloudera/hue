@@ -80,12 +80,12 @@ class MockDjangoRequest():
 def _extract_query_params(filters):
   filter_params = {}
 
-  for name, value in filters:
+  for name, value in filters.iteritems():
     if name == 'text':
       filter_params['text'] = value
       user_filter = re.search('((user):([^ ]+))', value)
       if user_filter:
         filter_params['username'] = user_filter.group(3)
-        filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '')
+        filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '').strip()
 
   return filter_params
