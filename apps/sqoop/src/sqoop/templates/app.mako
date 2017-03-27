@@ -22,279 +22,284 @@
 
 <%namespace name="actionbar" file="actionbar.mako" />
 
+%if not is_embeddable:
 ${ commonheader(None, "sqoop", user, request) | n,unicode }
-<div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
-  <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
+%endif
+
+<div id="sqoopComponents">
+  <div data-bind="if: !isLoading(), css: {'hide': isLoading}" id="top-bar-container" class="hide">
+    <div class="top-bar" data-bind="visible:shownSection() == 'jobs-list'">
+      <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+        <a title="${_('Create a new job')}" href="#job/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
+      </div>
+      <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+        <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
+      </div>
+      <h4>${_('Sqoop Jobs')}</h4>
+      <input id="filter-jobs" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
     </div>
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Manage links')}" href="#links" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage links')}</a>
+
+    <div class="top-bar" data-bind="visible:shownSection() == 'links-list'">
+      <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+        <a title="${_('Create a new link')}" href="#link/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New link')}</a>
+      </div>
+      <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+        <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
+      </div>
+      <h4>${_('Sqoop Links')}</h4>
+      <input id="filter-links" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
     </div>
-    <h4>${_('Sqoop Jobs')}</h4>
-    <input id="filter-jobs" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for job name or content')}"  data-bind="visible: isReady">
+
+    <!-- ko if: job -->
+    <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
+      <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
+        <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
+      </div>
+      <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
+      <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
+    </div>
+    <!-- /ko -->
+
+    <!-- ko if: link -->
+    <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: link">
+      <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
+      <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span data-bind="text: $root.link().name"></span></a></h4>
+    </div>
+    <!-- /ko -->
   </div>
 
-  <div class="top-bar" data-bind="visible:shownSection() == 'links-list'">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new link')}" href="#link/new" data-bind="visible: isReady"><i class="fa fa-plus-circle"></i> ${_('New link')}</a>
+  <div class="container-fluid">
+    <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 10px">
+      <div class="alert alert-error">
+        <i class="fa fa-exclamation-triangle"></i>
+        <strong>${_('Sqoop error')}:</strong>
+        <span data-bind="text: $data" class="message"></span>
+      </div>
     </div>
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Manage jobs')}" href="#jobs" data-bind="visible: isReady"><i class="fa fa-list"></i> ${_('Manage jobs')}</a>
+
+    <div class="row-fluid" data-bind="if: isLoading">
+      <div class="span10 offset1 center" style="margin-top: 30px">
+        <!--[if lte IE 9]>
+          <img src="${ static('desktop/art/spinner-big.gif') }" />
+        <![endif]-->
+        <!--[if !IE]> -->
+          <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
+        <!-- <![endif]-->
+      </div>
     </div>
-    <h4>${_('Sqoop Links')}</h4>
-    <input id="filter-links" type="text" class="input-xlarge search-query sqoop-filter" placeholder="${_('Search for link name or content')}"  data-bind="visible: isReady">
-  </div>
 
-  <!-- ko if: job -->
-  <div class="top-bar" data-bind="visible:shownSection() == 'job-editor', with: job">
-    <div style="margin-top: 4px; margin-right: 40px" class="pull-right">
-      <a title="${_('Create a new job')}" href="#job/new"><i class="fa fa-plus-circle"></i> ${_('New job')}</a>
-    </div>
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> ${_('New Job')}</h4>
-    <h4 data-bind="visible: persisted"><a title="${_('Back to jobs list')}" href="#jobs">${_('Sqoop Jobs')}</a> <span class="muted">/</span> <i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span class="muted" data-bind="editable: name, editableOptions: {'placement': 'right'}"></span></h4>
-  </div>
-  <!-- /ko -->
+    <div id="jobs" class="row-fluid mainSection hide">
+      <div id="jobs-list" class="row-fluid section hide">
+        <div class="row-fluid" data-bind="if: isReady">
+          <ul class="major-list" data-bind="foreach: filteredJobs">
+            <!-- ko if: submission -->
+            <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
+              <div class="pull-right">
+                <span class="label label-success" data-bind="visible: hasSucceeded">
+                  <span data-bind="text: ('${_ko('Last run: ')}' + submission().createdFormatted())"></span>
+                </span>
+                <span class="label label-warning" data-bind="visible: isRunning">
+                  <span data-bind="text: submission().status"></span>
+                </span>
+                <span class="label label-error" style="display: inline-block" data-bind="visible: hasFailed">
+                  <span data-bind="text: ('${_ko('Last run: ')}' + submission().createdFormatted())"></span>
+                </span>
+              </div>
+              <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
+              <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }, visible: submission().progress() > 0"></div>
+            </li>
+            <!-- /ko -->
 
-  <!-- ko if: link -->
-  <div class="top-bar" data-bind="visible:shownSection() == 'link-editor', with: link">
-    <h4 data-bind="visible: !persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel" data-bind="text: name"></a> <span class="muted">/</span> ${_('New Connection')}</h4>
-    <h4 data-bind="visible: persisted()"><a title="${_('Back to jobs list')}" href="#links">${_('Sqoop Links')}</a> <span class="muted">/</span> <a href="#link/edit-cancel"><i class="fa fa-arrow-circle-o-down"></i> &nbsp; <span data-bind="text: $root.link().name"></span></a></h4>
-  </div>
-  <!-- /ko -->
-</div>
-
-<div class="container-fluid">
-  <div data-bind="foreach: sqoop_errors" id="sqoop-error" class="row-fluid mainSection hide" style="margin-top: 10px">
-    <div class="alert alert-error">
-      <i class="fa fa-exclamation-triangle"></i>
-      <strong>${_('Sqoop error')}:</strong>
-      <span data-bind="text: $data" class="message"></span>
-    </div>
-  </div>
-
-  <div class="row-fluid" data-bind="if: isLoading">
-    <div class="span10 offset1 center" style="margin-top: 30px">
-      <!--[if lte IE 9]>
-        <img src="${ static('desktop/art/spinner-big.gif') }" />
-      <![endif]-->
-      <!--[if !IE]> -->
-        <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-      <!-- <![endif]-->
-    </div>
-  </div>
-
-  <div id="jobs" class="row-fluid mainSection hide">
-    <div id="jobs-list" class="row-fluid section hide">
-      <div class="row-fluid" data-bind="if: isReady">
-        <ul class="major-list" data-bind="foreach: filteredJobs">
-          <!-- ko if: submission -->
-          <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="pull-right">
-              <span class="label label-success" data-bind="visible: hasSucceeded">
-                <span data-bind="text: ('${_ko('Last run: ')}' + submission().createdFormatted())"></span>
-              </span>
-              <span class="label label-warning" data-bind="visible: isRunning">
-                <span data-bind="text: submission().status"></span>
-              </span>
-              <span class="label label-error" style="display: inline-block" data-bind="visible: hasFailed">
-                <span data-bind="text: ('${_ko('Last run: ')}' + submission().createdFormatted())"></span>
-              </span>
+            <!-- ko ifnot: submission -->
+            <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
+              <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
+            </li>
+            <!-- /ko -->
+          </ul>
+          <div class="card" data-bind="visible: filteredJobs().length == 0">
+            <div class="span10 offset1 center nojobs">
+              <a href="#job/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
+              <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/><a href="#job/new">${ _('Click here to add one.') }</a></h1>
             </div>
-            <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
-            <div class="sqoop-progress" data-bind="style:{ width: submission().progressFormatted() }, visible: submission().progress() > 0"></div>
-          </li>
-          <!-- /ko -->
-
-          <!-- ko ifnot: submission -->
-          <li data-bind="routie: 'job/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="main" data-bind="template: {name: 'job-list-item'}"></div>
-          </li>
-          <!-- /ko -->
-        </ul>
-        <div class="card" data-bind="visible: filteredJobs().length == 0">
-          <div class="span10 offset1 center nojobs">
-            <a href="#job/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
-            <h1 class="emptyMessage">${ _('There are currently no jobs.') }<br/><a href="#job/new">${ _('Click here to add one.') }</a></h1>
+            <div class="clearfix"></div>
           </div>
-          <div class="clearfix"></div>
         </div>
       </div>
-    </div>
 
-    <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
-      <div class="sidebar-nav span2" data-bind="visible: $root.job().persisted">
-        <form id="advanced-settings" method="POST" class="form form-horizontal no-padding">
-          ${ csrf_token(request) | n,unicode }
-          <ul class="nav nav-list">
-            <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
-            <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
-              <a id="save-run-link" data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
-                <i class="fa fa-play"></i> ${_('Run')}
-              </a>
-            </li>
-            <li data-bind="visible: $root.job().isRunning()">
-              <a data-placement="right" rel="tooltip" title="${_('Stop the job')}" href="#job/stop">
-                <i class="fa fa-stop"></i> ${_('Stop')}
-              </a>
-            </li>
-            <li data-bind="visible: $root.job().persisted">
-              <a data-placement="right" rel="tooltip" title="${_('Copy the job')}" href="#job/copy">
-                <i class="fa fa-files-o"></i> ${_('Copy')}
-              </a>
-            </li>
-            <li data-bind="visible: $root.job().persisted">
-              <a data-bind="click: $root.showDeleteJobModal.bind($root)" data-placement="right" rel="tooltip" title="${_('Delete the job')}" href="javascript:void(0);">
-                <i class="fa fa-times"></i> ${_('Delete')}
-              </a>
-            </li>
-            <li class="nav-header" data-bind="visible: $root.job().persisted() && ($root.job().outputDirectoryFilebrowserURL() || $root.job().inputDirectoryFilebrowserURL() || $root.job().submission().external_id())">${_('Submissions')}</li>
-            <li data-bind="visible: $root.job().persisted() && $root.job().outputDirectoryFilebrowserURL">
-              <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_blank">
-                <i class="fa fa-folder-open"></i> ${_('Output directory')}
-              </a>
-            </li>
-            <li data-bind="visible: $root.job().persisted() && $root.job().inputDirectoryFilebrowserURL">
-              <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_blank">
-                <i class="fa fa-folder-open"></i> ${_('Input directory')}
-              </a>
-            </li>
-            <li data-bind="visible: $root.job().submission().external_id()">
-              <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id() + '/single_logs'}">
-                <i class="fa fa-list"></i>
-                ${_('Logs')}
-              </a>
-            </li>
-            <li class="nav-header" data-bind="visible: $root.job().persisted && $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN', 'SUCCEEDED', 'FAILURE_ON_SUBMIT', 'FAILED']) > -1">${_('Last status')}</li>
-            <li data-bind="visible: $root.job().persisted">
-              <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
-                <span data-bind="text:  submission().createdFormatted()"></span>
-              </span>
-              <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
-                <span data-bind="text: submission().status"></span>
-              </span>
-              <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
-                <span data-bind="text: submission().createdFormatted()"></span>
-              </span>
-            </li>
-            <li data-bind="visible: $root.job().isRunning()">
-              <div class="progress progress-striped active" style="margin-top: 10px">
-                <div class="bar bar-warning" data-bind="style:{ width: submission().progressFormatted() }"></div>
-              </div>
-            </li>
-          </ul>
-        </form>
-      </div>
-
-      <div id="job-forms" data-bind="css: {span10: $root.job().persisted, span12: !$root.job().persisted}">
-        <div class="card">
-        <!-- ko if: $root.jobWizard.page -->
-          <!-- ko with: $root.jobWizard -->
-          <ul class="nav nav-pills" data-bind="foreach: pages">
-            <li data-bind="css: {'active': $parent.index() == $index()}">
-              <a href="javascript:void(0);" data-bind="routie: 'job/edit/wizard/' + identifier(), text: caption"></a>
-            </li>
-          </ul>
-
-          <form method="POST" class="form form-horizontal no-padding" data-bind="with: page">
+      <div id="job-editor" class="row-fluid section hide" data-bind="with: job">
+        <div class="sidebar-nav span2" data-bind="visible: $root.job().persisted">
+          <form id="advanced-settings" method="POST" class="form form-horizontal no-padding">
             ${ csrf_token(request) | n,unicode }
-            <div class="alert alert-info"><h3 data-bind="text: description"></h3></div>
-            <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
-            </div>
-
-            <div class="form-actions">
-              <!-- ko if: $parent.hasPrevious -->
-              <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Back')}</a>
-              &nbsp;
-              <!-- /ko -->
-              <!-- ko if: $parent.hasNext -->
-              <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
-              <!-- /ko -->
-              <!-- ko ifnot: $parent.hasNext -->
-              <a id="save-btn" class="btn" href="#job/save">${_('Save')}</a>
-              &nbsp;
-              <a id="save-run-btn" class="btn btn-primary disable-feedback" href="#job/save-and-run">${_('Save and run')}</a>
-              <!-- /ko -->
-            </div>
-          </form>
-          <!-- /ko -->
-        <!-- /ko -->
-          </div>
-      </div>
-    </div>
-  </div>
-
-  <div id="links" class="row-fluid mainSection hide">
-    <div id="links-list" class="row-fluid section hide">
-      <div class="row-fluid" data-bind="if: isReady">
-        <ul class="major-list" data-bind="foreach: filteredLinks">
-          <li data-bind="routie: 'link/edit/' + id()" title="${ _('Click to edit') }">
-            <div class="main" data-bind="template: {name: 'link-list-item'}"></div>
-          </li>
-        </ul>
-        <div class="card" data-bind="visible: filteredLinks().length == 0">
-          <div class="span10 offset1 center nojobs">
-            <a href="#link/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
-            <h1 class="emptyMessage">${ _('There are currently no links.') }<br/><a href="#link/new">${ _('Click here to add one.') }</a></h1>
-          </div>
-          <div class="clearfix"></div>
-        </div>
-      </div>
-    </div>
-
-    <div id="link-editor" class="row-fluid section hide" data-bind="with: link">
-      <div id="link-forms" class="span12">
-        <div class="card">
-          <form method="POST" class="form form-horizontal no-padding">
-            ${ csrf_token(request) | n,unicode }
-            <div data-bind="template: {'name': 'link-editor-form-error', 'data': {'name': ko.observable('linkConfig')}}" class=""></div>
-            <div class="control-group">
-              <label class="control-label">${ _('Name') }</label>
-              <div class="controls">
-                <input type="text" name="link-name" data-bind="value: name">
-              </div>
-            </div>
-            <div class="control-group" data-bind="visible: !persisted()">
-              <label class="control-label">${ _('Connector') }</label>
-              <div class="controls">
-                <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
-                </select>
-              </div>
-            </div>
-            <fieldset data-bind="foreach: link_config_values">
-              <div data-bind="foreach: inputs">
-                <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
-              </div>
-            </fieldset>
-            <fieldset data-bind="foreach: driver">
-              <div data-bind="foreach: inputs">
-                <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
-              </div>
-            </fieldset>
-            <div class="form-actions">
-              <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
-              <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
-            </div>
+            <ul class="nav nav-list">
+              <li class="nav-header" data-bind="visible: $root.job().persisted">${_('Actions')}</li>
+              <li data-bind="visible: $root.job().persisted() && !$root.job().isRunning()">
+                <a id="save-run-link" data-placement="right" rel="tooltip" title="${_('Run the job')}" href="#job/save-and-run">
+                  <i class="fa fa-play"></i> ${_('Run')}
+                </a>
+              </li>
+              <li data-bind="visible: $root.job().isRunning()">
+                <a data-placement="right" rel="tooltip" title="${_('Stop the job')}" href="#job/stop">
+                  <i class="fa fa-stop"></i> ${_('Stop')}
+                </a>
+              </li>
+              <li data-bind="visible: $root.job().persisted">
+                <a data-placement="right" rel="tooltip" title="${_('Copy the job')}" href="#job/copy">
+                  <i class="fa fa-files-o"></i> ${_('Copy')}
+                </a>
+              </li>
+              <li data-bind="visible: $root.job().persisted">
+                <a data-bind="click: $root.showDeleteJobModal.bind($root)" data-placement="right" rel="tooltip" title="${_('Delete the job')}" href="javascript:void(0);">
+                  <i class="fa fa-times"></i> ${_('Delete')}
+                </a>
+              </li>
+              <li class="nav-header" data-bind="visible: $root.job().persisted() && ($root.job().outputDirectoryFilebrowserURL() || $root.job().inputDirectoryFilebrowserURL() || $root.job().submission().external_id())">${_('Submissions')}</li>
+              <li data-bind="visible: $root.job().persisted() && $root.job().outputDirectoryFilebrowserURL">
+                <a data-bind="attr: { 'href': $root.job().outputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse output directory')}" href="javascript:void(0);" target="_blank">
+                  <i class="fa fa-folder-open"></i> ${_('Output directory')}
+                </a>
+              </li>
+              <li data-bind="visible: $root.job().persisted() && $root.job().inputDirectoryFilebrowserURL">
+                <a data-bind="attr: { 'href': $root.job().inputDirectoryFilebrowserURL }" data-placement="right" rel="tooltip" title="${_('Browse input directory')}" href="javascript:void(0);" target="_blank">
+                  <i class="fa fa-folder-open"></i> ${_('Input directory')}
+                </a>
+              </li>
+              <li data-bind="visible: $root.job().submission().external_id()">
+                <a rel="tooltip" title="${_('Logs')}" href="javascript:void(0);" target="_new" data-bind="attr: {href: '/jobbrowser/jobs/' + $root.job().submission().external_id() + '/single_logs'}">
+                  <i class="fa fa-list"></i>
+                  ${_('Logs')}
+                </a>
+              </li>
+              <li class="nav-header" data-bind="visible: $root.job().persisted && $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN', 'SUCCEEDED', 'FAILURE_ON_SUBMIT', 'FAILED']) > -1">${_('Last status')}</li>
+              <li data-bind="visible: $root.job().persisted">
+                <span class="label label-success" data-bind="visible: submission().status() == 'SUCCEEDED'">
+                  <span data-bind="text:  submission().createdFormatted()"></span>
+                </span>
+                <span class="label label-warning" data-bind="visible: $.inArray(submission().status(), ['BOOTING', 'RUNNING', 'UNKNOWN']) > -1">
+                  <span data-bind="text: submission().status"></span>
+                </span>
+                <span class="label label-error" style="display: inline-block" data-bind="visible: $.inArray(submission().status(), ['FAILURE_ON_SUBMIT', 'FAILED']) > -1">
+                  <span data-bind="text: submission().createdFormatted()"></span>
+                </span>
+              </li>
+              <li data-bind="visible: $root.job().isRunning()">
+                <div class="progress progress-striped active" style="margin-top: 10px">
+                  <div class="bar bar-warning" data-bind="style:{ width: submission().progressFormatted() }"></div>
+                </div>
+              </li>
+            </ul>
           </form>
         </div>
+
+        <div id="job-forms" data-bind="css: {span10: $root.job().persisted, span12: !$root.job().persisted}">
+          <div class="card">
+          <!-- ko if: $root.jobWizard.page -->
+            <!-- ko with: $root.jobWizard -->
+            <ul class="nav nav-pills" data-bind="foreach: pages">
+              <li data-bind="css: {'active': $parent.index() == $index()}">
+                <a href="javascript:void(0);" data-bind="routie: 'job/edit/wizard/' + identifier(), text: caption"></a>
+              </li>
+            </ul>
+
+            <form method="POST" class="form form-horizontal no-padding" data-bind="with: page">
+              ${ csrf_token(request) | n,unicode }
+              <div class="alert alert-info"><h3 data-bind="text: description"></h3></div>
+              <div class="job-form" data-bind="template: {'name': template(), 'data': node}">
+              </div>
+
+              <div class="form-actions">
+                <!-- ko if: $parent.hasPrevious -->
+                <a class="btn" data-bind="routie: 'job/edit/wizard/' + $parent.previousIndex()">${_('Back')}</a>
+                &nbsp;
+                <!-- /ko -->
+                <!-- ko if: $parent.hasNext -->
+                <a class="btn btn-primary" data-bind="routie: 'job/edit/wizard/' + $parent.nextIndex()">${_('Next')}</a>
+                <!-- /ko -->
+                <!-- ko ifnot: $parent.hasNext -->
+                <a id="save-btn" class="btn" href="#job/save">${_('Save')}</a>
+                &nbsp;
+                <a id="save-run-btn" class="btn btn-primary disable-feedback" href="#job/save-and-run">${_('Save and run')}</a>
+                <!-- /ko -->
+              </div>
+            </form>
+            <!-- /ko -->
+          <!-- /ko -->
+            </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="links" class="row-fluid mainSection hide">
+      <div id="links-list" class="row-fluid section hide">
+        <div class="row-fluid" data-bind="if: isReady">
+          <ul class="major-list" data-bind="foreach: filteredLinks">
+            <li data-bind="routie: 'link/edit/' + id()" title="${ _('Click to edit') }">
+              <div class="main" data-bind="template: {name: 'link-list-item'}"></div>
+            </li>
+          </ul>
+          <div class="card" data-bind="visible: filteredLinks().length == 0">
+            <div class="span10 offset1 center nojobs">
+              <a href="#link/new" class="nounderline"><i class="fa fa-plus-circle waiting"></i></a>
+              <h1 class="emptyMessage">${ _('There are currently no links.') }<br/><a href="#link/new">${ _('Click here to add one.') }</a></h1>
+            </div>
+            <div class="clearfix"></div>
+          </div>
+        </div>
+      </div>
+
+      <div id="link-editor" class="row-fluid section hide" data-bind="with: link">
+        <div id="link-forms" class="span12">
+          <div class="card">
+            <form method="POST" class="form form-horizontal no-padding">
+              ${ csrf_token(request) | n,unicode }
+              <div data-bind="template: {'name': 'link-editor-form-error', 'data': {'name': ko.observable('linkConfig')}}" class=""></div>
+              <div class="control-group">
+                <label class="control-label">${ _('Name') }</label>
+                <div class="controls">
+                  <input type="text" name="link-name" data-bind="value: name">
+                </div>
+              </div>
+              <div class="control-group" data-bind="visible: !persisted()">
+                <label class="control-label">${ _('Connector') }</label>
+                <div class="controls">
+                  <select class="input-xlarge" name="connector" data-bind="'options': $root.connectors, 'optionsText': function(item) { return item.name(); }, 'optionsValue': function(item) { return item.id(); }, 'value': connector_id">
+                  </select>
+                </div>
+              </div>
+              <fieldset data-bind="foreach: link_config_values">
+                <div data-bind="foreach: inputs">
+                  <div data-bind="template: 'connector-' + type().toLowerCase()"></div>
+                </div>
+              </fieldset>
+              <fieldset data-bind="foreach: driver">
+                <div data-bind="foreach: inputs">
+                  <div data-bind="template: 'driver-' + type().toLowerCase()"></div>
+                </div>
+              </fieldset>
+              <div class="form-actions">
+                <a href="#link/edit-cancel" class="btn">${_('Cancel')}</a>
+                <a href="#link/save" class="btn btn-primary">${_('Save')}</a>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-</div>
 
-<div data-bind="template: {'name': modal.name(), 'if': modal.name()}" id="modal-container" class="modal hide fade"></div>
+  <div data-bind="template: {'name': modal.name(), 'if': modal.name()}" id="modal-container" class="modal hide fade"></div>
 
-<div id="chooseFile" class="modal hide fade">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Choose a folder')}</h2>
+  <div id="chooseFile" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${_('Choose a folder')}</h2>
+    </div>
+    <div class="modal-body">
+      <div id="filechooser"></div>
+    </div>
+    <div class="modal-footer"></div>
   </div>
-  <div class="modal-body">
-    <div id="filechooser"></div>
-  </div>
-  <div class="modal-footer"></div>
-</div>
 
+</div>
 <script type="text/html" id="delete-job-modal">
 <div class="modal-header">
   <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
@@ -758,7 +763,7 @@ viewModel.job.subscribe(function(job) {
 });
 
 //// Render all data
-ko.applyBindings(viewModel);
+ko.applyBindings(viewModel, $('#sqoopComponents')[0]);
 
 //// Events
 function handle_form_errors(e, node, options, data) {
@@ -1313,4 +1318,6 @@ $(document).ready(function () {
 
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

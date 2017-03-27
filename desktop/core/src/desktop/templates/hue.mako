@@ -358,6 +358,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
+      <div id="embeddable_sqoop" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -550,6 +551,7 @@ ${ assist.assistPanel() }
         admin_wizard: '/about/admin_wizard',
         logs: '/logs',
         dump_config: '/desktop/dump_config',
+        sqoop: '/sqoop',
       };
 
       var SKIP_CACHE = ['filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
@@ -920,6 +922,10 @@ ${ assist.assistPanel() }
 
         page('/indexer/importer/', function(ctx){
           self.loadApp('importer');
+        });
+
+        page('/sqoop', function(ctx){
+          self.loadApp('sqoop');
         });
 
         page('/', function(ctx){
