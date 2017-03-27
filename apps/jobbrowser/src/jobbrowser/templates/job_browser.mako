@@ -130,6 +130,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: ! $root.job() -->
             ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
             <div class="btn-group">
+              <select data-bind="options: jobs.statesValuesFilter, selectedOptions: jobs.statesFilter, optionsText: 'name', optionsValue: 'value'" size="3" multiple="true"></select>
               <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
               <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
               <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
@@ -1151,7 +1152,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.loadingJobs = ko.observable(false);
 
-      self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
+      self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
+      self.statesFilter = ko.observable('');
+      self.statesValuesFilter = ko.observable([
+        {'value': 'completed', 'name': '${_("Succeeded")}'},
+        {'value': 'running', 'name': '${_("Running")}'},
+        {'value': 'failed', 'name': '${_("Failed")}'},
+      ]);
       self.timeValueFilter = ko.observable(7).extend({ throttle: 500 });
       self.timeUnitFilter = ko.observable('days').extend({ throttle: 500 });
       self.timeUnitFilterUnits = ko.observable([
@@ -1163,7 +1170,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.filters = ko.computed(function() {
         return [
           {'text': self.textFilter()},
-          {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}}
+          {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}},
+          {'states': self.statesFilter()},
         ];
       });
       self.filters.subscribe(function(value) {

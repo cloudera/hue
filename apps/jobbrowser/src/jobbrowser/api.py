@@ -185,13 +185,16 @@ class YarnApi(JobBrowserApi):
 
   @rm_ha
   def get_jobs(self, user, **kwargs):
-    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED', }
+    state_filters = {'running': 'UNDEFINED', 'completed': 'SUCCEEDED', 'failed': 'FAILED', 'killed': 'KILLED',}
+    states_filters = {'running': 'NEW,NEW_SAVING,SUBMITTED,ACCEPTED,RUNNING', 'completed': 'FINISHED', 'failed': 'FAILED,KILLED',}
     filters = {}
 
     if kwargs['username']:
       filters['user'] = kwargs['username']
     if kwargs['state'] and kwargs['state'] != 'all':
       filters['finalStatus'] = state_filters[kwargs['state']]
+    if kwargs['states']:
+      filters['states'] = ','.join([states_filters[_s] for _s in kwargs['states']])
     if kwargs.get('limit'):
       filters['limit'] = kwargs['limit']
     if kwargs.get('time_value'):
