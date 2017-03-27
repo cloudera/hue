@@ -25,10 +25,10 @@ from notebook.conf import get_ordered_interpreters
 
 
 def is_enabled():
-  """Automatic if Hue 4 or when search is enabled."""
+  """Automatic when search is enabled."""
   apps = get_apps_dict()
-  
-  return is_hue4() or 'search' in apps 
+
+  return 'search' in apps or HAS_SQL_ENABLED.get()
 
 
 IS_ENABLED = Config(
