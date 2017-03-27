@@ -190,7 +190,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <table id="jobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
-                  <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
                   <th>${_('Duration')}</th>
                   <th>${_('Type')}</th>
                   <th>${_('Status')}</th>
@@ -202,7 +201,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </thead>
                 <tbody data-bind="foreach: jobs.finishedApps">
                   <tr data-bind="click: fetchJob">
-                    <td><div class="hueCheckbox fa"></div></td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
@@ -246,7 +244,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
           <!-- /ko -->
 
-          <div data-bind="template: { name: 'pagination' }, visible: ! $root.job()"></div>
+          <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: ! $root.job()"></div>
         </div>
       </div>
 
@@ -304,16 +302,39 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="pagination">
-  Showing
-  <span data-bind="text: paginationPage"></span>
-  to
-  <span data-bind="text: paginationOffset() * paginationResultPage()"></span>
-  of
-  <span data-bind="text: paginationResultCounts"></span>
+  <!-- ko ifnot: hasPagination -->
+  <div class="inline">
+    <span data-bind="text: paginationResultCounts()"></span>
+    ${ _('jobs') }.
+  </div>
+  <!-- /ko -->
 
-  Show
-  <span data-bind="text: paginationOffset"></span>
-  results by page.
+  <!-- ko if: hasPagination -->
+  <div class="inline">
+    <div class="inline">
+      ${ _('Showing') }
+      <span data-bind="text: Math.min((paginationPage() - 1) * paginationResultPage() + 1, paginationResultCounts())"></span>
+      ${ _('to')}
+      <span data-bind="text: Math.min(paginationPage() * paginationResultPage(), paginationResultCounts())"></span>
+      ${ _('of') }
+      <span data-bind="text: paginationResultCounts"></span>
+      .
+  
+      ##${ _('Show')}
+      ##<span data-bind="text: paginationResultPage"></span>
+      ##${ _('results by page.') }
+    </div>
+  
+    <ul class="inline">
+      <li class="previous-page">
+        <a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a>
+      </li>
+      <li class="next-page">
+        <a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a>
+      </li>
+    </ul>
+  </div>
+  <!-- /ko -->
 </script>
 
 
@@ -1178,6 +1199,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.fetchJobs();
       });
 
+      self.hasPagination = ko.computed(function() {
+        return vm.interface() != 'jobs';
+      });
+      self.paginationPage = ko.observable(1);
+      self.paginationOffset = ko.observable(0);
+      self.paginationResultPage = ko.observable(100);
+      self.paginationResultCounts = ko.computed(function() {
+        return self.apps().length;
+      });
+
+      self.previousPage = function() {
+      };
+      self.nextPage = function() {
+      };
+
+
       self.fetchJobs = function () {
         self.loadingJobs(true);
         vm.job(null);
@@ -1226,9 +1263,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-      self.jobs = new Jobs(self);
-      self.job = ko.observable();
-
       self.interface = ko.observable('jobs');
       self.interface.subscribe(function (val) {
         hueUtils.changeURL('#!' + val);
@@ -1239,16 +1273,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.resetBreadcrumbs();
         self.job(null);
       };
+                                                                           
+      self.jobs = new Jobs(self);
+      self.job = ko.observable();
+                                                                           
       self.breadcrumbs = ko.observableArray([]);
       self.resetBreadcrumbs = function() {
         self.breadcrumbs([{'id': '', 'name': self.interface(), 'type': self.interface()}]);
       }
       self.resetBreadcrumbs();
-
-      self.paginationOffset = ko.observable(0);
-      self.paginationResultPage = ko.observable(100);
-      self.paginationPage = ko.observable(1);
-      self.paginationResultCounts = ko.observable();
     };
 
     var viewModel;
