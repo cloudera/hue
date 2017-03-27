@@ -1078,7 +1078,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: hasComplexity() -->
+    <!-- ko if: ! hasSuggestion() && hasComplexity() -->
       <!-- ko if: complexity()[0].risk.length === 0 || complexity()[0].risk === 'low' -->
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>

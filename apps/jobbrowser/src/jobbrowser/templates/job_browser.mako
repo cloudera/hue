@@ -305,7 +305,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- ko ifnot: hasPagination -->
   <div class="inline">
     <span data-bind="text: paginationResultCounts()"></span>
-    ${ _('jobs') }.
+    ${ _('jobs') }
   </div>
   <!-- /ko -->
 
@@ -318,7 +318,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <span data-bind="text: Math.min(paginationPage() * paginationResultPage(), paginationResultCounts())"></span>
       ${ _('of') }
       <span data-bind="text: paginationResultCounts"></span>
-      .
 
       ##${ _('Show')}
       ##<span data-bind="text: paginationResultPage"></span>
@@ -326,10 +325,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <ul class="inline">
-      <li class="previous-page">
+      <li class="previous-page" data-bind="visible: showPreviousPage">
         <a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a>
       </li>
-      <li class="next-page">
+      <li class="next-page" data-bind="visible: showNextPage">
         <a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a>
       </li>
     </ul>
@@ -1196,6 +1195,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.apps = ko.observableArray();
+      self.totalApps = ko.observable(null);
       self.runningApps = ko.computed(function(job) {
         return $.grep(self.apps(), function(job) { return job.apiStatus() == 'RUNNING'; });
       });
@@ -1219,38 +1219,47 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         {'value': 'minutes', 'name': '${_("minutes")}'},
       ]);
 
-      self.filters = ko.computed(function() {
-        return [
-          {'text': self.textFilter()},
-          {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}},
-          {'states': self.statesFilter()},
-        ];
-      });
-      self.filters.subscribe(function(value) {
-        self.fetchJobs();
-      });
-
       self.hasPagination = ko.computed(function() {
-        return vm.interface() != 'jobs';
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
       });
       self.paginationPage = ko.observable(1);
-      self.paginationOffset = ko.observable(0);
+      self.paginationOffset = ko.observable(1);
       self.paginationResultPage = ko.observable(100);
       self.paginationResultCounts = ko.computed(function() {
         return self.apps().length;
       });
       self.pagination = ko.computed(function() {
-        var pagination = [];
-        pagination.push({'paginationPage': self.paginationPage()});
-        pagination.push({'paginationOffset': self.paginationOffset()});
-        pagination.push({'paginationResultPage': self.paginationResultPage()});
-        return pagination;
+        return {
+            'page': self.paginationPage(),
+            'offset': self.paginationOffset(),
+            'limit': self.paginationResultPage()
+        };
       });
 
+      self.showPreviousPage = ko.computed(function() {
+        return self.paginationOffset() > 1;
+      });
+      self.showNextPage = ko.computed(function() {
+        return self.totalApps() != null && (self.paginationOffset() + self.paginationResultPage()) < self.totalApps();
+      });
       self.previousPage = function() {
+        self.paginationOffset(self.paginationOffset() - self.paginationResultPage());
       };
       self.nextPage = function() {
+        self.paginationOffset(self.paginationOffset() + self.paginationResultPage());
       };
+
+      self.filters = ko.computed(function() {
+        return [
+          {'text': self.textFilter()},
+          {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}},
+          {'states': self.statesFilter()},
+          {'pagination': self.pagination()},
+        ];
+      });
+      self.filters.subscribe(function(value) {
+        self.fetchJobs();
+      });
 
 
       self.fetchJobs = function () {
@@ -1269,6 +1278,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               });
             }
             self.apps(apps);
+            self.totalApps(data.total);
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1353,7 +1363,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         switch (h) {
           case '':
            break;
-          case 'apps':
+          case 'jobs':
           case 'workflows':
           case 'schedules':
           case 'bundles':

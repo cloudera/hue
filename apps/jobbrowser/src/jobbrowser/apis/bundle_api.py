@@ -41,9 +41,10 @@ class BundleApi(Api):
   def apps(self, filters):
     oozie_api = get_oozie(self.user)
     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
-    wf_list = oozie_api.get_bundles(**kwargs)
+    jobs = oozie_api.get_bundles(**kwargs)
 
-    return [{
+    return {
+      'apps': [{
         'id': app.id,
         'name': app.appName,
         'status': app.status,
@@ -52,7 +53,9 @@ class BundleApi(Api):
         'progress': 100,
         'duration': 10 * 3600,
         'submitted': 10 * 3600
-    } for app in wf_list.jobs]
+      } for app in jobs.jobs],
+      'total': jobs.total
+    }
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
