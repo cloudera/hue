@@ -58,6 +58,7 @@ module.exports = function(grunt) {
           'apps/useradmin/src/useradmin/static/useradmin/css/useradmin.css': 'apps/useradmin/src/useradmin/static/useradmin/less/useradmin.less',
           'apps/hbase/src/hbase/static/hbase/css/hbase.css': 'apps/hbase/src/hbase/static/hbase/less/hbase.less',
           'apps/security/src/security/static/security/css/security.css': 'apps/security/src/security/static/security/less/security.less',
+          'apps/sqoop/src/sqoop/static/sqoop/css/sqoop.css': 'apps/sqoop/src/sqoop/static/sqoop/less/sqoop.less',
         }
       }
     },
@@ -84,6 +85,8 @@ module.exports = function(grunt) {
           'apps/hbase/src/hbase/static/hbase/less/**/*.less',
           'apps/security/src/security/static/security/less/*.less',
           'apps/security/src/security/static/security/less/**/*.less',
+          'apps/sqoop/src/sqoop/static/sqoop/less/*.less',
+          'apps/sqoop/src/sqoop/static/sqoop/less/**/*.less',
         ],
         tasks: ['less']
       }
