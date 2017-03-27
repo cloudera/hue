@@ -20,8 +20,9 @@ from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
 
+%if not is_embeddable:
 ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
-
+%endif
 
 <link rel="stylesheet" href="${ static('desktop/css/httperrors.css') }">
 
@@ -70,7 +71,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
         </div>
       % else:
         % if user.is_superuser:
-          <a href="/logs" target="_blank" title="${ _('View server logs') }">${_('View logs')}</a>
+          <a href="/logs" ${ not is_embeddable and 'target="_blank"'  or '' } title="${ _('View server logs') }">${_('View logs')}</a>
         % endif
       % endif
 
@@ -84,4 +85,6 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
   }
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

@@ -355,6 +355,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
+      <div id="embeddable_500" class="embeddable"></div>
       <div id="embeddable_sqoop" class="embeddable"></div>
     </div>
 
@@ -518,6 +519,7 @@ ${ assist.assistPanel() }
 
       var EMBEDDABLE_PAGE_URLS = {
         404: '/404',
+        500: '/500',
         editor: '/editor',
         notebook: '/notebook',
         metastore: '/metastore/tables/',
@@ -716,6 +718,9 @@ ${ assist.assistPanel() }
                 }
                 $('#embeddable_' + app).html(r);
                 self.isLoadingEmbeddable(false);
+              },
+              error: function () {
+                page('/500');
               }
             });
           } else {
@@ -923,6 +928,10 @@ ${ assist.assistPanel() }
 
         page('/sqoop', function(ctx){
           self.loadApp('sqoop');
+        });
+
+        page('/500', function(ctx){
+          self.loadApp('500');
         });
 
         page('/', function(ctx){
