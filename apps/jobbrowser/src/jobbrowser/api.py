@@ -193,7 +193,7 @@ class YarnApi(JobBrowserApi):
       filters['user'] = kwargs['username']
     if kwargs['state'] and kwargs['state'] != 'all':
       filters['finalStatus'] = state_filters[kwargs['state']]
-    if kwargs['states']:
+    if kwargs.get('states'):
       filters['states'] = ','.join([states_filters[_s] for _s in kwargs['states']])
     if kwargs.get('limit'):
       filters['limit'] = kwargs['limit']
