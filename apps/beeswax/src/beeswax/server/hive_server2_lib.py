@@ -470,7 +470,8 @@ class HiveServerClient:
       'NONE': 'PLAIN',
       'NOSASL': 'NOSASL',
       'LDAP': 'PLAIN',
-      'PAM': 'PLAIN'
+      'PAM': 'PLAIN',
+      'CUSTOM': 'PLAIN',
   }
 
   DEFAULT_TABLE_TYPES = [
