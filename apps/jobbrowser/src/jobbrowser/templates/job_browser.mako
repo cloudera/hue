@@ -155,6 +155,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </button>
             </div>
 
+            <div class="card card-small">
+              <table id="jobsTable" class="datatables table table-condensed">
+                <thead>
+                <tr>
+                  <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+                  <th>${_('Duration')}</th>
+                  <th>${_('Type')}</th>
+                  <th>${_('Status')}</th>
+                  <th>${_('Progress')}</th>
+                  <th>${_('Name')}</th>
+                  <th>${_('User')}</th>
+                  <th>${_('Id')}</th>
+                </tr>
+                </thead>
+                <tbody data-bind="foreach: jobs.runningApps">
+                  <tr data-bind="click: fetchJob">
+                    <td><div class="hueCheckbox fa"></div></td>
+                    <td data-bind="text: duration"></td>
+                    <td data-bind="text: type"></td>
+                    <td data-bind="text: status"></td>
+                    <td data-bind="text: progress"></td>
+                    <td data-bind="text: name"></td>
+                    <td data-bind="text: user"></td>
+                    <td data-bind="text: id"></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
 
             <div class="card card-small">
               <table id="jobsTable" class="datatables table table-condensed">
@@ -170,7 +199,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <th>${_('Id')}</th>
                 </tr>
                 </thead>
-                <tbody data-bind="foreach: jobs.apps">
+                <tbody data-bind="foreach: jobs.finishedApps">
                   <tr data-bind="click: fetchJob">
                     <td><div class="hueCheckbox fa"></div></td>
                     <td data-bind="text: duration"></td>
@@ -1114,6 +1143,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.apps = ko.observableArray();
+      self.runningApps = ko.computed(function(job) {
+        return $.grep(self.apps(), function(job) { return job.apiStatus() == 'RUNNING'; });
+      });
+      self.finishedApps = ko.computed(function(job) {
+        return $.grep(self.apps(), function(job) { return job.apiStatus() == 'FINISHED'; });
+      });
       self.loadingJobs = ko.observable(false);
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
       self.textFilter.subscribe(function(value) {
