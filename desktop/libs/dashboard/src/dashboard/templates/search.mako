@@ -30,7 +30,7 @@ ${ notebookKoComponents.downloadSnippetResults() }
 %endif
 
 <div id="searchComponents" class="dashboard-search">
-${ common_search.page_structure(is_embeddable) }
+${ common_search.page_structure(False, is_embeddable) }
 </div>
 
 %if not is_embeddable:
