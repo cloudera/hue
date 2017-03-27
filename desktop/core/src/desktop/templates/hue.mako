@@ -116,7 +116,7 @@ ${ hueIcons.symbols() }
           </button>
 
           <ul class="dropdown-menu">
-            % if 'beeswax' in apps and 'impala' in apps:
+            % if 'beeswax' in apps or 'impala' in apps or SHOW_NOTEBOOKS.get() or interpreters:
               <li class="dropdown-submenu">
                 <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
@@ -953,7 +953,19 @@ ${ assist.assistPanel() }
         });
 
         page('/', function(ctx){
-          page('/editor');
+          % if 'beeswax' in apps or 'impala' in apps:
+            page('/editor');
+          % elif SHOW_NOTEBOOKS.get():
+            page('/notebook');
+          % elif interpreters:
+            page('/editor');
+          % elif IS_DASHBOARD_ENABLED.get():
+            page('/dashboard/new_search');
+          % elif 'jobbrowser' in apps:
+            page('/jobbrowser/apps');
+          % else:
+            page('/home');
+          % endif
         });
 
         page('*', function(ctx){
@@ -964,7 +976,6 @@ ${ assist.assistPanel() }
         page();
 
         huePubSub.subscribe('page.route', page);
-
       };
 
       var onePageViewModel = new OnePageViewModel();
