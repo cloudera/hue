@@ -135,8 +135,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
             </div>
 
-            ${_('in the last')} <input id="timeValue" class="input-mini no-margin" type="number" value="7" min="1" max="3650">
-            <select id="timeUnit" class="input-small no-margin">
+            ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
+            <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
               <option value="days">${_('days')}</option>
               <option value="hours">${_('hours')}</option>
               <option value="minutes">${_('minutes')}</option>
@@ -1150,16 +1150,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return $.grep(self.apps(), function(job) { return job.apiStatus() == 'FINISHED'; });
       });
       self.loadingJobs = ko.observable(false);
+
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 500 } });
-      self.textFilter.subscribe(function(value) {
-        self.fetchJobs();
-        // TBD: refreshPagination()
-      });
+      self.timeValueFilter = ko.observable(7).extend({ throttle: 500 });
+      self.timeUnitFilter = ko.observable('days').extend({ throttle: 500 });
+      self.timeUnitFilterUnits = ko.observable([
+        {'value': 'days', 'name': '${_("days")}'},
+        {'value': 'hours', 'name': '${_("hours")}'},
+        {'value': 'minutes', 'name': '${_("minutes")}'},
+      ]);
 
       self.filters = ko.computed(function() {
-        return [{'text': self.textFilter()}];
+        return [
+          {'text': self.textFilter()},
+          {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}}
+        ];
       });
-
+      self.filters.subscribe(function(value) {
+        self.fetchJobs();
+      });
 
       self.fetchJobs = function () {
         self.loadingJobs(true);

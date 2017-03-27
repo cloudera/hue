@@ -50,7 +50,7 @@ def jobs(request):
   response = {'status': -1}
 
   interface = json.loads(request.POST.get('interface'))
-  filters = [(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in _filter.items() if value]
+  filters = dict([(key, value) for _filter in json.loads(request.POST.get('filters', '[]')) for key, value in _filter.items() if value])
 
   response['apps'] = get_api(request.user, interface).apps(filters)
   response['status'] = 0
