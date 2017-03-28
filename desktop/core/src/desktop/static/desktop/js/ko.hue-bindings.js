@@ -3383,7 +3383,7 @@
             });
           }
 
-          var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), locations: e.data.locations };
+          var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), defaultDatabase: snippet.database(), locations: e.data.locations };
           huePubSub.publish('editor.active.locations', lastKnownLocations);
 
           huePubSub.subscribe('get.active.editor.locations', function () {
