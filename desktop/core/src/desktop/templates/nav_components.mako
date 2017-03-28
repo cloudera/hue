@@ -93,7 +93,6 @@ from django.utils.translation import ugettext as _
               fetchDeferral.resolve(data.entity);
             },
             errorCallback: function (error) {
-              hueUtils.logError(error);
               fetchDeferral.reject()
             }
           });
