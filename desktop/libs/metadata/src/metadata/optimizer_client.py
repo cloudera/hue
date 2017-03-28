@@ -107,7 +107,6 @@ class OptimizerApi(object):
       extra_parameters = {
           'colDelim': ',',
           'rowDelim': '\n',
-          'headerFields': OptimizerApi.UPLOAD[data_type]['headerFields']
       }
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
@@ -124,9 +123,11 @@ class OptimizerApi(object):
 
           for row in queries_csv:
             f_queries.write(row)
+            LOG.debug(row)
         else:
           # Table, column stats
           f_queries.write(json.dumps(data))
+          LOG.debug(json.dumps(data))
 
       finally:
         f_queries.close()
@@ -223,32 +224,9 @@ class OptimizerApi(object):
 
   UPLOAD = {
     'queries': {
-      'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT'],
+      'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT', 'DATABASE'],
       "colDelim": ",",
       "rowDelim": "\\n",
-      "headerFields": [
-          {
-              "count": 0,
-              "coltype": "SQL_ID",
-              "use": True,
-              "tag": "",
-              "name": "SQL_ID"
-          },
-          {
-              "count": 0,
-              "coltype": "NONE",
-              "use": True,
-              "tag": "",
-              "name": "ELAPSED_TIME"
-          },
-          {
-              "count": 0,
-              "coltype": "SQL_QUERY",
-              "use": True,
-              "tag": "",
-              "name": "SQL_FULLTEXT"
-          }
-      ]
     }
   }
 
@@ -256,9 +234,9 @@ class OptimizerApi(object):
 def OptimizerQueryDataAdapter(data):
   headers = OptimizerApi.UPLOAD['queries']['headers']
 
-  if data and len(data[0]) == 3:
+  if data and len(data[0]) == 4:
     rows = data
   else:
-    rows = ([str(uuid.uuid4()), 0.0, q] for q in data)
+    rows = ([str(uuid.uuid4()), 0.0, q, 'default'] for q in data)
 
   yield headers, rows
