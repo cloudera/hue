@@ -594,7 +594,7 @@ var MetastoreTable = (function () {
     self.fetchDetails();
   };
 
-  MetastoreTable.prototype.showContextPopover = function (entry, event) {
+  MetastoreTable.prototype.showContextPopover = function (entry, event, orientation) {
     var $source = $(event.target);
     var offset = $source.offset();
     huePubSub.publish('sql.context.popover.show', {
@@ -602,7 +602,7 @@ var MetastoreTable = (function () {
         type: 'table',
         identifierChain: [{ name: entry.name }]
       },
-      orientation: 'right',
+      orientation: orientation || 'right',
       sourceType: 'hive',
       defaultDatabase: entry.database.name,
       source: {

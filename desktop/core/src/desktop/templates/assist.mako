@@ -1661,7 +1661,7 @@ from notebook.conf import get_ordered_interpreters
     <!-- /ko -->
     <br/>
     <ul data-bind="foreach: activeTables">
-      <li>
+      <li data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
         <span data-bind="text: name"></span> <i class="fa fa-info"></i> <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
       </li>
     </ul>
@@ -1752,14 +1752,21 @@ from notebook.conf import get_ordered_interpreters
                 if (isPointInside(location.location, cursorPos.row+1, cursorPos.column+1)) {
                   statementFound = true;
                 }
-              } else if (statementFound && location.type === 'table') {
+              } else if (statementFound && location.type === 'table' && location.identifierChain.length <= 2) {
+                // tableIndex is used to make sure we only add each table once
                 tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
               } else if (statementFound && locations[i].type === 'column') {
                 columnIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
               }
             }
             self.activeTables($.map(tableIndex, function (value) {
-              return value;
+              return new MetastoreTable({
+                database: {
+                  name: value.identifierChain.length === 2 ? value.identifierChain[0].name : self.locationIndex()[self.activeCursorLocation().id].defaultDatabase
+                },
+                type: 'table',
+                name: value.name
+              });
             }));
             self.activeColumns($.map(columnIndex, function (value) {
               return value;
@@ -1769,6 +1776,7 @@ from notebook.conf import get_ordered_interpreters
 
         huePubSub.subscribeOnce('set.active.snippet.type', self.activeSourceType);
         huePubSub.publish('get.active.snippet.type');
+
         self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeSourceType).remove);
 
         self.disposals.push(huePubSub.subscribe('editor.active.cursor.location', function (location) {
