@@ -18,13 +18,6 @@ var MetastoreViewModel = (function () {
 
   /**
    * @param {Object} options
-   * @param {Object} options.i18n
-   * @param {string} options.i18n.errorFetchingTableDetails
-   * @param {string} options.i18n.errorFetchingTableFields
-   * @param {string} options.i18n.errorFetchingTableSample
-   * @param {string} options.i18n.errorLoadingDatabases
-   * @param {string} options.i18n.errorLoadingTablePreview
-   * @param {string} options.i18n.errorRefreshingTableStats
    * @param {string} options.user
    * @constructor
    */
@@ -32,7 +25,7 @@ var MetastoreViewModel = (function () {
     var self = this;
     self.partitionsLimit = options.partitionsLimit;
     self.assistAvailable = ko.observable(true);
-    self.apiHelper = ApiHelper.getInstance(options);
+    self.apiHelper = ApiHelper.getInstance();
     self.isHue4 = ko.observable(options.hue4);
     self.isLeftPanelVisible = ko.observable();
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -59,7 +52,7 @@ var MetastoreViewModel = (function () {
 
     self.selectedDatabases = ko.observableArray();
 
-    self.databaseQuery = ko.observable('').extend({rateLimit: 150});
+    self.databaseQuery = ko.observable('').extend({ rateLimit: 150 });
 
     self.currentTab = ko.observable('');
 
@@ -181,9 +174,6 @@ var MetastoreViewModel = (function () {
         self.databases($.map(databaseNames, function (name) {
           return new MetastoreDatabase({
             name: name,
-            apiHelper: self.apiHelper,
-            i18n: self.i18n,
-            metastore: self,
             optimizerEnabled: self.optimizerEnabled,
             navigatorEnabled: self.navigatorEnabled
           })

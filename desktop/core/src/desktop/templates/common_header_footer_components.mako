@@ -20,6 +20,8 @@ from django.template.defaultfilters import escape, escapejs
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
 
+from beeswax.conf import LIST_PARTITIONS_LIMIT
+
 from metadata.conf import has_optimizer, OPTIMIZER
 %>
 
@@ -128,6 +130,15 @@ from metadata.conf import has_optimizer, OPTIMIZER
         uploadCanceled: '${ _('The upload has been canceled') }',
         uploadSucceeded: '${ _('uploaded successfully') }',
       }
+    };
+
+    MetastoreGlobals = {
+      partitionsLimit: ${ LIST_PARTITIONS_LIMIT.get() },
+      i18n: {
+        errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
+        errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
+        errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
+      },
     };
 
     AutocompleterGlobals = {

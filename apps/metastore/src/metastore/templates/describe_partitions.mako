@@ -175,9 +175,9 @@ ${ assist.assistPanel() }
   (function () {
     ko.options.deferUpdates = true;
 
-    function PartitionViewModel(options, partition_keys_json, partition_values_json) {
+    function PartitionViewModel(partition_keys_json, partition_values_json) {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -254,16 +254,7 @@ ${ assist.assistPanel() }
     }
 
     $(document).ready(function () {
-
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
-        }
-      }
-
-      var viewModel = new PartitionViewModel(options, ${ partition_keys_json | n,unicode }, ${ partition_values_json | n,unicode });
+      var viewModel = new PartitionViewModel(${ partition_keys_json | n,unicode }, ${ partition_values_json | n,unicode });
 
       ko.applyBindings(viewModel);
 

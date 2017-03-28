@@ -1206,19 +1206,10 @@ ${ components.menubar() }
         % if is_embeddable:
         hue4: true,
         % endif
-        i18n: {
-          errorFetchingTableDetails: '${_('An error occurred fetching the table details. Please try again.')}',
-          errorFetchingTableFields: '${_('An error occurred fetching the table fields. Please try again.')}',
-          errorFetchingTableSample: '${_('An error occurred fetching the table sample. Please try again.')}',
-          errorRefreshingTableStats: '${_('An error occurred refreshing the table stats. Please try again.')}',
-          errorLoadingDatabases: '${ _('There was a problem loading the databases. Please try again.') }',
-          errorLoadingTablePreview: '${ _('There was a problem loading the table preview. Please try again.') }'
-        },
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
         navigatorEnabled: '${ is_navigator_enabled }' === 'True',
         optimizerUrl: '${ optimizer_url }',
-        navigatorUrl: '${ navigator_url }',
-        partitionsLimit: ${ LIST_PARTITIONS_LIMIT.get() }
+        navigatorUrl: '${ navigator_url }'
       };
 
       var viewModel = new MetastoreViewModel(options);

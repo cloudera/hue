@@ -1110,7 +1110,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
     };
 
-    var Jobs = function (vm, options) {
+    var Jobs = function (vm) {
       var self = this;
 
       self.apps = ko.observableArray();
@@ -1166,15 +1166,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
     };
 
-    var JobBrowserViewModel = function (options, RunningCoordinatorModel) {
+    var JobBrowserViewModel = function (RunningCoordinatorModel) {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-      self.jobs = new Jobs(self, options);
+      self.jobs = new Jobs(self);
       self.job = ko.observable();
 
       self.interface = ko.observable('jobs');
@@ -1212,14 +1212,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     });
 
     $(document).ready(function () {
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-        }
-      };
-
-      viewModel = new JobBrowserViewModel(options, RunningCoordinatorModel);
+      viewModel = new JobBrowserViewModel(RunningCoordinatorModel);
       % if not is_mini:
       ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
       % else:
