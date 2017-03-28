@@ -473,7 +473,6 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
-## Task History
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
 <script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
@@ -482,6 +481,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/autocompleter.js') }"></script>
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
+<script src="${ static('metastore/js/metastore.model.js') }"></script>
 
 
 <script type="text/javascript">
