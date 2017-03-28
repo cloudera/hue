@@ -314,7 +314,7 @@ def upload_history(request):
       original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(query_data['snippets'][0]['result']['handle']['guid']))
       execution_time = query_data['snippets'][0]['result']['executionTime'] * 100
 
-      queries.append((original_query_id, execution_time, query_data['snippets'][0]['statement']))
+      queries.append((original_query_id, execution_time, query_data['snippets'][0]['statement'], query_data['snippets'][0].get('database', 'default')))
     except Exception, e:
       LOG.warning('Skipping upload of %s: %s' % (doc, e))
 
