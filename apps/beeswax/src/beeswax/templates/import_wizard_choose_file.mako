@@ -209,9 +209,9 @@ ${ assist.assistPanel() }
   (function () {
     ko.options.deferUpdates = true;
 
-    function MetastoreViewModel(options) {
+    function ImportWizardChooseFileViewModel() {
       var self = this;
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -227,15 +227,8 @@ ${ assist.assistPanel() }
     }
 
     $(document).ready(function () {
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
-        }
-      }
 
-      var viewModel = new MetastoreViewModel(options);
+      var viewModel = new ImportWizardChooseFileViewModel();
 
       ko.applyBindings(viewModel);
 

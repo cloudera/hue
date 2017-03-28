@@ -18,23 +18,14 @@ var MetastoreDatabase = (function () {
   /**
    * @param {Object} options
    * @param {string} options.name
-   * @param {ApiHelper} options.apiHelper
-   * @param {MetastoreViewModel} options.metastore
    * @param {string} [options.tableName]
    * @param {string} [options.tableComment]
-   * @param {Object} options.i18n
-   * @param {string} options.i18n.errorFetchingTableDetails
-   * @param {string} options.i18n.errorFetchingTableFields
-   * @param {string} options.i18n.errorFetchingTableSample
-   * @param {string} options.i18n.errorRefreshingTableStats
    * @constructor
    */
   function MetastoreDatabase(options) {
     var self = this;
-    self.apiHelper = options.apiHelper;
-    self.i18n = options.i18n;
+    self.apiHelper = ApiHelper.getInstance();
     self.name = options.name;
-    self.metastore = options.metastore;
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(false);
@@ -127,8 +118,6 @@ var MetastoreDatabase = (function () {
             name: tableMeta.name,
             type: tableMeta.type,
             comment: tableMeta.comment,
-            apiHelper: self.apiHelper,
-            i18n: self.i18n,
             optimizerEnabled: optimizerEnabled,
             navigatorEnabled: navigatorEnabled
           })
@@ -226,7 +215,6 @@ var MetastoreTable = (function () {
 
   /**
    * @param {Object} options
-   * @param {ApiHelper} options.apiHelper
    * @param {MetastoreTable} options.metastoreTable
    */
   function MetastoreTablePartitions(options) {
@@ -235,7 +223,7 @@ var MetastoreTable = (function () {
     self.keys = ko.observableArray();
     self.values = ko.observableArray();
     self.metastoreTable = options.metastoreTable;
-    self.apiHelper = options.apiHelper;
+    self.apiHelper = ApiHelper.getInstance();
 
     self.loaded = ko.observable(false);
     self.loading = ko.observable(true);
@@ -271,18 +259,14 @@ var MetastoreTable = (function () {
 
   /**
    * @param {Object} options
-   * @param {ApiHelper} options.apiHelper
    * @param {MetastoreTable} options.metastoreTable
-   * @param {Object} options.i18n
-   * @param {string} options.i18n.errorFetchingTableSample
    */
   function MetastoreTableSamples(options) {
     var self = this;
     self.rows = ko.observableArray();
     self.headers = ko.observableArray();
     self.metastoreTable = options.metastoreTable;
-    self.apiHelper = options.apiHelper;
-    self.i18n = options.i18n;
+    self.apiHelper = ApiHelper.getInstance();
 
     self.hasErrors = ko.observable(false);
     self.loaded = ko.observable(false);
@@ -327,19 +311,12 @@ var MetastoreTable = (function () {
    * @param {string} options.name
    * @param {string} options.type
    * @param {string} options.comment
-   * @param {ApiHelper} options.apiHelper
-   * @param {Object} options.i18n
-   * @param {string} options.i18n.errorFetchingTableDetails
-   * @param {string} options.i18n.errorFetchingTableFields
-   * @param {string} options.i18n.errorFetchingTableSample
-   * @param {string} options.i18n.errorRefreshingTableStats
    * @constructor
    */
   function MetastoreTable(options) {
     var self = this;
     self.database = options.database;
-    self.apiHelper = options.apiHelper;
-    self.i18n = options.i18n;
+    self.apiHelper = ApiHelper.getInstance();
     self.optimizerEnabled = options.optimizerEnabled;
     self.navigatorEnabled = options.navigatorEnabled;
     self.name = options.name;
@@ -372,17 +349,14 @@ var MetastoreTable = (function () {
 
     self.favouriteColumns = ko.observableArray();
     self.samples = new MetastoreTableSamples({
-      apiHelper: self.apiHelper,
-      i18n: self.i18n,
       metastoreTable: self
     });
     self.partitions = new MetastoreTablePartitions({
-      apiHelper: self.apiHelper,
       metastoreTable: self
     });
 
     self.partitionsCountLabel = ko.pureComputed(function () {
-      if (self.partitions.values().length === self.database.metastore.partitionsLimit) {
+      if (self.partitions.values().length === MetastoreGlobals.partitionsLimit) {
         return self.partitions.values().length + '+'
       }
       return self.partitions.values().length;
@@ -425,7 +399,7 @@ var MetastoreTable = (function () {
         },
         errorCallback: function (data) {
           self.refreshingTableStats(false);
-          $.jHueNotify.error(self.i18n.errorRefreshingTableStats);
+          $.jHueNotify.error(MetastoreGlobals.i18n.errorRefreshingTableStats);
           console.error('apiHelper.refreshTableStats error');
           console.error(data);
         }

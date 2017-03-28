@@ -1195,14 +1195,7 @@ editorViewModelOptions.languages.push({
   name: HIVE_AUTOCOMPLETE_APP == "impala" ? "Impala" : "Hive"
 });
 
-var i18n = {
-  errorLoadingDatabases: "${ _('There was a problem loading the databases') }"
-};
-
-var apiHelper = ApiHelper.getInstance({
-  user: HIVE_AUTOCOMPLETE_USER,
-  i18n: i18n
-});
+var apiHelper = ApiHelper.getInstance();
 
 var editorViewModel = {
   sqlSourceTypes: [{

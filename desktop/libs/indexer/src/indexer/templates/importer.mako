@@ -1782,10 +1782,10 @@ ${ assist.assistPanel() }
       return koField;
     }
 
-    var IndexerViewModel = function (options) {
+    var IndexerViewModel = function () {
       var self = this;
 
-      self.apiHelper = ApiHelper.getInstance(options);
+      self.apiHelper = ApiHelper.getInstance();
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
@@ -1840,14 +1840,7 @@ ${ assist.assistPanel() }
     }
 
     $(document).ready(function () {
-      var options = {
-        user: '${ user.username }',
-        i18n: {
-          errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
-        }
-      }
-      viewModel = new IndexerViewModel(options);
+      viewModel = new IndexerViewModel();
       ko.applyBindings(viewModel, $('#importerComponents')[0]);
 
 
