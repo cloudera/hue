@@ -886,6 +886,10 @@ ${ assist.assistPanel() }
           self.loadApp('oozie_bundle');
         });
 
+        page('/metastore', function(ctx){
+          page('/metastore/tables');
+        });
+
         page('/metastore/*', function(ctx){
           self.currentContextParams(ctx.params);
           self.loadApp('metastore');
