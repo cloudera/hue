@@ -1610,6 +1610,7 @@ var EditorViewModel = (function() {
 
     self.loadTableStats = function (activeTables) {
       logGA('load_table_stats');
+      $(document).trigger("info", "Preparing table data...");
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
         db_tables: ko.mapping.toJSON(activeTables),
@@ -1618,7 +1619,7 @@ var EditorViewModel = (function() {
         with_ddl: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", activeTables + " stats uploaded successfully.");
+          $(document).trigger("info", $.map(activeTables, function(table) { return table.name; }) + " stats sent to analyse.");
           if (data.upload_table_ddl) {
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
           }
