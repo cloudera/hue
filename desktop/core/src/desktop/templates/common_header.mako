@@ -156,6 +156,8 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/sqlUtils.js') }"></script>
   <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
+  <script src="${ static('metastore/js/metastore.model.js') }"></script>
+
   ${ koComponents.all() }
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
