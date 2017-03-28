@@ -341,9 +341,19 @@ def upload_table_stats(request):
   table_ddls = []
 
   for db_table in db_tables:
-    path = _get_table_name(db_table)
+    path = _get_table_name(db_table['name'])
 
     try:
+      if with_ddl:
+        db = dbms.get(request.user)
+        query = hql_query('SHOW CREATE TABLE `%(database)s`.`%(table)s`' % path)
+        handle = db.execute_and_wait(query, timeout_sec=5.0)
+
+        if handle:
+          result = db.fetch(handle, rows=5000)
+          db.close(handle)
+          table_ddls.append((0, 0, '\n'.join([row[0] for row in result.rows()])))
+
       full_table_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table']).content)
       stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
@@ -377,17 +387,6 @@ def upload_table_stats(request):
             "num_trues": col_stats['num_trues'] if col_stats.get('num_trues', '') != '' else -1,
             "num_falses": col_stats['num_falses'] if col_stats.get('num_falses', '') != '' else -1,
           })
-
-      if with_ddl:
-        db = dbms.get(request.user)
-        query = hql_query('SHOW CREATE TABLE `%(database)s`.`%(table)s`' % path)
-        handle = db.execute_and_wait(query, timeout_sec=5.0)
-
-        if handle:
-          result = db.fetch(handle, rows=5000)
-          db.close(handle)
-          table_ddls.append((0, 0, '\n'.join([row[0] for row in result.rows()])))
-
     except Exception, e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
