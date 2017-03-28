@@ -253,47 +253,6 @@ a#advanced-btn:hover {
   margin-top: -12px;
 }
 
-.hueAnchor {
-  color: #FFFFFF;
-  opacity: 0.65;
-  filter: alpha(opacity=65);
-  position: fixed;
-  z-index: 2147483647;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  background-color: #333333;
-  padding: 10px;
-  padding-left: 14px;
-  padding-right: 14px;
-}
-
-.hueAnchor:hover {
-  text-decoration: none;
-  opacity: 0.85;
-  filter: alpha(opacity=85);
-}
-
-.hueAnchor input {
-  min-height: 19px!important;
-  height: 19px!important;
-  margin: 0;
-}
-
-
-
-#jHueScrollUpAnchor {
-  bottom: 20px;
-  right: 20px;
-  display: none;
-}
-
-#jHueScrollLeftAnchor {
-  bottom: 20px;
-  right: 20px;
-  display: none;
-}
-
 #jHueTourMask {
   position: absolute;
   display: none;
