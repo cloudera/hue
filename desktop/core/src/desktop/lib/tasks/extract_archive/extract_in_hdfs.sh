@@ -55,7 +55,7 @@ while [ "$1" != "" ]; do
     shift
 done
 
-if [ -z $UPLOAD_PATH ] || [ -z $FILE_NAME ] || [ -z OUTPUT_PATH ]
+if [ -z "$UPLOAD_PATH" ] || [ -z "$FILE_NAME" ] || [ -z "$OUTPUT_PATH" ]
 then
 	echo "ERROR: Missing Arguments"
 	usage
@@ -68,18 +68,18 @@ temp_output_dir=`mktemp -d 2>/dev/null || mktemp -d -t 'mytmpdir'`
 echo 'Created temporary output directory: '$temp_output_dir
 
 set -x
-if [[ $FILE_NAME =~ \.zip$ ]]
+if [[ "$FILE_NAME" =~ \.zip$ ]]
 then
-	unzip $FILE_NAME -d $temp_output_dir
+	unzip "$FILE_NAME" -d $temp_output_dir
 	exit_status=$(echo $?)
-elif [[ $FILE_NAME =~ \.tar\.gz$ ]] || [[ $FILE_NAME =~ \.tgz$ ]]
+elif [[ "$FILE_NAME" =~ \.tar\.gz$ ]] || [[ "$FILE_NAME" =~ \.tgz$ ]]
 then
-	tar -xvzf $FILE_NAME -C $temp_output_dir
+	tar -xvzf "$FILE_NAME" -C $temp_output_dir
 	exit_status=$(echo $?)
-elif [[ $FILE_NAME =~ \.bz2$ ]] || [[ $FILE_NAME =~ \.bzip2$ ]]
+elif [[ "$FILE_NAME" =~ \.bz2$ ]] || [[ "$FILE_NAME" =~ \.bzip2$ ]]
 then
-	filename_without_extension=$(echo $FILE_NAME | cut -f 1 -d '.')
-	bzip2 -dc $FILE_NAME > $temp_output_dir/$filename_without_extension
+	filename_without_extension=$(echo "$FILE_NAME" | cut -f 1 -d '.')
+	bzip2 -dc "$FILE_NAME" > $temp_output_dir/"$filename_without_extension"
 	exit_status=$(echo $?)
 else
 	echo 'ERROR: Could not interpret archive type.'
@@ -91,7 +91,7 @@ extracted_file_count=$(($(find $temp_output_dir/* -type d -maxdepth 0 | wc -l) +
 if [ $extracted_file_count != 0 ] && [ $exit_status == 0 ]
 then
 	echo "Copying extracted files to '$OUTPUT_PATH' in HDFS"
-	hadoop fs -put $temp_output_dir $OUTPUT_PATH
+	hadoop fs -put $temp_output_dir "$OUTPUT_PATH"
 	exit_status=$(echo $?)
 	echo "Copy to HDFS directory '$OUTPUT_PATH' complete!!!"
 else

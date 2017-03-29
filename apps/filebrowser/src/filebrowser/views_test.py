@@ -921,8 +921,8 @@ alert("XSS")
 
     USER_NAME = 'test'
     HDFS_DEST_DIR = prefix + "/tmp/fb-upload-test"
-    ZIP_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/test.zip')
-    HDFS_ZIP_FILE = HDFS_DEST_DIR + '/test.zip'
+    ZIP_FILE = os.path.realpath('apps/filebrowser/src/filebrowser/test_data/te st.zip')
+    HDFS_ZIP_FILE = HDFS_DEST_DIR + '/te st.zip'
     try:
       self.cluster.fs.mkdir(HDFS_DEST_DIR)
       self.cluster.fs.chown(HDFS_DEST_DIR, USER_NAME)
@@ -936,10 +936,11 @@ alert("XSS")
       assert_true(self.cluster.fs.exists(HDFS_ZIP_FILE))
 
       resp = self.c.post('/filebrowser/extract_archive',
-                         dict(upload_path=HDFS_DEST_DIR, archive_name='test.zip'))
+                         dict(upload_path=HDFS_DEST_DIR, archive_name='te st.zip'))
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true('handle' in response and response['handle']['id'], response)
+
     finally:
       cleanup_file(self.cluster, HDFS_ZIP_FILE)
 
