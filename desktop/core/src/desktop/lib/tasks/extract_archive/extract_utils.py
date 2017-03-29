@@ -15,6 +15,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import urllib
+
 from django.core.urlresolvers import reverse
 from django.utils.translation import ugettext as _
 
@@ -39,7 +41,7 @@ def extract_archive_in_hdfs(request, upload_path, file_name):
       shell_command='extract_archive_in_hdfs.sh',
       arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + file_name}, {'value': '-o=' + output_path}],
       archives=[],
-      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + file_name}],
+      files=[{'value': '/user/' + DEFAULT_USER.get() + '/common/extract_archive_in_hdfs.sh'}, {"value": upload_path + '/' + urllib.quote(file_name)}],
       env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}]
   )
 
