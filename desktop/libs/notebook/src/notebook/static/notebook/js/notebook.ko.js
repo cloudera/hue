@@ -902,6 +902,7 @@ var EditorViewModel = (function() {
           success: function(data) {
             if (data.status == 0) {
               self.complexity(data.query_complexity);
+              self.hasSuggestion('');
             } else {
               // TODO: Silence errors
               $(document).trigger('error', data.message);
@@ -913,16 +914,16 @@ var EditorViewModel = (function() {
       };
 
       if (self.type() === 'hive' || self.type() === 'impala') {
-        self.delayedStatement.subscribe(function () {
-          self.checkComplexity();
-          self.querySyntaxCompatibility();
-        });
         if (self.statement_raw()) {
           window.setTimeout(function(){
             self.checkComplexity();
-            self.querySyntaxCompatibility();
+            //self.querySyntaxCompatibility();
           }, 2000);
         }
+        self.delayedStatement.subscribe(function () {
+          self.checkComplexity();
+          //self.querySyntaxCompatibility(); Off for now
+        });
       }
     }
 

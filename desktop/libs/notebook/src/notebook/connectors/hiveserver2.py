@@ -536,6 +536,9 @@ DROP TABLE IF EXISTS `%(table)s`;
     data = api.query_risk(query=query)
     data = data.get(snippet['type'] + 'Risk', {})
 
+    if data and data == {"riskAnalysis": "", "risk": "low", "riskRecommendation": ""}:
+      data = []
+
     return [{
       'risk': risk.get('risk'),
       'riskAnalysis': risk.get('riskAnalysis'),
