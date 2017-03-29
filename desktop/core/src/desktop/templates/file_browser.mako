@@ -317,11 +317,10 @@ from desktop.views import _ko
       to { opacity: 1; }
     }
 
-    .fb-search-container {
-      position: absolute;
-      top: 26px;
-      right: 330px;
 
+    .fb-search-container {
+      margin-top: 5px;
+      margin-right: 6px;
       -webkit-animation-name: fb-search-visible;
       animation-name: fb-search-visible;
       -webkit-animation-duration: 0.4s;
@@ -536,13 +535,11 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <!-- ko if: searchVisible -->
-        <div class="fb-search-container">
-          <input class="clearable" type="text" placeholder="Search for name, description, etc..." data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
-        </div>
-        <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
+          <!-- ko if: $parent.searchVisible -->
+          <div class="fb-action fb-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: $parent.searchFocus, textInput: $parent.searchQuery, clearable: $parent.searchQuery"></div>
+          <!-- /ko -->
           <div><a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
