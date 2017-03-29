@@ -118,7 +118,7 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             % if 'beeswax' in apps or 'impala' in apps or SHOW_NOTEBOOKS.get() or interpreters:
               <li class="dropdown-submenu">
-                <a title="${_('Query editor')}" data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
+                <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
                 <ul class="dropdown-menu">
                   % if 'impala' in apps:
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('impala', true); }"><svg style="display: inline-block;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-impala"></use></svg> ${_('Impala Query')}</a></li>
@@ -132,7 +132,7 @@ ${ hueIcons.symbols() }
                   % if interpreters:
                   <li class="divider"></li>
                   <li class="dropdown-submenu">
-                    <a title="${_('More...')}" data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
+                    <a data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
                     <ul class="dropdown-menu">
                       % for interpreter in interpreters:
                         % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
@@ -141,7 +141,7 @@ ${ hueIcons.symbols() }
                       % endfor
                       % if user.is_superuser:
                         <li class="divider"></li>
-                        <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
+                        <li><a href="http://gethue.com/sql-editor/" target="_blank"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
                       % endif
                     </ul>
                   </li>
@@ -155,7 +155,7 @@ ${ hueIcons.symbols() }
             % if 'oozie' in apps:
               % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
               <li class="dropdown-submenu">
-                <a title="${_('Schedule with Oozie')}" data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon"  alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
+                <a data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
                 <ul class="dropdown-menu">
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
                   <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
