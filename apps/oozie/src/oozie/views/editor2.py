@@ -466,7 +466,8 @@ def list_editor_coordinators(request):
     coordinators.extend(coordinators_v1)
 
   return render('editor2/list_editor_coordinators.mako', request, {
-      'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML)
+    'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
