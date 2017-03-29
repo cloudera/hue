@@ -5939,6 +5939,44 @@ fieldset[disabled] .btn-warning {
   border-color: #E0E0E0;
   background-color: #E0E0E0;
 }
+.btn-inverse {
+  color: #FFFFFF;
+  border-color: #212121;
+  background-color: #212121;
+}
+.btn-inverse:focus,
+.btn-inverse:focus:active,
+.btn-inverse.focus,
+.open > .btn-inverse.dropdown-toggle:focus {
+  color: #FFFFFF;
+  border-color: #212121;
+  background-color: #212121;
+}
+.btn-inverse:hover,
+.btn-inverse:active,
+.btn-inverse.active,
+.btn-inverse:active:hover,
+.btn-inverse:focus:hover {
+  color: #FFFFFF;
+  border-color: #444;
+  background-color: #444;
+}
+.btn-inverse.disabled:focus,
+.btn-inverse[disabled]:focus,
+fieldset[disabled] .btn-inverse:focus,
+.btn-inverse.disabled.focus,
+.btn-inverse[disabled].focus,
+fieldset[disabled] .btn-inverse.focus,
+.btn-inverse.disabled:hover,
+.btn-inverse[disabled]:hover,
+fieldset[disabled] .btn-inverse:hover,
+.btn-inverse.disabled,
+.btn-inverse[disabled],
+fieldset[disabled] .btn-inverse {
+  color: #A0A0A0;
+  border-color: #E0E0E0;
+  background-color: #E0E0E0;
+}
 .dropdown-menu {
   -webkit-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
   -moz-box-shadow: 0 6px 12px rgba(0, 0, 0, 0.175);
