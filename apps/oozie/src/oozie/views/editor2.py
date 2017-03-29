@@ -726,7 +726,8 @@ def list_editor_bundles(request):
     bundles.extend(bundles_v1)
 
   return render('editor2/list_editor_bundles.mako', request, {
-      'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML)
+    'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML),
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
