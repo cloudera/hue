@@ -513,7 +513,7 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <div class="fb-folder-actions" data-bind="visible: activeEntry && !activeEntry().hasErrors()">
+        <div class="fb-folder-actions" data-bind="visible: activeEntry && activeEntry() && !activeEntry().hasErrors()">
           <!-- ko if: searchVisible -->
           <div class="fb-action fb-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
           <!-- /ko -->
