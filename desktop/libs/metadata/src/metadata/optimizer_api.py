@@ -341,7 +341,7 @@ def upload_table_stats(request):
   table_ddls = []
 
   for db_table in db_tables:
-    path = _get_table_name(db_table['name'])
+    path = _get_table_name(db_table)
 
     try:
       if with_ddl:
@@ -358,7 +358,7 @@ def upload_table_stats(request):
       stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])
 
       table_stats.append({
-        'table_name': db_table,
+        'table_name': path['table'],
         'num_rows':  stats.get('numRows', -1),
         'last_modified_time':  stats.get('transient_lastDdlTime', -1),
         'total_size':  stats.get('totalSize', -1),
@@ -375,7 +375,7 @@ def upload_table_stats(request):
           col_stats = dict([(key, val) for col_stat in col_stats for key, val in col_stat.iteritems()])
 
           column_stats.append({
-            'table_name': db_table,
+            'table_name': path['table'],
             'column_name': col,
             'data_type': col_stats['data_type'],
             "num_distinct": int(col_stats.get('distinct_count')) if col_stats.get('distinct_count') != '' else -1,
