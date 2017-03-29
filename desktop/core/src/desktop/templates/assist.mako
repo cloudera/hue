@@ -481,7 +481,7 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-documents-inner-panel">
     <!-- ko with: activeEntry -->
-    <div class="assist-flex-header assist-breadcrumb">
+    <div class="assist-flex-header assist-document-breadcrumb assist-breadcrumb">
       <!-- ko ifnot: isRoot -->
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
         <i class="fa fa-fw fa-chevron-left"></i>
@@ -506,8 +506,8 @@ from notebook.conf import get_ordered_interpreters
                  <i class='fa fa-info' title="${ _('Details') }"></i>
                </a>
              </div>
-               <!-- ko template: 'document-icon-template' --><!-- /ko -->
-             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
+             <a href="javascript:void(0)" class="assist-entry assist-document-link" data-bind="click: open, attr: {'title': name }">
+               <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: false } } --><!-- /ko -->
                <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
              </a>
            </li>

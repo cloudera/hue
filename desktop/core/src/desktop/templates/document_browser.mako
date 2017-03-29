@@ -779,7 +779,7 @@ from desktop.views import _ko
                 <!-- /ko -->
               </ul>
               <div class="doc-browser-primary-col">
-                <!-- ko template: 'document-icon-template' --><!-- /ko -->
+                <!-- ko template: { name: 'document-icon-template', data: { document: $data, showShareAddon: true } } --><!-- /ko -->
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
               </div>
               <div class="doc-browser-attr-group">

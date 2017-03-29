@@ -142,7 +142,7 @@
   </svg>
 
   <script type="text/html" id="document-icon-template">
-    <svg class="hi">
+    <svg class="hi" data-bind="with: document">
     <!-- ko if: isDirectory -->
     <use xlink:href="#hi-folder"></use>
     <!-- /ko -->
@@ -160,10 +160,10 @@
     <!-- ko case: $default --><use xlink:href="#hi-file"></use><!-- /ko -->
     <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: (isShared() || isSharedWithMe()) && selected() -->
+    <!-- ko if: $parent.showShareAddon && (isShared() || isSharedWithMe()) && selected() -->
     <use xlink:href="#hi-share-addon-selected"></use>
     <!-- /ko -->
-    <!-- ko if: (isShared() || isSharedWithMe()) && !selected() -->
+    <!-- ko if: $parent.showShareAddon && (isShared() || isSharedWithMe()) && !selected() -->
     <use xlink:href="#hi-share-addon"></use>
     <!-- /ko -->
     </svg>
