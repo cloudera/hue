@@ -213,7 +213,7 @@ ${ hueIcons.symbols() }
             % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             % if user.is_superuser:
-            <li><a href="/about"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
+            <li><a href="/about/"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
             % endif
             <li class="divider"></li>
             <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
@@ -767,6 +767,7 @@ ${ assist.assistPanel() }
 
         var pageMapping = [
           { url: '/500', app: '500' },
+          { url: '/about/', app: 'admin_wizard' },
           { url: '/about/admin_wizard', app: 'admin_wizard' },
           { url: '/dashboard/admin/collections', app: 'collections' },
           { url: '/dashboard/*', app: 'dashboard' },
