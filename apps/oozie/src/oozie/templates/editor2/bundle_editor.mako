@@ -63,7 +63,7 @@ ${ commonheader(_("Bundle Editor"), "Oozie", user, request) | n,unicode }
   </div>
 </%def>
 
-${ layout.menubar(section='bundles', is_editor=True, pullright=buttons) }
+${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
 
 <script type="text/javascript">
   if (window.location.hash != "") {
