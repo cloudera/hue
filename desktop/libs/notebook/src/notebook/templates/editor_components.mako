@@ -1024,7 +1024,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <div class="round-icon empty">&nbsp;</div>
     <!-- ko if: hasSuggestion() == null -->
     <div class="round-icon idle">
-      <i class="fa" data-bind="css: {'fa-spinner fa-spin': compatibilityCheckRunning}"></i>
+      <i class="fa" data-bind="css: {'fa-spinner fa-spin': complexityCheckRunning}"></i>
     </div>
     <!-- /ko -->
 
@@ -1078,8 +1078,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: hasComplexity() && hasSuggestion() && compatibilitySourcePlatform() === type() && compatibilityTargetPlatform() === type() && suggestion() && !suggestion().parseError() -->
-      <!-- ko if: complexity()[0].risk && (complexity()[0].risk.length === 0 || complexity()[0].risk === 'low') -->
+    <!-- ko if: hasComplexity() -->
+      <!-- ko if: complexity()[0].risk.length === 0 || complexity()[0].risk === 'low' -->
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
