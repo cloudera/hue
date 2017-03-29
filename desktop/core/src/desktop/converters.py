@@ -158,12 +158,16 @@ class DocumentConverter(object):
       LOG.info('Successfully imported %d documents' % len(self.imported_docs))
 
     # Set is_trashed field for old documents with is_trashed=None
-    docs = Document2.objects.filter(owner=self.user, is_trashed=None)
+    docs = Document2.objects.filter(owner=self.user, is_trashed=None).exclude(is_history=True)
     for doc in docs:
       try:
         if doc.path and doc.path != '/.Trash':
+          doc_last_modified = doc.last_modified
           doc.is_trashed = doc.path.startswith('/.Trash')
           doc.save()
+
+          # save() updates the last_modified to current time. Resetting it using update()
+          Document2.objects.filter(id=doc.id).update(last_modified=doc_last_modified)
       except Exception, e:
         LOG.exception("Failed to set is_trashed field with exception: %s" % e)
 

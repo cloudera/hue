@@ -469,6 +469,16 @@ class TestDocument2(object):
       query1 = Document2.objects.create(name='new_query.sql', type='query-hive', owner=self.user, data={}, parent_directory=dir)
       assert_true(query1.is_trashed is False)
 
+      # Create history doc
+      query1.is_history = True
+      query1.save()
+
+      query1 = Document2.objects.get(uuid=query1.uuid)
+      query1_last_modified = query1.last_modified
+      dir_last_modified = dir.last_modified
+      query_last_modified = query.last_modified
+      trashed_query_last_modified = trashed_query.last_modified
+
       # Converter sets is_trashed=True for currently trashed docs
       converter = DocumentConverter(self.user)
       converter.convert()
@@ -478,6 +488,14 @@ class TestDocument2(object):
       assert_true(trashed_query.is_trashed)
       assert_true(dir.is_trashed is False)
       assert_true(query.is_trashed is False)
+
+      # last_modified should be retained post conversion
+      assert_equal(dir_last_modified, dir.last_modified)
+      assert_equal(query_last_modified, query.last_modified)
+      assert_equal(trashed_query_last_modified, trashed_query.last_modified)
+
+      query1 = Document2.objects.get(uuid=query1.uuid)
+      assert_equal(query1_last_modified, query1.last_modified)
     finally:
       # Delete docs
       dir.delete()
