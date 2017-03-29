@@ -140,4 +140,32 @@
       <path d="M255.918,317.813c-7.543,0-14.963,3.044-20.305,8.402c-5.347,5.353-8.452,12.767-8.452,20.355   c0,7.543,3.105,14.957,8.452,20.298c5.354,5.358,12.772,8.459,20.305,8.459c7.583,0,15.002-3.101,20.36-8.459   c5.348-5.353,8.453-12.767,8.453-20.298c0-7.589-3.105-15.003-8.453-20.355C270.926,320.863,263.506,317.813,255.918,317.813z"></path>
     </symbol>
   </svg>
+
+  <script type="text/html" id="document-icon-template">
+    <svg class="hi">
+    <!-- ko if: isDirectory -->
+    <use xlink:href="#hi-folder"></use>
+    <!-- /ko -->
+    <!-- ko ifnot: isDirectory -->
+    <!-- ko switch: definition().type -->
+    <!-- ko case: 'link-pigscript' --><use xlink:href="#hi-file-pig"></use><!-- /ko -->
+    <!-- ko case: 'link-workflow' --><use xlink:href="#hi-file-job-designer"></use><!-- /ko -->
+    <!-- ko case: 'notebook' --><use xlink:href="#hi-file-notebook"></use><!-- /ko -->
+    <!-- ko case: 'oozie-bundle2' --><use xlink:href="#hi-file-oozie-bundle"></use><!-- /ko -->
+    <!-- ko case: 'oozie-coordinator2' --><use xlink:href="#hi-file-oozie-coordinator"></use><!-- /ko -->
+    <!-- ko case: 'oozie-workflow2' --><use xlink:href="#hi-file-oozie-workflow"></use><!-- /ko -->
+    <!-- ko case: 'query-hive' --><use xlink:href="#hi-file-hive"></use><!-- /ko -->
+    <!-- ko case: 'query-impala' --><use xlink:href="#hi-file-impala"></use><!-- /ko -->
+    <!-- ko case: 'search-dashboard' --><use xlink:href="#hi-file-search"></use><!-- /ko -->
+    <!-- ko case: $default --><use xlink:href="#hi-file"></use><!-- /ko -->
+    <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: (isShared() || isSharedWithMe()) && selected() -->
+    <use xlink:href="#hi-share-addon-selected"></use>
+    <!-- /ko -->
+    <!-- ko if: (isShared() || isSharedWithMe()) && !selected() -->
+    <use xlink:href="#hi-share-addon"></use>
+    <!-- /ko -->
+    </svg>
+  </script>
 </%def>

@@ -506,13 +506,8 @@ from notebook.conf import get_ordered_interpreters
                  <i class='fa fa-info' title="${ _('Details') }"></i>
                </a>
              </div>
+               <!-- ko template: 'document-icon-template' --><!-- /ko -->
              <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="click: open, attr: {'title': name }">
-               <!-- ko if: isDirectory -->
-               <i class="fa fa-fw fa-folder-o muted valign-middle"></i>
-               <!-- /ko -->
-               <!-- ko ifnot: isDirectory -->
-               <i class="fa fa-fw fa-file-o muted valign-middle"></i>
-               <!-- /ko -->
                <span data-bind="draggableText: { text: definition().name, meta: {'type': 'document', 'definition': definition()} }, text: definition().name"></span>
              </a>
            </li>
