@@ -524,7 +524,7 @@ ${ assist.assistPanel() }
         notebook: '/notebook',
         metastore: '/metastore/*',
         dashboard: '/dashboard/*',
-        oozie_workflow: '/oozie/editor/workflow/new/',
+        oozie_workflow: '/oozie/editor/workflow/*',
         oozie_coordinator: '/oozie/editor/coordinator/new/',
         oozie_bundle: '/oozie/editor/bundle/new/',
         jobbrowser: '/jobbrowser/apps',
@@ -553,7 +553,7 @@ ${ assist.assistPanel() }
         sqoop: '/sqoop',
       };
 
-      var SKIP_CACHE = ['dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = ['oozie_workflow', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -874,7 +874,9 @@ ${ assist.assistPanel() }
           self.loadApp('dashboard');
         });
 
-        page('/oozie/editor/workflow/new/', function(ctx){
+        page('/oozie/editor/workflow/*', function(ctx){
+          self.currentContextParams(ctx.params);
+          self.currentQueryString(ctx.querystring);
           self.loadApp('oozie_workflow');
         });
 

@@ -64,7 +64,8 @@ def list_editor_workflows(request):
     workflows.extend(workflows_v1)
 
   return render('editor2/list_editor_workflows.mako', request, {
-      'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML)
+    'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
