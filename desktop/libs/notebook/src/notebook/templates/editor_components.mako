@@ -3175,6 +3175,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
+      huePubSub.subscribe("editor.table.stats.upload", function (activeTables) {
+        viewModel.selectedNotebook().snippets()[0].loadTableStats(activeTables);
+      });
+
+      huePubSub.subscribe("editor.workload.upload", function () {
+        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(10);
+      });
+
       if (location.getParameter("github_status") != "") {
         if (location.getParameter("github_status") == "0") {
           $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");

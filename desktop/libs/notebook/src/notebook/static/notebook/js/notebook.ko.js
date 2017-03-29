@@ -1584,10 +1584,6 @@ var EditorViewModel = (function() {
       });
     };
 
-    huePubSub.subscribe("editor.workload.upload", function () {
-      self.loadQueryHistory(10);
-    });
-
     self.loadQueryHistory = function (n) {
       logGA('load_query_history');
 
@@ -1604,16 +1600,14 @@ var EditorViewModel = (function() {
       });
     };
 
-    huePubSub.subscribe("editor.table.stats.upload", function (activeTables) {
-      self.loadTableStats(activeTables);
-    });
-
     self.loadTableStats = function (activeTables) {
       logGA('load_table_stats');
       $(document).trigger("info", "Preparing table data...");
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
-        db_tables: ko.mapping.toJSON(activeTables),
+        db_tables: ko.mapping.toJSON($.map(activeTables, function(table) {
+          return table.database.name + '.' + table.name;
+        })),
         sourcePlatform: ko.mapping.toJSON(self.type()),
         with_columns: ko.mapping.toJSON(true),
         with_ddl: ko.mapping.toJSON(true)
