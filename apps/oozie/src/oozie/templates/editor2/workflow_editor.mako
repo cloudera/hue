@@ -431,7 +431,7 @@ ${ workflow.render() }
 
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
           <span data-bind="with: $root.getSubWorkflow(value())">
-            <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
+            <a href="#" data-bind="attr: { href: '${is_embeddable and '/hue' or ''}${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </span>
@@ -518,7 +518,7 @@ ${ workflow.render() }
       <!-- ko foreach: $root.history -->
       <tr>
         <td data-bind="text: $data.date"></td>
-        <td><a data-bind="attr:{'href': '/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/' }, text: $data.history.oozie_id" target="_blank"></a></td>
+        <td><a data-bind="attr:{'href': '${is_embeddable and '/hue' or ''}/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/' }, text: $data.history.oozie_id" target="_blank"></a></td>
         <td><a class="pointer" data-bind="click: function(){$data.expanded(!$data.expanded())}"><i class="fa fa-info-circle"></i></a></td>
       </tr>
       <tr data-bind="slideVisible: $data.expanded">
@@ -529,7 +529,7 @@ ${ workflow.render() }
           <dd>
             <!-- ko if: typeof $parent.history.properties[$data] == 'function' -->
               <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-                <a data-bind="text: $parent.history.properties[$data], attr: { href: '/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
+                <a data-bind="text: $parent.history.properties[$data], attr: { href: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
               <!-- /ko -->
               <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
               <span data-bind="text: $parent.history.properties[$data]"></span>
