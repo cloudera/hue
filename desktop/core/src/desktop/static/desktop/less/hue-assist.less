@@ -20,26 +20,22 @@
 @import (reference) "hue-mixins.less";
 
 .assist-panel {
-  .flex(0 0 200px);
+  .display-flex;
+  .flex-direction(column);
+  height: 100%;
+  overflow: hidden;
   position: relative;
-  overflow-x: hidden;
-  white-space: nowrap;
-  -webkit-transition: 0.4s flex;
-  -moz-transition: 0.4s flex;
-  -ms-transition: 0.4s flex;
-  transition: 0.4s flex;
 }
 
 .assist-hidden {
   .flex(0);
 }
 
-.assist-panel .assist {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 0;
-  bottom: 0;
+.assist-panel-contents  {
+  position: relative;
+  .flex(1 1 100%);
+  overflow: hidden;
+  padding-top: 10px;
 }
 
 .right-panel-tabs {
@@ -227,6 +223,9 @@
 }
 
 .assist-panel-switches {
+  position: relative;
+  .flex(0 0 40px);
+  line-height: 40px;
   padding-left: 12px;
   height: 40px;
   border-bottom: 1px solid @cui-default-border-color;
@@ -407,7 +406,7 @@
   display: table-cell;
 }
 
-.no-entries {
+.assist-no-entries {
   font-style: italic;
 }
 
@@ -564,6 +563,18 @@
   direction: ltr;
   line-height: 18px;
   margin-bottom: 10px;
+}
+
+.assist-invalidate-description {
+  display: inline-block;
+  margin-left: 20px;
+  font-style: italic;
+  color: @cui-gray-700;
+}
+
+.assist-sort {
+  padding: 6px 0;
+  margin-left: 10px;
 }
 
 .popular-color {

@@ -63,7 +63,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-no-database-entries">
     <ul class="assist-tables">
       <li>
-        <span style="font-style: italic">${_('The database has no tables')}</span>
+        <span class="assist-no-entries">${_('The database has no tables')}</span>
       </li>
     </ul>
   </script>
@@ -71,7 +71,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-no-table-entries">
     <ul>
       <li>
-        <span style="font-style: italic" class="assist-entry assist-field-link">${_('The table has no columns')}</span>
+        <span class="assist-no-entries">${_('The table has no columns')}</span>
       </li>
     </ul>
   </script>
@@ -179,7 +179,7 @@ from notebook.conf import get_ordered_interpreters
       </a>
       <!-- /ko -->
       <!-- ko ifnot: expandable -->
-      <div style="cursor: default;" class="assist-entry assist-field-link" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }">
+      <div class="assist-entry assist-field-link default-cursor" href="javascript:void(0)" data-bind="event: { dblclick: dblClick }, attr: {'title': definition.title }">
         <span class="highlightable" data-bind="css: { 'highlight': highlight}, attr: {'column': columnName, 'table': tableName, 'database': databaseName}, text: definition.displayName, draggableText: { text: editorText, meta: {'type': 'sql', 'column': columnName, 'table': tableName, 'database': databaseName} }"></span><!-- ko if: definition.primary_key === 'true'  --> <i class="fa fa-key"></i><!-- /ko --><!-- ko if: assistDbSource.activeSort() === 'popular' && popularity() > 0 --> <i title="${ _('Popular') }" class="fa fa-star-o top-star"></i> <!-- /ko -->
       </div>
       <!-- /ko -->
@@ -262,7 +262,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-s3-header-actions">
-    <div class="assist-db-header-actions" style="margin-top: -1px;">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -272,15 +272,15 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
       <div>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
@@ -309,7 +309,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+          <li class="assist-entry"><span class="assist-no-entries">${_('Empty directory')}</span></li>
         </ul>
         <!-- /ko -->
       </div>
@@ -326,7 +326,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-git-header-actions">
-    <div class="assist-db-header-actions" style="margin-top: -1px;">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.git.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -336,15 +336,15 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
-      <div style="padding-left: 5px;">
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      <div>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-git-header-actions' --><!-- /ko -->
@@ -368,7 +368,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+          <li class="assist-entry"><span class="assist-no-entries">${_('Empty directory')}</span></li>
         </ul>
         <!-- /ko -->
       </div>
@@ -399,7 +399,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-hdfs-header-actions">
-    <div class="assist-db-header-actions" style="margin-top: -1px;">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -409,15 +409,15 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-header assist-breadcrumb" >
       <!-- ko if: parent !== null -->
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
-      <div style="padding-left: 5px;">
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: path"></span>
+      <div>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: path"></span>
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
@@ -446,7 +446,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">${_('Empty directory')}</li>
+          <li class="assist-entry"><span class="assist-no-entries">${_('Empty directory')}</span></li>
         </ul>
         <!-- /ko -->
       </div>
@@ -473,7 +473,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-document-header-actions">
-    <div class="assist-header-actions" style="margin-top: -1px;">
+    <div class="assist-header-actions">
       <a class="inactive-action" href="javascript:void(0)"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
@@ -484,15 +484,15 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-header assist-breadcrumb">
       <!-- ko ifnot: isRoot -->
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition().name"></span>
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span data-bind="text: definition().name"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: isRoot -->
-      <div style="padding-left: 5px;">
-        <i class="fa fa-folder-o" style="font-size: 14px; line-height: 16px;vertical-align: top;margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;">/</span>
+      <div>
+        <i class="fa fa-fw fa-folder-o"></i>
+        <span>/</span>
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
@@ -519,7 +519,7 @@ from notebook.conf import get_ordered_interpreters
          </ul>
       </div>
       <div data-bind="visible: !loading() && ! hasErrors() && entries().length === 0">
-        <span style="font-style: italic;">${_('Empty directory')}</span>
+        <span class="assist-no-entries">${_('Empty directory')}</span>
       </div>
       <div class="center" data-bind="visible: loading() && ! hasErrors()">
         <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #BBB"></i>
@@ -532,7 +532,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-collections-header-actions">
-    <div class="assist-db-header-actions" style="margin-top: -1px;">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
@@ -562,7 +562,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">${_('No collections available.')}</li>
+          <li class="assist-entry"><span class="assist-no-entries">${_('No collections available.')}</span></li>
         </ul>
         <!-- /ko -->
       </div>
@@ -575,7 +575,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-hbase-header-actions">
-    <div class="assist-db-header-actions" style="margin-top: -1px;">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hbase.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -585,9 +585,9 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-inner-header assist-breadcrumb" >
       <!-- ko if: definition.host !== '' -->
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.clickHBaseRootItem'); }">
-        <i class="fa fa-chevron-left" style="font-size: 15px;margin-right:8px;"></i>
-        <i class="fa fa-th-large" style="font-size: 14px; line-height: 16px; vertical-align: top; margin-right:4px;"></i>
-        <span style="font-size: 14px;line-height: 16px;vertical-align: top;" data-bind="text: definition.name"></span>
+        <i class="fa fa-fw fa-chevron-left"></i>
+        <i class="fa fa-fw fa-th-large"></i>
+        <span data-bind="text: definition.name"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: definition.host === '' -->
@@ -613,13 +613,15 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry" style="font-style: italic;">
+          <li class="assist-entry">
+            <span class="assist-no-entries">
             <!-- ko if: definition.host === '' -->
             ${_('No clusters available.')}
             <!-- /ko -->
             <!-- ko if: definition.host !== '' -->
             ${_('No tables available.')}
             <!-- /ko -->
+            </span>
           </li>
         </ul>
         <!-- /ko -->
@@ -648,24 +650,24 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="ask-for-invalidate-title">
-    <a class="pull-right pointer close-popover inactive-action"><i class="fa fa-times"></i></a>
+    &nbsp;<a class="pull-right pointer close-popover inactive-action">&times;</a>
   </script>
 
   <script type="text/html" id="ask-for-invalidate-content">
-    <label class="radio" style="margin-bottom: 2px;">
+    <label class="radio">
       <input type="radio" name="refreshImpala" value="cache" data-bind="checked: invalidateOnRefresh" />
       ${ _('Clear cache') }
     </label>
-    <label class="radio" style="margin-bottom: 2px;">
+    <label class="radio">
       <input type="radio" name="refreshImpala" value="invalidate" data-bind="checked: invalidateOnRefresh" />
       ${ _('Perform incremental metadata update') }
     </label>
-    <div style="display: inline-block; margin-left: 20px; font-style: italic; color: #999;">${ _('This will sync missing tables in Hive.') }</div>
-    <label class="radio" style="margin-bottom: 2px;">
+    <div class="assist-invalidate-description">${ _('This will sync missing tables in Hive.') }</div>
+    <label class="radio">
       <input type="radio" name="refreshImpala" value="invalidateAndFlush" data-bind="checked: invalidateOnRefresh"  />
       ${ _('Invalidate all metadata and rebuild index') }
     </label>
-    <div style="display: inline-block; margin-left: 20px; font-style: italic; color: #999;">${ _('WARNING: This can be both resource and time-intensive.') }</div>
+    <div class="assist-invalidate-description">${ _('WARNING: This can be both resource and time-intensive.') }</div>
     <div style="width: 100%; display: inline-block; margin-top: 5px;"><button class="pull-right btn btn-primary" data-bind="css: { 'btn-primary': invalidateOnRefresh() !== 'invalidateAndFlush', 'btn-danger': invalidateOnRefresh() === 'invalidateAndFlush' }, click: function (data, event) { huePubSub.publish('close.popover'); triggerRefresh(data, event); }, clickBubble: false">${ _('Refresh') }</button></div>
   </script>
 
@@ -715,7 +717,7 @@ from notebook.conf import get_ordered_interpreters
       </div>
     </div>
     <div class="assist-flex-search" data-bind="visible: hasEntries() && isSearchVisible() && ! hasErrors()">
-      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" style="margin-top:3px;" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
+      <div class="assist-filter"><input id="searchInput" class="clearable" type="text" placeholder="${ _('Database name...') }" data-bind="hasFocus: editingSearch, clearable: filter.query, value: filter.query, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-db-scrollable" data-bind="visible: ! hasErrors() && ! loading() && hasEntries()">
       <!-- ko if: ! loading() && filteredEntries().length == 0 -->
@@ -751,7 +753,7 @@ from notebook.conf import get_ordered_interpreters
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
         <!-- ko if: $parent.activeSort -->
-        <a class="margin-left-10 inactive-action" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
+        <a class="assist-sort inactive-action" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
           <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
         </a>
         <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
@@ -798,9 +800,9 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-panel-template">
-    <div style="display: -ms-flexbox; display: flex; -ms-flex-direction: column; flex-direction: column; position:relative; height: 100%; overflow: hidden;">
+    <div class="assist-panel">
       <!-- ko if: availablePanels.length > 1 -->
-      <div style="position: relative; flex: 0 0 40px; line-height: 40px;" class="assist-panel-switches">
+      <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
           <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
@@ -810,7 +812,7 @@ from notebook.conf import get_ordered_interpreters
       <!-- /ko -->
       <!-- ko with: visiblePanel -->
       <!-- ko template: { if: showNavSearch && $parent.navigatorSearch.navigatorEnabled(), name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
-      <div style="position: relative; -ms-flex: 1 1 100%; flex: 1 1 100%; overflow: hidden; padding-top: 10px;" data-bind="style: { 'padding-top': $parent.availablePanels.length > 1 ? '10px' : '5px' }">
+      <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels.length > 1 ? '10px' : '5px' }">
         <div class="assist-inner-panel">
           <div class="assist-flex-panel">
             <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
