@@ -1124,7 +1124,7 @@ class Document2(models.Model):
       elif self.type == 'oozie-bundle2':
         url = reverse('oozie:edit_bundle') + '?bundle=' + str(self.id)
       elif self.type.startswith('query'):
-        url = reverse('notebook:editor') + '?editor=' + str(self.id)
+        url = '/editor' + '?editor=' + str(self.id)
       elif self.type == 'directory':
         url = '/home2' + '?uuid=' + self.uuid
       elif self.type == 'notebook':
