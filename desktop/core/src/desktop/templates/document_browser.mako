@@ -204,12 +204,6 @@ from desktop.views import _ko
       vertical-align: middle;
     }
 
-    .doc-browser-primary-col .hi {
-      vertical-align: middle;
-      display: inline-block;
-      margin-bottom: 0.2em;
-    }
-
     .doc-browser-attr-group {
       -ms-flex: 1;
       flex: 1;
@@ -785,32 +779,7 @@ from desktop.views import _ko
                 <!-- /ko -->
               </ul>
               <div class="doc-browser-primary-col">
-                <svg class="hi">
-                  <!-- ko if: isDirectory -->
-                  <use xlink:href="#hi-folder"></use>
-                  <!-- /ko -->
-                  <!-- ko ifnot: isDirectory -->
-                  <!-- ko switch: definition().type -->
-                  <!-- ko case: 'link-pigscript' --><use xlink:href="#hi-file-pig"></use><!-- /ko -->
-                  <!-- ko case: 'link-workflow' --><use xlink:href="#hi-file-job-designer"></use><!-- /ko -->
-                  <!-- ko case: 'notebook' --><use xlink:href="#hi-file-notebook"></use><!-- /ko -->
-                  <!-- ko case: 'oozie-bundle2' --><use xlink:href="#hi-file-oozie-bundle"></use><!-- /ko -->
-                  <!-- ko case: 'oozie-coordinator2' --><use xlink:href="#hi-file-oozie-coordinator"></use><!-- /ko -->
-                  <!-- ko case: 'oozie-workflow2' --><use xlink:href="#hi-file-oozie-workflow"></use><!-- /ko -->
-                  <!-- ko case: 'query-hive' --><use xlink:href="#hi-file-hive"></use><!-- /ko -->
-                  <!-- ko case: 'query-impala' --><use xlink:href="#hi-file-impala"></use><!-- /ko -->
-                  <!-- ko case: 'search-dashboard' --><use xlink:href="#hi-file-search"></use><!-- /ko -->
-                  <!-- ko case: $default --><use xlink:href="#hi-file"></use><!-- /ko -->
-                  <!-- /ko -->
-                  <!-- /ko -->
-
-                  <!-- ko if: (isShared() || isSharedWithMe()) && selected() -->
-                  <use xlink:href="#hi-share-addon-selected"></use>
-                  <!-- /ko -->
-                  <!-- ko if: (isShared() || isSharedWithMe()) && !selected() -->
-                  <use xlink:href="#hi-share-addon"></use>
-                  <!-- /ko -->
-                </svg>
+                <!-- ko template: 'document-icon-template' --><!-- /ko -->
                 <a href="javascript: void(0);" data-bind="text: definition().name, click: open, attr: { 'title': definition().name, 'href': definition().type === 'directory' ? '#' : definition().absoluteUrl }" class="margin-left-5"></a>
               </div>
               <div class="doc-browser-attr-group">
