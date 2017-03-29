@@ -22,9 +22,11 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Workflows"), "oozie", user, request) | n,unicode }
-${ layout.menubar(section='workflows', is_editor=True) }
+%endif
 
+${ layout.menubar(section='workflows', is_editor=True) }
 
 <div id="editor">
 
@@ -92,7 +94,7 @@ ${ layout.menubar(section='workflows', is_editor=True) }
             <a data-bind="attr: { 'href': '${ url('oozie:open_old_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->
           <!-- ko if: uuid() -->
-            <a data-bind="attr: { 'href': '${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
+            <a data-bind="attr: { 'href': '${ is_embeddable and '/hue' or '' }${ url('oozie:edit_workflow') }?workflow=' + id() }" data-row-selector="true"></a>
           <!-- /ko -->
         </td>
         <td data-bind="text: name"></td>
@@ -296,5 +298,6 @@ ${ commonimportexport(request) | n,unicode }
   });
 </script>
 
-
+%if not is_embeddable:
 ${commonfooter(request, messages) | n,unicode}
+%endif
