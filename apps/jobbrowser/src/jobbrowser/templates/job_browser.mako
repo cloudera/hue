@@ -1062,7 +1062,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         else if (/oozie-oozi-C/.test(self.id())) {
           interface = 'schedules';
-        } 
+        }
         else if (/oozie-oozi-B/.test(self.id())) {
           interface = 'bundles';
         }
@@ -1095,6 +1095,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               }
               if (vm.job().properties['coordinator_id']()) {
                 crumbs.push({'id': vm.job().properties['coordinator_id'](), 'name': vm.job().properties['coordinator_id'](), 'type': 'schedule'});
+              }
+            }
+            else if (/-oozie-oozi-C/.test(vm.job().id())) {
+              if (vm.job().properties['bundle_id']()) {
+                crumbs.push({'id': vm.job().properties['bundle_id'](), 'name': vm.job().properties['bundle_id'](), 'type': 'bundle'});
               }
             }
 
