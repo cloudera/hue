@@ -99,7 +99,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
   </div>
 </%def>
 
-${ layout.menubar(section='workflows', is_editor=True, pullright=buttons) }
+${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
 
 <style type="text/css">
   body {

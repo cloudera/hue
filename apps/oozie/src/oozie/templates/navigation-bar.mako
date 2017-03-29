@@ -22,7 +22,7 @@
 <%namespace name="utils" file="utils.inc.mako" />
 
 
-<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None)">
+<%def name="menubar(section='', dashboard=False, is_editor=False, pullright=None, is_embeddable=False)">
     <div class="navbar hue-title-bar">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -76,9 +76,33 @@
                 <li class="${utils.is_selected(section, 'oozie')}"><a href="${url('oozie:list_oozie_info')}">${ _('Oozie') }</a></li>
               % else:
                 % if is_editor:
-                  <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a></li>
-                  <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a></li>
-                  <li class="${utils.is_selected(section, 'bundles')}"><a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a></li>
+                  <li class="${utils.is_selected(section, 'workflows')}">
+                    % if is_embeddable:
+                    <a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }">
+                    % else:
+                    <a href="${url('oozie:list_editor_workflows')}">
+                    % endif
+                      ${ _('Workflows') }
+                    </a>
+                  </li>
+                  <li class="${utils.is_selected(section, 'coordinators')}">
+                    % if is_embeddable:
+                    <a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }">
+                    % else:
+                    <a href="${url('oozie:list_editor_coordinators')}">
+                    % endif
+                      ${ _('Coordinators') }
+                    </a>
+                  </li>
+                  <li class="${utils.is_selected(section, 'bundles')}">
+                    % if is_embeddable:
+                    <a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }">
+                    % else:
+                    <a href="${url('oozie:list_editor_bundles')}">
+                    % endif
+                      ${ _('Bundles') }
+                    </a>
+                  </li>
                 % else:
                   <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
                   <li class="${utils.is_selected(section, 'coordinators')}"><a href="${url('oozie:list_coordinators')}">${ _('Coordinators') }</a></li>
