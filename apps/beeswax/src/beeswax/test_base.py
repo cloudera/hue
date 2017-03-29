@@ -437,7 +437,7 @@ class BeeswaxSampleProvider(object):
       # Create a "test_partitions" table.
       CREATE_PARTITIONED_TABLE = """
         CREATE TABLE `%(db)s`.`test_partitions` (foo INT, bar STRING)
-        PARTITIONED BY (baz STRING, boom STRING)
+        PARTITIONED BY (baz STRING, boom INT)
         ROW FORMAT DELIMITED
           FIELDS TERMINATED BY '\t'
           LINES TERMINATED BY '\n'
@@ -448,13 +448,13 @@ class BeeswaxSampleProvider(object):
       LOAD_DATA = """
         LOAD DATA INPATH '%(data_file)s'
         OVERWRITE INTO TABLE `%(db)s`.`test_partitions`
-        PARTITION (baz='baz_one', boom='boom_two')
+        PARTITION (baz='baz_one', boom=12345)
       """ % {'db': cls.db_name, 'data_file': data_file % 1}
       make_query(cls.client, LOAD_DATA, wait=True, local=False)
 
       # Insert additional partition data into "test_partitions" table
       ADD_PARTITION = """
-        ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom='boom_bar') LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
+        ALTER TABLE `%(db)s`.`test_partitions` ADD PARTITION(baz='baz_foo', boom=67890) LOCATION '%(fs_prefix)s/baz_foo/boom_bar'
       """ % {'db': cls.db_name, 'fs_prefix': cls.cluster.fs_prefix}
       make_query(cls.client, ADD_PARTITION, wait=True, local=False)
 

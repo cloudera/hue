@@ -1117,17 +1117,27 @@ class PartitionKeyCompatible:
 class PartitionValueCompatible:
 
   def __init__(self, partition_row, table, properties=None):
+    self.partition_keys = table.partition_keys
     if properties is None:
       properties = {}
     # Parses: ['datehour=2013022516'] or ['month=2011-07/dt=2011-07-01/hr=12']
     partition = partition_row[0]
     parts = partition.split('/')
-    self.partition_spec = ','.join(["`%s`='%s'" % (pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
+    self.partition_spec = ','.join([self._get_partition_spec(pv[0], pv[1]) for pv in [part.split('=') for part in parts]])
     self.values = [pv[1] for pv in [part.split('=') for part in parts]]
     self.sd = type('Sd', (object,), properties,)
 
+
   def __repr__(self):
     return 'PartitionValueCompatible(spec:%s, values:%s, sd:%s)' % (self.partition_spec, self.values, self.sd)
+
+
+  def _get_partition_spec(self, name, value):
+    partition_spec = "`%s`='%s'" % (name, value)
+    partition_key = next((key for key in self.partition_keys if key.name == name), None)
+    if partition_key and partition_key.type.upper() not in ('STRING', 'CHAR', 'VARCHAR', 'TIMESTAMP', 'DATE'):
+      partition_spec = "`%s`=%s" % (name, value)
+    return partition_spec
 
 
 class ExplainCompatible:
