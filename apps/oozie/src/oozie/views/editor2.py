@@ -65,7 +65,6 @@ def list_editor_workflows(request):
 
   return render('editor2/list_editor_workflows.mako', request, {
     'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -467,7 +466,6 @@ def list_editor_coordinators(request):
 
   return render('editor2/list_editor_coordinators.mako', request, {
     'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
@@ -727,7 +725,6 @@ def list_editor_bundles(request):
 
   return render('editor2/list_editor_bundles.mako', request, {
     'bundles_json': json.dumps(bundles, cls=JSONEncoderForHTML),
-    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
