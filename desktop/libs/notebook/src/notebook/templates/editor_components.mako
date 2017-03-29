@@ -257,11 +257,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               </a>
             </li>
             <li>
-              <a class="pointer" data-toggle="modal" data-target="#importGithubModal">
-                <i class="fa fa-fw fa-github"></i> ${ _('Import from Github') }
-              </a>
-            </li>
-            <li>
               <a class="pointer" data-bind="click: function() { $root.selectedNotebook().exportJupyterNotebook() }">
                 <i class="fa fa-fw fa-file-code-o"></i> ${ _('Export to Jupyter') }
               </a>
@@ -438,23 +433,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
   <div class="modal-footer">
     <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
-<div id="importGithubModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Import from Github')}</h2>
-  </div>
-  <div class="modal-body">
-    <div class="input-prepend">
-      <span class="add-on"><i class="fa fa-github"></i></span>
-      <input id="importGithubUrl" type="text" placeholder="ie: https://github.com/romainr/hadoop-tutorials-examples/blob/master/notebook/shared_rdd/hue-sharedrdd-notebook.json" style="width: 726px" />
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a href="#" class="btn" data-dismiss="modal">${_('Close')}</a>
-    <a id ="importGithubBtn" href="#" class="btn btn-primary disable-feedback" data-bind="click: authorizeGithub">${_('Import')}</a>
   </div>
 </div>
 
@@ -1992,40 +1970,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   var MAIN_SCROLLABLE = '.content-panel';
   % endif
 
-  function authorizeGithub() {
-    if ($("#importGithubUrl").val().trim() != "") {
-      $(".fa-github").addClass("fa-spinner fa-spin");
-      $("#importGithubBtn").attr("disabled", "disabled");
-      $.getJSON("/notebook/api/github/authorize?currentURL=" + location.pathname + (location.search != "" ? location.search : "?github=true") + "&fetchURL=" + $("#importGithubUrl").val(), function (data) {
-        if (data.status == 0) {
-          $(".fa-github").removeClass("fa-spinner fa-spin");
-          $("#importGithubBtn").removeAttr("disabled");
-          $("#importGithubModal").modal("hide");
-          importGithub();
-        } else {
-          location.href = data.auth_url;
-        }
-      });
-    }
-  }
-
-  function importGithub() {
-    $(".hoverText").html("<i class='fa fa-spinner fa-spin'></i>");
-    showHoverMsg();
-    $.get("api/github/fetch?url=" + $("#importGithubUrl").val().trim(), function(data){
-      if (data && data.content){
-        if ($.isArray(data.content)) { // it's a Hue Notebook
-          window.importExternalNotebook(JSON.parse(data.content[0].fields.data));
-        } else { // iPython / Zeppelin
-          window.parseExternalJSON(data.content);
-        }
-        $("#importGithubUrl").val("");
-      } else {
-        $.jHueNotify.error("${ _("Failed to load") } " + $("#importGithubUrl").val());
-      }
-    });
-  }
-
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function(val) {
     isLeftNavOpen = val;
@@ -3183,15 +3127,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         viewModel.selectedNotebook().snippets()[0].loadQueryHistory(10);
       });
 
-      if (location.getParameter("github_status") != "") {
-        if (location.getParameter("github_status") == "0") {
-          $.jHueNotify.info("${ _('User successfully authenticated to GitHub.') }");
-          $("#importGithubUrl").val(location.getParameter("github_fetch"));
-          importGithub();
-        } else {
-          $.jHueNotify.error("${ _('Could not decode Github file content to JSON.') }");
-        }
-      }
 
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
