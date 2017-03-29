@@ -1101,7 +1101,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasComplexity() && hasSuggestion() && compatibilitySourcePlatform() === type() && compatibilityTargetPlatform() === type() && suggestion() && !suggestion().parseError() -->
-      <!-- ko if: complexity() && complexity().risk() && (complexity().risk().length === 0 || complexity().risk() === 'low') -->
+      <!-- ko if: complexity()[0].risk && (complexity()[0].risk.length === 0 || complexity()[0].risk === 'low') -->
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
@@ -1109,12 +1109,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
         <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: complexity() && complexity().risk() && complexity().risk() === 'high' -->
+      <!-- ko if: complexity()[0].risk === 'high' -->
         <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity().riskAnalysis"></strong> <span data-bind="text: complexity().riskRecommendation"></span></span>
+        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity()[0].riskAnalysis"></strong> <span data-bind="text: complexity()[0].riskRecommendation"></span></span>
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->

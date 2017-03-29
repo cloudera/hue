@@ -826,12 +826,12 @@ var EditorViewModel = (function() {
       };
     };
 
-    self.complexity = ko.observable();
+    self.complexity = ko.observableArray();
     self.hasComplexity = ko.computed(function () {
-      return self.complexity();
+      return self.complexity().length > 0;
     });
 
-    self.suggestion = ko.observable(typeof snippet.complexity != "undefined" && snippet.complexity != null ? snippet.complexity : '');
+    self.suggestion = ko.observable('');
     self.hasSuggestion = ko.observable(null);
 
     self.complexityCheckRunning = ko.observable(false);
@@ -901,7 +901,7 @@ var EditorViewModel = (function() {
           },
           success: function(data) {
             if (data.status == 0) {
-              self.complexity(ko.mapping.fromJS(data.query_complexity));
+              self.complexity(data.query_complexity);
             } else {
               // TODO: Silence errors
               $(document).trigger('error', data.message);

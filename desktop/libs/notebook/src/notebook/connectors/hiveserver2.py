@@ -536,11 +536,11 @@ DROP TABLE IF EXISTS `%(table)s`;
     data = api.query_risk(query=query)
     data = data.get(snippet['type'] + 'Risk', {})
 
-    return {
-      'risk': data.get('risk'),
-      'riskAnalysis': data.get('riskAnalysis'),
-      'riskRecommendation': data.get('riskRecommendation')
-    }
+    return [{
+      'risk': risk.get('risk'),
+      'riskAnalysis': risk.get('riskAnalysis'),
+      'riskRecommendation': risk.get('riskRecommendation')
+    } for risk in data]
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):
