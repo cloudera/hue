@@ -112,15 +112,15 @@
       window.onpopstate = loadUrlParam;
       loadUrlParam();
 
-      %if not is_embeddable:
       viewModel.activeEntry.subscribe(function (newEntry) {
         if (typeof newEntry !== 'undefined' && newEntry.definition().uuid && ! newEntry.isRoot()) {
-          hueUtils.changeURL('/home?uuid=' + newEntry.definition().uuid);
+          if (window.location.getParameter('uuid') == '' || window.location.getParameter('uuid') !== newEntry.definition().uuid){
+            hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/?uuid=' + newEntry.definition().uuid);
+          }
         } else if (typeof newEntry === 'undefined' || newEntry.isRoot()) {
-          hueUtils.changeURL('/home');
+          hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/');
         }
       });
-      %endif
 
       ko.applyBindings(viewModel, $('#homeComponents')[0]);
 

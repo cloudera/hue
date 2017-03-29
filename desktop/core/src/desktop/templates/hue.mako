@@ -529,7 +529,7 @@ ${ assist.assistPanel() }
         oozie_bundle: '/oozie/editor/bundle/*',
         jobbrowser: '/jobbrowser/apps',
         filebrowser: '/filebrowser/view=*',
-        home: '/home',
+        home: '/home*',
         indexer: '/indexer/indexer/',
         collections: '/dashboard/admin/collections',
         indexes: '/indexer/',
@@ -553,7 +553,7 @@ ${ assist.assistPanel() }
         sqoop: '/sqoop',
       };
 
-      var SKIP_CACHE = ['oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = ['home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -853,13 +853,10 @@ ${ assist.assistPanel() }
           }
         });
 
-        page('/home', function(ctx){
+        page('/home*', function(ctx){
+          self.currentQueryString(ctx.querystring);
+          self.currentContextParams(ctx.params);
           self.loadApp('home');
-          if (window.location.getParameter('uuid') !== '') {
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.openUuid(window.location.getParameter('uuid'));
-            });
-          }
         });
 
         page('/dashboard/*', function(ctx){
