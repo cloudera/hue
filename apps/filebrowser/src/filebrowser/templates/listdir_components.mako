@@ -589,8 +589,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       </a>
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0, visible: !isS3()">
+      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, visible: !isS3() && (selectedFiles().length > 1 || !(selectedFiles().length===1 && isArchive()))">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+      </li>
+      <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
+        <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
       </li>
     % endif
   <!-- /ko -->

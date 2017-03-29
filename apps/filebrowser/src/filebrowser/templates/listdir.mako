@@ -100,13 +100,16 @@ ${ fb_components.menubar() }
                 </a>
               </li>
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, enable: selectedFiles().length > 0, visible: !isS3()">
+                <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, visible: !isS3() && (selectedFiles().length > 1 || !(selectedFiles().length===1 && isArchive()))">
                   <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
+                </li>
+                <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
+                  <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}</a>
                 </li>
               % endif
             </ul>
           </div>
-          
+
           <button class="btn fileToolbarBtn" title="${_('Restore from trash')}" data-bind="visible: inRestorableTrash(), click: restoreTrashSelected, enable: selectedFiles().length > 0 && isCurrentDirSelected().length == 0"><i class="fa fa-cloud-upload"></i> ${_('Restore')}</button>
           <!-- ko ifnot: inTrash -->
           <!-- ko if: $root.isS3 -->
