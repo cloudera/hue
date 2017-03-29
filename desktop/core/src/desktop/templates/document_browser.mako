@@ -323,9 +323,8 @@ from desktop.views import _ko
     }
 
     .doc-browser-search-container {
-      position: absolute;
-      top: 26px;
-      right: 370px;
+      margin-top: 5px;
+      margin-right: 6px;
       -webkit-animation-name: doc-browser-search-visible;
       animation-name: doc-browser-search-visible;
       -webkit-animation-duration: 0.4s;
@@ -631,13 +630,11 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <!-- ko if: searchVisible -->
-        <div class="doc-browser-search-container">
-          <input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery">
-        </div>
-        <!-- /ko -->
         <!-- ko with: activeEntry -->
         <div class="doc-browser-folder-actions" data-bind="visible: ! hasErrors()">
+          <!-- ko if: $parent.searchVisible -->
+          <div class="doc-browser-action doc-browser-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: $parent.searchFocus, textInput: $parent.searchQuery, clearable: $parent.searchQuery"></div>
+          <!-- /ko -->
           <div><a class="inactive-action doc-browser-action" title="${_('Search')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
