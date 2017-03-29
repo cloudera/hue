@@ -88,7 +88,7 @@ class WorkflowApi(Api):
         'status': workflow.status,
         'apiStatus': self._api_status(workflow.status),
         'progress': workflow.get_progress(),
-        'type': 'workflow'
+        'type': 'workflow',
     }
 
     request = MockDjangoRequest(self.user)
@@ -96,6 +96,8 @@ class WorkflowApi(Api):
     common['properties'] = json.loads(response.content)
     common['properties']['xml'] = ''
     common['properties']['properties'] = ''
+    common['properties']['coordinator_id'] = workflow.get_parent_job_id()
+    common['properties']['bundle_id'] = workflow.conf_dict.get('oozie.bundle.id')
 
     return common
 
@@ -159,6 +161,10 @@ class WorkflowActionApi(Api):
 
     common['action_type'] = common['type']
     common['type'] = 'workflow-action'
+
+    common['properties'] = {
+      'workflow_id': appid.split('@', 1)[0]
+    }
 
     return common
 

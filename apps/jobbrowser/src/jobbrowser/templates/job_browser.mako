@@ -1059,7 +1059,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var interface = vm.interface();
         if (/oozie-oozi-W/.test(self.id())) {
           interface = 'workflows';
-        };
+        }
+        else if (/oozie-oozi-C/.test(self.id())) {
+          interface = 'schedules';
+        } 
+        else if (/oozie-oozi-B/.test(self.id())) {
+          interface = 'bundles';
+        }
 
         $.post("/jobbrowser/api/job", {
           app_id: ko.mapping.toJSON(self.id),
@@ -1079,6 +1085,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             if (/^task_/.test(vm.job().id())) {
               crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
             }
+
+            if (/-oozie-oozi-W@/.test(vm.job().id())) {
+              crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().properties['workflow_id'], 'type': 'workflow'});
+            }
+            else if (/-oozie-oozi-W/.test(vm.job().id())) {
+              if (vm.job().properties['bundle_id']()) {
+                crumbs.push({'id': vm.job().properties['bundle_id'](), 'name': vm.job().properties['bundle_id'](), 'type': 'bundle'});
+              }
+              if (vm.job().properties['coordinator_id']()) {
+                crumbs.push({'id': vm.job().properties['coordinator_id'](), 'name': vm.job().properties['coordinator_id'](), 'type': 'schedule'});
+              }
+            }
+
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
 
