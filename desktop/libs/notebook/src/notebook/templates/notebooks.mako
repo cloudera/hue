@@ -130,12 +130,7 @@ ${ commonheader(_("Notebooks"), "spark", user, request, "60px") | n,unicode }
 
 
 <div class="hueOverlay" data-bind="visible: isLoading">
-  <!--[if lte IE 9]>
-    <img src="${ static('desktop/art/spinner-big.gif') }" />
-  <![endif]-->
-  <!--[if !IE]> -->
-    <i class="fa fa-spinner fa-spin"></i>
-  <!-- <![endif]-->
+  <i class="fa fa-spinner fa-spin big-spinner"></i>
 </div>
 
 <div id="submit-notebook-modal" class="modal hide"></div>
