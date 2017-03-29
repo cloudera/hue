@@ -79,12 +79,7 @@ ${ commonheader(None, "sqoop", user, request) | n,unicode }
 
     <div class="row-fluid" data-bind="if: isLoading">
       <div class="span10 offset1 center" style="margin-top: 30px">
-        <!--[if lte IE 9]>
-          <img src="${ static('desktop/art/spinner-big.gif') }" />
-        <![endif]-->
-        <!--[if !IE]> -->
-          <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-        <!-- <![endif]-->
+        <i class="fa fa-spinner fa-spin big-spinner"></i>
       </div>
     </div>
 

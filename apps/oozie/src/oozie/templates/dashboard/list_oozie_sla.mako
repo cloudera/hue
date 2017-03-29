@@ -98,12 +98,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
       <div class="card-body">
         <p>
           <div class="loader hide" style="text-align: center;margin-top: 20px">
-            <!--[if lte IE 9]>
-              <img src="${ static('desktop/art/spinner-big.gif') }" />
-            <![endif]-->
-            <!--[if !IE]> -->
-              <i class="fa fa-spinner fa-spin" style="font-size: 60px; color: #DDD"></i>
-            <!-- <![endif]-->
+            <i class="fa fa-spinner fa-spin big-spinner"></i>
           </div>
 
           <div class="search-something center empty-wrapper">
