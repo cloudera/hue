@@ -535,11 +535,11 @@ from desktop.views import _ko
             </ul>
           </div>
         </h4>
-        <!-- ko with: activeEntry -->
-        <div class="fb-folder-actions" data-bind="visible: ! hasErrors()">
-          <!-- ko if: $parent.searchVisible -->
-          <div class="fb-action fb-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: $parent.searchFocus, textInput: $parent.searchQuery, clearable: $parent.searchQuery"></div>
+        <div class="fb-folder-actions" data-bind="visible: activeEntry && !activeEntry().hasErrors()">
+          <!-- ko if: searchVisible -->
+          <div class="fb-action fb-search-container"><input class="clearable" type="text" placeholder="${ _('Search for name, description, etc...') }" data-bind="hasFocus: searchFocus, textInput: searchQuery, clearable: searchQuery"></div>
           <!-- /ko -->
+          <!-- ko with: activeEntry -->
           <div><a class="inactive-action fb-action" title="${_('Search')}" href="javascript:void(0);" data-bind="toggle: $parent.searchVisible, click: function () { $parent.searchFocus($parent.searchVisible()) }, css: { 'blue' : ($parent.searchVisible() || $parent.searchQuery()) }"><i class="fa fa-fw fa-search"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div>
@@ -591,8 +591,8 @@ from desktop.views import _ko
             </ul>
           </div>
           <!-- /ko -->
+          <!-- /ko -->
         </div>
-        <!-- /ko -->
       </div>
 
       <!-- ko with: activeEntry -->
