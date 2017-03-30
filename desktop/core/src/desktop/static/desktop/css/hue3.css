@@ -697,84 +697,6 @@ html.modal-open {
   overflow: hidden;
 }
 
-
-.demi-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 1050;
-  width: 100%;
-  margin: -1px;
-  padding: 0;
-  background-color: #ffffff;
-  min-height: 210px;
-  border: 1px solid #CCC;
-  -webkit-border-bottom-right-radius: 0px;
-  -webkit-border-bottom-left-radius: 0px;
-  -moz-border-radius-bottomright: 0px;
-  -moz-border-radius-bottomleft: 0px;
-  border-bottom-right-radius: 0px;
-  border-bottom-left-radius: 0px;
-  outline: none;
-  -webkit-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.3);
-  -moz-box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.3);
-  box-shadow: 0px 0px 12px 0px rgba(0,0,0,0.3);
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding-box;
-  background-clip: padding-box;
-}
-
-.demi-modal-half {
-  width: 500px;
-  left: 50%;
-  margin-left: -250px;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-
-.demi-modal.fade {
-  top: -500px;
-  -webkit-transition: opacity 0.3s linear, top 0.3s ease-out;
-  -moz-transition: opacity 0.3s linear, top 0.3s ease-out;
-  -o-transition: opacity 0.3s linear, top 0.3s ease-out;
-  transition: opacity 0.3s linear, top 0.3s ease-out;
-}
-
-.demi-modal.fade.in {
-  top: 0;
-}
-
-.demi-modal .modal-header {
-  padding: 9px 15px;
-  border-bottom: 1px solid #eee;
-}
-
-.demi-modal .modal-header .close {
-  margin-top: 2px;
-}
-
-.demi-modal .modal-body {
-  position: relative;
-  max-height: 400px;
-  padding: 15px;
-  overflow-y: auto;
-}
-
-.demi-modal .modal-footer {
-  padding: 10px;
-}
-
-.demi-modal-chevron {
-  text-align:center;
-  width: 100%;
-  display: table;
-}
-
-.demi-modal-chevron:hover {
-  background-color: #F6F6F6;
-}
-
 .control-group.error .input-prepend .add-on i, .control-group.error .input-append .add-on i {
   color: #fff;
 }
@@ -2163,40 +2085,6 @@ input[type='password']::-ms-reveal {
 .ui-state-active a:visited {
   color: #ffffff;
   text-decoration: none;
-}
-
-.select-like {
-  display: inline-block;
-  position: relative;
-}
-
-.select-like input {
-  transition: none!important;
-  box-shadow: none!important;
-  border-radius: 4px!important;
-  cursor: pointer!important;
-}
-
-.select-like .fa {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  font-size: 15px;
-}
-
-.selectize-wrapper {
-  display: inline-block;
-  float:left;
-  margin-right: 4px;
-}
-
-.selectize-input {
-  padding-top: 6px !important;
-  padding-bottom: 5px !important;
-}
-
-.selectize-dropdown {
-  z-index: 10000!important;
 }
 
 input:invalid,textarea:invalid,select:invalid {
