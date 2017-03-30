@@ -765,215 +765,113 @@ ${ assist.assistPanel() }
 
         page.base('/hue');
 
-        page('/help', function(ctx){
-          self.loadApp('help');
-        });
-
-        page('/about/admin_wizard', function(ctx){
-          self.loadApp('admin_wizard');
-        });
-
-        page('/logs', function(ctx){
-          self.loadApp('logs');
-        });
-
-        page('/desktop/dump_config', function(ctx){
-          self.loadApp('dump_config');
-        });
-
-        page('/filebrowser/view=*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.loadApp('filebrowser');
-        });
-
-        page('/filebrowser/*', function(ctx){
-          page('/filebrowser/view=' + DropzoneGlobals.homeDir);
-        });
-
-        page('/dashboard/admin/collections', function(ctx){
-          self.loadApp('collections');
-        });
-
-        page('/useradmin/users/add_ldap_users', function(ctx){
-          self.loadApp('useradmin_addldap');
-        });
-
-        page('/useradmin/users/new', function(ctx){
-          self.loadApp('useradmin_newuser');
-        });
-
-        page('/useradmin/users/edit/:user', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.loadApp('useradmin_edituser');
-        });
-
-        page('/useradmin/users/', function(ctx){
-          self.loadApp('useradmin_users');
-        });
-
-        page('/useradmin/groups/', function(ctx){
-          self.loadApp('useradmin_groups');
-        });
-
-        page('/useradmin/permissions/', function(ctx){
-          self.loadApp('useradmin_permissions');
-        });
-
-        page('/useradmin/configurations/', function(ctx){
-          self.loadApp('useradmin_configurations');
-        });
-
-        page('/editor', function (ctx) {
-          self.loadApp('editor');
-          if (window.location.getParameter('editor') !== '') {
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.openNotebook(window.location.getParameter('editor'));
-            });
-          }
-          else if (window.location.getParameter('type') !== '') {
-            self.changeEditorType(window.location.getParameter('type'));
-          }
-        });
-
-        page('/pig', function (ctx) {
-          self.loadApp('editor');
-          self.changeEditorType('pig');
-        });
-
-        page('/notebook', function(ctx){
-          self.loadApp('notebook');
-          if (window.location.getParameter('notebook') !== '') {
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.openNotebook(window.location.getParameter('notebook'));
-            });
-          } else {
-            self.getActiveAppViewModel(function (viewModel) {
-              viewModel.newNotebook('notebook');
-            });
-          }
-        });
-
-        page('/home*', function(ctx){
-          self.currentQueryString(ctx.querystring);
-          self.currentContextParams(ctx.params);
-          self.loadApp('home');
-        });
-
-        page('/dashboard/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.currentQueryString(ctx.querystring);
-          self.loadApp('dashboard');
-        });
-
-        page('/search/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.currentQueryString(ctx.querystring);
-          self.loadApp('dashboard');
-        });
-
-        page('/oozie/editor/workflow/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.currentQueryString(ctx.querystring);
-          self.loadApp('oozie_workflow');
-        });
-
-        page('/oozie/editor/coordinator/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.currentQueryString(ctx.querystring);
-          self.loadApp('oozie_coordinator');
-        });
-
-        page('/oozie/editor/bundle/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.currentQueryString(ctx.querystring);
-          self.loadApp('oozie_bundle');
-        });
-
-        page('/metastore', function(ctx){
-          page('/metastore/tables');
-        });
-
-        page('/metastore/*', function(ctx){
-          self.currentContextParams(ctx.params);
-          self.loadApp('metastore');
-        });
-
-        page('/indexer/importer/prefill/*', function(ctx){
-          self.loadApp('indexer');
-          self.getActiveAppViewModel(function (viewModel) {
-            var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
-            if (! arguments) {
-              console.warn('Could not match ' + href)
-            }
-            hueUtils.waitForVariable(viewModel.createWizard, function(){
-              hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
-                viewModel.createWizard.prefill.source_type(arguments && arguments[1] ? arguments[1] : '');
-                viewModel.createWizard.prefill.target_type(arguments && arguments[2] ? arguments[2] : '');
-                viewModel.createWizard.prefill.target_path(arguments && arguments[3] ? arguments[3] : '');
+        var pageMapping = [
+          { url: '/500', app: '500' },
+          { url: '/about/admin_wizard', app: 'admin_wizard' },
+          { url: '/dashboard/admin/collections', app: 'collections' },
+          { url: '/dashboard/*', app: 'dashboard' },
+          { url: '/desktop/dump_config', app: 'dump_config' },
+          { url: '/editor', app: function () {
+            self.loadApp('editor');
+            if (window.location.getParameter('editor') !== '') {
+              self.getActiveAppViewModel(function (viewModel) {
+                viewModel.openNotebook(window.location.getParameter('editor'));
               });
-            });
+            }
+            else if (window.location.getParameter('type') !== '') {
+              self.changeEditorType(window.location.getParameter('type'));
+            }
+          }},
+          { url: '/filebrowser/view=*', app:  'filebrowser' },
+          { url: '/filebrowser/*', app: function () {
+            page('/filebrowser/view=' + DropzoneGlobals.homeDir);
+          }},
+          { url: '/hbase/', app: 'hbase' },
+          { url: '/help', app: 'help' },
+          { url: '/home*', app: 'home' },
+          { url: '/indexer/', app: 'indexes' },
+          { url: '/indexer/importer/', app: 'importer' },
+          { url: '/indexer/importer/prefill/*', app: function (ctx) {
+            self.loadApp('indexer');
+            self.getActiveAppViewModel(function (viewModel) {
+              var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
+              if (! arguments) {
+                console.warn('Could not match ' + href)
+              }
+              hueUtils.waitForVariable(viewModel.createWizard, function(){
+                hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
+                  viewModel.createWizard.prefill.source_type(arguments && arguments[1] ? arguments[1] : '');
+                  viewModel.createWizard.prefill.target_type(arguments && arguments[2] ? arguments[2] : '');
+                  viewModel.createWizard.prefill.target_path(arguments && arguments[3] ? arguments[3] : '');
+                });
+              });
+            })
+          }},
+          { url: '/jobbrowser/apps', app: 'jobbrowser' },
+          { url: '/logs', app: 'logs' },
+          { url: '/metastore', app: function () {
+            page('/metastore/tables');
+          }},
+          { url: '/metastore/*', app: 'metastore' },
+          { url: '/notebook', app: function () {
+            self.loadApp('notebook');
+            if (window.location.getParameter('notebook') !== '') {
+              self.getActiveAppViewModel(function (viewModel) {
+                viewModel.openNotebook(window.location.getParameter('notebook'));
+              });
+            } else {
+              self.getActiveAppViewModel(function (viewModel) {
+                viewModel.newNotebook('notebook');
+              });
+            }
+          }},
+          { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
+          { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
+          { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
+          { url: '/pig', app: function () {
+            self.loadApp('editor');
+            self.changeEditorType('pig');
+          }},
+          { url: '/search/*', app: 'dashboard' },
+          { url: '/security/hdfs', app: 'security_hdfs' },
+          { url: '/security/hive', app: 'security_hive' },
+          { url: '/security/hive2', app: 'security_hive2' },
+          { url: '/security/solr', app: 'security_solr' },
+          { url: '/sqoop', app: 'sqoop' },
+          { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
+          { url: '/useradmin/groups/', app: 'useradmin_groups' },
+          { url: '/useradmin/permissions/', app: 'useradmin_permissions' },
+          { url: '/useradmin/users/', app: 'useradmin_users' },
+          { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldap' },
+          { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
+          { url: '/useradmin/users/new', app: 'useradmin_newuser' },
+          { url: '/', app: function () {
+            % if 'beeswax' in apps or 'impala' in apps:
+              page('/editor');
+            % elif SHOW_NOTEBOOKS.get():
+              page('/notebook');
+            % elif interpreters:
+              page('/editor');
+            % elif IS_DASHBOARD_ENABLED.get():
+              page('/dashboard/new_search');
+            % elif 'jobbrowser' in apps:
+              page('/jobbrowser/apps');
+            % else:
+              page('/home');
+            % endif
+          }},
+          { url: '*', app: function (ctx) {
+            console.error('Route not found', ctx);
+            self.loadApp('404');
+          }}
+        ];
+
+        pageMapping.forEach(function (mapping) {
+          page(mapping.url, _.isFunction(mapping.app) ? mapping.app : function (ctx) {
+            self.currentContextParams(ctx.params);
+            self.currentQueryString(ctx.querystring);
+            self.loadApp(mapping.app);
           })
-        });
-
-        page('/indexer/', function(ctx){
-          self.loadApp('indexes');
-        });
-
-        page('/jobbrowser/apps', function(ctx){
-          self.loadApp('jobbrowser');
-        });
-
-        page('/hbase/', function(ctx){
-          self.loadApp('hbase');
-        });
-
-        page('/security/hive2', function(ctx){
-          self.loadApp('security_hive2');
-        });
-
-        page('/security/hive', function(ctx){
-          self.loadApp('security_hive');
-        });
-
-        page('/security/solr', function(ctx){
-          self.loadApp('security_solr');
-        });
-
-        page('/security/hdfs', function(ctx){
-          self.loadApp('security_hdfs');
-        });
-
-        page('/indexer/importer/', function(ctx){
-          self.loadApp('importer');
-        });
-
-        page('/sqoop', function(ctx){
-          self.loadApp('sqoop');
-        });
-
-        page('/500', function(ctx){
-          self.loadApp('500');
-        });
-
-        page('/', function(ctx){
-          % if 'beeswax' in apps or 'impala' in apps:
-            page('/editor');
-          % elif SHOW_NOTEBOOKS.get():
-            page('/notebook');
-          % elif interpreters:
-            page('/editor');
-          % elif IS_DASHBOARD_ENABLED.get():
-            page('/dashboard/new_search');
-          % elif 'jobbrowser' in apps:
-            page('/jobbrowser/apps');
-          % else:
-            page('/home');
-          % endif
-        });
-
-        page('*', function(ctx){
-          console.error('Route not found', ctx);
-          self.loadApp('404');
         });
 
         page();
