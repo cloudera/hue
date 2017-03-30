@@ -154,29 +154,31 @@ class OptimizerApi(object):
     return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id}).json()
 
 
-  def top_tables(self, workfloadId=None, database_name='default'):
-    return self._api.call_api('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower()}).json()
+  def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
+    return self._api.call_api('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None}).json()
 
 
-  def table_details(self, database_name, table_name):
-    return self._api.call_api('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower()}).json()
+  def table_details(self, database_name, table_name, page_size=100, startingToken=None):
+    return self._api.call_api('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None}).json()
 
 
-  def query_compatibility(self, source_platform, target_platform, query):
-    return self._api.call_api('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform}).json()
+  def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
+    return self._api.call_api('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, }).json()
 
 
-  def query_risk(self, query):
-    return self._api.call_api('getQueryRisk', {'tenant' : self._product_name, 'query': query}).json()
+  def query_risk(self, query, page_size=100, startingToken=None):
+    return self._api.call_api('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'pageSize': page_size, startingToken: None}).json()
 
 
-  def similar_queries(self, source_platform, query):
-    return self._api.call_api('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query}).json()
+  def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
+    return self._api.call_api('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None}).json()
 
 
-  def top_filters(self, db_tables=None):
+  def top_filters(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name
+      'tenant' : self._product_name,
+      'pageSize': page_size,
+      'startingToken': None
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -184,9 +186,11 @@ class OptimizerApi(object):
     return self._api.call_api('getTopFilters', args).json()
 
 
-  def top_aggs(self, db_tables=None):
+  def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name
+      'tenant' : self._product_name,
+      'pageSize': page_size,
+      'startingToken': None
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -194,9 +198,11 @@ class OptimizerApi(object):
     return self._api.call_api('getTopAggs', args).json()
 
 
-  def top_columns(self, db_tables=None):
+  def top_columns(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name
+      'tenant' : self._product_name,
+      'pageSize': page_size,
+      'startingToken': None
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -204,9 +210,11 @@ class OptimizerApi(object):
     return self._api.call_api('getTopColumns', args).json()
 
 
-  def top_joins(self, db_tables=None):
+  def top_joins(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name
+      'tenant' : self._product_name,
+      'pageSize': page_size,
+      'startingToken': None
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -214,9 +222,11 @@ class OptimizerApi(object):
     return self._api.call_api('getTopJoins', args).json()
 
 
-  def top_databases(self, db_tables=None):
+  def top_databases(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name
+      'tenant' : self._product_name,
+      'pageSize': page_size,
+      'startingToken': None
     }
 
     return self._api.call_api('getTopDataBases', args).json()
