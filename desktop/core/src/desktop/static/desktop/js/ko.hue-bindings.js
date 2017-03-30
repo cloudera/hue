@@ -79,6 +79,28 @@
     return ko.observableArray(typeof prop != "undefined" && prop != null ? prop : defvalue);
   };
 
+  ko.bindingHandlers.hueLink = {
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      if (IS_HUE_4) {
+        ko.bindingHandlers.click.init(element, function() {
+          return function () {
+            console.log('open ' + ko.unwrap(valueAccessor()));
+            huePubSub.publish('open.link', ko.unwrap(valueAccessor()));
+          }
+        }, allBindings, viewModel, bindingContext);
+        $(element).attr('href', 'javascript: void(0);');
+      } else {
+        $(element).attr('href', ko.unwrap(valueAccessor()));
+      }
+    },
+    update: function (element, valueAccessor) {
+      if (!IS_HUE_4) {
+        $(element).attr('href', ko.unwrap(valueAccessor()));
+      }
+    }
+
+  };
+
   ko.bindingHandlers.clickToCopy = {
     init: function (element, valueAccessor) {
       $(element).click(function () {
