@@ -691,7 +691,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
-        <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), attr: { href: $data.url }" target="_blank"></a>
+        <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), hueLink: $data.url" target="_blank"></a>
           <!-- ko if: typeof percentJob !== 'undefined' && percentJob() > -1 -->
           <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
