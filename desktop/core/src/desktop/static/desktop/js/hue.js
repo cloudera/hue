@@ -17,10 +17,12 @@
 var locale = 'en-US';
 
 import $ from 'jquery';
+import _ from 'lodash';
 import ko from 'knockout';
 import komapping from 'komapping';
 import page from 'page';
 
+window._ = _;
 window.$ = $;
 window.ko = ko;
 window.ko.mapping = komapping;
