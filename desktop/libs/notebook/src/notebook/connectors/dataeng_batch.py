@@ -44,7 +44,7 @@ def _exec(args):
     )
   except Exception, e:
     raise PopupException(e, title=_('Error accessing'))
-  
+
   response = json.loads(data)
   response['status'] = 'success'
 
@@ -58,7 +58,7 @@ class DataEngBatchApi(Api):
     Api.__init__(self, *args, **kwargs)
 
     self.fs = self.request.fs
-    self.jt = self.request.jt  
+    self.jt = self.request.jt
 
   def execute(self, notebook, snippet):
     # Get document from notebook
@@ -217,24 +217,62 @@ class DataEngBatchApi(Api):
 
 class DataEng():
 
-  def list_clusters(self):
-    return _exec(['list-clusters'])
+  def __init__(self, user): pass
+
+  def list_clusters(self, names=None, size=None, starting_token=None):
+    args = ['list-clusters']
+
+    if names:
+      args.append('--cluster-names')
+    if size is not None:
+      args.append('--page-size')
+    if starting_token:
+      args.append('--starting-token')
+
+    return _exec(args)
+
+  def list_jobs(self, submitter_crns=None, size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
+        creatation_date_after=None, cluster_crn=None, order=None):
+    args = ['list-jobs']
+
+    if submitter_crns:
+      args.append('--submitter-crns')
+    if size is not None:
+      args.append('--page-size')
+    if starting_token:
+      args.append('--starting-token')
+    if job_statuses:
+      args.append('--job-statuses')
+    if job_ids:
+      args.append('--job-ids')
+    if job_types:
+      args.append('--job-types')
+    if creation_date_before:
+      args.append('--creation-date-before')
+    if creatation_date_after:
+      args.append('--creation-date-after')
+    if cluster_crn:
+      args.append('--cluster-crn')
+    if order:
+      args.append('--order')
+
+    return _exec(args)
 
   def create_cluster(self):
-    pass
+    return _exec(['create-cluster'])
   def delete_cluster(self):
-    pass
+    return _exec(['delete-cluster'])
   def describe_clusters(self):
-    pass
+    return _exec(['describe-cluster'])
 
   def submit_hive_job(self):
-    pass
+    return _exec(['submit-hive-job'])
   def submit_spark_job(self):
-    pass  
+    return _exec(['submit-spark-job'])
   def submit_yarn_job(self):
-    pass
+    return _exec(['submit-yarn-job'])
   def submit_jobs(self):
-    pass
+    return _exec(['submit-jobs'])
 
   def terminate_jobs(self):
-    pass
+    return _exec(['terminate-jobs'])
