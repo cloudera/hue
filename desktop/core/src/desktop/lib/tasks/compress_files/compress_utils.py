@@ -23,11 +23,9 @@ from desktop.lib.paths import get_desktop_root
 
 from notebook.connectors.base import Notebook
 
-def compress_files_in_hdfs(request, file_names, upload_path):
+def compress_files_in_hdfs(request, file_names, upload_path, archive_name):
 
   _upload_compress_files_script_to_hdfs(request.fs)
-
-  output_path = upload_path
 
   files = [{"value": upload_path + '/' + file_name} for file_name in file_names]
   files.append({'value': '/user/' + DEFAULT_USER.get() + '/common/compress_files_in_hdfs.sh'})
@@ -35,12 +33,12 @@ def compress_files_in_hdfs(request, file_names, upload_path):
   shell_notebook = Notebook(
     description=_('HDFS Compression to %(upload_path)s/hue_compressed.zip') % {'upload_path': upload_path},
     isManaged=True,
-    onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': output_path})
+    onSuccessUrl=reverse('filebrowser.views.view', kwargs={'path': upload_path})
   )
 
   shell_notebook.add_shell_snippet(
       shell_command='compress_files_in_hdfs.sh',
-      arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-o=' + output_path}],
+      arguments=[{'value': '-u=' + upload_path}, {'value': '-f=' + ','.join(file_names)}, {'value': '-n=' + archive_name}],
       archives=[],
       files=files,
       env_var=[{'value': 'HADOOP_USER_NAME=${wf:user()}'}]

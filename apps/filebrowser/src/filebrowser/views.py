@@ -1390,13 +1390,16 @@ def compress_files_using_batch_job(request):
   response = {'status': -1, 'data': ''}
   if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
     upload_path = request.POST.get('upload_path', None)
+    archive_name = request.POST.get('archive_name', None)
     file_names = request.POST.getlist('files[]')
 
-    if upload_path and file_names:
+    if upload_path and file_names and archive_name:
       try:
-        response = compress_files_in_hdfs(request, file_names, upload_path)
+        response = compress_files_in_hdfs(request, file_names, upload_path, archive_name)
       except Exception, e:
         response['message'] = _('Exception occurred while compressing files: %s' % e)
+    else:
+      response['message'] = _('Error: Output directory is not set.');
   else:
     response['message'] = _('ERROR: Configuration parameter enable_extract_uploaded_archive ' +
                             'has to be enabled before calling this method.')

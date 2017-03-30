@@ -960,7 +960,7 @@ alert("XSS")
     self.cluster.fs.chmod(test_dir2, 0700)
 
     try:
-      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2']})
+      resp = self.c.post('/filebrowser/compress_files', {'upload_path': prefix, 'files[]': ['test_dir1','test_dir2'], 'archive_name': 'test_compress.zip'})
       response = json.loads(resp.content)
       assert_equal(0, response['status'], response)
       assert_true('handle' in response and response['handle']['id'], response)
