@@ -352,7 +352,7 @@ def upload_table_stats(request):
         if handle:
           result = db.fetch(handle, rows=5000)
           db.close(handle)
-          table_ddls.append((0, 0, '\n'.join([row[0] for row in result.rows()])))
+          table_ddls.append((0, 0, ' '.join([row[0] for row in result.rows()]), path['database']))
 
       full_table_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table']).content)
       stats = dict((stat['data_type'], stat['comment']) for stat in full_table_stats['stats'])

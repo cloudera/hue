@@ -370,7 +370,7 @@ from desktop.views import _ko
       <button class="btn" title="${_('Job browser')}" data-bind="click: function(){ page('/jobbrowser/') }">${ _('Jobs') }
         <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
       </button>
-      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible" title="${_('Inline browser')}">
+      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible" title="${_('Inline Job browser')}">
         <span class="caret"></span>
       </button>
     </div>
