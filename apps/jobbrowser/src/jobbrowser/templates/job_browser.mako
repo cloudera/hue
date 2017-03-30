@@ -86,7 +86,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
               </li>
             <!-- /ko -->
-            </ul>
+            <li data-bind="css: {'active': interface() === 'dataeng-jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('dataeng-jobs'); }">${ _('Jobs') }</a></li>
+            <li data-bind="css: {'active': interface() === 'dataeng-clusters'}"><a class="pointer" data-bind="click: function(){ selectInterface('dataeng-clusters'); }">${ _('Clusters') }</a></li>
+          </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right label label-warning" style="margin-top: 16px">${ _("Hive jobs are running as the 'hive' user") }</div>
           % endif
@@ -2045,6 +2047,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           case 'workflows':
           case 'schedules':
           case 'bundles':
+          case 'dataeng-clusters':
+          case 'dataeng-jobs':
             self.selectInterface(h);
             break;
           default:
