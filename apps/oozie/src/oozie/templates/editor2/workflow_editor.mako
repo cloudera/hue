@@ -679,9 +679,15 @@ ${ dashboard.import_bindings() }
       "width": 450
     });
     $("#addActionDemiModal").width(_el.width()).css("top", _el.position().top + 25).css("left", _el.position().left).modal("show");
+    %if is_embeddable:
+    $(".page-content").animate({
+    scrollTop: $("#addActionDemiModal").offset().top - 200
+    }, 200);
+    %else:
     $("html, body").animate({
       scrollTop: $("#addActionDemiModal").offset().top - 200
     }, 200);
+    %endif
   }
 
   function addActionDemiModalFieldPreview(field) {
