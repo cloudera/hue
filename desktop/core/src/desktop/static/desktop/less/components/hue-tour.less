@@ -1,0 +1,85 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+#jHueTourMask {
+  position: absolute;
+  display: none;
+  top: 0;
+  left: 0;
+  z-index: 9998;
+  background-color: #FFFFFF;
+  opacity: 0.9;
+  filter: alpha(opacity=90);
+}
+
+.jHueTourBadge {
+  background-color: #2c7fb3;
+  background-image: -moz-linear-gradient(bottom, #2c7fb3, #01639c);
+  background-image: -ms-linear-gradient(bottom, #2c7fb3, #01639c);
+  background-image: -webkit-gradient(linear, 0 100%, 0 0, from(#2c7fb3), to(#01639c));
+  background-image: -webkit-linear-gradient(bottom, #2c7fb3, #01639c);
+  background-image: -o-linear-gradient(bottom, #2c7fb3, #01639c);
+  background-image: linear-gradient(bottom, #2c7fb3, #01639c);
+  background-repeat: repeat-x;
+  filter: progid:DXImageTransform.Microsoft.gradient(startColorstr='#01639c', endColorstr='#2c7fb3', GradientType=0);
+  border: 1px solid #01639C;
+  border-right: none;
+  color: #FFFFFF;
+  padding: 4px;
+  padding-left: 8px;
+  -webkit-border-top-left-radius: 4px;
+  -webkit-border-bottom-left-radius: 4px;
+  -moz-border-radius-topleft: 4px;
+  -moz-border-radius-bottomleft: 4px;
+  border-top-left-radius: 4px;
+  border-bottom-left-radius: 4px;
+  position: fixed;
+  top: 100px;
+  z-index: 10000;
+  right: 0;
+  cursor: pointer;
+}
+
+.jHueTourBadgeLeft {
+  right: auto !important;
+  left: 0;
+  padding-left: 4px;
+  padding-right: 8px;
+  border-left: none;
+  border-right: 1px solid #01639C;
+  -webkit-border-top-left-radius: 0;
+  -webkit-border-bottom-left-radius: 0;
+  -moz-border-radius-topleft: 0;
+  -moz-border-radius-bottomleft: 0;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  -webkit-border-top-right-radius: 4px;
+  -webkit-border-bottom-right-radius: 4px;
+  -moz-border-radius-topright: 4px;
+  -moz-border-radius-bottomright: 4px;
+  border-top-right-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
+.jHueTourBadge:hover {
+  background-color: #2C7FB3;
+}
+
+.jHueTourExposed {
+  z-index: 9999;
+}
