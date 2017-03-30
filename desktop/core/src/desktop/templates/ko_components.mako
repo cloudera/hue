@@ -367,8 +367,10 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-panel-template">
     <div class="compose-action btn-group pull-right">
-      <button class="btn" title="${_('Running jobs')}" data-bind="click: function(){ onePageViewModel.currentApp('jobbrowser') }">${ _('Jobs') } <div id="jobBrowserCount" class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount">0</div></button>
-      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible">
+      <button class="btn" title="${_('Job browser')}" data-bind="click: function(){ page('/jobbrowser/') }">${ _('Jobs') }
+        <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
+      </button>
+      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible" title="${_('Inline browser')}">
         <span class="caret"></span>
       </button>
     </div>

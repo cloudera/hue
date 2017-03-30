@@ -1109,7 +1109,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       });
 
       self.openFileInEditor = function() {
-        huePubSub.publish('open.editor.query.external', {'statementType': 'file', 'statementPath': self.selectedFile().path});
+        huePubSub.publish('open.editor.new.query', {'statementType': 'file', 'statementPath': self.selectedFile().path});
       };
 
       self.currentPath = ko.observable(currentDirPath);
