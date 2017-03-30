@@ -808,9 +808,9 @@ ${ assist.assistPanel() }
               });
             })
           }},
-          { url: '/jobbrowser/apps', app: 'jobbrowser' },
+          { url: '/jobbrowser/', app: 'jobbrowser' },
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
-            page.redirect('/jobbrowser/jobs/#!job_' + _.trimRight(ctx.params[0], '/'));
+            page.redirect('/jobbrowser/jobs/#!application_' + _.trimRight(ctx.params[0], '/'));
           }},
           { url: '/jobbrowser/jobs', app: 'jobbrowser' },
           { url: '/logs', app: 'logs' },
