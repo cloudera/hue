@@ -128,15 +128,42 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <!-- ko if: selectedFiles -->
     <div class="modal-body">
-      <p>${_('Start a task to compress the selected file(s).')}</p>
-      <ul data-bind="foreach: selectedFiles()">
+      <div class="control-group">
+        <label class="control-label">${_('Archive Name')} </label>
+        <div class="controls">
+          <input data-bind="textInput: compressArchiveName" type="text" class="input-large">
+        </div>
+        <p>${_('Start a task to compress the selected file(s).')}</p>
+        <ul data-bind="foreach: selectedFiles()">
+          <li>
+            <span data-bind="text: $data.name"> </span>
+          </li>
+        </ul>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: archiveOverrideWarning, enable: compressArchiveName().length > 0"/>
+    </div>
+    <!-- /ko -->
+  </div>
+
+  <!-- compress warning modal -->
+  <div id="compressWarningModal" class="modal hide fade">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+      <h2 class="modal-title">${ _('Are you sure you want to override the existing archive?') }</h2>
+    </div>
+    <!-- ko if: compressArchiveName -->
+    <div class="modal-body">
+      <ul>
         <li>
-          <span data-bind="text: $data.name"> </span>
+          <span data-bind="text: compressArchiveName"> </span>
         </li>
       </ul>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
+      <a class="btn" data-dismiss="modal" data-bind="click: confirmCompressFiles">${_('No')}</a>
       <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: compressSelectedFiles"/>
     </div>
     <!-- /ko -->
@@ -589,7 +616,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       </a>
     </li>
     % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
-      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: confirmCompressFiles, visible: !isS3() && (selectedFiles().length > 1 || !(selectedFiles().length===1 && isArchive()))">
+      <li><a href="javascript: void(0)" title="${_('Compress selection into a single archive')}" data-bind="click: function() { setCompressArchiveDefault(); confirmCompressFiles();}, visible: showCompressButton">
         <i class="fa fa-fw fa-file-archive-o"></i> ${_('Compress')}</a>
       </li>
       <li><a href="javascript: void(0)" title="${_('Extract selected archive')}" data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
@@ -1081,6 +1108,8 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       self.isLoading = ko.observable(true);
 
       self.allSelected = ko.observable(false);
+
+      self.compressArchiveName = ko.observable('');
 
       self.selectedFiles = ko.computed(function () {
         return ko.utils.arrayFilter(self.files(), function (file) {
@@ -1696,6 +1725,29 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         });
       };
 
+      self.showCompressButton = ko.computed(function() {
+        var fileNames = self.selectedFiles().map(function(file) {
+          return file.name;
+        });
+        if (fileNames.indexOf('.') !== -1) {
+          return false;
+        }
+        return !self.isS3() && (self.selectedFiles().length > 1 || !(self.selectedFiles().length === 1 && self.isArchive()));
+      });
+
+      self.setCompressArchiveDefault = function() {
+        if (self.selectedFiles().length == 1) {
+          self.compressArchiveName(self.selectedFile().name + '.zip');
+        } else {
+          if (self.breadcrumbs().length === 1) {
+            self.compressArchiveName('root.zip'); // When compressing multiple files in root directory
+          }
+          else {
+            self.compressArchiveName(self.breadcrumbs()[self.breadcrumbs().length - 1].label + '.zip'); // Setting to parent directory name
+          }
+        }
+      };
+
       self.confirmCompressFiles = function() {
         $("#confirmCompressModal").modal({
           keyboard:true,
@@ -1720,9 +1772,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         });
       };
 
-      self.compressSelectedFiles = function() {
+      self.archiveOverrideWarning = function() {
         $("#confirmCompressModal").modal("hide");
+        var fileNames = self.files().map(function(file) {
+          return file.name;
+        });
+        if (fileNames.indexOf(self.compressArchiveName()) !== -1) {
+          $("#compressWarningModal").modal("show");
+        } else {
+          self.compressSelectedFiles();
+        }
+      }
 
+      self.compressSelectedFiles = function() {
+        $("#compressWarningModal").modal("hide");
         var fileNames = [];
         $(self.selectedFiles()).each(function (index, file) {
           fileNames.push(file.name);
@@ -1731,6 +1794,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         $.post("/filebrowser/compress_files", {
           "files": fileNames,
           "upload_path": self.currentPath(),
+          "archive_name": self.compressArchiveName()
         }, function (data) {
           if (data.status == 0) {
             $.jHueNotify.info("${ _('Task ') }" + data.history_uuid + "${_(' submitted.') }");
