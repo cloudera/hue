@@ -30,6 +30,7 @@ LOG = logging.getLogger(__name__)
 
 def get_api(user, interface):
   from jobbrowser.apis.bundle_api import BundleApi
+  from jobbrowser.apis.data_eng_api import DataEngClusterApi, DataEngJobApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
   from jobbrowser.apis.workflow_api import WorkflowApi
@@ -42,6 +43,10 @@ def get_api(user, interface):
     return ScheduleApi(user)
   elif interface == 'bundles':
     return BundleApi(user)
+  elif interface == 'dataeng-clusters':
+    return DataEngClusterApi(user)
+  elif interface == 'dataeng-jobs':
+    return DataEngJobApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
