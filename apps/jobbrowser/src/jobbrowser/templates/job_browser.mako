@@ -1315,15 +1315,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             break;
           default:
             var isJob = true;
-            if (/oozie-oozi-W/.test(h)) { viewModel.interface('workflows'); }
-            else if (/oozie-oozi-C/.test(h)) { viewModel.interface('schedules'); }
-            else if (/oozie-oozi-B/.test(h)) { viewModel.interface('bundles'); }
-            else { isJob = false; }
+            if (/oozie-oozi-W/.test(h)) {
+              viewModel.interface('workflows');
+            } else if (/oozie-oozi-C/.test(h)) {
+              viewModel.interface('schedules')
+            } else if (/oozie-oozi-B/.test(h)) {
+              viewModel.interface('bundles');
+            } else if (/job_/.test(h)) {
+              viewModel.interface('jobs');
+            } else {
+              isJob = false;
+            }
             if (isJob) {
               new Job(viewModel, {id: h}).fetchJob();
             }
         }
-      }
+      };
 
       window.onhashchange = function () {
         loadHash();
