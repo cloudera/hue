@@ -64,7 +64,7 @@
                   <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" alt="${ _('Oozie dashboard icon') }" /> ${ _('Oozie Dashboard') }
                 % else:
                 <a title="${ _('Switch to the dashboard') }" href="${getURL(section, dashboard, ENABLE_V2.get())}">
-                  <img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }" /> ${ _('Oozie Editor') }
+                  <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
                 % endif
                 </a>
                </li>
