@@ -25,6 +25,7 @@ from django.db.models import Q
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+from desktop.api2 import __paginate
 from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
@@ -426,7 +427,8 @@ def get_history(request):
 
   doc_type = request.GET.get('doc_type')
   doc_text = request.GET.get('doc_text')
-  limit = min(request.GET.get('len', 50), 100)
+  page = min(int(request.GET.get('page', 1)), 100)
+  limit = min(int(request.GET.get('limit', 50)), 100)
   is_notification_manager = request.GET.get('is_notification_manager', 'false') == 'true'
 
   if is_notification_manager:
@@ -437,8 +439,13 @@ def get_history(request):
   if doc_text:
     docs = docs.filter(Q(name__icontains=doc_text) | Q(description__icontains=doc_text) | Q(search__icontains=doc_text))
 
+  # Paginate
+  docs = docs.order_by('-last_modified')
+  response['count'] = docs.count()
+  docs = __paginate(page, limit, queryset=docs)['documents']
+
   history = []
-  for doc in docs.order_by('-last_modified')[:limit]:
+  for doc in docs:
     notebook = Notebook(document=doc).get_data()
     if 'snippets' in notebook:
       statement = notebook['description'] if is_notification_manager else _get_statement(notebook)

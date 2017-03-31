@@ -1061,6 +1061,7 @@ var EditorViewModel = (function() {
           column: 0
         }
       });
+      notebook.historyCurrentPage(1);
 
       // TODO: rename startLongOperationTimeout to startBlockingOperationTimeout
       // TODO: stop blocking operation UI if there is one
@@ -1757,6 +1758,11 @@ var EditorViewModel = (function() {
       self.fetchHistory();
     });
     self.loadingHistory = ko.observable(self.history().length == 0);
+    self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
+    self.historyCurrentPage.subscribe(function(val) {
+      self.fetchHistory();
+    });
+    self.historyTotalPages = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyTotalPages() : 1);
 
     self.schedulerViewModel = null;
     self.schedulerViewModelIsLoaded = ko.observable(false);
@@ -1772,6 +1778,7 @@ var EditorViewModel = (function() {
     self.retryModalCancel = null;
 
     self.avoidClosing = false;
+
 
     self.getSession = function (session_type) {
       var _s = null;
@@ -2106,10 +2113,13 @@ var EditorViewModel = (function() {
     };
 
     self.fetchHistory = function (callback) {
+      var QUERIES_PER_PAGE = 50;
       self.loadingHistory(true);
+
       $.get("/notebook/api/get_history", {
         doc_type: self.selectedSnippet(),
-        limit: 50,
+        limit: QUERIES_PER_PAGE,
+        page: self.historyCurrentPage(),
         doc_text: self.historyFilter(),
         is_notification_manager: vm.isNotificationManager()
       }, function(data) {
@@ -2129,6 +2139,7 @@ var EditorViewModel = (function() {
           });
         }
         self.history(parsedHistory);
+        self.historyTotalPages(Math.ceil(data.count / QUERIES_PER_PAGE));
       }).always(function(){
         self.loadingHistory(false);
         if (callback) {
@@ -2136,6 +2147,19 @@ var EditorViewModel = (function() {
         }
       });
     };
+
+    self.prevHistoryPage = function () {
+      if (self.historyCurrentPage() !== 1) {
+        self.historyCurrentPage(self.historyCurrentPage() - 1);
+      }
+    };
+
+    self.nextHistoryPage = function () {
+      if (self.historyCurrentPage() < self.historyTotalPages()) {
+        self.historyCurrentPage(self.historyCurrentPage() + 1);
+      }
+    };
+
 
     self.updateHistoryFailed = false;
     self.updateHistory = function (statuses, interval) {
@@ -2154,7 +2178,7 @@ var EditorViewModel = (function() {
           }).fail(function (xhr) {
             items = [];
             self.updateHistoryFailed = true;
-            console.warn('Lost connectivity to the Hue backend.');
+            console.warn('Lost connectivity to the Hue history refresh backend.');
           }).always(function () {
             if (items.length > 0) {
               window.setTimeout(function () {
