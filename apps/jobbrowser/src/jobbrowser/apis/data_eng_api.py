@@ -18,11 +18,13 @@
 import logging
 import json
 
+from datetime import datetime,  timedelta
+
 from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
 from liboozie.oozie_api import get_oozie
-from notebook.connectors.dataeng_batch import DataEng
+from notebook.connectors.dataeng_batch import DataEng, DATE_FORMAT
 
 
 LOG = logging.getLogger(__name__)
@@ -56,7 +58,8 @@ class DataEngClusterApi(Api):
 
     jobs = api.list_clusters()
     
-    return [{
+    return {
+      'apps': [{
         'id': app['clusterName'],
         'name': '%(workersGroupSize)s %(instanceType)s %(cdhVersion)s' % app,
         'status': app['status'],
@@ -66,7 +69,10 @@ class DataEngClusterApi(Api):
         'progress': 100,
         'duration': 10 * 3600,
         'submitted': app['creationDate']
-    } for app in jobs['clusters']]
+      } for app in jobs['clusters']],
+      'total': None
+    }
+            
 
 
   def app(self, appid):
@@ -137,7 +143,7 @@ class DataEngClusterApi(Api):
 class DataEngJobApi(Api):
 
   def apps(self, filters):
-#     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    kwargs = {}
 # 
 #     text_filters = _extract_query_params(filters)
 # 
@@ -146,9 +152,15 @@ class DataEngJobApi(Api):
 #     elif 'user' in text_filters:
 #       kwargs['filters'].append(('user', text_filters['username']))
 # 
-#     if 'time' in filters:
-#       kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
-# 
+    if 'time' in filters:
+      if filters['time']['time_unit'] == 'minutes':
+        delta = timedelta(minutes=int(filters['time']['time_value']))
+      elif filters['time']['time_unit'] == 'hours':
+        delta = timedelta(hours=int(filters['time']['time_value']))
+      else:
+        delta = timedelta(days=int(filters['time']['time_value']))                                                                    
+      kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
+
 #     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
 #       kwargs['filters'].extend([('text', text_filters.get('text'))])
 # 
@@ -160,20 +172,22 @@ class DataEngJobApi(Api):
 
     api = DataEng(self.user)
 
-    jobs = api.list_jobs()
+    jobs = api.list_jobs(**kwargs)
 
-    return [{
-        'id': app.id,
-        'name': app.appName,
-        'status': app.status,
-        'apiStatus': self._api_status(app.status),
-        'type': 'workflow',
-        'user': app.user,
-        'progress': app.get_progress(),
+    return {
+      'apps': [{
+        'id': app['jobId'],
+        'name': app['creationDate'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
+        'type': app['jobType'],
+        'user': '',
+        'progress': 100,
         'duration': 10 * 3600,
-        'submitted': 10 * 3600
-    } for app in wf_list.jobs]
-
+        'submitted': app['creationDate']
+      } for app in jobs['jobs']],
+      'total': None
+    }
 
   def app(self, appid):
     oozie_api = get_oozie(self.user)
@@ -234,10 +248,8 @@ class DataEngJobApi(Api):
     return {}
 
   def _api_status(self, status):
-    if status in ['PREP', 'RUNNING']:
+    if status in ['CREATING', 'CREATED', 'TERMINATING']:
       return 'RUNNING'
-    elif status == 'SUSPENDED':
-      return 'PAUSED'
     else:
       return 'FINISHED' # SUCCEEDED , KILLED and FAILED
 
