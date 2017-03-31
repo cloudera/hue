@@ -28,6 +28,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
+from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
 from navoptapi.api_lib import ApiLib
 
@@ -40,9 +41,12 @@ LOG = logging.getLogger(__name__)
 _JSON_CONTENT_TYPE = 'application/json'
 
 
+class NavOptException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
 
-class OptimizerApiException(PopupException):
-  pass
+  def __unicode__(self):
+    return smart_unicode(self.message)
 
 
 class OptimizerApi(object):
@@ -64,35 +68,20 @@ class OptimizerApi(object):
 
     return self._token
 
+  def _call(self, *kwargs):
+    data = self._api.call_api(*kwargs).json()
+
+    if data.get('code') == 'UNKNOWN':
+      raise NavOptException(data.get('message'))
+    else:
+      return data
 
   def get_tenant(self, email=None):
-    return self._api.call_api("getTenant", {"email" : email or self._email}).json()
+    return self._call("getTenant", {"email" : email or self._email})
 
 
   def create_tenant(self, group):
-    return self._api.call_api('createTenant', {'userGroup' : group}).json()
-
-
-  def authenticate(self):
-    try:
-      data = {
-          'productName': self._product_name,
-          'productSecret': self._product_secret,
-      }
-      return self._root.post('/api/authenticate', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
-
-
-  def delete_workload(self, token, email=None):
-    try:
-      data = {
-          'email': email if email is not None else self._email,
-          'token': token,
-      }
-      return self._root.post('/api/deleteWorkload', data=json.dumps(data), contenttype=_JSON_CONTENT_TYPE)
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Optimizer'))
+    return self._call('createTenant', {'userGroup' : group})
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
@@ -151,27 +140,27 @@ class OptimizerApi(object):
 
 
   def upload_status(self, workload_id):
-    return self._api.call_api('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id}).json()
+    return self._call('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id})
 
 
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    return self._api.call_api('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None}).json()
+    return self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None})
 
 
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
-    return self._api.call_api('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None}).json()
+    return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None})
 
 
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
-    return self._api.call_api('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, }).json()
+    return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, })
 
 
   def query_risk(self, query, page_size=100, startingToken=None):
-    return self._api.call_api('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'pageSize': page_size, startingToken: None}).json()
+    return self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'pageSize': page_size, startingToken: None})
 
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
-    return self._api.call_api('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None}).json()
+    return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None})
 
 
   def top_filters(self, db_tables=None, page_size=100, startingToken=None):
@@ -183,7 +172,7 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._api.call_api('getTopFilters', args).json()
+    return self._call('getTopFilters', args)
 
 
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
@@ -195,7 +184,7 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._api.call_api('getTopAggs', args).json()
+    return self._call('getTopAggs', args)
 
 
   def top_columns(self, db_tables=None, page_size=100, startingToken=None):
@@ -207,7 +196,7 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._api.call_api('getTopColumns', args).json()
+    return self._call('getTopColumns', args)
 
 
   def top_joins(self, db_tables=None, page_size=100, startingToken=None):
@@ -219,7 +208,7 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._api.call_api('getTopJoins', args).json()
+    return self._call('getTopJoins', args)
 
 
   def top_databases(self, db_tables=None, page_size=100, startingToken=None):
@@ -229,7 +218,7 @@ class OptimizerApi(object):
       'startingToken': None
     }
 
-    return self._api.call_api('getTopDataBases', args).json()
+    return self._call('getTopDataBases', args)
 
 
   UPLOAD = {
