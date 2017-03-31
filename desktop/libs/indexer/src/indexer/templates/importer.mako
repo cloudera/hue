@@ -797,6 +797,10 @@ ${ assist.assistPanel() }
     <!-- /ko -->
 
       <input type="number" class="input-small" placeholder="${ _('Length') }" data-bind="value: length, visible: type() == 'varchar' || type() == 'char'">
+      <!-- ko if: $parent.type() == 'decimal' -->
+        <input type="number" class="input-small" placeholder="${ _('Precision') }" data-bind="value: precision">
+        <input type="number" class="input-small" placeholder="${ _('Scale') }" data-bind="value: scale">
+      <!-- /ko -->
     </label>
 
     <!-- ko if: $root.createWizard.source.inputFormat() != 'manual' && typeof isPartition !== 'undefined' && isPartition() -->

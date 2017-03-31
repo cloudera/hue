@@ -79,7 +79,7 @@ def indexer(request):
 
 HIVE_PRIMITIVE_TYPES = \
     ("string", "tinyint", "smallint", "int", "bigint", "boolean",
-      "float", "double", "timestamp", "date", "char", "varchar")
+      "float", "double", "decimal", "timestamp", "date", "char", "varchar")
 HIVE_TYPES = HIVE_PRIMITIVE_TYPES + ("array", "map", "struct")
 
 
