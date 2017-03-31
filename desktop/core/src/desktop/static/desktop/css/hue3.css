@@ -1640,21 +1640,6 @@ input[type='password']::-ms-reveal {
   display: none;
 }
 
-.hue-ace-error {
-  position: absolute;
-  border-bottom: 1px dotted #FF0000;
-  border-radius: 0 !important;
-}
-
-.hue-ace-location {
-  position: absolute;
-  background-color: #DBE8F1;
-  border: 1px solid #DBE8F1;
-  border-radius: 1px;
-  margin-left: -1px;
-  margin-top: -1px;
-}
-
 .ui-resizable {
   position: relative;
 }
