@@ -21,6 +21,8 @@ import re
 import subprocess
 import time
 
+from datetime import datetime,  timedelta
+
 from django.core.urlresolvers import reverse
 from django.http import QueryDict
 from django.utils.translation import ugettext as _
@@ -49,6 +51,8 @@ def _exec(args):
   response['status'] = 'success'
 
   return response
+
+DATE_FORMAT = "%Y-%m-%d"
 
 
 class DataEngBatchApi(Api):
@@ -219,42 +223,45 @@ class DataEng():
 
   def __init__(self, user): pass
 
-  def list_clusters(self, names=None, size=None, starting_token=None):
+  def list_clusters(self, names=None, page_size=None, starting_token=None):
     args = ['list-clusters']
 
     if names:
-      args.append('--cluster-names')
-    if size is not None:
-      args.append('--page-size')
+      args.extend(['--cluster-names', names])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
     if starting_token:
-      args.append('--starting-token')
+      args.extend(['--starting-token', starting_token])
 
     return _exec(args)
 
-  def list_jobs(self, submitter_crns=None, size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
-        creatation_date_after=None, cluster_crn=None, order=None):
+  def list_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
+        creation_date_after=None, cluster_crn=None, order=None):
     args = ['list-jobs']
 
+    if creation_date_after is None:
+      creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
+
     if submitter_crns:
-      args.append('--submitter-crns')
-    if size is not None:
-      args.append('--page-size')
+      args.extend(['--submitter-crns', submitter_crns])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
     if starting_token:
-      args.append('--starting-token')
+      args.extend(['--starting-token', starting_token])
     if job_statuses:
-      args.append('--job-statuses')
+      args.extend(['--job-statuses', job_statuses])
     if job_ids:
-      args.append('--job-ids')
+      args.extend(['--job-ids', job_ids])
     if job_types:
-      args.append('--job-types')
+      args.extend(['--job-types', job_types])
     if creation_date_before:
-      args.append('--creation-date-before')
-    if creatation_date_after:
-      args.append('--creation-date-after')
+      args.extend(['--creation-date-before', creation_date_before])
+    if creation_date_after:
+      args.extend(['--creation-date-after', creation_date_after])
     if cluster_crn:
-      args.append('--cluster-crn')
+      args.extend(['--cluster-crn', cluster_crn])
     if order:
-      args.append('--order')
+      args.extend(['--order', order])
 
     return _exec(args)
 
