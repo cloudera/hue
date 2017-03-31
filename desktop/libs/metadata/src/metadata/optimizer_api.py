@@ -24,13 +24,13 @@ from django.http import Http404
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import force_unicode, smart_unicode
+from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 from libsentry.privilege_checker import PrivilegeChecker
 from notebook.models import Notebook
 
 from metadata.conf import NAVIGATOR
-from metadata.optimizer_client import OptimizerApi
+from metadata.optimizer_client import OptimizerApi, NavOptException
 
 LOG = logging.getLogger(__name__)
 
@@ -41,15 +41,6 @@ try:
   from beeswax.server import dbms
 except ImportError, e:
   LOG.warn("Hive lib not enabled")
-
-
-class NavOptException(Exception):
-  def __init__(self, message=None):
-    self.message = message or _('No error message, please check the logs.')
-
-  def __unicode__(self):
-    return smart_unicode(self.message)
-
 
 
 def error_handler(view_fn):
@@ -103,9 +94,6 @@ def top_tables(request):
 
   api = OptimizerApi()
   data = api.top_tables(database_name=database, page_size=limit)
-
-  if data['code'] == 'UNKNOWN':
-    raise NavOptException(data.get('message'))
 
   tables = [{
       'eid': table['eid'],
