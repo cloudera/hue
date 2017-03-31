@@ -769,6 +769,9 @@ ${ assist.assistPanel() }
           { url: '/500', app: '500' },
           { url: '/about/', app: 'admin_wizard' },
           { url: '/about/admin_wizard', app: 'admin_wizard' },
+          { url: '/accounts/logout', app: function () {
+            location.href = '/accounts/logout';
+          }},
           { url: '/dashboard/admin/collections', app: 'collections' },
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
