@@ -155,11 +155,11 @@ ${ hueIcons.symbols() }
             % if 'oozie' in apps:
               % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
               <li class="dropdown-submenu">
-                <a data-rel="navigator-tooltip" href="#"><img src="${ static('oozie/art/icon_oozie_editor_48.png') }" class="app-icon" alt="${ _('Oozie editor icon') }"/> ${ _('Workflow') }</a>
+                <a data-rel="navigator-tooltip" href="#"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Workflow') }</a>
                 <ul class="dropdown-menu">
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }" /> ${_('Schedule')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"><img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }" /> ${_('Bundle')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-workflow"></use></svg> ${_('Workflow')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-coordinator"></use></svg> ${_('Schedule')}</a></li>
+                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-bundle"></use></svg> ${_('Bundle')}</a></li>
                 </ul>
               </li>
               % endif
