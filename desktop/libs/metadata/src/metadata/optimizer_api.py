@@ -24,7 +24,7 @@ from django.http import Http404
 from django.views.decorators.http import require_POST
 
 from desktop.lib.django_util import JsonResponse
-from desktop.lib.i18n import force_unicode
+from desktop.lib.i18n import force_unicode, smart_unicode
 from desktop.models import Document2
 from libsentry.privilege_checker import PrivilegeChecker
 from notebook.models import Notebook
@@ -43,12 +43,27 @@ except ImportError, e:
   LOG.warn("Hive lib not enabled")
 
 
+class NavOptException(Exception):
+  def __init__(self, message=None):
+    self.message = message or _('No error message, please check the logs.')
+
+  def __unicode__(self):
+    return smart_unicode(self.message)
+
+
+
 def error_handler(view_fn):
   def decorator(*args, **kwargs):
     try:
       return view_fn(*args, **kwargs)
     except Http404, e:
       raise e
+    except NavOptException, e:
+      LOG.exception(e)
+      response = {
+        'status': -1,
+        'message': e.message
+      }
     except Exception, e:
       LOG.exception(e)
       response = {
@@ -84,10 +99,13 @@ def top_tables(request):
   response = {'status': -1}
 
   database = request.POST.get('database', 'default')
-  len = request.POST.get('len', 1000)
+  limit = request.POST.get('len', 1000)
 
   api = OptimizerApi()
-  data = api.top_tables(database_name=database, page_size=len)
+  data = api.top_tables(database_name=database, page_size=limit)
+
+  if data['code'] == 'UNKNOWN':
+    raise NavOptException(data.get('message'))
 
   tables = [{
       'eid': table['eid'],
