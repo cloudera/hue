@@ -1162,19 +1162,21 @@ from metadata.conf import has_navigator
         }
         self.orientationClass = 'hue-popover-' + orientation;
 
-        apiHelper.identifierChainToPath({
-          sourceType: self.sourceType,
-          identifierChain: self.data.identifierChain
-        }, function (path) {
-          pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function (type) {
-            if (IS_HUE_4) {
-              huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
-              huePubSub.publish('sql.context.popover.hide');
-            } else {
-              window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
-            }
-          }));
-        });
+        if ((self.isDatabase || self.isTable || self.isView) && self.data.identifierChain) {
+          apiHelper.identifierChainToPath({
+            sourceType: self.sourceType,
+            identifierChain: self.data.identifierChain
+          }, function (path) {
+            pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function (type) {
+              if (IS_HUE_4) {
+                huePubSub.publish('open.link', '/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'));
+                huePubSub.publish('sql.context.popover.hide');
+              } else {
+                window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
+              }
+            }));
+          });
+        }
 
         if (params.delayedHide) {
           var hideTimeout = -1;
