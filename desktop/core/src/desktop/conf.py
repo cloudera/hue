@@ -33,6 +33,7 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
+import string
 
 
 LOG = logging.getLogger(__name__)
@@ -1332,6 +1333,50 @@ IS_HUE_4 = Config( # To remove in Hue 5
   default=True,
   type=coerce_bool,
   help=_('Choose whether to enable the new Hue 4 interface.')
+)
+
+
+def get_clusters():
+  if CLUSTERS.get():
+    engines = CLUSTERS.get()
+    return dict([
+      (i, {
+        'analytics': engines[i].ANALYTICS.get(),
+        'nesting': engines[i].NESTING.get()
+      }) for i in engines]
+    )
+
+
+CLUSTERS = UnspecifiedConfigSection(
+  "clusters",
+  help="One entry for each additional cluster Hue can interact with.",
+  each=ConfigSection(
+    help=_("Name of the cluster to show to the user."),
+    members=dict(
+      TYPE=Config(
+          "type",
+          help=_("Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
+          default='local',
+          type=string,
+      ),
+      PRODUCT_SECRET=Config(
+        key="product_secret",
+        help=_("A secret passphrase associated with the productName."),
+        private=True,
+        default=None),
+      PRODUCT_SECRET_SCRIPT=Config(
+        key="product_secret_script",
+        help=_("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
+        private=True,
+        type=coerce_password_from_script,
+        default=None),
+      PRODUCT_AUTH_SECRET=Config(
+        key="product_auth_secret",
+        help=_("A secret passphrase associated with the productName."),
+        private=True,
+        default=None),
+      )
+  )
 )
 
 
