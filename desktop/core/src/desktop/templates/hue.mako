@@ -273,10 +273,9 @@ ${ hueIcons.symbols() }
         % if other_apps:
         <li class="header">&nbsp;</li>
         <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
-          % for other in other_apps:
-            <li><a href="/${ other.display_name }">${ other.nice_name }</a></li>
-          % endfor
-        </li>
+        % for other in other_apps:
+        <li><a href="/${ other.display_name }">${ other.nice_name }</a></li>
+        % endfor
         % endif
       </ul>
       <div class="left-nav-drop">
