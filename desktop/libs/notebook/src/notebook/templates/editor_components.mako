@@ -2048,7 +2048,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         if (vm.editorMode()) {
           $('#queryResults').removeAttr('style');
           DATATABLES_MAX_HEIGHT = $(window).height() - $(el).parent().offset().top - 40;
-          $(el).parents('.dataTables_wrapper').css('overflow-x', 'scroll');
+          $(el).parents('.dataTables_wrapper').css('overflow-x', 'auto');
           $(el).jHueHorizontalScrollbar();
           $(el).parents('.dataTables_wrapper').jHueScrollLeft();
         }
