@@ -19,6 +19,7 @@
   from django.utils.translation import ugettext as _
   from desktop.views import commonheader, commonfooter
   from useradmin.password_policy import is_password_policy_enabled, get_password_hint
+  from desktop.conf import is_hue4
 %>
 
 <%namespace name="hueIcons" file="/hue_icons.mako" />
@@ -26,10 +27,15 @@
 ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True) | n,unicode }
 
 <link rel="stylesheet" href="${ static('desktop/css/login.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/chosen/chosen.min.css') }">
+%if is_hue4():
+<link rel="stylesheet" href="${ static('desktop/css/login4.css') }">
+%endif
+
 <style type="text/css">
   body {
+    %if not is_hue4():
     background-color: #FAFAFA;
+    %endif
     padding-top: 150px;
   }
 
@@ -42,8 +48,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   }
 </style>
 
-${ hueIcons.symbols() }
-
+%if not is_hue4():
 <div class="navigator">
   <div class="pull-right">
 
@@ -58,7 +63,7 @@ ${ hueIcons.symbols() }
     </svg>
   </a>
 </div>
-
+%endif
 
 <div class="login-container">
 
@@ -70,7 +75,11 @@ ${ hueIcons.symbols() }
     </div>
     % else:
     <div class="logo">
+      %if is_hue4():
+      <svg style="height: 70px; width: 140px;"><use xlink:href="#hi-logo"></use></svg>
+      %else:
       <img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }">
+      %endif
     </div>
     % endif
 
@@ -143,14 +152,14 @@ ${ hueIcons.symbols() }
 
 <div class="trademark center muted">
   % if conf.CUSTOM.LOGO_SVG.get():
-    ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: text-top;"  alt="${ _('Hue logo') }"> -
+    ${ _('Powered by') } <img src="${ static('desktop/art/hue-login-logo.png') }" width="40" style="vertical-align: middle"  alt="${ _('Hue logo') }"> -
   % endif
   ${ _('Hue and the Hue logo are trademarks of Cloudera, Inc.') }
 </div>
 
-
+%if not is_hue4():
 <div class="footer"></div>
-
+%endif
 
 <script>
   $(document).ready(function () {
