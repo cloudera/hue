@@ -2604,18 +2604,16 @@ var EditorViewModel = (function() {
           self.loadNotebook(notebook, queryTab);
           if (typeof skipUrlChange === 'undefined' && ! self.isNotificationManager()){
             if (self.editorMode()) {
+              self.editorType(data.document.type.substring('query-'.length));
               if (self.isHue4()){
                 self.changeURL(self.URLS.hue4 + '?editor=' + data.document.id);
-              }
-              else {
+              } else {
                 self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
               }
-            }
-            else {
+            } else {
               if (self.isHue4()){
                 self.changeURL(self.URLS.hue4_notebook + '?notebook=' + data.document.id);
-              }
-              else {
+              } else {
                 self.changeURL(self.URLS.notebook + '?notebook=' + data.document.id);
               }
             }
