@@ -1697,9 +1697,12 @@ from notebook.conf import get_ordered_interpreters
     <!-- /ko -->
     <br/>
     <ul data-bind="foreach: activeTables">
-      <li data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
+      <li>
+        ## Click name to select
         <span data-bind="text: name"></span>
-        <i class="fa fa-info"></i>
+        <a href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
+          <i class="fa fa-info"></i>
+        </a>
         <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
       </li>
     </ul>
@@ -1710,12 +1713,9 @@ from notebook.conf import get_ordered_interpreters
         <ul>
           <li>'country-code' is a popular field <a href="javascript:void(0)">add</a></li>
           <li>'gender' would be a good dimension with low cardinality (2) <a href="javascript:void(0)">add</a></li>
-          <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
           <li>'f1'</li>
           <li>'f2'</li>
           <li>'f3'</li>
-          <li>'f4'</li>
-          <li>'f5'</li>
         </ul>
       </fieldset>
     </form>
@@ -1727,6 +1727,7 @@ from notebook.conf import get_ordered_interpreters
           <li>Popular fields for the tables are: [code, salary, amount]</li>
           <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
           <li>Parameterize the query?</li>
+          <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
           <li>Could be automated with integrated scheduler</li>
           <li>Data has not been refreshed since last run 3 days ago  <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li></li>
           <li>A schema change happened last week, a new column 'salary_med' was added</li>
