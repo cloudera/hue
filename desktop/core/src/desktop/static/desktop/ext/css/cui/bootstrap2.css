@@ -5527,6 +5527,9 @@ a.badge:focus {
   border-radius: 0;
   text-shadow: none;
 }
+.alert .close {
+  right: 0;
+}
 .table th,
 .table td {
   padding: 7px 8px 8px 8px;
