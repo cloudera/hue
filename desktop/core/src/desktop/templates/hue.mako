@@ -506,6 +506,10 @@ ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 
+% if request is not None:
+${ smart_unicode(login_modal(request).content) | n,unicode }
+% endif
+
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
 <script type="text/javascript">
