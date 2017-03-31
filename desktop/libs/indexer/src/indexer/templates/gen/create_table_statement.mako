@@ -26,6 +26,8 @@ def col_type(col):
     return "char(%s)" % col["length"]
   elif col["type"] == "varchar":
     return "varchar(%s)" % col["length"]
+  elif col["type"] == "decimal":
+    return "decimal(%s, %s)" % (col["precision"], col["scale"])
   return col["type"]
 
 %>
