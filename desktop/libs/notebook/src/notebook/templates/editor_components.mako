@@ -796,6 +796,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               </tbody>
             </table>
             <!-- /ko -->
+            <!-- ko with: $parent -->
+            <div class="pagination" data-bind="visible: historyTotalPages() > 1">
+            <ul>
+              <li data-bind="css: { 'disabled' : historyCurrentPage() === 1 }"><a href="javascript: void(0);" data-bind="click: function() { prevHistoryPage(); }">${ _("Prev") }</a></li>
+              <li class="active"><span data-bind="text: historyCurrentPage() + '/' + historyTotalPages()"></span></li>
+              <li data-bind="css: { 'disabled' : historyCurrentPage() === historyTotalPages() }"><a href="javascript: void(0);" data-bind="click: function() { nextHistoryPage(); }">${ _("Next") }</a></li>
+            </ul>
+            </div>
+            <!-- /ko -->
           <!-- /ko -->
         </div>
 
