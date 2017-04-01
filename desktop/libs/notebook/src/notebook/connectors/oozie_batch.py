@@ -142,7 +142,7 @@ class OozieApi(Api):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
-    return oozie_job.get_progress(),
+    return oozie_job.get_progress()
 
 
   def get_jobs(self, notebook, snippet, logs):
