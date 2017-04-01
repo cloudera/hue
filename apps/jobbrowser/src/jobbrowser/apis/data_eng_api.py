@@ -24,7 +24,7 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
 from liboozie.oozie_api import get_oozie
-from notebook.connectors.dataeng_batch import DataEng, DATE_FORMAT
+from notebook.connectors.dataeng import DataEng, DATE_FORMAT
 
 
 LOG = logging.getLogger(__name__)

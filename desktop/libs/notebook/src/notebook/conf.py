@@ -203,6 +203,9 @@ def _default_interpreters(user):
       ('pyspark', {
           'name': 'PySpark', 'interface': 'livy', 'options': {}
       }),
+      ('dataeng', {
+          'name': 'DataEng', 'interface': 'dataeng', 'options': {}
+      }),
       ('r', {
           'name': 'R', 'interface': 'livy', 'options': {}
       }),
