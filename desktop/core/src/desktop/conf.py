@@ -33,7 +33,6 @@ from desktop.lib.conf import Config, ConfigSection, UnspecifiedConfigSection,\
                              coerce_password_from_script, coerce_string
 from desktop.lib.i18n import force_unicode
 from desktop.lib.paths import get_desktop_root
-import string
 
 
 LOG = logging.getLogger(__name__)
@@ -1341,7 +1340,7 @@ def get_clusters():
     engines = CLUSTERS.get()
     return dict([
       (i, {
-        'analytics': engines[i].ANALYTICS.get(),
+        'analytics': engines[i].TYPE.get(),
         'nesting': engines[i].NESTING.get()
       }) for i in engines]
     )
@@ -1357,7 +1356,7 @@ CLUSTERS = UnspecifiedConfigSection(
           "type",
           help=_("Type of cluster, e.g. local ini, CM API, Dataeng, Arcus, BigQuery, Presto."),
           default='local',
-          type=string,
+          type=str,
       ),
       PRODUCT_SECRET=Config(
         key="product_secret",
