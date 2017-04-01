@@ -17,18 +17,14 @@
 
 import logging
 import json
-import re
 import subprocess
-import time
 
 from datetime import datetime,  timedelta
 
 from django.core.urlresolvers import reverse
-from django.http import QueryDict
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document2
 
 from notebook.connectors.base import Api, QueryError
 
@@ -58,33 +54,23 @@ DATE_FORMAT = "%Y-%m-%d"
 class DataEngBatchApi(Api):
 
 
-  def __init__(self, *args, **kwargs):
-    Api.__init__(self, *args, **kwargs)
-
-    self.fs = self.request.fs
-    self.jt = self.request.jt
-
   def execute(self, notebook, snippet):
-    # Get document from notebook
-    if not notebook.get('uuid', ''):
-      raise PopupException(_('Notebook is missing a uuid, please save the notebook before executing as a batch job.'))
+    db = self._get_db(snippet)
 
-    if notebook['type'] == 'notebook':
-      # Convert notebook to workflow
-      workflow_doc = WorkflowBuilder().create_notebook_workflow(notebook=notebook, user=self.user, managed=True, name=_("%s for %s") % (OozieApi.BATCH_JOB_PREFIX, notebook['name'] or notebook['type']))
-      workflow = Workflow(document=workflow_doc, user=self.user)
-    else:
-      notebook_doc = Document2.objects.get_by_uuid(user=self.user, uuid=notebook['uuid'], perm_type='read')
-      # Create a managed workflow from the notebook doc
-      workflow_doc = WorkflowBuilder().create_workflow(document=notebook_doc, user=self.user, managed=True, name=_("Batch job for %s") % (notebook_doc.name or notebook_doc.type))
-      workflow = Workflow(document=workflow_doc, user=self.user)
+    statement = self._get_current_statement(db, snippet)
+    session = self._get_session(notebook, snippet['type'])
 
-    # Submit workflow
-    job_id = _submit_workflow(user=self.user, fs=self.fs, jt=self.jt, workflow=workflow, mapping=None)
+    query = self._prepare_hql_query(snippet, statement['statement'], session)
+
+    handle = DataEng().submit_hive_job(cluster_name, query, params=None, job_xml=None)
+
+    if handle['status'] not in ('QUEUED', 'RUNNING'):
+      raise QueryError('Submission failure', handle=statement)
 
     return {
-      'id': job_id,
-      'has_result_set': True,
+      'id': handle['jobType'],
+      'crn': handle['crn'],
+      'has_result_set': False,
     }
 
 
@@ -92,33 +78,22 @@ class DataEngBatchApi(Api):
     response = {'status': 'running'}
 
     job_id = snippet['result']['handle']['id']
-    oozie_job = check_job_access_permission(self.request, job_id)
 
-    if oozie_job.is_running():
+    handle = DataEng().list_jobs(job_ids=[job_id])
+
+    if handle['status'] in ('QUEUED', 'RUNNING'):
       return response
-    elif oozie_job.status in ('KILLED', 'FAILED'):
-      raise QueryError(_('Job was %s') % oozie_job.status)
+    elif handle['status'] in ('KILLED', 'FAILED'):
+      raise QueryError(_('Job was %s') % handle['status'])
     else:
-      # Check if job results are actually available, since YARN takes a while to move logs to JHS,
-      log_output = self.get_log(notebook, snippet)
-      if log_output:
-        results = self._get_results(log_output, snippet['type'])
-        if results:
-          response['status'] = 'available'
-        else:
-          LOG.warn('No log result could be matched for %s' % job_id)
-      else:
-        response['status'] = 'failed'
+      response['status'] = 'available'
 
     return response
 
 
   def fetch_result(self, notebook, snippet, rows, start_over):
-    log_output = self.get_log(notebook, snippet)
-    results = self._get_results(log_output, snippet['type'])
-
     return {
-        'data':  [[line] for line in results.split('\n')],  # hdfs_link()
+        'data':  [[_('Job successfully completed.')]],
         'meta': [{'name': 'Header', 'type': 'STRING_TYPE', 'comment': ''}],
         'type': 'table',
         'has_more': False,
@@ -128,43 +103,29 @@ class DataEngBatchApi(Api):
   def cancel(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
 
-    job = check_job_access_permission(self, job_id)
-    oozie_job = check_job_edition_permission(job, self.user)
-
-    oozie_job.kill()
+    DataEng().terminate_jobs(job_ids=[job_id])
 
     return {'status': 0}
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
-    job_id = snippet['result']['handle']['id']
-
-    oozie_job = check_job_access_permission(self.request, job_id)
-    return self._get_log_output(oozie_job)
+    return ''
 
 
   def progress(self, snippet, logs):
-    job_id = snippet['result']['handle']['id']
-
-    oozie_job = check_job_access_permission(self.request, job_id)
-    return oozie_job.get_progress(),
+    return 50
 
 
   def get_jobs(self, notebook, snippet, logs):
-    jobs = []
+    ## 50cf0e00-746b-4d86-b8e3-f2722296df71
     job_id = snippet['result']['handle']['id']
-
-    oozie_job = check_job_access_permission(self.request, job_id)
-    actions = oozie_job.get_working_actions()
-    for action in actions:
-      if action.externalId is not None:
-        jobs.append({
-          'name': action.externalId,
-          'url': reverse('jobbrowser.views.single_job', kwargs={'job': action.externalId}),
-          'started': action.startTime is not None,
-          'finished': action.endTime is not None
-        })
-    return jobs
+    return [{
+        'name': job_id,
+        'url': reverse('jobbrowser.views.apps') + '#' + job_id,
+        'started': True,
+        'finished': False # Would need call to check_status
+      }
+    ]
 
 
   def close_statement(self, snippet):
@@ -173,50 +134,6 @@ class DataEngBatchApi(Api):
 
   def close_session(self, session):
     pass
-
-
-  def _get_log_output(self, oozie_workflow):
-    log_output = ''
-    q = QueryDict(self.request.GET, mutable=True)
-    q['format'] = 'python'  # Hack for triggering the good section in single_task_attempt_logs
-    self.request.GET = q
-
-    attempts = 0
-    max_attempts = 10
-    logs_found = False
-    while not logs_found and attempts < max_attempts:
-      logs, workflow_actions, is_really_done = get_workflow_logs(self.request, oozie_workflow, make_links=False,
-                                                                 log_start_pattern=self.LOG_START_PATTERN,
-                                                                 log_end_pattern=self.LOG_END_PATTERN)
-      if logs:
-        log_output = logs.values()[0]
-        if log_output.startswith('Unable to locate'):
-          LOG.debug('Failed to get job attempt logs, possibly due to YARN archiving job to JHS. Will sleep and try again.')
-          time.sleep(2.0)
-        else:
-          logs_found = True
-
-      attempts += 1
-    return log_output
-
-
-  def _get_results(self, log_output, action_type):
-    results = ''
-
-    if action_type == 'hive':
-      pattern = self.RESULTS_PATTERN
-    elif action_type == 'pig':
-      pattern = self.RESULTS_PATTERN_PIG
-    elif action_type == 'mapreduce':
-      pattern = self.RESULTS_PATTERN_MAPREDUCE
-    else:
-      pattern = self.RESULTS_PATTERN_GENERIC
-
-    re_results = re.compile(pattern, re.M | re.DOTALL)
-    if re_results.search(log_output):
-      results = re.search(re_results, log_output).group('results').strip()
-
-    return results
 
 
 class DataEng():
@@ -272,8 +189,16 @@ class DataEng():
   def describe_clusters(self):
     return _exec(['describe-cluster'])
 
-  def submit_hive_job(self):
-    return _exec(['submit-hive-job'])
+  def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
+    args = ['submit-hive-job', '--cluster-name', cluster_name, '--script', script]
+
+    if params:
+      args.extend(['--params', params])
+    if job_xml:
+      args.extend(['--job-xml ', job_xml])
+
+    return _exec(args)
+
   def submit_spark_job(self):
     return _exec(['submit-spark-job'])
   def submit_yarn_job(self):
@@ -281,5 +206,5 @@ class DataEng():
   def submit_jobs(self):
     return _exec(['submit-jobs'])
 
-  def terminate_jobs(self):
-    return _exec(['terminate-jobs'])
+  def terminate_jobs(self, job_ids):
+    return _exec(['terminate-jobs', '--job-ids', job_ids])
