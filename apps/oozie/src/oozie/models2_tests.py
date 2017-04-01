@@ -989,6 +989,37 @@ class TestExternalWorkflowGraph(object):
     assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'spark-widget')
     assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
 
+  def test_gen_workflow_data_for_xml_with_generic_nodes(self):
+    self.wf.definition = """<workflow-app name="Test" xmlns="uri:oozie:workflow:0.5" xmlns:sla="uri:oozie:sla:0.2">
+        <start to="email-0aaa"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="email-0aaa">
+            <email xmlns="uri:oozie:email-action:0.2">
+                <to>test</to>
+                <subject>test</subject>
+                <body>test</body>
+                <content_type>text/plain</content_type>
+            </email>
+            <ok to="End"/>
+            <error to="Kill"/>
+              <sla:info>
+                <sla:nominal-time>${nominal_time}</sla:nominal-time>
+                <sla:should-start>10</sla:should-start>
+                <sla:should-end>${30 * MINUTES}</sla:should-end>
+              </sla:info>
+        </action>
+        <end name="End"/>
+    </workflow-app>
+    """
+
+    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    assert_true(len(workflow_data['layout'][0]['rows']) == 4)
+    assert_true(len(workflow_data['workflow']['nodes']) == 4)
+    assert_equal(workflow_data['layout'][0]['rows'][1]['widgets'][0]['widgetType'], 'email-widget')
+    assert_true(len(workflow_data['workflow']['nodes'][1]['children']) == 2)
 
 class TestModelAPI(OozieMockBase):
 
