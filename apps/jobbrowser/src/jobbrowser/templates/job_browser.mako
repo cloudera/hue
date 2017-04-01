@@ -2092,7 +2092,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1) {
+<<<<<<< HEAD
           jobBrowserViewModel.load();
+=======
+          var h = window.location.hash;
+
+          h = h.indexOf('#!') === 0 ? h.substr(2) : '';
+          switch (h) {
+            case '':
+              h = 'jobs';
+            case 'slas':
+            case 'oozie-info':
+            case 'jobs':
+            case 'workflows':
+            case 'schedules':
+            case 'bundles':
+            case 'dataeng-clusters':
+            case 'dataeng-jobs':
+              viewModel.selectInterface(h);
+              break;
+            default:
+              if (h.indexOf('id=') === 0 && !viewModel.isMini()){
+                new Job(viewModel, {id: h.substr(3)}).fetchJob();
+              }
+              else {
+                viewModel.selectInterface('reset');
+              }
+          }
+>>>>>>> HUE-1176 [jb] Avoid error on SLA page
         }
       };
 
