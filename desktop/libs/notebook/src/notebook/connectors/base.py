@@ -191,7 +191,7 @@ class Notebook(object):
 
 
 def get_api(request, snippet):
-  from notebook.connectors.dataeng_batch import DataEngBatchApi
+  from notebook.connectors.dataeng import DataEngApi
   from notebook.connectors.hiveserver2 import HS2Api
   from notebook.connectors.jdbc import JdbcApi
   from notebook.connectors.rdbms import RdbmsApi
@@ -222,8 +222,8 @@ def get_api(request, snippet):
     return TextApi(request.user)
   elif interface == 'rdbms':
     return RdbmsApi(request.user, interpreter=snippet['type'])
-  elif interface == 'dataeng-batch':
-    return DataEngBatchApi(user=request.user, request=request)  
+  elif interface == 'dataeng':
+    return DataEngApi(user=request.user, request=request)  
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':

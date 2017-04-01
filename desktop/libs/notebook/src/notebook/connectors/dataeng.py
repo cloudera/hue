@@ -44,32 +44,31 @@ def _exec(args):
     raise PopupException(e, title=_('Error accessing'))
 
   response = json.loads(data)
+  # Chck data['status'] == 'success'
   response['status'] = 'success'
 
   return response
 
 DATE_FORMAT = "%Y-%m-%d"
+RUNNING_STATES = ('QUEUED', 'RUNNING')
 
 
-class DataEngBatchApi(Api):
+class DataEngApi(Api):
 
 
   def execute(self, notebook, snippet):
-    db = self._get_db(snippet)
+    statement = snippet['statement']
+    cluster_name = 'romain-cluster'
 
-    statement = self._get_current_statement(db, snippet)
-    session = self._get_session(notebook, snippet['type'])
+    handle = DataEng(self.user).submit_hive_job(cluster_name, statement, params=None, job_xml=None)
+    job = handle['job']
 
-    query = self._prepare_hql_query(snippet, statement['statement'], session)
-
-    handle = DataEng().submit_hive_job(cluster_name, query, params=None, job_xml=None)
-
-    if handle['status'] not in ('QUEUED', 'RUNNING'):
-      raise QueryError('Submission failure', handle=statement)
+    if job['status'] not in RUNNING_STATES:
+      raise QueryError('Submission failure', handle=job['status'])
 
     return {
-      'id': handle['jobType'],
-      'crn': handle['crn'],
+      'id': job['jobId'],
+      'crn': job['crn'],
       'has_result_set': False,
     }
 
@@ -79,11 +78,11 @@ class DataEngBatchApi(Api):
 
     job_id = snippet['result']['handle']['id']
 
-    handle = DataEng().list_jobs(job_ids=[job_id])
+    handle = DataEng(self.user).list_jobs(job_ids=[job_id])
 
-    if handle['status'] in ('QUEUED', 'RUNNING'):
+    if handle['status'] in RUNNING_STATES:
       return response
-    elif handle['status'] in ('KILLED', 'FAILED'):
+    elif handle['status'] in ('failed', 'terminated'):
       raise QueryError(_('Job was %s') % handle['status'])
     else:
       response['status'] = 'available'
@@ -103,7 +102,7 @@ class DataEngBatchApi(Api):
   def cancel(self, notebook, snippet):
     job_id = snippet['result']['handle']['id']
 
-    DataEng().terminate_jobs(job_ids=[job_id])
+    DataEng(self.user).terminate_jobs(job_ids=[job_id])
 
     return {'status': 0}
 
@@ -168,7 +167,7 @@ class DataEng():
     if job_statuses:
       args.extend(['--job-statuses', job_statuses])
     if job_ids:
-      args.extend(['--job-ids', job_ids])
+      args.extend(['--job-ids'] + job_ids)
     if job_types:
       args.extend(['--job-types', job_types])
     if creation_date_before:
