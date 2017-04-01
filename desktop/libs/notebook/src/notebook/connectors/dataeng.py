@@ -44,8 +44,6 @@ def _exec(args):
     raise PopupException(e, title=_('Error accessing'))
 
   response = json.loads(data)
-  # Chck data['status'] == 'success'
-  response['status'] = 'success'
 
   return response
 
@@ -58,7 +56,7 @@ class DataEngApi(Api):
 
   def execute(self, notebook, snippet):
     statement = snippet['statement']
-    cluster_name = 'romain-cluster'
+    cluster_name = 'rjustice-cluster'
 
     handle = DataEng(self.user).submit_hive_job(cluster_name, statement, params=None, job_xml=None)
     job = handle['job']
@@ -79,11 +77,12 @@ class DataEngApi(Api):
     job_id = snippet['result']['handle']['id']
 
     handle = DataEng(self.user).list_jobs(job_ids=[job_id])
+    job = handle['jobs'][0]
 
-    if handle['status'] in RUNNING_STATES:
+    if job['status'] in RUNNING_STATES:
       return response
-    elif handle['status'] in ('failed', 'terminated'):
-      raise QueryError(_('Job was %s') % handle['status'])
+    elif job['status'] in ('failed', 'terminated'):
+      raise QueryError(_('Job was %s') % job['status'])
     else:
       response['status'] = 'available'
 
@@ -120,7 +119,7 @@ class DataEngApi(Api):
     job_id = snippet['result']['handle']['id']
     return [{
         'name': job_id,
-        'url': reverse('jobbrowser.views.apps') + '#' + job_id,
+        'url': reverse('jobbrowser.views.apps') + '#!' + job_id,
         'started': True,
         'finished': False # Would need call to check_status
       }
