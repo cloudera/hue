@@ -34,20 +34,20 @@ class DataEngClusterApi(Api):
 
   def apps(self, filters):
 #     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
-# 
+#
 #     text_filters = _extract_query_params(filters)
-# 
+#
 #     if not has_dashboard_jobs_access(self.user):
 #       kwargs['filters'].append(('user', self.user.username))
 #     elif 'user' in text_filters:
 #       kwargs['filters'].append(('user', text_filters['username']))
-# 
+#
 #     if 'time' in filters:
 #       kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
-# 
+#
 #     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
 #       kwargs['filters'].extend([('text', text_filters.get('text'))])
-# 
+#
 #     if filters.get('states'):
 #       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
 #       for _state in filters.get('states'):
@@ -57,7 +57,7 @@ class DataEngClusterApi(Api):
     api = DataEng(self.user)
 
     jobs = api.list_clusters()
-    
+
     return {
       'apps': [{
         'id': app['clusterName'],
@@ -72,7 +72,7 @@ class DataEngClusterApi(Api):
       } for app in jobs['clusters']],
       'total': None
     }
-            
+
 
 
   def app(self, appid):
@@ -144,26 +144,26 @@ class DataEngJobApi(Api):
 
   def apps(self, filters):
     kwargs = {}
-# 
+#
 #     text_filters = _extract_query_params(filters)
-# 
+#
 #     if not has_dashboard_jobs_access(self.user):
 #       kwargs['filters'].append(('user', self.user.username))
 #     elif 'user' in text_filters:
 #       kwargs['filters'].append(('user', text_filters['username']))
-# 
+#
     if 'time' in filters:
       if filters['time']['time_unit'] == 'minutes':
         delta = timedelta(minutes=int(filters['time']['time_value']))
       elif filters['time']['time_unit'] == 'hours':
         delta = timedelta(hours=int(filters['time']['time_value']))
       else:
-        delta = timedelta(days=int(filters['time']['time_value']))                                                                    
+        delta = timedelta(days=int(filters['time']['time_value']))
       kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
 
 #     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
 #       kwargs['filters'].extend([('text', text_filters.get('text'))])
-# 
+#
 #     if filters.get('states'):
 #       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
 #       for _state in filters.get('states'):
@@ -190,25 +190,17 @@ class DataEngJobApi(Api):
     }
 
   def app(self, appid):
-    oozie_api = get_oozie(self.user)
-    workflow = oozie_api.get_job(jobid=appid)
+    handle = DataEng(self.user).list_jobs(job_ids=[appid])
+    job = handle['jobs'][0]
 
     common = {
-        'id': workflow.id,
-        'name': workflow.appName,
-        'status': workflow.status,
-        'apiStatus': self._api_status(workflow.status),
-        'progress': workflow.get_progress(),
-        'type': 'workflow',
+        'id': job['jobId'],
+        'name': job['jobId'],
+        'status': job['status'],
+        'apiStatus': self._api_status(job['status']),
+        'progress': 50,
+        'type': 'dataeng-job',
     }
-
-    request = MockDjangoRequest(self.user)
-    response = list_oozie_workflow(request, job_id=appid)
-    common['properties'] = json.loads(response.content)
-    common['properties']['xml'] = ''
-    common['properties']['properties'] = ''
-    common['properties']['coordinator_id'] = workflow.get_parent_job_id()
-    common['properties']['bundle_id'] = workflow.conf_dict.get('oozie.bundle.id')
 
     return common
 
@@ -225,10 +217,7 @@ class DataEngJobApi(Api):
 
 
   def logs(self, appid, app_type, log_name=None):
-    request = MockDjangoRequest(self.user)
-    data = get_oozie_job_log(request, job_id=appid)
-
-    return {'logs': json.loads(data.content)['log']}
+    return {'logs': ''}
 
 
   def profile(self, appid, app_type, app_property):

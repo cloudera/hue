@@ -1422,6 +1422,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/oozie-oozi-B/.test(self.id())) {
           interface = 'bundles';
         }
+        else if (/[a-z0-9]{8}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{4}\-[a-z0-9]{12}/.test(self.id())) {
+          interface = 'dataeng-jobs';
+        }
 
         interface = vm.isValidInterface(interface);
         vm.interface(interface);
