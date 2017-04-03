@@ -349,16 +349,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <a title="${ _('This is a history query') }"><i class="fa fa-fw fa-history"></i></a>
           </li>
           <li data-bind="visible: directoryUuid" style="display: none" class="no-horiz-padding muted">
-            <!-- ko if: IS_HUE_4 -->
-              <a title="${ _('Open directory of this query') }" data-bind="click: function() { huePubSub.publish('open.link', '/home?uuid=' + directoryUuid()) }"
-                class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
-              </a>
-            <!-- /ko -->
-            <!-- ko if: ! IS_HUE_4 -->
-              <a title="${ _('Open directory of this query') }" data-bind="attr: { 'href': '/home?uuid=' + directoryUuid() }"
-                class="pointer inactive-action"><i class="fa fa-fw fa-folder-o"></i>
-              </a>
-            <!-- /ko -->
+            <a title="${ _('Open directory of this query') }" data-bind="hueLink: '/home?uuid=' + directoryUuid()"
+              class="pointer inactive-action" href="javascript:void(0)"><i class="fa fa-fw fa-folder-o"></i>
+            </a>
           </li>
           <li data-bind="visible: parentSavedQueryUuid" style="display: none" class="no-horiz-padding muted">
             <a title="${ _('Click to open original saved query') }" data-bind="click: function() { $root.openNotebook(parentSavedQueryUuid()) }" class="pointer inactive-action">
