@@ -1350,7 +1350,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           location.hash = stripHashes(file.path);
         } else {
           %if is_embeddable:
-          huePubSub.publish('page.route', file.url);
+          huePubSub.publish('open.link', file.url);
           %else:
           location.href = file.url;
           %endif

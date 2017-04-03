@@ -497,6 +497,10 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     });
 
+    // catch leaking links
+    huePubSub.subscribe('open.link', function (href) {
+      location.href = href;
+    });
 
     $("div.navigator ul.dropdown-menu").css("maxHeight", $(window).height() - 50);
     var scrollableDropdownTimeout = -1;

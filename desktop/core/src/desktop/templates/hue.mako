@@ -631,15 +631,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           })
         });
 
-        huePubSub.subscribe('open.link', function (href) {
-          if (href.startsWith('/') && !href.startsWith('/hue')){
-            page('/hue' + href);
-          }
-          else {
-            page(href);
-          }
-        });
-
         var loadedJs = [];
         var loadedCss = [];
         var loadedApps = [];
@@ -752,10 +743,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             vm.createWizard.source.path(path);
           });
         };
-
-        huePubSub.subscribe('switch.app', function (name) {
-          self.currentApp(name);
-        });
 
         // prepend /hue to all the link on this page
         $('a[href]').each(function () {
@@ -887,7 +874,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         page();
 
-        huePubSub.subscribe('page.route', page);
+        huePubSub.subscribe('open.link', function (href) {
+          if (href.startsWith('/') && !href.startsWith('/hue')){
+            page('/hue' + href);
+          }
+          else {
+            page(href);
+          }
+        });
       };
 
       var onePageViewModel = new OnePageViewModel();
