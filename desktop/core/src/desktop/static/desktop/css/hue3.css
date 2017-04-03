@@ -1352,40 +1352,6 @@ body {
   transition: opacity .3s;
 }
 
-.dataTables_wrapper:hover > .hue-scrollbar-x-rail, .hue-scrollbar-x-rail:hover {
-  opacity: 1;
-}
-
-.hue-scrollbar-x-rail {
-  opacity: 0.2;
-  position: fixed;
-  z-index: 10000;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  -moz-transition: background-color .2s linear, opacity .2s linear;
-  -o-transition: background-color .2s linear, opacity .2s linear;
-  transition: background-color .2s linear, opacity .2s linear;
-  height: 9px;
-}
-
-
-.hue-scrollbar-x-rail > .hue-scrollbar-x {
-  position: absolute;
-  background-color: #C1C1C1;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-transition: background-color .2s linear;
-  -moz-transition: background-color .2s linear;
-  -o-transition: background-color .2s linear;
-  transition: background-color .2s linear;
-  bottom: 1px;
-  height: 9px;
-  z-index: 10000;
-}
-
 .dropdown-menu.less-padding > li > a {
   padding-left: 6px
 }
