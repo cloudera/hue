@@ -864,8 +864,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/') && !href.startsWith('/hue')){
             page('/hue' + href);
-          }
-          else {
+          } else {
             page(href);
           }
         });
