@@ -451,6 +451,14 @@ var EditorViewModel = (function() {
     self.isSqlDialect.subscribe(updateDatabases);
     updateDatabases();
 
+    huePubSub.subscribeOnce('assist.source.set', function (source) {
+      if (source !== self.type()) {
+        huePubSub.publish('assist.set.source', self.type());
+      }
+    });
+
+    huePubSub.publish('assist.get.source');
+
     var handleAssistSelection = function (databaseDef) {
       if (databaseDef.source === self.type() && self.database() !== databaseDef.name) {
         self.database(databaseDef.name);
@@ -2313,9 +2321,9 @@ var EditorViewModel = (function() {
       });
 
       download(JSON.stringify(jupyterNotebook), self.name() + ".ipynb", "text/plain");
-    }
+    };
 
-    huePubSub.subscribe("assist.db.panel.ready", function () {
+    huePubSub.subscribeOnce('assist.db.panel.ready', function () {
       if (self.type().indexOf('query') === 0 && self.snippets().length == 1) {
         huePubSub.publish('assist.set.database', {
           source: self.snippets()[0].type(),
@@ -2323,6 +2331,8 @@ var EditorViewModel = (function() {
         });
       }
     });
+
+    huePubSub.publish('assist.is.db.panel.ready');
 
     // Init
     if (notebook.snippets) {
