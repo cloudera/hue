@@ -97,7 +97,7 @@
 .hueCheckbox {
   width: 15px;
   height: 15px;
-  border: 1px solid #CCCCCC;
+  border: 1px solid @cui-gray-400;
   margin-top: 2px !important;
   padding: 0 !important;
   display: block !important;
@@ -105,17 +105,17 @@
 }
 
 .hueCheckbox.disabled {
-  border: 1px solid #DDDDDD;
-  background-color: #FEFEFE;
+  border: 1px solid @cui-gray-300;
+  background-color: @cui-gray-050;
   cursor: not-allowed;
 }
 
 .hueCheckbox:hover {
-  border-color: #999999;
+  border-color: @cui-gray-600;
 }
 
 .hueCheckbox.disabled:hover {
-  border-color: #DDDDDD;
+  border-color: @cui-gray-300;
 }
 
 .hueCheckboxText {
@@ -171,8 +171,8 @@
 
 .hue-ace-location {
   position: absolute;
-  background-color: #DBE8F1;
-  border: 1px solid #DBE8F1;
+  background-color: @hue-primary-color-light;
+  border: 1px solid @hue-primary-color-light;
   border-radius: 1px;
   margin-left: -1px;
   margin-top: -1px;

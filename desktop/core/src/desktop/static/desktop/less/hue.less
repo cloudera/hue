@@ -444,11 +444,7 @@ a:visited {
   padding: 18px 24px 0 0;
   display: inline-block;
   cursor: pointer;
-  transition-property: opacity, -webkit-filter;
-  transition-property: opacity, filter;
-  transition-property: opacity, filter, -webkit-filter;
-  transition-duration: 0.15s;
-  transition-timing-function: linear;
+  .hue-ease-transition(~"opacity, filter, -webkit-filter");
   font: inherit;
   color: inherit;
   text-transform: none;
@@ -487,11 +483,7 @@ a:visited {
   background-color: @hue-primary-color-dark;
   border-radius: 4px;
   position: absolute;
-  transition-property: -webkit-transform;
-  transition-property: transform;
-  transition-property: transform, -webkit-transform;
-  transition-duration: 0.15s;
-  transition-timing-function: ease;
+  .hue-ease-transition(~"transform, -webkit-transform");
 }
 
 .hamburger-inner::before, .hamburger-inner::after {
