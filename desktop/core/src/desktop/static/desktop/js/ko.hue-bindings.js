@@ -300,10 +300,16 @@
 
       ko.bindingHandlers.niceScroll.init($element.data('custom-hueAutocomplete').menu.element, function () {});
 
+
+      var enableAutocomplete = function () {
+        if ($element.data('custom-hueAutocomplete')) {
+          $element.hueAutocomplete("option", "disabled", false);
+        } else {
+          window.setTimeout(enableAutocomplete, 200);
+        }
+      };
       // IE 11 trick to prevent it from being shown on page refresh
-      window.setTimeout(function () {
-        $element.hueAutocomplete("option", "disabled", false);
-      }, 1000);
+      enableAutocomplete();
     }
   };
 
