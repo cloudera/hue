@@ -167,7 +167,7 @@ from desktop.views import _ko
     </button>
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
-      <a class="pointer pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-times"></i></a>
+      <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
       <!-- ko if: editorViewModel.selectedNotebook() -->
       <!-- ko with: editorViewModel.selectedNotebook() -->
       <div>
@@ -259,6 +259,16 @@ from desktop.views import _ko
       var HistoryPanel = function (params) {
         var self = this;
         self.historyPanelVisible = ko.observable(false);
+
+        self.historyPanelVisible.subscribe(function (newVal) {
+          if (newVal) {
+            huePubSub.publish('hide.jobs.panel');
+          }
+        });
+
+        huePubSub.subscribe('hide.history.panel', function () {
+          self.historyPanelVisible(false);
+        });
 
         self.editorViewModel = new EditorViewModel(null, '', {
           user: '${ user.username }',
@@ -368,7 +378,8 @@ from desktop.views import _ko
       <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
     </button>
     <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
-      <a href="javascript:void(0)" class="inactive-action pull-right" data-bind="click: function(){ page('/jobbrowser/'); jobsPanelVisible(false); }"><i class="fa fa-expand" title="${ _('Open Job Browser') }"></i></a>
+      <a class="pointer inactive-action pull-right" data-bind="click: function(){ jobsPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
+      <a class="pointer inactive-action pull-right" data-bind="click: function(){ page('/jobbrowser/'); jobsPanelVisible(false); }"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
       <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
       <div id="mini_jobbrowser"></div>
     </div>
@@ -382,6 +393,17 @@ from desktop.views import _ko
         var self = this;
 
         self.jobsPanelVisible = ko.observable(false);
+
+        self.jobsPanelVisible.subscribe(function (newVal) {
+          if (newVal) {
+            huePubSub.publish('hide.history.panel');
+          }
+        });
+
+        huePubSub.subscribe('hide.jobs.panel', function () {
+          self.jobsPanelVisible(false);
+        });
+
         self.jobCount = ko.observable(0);
         self.onePageViewModel = params.onePageViewModel;
 
