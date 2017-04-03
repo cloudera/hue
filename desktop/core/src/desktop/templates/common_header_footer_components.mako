@@ -449,7 +449,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
       if (xhr.responseText === '/* login required */') {
-        isAutoLogout = settings.url == '/desktop/debug/is_idle';
+        var isAutoLogout = settings.url == '/desktop/debug/is_idle';
         $('.blurred').removeClass('blurred');
 
         if ($('#login-modal').length > 0 && $('#login-modal').is(':hidden')) {
