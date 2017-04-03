@@ -328,9 +328,13 @@ var AutocompleteResults = (function () {
       if (foundVarRef.length > 0) {
         colRefDeferred.resolve({ type: 'T' });
       } else {
-        self.fetchFieldsForIdentifiers(self.parseResult.colRef.identifierChain, colRefCallback, function () {
+        try {
+          self.fetchFieldsForIdentifiers(self.parseResult.colRef.identifierChain, colRefCallback, function () {
+            colRefDeferred.resolve({ type: 'T' });
+          });
+        } catch (e) {
           colRefDeferred.resolve({ type: 'T' });
-        });
+        }  // TODO: Ignore for subqueries
       }
     } else {
       colRefDeferred.resolve({ type: 'T' });
@@ -945,7 +949,11 @@ var AutocompleteResults = (function () {
         addColumnsDeferred.resolve();
       };
 
-      self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+      try {
+        self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+      } catch (e) {
+        addColumnsDeferred.resolve();
+      } // TODO: Ignore for subqueries
     }
     return addColumnsDeferred;
   };
@@ -1681,12 +1689,16 @@ var AutocompleteResults = (function () {
           sourceType: self.snippet.type(),
           timeout: AUTOCOMPLETE_TIMEOUT,
           successCallback: function (data) {
-            var foundDb = data.filter(function (db) {
-              return db.toLowerCase() === identifierChain[0].name.toLowerCase();
-            });
-            var databaseName = foundDb.length > 0 ? identifierChain.shift().name : self.activeDatabase;
-            var tableName = identifierChain.shift().name;
-            fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
+            try {
+              var foundDb = data.filter(function (db) {
+                return db.toLowerCase() === identifierChain[0].name.toLowerCase();
+              });
+              var databaseName = foundDb.length > 0 ? identifierChain.shift().name : self.activeDatabase;
+              var tableName = identifierChain.shift().name;
+              fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
+            } catch (e) {
+              callback([]);
+            } // TODO: Ignore for subqueries
           },
           silenceErrors: true,
           errorCallback: errorCallback
@@ -1721,13 +1733,18 @@ var SqlAutocompleter3 = (function () {
 
   SqlAutocompleter3.prototype.autocomplete = function () {
     var self = this;
-    var parseResult = sql.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
+    try {
+      var parseResult = sql.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
 
-    if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
-      console.log(parseResult);
+      if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
+        console.log(parseResult);
+      }
+
+      self.suggestions.update(parseResult);
+    } catch(e) {
+      // This prevents Ace from inserting garbled text in case of exception
+      huePubSub.publish('hue.ace.autocompleter.done');
     }
-
-    self.suggestions.update(parseResult);
   };
 
   return SqlAutocompleter3;
