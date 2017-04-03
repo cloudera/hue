@@ -985,8 +985,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.searchActive = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
-        self.jobsPanelVisible = ko.observable(false);
-        self.historyPanelVisible = ko.observable(false);
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
