@@ -146,6 +146,19 @@ from notebook.conf import get_ordered_interpreters
     </li>
   </script>
 
+  <script type="text/html" id="hdfs-context-items">
+    <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw fa-info"></i> ${ _('Open in File Browser') }</a></li>
+    <!-- ko if: $currentApp() === 'editor' -->
+    <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
+    ## Generate create table statement
+    <!-- /ko -->
+    ## ------
+    ## Move
+    ## Copy
+    ## Rename
+    ## Delete
+  </script>
+
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
@@ -426,7 +439,7 @@ from notebook.conf import get_ordered_interpreters
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>

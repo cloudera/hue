@@ -84,7 +84,6 @@
       if (IS_HUE_4) {
         ko.bindingHandlers.click.init(element, function() {
           return function () {
-            console.log('open ' + ko.unwrap(valueAccessor()));
             huePubSub.publish('open.link', ko.unwrap(valueAccessor()));
           }
         }, allBindings, viewModel, bindingContext);
