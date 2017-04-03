@@ -71,6 +71,18 @@
   box-shadow: @left @top 6px 0 rgba(0, 0, 0, 0.18), @left @top 8px 0 rgba(0, 0, 0, 0.13);
 }
 
+@keyframes fadein {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.hue-fade-in {
+  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
+  -moz-animation: fadein 2s; /* Firefox < 16 */
+  -ms-animation: fadein 2s; /* Internet Explorer */
+  -o-animation: fadein 2s; /* Opera < 12.1 */
+  animation: fadein 2s;
+}
 // Flexbox mixins
 
 .display-flex() {
