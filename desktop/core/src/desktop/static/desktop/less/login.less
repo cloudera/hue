@@ -31,14 +31,14 @@
   display: block;
   margin: auto;
   margin-bottom: 50px;
-  background: #FFFFFF;
+  background: @cui-white;
   border: 1px solid #E0E2E3;
   border-radius: 4px;
   a {
     white-space: normal;
   }
   .logo {
-    background-color: #FFF;
+    background-color: @cui-white;
     width: 70px;
     height: 70px;
     text-align: center;
@@ -51,7 +51,7 @@
     margin-bottom: 35px;
   }
   .empty-logo {
-    background-color: #FFF;
+    background-color: @cui-white;
     width: 70px;
     height: 70px;
   }
@@ -86,7 +86,7 @@
       padding: 0;
       border: none;
       box-shadow: none;
-      background: #FFFFFF;
+      background: @cui-white;
       height: 45px;
       font-size: 16px;
       color: #9e9e9e;
@@ -116,7 +116,7 @@
 }
 
 :-webkit-autofill, :-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px white inset !important;
+  -webkit-box-shadow: 0 0 0 1000px white inset !important;
   -webkit-text-fill-color: #9e9e9e !important;
 }
 
@@ -146,7 +146,7 @@
   margin-left: auto;
   margin-right: auto;
   width: 100%;
-  background-color: #FAFAFA;
+  background-color: @cui-gray-050;
 }
 
 @media screen and (max-width: 800px) {
@@ -175,7 +175,7 @@
 }
 
 #login-modal {
-  padding: 0px !important;
+  padding: 0 !important;
   box-shadow: none;
   background: transparent;
   border: none;
