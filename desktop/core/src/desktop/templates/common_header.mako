@@ -174,6 +174,11 @@ if USE_NEW_EDITOR.get():
       }
       huePubSub.publish('set.current.app.name', appName);
     });
+
+    // catch leaking links
+    huePubSub.subscribe('open.link', function (href) {
+      location.href = href;
+    });
   </script>
 
 </head>
