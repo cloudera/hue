@@ -87,14 +87,35 @@ class SparkHistoryServerApi(object):
   def application(self, app_id):
     return self._root.get('applications/%(app_id)s' % {'app_id': app_id}, headers=self.headers)
 
-  def jobs(self, app_id, attempt_id):
-    return self._root.get('applications/%(app_id)s/%(attempt_id)s/jobs' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
+  def jobs(self, app_id):
+    return self._root.get('applications/%(app_id)s/jobs' % {'app_id': app_id}, headers=self.headers)
 
-  def stages(self, app_id, attempt_id):
-    return self._root.get('applications/%(app_id)s/%(attempt_id)s/stages' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
+  def stages(self, app_id):
+    return self._root.get('applications/%(app_id)s/stages' % {'app_id': app_id}, headers=self.headers)
 
-  def executors(self, app_id, attempt_id):
-    return self._root.get('applications/%(app_id)s/%(attempt_id)s/executors' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
+  def executors(self, app_id):
+    return self._root.get('applications/%(app_id)s/executors' % {'app_id': app_id}, headers=self.headers)
 
-  # TODO: stage attempts, task summaries, task list, storage, download logs
-  # http://spark.apache.org/docs/latest/monitoring.html#rest-api
+  def stage_attempts(self, app_id, stage_id):
+    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s' % {'app_id': app_id, 'stage_id': stage_id}, headers=self.headers)
+
+  def stage_attempt(self, app_id, stage_id, stage_attempt_id):
+    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+
+  def task_summary(self, app_id, stage_id, stage_attempt_id):
+    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskSummary' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+
+  def task_list(self, app_id, stage_id, stage_attempt_id):
+    return self._root.get('applications/%(app_id)s/stages/%(stage_id)s/%(stage_attempt_id)s/taskList' % {'app_id': app_id, 'stage_id': stage_id, 'stage_attempt_id': stage_attempt_id}, headers=self.headers)
+
+  def storages(self, app_id):
+    return self._root.get('applications/%(app_id)s/storage/rdd' % {'app_id': app_id}, headers=self.headers)
+
+  def storage(self, app_id, rdd_id):
+    return self._root.get('applications/%(app_id)s/storage/rdd/%(rdd_id)s' % {'app_id': app_id, 'rdd_id': rdd_id}, headers=self.headers)
+
+  def download_logs(self, app_id):
+    return self._root.get('applications/%(app_id)s/logs' % {'app_id': app_id}, headers=self.headers)
+
+  def download_attempt_logs(self, app_id, attempt_id):
+    return self._root.get('applications/%(app_id)s/%(attempt_id)s/logs' % {'app_id': app_id, 'attempt_id': attempt_id}, headers=self.headers)
