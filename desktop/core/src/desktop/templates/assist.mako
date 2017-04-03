@@ -825,7 +825,12 @@ from notebook.conf import get_ordered_interpreters
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
+          <!-- ko if: type === 'documents' -->
+          <svg class="hi"><use xlink:href="#hi-file-hue"></use></svg>
+          <!-- /ko -->
+          <!-- ko if: type !== 'documents' -->
           <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
+          <!-- /ko -->
         </div>
         <!-- /ko -->
       </div>
