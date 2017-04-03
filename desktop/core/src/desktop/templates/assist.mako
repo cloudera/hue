@@ -999,12 +999,26 @@ from notebook.conf import get_ordered_interpreters
           } else {
             huePubSub.publish("assist.database.set", {
               source: source,
-              name: null
+              name: 'default'
             });
           }
         });
 
-        huePubSub.publish("assist.db.panel.ready");
+        huePubSub.subscribe('assist.get.source', function () {
+          huePubSub.publish('assist.source.set', self.selectedSource().type);
+        });
+
+        huePubSub.subscribe('assist.set.source', function (source) {
+          if (self.sourceIndex[source]) {
+            self.selectedSource(self.sourceIndex[source]);
+          }
+        });
+
+        huePubSub.publish('assist.db.panel.ready');
+
+        huePubSub.subscribe('assist.is.db.panel.ready', function () {
+          huePubSub.publish('assist.db.panel.ready');
+        });
 
         self.selectedSource.subscribe(function (newSource) {
           if (newSource) {
