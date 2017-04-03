@@ -159,6 +159,16 @@ from notebook.conf import get_ordered_interpreters
     ## Delete
   </script>
 
+  <script type="text/html" id="document-context-items">
+    <li><a href="javascript: void(0);" data-bind="click: open">${ _('Open') }</a></li>
+    ## Share
+    ## -----
+    ## Move
+    ## Copy
+    ## Rename
+    ## Delete
+  </script>
+
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
@@ -513,7 +523,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-file-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
          <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-db-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
              <div class="assist-file-actions table-actions" style="opacity: 0;" >
                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
                  <i class='fa fa-info' title="${ _('Details') }"></i>
