@@ -1352,69 +1352,6 @@ body {
   transition: opacity .3s;
 }
 
-@keyframes fadein {
-  from { opacity: 0; }
-  to   { opacity: 1; }
-}
-
-.hue-spinner {
-  position: absolute;
-  top: 0; left: 0; bottom: 0; right: 0;
-  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadein 2s; /* Firefox < 16 */
-  -ms-animation: fadein 2s; /* Internet Explorer */
-  -o-animation: fadein 2s; /* Opera < 12.1 */
-  animation: fadein 2s;
-  margin: auto 0;
-  vertical-align: center;
-}
-
-.hue-spinner-overlay {
-  position: absolute;
-  z-index: 10000;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(255,255,255,.5);
-  -webkit-animation: fadein 2s; /* Safari, Chrome and Opera > 12.1 */
-  -moz-animation: fadein 2s; /* Firefox < 16 */
-  -ms-animation: fadein 2s; /* Internet Explorer */
-  -o-animation: fadein 2s; /* Opera < 12.1 */
-  animation: fadein 2s;
-}
-
-.hue-spinner-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin-left: -8px;
-  margin-top: -8px;
-}
-
-.hue-spinner-center.hue-spinner-large {
-  margin-left: -13px !important;
-  margin-top: -13px !important;
-}
-
-.hue-spinner-center.hue-spinner-xlarge {
-  margin-left: -30px !important;
-  margin-top: -30px !important;
-}
-
-.hue-spinner-large {
-  font-size: 26px !important;
-}
-
-.hue-spinner-xlarge {
-  font-size: 60px !important;
-}
-
-.hue-spinner i {
-  font-size: 16px;
-  color: #aaa;
-}
-
 .dataTables_wrapper:hover > .hue-scrollbar-x-rail, .hue-scrollbar-x-rail:hover {
   opacity: 1;
 }

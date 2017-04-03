@@ -1,0 +1,68 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+
+.hue-spinner {
+  position: absolute;
+  top: 0; left: 0; bottom: 0; right: 0;
+  .hue-fade-in();
+  margin: auto 0;
+  vertical-align: center;
+}
+
+.hue-spinner-overlay {
+  position: absolute;
+  z-index: 10000;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(255,255,255,.5);
+  .hue-fade-in();
+}
+
+.hue-spinner-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+}
+
+.hue-spinner-center.hue-spinner-large {
+  margin-left: -13px !important;
+  margin-top: -13px !important;
+}
+
+.hue-spinner-center.hue-spinner-xlarge {
+  margin-left: -30px !important;
+  margin-top: -30px !important;
+}
+
+.hue-spinner-large {
+  font-size: 26px !important;
+}
+
+.hue-spinner-xlarge {
+  font-size: 60px !important;
+}
+
+.hue-spinner i {
+  font-size: 16px;
+  color: #aaa;
+}
