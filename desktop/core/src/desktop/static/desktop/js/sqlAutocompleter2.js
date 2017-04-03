@@ -116,7 +116,11 @@ var SqlAutocompleter2 = (function () {
       if (foundVarRef.length > 0) {
         colRefCallback({ type: 'T' });
       } else {
-        self.fetchFieldsForIdentifiers(database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+        try {
+          self.fetchFieldsForIdentifiers(database, parseResult.colRef.identifierChain, colRefCallback, colRefDeferral.resolve);
+        } catch(e) {
+          colRefCallback({ type: 'T' });
+        } // TODO: Ignore for subqueries
       }
     } else {
       colRefDeferral.resolve();
@@ -819,12 +823,16 @@ var SqlAutocompleter2 = (function () {
         self.snippet.getApiHelper().loadDatabases({
           sourceType: self.snippet.type(),
           successCallback: function (data) {
-            var foundDb = data.filter(function (db) {
-              return db.toLowerCase() === identifierChain[0].name.toLowerCase();
-            });
-            var databaseName = foundDb.length > 0 ? identifierChain.shift().name : defaultDatabase;
-            var tableName = identifierChain.shift().name;
-            fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
+              try {
+                var foundDb = data.filter(function (db) {
+                  return db.toLowerCase() === identifierChain[0].name.toLowerCase();
+                });
+                var databaseName = foundDb.length > 0 ? identifierChain.shift().name : defaultDatabase;
+                var tableName = identifierChain.shift().name;
+                fetchFieldsInternal(tableName, databaseName, identifierChain, callback, errorCallback, []);
+              } catch (e) {
+                callback([]);
+              } // TODO: Ignore for subqueries
           },
           silenceErrors: true,
           errorCallback: errorCallback
@@ -1009,7 +1017,11 @@ var SqlAutocompleter2 = (function () {
         addColumnsDeferred.resolve();
       };
 
-      self.fetchFieldsForIdentifiers(database, table.identifierChain, callback, addColumnsDeferred.resolve);
+      try {
+        self.fetchFieldsForIdentifiers(database, table.identifierChain, callback, addColumnsDeferred.resolve);
+      } catch(e) {
+        addColumnsDeferred.resolve();
+      } // TODO: Ignore for subqueries
     }
     return addColumnsDeferred;
   };
