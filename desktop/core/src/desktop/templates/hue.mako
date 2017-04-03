@@ -109,13 +109,9 @@ ${ hueIcons.symbols() }
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
-        <div class="compose-action btn-group">
-          <button class="btn" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }" title="${ _('Hive editor') }">${ _('Compose') }</button>
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-
-          <ul class="dropdown-menu">
+        <div class="navbar-dropdown">
+          <button class="btn btn-primary pull-right" title="${ _('Compose') }" data-toggle="dropdown">${ _('NEW') }</button>
+          <ul class="dropdown-menu dropdown-menu-new">
             % if 'beeswax' in apps or 'impala' in apps or SHOW_NOTEBOOKS.get() or interpreters:
               <li class="dropdown-submenu">
                 <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
@@ -190,33 +186,24 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-right">
         % if user.is_authenticated() and section != 'login':
-        <div class="compose-action btn-group pull-right">
+        <div class="dropdown navbar-dropdown pull-right">
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
           %>
-          <button class="btn"
-          % if view_profile:
-            data-bind="click: function(){ page('/useradmin/users/') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"
-          % endif
-          >
-          ${ user.username }
-          </button>
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
+          <button class="btn btn-flat" data-toggle="dropdown"><i class="fa fa-user"></i> ${ user.username }</button>
           <ul class="dropdown-menu">
             % if view_profile:
-            <li><a href="${ url('useradmin.views.edit_user', username=user.username) }"><i class="fa fa-key"></i> ${_('Profile')}</a></li>
+            <li><a href="javascript:void(0)" data-bind="click: function(){ page('/useradmin/users/') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
             % if user.is_superuser:
-            <li data-bind="click: function () { page('/useradmin/users/') }"><a href="javascript: void(0);"><i class="fa fa-group"></i> ${_('Manage Users')}</a></li>
+            <li data-bind="click: function () { page('/useradmin/users/') }"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             % if user.is_superuser:
             <li><a href="/about/"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
             % endif
             <li class="divider"></li>
-            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-sign-out"></i> ${ _('Sign out') }</a></li>
+            <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
           </ul>
         </div>
         % endif
