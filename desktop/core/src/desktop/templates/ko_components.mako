@@ -160,13 +160,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-history-panel-template">
-    <div class="compose-action btn-group  pull-right">
-      <button class="btn" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
-        <i class="fa fa-history"></i>
-          <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
-          <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
-      </button>
-    </div>
+    <button class="btn btn-flat pull-right" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
+      <i class="fa fa-history"></i>
+        <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
+        <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
+    </button>
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
       <a class="pointer pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-times"></i></a>
@@ -366,15 +364,11 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-job-browser-panel-template">
-    <div class="compose-action btn-group pull-right">
-      <button class="btn" title="${_('Job browser')}" data-bind="click: function(){ page('/jobbrowser/') }">${ _('Jobs') }
-        <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
-      </button>
-      <button class="btn dropdown-toggle" data-bind="toggle: jobsPanelVisible" title="${_('Inline Job browser')}">
-        <span class="caret"></span>
-      </button>
-    </div>
+    <button class="btn btn-flat pull-right" title="${_('Preview Job browser')}" data-bind="toggle: jobsPanelVisible">${ _('Jobs') }
+      <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
+    </button>
     <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
+      <a href="javascript:void(0)" class="inactive-action pull-right" data-bind="click: function(){ page('/jobbrowser/'); jobsPanelVisible(false); }"><i class="fa fa-expand" title="${ _('Open Job Browser') }"></i></a>
       <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
       <div id="mini_jobbrowser"></div>
     </div>
