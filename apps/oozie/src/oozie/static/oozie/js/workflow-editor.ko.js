@@ -1242,7 +1242,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.schedule = function () {
     logGA('schedule');
     if (IS_HUE_4) {
-      huePubSub.publish('page.route', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
+      huePubSub.publish('open.link', '/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());
     }
     else {
       window.location.replace('/oozie/editor/coordinator/new/?workflow=' + self.workflow.uuid());

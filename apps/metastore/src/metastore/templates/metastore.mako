@@ -1172,7 +1172,7 @@ ${ components.menubar() }
       format: "json"
     },function(resp) {
       if (resp.uri_path) {
-        huePubSub.publish('page.route', resp.uri_path );
+        huePubSub.publish('open.link', resp.uri_path);
       } else if (resp.message) {
         $(document).trigger("error", resp.message);
       }
