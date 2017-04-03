@@ -66,7 +66,7 @@
      * @return {Object} Query rule row
      */
     QueryBuilder.getRule = function (database, table, column, rule) {
-      return $('.queryBuilderRow[database=\'' + database + '\'][table=\'' + table + '\'][column=\'' + column + '\'][rule=\'' + rule + '\']');
+      return $('.queryBuilderRow[database="' + database + '"][table="' + table + '"][column="' + column + '"][rule="' + rule + '"]');
     };
 
     /**
@@ -78,7 +78,7 @@
      * @return {number} Number of matching rows
      */
     QueryBuilder.countRulesByCategory = function (database, table, column, category) {
-      return $('.queryBuilderRow[database=\'' + database + '\'][table=\'' + table + '\'][column=\'' + column + '\'][category=\'' + category + '\']').length;
+      return $('.queryBuilderRow[database="' + database + '"][table="' + table + '"][column="' + column + '"][category="' + category + '"]').length;
     };
 
     /**
@@ -89,7 +89,7 @@
      * @return {Object} Query row
      */
     QueryBuilder.getFirstMatchingRow = function (database, table, column) {
-      return $('.queryBuilderRow[database=\'' + database + '\'][table=\'' + table + '\'][column=\'' + column + '\']').first();
+      return $('.queryBuilderRow[database="' + database + '"][table="' + table + '"][column="' + column + '"]').first();
     };
 
     /**
@@ -100,7 +100,7 @@
      * @return {number} Number of matching rules
      */
     QueryBuilder.countMatchingRows = function (database, table, column) {
-      return $('.queryBuilderRow[database=\'' + database + '\'][table=\'' + table + '\'][column=\'' + column + '\']').length;
+      return $('.queryBuilderRow[database="' + database + '"][table="' + table + '"][column="' + column + '"]').length;
     };
 
     /**
@@ -152,22 +152,28 @@
       // Should we hide databaseAndTable and column?
       var visibility = '';
       if (numOfMatchingRows) {
-        visibility = 'style=\'visibility:hidden\'';
+        visibility = 'style="visibility:hidden"';
       }
 
       // Should we have an input field?
       var inputField = '';
       if (hasInput) {
-        inputField = '<input type=\'text\' placeholder=\'Add here\' required>';
+        inputField = '<input type="text" placeholder="' + QueryBuilderGlobals.i18n.INSERT_VALUE_HERE + '" required>';
       }
 
       // Used to store new rule
-      var row = '<tr class=\'queryBuilderRow\' database=\'' + database + '\' table=\'' + table + '\' column=\'' + column + '\' rule=\'' + rule + '\' category=\'' + category + '\' template=\'' + template + '\'>\n                       <td class=\'databaseAndTable\' ' + visibility + '>' + database + '.' + table + '</td>\n                       <td class=\'column\' ' + visibility + '>' + column + '</td>\n                       <td class=\'rule\'>' + rule + '</td>\n                       <td class=\'input\'>' + inputField + '</td>\n                       <td class=\'deleteRule\' onclick=\'QueryBuilder.deleteRule($(this).closest("tr"))\'><i class=\'fa fa-times\'></i></td>\n                       </tr>';
+      var row = '<tr class="queryBuilderRow" database="' + database + '" table="' + table + '" column="' + column + '" rule="' + rule + '" category="' + category + '" template="' + template + '">' +
+        '<td class="databaseAndTable" ' + visibility + '>' + database + '.' + table + '</td>' +
+        '<td class="column" ' + visibility + '>' + column + '</td>' +
+        '<td class="rule">' + rule + '</td>' +
+        '<td class="input">' + inputField + '</td>' +
+        '<td class="deleteRule" onclick="QueryBuilder.deleteRule($(this).closest("tr"))"><i class="fa fa-times"></i></td>' +
+        '</tr>';
 
       // Check if the column is already in the rules
       if (numOfMatchingRows) {
         // Add after the last rule for this column
-        $('.queryBuilderRow[database=\'' + database + '\'][table=\'' + table + '\'][column=\'' + column + '\']').last().after(row);
+        $('.queryBuilderRow[database="' + database + '"][table="' + table + '"][column="' + column + '"]').last().after(row);
       } else {
         // Add at end of rules
         $('#queryBuilder').append(row);
@@ -212,22 +218,22 @@
       var query = (_query = {}, _query[PROJECT] = [], _query[AGGREGATE] = [], _query[FILTER] = [], _query[ORDER] = [], _query[FROM] = {}, _query);
 
       // Populate project
-      $('.queryBuilderRow[category=\'' + PROJECT + '\']').each(function () {
+      $('.queryBuilderRow[category="' + PROJECT + '"]').each(function () {
         QueryBuilder.addRuleToQuery(PROJECT, query, $(this));
       });
 
       // Populate aggregate
-      $('.queryBuilderRow[category=\'' + AGGREGATE + '\']').each(function () {
+      $('.queryBuilderRow[category="' + AGGREGATE + '"]').each(function () {
         QueryBuilder.addRuleToQuery(AGGREGATE, query, $(this));
       });
 
       // Populate filter
-      $('.queryBuilderRow[category=\'' + FILTER + '\']').each(function () {
+      $('.queryBuilderRow[category="' + FILTER + '"]').each(function () {
         QueryBuilder.addRuleToQuery(FILTER, query, $(this));
       });
 
       // Populate order
-      $('.queryBuilderRow[category=\'' + ORDER + '\']').each(function () {
+      $('.queryBuilderRow[category="' + ORDER + '"]').each(function () {
         QueryBuilder.addRuleToQuery(ORDER, query, $(this));
       });
 
@@ -250,7 +256,7 @@
       if (rules[PROJECT].length < 1 && rules[AGGREGATE].length < 1) {
         return {
           "status": "fail",
-          "message": "Query requires a select or aggregate."
+          "message": QueryBuilderGlobals.i18n.QUERY_REQUIRE
         };
       }
 
@@ -259,7 +265,7 @@
       // Indent for select
       var selectIndent;
       // Check if using SELECT DISTINCT
-      if ($('.queryBuilderRow[rule=\'' + SELECT_DISTINCT + '\']').length > 0) {
+      if ($('.queryBuilderRow[rule="' + SELECT_DISTINCT + '"]').length > 0) {
         finalQuery = 'SELECT DISTINCT ';
         selectIndent = '                ';
       } else {

@@ -79,7 +79,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 %if ENABLE_QUERY_BUILDER.get():
 <!-- For query builder -->
 <link rel="stylesheet" href="${ static('desktop/ext/css/jquery.contextMenu.min.css') }">
-<link rel="stylesheet" href="${ static('desktop/css/queryBuilder.css') }">
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.contextMenu.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.ui.position.min.js') }"></script>
 <script src="${ static('desktop/js/queryBuilder.js') }"></script>
@@ -853,6 +852,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
                 <th width="10%">${ _('Table') }</th>
                 <th>${ _('Column') }</th>
                 <th width="10%">${ _('Operation') }</th>
+                <th width="5%">&nbsp;</th>
                 <th width="1%">&nbsp;</th>
               </tr>
             </thead>

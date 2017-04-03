@@ -175,6 +175,13 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       }
     };
+
+    QueryBuilderGlobals = {
+      i18n: {
+        INSERT_VALUE_HERE: "${ _('Insert value here') }",
+        QUERY_REQUIRE: "${ _('Query requires a select or aggregate.') }"
+      }
+    }
   </script>
 
   <!--[if lt IE 9]>
