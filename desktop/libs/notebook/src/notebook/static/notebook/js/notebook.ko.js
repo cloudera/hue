@@ -1755,7 +1755,11 @@ var EditorViewModel = (function() {
     self.historyFilterVisible = ko.observable(false);
     self.historyFilter.extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 900 } });
     self.historyFilter.subscribe(function(val){
-      self.fetchHistory();
+      if (self.historyCurrentPage() != 1) {
+        self.historyCurrentPage(1);
+      } else {
+        self.fetchHistory();
+      }
     });
     self.loadingHistory = ko.observable(self.history().length == 0);
     self.historyCurrentPage = ko.observable(vm.selectedNotebook() ? vm.selectedNotebook().historyCurrentPage() : 1);
