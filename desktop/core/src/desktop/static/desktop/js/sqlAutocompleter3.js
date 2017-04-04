@@ -1742,6 +1742,9 @@ var SqlAutocompleter3 = (function () {
 
       self.suggestions.update(parseResult);
     } catch(e) {
+      if (typeof console.warn !== 'undefined') {
+        console.warn(e);
+      }
       // This prevents Ace from inserting garbled text in case of exception
       huePubSub.publish('hue.ace.autocompleter.done');
     }
