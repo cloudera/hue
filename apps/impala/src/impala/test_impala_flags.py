@@ -30,9 +30,12 @@ LOG = logging.getLogger(__name__)
 
 def test_impala_flags():
   test_impala_conf_dir = tempfile.mkdtemp()
-  finish = None
+  resets = []
 
   try:
+    if conf.QUERYCACHE_ROWS.get() != 50000:
+      resets.append(conf.QUERYCACHE_ROWS.set_for_testing(50000))
+
     assert_equal(conf.QUERYCACHE_ROWS.get(), 50000)
     assert_equal(conf.IMPERSONATION_ENABLED.get(), False)
 
@@ -44,7 +47,7 @@ def test_impala_flags():
     """
     file(os.path.join(test_impala_conf_dir, 'impalad_flags'), 'w').write(flags)
 
-    finish = conf.IMPALA_CONF_DIR.set_for_testing(test_impala_conf_dir)
+    resets.append(conf.IMPALA_CONF_DIR.set_for_testing(test_impala_conf_dir))
     impala_flags.reset()
 
     assert_equal(impala_flags.get_webserver_certificate_file(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
@@ -57,5 +60,5 @@ def test_impala_flags():
     assert_equal(conf.IMPERSONATION_ENABLED.get(), True)
   finally:
     impala_flags.reset()
-    if finish:
-      finish()
+    for reset in resets:
+      reset()
