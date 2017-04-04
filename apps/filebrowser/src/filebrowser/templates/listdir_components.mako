@@ -128,22 +128,20 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <!-- ko if: selectedFiles -->
     <div class="modal-body">
-      <div class="control-group">
-        <label class="control-label">${_('Archive Name')} </label>
-        <div class="controls">
-          <input data-bind="textInput: compressArchiveName" type="text" class="input-large">
-        </div>
-        <p>${_('Start a task to compress the selected file(s).')}</p>
+      <div class="form-inline">
+        <label>${_('Archive Name')} <input data-bind="textInput: compressArchiveName" type="text" class="margin-left-5 input-xlarge"></label>
+        <p class="margin-top-20">${_('Start a task to compress the selected file(s) and/or folder(s)')}</p>
         <ul data-bind="foreach: selectedFiles()">
           <li>
+            <i data-bind="css: { 'fa fa-fw muted': true, 'fa-file-o': type == 'file', 'fa-folder-o': type != 'file' }"></i>
             <span data-bind="text: $data.name"> </span>
           </li>
         </ul>
       </div>
     </div>
     <div class="modal-footer">
-      <a class="btn" data-dismiss="modal">${_('No')}</a>
-      <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: archiveOverrideWarning, enable: compressArchiveName().length > 0"/>
+      <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
+      <input type="submit" value="${_('Compress')}" class="btn btn-primary" data-bind="click: archiveOverrideWarning, enable: compressArchiveName().length > 0"/>
     </div>
     <!-- /ko -->
   </div>
@@ -164,7 +162,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <div class="modal-footer">
       <a class="btn" data-dismiss="modal" data-bind="click: confirmCompressFiles">${_('No')}</a>
-      <input type="submit" value="${_('Yes')}" class="btn btn-primary" data-bind="click: compressSelectedFiles"/>
+      <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: compressSelectedFiles"/>
     </div>
     <!-- /ko -->
   </div>
