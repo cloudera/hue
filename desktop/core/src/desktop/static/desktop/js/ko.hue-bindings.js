@@ -3535,9 +3535,11 @@
         window.clearInterval(checkEditorValueInterval);
         checkEditorValueInterval = window.setInterval(function () {
           if (lastEditorValue !== editor.getValue()) {
+            var lastKnownPosition = editor.getCursorPosition();
             window.clearInterval(checkEditorValueInterval);
             lastEditorValue = editor.getValue();
             editor.setValue(removeUnicodes(lastEditorValue), 1);
+            editor.moveCursorToPosition(lastKnownPosition);
           }
         }, 10);
       });
