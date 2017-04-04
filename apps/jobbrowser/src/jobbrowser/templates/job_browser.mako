@@ -162,6 +162,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <tr>
                   <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
                   <th>${_('Duration')}</th>
+                  <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
                   <th>${_('Status')}</th>
                   <th>${_('Progress')}</th>
@@ -173,6 +174,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <tbody data-bind="foreach: jobs.runningApps">
                   <tr data-bind="click: fetchJob">
                     <td><div class="hueCheckbox fa"></div></td>
+                    <td data-bind="text: duration"></td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
@@ -191,6 +193,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <thead>
                 <tr>
                   <th>${_('Duration')}</th>
+                  <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
                   <th>${_('Status')}</th>
                   <th>${_('Progress')}</th>
@@ -201,6 +204,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </thead>
                 <tbody data-bind="foreach: jobs.finishedApps">
                   <tr data-bind="click: fetchJob">
+                    <td data-bind="text: duration"></td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
@@ -1046,6 +1050,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.loadingJob = ko.observable(false);
 
+// _fetchJob(callback)
+
+// fetchJob
+// updateJob
 
       self.fetchJob = function () {
         self.loadingJob(true);
@@ -1194,7 +1202,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     var Jobs = function (vm) {
       var self = this;
 
-      self.apps = ko.observableArray();
+      self.apps = ko.observableArray().extend({ rateLimit: 50 });
       self.totalApps = ko.observable(null);
       self.runningApps = ko.computed(function(job) {
         return $.grep(self.apps(), function(job) { return job.apiStatus() == 'RUNNING'; });
@@ -1262,28 +1270,80 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
 
-      self.fetchJobs = function () {
-        self.loadingJobs(true);
-        vm.job(null);
-
-        $.post("/jobbrowser/api/jobs", {
+      self._fetchJobs = function (callback) {
+        return $.post("/jobbrowser/api/jobs", {
           interface: ko.mapping.toJSON(vm.interface),
           filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
           if (data.status == 0) {
-            var apps = [];
-            if (data && data.apps) {
-              data.apps.forEach(function (job) { // TODO: update and merge with status and progress
-                apps.push(new Job(vm, job));
-              });
-            }
-            self.apps(apps);
-            self.totalApps(data.total);
+            if (callback) {
+              callback(data);
+            };
           } else {
             $(document).trigger("error", data.message);
           }
+        });
+      };
+
+      var lastFetchJobsRequest = null;
+
+      self.fetchJobs = function () {
+        vm.apiHelper.cancelActiveRequest(lastFetchJobsRequest);
+
+        self.loadingJobs(true);
+        vm.job(null);
+        lastFetchJobsRequest = self._fetchJobs(function(data) {
+          var apps = [];
+          if (data && data.apps) {
+            data.apps.forEach(function (job) {
+              apps.push(new Job(vm, job));
+            });
+          }
+          self.apps(apps);
+          self.totalApps(data.total);
         }).always(function () {
           self.loadingJobs(false);
+        });
+      }
+
+
+      var lastUpdateJobsRequest = null;
+
+      self.updateJobs = function () {
+        vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
+
+        lastFetchJobsRequest = self._fetchJobs(function(data) {
+          var apps = [];
+          if (data && data.apps) {
+            var i = 0, j = 0;
+            var newJobs = [];
+
+            while (i < self.apps().length && j < data.apps.length) {
+              if (self.apps()[i].id() != data.apps[j].id) {
+                // New Job
+                newJobs.push(new Job(vm, data.apps[j]));
+                j++;
+              } else {
+                // Updated jobs
+                if (self.apps()[i].status() != data.apps[j].status) {
+                  self.apps()[i].status(data.apps[j].status);
+                  self.apps()[i].apiStatus(data.apps[j].apiStatus);
+                }
+                i++;
+                j++;
+              }
+            }
+
+            if (i < self.apps().length) {
+              self.apps().splice(i, self.apps().length - i);
+            }
+
+            newJobs.forEach(function (job) {
+              self.apps.push(job);
+            });
+
+            self.totalApps(data.total);
+          }
         });
       };
 
@@ -1322,6 +1382,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.jobs = new Jobs(self);
       self.job = ko.observable();
+      var clock;
+      self.job.subscribe(function(val) {
+        if (! val) {
+          clock = setInterval(self.jobs.updateJobs, 5000);
+        } else {
+          if (clock) {
+            clearInterval(clock);
+          }
+        }
+      });
+
 
       self.breadcrumbs = ko.observableArray([]);
       self.resetBreadcrumbs = function(extraCrumbs) {
@@ -1331,6 +1402,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
         self.breadcrumbs(crumbs);
       }
+
       self.resetBreadcrumbs();
     };
 
@@ -1377,7 +1449,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       window.onhashchange = function () {
         loadHash();
       }
+
       loadHash();
+      console.log('JB2 ready Triggered');
     });
   })();
 </script>

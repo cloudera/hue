@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
 from liboozie.oozie_api import get_oozie
+from liboozie.utils import format_time
 
 
 LOG = logging.getLogger(__name__)
@@ -76,7 +77,7 @@ class WorkflowApi(Api):
         'user': app.user,
         'progress': app.get_progress(),
         'duration': 10 * 3600,
-        'submitted': 10 * 3600
+        'submitted': format_time(app.createdTime)
       } for app in wf_list.jobs],
       'total': wf_list.total
     }
