@@ -54,7 +54,6 @@
     self.drawFirstColumn(); // Sets self.firstColumnInner, self.firstColumnTopCell and self.firstColumn
     self.drawLockedRows();
 
-    var isFirefox = navigator.userAgent.toLowerCase().indexOf("firefox") > 0;
     var manyColumns = self.thMapping.length > 20;
 
     var sortAdjustment = self.options.noSort ? 10 : 20; // 20 is the sorting css width
@@ -84,7 +83,7 @@
     var scrollTimeout = -1;
     var headerScroll = function () {
       self.headerRowContainer.scrollLeft(self.$parent.scrollLeft());
-      if (isFirefox || manyColumns) {
+      if (manyColumns) {
         window.clearTimeout(scrollTimeout);
         scrollTimeout = window.setTimeout(throttledHeaderPadding, 200);
       } else {
@@ -204,17 +203,7 @@
 
     if (!self.options.disableTopPosition) {
       self.repositionHeader();
-      var scrollFunction;
-      if (isFirefox) {
-        var ffThrottle = -1;
-        var throttledPositionClones = function () {
-          window.clearTimeout(ffThrottle);
-          ffThrottle = window.setTimeout(self.repositionHeader.bind(self), 10);
-        };
-        scrollFunction = throttledPositionClones;
-      } else {
-        scrollFunction = self.repositionHeader.bind(self);
-      }
+      var scrollFunction = self.repositionHeader.bind(self);
       self.$mainScrollable.on('scroll', scrollFunction);
       self.disposeFunctions.push(function () {
         self.$mainScrollable.off('scroll', scrollFunction);
