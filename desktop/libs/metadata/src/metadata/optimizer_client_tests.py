@@ -180,7 +180,7 @@ class TestOptimizerApi(object):
   def test_query_risk(self):
     query = 'Select * from (Select item.id from item)'
 
-    resp = self.api.query_risk(query=query)
+    resp = self.api.query_risk(query=query, source_platform='hive')
 
     assert_equal('success', resp['status'], resp)
 
