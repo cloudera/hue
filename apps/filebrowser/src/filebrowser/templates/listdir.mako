@@ -96,7 +96,7 @@ ${ fb_components.menubar() }
               </li>
               <li>
                 <a href="javascript: void(0)" title="${_('Set Replication')}" data-bind="visible: !inTrash() && !isS3() && selectedFiles().length == 1 && selectedFile().type == 'file', click: setReplicationFactor">
-                  <i class="fa fa-fw fa-hdd-o"></i>${_('Set replication')}
+                  <i class="fa fa-fw fa-hdd-o"></i> ${_('Set replication')}
                 </a>
               </li>
               % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
@@ -130,12 +130,12 @@ ${ fb_components.menubar() }
           % if 'oozie' in apps:
             <button class="btn fileToolbarBtn" title="${_('Submit')}"
               data-bind="visible: selectedFiles().length == 1 && $.inArray(selectedFile().name, ['workflow.xml', 'coordinator.xml', 'bundle.xml']) > -1, click: submitSelected">
-              <i class="fa fa-play"></i> ${_('Submit')}
+              <i class="fa fa-fw fa-play"></i> ${_('Submit')}
             </button>
             % if ENABLE_EXTRACT_UPLOADED_ARCHIVE.get():
               <button class="btn extractArchiveBtn" title="${_('Extract')}"
                 data-bind="visible: selectedFiles().length == 1 && isArchive() && !isS3(), click: confirmExtractArchive">
-                <i class="fa fa-play"></i> ${_('Extract')}
+                <i class="fa fa-fw fa-file-archive-o"></i> ${_('Extract')}
               </button>
             % endif
           % endif
