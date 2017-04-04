@@ -1099,12 +1099,12 @@ ${ components.menubar() }
       % endif
       <div class="content-panel" data-bind="niceScroll">
         <div class="metastore-main">
-          <h3>
+          <h1>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
             <!-- ko template: { if: database() !== null && database().table() === null, name: 'metastore-tables-actions' }--><!-- /ko -->
             <!-- ko template: { if: database() === null, name: 'metastore-databases-actions' }--><!-- /ko -->
             <!-- ko template: 'metastore-breadcrumbs' --><!-- /ko -->
-          </h3>
+          </h1>
           <i data-bind="visible: loading" class="fa fa-spinner fa-spin fa-2x margin-left-10" style="color: #999; display: none;"></i>
           <!-- ko template: { if: !loading() && database() === null, name: 'metastore-databases' } --><!-- /ko -->
           <!-- ko with: database -->
