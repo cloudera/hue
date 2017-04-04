@@ -810,7 +810,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       statement = "SELECT * FROM web_logs;"
       doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
       notebook = Notebook(document=doc)
-      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=5.0)
 
       self.client.post(reverse('notebook:fetch_result_data'),
                        {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100, 'startOver': 'false'})
@@ -840,7 +840,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
       statement = "SELECT * FROM web_logs;"
       doc = self.create_query_document(owner=self.user, query_type='impala', statement=statement)
       notebook = Notebook(document=doc)
-      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=2.0)
+      snippet = self.execute_and_wait(doc, snippet_idx=0, timeout=60.0, wait=5.0)
 
       self.client.post(reverse('notebook:fetch_result_data'),
                        {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet), 'rows': 100, 'startOver': 'false'})
