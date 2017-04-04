@@ -33,9 +33,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
 
 <style type="text/css">
   body {
-    %if not is_hue4():
-    background-color: #FAFAFA;
-    %endif
+    background-color: #F8F8F8;
     padding-top: 150px;
   }
 
