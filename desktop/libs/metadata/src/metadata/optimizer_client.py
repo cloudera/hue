@@ -155,8 +155,8 @@ class OptimizerApi(object):
     return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, })
 
 
-  def query_risk(self, query, page_size=100, startingToken=None):
-    return self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'pageSize': page_size, startingToken: None})
+  def query_risk(self, query, source_platform, page_size=100, startingToken=None):
+    return self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'pageSize': page_size, startingToken: None})
 
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):

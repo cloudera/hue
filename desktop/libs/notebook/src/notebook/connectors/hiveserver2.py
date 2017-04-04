@@ -533,7 +533,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     api = OptimizerApi()
 
-    data = api.query_risk(query=query)
+    data = api.query_risk(query=query, source_platform=snippet['type'])
     data = data.get(snippet['type'] + 'Risk', {})
 
     if data and data == {"riskAnalysis": "", "risk": "low", "riskRecommendation": ""}:

@@ -171,10 +171,11 @@ def query_risk(request):
   response = {'status': -1}
 
   query = json.loads(request.POST.get('query'))
+  source_platform = request.POST.get('sourcePlatform')
 
   api = OptimizerApi()
 
-  data = api.query_risk(query=query)
+  data = api.query_risk(query=query, source_platform=source_platform)
 
   if data:
     response['status'] = 0
