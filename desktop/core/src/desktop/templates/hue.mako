@@ -217,55 +217,28 @@ ${ hueIcons.symbols() }
   </nav>
 
   <div class="content-wrapper">
-    <div class="left-nav" data-bind="css: { 'left-nav-visible': leftNavVisible }, niceScroll">
-      <ul class="left-nav-menu">
-        <li data-bind="click: function () { page('/home') }"><a href="javascript: void(0);">Documents</a></li>
-        <li class="header">&nbsp;</li>
-        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Analyse') }</li>
-        % if interpreters:
-        <li data-bind="click: function () { page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><a href="javascript: void(0);">Editor</a></li>
-        % endif
-        % if IS_DASHBOARD_ENABLED.get():
-        <li data-bind="click: function () { page('/dashboard/new_search') }"><a href="javascript: void(0);">Dashboard</a></li>
-        % endif
-        % if 'oozie' in apps:
-        <li data-bind="click: function () { page('/oozie/editor/workflow/new/') }"><a href="javascript: void(0);">Workflows</a></li>
-        % endif
-        <li class="header">&nbsp;</li>
-        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Browse') }</li>
-        % if 'filebrowser' in apps:
-        <li data-bind="click: function () { page('/filebrowser/') }"><a href="javascript: void(0);">Files</a></li>
-        % endif
-        % if is_s3_enabled:
-        <li data-bind="click: function () { page('/filebrowser/view=S3A://') }"><a href="javascript: void(0);">S3</a></li>
-        % endif
-        % if 'metastore' in apps:
-        <li data-bind="click: function () { page('/metastore/tables/') }"><a href="javascript: void(0);">Tables</a></li>
-        % endif
-        % if 'search' in apps:
-        <li data-bind="click: function () { page('/indexer/') }"><a href="javascript: void(0);">Indexes</a></li>
-        % endif
-        % if 'jobbrowser' in apps:
-        <li data-bind="click: function () { page('/jobbrowser/') }"><a href="javascript: void(0);">Jobs</a></li>
-        % endif
-        % if 'hbase' in apps:
-        <li data-bind="click: function () { page('/hbase/') }"><a href="javascript: void(0);">HBase</a></li>
-        % endif
-        % if 'security' in apps:
-          <li data-bind="click: function () { page('/security/hive') }"><a href="javascript: void(0);">Security</a></li>
-        % endif
-        % if 'sqoop' in apps:
-        <li><a href="/${apps['sqoop'].display_name}">${_('Sqoop')}</a></li>
-        % endif
-        % if other_apps:
-        <li class="header">&nbsp;</li>
-        <li class="header" style="padding-left: 4px; border-bottom: 1px solid #DDD; padding-bottom: 3px;">${ _('Apps') }</li>
-        % for other in other_apps:
-        <li><a href="/${ other.display_name }">${ other.nice_name }</a></li>
-        % endfor
-        % endif
-      </ul>
-      <div class="left-nav-drop">
+
+
+    <script type="text/html" id="tmpl-sidebar-link">
+      <a role="button" class="sidebar-item" data-bind="click: item.click, attr: { title: item.displayName }">
+        <!-- ko if: item.icon --><i class="fa" data-bind="css: item.icon"></i><!-- /ko -->
+        <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
+      </a>
+    </script>
+
+    <div class="sidebar" data-bind="visible: leftNavVisible" style="display:none;">
+      <div class="sidebar-content">
+        <!-- ko foreach: {data: items, as: 'item'} -->
+          <!-- ko if: item.isCategory -->
+             <h4 class="sidebar-category-item" data-bind="text: item.displayName"></h4>
+             <!-- ko template: {name: 'tmpl-sidebar-link', foreach: item.children, as: 'item'} --><!-- /ko -->
+          <!-- /ko -->
+          <!-- ko ifnot: item.isCategory -->
+             <!-- ko template: { name: 'tmpl-sidebar-link' } --><!-- /ko -->
+          <!-- /ko -->
+        <!-- /ko -->
+      </div>
+      <div class="sidebar-footer-panel">
         <div data-bind="dropzone: {
             clickable: false,
             url: '/filebrowser/upload/file?dest=' + DropzoneGlobals.homeDir,
@@ -1073,10 +1046,157 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
       var topNavViewModel = new TopNavViewModel();
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
-      ko.applyBindings(topNavViewModel, $('.left-nav')[0]);
 
       return topNavViewModel;
     })(onePageViewModel);
+
+
+    (function (onePageViewModel, topNavViewModel) {
+      function SideBarViewModel () {
+        self.items = [];
+
+        self.leftNavVisible = topNavViewModel.leftNavVisible;
+        self.onePageViewModel = onePageViewModel;
+
+        self.items.push({
+          displayName: '${ _('Documents') }',
+          click: function () {
+            page('/home')
+          }
+        });
+
+        var analyzeItems = [];
+
+        % if interpreters:
+          analyzeItems.push({
+            displayName: '${ _('Editor') }',
+            click: function () {
+              page('/editor');
+              onePageViewModel.changeEditorType('hive', true);
+            }
+          });
+        % endif
+        % if IS_DASHBOARD_ENABLED.get():
+          analyzeItems.push({
+            displayName: '${ _('Dashboard') }',
+            click: function () {
+              page('/dashboard/new_search');
+            }
+          });
+        % endif
+        % if 'oozie' in apps:
+          analyzeItems.push({
+            displayName: '${ _('Workflows') }',
+            click: function () {
+              page('/oozie/editor/workflow/new/')
+            }
+          });
+        % endif
+
+        if (analyzeItems.length > 0) {
+          self.items.push({
+            isCategory: true,
+            displayName: '${ _('Analyze') }',
+            children: analyzeItems
+          })
+        }
+
+        var browseItems = [];
+
+        % if 'filebrowser' in apps:
+          browseItems.push({
+            displayName: '${ _('Files') }',
+            click: function () {
+              page('/filebrowser/')
+            }
+          });
+        % endif
+        % if is_s3_enabled:
+          browseItems.push({
+            displayName: '${ _('S3') }',
+            click: function () {
+              page('/filebrowser/view=S3A://')
+            }
+          });
+        % endif
+        % if 'metastore' in apps:
+          browseItems.push({
+            displayName: '${ _('Tables') }',
+            click: function () {
+              page('/metastore/tables/')
+            }
+          });
+        % endif
+        % if 'search' in apps:
+          browseItems.push({
+            displayName: '${ _('Indexes') }',
+            click: function () {
+              page('/indexer/')
+            }
+          });
+        % endif
+        % if 'jobbrowser' in apps:
+          browseItems.push({
+            displayName: '${ _('Jobs') }',
+            click: function () {
+              page('/jobbrowser/')
+            }
+          });
+        % endif
+        % if 'hbase' in apps:
+          browseItems.push({
+            displayName: '${ _('HBase') }',
+            click: function () {
+              page('/hbase/')
+            }
+          });
+        % endif
+        % if 'security' in apps:
+          browseItems.push({
+            displayName: '${ _('Security') }',
+            click: function () {
+              page('/security/hive')
+            }
+          });
+        % endif
+        % if 'sqoop' in apps:
+          browseItems.push({
+            displayName: '${ _('Sqoop') }',
+            click: function () {
+              page('/sqoop')
+            }
+          });
+        % endif
+
+        if (browseItems.length > 0) {
+          self.items.push({
+            isCategory: true,
+            displayName: '${ _('Browse') }',
+            children: browseItems
+          })
+        }
+
+        % if other_apps:
+          var otherApps = [];
+        % for other in other_apps:
+          otherApps.push({
+            displayName: '${ other.nice_name }',
+            click: function () {
+              window.location('/${ other.nice_name }')
+            }
+          });
+        % endfor
+          self.items.push({
+            isCategory: true,
+            displayName: '${ _('Apps') }',
+            children: otherApps
+          });
+        % endif
+      }
+
+      var sidebarViewModel = new SideBarViewModel();
+      ko.applyBindings(sidebarViewModel, $('.sidebar')[0]);
+    })(onePageViewModel, topNavViewModel);
 
     window.hueDebug = {
       viewModel: function (element) {

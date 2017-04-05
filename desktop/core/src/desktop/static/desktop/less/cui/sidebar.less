@@ -1,0 +1,128 @@
+
+
+@import (reference) "extra-variables.less";
+
+@sidebar-width: 180px;
+@collapsed-sidebar-width: 48px;
+@sidebar-animation-duration: 250ms;
+@sidebar-category-font-size: 13px;
+@sidebar-left-spacing: 16px;
+
+.sidebar {
+  position: fixed;
+  top: @navbar-height;
+  left: 0;
+  bottom: 0;
+  background-color: @cui-gray-050;
+  width: @sidebar-width;
+  transition: width @sidebar-animation-duration;
+  z-index: 1000;
+  overflow: hidden;
+  box-shadow: 0 1px 2px 0;
+
+
+  .fa:before {
+    font-size: 16px;
+    color: @cui-gray-600;
+  }
+
+  .sidebar-content {
+    top: 48px;
+    bottom: 36px;
+    position: absolute;
+    overflow-y: auto;
+    min-width: @sidebar-width;
+  }
+
+  .sidebar-item {
+    display: block;
+    padding-left: @sidebar-left-spacing;
+    line-height: 36px;
+    color: @text-color;
+
+    .fa {
+      margin-right: 14px;
+      width: 18px;
+      text-align: center;
+    }
+  }
+
+  .sidebar-item.active {
+    font-weight: bold;
+    background: @cui-gray-100;
+
+    .fa:before {
+      color: @cui-blue-500;
+    }
+  }
+
+  .sidebar-item:hover {
+    background: @cui-gray-100;
+  }
+
+  .sidebar-category-item {
+    margin: 20px 0 4px @sidebar-left-spacing;
+    font-size: @sidebar-category-font-size;
+    font-weight: bold;
+    color: @cui-gray-600;
+    transition: opacity @sidebar-animation-duration;
+  }
+
+  .sidebar-action-button {
+    background-color: inherit;
+    display: block;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    line-height: 36px;
+    width: 100%;
+    text-align: right;
+    padding-right: 16px;
+    color: @text-color;
+    box-shadow: 0 0px 2px 0;
+
+    &:hover {
+      background: @cui-gray-100;
+    }
+  }
+
+  .sidebar-item-name {
+    transition: opacity @sidebar-animation-duration;
+    opacity: 1;
+  }
+
+  .sidebar-footer-panel {
+    background-color: inherit;
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    left: 0;
+    width: 100%;
+    color: @text-color;
+    box-shadow: 0 0 2px 0;
+  }
+}
+
+.sidebar.collapsed {
+  width: @collapsed-sidebar-width;
+
+  .sidebar-category-item, .sidebar-item-name {
+    opacity: 0;
+  }
+
+  .sidebar-action-button {
+    text-align: center;
+    padding: 0;
+  }
+}
+
+.sidebar-placeholder {
+  transition: width @sidebar-animation-duration;
+  width: @sidebar-width;
+  height: 100%;
+
+  &.collapsed {
+    width: @collapsed-sidebar-width;
+  }
+}
