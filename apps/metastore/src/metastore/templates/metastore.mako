@@ -826,9 +826,9 @@ ${ components.menubar() }
     <li><a href="#sample" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-sample'); }">${_('Sample')}</a></li>
     <!-- ko if: $root.optimizerEnabled() -->
       <!-- ko if: $root.database().table().optimizerDetails() -->
-      <li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
-      <li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
-      <li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
+      ##<li><a href="#permissions" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-permissions'); }">${_('Permissions')}</a></li>
+      ##<li><a href="#queries" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-queries'); }">${_('Queries')} (<span data-bind="text: $root.database().table().optimizerDetails().queryCount"></span>)</a></li>
+      ##<li><a href="#joins" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-joins'); }">${_('Joins')} (<span data-bind="text: $root.database().table().optimizerDetails().joinCount"></span>)</a></li>
       <!-- /ko -->
       ##<!-- ko if: $root.database().table().relationshipsDetails() -->
       ##<li><a href="#relationships" data-toggle="tab" data-bind="click: function(){ $root.currentTab('table-relationships'); }">${_('Relationships')} (<span data-bind="text: $root.database().table().relationshipsDetails().inputs().length + $root.database().table().relationshipsDetails().targets().length"></span>)</a></li>
