@@ -175,7 +175,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <tr data-bind="click: fetchJob">
                     <td><div class="hueCheckbox fa"></div></td>
                     <td data-bind="text: duration"></td>
-                    <td data-bind="text: duration"></td>
+                    <td data-bind="text: submitted"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
                     <td data-bind="text: progress"></td>
@@ -205,7 +205,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <tbody data-bind="foreach: jobs.finishedApps">
                   <tr data-bind="click: fetchJob">
                     <td data-bind="text: duration"></td>
-                    <td data-bind="text: duration"></td>
+                    <td data-bind="text: submitted"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
                     <td data-bind="text: progress"></td>
@@ -1034,7 +1034,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.status = ko.observableDefault(job.status);
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
-      self.checkStatusTimeout = null;
 
       self.user = ko.observableDefault(job.user);
       self.cluster = ko.observableDefault(job.cluster);
@@ -1050,18 +1049,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.loadingJob = ko.observable(false);
 
-// _fetchJob(callback)
+      self._fetchJob = function (callback) {
+        return $.post("/jobbrowser/api/job", {
+          app_id: ko.mapping.toJSON(self.id),
+          interface: ko.mapping.toJSON(vm.interface)
+        }, function (data) {
+          if (data.status == 0) {
+            if (callback) {
+              callback(data);
+            };
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        });
+      };
 
-// fetchJob
-// updateJob
+      var lastFetchJobRequest = null;
+      var lastUpdateJobRequest = null;
 
       self.fetchJob = function () {
-        self.loadingJob(true);
+        vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
+        vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
 
-        if (self.checkStatusTimeout != null) {
-          clearTimeout(self.checkStatusTimeout);
-          self.checkStatusTimeout = null;
-        }
+        self.loadingJob(true);
 
         var interface = vm.interface();
         if (/oozie-oozi-W/.test(self.id())) {
@@ -1073,11 +1083,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/oozie-oozi-B/.test(self.id())) {
           interface = 'bundles';
         }
+        vm.interface(interface);
 
-        $.post("/jobbrowser/api/job", {
-          app_id: ko.mapping.toJSON(self.id),
-          interface: ko.mapping.toJSON(interface)
-        }, function (data) {
+        lastFetchJobRequest = self._fetchJob(function (data) {
           if (data.status == 0) {
             vm.interface(interface);
             vm.job(new Job(vm, data.app));
@@ -1113,18 +1121,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
 
-            vm.job().fetchLogs();
-            vm.job().fetchStatus();
-
-            //if (self.mainType() == 'schedules') {
-              //vm.job().coordVM.setActions(data.app.actions);
-            //}
+            self.fetchLogs();
           } else {
             $(document).trigger("error", data.message);
           }
         }).always(function () {
           self.loadingJob(false);
         });
+      };
+
+      self.updateJob = function () {console.log('update job');
+        vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+
+        if (vm.job() == self && self.apiStatus() == 'RUNNING') {
+          lastFetchJobRequest = self._fetchJob(function (data) {
+            vm.job(new Job(vm, data.app)); // vm.job().fetchStatus() would only update progress and status
+            vm.job().fetchLogs();
+          });
+        }
       };
 
       self.fetchLogs = function (name) {
@@ -1139,7 +1153,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           } else {
             $(document).trigger("error", data.message);
           }
-        }).always(function () {
         });
       };
 
@@ -1155,7 +1168,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           } else {
             $(document).trigger("error", data.message);
           }
-        }).always(function () {
         });
       };
 
@@ -1172,10 +1184,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.status(data.app.status);
             self.apiStatus(data.app.apiStatus);
             self.progress(data.app.progress);
-
-            if (self.apiStatus() == 'RUNNING') {
-              self.checkStatusTimeout = setTimeout(self.fetchStatus, 2000);
-            }
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1286,8 +1294,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       var lastFetchJobsRequest = null;
+      var lastUpdateJobsRequest = null;
 
       self.fetchJobs = function () {
+        vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
         vm.apiHelper.cancelActiveRequest(lastFetchJobsRequest);
 
         self.loadingJobs(true);
@@ -1306,10 +1316,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       }
 
-
-      var lastUpdateJobsRequest = null;
-
-      self.updateJobs = function () {
+      self.updateJobs = function () {console.log('update jobs');
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
@@ -1384,12 +1391,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.job = ko.observable();
       var clock;
       self.job.subscribe(function(val) {
-        if (! val) {
-          clock = setInterval(self.jobs.updateJobs, 5000);
+        clearInterval(clock);
+        if (val) {
+          clock = setInterval(val.updateJob, 5000);console.log('set interval');
         } else {
-          if (clock) {
-            clearInterval(clock);
-          }
+          clock = setInterval(self.jobs.updateJobs, 20000);console.log('set interval');
         }
       });
 
