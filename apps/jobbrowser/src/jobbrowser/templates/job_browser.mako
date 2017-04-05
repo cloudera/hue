@@ -673,23 +673,44 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
   <br><br>
-  Variables, Workspace<br>
+  Variables? Workspace<br>
   Duration 8s<br>
   <br><br>
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">${ _('Stop') }</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">${ _('Resume')}</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">${ _('Rerun') }</a>
+  <div class="btn-group">
+    <!-- ko if: $root.job().hasKill -->
+    <button class="btn btn-danger" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
+      ## TODO confirmation
+      <i class="fa fa-times"></i> ${_('Kill')}
+    </button>
+    <!-- /ko -->
+    <!-- ko if: $root.job().hasResume -->
+    <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
+      <i class="fa fa-play"></i> ${ _('Resume') }
+    </button>
+    <!-- /ko -->
+    <!-- ko if: $root.job().hasSuspend -->
+    <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('resume'); }, enable: suspendEnabled">
+      <i class="fa fa-pause"></i> ${ _('Suspend') }
+    </button>
+    <!-- /ko -->
+    <!-- ko if: $root.job().hasRerun -->
+    <button class="btn" title="${ _('Rerun selected') }" data-bind="click: function() { control('rerun'); }, enable: rerunEnabled">
+      <i class="fa fa-repeat"></i> ${ _('Rerun') }
+    </button>
+    <!-- /ko -->
+  </div>
+
 
   <ul class="nav nav-tabs margin-top-20">
     <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
+    <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
     <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
     <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
     <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
   </ul>
 
@@ -978,7 +999,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   (function () {
 
-/**
+/**  cf. updateWorkflowGraph()
+
     var Workflow = function(vm, job) {
 
             var lastPosition = {
@@ -1036,6 +1058,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.status = ko.observableDefault(job.status);
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
+      self.isRunning = ko.computed(function() {
+        return self.apiStatus() != 'SUCCEEDED' && self.apiStatus() != 'FAILED';
+      });
 
       self.user = ko.observableDefault(job.user);
       self.cluster = ko.observableDefault(job.cluster);
@@ -1049,7 +1074,37 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
+      self.isKill = ko.computed(function() {
+        return ['workflow'].indexOf(self.type()) != -1;
+      });
+      self.hasKill = ko.computed(function() {
+        return ['workflow'].indexOf(self.type()) != -1;
+      });
+      self.killEnabled = ko.computed(function() {
+        return self.hasKill() && self.apiStatus() == 'RUNNING';
+      });
+      self.hasResume = ko.computed(function() {
+        return ['workflow'].indexOf(self.type()) != -1;
+      });
+      self.resumeEnabled = ko.computed(function() {
+        return self.hasResume() && self.apiStatus() == 'PAUSED';
+      });
+      self.hasRerun = ko.computed(function() {
+        return ['workflow'].indexOf(self.type()) != -1;
+      });
+      self.rerunEnabled = ko.computed(function() {
+        return self.hasRerun() && ! self.isRunning();
+      });
+      self.hasPause = ko.computed(function() {
+        return ['workflow'].indexOf(self.type()) != -1;
+      });
+      self.pauseEnabled = ko.computed(function() {
+        return self.hasPause() && self.apiStatus() == 'RUNNING';
+      });
+
       self.loadingJob = ko.observable(false);
+      var lastFetchJobRequest = null;
+      var lastUpdateJobRequest = null;
 
       self._fetchJob = function (callback) {
         return $.post("/jobbrowser/api/job", {
@@ -1065,9 +1120,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           }
         });
       };
-
-      var lastFetchJobRequest = null;
-      var lastUpdateJobRequest = null;
 
       self.fetchJob = function () {
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
@@ -1123,7 +1175,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
 
-            self.fetchLogs();
+            vm.job().fetchLogs();
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1137,8 +1189,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
-            vm.job(new Job(vm, data.app)); // vm.job().fetchStatus() would only update progress and status
+            // vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
+            vm.job().fetchStatus();
             vm.job().fetchLogs();
+            // vm.job().fetchProfile(); // Get name of active tab?
+            // updateWorkflowGraph() // If workflow
           });
         }
       };
@@ -1174,10 +1229,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.fetchStatus = function () {
-        if (self.apiStatus() != 'RUNNING') {
-          return;
-        }
-
         $.post("/jobbrowser/api/job", {
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(self.mainType)
@@ -1201,10 +1252,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
              $(document).trigger("info", data.message);
+             self.fetchStatus();
           } else {
             $(document).trigger("error", data.message);
           }
-        }).always(function () {
         });
       };
     };
@@ -1215,10 +1266,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apps = ko.observableArray().extend({ rateLimit: 50 });
       self.totalApps = ko.observable(null);
       self.runningApps = ko.computed(function(job) {
-        return $.grep(self.apps(), function(job) { return job.apiStatus() == 'RUNNING'; });
+        return $.grep(self.apps(), function(job) { return job.isRunning(); });
       });
       self.finishedApps = ko.computed(function(job) {
-        return $.grep(self.apps(), function(job) { return job.apiStatus() == 'FINISHED'; });
+        return $.grep(self.apps(), function(job) { return ! job.isRunning(); });
       });
       self.loadingJobs = ko.observable(false);
       self.selectedJobs = ko.observableArray();
