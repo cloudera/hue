@@ -461,10 +461,11 @@ from desktop.views import _ko
             self.editor().session.remove(range);
           }
         }
-        var match = self.editor().getTextAfterCursor().match(/^[^\s.]+/);
-        if (match) {
-          self.editor().removeTextAfterCursor(match[0].length);
-        }
+        // TODO: Only replace when editing identifiers (using parse locations)
+##         var match = self.editor().getTextAfterCursor().match(/^[^\s.]+/);
+##         if (match) {
+##           self.editor().removeTextAfterCursor(match[0].length);
+##         }
         // TODO: Move cursor handling for '? FROM tbl' here
         self.editor().execCommand('insertstring', self.suggestions.filtered()[self.selectedIndex()].value);
         self.editor().renderer.scrollCursorIntoView();
