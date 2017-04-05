@@ -763,8 +763,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               self.changeEditorType(window.location.getParameter('type'));
             }
           }},
-          { url: '/notebook/editor', app: function () {
-            page('/editor' + (window.location.getParameter('editor') !== '' ? '?editor=' + window.location.getParameter('editor') : ''));
+          { url: '/notebook/editor', app: function (ctx) {
+            page('/editor?' + ctx.querystring);
           }},
           { url: '/filebrowser/view=*', app:  'filebrowser' },
           { url: '/filebrowser/*', app: function () {
@@ -813,8 +813,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               });
             }
           }},
-          { url: '/notebook/editor', app: function () {
-            page('/notebook' + (window.location.getParameter('notebook') !== '' ? '?notebook=' + window.location.getParameter('notebook') : ''));
+          { url: '/notebook/editor', app: function (ctx) {
+            page('/notebook?' + ctx.querystring);
           }},
           { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
           { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
