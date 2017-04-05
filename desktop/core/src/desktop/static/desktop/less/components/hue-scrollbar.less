@@ -21,31 +21,24 @@
 }
 
 .hue-scrollbar-x-rail {
-  opacity: 0.2;
   position: fixed;
   z-index: 10000;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-transition: background-color .2s linear, opacity .2s linear;
-  -moz-transition: background-color .2s linear, opacity .2s linear;
-  -o-transition: background-color .2s linear, opacity .2s linear;
-  transition: background-color .2s linear, opacity .2s linear;
-  height: 9px;
-}
-
-
-.hue-scrollbar-x-rail > .hue-scrollbar-x {
-  position: absolute;
-  background-color: #C1C1C1;
-  -webkit-border-radius: 5px;
-  -moz-border-radius: 5px;
-  border-radius: 5px;
-  -webkit-transition: background-color .2s linear;
-  -moz-transition: background-color .2s linear;
-  -o-transition: background-color .2s linear;
-  transition: background-color .2s linear;
-  bottom: 1px;
-  height: 9px;
-  z-index: 10000;
+  padding: 2px;
+  background-color: #F4F4F4;
+  border: 1px solid #F0F0F0;
+  &>.hue-scrollbar-x {
+    position: absolute;
+    background-color: #C1C1C1;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    .hue-linear-transition(background-color);
+    height: 8px;
+    z-index: 10000;
+  }
+  &:hover {
+    &>.hue-scrollbar-x {
+      background-color: #7D7D7D;
+    }
+  }
 }

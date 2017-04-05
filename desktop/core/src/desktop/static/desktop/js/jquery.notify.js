@@ -76,18 +76,12 @@
       }
       el.find(".message").html("<strong>" + _this.options.message + "</strong>");
 
-      el.find(".message").niceScroll({
+      hueUtils.initNiceScroll(el.find(".message"), {
         cursorcolor: scrollColor,
         cursorborder: '1px solid ' + scrollColor,
-        cursoropacitymin: 0,
-        cursoropacitymax: 0.7,
-        scrollspeed: 100,
-        mousescrollstep: 60,
-        cursorminheight: 20,
         horizrailenabled: false,
         zindex: 14000,
         railoffset: {left: 5},
-        autohidemode: 'leave'
       });
 
       if (_this.options.css != null) {

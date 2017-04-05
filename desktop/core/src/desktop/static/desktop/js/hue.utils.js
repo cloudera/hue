@@ -344,6 +344,25 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     }
   };
 
+  hueUtils.initNiceScroll = function ($el, options) {
+    var defaults = {
+      cursorcolor: "#7D7D7D",
+      cursorborder: "1px solid #7D7D7D",
+      background: "#F4F4F4",
+      cursoropacitymin: 0.38,
+      cursoropacitymax: 1,
+      mousescrollstep: 60,
+      cursorwidth: "6px",
+      railpadding: { top: 1, right: 1, left: 1, bottom: 1 },
+      hidecursordelay: 0,
+      scrollspeed: 1,
+      cursorminheight: 20,
+      horizrailenabled: true,
+      autohidemode: "cursor"
+    }
+    return $el.niceScroll($.extend(defaults, options || {}));
+  };
+
 }(hueUtils = window.hueUtils || {}));
 
 if (!Object.keys) {

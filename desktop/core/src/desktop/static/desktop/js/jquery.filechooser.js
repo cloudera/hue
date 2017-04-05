@@ -367,18 +367,7 @@
         $('<div>').addClass('clearfix').appendTo($(_parent.element).find('.filechooser-tree'));
 
         if (typeof $.nicescroll !== 'undefined') {
-          $scrollingBreadcrumbs.niceScroll({
-            cursorcolor: "#C1C1C1",
-            cursorborder: "1px solid #C1C1C1",
-            cursoropacitymin: 0,
-            cursoropacitymax: 1,
-            scrollspeed: 100,
-            mousescrollstep: 60,
-            railhoffset: {
-              top: 2
-            },
-            autohidemode: "leave"
-          });
+          hueUtils.initNiceScroll($scrollingBreadcrumbs, {railhoffset: {top: 2}});
           $scrollingBreadcrumbs.parents('.modal').find('.nicescroll-rails-vr').remove();
         }
 
