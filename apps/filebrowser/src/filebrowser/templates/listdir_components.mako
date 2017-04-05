@@ -1225,7 +1225,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
 
           if ($("#hueBreadcrumbText").is(":visible")) {
-            $(".hueBreadcrumb").show();
+            $(".hue-breadcrumbs").show();
             $("#hueBreadcrumbText").hide();
             $("#editBreadcrumb").show();
           }
@@ -2534,7 +2534,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       $("#editBreadcrumb").click(function (e) {
         if ($(e.target).is('ul')){
           $(this).hide();
-          $(".hueBreadcrumb").hide();
+          $(".hue-breadcrumbs").hide();
           $("#hueBreadcrumbText").show().focus();
         }
       });
@@ -2556,7 +2556,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         },
         onBlur: function() {
           $("#hueBreadcrumbText").hide();
-          $(".hueBreadcrumb").show();
+          $(".hue-breadcrumbs").show();
           $("#editBreadcrumb").show();
         },
         smartTooltip: "${_('Did you know? You can use the tab key or CTRL + Space to autocomplete file and folder names')}"

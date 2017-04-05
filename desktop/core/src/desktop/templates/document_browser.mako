@@ -293,7 +293,7 @@ from desktop.views import _ko
       border: 1px solid #338BB8 !important;
     }
 
-    .hueBreadcrumbBar a {
+    .hue-breadcrumbs-bar a {
       color: #338BB8 !important;
       display: inline !important;
     }

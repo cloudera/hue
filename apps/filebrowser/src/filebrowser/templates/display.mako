@@ -485,7 +485,7 @@ ${ fb_components.menubar() }
   $(document).ready(function () {
     ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
-    $("#loader").css("marginLeft", ($(".hueBreadcrumbBar").width() - $("#loader").width()) / 2);
+    $("#loader").css("marginLeft", ($(".hue-breadcrumbs-bar").width() - $("#loader").width()) / 2);
 
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");

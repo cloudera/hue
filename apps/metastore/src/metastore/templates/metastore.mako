@@ -74,7 +74,7 @@ ${ components.menubar() }
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
 
 <script type="text/html" id="metastore-breadcrumbs">
-  <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+  <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
     <li>
       <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}</a>
       <!-- ko if: database -->

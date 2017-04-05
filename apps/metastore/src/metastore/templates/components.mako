@@ -39,7 +39,7 @@
 
 
 <%def name="breadcrumbs(breadcrumbs, icon='')">
-  <ul class="nav nav-pills hueBreadcrumbBar" id="breadcrumbs">
+  <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
     %if icon != '':
       <li>
         <i class="${icon}"></i>

@@ -275,7 +275,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="breadcrumbs">
   <h3>
-    <ul class="inline hueBreadcrumbBar" data-bind="foreach: breadcrumbs">
+    <ul class="inline hue-breadcrumbs-bar" data-bind="foreach: breadcrumbs">
       <li>
       <!-- ko if: $index() > 0 -->
         <span class="divider">&gt;</span>

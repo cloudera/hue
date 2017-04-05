@@ -22,7 +22,7 @@ from aws import get_client
 
 <%def name="breadcrumbs(path, breadcrumbs, from_listdir=False)">
     % if from_listdir:
-      <ul class="nav nav-pills hueBreadcrumbBar">
+      <ul class="nav nav-pills hue-breadcrumbs-bar">
         %if path.lower().find('s3a://') == 0:
           <li style="padding-top: 10px">
             <span class="homeLink" title="${ _('S3 region %s') % get_client()._region }">
@@ -33,7 +33,7 @@ from aws import get_client
           <li><a class="pointer homeLink" data-bind="click: $root.openHome, attr:{'href': '${url('filebrowser.views.view', path=urlencode(path))}?default_to_home'}"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         %endif
         <li>
-            <ul id="editBreadcrumb" class="hueBreadcrumb editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
+            <ul id="editBreadcrumb" class="hue-breadcrumbs editable-breadcrumbs" data-bind="foreach: breadcrumbs" style="padding-right:40px; padding-top: 12px" title="${_('Edit path')}">
                 <li data-bind="visible: label.slice(-1) == '/'"><a data-bind="click: show, attr:{'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"><span class="divider" data-bind="text: label"></span></a></li>
                 <li data-bind="visible: label.slice(-1) != '/'"><a data-bind="text: label, click: show, attr:{'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span></li>
             </ul>
@@ -55,10 +55,10 @@ from aws import get_client
         </li>
       </ul>
     % else:
-      <ul class="nav nav-pills hueBreadcrumbBar">
+      <ul class="nav nav-pills hue-breadcrumbs-bar">
         <li><a href="${url('filebrowser.views.view', path=urlencode(path))}?default_to_home" class="homeLink"><i class="fa fa-home"></i> ${_('Home')}</a></li>
         <li>
-          <ul class="hueBreadcrumb" style="padding-right:40px; padding-top: 12px">
+          <ul class="hue-breadcrumbs" style="padding-right:40px; padding-top: 12px">
           % for breadcrumb_item in breadcrumbs:
             <% label, f_url = breadcrumb_item['label'], breadcrumb_item['url'] %>
             %if label[-1] == '/':

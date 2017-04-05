@@ -93,7 +93,7 @@ ${ assist.assistPanel() }
                 <a href="${ url('beeswax:create_table', database=database) }" title="${_('Create a new table manually')}" class="inactive-action margin-left-10"><i class="fa fa-wrench"></i></a>
               </div>
 
-              <ul id="breadcrumbs" class="nav nav-pills hueBreadcrumbBar">
+              <ul id="breadcrumbs" class="nav nav-pills hue-breadcrumbs-bar">
                 <li>
                   <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
                 </li>

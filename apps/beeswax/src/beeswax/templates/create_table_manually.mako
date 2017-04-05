@@ -92,7 +92,7 @@ ${ assist.assistPanel() }
               <div class="inline-block pull-right" style="margin-top: -8px">
                 <a href="${ url('beeswax:import_wizard', database=database) }" title="${_('Create a new table from a file')}" class="inactive-action"><span class="fa-stack fa-fw" style="width: 1.28571429em"><i class="fa fa-file-o fa-stack-1x"></i><i class="fa fa-plus-circle fa-stack-1x" style="font-size: 14px; margin-left: 5px; margin-top: 6px;"></i></span></a>
               </div>
-              <ul id="breadcrumbs" class="nav nav-pills hueBreadcrumbBar">
+              <ul id="breadcrumbs" class="nav nav-pills hue-breadcrumbs-bar">
                 <li>
                   <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
                 </li>

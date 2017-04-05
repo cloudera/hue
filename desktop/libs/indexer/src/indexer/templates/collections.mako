@@ -30,16 +30,16 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 <link rel="stylesheet" href="${ static('indexer/css/admin.css') }">
 
 <style type="text/css">
-.hueBreadcrumb {
+.hue-breadcrumbs {
   padding: 12px 14px;
 }
 
-.hueBreadcrumbBar {
+.hue-breadcrumbs-bar {
   padding: 0;
   margin: 12px;
 }
 
-.hueBreadcrumbBar a {
+.hue-breadcrumbs-bar a {
   color: #338BB8 !important;
   display: inline !important;
 }
@@ -135,7 +135,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 
 <!-- breadcrumb component -->
 <script id="breadcrumb" type="text/html">
-<ul data-bind="foreach: breadcrumb.list" class="nav nav-pills hueBreadcrumbBar">
+<ul data-bind="foreach: breadcrumb.list" class="nav nav-pills hue-breadcrumbs-bar">
   <li class="nowrap">
     <!-- ko if: $index() == ( $root.breadcrumb.list().length - 1 ) -->
     <span data-bind="text: label" style="padding-left:12px"></span>
