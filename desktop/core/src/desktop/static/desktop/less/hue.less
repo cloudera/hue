@@ -18,6 +18,7 @@
 @import (reference) "cui/colors.less";
 @import (reference) "hue-mixins.less";
 
+@import "cui/sidebar";
 @import "hue-assist";
 @import "hue-autocomplete";
 @import "hue-cui-overrides.less";
@@ -314,88 +315,19 @@ body {
   }
 }
 
-.left-nav {
-  position:absolute;
-  background-color: @hue-primary-color-dark;
-  color: @cui-gray-050;
-  z-index: 1048;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 0;
-  overflow-x: hidden;
-  white-space: nowrap;
-  .hue-ease-transition(width);
+.sidebar {
+  .sidebar-footer-panel div {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    text-align: center;
+  }
+
+  a {
+    .pointer
+  }
 }
 
-.left-nav-menu {
-  padding-bottom: 60px;
-  margin: 10px 0 0 0;
-}
 
-.left-nav-menu li.header {
-  text-transform: uppercase;
-  letter-spacing: 1px;
-}
-
-.left-nav-menu li {
-  padding-left: 15px;
-  list-style: none;
-  line-height: 33px;
-  height: 33px;
-}
-
-.left-nav-menu li:not(.header) {
-  background-color: transparent;
-  cursor: pointer;
-  .hue-ease-transition(background-color);
-}
-
-.left-nav-menu li:not(.header):hover {
-  background-color: rgba(240, 240, 240, 0.9);
-}
-
-.left-nav-menu li a {
-  font-size: 14px;
-  letter-spacing: 1px;
-  color: @cui-gray-050;
-  .hue-ease-transition(color);
-}
-
-.left-nav-menu li:not(.header):hover a {
-  color: @cui-blue-900;
-}
-
-.left-nav-menu li a:hover {
-  text-decoration: none;
-}
-
-.left-nav-visible {
-  width: 200px;
-  .hue-box-shadow-top;
-}
-
-.left-nav-drop {
-  border-top: 1px solid rgba(240, 240, 240, 0.9);
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  font-size: 16px;
-  background-color: @hue-primary-color-dark;
-  width: 0;
-}
-
-.left-nav-drop div {
-  margin-top: 15px;
-  margin-bottom: 15px;
-  text-align: center;
-}
-
-.left-nav-visible .left-nav-drop {
-  width: 200px;
-  position: fixed;
-  .hue-ease-transition(width);
-}
 
 .inactive-action,
 .inactive-action a {
