@@ -1402,12 +1402,6 @@ body {
   text-overflow: ellipsis;
 }
 
-.fileChooserActionUploader {
-  float: left;
-  margin-top: 10px;
-  margin-right: 4px;
-}
-
 input[type='password']::-ms-reveal {
   display: none;
 }
