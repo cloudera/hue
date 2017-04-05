@@ -22,7 +22,6 @@ from django.utils.translation import ugettext as _
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
 from liboozie.oozie_api import get_oozie
-from liboozie.utils import format_time
 
 
 LOG = logging.getLogger(__name__)
@@ -30,7 +29,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
-  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access
+  from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json
 except Exception, e:
   LOG.exception('Some applications are not enabled for Job Browser v2: %s' % e)
 
@@ -69,16 +68,16 @@ class WorkflowApi(Api):
 
     return {
       'apps':[{
-        'id': app.id,
-        'name': app.appName,
-        'status': app.status,
-        'apiStatus': self._api_status(app.status),
+        'id': app['id'],
+        'name': app['appName'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
         'type': 'workflow',
-        'user': app.user,
-        'progress': app.get_progress(),
-        'duration': 10 * 3600,
-        'submitted': format_time(app.createdTime)
-      } for app in wf_list.jobs],
+        'user': app['user'],
+        'progress': app['progress'],
+        'duration': app['durationInMillis'],
+        'submitted': app['startTimeInMillis']
+      } for app in massaged_oozie_jobs_for_json(wf_list.jobs, self.user)['jobs']],
       'total': wf_list.total
     }
 
@@ -156,7 +155,7 @@ class WorkflowApi(Api):
     elif status == 'SUSPENDED':
       return 'PAUSED'
     elif status == 'SUCCEEDED':
-      return 'SUCCEEDED'    
+      return 'SUCCEEDED'
     else:
       return 'FAILED' # KILLED and FAILED
 

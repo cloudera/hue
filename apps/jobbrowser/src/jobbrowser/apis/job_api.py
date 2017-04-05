@@ -104,7 +104,7 @@ class YarnApi(Api):
         'user': self.user.username,
         'progress': app.progress,
         'duration': 10 * 3600,
-        'submitted': 10 * 3600
+        'submitted': app.startTimeMs
       } for app in jobs],
       'total': None
     }
@@ -179,8 +179,10 @@ class YarnApi(Api):
   def _api_status(self, status):
     if status in ['NEW', 'NEW_SAVING', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
       return 'RUNNING'
+    elif status == 'FINISHED':
+      return 'SUCCEEDED'
     else:
-      return 'FINISHED' # FINISHED, FAILED, KILLED
+      return 'FAILED' # FAILED, KILLED
 
 
 class YarnMapReduceTaskApi(Api):
