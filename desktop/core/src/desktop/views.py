@@ -45,8 +45,8 @@ import desktop.conf
 import desktop.log.log_buffer
 
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
+
 from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, HTTP_PORT
-from desktop.converters import DocumentConverter
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
@@ -113,12 +113,6 @@ def home(request):
 
 
 def home2(request, is_embeddable=False):
-  try:
-    converter = DocumentConverter(request.user)
-    converter.convert()
-  except Exception, e:
-    LOG.warning("Failed to convert and import documents: %s" % e)
-
   apps = appmanager.get_apps_dict(request.user)
 
   return render('home2.mako', request, {
