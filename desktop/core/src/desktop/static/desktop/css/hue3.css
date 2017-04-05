@@ -1402,10 +1402,6 @@ body {
   text-overflow: ellipsis;
 }
 
-input[type='password']::-ms-reveal {
-  display: none;
-}
-
 .ui-resizable {
   position: relative;
 }
