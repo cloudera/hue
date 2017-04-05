@@ -290,14 +290,23 @@
 
 .assist-tables > li:hover {
   background-color: @cui-gray-100;
-}
-
-.assist-tables > li:hover .assist-column {
-  background-color: @cui-white;
-}
-
-.assist-tables > li:hover .assist-column:hover {
-  background-color: @cui-gray-100;
+  .assist-column {
+    background-color: @cui-white;
+    .assist-actions, .assist-file-actions {
+      background-color: @cui-white;
+    }
+    &:hover {
+      background-color: @cui-gray-100;
+    }
+  }
+  .assist-column:hover {
+    .assist-actions, .assist-file-actions {
+      background-color: @cui-gray-100;
+    }
+  }
+  .assist-actions, .assist-file-actions {
+    background-color: @cui-gray-100;
+  }
 }
 
 .assist-breadcrumb {
@@ -386,23 +395,6 @@
   padding-left:4px;
   background-color: @cui-white;
 }
-
-.assist-tables > li:hover {
-  .assist-column {
-    .assist-actions, .assist-file-actions {
-      background-color: @cui-white;
-    }
-  }
-  .assist-column:hover {
-    .assist-actions, .assist-file-actions {
-      background-color: @cui-gray-100;
-    }
-  }
-  .assist-actions, .assist-file-actions {
-    background-color: @cui-gray-100;
-  }
-}
-
 
 .table-actions {
   padding-top:2px;
