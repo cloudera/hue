@@ -19,15 +19,19 @@ import json
 import logging
 
 from django.utils.translation import ugettext as _
+from hadoop.yarn import resource_manager_api
+
+from desktop.lib.exceptions_renderable import PopupException
 
 
 LOG = logging.getLogger(__name__)
 
 
 try:
-  from jobbrowser.api import YarnApi as NativeYarnApi
+  from jobbrowser.api import YarnApi as NativeYarnApi, ApplicationNotRunning, JobExpired
   from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
   from jobbrowser.views import job_attempt_logs_json, kill_job, massage_job_for_json
+  from jobbrowser.yarn_models import Application
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -112,9 +116,23 @@ class YarnApi(Api):
 
 
   def app(self, appid):
-    app = NativeYarnApi(self.user).get_job(jobid=appid)
+    try:
+      job = NativeYarnApi(self.user).get_job(jobid=appid)
+    except ApplicationNotRunning, e:
+      if e.job.get('state', '').lower() == 'accepted':
+        rm_api = resource_manager_api.get_resource_manager(self.user)
+        job = Application(e.job, rm_api)
+      else:
+        raise e  # Job has not yet been accepted by RM
+    except JobExpired, e:
+      raise PopupException(_('Job %s has expired.') % appid, detail=_('Cannot be found on the History Server.'))
+    except Exception, e:
+      msg = 'Could not find job %s.'
+      LOG.exception(msg % appid)
+      raise PopupException(_(msg) % appid, detail=e)
 
-    app = massage_job_for_json(app, user=self.user)
+
+    app = massage_job_for_json(job, user=self.user)
 
     common = {
         'id': app['id'],
@@ -128,7 +146,7 @@ class YarnApi(Api):
         'submitted': app['startTimeMs']
     }
 
-    if app['applicationType'] == 'MR2':
+    if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
       common['type'] = 'MAPREDUCE'
       common['durationFormatted'] = app['durationFormatted']
 
@@ -144,6 +162,7 @@ class YarnApi(Api):
           'metadata': [],
           'counters': []
       }
+
     return common
 
 
@@ -160,7 +179,7 @@ class YarnApi(Api):
 
     if app_type == 'MAPREDUCE':
       response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
-      logs = json.loads(response.content)['log']
+      logs = json.loads(response.content).get('log')
     else:
       logs = None
     return {'logs': logs}
