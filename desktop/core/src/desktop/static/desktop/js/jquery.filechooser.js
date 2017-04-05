@@ -184,13 +184,13 @@
 
       path = data.current_dir_path; // use real path.
       var _flist = $("<ul>").addClass("unstyled").css({
-        'height': '270px',
+        'height': '260px',
         'overflow-y': 'auto'
       });
       if (data.title != null && data.title == "Error") {
         var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
         _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
-        var _previousLink = $("<a>").addClass("btn").addClass("bnt-small").text(_parent.options.labels.BACK).click(function () {
+        var _previousLink = $("<a>").addClass("btn").text(_parent.options.labels.BACK).click(function () {
           _parent.options.onFolderChange(_parent.previousPath);
           _parent.navigateTo(_parent.previousPath);
         });
@@ -467,7 +467,7 @@
           initUploader(path, _parent, _uploadFileBtn, _parent.options.labels);
         }
         if (_parent.options.selectFolder) {
-          _selectFolderBtn = $("<a>").addClass("btn").addClass("small").text(_parent.options.labels.SELECT_FOLDER);
+          _selectFolderBtn = $("<a>").addClass("btn").text(_parent.options.labels.SELECT_FOLDER);
           if (_parent.options.uploadFile) {
             _selectFolderBtn.css("margin-top", "10px");
           }
@@ -479,7 +479,7 @@
         }
         $("<span> </span>").appendTo(_actions);
         if (_parent.options.createFolder) {
-          _createFolderBtn = $("<a>").addClass("btn").addClass("small").text(_parent.options.labels.CREATE_FOLDER);
+          _createFolderBtn = $("<a>").addClass("btn").text(_parent.options.labels.CREATE_FOLDER);
           if (_parent.options.uploadFile) {
             _createFolderBtn.css("margin-top", "10px");
           }
