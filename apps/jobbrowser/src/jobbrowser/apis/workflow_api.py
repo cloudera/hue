@@ -155,8 +155,10 @@ class WorkflowApi(Api):
       return 'RUNNING'
     elif status == 'SUSPENDED':
       return 'PAUSED'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'    
     else:
-      return 'FINISHED' # SUCCEEDED , KILLED and FAILED
+      return 'FAILED' # KILLED and FAILED
 
 
 class WorkflowActionApi(Api):
