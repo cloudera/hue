@@ -4413,16 +4413,8 @@
         }).appendTo($wrapper);
 
         if ($.fn.niceScroll && withNiceScroll) {
-          $container.niceScroll({
-            cursorcolor: "#C1C1C1",
-            cursorborder: "1px solid #C1C1C1",
-            cursoropacitymin: 0,
-            cursoropacitymax: 1,
-            scrollspeed: 1,
-            mousescrollstep: 60,
-            cursorminheight: options.cursorminheight || 20,
-            horizrailenabled: options.horizrailenabled || false,
-            autohidemode: "leave"
+          hueUtils.initNiceScroll($container, {
+            horizrailenabled: false
           });
         }
       } else {
@@ -4802,17 +4794,7 @@
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
-        var niceScroll = $(element).niceScroll({
-          cursorcolor: "#C1C1C1",
-          cursorborder: "1px solid #C1C1C1",
-          cursoropacitymin: 0,
-          cursoropacitymax: 1,
-          mousescrollstep: 60,
-          scrollspeed: 1,
-          cursorminheight: options.cursorminheight || 20,
-          horizrailenabled: typeof options.horizrailenabled !== 'undefined' ? options.horizrailenabled : true,
-          autohidemode: "leave"
-        });
+        var niceScroll = hueUtils.initNiceScroll($(element), options);
         $(element).addClass('nicescrollified');
         ko.utils.domNodeDisposal.addDisposeCallback(element, niceScroll.remove);
       }

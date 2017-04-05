@@ -692,6 +692,8 @@ from metadata.conf import has_navigator
             }
           });
 
+          hueUtils.initNiceScroll($t.parents('.dataTables_wrapper'));
+
           $t.parents('.dataTables_wrapper').niceScroll({
             cursorcolor: "#C1C1C1",
             cursorborder: "1px solid #C1C1C1",
