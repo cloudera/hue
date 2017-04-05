@@ -20,15 +20,14 @@ import logging
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
-from jobbrowser.views import job_attempt_logs_json, kill_job
-
 
 LOG = logging.getLogger(__name__)
 
 
 try:
   from jobbrowser.api import YarnApi as NativeYarnApi
+  from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
+  from jobbrowser.views import job_attempt_logs_json, kill_job, massage_job_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -94,48 +93,52 @@ class YarnApi(Api):
 
     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
 
+    apps = [massage_job_for_json(job, user=self.user) for job in jobs]
+
     return {
       'apps': [{
-        'id': app.jobId,
-        'name': app.name,
-        'type': app.applicationType,
-        'status': app.status,
-        'apiStatus': self._api_status(app.status),
-        'user': self.user.username,
-        'progress': app.progress,
-        'duration': 10 * 3600,
-        'submitted': app.startTimeMs
-      } for app in jobs],
+        'id': app['id'],
+        'name': app['name'],
+        'type': app['applicationType'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
+        'user': app['user'],
+        'progress': app['progress'],
+        'duration': app['durationMs'],
+        'submitted': app['startTimeMs']
+      } for app in apps],
       'total': None
     }
+
 
   def app(self, appid):
     app = NativeYarnApi(self.user).get_job(jobid=appid)
 
+    app = massage_job_for_json(app, user=self.user)
+
     common = {
-        'id': app.jobId,
-        'name': app.name,
-        'type': app.applicationType,
-        'status': app.status,
-        'apiStatus': self._api_status(app.status),
-        'user': self.user.username,
-        'progress': app.progress,
-        'duration': 10 * 3600,
-        'submitted': 10 * 3600
+        'id': app['id'],
+        'name': app['name'],
+        'type': app['applicationType'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
+        'user': app['user'],
+        'progress': app['progress'],
+        'duration': app['durationMs'],
+        'submitted': app['startTimeMs']
     }
 
-    if app.applicationType == 'MR2':
+    if app['applicationType'] == 'MR2':
       common['type'] = 'MAPREDUCE'
-      common['duration'] = app.duration
-      common['durationFormatted'] = app.durationFormatted
+      common['durationFormatted'] = app['durationFormatted']
 
       common['properties'] = {
-          'maps_percent_complete': app.maps_percent_complete,
-          'reduces_percent_complete': app.reduces_percent_complete,
-          'finishedMaps': app.finishedMaps,
-          'finishedReduces': app.finishedReduces,
-          'desiredMaps': app.desiredMaps,
-          'desiredReduces': app.desiredReduces,
+          'maps_percent_complete': app['mapsPercentComplete'],
+          'reduces_percent_complete': app['reducesPercentComplete'],
+          'finishedMaps': app['finishedMaps'],
+          'finishedReduces': app['finishedReduces'],
+          'desiredMaps': app['desiredMaps'],
+          'desiredReduces': app['desiredReduces'],
 
           'tasks': [],
           'metadata': [],

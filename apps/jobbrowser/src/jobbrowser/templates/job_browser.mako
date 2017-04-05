@@ -166,7 +166,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   <tr data-bind="click: fetchJob">
                     <td><div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#runningJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div></td>
                     <td data-bind="text: duration"></td>
-                    <td data-bind="text: submitted></td>
+                    <td data-bind="text: submitted"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
                     <td data-bind="text: progress"></td>
@@ -1025,7 +1025,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.mainType = ko.observable(vm.interface());
 
       self.hasKill = ko.computed(function() {
-        return ['workflow'].indexOf(self.type()) != -1;
+        return ['MAPREDUCE', 'SPARK', 'workflow'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.computed(function() {
         return self.hasKill() && self.apiStatus() == 'RUNNING';
@@ -1253,6 +1253,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
           });
         }
+      };
     };
 
     var Jobs = function (vm) {
@@ -1270,7 +1271,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.computed(function() {
-        return ['workflows'].indexOf(vm.interface()) != -1;
+        return ['jobs', 'workflows'].indexOf(vm.interface()) != -1;
       });
       self.killEnabled = ko.computed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
