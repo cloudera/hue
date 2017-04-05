@@ -157,10 +157,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </div>
 
             <div class="card card-small">
-              <table id="jobsTable" class="datatables table table-condensed">
+              <table id="runningJobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
-                  <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+                  <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.runningApps, selectedValues: jobs.selectedJobs }"></div></th>
                   <th>${_('Duration')}</th>
                   <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
@@ -173,9 +173,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </thead>
                 <tbody data-bind="foreach: jobs.runningApps">
                   <tr data-bind="click: fetchJob">
-                    <td><div class="hueCheckbox fa"></div></td>
+                    <td><div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#runningJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div></td>
                     <td data-bind="text: duration"></td>
-                    <td data-bind="text: submitted"></td>
+                    <td data-bind="text: submitted></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: status"></td>
                     <td data-bind="text: progress"></td>
@@ -189,9 +189,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
             <div class="card card-small">
-              <table id="jobsTable" class="datatables table table-condensed">
+              <table id="finishedJobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
+                  <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.finishedApps, selectedValues: jobs.selectedJobs }"></div></th>
                   <th>${_('Duration')}</th>
                   <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
@@ -204,6 +205,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </thead>
                 <tbody data-bind="foreach: jobs.finishedApps">
                   <tr data-bind="click: fetchJob">
+                    <td><div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#finishedJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div></td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: submitted"></td>
                     <td data-bind="text: type"></td>
@@ -1219,6 +1221,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return $.grep(self.apps(), function(job) { return job.apiStatus() == 'FINISHED'; });
       });
       self.loadingJobs = ko.observable(false);
+      self.selectedJobs = ko.observableArray();
 
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesFilter = ko.observable('');
