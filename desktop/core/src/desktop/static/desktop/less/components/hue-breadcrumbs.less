@@ -16,39 +16,27 @@
  limitations under the License.
 */
 
-.jobbrowser-components {
-  .content-panel-inner {
-    padding: 10px;
+.hue-breadcrumbs {
+  list-style: none outside none;
+  padding: 9px 9px;
+  li {
+    display: inline-block;
   }
-  .tab-content {
-    padding: 10px;
-    border: none !important;
-  }
-
-  .hue-breadcrumbs-bar {
-    padding: 0;
-  }
-
-  .hue-breadcrumbs-bar li {
-    padding: 12px;
-  }
-
-  .hue-breadcrumbs-bar li:first-child {
-    padding-left: 0;
-    padding-right: 0;
-  }
-
-  .hue-breadcrumbs-bar a {
-    color: #338BB8 !important;
-    display: inline !important;
-  }
-
   .divider {
-    color: #CCC;
-    padding-right: 12px;
+    color: #999999;
+    padding: 0 5px;
   }
-
-  .app-icon {
-    vertical-align: text-top;
+  .active a {
+    color: #333333;
+  }
+  a.nounderline:hover {
+    text-decoration: none;
+  }
+  & > li:last-child > a {
+    font-weight: bold;
+    color: #333333;
+  }
+  & > li:last-child > span {
+    display: none;
   }
 }

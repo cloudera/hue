@@ -262,14 +262,14 @@
 
         $search.appendTo($(_parent.element).find('.filechooser-tree'));
 
-        var $homeBreadcrumb = $("<ul>").addClass("hueBreadcrumb").css({
+        var $homeBreadcrumb = $("<ul>").addClass("hue-breadcrumbs").css({
           'padding': '0',
           'marginLeft': '0',
           'float': 'left',
           'white-space': 'nowrap'
         });
 
-        var $scrollingBreadcrumbs = $("<ul>").addClass("hueBreadcrumb editable-breadcrumbs").css({
+        var $scrollingBreadcrumbs = $("<ul>").addClass("hue-breadcrumbs editable-breadcrumbs").css({
           'padding': '0',
           'marginLeft': '10px',
           'marginBottom': '0',

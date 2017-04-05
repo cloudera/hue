@@ -86,36 +86,36 @@ ul.errorlist li {
   line-height: 18px;
 }
 
-.hueBreadcrumb {
+.hue-breadcrumbs {
   font-size: 1.25em;
   list-style: none outside none;
   padding: 9px 9px;
 }
 
-.hueBreadcrumb li {
+.hue-breadcrumbs li {
   display: inline-block;
   text-shadow: 0 1px 0 #FFFFFF;
 }
 
-.hueBreadcrumb .divider {
+.hue-breadcrumbs .divider {
   color: #999999;
   padding: 0 5px;
 }
 
-.hueBreadcrumb .active a {
+.hue-breadcrumbs .active a {
   color: #333333;
 }
 
-.hueBreadcrumb a.nounderline:hover {
+.hue-breadcrumbs a.nounderline:hover {
   text-decoration: none;
 }
 
-.hueBreadcrumb > li:last-child > a {
+.hue-breadcrumbs > li:last-child > a {
   font-weight: bold;
   color: #333333;
 }
 
-.hueBreadcrumb > li:last-child > span {
+.hue-breadcrumbs > li:last-child > span {
   display: none;
 }
 
@@ -123,7 +123,7 @@ ul.errorlist li {
   padding-bottom: 0;
 }
 
-.hueBreadcrumbBar {
+.hue-breadcrumbs-bar {
   padding: 8px 15px;
   margin: 0 0 20px;
   list-style: none;

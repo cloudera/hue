@@ -251,16 +251,16 @@ ${ commonshare() | n,unicode }
     width: 40px;
   }
 
-  .hueBreadcrumb {
+  .hue-breadcrumbs {
     padding: 12px 14px;
   }
 
-  .hueBreadcrumbBar {
+  .hue-breadcrumbs-bar {
     padding: 0;
     margin: 12px;
   }
 
-  .hueBreadcrumbBar a {
+  .hue-breadcrumbs-bar a {
     color: #338BB8 !important;
     display: inline !important;
   }
