@@ -143,17 +143,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <option value="minutes">${_('minutes')}</option>
             </select>
 
-            <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
-              <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-              <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
-                <i class="fa fa-play"></i><span class="hide-small"> ${ _('Resume') }</span>
-              </button>
-              <button class="btn bulkToolbarBtn bulk-suspend" data-operation="suspend" title="${ _('Suspend selected') }" disabled="disabled" type="button">
-                <i class="fa fa-pause"></i><span class="hide-small"> ${ _('Suspend') }</span>
-              </button>
-              <button class="btn bulkToolbarBtn btn-danger bulk-kill disable-feedback" data-operation="kill" title="${ _('Kill selected') }" disabled="disabled" type="button">
-                <i class="fa fa-times"></i><span class="hide-small"> ${ _('Kill') }</span>
-              </button>
+            <div class="pull-right">
+              <div data-bind="template: { name: 'actions', 'data': jobs }"></div>
             </div>
 
             <div class="card card-small">
@@ -662,6 +653,36 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
+<script type="text/html" id="actions">
+  <div class="btn-group">
+    <!-- ko if: hasResume -->
+    <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
+      <i class="fa fa-play"></i> ${ _('Resume') }
+    </button>
+    <!-- /ko -->
+
+    <!-- ko if: hasPause -->
+    <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('resume'); }, enable: pauseEnabled">
+      <i class="fa fa-pause"></i> ${ _('Suspend') }
+    </button>
+    <!-- /ko -->
+
+    <!-- ko if: hasRerun -->
+    <button class="btn" title="${ _('Rerun selected') }" data-bind="click: function() { control('rerun'); }, enable: rerunEnabled">
+      <i class="fa fa-repeat"></i> ${ _('Rerun') }
+    </button>
+    <!-- /ko -->
+
+    <!-- ko if: hasKill -->
+    <button class="btn btn-danger" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
+      ## TODO confirmation
+      <i class="fa fa-times"></i> ${_('Kill')}
+    </button>
+    <!-- /ko -->
+  </div>
+</script>
+
+
 <script type="text/html" id="workflow-page">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
@@ -681,30 +702,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <div class="btn-group">
-    <!-- ko if: $root.job().hasKill -->
-    <button class="btn btn-danger" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
-      ## TODO confirmation
-      <i class="fa fa-times"></i> ${_('Kill')}
-    </button>
-    <!-- /ko -->
-    <!-- ko if: $root.job().hasResume -->
-    <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
-      <i class="fa fa-play"></i> ${ _('Resume') }
-    </button>
-    <!-- /ko -->
-    <!-- ko if: $root.job().hasSuspend -->
-    <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('resume'); }, enable: suspendEnabled">
-      <i class="fa fa-pause"></i> ${ _('Suspend') }
-    </button>
-    <!-- /ko -->
-    <!-- ko if: $root.job().hasRerun -->
-    <button class="btn" title="${ _('Rerun selected') }" data-bind="click: function() { control('rerun'); }, enable: rerunEnabled">
-      <i class="fa fa-repeat"></i> ${ _('Rerun') }
-    </button>
-    <!-- /ko -->
-  </div>
-
+  <div data-bind="template: { name: 'actions' }"></div>
 
   <ul class="nav nav-tabs margin-top-20">
     <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
@@ -1074,27 +1072,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
-      self.isKill = ko.computed(function() {
-        return ['workflow'].indexOf(self.type()) != -1;
-      });
       self.hasKill = ko.computed(function() {
         return ['workflow'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.computed(function() {
         return self.hasKill() && self.apiStatus() == 'RUNNING';
       });
+
       self.hasResume = ko.computed(function() {
         return ['workflow'].indexOf(self.type()) != -1;
       });
       self.resumeEnabled = ko.computed(function() {
         return self.hasResume() && self.apiStatus() == 'PAUSED';
       });
+
       self.hasRerun = ko.computed(function() {
         return ['workflow'].indexOf(self.type()) != -1;
       });
       self.rerunEnabled = ko.computed(function() {
         return self.hasRerun() && ! self.isRunning();
       });
+
       self.hasPause = ko.computed(function() {
         return ['workflow'].indexOf(self.type()) != -1;
       });
@@ -1273,6 +1271,43 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.loadingJobs = ko.observable(false);
       self.selectedJobs = ko.observableArray();
+
+      self.hasKill = ko.computed(function() {
+        return ['workflows'].indexOf(vm.interface()) != -1;
+      });
+      self.killEnabled = ko.computed(function() {
+        return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+          return job.killEnabled();
+        }).length == self.selectedJobs().length;
+      });
+
+      self.hasResume = ko.computed(function() {
+        return ['workflows'].indexOf(vm.interface()) != -1;
+      });
+      self.resumeEnabled = ko.computed(function() {
+        return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+          return job.resumeEnabled();
+        }).length == self.selectedJobs().length;
+      });
+
+      self.hasRerun = ko.computed(function() {
+        return ['workflows'].indexOf(vm.interface()) != -1;
+      });
+      self.rerunEnabled = ko.computed(function() {
+        return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+          return job.hasRerun();
+        }).length == self.selectedJobs().length;
+      });
+
+      self.hasPause = ko.computed(function() {
+        return ['workflows'].indexOf(vm.interface()) != -1;
+      });
+      self.pauseEnabled = ko.computed(function() {
+        return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+          return job.pauseEnabled();
+        }).length == self.selectedJobs().length;
+      });
+
 
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesFilter = ko.observable('');
