@@ -499,9 +499,7 @@ a#advanced-btn:hover {
 .navigator .dropdown-menu {
   z-index: 20000;
   box-shadow: none;
-  margin-top: -4px;
-  margin-left: -1px;
-  border-top: 2px solid #EEE;
+  border-radius: 0;
 }
 
 .navigator .nav-pills > li > a {
