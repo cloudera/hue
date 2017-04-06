@@ -1012,7 +1012,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiStatus = ko.observableDefault(job.apiStatus);
       self.progress = ko.observableDefault(job.progress);
       self.isRunning = ko.computed(function() {
-        return self.apiStatus() != 'SUCCEEDED' && self.apiStatus() != 'FAILED';
+        return self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED';
       });
 
       self.user = ko.observableDefault(job.user);
@@ -1197,20 +1197,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.control = function (action) {
-        $.post("/jobbrowser/api/job/action", {
-          app_id: ko.mapping.toJSON(self.id),
-          interface: ko.mapping.toJSON(vm.interface),
-          app_type: ko.mapping.toJSON(self.type),
-          operation: ko.mapping.toJSON({action: action})
-        }, function (data) {
-          if (data.status == 0) {
-             $(document).trigger("info", data.message);
-             self.fetchStatus();
-          } else {
-            $(document).trigger("error", data.message);
-          }
+        vm.jobs._control([self.id()], action, function(data) {
+            $(document).trigger("info", data.message);
+            self.fetchStatus();
         });
-      };
+      }
 
       self.updateWorkflowGraph = function() {
         var lastPosition = {
@@ -1445,13 +1436,28 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.control = function (action) {
+        self._control(
+          $.map(self.selectedJobs(), function(job) {
+            return job.id();
+          }),
+          action,
+          function(data) {
+            $(document).trigger("info", data.message);
+            self.updateJobs();
+          }
+        )
+      }
+
+      self._control = function (app_ids, action, callback) {
         $.post("/jobbrowser/api/job/action", {
-          app_id: ko.mapping.toJSON(self.id), // CSV list
+          app_ids: ko.mapping.toJSON(app_ids),
           interface: ko.mapping.toJSON(vm.interface),
           operation: ko.mapping.toJSON({action: action})
         }, function (data) {
           if (data.status == 0) {
-            $(document).trigger("info", data.message);
+            if (callback) {
+              callback(data);
+            }
           } else {
             $(document).trigger("error", data.message);
           }

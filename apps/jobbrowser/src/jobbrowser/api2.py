@@ -76,14 +76,14 @@ def job(request):
 
 @api_error_handler
 def action(request):
-  response = {'status': -1}
+  response = {'status': -1, 'message': ''}
 
   interface = json.loads(request.POST.get('interface'))
-  app_id = json.loads(request.POST.get('app_id'))
+  app_ids = json.loads(request.POST.get('app_ids'))
   operation = json.loads(request.POST.get('operation'))
 
   response['operation'] = operation
-  response.update(get_api(request.user, interface).action(app_id, operation))
+  response.update(get_api(request.user, interface).action(app_ids, operation))
 
   return JsonResponse(response)
 
