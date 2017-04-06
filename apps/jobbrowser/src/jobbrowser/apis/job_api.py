@@ -190,6 +190,7 @@ class YarnApi(Api):
       if app_property == 'tasks':
         return {
           'task_list': YarnMapReduceTaskApi(self.user, appid).apps()['apps'],
+          'filter_text': ''
         }
       elif app_property == 'metadata':
         return NativeYarnApi(self.user).get_job(jobid=appid).full_job_conf
@@ -215,8 +216,46 @@ class YarnMapReduceTaskApi(Api):
 
 
   def apps(self):
+    filter_params = {
+      'task_types': None,
+      'task_states': None,
+      'task_text': None,
+      'jobid': self.app_id,
+      'pagenum': 1
+    }
+ 
+#     filter_params.update(_extract_query_params(filters)
+#     
+#     #filter_params['text']
+#  
+#     if filters.get('states'):
+#       filter_params['states'] = filters['states']
+#  
+#     if 'time' in filters:
+#       filter_params['time_value'] = int(filters['time']['time_value'])
+#       filter_params['time_unit'] = filters['time']['time_unit']
+ 
+#     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
+#  
+#     apps = [massage_job_for_json(job, user=self.user) for job in jobs]
+#  
+#     return {
+#       'apps': [{
+#         'id': app['id'],
+#         'name': app['name'],
+#         'type': app['applicationType'],
+#         'status': app['status'],
+#         'apiStatus': self._api_status(app['status']),
+#         'user': app['user'],
+#         'progress': app['progress'],
+#         'duration': app['durationMs'],
+#         'submitted': app['startTimeMs']
+#       } for app in apps],
+#       'total': None
+#     }
+
     return {
-      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(jobid=self.app_id, pagenum=1)],
+      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(**filter_params)],
       'total': None
     }
 

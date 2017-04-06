@@ -109,8 +109,10 @@ class ScheduleApi(Api):
       return 'RUNNING'
     elif status in ['PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']:
       return 'PAUSED'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
     else:
-      return 'FINISHED' # SUCCEEDED, DONEWITHERROR, KILLED, FAILED
+      return 'FINISHED' # DONEWITHERROR, KILLED, FAILED
 
 
 class MockGet():

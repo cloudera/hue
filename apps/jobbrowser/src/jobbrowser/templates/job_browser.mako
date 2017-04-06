@@ -144,7 +144,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </select>
 
             <div class="pull-right">
-              <div data-bind="template: { name: 'actions', 'data': jobs }"></div>
+              <div data-bind="template: { name: 'job-actions', 'data': jobs }"></div>
             </div>
 
             <div class="card card-small">
@@ -374,7 +374,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <div data-bind="template: { name: 'actions' }"></div>
+  <div data-bind="template: { name: 'job-actions' }"></div>
 </script>
 
 
@@ -401,7 +401,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <div data-bind="template: { name: 'actions' }"></div>
+  <div data-bind="template: { name: 'job-actions' }"></div>
 
   <ul class="nav nav-tabs margin-top-20">
     <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
@@ -421,20 +421,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
-      ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}" value="user:${ user.username }">
+      ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}">
       <span class="btn-group">
         <class="btn-group">
           <a class="btn btn-status btn-success" data-value="completed">${ _('MAP') }</a>
           <a class="btn btn-status btn-warning" data-value="running">${ _('REDUCE') }</a>
         </span>
       </span>
-
-      <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
-        <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
-          <i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span>
-        </button>
-      </div>
 
       <table class="table table-condensed">
         <thead>
@@ -523,13 +516,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
         </span>
       </span>
-
-      <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
-        <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
-          <i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span>
-        </button>
-      </div>
 
       <table class="table table-condensed">
         <thead>
@@ -659,11 +645,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
   
-  <div data-bind="template: { name: 'actions' }"></div>
+  <div data-bind="template: { name: 'job-actions' }"></div>
 </script>
 
 
-<script type="text/html" id="actions">
+<script type="text/html" id="job-actions">
   <div class="btn-group">
     <!-- ko if: hasResume -->
     <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
@@ -672,7 +658,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- /ko -->
 
     <!-- ko if: hasPause -->
-    <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('resume'); }, enable: pauseEnabled">
+    <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('suspend'); }, enable: pauseEnabled">
       <i class="fa fa-pause"></i> ${ _('Suspend') }
     </button>
     <!-- /ko -->
@@ -712,7 +698,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <div data-bind="template: { name: 'actions' }"></div>
+  <div data-bind="template: { name: 'job-actions' }"></div>
 
   <ul class="nav nav-tabs margin-top-20">
     <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
@@ -816,9 +802,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">${ _('Stop') }</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('resume'); }">${ _('Resume')}</a> |
-  <a href="javascript:void(0)" data-bind="click: function() { control('rerun'); }">${ _('Rerun') }</a>
+  <div data-bind="template: { name: 'job-actions' }"></div>
 
   <br>
 
@@ -840,6 +824,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="schedule-page-tasks">
+      <div data-bind="template: { name: 'job-actions' }"></div>
+      
+      ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
+      <div class="btn-group">
+        <select size="3" multiple="true"></select>
+        <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+        <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+        <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+      </div>
+    
       <table id="jobsTable" class="datatables table table-condensed">
         <thead>
         <tr>
@@ -1033,31 +1027,31 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
-      self.hasKill = ko.computed(function() {
-        return ['MAPREDUCE', 'SPARK', 'workflow'].indexOf(self.type()) != -1;
+      self.hasKill = ko.pureComputed(function() {
+        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule'].indexOf(self.type()) != -1;
       });
-      self.killEnabled = ko.computed(function() {
+      self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.apiStatus() == 'RUNNING';
       });
 
-      self.hasResume = ko.computed(function() {
-        return ['workflow'].indexOf(self.type()) != -1;
+      self.hasResume = ko.pureComputed(function() {
+        return ['workflow', 'schedule'].indexOf(self.type()) != -1;
       });
-      self.resumeEnabled = ko.computed(function() {
+      self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.apiStatus() == 'PAUSED';
       });
 
-      self.hasRerun = ko.computed(function() {
+      self.hasRerun = ko.pureComputed(function() {
         return ['workflow'].indexOf(self.type()) != -1;
       });
-      self.rerunEnabled = ko.computed(function() {
+      self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && ! self.isRunning();
       });
 
-      self.hasPause = ko.computed(function() {
-        return ['workflow'].indexOf(self.type()) != -1;
+      self.hasPause = ko.pureComputed(function() {
+        return ['workflow', 'schedule'].indexOf(self.type()) != -1;
       });
-      self.pauseEnabled = ko.computed(function() {
+      self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.apiStatus() == 'RUNNING';
       });
 
@@ -1279,37 +1273,37 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.loadingJobs = ko.observable(false);
       self.selectedJobs = ko.observableArray();
 
-      self.hasKill = ko.computed(function() {
+      self.hasKill = ko.pureComputed(function() {
         return ['jobs', 'workflows'].indexOf(vm.interface()) != -1;
       });
-      self.killEnabled = ko.computed(function() {
+      self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
           return job.killEnabled();
         }).length == self.selectedJobs().length;
       });
 
-      self.hasResume = ko.computed(function() {
+      self.hasResume = ko.pureComputed(function() {
         return ['workflows'].indexOf(vm.interface()) != -1;
       });
-      self.resumeEnabled = ko.computed(function() {
+      self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
           return job.resumeEnabled();
         }).length == self.selectedJobs().length;
       });
 
-      self.hasRerun = ko.computed(function() {
+      self.hasRerun = ko.pureComputed(function() {
         return ['workflows'].indexOf(vm.interface()) != -1;
       });
-      self.rerunEnabled = ko.computed(function() {
+      self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
           return job.hasRerun();
         }).length == self.selectedJobs().length;
       });
 
-      self.hasPause = ko.computed(function() {
+      self.hasPause = ko.pureComputed(function() {
         return ['workflows'].indexOf(vm.interface()) != -1;
       });
-      self.pauseEnabled = ko.computed(function() {
+      self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
           return job.pauseEnabled();
         }).length == self.selectedJobs().length;
