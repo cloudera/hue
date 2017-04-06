@@ -74,6 +74,7 @@ class MockDjangoRequest():
     self.jt = None
     self.GET = get if get is not None else {'format': 'json'}
     self.POST = post if post is not None else {}
+    self.REQUEST = {}
     self.method = "POST"
 
 
