@@ -1690,11 +1690,6 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assistant-panel-template">
     ${ _('Tables') }
-    <!-- ko if: HAS_OPTIMIZER -->
-      <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
-        <i class="fa fa-fw fa-cloud-upload"></i>
-      </a>
-    <!-- /ko -->
     <br/>
     <ul data-bind="foreach: activeTables">
       <li>
@@ -1709,32 +1704,13 @@ from notebook.conf import get_ordered_interpreters
 
     <form class="form-horizontal">
       <fieldset>
-        ${ _('Fields') }<br/>
-        <ul>
-          <li>'country-code' is a popular field <a href="javascript:void(0)">add</a></li>
-          <li>'gender' would be a good dimension with low cardinality (2) <a href="javascript:void(0)">add</a></li>
-          <li>'f1'</li>
-          <li>'f2'</li>
-          <li>'f3'</li>
-        </ul>
-      </fieldset>
-    </form>
-
-    <form class="form-horizontal">
-      <fieldset>
-        ${ _('Suggestions') }<br/>
-        <ul>
-          <li>Popular fields for the tables are: [code, salary, amount]</li>
-          <li>The query would run 2x faster by adding a WHERE date_f > '2017-01-01'</li>
-          <li>Parameterize the query?</li>
-          <li>'ts_s=17Q1' is the latest partition <a href="javascript:void(0)">add</a></li>
-          <li>Could be automated with integrated scheduler</li>
-          <li>Data has not been refreshed since last run 3 days ago  <i class="fa fa-warning"></i> <i class="fa fa-refresh"></i></li></li>
-          <li>A schema change happened last week, a new column 'salary_med' was added</li>
-          <li>Data statistics are not accurate, click to refresh them</li>
-          <li>Query ran 17 times last week</li>
-          <li>The datasets are sometimes joined with table [Population]</li>
-          <li>Query would be a good candidate to run interactively with Impala</li>
+        <div data-bind="visible: activeRisks().length > 0">${ _('Suggestions') }</div>
+        <ul data-bind="foreach: activeRisks">
+          <li>
+            <span data-bind="text: risk"></span>
+            <span data-bind="text: riskAnalysis"></span>
+            <span data-bind="text: riskRecommendation"></span>
+          </li>
         </ul>
       </fieldset>
     </form>
@@ -1743,6 +1719,12 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
         <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
       </a>
+      <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+        <i class="fa fa-fw fa-gears"></i> ${_('Analyse Query')}
+      </a>
+      <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
+        <i class="fa fa-fw fa-cloud-upload"></i>
+      </a>      
     <!-- /ko -->
   </script>
 
@@ -1759,6 +1741,7 @@ from notebook.conf import get_ordered_interpreters
         self.activeSourceType = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeColumns = ko.observableArray();
+        self.activeRisks = ko.observableArray();
 
         var isPointInside = function (location, row, col) {
           return (location.first_line < row && row < location.last_line) ||
@@ -1828,6 +1811,10 @@ from notebook.conf import get_ordered_interpreters
           index[activeLocations.id] = activeLocations;
           self.locationIndex(index);
           initActive();
+        }).remove);
+
+        self.disposals.push(huePubSub.subscribe('editor.active.risks', function (activeRisks) {
+          self.activeRisks(activeRisks);
         }).remove);
 
         huePubSub.publish('get.active.editor.locations');
