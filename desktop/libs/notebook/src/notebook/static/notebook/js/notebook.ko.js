@@ -647,7 +647,7 @@ var EditorViewModel = (function() {
 
     function prepopulateChart() {
       var type = self.chartType();
-      logGA('chart/' + type);
+      hueAnalytics.log('notebook', 'chart/' + type);
 
       if (type === ko.HUE_CHARTS.TYPES.MAP && self.result.cleanedNumericMeta().length >= 2) {
         if ((self.chartX() === null || typeof self.chartX() === 'undefined')) {
@@ -897,7 +897,7 @@ var EditorViewModel = (function() {
 
         self.getApiHelper().cancelActiveRequest(lastComplexityRequest);
 
-        logGA('get_query_risk');
+        hueAnalytics.log('notebook', 'get_query_risk');
         self.complexityCheckRunning(true);
         lastComplexityRequest = $.ajax({
           type: 'POST',
@@ -1037,7 +1037,7 @@ var EditorViewModel = (function() {
       $(document).trigger("executeStarted", {vm: vm, snippet: self});
       self.lastExecuted(now);
       $(".jHueNotify").hide();
-      logGA('execute/' + self.type());
+      hueAnalytics.log('notebook', 'execute/' + self.type());
 
       if (self.result.fetchedOnce()) {
         self.close();
@@ -1191,18 +1191,18 @@ var EditorViewModel = (function() {
           }
         });
       }
-      logGA('format');
+      hueAnalytics.log('notebook', 'format');
     };
 
     self.clear = function () {
-      logGA('clear');
+      hueAnalytics.log('notebook', 'clear');
       self.ace().setValue('', 1);
       self.result.clear();
       self.status('ready');
     };
 
     self.explain = function () {
-      logGA('explain');
+      hueAnalytics.log('notebook', 'explain');
 
       if (self.statement() == '' || self.status() == 'running' || self.status() === 'loading') {
         return;
@@ -1239,7 +1239,7 @@ var EditorViewModel = (function() {
     self.queryCompatibility = function (targetPlatform) {
       self.getApiHelper().cancelActiveRequest(lastCompatibilityRequest);
 
-      logGA('compatibility');
+      hueAnalytics.log('notebook', 'compatibility');
       self.compatibilityCheckRunning(targetPlatform != self.type());
       self.hasSuggestion(null);
 
@@ -1296,7 +1296,7 @@ var EditorViewModel = (function() {
         if( self.status() == 'available') {
           startLongOperationTimeout();
           self.isFetchingData = true;
-          logGA('fetchResult/' + rows + '/' + startOver);
+          hueAnalytics.log('notebook', 'fetchResult/' + rows + '/' + startOver);
           $.post("/notebook/api/fetch_result_data", {
             notebook: ko.mapping.toJSON(notebook.getContext()),
             snippet: ko.mapping.toJSON(self.getContext()),
@@ -1478,7 +1478,7 @@ var EditorViewModel = (function() {
         clearTimeout(self.checkStatusTimeout);
         self.checkStatusTimeout = null;
       }
-      logGA('cancel');
+      hueAnalytics.log('notebook', 'cancel');
 
       if ($.isEmptyObject(self.result.handle())) { // Query was not even submitted yet
         if (self.executingBlockingOperation != null) {
@@ -1596,7 +1596,7 @@ var EditorViewModel = (function() {
     };
 
     self.loadQueryHistory = function (n) {
-      logGA('load_query_history');
+      hueAnalytics.log('notebook', 'load_query_history');
 
       $.post("/metadata/api/optimizer/upload/history", {
         n: typeof n != "undefined" ? n : null,
@@ -1612,7 +1612,7 @@ var EditorViewModel = (function() {
     };
 
     self.loadTableStats = function (activeTables) {
-      logGA('load_table_stats');
+      hueAnalytics.log('notebook', 'load_table_stats');
       $(document).trigger("info", "Preparing table data...");
 
       $.post("/metadata/api/optimizer/upload/table_stats", {
@@ -1652,7 +1652,7 @@ var EditorViewModel = (function() {
     };
 
     self.getSimilarQueries = function () {
-      logGA('get_query_similarity');
+      hueAnalytics.log('notebook', 'get_query_similarity');
 
       $.post("/notebook/api/optimizer/statement/similarity", {
         notebook: ko.mapping.toJSON(notebook.getContext()),
@@ -1952,7 +1952,7 @@ var EditorViewModel = (function() {
         }
       }, 100);
 
-      logGA('add_snippet/' + (type ? type : self.selectedSnippet()));
+      hueAnalytics.log('notebook', 'add_snippet/' + (type ? type : self.selectedSnippet()));
       return snippet;
     };
 
@@ -1978,7 +1978,7 @@ var EditorViewModel = (function() {
     };
 
     self.save = function () {
-      logGA('save');
+      hueAnalytics.log('notebook', 'save');
 
       // Remove the result data from the snippets
       var cp = ko.mapping.toJS(self, NOTEBOOK_MAPPING);
@@ -2048,7 +2048,7 @@ var EditorViewModel = (function() {
     };
 
     self.close = function () {
-      logGA('close');
+      hueAnalytics.log('notebook', 'close');
       $.post("/notebook/api/notebook/close", {
         "notebook": ko.mapping.toJSON(self, NOTEBOOK_MAPPING),
         "editorMode": vm.editorMode()
@@ -2221,7 +2221,7 @@ var EditorViewModel = (function() {
     };
 
     self.clearHistory = function (type) {
-      logGA('clearHistory');
+      hueAnalytics.log('notebook', 'clearHistory');
       $.post("/notebook/api/clear_history", {
         notebook: ko.mapping.toJSON(self.getContext()),
         doc_type: self.selectedSnippet(),
@@ -2252,7 +2252,7 @@ var EditorViewModel = (function() {
         } else {
           _action = 'new';
         }
-        logGA('schedule/' + _action);
+        hueAnalytics.log('notebook', 'schedule/' + _action);
 
         $.get('/oozie/editor/coordinator/' + _action + '/', {
           format: 'json',
@@ -2697,12 +2697,6 @@ var EditorViewModel = (function() {
       self.selectedNotebook().parentSavedQueryUuid(null);
       self.saveNotebook();
     };
-  }
-
-  function logGA(page) {
-    if (typeof trackOnGA == 'function') {
-      trackOnGA('notebook/' + page);
-    }
   }
 
   return EditorViewModel;

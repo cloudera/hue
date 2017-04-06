@@ -765,7 +765,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       }
       if (!element.hasClass('in'))
         element.modal('show');
-      logGA(modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
+      hueAnalytics.log('hbase', modal.slice(0, modal.indexOf('_modal') != -1 ? modal.indexOf('_modal') : modal.length));
     }
 
 
@@ -857,16 +857,6 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       if (isNaN(parseInt(value)) && value.trim() != '')
         value = '"' + value + '"';
       return encodeURIComponent(value);
-    };
-
-    function logGA(postfix) {
-      if (postfix == null)
-        postfix = "";
-      if (typeof trackOnGA == 'function') {
-        window.setTimeout(function () {
-          trackOnGA('hbase/' + postfix);
-        }, 10);
-      }
     };
 
     function table_search(value) {
@@ -1591,7 +1581,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
       var _reload = self.reload;
       self.reload = function (callback) {
-        logGA('get_row');
+        hueAnalytics.log('hbase', 'get_row');
         _reload(function () {
           if (callback != null)
             callback();
@@ -1614,7 +1604,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       });
       self.drop = function (cont) {
         function doDrop() {
-          logGA('filter_columns');
+          hueAnalytics.log('hbase', 'filter_columns');
           self.parent.isLoading(true);
           return API.queryTable('deleteColumn', prepForTransport(self.parent.row), prepForTransport(self.name)).done(function (data) {
             self.parent.items.remove(self);
@@ -1640,7 +1630,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
       self.value.subscribe(function (value) {
         //change transport prep to object wrapper
-        logGA('put_column');
+        hueAnalytics.log('hbase', 'put_column');
         API.queryTable('putColumn', prepForTransport(self.parent.row), prepForTransport(self.name), "hbase-post-key-" + JSON.stringify(value)).done(function (data) {
           self.reload(function () {
           }, true);
@@ -2351,7 +2341,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           routie(cluster + '/' + table);
         },
         ':cluster/:table/query/:query': function (cluster, table, query) {
-          logGA('query_table');
+          hueAnalytics.log('hbase', 'query_table');
           $.totalStorage('hbase_cluster', cluster);
           app.station('table');
           app.search.cur_input(query);
@@ -2365,7 +2355,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           routed = true;
         },
         ':cluster/:table': function (cluster, table) {
-          logGA('view_table');
+          hueAnalytics.log('hbase', 'view_table');
           $.totalStorage('hbase_cluster', cluster);
           Router.setTable(cluster, table);
           resetSearch();
@@ -2378,7 +2368,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           if ($.inArray(cluster, app.clusterNames()) == -1) {
             routie('');
           } else {
-            logGA('view_cluster');
+            hueAnalytics.log('hbase', 'view_cluster');
             $.totalStorage('hbase_cluster', cluster);
             app.station('cluster');
             app.cluster(cluster);
@@ -2394,7 +2384,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           routed = true;
         },
         'error': function () {
-          logGA('error');
+          hueAnalytics.log('hbase', 'error');
           routed = true;
         },
         '': function () {
@@ -2408,7 +2398,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
           routed = true;
         },
         '*': function () {
-          logGA('');
+          hueAnalytics.log('hbase', '');
           if (!routed)
             history.back();
           routed = false;

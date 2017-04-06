@@ -840,7 +840,7 @@ var Collection = function (vm, collection) {
 
   self.addFacet = function (facet_json) {
     self.removeFacet(function(){return facet_json.widget_id});
-    logGA('add_facet/' + facet_json.widgetType);
+    hueAnalytics.log('dashboard', 'add_facet/' + facet_json.widgetType);
 
     $.post("/dashboard/template/new_facet", {
         "collection": ko.mapping.toJSON(self),
@@ -1732,7 +1732,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
     self.cancelAsync = function (facet) { // TODO: have a common generic with Notebook
       self.isCanceling(true);
-      logGA('cancel');
+      hueAnalytics.log('dashboard', 'cancel');
 
       multiQs = $.map(self.asyncSearchesCounter(), function (facet) {
         $.post("/notebook/api/cancel_statement", {
@@ -1822,7 +1822,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
     self.search = function (callback) {
       $(".jHueNotify").hide();
-      logGA('search');
+      hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 
       if (self.selectedQDefinition() != null) {
@@ -2406,8 +2406,3 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
   self.build();
 };
 
-function logGA(page) {
-  if (typeof trackOnGA == 'function') {
-    trackOnGA('dashboard/' + page);
-  }
-}

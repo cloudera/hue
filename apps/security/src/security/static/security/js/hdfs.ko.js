@@ -469,7 +469,7 @@ var Assist = function (vm, assist) {
     var _isLoading = window.setTimeout(function () {
       self.isLoadingAcls(true);
     }, 1000);
-    logGA('get_acls');
+    hueAnalytics.log('security/hdfs', 'get_acls');
     $.getJSON('/security/api/hdfs/get_acls', {
       'path': self.path()
     }, function (data) {
@@ -496,7 +496,7 @@ var Assist = function (vm, assist) {
 
   self.updateAcls = function () {
     $(".jHueNotify").hide();
-    logGA('updateAcls');
+    hueAnalytics.log('security/hdfs', 'updateAcls');
 
     $.post("/security/api/hdfs/update_acls", {
           'path': self.path(),
@@ -541,7 +541,7 @@ var Assist = function (vm, assist) {
 
   self.bulkDeleteAcls = function () {
     $(".jHueNotify").hide();
-    logGA('bulkDeleteAcls');
+    hueAnalytics.log('security/hdfs', 'bulkDeleteAcls');
 
     var checkedPaths = self.checkedItems();
 
@@ -563,7 +563,7 @@ var Assist = function (vm, assist) {
 
   self.bulkAddAcls = function () {
     $(".jHueNotify").hide();
-    logGA('bulkAddAcls');
+    hueAnalytics.log('security/hdfs', 'bulkAddAcls');
 
     var checkedPaths = self.checkedItems();
 
@@ -583,7 +583,7 @@ var Assist = function (vm, assist) {
 
   self.bulkSyncAcls = function () {
     $(".jHueNotify").hide();
-    logGA('bulkSyncAcls');
+    hueAnalytics.log('security/hdfs', 'bulkSyncAcls');
 
     var checkedPaths = self.checkedItems();
 
@@ -663,9 +663,3 @@ var HdfsViewModel = function (initial) {
     });
   }
 };
-
-function logGA(page) {
-  if (typeof trackOnGA == 'function') {
-    trackOnGA('security/hdfs' + page);
-  }
-}

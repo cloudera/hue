@@ -581,6 +581,15 @@ var hueDebugTimer = (function () {
   };
 })();
 
+var hueAnalytics = (function () {
+  return {
+    log: function (app, page) {
+      if (typeof trackOnGA == 'function') {
+        trackOnGA(app + '/' + page);
+      }
+    }
+  };
+})();
 
 Number.prototype.toHHMMSS = function (skipZeroSeconds) {
   var n = this;
