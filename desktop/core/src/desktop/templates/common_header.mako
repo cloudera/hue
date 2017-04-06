@@ -369,7 +369,7 @@ ${ hueIcons.symbols() }
                % for notebook in notebooks:
                  <li>
                    <a href="${ url('notebook:notebook') }?notebook=${ notebook['id'] }">
-                     <i class="fa fa-file-text-o" style="vertical-align: middle"></i> ${ notebook['name'] |n }
+                     <i class="fa fa-fw fa-file-text-o" style="vertical-align: middle"></i> ${ notebook['name'] |n }
                    </a>
                  </li>
                % endfor
