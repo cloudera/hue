@@ -426,6 +426,16 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
 <script type="text/javascript">
   $(document).ready(function () {
+    if ($.fn.editableform) {
+      $.fn.editableform.buttons =
+          '<button type="submit" class="btn btn-primary editable-submit disable-feedback">' +
+          '<i class="fa fa-fw fa-check"></i>' +
+          '</button>' +
+          '<button type="button" class="btn btn-default editable-cancel">' +
+          '<i class="fa fa-fw fa-times"></i>' +
+          '</button>';
+    }
+
     $(document).on("info", function (e, msg) {
       $.jHueNotify.info(msg);
     });
