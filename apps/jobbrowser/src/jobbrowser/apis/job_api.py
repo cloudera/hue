@@ -21,6 +21,7 @@ import logging
 from django.utils.translation import ugettext as _
 from hadoop.yarn import resource_manager_api
 
+from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -53,8 +54,8 @@ class JobApi(Api):
   def app(self, appid):
     return self._get_api(appid).app(appid)
 
-  def action(self, appid, operation):
-    return self._get_api(appid).action(operation, appid)
+  def action(self, app_ids, operation):
+    return self._get_api(app_ids).action(operation, app_ids)
 
   def logs(self, appid, app_type, log_name):
     return self._get_api(appid).logs(appid, app_type, log_name)
@@ -63,7 +64,9 @@ class JobApi(Api):
     return self._get_api(appid).profile(appid, app_type, app_property)
 
   def _get_api(self, appid):
-    if appid.startswith('task_'):
+    if type(appid) == list:
+      return self.yarn_api
+    elif appid.startswith('task_'):
       return YarnMapReduceTaskApi(self.user, appid)
     elif appid.startswith('attempt_'):
       return YarnMapReduceTaskAttemptApi(self.user, appid)
@@ -166,9 +169,15 @@ class YarnApi(Api):
     return common
 
 
-  def action(self, operation, appid):
+  def action(self, operation, app_ids):
     if operation['action'] == 'kill':
-      return kill_job(MockDjangoRequest(self.user), job=appid)
+      kills = []
+      for app_id in app_ids:
+        try:
+          kill_job(MockDjangoRequest(self.user), job=app_id)
+        except MessageException:
+          kills.append(app_id)
+      return {'kills': kills, 'status': len(app_ids) - len(kills), 'message': _('Stop signal sent to %s') % kills}
     else:
       return {}
 
@@ -223,22 +232,22 @@ class YarnMapReduceTaskApi(Api):
       'jobid': self.app_id,
       'pagenum': 1
     }
- 
+
 #     filter_params.update(_extract_query_params(filters)
-#     
+#
 #     #filter_params['text']
-#  
+#
 #     if filters.get('states'):
 #       filter_params['states'] = filters['states']
-#  
+#
 #     if 'time' in filters:
 #       filter_params['time_value'] = int(filters['time']['time_value'])
 #       filter_params['time_unit'] = filters['time']['time_unit']
- 
+
 #     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
-#  
+#
 #     apps = [massage_job_for_json(job, user=self.user) for job in jobs]
-#  
+#
 #     return {
 #       'apps': [{
 #         'id': app['id'],
