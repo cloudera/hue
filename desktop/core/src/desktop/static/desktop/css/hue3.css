@@ -518,6 +518,15 @@ a#advanced-btn:hover {
   padding-right: 8px;
 }
 
+.navigator .dropdown-menu > li > a:hover > .fa {
+  color: #FFFFFF;
+}
+
+.navigator .dropdown-menu > li > a:hover > img {
+  -webkit-filter: brightness(100);
+  filter: brightness(100);
+}
+
 .navigator .dropdown-menu > li > a {
   padding-left: 5px;
   padding-right: 30px;
