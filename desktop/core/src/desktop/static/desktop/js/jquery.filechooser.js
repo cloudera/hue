@@ -167,7 +167,7 @@
         $li.appendTo($ul);
       });
       $(self.element).find('.filechooser-services').empty().width(80);
-      $(self.element).find('.filechooser-tree').width(470).css('paddingLeft', '6px').css('borderLeft', '1px solid #EEE').css('marginLeft', '80px').css('min-height', '330px');
+      $(self.element).find('.filechooser-tree').width(480).css('paddingLeft', '6px').css('borderLeft', '1px solid #EEE').css('marginLeft', '80px').css('min-height', '330px');
       $ul.appendTo($(self.element).find('.filechooser-services'));
     }
   };
