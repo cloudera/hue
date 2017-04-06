@@ -138,18 +138,6 @@ class DataEng():
 
   def __init__(self, user): pass
 
-  def list_clusters(self, names=None, page_size=None, starting_token=None):
-    args = ['list-clusters']
-
-    if names:
-      args.extend(['--cluster-names', names])
-    if page_size is not None:
-      args.extend(['--page-size', str(page_size)])
-    if starting_token:
-      args.extend(['--starting-token', starting_token])
-
-    return _exec(args)
-
   def list_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
         creation_date_after=None, cluster_crn=None, order=None):
     args = ['list-jobs']
@@ -180,12 +168,35 @@ class DataEng():
 
     return _exec(args)
 
-  def create_cluster(self):
-    return _exec(['create-cluster'])
-  def delete_cluster(self):
-    return _exec(['delete-cluster'])
-  def describe_clusters(self):
-    return _exec(['describe-cluster'])
+  def describe_jobs(self, submitter_crns=None, page_size=None, starting_token=None, job_statuses=None, job_ids=None, job_types=None, creation_date_before=None,
+        creation_date_after=None, cluster_crn=None, order=None):
+    args = ['describe-jobs']
+
+    if creation_date_after is None:
+      creation_date_after = (datetime.today() - timedelta(days=7)).strftime(DATE_FORMAT)
+
+    if submitter_crns:
+      args.extend(['--submitter-crns', submitter_crns])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
+    if starting_token:
+      args.extend(['--starting-token', starting_token])
+    if job_statuses:
+      args.extend(['--job-statuses', job_statuses])
+    if job_ids:
+      args.extend(['--job-ids'] + job_ids)
+    if job_types:
+      args.extend(['--job-types', job_types])
+    if creation_date_before:
+      args.extend(['--creation-date-before', creation_date_before])
+    if creation_date_after:
+      args.extend(['--creation-date-after', creation_date_after])
+    if cluster_crn:
+      args.extend(['--cluster-crn', cluster_crn])
+    if order:
+      args.extend(['--order', order])
+
+    return _exec(args)
 
   def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
     args = ['submit-hive-job', '--cluster-name', cluster_name, '--script', script]
@@ -199,10 +210,34 @@ class DataEng():
 
   def submit_spark_job(self):
     return _exec(['submit-spark-job'])
+  
   def submit_yarn_job(self):
     return _exec(['submit-yarn-job'])
+  
   def submit_jobs(self):
     return _exec(['submit-jobs'])
 
   def terminate_jobs(self, job_ids):
     return _exec(['terminate-jobs', '--job-ids', job_ids])
+
+  
+  def list_clusters(self, names=None, page_size=None, starting_token=None):
+    args = ['list-clusters']
+
+    if names:
+      args.extend(['--cluster-names', names])
+    if page_size is not None:
+      args.extend(['--page-size', str(page_size)])
+    if starting_token:
+      args.extend(['--starting-token', starting_token])
+
+    return _exec(args)
+
+  def create_cluster(self):
+    return _exec(['create-cluster'])
+  
+  def delete_cluster(self):
+    return _exec(['delete-cluster'])
+  
+  def describe_clusters(self):
+    return _exec(['describe-cluster'])

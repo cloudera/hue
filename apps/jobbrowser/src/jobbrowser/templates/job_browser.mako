@@ -238,6 +238,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: mainType() == 'bundles' -->
               <div class="jb-panel" data-bind="template: { name: 'bundle-page' }"></div>
             <!-- /ko -->
+            
+            <!-- ko if: mainType().startsWith('dataeng-job') -->
+              <div data-bind="template: { name: 'dataeng-job-page' }"></div>
+            <!-- /ko -->
 
           <!-- /ko -->
           <!-- /ko -->
@@ -384,6 +388,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="template: { name: 'job-spark-page', data: $root.job() }"></div>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="job-yarn-page">
   <div class="row-fluid">
@@ -771,6 +776,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
     </div>
   </div>
+</script>
+
+
+<script type="text/html" id="dataeng-job-page">
+  <!-- ko if: type() == 'dataeng-job-HIVE' -->
+    <div data-bind="template: { name: 'job-dataeng-job-hive-page', data: $root.job() }"></div>
+  <!-- /ko -->
+</script>
+
+
+<script type="text/html" id="job-dataeng-job-hive-page">
+  ${ _('Id') } <span data-bind="text: id"></span>
+  ${ _('Name') } <span data-bind="text: name"></span>
+  ${ _('Type') } <span data-bind="text: type"></span>
+  ${ _('Status') } <span data-bind="text: status"></span>
+  ${ _('User') } <span data-bind="text: user"></span>
+  ${ _('Progress') } <span data-bind="text: progress"></span>
+  ${ _('Duration') } <span data-bind="text: duration"></span>
+  ${ _('Submitted') } <span data-bind="text: submitted"></span>
+  
+  <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
 </script>
 
 
