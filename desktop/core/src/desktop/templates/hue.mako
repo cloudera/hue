@@ -109,60 +109,36 @@ ${ hueIcons.symbols() }
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
-        <div class="navbar-dropdown">
-          <button class="btn btn-primary pull-right" title="${ _('Compose') }" data-toggle="dropdown">${ _('NEW') }</button>
-          <ul class="dropdown-menu dropdown-menu-new">
-            % if 'beeswax' in apps or 'impala' in apps or SHOW_NOTEBOOKS.get() or interpreters:
-              <li class="dropdown-submenu">
-                <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><i class="fa fa-fw fa-edit inline-block"></i> ${ _('Editor') }</a>
-                <ul class="dropdown-menu">
-                  % if 'impala' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('impala', true); }"><svg style="display: inline-block;"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-impala"></use></svg> ${_('Impala Query')}</a></li>
-                  % endif
-                  % if 'beeswax' in apps:
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-hive"></use></svg> ${_('Hive Query')}</a></li>
-                  % endif
-                  % if SHOW_NOTEBOOKS.get():
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/notebook'); }"><i class="fa fa-fw fa-file-text-o inline-block"></i> ${ _('Notebook') }</a></li>
-                  % endif
-                  % if interpreters:
-                  <li class="divider"></li>
-                  <li class="dropdown-submenu">
-                    <a data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon">${ _('More') }</span></a>
-                    <ul class="dropdown-menu">
-                      % for interpreter in interpreters:
-                        % if interpreter['name'] != 'Hive' and interpreter['name'] != 'Impala':
-                        <li><a  href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('${ interpreter['type'] }', true); }"><span class="dropdown-no-icon">${ interpreter['name'] }</span></a></li>
-                        % endif
-                      % endfor
-                      % if user.is_superuser:
-                        <li class="divider"></li>
-                        <li><a href="http://gethue.com/sql-editor/" target="_blank"><span class="dropdown-no-icon">${ _('Add more...') }</span></a></li>
-                      % endif
-                    </ul>
-                  </li>
-                  % endif
-                </ul>
-              </li>
-            % endif
-            % if IS_DASHBOARD_ENABLED.get():
-              <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-area-chart"></i> ${ _('Dashboard') }</a></li>
-            % endif
-            % if 'oozie' in apps:
-              % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
-              <li class="dropdown-submenu">
-                <a data-rel="navigator-tooltip" href="#"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Workflow') }</a>
-                <ul class="dropdown-menu">
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/workflow/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-workflow"></use></svg> ${_('Workflow')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/coordinator/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-coordinator"></use></svg> ${_('Schedule')}</a></li>
-                  <li><a href="javascript: void(0)" data-bind="click: function(){ page('/oozie/editor/bundle/new/') }"><svg><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie-bundle"></use></svg> ${_('Bundle')}</a></li>
-                </ul>
-              </li>
-              % endif
-            % endif
+
+        <div class="btn-group" data-bind="visible: true" style="display:none;">
+          <!-- ko with: mainQuickCreateAction -->
+          <button class="btn btn-primary" href="javascript: void(0);" data-bind="click: click"><span data-bind="text: displayName"></span></button>
+          <!-- /ko -->
+          <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
+          <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
+            <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
         </div>
+
+        <script type="text/html" id="quick-create-item-template">
+          <!-- ko if: item.dividerAbove -->
+          <li class="divider"></li>
+          <!-- /ko -->
+          <li data-bind="css: { 'dropdown-submenu': item.isCategory }"><a href="javascript: void(0);" data-bind="click: item.click">
+            <!-- ko if: item.icon -->
+            <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
+            <!-- /ko -->
+            <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span></a>
+            <!-- ko if: item.isCategory -->
+            <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
+              <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
+            </ul>
+            <!-- /ko -->
+          </li>
+        </script>
       </div>
+
+
 
       <div class="top-nav-middle">
         <div class="search-container">
@@ -963,6 +939,107 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.searchActive = ko.observable(false);
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
+
+        self.quickCreateActions = [];
+
+        % if 'impala' in apps:
+          self.mainQuickCreateAction = {
+            displayName: '${ _('Query') }',
+            icon: 'impala',
+            click: function(){
+              page('/editor');
+              onePageViewModel.changeEditorType('impala', true);
+            }
+          };
+        % elif 'beeswax' in apps:
+          self.mainQuickCreateAction = {
+            displayName: '${ _('Query Hive') }',
+            icon: 'hive',
+            click: function(){
+              page('/editor');
+              onePageViewModel.changeEditorType('hive', true);
+            }
+          };
+        % endif
+
+        % if interpreters:
+          var interpreters = [];
+
+          interpreters.push({
+            displayName: '${ _('Notebook') }',
+            icon: 'notebook',
+            click: function(){
+              page('/notebook');
+            }
+          });
+        % for interpreter in interpreters:
+          interpreters.push({
+            displayName: '${ interpreter['name'] }',
+            dividerAbove: interpreters.length === 1,
+            icon: '${ interpreter['type'] }',
+            click: function () {
+              page('/editor');
+              onePageViewModel.changeEditorType('${ interpreter['type'] }', true);
+            }
+          });
+        %endfor
+        % if user.is_superuser:
+          interpreters.push({
+            displayName: '${ _('Add more...') }',
+            dividerAbove: true,
+            click: function () {
+              window.open('http://gethue.com/sql-editor/', '_blank');
+            }
+          });
+        % endif
+
+          self.quickCreateActions.push({
+            displayName: '${ _('Editor') }',
+            icon: 'editor',
+            isCategory: true,
+            children: interpreters
+          });
+        %endif
+
+        % if IS_DASHBOARD_ENABLED.get():
+          self.quickCreateActions.push({
+            displayName: '${ _('Dashboard') }',
+            icon: 'dashboard',
+            click: function () {
+              page('/dashboard/new_search');
+            }
+          });
+        % endif
+
+
+        % if 'oozie' in apps:
+          % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+            self.quickCreateActions.push({
+              displayName: '${ _('Workflow') }',
+              icon: 'oozie',
+              isCategory: true,
+              children: [{
+                displayName: '${_('New Workflow')}',
+                icon: 'oozie-workflow',
+                click: function() {
+                  page('/oozie/editor/workflow/new/')
+                }
+              }, {
+                displayName: '${_('New Schedule')}',
+                icon: 'oozie-coordinator',
+                click: function() {
+                  page('/oozie/editor/coordinator/new/')
+                }
+              }, {
+                displayName: '${_('New Bundle')}',
+                icon: 'oozie-bundle',
+                click: function() {
+                  page('/oozie/editor/bundle/new/')
+                }
+              }]
+            });
+          % endif
+        % endif
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
