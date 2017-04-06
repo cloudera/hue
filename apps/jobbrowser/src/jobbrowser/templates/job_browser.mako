@@ -143,6 +143,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <option value="minutes">${_('minutes')}</option>
             </select>
 
+            <button class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
+              <i class="fa fa-refresh"></i>
+            </button>
+
+
             <div class="pull-right">
               <div data-bind="template: { name: 'job-actions', 'data': jobs }"></div>
             </div>
@@ -1287,7 +1292,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
-          return job.hasRerun();
+          return job.rerunEnabled();
         }).length == self.selectedJobs().length;
       });
 
