@@ -87,7 +87,7 @@
 
     huePubSub.subscribe('reposition.scroll.anchor.up', function(){
       $('#jHueScrollUpAnchor').css('right', '20px');
-      if (!$(_this.element).is('body')) {
+      if (!$(_this.element).is('body') && $(_this.element).is(':visible')) {
         var adjustRight = $(window).width() - $(_this.element).offset().left - $(_this.element).width();
         if (adjustRight > 20) {
           $('#jHueScrollUpAnchor').css('right', adjustRight + 'px');
