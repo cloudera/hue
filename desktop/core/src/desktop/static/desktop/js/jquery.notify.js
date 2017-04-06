@@ -72,7 +72,7 @@
       }
       else if (_this.options.level == TYPES.INFO) {
         el.addClass("alert-info");
-        scrollColor = '#338bb8';
+        scrollColor = '#0B7FAD';
       }
       el.find(".message").html("<strong>" + _this.options.message + "</strong>");
 

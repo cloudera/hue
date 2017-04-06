@@ -173,7 +173,7 @@
 }
 
 .selectize-edit:hover {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .selectize-actions {
@@ -193,7 +193,7 @@
 }
 
 .selectize-actions i:hover {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .selectize-control.multi .selectize-input.has-items {
@@ -234,9 +234,9 @@
   cursor: pointer;
   margin: 0 3px 3px 0;
   padding: 2px 6px;
-  background: #338BB8;
+  background: #0B7FAD;
   color: #FFF;
-  border: 0 solid #338BB8;
+  border: 0 solid #0B7FAD;
   border-radius: 5px
 }
 
@@ -246,8 +246,8 @@
 
 .selectize-control.multi .selectize-input > div.active {
   background: #DBE8F1;
-  color: #338BB8;
-  border: 0 solid #338BB8;
+  color: #0B7FAD;
+  border: 0 solid #0B7FAD;
 }
 
 .selectize-control.multi .selectize-input.disabled > div,

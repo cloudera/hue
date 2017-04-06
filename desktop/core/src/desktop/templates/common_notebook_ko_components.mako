@@ -63,7 +63,7 @@ except ImportError, e:
             <img class="snippet-icon" data-bind="attr: { 'src': $root.getSnippetViewSettings(type()).snippetImage }"  alt="${ _('Snippet icon') }">
             <!-- /ko -->
             <!-- ko if: $root.getSnippetViewSettings(type()).snippetIcon -->
-            <i style="margin-left: 2px; color: #338bb8;" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>
+            <i style="margin-left: 2px; color: #0B7FAD;" class="fa snippet-icon" data-bind="css: $root.getSnippetViewSettings(type()).snippetIcon"></i>
             <!-- /ko -->
             </div>
             <span data-bind="text: name"></span>

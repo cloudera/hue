@@ -168,7 +168,7 @@ var HueColors = {
   },
   LIGHT_BLUE: "#DBE8F1",
   BLUE: "#87BAD5",
-  DARK_BLUE: "#338BB8",
+  DARK_BLUE: "#0B7FAD",
   DARKER_BLUE: "#205875",
   PURPLE: "#C0B1E9",
   GRAY: "#666666",

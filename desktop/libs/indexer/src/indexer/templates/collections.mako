@@ -40,7 +40,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 }
 
 .hue-breadcrumbs-bar a {
-  color: #338BB8 !important;
+  color: #0B7FAD !important;
   display: inline !important;
 }
 

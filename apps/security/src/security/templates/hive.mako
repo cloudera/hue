@@ -551,7 +551,7 @@ ${ layout.menubar(section='hive1') }
 
 <%def name="withPrivilegesPullRight()">
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #338bb8" title="${ _('Has some privileges') }"></i>&nbsp;
+    <i class="fa fa-shield" data-bind="visible: withPrivileges()" style="color: #0B7FAD" title="${ _('Has some privileges') }"></i>&nbsp;
     <i class="fa fa-file-o muted" data-bind="click: $root.assist.showHdfs ,visible: isTable()"></i>
   </div>
 </%def>

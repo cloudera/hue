@@ -66,12 +66,12 @@
 }
 
 .step-indicator .active .step {
-  border-color: #338BB8;
-  color: #338BB8;
+  border-color: #0B7FAD;
+  color: #0B7FAD;
 }
 
 .step-indicator .active .caption {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .step-indicator .complete .step {
@@ -93,12 +93,12 @@
 }
 
 .step-indicator .active.complete .step {
-  border-color: #338BB8;
-  color: #338BB8;
+  border-color: #0B7FAD;
+  color: #0B7FAD;
 }
 
 .step-indicator .active.complete .caption {
-  color: #338BB8;
+  color: #0B7FAD;
 }
 
 .step-indicator .inactive .caption {

@@ -261,7 +261,7 @@ ${ commonshare() | n,unicode }
   }
 
   .hue-breadcrumbs-bar a {
-    color: #338BB8 !important;
+    color: #0B7FAD !important;
     display: inline !important;
   }
 

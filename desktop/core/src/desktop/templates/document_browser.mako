@@ -100,11 +100,11 @@ from desktop.views import _ko
     }
 
     .doc-browser-breadcrumbs li:not(.divider):not(.active):hover {
-      border-bottom: 2px solid #338BB8;
+      border-bottom: 2px solid #0B7FAD;
     }
 
     .doc-browser-breadcrumbs a {
-      color: #338BB8 !important;
+      color: #0B7FAD !important;
     }
 
     .doc-browser-breadcrumbs a:hover {
@@ -156,13 +156,13 @@ from desktop.views import _ko
     }
 
     .doc-browser-list i {
-      color: #338BB8;
+      color: #0B7FAD;
       font-size: 20px;
       font-weight: lighter;
     }
 
     .doc-browser-list .hi {
-      color: #338BB8;
+      color: #0B7FAD;
       font-size: 24px;
     }
 
@@ -234,7 +234,7 @@ from desktop.views import _ko
     }
 
     .doc-browser-shared-icon-active {
-      color: #338BB8 !important;
+      color: #0B7FAD !important;
     }
 
     .doc-browser-type {
@@ -255,7 +255,7 @@ from desktop.views import _ko
 
     .doc-browser-drag-select {
       position: fixed;
-      border: 1px solid #338BB8;
+      border: 1px solid #0B7FAD;
       cursor: pointer;
     }
 
@@ -272,7 +272,7 @@ from desktop.views import _ko
       vertical-align: middle;
       padding: 1px 12px 1px 7px;
       cursor: pointer;
-      background-color: #338BB8;
+      background-color: #0B7FAD;
       color: #DBE8F1;
       border-radius: 2px;
       z-index: 1000;
@@ -290,11 +290,11 @@ from desktop.views import _ko
     }
 
     .doc-browser-drop-hover {
-      border: 1px solid #338BB8 !important;
+      border: 1px solid #0B7FAD !important;
     }
 
     .hue-breadcrumbs-bar a {
-      color: #338BB8 !important;
+      color: #0B7FAD !important;
       display: inline !important;
     }
 
@@ -667,7 +667,7 @@ from desktop.views import _ko
                 % if SHOW_NOTEBOOKS.get():
                   <li>
                     <a title="${_('Notebook')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('notebook:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
-                      <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #338BB8;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
+                      <i style="font-size: 24px; line-height: 24px; vertical-align: middle; color: #0B7FAD;" class="fa app-icon fa-fw fa-file-text-o"></i> ${_('Notebook')}
                     </a>
                   </li>
                 % endif

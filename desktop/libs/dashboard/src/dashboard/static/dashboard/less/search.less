@@ -16,6 +16,8 @@
  limitations under the License.
 */
 
+@import (reference) "hue-mixins.less";
+
 .dashboard-container {
   .dropdown-menu li {
     font-size: 14px;
@@ -247,7 +249,7 @@
   .editor-title {
     font-weight: bold;
     color: #262626;
-    border-bottom: 1px solid #338bb8;
+    border-bottom: 1px solid @hue-primary-color-dark;
   }
 
   .document-details-actions {
@@ -310,7 +312,7 @@
   }
 
   .result-container .show-details-icon:hover i {
-    color: #338bb8;
+    color: @hue-primary-color-dark;
   }
 
   .result-sorting th {
@@ -687,11 +689,11 @@
   }
 
   .grid-side-btn.active {
-    color: #338bb8;
+    color: @hue-primary-color-dark;
   }
 
   .grid-side-btn:hover {
-    color: #338bb8;
+    color: @hue-primary-color-dark;
   }
 
   .card-widget .selectize-control {
