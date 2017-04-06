@@ -20,6 +20,9 @@
 <%def name="symbols()">
   <svg version="1.1" xmlns="http://www.w3.org/2000/svg" style="display:none;">
 
+    <symbol id="hi-empty" viewBox="0 0 640 640">
+    </symbol>
+
     <symbol id="hi-file" viewBox="0 0 640 640">
       <path d="M574.3,143.67L445.74,12.32A41.24,41.24,0,0,0,416.44,0H95A41,41,0,0,0,54,41V599a41,41,0,0,0,41,41H545a41,41,0,0,0,41-41V172.35A40.78,40.78,0,0,0,574.3,143.67ZM422.87,34.7L551.43,166a9,9,0,0,1,2.57,6.3V181H413.51a8.19,8.19,0,0,1-8.51-8.51V32h11.44A9.05,9.05,0,0,1,422.87,34.7ZM545,608H95a9,9,0,0,1-9-9V41a9,9,0,0,1,9-9H373V172.49A40.21,40.21,0,0,0,413.51,213H554V599A9,9,0,0,1,545,608Z"></path>
     </symbol>
@@ -189,5 +192,21 @@
       <use xlink:href="#hi-share-addon"></use>
       <!-- /ko -->
     </svg>
+  </script>
+
+  <script type="text/html" id="app-icon-template">
+    <!-- ko switch: icon -->
+    <!-- ko case: 'editor' --><i class="fa fa-fw fa-edit inline-block"></i><!-- /ko -->
+    <!-- ko case: 'pig' --><svg class="hi"><use xlink:href="#hi-pig"></use></svg><!-- /ko -->
+    <!-- ko case: 'notebook' --><svg class="hi"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie' --><svg class="hi"><use xlink:href="#hi-oozie"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-bundle' --><svg class="hi"><use xlink:href="#hi-oozie-bundle"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-coordinator' --><svg class="hi"><use xlink:href="#hi-oozie-coordinator"></use></svg><!-- /ko -->
+    <!-- ko case: 'oozie-workflow' --><svg class="hi"><use xlink:href="#hi-oozie-workflow"></use></svg><!-- /ko -->
+    <!-- ko case: 'hive' --><svg class="hi"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
+    <!-- ko case: 'impala' --><svg class="hi"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
+    <!-- ko case: 'dashboard' --><i class="fa fa-fw fa-area-chart"></i><!-- /ko -->
+    <!-- ko case: $else --><svg class="hi"><use xlink:href="#hi-empty"></use></svg><!-- /ko -->
+    <!-- /ko -->
   </script>
 </%def>
