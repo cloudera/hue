@@ -189,7 +189,7 @@ class YarnApi(Api):
     if app_type == 'MAPREDUCE':
       if app_property == 'tasks':
         return {
-          'task_list': YarnMapReduceTaskApi(self.user, appid).apps(),
+          'task_list': YarnMapReduceTaskApi(self.user, appid).apps()['apps'],
         }
       elif app_property == 'metadata':
         return NativeYarnApi(self.user).get_job(jobid=appid).full_job_conf
@@ -245,7 +245,7 @@ class YarnMapReduceTaskApi(Api):
   def profile(self, appid, app_type, app_property):
     if app_property == 'attempts':
       return {
-          'task_list': YarnMapReduceTaskAttemptApi(self.user, appid).apps(),
+          'task_list': YarnMapReduceTaskAttemptApi(self.user, appid).apps()['apps'],
       }
     elif app_property == 'counters':
       return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=appid).counters

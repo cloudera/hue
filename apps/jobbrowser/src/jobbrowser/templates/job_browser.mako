@@ -373,6 +373,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+
+  <div data-bind="template: { name: 'actions' }"></div>
 </script>
 
 
@@ -399,7 +401,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
-  <a href="javascript:void(0)" data-bind="click: function() { control('kill'); }">Stop</a>
+  <div data-bind="template: { name: 'actions' }"></div>
 
   <ul class="nav nav-tabs margin-top-20">
     <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
@@ -429,7 +431,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
         <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span></button>
+        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
+          <i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span>
+        </button>
       </div>
 
       <table class="table table-condensed">
@@ -522,7 +526,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="btn-toolbar pull-right" style="display: inline; vertical-align: middle; margin-left: 10px; font-size: 12px">
         <span class="loader hide"><i class="fa fa-2x fa-spinner fa-spin muted"></i></span>
-        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button"><i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span></button>
+        <button class="btn bulkToolbarBtn bulk-resume" data-operation="resume" title="${ _('Resume selected') }" disabled="disabled" type="button">
+          <i class="fa fa-play"></i><span class="hide-small"> ${ _('View') }</span>
+        </button>
       </div>
 
       <table class="table table-condensed">
@@ -642,6 +648,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 </script>
 
+
 <script type="text/html" id="job-spark-page">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
@@ -651,6 +658,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+  
+  <div data-bind="template: { name: 'actions' }"></div>
 </script>
 
 
