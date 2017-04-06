@@ -16,6 +16,8 @@
  limitations under the License.
 */
 
+@import (reference) "hue-mixins.less";
+
 #oozie_workflowComponents {
 
   .draggable-widget, .draggable-icon {
@@ -107,7 +109,7 @@
   }
 
   .widget-icon {
-    color: #338bb8;
+    color: @hue-primary-color-dark;
     height: 16px;
     width: 16px;
     margin-left: 3px;
@@ -124,7 +126,7 @@
     height: 0;
     border-style: solid;
     border-width: 0 40px 40px 0;
-    border-color: transparent #338bb8 transparent transparent;
+    border-color: transparent @hue-primary-color-dark transparent transparent;
     cursor: pointer;
   }
 
@@ -136,7 +138,7 @@
 
   .card-widget h6 {
     text-transform: uppercase;
-    color: #338bb8;
+    color: @hue-primary-color-dark;
     margin-bottom: 1px;
   }
 

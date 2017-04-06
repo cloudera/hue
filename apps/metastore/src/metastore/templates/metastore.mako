@@ -139,7 +139,7 @@ ${ components.menubar() }
           <!-- ko if: $root.optimizerEnabled  -->
           <td>
             <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: { 'title': popularity() }">
-              <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : popularity() + '%' }"></div>
+              <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : popularity() + '%' }"></div>
             </div>
           </td>
           <!-- /ko -->
@@ -489,7 +489,7 @@ ${ components.menubar() }
                 <!-- ko if: optimizerStats() -->
                 <td>
                   <div class="progress" style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': optimizerStats().popularity}">
-                    <div class="bar" style="background-color: #338bb8" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
+                    <div class="bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : optimizerStats().popularity + '%' }"></div>
                   </div>
                 </td>
                 <td data-bind="text: optimizerStats().column_count"></td>
@@ -767,7 +767,7 @@ ${ components.menubar() }
     <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + qid(), '_blank'); }">
       <td data-bind="text: qid"></td>
       <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
-        <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : Math.round(queryCount() / $parent.optimizerDetails().queryCount() * 100) + '%' }"></div>
+        <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : Math.round(queryCount() / $parent.optimizerDetails().queryCount() * 100) + '%' }"></div>
       </td>
       <td><code data-bind="text: queryChar"></code></td>
       <td><code data-bind="text: query().substring(0, 100) + '...'"></code></td>
@@ -983,7 +983,7 @@ ${ components.menubar() }
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
-              <div class="progress bar" style="background-color: #338bb8" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
+              <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
             </td>
             <td><a data-bind="text: tableName, attr: { href: '/metastore/table/' + $root.database().name + '/' + tableName() }"></a></td>
             <td class="pointer"><code data-bind="text: joinColumns, click: scrollToColumn"></code></td>

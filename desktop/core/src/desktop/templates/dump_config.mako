@@ -38,7 +38,7 @@ ${ layout.menubar(section='dump_config') }
     <div class="card card-home">
       <h2 class="card-heading simple">
         <div class="pull-right muted">
-          ${_('Configuration files located in')} <code style="color: #338BB8">${conf_dir}</code>
+          ${_('Configuration files located in')} <code style="color: #0B7FAD">${conf_dir}</code>
         </div>
         ${_('Configuration Sections and Variables')}
       </h2>

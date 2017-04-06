@@ -40,7 +40,7 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   .footer {
     position: fixed;
     bottom: 0;
-    background-color: #338BB8;
+    background-color: #0B7FAD;
     height: 6px;
     width: 100%;
   }

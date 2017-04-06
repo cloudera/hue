@@ -155,7 +155,7 @@ ${ common_home.homeJSModels(is_embeddable) }
 
   .hide-assist:hover {
     margin-right: 2px;
-    color: #338bb8;
+    color: #0B7FAD;
   }
 
   .home-container {

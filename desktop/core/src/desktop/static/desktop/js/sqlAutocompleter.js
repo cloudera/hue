@@ -885,7 +885,7 @@ var SqlAutocompleter = (function () {
         var optData = self.topTablesPerDb[item.database][table];
         item.docHTML = '<table style="margin:10px;">' +
             '<tr style="height: 20px;"><td style="width: 80px;">Table:</td><td style="width: 100px;">' + optData.name + '</td></tr>' +
-            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #338bb8; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
+            '<tr style="height: 20px;"><td style="width: 80px;">Popularity:</td><td style="width: 100px;"><div class="progress" style="height: 10px; width: 100px;"><div class="bar" style="background-color: #0B7FAD; width: ' + optData.popularity + '%" ></div></div></td></tr>' +
             '<tr style="height: 20px;"><td style="width: 80px;">Columns:</td><td style="width: 100px;">' + optData.column_count + '</td></tr>' +
             '<tr style="height: 20px;"><td style="width: 80px;">Fact:</td><td style="width: 100px;">' + optData.is_fact + '</td></tr>' +
             '</table>';

@@ -98,7 +98,7 @@
                   %endif
               },
               %if styleModifier:
-                style: { color: ${styleModifier}() ? '#338bb8': '#999999'}
+                style: { color: ${styleModifier}() ? '#0B7FAD': '#999999'}
               %else:
                 style: { color: '#999999'}
               %endif

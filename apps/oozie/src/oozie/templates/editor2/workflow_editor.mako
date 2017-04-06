@@ -148,7 +148,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     % if ENABLE_IMPALA_ACTION.get():
@@ -220,7 +220,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
     % endif
 
@@ -235,7 +235,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
                     draggable: {data: draggableHive2Action(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHive2Action());}}}"
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
-         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
+         <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
 
     % if ENABLE_IMPALA_ACTION.get():

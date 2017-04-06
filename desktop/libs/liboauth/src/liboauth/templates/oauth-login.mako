@@ -99,7 +99,7 @@ from django.utils.translation import ugettext as _
     .footer {
       position: fixed;
       bottom: 0;
-      background-color: #338BB8;
+      background-color: #0B7FAD;
       height: 4px;
       width: 100%;
     }

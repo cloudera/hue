@@ -173,7 +173,7 @@
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'hive2-widget' || widgetType() == 'hive-document-widget' -->
-      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }"><sup style="color: #338bb8; margin-left: -4px">2</sup>
+      <img src="${ static('oozie/art/icon_beeswax_48.png') }" class="widget-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px">2</sup>
       <!-- /ko -->
 
       <!-- ko if: widgetType() == 'impala-widget' || widgetType() == 'impala-document-widget' -->

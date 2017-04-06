@@ -189,7 +189,7 @@ ${ layout.menubar(section='quick_start') }
               <h2 class="card-heading simple">${ _('Use the applications') }</h2>
 
               <div class="card-body">
-                <a href="${ url('desktop.views.home2') }" style="padding-left: 2px; line-height: 24px; margin-right: 4px"><i class="fa fa-home" style="font-size: 24px; color: #338bb8; vertical-align: middle;"></i> ${ _('Hue Home') }</a>
+                <a href="${ url('desktop.views.home2') }" style="padding-left: 2px; line-height: 24px; margin-right: 4px"><i class="fa fa-home" style="font-size: 24px; color: #0B7FAD; vertical-align: middle;"></i> ${ _('Hue Home') }</a>
               </div>
             </div>
 

@@ -48,7 +48,7 @@
     }
 
     .header {
-      background-color: #338BB8;
+      background-color: #0B7FAD;
       position: fixed;
       top: 0;
       width: 100%;
@@ -59,7 +59,7 @@
     .footer {
       position: fixed;
       bottom: 0;
-      background-color: #338BB8;
+      background-color: #0B7FAD;
       color: #FFF;
       font-size: 10px;
       width: 100%;
@@ -68,7 +68,7 @@
     }
 
     a {
-      color: #338bb8;
+      color: #0B7FAD;
       text-decoration: none;
       font-weight: bold;
     }

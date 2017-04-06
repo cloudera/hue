@@ -279,11 +279,11 @@ ${ layout.menubar(section='hdfs') }
 </%def>
 
 <%def name="aclBitPullRight()">
-  <div class="pull-right rwx" data-bind="style: { color: aclBit() ? '#338bb8': '#999999'}">
+  <div class="pull-right rwx" data-bind="style: { color: aclBit() ? '#0B7FAD': '#999999'}">
     <span data-bind="text: rwx"></span>
   </div>
   <div class="pull-right">
-    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #338bb8" title="${ _('Has some ACLs') }"></i>
+    <i class="fa fa-shield" data-bind="visible: aclBit()" style="color: #0B7FAD" title="${ _('Has some ACLs') }"></i>
   </div>
 </%def>
 
