@@ -156,7 +156,13 @@ class OptimizerApi(object):
 
 
   def query_risk(self, query, source_platform, page_size=100, startingToken=None):
-    return self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'pageSize': page_size, startingToken: None})
+    response = self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'pageSize': page_size, startingToken: None})
+    data = response.get(source_platform + 'Risk', {})
+
+    if data and data == [{u'riskAnalysis': u'', u'risk': u'low', u'riskRecommendation': u''}]:
+      data = []
+
+    return data
 
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):

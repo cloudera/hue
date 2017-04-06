@@ -899,6 +899,8 @@ var EditorViewModel = (function() {
 
         hueAnalytics.log('notebook', 'get_query_risk');
         self.complexityCheckRunning(true);
+        huePubSub.publish('editor.active.risks', []);
+
         lastComplexityRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
@@ -915,6 +917,7 @@ var EditorViewModel = (function() {
               // TODO: Silence errors
               $(document).trigger('error', data.message);
             }
+            huePubSub.publish('editor.active.risks', self.complexity());
             lastCheckedComplexityStatement = self.statement_raw();
             self.complexityCheckRunning(false);
           }

@@ -1075,9 +1075,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
-        <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
-        <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: complexity()[0].risk === 'high' -->
         <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
@@ -1086,6 +1083,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- ko if: showOptimizer -->
         <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity()[0].riskAnalysis"></strong> <span data-bind="text: complexity()[0].riskRecommendation"></span></span>
         <!-- /ko -->
+      <!-- /ko -->
+    <!-- /ko -->
+    <!-- ko if: ! hasSuggestion() && ! hasComplexity() -->
+      <!-- ko if: showOptimizer -->
+        <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
       <!-- /ko -->
     <!-- /ko -->
   </div>
