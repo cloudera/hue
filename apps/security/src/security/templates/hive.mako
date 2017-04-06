@@ -669,7 +669,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           highlightMainMenu(mainSection);
           viewModel.updateSectionHash(mainSection);
         }
-        logGA(mainSection);
+        hueAnalytics.log('security/hive', mainSection);
       }
 
       function highlightMainMenu(mainSection) {

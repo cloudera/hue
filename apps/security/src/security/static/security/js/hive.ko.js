@@ -1331,9 +1331,3 @@ var HiveViewModel = function (initial) {
     $(document).trigger("show.mainSection");
   }
 };
-
-function logGA(page) {
-  if (typeof trackOnGA == 'function') {
-    trackOnGA('sentry/' + page);
-  }
-}

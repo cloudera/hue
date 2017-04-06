@@ -1475,7 +1475,7 @@ $(document).ready(function () {
     if ($(e.target).attr("href") != "#results" && $(e.target).attr("href") != "#columns"){
       $($(e.target).attr("href")).css('height', 'auto');
       if ($(e.target).attr("href") == "#chart") {
-        logGA('results/chart');
+        hueAnalytics.log('beeswax', 'results/chart');
         predictGraph();
       }
     } else {
@@ -2281,7 +2281,7 @@ function trySaveDesign() {
   viewModel.design.query.value(query);
   if (viewModel.design.id() && viewModel.design.id() != -1) {
     viewModel.saveDesign();
-    logGA('design/save');
+    hueAnalytics.log('beeswax', 'design/save');
   }
 }
 
@@ -2297,7 +2297,7 @@ function trySaveAsDesign() {
     viewModel.saveDesign();
     $('#saveAs').find('.help-inline').text('');
     $('#saveAs').find('.control-group').removeClass('error');
-    logGA('design/save-as');
+    hueAnalytics.log('beeswax', 'design/save-as');
   } else if (viewModel.design.name()) {
     $.jHueNotify.error("${_('No query provided to save.')}");
     $('#saveAs').modal('hide');
@@ -2321,7 +2321,7 @@ function trySaveResults() {
       $("#saveResultsModal .loader").hide();
     });
   }
-  logGA('results/save');
+  hueAnalytics.log('beeswax', 'results/save');
 }
 
 $(document).on('saved.results', function() {
@@ -2353,7 +2353,7 @@ function tryExecuteQuery() {
     viewModel.executeQuery();
   }
 
-  logGA('query/execute');
+  hueAnalytics.log('beeswax', 'query/execute');
 }
 
 function tryExecuteNextStatement() {
@@ -2373,7 +2373,7 @@ function tryExecuteNextStatement() {
     viewModel.executeNextStatement();
   }
 
-  logGA('query/execute_next');
+  hueAnalytics.log('beeswax', 'query/execute_next');
 }
 
 function tryExecuteParameterizedQuery() {
@@ -2389,7 +2389,7 @@ function tryExplainQuery() {
   viewModel.design.query.value(query);
   viewModel.explainQuery();
 
-  logGA('query/explain');
+  hueAnalytics.log('beeswax', 'query/explain');
 }
 
 
@@ -2732,7 +2732,7 @@ $(document).ready(function () {
       renderRecent();
       placeResizePanelHandle();
 
-      logGA('query/results');
+      hueAnalytics.log('beeswax', 'query/results');
     },
     'query/explanation': function () {
       if (! viewModel.design.results.explanation()) {
@@ -2750,7 +2750,7 @@ $(document).ready(function () {
 
       clickHard('.resultsContainer .nav-tabs a[href="#log"]');
 
-      logGA('watch/logs');
+      hueAnalytics.log('beeswax', 'watch/logs');
     },
     'watch/results': function() {
       showSection('query-editor');
@@ -2758,7 +2758,7 @@ $(document).ready(function () {
 
       clickHard('.resultsContainer .nav-tabs a[href="#results"]');
 
-      logGA('watch/results');
+      hueAnalytics.log('beeswax', 'watch/results');
     },
     '*': function () {
       routie('query');
