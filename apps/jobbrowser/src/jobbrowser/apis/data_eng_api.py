@@ -136,8 +136,10 @@ class DataEngClusterApi(Api):
   def _api_status(self, status):
     if status in ['CREATING', 'CREATED', 'TERMINATING']:
       return 'RUNNING'
+    elif status in ['ARCHIVING']:
+      return 'SUCCEEDED'    
     else:
-      return 'FINISHED' # SUCCEEDED , KILLED and FAILED
+      return 'FAILED' # KILLED and FAILED
 
 
 class DataEngJobApi(Api):
@@ -190,8 +192,16 @@ class DataEngJobApi(Api):
     }
 
   def app(self, appid):
-    handle = DataEng(self.user).list_jobs(job_ids=[appid])
+    handle = DataEng(self.user).describe_jobs(job_ids=[appid])
+
     job = handle['jobs'][0]
+
+# {u'jobs': [{u'status': u'FAILED', u'submitterCrn': u'crn:altus:iam:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:user:/csGD5p16ZWkUateZrvVk9zm10gXQAkjqKvsIPVkQ5U=/d122f235-3a45-46a0-b3a6-e572c76a711c',
+#              u'jobId': u'9c697bc9-175d-4260-8d84-56fffc148810', u'clusterCrn': u'crn:altus:dataeng:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:cluster:praveen-hive-on-mr/2bb313d7-ffbf-42bd-a9d9-5e4f827ea799', 
+#              u'creationDate': u'2017-04-06T00:32:51.673000+00:00', u'crn': u'crn:altus:dataeng:us-west-1:12a0079b-1591-4ca0-b721-a446bda74e67:job:9c697bc9-175d-4260-8d84-56fffc148810', 
+#              u'hiveJobDetails': {u'params': [], u'script': u'file:///Users/praveen/Code/Cloudera/scripts/queries/simple.hql'},
+#               u'jobType': u'HIVE', u'failureAction': u'INTERRUPT_JOB_QUEUE'}]}
+
 
     common = {
         'id': job['jobId'],
@@ -199,7 +209,13 @@ class DataEngJobApi(Api):
         'status': job['status'],
         'apiStatus': self._api_status(job['status']),
         'progress': 50,
-        'type': 'dataeng-job',
+        'duration': 10 * 3600,
+        'submitted': job['creationDate'],
+        'type': 'dataeng-job-%s' % job['jobType'],
+    }
+    
+    common['properties'] = {
+      'properties': job
     }
 
     return common
@@ -239,6 +255,8 @@ class DataEngJobApi(Api):
   def _api_status(self, status):
     if status in ['CREATING', 'CREATED', 'TERMINATING']:
       return 'RUNNING'
+    elif status in ['COMPLETED']:
+      return 'SUCCEEDED'
     else:
-      return 'FINISHED' # SUCCEEDED , KILLED and FAILED
+      return 'FAILED' # INTERRUPTED , KILLED and FAILED
 
