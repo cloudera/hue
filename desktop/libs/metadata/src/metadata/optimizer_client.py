@@ -217,14 +217,14 @@ class OptimizerApi(object):
     return self._call('getTopJoins', args)
 
 
-  def top_databases(self, db_tables=None, page_size=100, startingToken=None):
+  def top_databases(self, page_size=100, startingToken=None):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
       'startingToken': None
     }
 
-    return self._call('getTopDataBases', args)
+    return self._call('getTopDatabases', args)
 
 
   UPLOAD = {

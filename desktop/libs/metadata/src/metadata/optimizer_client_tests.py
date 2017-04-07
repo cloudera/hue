@@ -71,9 +71,9 @@ class TestOptimizerApi(BaseTestOptimizerApi):
         (uuid_default(), 0, "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;", 'default'),
         (uuid_default(), 0, "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;", 'default'),
         (uuid_default(), 0, "select Part.partkey, max(Part.salary), Part.name, Part.type from db1.Part where Part.yyprice > 2095", 'db1'),
-        (uuid_default(), 0, "elect Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", 'default'),
+        (uuid_default(), 0, "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", 'default'),
         (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", 'default'),
-        (uuid_default(), 0, "elect orders.key, orders.id from orders where orders.price < 9999", 'default'),
+        (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", 'default'),
         (uuid_default(), 0, "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;", 'default'),
     ]
 
@@ -101,8 +101,8 @@ class TestOptimizerApi(BaseTestOptimizerApi):
       time.sleep(1)
       LOG.info('Upload state: %(state)s' % resp['status'])
 
-    assert_true(i < 60)
-    LOG.info('Final Upload state: %(state)s' % resp['status'])
+    assert_true(i < 60 and resp['status']['state'] == 'FINISHED', resp)
+    assert_equal(resp['status']['successQueries'], 7, resp)
 
 
   def test_top_tables(self):
@@ -205,13 +205,16 @@ class TestOptimizerApi(BaseTestOptimizerApi):
   def test_top_columns(self):
     resp = self.api.top_columns(db_tables='db1.Part')
 
-    assert_true(len(resp.get('results', '')) > 0, resp)
-
     assert_true('orderbyColumns' in resp, resp)
     assert_true('selectColumns' in resp, resp)
     assert_true('filterColumns' in resp, resp)
     assert_true('joinColumns' in resp, resp)
     assert_true('groupbyColumns' in resp, resp)
+
+    assert_true(resp['orderbyColumns'], resp)
+    assert_true('selectColumns' in resp, resp)
+    assert_true('filterColumns' in resp, resp)
+    assert_true('joinColumns' in resp, resp)
     assert_true('groupbyColumns' in resp, resp)
 
 
