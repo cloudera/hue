@@ -81,6 +81,7 @@
     padding-left: 3px !important;
     padding-right: 3px !important;
     background-color: @cui-white;
+    border-bottom: 1px solid @cui-gray-100;
   }
 
   .card-widget .card-body {
@@ -218,6 +219,16 @@
     padding-bottom: 6px;
   }
 
+  .form-search .input-append .btn {
+    border-radius: 4px!important;
+    margin-right: 10px;
+    &.flat-left {
+      border-top-left-radius: 0!important;
+      border-bottom-left-radius: 0!important;
+      border-left-width: 0;
+    }
+  }
+
   .widget-settings-section {
     display: none;
   }
@@ -227,10 +238,6 @@
     font-size: 80px;
     color: #CCC;
     text-align: center;
-  }
-
-  .card {
-    margin: 0;
   }
 
   .move-widget {
