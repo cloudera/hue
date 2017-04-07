@@ -1647,6 +1647,8 @@ var EditorViewModel = (function() {
             window.setTimeout(function () {
               self.watchUploadStatus(workloadId);
             }, 2000);
+          } else {
+            $(document).trigger("info", ko.mapping.toJSON(data.upload_status.status));
           }
         } else {
           $(document).trigger("error", data.message);
