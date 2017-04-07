@@ -45,7 +45,7 @@ import desktop.conf
 import desktop.log.log_buffer
 
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, HTTP_PORT
 from desktop.converters import DocumentConverter
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
@@ -475,8 +475,17 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
-    'is_s3_enabled': is_s3_enabled() and has_s3_access(user)
+    'is_s3_enabled': is_s3_enabled() and has_s3_access(user),
+    'banner_message': get_banner_message(request)
   })
+
+def get_banner_message(request):
+  banner_message = None
+  if HUE_LOAD_BALANCER.get() and request.META.get('SERVER_PORT') and str(request.META['SERVER_PORT']) == str(HTTP_PORT.get()):
+    banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 40px; color: #DBE8F1">%s: %s</div>' % \
+      (_('You are accessing Hue from a non-load balanced port, please switch to one of the available load-balanced hosts'),
+      ", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
+  return banner_message
 
 def commonshare():
   return django_mako.render_to_string("common_share.mako", {})
