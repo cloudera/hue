@@ -130,7 +130,7 @@ from desktop.views import commonheader, commonfooter, _ko
       <span data-bind="foreach: query.qs">
         <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
-        <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
+        <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
       </span>
 
