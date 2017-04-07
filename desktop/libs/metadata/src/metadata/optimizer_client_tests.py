@@ -19,7 +19,7 @@ import logging
 import time
 
 from nose.plugins.skip import SkipTest
-from nose.tools import assert_equal, assert_true
+from nose.tools import assert_equal, assert_true, assert_false
 
 from django.contrib.auth.models import User
 
@@ -362,8 +362,31 @@ GROUP BY account_client,
     _assert_risks(['>=10 columns present in GROUP BY list.'], resp)
 
 
-def _assert_risks(risks, suggestions):
+  def test_risk_cross_join_false_positive(self):
+
+    source_platform = 'hive'
+    query = '''SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary
+FROM
+  sample_07 s07 JOIN
+  sample_08 s08
+ON ( s07.code = s08.code )
+WHERE
+( s07.total_emp > s08.total_emp
+ AND s07.salary > 100000 )
+ORDER BY s07.salary DESC
+LIMIT 1000
+
+'''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Cartesian or CROSS join found.'], resp, present=False)
+
+
+def _assert_risks(risks, suggestions, present=True):
   suggestion_names = [suggestion['riskAnalysis'] for suggestion in suggestions]
 
   for risk in risks:
-    assert_true(risk in suggestion_names, suggestions)
+    if present:
+      assert_true(risk in suggestion_names, suggestions)
+    else:
+      assert_false(risk in suggestion_names, suggestions)
