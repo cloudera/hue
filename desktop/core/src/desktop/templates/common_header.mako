@@ -66,7 +66,7 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/css/hue3-extra.css') }" rel="stylesheet">
 
   <style type="text/css">
-    % if conf.CUSTOM.BANNER_TOP_HTML.get():
+    % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
       body {
         display: none;
         visibility: hidden;
@@ -186,9 +186,9 @@ if USE_NEW_EDITOR.get():
 
 ${ hueIcons.symbols() }
 
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
   <div class="banner">
-    ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
+    ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
   </div>
 % endif
 

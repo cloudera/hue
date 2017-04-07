@@ -131,6 +131,13 @@ HTTP_ALLOWED_METHODS = Config(
   private=True,
   default=['OPTIONS', 'GET', 'HEAD', 'POST', 'PUT', 'DELETE', 'CONNECT'])
 
+HUE_LOAD_BALANCER = Config(
+  key="hue_load_balancer",
+  help=_("A comma-separated list of available Hue load balancers."),
+  type=coerce_csv,
+  default=[]
+)
+
 X_FRAME_OPTIONS = Config(
   key="http_x_frame_options",
   help=_("X-Frame-Options HTTP header value."),
