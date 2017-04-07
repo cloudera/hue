@@ -51,6 +51,14 @@ from desktop.views import commonheader, commonfooter, _ko
   </form>
 %else:
 <div class="search-bar" data-bind="visible: ! $root.isPlayerMode()">
+  <div class="pull-left">
+    <div class="app-header">
+      <a href="#" data-bind="hueLink: '${ url('search:new_search') }'">
+        <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
+      </a>
+    </div>
+  </div>
+
   <div class="pull-right" style="padding-right:50px">
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
