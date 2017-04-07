@@ -1017,23 +1017,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         % if 'oozie' in apps:
           % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
             self.quickCreateActions.push({
-              displayName: '${ _('Workflow') }',
+              displayName: '${ _('Scheduler') }',
               icon: 'oozie',
               isCategory: true,
               children: [{
-                displayName: '${_('New Workflow')}',
+                displayName: '${_('Workflow')}',
                 icon: 'oozie-workflow',
                 click: function() {
                   page('/oozie/editor/workflow/new/')
                 }
               }, {
-                displayName: '${_('New Schedule')}',
+                displayName: '${_('Schedule')}',
                 icon: 'oozie-coordinator',
                 click: function() {
                   page('/oozie/editor/coordinator/new/')
                 }
               }, {
-                displayName: '${_('New Bundle')}',
+                displayName: '${_('Bundle')}',
                 icon: 'oozie-bundle',
                 click: function() {
                   page('/oozie/editor/bundle/new/')

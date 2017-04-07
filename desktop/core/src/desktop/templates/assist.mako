@@ -1723,7 +1723,7 @@ from notebook.conf import get_ordered_interpreters
         <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
       </a>
       <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
-        <i class="fa fa-fw fa-cloud-upload"> ${_('Upload DDL')}</i>
+        <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload DDL')}
       </a>
       </br>
       <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
