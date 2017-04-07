@@ -289,48 +289,38 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <li class="app-header">
             <!-- ko if: editorMode -->
               <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
+              <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
               <!-- ko if: editorType() == 'impala' -->
-                <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-impala"></use></svg>
                 Impala
               <!-- /ko -->
               <!-- ko if: editorType() == 'rdbms' -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('DBQuery icon') }" />
                 DB Query
               <!-- /ko -->
               <!-- ko if: editorType() == 'pig' -->
-                <img src="${ static('pig/art/icon_pig_48.png') }" class="app-icon"  alt="${ _('Pig icon') }"/>
                 Pig
               <!-- /ko -->
               <!-- ko if: editorType() == 'java' -->
-                <i class="fa fa-file-code-o app-icon" style="vertical-align: middle"></i>
                 Java
               <!-- /ko -->
               <!-- ko if: editorType() == 'spark2' -->
-                <img src="${ static('spark/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }" />
                 Spark
               <!-- /ko -->
               <!-- ko if: editorType() == 'sqoop1' -->
-                <img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }" />
                 Sqoop 1
               <!-- /ko -->
               <!-- ko if: editorType() == 'distcp' -->
-                <i class="fa fa-files-o app-icon" style="vertical-align: middle"></i>
                 DistCp
               <!-- /ko -->
               <!-- ko if: editorType() == 'shell' -->
-                <i class="fa fa-terminal app-icon" style="vertical-align: middle"></i>
                 Shell
               <!-- /ko -->
               <!-- ko if: editorType() == 'mapreduce' -->
-                <i class="fa fa-file-archive-o app-icon" style="vertical-align: middle"></i>
                 MapReduce
               <!-- /ko -->
               <!-- ko if: editorType() == 'beeswax' || editorType() == 'hive' -->
-                <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-hive"></use></svg>
                 Hive
               <!-- /ko -->
               <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
-                <img src="${ static('rdbms/art/icon_rdbms_48.png') }" class="app-icon" alt="${ _('SQL') }" />
                 SQL
               <!-- /ko -->
               </a>
