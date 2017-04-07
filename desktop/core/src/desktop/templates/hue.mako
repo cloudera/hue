@@ -1144,10 +1144,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }
         });
 
-        var analyzeItems = [];
+        var appsItems = [];
 
         % if interpreters:
-          analyzeItems.push({
+          appsItems.push({
             displayName: '${ _('Editor') }',
             click: function () {
               page('/editor?type=hive');
@@ -1155,7 +1155,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if IS_DASHBOARD_ENABLED.get():
-          analyzeItems.push({
+          appsItems.push({
             displayName: '${ _('Dashboard') }',
             click: function () {
               page('/dashboard/new_search');
@@ -1163,26 +1163,26 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'oozie' in apps:
-          analyzeItems.push({
-            displayName: '${ _('Workflows') }',
+          appsItems.push({
+            displayName: '${ _('Scheduler') }',
             click: function () {
               page('/oozie/editor/workflow/new/')
             }
           });
         % endif
 
-        if (analyzeItems.length > 0) {
+        if (appsItems.length > 0) {
           self.items.push({
             isCategory: true,
-            displayName: '${ _('Analyze') }',
-            children: analyzeItems
+            displayName: '${ _('Apps') }',
+            children: appsItems
           })
         }
 
-        var browseItems = [];
+        var browserItems = [];
 
         % if 'filebrowser' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Files') }',
             click: function () {
               page('/filebrowser/')
@@ -1190,7 +1190,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if is_s3_enabled:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('S3') }',
             click: function () {
               page('/filebrowser/view=S3A://')
@@ -1198,7 +1198,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'metastore' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Tables') }',
             click: function () {
               page('/metastore/tables/')
@@ -1206,7 +1206,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'search' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Indexes') }',
             click: function () {
               page('/indexer/')
@@ -1214,7 +1214,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'jobbrowser' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Jobs') }',
             click: function () {
               page('/jobbrowser/')
@@ -1222,7 +1222,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'hbase' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('HBase') }',
             click: function () {
               page('/hbase/')
@@ -1230,7 +1230,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'security' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Security') }',
             click: function () {
               page('/security/hive')
@@ -1238,7 +1238,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
         % if 'sqoop' in apps:
-          browseItems.push({
+          browserItems.push({
             displayName: '${ _('Sqoop') }',
             click: function () {
               page('/sqoop')
@@ -1246,29 +1246,23 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
         % endif
 
-        if (browseItems.length > 0) {
+        if (browserItems.length > 0) {
           self.items.push({
             isCategory: true,
-            displayName: '${ _('Browse') }',
-            children: browseItems
+            displayName: '${ _('Browsers') }',
+            children: browserItems
           })
         }
 
         % if other_apps:
-          var otherApps = [];
         % for other in other_apps:
-          otherApps.push({
+          appsItems.push({
             displayName: '${ other.nice_name }',
             click: function () {
               window.location('/${ other.nice_name }')
             }
           });
         % endfor
-          self.items.push({
-            isCategory: true,
-            displayName: '${ _('Apps') }',
-            children: otherApps
-          });
         % endif
       }
 
