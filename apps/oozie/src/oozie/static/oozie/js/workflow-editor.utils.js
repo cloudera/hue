@@ -20,8 +20,8 @@ function linkWidgets(fromId, toId) {
   if (_from.length > 0 && _to.length > 0) {
     var $painter = $(document.body);
 
-    if ($('.content-panel').length > 0){
-      $painter = $('.content-panel');
+    if ($('#oozie_workflowComponents').length > 0){
+      $painter = $('#oozie_workflowComponents');
     }
 
     var _fromCenter = {
