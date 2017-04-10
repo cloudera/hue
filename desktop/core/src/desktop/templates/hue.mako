@@ -947,45 +947,45 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         self.quickCreateActions = [];
 
-        % if 'impala' in apps:
+        % if cluster_config.main_quick_action:
           self.mainQuickCreateAction = {
-            displayName: '${ _('Query') }',
-            icon: 'impala',
+            displayName: '${ cluster_config.main_quick_action['displayName'] }',
+            // Tooltip
+            icon: '${ cluster_config.main_quick_action['type'] }',
             click: function(){
-              page('/editor?type=impala');
-            }
-          };
-        % elif 'beeswax' in apps:
-          self.mainQuickCreateAction = {
-            displayName: '${ _('Query Hive') }',
-            icon: 'hive',
-            click: function(){
-              page('/editor?type=hive');
+              page('${ cluster_config.main_quick_action['page'] }');
             }
           };
         % endif
 
-        % if interpreters:
-          var interpreters = [];
-
-          interpreters.push({
-            displayName: '${ _('Notebook') }',
-            icon: 'notebook',
-            click: function(){
-              page('/notebook');
+        
+        % for name, app in cluster_config.get_apps().iteritems():
+          var interpreters = []; 
+          
+          % if name == 'editor' and SHOW_NOTEBOOKS.get():
+           interpreters.push({
+             displayName: '${ _('Notebook') }',
+             icon: 'notebook',
+             click: function(){
+               page('/notebook');
             }
           });
-        % for interpreter in interpreters:
-          interpreters.push({
-            displayName: '${ interpreter['name'] }',
-            dividerAbove: interpreters.length === 1,
-            icon: '${ interpreter['type'] }',
-            click: function () {
-              page('/editor?type=${ interpreter['type'] }');
-            }
-          });
-        %endfor
-        % if user.is_superuser:
+          % endif
+          
+          % for interpreter in app['interpreters']:
+            interpreters.push({
+              displayName: '${ interpreter['displayName'] }',
+              % if name == 'editor' and SHOW_NOTEBOOKS.get():
+              dividerAbove: interpreters.length === 1,
+              % endif
+              icon: '${ interpreter['type'] }',
+              click: function () {
+                page('/${ interpreter['page'] }');
+              }
+            });
+          % endfor
+          
+          % if name == 'editor' and user.is_superuser:
           interpreters.push({
             displayName: '${ _('Add more...') }',
             dividerAbove: true,
@@ -993,55 +993,26 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               window.open('http://gethue.com/sql-editor/', '_blank');
             }
           });
-        % endif
+          % endif
 
-          self.quickCreateActions.push({
-            displayName: '${ _('Editor') }',
-            icon: 'editor',
-            isCategory: true,
-            children: interpreters
-          });
-        %endif
-
-        % if IS_DASHBOARD_ENABLED.get():
-          self.quickCreateActions.push({
-            displayName: '${ _('Dashboard') }',
-            icon: 'dashboard',
-            click: function () {
-              page('/dashboard/new_search');
-            }
-          });
-        % endif
-
-
-        % if 'oozie' in apps:
-          % if not user.has_hue_permission(action="disable_editor_access", app="oozie") or user.is_superuser:
+          % if app['interpreters']:
             self.quickCreateActions.push({
-              displayName: '${ _('Scheduler') }',
-              icon: 'oozie',
+              displayName: '${ app['displayName'] }',
+              icon: '${ app['name'] }',
               isCategory: true,
-              children: [{
-                displayName: '${_('Workflow')}',
-                icon: 'oozie-workflow',
-                click: function() {
-                  page('/oozie/editor/workflow/new/')
-                }
-              }, {
-                displayName: '${_('Schedule')}',
-                icon: 'oozie-coordinator',
-                click: function() {
-                  page('/oozie/editor/coordinator/new/')
-                }
-              }, {
-                displayName: '${_('Bundle')}',
-                icon: 'oozie-bundle',
-                click: function() {
-                  page('/oozie/editor/bundle/new/')
-                }
-              }]
+              children: interpreters
+            });
+          % else:
+            self.quickCreateActions.push({
+              displayName: '${ app['displayName'] }',
+              icon: '${ app['name'] }',
+              click: function () {
+                page('${ app['page'] }');
+              }
             });
           % endif
-        % endif
+        
+        % endfor
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
