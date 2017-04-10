@@ -433,19 +433,20 @@ from desktop.views import _ko
             window.clearTimeout(checkJobBrowserStatusIdx);
           });
 
-          // load the mini jobbrowser
-          $.ajax({
-            url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
-            beforeSend: function (xhr) {
-              xhr.setRequestHeader('X-Requested-With', 'Hue');
-            },
-            dataType: 'html',
-            success: function (response) {
-              var r = params.onePageViewModel.processHeaders(response);
-              $('#mini_jobbrowser').html(r);
-            }
-          });
         };
+
+        // load the mini jobbrowser
+        $.ajax({
+          url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
+          beforeSend: function (xhr) {
+            xhr.setRequestHeader('X-Requested-With', 'Hue');
+          },
+          dataType: 'html',
+          success: function (response) {
+            var r = params.onePageViewModel.processHeaders(response);
+            $('#mini_jobbrowser').html(r);
+          }
+        });
 
         var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
 
