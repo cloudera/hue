@@ -1761,27 +1761,54 @@ from notebook.conf import get_ordered_interpreters
           if (typeof self.activeCursorLocation() !== 'undefined' && typeof self.locationIndex()[self.activeCursorLocation().id] !== 'undefined') {
             var locations = self.locationIndex()[self.activeCursorLocation().id].locations;
             self.activeSourceType(self.locationIndex()[self.activeCursorLocation().id].type);
-            var statementFound = false;
+
+            var statements = [];
+
+            // Statement always comes first
+            var currentStatement = [];
+            locations.forEach(function (location) {
+              if (location.type === 'statement') {
+                if (currentStatement.length > 0) {
+                  statements.push(currentStatement);
+                  currentStatement = [];
+                }
+              }
+              currentStatement.push(location);
+            });
+            if (currentStatement.length > 0) {
+              statements.push(currentStatement);
+            }
+
+            if (statements.length > 0) {
+              // Pick the last statement by default (only one or cursor after last ';')
+              var activeStatement = _.last(statements);
+              if (statements.length > 1) {
+                var cursorPos = self.activeCursorLocation().position;
+                var index = 0;
+                statements.every(function (statement) {
+                  // First is the actual statement
+                  if (isPointInside(statement[0].location, cursorPos.row+1, cursorPos.column+1)) {
+                    activeStatement = statement;
+                    return false;
+                  }
+                  index++;
+                  return true;
+                })
+              }
+            }
 
             var tableIndex = {};
             var columnIndex = {};
-            for (var i = 0; i < locations.length; i++) {
-              var location = locations[i];
-              if (location.type === 'statement') {
-                if (statementFound) {
-                  break;
-                }
-                var cursorPos = self.activeCursorLocation().position;
-                if (isPointInside(location.location, cursorPos.row+1, cursorPos.column+1)) {
-                  statementFound = true;
-                }
-              } else if (statementFound && location.type === 'table' && location.identifierChain.length <= 2) {
+
+            activeStatement.forEach(function (location) {
+              if (location.type === 'table' && location.identifierChain.length <= 2) {
                 // tableIndex is used to make sure we only add each table once
                 tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
-              } else if (statementFound && locations[i].type === 'column') {
+              } else if (location.type === 'column') {
                 columnIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
               }
-            }
+            });
+
             self.activeTables($.map(tableIndex, function (value) {
               return new MetastoreTable({
                 database: {
