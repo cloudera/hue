@@ -130,7 +130,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     self.db = dbms.get(self.user, get_query_server_config())
     self.cluster.fs.do_as_user('test', self.cluster.fs.create_home_dir, '/user/test')
 
-  def _verify_query_state(self, state):
+  def _verify_query_state(self, state, *extra_states):
     """
     Verify the state of the latest query.
     Return the id of that query
@@ -138,7 +138,7 @@ class TestBeeswaxWithHadoop(BeeswaxSampleProvider):
     resp = self.client.get('/beeswax/query_history')
     history = resp.context['page'].object_list[0]
     last_state = history.last_state
-    assert_equal(beeswax.models.QueryHistory.STATE[last_state], state)
+    assert_true(beeswax.models.QueryHistory.STATE[last_state] in (state,) + extra_states)
     return history.id
 
 
@@ -229,7 +229,7 @@ for x in sys.stdin:
 
     # Check that we report this query as "running" (this query should take a little while).
     if not is_hive_on_spark():
-      self._verify_query_state(beeswax.models.QueryHistory.STATE.running)
+      self._verify_query_state(beeswax.models.QueryHistory.STATE.running, beeswax.models.QueryHistory.STATE.available)
 
     response = wait_for_query_to_finish(self.client, response, max=180.0)
     content = fetch_query_result_data(self.client, response)
