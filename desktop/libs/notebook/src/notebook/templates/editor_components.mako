@@ -164,15 +164,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
-
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    showProcessingMessages: false,
-    tex2jax: { inlineMath: [['$','$'],['\\(','\\)']] },
-    TeX: { equationNumbers: {autoNumber: "AMS"} }
-  });
-</script>
-
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -1988,44 +1979,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     $(".hoverMsg").addClass("hide");
   };
 
-  function escapeMathJax(code) {
-    var escapeMap = {
-      "&": "&amp;",
-      "<": "&lt;",
-      ">": "&gt;",
-      '"': "&quot;",
-      "'": "&#x27;",
-      "`": "&#x60;"
-    };
-    var escaper = function (match) {
-      return escapeMap[match];
-    };
-    var source = "(?:" + Object.keys(escapeMap).join("|") + ")";
-    var testRegexp = RegExp(source);
-    var replaceRegexp = RegExp(source, "g");
-    code = code == null ? "" : "" + code;
-    return testRegexp.test(code) ? string.replace(replaceRegexp, escaper) : code;
-  }
-
-  var mathJaxTimeout = 0;
-
-  if (typeof MathJax == "undefined") {
-    escapeMathJax = function (code) {
-      return code;
-    }
-  }
-
   function renderMarkdown(text, snippetId) {
-    window.clearTimeout(mathJaxTimeout);
-
     text = text.replace(/([^$]*)([$]+[^$]*[$]+)?/g, function (a, text, code) {
-      return markdown.toHTML(text).replace(/^<p>|<\/p>$/g, '') + (code ? escapeMathJax(code) : '');
+      return markdown.toHTML(text).replace(/^<p>|<\/p>$/g, '') + (code ? code : '');
     });
-    if (typeof MathJax != "undefined") {
-      mathJaxTimeout = window.setTimeout(function () {
-        MathJax.Hub.Queue(["Typeset", MathJax.Hub, $("#liveMD" + snippetId)[0]]);
-      }, 500);
-    }
     return text;
   }
 
@@ -3599,11 +3556,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
     });
   })();
-
-  var mathjax = document.createElement("script");
-  mathjax.src = "//cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
-  mathjax.async = false;
-  document.head.appendChild(mathjax);
 </script>
 
 </%def>
