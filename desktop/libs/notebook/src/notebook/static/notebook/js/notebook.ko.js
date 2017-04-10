@@ -2406,7 +2406,12 @@ var EditorViewModel = (function() {
         self.selectedNotebook().fetchHistory(); // Js error if notebook did not have snippets
       }
     });
-    self.editorTypeTitle = ko.observable(options.editor_type);
+    self.editorTypeTitle = ko.pureComputed(function () {
+      var foundInterpreter = $.grep(options.languages, function (interpreter) {
+        return interpreter.type === self.editorType();
+      })
+      return foundInterpreter.length > 0 ? foundInterpreter[0].name : self.editorType();
+    });
     self.useNewAutocompleter = options.useNewAutocompleter || false;
     self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
