@@ -514,13 +514,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 25);
         };
 
-        self.changeEditorType = function (type, changeURL) {
+        self.changeEditorType = function (type) {
           self.getActiveAppViewModel(function (viewModel) {
             if (viewModel && viewModel.selectedNotebook) {
               hueUtils.waitForObservable(viewModel.selectedNotebook, function(){
-                viewModel.selectedNotebook().selectedSnippet(type);
-                viewModel.editorType(type);
-                viewModel.newNotebook(type);
+                if (viewModel.editorType() !== type) {
+                  viewModel.selectedNotebook().selectedSnippet(type);
+                  viewModel.editorType(type);
+                  viewModel.newNotebook(type);
+                }
               });
             }
           })
@@ -664,7 +666,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           window.resumeAppIntervals(app);
           $('.embeddable').hide();
           $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
-        }
+        };
 
         self.dropzoneError = function (filename) {
           self.loadApp('importer');
@@ -702,15 +704,17 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
           { url: '/editor', app: function () {
-            self.loadApp('editor');
-            if (window.location.getParameter('editor') !== '') {
-              self.getActiveAppViewModel(function (viewModel) {
-                viewModel.openNotebook(window.location.getParameter('editor'));
-              });
-            }
-            else if (window.location.getParameter('type') !== '') {
-              self.changeEditorType(window.location.getParameter('type'));
-            }
+            // Defer to allow window.location param update
+            _.defer(function () {
+              self.loadApp('editor');
+              if (window.location.getParameter('editor') !== '') {
+                self.getActiveAppViewModel(function (viewModel) {
+                  viewModel.openNotebook(window.location.getParameter('editor'));
+                });
+              } else if (window.location.getParameter('type') !== '') {
+                self.changeEditorType(window.location.getParameter('type'));
+              }
+            });
           }},
           { url: '/notebook/editor', app: function (ctx) {
             page('/editor?' + ctx.querystring);
@@ -947,8 +951,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             displayName: '${ _('Query') }',
             icon: 'impala',
             click: function(){
-              page('/editor');
-              onePageViewModel.changeEditorType('impala', true);
+              page('/editor?type=impala');
             }
           };
         % elif 'beeswax' in apps:
@@ -956,8 +959,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             displayName: '${ _('Query Hive') }',
             icon: 'hive',
             click: function(){
-              page('/editor');
-              onePageViewModel.changeEditorType('hive', true);
+              page('/editor?type=hive');
             }
           };
         % endif
@@ -978,8 +980,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             dividerAbove: interpreters.length === 1,
             icon: '${ interpreter['type'] }',
             click: function () {
-              page('/editor');
-              onePageViewModel.changeEditorType('${ interpreter['type'] }', true);
+              page('/editor?type=${ interpreter['type'] }');
             }
           });
         %endfor
@@ -1148,8 +1149,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           analyzeItems.push({
             displayName: '${ _('Editor') }',
             click: function () {
-              page('/editor');
-              onePageViewModel.changeEditorType('hive', true);
+              page('/editor?type=hive');
             }
           });
         % endif
