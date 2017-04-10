@@ -3383,8 +3383,13 @@
 
       var activeTokens = [];
       if (window.Worker) {
-        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?version=1');
+        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?bust=' + Math.random());
         var workerIsReady = false;
+
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          aceSqlWorker.terminate();
+        });
+
         var AceRange = ace.require('ace/range').Range;
         aceSqlWorker.onmessage = function(e) {
           workerIsReady = true;
