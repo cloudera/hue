@@ -1,0 +1,66 @@
+/*
+ Licensed to Cloudera, Inc. under one
+ or more contributor license agreements.  See the NOTICE file
+ distributed with this work for additional information
+ regarding copyright ownership.  Cloudera, Inc. licenses this file
+ to you under the Apache License, Version 2.0 (the
+ "License"); you may not use this file except in compliance
+ with the License.  You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+*/
+
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Roboto Light'), local('Roboto-Light'), url(../ext/fonts/roboto-300-normal.woff2) format('woff'), url(../ext/fonts/roboto-300-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto'), local('Roboto-Regular'), url(../ext/fonts/roboto-400-normal.woff2) format('woff'), url(../ext/fonts/roboto-400-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 500;
+	src: local('Roboto Medium'), local('Roboto-Medium'), url(../ext/fonts/roboto-500-normal.woff2) format('woff'), url(../ext/fonts/roboto-500-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Roboto Bold'), local('Roboto-Bold'), url(../ext/fonts/roboto-700-normal.woff2) format('woff'), url(../ext/fonts/roboto-700-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto Mono';
+	font-style: normal;
+	font-weight: 300;
+	src: local('Roboto Mono Light'), local('RobotoMono-Light'), url(../ext/fonts/roboto-mono-300-normal.woff2) format('woff'), url(../ext/fonts/roboto-mono-300-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto Mono';
+	font-style: normal;
+	font-weight: 400;
+	src: local('Roboto Mono'), local('RobotoMono-Regular'), url(../ext/fonts/roboto-mono-400-normal.woff2) format('woff'), url(../ext/fonts/roboto-mono-400-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto Mono';
+	font-style: normal;
+	font-weight: 500;
+	src: local('Roboto Mono Medium'), local('RobotoMono-Medium'), url(../ext/fonts/roboto-mono-500-normal.woff2) format('woff'), url(../ext/fonts/roboto-mono-500-normal.woff) format('woff');
+}
+@font-face {
+	font-family: 'Roboto Mono';
+	font-style: normal;
+	font-weight: 700;
+	src: local('Roboto Mono Bold'), local('RobotoMono-Bold'), url(../ext/fonts/roboto-mono-700-normal.woff2) format('woff'), url(../ext/fonts/roboto-mono-700-normal.woff) format('woff');
+}
