@@ -2391,7 +2391,7 @@ var EditorViewModel = (function() {
       notebook: '/notebook/notebook',
       hue4: '/hue/editor',
       hue4_notebook: '/hue/notebook'
-    }
+    };
 
     self.user = options.user;
     self.userId = options.userId;
@@ -2564,12 +2564,12 @@ var EditorViewModel = (function() {
     self.init = function () {
       if (editor_id) {
         self.openNotebook(editor_id);
-      }
-      else if (window.location.getParameter('editor') !== ''){
+      } else if (window.location.getParameter('editor') !== ''){
         self.openNotebook(window.location.getParameter('editor'));
-      }
-      else if (notebooks.length > 0) {
+      } else if (notebooks.length > 0) {
         self.loadNotebook(notebooks[0]); // Old way of loading json for /browse
+      } else if (window.location.getParameter('type') !== '') {
+        self.newNotebook(window.location.getParameter('type'));
       } else {
         self.newNotebook();
       }
