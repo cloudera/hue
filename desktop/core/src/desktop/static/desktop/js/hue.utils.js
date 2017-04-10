@@ -348,8 +348,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     var defaults = {
       cursorcolor: "#7D7D7D",
       cursorborder: "1px solid #7D7D7D",
-      background: "#F4F4F4",
-      cursoropacitymin: 0.38,
+      cursoropacitymin: 0,
       cursoropacitymax: 1,
       mousescrollstep: 60,
       cursorwidth: "6px",
@@ -358,7 +357,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       scrollspeed: 1,
       cursorminheight: 20,
       horizrailenabled: true,
-      autohidemode: "cursor"
+      autohidemode: "leave"
     }
     return $el.niceScroll($.extend(defaults, options || {}));
   };
