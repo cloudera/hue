@@ -21,6 +21,12 @@ import logging
 import os
 import urllib
 import uuid
+from notebook.conf import get_ordered_interpreters
+
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
 
 from itertools import chain
 
@@ -35,6 +41,9 @@ from django.db.models.query import QuerySet
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from settings import HUE_DESKTOP_VERSION
+
+from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+from notebook.conf import SHOW_NOTEBOOKS
 
 from desktop import appmanager
 from desktop.lib.i18n import force_unicode
@@ -1489,6 +1498,157 @@ class Document2Permission(models.Model):
     Returns true if the given user has permissions based on users, groups, or all flag
     """
     return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
+
+
+
+
+class ClusterConfig():
+  
+  def __init__(self, user, apps=None):
+    self.user = user
+    self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
+  
+  def setConfig(self):
+    # dataeng Execute  in Hive by default
+    #         JB: hide yarn, show dataeng
+    # Nav, NavOpt?
+    # reload "some ini sections"
+    pass
+  
+  @property
+  def main_quick_action(self):
+    return self._get_editor()['interpreters'][1]
+  
+  
+  def _get_editor(self):
+    interpreters = []
+    
+    if SHOW_NOTEBOOKS.get():
+      interpreters.append({
+        'name': 'notebook',
+        'type': 'notebook',
+        'displayName': 'Notebook',
+        'tooltip': _('Notebook'),
+        'page': '/notebook'
+      })    
+    
+    for interpreter in get_ordered_interpreters(self.user):
+      interpreters.append({
+        'name': interpreter['name'],
+        'type': interpreter['type'],
+        'displayName': interpreter['type'].title(),
+        'tooltip': _('%s Query') % interpreter['type'].title(),
+        'page': '/editor/?type=%(type)s' % interpreter,
+      })
+
+    return {
+        'name': 'editor',
+        'displayName': _('Editor'),
+        'interpreters': interpreters 
+      }
+
+  def _get_dashboard(self):
+    interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
+#     'interpreters': [
+#           {'solr': {}},
+#           {'impala': {}}
+#         ]    
+    
+    if IS_DASHBOARD_ENABLED.get():    
+      return {
+          'name': 'dashboard',
+          'displayName': _('Dashboard'),
+          'interpreters': interpreters,
+          'page': '/dashboard/new_search'
+        }
+    else:
+      return {}
+  
+  def _get_scheduler(self):
+    interpreters = [{
+        'type': 'oozie-workflow',
+        'displayName': _('Workflow'),
+        'tooltip': _('Workflow'),
+        'page': '/oozie/editor/workflow/new/'
+      }, {
+        'type': 'oozie-coordinator',
+        'displayName': _('Schedule'),
+        'tooltip': _('Schedule'),
+        'page': '/oozie/editor/coordinator/new/'
+      }, {
+        'type': 'oozie-bundle',
+        'displayName': _('Bundle'),
+        'tooltip': _('Bundle'),
+        'page': '/oozie/editor/bundle/new/'
+      }
+    ]
+
+    if 'oozie' in self.apps and not self.user.has_hue_permission(action="disable_editor_access", app="oozie") or self.user.is_superuser:
+      return {
+          'name': 'oozie',
+          'displayName': _('Scheduler'),
+          'interpreters': interpreters,
+        }
+    else:
+      return {}  
+  
+  def get_apps(self):
+    apps = OrderedDict([      
+      ('editor', self._get_editor()),
+      ('dashboard', self._get_dashboard()),
+      ('browser', {
+          'name': 'browser',
+          'displayName': _('Browsers'),
+        'interpreters': [{
+            'type': 'hdfs',
+            'displayName': _('Jobs'),
+            'page': '/jobbrowser/',
+          }, {
+            'type': 'metastore',
+            'displayName': _('Jobs'),
+            'page': '/jobbrowser/',
+          }, {
+            'type': 's3',
+            'displayName': _('Jobs'),
+            'page': '/jobbrowser/',
+          }, {
+            'type': 'jobbrowser',
+            'displayName': _('Jobs'),
+            'page': '/jobbrowser/',
+            'interpreters': [
+              'yarn',
+              'oozie',
+              'dataeng'
+            ]
+          }
+        ]
+      }),
+      ('scheduler', self._get_scheduler())
+    ])
+    
+    # Default action
+    # If not in user setting, first interpreter in apps
+#     default_app = None    
+#     if apps['editor'] and apps['editor']['interpreters']:
+#       if 'impala' in apps['editor']['interpreters']:
+#         default_app = apps['editor']['interpreters']['impala']
+#       elif 'hive' in apps['editor']['interpreters']:
+#         default_app = apps['editor']['interpreters']['hive']
+#       elif 'notebook' in apps['editor']['interpreters']:
+#         default_app = apps['editor']['interpreters']['notebook']
+#     elif apps['dashboard'] and apps['dashboard']['interpreters']:
+#       default_app = apps['dashboard']['interpreters'][0]
+#     elif apps['browser'] and apps['browser']['interpreters']:
+#       default_app = apps['browser']['interpreters'][0]
+#     elif apps['scheduler'] and apps['scheduler']['interpreters']:
+#       default_app = apps['scheduler']['interpreters'][0]
+#     
+#     
+#     
+#     default_app['isDefault'] = True
+    
+    return apps
+
 
 
 def get_data_link(meta):

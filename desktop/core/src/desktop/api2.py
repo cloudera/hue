@@ -41,7 +41,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default
+from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig
 
 
 LOG = logging.getLogger(__name__)
@@ -62,6 +62,17 @@ def api_error_handler(func):
         return JsonResponse(response)
 
   return decorator
+
+
+@api_error_handler
+def get_config(request):
+  app_config = ClusterConfig(request.user).get_apps()
+  
+  return JsonResponse({
+    'status': 0,
+    'app_config': app_config,
+    'main_button_action': app_config['editor']['interpreters'][1]
+  })
 
 
 @api_error_handler
