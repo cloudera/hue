@@ -1689,6 +1689,9 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assistant-panel-template">
+    <!-- ko if: statementCount() > 1 -->
+    ${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span><br/>
+    <!-- /ko -->
     ${ _('Tables') }
     <br/>
     <ul data-bind="foreach: activeTables">
@@ -1742,7 +1745,9 @@ from notebook.conf import get_ordered_interpreters
         self.activeSourceType = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeColumns = ko.observableArray();
-        self.activeRisks = ko.observableArray();
+        self.activeRisks = ko.observableArray()
+        self.statementCount = ko.observable(0);
+        self.activeStatementIndex = ko.observable(0);
 
         var isPointInside = function (location, row, col) {
           return (location.first_line < row && row < location.last_line) ||
@@ -1758,6 +1763,9 @@ from notebook.conf import get_ordered_interpreters
         };
 
         var initActive = function () {
+          if (_.isUndefined(self.activeCursorLocation())) {
+            huePubSub.publish('get.active.editor.cursor.location');
+          }
           if (typeof self.activeCursorLocation() !== 'undefined' && typeof self.locationIndex()[self.activeCursorLocation().id] !== 'undefined') {
             var locations = self.locationIndex()[self.activeCursorLocation().id].locations;
             self.activeSourceType(self.locationIndex()[self.activeCursorLocation().id].type);
@@ -1778,23 +1786,27 @@ from notebook.conf import get_ordered_interpreters
             if (currentStatement.length > 0) {
               statements.push(currentStatement);
             }
+            self.statementCount(statements.length);
 
             if (statements.length > 0) {
               // Pick the last statement by default (only one or cursor after last ';')
+              var statementIndex = statements.length;
               var activeStatement = _.last(statements);
               if (statements.length > 1) {
                 var cursorPos = self.activeCursorLocation().position;
-                var index = 0;
+                var index = 1;
                 statements.every(function (statement) {
                   // First is the actual statement
                   if (isPointInside(statement[0].location, cursorPos.row+1, cursorPos.column+1)) {
                     activeStatement = statement;
+                    statementIndex = index;
                     return false;
                   }
                   index++;
                   return true;
                 })
               }
+              self.activeStatementIndex(statementIndex);
             }
 
             var tableIndex = {};
