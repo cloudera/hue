@@ -55,6 +55,7 @@ var ApiHelper = (function () {
   var SAMPLE_API_PREFIX = "/notebook/api/sample/";
   var DOCUMENTS_API = "/desktop/api2/doc/";
   var DOCUMENTS_SEARCH_API = "/desktop/api2/docs/";
+  var FETCH_CONFIG = '/desktop/api2/get_config/';
   var HDFS_API_PREFIX = "/filebrowser/view=";
   var GIT_API_PREFIX = "/desktop/api/vcs/contents/";
   var S3_API_PREFIX = "/filebrowser/view=S3A://";
@@ -1420,6 +1421,10 @@ var ApiHelper = (function () {
       errorCallback: self.assistErrorCallback(options),
       cacheCondition: genericCacheCondition
     }));
+  };
+
+  ApiHelper.prototype.getClusterConfig = function (data) {
+    return $.post(FETCH_CONFIG, data);
   };
 
   /**

@@ -1500,29 +1500,26 @@ class Document2Permission(models.Model):
     return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
 
 
-
-
 class ClusterConfig():
-  
+
   def __init__(self, user, apps=None):
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
-  
-  def setConfig(self):
-    # dataeng Execute  in Hive by default
-    #         JB: hide yarn, show dataeng
-    # Nav, NavOpt?
-    # reload "some ini sections"
+
+
+  def refreshConfig(self):
+    # TODO: reload "some ini sections"
     pass
-  
+
+
   @property
   def main_quick_action(self):
-    return self._get_editor()['interpreters'][1]
-  
-  
+    return self._get_editor()['interpreters'][1] # TODO handle default and user personal one
+
+
   def _get_editor(self):
     interpreters = []
-    
+
     if SHOW_NOTEBOOKS.get():
       interpreters.append({
         'name': 'notebook',
@@ -1530,8 +1527,8 @@ class ClusterConfig():
         'displayName': 'Notebook',
         'tooltip': _('Notebook'),
         'page': '/notebook'
-      })    
-    
+      })
+
     for interpreter in get_ordered_interpreters(self.user):
       interpreters.append({
         'name': interpreter['name'],
@@ -1541,20 +1538,19 @@ class ClusterConfig():
         'page': '/editor/?type=%(type)s' % interpreter,
       })
 
-    return {
-        'name': 'editor',
-        'displayName': _('Editor'),
-        'interpreters': interpreters 
+    if interpreters:
+      return {
+          'name': 'editor',
+          'displayName': _('Editor'),
+          'interpreters': interpreters
       }
+    else:
+      return None
 
   def _get_dashboard(self):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
-#     'interpreters': [
-#           {'solr': {}},
-#           {'impala': {}}
-#         ]    
-    
-    if IS_DASHBOARD_ENABLED.get():    
+
+    if IS_DASHBOARD_ENABLED.get():
       return {
           'name': 'dashboard',
           'displayName': _('Dashboard'),
@@ -1563,10 +1559,10 @@ class ClusterConfig():
         }
     else:
       return None
-  
+
   def _get_browser(self):
     interpreters = []
-   
+
     if 'filebrowser' in self.apps:
       interpreters.append({
         'type': 'hdfs',
@@ -1574,7 +1570,7 @@ class ClusterConfig():
         'tooltip': _('Files'),
         'page': '/filebrowser/'
       })
-  
+
     if is_s3_enabled() and has_s3_access(self.user):
       interpreters.append({
         'type': 's3',
@@ -1582,7 +1578,7 @@ class ClusterConfig():
         'tooltip': _('S3'),
         'page': '/filebrowser/view=S3A://'
       })
-        
+
     if 'metastore' in self.apps:
       interpreters.append({
         'type': 'tables',
@@ -1636,11 +1632,12 @@ class ClusterConfig():
           'name': 'browser',
           'displayName': _('Browsers'),
           'interpreters': interpreters,
+          'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         }
     else:
       return None
-  
-  
+
+
   def _get_scheduler(self):
     interpreters = [{
         'type': 'oozie-workflow',
@@ -1667,14 +1664,14 @@ class ClusterConfig():
           'interpreters': interpreters,
         }
     else:
-      return None  
+      return None
 
 
   def _get_sdk_apps(self):
-    current_app, other_apps, apps_list = _get_apps(self.user)  
+    current_app, other_apps, apps_list = _get_apps(self.user)
 
     interpreters = []
-    
+
     for other in other_apps:
       interpreters.push({
         'type': other.nice_name,
@@ -1691,10 +1688,10 @@ class ClusterConfig():
         }
     else:
       return None
-  
-  
+
+
   def get_apps(self):
-    apps = OrderedDict([      
+    apps = OrderedDict([
       ('editor', self._get_editor()),
       ('dashboard', self._get_dashboard()),
       ('browser', self._get_browser()),
@@ -1702,27 +1699,6 @@ class ClusterConfig():
       ('sdkapps', self._get_sdk_apps()),
     ])
 
-    # Default action
-    # If not in user setting, first interpreter in apps
-#     default_app = None    
-#     if apps['editor'] and apps['editor']['interpreters']:
-#       if 'impala' in apps['editor']['interpreters']:
-#         default_app = apps['editor']['interpreters']['impala']
-#       elif 'hive' in apps['editor']['interpreters']:
-#         default_app = apps['editor']['interpreters']['hive']
-#       elif 'notebook' in apps['editor']['interpreters']:
-#         default_app = apps['editor']['interpreters']['notebook']
-#     elif apps['dashboard'] and apps['dashboard']['interpreters']:
-#       default_app = apps['dashboard']['interpreters'][0]
-#     elif apps['browser'] and apps['browser']['interpreters']:
-#       default_app = apps['browser']['interpreters'][0]
-#     elif apps['scheduler'] and apps['scheduler']['interpreters']:
-#       default_app = apps['scheduler']['interpreters'][0]
-#     
-#     
-#     
-#     default_app['isDefault'] = True
-    
     return apps
 
 
@@ -1741,7 +1717,7 @@ def _get_apps(user, section=None):
         current_app = app
   else:
     apps_list = []
-    
+
   return current_app, other_apps, apps_list
 
 

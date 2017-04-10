@@ -821,7 +821,7 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-panel-template">
     <div class="assist-panel">
-      <!-- ko if: availablePanels.length > 1 -->
+      <!-- ko if: availablePanels().length > 1 -->
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
@@ -832,7 +832,7 @@ from notebook.conf import get_ordered_interpreters
       <!-- /ko -->
       <!-- ko with: visiblePanel -->
       <!-- ko template: { if: showNavSearch && $parent.navigatorSearch.navigatorEnabled(), name: 'assist-panel-navigator-search', data: $parent }--><!-- /ko -->
-      <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels.length > 1 ? '10px' : '5px' }">
+      <div class="assist-panel-contents" data-bind="style: { 'padding-top': $parent.availablePanels().length > 1 ? '10px' : '5px' }">
         <div class="assist-inner-panel">
           <div class="assist-flex-panel">
             <!-- ko template: { name: templateName, data: panelData } --><!-- /ko -->
@@ -1411,122 +1411,140 @@ from notebook.conf import get_ordered_interpreters
 
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
-        self.availablePanels = [
-        % if get_ordered_interpreters():
-          new AssistInnerPanel({
-            panelData: new AssistDbPanel($.extend({
-              apiHelper: self.apiHelper,
-              i18n: i18n
-            }, params.sql)),
-            apiHelper: self.apiHelper,
-            name: '${ _("SQL") }',
-            type: 'sql',
-            icon: 'fa-database',
-            minHeight: 75
-          })
-        ];
-        % endif
+        self.availablePanels = ko.pureComputed(function() {
+          var panels = [];
+          var appConfig = hueDebug.viewModel($('.top-nav')[0]).clusterConfig() && hueDebug.viewModel($('.top-nav')[0]).clusterConfig()['app_config']; // TODO clean-up
 
-        if (self.tabsEnabled) {
-          <%
-            try:
-              apps
-            except NameError:
-              apps = appmanager.get_apps_dict(user)
-          %>
-          % if 'filebrowser' in apps:
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistHdfsPanel({
-              apiHelper: self.apiHelper
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("HDFS") }',
-            type: 'hdfs',
-            icon: 'fa-folder-o',
-            minHeight: 50
-          }));
-          % endif
-
-          if (window.IS_S3_ENABLED) { // coming from common_header.mako
-            self.availablePanels.push(new AssistInnerPanel({
-              panelData: new AssistS3Panel({
-                apiHelper: self.apiHelper
-              }),
-              apiHelper: self.apiHelper,
-              name: '${ _("S3") }',
-              type: 's3',
-              icon: 'fa-cubes',
-              minHeight: 50
-            }));
+          if (! appConfig) { // TODO handle no panel and return []
+            return [new AssistInnerPanel({
+                panelData: new AssistDbPanel($.extend({
+                  apiHelper: self.apiHelper,
+                  i18n: i18n
+                }, params.sql)),
+                apiHelper: self.apiHelper,
+                name: '${ _("SQL") }',
+                type: 'sql',
+                icon: 'fa-database',
+                minHeight: 75
+              })];
           }
 
-          % if 'search' in apps:
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistCollectionsPanel({
-              apiHelper: self.apiHelper
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("Collections") }',
-            type: 'collections',
-            icon: 'fa-search-plus',
-            minHeight: 50,
-            showNavSearch: false
-          }));
-          % endif
+          if (appConfig['editor']) {
+            panels.push(
+              new AssistInnerPanel({
+                panelData: new AssistDbPanel($.extend({
+                  apiHelper: self.apiHelper,
+                  i18n: i18n
+                }, params.sql)),
+                apiHelper: self.apiHelper,
+                name: '${ _("SQL") }',
+                type: 'sql',
+                icon: 'fa-database',
+                minHeight: 75
+              })
+            );
+          }
 
-          % if 'hbase' in apps:
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistHBasePanel({
-              apiHelper: self.apiHelper
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("HBase") }',
-            type: 'hbase',
-            icon: 'fa-th-large',
-            minHeight: 50,
-            showNavSearch: false
-          }));
-          % endif
+          if (self.tabsEnabled) {
 
-          self.availablePanels.push(new AssistInnerPanel({
-            panelData: new AssistDocumentsPanel({
-              user: params.user,
-              apiHelper: self.apiHelper,
-              i18n: i18n
-            }),
-            apiHelper: self.apiHelper,
-            name: '${ _("Documents") }',
-            type: 'documents',
-            icon: 'fa-files-o',
-            minHeight: 50,
-            rightAlignIcon: true,
-            visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-          }));
+            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hdfs') != -1) {
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistHdfsPanel({
+                  apiHelper: self.apiHelper
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("HDFS") }',
+                type: 'hdfs',
+                icon: 'fa-folder-o',
+                minHeight: 50
+              }));
+            }
 
-          if (${ len(VCS.keys()) } > 0) {
-            self.availablePanels.push(new AssistInnerPanel({
-              panelData: new AssistGitPanel({
-                apiHelper: self.apiHelper
+            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('s3') != -1) {
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistS3Panel({
+                  apiHelper: self.apiHelper
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("S3") }',
+                type: 's3',
+                icon: 'fa-cubes',
+                minHeight: 50
+              }));
+            }
+
+            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistCollectionsPanel({
+                  apiHelper: self.apiHelper
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("Collections") }',
+                type: 'collections',
+                icon: 'fa-search-plus',
+                minHeight: 50,
+                showNavSearch: false
+              }));
+            }
+
+            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistHBasePanel({
+                  apiHelper: self.apiHelper
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("HBase") }',
+                type: 'hbase',
+                icon: 'fa-th-large',
+                minHeight: 50,
+                showNavSearch: false
+              }));
+            }
+
+            panels.push(new AssistInnerPanel({
+              panelData: new AssistDocumentsPanel({
+                user: params.user,
+                apiHelper: self.apiHelper,
+                i18n: i18n
               }),
               apiHelper: self.apiHelper,
-              name: '${ _("Git") }',
-              type: 'git',
-              icon: 'fa-github',
+              name: '${ _("Documents") }',
+              type: 'documents',
+              icon: 'fa-files-o',
               minHeight: 50,
-              showNavSearch: false,
-              rightAlignIcon: true
+              rightAlignIcon: true,
+              visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
             }));
+
+            if (${ len(VCS.keys()) } > 0) {
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistGitPanel({
+                  apiHelper: self.apiHelper
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("Git") }',
+                type: 'git',
+                icon: 'fa-github',
+                minHeight: 50,
+                showNavSearch: false,
+                rightAlignIcon: true
+              }));
+            }
+
           }
-        }
 
-        var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels[0].type);
+          return panels;
+        });
 
-        var lastFoundPanel = self.availablePanels.filter(function (panel) { return panel.type === lastOpenPanelType });
-        var dbPanel = self.availablePanels.filter(function (panel) { return panel.type === 'sql' });
+        // TODO handle panel reloading
+        var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels()[0].type);
+
+        var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === lastOpenPanelType });
+        var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
         if (lastFoundPanel.length === 1) {
           dbPanel[0].panelData.init(); // always forces the db panel to load
         }
-        self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels[0]);
+        self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]);
 
         self.visiblePanel().panelData.init();
 

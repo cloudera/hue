@@ -67,7 +67,7 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   app_config = ClusterConfig(request.user).get_apps()
-  
+
   return JsonResponse({
     'status': 0,
     'app_config': app_config,
