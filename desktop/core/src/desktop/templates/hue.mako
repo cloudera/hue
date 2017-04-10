@@ -949,16 +949,19 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         self.config = ko.observable();
         
-        $.post("/desktop/api2/get_config/", {
-          cluster: ko.mapping.toJSON('default'),
-        }, function (data) {
-          if (data.status == 0) {
-            self.config(data);
-          } else {
-            $(document).trigger("error", data.message);
-          }
-        });
+        self.getConfig = function() {
+          $.post("/desktop/api2/get_config/", {
+            cluster: ko.mapping.toJSON('default'),
+          }, function (data) {
+            if (data.status == 0) {
+              self.config(data);
+            } else {
+              $(document).trigger("error", data.message);
+            }
+          });
+        };
 
+        self.getConfig();
 
         self.mainQuickCreateAction = ko.computed(function() {          
           if (self.config()) {
@@ -1112,138 +1115,86 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     (function (onePageViewModel, topNavViewModel) {
       function SideBarViewModel () {
-        self.items = [];
+        //self.items = [];
+        
+        self.items = ko.computed(function() {
+          var items = [];
+          
+          items.push({
+            displayName: '${ _('Documents') }',
+            click: function () {
+              page('/home')
+            }
+          });
+          
+          var appConfig = hueDebug.viewModel($('.top-nav')[0]).config() && hueDebug.viewModel($('.top-nav')[0]).config()['app_config'];
+          
+          if (! appConfig) {
+            return items;
+          }
+                                              
+          var appsItems = [];
+          $.each(['editor', 'dashboard', 'scheduler'], function(index, appName) {
+            if (appConfig[appName]) {
+              appsItems.push({
+                displayName: appConfig[appName]['displayName'],
+                click: function () {
+                  page(appConfig[appName]['page']);
+                }
+              });
+            };
+          });
+          if (appsItems.length > 0) {
+            items.push({
+              isCategory: true,
+              displayName: '${ _('Apps') }',
+              children: appsItems
+            })
+          }
+          
+          var browserItems = [];
+          if (appConfig['browser']) {
+            $.each(appConfig['browser']['interpreters'], function(index, browser) {
+              browserItems.push({
+                displayName: browser['displayName'],
+                click: function () {
+                  page(browser['page'])
+                }
+              });
+            });
+          }
+          if (browserItems.length > 0) {
+            items.push({
+              isCategory: true,
+              displayName: '${ _('Browsers') }',
+              children: browserItems
+            })
+          }
+                     
+          var sdkItems = [];
+          if (appConfig['sdkapps']) {
+            $.each(appConfig['sdkapps']['interpreters'], function(index, browser) {
+              sdkItems.push({
+                displayName: browser['displayName'],
+                click: function () {
+                  page(browser['page'])
+                }
+              });
+            });
+          }
+          if (sdkItems.length > 0) {
+            items.push({
+              isCategory: true,
+              displayName: appConfig['sdkapps']['displayName'],
+              children: sdkItems
+            })
+          }
+          
+          return items;
+        });
 
         self.leftNavVisible = topNavViewModel.leftNavVisible;
         self.onePageViewModel = onePageViewModel;
-
-        self.items.push({
-          displayName: '${ _('Documents') }',
-          click: function () {
-            page('/home')
-          }
-        });
-
-        var appsItems = [];
-
-        % if interpreters:
-          appsItems.push({
-            displayName: '${ _('Editor') }',
-            click: function () {
-              page('/editor?type=hive');
-            }
-          });
-        % endif
-        % if IS_DASHBOARD_ENABLED.get():
-          appsItems.push({
-            displayName: '${ _('Dashboard') }',
-            click: function () {
-              page('/dashboard/new_search');
-            }
-          });
-        % endif
-        % if 'oozie' in apps:
-          appsItems.push({
-            displayName: '${ _('Scheduler') }',
-            click: function () {
-              page('/oozie/editor/workflow/new/')
-            }
-          });
-        % endif
-
-        if (appsItems.length > 0) {
-          self.items.push({
-            isCategory: true,
-            displayName: '${ _('Apps') }',
-            children: appsItems
-          })
-        }
-
-        var browserItems = [];
-
-        % if 'filebrowser' in apps:
-          browserItems.push({
-            displayName: '${ _('Files') }',
-            click: function () {
-              page('/filebrowser/')
-            }
-          });
-        % endif
-        % if is_s3_enabled:
-          browserItems.push({
-            displayName: '${ _('S3') }',
-            click: function () {
-              page('/filebrowser/view=S3A://')
-            }
-          });
-        % endif
-        % if 'metastore' in apps:
-          browserItems.push({
-            displayName: '${ _('Tables') }',
-            click: function () {
-              page('/metastore/tables/')
-            }
-          });
-        % endif
-        % if 'search' in apps:
-          browserItems.push({
-            displayName: '${ _('Indexes') }',
-            click: function () {
-              page('/indexer/')
-            }
-          });
-        % endif
-        % if 'jobbrowser' in apps:
-          browserItems.push({
-            displayName: '${ _('Jobs') }',
-            click: function () {
-              page('/jobbrowser/')
-            }
-          });
-        % endif
-        % if 'hbase' in apps:
-          browserItems.push({
-            displayName: '${ _('HBase') }',
-            click: function () {
-              page('/hbase/')
-            }
-          });
-        % endif
-        % if 'security' in apps:
-          browserItems.push({
-            displayName: '${ _('Security') }',
-            click: function () {
-              page('/security/hive')
-            }
-          });
-        % endif
-        % if 'sqoop' in apps:
-          browserItems.push({
-            displayName: '${ _('Sqoop') }',
-            click: function () {
-              page('/sqoop')
-            }
-          });
-        % endif
-
-        if (browserItems.length > 0) {
-          self.items.push({
-            isCategory: true,
-            displayName: '${ _('Browsers') }',
-            children: browserItems
-          })
-        }
-
-        % if other_apps:
-        % for other in other_apps:
-          appsItems.push({
-            displayName: '${ other.nice_name }',
-            click: function () {
-              window.location('/${ other.nice_name }')
-            }
-          });
-        % endfor
-        % endif
       }
 
       var sidebarViewModel = new SideBarViewModel();

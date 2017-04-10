@@ -44,6 +44,7 @@ from notebook.conf import get_ordered_interpreters
 import desktop.conf
 import desktop.log.log_buffer
 
+from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 
 from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, HTTP_PORT
@@ -55,8 +56,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import UserPreferences, Settings, hue_version, ClusterConfig
-from desktop import appmanager
+from desktop.models import UserPreferences, Settings, hue_version, ClusterConfig, _get_apps
 
 
 LOG = logging.getLogger(__name__)
@@ -438,20 +438,7 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
   """
   Returns the rendered common header
   """
-  current_app = None
-  other_apps = []
-  if user.is_authenticated():
-    apps = appmanager.get_apps(user)
-    apps_list = appmanager.get_apps_dict(user)
-    for app in apps:
-      if app.display_name not in [
-          'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
-          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
-        other_apps.append(app)
-      if section == app.display_name:
-        current_app = app
-  else:
-    apps_list = []
+  current_app, other_apps, apps_list = _get_apps(user, section)
 
   template = 'common_header.mako'
   if is_mobile:

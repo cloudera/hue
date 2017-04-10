@@ -21,7 +21,6 @@ import logging
 import os
 import urllib
 import uuid
-from notebook.conf import get_ordered_interpreters
 
 try:
   from collections import OrderedDict
@@ -42,8 +41,9 @@ from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from settings import HUE_DESKTOP_VERSION
 
+from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
-from notebook.conf import SHOW_NOTEBOOKS
+from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
 from desktop.lib.i18n import force_unicode
@@ -1562,7 +1562,84 @@ class ClusterConfig():
           'page': '/dashboard/new_search'
         }
     else:
-      return {}
+      return None
+  
+  def _get_browser(self):
+    interpreters = []
+   
+    if 'filebrowser' in self.apps:
+      interpreters.append({
+        'type': 'hdfs',
+        'displayName': _('Files'),
+        'tooltip': _('Files'),
+        'page': '/filebrowser/'
+      })
+  
+    if is_s3_enabled() and has_s3_access(self.user):
+      interpreters.append({
+        'type': 's3',
+        'displayName': _('S3'),
+        'tooltip': _('S3'),
+        'page': '/filebrowser/view=S3A://'
+      })
+        
+    if 'metastore' in self.apps:
+      interpreters.append({
+        'type': 'tables',
+        'displayName': _('Tables'),
+        'tooltip': _('Tables'),
+        'page': '/metastore/tables'
+      })
+
+    if 'search' in self.apps:
+      interpreters.append({
+        'type': 'indexes',
+        'displayName': _('Indexes'),
+        'tooltip': _('Indexes'),
+        'page': '/indexer/'
+      })
+
+    if 'jobbrowser' in self.apps:
+      interpreters.append({
+        'type': 'jobs',
+        'displayName': _('Jobs'),
+        'tooltip': _('Jobs'),
+        'page': '/jobbrowser/'
+      })
+
+    if 'hbase' in self.apps:
+      interpreters.append({
+        'type': 'hbase',
+        'displayName': _('HBase'),
+        'tooltip': _('HBase'),
+        'page': '/hbase/'
+      })
+
+    if 'security' in self.apps:
+      interpreters.append({
+        'type': 'security',
+        'displayName': _('Security'),
+        'tooltip': _('Security'),
+        'page': '/security/hive'
+      })
+
+    if 'sqoop' in self.apps:
+      interpreters.append({
+        'type': 'sqoop',
+        'displayName': _('Sqoop'),
+        'tooltip': _('Sqoop'),
+        'page': '/sqoop'
+      })
+
+    if interpreters:
+      return {
+          'name': 'browser',
+          'displayName': _('Browsers'),
+          'interpreters': interpreters,
+        }
+    else:
+      return None
+  
   
   def _get_scheduler(self):
     interpreters = [{
@@ -1590,42 +1667,41 @@ class ClusterConfig():
           'interpreters': interpreters,
         }
     else:
-      return {}  
+      return None  
+
+
+  def _get_sdk_apps(self):
+    current_app, other_apps, apps_list = _get_apps(self.user)  
+
+    interpreters = []
+    
+    for other in other_apps:
+      interpreters.push({
+        'type': other.nice_name,
+        'displayName': other.nice_name,
+        'tooltip': other.nice_name,
+        'page': '/%s' % other.nice_name
+      })
+
+    if interpreters:
+      return {
+          'name': 'other',
+          'displayName': _('Other Apps'),
+          'interpreters': interpreters,
+        }
+    else:
+      return None
+  
   
   def get_apps(self):
     apps = OrderedDict([      
       ('editor', self._get_editor()),
       ('dashboard', self._get_dashboard()),
-      ('browser', {
-          'name': 'browser',
-          'displayName': _('Browsers'),
-        'interpreters': [{
-            'type': 'hdfs',
-            'displayName': _('Jobs'),
-            'page': '/jobbrowser/',
-          }, {
-            'type': 'metastore',
-            'displayName': _('Jobs'),
-            'page': '/jobbrowser/',
-          }, {
-            'type': 's3',
-            'displayName': _('Jobs'),
-            'page': '/jobbrowser/',
-          }, {
-            'type': 'jobbrowser',
-            'displayName': _('Jobs'),
-            'page': '/jobbrowser/',
-            'interpreters': [
-              'yarn',
-              'oozie',
-              'dataeng'
-            ]
-          }
-        ]
-      }),
-      ('scheduler', self._get_scheduler())
+      ('browser', self._get_browser()),
+      ('scheduler', self._get_scheduler()),
+      ('sdkapps', self._get_sdk_apps()),
     ])
-    
+
     # Default action
     # If not in user setting, first interpreter in apps
 #     default_app = None    
@@ -1649,6 +1725,24 @@ class ClusterConfig():
     
     return apps
 
+
+def _get_apps(user, section=None):
+  current_app = None
+  other_apps = []
+  if user.is_authenticated():
+    apps = appmanager.get_apps(user)
+    apps_list = appmanager.get_apps_dict(user)
+    for app in apps:
+      if app.display_name not in [
+          'beeswax', 'impala', 'pig', 'jobsub', 'jobbrowser', 'metastore', 'hbase', 'sqoop', 'oozie', 'filebrowser',
+          'useradmin', 'search', 'help', 'about', 'zookeeper', 'proxy', 'rdbms', 'spark', 'indexer', 'security', 'notebook'] and app.menu_index != -1:
+        other_apps.append(app)
+      if section == app.display_name:
+        current_app = app
+  else:
+    apps_list = []
+    
+  return current_app, other_apps, apps_list
 
 
 def get_data_link(meta):
