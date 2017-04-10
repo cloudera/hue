@@ -3419,7 +3419,7 @@
           huePubSub.publish('editor.active.locations', lastKnownLocations);
 
           huePubSub.subscribe('get.active.editor.locations', function () {
-            huePubSub.publish('editor.active.cursor.location', lastKnownLocations);
+            huePubSub.publish('editor.active.locations', lastKnownLocations);
           });
 
 
@@ -3619,7 +3619,7 @@
         }, 100);
       });
 
-      huePubSub.subscribe('get.active.editor.locations', function () {
+      huePubSub.subscribe('get.active.editor.cursor.location', function () {
         huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
       });
 

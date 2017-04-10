@@ -2653,6 +2653,7 @@ var EditorViewModel = (function() {
           if (typeof skipUrlChange === 'undefined' && ! self.isNotificationManager()){
             if (self.editorMode()) {
               self.editorType(data.document.type.substring('query-'.length));
+              huePubSub.publish('active.snippet.type.changed', self.editorType());
               if (self.isHue4()){
                 self.changeURL(self.URLS.hue4 + '?editor=' + data.document.id);
               } else {
@@ -2689,6 +2690,7 @@ var EditorViewModel = (function() {
           if (window.location.getParameter('type') === '') {
             hueUtils.changeURLParameter('type', self.editorType());
           }
+          huePubSub.publish('active.snippet.type.changed', editorType);
         }
 
         if (typeof callback !== 'undefined'){
