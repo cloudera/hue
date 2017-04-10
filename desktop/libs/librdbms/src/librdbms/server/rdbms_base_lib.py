@@ -24,7 +24,7 @@ LOG = logging.getLogger(__name__)
 class BaseRDBMSDataTable(object):
   def __init__(self, cursor, columns, fetch_size=1000):
     self.cursor = cursor
-    if columns and isinstance(columns[0], dict): # Bacward compatible for API without column metadata
+    if columns and isinstance(columns[0], dict): # Backward compatible for API without column metadata
       self.columns_description = columns
       self.columns = [col['name'] for col in columns]
     else:

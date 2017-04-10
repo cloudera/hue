@@ -43,20 +43,19 @@ SHOW_NOTEBOOKS = Config(
 def _remove_duplications(a_list):
   return list(OrderedDict.fromkeys(a_list))
 
+
 def get_ordered_interpreters(user=None):
   if not INTERPRETERS.get():
-    _default_interpreters()
+    _default_interpreters(user)
 
   interpreters = INTERPRETERS.get()
   interpreters_shown_on_wheel = _remove_duplications(INTERPRETERS_SHOWN_ON_WHEEL.get())
 
   unknown_interpreters = set(interpreters_shown_on_wheel) - set(interpreters)
   if unknown_interpreters:
-      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s"
-                       % unknown_interpreters)
+      raise ValueError("Interpreters from interpreters_shown_on_wheel is not in the list of Interpreters %s" % unknown_interpreters)
 
-  reordered_interpreters = interpreters_shown_on_wheel + \
-                           [i for i in interpreters if i not in interpreters_shown_on_wheel]
+  reordered_interpreters = interpreters_shown_on_wheel + [i for i in interpreters if i not in interpreters_shown_on_wheel]
 
   return [{
       "name": interpreters[i].NAME.get(),
@@ -65,6 +64,7 @@ def get_ordered_interpreters(user=None):
       "options": interpreters[i].OPTIONS.get()}
       for i in reordered_interpreters
   ]
+
 
 INTERPRETERS = UnspecifiedConfigSection(
   "interpreters",
@@ -140,14 +140,57 @@ ENABLE_BATCH_EXECUTE = Config(
 )
 
 
-def _default_interpreters():
-  INTERPRETERS.set_for_testing(OrderedDict((
-      ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
-      }),
-      ('impala', {
-          'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
-      }),
+def _default_interpreters(user):
+  interpreters = []
+  apps = appmanager.get_apps_dict(user)
+  
+  if 'impala' in apps:
+    interpreters.append(('hive', {
+      'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
+    }),)
+  
+  if 'impala' in apps:
+    interpreters.append(('impala', {
+      'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
+    }),)
+
+  if 'pig' in apps:
+    interpreters.append(('pig', {
+      'name': 'Pig', 'interface': 'oozie', 'options': {}
+    }))
+  
+  if 'oozie' in apps:  
+    interpreters.extend(
+        ('pig', {
+            'name': 'Pig', 'interface': 'oozie', 'options': {}
+        }),
+        ('java', {
+            'name': 'Java', 'interface': 'oozie', 'options': {}
+        }),
+        ('sqoop1', {
+            'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
+        }),
+        ('distcp', {
+            'name': 'Distcp', 'interface': 'oozie', 'options': {}
+        }),
+        ('spark2', {
+            'name': 'Spark', 'interface': 'oozie', 'options': {}
+        }),
+        ('mapreduce', {
+            'name': 'MapReduce', 'interface': 'oozie', 'options': {}
+        }),
+        ('shell', {
+            'name': 'Shell', 'interface': 'oozie', 'options': {}
+        }),
+      )
+  
+  if 'serch' in apps: # And Solr 6+
+    interpreters.append(('solr', {
+        'name': 'Solr SQL', 'interface': 'solr', 'options': {}
+    }),)
+  
+  if SHOW_NOTEBOOKS.get():
+    interpreters.extend(
       ('spark', {
           'name': 'Scala', 'interface': 'livy', 'options': {}
       }),
@@ -163,42 +206,12 @@ def _default_interpreters():
       ('py', {
           'name': 'Spark Submit Python', 'interface': 'livy-batch', 'options': {}
       }),
-      ('pig', {
-          'name': 'Pig', 'interface': 'oozie', 'options': {}
-      }),
-      ('solr', {
-          'name': 'Solr SQL', 'interface': 'solr', 'options': {}
-      }),
-      ('java', {
-          'name': 'Java', 'interface': 'oozie', 'options': {}
-      })
-      ,
-      ('sqoop1', {
-          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
-      })
-      ,
-      ('distcp', {
-          'name': 'Distcp', 'interface': 'oozie', 'options': {}
-      })
-      ,
-      ('spark2', {
-          'name': 'Spark', 'interface': 'oozie', 'options': {}
-      })
-      ,
-      ('mapreduce', {
-          'name': 'MapReduce', 'interface': 'oozie', 'options': {}
-      })
-      ,
-      ('shell', {
-          'name': 'Shell', 'interface': 'oozie', 'options': {}
-      })
-      ,
       ('text', {
           'name': 'Text', 'interface': 'text', 'options': {}
       }),
       ('markdown', {
           'name': 'Markdown', 'interface': 'text', 'options': {}
       })
-    ))
-  )
-
+    )
+  
+  INTERPRETERS.set_for_testing(OrderedDict(interpreters))
