@@ -947,25 +947,19 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.searchInput = ko.observable();
 
 
-        self.config = ko.observable();
-        
-        self.getConfig = function() {
-          $.post("/desktop/api2/get_config/", {
-            cluster: ko.mapping.toJSON('default'),
-          }, function (data) {
-            if (data.status == 0) {
-              self.config(data);
-            } else {
-              $(document).trigger("error", data.message);
-            }
-          });
-        };
+        self.clusterConfig = ko.observable();
 
-        self.getConfig();
+        self.apiHelper.getClusterConfig().done(function (data) {
+          if (data.status == 0) {
+            self.clusterConfig(data);
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        });
 
-        self.mainQuickCreateAction = ko.computed(function() {          
-          if (self.config()) {
-            var topApp = self.config()['main_button_action'];
+        self.mainQuickCreateAction = ko.pureComputed(function() {
+          if (self.clusterConfig()) {
+            var topApp = self.clusterConfig()['main_button_action'];
             return {
               displayName: topApp.displayName,
               icon: topApp.type,
@@ -977,12 +971,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             return null;
           }
         });
-        
 
-        self.quickCreateActions = ko.computed(function() {
+
+        self.quickCreateActions = ko.pureComputed(function() {
           var apps = [];
-          if (self.config()) {
-          $.each(self.config()['button_actions'], function(index, app) {
+          if (self.clusterConfig()) {
+          $.each(self.clusterConfig()['button_actions'], function(index, app) {
             var interpreters = [];
             $.each(app['interpreters'], function(index, interpreter) {
               interpreters.push({
@@ -996,7 +990,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 }
               });
             });
-            
+
             % if user.is_superuser:
             if (app.name == 'editor') {
               interpreters.push({
@@ -1008,7 +1002,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
              });
             }
             % endif
-          
+
             apps.push({
               displayName: app.displayName,
               icon: app.name,
@@ -1020,11 +1014,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             });
           });
           }
-                                                           
+
           return apps;
         });
-        
-       
+
+
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
@@ -1115,31 +1109,30 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     (function (onePageViewModel, topNavViewModel) {
       function SideBarViewModel () {
-        //self.items = [];
-        
-        self.items = ko.computed(function() {
+
+        self.items = ko.pureComputed(function() {
           var items = [];
-          
+
           items.push({
             displayName: '${ _('Documents') }',
             click: function () {
               page('/home')
             }
           });
-          
-          var appConfig = hueDebug.viewModel($('.top-nav')[0]).config() && hueDebug.viewModel($('.top-nav')[0]).config()['app_config'];
-          
-          if (! appConfig) {
+
+          var clusterConfig = topNavViewModel.clusterConfig();
+
+          if (! clusterConfig) {
             return items;
           }
-                                              
+
           var appsItems = [];
           $.each(['editor', 'dashboard', 'scheduler'], function(index, appName) {
-            if (appConfig[appName]) {
+            if (clusterConfig[appName]) {
               appsItems.push({
-                displayName: appConfig[appName]['displayName'],
+                displayName: clusterConfig[appName]['displayName'],
                 click: function () {
-                  page(appConfig[appName]['page']);
+                  page(clusterConfig[appName]['page']);
                 }
               });
             };
@@ -1151,10 +1144,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               children: appsItems
             })
           }
-          
+
           var browserItems = [];
-          if (appConfig['browser']) {
-            $.each(appConfig['browser']['interpreters'], function(index, browser) {
+          if (clusterConfig['browser']) {
+            $.each(clusterConfig['browser']['interpreters'], function(index, browser) {
               browserItems.push({
                 displayName: browser['displayName'],
                 click: function () {
@@ -1170,10 +1163,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               children: browserItems
             })
           }
-                     
+
           var sdkItems = [];
-          if (appConfig['sdkapps']) {
-            $.each(appConfig['sdkapps']['interpreters'], function(index, browser) {
+          if (clusterConfig['sdkapps']) {
+            $.each(clusterConfig['sdkapps']['interpreters'], function(index, browser) {
               sdkItems.push({
                 displayName: browser['displayName'],
                 click: function () {
@@ -1185,11 +1178,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (sdkItems.length > 0) {
             items.push({
               isCategory: true,
-              displayName: appConfig['sdkapps']['displayName'],
+              displayName: clusterConfig['sdkapps']['displayName'],
               children: sdkItems
             })
           }
-          
+
           return items;
         });
 

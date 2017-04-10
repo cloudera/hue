@@ -143,12 +143,12 @@ ENABLE_BATCH_EXECUTE = Config(
 def _default_interpreters(user):
   interpreters = []
   apps = appmanager.get_apps_dict(user)
-  
+
   if 'impala' in apps:
     interpreters.append(('hive', {
       'name': 'Hive', 'interface': 'hiveserver2', 'options': {}
     }),)
-  
+
   if 'impala' in apps:
     interpreters.append(('impala', {
       'name': 'Impala', 'interface': 'hiveserver2', 'options': {}
@@ -158,37 +158,37 @@ def _default_interpreters(user):
     interpreters.append(('pig', {
       'name': 'Pig', 'interface': 'oozie', 'options': {}
     }))
-  
-  if 'oozie' in apps:  
+
+  if 'oozie' in apps:
     interpreters.extend(
-        ('pig', {
-            'name': 'Pig', 'interface': 'oozie', 'options': {}
-        }),
-        ('java', {
-            'name': 'Java', 'interface': 'oozie', 'options': {}
-        }),
-        ('sqoop1', {
-            'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
-        }),
-        ('distcp', {
-            'name': 'Distcp', 'interface': 'oozie', 'options': {}
-        }),
-        ('spark2', {
-            'name': 'Spark', 'interface': 'oozie', 'options': {}
-        }),
-        ('mapreduce', {
-            'name': 'MapReduce', 'interface': 'oozie', 'options': {}
-        }),
-        ('shell', {
-            'name': 'Shell', 'interface': 'oozie', 'options': {}
-        }),
-      )
-  
+      ('pig', {
+          'name': 'Pig', 'interface': 'oozie', 'options': {}
+      }),
+      ('java', {
+          'name': 'Java', 'interface': 'oozie', 'options': {}
+      }),
+      ('sqoop1', {
+          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
+      }),
+      ('distcp', {
+          'name': 'Distcp', 'interface': 'oozie', 'options': {}
+      }),
+      ('spark2', {
+          'name': 'Spark', 'interface': 'oozie', 'options': {}
+      }),
+      ('mapreduce', {
+          'name': 'MapReduce', 'interface': 'oozie', 'options': {}
+      }),
+      ('shell', {
+          'name': 'Shell', 'interface': 'oozie', 'options': {}
+      }),
+    )
+
   if 'serch' in apps: # And Solr 6+
     interpreters.append(('solr', {
         'name': 'Solr SQL', 'interface': 'solr', 'options': {}
     }),)
-  
+
   if SHOW_NOTEBOOKS.get():
     interpreters.extend(
       ('spark', {
@@ -213,5 +213,5 @@ def _default_interpreters(user):
           'name': 'Markdown', 'interface': 'text', 'options': {}
       })
     )
-  
+
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
