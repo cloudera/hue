@@ -71,7 +71,8 @@ def get_config(request):
   return JsonResponse({
     'status': 0,
     'app_config': app_config,
-    'main_button_action': app_config['editor']['interpreters'][1]
+    'main_button_action': app_config['editor']['interpreters'][1],
+    'button_actions': [app_config['editor'], app_config['dashboard'], app_config['scheduler']],
   })
 
 
