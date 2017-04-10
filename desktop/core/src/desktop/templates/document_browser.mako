@@ -94,7 +94,7 @@ from desktop.views import _ko
       padding: 0 6px;
     }
 
-    .active {
+    .doc-browser-container .active {
       padding: 0 12px;
       color: #444;
     }
