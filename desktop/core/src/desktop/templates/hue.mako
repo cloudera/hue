@@ -92,9 +92,9 @@
 
 ${ hueIcons.symbols() }
 
-% if conf.CUSTOM.BANNER_TOP_HTML.get():
+% if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
 <div class="banner">
-  ${ conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
+  ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
 </div>
 % endif
 

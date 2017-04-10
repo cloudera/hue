@@ -80,7 +80,8 @@ def hue(request):
       'layer': desktop.conf.LEAFLET_TILE_LAYER.get(),
       'attribution': desktop.conf.LEAFLET_TILE_LAYER_ATTRIBUTION.get()
     },
-    'is_demo': desktop.conf.DEMO_ENABLED.get()
+    'is_demo': desktop.conf.DEMO_ENABLED.get(),
+    'banner_message': get_banner_message(request)
   })
 
 def ko_editor(request):
@@ -476,8 +477,8 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
 def get_banner_message(request):
   banner_message = None
   if HUE_LOAD_BALANCER.get() and request.META.get('SERVER_PORT') and str(request.META['SERVER_PORT']) == str(HTTP_PORT.get()):
-    banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 40px; color: #DBE8F1">%s: %s</div>' % \
-      (_('You are accessing Hue from a non-load balanced port, please switch to one of the available load-balanced hosts'),
+    banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s: %s</div>' % \
+      (_('You are accessing a non-optimized Hue, please switch to one of the available addresses'),
       ", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
   return banner_message
 
