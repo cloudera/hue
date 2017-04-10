@@ -1560,7 +1560,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       loadHash();
-      console.log('JB2 ready Triggered');
     });
   })();
 </script>
