@@ -1534,22 +1534,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % endif
 
       var loadHash = function () {
-        var h = window.location.hash;
-        if (h.indexOf('#!') === 0) {
-          h = h.substr(2);
-        }
+        if (window.location.pathname.indexOf('jobbrowser') > -1) {
+          var h = window.location.hash;
+          if (h.indexOf('#!') === 0) {
+            h = h.substr(2);
+          }
 
-        switch (h) {
-          case '':
-           break;
-          case 'jobs':
-          case 'workflows':
-          case 'schedules':
-          case 'bundles':
-            viewModel.selectInterface(h);
-            break;
-          default:
-            new Job(viewModel, {id: h}).fetchJob();
+          switch (h) {
+            case '':
+              break;
+            case 'jobs':
+            case 'workflows':
+            case 'schedules':
+            case 'bundles':
+              viewModel.selectInterface(h);
+              break;
+            default:
+              new Job(viewModel, {id: h}).fetchJob();
+          }
         }
       };
 
