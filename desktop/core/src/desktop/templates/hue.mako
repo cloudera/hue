@@ -946,82 +946,82 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
 
-        self.quickCreateActions = [];
 
-        
-        self.config = ko.observableArray();
+        self.config = ko.observable();
         
         $.post("/desktop/api2/get_config/", {
           cluster: ko.mapping.toJSON('default'),
         }, function (data) {
           if (data.status == 0) {
-            self.config(ko.mapping.fromJS(data));
+            self.config(data);
           } else {
             $(document).trigger("error", data.message);
           }
         });
 
 
-        self.mainQuickCreateAction = ko.computed(function() {
-          var topApp = self.config()['main_button_action'];
-          if (topApp) {
+        self.mainQuickCreateAction = ko.computed(function() {          
+          if (self.config()) {
+            var topApp = self.config()['main_button_action'];
             return {
               displayName: topApp.displayName,
               icon: topApp.type,
               click: function(){
-                page(topApp.page());
+                page(topApp.page);
               }
             };
           } else {
             return null;
           }
         });
-
         
-        % for name, app in cluster_config.get_apps().iteritems():
-          var interpreters = []; 
-          
-          % for interpreter in app['interpreters']:
-            interpreters.push({
-              displayName: '${ interpreter['displayName'] }',
-              % if name == 'editor' and SHOW_NOTEBOOKS.get():
-              dividerAbove: interpreters.length === 1,
-              % endif
-              icon: '${ interpreter['type'] }',
-              click: function () {
-                page('/${ interpreter['page'] }');
-              }
+
+        self.quickCreateActions = ko.computed(function() {
+          var apps = [];
+          if (self.config()) {
+          $.each(self.config()['button_actions'], function(index, app) {
+            var interpreters = [];
+            $.each(app['interpreters'], function(index, interpreter) {
+              interpreters.push({
+                displayName: interpreter.displayName,
+                % if SHOW_NOTEBOOKS.get():
+                dividerAbove: app.name == 'editor' && index == 1,
+                % endif
+                icon: interpreter.type,
+                click: function () {
+                  page(interpreter.page);
+                }
+              });
             });
-          % endfor
-          
-          % if name == 'editor' and user.is_superuser:
-          interpreters.push({
-            displayName: '${ _('Add more...') }',
-            dividerAbove: true,
-            click: function () {
-              window.open('http://gethue.com/sql-editor/', '_blank');
+            
+            % if user.is_superuser:
+            if (app.name == 'editor') {
+              interpreters.push({
+                displayName: '${ _('Add more...') }',
+                dividerAbove: true,
+                click: function () {
+                  window.open('http://gethue.com/sql-editor/', '_blank');
+                }
+             });
             }
-          });
-          % endif
-
-          % if app['interpreters']:
-            self.quickCreateActions.push({
-              displayName: '${ app['displayName'] }',
-              icon: '${ app['name'] }',
-              isCategory: true,
-              children: interpreters
-            });
-          % else:
-            self.quickCreateActions.push({
-              displayName: '${ app['displayName'] }',
-              icon: '${ app['name'] }',
+            % endif
+          
+            apps.push({
+              displayName: app.displayName,
+              icon: app.name,
+              isCategory: interpreters.length > 0,
+              children: interpreters,
               click: function () {
-                page('${ app['page'] }');
+                page(app.page);
               }
             });
-          % endif
+          });
+          }
+                                                           
+          return apps;
+        });
         
-        % endfor
+       
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
