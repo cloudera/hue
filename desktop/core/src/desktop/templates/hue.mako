@@ -112,8 +112,10 @@ ${ hueIcons.symbols() }
 
 
         <div class="btn-group" data-bind="visible: true" style="display:none;">
+          <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
           <button class="btn btn-primary disable-feedback" href="javascript: void(0);" data-bind="click: click"><span data-bind="text: displayName"></span></button>
+          <!-- /ko -->
           <!-- /ko -->
           <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
           <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
@@ -194,7 +196,6 @@ ${ hueIcons.symbols() }
   </nav>
 
   <div class="content-wrapper">
-
 
     <script type="text/html" id="tmpl-sidebar-link">
       <a role="button" class="sidebar-item" data-bind="click: item.click, attr: { title: item.displayName }">
@@ -947,30 +948,38 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         self.quickCreateActions = [];
 
-        % if cluster_config.main_quick_action:
-          self.mainQuickCreateAction = {
-            displayName: '${ cluster_config.main_quick_action['displayName'] }',
-            // Tooltip
-            icon: '${ cluster_config.main_quick_action['type'] }',
-            click: function(){
-              page('${ cluster_config.main_quick_action['page'] }');
-            }
-          };
-        % endif
+        
+        self.config = ko.observableArray();
+        
+        $.post("/desktop/api2/get_config/", {
+          cluster: ko.mapping.toJSON('default'),
+        }, function (data) {
+          if (data.status == 0) {
+            self.config(ko.mapping.fromJS(data));
+          } else {
+            $(document).trigger("error", data.message);
+          }
+        });
+
+
+        self.mainQuickCreateAction = ko.computed(function() {
+          var topApp = self.config()['main_button_action'];
+          if (topApp) {
+            return {
+              displayName: topApp.displayName,
+              icon: topApp.type,
+              click: function(){
+                page(topApp.page());
+              }
+            };
+          } else {
+            return null;
+          }
+        });
 
         
         % for name, app in cluster_config.get_apps().iteritems():
           var interpreters = []; 
-          
-          % if name == 'editor' and SHOW_NOTEBOOKS.get():
-           interpreters.push({
-             displayName: '${ _('Notebook') }',
-             icon: 'notebook',
-             click: function(){
-               page('/notebook');
-            }
-          });
-          % endif
           
           % for interpreter in app['interpreters']:
             interpreters.push({

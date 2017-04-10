@@ -136,6 +136,8 @@ dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/doc/restore/?$', 'restore_document'),
   (r'^desktop/api2/doc/share/?$', 'share_document'),
 
+  (r'^desktop/api2/get_config/?$', 'get_config'),
+
   (r'^desktop/api2/doc/export/?$', 'export_documents'),
   (r'^desktop/api2/doc/import/?$', 'import_documents'),
 
