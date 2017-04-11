@@ -313,16 +313,16 @@ ${ hueIcons.symbols() }
          <ul role="menu" class="dropdown-menu">
            % if 'beeswax' in apps:
              % if USE_NEW_EDITOR.get():
-             <li><a href="${ url('notebook:editor') }?type=hive"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=hive"><svg class="svg-app-icon"><use xlink:href="#hi-hive"></use></svg> ${_('Hive')}</a></li>
              % else:
-             <li><a href="/${apps['beeswax'].display_name}"><img src="${ static(apps['beeswax'].icon_path) }" class="app-icon" alt="${ _('Hive icon') }"/> ${_('Hive')}</a></li>
+             <li><a href="/${apps['beeswax'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-hive"></use></svg> ${_('Hive')}</a></li>
              % endif
            % endif
            % if 'impala' in apps:
              % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
-             <li><a href="${ url('notebook:editor') }?type=impala"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=impala"><svg class="svg-app-icon"><use xlink:href="#hi-impala"></use></svg> ${_('Impala')}</a></li>
              % else:
-             <li><a href="/${apps['impala'].display_name}"><img src="${ static(apps['impala'].icon_path) }" class="app-icon" alt="${ _('Impala icon') }"/> ${_('Impala')}</a></li>
+             <li><a href="/${apps['impala'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-impala"></use></svg> ${_('Impala')}</a></li>
              % endif
            % endif
            % if 'rdbms' in apps:
@@ -334,13 +334,13 @@ ${ hueIcons.symbols() }
            % endif
            % if 'pig' in apps:
              % if USE_NEW_EDITOR.get() and False:
-             <li><a href="${ url('notebook:editor') }?type=pig"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig')}</a></li>
+             <li><a href="${ url('notebook:editor') }?type=pig"><svg class="svg-app-icon"><use xlink:href="#hi-pig"></use></svg> ${_('Pig')}</a></li>
              % else:
-             <li><a href="/${apps['pig'].display_name}"><img src="${ static(apps['pig'].icon_path) }" class="app-icon" alt="${ _('Pig icon') }"/> ${_('Pig')}</a></li>
+             <li><a href="/${apps['pig'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-pig"></use></svg> ${_('Pig')}</a></li>
              % endif
            % endif
            % if 'jobsub' in apps:
-             <li><a href="/${apps['jobsub'].display_name}"><img src="${ static(apps['jobsub'].icon_path) }" class="app-icon" alt="${ _('Job designer icon') }"/> ${_('Job Designer')}</a></li>
+             <li><a href="/${apps['jobsub'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-job-designer"></use></svg> ${_('Job Designer')}</a></li>
            % endif
          </ul>
        </li>
