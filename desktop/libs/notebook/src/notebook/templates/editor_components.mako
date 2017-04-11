@@ -1958,7 +1958,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function(val) {
     isLeftNavOpen = val;
-  });
+  }, 'editor');
 
   var showHoverMsg = function (e) {
     var dt = null;
@@ -2815,22 +2815,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       splitDraggableTimeout = window.setTimeout(function () {
         redrawFixedHeaders(100);
       }, 200);
-    });
+    }, 'editor');
 
     huePubSub.subscribe('redraw.fixed.headers', function () {
       hideFixedHeaders();
       redrawFixedHeaders(200);
-    });
+    }, 'editor');
 
     huePubSub.subscribe('show.saveToFile.modal', function () {
       $('#saveToFileModal').modal('show');
-    });
+    }, 'editor');
 
     huePubSub.subscribe('tab.switched', function (tab) {
       if (tab !== 'queryResults') {
         $('.hue-datatable-search').hide();
       }
-    });
+    }, 'editor');
 
     huePubSub.subscribe('detach.scrolls', function (snippet) {
       var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
@@ -2840,7 +2840,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
       }
-    });
+    }, 'editor');
 
     huePubSub.subscribe('table.row.dblclick', function(data){
       var $el = $(data.table);
@@ -2860,7 +2860,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       $('#detailsModal').modal('show');
 
-    });
+    }, 'editor');
 
     window.redrawFixedHeaders = redrawFixedHeaders;
 
@@ -3118,7 +3118,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       huePubSub.subscribe('assist.set.manual.visibility', function () {
         wasAssistVisible = viewModel.isLeftPanelVisible();
-      });
+      }, 'editor');
 
       viewModel.isLeftPanelVisible.subscribe(function (value) {
         redrawFixedHeaders(200);
@@ -3143,11 +3143,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       huePubSub.subscribe('show.retry.modal', function (data) {
         $('#retryModal').modal('show');
-      });
+      }, 'editor');
 
       huePubSub.subscribe('hide.retry.modal', function (data) {
         $('#retryModal').modal('hide');
-      });
+      }, 'editor');
 
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function (e) {
@@ -3174,7 +3174,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         return false;
       });
 
-      huePubSub.subscribe('editor.save', saveKeyHandler);
+      huePubSub.subscribe('editor.save', saveKeyHandler, 'editor');
 
       $(document).bind('keyup', function (e) {
         if (e.keyCode == 191 && e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
@@ -3206,7 +3206,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         return false;
       });
 
-      huePubSub.subscribe('editor.create.new', newKeyHandler);
+      huePubSub.subscribe('editor.create.new', newKeyHandler, 'editor');
 
       var initialResizePosition = 100;
 
@@ -3418,7 +3418,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '0'});
         $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '0'});
         $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '0.55'});
-      });
+      }, 'editor');
 
       huePubSub.subscribe('editor.snippet.result.normal', function (snippet) {
         var $snippet = $("#snippet_" + snippet.id());
@@ -3426,11 +3426,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '1'});
         $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '1'});
         $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '1'});
-      });
+      }, 'editor');
 
       $(document).on("renderDataError", function (e, options) {
         huePubSub.publish('editor.snippet.result.normal', options.snippet);
-      });
+      }, 'editor');
 
       $(document).on("progress", function (e, options) {
         if (options.data == 100) {
@@ -3455,7 +3455,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         if (typeof renderJqCron !== 'undefined'){
           renderJqCron();
         }
-      });
+      }, 'editor');
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
@@ -3463,7 +3463,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $('.submit-modal').modal('hide');
 
         $('a[href=\'#scheduledJobsTab\']').click();
-      });
+      }, 'editor');
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
         if (jobs.length > 0) {
@@ -3485,7 +3485,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             });
           }
         }
-      });
+      }, 'editor');
 
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
