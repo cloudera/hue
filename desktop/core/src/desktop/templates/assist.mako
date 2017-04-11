@@ -1788,17 +1788,18 @@ from notebook.conf import get_ordered_interpreters
             }
             self.statementCount(statements.length);
 
+            var activeLocations = [];
             if (statements.length > 0) {
               // Pick the last statement by default (only one or cursor after last ';')
               var statementIndex = statements.length;
-              var activeStatement = _.last(statements);
+              activeLocations = _.last(statements);
               if (statements.length > 1) {
                 var cursorPos = self.activeCursorLocation().position;
                 var index = 1;
                 statements.every(function (statement) {
                   // First is the actual statement
                   if (isPointInside(statement[0].location, cursorPos.row+1, cursorPos.column+1)) {
-                    activeStatement = statement;
+                    activeLocations = statement;
                     statementIndex = index;
                     return false;
                   }
@@ -1812,7 +1813,7 @@ from notebook.conf import get_ordered_interpreters
             var tableIndex = {};
             var columnIndex = {};
 
-            activeStatement.forEach(function (location) {
+            activeLocations.forEach(function (location) {
               if (location.type === 'table' && location.identifierChain.length <= 2) {
                 // tableIndex is used to make sure we only add each table once
                 tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
