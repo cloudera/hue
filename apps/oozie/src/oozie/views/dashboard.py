@@ -646,7 +646,7 @@ def list_oozie_sla(request):
   if request.REQUEST.get('format') == 'json':
     massaged_slas = []
     for sla in oozie_slas:
-      massaged_slas.append(massaged_sla_for_json(sla, request))
+      massaged_slas.append(massaged_sla_for_json(sla))
 
     return HttpResponse(json.dumps({'oozie_slas': massaged_slas}), content_type="text/json")
 
@@ -659,7 +659,7 @@ def list_oozie_sla(request):
   })
 
 
-def massaged_sla_for_json(sla, request):
+def massaged_sla_for_json(sla):
   massaged_sla = {
     'slaStatus': sla['slaStatus'],
     'id': sla['id'],
