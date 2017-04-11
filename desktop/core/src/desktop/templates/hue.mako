@@ -114,7 +114,9 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none;">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback" href="javascript: void(0);" data-bind="click: click"><span data-bind="text: displayName"></span></button>
+          <button class="btn btn-primary disable-feedback" href="javascript: void(0);" data-bind="click: click, attr: {title: tooltip}">
+            <span data-bind="text: displayName"></span>
+          </button>
           <!-- /ko -->
           <!-- /ko -->
           <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
@@ -961,8 +963,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (self.clusterConfig()) {
             var topApp = self.clusterConfig()['main_button_action'];
             return {
-              displayName: topApp.displayName,
+              displayName: topApp.type == 'hive' || topApp.type == 'impala' ? '${ _("Query") }' : topApp.displayName,
               icon: topApp.type,
+              tooltip: topApp.tooltip,
               click: function(){
                 page(topApp.page);
               }
