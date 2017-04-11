@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import sys
 import time
 
 from django.contrib.auth.models import User
@@ -27,7 +28,7 @@ from desktop.converters import DocumentConverter
 class Command(NoArgsCommand):
 
   def handle_noargs(self, **options):
-    self.stdout.write('Starting document conversions...\n')
+    print 'Starting document conversions...\n'
     try:
       with transaction.atomic():
         users = User.objects.all()
@@ -39,7 +40,10 @@ class Command(NoArgsCommand):
           converter = DocumentConverter(user)
           converter.convert()
           logging.info("Document conversions for user:%s took %.3f seconds" % (user.username, time.time() - start_time))
+
+          if converter.failed_docs:
+            print >> sys.stderr, 'Failed to import %d document(s) for user: %s - %s' % (len(converter.failed_docs), user.username, ([doc.id for doc in converter.failed_docs]))
     except Exception, e:
       logging.exception("Failed to execute the document conversions.")
 
-    self.stdout.write('Finished running document conversions.\n')
+    print 'Finished running document conversions.\n'
