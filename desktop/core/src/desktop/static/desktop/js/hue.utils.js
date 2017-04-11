@@ -423,12 +423,16 @@ var huePubSub = (function () {
   var hOP = topics.hasOwnProperty;
 
   return {
-    subscribe: function (topic, listener) {
+    subscribe: function (topic, listener, app) {
       if (!hOP.call(topics, topic)) {
         topics[topic] = [];
       }
 
-      var index = topics[topic].push(listener) - 1;
+      var index = topics[topic].push({
+        listener: listener,
+        app: app,
+        status: 'running'
+      }) - 1;
 
       return {
         remove: function () {
@@ -436,11 +440,11 @@ var huePubSub = (function () {
         }
       };
     },
-    subscribeOnce: function (topic, listener) {
+    subscribeOnce: function (topic, listener, app) {
       var ephemeral = this.subscribe(topic, function () {
         listener.apply(listener, arguments);
         ephemeral.remove();
-      });
+      }, app);
 
     },
     publish: function (topic, info) {
@@ -449,11 +453,35 @@ var huePubSub = (function () {
       }
 
       topics[topic].forEach(function (item) {
-        item(info);
+        if (item.status === 'running') {
+          item.listener(info);
+        }
       });
     },
     getTopics: function () {
       return topics;
+    },
+    pauseAppSubscribers: function (app) {
+      if (app) {
+        Object.keys(topics).forEach(function (topicName) {
+          topics[topicName].forEach(function (topic) {
+            if (topic.app === app) {
+              topic.status = 'paused';
+            }
+          });
+        });
+      }
+    },
+    resumeAppSubscribers: function (app) {
+      if (app) {
+        Object.keys(topics).forEach(function (topicName) {
+          topics[topicName].forEach(function (topic) {
+            if (topic.app === app) {
+              topic.status = 'running';
+            }
+          });
+        });
+      }
     }
   };
 })();
