@@ -126,8 +126,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="content-panel-inner">
 
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
-
-            <!-- ko if: ! $root.job() -->
+            <!-- ko if: interface() !== 'slas' -->
+            <!-- ko if: !$root.job() -->
             ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
             <div class="btn-group">
               <select data-bind="options: jobs.statesValuesFilter, selectedOptions: jobs.statesFilter, optionsText: 'name', optionsValue: 'value'" size="3" multiple="true"></select>
@@ -212,6 +212,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
 
           <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: ! $root.job()"></div>
+          <!-- /ko -->
+
+          <!-- ko if: interface() === 'slas' -->
+            <!-- ko hueSpinner: { spin: !slasLoaded(), center: true, size: 'xlarge' } --><!-- /ko -->
+            <div id="slas"></div>
+          <!-- /ko -->
         </div>
       </div>
 
@@ -303,7 +309,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
   <!-- /ko -->
 </script>
-
 
 <script type="text/html" id="job-page">
   <!-- ko if: type() == 'MAPREDUCE' -->
@@ -861,7 +866,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-
 <script type="text/javascript">
 
   (function () {
@@ -1334,13 +1338,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
+      self.slasLoaded = ko.observable(false);
+      self.loadSlaPage = function(){
+        if (!self.slasLoaded()) {
+          $.ajax({
+            url: '/oozie/list_oozie_sla/?is_embeddable=true',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('X-Requested-With', 'Hue');
+            },
+            dataType: 'html',
+            success: function (response) {
+              self.slasLoaded(true);
+              $('#slas').html(response);
+            }
+          });
+        }
+      }
+
       self.interface = ko.observable('jobs');
       self.selectInterface = function(interface) {
         self.interface(interface);
         self.resetBreadcrumbs();
         hueUtils.changeURL('#!' + interface);
-        self.jobs.fetchJobs();
-        self.job(null);
+        if (interface === 'slas'){
+          self.loadSlaPage();
+        }
+        else {
+          self.jobs.fetchJobs();
+          self.job(null);
+        }
       };
 
       self.jobs = new Jobs(self);
@@ -1398,6 +1424,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           switch (h) {
             case '':
               break;
+            case 'slas':
             case 'jobs':
             case 'workflows':
             case 'schedules':

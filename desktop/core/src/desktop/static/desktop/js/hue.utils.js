@@ -196,6 +196,9 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
   }
 
   hueUtils.changeURL = function (newURL) {
+    if (window.location.hash !== '' && newURL.indexOf('#') === -1){
+      newURL = newURL + window.location.hash;
+    }
     window.history.pushState(null, null, newURL);
   }
 
