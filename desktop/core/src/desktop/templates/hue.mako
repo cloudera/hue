@@ -853,7 +853,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.rightAssistVisible = ko.observable();
         self.rightAssistVisible.subscribe(function () {
           window.setTimeout(function () {
-            huePubSub.publish('reposition.scroll.anchor.up')
+            huePubSub.publish('reposition.scroll.anchor.up');
+            huePubSub.publish('nicescroll.resize');
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
