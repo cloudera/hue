@@ -614,6 +614,7 @@ def list_oozie_info(request):
     'metrics': metrics,
     'configuration': configuration,
     'oozie_status': oozie_status,
+    'is_embeddable': request.GET.get('is_embeddable', False),
   })
 
 
