@@ -4799,9 +4799,14 @@
     init: function (element, valueAccessor, allBindings) {
       var options = valueAccessor() || {};
       if ((typeof options.enable === 'undefined' || options.enable) && $.fn.niceScroll) {
-        var niceScroll = hueUtils.initNiceScroll($(element), options);
+        hueUtils.initNiceScroll($(element), options);
         $(element).addClass('nicescrollified');
-        ko.utils.domNodeDisposal.addDisposeCallback(element, niceScroll.remove);
+        huePubSub.subscribe('nicescroll.resize', function () {
+          $(element).getNiceScroll().resize();
+        });
+        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+          $(element).getNiceScroll().remove();
+        });
       }
     }
   };
