@@ -126,6 +126,14 @@
       <path d="M237.5,374.9c-25.3-16.2-50.2-43.5-50.2-76.2C212,318.8,225.1,350,237.5,374.9Z"></path>
     </symbol>
 
+    <symbol id="hi-job-designer" viewBox="0 0 640 640">
+      <path d="M595.65,152.73,403.42,466.31l-69.55-48.53,192.2-313.6Zm-25.2-120.9-29.6,48.23,69.58,48.55L640,80.35ZM325.86,446.63l-33,119.06,89-80Z"></path>
+      <ellipse cx="64.08" cy="79.77" rx="64.08" ry="64.18"></ellipse>
+      <ellipse cx="304.43" cy="196.31" rx="64.08" ry="64.18"></ellipse>
+      <ellipse cx="64.08" cy="560.23" rx="64.08" ry="64.18"></ellipse>
+      <polygon points="283.28 580.84 44.69 580.84 44.69 48.48 313.06 178.43 295.63 214.43 84.69 112.29 84.69 540.84 283.28 540.84 283.28 580.84"></polygon>
+    </symbol>
+
     <symbol id="hi-logo" viewBox="0 0 159.657 40">
       % if conf.CUSTOM.LOGO_SVG.get():
         ${ conf.CUSTOM.LOGO_SVG.get()|n }
@@ -254,6 +262,7 @@
     <!-- ko case: 'impala' --><svg class="hi"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'jar' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
     <!-- ko case: 'java' --><i class="fa fa-file-code-o app-icon"></i><!-- /ko -->
+    <!-- ko case: 'job-designer' --><svg class="hi"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
     <!-- ko case: 'mapreduce' --><i class="fa fa-fw fa-file-archive-o"></i><!-- /ko -->
     <!-- ko case: 'markdown' --><svg class="hi"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
     <!-- ko case: 'notebook' --><svg class="hi"><use xlink:href="#hi-file-notebook"></use></svg><!-- /ko -->
