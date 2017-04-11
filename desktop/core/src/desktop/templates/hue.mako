@@ -623,6 +623,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.isLoadingEmbeddable(true);
           loadedApps.forEach(function (loadedApp) {
             window.pauseAppIntervals(loadedApp);
+            huePubSub.pauseAppSubscribers(loadedApp);
           });
           if (typeof self.embeddable_cache[app] === 'undefined') {
             if (loadedApps.indexOf(app) == -1){
@@ -652,6 +653,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               },
               dataType: 'html',
               success: function (response) {
+                window.clearAppIntervals(app);
+                huePubSub.clearAppSubscribers(app);
                 self.extraEmbeddableURLParams('');
                 var r = self.processHeaders(response);
                 if (SKIP_CACHE.indexOf(app) === -1) {
@@ -668,6 +671,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.isLoadingEmbeddable(false);
           }
           window.resumeAppIntervals(app);
+          huePubSub.resumeAppSubscribers(app);
           $('.embeddable').hide();
           $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
         };

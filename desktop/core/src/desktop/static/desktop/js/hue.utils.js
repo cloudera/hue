@@ -482,6 +482,13 @@ var huePubSub = (function () {
           });
         });
       }
+    },
+    clearAppSubscribers: function (app) {
+      if (app) {
+        Object.keys(topics).forEach(function (topicName) {
+          topics[topicName] = topics[topicName].filter(function(obj){ return obj.app !== app});
+        });
+      }
     }
   };
 })();

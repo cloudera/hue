@@ -300,7 +300,7 @@ var EditorViewModel = (function() {
       if (self.inFocus() || notebook.snippets().length === 1) {
         huePubSub.publish('set.active.snippet.type', self.type());
       }
-    });
+    }, 'editor');
 
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
@@ -345,7 +345,7 @@ var EditorViewModel = (function() {
       if (self.type() == options.sourceType) {
         updateDatabases();
       }
-    });
+    }, 'editor');
 
     huePubSub.subscribe('save.snippet.to.file', function() {
       var data = {
@@ -363,7 +363,7 @@ var EditorViewModel = (function() {
       }
       var apiHelper = ApiHelper.getInstance();
       apiHelper.saveSnippetToFile(data, options);
-    });
+    }, 'editor');
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -373,7 +373,7 @@ var EditorViewModel = (function() {
       contextData.tabId = 'context' + self.pinnedContextTabs().length;
       self.pinnedContextTabs.push(contextData);
       self.currentQueryTab(contextData.tabId);
-    });
+    }, 'editor');
 
     self.removeContextTab = function (context) {
       if (context.tabId === self.currentQueryTab()) {
