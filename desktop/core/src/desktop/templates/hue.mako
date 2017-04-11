@@ -777,6 +777,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/notebook/editor', app: function (ctx) {
             page('/notebook?' + ctx.querystring);
           }},
+          { url: '/notebook/notebooks', app: function (ctx) {
+            page('/home?' + ctx.querystring);
+          }},
           { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
           { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
           { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },

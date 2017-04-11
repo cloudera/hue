@@ -266,7 +266,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         </a>
         <!-- /ko -->
 
-        <a class="btn" data-bind="attr: { 'href': '${ url('notebook:notebooks') }?type=' + editorType(), 'title':  editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
+        <a class="btn" data-bind="hueLink: '${ url('notebook:notebooks') }?type=' + editorType(), attr: { 'title':  editorMode() ? '${ _('Queries') }' : '${ _('Notebooks') }'  }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-tags"></i>
         </a>
 
@@ -279,7 +279,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <ul class="nav editor-nav">
           <li class="app-header">
             <!-- ko if: editorMode -->
-              <a data-bind="attr: { href: '${ url('notebook:editor') }?type=' + editorType(), title: editorTypeTitle() + '${ _(' Editor') }' }" style="cursor: pointer">
+              <a data-bind="hueLink: '${ url('notebook:editor') }?type=' + editorType(), attr: { 'title': editorTypeTitle() + '${ _(' Editor') }'}" style="cursor: pointer">
               <!-- ko template: { name: 'app-icon-template', data: { icon: editorType() } } --><!-- /ko -->
               <!-- ko if: editorType() == 'impala' -->
                 Impala
