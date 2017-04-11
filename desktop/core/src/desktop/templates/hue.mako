@@ -113,7 +113,7 @@ ${ hueIcons.symbols() }
 
         <div class="btn-group" data-bind="visible: true" style="display:none;">
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary" href="javascript: void(0);" data-bind="click: click"><span data-bind="text: displayName"></span></button>
+          <button class="btn btn-primary disable-feedback" href="javascript: void(0);" data-bind="click: click"><span data-bind="text: displayName"></span></button>
           <!-- /ko -->
           <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
           <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
