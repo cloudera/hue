@@ -49,7 +49,6 @@ body {
   margin: 0;
   padding: 0;
   overflow: hidden;
-  border-top: 3px solid @hue-primary-color-dark;
 }
 
 .content-wrapper {
@@ -59,6 +58,7 @@ body {
   position: relative;
   width: 100%;
   background-color: @cui-white;
+  border-top: 2px solid @hue-primary-color-dark;
 }
 
 .svg-hue-logo-main {
@@ -315,14 +315,14 @@ body {
 .hue-title-bar {
   border-bottom: 1px solid #DCDCDC;
   background-color:#F8F8F8;
-  -webkit-box-shadow:inset 0 -1px #DCDCDC;
-  box-shadow:inset 0 -1px #DCDCDC;
 
   .navbar-inner {
     background-color: transparent !important;
     margin: 0 !important;
-    padding-top: 8px;
+    padding-top: 0;
+    padding-bottom: 0;
     background: none;
+    min-height: 51px;
   }
 }
 
@@ -742,7 +742,6 @@ a:visited {
   background-color: transparent;
   border: none;
   border-bottom: 1px solid @cui-gray-050;
-  padding-bottom: 6px;
 }
 
 .page-content .navbar.navbar-inverse.navbar-fixed-top {
