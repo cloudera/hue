@@ -780,8 +780,17 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/notebook/notebooks', app: function (ctx) {
             page('/home?' + ctx.querystring);
           }},
+          { url: '/oozie/editor/bundle/list', app: function (ctx) {
+            page('/home?type=oozie-bundle');
+          }},
           { url: '/oozie/editor/bundle/*', app: 'oozie_bundle' },
+          { url: '/oozie/editor/coordinator/list', app: function (ctx) {
+            page('/home?type=oozie-coordinator');
+          }},
           { url: '/oozie/editor/coordinator/*', app: 'oozie_coordinator' },
+          { url: '/oozie/editor/workflow/list', app: function (ctx) {
+            page('/home?type=oozie-workflow');
+          }},
           { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
           { url: '/pig', app: function () {
             self.loadApp('editor');
