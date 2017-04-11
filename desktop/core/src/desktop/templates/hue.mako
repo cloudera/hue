@@ -270,6 +270,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_oozie_workflow" class="embeddable"></div>
       <div id="embeddable_oozie_coordinator" class="embeddable"></div>
       <div id="embeddable_oozie_bundle" class="embeddable"></div>
+      <div id="embeddable_oozie_info" class="embeddable"></div>
       <div id="embeddable_jobbrowser" class="embeddable"></div>
       <div id="embeddable_filebrowser" class="embeddable"></div>
       <div id="embeddable_home" class="embeddable"></div>
@@ -470,6 +471,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         oozie_workflow: '/oozie/editor/workflow/*',
         oozie_coordinator: '/oozie/editor/coordinator/*',
         oozie_bundle: '/oozie/editor/bundle/*',
+        oozie_info: '/oozie/list_oozie_info',
         jobbrowser: '/jobbrowser/apps',
         filebrowser: '/filebrowser/view=*',
         home: '/home*',
@@ -792,6 +794,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/home?type=oozie-workflow');
           }},
           { url: '/oozie/editor/workflow/*', app: 'oozie_workflow' },
+          { url: '/oozie/list_oozie_info', app: 'oozie_info' },
+          { url: '/oozie/list_oozie_sla', app: function() {
+            page.redirect('/jobbrowser/#!slas');
+          }},
           { url: '/pig', app: function () {
             self.loadApp('editor');
             self.changeEditorType('pig');

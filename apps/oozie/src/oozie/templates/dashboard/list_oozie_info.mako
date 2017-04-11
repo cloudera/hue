@@ -22,7 +22,9 @@
 <%namespace name="layout" file="../navigation-bar.mako" />
 <%namespace name="utils" file="../utils.inc.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_("Oozie Information"), "oozie", user, request) | n,unicode }
+%endif
 ${ layout.menubar(section='oozie', dashboard=True) }
 
 
@@ -30,7 +32,6 @@ ${ layout.menubar(section='oozie', dashboard=True) }
 
   <div class="card card-small">
   <div class="card-body">
-  <p>
 
   <h1 class="card-heading card-heading-noborder simple pull-right" style="margin-top: -4px;">
   ${ _('Oozie status') }
@@ -77,12 +78,8 @@ ${ layout.menubar(section='oozie', dashboard=True) }
             " id="${ category }">
 
               % for index, group in enumerate(instrumentation[category]):
-                <p class="nav-header">${ group['group'] }</p>
+              <div class="nav-header">${ group['group'] }</div>
               <table id="intrumentationTable-${ category }-${ index }" class="table table-striped table-condensed">
-                <thead>
-                <th></th>
-                <th></th>
-                </thead>
               <tbody>
                 % for item in group['data']:
                 <tr>
@@ -214,10 +211,10 @@ ${ layout.menubar(section='oozie', dashboard=True) }
       <a href="${ url('oozie:list_oozie_bundles') }" class="btn">${ _('Back') }</a>
     </div>
 
-    </p>
     </div>
     </div>
   </div>
+</div>
 
 <script>
   $(document).ready(function(){
@@ -307,4 +304,6 @@ ${ layout.menubar(section='oozie', dashboard=True) }
   });
 </script>
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif
