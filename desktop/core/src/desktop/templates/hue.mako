@@ -114,7 +114,7 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none;">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback" href="javascript: void(0);" data-bind="click: click, attr: {title: tooltip}">
+          <button class="btn btn-primary disable-feedback hue-main-create-btn" href="javascript: void(0);" data-bind="click: click, attr: {title: tooltip}">
             <span data-bind="text: displayName"></span>
           </button>
           <!-- /ko -->
@@ -258,7 +258,7 @@ ${ hueIcons.symbols() }
       sidePanelVisible: leftAssistVisible,
       orientation: 'left',
       onPosition: function() { huePubSub.publish('split.draggable.position') }
-    }"><div class="resize-bar">&nbsp;</div></div>
+    }"><div class="resize-bar"></div></div>
 
 
     <div class="page-content" data-bind="niceScroll: {horizrailenabled: false}">
