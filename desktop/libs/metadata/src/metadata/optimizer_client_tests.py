@@ -75,6 +75,41 @@ class TestOptimizerApi(BaseTestOptimizerApi):
         (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", 'default'),
         (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", 'default'),
         (uuid_default(), 0, "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;", 'default'),
+
+        # DDL
+        (uuid_default(), 0, '''CREATE TABLE `web_logs`(
+  `_version_` bigint,
+  `app` string COMMENT 'app',
+  `bytes` smallint COMMENT 'http://demo.gethue.com/ is',
+  `city` string COMMENT 'city',
+  `client_ip` string,
+  `code` tinyint,
+  `country_code` string,
+  `country_code3` string,
+  `country_name` string,
+  `device_family` string,
+  `extension` string,
+  `latitude` float,
+  `longitude` float,
+  `method` string,
+  `os_family` string,
+  `os_major` string,
+  `protocol` string,
+  `record` string,
+  `referer` string,
+  `region_code` bigint,
+  `request` string,
+  `subapp` string,
+  `time` string,
+  `url` string,
+  `user_agent` string,
+  `user_agent_family` string,
+  `user_agent_major` string,
+  `id` string)
+COMMENT 'http://demo.gethue.com/ rocks!'
+PARTITIONED BY (
+  `date` string)
+''', 'edw')
     ]
 
     resp = self.api.upload(data=queries, data_type='queries', source_platform='hive')
@@ -102,7 +137,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
       LOG.info('Upload state: %(state)s' % resp['status'])
 
     assert_true(i < 60 and resp['status']['state'] == 'FINISHED', resp)
-    assert_equal(resp['status']['successQueries'], 7, resp)
+    assert_equal(resp['status']['successQueries'], 8, resp)
 
 
   def test_top_tables(self):
@@ -279,7 +314,9 @@ FROM
     query = '''SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary
 FROM
   sample_07 s07
-cross
+
+CROSS
+
 JOIN
   sample_08 s08
 ON ( s07.code = s08.code )
@@ -380,6 +417,41 @@ LIMIT 1000
 
     resp = self.api.query_risk(query=query, source_platform=source_platform)
     _assert_risks(['Cartesian or CROSS join found.'], resp, present=False)
+
+
+  def test_risk_no_filter_on_any_partitioned_column(self):
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs'''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+
+
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs LIMIT 1'''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+
+
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs WHERE app='oozie' LIMIT 1'''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+
+
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs WHERE date='20180101' '''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp, present=False)
+
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs WHERE app='oozie' AND date='20180101' '''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp, present=False)
 
 
 def _assert_risks(risks, suggestions, present=True):
