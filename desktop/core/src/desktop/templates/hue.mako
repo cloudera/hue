@@ -443,6 +443,9 @@ ${ koComponents.all() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
+## clusterConfig makes an ajax call so it needs to be after commonHeaderFooterComponents
+<script src="${ static('desktop/js/clusterConfig.js') }"></script>
+
 ${ assist.assistJSModels() }
 ${ assist.assistPanel() }
 
@@ -954,7 +957,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         'HUE': 'fa-file-o'
       };
 
-      function TopNavViewModel () {
+      function TopNavViewModel (onePageViewModel) {
         var self = this;
         self.onePageViewModel = onePageViewModel;
         self.leftNavVisible = ko.observable(false);
@@ -971,80 +974,70 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.searchHasFocus = ko.observable(false);
         self.searchInput = ko.observable();
 
+        self.mainQuickCreateAction = ko.observable();
+        self.quickCreateActions = ko.observableArray();
 
-        self.clusterConfig = ko.observable();
-
-        self.apiHelper.getClusterConfig().done(function (data) {
-          if (data.status == 0) {
-            self.clusterConfig(data);
-          } else {
-            $(document).trigger("error", data.message);
-          }
-        });
-
-        self.mainQuickCreateAction = ko.pureComputed(function() {
-          if (self.clusterConfig()) {
-            var topApp = self.clusterConfig()['main_button_action'];
-            return {
-              displayName: topApp.type == 'hive' || topApp.type == 'impala' ? '${ _("Query") }' : topApp.displayName,
+        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+          if (clusterConfig && clusterConfig['main_button_action']) {
+            var topApp = clusterConfig['main_button_action'];
+            self.mainQuickCreateAction({
+              displayName: topApp.type === 'hive' || topApp.type === 'impala' ? '${ _("Query") }' : topApp.displayName,
               icon: topApp.type,
               tooltip: topApp.tooltip,
-              click: function(){
+              click: function () {
                 page(topApp.page);
               }
-            };
+            });
           } else {
-            return null;
+            self.mainQuickCreateAction(undefined);
           }
-        });
 
+          if (clusterConfig && clusterConfig['button_actions']) {
+            var apps = [];
+            var buttonActions = clusterConfig['button_actions'];
+              buttonActions.forEach(function(app) {
+              var interpreters = [];
+              $.each(app['interpreters'], function(index, interpreter) {
+                interpreters.push({
+                  displayName: interpreter.displayName,
+                  % if SHOW_NOTEBOOKS.get():
+                    dividerAbove: app.name === 'editor' && index === 1,
+                  % endif
+                  icon: interpreter.type,
+                  click: function () {
+                    page(interpreter.page);
+                  }
+                });
+              });
 
-        self.quickCreateActions = ko.pureComputed(function() {
-          var apps = [];
-          if (self.clusterConfig()) {
-          $.each(self.clusterConfig()['button_actions'], function(index, app) {
-            var interpreters = [];
-            $.each(app['interpreters'], function(index, interpreter) {
-              interpreters.push({
-                displayName: interpreter.displayName,
-                % if SHOW_NOTEBOOKS.get():
-                dividerAbove: app.name == 'editor' && index == 1,
-                % endif
-                icon: interpreter.type,
+              % if user.is_superuser:
+                if (app.name === 'editor') {
+                  interpreters.push({
+                    displayName: '${ _('Add more...') }',
+                    dividerAbove: true,
+                    click: function () {
+                      window.open('http://gethue.com/sql-editor/', '_blank');
+                    }
+                  });
+                }
+              % endif
+
+              apps.push({
+                displayName: app.displayName,
+                icon: app.name,
+                isCategory: interpreters.length > 0,
+                children: interpreters,
                 click: function () {
-                  page(interpreter.page);
+                  page(app.page);
                 }
               });
             });
 
-            % if user.is_superuser:
-            if (app.name == 'editor') {
-              interpreters.push({
-                displayName: '${ _('Add more...') }',
-                dividerAbove: true,
-                click: function () {
-                  window.open('http://gethue.com/sql-editor/', '_blank');
-                }
-             });
-            }
-            % endif
-
-            apps.push({
-              displayName: app.displayName,
-              icon: app.name,
-              isCategory: interpreters.length > 0,
-              children: interpreters,
-              click: function () {
-                page(app.page);
-              }
-            });
-          });
+            self.quickCreateActions(apps);
+          } else {
+            self.quickCreateActions([]);
           }
-
-          return apps;
         });
-
-
 
         self.searchAutocompleteSource = function (request, callback) {
           // TODO: Extract complete contents to common module (shared with nav search autocomplete)
@@ -1123,10 +1116,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         };
       }
 
-      TopNavViewModel.prototype.performSearch = function () {
-      };
+      TopNavViewModel.prototype.performSearch = function () { };
 
-      var topNavViewModel = new TopNavViewModel();
+      var topNavViewModel = new TopNavViewModel(onePageViewModel);
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
 
       return topNavViewModel;
@@ -1134,9 +1126,13 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 
     (function (onePageViewModel, topNavViewModel) {
-      function SideBarViewModel () {
 
-        self.items = ko.pureComputed(function() {
+      function SideBarViewModel (onePageViewModel, topNavViewModel) {
+        var self = this;
+
+        self.items = ko.observableArray();
+
+        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           var items = [];
 
           items.push({
@@ -1146,80 +1142,78 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
           });
 
-
-          if (! topNavViewModel.clusterConfig()) {
-            return items;
-          }
-
-          var clusterConfig = topNavViewModel.clusterConfig()['app_config'];
-
-          var appsItems = [];
-          $.each(['editor', 'dashboard', 'scheduler'], function(index, appName) {
-            if (clusterConfig[appName]) {
-              appsItems.push({
-                displayName: clusterConfig[appName]['displayName'],
-                click: function () {
-                  page(clusterConfig[appName]['page']);
-                }
-              });
-            };
-          });
-          if (appsItems.length > 0) {
-            items.push({
-              isCategory: true,
-              displayName: '${ _('Apps') }',
-              children: appsItems
-            })
-          }
-
-          var browserItems = [];
-          if (clusterConfig['browser']) {
-            $.each(clusterConfig['browser']['interpreters'], function(index, browser) {
-              browserItems.push({
-                displayName: browser['displayName'],
-                click: function () {
-                  page(browser['page'])
-                }
-              });
+          if (clusterConfig && clusterConfig['app_config']) {
+            var appsItems = [];
+            var appConfig = clusterConfig['app_config'];
+            ['editor', 'dashboard', 'scheduler'].forEach(function(appName) {
+              if (appConfig[appName]) {
+                appsItems.push({
+                  displayName: appConfig[appName]['displayName'],
+                  click: function () {
+                    page(appConfig[appName]['page']);
+                  }
+                });
+              }
             });
-          }
-          if (browserItems.length > 0) {
-            items.push({
-              isCategory: true,
-              displayName: '${ _('Browsers') }',
-              children: browserItems
-            })
-          }
+            if (appsItems.length > 0) {
+              items.push({
+                isCategory: true,
+                displayName: '${ _('Apps') }',
+                children: appsItems
+              })
+            }
 
-          var sdkItems = [];
-          if (clusterConfig['sdkapps']) {
-            $.each(clusterConfig['sdkapps']['interpreters'], function(index, browser) {
-              sdkItems.push({
-                displayName: browser['displayName'],
-                click: function () {
-                  page(browser['page'])
-                }
+            var browserItems = [];
+            if (appConfig['browser'] && appConfig['browser']['interpreters']) {
+              appConfig['browser']['interpreters'].forEach(function(browser) {
+                browserItems.push({
+                  displayName: browser['displayName'],
+                  click: function () {
+                    page(browser['page'])
+                  }
+                });
               });
-            });
-          }
-          if (sdkItems.length > 0) {
-            items.push({
-              isCategory: true,
-              displayName: clusterConfig['sdkapps']['displayName'],
-              children: sdkItems
-            })
+            }
+            if (browserItems.length > 0) {
+              items.push({
+                isCategory: true,
+                displayName: '${ _('Browsers') }',
+                children: browserItems
+              })
+            }
+
+            var sdkItems = [];
+            if (appConfig['sdkapps'] && appConfig['sdkapps']['interpreters']) {
+              appConfig['sdkapps']['interpreters'].forEach(function(browser) {
+                sdkItems.push({
+                  displayName: browser['displayName'],
+                  click: function () {
+                    page(browser['page'])
+                  }
+                });
+              });
+            }
+            if (sdkItems.length > 0) {
+              items.push({
+                isCategory: true,
+                displayName: appConfig['sdkapps']['displayName'],
+                children: sdkItems
+              })
+            }
           }
 
-          return items;
+          self.items(items);
         });
 
         self.leftNavVisible = topNavViewModel.leftNavVisible;
         self.onePageViewModel = onePageViewModel;
       }
 
-      var sidebarViewModel = new SideBarViewModel();
+      var sidebarViewModel = new SideBarViewModel(onePageViewModel, topNavViewModel);
       ko.applyBindings(sidebarViewModel, $('.sidebar')[0]);
     })(onePageViewModel, topNavViewModel);
+
+    huePubSub.publish('cluster.config.get.config');
 
     window.hueDebug = {
       viewModel: function (element) {
