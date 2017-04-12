@@ -84,10 +84,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ selectInterface('workflows'); }">${ _('Workflows') }</a></li>
             <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ selectInterface('schedules'); }">${ _('Schedules') }</a></li>
             <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ selectInterface('bundles'); }">${ _('Bundles') }</a></li>
-            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ }">${ _('SLAs') }</a></li>
+            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ selectInterface('slas'); }">${ _('SLAs') }</a></li>
             </ul>
           % if not hiveserver2_impersonation_enabled:
-            <div class="pull-right alert alert-warning" style="margin-top: 4px">${ _("Hive jobs are running as the 'hive' user") }</div>
+            <div class="pull-right label label-warning" style="margin-top: 16px">${ _("Hive jobs are running as the 'hive' user") }</div>
           % endif
         </div>
       </div>
@@ -125,7 +125,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div class="content-panel-inner">
 
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
-            <!-- ko if: interface() !== 'slas' -->
+            <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
             <div class="btn-group">
@@ -213,10 +213,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: ! $root.job()"></div>
           <!-- /ko -->
 
+          % if not is_mini:
           <!-- ko if: interface() === 'slas' -->
-            <!-- ko hueSpinner: { spin: !slasLoaded(), center: true, size: 'xlarge' } --><!-- /ko -->
-            <div id="slas"></div>
+            <!-- ko hueSpinner: { spin: slasLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
           <!-- /ko -->
+          <div id="slas" data-bind="visible: interface() === 'slas'"></div>
+
+          <!-- ko if: interface() === 'oozie-info' -->
+            <!-- ko hueSpinner: { spin: oozieInfoLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
+          <!-- /ko -->
+          <div id="oozieInfo" data-bind="visible: interface() === 'oozie-info'"></div>
+          %endif
         </div>
       </div>
 
@@ -269,6 +276,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <!-- /ko -->
       <!-- /ko -->
       </li>
+      % if not is_mini:
+      <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf($parent.interface()) > -1 -->
+      <li class="pull-right">
+        <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
+      </li>
+      <!-- /ko -->
+      % endif
     </ul>
   </h3>
 </script>
@@ -965,7 +979,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             vm.interface(interface);
             vm.job(new Job(vm, data.app));
 
-            hueUtils.changeURL('#!' + vm.job().id());
+            hueUtils.changeURL('#!id=' + vm.job().id());
             var crumbs = [];
 
             if (/^attempt_/.test(vm.job().id())) {
@@ -1337,9 +1351,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
 
-      self.slasLoaded = ko.observable(false);
+      self.slasLoadedOnce = false;
+      self.slasLoading = ko.observable(true);
       self.loadSlaPage = function(){
-        if (!self.slasLoaded()) {
+        if (!self.slasLoadedOnce) {
           $.ajax({
             url: '/oozie/list_oozie_sla/?is_embeddable=true',
             beforeSend: function (xhr) {
@@ -1347,8 +1362,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             },
             dataType: 'html',
             success: function (response) {
-              self.slasLoaded(true);
+              self.slasLoading(false);
               $('#slas').html(response);
+            }
+          });
+        }
+      }
+
+      self.oozieInfoLoadedOnce = false;
+      self.oozieInfoLoading = ko.observable(true);
+      self.loadOozieInfoPage = function(){
+        if (!self.oozieInfoLoadedOnce) {
+          self.oozieInfoLoadedOnce = true;
+          $.ajax({
+            url: '/oozie/list_oozie_info/?is_embeddable=true',
+            beforeSend: function (xhr) {
+              xhr.setRequestHeader('X-Requested-With', 'Hue');
+            },
+            dataType: 'html',
+            success: function (response) {
+              self.oozieInfoLoading(false);
+              $('#oozieInfo').html(response);
             }
           });
         }
@@ -1359,12 +1393,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.interface(interface);
         self.resetBreadcrumbs();
         hueUtils.changeURL('#!' + interface);
+        self.job(null);
         if (interface === 'slas'){
+          % if not is_mini:
           self.loadSlaPage();
+          % endif
+        }
+        else if (interface === 'oozie-info') {
+          % if not is_mini:
+          self.loadOozieInfoPage();
+          % endif
         }
         else {
           self.jobs.fetchJobs();
-          self.job(null);
         }
       };
 
@@ -1373,10 +1414,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var clock;
       self.job.subscribe(function(val) {
         clearInterval(clock);
-        if (val) {
-          clock = setInterval(val.updateJob, 5000, 'jobbrowser');
-        } else {
-          clock = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
+        if (self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
+          if (val) {
+            clock = setInterval(val.updateJob, 5000, 'jobbrowser');
+          } else {
+            clock = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
+          }
         }
       });
 
@@ -1414,24 +1457,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % endif
 
       var loadHash = function () {
-        if (window.location.pathname.indexOf('jobbrowser') > -1) {
+        if (window.location.pathname.indexOf('jobbrowser') > -1 || $('#jobbrowserMiniComponents').is(':visible')) {
           var h = window.location.hash;
           if (h.indexOf('#!') === 0) {
             h = h.substr(2);
-          }
-
-          switch (h) {
-            case '':
-              break;
-            case 'slas':
-            case 'jobs':
-            case 'workflows':
-            case 'schedules':
-            case 'bundles':
-              viewModel.selectInterface(h);
-              break;
-            default:
-              new Job(viewModel, {id: h}).fetchJob();
+            switch (h) {
+              case '':
+                break;
+              case 'slas':
+              case 'oozie-info':
+              case 'jobs':
+              case 'workflows':
+              case 'schedules':
+              case 'bundles':
+                viewModel.selectInterface(h);
+                break;
+              default:
+                if (h.indexOf('id=') === 0){
+                  new Job(viewModel, {id: h.substr(3)}).fetchJob();
+                }
+            }
           }
         }
       };

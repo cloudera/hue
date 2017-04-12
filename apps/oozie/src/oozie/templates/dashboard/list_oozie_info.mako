@@ -24,8 +24,8 @@
 
 %if not is_embeddable:
 ${ commonheader(_("Oozie Information"), "oozie", user, request) | n,unicode }
-%endif
 ${ layout.menubar(section='oozie', dashboard=True) }
+%endif
 
 
 <div class="container-fluid">
@@ -206,10 +206,11 @@ ${ layout.menubar(section='oozie', dashboard=True) }
       ${ utils.display_conf(configuration, "configurationTable") }
     </div>
 
-
+    %if not is_embeddable:
     <div style="margin-bottom: 16px; margin-top: 10px">
       <a href="${ url('oozie:list_oozie_bundles') }" class="btn">${ _('Back') }</a>
     </div>
+    %endif
 
     </div>
     </div>
