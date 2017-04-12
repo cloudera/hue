@@ -59,13 +59,27 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
 </style>
 
 
-<div class="search-bar" style="height: 30px">
-  <div class="pull-right">
-    <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:admin_collections') + "')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-tags"></i> ${ _('Dashboards') }
-    </a>
+<div class="navbar hue-title-bar nokids">
+  <div class="navbar-inner">
+    <div class="container-fluid">
+      <div class="pull-right">
+        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:admin_collections') + "')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+          <i class="fa fa-tags"></i> ${ _('Dashboards') }
+        </a>
+      </div>
+
+      <div class="nav-collapse">
+        <ul class="nav">
+          <li class="app-header">
+            <a href="#manage">
+              <i class="fa fa-database app-icon"></i>
+              ${_('Indexes')}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
   </div>
-  <h4><a href="#manage"><i class="fa fa-database"></i> ${_('Indexes')}</a></h4>
 </div>
 
 <div class="container-fluid">
