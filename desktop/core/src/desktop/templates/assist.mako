@@ -1721,47 +1721,55 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assistant-panel-template">
-    <!-- ko if: statementCount() > 1 -->
-    ${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span><br/>
-    <!-- /ko -->
-    ${ _('Tables') }
-    <br/>
-    <ul data-bind="foreach: activeTables">
-      <li>
-        ## Click name to select
-        <span data-bind="text: name"></span>
-        <a href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
-          <i class="fa fa-info"></i>
+    <div class="assist-inner-panel">
+      <!-- ko if: statementCount() > 1 -->
+      <div class="assist-inner-header">
+      ${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span>
+      </div>
+      <br/>
+      <!-- /ko -->
+      <div class="assist-inner-header">
+      ${ _('Tables') }
+      </div>
+      <ul data-bind="foreach: activeTables">
+        <li>
+          ## Click name to select
+          <span data-bind="text: name"></span>
+          <div class="pull-right margin-right-10">
+            <a class="inactive-action" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
+              <i class="fa fa-info"></i>
+            </a>
+            <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
+          </div>
+        </li>
+      </ul>
+
+      <form class="form-horizontal">
+        <fieldset>
+          <div data-bind="visible: activeRisks().length > 0">${ _('Suggestions') }</div>
+          <ul data-bind="foreach: activeRisks">
+            <li>
+              <span data-bind="text: risk"></span>
+              <span data-bind="text: riskAnalysis"></span>
+              <span data-bind="text: riskRecommendation"></span>
+            </li>
+          </ul>
+        </fieldset>
+      </form>
+
+      <!-- ko if: HAS_OPTIMIZER -->
+        <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+          <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
         </a>
-        <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
-      </li>
-    </ul>
-
-    <form class="form-horizontal">
-      <fieldset>
-        <div data-bind="visible: activeRisks().length > 0">${ _('Suggestions') }</div>
-        <ul data-bind="foreach: activeRisks">
-          <li>
-            <span data-bind="text: risk"></span>
-            <span data-bind="text: riskAnalysis"></span>
-            <span data-bind="text: riskRecommendation"></span>
-          </li>
-        </ul>
-      </fieldset>
-    </form>
-
-    <!-- ko if: HAS_OPTIMIZER -->
-      <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-        <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
-      </a>
-      <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
-        <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload DDL')}
-      </a>
-      </br>
-      <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-        <i class="fa fa-fw fa-gears"></i> ${_('Analyse Query')}
-      </a>
-    <!-- /ko -->
+        <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
+          <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload DDL')}
+        </a>
+        </br>
+        <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+          <i class="fa fa-fw fa-gears"></i> ${_('Analyse Query')}
+        </a>
+      <!-- /ko -->
+    </div>
   </script>
 
   <script type="text/javascript">
