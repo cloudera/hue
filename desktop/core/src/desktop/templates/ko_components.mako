@@ -380,7 +380,11 @@ from desktop.views import _ko
     <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ jobsPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ page('/jobbrowser/'); jobsPanelVisible(false); }"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
-      <span style="font-size: 15px; font-weight: 300">${_('Jobs')} | ${_('Workflows')} | ${_('Schedules')}</span>
+      <ul class="inline">
+        <li><a href="#!jobs">${_('Jobs')}</a></li>
+        <li><a href="#!workflows">${_('Workflows')}</a></li>
+        <li><a href="#!schedules">${_('Schedules')}</a></li>
+      </ul>
       <div id="mini_jobbrowser"></div>
     </div>
   </script>
