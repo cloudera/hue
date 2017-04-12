@@ -261,7 +261,7 @@
     <!-- ko case: 'hive' --><svg class="hi"><use xlink:href="#hi-hive"></use></svg><!-- /ko -->
     <!-- ko case: 'impala' --><svg class="hi"><use xlink:href="#hi-impala"></use></svg><!-- /ko -->
     <!-- ko case: 'jar' --><svg class="hi"><use xlink:href="#hi-spark"></use></svg><!-- /ko -->
-    <!-- ko case: 'java' --><i class="fa fa-file-code-o app-icon"></i><!-- /ko -->
+    <!-- ko case: 'java' --><i class="fa fa-fw fa-file-code-o"></i><!-- /ko -->
     <!-- ko case: 'job-designer' --><svg class="hi"><use xlink:href="#hi-job-designer"></use></svg><!-- /ko -->
     <!-- ko case: 'mapreduce' --><i class="fa fa-fw fa-file-archive-o"></i><!-- /ko -->
     <!-- ko case: 'markdown' --><svg class="hi"><use xlink:href="#hi-markdown"></use></svg><!-- /ko -->
