@@ -54,7 +54,7 @@
         <div class="layout-box" style="width: 100px;"></div>
       </div>
     </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
+    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>

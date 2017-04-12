@@ -14,12 +14,12 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-function magicLayout(vm) {
-  loadLayout(vm, vm.initial.layout);
-  $(document).trigger("magicLayout");
+function magicSearchLayout(vm) {
+  loadSearchLayout(vm, vm.initial.layout);
+  $(document).trigger("magicSearchLayout");
 }
 
-function loadLayout(viewModel, json_layout) {
+function loadSearchLayout(viewModel, json_layout) {
   var _columns = [];
 
   $(json_layout).each(function (cnt, json_col) {
@@ -1402,7 +1402,7 @@ var NewTemplate = function (vm, initial) {
     }
 
     if (initial.autoLoad) {
-      magicLayout(vm);
+      magicSearchLayout(vm);
     }
   };
 
@@ -1554,7 +1554,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
 
     self.previewColumns = ko.observable("");
     self.columns = ko.observable([]);
-    loadLayout(self, self.collectionJson.layout);
+    loadSearchLayout(self, self.collectionJson.layout);
 
     self.additionalMustache = null;
 
@@ -2393,7 +2393,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.fieldAnalysesName("");
     self.previewColumns("");
     self.columns([]);
-    loadLayout(self, self.collectionJson.layout);
+    loadSearchLayout(self, self.collectionJson.layout);
     self.isEditing(true);
     self.isRetrievingResults(false);
     self.hasRetrievedResults(true);
