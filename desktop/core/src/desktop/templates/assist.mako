@@ -1411,147 +1411,161 @@ from notebook.conf import get_ordered_interpreters
 
         self.tabsEnabled = '${ USE_NEW_SIDE_PANELS.get() }' === 'True';
 
-        self.availablePanels = ko.pureComputed(function() {
-          var panels = [];
-          var appConfig = hueDebug.viewModel($('.top-nav')[0]).clusterConfig() && hueDebug.viewModel($('.top-nav')[0]).clusterConfig()['app_config']; // TODO clean-up
-
-          if (! appConfig) { // TODO handle no panel and return []
-            return [new AssistInnerPanel({
-                panelData: new AssistDbPanel($.extend({
-                  apiHelper: self.apiHelper,
-                  i18n: i18n
-                }, params.sql)),
-                apiHelper: self.apiHelper,
-                name: '${ _("SQL") }',
-                type: 'sql',
-                icon: 'fa-database',
-                minHeight: 75
-              })];
-          }
-
-          if (appConfig['editor']) {
-            panels.push(
-              new AssistInnerPanel({
-                panelData: new AssistDbPanel($.extend({
-                  apiHelper: self.apiHelper,
-                  i18n: i18n
-                }, params.sql)),
-                apiHelper: self.apiHelper,
-                name: '${ _("SQL") }',
-                type: 'sql',
-                icon: 'fa-database',
-                minHeight: 75
-              })
-            );
-          }
-
-          if (self.tabsEnabled) {
-
-            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hdfs') != -1) {
-              panels.push(new AssistInnerPanel({
-                panelData: new AssistHdfsPanel({
-                  apiHelper: self.apiHelper
-                }),
-                apiHelper: self.apiHelper,
-                name: '${ _("HDFS") }',
-                type: 'hdfs',
-                icon: 'fa-folder-o',
-                minHeight: 50
-              }));
-            }
-
-            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('s3') != -1) {
-              panels.push(new AssistInnerPanel({
-                panelData: new AssistS3Panel({
-                  apiHelper: self.apiHelper
-                }),
-                apiHelper: self.apiHelper,
-                name: '${ _("S3") }',
-                type: 's3',
-                icon: 'fa-cubes',
-                minHeight: 50
-              }));
-            }
-
-            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
-              panels.push(new AssistInnerPanel({
-                panelData: new AssistCollectionsPanel({
-                  apiHelper: self.apiHelper
-                }),
-                apiHelper: self.apiHelper,
-                name: '${ _("Collections") }',
-                type: 'collections',
-                icon: 'fa-search-plus',
-                minHeight: 50,
-                showNavSearch: false
-              }));
-            }
-
-            if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
-              panels.push(new AssistInnerPanel({
-                panelData: new AssistHBasePanel({
-                  apiHelper: self.apiHelper
-                }),
-                apiHelper: self.apiHelper,
-                name: '${ _("HBase") }',
-                type: 'hbase',
-                icon: 'fa-th-large',
-                minHeight: 50,
-                showNavSearch: false
-              }));
-            }
-
-            panels.push(new AssistInnerPanel({
-              panelData: new AssistDocumentsPanel({
-                user: params.user,
-                apiHelper: self.apiHelper,
-                i18n: i18n
-              }),
-              apiHelper: self.apiHelper,
-              name: '${ _("Documents") }',
-              type: 'documents',
-              icon: 'fa-files-o',
-              minHeight: 50,
-              rightAlignIcon: true,
-              visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
-            }));
-
-            if (${ len(VCS.keys()) } > 0) {
-              panels.push(new AssistInnerPanel({
-                panelData: new AssistGitPanel({
-                  apiHelper: self.apiHelper
-                }),
-                apiHelper: self.apiHelper,
-                name: '${ _("Git") }',
-                type: 'git',
-                icon: 'fa-github',
-                minHeight: 50,
-                showNavSearch: false,
-                rightAlignIcon: true
-              }));
-            }
-
-          }
-
-          return panels;
-        });
+        self.availablePanels = ko.observableArray();
+        self.visiblePanel = ko.observable();
 
         // TODO handle panel reloading
-        var lastOpenPanelType = self.apiHelper.getFromTotalStorage('assist', 'last.open.panel', self.availablePanels()[0].type);
-
-        var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === lastOpenPanelType });
-        var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
-        if (lastFoundPanel.length === 1) {
-          dbPanel[0].panelData.init(); // always forces the db panel to load
-        }
-        self.visiblePanel = ko.observable(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]);
-
-        self.visiblePanel().panelData.init();
+        self.lastOpenPanelType = ko.observable();
+        self.apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
 
         self.visiblePanel.subscribe(function(newValue) {
-          self.apiHelper.setInTotalStorage('assist', 'last.open.panel', newValue.type);
           newValue.panelData.init();
         });
+
+        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+          if (clusterConfig && clusterConfig['app_config']) {
+            var panels = [];
+            var appConfig = clusterConfig['app_config'];
+
+            if (appConfig['editor']) {
+              panels.push(
+                      new AssistInnerPanel({
+                        panelData: new AssistDbPanel($.extend({
+                          apiHelper: self.apiHelper,
+                          i18n: i18n
+                        }, params.sql)),
+                        apiHelper: self.apiHelper,
+                        name: '${ _("SQL") }',
+                        type: 'sql',
+                        icon: 'fa-database',
+                        minHeight: 75
+                      })
+              );
+            }
+
+            if (self.tabsEnabled) {
+
+              if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hdfs') != -1) {
+                panels.push(new AssistInnerPanel({
+                  panelData: new AssistHdfsPanel({
+                    apiHelper: self.apiHelper
+                  }),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("HDFS") }',
+                  type: 'hdfs',
+                  icon: 'fa-folder-o',
+                  minHeight: 50
+                }));
+              }
+
+              if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('s3') != -1) {
+                panels.push(new AssistInnerPanel({
+                  panelData: new AssistS3Panel({
+                    apiHelper: self.apiHelper
+                  }),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("S3") }',
+                  type: 's3',
+                  icon: 'fa-cubes',
+                  minHeight: 50
+                }));
+              }
+
+              if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('indexes') != -1) {
+                panels.push(new AssistInnerPanel({
+                  panelData: new AssistCollectionsPanel({
+                    apiHelper: self.apiHelper
+                  }),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("Collections") }',
+                  type: 'collections',
+                  icon: 'fa-search-plus',
+                  minHeight: 50,
+                  showNavSearch: false
+                }));
+              }
+
+              if (appConfig['browser'] && appConfig['browser']['interpreter_names'].indexOf('hbase') != -1) {
+                panels.push(new AssistInnerPanel({
+                  panelData: new AssistHBasePanel({
+                    apiHelper: self.apiHelper
+                  }),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("HBase") }',
+                  type: 'hbase',
+                  icon: 'fa-th-large',
+                  minHeight: 50,
+                  showNavSearch: false
+                }));
+              }
+
+              panels.push(new AssistInnerPanel({
+                panelData: new AssistDocumentsPanel({
+                  user: params.user,
+                  apiHelper: self.apiHelper,
+                  i18n: i18n
+                }),
+                apiHelper: self.apiHelper,
+                name: '${ _("Documents") }',
+                type: 'documents',
+                icon: 'fa-files-o',
+                minHeight: 50,
+                rightAlignIcon: true,
+                visible: params.visibleAssistPanels && params.visibleAssistPanels.indexOf('documents') !== -1
+              }));
+
+              var vcsKeysLength = ${ len(VCS.keys()) };
+              if (vcsKeysLength > 0) {
+                panels.push(new AssistInnerPanel({
+                  panelData: new AssistGitPanel({
+                    apiHelper: self.apiHelper
+                  }),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("Git") }',
+                  type: 'git',
+                  icon: 'fa-github',
+                  minHeight: 50,
+                  showNavSearch: false,
+                  rightAlignIcon: true
+                }));
+              }
+
+            }
+
+            self.availablePanels(panels);
+          } else {
+            self.availablePanels([new AssistInnerPanel({
+              panelData: new AssistDbPanel($.extend({
+                apiHelper: self.apiHelper,
+                i18n: i18n
+              }, params.sql)),
+              apiHelper: self.apiHelper,
+              name: '${ _("SQL") }',
+              type: 'sql',
+              icon: 'fa-database',
+              minHeight: 75
+            })]);
+          }
+
+          if (!self.lastOpenPanelType()) {
+            self.lastOpenPanelType(self.availablePanels()[0].type);
+          }
+
+          var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === self.lastOpenPanelType() });
+          var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
+          if (lastFoundPanel.length === 1) {
+            dbPanel[0].panelData.init(); // always forces the db panel to load
+          }
+
+          self.visiblePanel(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]);
+        });
+
+        window.setTimeout(function () {
+          // Main initialization trigger in hue.mako, this is for Hue 3
+          if (self.availablePanels().length === 0) {
+            huePubSub.publish('cluster.config.get.config');
+          }
+        }, 0);
 
         self.navigatorSearch = new NavigatorSearch(self, params.sql.navigationSettings);
       }
