@@ -1146,11 +1146,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
           });
 
-          var clusterConfig = topNavViewModel.clusterConfig();
 
-          if (! clusterConfig) {
+          if (! topNavViewModel.clusterConfig()) {
             return items;
           }
+
+          var clusterConfig = topNavViewModel.clusterConfig()['app_config'];
 
           var appsItems = [];
           $.each(['editor', 'dashboard', 'scheduler'], function(index, appName) {

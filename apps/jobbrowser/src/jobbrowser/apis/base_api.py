@@ -30,7 +30,6 @@ def get_api(user, interface):
   from jobbrowser.apis.bundle_api import BundleApi
   from jobbrowser.apis.job_api import JobApi
   from jobbrowser.apis.schedule_api import ScheduleApi
-  from jobbrowser.apis.slas_api import SlaApi
   from jobbrowser.apis.workflow_api import WorkflowApi
 
   if interface == 'jobs':
@@ -41,8 +40,6 @@ def get_api(user, interface):
     return ScheduleApi(user)
   elif interface == 'bundles':
     return BundleApi(user)
-  elif interface == 'slas':
-    return SlaApi(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
