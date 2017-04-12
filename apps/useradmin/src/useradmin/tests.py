@@ -662,6 +662,18 @@ class TestUserAdmin(BaseUserAdminTests):
       assert_true(response.status_code == 302 and "login" in response["location"],
                   "Inactivated user gets redirected to login page")
 
+      # Create a new user with unicode characters
+      response = c.post('/useradmin/users/new', dict(username='christian_häusler',
+                                                     password1="test",
+                                                     password2="test",
+                                                     is_active="True"))
+      response = c.get('/useradmin/')
+      assert_true('christian_häusler' in response.content)
+      assert_true(len(response.context["users"]) > 1)
+
+      # Validate profile is created.
+      assert_true(UserProfile.objects.filter(user__username='christian_häusler').exists())
+
       # Delete that regular user
       funny_profile = get_profile(test_user)
       response = c_su.post('/useradmin/users/delete', {u'user_ids': [funny_user.id]})
