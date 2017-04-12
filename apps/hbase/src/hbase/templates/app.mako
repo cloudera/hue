@@ -2079,10 +2079,10 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 
 
     var Router = {
-      go: function (page) {
-        if (!Views.render(page))
+      go: function (hBasePage) {
+        if (!Views.render(hBasePage))
           return history.back();
-        return page;
+        return hBasePage;
       },
       setTable: function (cluster, table) {
         Router.setCluster(cluster);
@@ -2106,21 +2106,21 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
       setCluster: function (cluster) {
         app.cluster(cluster);
       }
-    }
+    };
 
     var Views = {
       render: function (view) {
-        page = $('.hbase-page#hbase-page-' + view);
-        if (!page)
+        var hBasePage = $('.hbase-page#hbase-page-' + view);
+        if (!hBasePage)
           return false;
         $('.hbase-page.active').removeClass('active');
-        page.addClass('active');
-        return page;
+        hBasePage.addClass('active');
+        return hBasePage;
       },
       displayError: function (error) {
         console.log(error);
       }
-    }
+    };
 
 
     window.convertTimestamp = function (timestamp) {
