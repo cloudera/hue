@@ -112,10 +112,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
             </div>
             <div class="doc-col" data-bind="css: { 'doc-col-no-desc' : !hasDescription }">
               <!-- ko if: typeof click !== 'undefined' -->
-              <a class="pointer" data-bind="click: click, html: hue_name" target="_blank" ></a>
+                <a class="pointer" data-bind="click: click, html: hue_name" target="_blank"></a>
               <!-- /ko -->
               <!-- ko if: typeof click === 'undefined' && typeof link !== 'undefined'-->
-              <a class="pointer" data-bind="attr: { 'href': link }, text: originalName" target="_blank" ></a>
+                <a class="pointer" data-bind="hueLink: link, text: originalName, attr: { target: IS_HUE_4 ? '_self' : '_blank' }"></a>
               <!-- /ko -->
               <div class="doc-desc" data-bind="html: hue_description"></div>
             </div>
