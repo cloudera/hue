@@ -106,7 +106,7 @@ ${ hueIcons.symbols() }
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
-        <a class="brand" data-bind="click: function () { page('/home') }" href="javascript: void(0);" title="${_('Documents')}">
+        <a class="brand" data-bind="hueLink: '/home'" href="javascript: void(0);" title="${_('Documents')}">
           <svg style="height: 24px; width: 120px;"><use xlink:href="#hi-logo"></use></svg>
         </a>
 
@@ -114,7 +114,7 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none;">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback hue-main-create-btn" href="javascript: void(0);" data-bind="click: click, attr: {title: tooltip}">
+          <button class="btn btn-primary disable-feedback hue-main-create-btn" href="javascript: void(0);" data-bind="hueLink: url, attr: {title: tooltip}">
             <span data-bind="text: displayName"></span>
           </button>
           <!-- /ko -->
@@ -129,7 +129,7 @@ ${ hueIcons.symbols() }
           <!-- ko if: item.dividerAbove -->
           <li class="divider"></li>
           <!-- /ko -->
-          <li data-bind="css: { 'dropdown-submenu': item.isCategory }"><a href="javascript: void(0);" data-bind="click: item.click">
+          <li data-bind="css: { 'dropdown-submenu': item.isCategory }"><a href="javascript: void(0);" data-bind="hueLink: item.url">
             <!-- ko if: item.icon -->
             <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
             <!-- /ko -->
@@ -174,10 +174,10 @@ ${ hueIcons.symbols() }
           <button class="btn btn-flat" data-toggle="dropdown"><i class="fa fa-user"></i> ${ user.username }</button>
           <ul class="dropdown-menu">
             % if view_profile:
-            <li><a href="javascript:void(0)" data-bind="click: function(){ page('/useradmin/users/') }" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
+            <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
             % if user.is_superuser:
-            <li data-bind="click: function () { page('/useradmin/users/') }"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
+            <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
             % endif
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
             % if user.is_superuser:
@@ -200,7 +200,7 @@ ${ hueIcons.symbols() }
   <div class="content-wrapper">
 
     <script type="text/html" id="tmpl-sidebar-link">
-      <a role="button" class="sidebar-item" data-bind="click: item.click, attr: { title: item.displayName }">
+      <a role="button" class="sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
         <!-- ko if: item.icon --><i class="fa" data-bind="css: item.icon"></i><!-- /ko -->
         <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
@@ -984,9 +984,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               displayName: topApp.type === 'hive' || topApp.type === 'impala' ? '${ _("Query") }' : topApp.displayName,
               icon: topApp.type,
               tooltip: topApp.tooltip,
-              click: function () {
-                page(topApp.page);
-              }
+              url: topApp.page
             });
           } else {
             self.mainQuickCreateAction(undefined);
@@ -1004,9 +1002,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                     dividerAbove: app.name === 'editor' && index === 1,
                   % endif
                   icon: interpreter.type,
-                  click: function () {
-                    page(interpreter.page);
-                  }
+                  url: interpreter.page
                 });
               });
 
@@ -1027,9 +1023,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 icon: app.name,
                 isCategory: interpreters.length > 0,
                 children: interpreters,
-                click: function () {
-                  page(app.page);
-                }
+                url: app.page
               });
             });
 
@@ -1137,9 +1131,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
           items.push({
             displayName: '${ _('Documents') }',
-            click: function () {
-              page('/home')
-            }
+            url: '/home'
           });
 
           if (clusterConfig && clusterConfig['app_config']) {
@@ -1149,9 +1141,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               if (appConfig[appName]) {
                 appsItems.push({
                   displayName: appConfig[appName]['displayName'],
-                  click: function () {
-                    page(appConfig[appName]['page']);
-                  }
+                  url: appConfig[appName]['page']
                 });
               }
             });
@@ -1168,9 +1158,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               appConfig['browser']['interpreters'].forEach(function(browser) {
                 browserItems.push({
                   displayName: browser['displayName'],
-                  click: function () {
-                    page(browser['page'])
-                  }
+                  url: browser['page']
                 });
               });
             }
@@ -1187,9 +1175,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               appConfig['sdkapps']['interpreters'].forEach(function(browser) {
                 sdkItems.push({
                   displayName: browser['displayName'],
-                  click: function () {
-                    page(browser['page'])
-                  }
+                  url: browser['page']
                 });
               });
             }

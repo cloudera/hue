@@ -83,8 +83,13 @@
     init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
       if (IS_HUE_4) {
         ko.bindingHandlers.click.init(element, function() {
-          return function () {
-            huePubSub.publish('open.link', ko.unwrap(valueAccessor()));
+          return function (data, event) {
+            var url = ko.unwrap(valueAccessor());
+            if (event.ctrlKey || event.metaKey) {
+              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), '_blank');
+            } else {
+              huePubSub.publish('open.link', url);
+            }
           }
         }, allBindings, viewModel, bindingContext);
         $(element).attr('href', 'javascript: void(0);');
