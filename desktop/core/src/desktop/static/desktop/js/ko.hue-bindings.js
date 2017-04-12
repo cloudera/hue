@@ -3271,6 +3271,16 @@
       var apiHelper = snippet.getApiHelper();
       var aceOptions = options.aceOptions || {};
 
+      var disposeFunctions = [];
+
+      var dispose = function () {
+        disposeFunctions.forEach(function (dispose) {
+          dispose();
+        })
+      };
+
+      ko.utils.domNodeDisposal.addDisposeCallback(element, dispose);
+
       $el.text(snippet.statement_raw());
 
       window.setTimeout(function () {
@@ -3316,17 +3326,23 @@
         }
       }
 
-
-      snippet.errors.subscribe(function (newErrors) {
+      var errorsSub = snippet.errors.subscribe(function (newErrors) {
         processErrorsAndWarnings('error', newErrors);
       });
 
-      snippet.aceWarnings.subscribe(function (newWarnings) {
+
+      var aceWarningsSub = snippet.aceWarnings.subscribe(function (newWarnings) {
         processErrorsAndWarnings('warning', newWarnings);
       });
 
-      snippet.aceErrors.subscribe(function (newErrors) {
+      var aceErrorsSub = snippet.aceErrors.subscribe(function (newErrors) {
         processErrorsAndWarnings('error', newErrors);
+      });
+
+      disposeFunctions.push(function () {
+        errorsSub.dispose();
+        aceWarningsSub.dispose();
+        aceErrorsSub.dispose();
       });
 
       editor.setTheme($.totalStorage("hue.ace.theme") || "ace/theme/hue");
@@ -3391,7 +3407,7 @@
         var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?bust=' + Math.random());
         var workerIsReady = false;
 
-        ko.utils.domNodeDisposal.addDisposeCallback(element, function () {
+        disposeFunctions.push(function () {
           aceSqlWorker.terminate();
         });
 
@@ -3423,8 +3439,12 @@
           var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), defaultDatabase: snippet.database(), locations: e.data.locations };
           huePubSub.publish('editor.active.locations', lastKnownLocations);
 
-          huePubSub.subscribe('get.active.editor.locations', function () {
+          var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
             huePubSub.publish('editor.active.locations', lastKnownLocations);
+          });
+
+          disposeFunctions.push(function () {
+            locationsSub.remove();
           });
 
 
@@ -3490,12 +3510,6 @@
           });
         };
 
-        editor.on("change", function (e) {
-          if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
-            aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
-          }
-        });
-
         var whenWorkerIsReady = function (callback) {
           if (!workerIsReady) {
             aceSqlWorker.postMessage({ ping: true });
@@ -3507,12 +3521,16 @@
           }
         };
 
-        huePubSub.subscribe('editor.refresh.locations', function () {
+        var refreshSub = huePubSub.subscribe('editor.refresh.locations', function () {
           if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
             whenWorkerIsReady(function () {
               aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
             });
           }
+        });
+
+        disposeFunctions.push(function () {
+          refreshSub.remove();
         });
       }
 
@@ -3551,7 +3569,6 @@
       var langTools = ace.require("ace/ext/language_tools");
       langTools.textCompleter.setSqlMode(snippet.isSqlDialect());
 
-      editor.on("focus", initAutocompleters);
       initAutocompleters();
 
       var removeUnicodes = function (value) {
@@ -3575,7 +3592,7 @@
 
       var lastEditorValue = null;
       var checkEditorValueInterval = -1;
-      editor.on('paste', function (e) {
+      var pasteListener = editor.on('paste', function (e) {
         window.clearInterval(checkEditorValueInterval);
         checkEditorValueInterval = window.setInterval(function () {
           if (lastEditorValue !== editor.getValue()) {
@@ -3588,7 +3605,11 @@
         }, 10);
       });
 
-      editor.on("input", function () {
+      disposeFunctions.push(function () {
+        editor.off('paste', pasteListener);
+      });
+
+      var inputListener = editor.on('input', function () {
         if (editor.getValue().length == 0) {
           if (!placeHolderVisible && placeHolderElement) {
             placeHolderElement.appendTo(editor.renderer.scroller);
@@ -3603,7 +3624,12 @@
         }
       });
 
-      editor.on("focus", function () {
+      disposeFunctions.push(function () {
+        editor.off('input', inputListener);
+      });
+
+      var focusListener = editor.on('focus', function () {
+        initAutocompleters();
         snippet.inFocus(true);
         $(".ace-editor").data("last-active-editor", false);
         $el.data("last-active-editor", true);
@@ -3616,28 +3642,41 @@
         }
       });
 
+      disposeFunctions.push(function () {
+        editor.off('focus', focusListener);
+      });
+
       var changeSelectionThrottle = -1;
-      editor.selection.on("changeSelection", function () {
+      var changeSelectionListener = editor.selection.on('changeSelection', function () {
         window.clearTimeout(changeSelectionThrottle);
         changeSelectionThrottle = window.setTimeout(function () {
           huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
         }, 100);
-      });
-
-      huePubSub.subscribe('get.active.editor.cursor.location', function () {
-        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
-      });
-
-      editor.selection.on("changeSelection", function () {
         snippet.selectedStatement(editor.getSelectedText());
       });
 
-      editor.on("blur", function () {
+      disposeFunctions.push(function () {
+        editor.selection.off('changeSelection', changeSelectionListener);
+      });
+
+      var cursorLocationSub = huePubSub.subscribe('get.active.editor.cursor.location', function () {
+        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
+      });
+
+      disposeFunctions.push(function () {
+        cursorLocationSub.remove();
+      });
+
+      var blurListener = editor.on('blur', function () {
         snippet.inFocus(false);
         snippet.statement_raw(removeUnicodes(editor.getValue()));
         if (options.onBlur) {
           options.onBlur($el, removeUnicodes(editor.getValue()));
         }
+      });
+
+      disposeFunctions.push(function () {
+        editor.off('blur', blurListener);
       });
 
       // TODO: Move context menu logic to separate module
@@ -3675,19 +3714,27 @@
           return range;
         };
 
-        huePubSub.subscribe('sql.context.popover.shown', function () {
+        var popoverShownSub = huePubSub.subscribe('sql.context.popover.shown', function () {
           hideContextTooltip();
           keepLastMarker = true;
           disableTooltip = true;
         });
 
-        huePubSub.subscribe('sql.context.popover.hidden', function () {
+        disposeFunctions.push(function () {
+          popoverShownSub.remove();
+        });
+
+        var popoverHiddenSub = huePubSub.subscribe('sql.context.popover.hidden', function () {
           disableTooltip = false;
           clearActiveMarkers();
           keepLastMarker = false;
         });
 
-        editor.on("mousemove", function (e) {
+        disposeFunctions.push(function () {
+          popoverHiddenSub.remove();
+        });
+
+        var mousemoveListener = editor.on('mousemove', function (e) {
           clearTimeout(tooltipTimeout);
           var selectionRange = editor.selection.getRange();
           if (selectionRange.isEmpty()) {
@@ -3724,19 +3771,33 @@
           }
         });
 
-        editor.on("input", function (e) {
+        disposeFunctions.push(function () {
+          editor.off('mousemove', mousemoveListener);
+        });
+
+        var inputListener = editor.on('input', function (e) {
           clearActiveMarkers();
           lastHoveredToken = null;
         });
 
-        editor.container.addEventListener("mouseout", function (e) {
+        disposeFunctions.push(function () {
+          editor.off('input', mousemoveListener);
+        });
+
+        var mouseoutListener = function (e) {
           clearActiveMarkers();
           clearTimeout(tooltipTimeout);
           contextTooltip.hide();
           lastHoveredToken = null;
+        };
+
+        editor.container.addEventListener('mouseout', mouseoutListener);
+
+        disposeFunctions.push(function () {
+          editor.container.removeEventListener('mouseout', mouseoutListener);
         });
 
-        editor.container.addEventListener("contextmenu", function (e) {
+        var contextmenuListener = function (e) {
           var selectionRange = editor.selection.getRange();
           huePubSub.publish('sql.context.popover.hide');
           if (selectionRange.isEmpty()) {
@@ -3763,18 +3824,29 @@
               return false;
             }
           }
+        };
+
+        var contextmenuListener = editor.container.addEventListener('contextmenu', contextmenuListener);
+
+        disposeFunctions.push(function () {
+          editor.container.removeEventListener('contextmenu', contextmenuListener);
         });
+
       }());
 
       editor.previousSize = 0;
 
       // TODO: Get rid of this
-      window.setInterval(function(){
+      var idInterval = window.setInterval(function(){
         editor.session.getMode().$id = snippet.getAceMode(); // forces the id again because of Ace command internals
       }, 100);
 
+      disposeFunctions.push(function () {
+        window.clearInterval(idInterval);
+      });
+
       editor.middleClick = false;
-      editor.on("mousedown", function (e) {
+      var mousedownListener = editor.on('mousedown', function (e) {
         if (e.domEvent.which == 2) { // middle click
           editor.middleClick = true;
           var tempText = editor.getSelectedText();
@@ -3790,17 +3862,33 @@
         }
       });
 
-      huePubSub.subscribe('ace.replace', function (data) {
+      disposeFunctions.push(function () {
+        editor.off('mousedown', mousedownListener);
+      });
+
+      var aceReplaceSub = huePubSub.subscribe('ace.replace', function (data) {
         var Range = ace.require('ace/range').Range;
         var range = new Range(data.location.first_line - 1, data.location.first_column - 1, data.location.last_line - 1, data.location.last_column - 1);
         editor.getSession().getDocument().replace(range, data.text);
       });
 
-      editor.on("click", function (e) {
+      disposeFunctions.push(function () {
+        aceReplaceSub.remove();
+      });
+
+      var clickListener = editor.on('click', function (e) {
         editor.clearErrorsAndWarnings();
       });
 
-      editor.on("change", function (e) {
+      disposeFunctions.push(function () {
+        editor.off('click', clickListener);
+      });
+
+      var changeListener = editor.on("change", function (e) {
+        if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
+          aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
+        }
+
         snippet.statement_raw(removeUnicodes(editor.getValue()));
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
@@ -3824,6 +3912,10 @@
             editor.session.remove(new AceRange(0, 0, 0, 200));
           }
         }
+      });
+
+      disposeFunctions.push(function () {
+        editor.off("change", changeListener);
       });
 
       editor.commands.addCommand({
@@ -3883,7 +3975,7 @@
         return /^\s*$/.test(editor.getValue()) || /^.*;\s*$/.test(editor.getTextBeforeCursor());
       };
 
-      huePubSub.subscribe('editor.insert.table.at.cursor', function(details) {
+      var insertTableAtCursorSub = huePubSub.subscribe('editor.insert.table.at.cursor', function(details) {
         if ($el.data('last-active-editor')) {
           var qualifiedName = snippet.database() == details.database ? details.name : details.database + '.' + details.name;
           if (isNewStatement()) {
@@ -3894,7 +3986,11 @@
         }
       });
 
-      huePubSub.subscribe('editor.insert.column.at.cursor', function(details) {
+      disposeFunctions.push(function () {
+        insertTableAtCursorSub.remove();
+      });
+
+      var insertColumnAtCursorSub = huePubSub.subscribe('editor.insert.column.at.cursor', function(details) {
         if ($el.data('last-active-editor')) {
           if (isNewStatement()) {
             var qualifiedFromName = snippet.database() == details.database ? details.table : details.database + '.' + details.table;
@@ -3905,28 +4001,49 @@
         }
       });
 
-      huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
+      disposeFunctions.push(function () {
+        insertColumnAtCursorSub.remove();
+      });
+
+      var dblClickHdfsItemSub = huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), "'" + assistHdfsEntry.path + "'");
         }
       });
 
-      huePubSub.subscribe("assist.dblClickGitItem", function(assistGitEntry) {
+      disposeFunctions.push(function () {
+        dblClickHdfsItemSub.remove();
+      });
+
+
+      var dblClickGitItemSub = huePubSub.subscribe("assist.dblClickGitItem", function(assistGitEntry) {
         if ($el.data("last-active-editor")) {
           editor.session.setValue(assistGitEntry.fileContent());
         }
       });
 
-      huePubSub.subscribe("assist.dblClickS3Item", function(assistS3Entry) {
+      disposeFunctions.push(function () {
+        dblClickGitItemSub.remove();
+      });
+
+      var dblClickS3ItemSub = huePubSub.subscribe("assist.dblClickS3Item", function(assistS3Entry) {
         if ($el.data("last-active-editor")) {
           editor.session.insert(editor.getCursorPosition(), "'S3A://" + assistS3Entry.path + "'");
         }
       });
 
-      huePubSub.subscribe('sample.error.insert.click', function(popoverEntry) {
+      disposeFunctions.push(function () {
+        dblClickS3ItemSub.remove();
+      });
+
+      var sampleErrorInsertSub = huePubSub.subscribe('sample.error.insert.click', function(popoverEntry) {
           var table = popoverEntry.identifierChain[popoverEntry.identifierChain.length - 1]['name'];
           var text = "SELECT * FROM " + table + " LIMIT 100";
           editor.session.insert(editor.getCursorPosition(), text);
+      });
+
+      disposeFunctions.push(function () {
+        sampleErrorInsertSub.remove();
       });
 
       var $tableDropMenu = $el.next('.table-drop-menu');
@@ -3940,18 +4057,29 @@
         }, 300);
       };
 
-      $(document).click(function (event) {
+      var documentClickListener = function (event) {
         if ($tableDropMenu.find($(event.target)).length === 0) {
           hideDropMenu();
         }
+      };
+
+      $(document).on('click', documentClickListener);
+
+      disposeFunctions.push(function () {
+        $(document).off('click', documentClickListener);
       });
 
+
       var lastMeta = {};
-      huePubSub.subscribe('draggable.text.meta', function (meta) {
+      var draggableTextSub = huePubSub.subscribe('draggable.text.meta', function (meta) {
         lastMeta = meta;
         if (typeof meta !== 'undefined' && typeof meta.table !== 'undefined') {
           $identifierDropMenu.text(meta.table)
         }
+      });
+
+      disposeFunctions.push(function () {
+        draggableTextSub.remove();
       });
 
       var menu = ko.bindingHandlers.contextMenu.initContextMenu($tableDropMenu, $('.content-panel'));
@@ -3987,22 +4115,17 @@
         setFromDropMenu('DROP TABLE ' + lastMeta.table + ';');
       });
 
-      var draggableMeta = {};
-      huePubSub.subscribe('draggable.text.meta', function (meta) {
-        draggableMeta = meta;
-      });
-
       $el.droppable({
         accept: ".draggableText",
         drop: function (e, ui) {
           var position = editor.renderer.screenToTextCoordinates(e.clientX, e.clientY);
           var text = ui.helper.text();
-          if (draggableMeta.type === 's3' || draggableMeta.type === 'hdfs'){
-            text = "'" + draggableMeta.definition.path + "'";
+          if (lastMeta.type === 's3' || lastMeta.type === 'hdfs'){
+            text = "'" + lastMeta.definition.path + "'";
           }
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
-          if (draggableMeta.table && ! draggableMeta.column && /.*;|^\s*$/.test(before)) {
+          if (lastMeta.table && ! lastMeta.column && /.*;|^\s*$/.test(before)) {
             menu.show(e);
           } else {
             if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
@@ -4021,7 +4144,7 @@
 
       var autocompleteTemporarilyDisabled = false;
       var autocompleteThrottle = -1;
-      editor.commands.on("afterExec", function (e) {
+      var afterExecListener = editor.commands.on('afterExec', function (e) {
         if (editor.getOption('enableLiveAutocompletion') && e.command.name === "insertstring") {
           if (/\S+\(\)$/.test(e.args)) {
             editor.moveCursorTo(editor.getCursorPosition().row, editor.getCursorPosition().column - 1);
@@ -4102,6 +4225,9 @@
         }
       });
 
+      disposeFunctions.push(function () {
+        editor.commands.off('afterExec', afterExecListener);
+      });
       editor.$blockScrolling = Infinity;
       snippet.ace(editor);
     },

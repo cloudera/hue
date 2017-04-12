@@ -276,6 +276,7 @@ from desktop.views import _ko
 
       function HueAceAutocompleter (params, element) {
         var self = this;
+        self.disposeFunctions = [];
         self.editor = params.editor;
         self.snippet = params.snippet;
 
@@ -415,7 +416,7 @@ from desktop.views import _ko
           }, 300);
         };
 
-        huePubSub.subscribe('hue.ace.autocompleter.done', function () {
+        var autocompleterDoneSub = huePubSub.subscribe('hue.ace.autocompleter.done', function () {
           window.setTimeout(function () {
             if (self.active() && self.suggestions.filtered().length === 0) {
               self.detach();
@@ -423,7 +424,11 @@ from desktop.views import _ko
           }, 0);
         });
 
-        huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
+        self.disposeFunctions.push(function () {
+          autocompleterDoneSub.remove();
+        });
+
+        var autocompleterShowSub = huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
           var session = self.editor().getSession();
           var pos = self.editor().getCursorPosition();
           var line = session.getLine(pos.row);
@@ -442,11 +447,26 @@ from desktop.views import _ko
           self.selectedIndex(0);
         });
 
-        huePubSub.subscribe('hue.ace.autocompleter.hide', function () {
+        self.disposeFunctions.push(function () {
+          autocompleterShowSub.remove();
+        });
+
+        var autocompleterHideSub = huePubSub.subscribe('hue.ace.autocompleter.hide', function () {
           self.detach();
         });
 
+        self.disposeFunctions.push(function () {
+          autocompleterHideSub.remove();
+        });
       }
+
+      HueAceAutocompleter.prototype.dispose = function () {
+        var self = this;
+        self.disposeFunctions.forEach(function (disposeFunction) {
+          disposeFunction();
+        })
+        self.detach();
+      };
 
       HueAceAutocompleter.prototype.insertSuggestion = function () {
         var self = this;
