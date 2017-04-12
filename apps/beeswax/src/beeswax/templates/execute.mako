@@ -984,11 +984,6 @@ ${ assist.assistPanel() }
     float: right;
   }
 
-  .fileChooserBtn {
-    border-radius: 0 3px 3px 0;
-    height: 31px;
-  }
-
   .CodeMirror {
     border: 1px solid #eee;
     margin-bottom: 20px;

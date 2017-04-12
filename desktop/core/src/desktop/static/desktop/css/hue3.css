@@ -683,10 +683,6 @@ html.modal-open {
  cursor: pointer!important;
 }
 
-.inline {
-  display: inline;
-}
-
 .actionbar-creation {
   margin: 0;
 }

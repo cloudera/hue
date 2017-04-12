@@ -745,12 +745,6 @@ ${ commonshare() | n,unicode }
 <link rel="stylesheet" href="${ static('pig/css/pig.css') }">
 <link rel="stylesheet" href="${ static('desktop/ext/css/codemirror.css') }">
 
-<style type="text/css">
-  .fileChooserBtn {
-    border-radius: 0 3px 3px 0;
-  }
-</style>
-
 <script type="text/javascript">
   var LABELS = {
     KILL_ERROR: "${ _('The Pig job could not be killed.') }",
