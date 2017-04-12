@@ -119,7 +119,7 @@ ${ hueIcons.symbols() }
           </button>
           <!-- /ko -->
           <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
           <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
