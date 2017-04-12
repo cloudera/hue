@@ -352,7 +352,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       cursorcolor: "#7D7D7D",
       cursorborder: "1px solid #7D7D7D",
       cursoropacitymin: 0,
-      cursoropacitymax: 1,
+      cursoropacitymax: navigator.platform.indexOf('Win') > -1 ? 1: 0.7,
       mousescrollstep: 60,
       cursorwidth: "6px",
       railpadding: { top: 1, right: 1, left: 1, bottom: 1 },
