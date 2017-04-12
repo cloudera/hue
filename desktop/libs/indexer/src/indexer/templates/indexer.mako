@@ -91,10 +91,6 @@ ${ assist.assistPanel() }
     overflow-x: hidden;
   }
 
-  .fileChooserBtn {
-    height: 29px;
-  }
-
   .form-control.path {
     vertical-align: top;
   }
