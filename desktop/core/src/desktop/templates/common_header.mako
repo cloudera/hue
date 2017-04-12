@@ -163,6 +163,9 @@ if USE_NEW_EDITOR.get():
 
   ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
+  <script src="${ static('desktop/js/apiHelper.js') }"></script>
+  <script src="${ static('desktop/js/clusterConfig.js') }"></script>
+
   <script type="text/javascript">
     var IS_HUE_4 = false;
 

@@ -812,7 +812,6 @@ ${ commonshare() | n,unicode }
 <script src="${ static('desktop/js/sqlAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/apiHelper.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }" type="text/javascript" charset="utf-8"></script>
 
 ${ assist.assistJSModels() }
