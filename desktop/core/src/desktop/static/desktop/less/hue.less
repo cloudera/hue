@@ -771,24 +771,26 @@ a:visited {
 }
 
 /* search */
-#searchComponents .search-bar, #searchComponents .card-toolbar {
-  position: static;
-}
 
-#searchComponents .card-toolbar {
-  zoom: 0.8;
-}
-
-#searchComponents .card-toolbar a, #searchComponents .card-toolbar .draggable-widget {
-  float: left;
-}
-
-#searchComponents .card-toolbar .draggable-widget a {
-  float: none;
-}
-
-#searchComponents .form-search .input-append .search-query {
-  width: 50px;
+#searchComponents {
+  .search-bar, .card-toolbar {
+    position: static;
+    width: auto;
+  }
+  .card-toolbar {
+    a, .draggable-widget {
+      float: left;
+      a {
+        float: none;
+      }
+    }
+  }
+  .with-top-margin {
+    margin-top: 10px;
+  }
+  .form-search .input-append .search-query {
+    width: 50px;
+  }
 }
 
 /* oozie workflow */
