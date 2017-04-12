@@ -30,12 +30,12 @@ ko.bindingHandlers.droppable = {
 };
 
 
-function magicLayout(vm) {
-  loadLayout(vm, vm.initial.layout);
-  $(document).trigger("magicLayout");
+function magicWorkflowLayout(vm) {
+  loadWorkflowLayout(vm, vm.initial.layout);
+  $(document).trigger("magicWorkflowLayout");
 }
 
-function loadColumns(viewModel, json_layout) {
+function loadWorkflowColumns(viewModel, json_layout) {
   var _columns = [];
 
   $(json_layout).each(function (cnt, json_col) {
@@ -55,7 +55,7 @@ function loadColumns(viewModel, json_layout) {
         });
         row.addWidget(_w);
       });
-      row.columns(loadColumns(viewModel, json_row.columns));
+      row.columns(loadWorkflowColumns(viewModel, json_row.columns));
       _rows.push(row);
     });
     var column = new ExtendedColumn(json_col.size, _rows);
@@ -64,8 +64,8 @@ function loadColumns(viewModel, json_layout) {
   return _columns;
 }
 
-function loadLayout(viewModel, json_layout) {
-  var _cols = loadColumns(viewModel, json_layout);
+function loadWorkflowLayout(viewModel, json_layout) {
+  var _cols = loadWorkflowColumns(viewModel, json_layout);
   viewModel.oozieColumns(_cols);
 }
 
@@ -526,7 +526,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.inited = ko.observable(self.oozieColumns().length > 0);
   self.init = function (callback) {
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
-    loadLayout(self, layout_json);
+    loadWorkflowLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
   };
 

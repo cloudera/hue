@@ -3558,7 +3558,7 @@ $(document).ready(function () {
     $(this).parent().addClass("active");
   });
 
-  $(document).on("magicLayout", function(){
+  $(document).on("magicSearchLayout", function(){
     resizeFieldsList();
   });
 
