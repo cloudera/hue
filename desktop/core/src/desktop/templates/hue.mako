@@ -328,7 +328,7 @@ ${ hueIcons.symbols() }
           <!-- /ko -->
 
           <!-- ko if: activeRightTab() === 'schedules' -->
-          <div>Schedules</div>
+          <div class="assist-inner-panel">Schedules</div>
           <!-- /ko -->
         </div>
       </div>
