@@ -2257,7 +2257,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           self.collection.id(data.id);
           $(document).trigger("info", data.message);
           if (window.location.search.indexOf("collection") == -1) {
-            hueUtils.changeURL('/dashboard/?collection=' + data.id);
+            hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/?collection=' + data.id);
           }
         }
         else {
@@ -2401,6 +2401,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
     self.showCores(false);
     self.isSyncingCollections(false);
     self.isPlayerMode(false);
+
+    if (window.location.search.indexOf("collection") > -1) {
+      hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/new_search');
+    }
   }
 
   self.build();
