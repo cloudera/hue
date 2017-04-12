@@ -68,9 +68,11 @@ from desktop.views import commonheader, commonfooter, _ko
       <i class="fa fa-save"></i>
     </a>
     % endif
+    %if not is_embeddable:
     <a class="btn pointer" title="${ _('Player mode') }" rel="tooltip" data-placement="bottom" data-bind="click: function(){ hueUtils.goFullScreen(); $root.isEditing(false); $root.isPlayerMode(true); }">
       <i class="fa fa-expand"></i>
     </a>
+    %endif
     &nbsp;&nbsp;&nbsp;
     <a class="btn pointer" title="${ _('General Settings') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#settingsDemiModal"
         data-bind="css: {'btn': true}, visible: columns().length != 0">
@@ -3570,18 +3572,6 @@ $(document).ready(function () {
     }, 200);
   });
 
-/*
-function newSearch() {
-  ko.cleanNode($('#searchComponents')[0]);
-  viewModel = new SearchViewModel(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
-  ko.applyBindings(viewModel, $('#searchComponents')[0]);
-
-  viewModel.init();
-  //viewModel.collection.facets.removeAll();
-  //viewModel.columns([]);
-
-  viewModel.search();
-}*/
 
   var _query = ${ query | n,unicode };
 
