@@ -1542,7 +1542,8 @@ class ClusterConfig():
       return {
           'name': 'editor',
           'displayName': _('Editor'),
-          'interpreters': interpreters
+          'interpreters': interpreters,
+          'page': interpreters[0 if len(interpreters) == 1 else 1]['page']
       }
     else:
       return None
@@ -1662,6 +1663,7 @@ class ClusterConfig():
           'name': 'oozie',
           'displayName': _('Scheduler'),
           'interpreters': interpreters,
+          'page': interpreters[0]['page']
         }
     else:
       return None
