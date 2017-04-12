@@ -68,18 +68,14 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
   <form method="POST" action="${action}" autocomplete="off">
     ${ csrf_token(request) | n,unicode }
 
-    % if conf.CUSTOM.LOGO_SVG.get():
-    <div class="empty-logo">
-    </div>
-    % else:
     <div class="logo">
       %if is_hue4():
-      <svg style="height: 70px; width: 140px;"><use xlink:href="#hi-logo"></use></svg>
+      <svg style="height: 80px; width: 200px;"><use xlink:href="#hi-logo"></use></svg>
       %else:
       <img src="${ static('desktop/art/hue-login-logo-ellie@2x.png') }" width="70" height="70" alt="${ _('Hue logo') }">
       %endif
     </div>
-    % endif
+    <h3>Query. Explore. Repeat.</h3>
 
     %if first_login_ever:
       <div class="alert alert-info center">
