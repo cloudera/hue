@@ -79,54 +79,8 @@ ul.errorlist li {
   font-style: italic;
 }
 
-.homeLink,
-.trashLink,
-.historyLink {
-  font-size: 1.25em;
-  line-height: 18px;
-}
-
-.hue-breadcrumbs {
-  font-size: 1.25em;
-  list-style: none outside none;
-  padding: 9px 9px;
-}
-
-.hue-breadcrumbs li {
-  display: inline-block;
-  text-shadow: 0 1px 0 #FFFFFF;
-}
-
-.hue-breadcrumbs .divider {
-  color: #999999;
-  padding: 0 5px;
-}
-
-.hue-breadcrumbs .active a {
-  color: #333333;
-}
-
-.hue-breadcrumbs a.nounderline:hover {
-  text-decoration: none;
-}
-
-.hue-breadcrumbs > li:last-child > a {
-  font-weight: bold;
-  color: #333333;
-}
-
-.hue-breadcrumbs > li:last-child > span {
-  display: none;
-}
-
 .hueWell {
   padding-bottom: 0;
-}
-
-.hue-breadcrumbs-bar {
-  padding: 8px 15px;
-  margin: 0 0 20px;
-  list-style: none;
 }
 
 .modal-body iframe {
