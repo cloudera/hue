@@ -100,7 +100,7 @@ class YarnApi(Api):
 
     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
 
-    apps = [massage_job_for_json(job, user=self.user) for job in jobs]
+    apps = [massage_job_for_json(job, user=self.user) for job in reversed(jobs)]
 
     return {
       'apps': [{
