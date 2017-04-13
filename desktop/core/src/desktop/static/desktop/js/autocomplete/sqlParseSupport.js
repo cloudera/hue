@@ -364,17 +364,10 @@ var SqlParseSupport = (function () {
           if (parser.isHive() && !location.linked) {
             location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
           }
-          parser.expandIdentifierChain(location, true);
+          parser.expandIdentifierChain(location, true, true);
 
           if (typeof location.identifierChain === 'undefined') {
             parser.yy.locations.splice(i, 1);
-          } else if (location.identifierChain.length < 2) {
-            location.tables = [];
-            location.linked = false;
-            parser.expandIdentifierChain(location, true);
-            if (location.tables.length === 0) {
-              parser.yy.locations.splice(i, 1);
-            }
           }
         }
       }
@@ -614,7 +607,7 @@ var SqlParseSupport = (function () {
       }
     };
 
-    parser.expandIdentifierChain = function (wrapper, anyOwner) {
+    parser.expandIdentifierChain = function (wrapper, anyOwner, isColumnLocation) {
       if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
         return;
       }
@@ -680,7 +673,7 @@ var SqlParseSupport = (function () {
       // Reduce the tablePrimaries to the one that matches the first identifier if found
       var foundPrimary;
       var doubleMatch = false;
-      if (identifierChain.length > 0) {
+      if (identifierChain.length > (isColumnLocation ? 1: 0)) {
         for (var i = 0; i < tablePrimaries.length; i++) {
           if (tablePrimaries[i].subQueryAlias) {
             if (tablePrimaries[i].subQueryAlias === identifierChain[0].name) {
@@ -712,23 +705,37 @@ var SqlParseSupport = (function () {
         if (doubleMatch) {
           identifierChain.shift();
         }
-      } else if (tablePrimaries.length === 1) {
+      } else if (tablePrimaries.length === 1 && !isColumnLocation) {
         foundPrimary = tablePrimaries[0];
       }
 
       if (foundPrimary) {
-        if (foundPrimary.subQueryAlias) {
-          identifierChain.unshift({subQuery: foundPrimary.subQueryAlias});
-        } else {
-          identifierChain = foundPrimary.identifierChain.concat(identifierChain);
-        }
-        if (wrapper.tables) {
-          wrapper.tables.push({identifierChain: identifierChain});
-          delete wrapper.identifierChain;
-        } else {
+        if (isColumnLocation) {
           wrapper.identifierChain = identifierChain;
+          if (foundPrimary.subQueryAlias) {
+            wrapper.tables = [{ subQuery: foundPrimary.subQueryAlias }];
+          } else if (foundPrimary.alias) {
+            wrapper.tables = [{ identifierChain: foundPrimary.identifierChain, alias: foundPrimary.alias }];
+          } else {
+            wrapper.tables = [{ identifierChain: foundPrimary.identifierChain }];
+          }
+        } else {
+          if (foundPrimary.subQueryAlias) {
+            identifierChain.unshift({ subQuery: foundPrimary.subQueryAlias });
+          } else {
+            identifierChain = foundPrimary.identifierChain.concat(identifierChain);
+          }
+          if (wrapper.tables) {
+            wrapper.tables.push({identifierChain: identifierChain});
+            delete wrapper.identifierChain;
+          } else {
+            wrapper.identifierChain = identifierChain;
+          }
         }
       } else {
+        if (isColumnLocation) {
+          wrapper.tables = [];
+        }
         tablePrimaries.forEach(function (tablePrimary) {
           var targetTable = tablePrimary.subQueryAlias ? { subQuery: tablePrimary.subQueryAlias } : { identifierChain: tablePrimary.identifierChain } ;
           if (tablePrimary.alias) {
@@ -739,7 +746,6 @@ var SqlParseSupport = (function () {
           }
         });
       }
-
       delete wrapper.owner;
       wrapper.linked = true;
     };

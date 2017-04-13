@@ -50,12 +50,12 @@
         afterCursor: '',
         containsKeywords: ['SELECT'],
         expectedResult: {
-          lowerCase: false,
           locations: [
             { type: 'statement', location: { 'first_line': 1, 'last_line': 1, 'first_column': 1, 'last_column': 23 } },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 10, last_column: 13 }, identifierChain: [{ name: 'tbl' }] },
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'tbl' }, { name: 'col' }, { name: 'field'}] }
-          ]
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 14, last_column: 23 }, identifierChain: [{ name: 'col' }, { name: 'field'}], tables: [{ identifierChain: [{ name: 'tbl' }] }] }
+          ],
+          lowerCase: false
         }
       });
     });
