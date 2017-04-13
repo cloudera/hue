@@ -160,7 +160,7 @@ def _default_interpreters(user):
     }))
 
   if 'oozie' in apps:
-    interpreters.extend(
+    interpreters.extend((
       ('pig', {
           'name': 'Pig', 'interface': 'oozie', 'options': {}
       }),
@@ -182,7 +182,7 @@ def _default_interpreters(user):
       ('shell', {
           'name': 'Shell', 'interface': 'oozie', 'options': {}
       }),
-    )
+    ))
 
   if 'serch' in apps: # And Solr 6+
     interpreters.append(('solr', {
@@ -190,7 +190,7 @@ def _default_interpreters(user):
     }),)
 
   if SHOW_NOTEBOOKS.get():
-    interpreters.extend(
+    interpreters.extend((
       ('spark', {
           'name': 'Scala', 'interface': 'livy', 'options': {}
       }),
@@ -212,6 +212,6 @@ def _default_interpreters(user):
       ('markdown', {
           'name': 'Markdown', 'interface': 'text', 'options': {}
       })
-    )
+    ))
 
   INTERPRETERS.set_for_testing(OrderedDict(interpreters))
