@@ -40,7 +40,7 @@ ${ fb_components.menubar() }
   <link href="${ static('filebrowser/css/display.css') }" rel="stylesheet" type="text/css">
   <div class="row-fluid">
     <div class="span2">
-      <div class="sidebar-nav" style="padding-top: 0">
+      <div class="sidebar-nav margin-top-10">
         <!-- ko if: $root.file -->
         <ul class="nav nav-list">
           <!-- ko if: $root.isViewing -->
