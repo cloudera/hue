@@ -27,10 +27,12 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
 from libsentry.privilege_checker import PrivilegeChecker
+from notebook.api import _get_statement
 from notebook.models import Notebook
 
 from metadata.conf import NAVIGATOR
 from metadata.optimizer_client import OptimizerApi, NavOptException
+
 
 LOG = logging.getLogger(__name__)
 
@@ -320,8 +322,7 @@ def upload_history(request):
     try:
       original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(query_data['snippets'][0]['result']['handle']['guid']))
       execution_time = query_data['snippets'][0]['result']['executionTime'] * 100
-
-      queries.append((original_query_id, execution_time, query_data['snippets'][0]['statement'], query_data['snippets'][0].get('database', 'default')))
+      queries.append((original_query_id, execution_time, _get_statement(query_data), query_data['snippets'][0].get('database', 'default')))
     except Exception, e:
       LOG.warning('Skipping upload of %s: %s' % (doc, e))
 
