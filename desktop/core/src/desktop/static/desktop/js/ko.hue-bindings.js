@@ -3412,6 +3412,17 @@
         });
 
         var AceRange = ace.require('ace/range').Range;
+
+        var lastKnownLocations = [];
+
+        var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
+          huePubSub.publish('editor.active.locations', lastKnownLocations);
+        });
+
+        disposeFunctions.push(function () {
+          locationsSub.remove();
+        });
+
         aceSqlWorker.onmessage = function(e) {
           workerIsReady = true;
           if (e.data.ping) {
@@ -3437,16 +3448,6 @@
           }
 
           var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), defaultDatabase: snippet.database(), locations: e.data.locations };
-          huePubSub.publish('editor.active.locations', lastKnownLocations);
-
-          var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
-            huePubSub.publish('editor.active.locations', lastKnownLocations);
-          });
-
-          disposeFunctions.push(function () {
-            locationsSub.remove();
-          });
-
 
           // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
           while(activeTokens.length > 0) {
@@ -3459,10 +3460,12 @@
             }
             if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
               var clonedChain = location.identifierChain.concat();
+              var dbFound = false;
               if (apiHelper.containsDatabase(snippet.type(), clonedChain[0].name)) {
                 clonedChain.shift();
+                dbFound = true;
               }
-              if (clonedChain.length > 1) {
+              if (dbFound && clonedChain.length > 1) {
                 location.type = 'complex';
               }
             }
@@ -3508,6 +3511,8 @@
               }
             }
           });
+
+          huePubSub.publish('editor.active.locations', lastKnownLocations);
         };
 
         var whenWorkerIsReady = function (callback) {
