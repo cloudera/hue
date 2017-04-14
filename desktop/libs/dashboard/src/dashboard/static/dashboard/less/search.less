@@ -29,8 +29,8 @@
   }
 
   .search-bar {
-    background-color: #F5F5F5;
-    border-bottom: 1px solid #e3e3e3;
+    background-color: @cui-gray-050;
+    border-bottom: 1px solid @cui-gray-200;
     -webkit-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     -moz-box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.065);
@@ -97,7 +97,7 @@
   }
 
   .counter {
-    color: #999999;
+    color: @cui-gray-600;
     font-size: 13px;
   }
 
@@ -129,7 +129,7 @@
   }
 
   .breadcrumb {
-    background-color: #FFFFFF;
+    background-color: @cui-white;
     padding-left: 0;
     margin-bottom: 0;
   }
@@ -143,20 +143,15 @@
   }
 
   .selectMask {
-    background-color: #F9F9F9;
-    background-image: linear-gradient(to bottom, #FFFFFF, #F1F1F1);
-    background-repeat: repeat-x;
-    border: 1px solid #C0C0C0;
-    border-right-color: rgba(0, 0, 0, 0.1);
-    border-radius: 2px;
-    border-bottom-right-radius: 0;
-    border-top-right-radius: 0;
+    background-color: @cui-gray-050;
+    border: 1px solid @cui-gray-400;
+    border-radius: 0;
     box-shadow: none;
-    color: #444444;
+    color: @cui-gray-800;
     display: inline-block;
     font-size: 13px;
-    height: 29px;
-    line-height: 29px;
+    height: 30px;
+    line-height: 30px;
     margin: 0;
     margin-left: 5px;
     min-height: 29px;
@@ -171,8 +166,6 @@
   .search-query {
     border-bottom-left-radius: 0 !important;
     border-top-left-radius: 0 !important;
-    margin-left: 0 !important;
-    border-left: 0 !important;
   }
 
   .download-btn-group {
@@ -217,11 +210,11 @@
   }
 
   .CodeMirror {
-    border: 1px dotted #DDDDDD;
+    border: 1px dotted @cui-gray-300;
   }
 
   [contenteditable=true] {
-    border: 1px dotted #DDDDDD;
+    border: 1px dotted @cui-gray-300;
     outline: 0;
     margin-top: 20px;
     margin-bottom: 20px;
@@ -229,14 +222,14 @@
   }
 
   [contenteditable=true] [class*="span"], .tmpl [class*="span"] {
-    background-color: #eee;
+    background-color: @cui-purple-gray-050;
     -webkit-border-radius: 3px;
     -moz-border-radius: 3px;
     border-radius: 3px;
     min-height: 40px;
     line-height: 40px;
-    background-color: #F3F3F3;
-    border: 2px dashed #DDD;
+    background-color: @cui-gray-050;
+    border: 2px dashed @cui-gray-300;
   }
 
   .tmpl {
@@ -245,7 +238,7 @@
   }
 
   .tmpl [class*="span"] {
-    color: #999;
+    color: @cui-gray-600;
     font-size: 12px;
     text-align: center;
     font-weight: bold;
@@ -253,12 +246,12 @@
 
   .editor-title {
     font-weight: bold;
-    color: #262626;
+    color: @cui-gray-900;
     border-bottom: 1px solid @hue-primary-color-dark;
   }
 
   .document-details-actions {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
     padding: 10px;
     margin-top: 8px;
   }
@@ -269,7 +262,7 @@
 
   .document-details {
     padding: 10px;
-    border-left: 1px solid #e5e5e5;
+    border-left: 1px solid @cui-gray-100;
     width: 93%;
   }
 
@@ -279,11 +272,11 @@
   }
 
   .document-details tr.readonly:hover {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
   }
 
   .result-row:nth-child(even) {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
   }
 
   .result-row td {
@@ -292,12 +285,12 @@
   }
 
   .result-container thead tr {
-    border-bottom: 1px solid #e5e5e5;
+    border-bottom: 1px solid @cui-gray-100;
     text-align: left;
   }
 
   .result-container td {
-    border-right: 1px solid #e5e5e5;
+    border-right: 1px solid @cui-gray-100;
   }
 
   .result-container .show-details-icon {
@@ -305,15 +298,15 @@
     height: 8px;
     padding: 0;
     line-height: 8px;
-    border-top: 1px solid #FFF;
+    border-top: 1px solid @cui-white;
   }
 
   .result-container .show-details-icon:hover {
-    border-top-color: #DDD;
+    border-top-color: @cui-gray-300;
   }
 
   .result-container .show-details-icon i {
-    color: #D1D1D1;
+    color: @cui-gray-400;
   }
 
   .result-container .show-details-icon:hover i {
@@ -321,14 +314,14 @@
   }
 
   .result-sorting th {
-    border-top: 3px solid #FFFFFF !important;
+    border-top: 3px solid @cui-white !important;
     padding-left: 3px !important;
     padding-right: 4px !important;
     vertical-align: middle !important;
   }
 
   .result-sorting th:hover {
-    border-top: 3px solid #EEEEEE !important;
+    border-top: 3px solid @cui-purple-gray-050 !important;
   }
 
   .result-sorting th span, .result-sorting th i {
@@ -347,10 +340,10 @@
 
   .filter-box .title {
     font-weight: bold;
-    color: #333;
+    color: @cui-gray-800;
     padding: 5px;
-    border: 1px solid #d8d8d8;
-    background-color: #F6F6F6;
+    border: 1px solid @cui-gray-300;
+    background-color: @cui-gray-050;
     border-bottom: none;
     -webkit-border-radius: 3px 3px 0 0;
     -moz-border-radius: 3px 3px 0 0;
@@ -358,17 +351,17 @@
   }
 
   .filter-box .title a {
-    color: #333;
+    color: @cui-gray-800;
   }
 
   .filter-box .title.excluded {
-    background-color: #d84a38;
+    background-color: @cui-red-500;
   }
 
   .filter-box .content {
     padding: 8px;
-    background-color: #FFFFFF;
-    border: 1px solid #d8d8d8;
+    background-color: @cui-white;
+    border: 1px solid @cui-gray-300;
     border-top: none;
     -webkit-border-radius: 0 0 3px 3px;
     -moz-border-radius: 0 0 3px 3px;
@@ -392,7 +385,7 @@
   }
 
   .filter-box:hover .title, .filter-box:hover .content {
-    border: 1px solid #d8d8d8 !important;
+    border: 1px solid @cui-gray-300 !important;
   }
 
   .filter-box:hover .content-readonly {
@@ -425,7 +418,7 @@
   }
 
   .field-selector.hoverable:hover {
-    background-color: #DDD;
+    background-color: @cui-gray-300;
   }
 
   .fa.analysis {
@@ -434,7 +427,7 @@
   }
 
   .fa.analysis:hover {
-    color: #333;
+    color: @cui-gray-800;
   }
 
   .typeahead {
@@ -463,7 +456,7 @@
   }
 
   .trigger-exclude:hover {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
     text-decoration: none;
   }
 
@@ -472,7 +465,7 @@
   }
 
   .fa-sign-out.red {
-    color: #d84a38;
+    color: @cui-red-500;
   }
 
   .hue-tree {
@@ -501,7 +494,7 @@
   }
 
   .pivot-cell.selected {
-    border: 2px dashed #CCC;
+    border: 2px dashed @cui-gray-400;
   }
 
   .partitionChart {
@@ -525,7 +518,7 @@
 
   .partitionChart text {
     pointer-events: none;
-    fill: #212121;
+    fill: @cui-gray-900;
   }
 
   .d3-tip {
@@ -533,7 +526,7 @@
     font-weight: bold;
     padding: 12px;
     background: rgba(0, 0, 0, 0.8);
-    color: #fff;
+    color: @cui-white;
     border-radius: 2px;
     pointer-events: none;
     margin-top: 5px;
@@ -669,7 +662,7 @@
   }
 
   .grid-side-btn {
-    color: #DBE8F1;
+    color: @cui-blue-050;
     display: inline-block;
     line-height: 27px;
     height: 27px;
@@ -686,11 +679,11 @@
 
   .grid-side-btn.disabled {
     cursor: default !important;
-    color: #DBE8F1 !important;
+    color: @cui-blue-050 !important;
   }
 
   .grid-side-btn:focus {
-    color: #DBE8F1;
+    color: @cui-blue-050;
   }
 
   .grid-side-btn.active {
@@ -726,7 +719,7 @@
     }
 
     .search-bar input {
-      border-left: 1px solid #c0c0c0 !important;
+      border-left: 1px solid @cui-gray-400 !important;
     }
 
     .dashboard {

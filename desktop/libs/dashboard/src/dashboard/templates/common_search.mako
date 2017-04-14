@@ -59,7 +59,7 @@ from desktop.views import commonheader, commonfooter, _ko
     </div>
   </div>
 
-  <div class="pull-right" style="padding-right:50px">
+  <div class="pull-right" ${ is_embeddable and '' or 'style="padding-right:50px"'}>
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
@@ -129,7 +129,6 @@ from desktop.views import commonheader, commonfooter, _ko
   </form>
 
   <form class="form-search" style="margin: 0" data-bind="submit: searchBtn, visible: columns().length != 0">
-    <strong>${_("Search")}</strong>
     <div class="input-append">
       <div class="selectMask">
         <span
@@ -138,13 +137,12 @@ from desktop.views import commonheader, commonfooter, _ko
       </div>
 
       <span data-bind="foreach: query.qs">
-        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4}" maxlength="4096" type="text" class="search-query">
+        <input data-bind="clearable: q, valueUpdate:'afterkeydown', typeahead: { target: q, nonBindableSource: queryTypeahead, multipleValues: true, multipleValuesSeparator: ':', extraKeywords: 'AND OR TO', completeSolrRanges: true }, css:{'input-xlarge': $root.query.qs().length == 1, 'input-medium': $root.query.qs().length < 4, 'input-small': $root.query.qs().length >= 4, 'flat-left': $index() === 0}" maxlength="4096" type="text" class="search-query">
         <!-- ko if: $index() >= 1 -->
         <a class="btn flat-left" href="javascript:void(0)" data-bind="click: $root.query.removeQ"><i class="fa fa-minus"></i></a>
         <!-- /ko -->
       </span>
-
-      <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ"><i class="fa fa-plus"></i></a>
+      <a class="btn" href="javascript:void(0)" data-bind="click: $root.query.addQ, css: { 'flat-left': $root.query.qs().length === 1}, style: { 'margin-left': $root.query.qs().length > 1 ? '10px' : '0' }"><i class="fa fa-plus"></i></a>
 
       <button type="submit" id="search-btn" class="btn btn-inverse" style="margin-left:10px; margin-right:10px">
         <i class="fa fa-search" data-bind="visible: ! isRetrievingResults()"></i>
