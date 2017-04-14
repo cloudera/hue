@@ -118,7 +118,7 @@ class TestDocumentConverter(object):
 
       # Verify default properties
       assert_true(doc2.data_dict['isSaved'])
-      assert_false(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S') == doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       #
       # Query History
@@ -215,6 +215,10 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     try:
       # Test that corresponding doc2 is created after convert
       assert_false(Document2.objects.filter(owner=self.user, type='query-impala').exists())
@@ -227,6 +231,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doc.name, doc2.data_dict['name'])
       assert_equal(doc.description, doc2.data_dict['description'])
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('impala', doc2.data_dict['sessions'][0]['type'])
@@ -268,6 +273,10 @@ class TestDocumentConverter(object):
     )
     doc = Document.objects.link(query, owner=query.owner, extra=query.type, name=query.name, description=query.desc)
 
+    # Setting doc.last_modified to older date
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     try:
       # Test that corresponding doc2 is created after convert
       assert_false(Document2.objects.filter(owner=self.user, type='query-sqlite').exists())
@@ -280,6 +289,7 @@ class TestDocumentConverter(object):
       # Verify Document2 attributes
       assert_equal(doc.name, doc2.data_dict['name'])
       assert_equal(doc.description, doc2.data_dict['description'])
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
       # Verify session type
       assert_equal('sqlite', doc2.data_dict['sessions'][0]['type'])
@@ -309,6 +319,11 @@ class TestDocumentConverter(object):
     }
     pig_script = create_or_update_script(**attrs)
 
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=pig_script.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
     try:
       # Test that corresponding doc2 is created after convert
       assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
@@ -321,6 +336,7 @@ class TestDocumentConverter(object):
       # Verify absolute_url
       response = self.client.get(doc2.get_absolute_url())
       assert_equal(200, response.status_code)
+      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
     finally:
       pig_script.delete()
 
