@@ -942,7 +942,6 @@ ${ dashboard.layout_skeleton() }
 
 
 <script type="text/html" id="grid-chart-settings">
-
 <!-- ko if: $parent.widgetType() == 'resultset-widget' -->
   <ul class="nav nav-list" style="border: none; background-color: #FFF" data-bind="visible: chartType() != ''">
     <li data-bind="visible: [ko.HUE_CHARTS.TYPES.MAP, ko.HUE_CHARTS.TYPES.GRADIENTMAP, ko.HUE_CHARTS.TYPES.PIECHART].indexOf(chartType()) == -1" class="nav-header">${_('x-axis')}</li>
@@ -1460,7 +1459,7 @@ ${ dashboard.layout_skeleton() }
           </ul>
         </div>
 
-        <div>
+        <div data-bind="visible: template.showGrid() || (template.showChart() && widgetType() === 'resultset-widget')">
           <a class="grid-side-btn" href="javascript:void(0)" data-bind="click: function(){ template.showFieldList(!template.showFieldList())}, css: { 'blue' : template.showFieldList() }">
             <!-- ko if: template.showFieldList() -->
               <i class="fa fa-fw fa-chevron-left"></i>
@@ -1543,7 +1542,7 @@ ${ dashboard.layout_skeleton() }
         </div>
       </div>
 
-      <div data-bind="visible: template.showFieldList() && template.showChart()" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
+      <div data-bind="visible: template.showFieldList() && template.showChart() &&  widgetType() === 'resultset-widget'" style="float:left; width:200px; margin-right:10px; background-color:#FFF; padding:5px;">
         <span data-bind="template: {name: 'grid-chart-settings', data: template.chartSettings}"></span>
       </div>
     </span>
