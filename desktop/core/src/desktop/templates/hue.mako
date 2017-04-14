@@ -714,7 +714,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/accounts/logout', app: function () {
             location.href = '/accounts/logout';
           }},
-          { url: '/dashboard/admin/collections', app: 'collections' },
+          { url: '/dashboard/admin/collections', app: function (ctx) {
+            page('/home?type=dashboard');
+          }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
           { url: '/editor', app: function () {
