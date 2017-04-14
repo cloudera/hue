@@ -96,6 +96,12 @@ class OptimizerApi(object):
       extra_parameters = {
           'colDelim': ',',
           'rowDelim': '\n',
+          "headerFields": [
+            {"count": 0, "name": "SQL_ID", "coltype": "SQL_ID", "use": True, "tag": ""},
+            {"count": 0, "name": "ELAPSED_TIME", "coltype": "NONE", "use": True, "tag": ""},
+            {"count": 0, "name": "SQL_FULLTEXT", "coltype": "SQL_QUERY", "use": True, "tag": ""},
+            {"count": 0, "name": "DATABASE", "coltype": "NONE", "use": True, "tag": "DATABASE"}
+          ],
       }
 
     f_queries_path = NamedTemporaryFile(suffix=data_suffix)
@@ -227,17 +233,8 @@ class OptimizerApi(object):
     return self._call('getTopDatabases', args)
 
 
-  UPLOAD = {
-    'queries': {
-      'headers': ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT', 'DATABASE'],
-      "colDelim": ",",
-      "rowDelim": "\\n",
-    }
-  }
-
-
 def OptimizerQueryDataAdapter(data):
-  headers = OptimizerApi.UPLOAD['queries']['headers']
+  headers = ['SQL_ID', 'ELAPSED_TIME', 'SQL_FULLTEXT', 'DATABASE']
 
   if data and len(data[0]) == 4:
     rows = data

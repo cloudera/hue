@@ -311,7 +311,7 @@ def _convert_queries(queries_data):
       original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(query_data['snippets'][0]['result']['handle']['guid']))
       execution_time = query_data['snippets'][0]['result']['executionTime'] * 100
       statement = ' '.join([line for line in _get_statement(query_data).strip().splitlines() if not line.strip().startswith('--')])
-      queries.append((original_query_id, execution_time, statement, query_data['snippets'][0].get('database', 'default')))
+      queries.append((original_query_id, execution_time, statement, query_data['snippets'][0].get('database', 'default').strip()))
     except Exception, e:
       LOG.warning('Skipping upload of %s: %s' % (query_data['uuid'], e))
 
