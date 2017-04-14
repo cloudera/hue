@@ -30,6 +30,10 @@ from metastore.conf import ENABLE_NEW_CREATE_TABLE
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 
+<%
+MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
+%>
+
 % if not is_embeddable:
 ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
@@ -76,7 +80,7 @@ ${ components.menubar() }
   <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
     <li>
       <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}
-        <!-- ko if: database() != null -->
+        <!-- ko if: database -->
         <span class="divider">&gt;</span>
         <!-- /ko -->
       </a>
@@ -122,7 +126,7 @@ ${ components.menubar() }
         <th width="50%">${_('Comment')}</th>
       </tr>
       </thead>
-      <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
+      <tbody data-bind="hueach: {data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200, disableHueEachRowCount: 5, scrollUp: true}">
         <tr>
           <td data-bind="text: $index() + $indexOffset() + 1"></td>
           <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
@@ -333,7 +337,7 @@ ${ components.menubar() }
 </script>
 
 <script type="text/html" id="metastore-databases">
-  <div class="actionbar-actions" data-bind="dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
+  <div class="actionbar-actions" data-bind="dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5 }">
     <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a database...') }" data-bind="clearable: databaseQuery, value: databaseQuery, valueUpdate: 'afterkeydown'"/>
     % if has_write_access:
       <button class="btn toolbarBtn margin-left-20" title="${_('Drop the selected databases')}" data-bind="click: function () { $('#dropDatabase').modal('show'); }, disable: selectedDatabases().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
@@ -379,7 +383,7 @@ ${ components.menubar() }
       <th>${ _('Database Name') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 145, scrollUp: true}">
+    <tbody data-bind="hueach: {data: filteredDatabases, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 145, scrollUp: true}">
     <tr>
       <td width="1%" style="text-align: center">
         <div class="hueCheckbox fa" data-bind="multiCheck: '#databasesTable', value: $data, hueChecked: $parent.selectedDatabases"></div>
@@ -445,7 +449,7 @@ ${ components.menubar() }
     <div class="row-fluid">
       <div class="span12 tile">
         <h4>${ _('Tables') }</h4>
-        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '.content-panel', nicescroll: true, jumpCorrection: 5 }">
+        <div class="actionbar-actions" data-bind="visible: tables().length > 0, dockable: { scrollable: '${ MAIN_SCROLLABLE }', nicescroll: true, jumpCorrection: 5 }">
           <input class="input-xlarge search-query margin-left-10" type="text" placeholder="${ _('Search for a table...') }" data-bind="clearable: tableQuery, value: tableQuery, valueUpdate: 'afterkeydown'"/>
           <button class="btn toolbarBtn margin-left-20" title="${_('Browse the selected table')}" data-bind="click: function () { setTable(selectedTables()[0]); selectedTables([]); }, disable: selectedTables().length !== 1"><i class="fa fa-eye"></i> ${_('View')}</button>
           <button class="btn toolbarBtn" title="${_('Query the selected table')}" data-bind="click: function () { IS_HUE_4 ? queryAndWatch('/notebook/browse/' + name + '/' + selectedTables()[0].name + '/') : location.href = '/notebook/browse/' + name + '/' + selectedTables()[0].name; }, disable: selectedTables().length !== 1">
@@ -477,7 +481,7 @@ ${ components.menubar() }
             <th width="1%">${ _('Type') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 277, scrollUp: true}">
+          <tbody data-bind="hueach: {data: filteredTables, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 277, scrollUp: true}">
             <tr>
               <td width="1%" style="text-align: center">
                 <div class="hueCheckbox fa" data-bind="multiCheck: '#tablesTable', value: $data, hueChecked: $parent.selectedTables"></div>
@@ -765,7 +769,7 @@ ${ components.menubar() }
       <th width="10%">${ _('Impala Compatible') }</th>
     </tr>
     </thead>
-    <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200}">
+    <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200}">
     <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + qid(), '_blank'); }">
       <td data-bind="text: qid"></td>
       <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
@@ -981,7 +985,7 @@ ${ components.menubar() }
             <th width="10%">${ _('Join counts') }</th>
           </tr>
           </thead>
-          <tbody data-bind="hueach: {data: $data, itemHeight: 29, scrollable: '.content-panel', scrollableOffset: 200}">
+          <tbody data-bind="hueach: {data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200}">
           <tr>
             <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
@@ -1099,7 +1103,7 @@ ${ components.menubar() }
       </div>
       <div class="resizer" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: $root.isLeftPanelVisible }"><div class="resize-bar">&nbsp;</div></div>
       % endif
-      <div class="content-panel" data-bind="niceScroll">
+      <div class="content-panel" ${ not is_embeddable and 'data-bind="niceScroll"' or ''}>
         <div class="metastore-main">
           <h1>
             <!-- ko template: { if: database() !== null && database().table() !== null, name: 'metastore-describe-table-actions' }--><!-- /ko -->
@@ -1217,8 +1221,8 @@ ${ components.menubar() }
       var viewModel = new MetastoreViewModel(options);
 
       huePubSub.subscribe('metastore.scroll.to.top', function () {
-        $(".content-panel").scrollTop(0);
-        $('.content-panel').getNiceScroll().resize();
+        $('${ MAIN_SCROLLABLE }').scrollTop(0);
+        $('${ MAIN_SCROLLABLE }').getNiceScroll().resize();
       });
 
       viewModel.currentTab.subscribe(function(tab){
@@ -1247,7 +1251,7 @@ ${ components.menubar() }
                     includeNavigator: false,
                     parentId: 'sample',
                     classToRemove: 'sample-table',
-                    mainScrollable: '.content-panel',
+                    mainScrollable: '${ MAIN_SCROLLABLE }',
                     stickToTopPosition: 73,
                     clonedContainerPosition: 'fixed',
                     app: 'metastore'
@@ -1272,7 +1276,7 @@ ${ components.menubar() }
             });
           }
         }
-        $('.content-panel').getNiceScroll().resize();
+        $('${ MAIN_SCROLLABLE }').getNiceScroll().resize();
       });
 
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);

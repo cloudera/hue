@@ -633,19 +633,6 @@ html.modal-open {
  font-size: 60px;
 }
 
-.pointer {
- cursor: pointer!important;
-}
-
-.actionbar-creation {
-  margin: 0;
-}
-
-.actionbar-actions {
-  margin: 0px 0px 10px 0px;
-}
-
-
 .jHueAutocomplete {
    -webkit-border-radius: 0;
       -moz-border-radius: 0;
@@ -1343,16 +1330,6 @@ body {
   letter-spacing: normal;
   pointer-events: none;
   height: 130px;
-}
-
-.dockable {
-  background-color: #FFF;
-  z-index: 1000;
-  padding-bottom: 2px;
-}
-
-*::-ms-clear {
-  display: none;
 }
 
 .stats-popover-name {
