@@ -228,6 +228,9 @@ class DocumentConverter(object):
           extra=document.extra
         )
 
+        # save() updates the last_modified to current time. Resetting it using update()
+        Document2.objects.filter(id=document2.id).update(last_modified=document.last_modified)
+
         document.add_tag(self.imported_tag)
         document.save()
         return document2
