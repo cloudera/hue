@@ -29,16 +29,16 @@
   }
 
   .row-container.is-editing {
-    border: 1px solid #e5e5e5;
+    border: 1px solid @cui-gray-100;
   }
 
   .ui-sortable {
-    background-color: #F3F3F3;
+    background-color: @cui-gray-050;
     min-height: 100px;
   }
 
   .ui-sortable.white {
-    background-color: #FFF!important;
+    background-color: @cui-white!important;
   }
 
   .ui-sortable h2 {
@@ -52,7 +52,7 @@
   }
 
   .ui-sortable-disabled {
-    background-color: #FFF;
+    background-color: @cui-white;
   }
 
   .sortable-arguments {
@@ -101,15 +101,15 @@
   }
 
   .row-header {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
     display: inline;
     padding: 3px;
-    border: 1px solid #e5e5e5;
+    border: 1px solid @cui-gray-100;
     border-bottom: none;
   }
 
   .row-highlight {
-    background-color: #DDD;
+    background-color: @cui-gray-300;
     min-height: 100px;
   }
 
@@ -117,7 +117,7 @@
     position: absolute;
     right: 204px;
     top: 80px;
-    color: #666;
+    color: @cui-gray-700;
     font-size: 20px;
     z-index: 1000;
   }
@@ -126,29 +126,29 @@
     position: absolute;
     left: 120px;
     top: 160px;
-    color: #666;
+    color: @cui-gray-700;
     font-size: 20px;
   }
 
   .emptyRow {
     margin-top: 10px;
     margin-left: 140px;
-    color: #666;
+    color: @cui-gray-700;
     font-size: 18px;
   }
 
   .preview-row {
-    background-color: #f9f9f9;
+    background-color: @cui-gray-050;
     min-height: 400px !important;
     margin-top: 30px;
     text-align: center;
-    color:#DDD;
+    color:@cui-gray-300;
   }
 
   .toolbar-label {
     float: left;
     font-weight: bold;
-    color: #999;
+    color: @cui-gray-600;
     padding-left: 8px;
     padding-top: 24px;
   }
@@ -157,7 +157,7 @@
     width: 40px;
     text-align: center;
     float: left;
-    border: 1px solid #CCC;
+    border: 1px solid @cui-gray-400;
     margin-top: 10px;
     margin-left: 10px;
     cursor: move;
@@ -174,7 +174,7 @@
 
   .draggable-widget.disabled a {
     cursor: default;
-    color: #CCC;
+    color: @cui-gray-400;
   }
 
   .layout-container {
@@ -187,18 +187,18 @@
   .layout-box {
     float: left;
     height: 48px;
-    background-color: #DDD;
+    background-color: @cui-gray-300;
     text-align: center;
   }
 
   .layout-box i {
-    color: #999;
+    color: @cui-gray-600;
     font-size: 28px;
     line-height: 54px;
   }
 
   .layout-container:hover .layout-box {
-    background-color: #CCC;
+    background-color: @cui-gray-400;
   }
 
   .with-top-margin {
@@ -219,13 +219,15 @@
     padding-bottom: 6px;
   }
 
-  .form-search .input-append .btn {
-    border-radius: 4px!important;
-    margin-right: 10px;
-    &.flat-left {
+  .form-search .input-append {
+    .btn {
+      border-radius: 4px !important;
+    }
+    .flat-left {
       border-top-left-radius: 0!important;
       border-bottom-left-radius: 0!important;
       border-left-width: 0;
+      margin-left: 0;
     }
   }
 
@@ -236,7 +238,7 @@
   .widget-spinner {
     padding: 10px;
     font-size: 80px;
-    color: #CCC;
+    color: @cui-gray-400;
     text-align: center;
   }
 
@@ -249,16 +251,16 @@
   }
 
   .add-row {
-    background-color: #F6F6F6;
+    background-color: @cui-gray-050;
     min-height: 36px;
-    border: 2px dashed #DDD;
+    border: 2px dashed @cui-gray-300;
     text-align: center;
     padding: 4px;
     cursor: pointer;
   }
 
   .add-row:before {
-    color: #DDD;
+    color: @cui-gray-300;
     display: inline-block;
     font-family: FontAwesome;
     font-style: normal;
@@ -272,18 +274,18 @@
 
   .add-row-highlight {
     min-height: 10px;
-    background-color: #CCC;
+    background-color: @cui-gray-400;
   }
 
   .spinedit-cnt div.spinedit .fa-chevron-up {
     top: -7px;
-    color: #666;
+    color: @cui-gray-700;
   }
 
   .spinedit-cnt div.spinedit .fa-chevron-down {
     top: 7px;
     left: -4px;
-    color: #666;
+    color: @cui-gray-700;
   }
 
   .facet-field-cnt {
@@ -297,12 +299,12 @@
   }
 
   .facet-field-label {
-    color: #333;
+    color: @cui-gray-800;
     font-size: 11px;
     margin-bottom: 2px;
     margin-right: 4px;
     text-transform: uppercase;
-    text-shadow: 1px 1px 0 #fff;
+    text-shadow: 1px 1px 0 @cui-white;
   }
 
   .facet-field-label-fixed-width {
@@ -431,7 +433,7 @@
 
   .ace-editor {
     padding-left: 4px;
-    border-left: 1px solid #FFFFFF;
+    border-left: 1px solid @cui-white;
     -webkit-transition: border-left-color 0.2s ease;
     -moz-transition: border-left-color 0.2s ease;
     -ms-transition: border-left-color 0.2s ease;
