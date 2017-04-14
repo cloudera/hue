@@ -75,21 +75,24 @@ ${ components.menubar() }
 <script type="text/html" id="metastore-breadcrumbs">
   <ul class="nav nav-pills hue-breadcrumbs-bar" id="breadcrumbs">
     <li>
-      <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}</a>
-      <!-- ko if: database -->
-      <span class="divider">&gt;</span>
-      <!-- /ko -->
+      <a href="javascript:void(0);" data-bind="click: databasesBreadcrumb">${_('Databases')}
+        <!-- ko if: database() != null -->
+        <span class="divider">&gt;</span>
+        <!-- /ko -->
+      </a>
     </li>
     <!-- ko with: database -->
     <li>
-      <a href="javascript:void(0);" data-bind="text: name, click: $root.tablesBreadcrumb"></a>
-      <!-- ko if: table -->
-      <span class="divider">&gt;</span>
-      <!-- /ko -->
+      <a href="javascript:void(0);" data-bind="click: $root.tablesBreadcrumb">
+        <span data-bind="text: name"></span>
+        <!-- ko with: table -->
+        <span class="divider">&gt;</span>
+        <!-- /ko -->
+      </a>
     </li>
     <!-- ko with: table -->
     <li class="editable-breadcrumbs" title="${_('Edit path')}" data-bind="click: function(){ $parent.editingTable(true); }, visible: !$parent.editingTable()">
-      <span data-bind="text: name"></span>
+      <a href="javascript:void(0)" data-bind="text: name"></a>
     </li>
     <!-- /ko -->
     <!-- ko if: editingTable -->
