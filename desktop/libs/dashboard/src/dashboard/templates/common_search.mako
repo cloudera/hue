@@ -59,7 +59,7 @@ from desktop.views import commonheader, commonfooter, _ko
     </div>
   </div>
 
-  <div class="pull-right" ${ is_embeddable and '' or 'style="padding-right:50px"'}>
+  <div class="pull-right" style="${ is_embeddable and '' or 'padding-right:50px'}">
     <a class="btn pointer" title="${ _('Edit') }" rel="tooltip" data-placement="bottom" data-bind="click: toggleEditing, css: {'btn': true, 'btn-inverse': isEditing}">
       <i class="fa fa-pencil"></i>
     </a>
