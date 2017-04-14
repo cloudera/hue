@@ -183,7 +183,7 @@ def _default_interpreters(user):
       }),
     ))
 
-  if 'serch' in apps: # And Solr 6+
+  if 'search' in apps: # And Solr 6+
     interpreters.append(('solr', {
         'name': 'Solr SQL', 'interface': 'solr', 'options': {}
     }),)
