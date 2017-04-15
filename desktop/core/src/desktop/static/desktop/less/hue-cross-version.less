@@ -260,3 +260,19 @@ input[type='password']::-ms-reveal {
 .actionbar-actions {
   margin: 0px 0px 10px 0px;
 }
+
+.status-circle {
+  border-radius: 4px;
+  width: 8px;
+  height: 8px;
+  display: inline-block;
+  &.green {
+    background-color: @cui-green;
+  }
+  &.orange {
+    background-color: @cui-orange;
+  }
+  &.red {
+    background-color: @cui-red;
+  }
+}
