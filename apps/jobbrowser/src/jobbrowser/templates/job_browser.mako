@@ -127,39 +127,41 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
-            ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
-            <div class="btn-group">
-              <select data-bind="options: jobs.statesValuesFilter, selectedOptions: jobs.statesFilter, optionsText: 'name', optionsValue: 'value'" size="3" multiple="true"></select>
-              <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
-              <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
-              <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-            </div>
+            <form class="form-inline">
+              ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
+              <span data-bind="foreach: jobs.statesValuesFilter">
+                <label class="checkbox">
+                  <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
+                  <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+                  <span data-bind="text: name, attr: {for: name}"></span>
+                </label>
+              </span>
 
-            ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
-            <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
-              <option value="days">${_('days')}</option>
-              <option value="hours">${_('hours')}</option>
-              <option value="minutes">${_('minutes')}</option>
-            </select>
+              ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
+              <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
+                <option value="days">${_('days')}</option>
+                <option value="hours">${_('hours')}</option>
+                <option value="minutes">${_('minutes')}</option>
+              </select>
 
-            <button class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
-              <i class="fa fa-refresh"></i>
-            </button>
+              <a class="btn" title="${ _('Refresh') }" data-bind="click: jobs.updateJobs">
+                <i class="fa fa-refresh"></i>
+              </a>
+
+              <div data-bind="template: { name: 'job-actions', 'data': jobs }" class="pull-right"></div>
+            </form>
 
 
-            <div class="pull-right">
-              <div data-bind="template: { name: 'job-actions', 'data': jobs }"></div>
-            </div>
 
             <div class="card card-small">
               <table id="finishedJobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
                   <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
+                  <th width="10"></th>
                   <th>${_('Duration')}</th>
                   <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
-                  <th>${_('Status')}</th>
                   <th>${_('Progress')}</th>
                   <th>${_('Name')}</th>
                   <th>${_('User')}</th>
@@ -168,11 +170,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </thead>
                 <tbody data-bind="foreach: jobs.apps">
                   <tr data-bind="click: fetchJob">
-                    <td><div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#finishedJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div></td>
+                    <td>
+                      <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#finishedJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
+                    </td>
+                    <td>
+                      <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': status() == 'SUCCEEDED','orange': ['RUNNING', 'ACCEPTED'].indexOf(status()) > -1, 'red': status() == 'KILLED'}"></div>
+                    </td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: submitted"></td>
                     <td data-bind="text: type"></td>
-                    <td data-bind="text: status"></td>
                     <td data-bind="text: progress"></td>
                     <td data-bind="text: name"></td>
                     <td data-bind="text: user"></td>
@@ -1179,12 +1185,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
-      self.statesFilter = ko.observable('');
-      self.statesValuesFilter = ko.observable([
-        {'value': 'completed', 'name': '${_("Succeeded")}'},
-        {'value': 'running', 'name': '${_("Running")}'},
-        {'value': 'failed', 'name': '${_("Failed")}'},
+      self.statesValuesFilter = ko.observableArray([
+        ko.mapping.fromJS({'value': 'completed', 'name': '${_("Succeeded")}', 'checked': true, 'klass': 'green'}),
+        ko.mapping.fromJS({'value': 'running', 'name': '${_("Running")}', 'checked': true, 'klass': 'orange'}),
+        ko.mapping.fromJS({'value': 'failed', 'name': '${_("Failed")}', 'checked': true, 'klass': 'red'}),
       ]);
+      self.statesFilter = ko.computed(function () {
+        var checkedStates = ko.utils.arrayFilter(self.statesValuesFilter(), function (state) {
+          return state.checked();
+        });
+        return ko.utils.arrayMap(checkedStates, function(state){
+          return state.value()
+        });
+      });
       self.timeValueFilter = ko.observable(7).extend({ throttle: 500 });
       self.timeUnitFilter = ko.observable('days').extend({ throttle: 500 });
       self.timeUnitFilterUnits = ko.observable([
@@ -1227,7 +1240,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return [
           {'text': self.textFilter()},
           {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}},
-          {'states': self.statesFilter()},
+          {'states': ko.mapping.toJS(self.statesFilter())},
           {'pagination': self.pagination()},
         ];
       });
