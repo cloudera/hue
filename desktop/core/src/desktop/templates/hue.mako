@@ -190,9 +190,9 @@ ${ hueIcons.symbols() }
         % endif
 
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
-        % if 'jobbrowser' in apps:
+        <!-- ko if: hasJobBrowser -->
           <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
-        % endif
+        <!-- /ko -->
       </div>
     </div>
   </nav>
@@ -980,6 +980,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.mainQuickCreateAction = ko.observable();
         self.quickCreateActions = ko.observableArray();
 
+        self.hasJobBrowser = ko.observable(true);
+
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           if (clusterConfig && clusterConfig['main_button_action']) {
             var topApp = clusterConfig['main_button_action'];
@@ -1034,6 +1036,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           } else {
             self.quickCreateActions([]);
           }
+                                                                                   
+          self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser']);
         });
 
         self.searchAutocompleteSource = function (request, callback) {
