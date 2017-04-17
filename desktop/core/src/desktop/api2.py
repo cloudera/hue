@@ -66,12 +66,13 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_config(request):
-  app_config = ClusterConfig(request.user).get_apps()
+  cluster_config = ClusterConfig(request.user)
+  app_config = cluster_config.get_apps()
 
   return JsonResponse({
     'status': 0,
     'app_config': app_config,
-    'main_button_action': app_config['editor']['interpreters'][1],
+    'main_button_action': cluster_config.main_quick_action,
     'button_actions': [
       app for app in [
         app_config.get('editor'),

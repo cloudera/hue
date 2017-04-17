@@ -821,25 +821,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldap' },
           { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
           { url: '/useradmin/users/new', app: 'useradmin_newuser' },
-          { url: '/', app: function () {
-            % if 'beeswax' in apps or 'impala' in apps:
-              page('/editor');
-            % elif SHOW_NOTEBOOKS.get():
-              page('/notebook');
-            % elif interpreters:
-              page('/editor');
-            % elif IS_DASHBOARD_ENABLED.get():
-              page('/dashboard/new_search');
-            % elif 'jobbrowser' in apps:
-              page('/jobbrowser/');
-            % else:
-              page('/home');
-            % endif
-          }},
-          { url: '*', app: function (ctx) {
-            console.error('Route not found', ctx);
-            self.loadApp('404');
-          }}
         ];
 
         pageMapping.forEach(function (mapping) {
@@ -850,7 +831,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           })
         });
 
-        page();
+        huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+          page('/', function() {  page(clusterConfig['main_button_action'].page); });
+          page('*', function (ctx) {
+            console.error('Route not found', ctx);
+            self.loadApp('404');
+          });
+          page();
+        });
 
         huePubSub.subscribe('open.link', function (href) {
           if (href.startsWith('/') && !href.startsWith('/hue')){
@@ -1036,7 +1024,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           } else {
             self.quickCreateActions([]);
           }
-                                                                                   
+
           self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser']);
         });
 
