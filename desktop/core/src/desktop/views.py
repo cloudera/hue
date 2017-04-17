@@ -50,13 +50,13 @@ from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _ge
 from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, HTTP_PORT
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
-from desktop.lib.django_util import JsonResponse, login_notrequired, render_json, render
+from desktop.lib.django_util import JsonResponse, login_notrequired, render
 from desktop.lib.i18n import smart_str
 from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import UserPreferences, Settings, hue_version, ClusterConfig, _get_apps
+from desktop.models import Settings, hue_version, ClusterConfig, _get_apps
 
 
 LOG = logging.getLogger(__name__)

@@ -43,7 +43,6 @@ from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
-from hadoop.cluster import get_default_yarncluster
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
@@ -1515,18 +1514,30 @@ class ClusterConfig():
 
   @property
   def main_quick_action(self):
+    apps = self.get_apps()
+    if not apps:
+      raise PopupException(_('No permission to any app.'))
+
+    default_app = apps.values()[0]
+    default_interpreter = default_app.get('interpreters')
+
     try:
-      default_app = json.loads(UserPreferences.objects.get(user=self.user, key='default_app').value)
-      app = self.get_apps()[default_app['app']]
-      if default_app.get('interpreter'):
-        return [interpreter for interpreter in app['interpreters'] if interpreter['type'] == default_app['interpreter']][0]
-      else:
-        return app
+      user_default_app = json.loads(UserPreferences.objects.get(user=self.user, key='default_app').value)
+      if apps.get(user_default_app['app']):
+        default_app = self.get_apps()[user_default_app['app']]
+        if default_app.get('interpreters'):
+          interpreters = [interpreter for interpreter in default_app['interpreters'] if interpreter['type'] == default_app['interpreter']]
+          if interpreters:
+            default_interpreter = interpreter[0]
     except UserPreferences.DoesNotExist:
       pass
     except Exception:
       LOG.exception('Could not load back default app')
-    return self.get_apps().values()[0]['interpreters'][0]
+
+    if default_interpreter:
+      return default_interpreter[0]
+    else:
+      return default_app
 
 
   def _get_editor(self):
@@ -1609,6 +1620,7 @@ class ClusterConfig():
       })
 
     if 'jobbrowser' in self.apps:
+      from hadoop.cluster import get_default_yarncluster # Circular loop
       if get_default_yarncluster():
         interpreters.append({
           'type': 'yarn',
