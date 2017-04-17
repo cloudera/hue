@@ -81,7 +81,6 @@ dynamic_patterns += patterns('desktop.views',
   (r'^desktop/reset_all_debug','reset_all_debug'),
   (r'^bootstrap.js$', 'bootstrap'), # unused
 
-  (r'^desktop/prefs/(?P<key>\w+)?$', 'prefs'),
   (r'^desktop/status_bar/?$', 'status_bar'),
   (r'^desktop/debug/is_alive$','is_alive'),
   (r'^desktop/debug/is_idle$','is_idle'),
@@ -137,6 +136,7 @@ dynamic_patterns += patterns('desktop.api2',
   (r'^desktop/api2/doc/share/?$', 'share_document'),
 
   (r'^desktop/api2/get_config/?$', 'get_config'),
+  (r'^desktop/api2/get_user_preferences/(?P<key>\w+)?$', 'user_preferences'),
 
   (r'^desktop/api2/doc/export/?$', 'export_documents'),
   (r'^desktop/api2/doc/import/?$', 'import_documents'),

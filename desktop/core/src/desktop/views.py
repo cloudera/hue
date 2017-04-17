@@ -200,36 +200,6 @@ def download_log_view(request):
   return render_to_response("logs.mako", dict(log=[_("No logs found.")], is_embeddable=request.GET.get('is_embeddable', False)))
 
 
-@access_log_level(logging.DEBUG)
-def prefs(request, key=None):
-  """Get or set preferences."""
-  if key is None:
-    d = dict( (x.key, x.value) for x in UserPreferences.objects.filter(user=request.user))
-    return render_json(d)
-  else:
-    if "set" in request.REQUEST:
-      try:
-        x = UserPreferences.objects.get(user=request.user, key=key)
-      except UserPreferences.DoesNotExist:
-        x = UserPreferences(user=request.user, key=key)
-      x.value = request.REQUEST["set"]
-      x.save()
-      return render_json(True)
-    if "delete" in request.REQUEST:
-      try:
-        x = UserPreferences.objects.get(user=request.user, key=key)
-        x.delete()
-        return render_json(True)
-      except UserPreferences.DoesNotExist:
-        return render_json(False)
-    else:
-      try:
-        x = UserPreferences.objects.get(user=request.user, key=key)
-        return render_json(x.value)
-      except UserPreferences.DoesNotExist:
-        return render_json(None)
-
-
 def bootstrap(request):
   """Concatenates bootstrap.js files from all installed Hue apps."""
 
