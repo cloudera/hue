@@ -1429,17 +1429,17 @@ from notebook.conf import get_ordered_interpreters
 
             if (appConfig['editor']) {
               panels.push(
-                      new AssistInnerPanel({
-                        panelData: new AssistDbPanel($.extend({
-                          apiHelper: self.apiHelper,
-                          i18n: i18n
-                        }, params.sql)),
-                        apiHelper: self.apiHelper,
-                        name: '${ _("SQL") }',
-                        type: 'sql',
-                        icon: 'fa-database',
-                        minHeight: 75
-                      })
+                new AssistInnerPanel({
+                  panelData: new AssistDbPanel($.extend({
+                    apiHelper: self.apiHelper,
+                    i18n: i18n
+                  }, params.sql)),
+                  apiHelper: self.apiHelper,
+                  name: '${ _("SQL") }',
+                  type: 'sql',
+                  icon: 'fa-database',
+                  minHeight: 75
+                })
               );
             }
 

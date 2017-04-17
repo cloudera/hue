@@ -72,7 +72,13 @@ def get_config(request):
     'status': 0,
     'app_config': app_config,
     'main_button_action': app_config['editor']['interpreters'][1],
-    'button_actions': [app_config['editor'], app_config['dashboard'], app_config['scheduler']],
+    'button_actions': [
+      app for app in [
+        app_config.get('editor'),
+        app_config.get('dashboard'),
+        app_config.get('scheduler')
+      ] if app is not None
+    ],
   })
 
 

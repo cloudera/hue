@@ -80,11 +80,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-            <li data-bind="css: {'active': interface() === 'jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('jobs'); }">${ _('Jobs') }</a></li>
-            <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ selectInterface('workflows'); }">${ _('Workflows') }</a></li>
-            <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ selectInterface('schedules'); }">${ _('Schedules') }</a></li>
-            <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ selectInterface('bundles'); }">${ _('Bundles') }</a></li>
-            <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ selectInterface('slas'); }">${ _('SLAs') }</a></li>
+            <!-- ko if: appConfig() && appConfig()['browser'] && appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 -->
+              <li data-bind="css: {'active': interface() === 'jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('jobs'); }">${ _('Jobs') }</a></li>
+            <!-- /ko -->
+            <!-- ko if: appConfig() && appConfig()['scheduler'] && appConfig()['scheduler']['interpreters'].length > 0 -->
+              <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ selectInterface('workflows'); }">${ _('Workflows') }</a></li>
+              <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ selectInterface('schedules'); }">${ _('Schedules') }</a></li>
+              <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ selectInterface('bundles'); }">${ _('Bundles') }</a></li>
+              <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ selectInterface('slas'); }">${ _('SLAs') }</a></li>
+            <!-- /ko -->
             </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right label label-warning" style="margin-top: 16px">${ _("Hive jobs are running as the 'hive' user") }</div>
@@ -1363,6 +1367,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.assistAvailable = ko.observable(true);
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
+      self.appConfig = ko.observable();
 
       self.slasLoadedOnce = false;
       self.slasLoading = ko.observable(true);
@@ -1461,6 +1466,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       viewModel.job().fetchJob();
     });
 
+   huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+     viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+   });
+
     $(document).ready(function () {
       viewModel = new JobBrowserViewModel(RunningCoordinatorModel);
       % if not is_mini:
@@ -1468,6 +1477,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % else:
       ko.applyBindings(viewModel, $('#jobbrowserMiniComponents')[0]);
       % endif
+
+      huePubSub.publish('cluster.config.get.config');
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1 || $('#jobbrowserMiniComponents').is(':visible')) {
