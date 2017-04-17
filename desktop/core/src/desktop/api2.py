@@ -41,7 +41,8 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig
+from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig,\
+  UserPreferences
 
 
 LOG = logging.getLogger(__name__)
@@ -573,6 +574,38 @@ def _update_imported_oozie_document(doc, uuids_map):
       doc['fields']['data'] = doc['fields']['data'].replace(key, value)
 
   return doc
+
+
+def user_preferences(request, key=None):
+  response = {'status': 0, 'data': {}}
+
+  if request.method != "POST":
+    if key is not None:
+      try:
+        x = UserPreferences.objects.get(user=request.user, key=key)
+        response['data'] = {key: x.value}
+      except UserPreferences.DoesNotExist:
+        response['data'] = None
+    else:
+      response['data'] = dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user))
+  else:
+    if "set" in request.POST:
+      try:
+        x = UserPreferences.objects.get(user=request.user, key=key)
+      except UserPreferences.DoesNotExist:
+        x = UserPreferences(user=request.user, key=key)
+      x.value = request.POST["set"]
+      x.save()
+      response['data'] = {key: x.value}
+    elif "delete" in request.POST:
+      try:
+        x = UserPreferences.objects.get(user=request.user, key=key)
+        x.delete()
+      except UserPreferences.DoesNotExist:
+        pass
+
+  return JsonResponse(response)
+
 
 def search_entities(request):
   sources = json.loads(request.POST.get('sources')) or []

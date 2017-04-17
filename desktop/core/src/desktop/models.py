@@ -1515,7 +1515,18 @@ class ClusterConfig():
 
   @property
   def main_quick_action(self):
-    return self._get_editor()['interpreters'][1] # TODO handle default and user personal one
+    try:
+      default_app = json.loads(UserPreferences.objects.get(user=self.user, key='default_app').value)
+      app = self.get_apps()[default_app['app']]
+      if default_app.get('interpreter'):
+        return [interpreter for interpreter in app['interpreters'] if interpreter['type'] == default_app['interpreter']][0]
+      else:
+        return app
+    except UserPreferences.DoesNotExist:
+      pass
+    except Exception:
+      LOG.exception('Could not load back default app')
+    return self.get_apps().values()[0]['interpreters'][0]
 
 
   def _get_editor(self):
@@ -1541,10 +1552,10 @@ class ClusterConfig():
 
     if interpreters:
       return {
-          'name': 'editor',
-          'displayName': _('Editor'),
-          'interpreters': interpreters,
-          'page': interpreters[0 if len(interpreters) == 1 else 1]['page']
+        'name': 'editor',
+        'displayName': _('Editor'),
+        'interpreters': interpreters,
+        'page': interpreters[0 if len(interpreters) == 1 else 1]['page']
       }
     else:
       return None
@@ -1554,11 +1565,11 @@ class ClusterConfig():
 
     if IS_DASHBOARD_ENABLED.get():
       return {
-          'name': 'dashboard',
-          'displayName': _('Dashboard'),
-          'interpreters': interpreters,
-          'page': '/dashboard/new_search'
-        }
+        'name': 'dashboard',
+        'displayName': _('Dashboard'),
+        'interpreters': interpreters,
+        'page': '/dashboard/new_search'
+      }
     else:
       return None
 

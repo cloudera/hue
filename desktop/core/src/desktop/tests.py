@@ -281,35 +281,36 @@ def test_prefs():
   c = make_logged_in_client()
 
   # Get everything
-  response = c.get('/desktop/prefs/')
-  assert_equal('{}', response.content)
+  response = c.get('/desktop/api2/get_user_preferences/')
+  assert_equal({}, json.loads(response.content)['data'])
 
   # Set and get
-  response = c.get('/desktop/prefs/foo', dict(set="bar"))
-  assert_equal('true', response.content)
-  response = c.get('/desktop/prefs/foo')
-  assert_equal('"bar"', response.content)
+  response = c.post('/desktop/api2/get_user_preferences/foo', {'set': 'bar'})
+  assert_equal('bar', json.loads(response.content)['data']['foo'])
+  response = c.get('/desktop/api2/get_user_preferences/')
+  assert_equal('bar', json.loads(response.content)['data']['foo'])
 
   # Reset (use post this time)
-  c.post('/desktop/prefs/foo', dict(set="baz"))
-  response = c.get('/desktop/prefs/foo')
-  assert_equal('"baz"', response.content)
+  c.post('/desktop/api2/get_user_preferences/foo', {'set': 'baz'})
+  response = c.get('/desktop/api2/get_user_preferences/foo')
+  assert_equal('baz', json.loads(response.content)['data']['foo'])
 
   # Check multiple values
-  c.post('/desktop/prefs/elephant', dict(set="room"))
-  response = c.get('/desktop/prefs/')
-  assert_true("baz" in response.content)
-  assert_true("room" in response.content)
+  c.post('/desktop/api2/get_user_preferences/elephant', {'set': 'room'})
+  response = c.get('/desktop/api2/get_user_preferences/')
+  assert_true("baz" in json.loads(response.content)['data'].values(), response.content)
+  assert_true("room" in json.loads(response.content)['data'].values(), response.content)
 
   # Delete everything
-  c.get('/desktop/prefs/elephant', dict(delete=""))
-  c.get('/desktop/prefs/foo', dict(delete=""))
-  response = c.get('/desktop/prefs/')
-  assert_equal('{}', response.content)
+  c.post('/desktop/api2/get_user_preferences/elephant', {'delete': ''})
+  c.post('/desktop/api2/get_user_preferences/foo', {'delete': ''})
+  response = c.get('/desktop/api2/get_user_preferences/')
+  assert_equal({}, json.loads(response.content)['data'])
 
   # Check non-existent value
-  response = c.get('/desktop/prefs/doesNotExist')
-  assert_equal('null', response.content)
+  response = c.get('/desktop/api2/get_user_preferences/doesNotExist')
+  assert_equal(None, json.loads(response.content)['data'])
+
 
 def test_status_bar():
   """
