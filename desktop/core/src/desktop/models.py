@@ -43,6 +43,7 @@ from settings import HUE_DESKTOP_VERSION
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
 from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
+from hadoop.cluster import get_default_yarncluster
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
@@ -1597,12 +1598,13 @@ class ClusterConfig():
       })
 
     if 'jobbrowser' in self.apps:
-      interpreters.append({
-        'type': 'jobs',
-        'displayName': _('Jobs'),
-        'tooltip': _('Jobs'),
-        'page': '/jobbrowser/'
-      })
+      if get_default_yarncluster():
+        interpreters.append({
+          'type': 'yarn',
+          'displayName': _('Jobs'),
+          'tooltip': _('Jobs'),
+          'page': '/jobbrowser/'
+        })
 
     if 'hbase' in self.apps:
       interpreters.append({
@@ -1693,13 +1695,13 @@ class ClusterConfig():
 
 
   def get_apps(self):
-    apps = OrderedDict([
+    apps = OrderedDict([app for app in [
       ('editor', self._get_editor()),
       ('dashboard', self._get_dashboard()),
       ('browser', self._get_browser()),
       ('scheduler', self._get_scheduler()),
       ('sdkapps', self._get_sdk_apps()),
-    ])
+    ] if app[1]])
 
     return apps
 
