@@ -179,7 +179,7 @@ var AssistDbSource = (function () {
     var nestedFilter = {
       query: ko.observable("").extend({ rateLimit: { timeout: 250, method: 'notifyWhenChangesStop' } }),
       showTables: ko.observable(true),
-      enableActiveFilter: self.navigationSettings.enableActiveFilter && typeof window.Worker !== 'undefined',
+      enableActiveFilter: typeof window.Worker !== 'undefined',
       showActive: ko.observable(false),
       showViews: ko.observable(true),
       activeEditorTables: ko.observableArray([])
