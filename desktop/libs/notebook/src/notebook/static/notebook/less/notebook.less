@@ -442,14 +442,14 @@
     margin-left: 0;
   }
 
-  .show-assist {
+  .show-assist,
+  .show-assist-right {
     position: fixed;
     top: 80px;
     background-color: #FFF;
     width: 16px;
     height: 24px;
     line-height: 24px;
-    margin-left: -2px;
     text-align: center;
     -webkit-border-top-right-radius: 3px;
     -webkit-border-bottom-right-radius: 3px;
@@ -458,33 +458,69 @@
     border-top-right-radius: 3px;
     border-bottom-right-radius: 3px;
     z-index: 1000;
+  }
+
+  .show-assist {
+    left: 8px;
+    margin-left: -2px;
     -webkit-transition: margin-left 0.2s linear;
     -moz-transition: margin-left 0.2s linear;
     -ms-transition: margin-left 0.2s linear;
     transition: margin-left 0.2s linear;
   }
 
+  .show-assist-right {
+    right: 8px;
+    margin-right: -2px;
+    -webkit-transition: margin-right 0.2s linear;
+    -moz-transition: margin-right 0.2s linear;
+    -ms-transition: margin-right 0.2s linear;
+    transition: margin-right 0.2s linear;
+  }
+
   .show-assist:hover {
     margin-left: 0;
   }
 
-  .hide-assist {
+  .show-assist-right:hover {
+    margin-right: 0;
+  }
+
+  .hide-assist,
+  .hide-assist-right {
     position: absolute;
     top: 2px;
-    right: 4px;
     z-index: 1000;
     color: #aaa;
     font-size: 12px;
+  }
+
+  .hide-assist {
+    right: 4px;
     -webkit-transition: margin-right 0.2s linear, color 0.5s ease;
     -moz-transition: margin-right 0.2s linear, color 0.5s ease;
     -ms-transition: margin-right 0.2s linear, color 0.5s ease;
     transition: margin-right 0.2s linear, color 0.5s ease;
   }
 
+  .hide-assist-right {
+    left: 4px;
+    -webkit-transition: margin-left 0.2s linear, color 0.5s ease;
+    -moz-transition: margin-left 0.2s linear, color 0.5s ease;
+    -ms-transition: margin-left 0.2s linear, color 0.5s ease;
+    transition: margin-left 0.2s linear, color 0.5s ease;
+  }
+
   .hide-assist:hover {
     margin-right: 2px;
     color: @hue-primary-color-dark;
   }
+
+  .hide-assist-right:hover {
+    margin-left: 2px;
+    color: @hue-primary-color-dark;
+  }
+
 
   .logs {
     padding: 9.5px;

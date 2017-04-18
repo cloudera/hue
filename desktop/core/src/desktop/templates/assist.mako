@@ -1803,7 +1803,7 @@ from notebook.conf import get_ordered_interpreters
         };
 
         var initActive = function () {
-          if (_.isUndefined(self.activeCursorLocation())) {
+          if (!self.activeCursorLocation()) {
             huePubSub.publish('get.active.editor.cursor.location');
           }
           if (typeof self.activeCursorLocation() !== 'undefined' && typeof self.locationIndex()[self.activeCursorLocation().id] !== 'undefined') {
@@ -1832,7 +1832,7 @@ from notebook.conf import get_ordered_interpreters
             if (statements.length > 0) {
               // Pick the last statement by default (only one or cursor after last ';')
               var statementIndex = statements.length;
-              activeLocations = _.last(statements);
+              activeLocations = statements[statementIndex - 1];
               if (statements.length > 1) {
                 var cursorPos = self.activeCursorLocation().position;
                 var index = 1;

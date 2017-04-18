@@ -182,12 +182,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   .search-bar {
     top: 58px!important;
   }
-  .show-assist {
+
+  .show-assist,
+  .show-assist-right {
     top: 110px!important;
   }
+
   .main-content {
     top: 112px!important;
   }
+
   .context-panel {
     height: calc(100% - 104px);
     top: 104px;
@@ -427,6 +431,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible() && $root.assistAvailable(), click: function() { $root.isLeftPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
   <i class="fa fa-chevron-right"></i>
 </a>
+<a title="${_('Toggle Assist')}" class="pointer show-assist-right" data-bind="visible: !$root.isRightPanelVisible() && $root.isRightPanelAvailable(), click: function() { $root.isRightPanelVisible(true); huePubSub.publish('assist.set.manual.visibility'); }">
+  <i class="fa fa-chevron-left"></i>
+</a>
 % endif
 
 
@@ -464,8 +471,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         }
       }"></div>
   </div>
-  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
+
   <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
@@ -518,6 +526,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       % endif
     </div>
   </div>
+
+  % if not is_embeddable:
+    <!-- ko if: isRightPanelAvailable -->
+    <div class="resizer" data-bind="visible: isRightPanelVisible, splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+    <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible">
+      <a title="${_('Toggle Assist')}" class="pointer hide-assist-right" data-bind="click: function() { isRightPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
+        <i class="fa fa-chevron-right"></i>
+      </a>
+      <div class="assist" data-bind="component: {
+      name: 'right-assist-panel',
+      params: {}
+    }">
+      </div>
+    </div>
+    <!-- /ko -->
+  % endif
 
 
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
