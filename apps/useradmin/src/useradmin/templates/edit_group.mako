@@ -20,10 +20,11 @@ import urllib
 from django.utils.translation import ugettext as _
 %>
 
-
 <%namespace name="layout" file="layout.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
+%endif
 ${layout.menubar(section='groups')}
 
 <%def name="render_field(field)">
@@ -102,4 +103,6 @@ ${layout.menubar(section='groups')}
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

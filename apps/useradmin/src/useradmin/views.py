@@ -434,7 +434,12 @@ def edit_group(request, name=None):
   else:
     form = GroupEditForm(instance=instance)
 
-  return render('edit_group.mako', request, dict(form=form, action=request.path, name=name))
+  return render('edit_group.mako', request, {
+    'form': form,
+    'action': request.path,
+    'name': name,
+    'is_embeddable': request.GET.get('is_embeddable', False),
+  })
 
 
 def edit_permission(request, app=None, priv=None):

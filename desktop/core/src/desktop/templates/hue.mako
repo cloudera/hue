@@ -280,6 +280,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_indexes" class="embeddable"></div>
       <div id="embeddable_useradmin_users" class="embeddable"></div>
       <div id="embeddable_useradmin_groups" class="embeddable"></div>
+      <div id="embeddable_useradmin_newgroup" class="embeddable"></div>
       <div id="embeddable_useradmin_permissions" class="embeddable"></div>
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
@@ -484,6 +485,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         importer: '/indexer/importer/',
         useradmin_users: '/useradmin/users',
         useradmin_groups: '/useradmin/groups',
+        useradmin_newgroup: '/useradmin/groups/new',
         useradmin_permissions: '/useradmin/permissions',
         useradmin_configurations: '/useradmin/configurations',
         useradmin_newuser: '/useradmin/users/new',
@@ -501,7 +503,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         sqoop: '/sqoop',
       };
 
-      var SKIP_CACHE = ['home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = ['home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_permissions', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -816,6 +818,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/sqoop', app: 'sqoop' },
           { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
           { url: '/useradmin/groups/', app: 'useradmin_groups' },
+          { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
           { url: '/useradmin/permissions/', app: 'useradmin_permissions' },
           { url: '/useradmin/users/', app: 'useradmin_users' },
           { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldap' },
