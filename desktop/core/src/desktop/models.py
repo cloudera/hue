@@ -1526,9 +1526,9 @@ class ClusterConfig():
       if apps.get(user_default_app['app']):
         default_app = self.get_apps()[user_default_app['app']]
         if default_app.get('interpreters'):
-          interpreters = [interpreter for interpreter in default_app['interpreters'] if interpreter['type'] == default_app['interpreter']]
+          interpreters = [interpreter for interpreter in default_app['interpreters'] if interpreter['type'] == user_default_app['interpreter']]
           if interpreters:
-            default_interpreter = interpreter[0]
+            default_interpreter = interpreters
     except UserPreferences.DoesNotExist:
       pass
     except Exception:
@@ -1566,7 +1566,7 @@ class ClusterConfig():
         'name': 'editor',
         'displayName': _('Editor'),
         'interpreters': interpreters,
-        'page': interpreters[0 if len(interpreters) == 1 else 1]['page']
+        'page': interpreters[0]['page']
       }
     else:
       return None
