@@ -69,7 +69,11 @@ class OptimizerApi(object):
     return self._token
 
   def _call(self, *kwargs):
-    data = self._api.call_api(*kwargs).json()
+    resp = self._api.call_api(*kwargs)
+    data = resp.json()
+
+    if resp.headers.get('x-altus-request-id'):
+      LOG.info('%s: %s' % (resp.headers['x-altus-request-id'], kwargs))
 
     if data.get('code') == 'UNKNOWN':
       raise NavOptException(data.get('message'))
