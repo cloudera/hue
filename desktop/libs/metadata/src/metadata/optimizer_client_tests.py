@@ -184,7 +184,7 @@ PARTITIONED BY (
   def test_query_risk(self):
     query = 'Select * from items'
 
-    resp = self.api.query_risk(query=query, source_platform='hive')
+    resp = self.api.query_risk(query=query, source_platform='hive', db_name='default')
 
     assert_true(len(resp) > 0, resp)
     assert_true('riskAnalysis' in resp[0], resp)
@@ -305,8 +305,8 @@ FROM
                                     FROM sample_01) t1) t2) t3) t4) t5) t6) t7) t8) t9) t10) t11) t12
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['>=10 Inline Views present in query.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['>=10 Inline Views present in query.'], resp['hints'])
 
 
   def test_risk_cartesian_cross_join(self):
@@ -326,16 +326,16 @@ WHERE
 ORDER BY s07.salary DESC
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Cartesian or CROSS join found.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT ID, NAME, AMOUNT, DATE FROM CUSTOMERS, ORDERS
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Cartesian or CROSS join found.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
 
 
   def test_risk_5_joins(self):
@@ -372,8 +372,8 @@ ORDER BY s07.salary DESC
 LIMIT 1000
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['>=5 table joins or >=10 join conditions found.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['>=5 table joins or >=10 join conditions found.'], resp['hints'])
 
 
   def test_risk_10_group_by_columns(self):
@@ -395,8 +395,8 @@ GROUP BY account_client,
          limit 5
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['>=10 columns present in GROUP BY list.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['>=10 columns present in GROUP BY list.'], resp['hints'])
 
 
   def test_risk_cross_join_false_positive(self):
@@ -415,43 +415,44 @@ LIMIT 1000
 
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Cartesian or CROSS join found.'], resp, present=False)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'], present=False)
 
 
   def test_risk_no_filter_on_any_partitioned_column(self):
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs'''
+    db_name = 'default'
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs LIMIT 1'''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE app='oozie' LIMIT 1'''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE date='20180101' '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp, present=False)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'], present=False)
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE app='oozie' AND date='20180101' '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp, present=False)
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'], present=False)
 
 
 def _assert_risks(risks, suggestions, present=True):
