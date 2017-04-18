@@ -467,6 +467,51 @@
         });
       });
 
+      it('should report locations for "SELECT tbl.col FROM some_tbl tbl;"', function() {
+        assertLocations({
+          dialect: 'hive',
+          beforeCursor: 'SELECT tbl.col FROM some_tbl tbl;',
+          afterCursor: '',
+          expectedLocations: [
+            { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 33 } },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'some_tbl' }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 29 }, identifierChain: [{ name: 'some_tbl' }] }
+          ]
+        });
+      });
+
+      it('should report locations for "SELECT tbl.col.cplx FROM some_tbl tbl;"', function() {
+        assertLocations({
+          dialect: 'hive',
+          beforeCursor: 'SELECT tbl.col.cplx FROM some_tbl tbl;',
+          afterCursor: '',
+          expectedLocations: [
+            { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 } },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'some_tbl' }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 20 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 34 }, identifierChain: [{ name: 'some_tbl' }] }
+          ]
+        });
+      });
+
+      it('should report locations for "SELECT some_tbl.col.cplx FROM some_tbl;"', function() {
+        assertLocations({
+          dialect: 'hive',
+          beforeCursor: 'SELECT some_tbl.col.cplx FROM some_tbl;',
+          afterCursor: '',
+          expectedLocations: [
+            { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 39 } },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 16 }, identifierChain: [{ name: 'some_tbl' }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'some_tbl' }] }] },
+            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }] }] },
+            { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 39 }, identifierChain: [{ name: 'some_tbl' }] }
+          ]
+        });
+      });
+
+
       it('should report locations for "SELECT testTableB.a, cos(1), tta.abcdefg|hijk, tta.bla, cos(1) FROM testTableA tta, testTableB;"', function() {
         assertLocations({
           dialect: 'hive',
