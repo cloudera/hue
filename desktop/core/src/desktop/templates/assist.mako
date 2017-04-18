@@ -1721,34 +1721,38 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assistant-panel-template">
-    <div class="assist-inner-panel">
-      <!-- ko if: statementCount() > 1 -->
-      <div class="assist-inner-header">
-      ${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span>
-      </div>
-      <br/>
-      <!-- /ko -->
-      <div class="assist-inner-header">
-      ${ _('Tables') }
-      </div>
-      <ul data-bind="foreach: activeTables">
-        <li>
-          ## Click name to select
-          <span data-bind="text: name"></span>
-          <div class="pull-right margin-right-10">
-            <a class="inactive-action" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }">
-              <i class="fa fa-info"></i>
-            </a>
-            <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
-          </div>
-        </li>
-      </ul>
+    <div class="assist-inner-panel assist-assistant-panel">
+      <div class="assist-flex-panel">
+        <!-- ko if: statementCount() > 1 -->
+        <div class="assist-flex-header">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
+        <!-- /ko -->
 
-      <form class="form-horizontal">
-        <fieldset>
-          <div>${ _('Suggestions') }</div>
-          <!-- ko if: hasActiveRisks -->
-          <ul data-bind="foreach: activeRisks()['hints']">
+        <div class="assist-flex-header"><div class="assist-inner-header">${ _('Tables') }</div></div>
+        <div class="assist-flex-half">
+          <!-- ko if: activeTables().length === 0 -->
+          <div class="assist-no-entries">${ _('No tables identified.') }</div>
+          <!-- /ko -->
+          <!-- ko if: activeTables().length > 0 -->
+          <ul data-bind="foreach: activeTables">
+            <li>
+              <span data-bind="text: name"></span>
+              <div class="pull-right margin-right-10">
+                <a class="inactive-action" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }"><i class="fa fa-info"></i></a>
+                <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
+              </div>
+            </li>
+          </ul>
+          <!-- /ko -->
+        </div>
+
+        <!-- ko if: HAS_OPTIMIZER -->
+        <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Suggestions') }</div></div>
+        <div class="assist-flex-half">
+          <!-- ko if: !activeRisks().hints || activeRisks().hints.length === 0 -->
+          <div class="assist-no-entries">${ _('No optimization hints identified.') }</div>
+          <!-- /ko -->
+          <!-- ko if: activeRisks().hints && activeRisks().hints.lenth > 0 -->
+          <ul data-bind="foreach: activeRisks().hints">
             <li>
               <span data-bind="text: risk"></span>
               <span data-bind="text: riskAnalysis"></span>
@@ -1756,16 +1760,17 @@ from notebook.conf import get_ordered_interpreters
             </li>
           </ul>
           <!-- /ko -->
-        </fieldset>
-      </form>
+        </div>
 
-      <!-- ko if: HAS_OPTIMIZER -->
         <!-- ko if: hasActiveRisks() && activeRisks()['noDDL'].length > 0 -->
-        <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns DDL/stats in order to improve recommendations') }">
-          <i class="fa fa-fw fa-gears"></i> ${_('Optimize Analysis')}
-        </a>
+        <div class="assist-flex-fill">
+          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns DDL/stats in order to improve recommendations') }">
+            <i class="fa fa-fw fa-gears"></i> ${_('Optimize Analysis')}
+          </a>
+        </div>
         <!-- /ko -->
-      <!-- /ko -->
+        <!-- /ko -->
+      </div>
     </div>
   </script>
 
