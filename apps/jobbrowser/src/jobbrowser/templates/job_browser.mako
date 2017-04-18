@@ -156,7 +156,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </form>
 
 
-
             <div class="card card-small">
               <table id="finishedJobsTable" class="datatables table table-condensed">
                 <thead>
@@ -920,14 +919,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.mainType = ko.observable(vm.interface());
 
       self.hasKill = ko.pureComputed(function() {
-        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule'].indexOf(self.type()) != -1;
+        return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.apiStatus() == 'RUNNING';
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflow', 'schedule'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.apiStatus() == 'PAUSED';
@@ -941,7 +940,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflow', 'schedule'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.apiStatus() == 'RUNNING';
@@ -1152,7 +1151,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows'].indexOf(vm.interface()) != -1;
+        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1161,7 +1160,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows'].indexOf(vm.interface()) != -1;
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1179,7 +1178,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows'].indexOf(vm.interface()) != -1;
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
