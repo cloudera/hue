@@ -20,9 +20,11 @@ from django.utils.translation import ugettext as _
 %>
 <%namespace name="layout" file="layout.mako" />
 
+%if not is_embeddable:
 ${ commonheader(_('Hue Permissions'), "useradmin", user, request) | n,unicode }
-${layout.menubar(section='permissions')}
+%endif
 
+${layout.menubar(section='permissions')}
 
 <%def name="render_field(field)">
   %if not field.is_hidden:
@@ -75,4 +77,6 @@ ${layout.menubar(section='permissions')}
 
 ${layout.commons()}
 
+%if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
+%endif

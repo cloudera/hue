@@ -479,7 +479,13 @@ def edit_permission(request, app=None, priv=None):
   else:
     form = PermissionsEditForm(instance=instance)
 
-  return render('edit_permissions.mako', request, dict(form=form, action=request.path, app=app, priv=priv))
+  return render('edit_permissions.mako', request, {
+    'form': form,
+    'action': request.path,
+    'app': app,
+    'priv': priv,
+    'is_embeddable': request.GET.get('is_embeddable', False),
+  })
 
 
 def add_ldap_users(request):
