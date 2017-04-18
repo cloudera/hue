@@ -18,11 +18,16 @@
 import errno
 import logging
 import os.path
+import random
+
+from django.utils.translation import ugettext as _
 
 from hadoop import confparse
-from desktop.lib import security_util
 
-from libsentry.conf import SENTRY_CONF_DIR, HOSTNAME
+from desktop.lib import security_util
+from desktop.lib.exceptions_renderable import PopupException
+
+from libsentry.conf import SENTRY_CONF_DIR, HOSTNAME, PORT
 
 
 LOG = logging.getLogger(__name__)
@@ -36,10 +41,8 @@ _CONF_SENTRY_SERVER_PRINCIPAL = 'sentry.service.server.principal'
 _CONF_SENTRY_SERVER_SECURITY_MODE = 'sentry.service.security.mode'
 _CONF_SENTRY_SERVER_ADMIN_GROUP = 'sentry.service.admin.group'
 
-_CONF_SENTRY_SERVER_HA_ENABLED = 'sentry.ha.enabled'
-_CONF_SENTRY_SERVER_HA_HAS_SECURITY = 'sentry.ha.zookeeper.security'
-_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES = 'sentry.ha.zookeeper.quorum'
-_CONF_SENTRY_SERVER_HA_ZOOKEEPER_NAMESPACE = 'sentry.ha.zookeeper.namespace'
+_CONF_SENTRY_SERVER_RPC_ADDRESSES = 'sentry.service.client.server.rpc-address'
+_CONF_SENTRY_SERVER_RPC_PORT = 'sentry.service.client.server.rpc-port'
 
 
 def reset():
@@ -53,9 +56,9 @@ def get_conf(name='sentry'):
   return _SITE_DICT[name]
 
 
-
 def get_hive_sentry_provider():
   return get_conf(name='hive').get(_CONF_HIVE_PROVIDER, 'server1')
+
 
 def get_solr_sentry_provider():
   return 'service1'
@@ -70,24 +73,67 @@ def get_sentry_server_principal():
   else:
     return None
 
+
 def get_sentry_server_authentication():
   return get_conf().get(_CONF_SENTRY_SERVER_SECURITY_MODE, 'NOSASL').upper()
+
 
 def get_sentry_server_admin_groups():
   return get_conf().get(_CONF_SENTRY_SERVER_ADMIN_GROUP, '').split(',')
 
 
-def get_sentry_server_ha_enabled():
-  return get_conf().get(_CONF_SENTRY_SERVER_HA_ENABLED, 'FALSE').upper() == 'TRUE'
+def get_sentry_server_rpc_addresses():
+  hosts = None
+  servers = get_conf().get(_CONF_SENTRY_SERVER_RPC_ADDRESSES)
+  if servers:
+    hosts = servers.split(',')
+  return hosts
 
-def get_sentry_server_ha_has_security():
-  return get_conf().get(_CONF_SENTRY_SERVER_HA_HAS_SECURITY, 'FALSE').upper() == 'TRUE'
 
-def get_sentry_server_ha_zookeeper_quorum():
-  return get_conf().get(_CONF_SENTRY_SERVER_HA_ZOOKEEPER_ADDRESSES)
+def get_sentry_server_rpc_port():
+  return int(get_conf().get(_CONF_SENTRY_SERVER_RPC_PORT, '8038'))
 
-def get_sentry_server_ha_zookeeper_namespace():
-  return get_conf().get(_CONF_SENTRY_SERVER_HA_ZOOKEEPER_NAMESPACE, 'sentry')
+
+def is_ha_enabled():
+  return get_sentry_server_rpc_addresses() is not None
+
+
+def get_sentry_client(username, client_class, component=None):
+  server = None
+  if is_ha_enabled():
+    servers = _get_server_properties()
+    if servers:
+      server = random.choice(servers)
+
+  if server is None:
+    if HOSTNAME.get() and PORT.get():
+      LOG.info('No Sentry servers configured in %s, falling back to libsentry configured host: %s:%s' %
+               (_CONF_SENTRY_SERVER_RPC_ADDRESSES, HOSTNAME.get(), PORT.get()))
+      server = {
+          'hostname': HOSTNAME.get(),
+          'port': PORT.get()
+      }
+    else:
+      raise PopupException(_('No Sentry servers are configured.'))
+
+  if component:
+    client = client_class(server['hostname'], server['port'], username, component=component)
+  else:
+    client = client_class(server['hostname'], server['port'], username)
+
+  return client
+
+
+def _get_server_properties():
+  try:
+    servers = []
+    sentry_servers = get_sentry_server_rpc_addresses()
+    for server in sentry_servers:
+      servers.append({'hostname': server, 'port': get_sentry_server_rpc_port()})
+  except Exception, e:
+    raise PopupException(_('Error in retrieving Sentry server properties.'), detail=e)
+
+  return servers
 
 
 def _parse_sites():
@@ -106,6 +152,7 @@ def _parse_sites():
 
   for name, path in paths:
     _SITE_DICT[name] = _parse_site(path)
+
 
 def _parse_site(site_path):
   try:
