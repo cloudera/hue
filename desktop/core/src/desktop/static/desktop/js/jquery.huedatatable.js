@@ -184,6 +184,10 @@
         });
 
         search.find('input').focus();
+
+        huePubSub.subscribe('hue.datatable.search.hide', function () {
+          $('.hue-datatable-search').hide();
+        });
       }
       else {
         $('.hue-datatable-search').show();
