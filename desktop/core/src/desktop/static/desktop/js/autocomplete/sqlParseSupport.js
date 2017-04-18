@@ -322,6 +322,12 @@ var SqlParseSupport = (function () {
             if (found.length > 0) {
               if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && found[0].identifierChain[0].name === location.identifierChain[0].name) {
                 location.type = 'database';
+              } else if (found[0].alias && location.identifierChain[0].name === found[0].alias && location.identifierChain.length > 1) {
+                location.type = 'column';
+                parser.expandIdentifierChain(location, true);
+              } else if (!found[0].alias && found[0].identifierChain && location.identifierChain[0].name === found[0].identifierChain[found[0].identifierChain.length - 1].name && location.identifierChain.length > 1) {
+                location.type = 'column';
+                parser.expandIdentifierChain(location, true);
               } else {
                 location.type = 'table';
                 parser.expandIdentifierChain(location, true);
