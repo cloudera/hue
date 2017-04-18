@@ -170,7 +170,7 @@ class OptimizerApi(object):
       'dbName': db_name,
       'sourcePlatform': source_platform,
       'pageSize': page_size,
-      startingToken: None
+      'startingToken': startingToken
     })
 
     hints = response.get(source_platform + 'Risk', {})
