@@ -927,30 +927,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <tr>
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
           <th>${_('Status')}</th>
-          <th>${_('Title')}</th>
-          <th>${_('type')}</th>
-          <th>${_('errorMessage')}</th>
-          <th>${_('missingDependencies')}</th>
-          <th>${_('number')}</th>
-          <th>${_('errorCode')}</th>
+          <th>${_('Name')}</th>
+          <th>${_('Type')}</th>
+          <th>${_('nextMaterializedTime')}</th>
+          <th>${_('lastAction')}</th>
+          <th>${_('frequency')}</th>
+          <th>${_('timeUnit')}</th>
           <th>${_('externalId')}</th>
           <th>${_('id')}</th>
-          <th>${_('lastModifiedTime')}</th>
+          <th>${_('pauseTime')}</th>
         </tr>
         </thead>
         <tbody data-bind="foreach: properties['actions']">
           <tr data-bind="click: function() {  if (externalId()) { $root.job().id(externalId()); $root.job().fetchJob();} }">
             <td><div class="hueCheckbox fa"></div></td>
             <td data-bind="text: status"></td>
-            <td data-bind="text: title"></td>
+            <td data-bind="text: name"></td>
             <td data-bind="text: type"></td>
-            <td data-bind="text: errorMessage"></td>
-            <td data-bind="text: missingDependencies"></td>
-            <td data-bind="text: number"></td>
-            <td data-bind="text: errorCode"></td>
+            <td data-bind="text: nextMaterializedTime"></td>
+            <td data-bind="text: lastAction"></td>
+            <td data-bind="text: frequency"></td>
+            <td data-bind="text: timeUnit"></td>
             <td data-bind="text: externalId"></td>
             <td data-bind="text: id"></td>
-            <td data-bind="text: lastModifiedTime"></td>
+            <td data-bind="text: pauseTime"></td>
           </tr>
         </tbody>
       </table>    </div>
