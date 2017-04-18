@@ -641,7 +641,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
-  
+
   <div data-bind="template: { name: 'job-actions' }"></div>
 </script>
 
@@ -822,7 +822,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div class="tab-pane" id="schedule-page-tasks">
       <div data-bind="template: { name: 'job-actions' }"></div>
-      
+
       ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
       <div class="btn-group">
         <select size="3" multiple="true"></select>
@@ -830,7 +830,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
       </div>
-    
+
       <table id="jobsTable" class="datatables table table-condensed">
         <thead>
         <tr>
@@ -885,6 +885,88 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
+
+
+  <br><br>
+  Variables, Workspace<br>
+  Duration 8s<br>
+  nextTime<span data-bind="text: properties['nextTime']"></span><br>
+  total_actions<span data-bind="text: properties['total_actions']"></span><br>
+  endTime<span data-bind="text: properties['endTime']"></span><br>
+  <br><br>
+
+  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+  </div>
+
+  <div data-bind="template: { name: 'job-actions' }"></div>
+
+  <br>
+
+  <ul class="nav nav-tabs">
+    <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
+    <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#schedule-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+    <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+  </ul>
+
+  <div class="tab-content">
+    <div class="tab-pane active" id="bundle-page-coordinators">
+      <div data-bind="template: { name: 'job-actions' }"></div>
+
+      ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
+      <div class="btn-group">
+        <select size="3" multiple="true"></select>
+        <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+        <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+        <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+      </div>
+
+      <table id="jobsTable" class="datatables table table-condensed">
+        <thead>
+        <tr>
+          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+          <th>${_('Status')}</th>
+          <th>${_('Title')}</th>
+          <th>${_('type')}</th>
+          <th>${_('errorMessage')}</th>
+          <th>${_('missingDependencies')}</th>
+          <th>${_('number')}</th>
+          <th>${_('errorCode')}</th>
+          <th>${_('externalId')}</th>
+          <th>${_('id')}</th>
+          <th>${_('lastModifiedTime')}</th>
+        </tr>
+        </thead>
+        <tbody data-bind="foreach: properties['actions']">
+          <tr data-bind="click: function() {  if (externalId()) { $root.job().id(externalId()); $root.job().fetchJob();} }">
+            <td><div class="hueCheckbox fa"></div></td>
+            <td data-bind="text: status"></td>
+            <td data-bind="text: title"></td>
+            <td data-bind="text: type"></td>
+            <td data-bind="text: errorMessage"></td>
+            <td data-bind="text: missingDependencies"></td>
+            <td data-bind="text: number"></td>
+            <td data-bind="text: errorCode"></td>
+            <td data-bind="text: externalId"></td>
+            <td data-bind="text: id"></td>
+            <td data-bind="text: lastModifiedTime"></td>
+          </tr>
+        </tbody>
+      </table>    </div>
+
+    <div class="tab-pane" id="schedule-page-logs">
+      <pre data-bind="html: logs"></pre>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-metadata">
+      <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+    </div>
+
+    <div class="tab-pane" id="schedule-page-xml">
+      <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+    </div>
+  </div>
 </script>
 
 

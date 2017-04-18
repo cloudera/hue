@@ -16,14 +16,15 @@
 # limitations under the License.
 
 import logging
+import json
 
 from django.utils.translation import ugettext as _
 
 from liboozie.oozie_api import get_oozie
-from notebook.connectors.oozie_batch import OozieApi
 
-from jobbrowser.apis.base_api import Api
-from oozie.views.dashboard import get_oozie_job_log
+from jobbrowser.apis.base_api import Api, MockDjangoRequest
+from liboozie.utils import format_time
+from oozie.views.dashboard import get_oozie_job_log, massaged_bundle_actions_for_json
 
 
 LOG = logging.getLogger(__name__)
@@ -31,7 +32,6 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import massaged_coordinator_actions_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -44,25 +44,69 @@ class BundleApi(Api):
     jobs = oozie_api.get_bundles(**kwargs)
 
     return {
-      'apps': [{
+      'apps':[{
         'id': app.id,
         'name': app.appName,
         'status': app.status,
+        'apiStatus': self._api_status(app.status),
         'type': 'bundle',
         'user': app.user,
-        'progress': 100,
+        'progress': app.get_progress(),
         'duration': 10 * 3600,
         'submitted': 10 * 3600
       } for app in jobs.jobs],
       'total': jobs.total
     }
 
+
   def app(self, appid):
     oozie_api = get_oozie(self.user)
     bundle = oozie_api.get_bundle(jobid=appid)
 
-    return {
+    common = {
         'id': bundle.bundleJobId,
         'name': bundle.bundleJobName,
         'status': bundle.status,
+        'apiStatus': self._api_status(bundle.status),
+        'progress': bundle.get_progress(),
+        'type': 'bundle',
+        'startTime': format_time(bundle.startTime),
+        'properties': {}
     }
+    common['properties']['actions'] = massaged_bundle_actions_for_json(bundle)
+    common['properties']['xml'] = ''
+    common['properties']['properties'] = ''
+
+    return common
+
+  def logs(self, appid, app_type, log_name=None):
+    request = MockDjangoRequest(self.user)
+    data = get_oozie_job_log(request, job_id=appid)
+
+    return {'logs': json.loads(data.content)['log']}
+
+
+  def profile(self, appid, app_type, app_property):
+    if app_property == 'xml':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_bundle(jobid=appid)
+      return {
+        'xml': workflow.definition,
+      }
+    elif app_property == 'properties':
+      oozie_api = get_oozie(self.user)
+      workflow = oozie_api.get_bundle(jobid=appid)
+      return {
+        'properties': workflow.conf_dict,
+      }
+
+  def _api_status(self, status):
+    if status in ['PREP', 'RUNNING', 'RUNNINGWITHERROR']:
+      return 'RUNNING'
+    elif status in ['PREPSUSPENDED', 'SUSPENDED', 'SUSPENDEDWITHERROR', 'PREPPAUSED', 'PAUSED', 'PAUSEDWITHERROR']:
+      return 'PAUSED'
+    elif status == 'SUCCEEDED':
+      return 'SUCCEEDED'
+    else:
+      return 'FINISHED' # DONEWITHERROR, KILLED, FAILED
+
