@@ -448,6 +448,7 @@
 }
 
 .assist-no-entries {
+  color: @cui-gray-600;
   font-style: italic;
 }
 
@@ -464,6 +465,11 @@
   position: relative;
   .flex(0 0 25px);
   white-space: nowrap;
+
+  &.assist-divider {
+    padding-top: 10px;
+    border-top: 1px solid @cui-default-border-color;
+  }
 }
 
 .assist-flex-table-search {
@@ -846,4 +852,16 @@
 
 .sql-context-flex-fill.context-sample-container {
   margin: 0;
+}
+
+.assist-assistant-panel {
+  left: 0;
+
+  .assist-flex-panel > div {
+    padding-left: 10px;
+  }
+
+  .assist-no-entries {
+    padding: 5px 10px;
+  }
 }
