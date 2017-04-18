@@ -64,6 +64,9 @@ module.exports = function(grunt) {
       }
     },
     watch: {
+      options: {
+        atBegin: true
+      },
       less: {
         files: [
           'desktop/core/src/desktop/static/desktop/less/*.less',
