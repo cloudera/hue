@@ -2153,32 +2153,65 @@
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
       var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? Math.max($.totalStorage(options.appName + "_left_panel_width"), 250) : 250;
+      var rightPanelWidth = $.totalStorage(options.appName + "_right_panel_width") != null ? Math.max($.totalStorage(options.appName + "_right_panel_width"), 250) : 250;
 
       var containerSelector = options.containerSelector || ".panel-container";
-      var leftPanelSelector = options.leftPanelSelector || ".left-panel";
       var contentPanelSelector = options.contentPanelSelector || ".content-panel";
 
       var onPosition = options.onPosition || function() {};
 
+      var hasLeftPanel = !!options.leftPanelVisible;
+      var hasRightPanel = !!options.rightPanelVisible;
+
+      var isRightPanel = !!options.isRightPanel;
+
       var $resizer = $(element);
-      var $leftPanel = $(leftPanelSelector);
+      var $leftPanel = $('.left-panel');
+      var $rightPanel = $('.right-panel');
       var $contentPanel = $(contentPanelSelector);
       var $container = $(containerSelector);
 
       var positionPanels = function () {
-        if (ko.isObservable(options.leftPanelVisible) && ! options.leftPanelVisible()) {
-          $contentPanel.css("width", "100%");
-          $contentPanel.css("left", "0");
-          $resizer.hide();
+        if (isRightPanel) {
+          var oppositeWidth = hasLeftPanel && ko.unwrap(options.leftPanelVisible) ? $leftPanel.width() + $resizer.width() : 0;
+          var totalWidth = $container.width() - oppositeWidth;
+          if (ko.unwrap(options.rightPanelVisible)) {
+            $resizer.show();
+            rightPanelWidth = Math.min(rightPanelWidth, $container.width() - 100);
+            var contentPanelWidth = totalWidth - rightPanelWidth - $resizer.width();
+            $rightPanel.css("width", rightPanelWidth + "px");
+            $contentPanel.css("width", contentPanelWidth + "px");
+            $resizer.css("right", rightPanelWidth + $resizer.width() + "px");
+            $contentPanel.css("right", rightPanelWidth + $resizer.width() + "px");
+          } else {
+            if (oppositeWidth === 0) {
+              $contentPanel.css("width", "100%");
+            } else {
+              $contentPanel.css("width", totalWidth);
+            }
+            $contentPanel.css("right", "0");
+            $resizer.hide();
+          }
         } else {
-          $resizer.show();
-          var totalWidth = $container.width();
-          leftPanelWidth = Math.min(leftPanelWidth, totalWidth - 100);
-          var contentPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
-          $leftPanel.css("width", leftPanelWidth + "px");
-          $contentPanel.css("width", contentPanelWidth + "px");
-          $resizer.css("left", leftPanelWidth + "px");
-          $contentPanel.css("left", leftPanelWidth + $resizer.width() + "px");
+          var oppositeWidth = hasRightPanel && ko.unwrap(options.rightPanelVisible) ? $rightPanel.width() + $resizer.width() : 0;
+          var totalWidth = $container.width() - oppositeWidth;
+          if (ko.unwrap(options.leftPanelVisible)) {
+            $resizer.show();
+            leftPanelWidth = Math.min(leftPanelWidth, totalWidth - 100);
+            var contentPanelWidth = totalWidth - leftPanelWidth - $resizer.width();
+            $leftPanel.css("width", leftPanelWidth + "px");
+            $contentPanel.css("width", contentPanelWidth + "px");
+            $resizer.css("left", leftPanelWidth + "px");
+            $contentPanel.css("left", leftPanelWidth + $resizer.width() + "px");
+          } else {
+            if (oppositeWidth === 0) {
+              $contentPanel.css("width", "100%");
+            } else {
+              $contentPanel.css("width", totalWidth);
+            }
+            $contentPanel.css("left", "0");
+            $resizer.hide();
+          }
         }
         onPosition();
       };
@@ -2187,24 +2220,48 @@
         options.leftPanelVisible.subscribe(positionPanels);
       }
 
+      if (ko.isObservable(options.rightPanelVisible)) {
+        options.rightPanelVisible.subscribe(positionPanels);
+      }
+
       var dragTimeout = -1;
       $resizer.draggable({
         axis: "x",
         containment: $container,
         drag: function (event, ui) {
-          ui.position.left = Math.min($container.width() - $container.position().left - 200, Math.max(250, ui.position.left));
+          if (isRightPanel) {
+            ui.position.left = Math.min($container.width() - 200, ui.position.left);
+          } else {
+            ui.position.left = Math.min($container.width() - $container.position().left - 200, Math.max(250, ui.position.left));
+          }
 
           dragTimeout = window.setTimeout(function () {
-            $leftPanel.css("width", ui.position.left + "px");
-            leftPanelWidth = ui.position.left;
-            $contentPanel.css("width", $container.width() - ui.position.left - $resizer.width() + "px");
-            $contentPanel.css("left", ui.position.left + $resizer.width());
+            if (isRightPanel) {
+              var oppositeWidth = hasLeftPanel && ko.unwrap(options.leftPanelVisible) ? $leftPanel.width() + $resizer.width() : 0;
+              var totalWidth = $container.width() - oppositeWidth;
+              rightPanelWidth = $container.width() - ui.position.left;
+              $rightPanel.css("width", rightPanelWidth + "px");
+              $contentPanel.css("width", totalWidth - rightPanelWidth + "px");
+              // $contentPanel.css("right", rightPanelWidth + $resizer.width());
+            } else {
+              var oppositeWidth = hasRightPanel && ko.unwrap(options.rightPanelVisible) ? $rightPanel.width() + $resizer.width() : 0;
+              var totalWidth = $container.width() - oppositeWidth;
+              leftPanelWidth = ui.position.left;
+              $leftPanel.css("width", leftPanelWidth + "px");
+              $contentPanel.css("width", totalWidth - leftPanelWidth - $resizer.width() + "px");
+              $contentPanel.css("left", leftPanelWidth + $resizer.width());
+            }
             onPosition();
           }, 10);
 
         },
         stop: function () {
-          $.totalStorage(options.appName + "_left_panel_width", leftPanelWidth);
+          console.log('stop');
+          if (isRightPanel) {
+            $.totalStorage(options.appName + "_right_panel_width", rightPanelWidth);
+          } else {
+            $.totalStorage(options.appName + "_left_panel_width", leftPanelWidth);
+          }
           window.setTimeout(positionPanels, 100);
           huePubSub.publish('split.panel.resized');
         }
