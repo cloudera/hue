@@ -73,6 +73,8 @@ class OptimizerApi(object):
 
     if data.get('code') == 'UNKNOWN':
       raise NavOptException(data.get('message'))
+    elif data.get('errorMsg'):
+      raise NavOptException(data.get('errorMsg'))
     else:
       return data
 
@@ -161,15 +163,27 @@ class OptimizerApi(object):
     return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, })
 
 
-  def query_risk(self, query, source_platform, page_size=100, startingToken=None):
-    response = self._call('getQueryRisk', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'pageSize': page_size, startingToken: None})
-    data = response.get(source_platform + 'Risk', {})
+  def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
+    response = self._call('getQueryRisk', {
+      'tenant' : self._product_name,
+      'query': query,
+      'dbName': db_name,
+      'sourcePlatform': source_platform,
+      'pageSize': page_size,
+      startingToken: None
+    })
 
-    if data and data == [{u'riskAnalysis': u'', u'risk': u'low', u'riskRecommendation': u''}]:
-      data = []
+    hints = response.get(source_platform + 'Risk', {})
 
-    return data
+    if hints and hints == [{u'riskAnalysis': u'', u'risk': u'low', u'riskId': 0, u'riskRecommendation': u''}]:
+      hints = []
 
+    return {
+      'hints': hints,
+      'tables': response.get('tables', []),
+      'noStats': response.get('noStats', []),
+      'noDDL': response.get('noStats', []),
+    }
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
     return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None})

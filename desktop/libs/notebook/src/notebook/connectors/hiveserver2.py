@@ -533,13 +533,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     api = OptimizerApi()
 
-    data = api.query_risk(query=query, source_platform=snippet['type'])
-
-    return [{
-      'risk': risk.get('risk'),
-      'riskAnalysis': risk.get('riskAnalysis'),
-      'riskRecommendation': risk.get('riskRecommendation')
-    } for risk in data]
+    return api.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
 
 
   def statement_compatibility(self, notebook, snippet, source_platform, target_platform):

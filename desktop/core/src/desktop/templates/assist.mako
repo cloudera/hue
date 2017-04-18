@@ -1746,28 +1746,25 @@ from notebook.conf import get_ordered_interpreters
 
       <form class="form-horizontal">
         <fieldset>
-          <div data-bind="visible: activeRisks().length > 0">${ _('Suggestions') }</div>
-          <ul data-bind="foreach: activeRisks">
+          <div>${ _('Suggestions') }</div>
+          <!-- ko if: hasActiveRisks -->
+          <ul data-bind="foreach: activeRisks()['hints']">
             <li>
               <span data-bind="text: risk"></span>
               <span data-bind="text: riskAnalysis"></span>
               <span data-bind="text: riskRecommendation"></span>
             </li>
           </ul>
+          <!-- /ko -->
         </fieldset>
       </form>
 
       <!-- ko if: HAS_OPTIMIZER -->
-        <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-          <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload workload')}
+        <!-- ko if: hasActiveRisks() && activeRisks()['noDDL'].length > 0 -->
+        <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns DDL/stats in order to improve recommendations') }">
+          <i class="fa fa-fw fa-gears"></i> ${_('Optimize Analysis')}
         </a>
-        <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns stats in order to improve recommendations') }">
-          <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload DDL')}
-        </a>
-        </br>
-        <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-          <i class="fa fa-fw fa-gears"></i> ${_('Analyse Query')}
-        </a>
+        <!-- /ko -->
       <!-- /ko -->
     </div>
   </script>
@@ -1785,7 +1782,10 @@ from notebook.conf import get_ordered_interpreters
         self.activeSourceType = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeColumns = ko.observableArray();
-        self.activeRisks = ko.observableArray()
+        self.activeRisks = ko.observable({})
+        self.hasActiveRisks = ko.pureComputed(function () {
+           return Object.keys(self.activeRisks()).length > 0;
+        });
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
