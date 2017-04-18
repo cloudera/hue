@@ -437,7 +437,9 @@ def commonheader(title, section, user, request=None, padding="90px", skip_topbar
 
 def get_banner_message(request):
   banner_message = None
-  if HUE_LOAD_BALANCER.get() and request.META.get('SERVER_PORT') and str(request.META['SERVER_PORT']) == str(HTTP_PORT.get()):
+  forwarded_host = request.META.get('HTTP_X_FORWARDED_HOST')
+
+  if HUE_LOAD_BALANCER.get() and (not forwarded_host or not any(forwarded_host in lb for lb in HUE_LOAD_BALANCER.get())):
     banner_message = '<div style="padding: 4px; text-align: center; background-color: #003F6C; height: 24px; color: #DBE8F1">%s: %s</div>' % \
       (_('You are accessing a non-optimized Hue, please switch to one of the available addresses'),
       ", ".join(['<a href="%s" style="color: #FFF; font-weight: bold">%s</a>' % (host, host) for host in HUE_LOAD_BALANCER.get()]))
