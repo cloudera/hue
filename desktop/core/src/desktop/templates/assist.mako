@@ -1914,4 +1914,67 @@ from notebook.conf import get_ordered_interpreters
       });
     })();
   </script>
+
+  <script type="text/html" id="right-assist-panel-template">
+    <div style="height: 100%; width: 100%; position: relative;">
+      <ul class="right-panel-tabs nav nav-pills">
+        <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeTab('assistant'); }">${ _('Assistant') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeTab('functions'); }">${ _('Functions') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeTab('schedules'); }">${ _('Schedule') }</a></li>
+      </ul>
+
+      <div class="right-panel-tab-content tab-content">
+        <!-- ko if: activeTab() === 'assistant' -->
+        <div data-bind="component: { name: 'assistant-panel' }"></div>
+        <!-- /ko -->
+
+        <!-- ko if: activeTab() === 'functions' -->
+        <div data-bind="component: { name: 'functions-panel' }"></div>
+        <!-- /ko -->
+
+        <!-- ko if: activeTab() === 'schedules' -->
+        <div class="assist-inner-panel">Schedules</div>
+        <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
+
+  <script type="text/javascript">
+    (function () {
+      function RightAssistPanel(params) {
+        var self = this;
+
+        self.activeTab = ko.observable();
+        self.assistantAvailable = ko.observable(false);
+
+        huePubSub.subscribe('active.snippet.type.changed', function (type) {
+          if (type === 'hive' || type === 'impala') {
+            if (!self.assistantAvailable() && self.activeTab() !== 'assistant') {
+              self.activeTab('assistant');
+            }
+            self.assistantAvailable(true);
+          } else {
+            if (self.activeTab() === 'assistant') {
+              self.activeTab('functions');
+            }
+            self.assistantAvailable(false);
+          }
+        });
+
+        if (!self.activeTab()) {
+          self.activeTab('functions');
+        }
+
+        if (self.assistantAvailable()) {
+          self.activeTab('assistant');
+        }
+      }
+
+      ko.components.register('right-assist-panel', {
+        viewModel: RightAssistPanel,
+        template: { element: 'right-assist-panel-template' }
+      });
+    })();
+  </script>
 </%def>

@@ -311,30 +311,18 @@ ${ hueIcons.symbols() }
     }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
     <div class="right-panel side-panel-closed" data-bind="css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }">
-      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible() && rightAssistAvailable(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
+      <!-- ko if: rightAssistAvailable -->
+      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
-      <div data-bind="visible: rightAssistVisible() && rightAssistAvailable()" style="display: none; height: 100%; width: 100%; position: relative;">
-        <ul class="right-panel-tabs nav nav-pills">
-          <li data-bind="css: { 'active' : activeRightTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('assistant'); }">${ _('Assistant') }</a></li>
-          <li data-bind="css: { 'active' : activeRightTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('functions'); }">${ _('Functions') }</a></li>
-          <li data-bind="css: { 'active' : activeRightTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeRightTab('schedules'); }">${ _('Schedule') }</a></li>
-        </ul>
-
-        <div class="right-panel-tab-content tab-content">
-          <!-- ko if: activeRightTab() === 'assistant' -->
-          <div data-bind="component: { name: 'assistant-panel' }"></div>
-          <!-- /ko -->
-
-          <!-- ko if: activeRightTab() === 'functions' -->
-          <div data-bind="component: { name: 'functions-panel' }"></div>
-          <!-- /ko -->
-
-          <!-- ko if: activeRightTab() === 'schedules' -->
-          <div class="assist-inner-panel">Schedules</div>
-          <!-- /ko -->
-        </div>
+      <!-- ko if: rightAssistVisible -->
+      <div class="assist" data-bind="component: {
+          name: 'right-assist-panel',
+          params: {}
+        }">
       </div>
+      <!-- /ko -->
+      <!-- /ko -->
     </div>
 
     <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
@@ -876,15 +864,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
-        self.assistantAvailable = ko.observable(false);
-        self.activeRightTab = ko.observable();
         self.activeAppViewModel = ko.observable();
 
         huePubSub.subscribe('set.current.app.name', function (appName) {
           self.rightAssistAvailable(appName === 'editor' || appName === 'notebook');
         });
         huePubSub.publish('get.current.app.name');
-
 
         self.contextPanelVisible = ko.observable(false);
         self.sessionsAvailable = ko.observable(false);
@@ -897,30 +882,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.contextPanelVisible(visible);
         });
 
-        huePubSub.subscribe('active.snippet.type.changed', function (type) {
-          if (type === 'hive' || type === 'impala') {
-            if (!self.assistantAvailable() && self.activeRightTab() !== 'assistant') {
-              self.activeRightTab('assistant');
-            }
-            self.assistantAvailable(true);
-          } else {
-            if (self.activeRightTab() === 'assistant') {
-              self.activeRightTab('functions');
-            }
-            self.assistantAvailable(false);
-          }
-        });
-
         huePubSub.subscribe('set.current.app.view.model', self.activeAppViewModel);
         huePubSub.publish('get.current.app.view.model');
-
-        if (!self.activeRightTab()) {
-          self.activeRightTab('functions');
-        }
-
-        if (self.assistantAvailable()) {
-          self.activeRightTab = ko.observable('assistant');
-        }
 
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
         self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
