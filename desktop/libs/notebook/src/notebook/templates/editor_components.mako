@@ -1060,22 +1060,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: ! hasSuggestion() && hasComplexity() -->
-      <!-- ko if: complexity()[0].risk.length === 0 || complexity()[0].risk === 'low' -->
+    <!-- ko if: ! hasSuggestion() && hasRisks() -->
+      <!-- ko if: complexity()['hints'][0].risk === 'low' -->
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
       <!-- /ko -->
-      <!-- ko if: complexity()[0].risk === 'high' -->
+      <!-- ko if: complexity()['hints'][0].risk != 'low' -->
         <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity()[0].riskAnalysis"></strong> <span data-bind="text: complexity()[0].riskRecommendation"></span></span>
+        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity()['hints'][0].riskAnalysis"></strong> <span data-bind="text: complexity()['hints'][0].riskRecommendation"></span></span>
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: ! hasSuggestion() && ! hasComplexity() -->
+    <!-- ko if: hasSuggestion() == '' && ! hasRisks() -->
+      <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <i class="fa fa-check"></i>
+      </div>
       <!-- ko if: showOptimizer -->
         <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
       <!-- /ko -->
@@ -1703,6 +1706,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
+        % if user.is_superuser:
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
+            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
+          </a>
+        </li>
+        % endif
         <!-- /ko -->
       </ul>
     </div>
@@ -3074,7 +3084,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
 
       huePubSub.subscribe("editor.workload.upload", function () {
-        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(10);
+        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(100);
       });
 
 

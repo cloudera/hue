@@ -834,9 +834,12 @@ var EditorViewModel = (function() {
       };
     };
 
-    self.complexity = ko.observableArray();
-    self.hasComplexity = ko.computed(function () {
-      return self.complexity().length > 0;
+    self.complexity = ko.observable({});
+    self.hasComplexity = ko.pureComputed(function () {
+      return Object.keys(self.complexity()).length > 0;
+    });
+    self.hasRisks = ko.pureComputed(function () {
+      return self.hasComplexity() && self.complexity()['hints'].length > 0;
     });
 
     self.suggestion = ko.observable('');
@@ -899,12 +902,12 @@ var EditorViewModel = (function() {
 
         hueAnalytics.log('notebook', 'get_query_risk');
         self.complexityCheckRunning(true);
-        huePubSub.publish('editor.active.risks', []);
+        huePubSub.publish('editor.active.risks', {});
 
         lastComplexityRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
-          timeout: 10000, // 10 seconds
+          timeout: 15000, // 15 seconds
           data: {
             notebook: ko.mapping.toJSON(notebook.getContext()),
             snippet: ko.mapping.toJSON(self.getContext())
@@ -914,8 +917,8 @@ var EditorViewModel = (function() {
               self.complexity(data.query_complexity);
               self.hasSuggestion('');
             } else {
-              // TODO: Silence errors
-              $(document).trigger('error', data.message);
+              self.hasSuggestion(data.message); // TODO Properly inform user
+              self.complexity({});
             }
             huePubSub.publish('editor.active.risks', self.complexity());
             lastCheckedComplexityStatement = self.statement_raw();
