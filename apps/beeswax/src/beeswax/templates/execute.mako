@@ -2258,7 +2258,7 @@ $(document).on('error.query', function () {
       errorWidgets.push(
         codeMirror.addLineWidget(
           selectedLine > 0 ? selectedLine - 1 : selectedLine,
-          $("<div>").addClass("editorError").html("<i class='fa fa-exclamation-circle'></i> " + err)[0], {
+          $("<div>").addClass("editorError").text(err)[0], {
             coverGutter: true,
             noHScroll: true
           }
