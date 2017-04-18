@@ -188,6 +188,9 @@ var AssistDbSource = (function () {
     huePubSub.subscribe('editor.active.locations', function (activeLocations) {
       var activeTables = [];
       // TODO: Test multiple snippets
+      if (self.sourceType !== activeLocations.type) {
+        return;
+      }
       activeLocations.locations.forEach(function (location) {
         if (location.type === 'table') {
           activeTables.push(location.identifierChain.length == 2 ? { table: location.identifierChain[1].name, db: location.identifierChain[0].name} : { table: location.identifierChain[0].name });
