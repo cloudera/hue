@@ -259,7 +259,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- /ko -->
 
         <!-- ko if: editorMode -->
-        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType()); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
+        <a class="btn" href="javascript:void(0)" data-bind="click: function() { newNotebook($root.editorType(), null, selectedNotebook() ? $root.selectedNotebook().snippets()[0].currentQueryTab() : null); }, attr: { 'title': '${ _('New ') }' +  editorTypeTitle() + '${ _(' Query') }' }" rel="tooltip" data-placement="bottom">
           <i class="fa fa-file-o"></i>
         </a>
         <!-- /ko -->
@@ -3229,7 +3229,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           viewModel.selectedNotebook().newSnippet();
         }
         else {
-          viewModel.newNotebook(viewModel.editorType());
+          viewModel.newNotebook(viewModel.editorType(), null, viewModel.selectedNotebook() ? viewModel.selectedNotebook().snippets()[0].currentQueryTab() : null);
         }
       }
 

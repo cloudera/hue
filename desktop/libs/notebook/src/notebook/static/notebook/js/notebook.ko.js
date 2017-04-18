@@ -2685,14 +2685,17 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.newNotebook = function (editorType, callback) {
+    self.newNotebook = function (editorType, callback, queryTab) {
       $.post("/notebook/api/create_notebook", {
         type: editorType || options.editor_type,
         directory_uuid: window.location.getParameter('directory_uuid')
       }, function (data) {
         self.loadNotebook(data.notebook);
         if (self.editorMode() && !self.isNotificationManager()) {
-          self.selectedNotebook().newSnippet(self.editorType());
+          var snippet = self.selectedNotebook().newSnippet(self.editorType());
+          if (queryTab && ['queryHistory', 'savedQueries', 'queryBuilderTab'].indexOf(queryTab) > -1) {
+            snippet.currentQueryTab(queryTab);
+          }
           huePubSub.publish('detach.scrolls', self.selectedNotebook().snippets()[0]);
           if (window.location.getParameter('type') === '') {
             hueUtils.changeURLParameter('type', self.editorType());
@@ -2700,7 +2703,7 @@ var EditorViewModel = (function() {
           huePubSub.publish('active.snippet.type.changed', editorType);
         }
 
-        if (typeof callback !== 'undefined'){
+        if (typeof callback !== 'undefined' && callback !== null){
           callback();
         }
       });
