@@ -318,7 +318,7 @@
           startCol = Math.max(1, startCol - 1);
           endCol = Math.min(aoColumns.length, endCol + 1);
 
-          var rowHeight = 29;
+          var rowHeight = 32;
           var invisibleOffset = $t.data('oInit')['forceInvisible'] ? $t.data('oInit')['forceInvisible'] : (aoColumns.length < 100 ? 10 : 1);
           var scrollable = $t.parents($t.data('oInit')['scrollable']);
           var visibleRows = Math.ceil((scrollable.height() - Math.max($t.offset().top, 0)) / rowHeight);
@@ -341,7 +341,7 @@
             if ($t.data('fnDraws') === 0) {
               var html = '';
               for (var i = 0; i < data.length; i++) {
-                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 29px"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
+                html += '<tr class="ht-visible-row ht-visible-row-' + i + '" style="height: 32px"><td>' + data[i][0] + '</td><td colspan="' + (aoColumns.length - 1) + '" class="stripe"></td></tr>';
               }
               appendable.html(html);
               if ($t.data('plugin_jHueTableExtender')) {
