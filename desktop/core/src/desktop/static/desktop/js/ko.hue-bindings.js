@@ -3712,7 +3712,7 @@
       var changeSelectionListener = editor.selection.on('changeSelection', function () {
         window.clearTimeout(changeSelectionThrottle);
         changeSelectionThrottle = window.setTimeout(function () {
-          huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
+          huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition(), editor: editor });
         }, 100);
         snippet.selectedStatement(editor.getSelectedText());
       });
@@ -3722,7 +3722,7 @@
       });
 
       var cursorLocationSub = huePubSub.subscribe('get.active.editor.cursor.location', function () {
-        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition() });
+        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition(), editor: editor });
       });
 
       disposeFunctions.push(function () {
