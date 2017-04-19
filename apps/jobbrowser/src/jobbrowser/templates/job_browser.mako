@@ -418,7 +418,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
-      ${_('Filter')} <input type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}">
+      ${_('Filter')}
+      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}">
       <span class="btn-group">
         <class="btn-group">
           <a class="btn btn-status btn-success" data-value="completed">${ _('MAP') }</a>
@@ -1000,6 +1001,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
+      self.textFilter = ko.observable('').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
+      self.filters = ko.computed(function() {
+        return [
+          {'text': self.textFilter()},
+        ];
+      });
+      self.filters.subscribe(function(value) {
+        self.fetchProfile('tasks');
+      });
+
       self.hasKill = ko.pureComputed(function() {
         return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
@@ -1144,7 +1155,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           app_id: ko.mapping.toJSON(self.id),
           interface: ko.mapping.toJSON(vm.interface),
           app_type: ko.mapping.toJSON(self.type),
-          app_property: ko.mapping.toJSON(name)
+          app_property: ko.mapping.toJSON(name),
+          app_filters: ko.mapping.toJSON(self.filters),
         }, function (data) {
           if (data.status == 0) {
             self.properties[name](data[name]);

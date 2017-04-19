@@ -111,11 +111,12 @@ def profile(request):
   app_id = json.loads(request.POST.get('app_id'))
   app_type = json.loads(request.POST.get('app_type'))
   app_property = json.loads(request.POST.get('app_property'))
+  app_filters = dict([(key, value) for _filter in json.loads(request.POST.get('app_filters', '[]')) for key, value in _filter.items() if value])
 
   api = get_api(request.user, interface)
   api._set_request(request) # For YARN
 
-  response[app_property] = api.profile(app_id, app_type, app_property)
+  response[app_property] = api.profile(app_id, app_type, app_property, app_filters)
   response['status'] = 0
 
   return JsonResponse(response)
