@@ -238,8 +238,11 @@ class YarnMapReduceTaskApi(Api):
     if filters.get('text'):
       filter_params['task_text'] = filters['text']
 
-    if filters.get('states') and len(filters.get('states')) == 1:
-      filter_params['task_types'] = filters['states'][0]
+    if filters.get('states'):
+      filter_params['task_states'] = filters['states']
+
+    if filters.get('types') and len(filters.get('types')) == 1:
+      filter_params['task_types'] = filters['types'][0]
 
     return {
       'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(**filter_params)],
