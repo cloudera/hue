@@ -36,8 +36,7 @@
       </span>
       <span class="auto-logged-out link-message" style="display: none">
         ${ _('We did not hear from you for about') } <strong class="time">${ conf.AUTH.IDLE_SESSION_TIMEOUT.get() }</strong> ${ _('and for security reasons Hue logged you out') }
-        <div class="margin-top-30"></div>
-        <a class="reload pointer">
+        <a class="reload pointer margin-top-30">
           ${ _('Please reload this page to continue') }
         </a>
       </span>

@@ -102,7 +102,7 @@ ${ hueIcons.symbols() }
   <nav class="navbar">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
-        <a class="hamburger hamburger-hue pull-left" type="button" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
+        <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
           <span class="hamburger-box"><span class="hamburger-inner"></span></span>
         </a>
 
@@ -114,12 +114,12 @@ ${ hueIcons.symbols() }
         <div class="btn-group" data-bind="visible: true" style="display:none;">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
-          <button class="btn btn-primary disable-feedback hue-main-create-btn" href="javascript: void(0);" data-bind="hueLink: url, attr: {title: tooltip}">
+          <button class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}">
             <span data-bind="text: displayName"></span>
           </button>
           <!-- /ko -->
           <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown" href="javascript: void(0);"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
           <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
