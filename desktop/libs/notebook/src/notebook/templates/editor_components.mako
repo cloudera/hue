@@ -2060,7 +2060,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $(el).jHueTableExtender2({
           mainScrollable: MAIN_SCROLLABLE,
           % if is_embeddable:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 50 + bannerTopHeight },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 47 : 50 + bannerTopHeight },
           % else:
           stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 + bannerTopHeight },
           % endif
@@ -3123,6 +3123,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       viewModel.isPlayerMode.subscribe(function (value) {
         if (value){
           $(".jHueNotify").hide();
+          huePubSub.publish('side.panels.hide');
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(false);
           $(".navigator").hide();
@@ -3135,6 +3136,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
+          huePubSub.publish('side.panels.show');
           viewModel.isLeftPanelVisible(wasAssistVisible);
           viewModel.assistAvailable(isAssistAvailable);
           $(".navigator").show();
