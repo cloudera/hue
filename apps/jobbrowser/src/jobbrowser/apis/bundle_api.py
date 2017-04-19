@@ -108,5 +108,5 @@ class BundleApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FINISHED' # DONEWITHERROR, KILLED, FAILED
+      return 'FAILED' # DONEWITHERROR, KILLED, FAILED
 
