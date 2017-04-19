@@ -886,6 +886,21 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('set.current.app.view.model', self.activeAppViewModel);
         huePubSub.publish('get.current.app.view.model');
 
+        var previousVisibilityValues = {};
+        huePubSub.subscribe('side.panels.hide', function(){
+          previousVisibilityValues = {
+            left: self.leftAssistVisible(),
+            right: self.rightAssistVisible()
+          }
+          self.leftAssistVisible(false);
+          self.rightAssistVisible(false);
+        });
+
+        huePubSub.subscribe('side.panels.show', function(){
+          self.leftAssistVisible(previousVisibilityValues.left);
+          self.rightAssistVisible(previousVisibilityValues.right);
+        });
+
         self.apiHelper.withTotalStorage('assist', 'left_assist_panel_visible', self.leftAssistVisible, true);
         self.apiHelper.withTotalStorage('assist', 'right_assist_panel_visible', self.rightAssistVisible, true);
       }
