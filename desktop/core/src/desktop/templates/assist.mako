@@ -1782,12 +1782,13 @@ from notebook.conf import get_ordered_interpreters
         self.disposals = [];
 
         self.activeCursorLocation = ko.observable();
+        self.activeStatementLocation = ko.observable();
         self.locationIndex = ko.observable({});
 
         self.activeSourceType = ko.observable();
         self.activeTables = ko.observableArray();
         self.activeColumns = ko.observableArray();
-        self.activeRisks = ko.observable({})
+        self.activeRisks = ko.observable({});
         self.hasActiveRisks = ko.pureComputed(function () {
            return Object.keys(self.activeRisks()).length > 0;
         });
@@ -1806,6 +1807,20 @@ from notebook.conf import get_ordered_interpreters
             return identifier.name;
           }).join('.');
         };
+
+        var AceRange = ace.require('ace/range').Range;
+        var findStatementTextAtCursor = function () {
+          if (!self.activeStatementLocation() || !self.activeCursorLocation()) {
+            return; // undefined when unknown
+          }
+          var statementLoc = self.activeStatementLocation();
+          var editor = self.activeCursorLocation().editor;
+          return editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1))
+        };
+
+        self.disposals.push(huePubSub.subscribe('get.active.editor.statement', function () {
+          huePubSub.publish('set.active.editor.statement', findStatementTextAtCursor());
+        }).remove);
 
         var initActive = function () {
           if (!self.activeCursorLocation()) {
@@ -1859,7 +1874,10 @@ from notebook.conf import get_ordered_interpreters
             var columnIndex = {};
 
             activeLocations.forEach(function (location) {
-              if (location.type === 'table' && location.identifierChain.length <= 2) {
+              if (location.type === 'statement' && self.activeStatementLocation() !== location.location) {
+                self.activeStatementLocation(location.location);
+                huePubSub.publish('active.editor.statement.changed', findStatementTextAtCursor());
+              } else if (location.type === 'table' && location.identifierChain.length <= 2) {
                 // tableIndex is used to make sure we only add each table once
                 tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
               } else if (location.type === 'column') {
