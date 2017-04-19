@@ -76,11 +76,13 @@ class ScheduleApi(Api):
         'startTime': format_time(coordinator.startTime),
     }
     common['properties'] = json.loads(response.content)
+    common['properties']['tasks'] = common['properties']['actions']
     common['properties']['xml'] = ''
     common['properties']['properties'] = ''
     common['properties']['bundle_id'] = coordinator.conf_dict.get('oozie.bundle.id')
 
     return common
+
 
   def logs(self, appid, app_type, log_name=None):
     request = MockDjangoRequest(self.user)
@@ -92,16 +94,19 @@ class ScheduleApi(Api):
   def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'xml':
       oozie_api = get_oozie(self.user)
-      workflow = oozie_api.get_coordinator(jobid=appid)
+      coordinator = oozie_api.get_coordinator(jobid=appid)
       return {
-        'xml': workflow.definition,
+        'xml': coordinator.definition,
       }
     elif app_property == 'properties':
       oozie_api = get_oozie(self.user)
-      workflow = oozie_api.get_coordinator(jobid=appid)
+      coordinator = oozie_api.get_coordinator(jobid=appid)
       return {
-        'properties': workflow.conf_dict,
+        'properties': coordinator.conf_dict,
       }
+    elif app_property == 'tasks':
+      coordinator = self.app(appid)
+      return coordinator['properties']['tasks']
 
   def _api_status(self, status):
     if status in ['PREP', 'RUNNING', 'RUNNINGWITHERROR']:
@@ -111,7 +116,7 @@ class ScheduleApi(Api):
     elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
-      return 'FINISHED' # DONEWITHERROR, KILLED, FAILED
+      return 'FAILED' # DONEWITHERROR, KILLED, FAILED
 
 
 class MockGet():

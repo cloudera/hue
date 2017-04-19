@@ -49,7 +49,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('oozie/js/list-oozie-coordinator.ko.js') }"></script>
 <script src="${ static('desktop/js/ace/ace.js') }"></script>
 
 % if not is_mini:
@@ -279,14 +278,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <!-- /ko -->
       <!-- /ko -->
       </li>
-      % if not is_mini:
-      <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf($parent.interface()) > -1 -->
-      <li class="pull-right">
-        <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
-      </li>
-      <!-- /ko -->
-      % endif
     </ul>
+    % if not is_mini:
+      <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf(interface()) > -1 -->
+      <span class="pull-right">
+        <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
+      </span>
+      <!-- /ko -->
+    % endif
   </h3>
 </script>
 
@@ -652,6 +651,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <i class="fa fa-times"></i> ${_('Kill')}
     </button>
     <!-- /ko -->
+
+    <!-- ko if: hasIgnore -->
+    <button class="btn btn-danger" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
+      ## TODO confirmation
+      <i class="fa fa-eraser"></i> ${_('Ignore')}
+    </button>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -784,32 +790,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <br>
 
   <ul class="nav nav-tabs">
-    <li class="active"><a href="#schedule-page-calendar" data-toggle="tab">${ _('Calendar') }</a></li>
+    <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
     <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#schedule-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
     <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
     <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
   </ul>
 
   <div class="tab-content">
     <div class="tab-pane active" id="schedule-page-calendar">
-      <pre data-bind="text: ko.toJSON(properties['actions'], null, 2)"></pre>
-    </div>
-
-    <div class="tab-pane" id="schedule-page-logs">
-      <pre data-bind="html: logs"></pre>
-    </div>
-
-    <div class="tab-pane" id="schedule-page-tasks">
+      <!-- ko with: coordinatorActions() -->
       <div data-bind="template: { name: 'job-actions' }"></div>
 
-      ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
-      <div class="btn-group">
-        <select size="3" multiple="true"></select>
-        <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
-        <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
-        <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-      </div>
+      ${_('Filter')}
+      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+
+      <span data-bind="foreach: statesValuesFilter">
+        <label class="checkbox">
+          <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
+          <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+          <span data-bind="text: name, attr: {for: name}"></span>
+        </label>
+      </span>
 
       <table id="schedulesTable" class="datatables table table-condensed">
         <thead>
@@ -827,22 +828,29 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <th>${_('lastModifiedTime')}</th>
         </tr>
         </thead>
-        <tbody data-bind="foreach: properties['actions']">
-          <tr data-bind="click: function() {  if (externalId()) { $root.job().id(externalId()); $root.job().fetchJob();} }">
-            <td><div class="hueCheckbox fa"></div></td>
-            <td data-bind="text: status"></td>
-            <td data-bind="text: title"></td>
-            <td data-bind="text: type"></td>
-            <td data-bind="text: errorMessage"></td>
-            <td data-bind="text: missingDependencies"></td>
-            <td data-bind="text: number"></td>
-            <td data-bind="text: errorCode"></td>
-            <td data-bind="text: externalId"></td>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: lastModifiedTime"></td>
+        <tbody data-bind="foreach: apps">
+          <tr data-bind="click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
+            <td>
+              <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
+            </td>
+            <td data-bind="text: properties.status"></td>
+            <td data-bind="text: properties.title"></td>
+            <td data-bind="text: properties.type"></td>
+            <td data-bind="text: properties.errorMessage"></td>
+            <td data-bind="text: properties.missingDependencies"></td>
+            <td data-bind="text: properties.number"></td>
+            <td data-bind="text: properties.errorCode"></td>
+            <td data-bind="text: properties.externalId"></td>
+            <td data-bind="text: properties.id"></td>
+            <td data-bind="text: properties.lastModifiedTime"></td>
           </tr>
         </tbody>
       </table>
+      <!-- /ko -->
+    </div>
+
+    <div class="tab-pane" id="schedule-page-logs">
+      <pre data-bind="html: logs"></pre>
     </div>
 
     <div class="tab-pane" id="schedule-page-metadata">
@@ -975,10 +983,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.logs = ko.observable('');
 
-      //self.coordVM = new RunningCoordinatorModel([]);
-
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
+
+      self.coordinatorActions = ko.computed(function() {
+        if (self.mainType() == 'schedules' && self.properties['tasks']) {
+          var apps = [];
+          self.properties['tasks']().forEach(function (instance) {
+            var job = new Job(vm, ko.mapping.toJS(instance));
+            job.resumeEnabled = function() { return false };
+            job.properties = instance;
+            apps.push(job);
+          });
+          var instances = new Jobs(vm);
+          instances.apps(apps)
+          instances.isCoordinator(true);
+          return instances;
+        }
+      });
 
       self.textFilter = ko.observable('').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesValuesFilter = ko.observableArray([
@@ -1032,7 +1054,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasRerun = ko.pureComputed(function() {
-        return ['workflow'].indexOf(self.type()) != -1;
+        return ['workflow', 'schedule-task'].indexOf(self.type()) != -1;
       });
       self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && ! self.isRunning();
@@ -1043,6 +1065,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.apiStatus() == 'RUNNING';
+      });
+
+      self.hasIgnore = ko.pureComputed(function() {
+        return ['schedule-task'].indexOf(self.type()) != -1;
+      });
+      self.ignoreEnabled = ko.pureComputed(function() {
+        return self.hasIgnore() && ! self.isRunning();
       });
 
       self.loadingJob = ko.observable(false);
@@ -1246,12 +1275,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.apps = ko.observableArray().extend({ rateLimit: 50 });
       self.totalApps = ko.observable(null);
+      self.isCoordinator = ko.observable(false);
 
       self.loadingJobs = ko.observable(false);
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1260,7 +1290,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1269,7 +1299,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasRerun = ko.pureComputed(function() {
-        return ['workflows'].indexOf(vm.interface()) != -1;
+        return ['workflows'].indexOf(vm.interface()) != -1 || self.isCoordinator();
       });
       self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1278,7 +1308,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1286,6 +1316,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }).length == self.selectedJobs().length;
       });
 
+      self.hasIgnore = ko.pureComputed(function() {
+        return self.isCoordinator();
+      });
+      self.ignoreEnabled = ko.pureComputed(function() {
+        return self.hasIgnore() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+          return job.ignoreEnabled();
+        }).length == self.selectedJobs().length;
+      });
 
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesValuesFilter = ko.observableArray([
@@ -1459,7 +1497,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
     };
 
-    var JobBrowserViewModel = function (RunningCoordinatorModel) {
+    var JobBrowserViewModel = function () {
       var self = this;
 
       self.apiHelper = ApiHelper.getInstance();
@@ -1592,7 +1630,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     });
 
     $(document).ready(function () {
-      viewModel = new JobBrowserViewModel(RunningCoordinatorModel);
+      viewModel = new JobBrowserViewModel();
       % if not is_mini:
       ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
       % else:

@@ -1002,7 +1002,7 @@ def massaged_coordinator_actions_for_json(coordinator, oozie_bundle):
       'id': action.id,
       'url': action.externalId and reverse('oozie:list_oozie_workflow', kwargs={'job_id': action.externalId}) + '?%s' % '&'.join(related_job_ids) or '',
       'number': action.actionNumber,
-      'type': action.type,
+      'type': 'schedule-task',
       'status': action.status,
       'externalId': action.externalId or '-',
       'externalIdUrl': action.externalId and reverse('oozie:list_oozie_workflow_action', kwargs={'action': action.externalId}) or '',
