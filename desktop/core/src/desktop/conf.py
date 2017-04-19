@@ -1017,6 +1017,12 @@ LDAP = ConfigSection(
                                     help=_("Whether or not to follow referrals."),
                                     type=coerce_bool,
                                     default=False),
+          TEST_LDAP_USER=Config("test_ldap_user",
+                           default=None,
+                           help=_("The test user name to use for LDAP search.")),
+          TEST_LDAP_GROUP=Config("test_ldap_group",
+                            default=None,
+                            help=_("The test group name to use for LDAP search.")),
 
           DEBUG = Config("debug",
             type=coerce_bool,
@@ -1100,6 +1106,12 @@ LDAP = ConfigSection(
                    default=True,
                    type=coerce_bool,
                    help=_("Use search bind authentication.")),
+    TEST_LDAP_USER=Config("test_ldap_user",
+                   default=None,
+                   help=_("The test user name to use for LDAP search.")),
+    TEST_LDAP_GROUP=Config("test_ldap_group",
+                   default=None,
+                   help=_("The test group name to use for LDAP search.")),
 
     USERS = ConfigSection(
       key="users",
