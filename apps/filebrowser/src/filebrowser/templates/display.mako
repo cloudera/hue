@@ -455,7 +455,7 @@ ${ fb_components.menubar() }
           self.upperPage(self.page() - 1);
           self.page(Math.max(self.page() - _difference - 1, 1));
         }
-        changePage();
+        self.changePage();
       }
     };
 
