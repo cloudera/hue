@@ -60,8 +60,8 @@ class JobApi(Api):
   def logs(self, appid, app_type, log_name):
     return self._get_api(appid).logs(appid, app_type, log_name)
 
-  def profile(self, appid, app_type, app_property):
-    return self._get_api(appid).profile(appid, app_type, app_property)
+  def profile(self, appid, app_type, app_property, app_filters):
+    return self._get_api(appid).profile(appid, app_type, app_property, app_filters)
 
   def _get_api(self, appid):
     if type(appid) == list:
@@ -194,11 +194,11 @@ class YarnApi(Api):
     return {'logs': logs}
 
 
-  def profile(self, appid, app_type, app_property):
+  def profile(self, appid, app_type, app_property, app_filters):
     if app_type == 'MAPREDUCE':
       if app_property == 'tasks':
         return {
-          'task_list': YarnMapReduceTaskApi(self.user, appid).apps()['apps'],
+          'task_list': YarnMapReduceTaskApi(self.user, appid).apps(app_filters)['apps'],
           'filter_text': ''
         }
       elif app_property == 'metadata':
@@ -224,7 +224,7 @@ class YarnMapReduceTaskApi(Api):
     self.app_id = '_'.join(app_id.replace('task_', 'application_').split('_')[:3])
 
 
-  def apps(self):
+  def apps(self, filters):
     filter_params = {
       'task_types': None,
       'task_states': None,
@@ -232,6 +232,11 @@ class YarnMapReduceTaskApi(Api):
       'jobid': self.app_id,
       'pagenum': 1
     }
+
+    filters = _extract_query_params(filters)
+
+    if filters.get('text'):
+      filter_params['task_text'] = filters['text']
 
 #     filter_params.update(_extract_query_params(filters)
 #
@@ -290,7 +295,7 @@ class YarnMapReduceTaskApi(Api):
     return {'progress': 0, 'logs': logs}
 
 
-  def profile(self, appid, app_type, app_property):
+  def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'attempts':
       return {
           'task_list': YarnMapReduceTaskAttemptApi(self.user, appid).apps()['apps'],
@@ -350,7 +355,7 @@ class YarnMapReduceTaskAttemptApi(Api):
     return {'progress': 0, 'logs': syslog if log_name == 'syslog' else stderr if log_name == 'stderr' else stdout}
 
 
-  def profile(self, appid, app_type, app_property):
+  def profile(self, appid, app_type, app_property, app_filters):
     if app_property == 'counters':
       return NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).get_attempt(self.attempt_id).counters
 

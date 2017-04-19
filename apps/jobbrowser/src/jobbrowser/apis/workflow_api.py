@@ -133,7 +133,7 @@ class WorkflowApi(Api):
     return {'logs': json.loads(data.content)['log']}
 
 
-  def profile(self, appid, app_type, app_property):
+  def profile(self, appid, app_type, app_property, app_filters):
     if '@' in appid:
       return WorkflowActionApi(self.self.user).profile(appid, app_type, app_property)
 
