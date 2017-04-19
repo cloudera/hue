@@ -157,7 +157,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
             <div class="card card-small">
-              <table id="finishedJobsTable" class="datatables table table-condensed">
+              <table id="jobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
                   <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
@@ -174,7 +174,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <tbody data-bind="foreach: jobs.apps">
                   <tr data-bind="click: fetchJob">
                     <td>
-                      <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#finishedJobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
+                      <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                     </td>
                     <td>
                       <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': status() == 'SUCCEEDED','orange': ['RUNNING', 'ACCEPTED'].indexOf(status()) > -1, 'red': status() == 'KILLED'}"></div>
@@ -714,7 +714,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="tab-pane" id="workflow-page-tasks">
-      <table id="jobsTable" class="datatables table table-condensed">
+      <table id="actionsTable" class="datatables table table-condensed">
         <thead>
         <tr>
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
@@ -788,7 +788,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
   <br><br>
-  Variables, Workspace<br>
+  Variables<br>
   Duration 8s<br>
   nextTime<span data-bind="text: properties['nextTime']"></span><br>
   total_actions<span data-bind="text: properties['total_actions']"></span><br>
@@ -807,7 +807,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <li class="active"><a href="#schedule-page-calendar" data-toggle="tab">${ _('Calendar') }</a></li>
     <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
     <li><a href="#schedule-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#schedule-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+    <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
     <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
   </ul>
 
@@ -831,7 +831,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
       </div>
 
-      <table id="jobsTable" class="datatables table table-condensed">
+      <table id="schedulesTable" class="datatables table table-condensed">
         <thead>
         <tr>
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
@@ -905,9 +905,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
   <ul class="nav nav-tabs">
     <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#schedule-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-    <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+    <li><a href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+    <li><a href="#bundle-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+    <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
   </ul>
 
   <div class="tab-content">
@@ -922,7 +922,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
       </div>
 
-      <table id="jobsTable" class="datatables table table-condensed">
+      <table id="coordsTable" class="datatables table table-condensed">
         <thead>
         <tr>
           <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
@@ -939,7 +939,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </tr>
         </thead>
         <tbody data-bind="foreach: properties['actions']">
-          <tr data-bind="click: function() {  if (externalId()) { $root.job().id(externalId()); $root.job().fetchJob();} }">
+          <tr data-bind="click: function() {  if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
             <td><div class="hueCheckbox fa"></div></td>
             <td data-bind="text: status"></td>
             <td data-bind="text: name"></td>
@@ -955,15 +955,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </tbody>
       </table>    </div>
 
-    <div class="tab-pane" id="schedule-page-logs">
+    <div class="tab-pane" id="bundle-page-logs">
       <pre data-bind="html: logs"></pre>
     </div>
 
-    <div class="tab-pane" id="schedule-page-metadata">
+    <div class="tab-pane" id="bundle-page-metadata">
       <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
     </div>
 
-    <div class="tab-pane" id="schedule-page-xml">
+    <div class="tab-pane" id="bundle-page-xml">
       <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
     </div>
   </div>
