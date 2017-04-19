@@ -99,7 +99,7 @@ ${ hueIcons.symbols() }
 % endif
 
 <div class="main-page">
-  <nav class="navbar top-nav-container">
+  <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
         <a class="hamburger hamburger-hue pull-left" data-bind="toggle: leftNavVisible, css: { 'is-active': leftNavVisible }">
