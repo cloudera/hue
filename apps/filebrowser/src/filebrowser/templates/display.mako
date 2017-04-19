@@ -144,11 +144,10 @@ ${ fb_components.menubar() }
                 <!-- /ko -->
               <!-- /ko -->
             <!-- /ko -->
-            <div id="loader" data-bind="visible: isLoading">
-              <i class="fa fa-spinner fa-spin"></i>
-            </div>
+            <!-- ko hueSpinner: { spin: !$root.file() && isLoading(), center: true, size: 'xlarge' } --><!-- /ko -->
             <!-- ko if: $root.isViewing -->
             <div id="fileArea" data-bind="css: {'loading': isLoading}, visible: $root.file() && $root.file().stats.size()">
+              <!-- ko hueSpinner: { spin: isLoading, center: true, size: 'xlarge' } --><!-- /ko -->
               <pre></pre>
               <table class="binary">
                 <tbody>
@@ -484,8 +483,6 @@ ${ fb_components.menubar() }
 
   $(document).ready(function () {
     ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
-
-    $("#loader").css("marginLeft", ($(".hue-breadcrumbs-bar").width() - $("#loader").width()) / 2);
 
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
