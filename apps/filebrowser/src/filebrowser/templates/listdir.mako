@@ -55,7 +55,7 @@ ${ fb_components.menubar() }
       <%def name="actions()">
         <div class="btn-toolbar" style="display: inline; vertical-align: middle">
           <div id="ch-dropdown" class="btn-group" style="vertical-align: middle">
-            <button href="javascript: void(0)" class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
+            <button class="btn dropdown-toggle" title="${_('Actions')}" data-toggle="dropdown"
             data-bind="visible: !inTrash(), enable: selectedFiles().length > 0 && (!isS3() || (isS3() && !isS3Root()))">
               <i class="fa fa-cog"></i> ${_('Actions')}
               <span class="caret" style="line-height: 15px"></span>
@@ -64,7 +64,7 @@ ${ fb_components.menubar() }
               <li><a href="javascript: void(0)" title="${_('Rename')}" data-bind="visible: !inTrash() && selectedFiles().length == 1, click: renameFile,
               enable: selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
               ${_('Rename')}</a></li>
-              <li><a href="javascript: void(0)"title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
+              <li><a href="javascript: void(0)" title="${_('Move')}" data-bind="click: move, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
               <li><a href="javascript: void(0)" title="${_('Copy')}" data-bind="click: copy, enable: selectedFiles().length > 0 &&
               isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>

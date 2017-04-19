@@ -260,7 +260,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <div id="renameNameExistsAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important"><span class="newName"></span> ${_('already exists.')}</span>
         </div>
-        <input id="renameSrcPath" type="hidden" name="src_path" type="text">
+        <input id="renameSrcPath" type="hidden" name="src_path">
         <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Rename')}" class="btn btn-primary" />
       </div>
@@ -282,7 +282,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <div id="replicationFactorRequiredAlert" class="hide" style="position: absolute; left: 10px;">
           <span class="label label-important">${_('Replication factor is required.')}</span>
         </div>
-        <input id="SrcPath" type="hidden" name="src_path" type="text">
+        <input id="SrcPath" type="hidden" name="src_path">
         <a class="btn" data-dismiss="modal">${_('Cancel')}</a>
         <input type="submit" value="${_('Submit')}" class="btn btn-primary" />
       </div>
@@ -342,7 +342,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               <th class="center">${_('Group')}</th>
               <th class="center">${_('Other')}</th>
               <th class="center">&nbsp;</th>
-              <th width="120">&nbsp</th>
+              <th width="120">&nbsp;</th>
             </tr>
           </thead>
           <tbody>
@@ -437,7 +437,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <div id="uploadFileModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Upload to')} <span id="uploadDirName" data-bind="text: currentPath"></span></h2>
+      <h2 class="modal-title">${_('Upload to')} <span data-bind="text: currentPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
       <div id="fileUploader" class="uploader">
@@ -453,7 +453,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <div id="uploadArchiveModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Upload and extract in')} <span id="uploadDirName" data-bind="text: currentPath"></span></h2>
+      <h2 class="modal-title">${_('Upload and extract in')} <span data-bind="text: currentPath"></span></h2>
     </div>
     <div class="modal-body form-inline">
       <div id="archiveUploader" class="uploader">
@@ -487,7 +487,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           ${_('Bucket Name')}
           <!-- /ko -->
           <input id="newDirectoryNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
-        <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
+          <input type="hidden" name="path" data-bind="value: currentPath"/>
       </div>
       <div class="modal-footer">
         <div id="directoryNameRequiredAlert" class="hide" style="position: absolute; left: 10px;">
@@ -512,7 +512,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         </div>
         <div class="modal-body">
           <label>${_('File Name')} <input id="newFileNameInput" name="name" value="" type="text" class="input-xlarge"/></label>
-          <input type="hidden" name="path" type="text" data-bind="value: currentPath"/>
+          <input type="hidden" name="path" data-bind="value: currentPath"/>
         </div>
         <div class="modal-footer">
            <div id="fileNameRequiredAlert" class="alert-message error hide" style="position: absolute; left: 10px;">
@@ -579,7 +579,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Rename')}" data-bind="visible: !$root.inTrash() && $root.selectedFiles().length == 1, click: $root.renameFile,
     enable: $root.selectedFiles().length == 1 && isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-font"></i>
     ${_('Rename')}</a></li>
-    <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#"title="${_('Move')}" data-bind="click: $root.move, enable: $root.selectedFiles().length > 0 &&
+    <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Move')}" data-bind="click: $root.move, enable: $root.selectedFiles().length > 0 &&
     isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-random"></i> ${_('Move')}</a></li>
     <li data-bind="visible: !isS3() || (isS3() && !isS3Root())"><a href="#" title="${_('Copy')}" data-bind="click: $root.copy, enable: $root.selectedFiles().length > 0 &&
     isCurrentDirSelected().length == 0"><i class="fa fa-fw fa-files-o"></i> ${_('Copy')}</a></li>
@@ -683,7 +683,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 
 
-  <script charset="utf-8">
+  <script>
     var _dragged;
     var _dropzone;
 
