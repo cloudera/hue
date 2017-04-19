@@ -170,17 +170,11 @@
     };
 
     var overHandler = function () {
-      self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ') td').css({
-        'border-left': '2px solid #CCC',
-        'background-color': '#EEE'
-      });
+      self.$parent.find('.fixed-first-column table tbody tr:eq(' + $(this).index() + ') td').addClass('fixed-first-col-hover');
     };
 
     var outHandler = function () {
-      self.$parent.find('.fixed-first-column table tbody tr td').css({
-        'border-left': '2px solid #FFF',
-        'background-color': '#F9F9F9'
-      });
+      self.$parent.find('.fixed-first-column table tbody tr td').removeClass('fixed-first-col-hover');
     };
 
     self.$parent.children('table').on('click dblclick', 'tbody tr', clickHandler);
@@ -408,7 +402,7 @@
       if ($(this).html() === '') {
         foundEmptyTh = true;
       }
-      h+= '<tr><td style="border-left: 2px solid #FFF">' + $(this).html() +'</td></tr>';
+      h+= '<tr><td>' + $(this).html() +'</td></tr>';
     });
     if (foundEmptyTh) {
       // In IE it's sometimes empty so we'll redraw in a bit
@@ -433,7 +427,7 @@
     var firstColumnInner = $("<div>").css("background-color", "#FFFFFF").width(originalTh.outerWidth()).height(self.$parent.get(0).scrollHeight);
     clonedTable.appendTo(firstColumnInner);
 
-    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("marginLeft", "-2px").css("overflow", "hidden").css("top", topPosition + "px");
+    var firstColumn = $("<div>").attr("id", self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").addClass("fixed-first-column").width(originalTh.outerWidth()).height(self.$parent.height()).css("overflow", "hidden").css("top", topPosition + "px");
     firstColumn.css("position", self.options.clonedContainerPosition || "fixed");
 
     firstColumnInner.appendTo(firstColumn);
