@@ -84,6 +84,12 @@
           scrollbar.css("left", ((scrollbarRail.width() - scrollbar.width()) * ($(el).parents('.dataTables_wrapper').scrollLeft() / ($(el).parents('.dataTables_wrapper')[0].scrollWidth - $(el).parents('.dataTables_wrapper').width()))) + "px");
         });
       } else {
+        if ($(el).parents('.dataTables_wrapper').width() === $(el).parents('.dataTables_wrapper')[0].scrollWidth) {
+          $('.hue-scrollbar-x-rail').hide();
+        }
+        else {
+          $('.hue-scrollbar-x-rail').show();
+        }
         $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x-rail').width($(el).parents(".dataTables_wrapper").width() - colWidth);
         var scrollbar = $(el).parents('.dataTables_wrapper').find('.hue-scrollbar-x');
         scrollbar.width(Math.max(20, $(el).parents('.dataTables_wrapper').width() * ($(el).parents('.dataTables_wrapper').width() / $(el).parents('.dataTables_wrapper')[0].scrollWidth)));
