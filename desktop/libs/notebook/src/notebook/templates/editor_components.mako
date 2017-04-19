@@ -547,49 +547,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="context-panel" data-bind="css: {'visible': isContextPanelVisible}" style="${ 'height: 100%' if not is_embeddable else '' }">
     <ul class="nav nav-tabs">
       <li class="active"><a href="#sessionsTab" data-toggle="tab">${_('Sessions')}</a></li>
-      % if ENABLE_QUERY_SCHEDULING.get():
-      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
-        <li><a href="#scheduleTab" data-toggle="tab">${_('Schedule')}</a></li>
-      <!-- /ko -->
-      % endif
     </ul>
 
     <div class="tab-content" style="border: none">
-
-    <div class="tab-pane active" id="sessionsTab">
-      <div class="row-fluid">
-        <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+      <div class="tab-pane active" id="sessionsTab">
+        <div class="row-fluid">
+          <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+        </div>
       </div>
     </div>
-
-    % if ENABLE_QUERY_SCHEDULING.get():
-      <!-- ko if: $root.selectedNotebook() && $root.selectedNotebook().isBatchable() -->
-      <!-- ko with: $root.selectedNotebook() -->
-      <div class="tab-pane" id="scheduleTab">
-        <!-- ko if: isSaved() -->
-        <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
-          <a data-bind="click: $root.saveNotebook">${ _('Save changes') }</a>
-        <!-- /ko -->
-        <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
-          <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
-        <!-- /ko -->
-        <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
-          <a data-bind="click: showSubmitPopup">${ _('View') }</a>
-          ##<a data-bind="click: showSubmitPopup">${ _('Synchronize') }</a>
-          <a data-bind="click: showSubmitPopup">${ _('Stop') }</a>
-        <!-- /ko -->
-        <br>
-        <br>
-        <div id="schedulerEditor"></div>
-        <!-- /ko -->
-
-        <!-- ko ifnot: isSaved() -->
-        ${ _('Query needs to be saved first.') }
-        <!-- /ko -->
-      </div>
-      <!-- /ko -->
-      <!-- /ko -->
-    % endif
   </div>
 </script>
 
@@ -3463,12 +3429,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               redrawFixedHeaders();
             });
           }, 2000);
-        }
-      });
-
-      $(document).on('shown', 'a[href="#scheduleTab"]', function(){
-        if (viewModel.selectedNotebook().schedulerViewModel == null) {
-          viewModel.selectedNotebook().loadScheduler();
         }
       });
 

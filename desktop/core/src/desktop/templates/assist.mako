@@ -25,7 +25,7 @@ from desktop.views import _ko
 
 from metadata.conf import has_navigator
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-from notebook.conf import ENABLE_QUERY_BUILDER
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 from notebook.conf import get_ordered_interpreters
 %>
 
@@ -1920,12 +1920,97 @@ from notebook.conf import get_ordered_interpreters
     })();
   </script>
 
+  <script type="text/html" id="schedule-panel-template">
+    <div class="assist-inner-panel">
+      <div class="assist-flex-panel">
+        <div class="assist-flex-header"><div class="assist-inner-header">${ _('Schedule') }</div></div>
+        <!-- ko if: selectedNotebook() && selectedNotebook().isBatchable() -->
+        <!-- ko with: selectedNotebook() -->
+        <div class="tab-pane" id="scheduleTab">
+          <!-- ko if: isSaved() -->
+          <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
+          <a data-bind="click: $root.saveNotebook">${ _('Save changes') }</a>
+          <!-- /ko -->
+          <!-- ko if: schedulerViewModelIsLoaded() && ! schedulerViewModel.coordinator.isDirty() && ! viewSchedulerId()-->
+          <a data-bind="click: showSubmitPopup" href="javascript: void(0);">${ _('Start') }</a>
+          <!-- /ko -->
+          <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
+          <a data-bind="click: showSubmitPopup">${ _('View') }</a>
+          ##<a data-bind="click: showSubmitPopup">${ _('Synchronize') }</a>
+          <a data-bind="click: showSubmitPopup">${ _('Stop') }</a>
+          <!-- /ko -->
+          <br>
+          <br>
+          <div id="schedulerEditor"></div>
+          <!-- /ko -->
+
+          <!-- ko ifnot: isSaved() -->
+          ${ _('Query needs to be saved first.') }
+          <!-- /ko -->
+        </div>
+        <!-- /ko -->
+        <!-- /ko -->
+      </div>
+    </div>
+  </script>
+
+  <script type="text/javascript">
+    (function () {
+      function SchedulePanel(params) {
+        var self = this;
+        self.disposals = [];
+        self.selectedNotebook = ko.observable();
+
+        // TODO: Move all the scheduler logic out of the notebook to here.
+
+        self.disposals.push(self.selectedNotebook.subscribe(function (notebook) {
+          if (notebook && notebook.schedulerViewModel == null) {
+            notebook.loadScheduler();
+          }
+        }).dispose);
+
+        // Hue 3
+        self.disposals.push(huePubSub.subscribe('set.selected.notebook', self.selectedNotebook).remove);
+        self.disposals.push(huePubSub.subscribe('selected.notebook.changed', self.selectedNotebook).remove);
+        huePubSub.publish('get.selected.notebook');
+
+        // Hue 4
+        self.disposals.push(huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
+          if (viewModel.selectedNotebook) {
+            if (viewModel.selectedNotebook()) {
+              self.selectedNotebook(viewModel.selectedNotebook());
+            } else {
+              var subscription = viewModel.selectedNotebook.subscribe(function (notebook) {
+                self.selectedNotebook(notebook);
+                subscription.dispose();
+              });
+            }
+          } else {
+            self.selectedNotebook(undefined);
+          }
+        }).remove);
+      }
+
+      SchedulePanel.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
+      };
+
+      ko.components.register('schedule-panel', {
+        viewModel: SchedulePanel,
+        template: { element: 'schedule-panel-template' }
+      });
+    })();
+  </script>
+
   <script type="text/html" id="right-assist-panel-template">
     <div style="height: 100%; width: 100%; position: relative;">
       <ul class="right-panel-tabs nav nav-pills">
         <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeTab('assistant'); }">${ _('Assistant') }</a></li>
         <li data-bind="css: { 'active' : activeTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeTab('functions'); }">${ _('Functions') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'schedules' }"><a href="javascript: void(0);" data-bind="click: function() { activeTab('schedules'); }">${ _('Schedule') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeTab('schedules'); }">${ _('Schedule') }</a></li>
       </ul>
 
       <div class="right-panel-tab-content tab-content">
@@ -1937,9 +2022,8 @@ from notebook.conf import get_ordered_interpreters
         <div data-bind="component: { name: 'functions-panel' }"></div>
         <!-- /ko -->
 
-        <!-- ko if: activeTab() === 'schedules' -->
-        <div class="assist-inner-panel">Schedules</div>
-        <!-- /ko -->
+        ## TODO: Switch to if: when loadSchedules from notebook.ko.js has been moved to the schedule-panel component
+        <div data-bind="component: { name: 'schedule-panel' }, visible: activeTab() === 'schedules'" style="display:none;"></div>
       </div>
     </div>
   </script>
@@ -1949,11 +2033,24 @@ from notebook.conf import get_ordered_interpreters
     (function () {
       function RightAssistPanel(params) {
         var self = this;
+        self.disposals = [];
 
         self.activeTab = ko.observable();
         self.assistantAvailable = ko.observable(false);
 
-        huePubSub.subscribe('active.snippet.type.changed', function (type) {
+        self.schedulesAvailable = ko.observable(false);
+
+        if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
+          self.disposals.push(huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
+            self.schedulesAvailable(!!viewModel.selectedNotebook);
+          }).remove);
+          huePubSub.publish('get.current.app.view.model');
+        } else {
+          // Right assist is only available in the Hue 3 editor and notebook.
+          self.schedulesAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
+        }
+
+        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', function (type) {
           if (type === 'hive' || type === 'impala') {
             if (!self.assistantAvailable() && self.activeTab() !== 'assistant') {
               self.activeTab('assistant');
@@ -1965,7 +2062,7 @@ from notebook.conf import get_ordered_interpreters
             }
             self.assistantAvailable(false);
           }
-        });
+        }).remove);
 
         if (!self.activeTab()) {
           self.activeTab('functions');
@@ -1975,6 +2072,13 @@ from notebook.conf import get_ordered_interpreters
           self.activeTab('assistant');
         }
       }
+
+      RightAssistPanel.prototype.dispose = function () {
+        var self = this;
+        self.disposals.forEach(function (dispose) {
+          dispose();
+        })
+      };
 
       ko.components.register('right-assist-panel', {
         viewModel: RightAssistPanel,
