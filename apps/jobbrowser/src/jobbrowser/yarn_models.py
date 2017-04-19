@@ -403,7 +403,7 @@ class Attempt:
   @property
   def counters(self):
     if not hasattr(self, '_counters'):
-      self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobCounters']
+      self._counters = self.task.job.api.task_attempt_counters(self.task.jobId, self.task.id, self.id)['jobTaskAttemptCounters']
     return self._counters
 
   def get_task_log(self, offset=0):
