@@ -135,7 +135,7 @@ var AssistDbSource = (function () {
             if (db.loading()) {
               var subscription = db.loading.subscribe(function () {
                 if (subscription) {
-                  subscription.remove();
+                  subscription.dispose();
                 }
                 applyPopularity();
               });
