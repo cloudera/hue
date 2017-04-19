@@ -2418,6 +2418,17 @@ var EditorViewModel = (function() {
     self.useNewAutocompleter = options.useNewAutocompleter || false;
     self.autocompleteTimeout = options.autocompleteTimeout;
     self.selectedNotebook = ko.observable();
+
+    if (!IS_HUE_4) {
+      // TODO: In Hue 4 we have to do this from hue.mako as there are multiple notebooks/editors
+      self.selectedNotebook.subscribe(function (newVal) {
+        huePubSub.publish('selected.notebook.changed', newVal);
+      });
+
+      huePubSub.subscribe('get.selected.notebook', function () {
+        huePubSub.publish('set.selected.notebook', self.selectedNotebook());
+      });
+    }
     self.combinedContent = ko.observable();
     self.isPlayerMode = ko.observable(false);
     self.isFullscreenMode = ko.observable(false);
