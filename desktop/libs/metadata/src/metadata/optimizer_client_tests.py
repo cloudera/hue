@@ -311,26 +311,6 @@ FROM
 
   def test_risk_cartesian_cross_join(self):
     source_platform = 'hive'
-    query = '''SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary
-FROM
-  sample_07 s07
-
-CROSS
-
-JOIN
-  sample_08 s08
-ON ( s07.code = s08.code )
-WHERE
-( s07.total_emp > s08.total_emp
- AND s07.salary > 100000 )
-ORDER BY s07.salary DESC
-'''
-
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
-    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
-
-
-    source_platform = 'hive'
     query = '''SELECT ID, NAME, AMOUNT, DATE FROM CUSTOMERS, ORDERS
 '''
 
@@ -425,34 +405,34 @@ LIMIT 1000
     db_name = 'default'
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs LIMIT 1'''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE app='oozie' LIMIT 1'''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'])
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE date='20180101' '''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'], present=False)
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'], present=False)
 
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs WHERE app='oozie' AND date='20180101' '''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
-    _assert_risks(['Query on partitioned table is missing filters on parttioning columns.'], resp['hints'], present=False)
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'], present=False)
 
 
 def _assert_risks(risks, suggestions, present=True):

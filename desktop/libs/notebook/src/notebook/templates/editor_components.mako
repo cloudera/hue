@@ -1059,6 +1059,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
       <!-- /ko -->
     <!-- /ko -->
+    <!-- ko if: hasSuggestion() == 'error'  -->
+      <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <i class="fa fa-check"></i>
+      </div>
+      <!-- ko if: showOptimizer -->
+        <span class="optimizer-explanation alert-neutral alert-neutral">${ _('Not validated.') }</span>
+      <!-- /ko -->
+    <!-- /ko -->
   </div>
   <!-- /ko -->
 
@@ -3063,6 +3071,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         viewModel.selectedNotebook().snippets()[0].loadQueryHistory(100);
       });
 
+      huePubSub.subscribe('active.editor.statement.changed', function (statement) {
+        viewModel.selectedNotebook().snippets()[0].positionStatement(statement);
+      });
 
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();

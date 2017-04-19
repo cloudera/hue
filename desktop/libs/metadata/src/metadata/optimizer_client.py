@@ -45,6 +45,9 @@ class NavOptException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
 
+  def __str__(self):
+    return str(self.message)
+
   def __unicode__(self):
     return smart_unicode(self.message)
 
@@ -179,7 +182,7 @@ class OptimizerApi(object):
 
     hints = response.get(source_platform + 'Risk', {})
 
-    if hints and hints == [{u'riskAnalysis': u'', u'risk': u'low', u'riskId': 0, u'riskRecommendation': u''}]:
+    if hints and hints == [{"riskTables": [], "riskAnalysis": "", "riskId": 0, "risk": "low", "riskRecommendation": ""}]:
       hints = []
 
     return {
