@@ -74,6 +74,34 @@
       });
     });
 
+    it('should report locations for "select x from x;select y from y;"', function () {
+      assertLocations({
+        beforeCursor: 'select x from x;select y from y;',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 16 } },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'x' }], tables: [{ identifierChain: [{ name: 'x' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 15, last_column: 16 }, identifierChain: [{ name: 'x' }] },
+          { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 32 } },
+          { type: 'column', location: { first_line: 1, last_line: 1, first_column: 24, last_column: 25 }, identifierChain: [{ name: 'y' }], tables: [{ identifierChain: [{ name: 'y' }] }] },
+          { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 32 }, identifierChain: [{ name: 'y' }] }
+        ]
+      });
+    });
+
+    it('should report locations for "-- comment\nselect x from x;\n\n\nselect y from y;"', function () {
+      assertLocations({
+        beforeCursor: '-- comment\nselect x from x;\n\n\nselect y from y;',
+        expectedLocations: [
+          { type: 'statement', location: { first_line: 1, last_line: 2, first_column: 1, last_column: 16 } },
+          { type: 'column', location: { first_line: 2, last_line: 2, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'x' }], tables: [{ identifierChain: [{ name: 'x' }] }] },
+          { type: 'table', location: { first_line: 2, last_line: 2, first_column: 15, last_column: 16 }, identifierChain: [{ name: 'x' }] },
+          { type: 'statement', location: { first_line: 2, last_line: 5, first_column: 17, last_column: 16 } },
+          { type: 'column', location: { first_line: 5, last_line: 5, first_column: 8, last_column: 9 }, identifierChain: [{ name: 'y' }], tables: [{ identifierChain: [{ name: 'y' }] }] },
+          { type: 'table', location: { first_line: 5, last_line: 5, first_column: 15, last_column: 16 }, identifierChain: [{ name: 'y' }] }
+        ]
+      });
+    });
+
     it('should report locations for "select x from x, y;"', function () {
       assertLocations({
         beforeCursor: 'select x from x, y;',
