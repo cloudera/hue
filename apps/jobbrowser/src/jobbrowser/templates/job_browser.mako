@@ -419,12 +419,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
       ${_('Filter')}
-      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by id, name, user...')}">
-      <span class="btn-group">
-        <class="btn-group">
-          <a class="btn btn-status btn-success" data-value="completed">${ _('MAP') }</a>
-          <a class="btn btn-status btn-warning" data-value="running">${ _('REDUCE') }</a>
-        </span>
+      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+      <span data-bind="foreach: statesValuesFilter">
+        <label class="checkbox">
+          <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
+          <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+          <span data-bind="text: name, attr: {for: name}"></span>
+        </label>
       </span>
 
       <table class="table table-condensed">
@@ -1002,9 +1003,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.mainType = ko.observable(vm.interface());
 
       self.textFilter = ko.observable('').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
+      self.statesValuesFilter = ko.observableArray([
+        ko.mapping.fromJS({'value': 'map', 'name': '${_("Map")}', 'checked': true, 'klass': 'green'}),
+        ko.mapping.fromJS({'value': 'reduce', 'name': '${_("Reduce")}', 'checked': true, 'klass': 'orange'}),
+      ]);
+      self.statesFilter = ko.computed(function () {
+        var checkedStates = ko.utils.arrayFilter(self.statesValuesFilter(), function (state) {
+          return state.checked();
+        });
+        return ko.utils.arrayMap(checkedStates, function(state){
+          return state.value()
+        });
+      });
       self.filters = ko.computed(function() {
         return [
           {'text': self.textFilter()},
+          {'states': ko.mapping.toJS(self.statesFilter())},
         ];
       });
       self.filters.subscribe(function(value) {

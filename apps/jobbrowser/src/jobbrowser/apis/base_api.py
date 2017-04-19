@@ -85,5 +85,7 @@ def _extract_query_params(filters):
       if user_filter:
         filter_params['username'] = user_filter.group(3)
         filter_params['text'] = filter_params['text'].replace(user_filter.group(1), '').strip()
+    else:
+      filter_params[name] = value
 
   return filter_params
