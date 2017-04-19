@@ -238,35 +238,8 @@ class YarnMapReduceTaskApi(Api):
     if filters.get('text'):
       filter_params['task_text'] = filters['text']
 
-#     filter_params.update(_extract_query_params(filters)
-#
-#     #filter_params['text']
-#
-#     if filters.get('states'):
-#       filter_params['states'] = filters['states']
-#
-#     if 'time' in filters:
-#       filter_params['time_value'] = int(filters['time']['time_value'])
-#       filter_params['time_unit'] = filters['time']['time_unit']
-
-#     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
-#
-#     apps = [massage_job_for_json(job, user=self.user) for job in jobs]
-#
-#     return {
-#       'apps': [{
-#         'id': app['id'],
-#         'name': app['name'],
-#         'type': app['applicationType'],
-#         'status': app['status'],
-#         'apiStatus': self._api_status(app['status']),
-#         'user': app['user'],
-#         'progress': app['progress'],
-#         'duration': app['durationMs'],
-#         'submitted': app['startTimeMs']
-#       } for app in apps],
-#       'total': None
-#     }
+    if filters.get('states') and len(filters.get('states')) == 1:
+      filter_params['task_types'] = filters['states'][0]
 
     return {
       'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(**filter_params)],
