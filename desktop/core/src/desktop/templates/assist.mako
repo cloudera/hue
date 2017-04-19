@@ -1748,15 +1748,18 @@ from notebook.conf import get_ordered_interpreters
         <!-- ko if: HAS_OPTIMIZER -->
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Suggestions') }</div></div>
         <div class="assist-flex-half">
-          <!-- ko if: !activeRisks().hints || activeRisks().hints.length === 0 -->
-          <div class="assist-no-entries">${ _('No optimization hints identified.') }</div>
+          <!-- ko if: ! activeRisks().hints -->
+          <div class="assist-no-entries">...</div>
           <!-- /ko -->
-          <!-- ko if: activeRisks().hints && activeRisks().hints.lenth > 0 -->
+          <!-- ko if: activeRisks().hints && activeRisks().hints.length === 0 -->
+          <div class="assist-no-entries">${ _('No optimizations identified.') }</div>
+          <!-- /ko -->
+          <!-- ko if: activeRisks().hints && activeRisks().hints.length > 0 -->
           <ul data-bind="foreach: activeRisks().hints">
             <li>
               <span data-bind="text: risk"></span>
               <span data-bind="text: riskAnalysis"></span>
-              <span data-bind="text: riskRecommendation"></span>
+              <div data-bind="text: riskRecommendation"></div>
             </li>
           </ul>
           <!-- /ko -->
@@ -1764,8 +1767,8 @@ from notebook.conf import get_ordered_interpreters
 
         <!-- ko if: hasActiveRisks() && activeRisks()['noDDL'].length > 0 -->
         <div class="assist-flex-fill">
-          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Load table and columns DDL/stats in order to improve recommendations') }">
-            <i class="fa fa-fw fa-gears"></i> ${_('Optimize Analysis')}
+          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Some table and columns DDL/stats are missing. Load them in order to improve the recommendations') }">
+            <i class="fa fa-fw fa-gears"></i> ${_('Optimize more')}
           </a>
         </div>
         <!-- /ko -->
@@ -1790,7 +1793,7 @@ from notebook.conf import get_ordered_interpreters
         self.activeColumns = ko.observableArray();
         self.activeRisks = ko.observable({});
         self.hasActiveRisks = ko.pureComputed(function () {
-           return Object.keys(self.activeRisks()).length > 0;
+           return self.activeRisks().hints && self.activeRisks().length > 0;
         });
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);

@@ -511,6 +511,7 @@ var EditorViewModel = (function() {
     });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
+    self.positionStatement = ko.observable('');
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
@@ -603,7 +604,7 @@ var EditorViewModel = (function() {
       }
     });
     self.statement = ko.computed(function () {
-      var statement = self.isSqlDialect() && self.selectedStatement() ? self.selectedStatement() : self.statement_raw();
+      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() && HAS_OPTIMIZER ? self.positionStatement() : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
         statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "}", "g"), "$1" + variable.value());
       });
@@ -894,7 +895,7 @@ var EditorViewModel = (function() {
       self.delayedStatement = ko.pureComputed(self.statement).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 2000 } });
 
       self.checkComplexity = function () {
-        if (lastCheckedComplexityStatement === self.statement_raw()) {
+        if (lastCheckedComplexityStatement === self.statement()) {
           return;
         }
 
@@ -902,6 +903,8 @@ var EditorViewModel = (function() {
 
         hueAnalytics.log('notebook', 'get_query_risk');
         self.complexityCheckRunning(true);
+        self.hasSuggestion(null);
+        self.complexity({});
         huePubSub.publish('editor.active.risks', {});
 
         lastComplexityRequest = $.ajax({
@@ -917,11 +920,11 @@ var EditorViewModel = (function() {
               self.complexity(data.query_complexity);
               self.hasSuggestion('');
             } else {
-              self.hasSuggestion(data.message); // TODO Properly inform user
-              self.complexity({});
+              self.hasSuggestion('error');
+              self.complexity({'hints': []});
             }
             huePubSub.publish('editor.active.risks', self.complexity());
-            lastCheckedComplexityStatement = self.statement_raw();
+            lastCheckedComplexityStatement = self.statement();
             self.complexityCheckRunning(false);
           }
         });
@@ -1122,7 +1125,7 @@ var EditorViewModel = (function() {
             if (vm.isNotificationManager()) { // Update task status
               var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
               if (tasks.length == 1) {
-                tasks[0].status(self.status()); console.log(tasks[0].uuid());
+                tasks[0].status(self.status());
               }
             } else {
               notebook.history.unshift(

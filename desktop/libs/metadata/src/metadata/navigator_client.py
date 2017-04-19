@@ -79,6 +79,9 @@ class NavigatorApiException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
 
+  def __str__(self):
+    return str(self.message)
+
   def __unicode__(self):
     return smart_unicode(self.message)
 
@@ -87,6 +90,9 @@ class EntityDoesNotExistException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
 
+  def __str__(self):
+    return str(self.message)
+
   def __unicode__(self):
     return smart_unicode(self.message)
 
@@ -94,6 +100,9 @@ class EntityDoesNotExistException(Exception):
 class NavigathorAuthException(Exception):
   def __init__(self, message=None):
     self.message = message or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
 
   def __unicode__(self):
     return smart_unicode(self.message)
