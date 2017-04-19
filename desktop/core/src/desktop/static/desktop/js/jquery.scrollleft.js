@@ -124,6 +124,7 @@
     $(document).on("click", "#jHueScrollLeftAnchor", function (event) {
       if ($("#jHueScrollLeftAnchor").data("caller") != null) {
         $("#jHueScrollLeftAnchor").data("caller").animate({scrollLeft: 0}, 300, function () {
+          $(document).find("[jHueLeftScrollified='true']").trigger('scroll_update');
           if ($(document).find("[jHueLeftScrollified='true']").not($("#jHueScrollLeftAnchor").data("caller")).is("body") && $(window).scrollLeft() > _this.options.threshold) {
             $("#jHueScrollLeftAnchor").data("caller", $("body, html"));
           }
