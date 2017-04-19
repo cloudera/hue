@@ -188,8 +188,8 @@ ${ fb_components.menubar() }
   });
 
   function resizeText() {
-    hueUtils.waitForRendered('#fileArea', function(el){ return el.height() > 0 }, function(){
-      $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 26);
+    hueUtils.waitForRendered('#fileArea', function(el){ return el.is(':visible') }, function(){
+      $("#fileArea").height($(window).height() - $("#fileArea").offset().top - 30);
     });
   }
 
