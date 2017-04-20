@@ -31,6 +31,7 @@ var prepareNewStatement = function () {
     parser.yy.errors.push(error);
     return message;
   };
+  prioritizeSuggestions();
 };
 
 var addCommonTableExpressions = function (identifiers) {

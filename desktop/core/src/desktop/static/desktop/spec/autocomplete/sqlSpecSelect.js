@@ -370,6 +370,98 @@
         });
       });
 
+      it('should suggest tables for "SELECT |;\n\nSELECT * FROM foo;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ';\n\nSELECT * FROM foo;',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT * FROM foo;\n\nSELECT |;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo;\n\nSELECT ',
+          afterCursor: ';',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT |;\n\nSELECT * FROM foo boo;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT ',
+          afterCursor: ';\n\nSELECT * FROM foo boo;',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
+      it('should suggest tables for "SELECT * FROM foo boo;\n\nSELECT |;"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM foo boo;\n\nSELECT ',
+          afterCursor: ';',
+          containsKeywords: ['*', 'ALL', 'DISTINCT'],
+          expectedResult: {
+            lowerCase: false,
+            suggestTables: {
+              prependQuestionMark: true,
+              prependFrom: true
+            },
+            suggestAggregateFunctions: { tables: [] },
+            suggestAnalyticFunctions: true,
+            suggestFunctions: {},
+            suggestDatabases: {
+              prependQuestionMark: true,
+              prependFrom: true,
+              appendDot: true
+            }
+          }
+        });
+      });
+
       it('should suggest lowerCase for "select |"', function() {
         assertAutoComplete({
           beforeCursor: 'select ',
