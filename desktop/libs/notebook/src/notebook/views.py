@@ -273,7 +273,16 @@ def download(request):
   snippet = json.loads(request.POST.get('snippet', '{}'))
   file_format = request.POST.get('format', 'csv')
 
-  return get_api(request, snippet).download(notebook, snippet, file_format)
+  response = get_api(request, snippet).download(notebook, snippet, file_format)
+
+  if response:
+    request.audit = {
+      'operation': 'DOWNLOAD',
+      'operationText': 'User %s downloaded results from %s as %s' % (request.user.username, _get_snippet_name(notebook), file_format),
+      'allowed': True
+    }
+
+  return response
 
 
 def install_examples(request):

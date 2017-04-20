@@ -649,6 +649,11 @@ def export_result(request):
       request.fs.do_as_user(request.user.username, request.fs.rmtree, destination)
     response['watch_url'] = api.export_data_as_hdfs_file(snippet, destination, overwrite)
     response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to HDFS destination: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'hive-table':
     if is_embedded:
       sql, success_url = api.export_data_as_table(notebook, snippet, destination)
@@ -668,6 +673,11 @@ def export_result(request):
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=save_as_table&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to Hive table: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'hdfs-directory':
     if is_embedded:
       sql, success_url = api.export_large_data_to_hdfs(notebook, snippet, destination)
@@ -687,6 +697,11 @@ def export_result(request):
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=insert_as_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to HDFS directory: %s' % (request.user.username, destination),
+      'allowed': True
+    }
   elif data_format == 'search-index':
     if is_embedded:
       if destination == '__hue__':
@@ -724,6 +739,11 @@ def export_result(request):
       notebook_id = notebook['id'] or request.GET.get('editor', request.GET.get('notebook'))
       response['watch_url'] = reverse('notebook:execute_and_watch') + '?action=index_query&notebook=' + str(notebook_id) + '&snippet=0&destination=' + destination
       response['status'] = 0
+    request.audit = {
+      'operation': 'EXPORT',
+      'operationText': 'User %s exported to Search index: %s' % (request.user.username, destination),
+      'allowed': True
+    }
 
   return JsonResponse(response)
 
