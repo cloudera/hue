@@ -146,11 +146,11 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-table-analysis">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
       <!-- ko if: stats.length > 0 -->
-        <table class="table table-striped">
+        <table class="table table-condensed">
           <tbody data-bind="foreach: stats">
             <tr>
-              <th data-bind="text: data_type, style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th>
-              <td data-bind="text: $parents[1].formatAnalysisValue(data_type, comment), style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td>
+              <td><strong data-bind="text: data_type"></strong></td>
+              <td data-bind="text: $parents[1].formatAnalysisValue(data_type, comment)"></td>
             </tr>
           </tbody>
         </table>
@@ -163,8 +163,8 @@ from metadata.conf import has_navigator
       <table class="table table-condensed">
         <tbody data-bind="foreach: stats">
           <tr>
-            <th data-bind="text: Object.keys($data)[0], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></th>
-            <td data-bind="text: $data[Object.keys($data)[0]], style:{'border-top-color': $index() == 0 ? '#ffffff' : '#e5e5e5'}" style="background-color: #FFF"></td>
+            <td><strong data-bind="text: Object.keys($data)[0]"></strong></td>
+            <td data-bind="text: $data[Object.keys($data)[0]]"></td>
           </tr>
         </tbody>
       </table>
