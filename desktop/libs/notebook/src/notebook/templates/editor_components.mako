@@ -1565,22 +1565,22 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
       </div>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
+    <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: errors().length > 0">
       <ul class="unstyled" data-bind="foreach: errors">
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: aceErrors().length > 0">
+    <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: aceErrors().length > 0">
       <ul class="unstyled" data-bind="foreach: aceErrors">
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-gradient" style="margin-bottom: 0" data-bind="visible: aceWarnings().length > 0">
+    <div class="snippet-error-container alert" style="margin-bottom: 0" data-bind="visible: aceWarnings().length > 0">
       <ul class="unstyled" data-bind="foreach: aceWarnings">
         <li data-bind="text: message"></li>
       </ul>
     </div>
-    <div class="snippet-error-container alert alert-error alert-error-gradient" style="margin-bottom: 0" data-bind="visible: status() == 'canceled', click: function() { status('ready'); }" title="${ _('Click to hide') }">
+    <div class="snippet-error-container alert alert-error" style="margin-bottom: 0" data-bind="visible: status() == 'canceled', click: function() { status('ready'); }" title="${ _('Click to hide') }">
       <ul class="unstyled">
         <li>${ _("The statement was canceled.") }</li>
       </ul>
