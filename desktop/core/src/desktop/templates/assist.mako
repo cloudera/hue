@@ -1765,7 +1765,7 @@ from notebook.conf import get_ordered_interpreters
           <!-- ko if: activeRisks().hints && activeRisks().hints.length > 0 -->
           <ul class="risk-list" data-bind="foreach: activeRisks().hints">
             <li>
-              <div data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk }"><span data-bind="text: riskAnalysis"></span></div>
+              <div class="risk-list-title" data-bind="css: { 'risk-list-high' : risk === 'high', 'risk-list-normal':  risk !== 'high' }, tooltip: { title: risk }"><span data-bind="text: riskAnalysis"></span></div>
               <div class="risk-list-description" data-bind="text: riskRecommendation"></div>
             </li>
           </ul>
