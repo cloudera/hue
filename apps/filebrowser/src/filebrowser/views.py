@@ -161,6 +161,13 @@ def download(request, path):
     response["Last-Modified"] = http_date(stats['mtime'])
     response["Content-Length"] = stats['size']
     response['Content-Disposition'] = request.GET.get('disposition', 'attachment') if _can_inline_display(path) else 'attachment'
+
+    request.audit = {
+        'operation': 'DOWNLOAD',
+        'operationText': 'User %s downloaded file %s with size: %d bytes' % (request.user.username, path, stats['size']),
+        'allowed': True
+    }
+
     return response
 
 
