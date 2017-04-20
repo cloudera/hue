@@ -1801,7 +1801,7 @@ from notebook.conf import get_ordered_interpreters
         self.activeColumns = ko.observableArray();
         self.activeRisks = ko.observable({});
         self.hasActiveRisks = ko.pureComputed(function () {
-           return self.activeRisks().hints && self.activeRisks().length > 0;
+           return self.activeRisks().hints && self.activeRisks().hints.length > 0;
         });
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);

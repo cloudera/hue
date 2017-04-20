@@ -1039,22 +1039,25 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: ! hasSuggestion() && hasRisks() -->
-      <!-- ko if: complexity()['hints'][0].risk === 'low' -->
+    <!-- ko if: ! hasSuggestion() && topRisk() -->
+      <!-- ko if: topRisk().risk === 'low' -->
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
       <!-- /ko -->
-      <!-- ko if: complexity()['hints'][0].risk != 'low' -->
+      <!-- ko if: topRisk().risk != 'low' -->
         <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-error alert-neutral"><strong data-bind="text: complexity()['hints'][0].riskAnalysis"></strong> <span data-bind="text: complexity()['hints'][0].riskRecommendation"></span></span>
+        <span class="optimizer-explanation alert-error alert-neutral">
+          <strong data-bind="text: topRisk().riskAnalysis"></strong>
+          <span data-bind="text: topRisk().riskRecommendation"></span>
+        </span>
         <!-- /ko -->
       <!-- /ko -->
     <!-- /ko -->
-    <!-- ko if: hasSuggestion() == '' && ! hasRisks() -->
+    <!-- ko if: hasSuggestion() == '' && ! topRisk() -->
       <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
         <i class="fa fa-check"></i>
       </div>
