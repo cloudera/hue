@@ -410,7 +410,7 @@ from desktop.views import _ko
             if (initialDevicePixelRation !== window.devicePixelRatio) {
               initialOffset = newOffset;
               initialDevicePixelRation = window.devicePixelRatio;
-            } else if (newOffset.top !== initialOffset.top || newOffset.left !== initialOffset.left) {
+            } else if (Math.abs(newOffset.top - initialOffset.top) > 20 || Math.abs(newOffset.left - initialOffset.left) > 20) {
               self.detach();
             }
           }, 300);
