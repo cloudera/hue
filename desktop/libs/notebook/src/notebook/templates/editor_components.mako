@@ -460,7 +460,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             sourceTypes: sqlSourceTypes,
             activeSourceType: activeSqlSourceType,
             navigationSettings: {
-              enableActiveFilter: editorMode(),
               openDatabase: false,
               openItem: false,
               showStats: true,
