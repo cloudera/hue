@@ -190,6 +190,14 @@ input[type='password']::-ms-reveal {
   margin-top: -1px;
 }
 
+.ace_gutter-cell {
+  border-right: 1px solid transparent;
+  &.ace-active-gutter-decoration {
+    background-color: @hue-primary-color-light !important;
+    border-right: 1px solid @hue-primary-color-dark;
+  }
+}
+
 .card {
   background-color: @cui-white;
 }

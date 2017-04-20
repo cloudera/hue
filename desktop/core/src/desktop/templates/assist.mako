@@ -1812,13 +1812,34 @@ from notebook.conf import get_ordered_interpreters
         };
 
         var AceRange = ace.require('ace/range').Range;
+        var lastMarkedGutterLines = [];
         var findStatementTextAtCursor = function () {
           if (!self.activeStatementLocation() || !self.activeCursorLocation()) {
             return; // undefined when unknown
           }
           var statementLoc = self.activeStatementLocation();
+
           var editor = self.activeCursorLocation().editor;
-          return editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1))
+          var statementAtCursor = editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1));
+
+          var leadingEmptyLineCount = 0;
+          var leadingWhiteSpace = statementAtCursor.match(/^\s+/);
+          if (leadingWhiteSpace) {
+            var lineBreakMatch = leadingWhiteSpace[0].match(/^(\r\n)|(\n)|(\r)/g);
+            if (lineBreakMatch) {
+              leadingEmptyLineCount = lineBreakMatch.length;
+            }
+          }
+
+          while(lastMarkedGutterLines.length) {
+            editor.session.removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
+          }
+          for (var line = statementLoc.first_line - 1 + leadingEmptyLineCount; line < statementLoc.last_line; line ++) {
+            lastMarkedGutterLines.push(line);
+            editor.session.addGutterDecoration(line, 'ace-active-gutter-decoration');
+          }
+
+          return editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1));
         };
 
         self.disposals.push(huePubSub.subscribe('get.active.editor.statement', function () {

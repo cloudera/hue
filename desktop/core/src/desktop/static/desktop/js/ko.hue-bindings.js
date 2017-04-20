@@ -3502,6 +3502,7 @@
             }
           }
 
+
           var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), defaultDatabase: snippet.database(), locations: e.data.locations };
 
           // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
