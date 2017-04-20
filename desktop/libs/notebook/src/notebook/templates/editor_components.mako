@@ -648,7 +648,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </div>
 
     <!-- ko if: status() == 'available' && ! result.fetchedOnce() -->
-    <div data-bind="visible: css: resultsKlass" style="display:none;">
+    <div data-bind="css: resultsKlass">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
     </div>
     <!-- /ko -->
