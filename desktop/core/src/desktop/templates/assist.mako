@@ -784,7 +784,7 @@ from notebook.conf import get_ordered_interpreters
           <!-- /ko -->
           ${_('Sort')}
         </a>
-        <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
+        <ul class="dropdown-menu" style="top: initial; left: inherit; position: fixed; z-index:10000;">
           <li>
             <a href="javascript:void(0)" data-bind="click: function () { $parent.activeSort('creation'); }">
               <i class="fa fa-fw" data-bind="css: { 'fa-check': $parent.activeSort() === 'creation' }"></i> ${ _('Default') }
