@@ -1028,7 +1028,7 @@ from notebook.conf import get_ordered_interpreters
         });
 
         huePubSub.subscribe('assist.get.source', function () {
-          huePubSub.publish('assist.source.set', self.selectedSource().type);
+          huePubSub.publish('assist.source.set', self.selectedSource() ? self.selectedSource().sourceType : undefined);
         });
 
         huePubSub.subscribe('assist.set.source', function (source) {
