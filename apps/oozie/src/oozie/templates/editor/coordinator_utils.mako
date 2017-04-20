@@ -27,7 +27,7 @@
       <div class="row-fluid">
         <div class="span9">
           <a data-bind="visible: isAdvancedCron" href="http://quartz-scheduler.org/api/2.0.0/org/quartz/CronExpression.html" class="pull-right" target="_blank">&nbsp;<i class="fa fa-question-circle" title="${ _('Check syntax ?') }"></i></a>
-          <input data-bind="visible: isAdvancedCron" id="coord-frequency" name="cron_frequency" class="pull-right"/>
+          <input data-bind="textInput: cronFrequency, visible: isAdvancedCron, tagsNotAllowed" id="coord-frequency" name="cron_frequency" class="pull-right"/>
           <span data-bind="visible: isAdvancedCron" class="pull-right" style="padding-right:20px">
             ${ _('Crontab') }
           </span>&nbsp;
