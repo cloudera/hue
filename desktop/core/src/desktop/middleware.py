@@ -100,8 +100,10 @@ class ExceptionMiddleware(object):
         response.status_code = getattr(exception, 'error_code', 500)
         return response
       else:
-        response = render("error.mako", request,
-                      dict(error=exception.response_data.get("message")))
+        response = render("error.mako", request, {
+          'error': exception.response_data.get("message"),
+          'is_embeddable': request.GET.get('is_embeddable', False),
+        })
         response.status_code = getattr(exception, 'error_code', 500)
         return response
 
@@ -647,7 +649,10 @@ class EnsureSafeRedirectURLMiddleware(object):
       if is_safe_url(location, request.get_host()):
         return response
 
-      response = render("error.mako", request, dict(error=_('Redirect to %s is not allowed.') % response['Location']))
+      response = render("error.mako", request, {
+        'error': _('Redirect to %s is not allowed.') % response['Location'],
+        'is_embeddable': request.GET.get('is_embeddable', False),
+      })
       response.status_code = 403
       return response
     else:
