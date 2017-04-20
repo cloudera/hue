@@ -1066,11 +1066,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- /ko -->
     <!-- /ko -->
     <!-- ko if: hasSuggestion() == 'error'  -->
-      <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
-        <i class="fa fa-check"></i>
+      <div class="round-icon idle" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
       </div>
       <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-neutral alert-neutral">${ _('Not validated.') }</span>
+        <span class="optimizer-explanation alert-neutral">${ _('Not validated.') }</span>
       <!-- /ko -->
     <!-- /ko -->
   </div>
