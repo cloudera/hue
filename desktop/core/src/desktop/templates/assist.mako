@@ -772,8 +772,17 @@ from notebook.conf import get_ordered_interpreters
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
         <!-- ko if: $parent.activeSort -->
-        <a class="assist-sort inactive-action" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
-          <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
+        <a class="assist-sort inactive-action inactive-action-dark" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
+          <!-- ko if: $parent.activeSort() === 'creation' -->
+          <i class="pointer fa fa-sort" title="${_('Sort')}"></i>
+          <!-- /ko -->
+          <!-- ko if: $parent.activeSort() === 'popular' -->
+          <i class="pointer fa fa-star-0" title="${_('Sort')}"></i>
+          <!-- /ko -->
+          <!-- ko if: $parent.activeSort() === 'alpha' -->
+          <i class="pointer fa fa-sort-alpha-asc" title="${_('Sort')}"></i>
+          <!-- /ko -->
+          ${_('Sort')}
         </a>
         <ul class="dropdown-menu hue-inner-drop-down" style="top: initial; left: inherit; position: fixed; z-index:10000;">
           <li>
