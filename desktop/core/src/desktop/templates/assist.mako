@@ -1850,9 +1850,11 @@ from notebook.conf import get_ordered_interpreters
           return editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1));
         };
 
-        self.disposals.push(huePubSub.subscribe('get.active.editor.statement', function () {
+        var activeStatementSub = huePubSub.subscribe('get.active.editor.statement', function () {
           huePubSub.publish('set.active.editor.statement', findStatementTextAtCursor());
-        }).remove);
+        });
+
+        self.disposals.push(activeStatementSub.remove.bind(activeStatementSub));
 
         var initActive = function () {
           if (!self.activeCursorLocation()) {
@@ -1935,23 +1937,27 @@ from notebook.conf import get_ordered_interpreters
         huePubSub.subscribeOnce('set.active.snippet.type', self.activeSourceType);
         huePubSub.publish('get.active.snippet.type');
 
-        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', self.activeSourceType).remove);
+        var snippetTypeChangedSub = huePubSub.subscribe('active.snippet.type.changed', self.activeSourceType);
+        self.disposals.push(snippetTypeChangedSub.remove.bind(snippetTypeChangedSub));
 
-        self.disposals.push(huePubSub.subscribe('editor.active.cursor.location', function (location) {
+        var cursorLocationSub = huePubSub.subscribe('editor.active.cursor.location', function (location) {
           self.activeCursorLocation(location);
           initActive();
-        }).remove);
+        });
+        self.disposals.push(cursorLocationSub.remove.bind(cursorLocationSub));
 
-        self.disposals.push(huePubSub.subscribe('editor.active.locations', function (activeLocations) {
+        var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
           var index = self.locationIndex();
           index[activeLocations.id] = activeLocations;
           self.locationIndex(index);
           initActive();
-        }).remove);
+        });
+        self.disposals.push(activeLocationsSub.remove.bind(activeLocationsSub));
 
-        self.disposals.push(huePubSub.subscribe('editor.active.risks', function (activeRisks) {
+        var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (activeRisks) {
           self.activeRisks(activeRisks);
-        }).remove);
+        });
+        self.disposals.push(activeRisksSub.remove.bind(activeRisksSub));
 
         huePubSub.publish('get.active.editor.locations');
       }
@@ -2013,19 +2019,22 @@ from notebook.conf import get_ordered_interpreters
 
         // TODO: Move all the scheduler logic out of the notebook to here.
 
-        self.disposals.push(self.selectedNotebook.subscribe(function (notebook) {
+        var selectedNotebookSub = self.selectedNotebook.subscribe(function (notebook) {
           if (notebook && notebook.schedulerViewModel == null) {
             notebook.loadScheduler();
           }
-        }).dispose);
+        });
+        self.disposals.push(selectedNotebookSub.dispose.bind(selectedNotebookSub));
 
         // Hue 3
-        self.disposals.push(huePubSub.subscribe('set.selected.notebook', self.selectedNotebook).remove);
-        self.disposals.push(huePubSub.subscribe('selected.notebook.changed', self.selectedNotebook).remove);
+        var setSelectedNotebookSub = huePubSub.subscribe('set.selected.notebook', self.selectedNotebook);
+        self.disposals.push(setSelectedNotebookSub.remove.bind(setSelectedNotebookSub));
+        var selectedNotebookChangedSub = huePubSub.subscribe('selected.notebook.changed', self.selectedNotebook);
+        self.disposals.push(selectedNotebookChangedSub.remove.bind(selectedNotebookChangedSub));
         huePubSub.publish('get.selected.notebook');
 
         // Hue 4
-        self.disposals.push(huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
+        var currentAppSub = huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
           if (viewModel.selectedNotebook) {
             if (viewModel.selectedNotebook()) {
               self.selectedNotebook(viewModel.selectedNotebook());
@@ -2038,7 +2047,8 @@ from notebook.conf import get_ordered_interpreters
           } else {
             self.selectedNotebook(undefined);
           }
-        }).remove);
+        });
+        self.disposals.push(currentAppSub.remove.bind(currentAppSub));
       }
 
       SchedulePanel.prototype.dispose = function () {
@@ -2091,16 +2101,17 @@ from notebook.conf import get_ordered_interpreters
         self.schedulesAvailable = ko.observable(false);
 
         if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
-          self.disposals.push(huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
+          var currentAppSub = huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
             self.schedulesAvailable(!!viewModel.selectedNotebook);
-          }).remove);
+          });
+          self.disposals.push(currentAppSub.remove.bind(currentAppSub));
           huePubSub.publish('get.current.app.view.model');
         } else {
           // Right assist is only available in the Hue 3 editor and notebook.
           self.schedulesAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
         }
 
-        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', function (type) {
+        var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', function (type) {
           if (type === 'hive' || type === 'impala') {
             if (!self.assistantAvailable() && self.activeTab() !== 'assistant') {
               self.activeTab('assistant');
@@ -2112,7 +2123,8 @@ from notebook.conf import get_ordered_interpreters
             }
             self.assistantAvailable(false);
           }
-        }).remove);
+        });
+        self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
         if (!self.activeTab()) {
           self.activeTab('functions');
