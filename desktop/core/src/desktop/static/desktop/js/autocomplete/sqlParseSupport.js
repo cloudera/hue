@@ -35,6 +35,7 @@ var SqlParseSupport = (function () {
         parser.yy.errors.push(error);
         return message;
       };
+      prioritizeSuggestions();
     };
 
     parser.addCommonTableExpressions = function (identifiers) {
