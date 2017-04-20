@@ -58,5 +58,8 @@ class PopupException(Exception):
     if not request.ajax:
       data['request'] = request
     response = desktop.lib.django_util.render("popup_error.mako", request, data)
-    response.status_code = self.error_code
+    if self.error_code == 500 and data['is_embeddable']: # Hue 4
+      response.status_code = 200
+    else:
+      response.status_code = self.error_code
     return response
