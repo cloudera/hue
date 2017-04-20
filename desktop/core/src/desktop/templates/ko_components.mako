@@ -177,7 +177,7 @@ from desktop.views import _ko
         <!-- ko if: selectedSnippet -->
         <!-- ko if: selectedSnippet().progress -->
         <div class="snippet-progress-container">
-          <div class="progress-snippet progress active" data-bind="css: {
+          <div class="progress-snippet progress" data-bind="css: {
                     'progress-starting': progress() == 0 && status() == 'running',
                     'progress-warning': progress() > 0 && progress() < 100,
                     'progress-success': progress() == 100,

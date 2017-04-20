@@ -619,7 +619,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
         <li data-bind="attr: {'id': $data.name.substr(4)}"><a data-bind="text: $.trim($data.name), hueLink: $data.url" target="_blank"></a>
           <!-- ko if: typeof percentJob !== 'undefined' && percentJob() > -1 -->
-          <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
+          <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': percentJob() < 100, 'progress-success': percentJob() === 100}">
             <div class="bar" data-bind="style: {'width': percentJob() + '%'}"></div>
           </div>
           <!-- /ko -->
@@ -1552,7 +1552,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script type="text/html" id="snippet-execution-status">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
     <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
-      <div class="progress-snippet progress active" data-bind="css: {
+      <div class="progress-snippet progress" data-bind="css: {
         'progress-starting': progress() == 0 && status() == 'running',
         'progress-warning': progress() > 0 && progress() < 100,
         'progress-success': progress() == 100,

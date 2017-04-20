@@ -394,7 +394,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
   <br><br>
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
@@ -495,7 +495,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('elapsedTime') } <span data-bind="text: elapsedTime"></span>
   <!-- /ko -->
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
@@ -577,7 +577,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('finishTime') } <span data-bind="text: finishTime"></span>
   <!-- /ko -->
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
@@ -781,7 +781,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   endTime<span data-bind="text: properties['endTime']"></span><br>
   <br><br>
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
@@ -881,7 +881,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   endTime<span data-bind="text: properties['endTime']"></span><br>
   <br><br>
 
-  <div class="progress-job progress active pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
     <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
   </div>
 
