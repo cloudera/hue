@@ -569,7 +569,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <!-- ko foreach: sessions -->
       <h4 data-bind="text: $parents[1].getSnippetName(type())" style="clear:left; display: inline-block"></h4>
       <div class="session-actions">
-        <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }"><i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }</a>
+        <a class="inactive-action pointer" title="${ _('Recreate session') }" rel="tooltip" data-bind="click: function() { $parent.restartSession($data) }">
+          <i class="fa fa-refresh" data-bind="css: { 'fa-spin': restarting }"></i> ${ _('Recreate') }
+        </a>
         <a class="inactive-action pointer margin-left-10" title="${ _('Close session') }" rel="tooltip" data-bind="click: function() { $parent.closeAndRemoveSession($data) }"><i class="fa fa-times"></i> ${ _('Close') }</a>
         % if conf.USE_DEFAULT_CONFIGURATION.get():
           <a class="inactive-action pointer margin-left-10" title="${ _('Save session settings as default') }" rel="tooltip" data-bind="click: function() { $parent.saveDefaultUserProperties($data) }"><i class="fa fa-save"></i> ${ _('Set as default settings') }</a>
@@ -646,9 +648,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-check muted"></i> ${ _("Results have expired, rerun the query if needed.") }</pre>
     </div>
 
-    <div data-bind="visible: status() == 'available' && ! result.fetchedOnce(), css: resultsKlass" style="display:none;">
+    <!-- ko if: status() == 'available' && ! result.fetchedOnce() -->
+    <div data-bind="visible: css: resultsKlass" style="display:none;">
       <pre class="margin-top-10 no-margin-bottom"><i class="fa fa-spin fa-spinner"></i> ${ _('Loading...') }</pre>
     </div>
+    <!-- /ko -->
   </div>
 </script>
 
@@ -1606,9 +1610,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type ="text/html" id="snippet-execution-controls">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
-    <a class="snippet-side-btn blue" style="cursor: default;" data-bind="visible: status() == 'loading'" title="${ _('Creating session') }">
+    <!-- ko if: status() == 'loading' -->
+    <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
       <i class="fa fa-fw fa-spinner fa-spin"></i>
     </a>
+    <!-- /ko -->
     <a class="snippet-side-btn" data-bind="click: reexecute, visible: $root.editorMode() && result.handle() && result.handle().has_more_statements, css: {'blue': $parent.history().length == 0 || $root.editorMode(), 'disabled': ! isReady() }" title="${ _('Restart from the first statement') }">
       <i class="fa fa-fw fa-repeat snippet-side-single"></i>
     </a>
@@ -1798,7 +1804,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>
   </div>
   <div class="ace-filechooser-content">
-    <i class="fa fa-spinner fa-spin" style="font-size: 30px; color: #DDD"></i>
   </div>
 </div>
 
