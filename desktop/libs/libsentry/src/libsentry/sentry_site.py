@@ -98,10 +98,10 @@ def is_ha_enabled():
   return get_sentry_server_rpc_addresses() is not None
 
 
-def get_sentry_client(username, client_class, component=None):
+def get_sentry_client(username, client_class, exempt_host=None, component=None):
   server = None
   if is_ha_enabled():
-    servers = _get_server_properties()
+    servers = _get_server_properties(exempt_host=exempt_host)
     if servers:
       server = random.choice(servers)
 
@@ -124,12 +124,13 @@ def get_sentry_client(username, client_class, component=None):
   return client
 
 
-def _get_server_properties():
+def _get_server_properties(exempt_host=None):
   try:
     servers = []
     sentry_servers = get_sentry_server_rpc_addresses()
     for server in sentry_servers:
-      servers.append({'hostname': server, 'port': get_sentry_server_rpc_port()})
+      if server != exempt_host:
+        servers.append({'hostname': server, 'port': get_sentry_server_rpc_port()})
   except Exception, e:
     raise PopupException(_('Error in retrieving Sentry server properties.'), detail=e)
 

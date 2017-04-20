@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import logging
+import threading
 import time
 
 from django.utils.translation import ugettext as _
@@ -28,6 +29,9 @@ from libsentry.sentry_site import get_sentry_client, is_ha_enabled
 
 
 LOG = logging.getLogger(__name__)
+
+API_CACHE = None
+API_CACHE_LOCK = threading.Lock()
 
 
 def ha_error_handler(func):
@@ -44,8 +48,7 @@ def ha_error_handler(func):
         else:
           LOG.info('Could not connect to Sentry server %s, attempting to fetch next available client.' % args[0].client.host)
           time.sleep(1)
-          args[0].client = get_sentry_client(args[0].client.username, SentryClient)
-          LOG.info('Picked %s' % args[0].client)
+          args[0].client = get_cached_client(args[0].client.username, force_reset=True)
       except SentryException, e:
         raise e
       except Exception, e:
@@ -55,9 +58,27 @@ def ha_error_handler(func):
 
 
 def get_api(user):
-  client = get_sentry_client(user.username, SentryClient)
-
+  client = get_cached_client(user.username)
   return SentryApi(client)
+
+
+def get_cached_client(username, force_reset=False):
+  exempt_host = None
+
+  global API_CACHE
+  if force_reset and API_CACHE is not None:
+    exempt_host = API_CACHE.host
+    LOG.info("Force resetting the cached Sentry client to exempt current host: %s" % exempt_host)
+    API_CACHE = None
+
+  if API_CACHE is None:
+    API_CACHE_LOCK.acquire()
+    try:
+      API_CACHE = get_sentry_client(username, SentryClient, exempt_host=exempt_host)
+      LOG.info("Setting cached Sentry client to host: %s" % API_CACHE.host)
+    finally:
+      API_CACHE_LOCK.release()
+  return API_CACHE
 
 
 class SentryApi(object):
