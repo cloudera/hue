@@ -53,7 +53,6 @@ ${ assist.assistPanel() }
       user: '${user.username}',
       sql: {
         navigationSettings: {
-          enableActiveFilter: true,
           openDatabase: false,
           openItem: false,
           showStats: false,

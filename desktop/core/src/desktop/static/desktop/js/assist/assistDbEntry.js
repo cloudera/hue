@@ -80,27 +80,11 @@ var AssistDbEntry = (function () {
     });
 
     self.filteredEntries = ko.pureComputed(function () {
-      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && !self.filter.showActive() && self.filter.query().length === 0)) {
+      if (self.filter == null || (self.filter.showTables && self.filter.showTables() && self.filter.showViews() && self.filter.query().length === 0)) {
         return self.entries();
       }
       var result = [];
       $.each(self.entries(), function (index, entry) {
-        if (self.filter.showActive()) {
-          var found = false;
-          for (var i = 0; i < self.filter.activeEditorTables().length; i++) {
-            var activeTable = self.filter.activeEditorTables()[i];
-            if (activeTable.db && self.definition.name !== activeTable.db) {
-              continue;
-            }
-            if (activeTable.table === entry.definition.name) {
-              found = true;
-              break;
-            }
-          }
-          if (!found) {
-            return;
-          }
-        }
         if ((entry.definition.isTable && !self.filter.showTables()) || (entry.definition.isView && !self.filter.showViews()) ) {
           return;
         }

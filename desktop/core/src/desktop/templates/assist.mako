@@ -771,7 +771,6 @@ from notebook.conf import get_ordered_interpreters
       <div>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showTables" />${_('Tables')}</label>
         <label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showViews" />${_('Views')}</label>
-        <!-- ko if: filter.enableActiveFilter --><label class="checkbox inline-block margin-left-5"><input type="checkbox" data-bind="checked: filter.showActive" />${_('Active')}</label><!-- /ko -->
         <!-- ko if: $parent.activeSort -->
         <a class="assist-sort inactive-action" style="position: absolute;" data-toggle="dropdown" href="javascript:void(0)">
           <i class="pointer fa fa-sort" title="${_('Sort')}"></i> ${_('Sort')}
