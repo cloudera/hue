@@ -835,12 +835,19 @@ var EditorViewModel = (function() {
       };
     };
 
-    self.complexity = ko.observable({});
+    self.complexity = ko.observable();
     self.hasComplexity = ko.pureComputed(function () {
-      return Object.keys(self.complexity()).length > 0;
+      return self.complexity() && Object.keys(self.complexity()).length > 0;
     });
     self.hasRisks = ko.pureComputed(function () {
-      return self.hasComplexity() && self.complexity()['hints'].length > 0;
+      return self.hasComplexity() && self.complexity()['hints'] && self.complexity()['hints'].length > 0;
+    });
+    self.topRisk = ko.pureComputed(function () {
+      if (self.hasRisks()) {
+        return self.complexity()['hints'][0];
+      } else {
+        return null;
+      }
     });
 
     self.suggestion = ko.observable('');
@@ -917,8 +924,8 @@ var EditorViewModel = (function() {
           },
           success: function(data) {
             if (data.status == 0) {
-              self.complexity(data.query_complexity);
               self.hasSuggestion('');
+              self.complexity(data.query_complexity);
             } else {
               self.hasSuggestion('error');
               self.complexity({'hints': []});
