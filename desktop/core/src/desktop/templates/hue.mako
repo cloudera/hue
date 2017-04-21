@@ -740,7 +740,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
           { url: '/indexer/importer/prefill/*', app: function (ctx) {
-            self.loadApp('indexer');
+            self.loadApp('importer');
             self.getActiveAppViewModel(function (viewModel) {
               var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
               if (! arguments) {
