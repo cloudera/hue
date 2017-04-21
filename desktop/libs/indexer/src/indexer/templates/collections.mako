@@ -379,7 +379,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unico
   <div data-bind="with: edit" class="sidebar-nav card-small">
     <ul class="nav nav-list">
       <li class="nav-header">${_('Actions')}</li>
-      <li><a data-bind="attr: { href: '/search/browse/' + collection().name() }"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
+      <li><a data-bind="hueLink: '/search/browse/' + collection().name()"><i class="fa fa-search"></i> ${ _('Search') }</a></li>
       <li><a data-bind="routie: 'edit/' + collection().name() + '/upload'" href="javascript:void(0)"><i class="fa fa-arrow-circle-o-down"></i> ${_('Index file')}</a></li>
       <li><a data-bind="visible: !collection().isCoreOnly()" href="#deleteCollection" data-toggle="modal"><i class="fa fa-times"></i> ${_('Delete')}</a></li>
     </ul>
@@ -602,7 +602,7 @@ routie({
     var _interval = window.setInterval(function(){
       if (vm.manage.hasLoadedOnce()){
         window.clearInterval(_interval);
-        routie("edit/"+name);
+        routie("edit/" + name);
       }
     }, 300);
   },
