@@ -171,7 +171,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                       <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                     </td>
                     <td>
-                      <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': status() == 'SUCCEEDED','orange': ['RUNNING', 'ACCEPTED'].indexOf(status()) > -1, 'red': status() == 'KILLED'}"></div>
+                      <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': apiStatus() == 'SUCCEEDED', 'orange': isRunning(), 'red': apiStatus() == 'FAILED'}"></div>
                     </td>
                     <td data-bind="text: duration"></td>
                     <td data-bind="text: submitted"></td>

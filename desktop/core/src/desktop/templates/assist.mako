@@ -777,7 +777,7 @@ from notebook.conf import get_ordered_interpreters
           <i class="pointer fa fa-sort" title="${_('Sort')}"></i>
           <!-- /ko -->
           <!-- ko if: $parent.activeSort() === 'popular' -->
-          <i class="pointer fa fa-star-0" title="${_('Sort')}"></i>
+          <i class="pointer fa fa-star-o" title="${_('Sort')}"></i>
           <!-- /ko -->
           <!-- ko if: $parent.activeSort() === 'alpha' -->
           <i class="pointer fa fa-sort-alpha-asc" title="${_('Sort')}"></i>

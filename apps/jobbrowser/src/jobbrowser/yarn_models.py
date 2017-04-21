@@ -56,6 +56,7 @@ class Application(object):
   def _fixup(self):
     self.is_mr2 = True
     jobid = self.id
+    self.yarnStatus = self.state
     if self.state in ('FINISHED', 'FAILED', 'KILLED'):
       setattr(self, 'status', self.finalStatus)
     else:
