@@ -22,7 +22,7 @@
 <%namespace name="actionbar" file="actionbar.mako" />
 
 %if not is_embeddable:
-${ commonheader(_('Search Indexes'), "indexer", user, request, "29px") | n,unicode }
+${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unicode }
 %endif
 
 <div id="indexesComponents">
