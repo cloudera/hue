@@ -23,7 +23,6 @@ from desktop.views import commonheader, commonfooter, _ko
 
 <%namespace name="dashboard" file="common_dashboard.mako" />
 
-
 <%def name="page_structure(is_mobile=False, is_embeddable=False)">
 
 <script type="text/javascript">
