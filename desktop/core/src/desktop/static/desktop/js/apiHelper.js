@@ -1498,13 +1498,21 @@ var ApiHelper = (function () {
     }));
   };
 
-  ApiHelper.prototype.createNavDbTablesJson = function (options) {
+  ApiHelper.prototype.createNavOptDbTablesJson = function (options) {
     var self = this;
     var dbTables = [];
     options.tables.forEach(function (table) {
       var clonedIdentifierChain = table.identifierChain.concat();
-      var database = options.defaultDatabase && !self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name) ? options.defaultDatabase : clonedIdentifierChain.shift().name;
-      dbTables.push(database + '.' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
+
+      var databasePrefix;
+      if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
+        databasePrefix = clonedIdentifierChain.shift().name + '.';
+      } else if (options.defaultDatabase) {
+        databasePrefix = options.defaultDatabase + '.';
+      } else {
+        databasePrefix = '';
+      }
+      dbTables.push(databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
     });
     return ko.mapping.toJSON(dbTables);
   };
@@ -1618,7 +1626,7 @@ var ApiHelper = (function () {
     var data, hash;
     if (options.tables) {
       data = {
-        dbTables: self.createNavDbTablesJson(options)
+        dbTables: self.createNavOptDbTablesJson(options)
       };
       hash = data.dbTables.hashCode();
     } else if (options.database) {
