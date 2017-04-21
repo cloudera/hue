@@ -485,9 +485,9 @@ def augment_solr_response(response, collection, query):
                   _series[legend].append(row[last_xx_col])
                   _series[legend].append(cell)
 
-            for name, val in _series.iteritems():
-              _c = range_pair(facet['field'], name, selected_values.get(facet['id'], []), val, 1, collection_facet)
-              extraSeries.append({'counts': _c, 'label': name})
+            for _name, val in _series.iteritems():
+              _c = range_pair(facet['field'], _name, selected_values.get(facet['id'], []), val, 1, collection_facet)
+              extraSeries.append({'counts': _c, 'label': _name})
             counts = []
         elif collection_facet['properties'].get('isOldPivot'):
           facet_fields = [collection_facet['field']] + [f['field'] for f in collection_facet['properties'].get('facets', []) if f['aggregate']['function'] == 'count']
