@@ -1500,7 +1500,8 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.createNavOptDbTablesJson = function (options) {
     var self = this;
-    var dbTables = [];
+    var tables = [];
+    var tableIndex = {};
     options.tables.forEach(function (table) {
       var clonedIdentifierChain = table.identifierChain.concat();
 
@@ -1512,9 +1513,13 @@ var ApiHelper = (function () {
       } else {
         databasePrefix = '';
       }
-      dbTables.push(databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.'));
+      var identifier = databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.');
+      if (!tableIndex[databasePrefix  + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('.')]) {
+        tables.push(identifier);
+        tableIndex[identifier] = true;
+      }
     });
-    return ko.mapping.toJSON(dbTables);
+    return ko.mapping.toJSON(tables);
   };
 
   /**

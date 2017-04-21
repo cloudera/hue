@@ -130,6 +130,29 @@
           });
 
           expect(result).toEqual('["default.a_table_from_default","other_db.a_table_from_other_db"]');
+        });
+
+        it('should remove duplicates', function () {
+          spyOn(subject, 'containsDatabase').and.callFake(function () {
+            return true;
+          });
+
+          var result = subject.createNavOptDbTablesJson({
+            defaultDatabase: 'default',
+            sourceType: 'hive',
+            tables: [
+              { identifierChain: [{ name: 'someTable' }] },
+              { identifierChain: [{ name: 'someDb' }, { name: 'someTable' }] },
+              { identifierChain: [{ name: 'default' }, { name: 'someTable' }] },
+              { identifierChain: [{ name: 'someDb' }, { name: 'otherTable' }] },
+              { identifierChain: [{ name: 'someDb' }, { name: 'someTable' }] },
+              { identifierChain: [{ name: 'someTable' }] },
+              { identifierChain: [{ name: 'someDb' }, { name: 'otherTable' }] },
+              { identifierChain: [{ name: 'someDb' }, { name: 'otherTable' }] }
+            ]
+          });
+
+          expect(result).toEqual('["default.someTable","someDb.someTable","someDb.otherTable"]');
         })
       });
     })
