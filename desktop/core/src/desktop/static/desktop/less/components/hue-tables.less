@@ -478,3 +478,48 @@ div.box {
   border-left: 2px solid @hue-primary-color-light !important;
   padding-left: 14px !important;
 }
+
+
+/*
+ * jHueTableExtender
+ */
+
+.rowSelected {
+  background-color: @cui-gray-100 !important;
+}
+
+.columnSelected {
+  background-color: @cui-yellow-100 !important;
+}
+
+.cellSelected {
+  background-color: @cui-gray-300 !important;
+}
+
+.jHueTableExtenderClonedContainerColumn {
+  border-right: 1px solid @cui-gray-100;
+}
+
+#jHueTableExtenderNavigator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  display: none;
+  min-width: 160px;
+  padding: 10px 20px 2px 10px;
+  margin: 2px 0 0;
+  background-color: @cui-white;
+  border: 1px solid @cui-gray-400;
+  border-radius: 6px;
+  .hue-box-shadow-bottom;
+  -webkit-background-clip: padding-box;
+  -moz-background-clip: padding;
+  background-clip: padding-box;
+  white-space: nowrap;
+  a {
+    margin-left: 10px;
+    margin-right: -14px;
+    margin-top: -12px;
+  }
+}

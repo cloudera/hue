@@ -157,56 +157,6 @@ a#advanced-btn:hover {
   cursor: pointer!important;
 }
 
-
-/*
- * jHueTableExtender
- */
-
-.rowSelected {
-  background-color: #EEEEEE !important;
-}
-
-.columnSelected {
-  background-color: #FFFACC !important;
-}
-
-.cellSelected {
-  background-color: #DDDDDD !important;
-}
-
-.jHueTableExtenderClonedContainerColumn {
-  border-right: 1px solid #e5e5e5;
-}
-
-#jHueTableExtenderNavigator {
-  position: absolute;
-  left: 0;
-  top: 0;
-  z-index: 1000;
-  display: none;
-  min-width: 160px;
-  padding: 10px 20px 2px 10px;
-  margin: 2px 0 0;
-  background-color: #ffffff;
-  border: 1px solid #ccc;
-  -webkit-border-radius: 6px;
-  -moz-border-radius: 6px;
-  border-radius: 6px;
-  -webkit-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -moz-box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
-  -webkit-background-clip: padding-box;
-  -moz-background-clip: padding;
-  background-clip: padding-box;
-  white-space: nowrap;
-}
-
-#jHueTableExtenderNavigator a {
-  margin-left: 10px;
-  margin-right: -14px;
-  margin-top: -12px;
-}
-
 .popover-inner {
   text-align: left;
 }
