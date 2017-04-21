@@ -24,7 +24,6 @@ from liboozie.oozie_api import get_oozie
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from liboozie.utils import format_time
-from oozie.views.dashboard import get_oozie_job_log, massaged_bundle_actions_for_json
 
 
 LOG = logging.getLogger(__name__)
@@ -32,6 +31,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
+  from oozie.views.dashboard import get_oozie_job_log, massaged_bundle_actions_for_json, massaged_oozie_jobs_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -45,16 +45,16 @@ class BundleApi(Api):
 
     return {
       'apps':[{
-        'id': app.id,
-        'name': app.appName,
-        'status': app.status,
-        'apiStatus': self._api_status(app.status),
+        'id': app['id'],
+        'name': app['appName'],
+        'status': app['status'],
+        'apiStatus': self._api_status(app['status']),
         'type': 'bundle',
-        'user': app.user,
-        'progress': app.get_progress(),
-        'duration': 10 * 3600,
-        'submitted': 10 * 3600
-      } for app in jobs.jobs],
+        'user': app['user'],
+        'progress': app['progress'],
+        'duration': app['durationInMillis'],
+        'submitted': app['kickoffTimeInMillis']
+      } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
       'total': jobs.total
     }
 
