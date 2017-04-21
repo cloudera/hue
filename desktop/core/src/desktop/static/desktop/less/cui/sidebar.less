@@ -1,29 +1,30 @@
 
 
 @import (reference) "extra-variables.less";
+@import (reference) "../hue-mixins.less";
 
-@sidebar-width: 180px;
+@sidebar-width: 200px;
 @collapsed-sidebar-width: 48px;
 @sidebar-animation-duration: 250ms;
 @sidebar-category-font-size: 13px;
 @sidebar-left-spacing: 16px;
+@sidebar-background-color: @cui-gray-050;
 
 .sidebar {
   position: fixed;
   top: @navbar-height;
   left: 0;
   bottom: 0;
-  background-color: @cui-gray-050;
+  background-color: @sidebar-background-color;
   width: @sidebar-width;
   transition: width @sidebar-animation-duration;
   z-index: 1000;
   overflow: hidden;
   box-shadow: 0 1px 2px 0;
 
-
-  .fa:before {
-    font-size: 16px;
-    color: @cui-gray-600;
+  &.sidebar-below-top-bar {
+    top: 0;
+    padding-top: 10px;
   }
 
   .sidebar-content {
@@ -37,19 +38,26 @@
   .sidebar-item {
     display: block;
     padding-left: @sidebar-left-spacing;
-    line-height: 36px;
+    line-height: 38px;
     color: @text-color;
+    background-color: @sidebar-background-color;
 
-    .fa {
+    .hue-ease-transition(~"background-color, color");
+
+    .sidebar-icon {
+      color: @cui-gray-600;
+      display: inline-block;
       margin-right: 14px;
       width: 18px;
       text-align: center;
+      .hue-ease-transition(color);
     }
   }
 
   .sidebar-item.active {
     font-weight: bold;
-    background: @cui-gray-100;
+    color: @cui-blue-500;
+    background-color: @cui-gray-100;
 
     .fa:before {
       color: @cui-blue-500;
@@ -57,14 +65,17 @@
   }
 
   .sidebar-item:hover {
-    background: @cui-gray-100;
+    color: @cui-blue-500;
+    background-color: @cui-gray-100;
+    .sidebar-icon {
+      color: @cui-blue-500;
+    }
   }
 
   .sidebar-category-item {
     margin: 20px 0 4px @sidebar-left-spacing;
-    font-size: @sidebar-category-font-size;
-    font-weight: bold;
-    color: @cui-gray-600;
+    font-size: @sidebar-category-font-size * 1.2;
+    color: @cui-blue-700;
     transition: opacity @sidebar-animation-duration;
   }
 
@@ -80,7 +91,7 @@
     text-align: right;
     padding-right: 16px;
     color: @text-color;
-    box-shadow: 0 0px 2px 0;
+    box-shadow: 0 0 2px 0;
 
     &:hover {
       background: @cui-gray-100;

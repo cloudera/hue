@@ -201,12 +201,12 @@ ${ hueIcons.symbols() }
 
     <script type="text/html" id="tmpl-sidebar-link">
       <a role="button" class="sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
-        <!-- ko if: item.icon --><i class="fa" data-bind="css: item.icon"></i><!-- /ko -->
+        <!-- ko if: item.icon --><div class="sidebar-icon"><!-- ko template: { name: 'app-icon-template' } --><!-- /ko --></div><!-- /ko -->
         <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
     </script>
 
-    <div class="sidebar" data-bind="visible: leftNavVisible" style="display:none;">
+    <div class="sidebar sidebar-below-top-bar" data-bind="visible: leftNavVisible" style="display:none;">
       <div class="sidebar-content">
         <!-- ko foreach: {data: items, as: 'item'} -->
           <!-- ko if: item.isCategory -->
@@ -1112,11 +1112,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           var items = [];
 
-          items.push({
-            displayName: '${ _('Documents') }',
-            url: '/home'
-          });
-
           if (clusterConfig && clusterConfig['app_config']) {
             var appsItems = [];
             var appConfig = clusterConfig['app_config'];
@@ -1124,7 +1119,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               if (appConfig[appName]) {
                 appsItems.push({
                   displayName: appConfig[appName]['displayName'],
-                  url: appConfig[appName]['page']
+                  url: appConfig[appName]['page'],
+                  icon: appName
                 });
               }
             });
@@ -1137,18 +1133,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             }
 
             var browserItems = [];
+            browserItems.push({
+              displayName: '${ _('Documents') }',
+              url: '/home',
+              icon: 'documents'
+            });
             if (appConfig['browser'] && appConfig['browser']['interpreters']) {
               appConfig['browser']['interpreters'].forEach(function(browser) {
+                console.log(browser.type);
                 browserItems.push({
-                  displayName: browser['displayName'],
-                  url: browser['page']
+                  displayName: browser.displayName,
+                  url: browser.page,
+                  icon: browser.type
                 });
               });
             }
             if (browserItems.length > 0) {
               items.push({
                 isCategory: true,
-                displayName: '${ _('Browsers') }',
+                displayName: '${ _('Browse') }',
                 children: browserItems
               })
             }
