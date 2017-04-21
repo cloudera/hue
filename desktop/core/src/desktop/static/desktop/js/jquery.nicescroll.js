@@ -14,6 +14,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//
+// THIS IS A MODIFIED VERSION OF THE PLUGIN
+// it has a proper management of debouncing and disables touchscreens handling
+//
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+
 /* jquery.nicescroll
 -- version 3.6.8
 -- copyright 2016-02-29 InuYaksa*2016
@@ -173,9 +182,9 @@
     d.ischrome22 = (!d.ischrome38)&&(d.ischrome && d.haspointerlock);
     d.ischrome26 = (!d.ischrome38)&&(d.ischrome && ("transition" in _style)); // issue with transform detection (maintain prefix)
 
-    d.cantouch = ("ontouchstart" in document.documentElement) || ("ontouchstart" in window); // with detection for Chrome Touch Emulation
-    d.hasw3ctouch = (window.PointerEvent || false) && ((navigator.MaxTouchPoints > 0)||(navigator.msMaxTouchPoints > 0)); //IE11 pointer events, following W3C Pointer Events spec
-    d.hasmstouch = (!d.hasw3ctouch)&&(window.MSPointerEvent || false); // IE10 pointer events
+    d.cantouch = false; // note: disabled all touchscreens because of several customers' problems with touchscreens
+    d.hasw3ctouch = false;
+    d.hasmstouch = false;
 
     d.ismac = /^mac$/i.test(_platform);
 
@@ -413,16 +422,6 @@
     }
 
     this.istouchcapable = false; // desktop devices with touch screen support
-
-    //## Check WebKit-based desktop with touch support
-    //## + Firefox 18 nightly build (desktop) false positive (or desktop with touch support)
-
-    if (!cap.cantouch && (cap.hasw3ctouch||cap.hasmstouch)) {  // desktop device with multiple input
-      this.istouchcapable = true;
-    } else if (cap.cantouch && !cap.isios && !cap.isandroid && (cap.iswebkit || cap.ismozilla)) {
-      this.istouchcapable = true;
-//      cap.cantouch = false; // parse normal desktop events
-    }
 
     //## disable MouseLock API on user request
     if (!self.opt.enablemouselockapi) {
