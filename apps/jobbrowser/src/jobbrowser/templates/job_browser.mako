@@ -80,14 +80,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 ${ _('Job Browser') }
               </a>
             </li>
-            <!-- ko if: appConfig() && appConfig()['browser'] && appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1 -->
-              <li data-bind="css: {'active': interface() === 'jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('jobs'); }">${ _('Jobs') }</a></li>
-            <!-- /ko -->
-            <!-- ko if: appConfig() && appConfig()['scheduler'] && appConfig()['scheduler']['interpreters'].length > 0 -->
-              <li data-bind="css: {'active': interface() === 'workflows'}"><a class="pointer" data-bind="click: function(){ selectInterface('workflows'); }">${ _('Workflows') }</a></li>
-              <li data-bind="css: {'active': interface() === 'schedules'}"><a class="pointer" data-bind="click: function(){ selectInterface('schedules'); }">${ _('Schedules') }</a></li>
-              <li data-bind="css: {'active': interface() === 'bundles'}"><a class="pointer" data-bind="click: function(){ selectInterface('bundles'); }">${ _('Bundles') }</a></li>
-              <li data-bind="css: {'active': interface() === 'slas'}"><a class="pointer" data-bind="click: function(){ selectInterface('slas'); }">${ _('SLAs') }</a></li>
+            <!-- ko foreach: availableInterfaces -->
+              <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()"><a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a></li>
             <!-- /ko -->
             </ul>
           % if not hiveserver2_impersonation_enabled:
@@ -1474,6 +1468,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.appConfig = ko.observable();
 
+      self.availableInterfaces = ko.pureComputed(function () {
+        var jobsInterfaceCondition = function () {
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
+        }
+        var schedulerInterfaceCondition = function () {
+          return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0
+        }
+
+        var interfaces = [
+          {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
+          {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
+        ];
+
+        return interfaces.filter(function (i) {
+          return i.condition()
+        });
+      });
+
       self.slasLoadedOnce = false;
       self.slasLoading = ko.observable(true);
       self.loadSlaPage = function(){
@@ -1511,7 +1526,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       }
 
-      self.interface = ko.observable('jobs');
+      self.interface = ko.observable();
       self.selectInterface = function(interface) {
         self.interface(interface);
         self.resetBreadcrumbs();
@@ -1571,9 +1586,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       viewModel.job().fetchJob();
     });
 
-   huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-     viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
-   });
+    huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+      viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+      huePubSub.publish('jobbrowser.load.interface');
+    });
 
     $(document).ready(function () {
       viewModel = new JobBrowserViewModel(RunningCoordinatorModel);
@@ -1610,11 +1626,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
 
+      huePubSub.subscribe('jobbrowser.load.interface', function () {
+        var h = window.location.hash;
+        var flatAvailableInterfaces = viewModel.availableInterfaces().map(function (i) {
+          return i.interface
+        });
+        if (h.indexOf('#!') === 0) {
+          if (flatAvailableInterfaces.indexOf(h.substr(2)) === -1) {
+            window.location.hash = '!' + flatAvailableInterfaces[0];
+          }
+          else {
+            viewModel.selectInterface(h.substr(2));
+          }
+        }
+        else {
+          window.location.hash = '!' + flatAvailableInterfaces[0];
+        }
+      });
+
       window.onhashchange = function () {
         loadHash();
       }
-
-      loadHash();
     });
   })();
 </script>
