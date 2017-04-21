@@ -55,9 +55,10 @@ def get_cluster_source_ids(api):
     CLUSTER_SOURCE_IDS = ''
     if get_navigator_hue_server_name():
       sources = api.get_cluster_source_ids()
+      LOG.info('Navigator cluster source ids: %s' % sources)
       if sources:
         # Sometimes sourceId seems to be missing
-        source_ids = ['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in api.get_cluster_source_ids()]
+        source_ids = ['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in sources]
         CLUSTER_SOURCE_IDS = '(' + ' OR '.join(source_ids) + ') AND '
       else:
         # 0 means always false
