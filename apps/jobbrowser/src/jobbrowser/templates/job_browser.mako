@@ -258,14 +258,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <h3>
     <ul class="inline hue-breadcrumbs-bar" data-bind="foreach: breadcrumbs">
       <li>
-      <!-- ko if: $index() > 0 -->
-        <span class="divider">&gt;</span>
-      <!-- /ko -->
-
-      <!-- ko if: $index() == 0 -->
-        <a href="javascript:void(0)" data-bind="text: name, click: function() { $root.selectInterface(name); }" style="text-transform: capitalize"></a>
-      <!-- /ko -->
-
       <!-- ko if: $index() != 0 -->
         <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
           <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">

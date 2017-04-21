@@ -1140,7 +1140,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             });
             if (appConfig['browser'] && appConfig['browser']['interpreters']) {
               appConfig['browser']['interpreters'].forEach(function(browser) {
-                console.log(browser.type);
                 browserItems.push({
                   displayName: browser.displayName,
                   url: browser.page,
