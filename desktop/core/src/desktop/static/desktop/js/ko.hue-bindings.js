@@ -3707,16 +3707,21 @@
         editor.off('focus', focusListener);
       });
 
-      var changeSelectionThrottle = -1;
-      var changeSelectionListener = editor.selection.on('changeSelection', function () {
-        window.clearTimeout(changeSelectionThrottle);
-        changeSelectionThrottle = window.setTimeout(function () {
+      var changeCursorThrottle = -1;
+      var changeCursorListener = editor.selection.on('changeCursor', function () {
+        window.clearTimeout(changeCursorThrottle);
+        changeCursorThrottle = window.setTimeout(function () {
           huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition(), editor: editor });
-        }, 100);
+        }, 150);
+      });
+
+      var changeSelectionListener = editor.selection.on('changeSelection', function () {
         snippet.selectedStatement(editor.getSelectedText());
       });
 
       disposeFunctions.push(function () {
+        window.clearTimeout(changeCursorThrottle);
+        editor.selection.off('changeCursor', changeCursorListener);
         editor.selection.off('changeSelection', changeSelectionListener);
       });
 
