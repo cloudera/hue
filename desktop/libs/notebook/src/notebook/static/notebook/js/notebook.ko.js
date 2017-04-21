@@ -932,6 +932,8 @@ var EditorViewModel = (function() {
             }
             huePubSub.publish('editor.active.risks', self.complexity());
             lastCheckedComplexityStatement = self.statement();
+          },
+          always: function(data) {
             self.complexityCheckRunning(false);
           }
         });

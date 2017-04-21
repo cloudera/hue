@@ -162,6 +162,7 @@ def browse(request, name, is_mobile=False):
       'engines': get_engines(request.user)
     }),
     'is_owner': True,
+    'is_embeddable': request.GET.get('is_embeddable', False),
     'can_edit_index': can_edit_index(request.user),
     'mobile': is_mobile
   })
