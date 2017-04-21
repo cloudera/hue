@@ -1473,7 +1473,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
         }
         var schedulerInterfaceCondition = function () {
-          return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0
+          return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0;
         }
 
         var interfaces = [
@@ -1629,14 +1629,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('jobbrowser.load.interface', function () {
         var h = window.location.hash;
         var flatAvailableInterfaces = viewModel.availableInterfaces().map(function (i) {
-          return i.interface
+          return i.interface;
         });
         if (h.indexOf('#!') === 0) {
-          if (flatAvailableInterfaces.indexOf(h.substr(2)) === -1) {
-            window.location.hash = '!' + flatAvailableInterfaces[0];
+          if (h.indexOf('id=') === -1) {
+            if (flatAvailableInterfaces.indexOf(h.substr(2)) === -1) {
+              window.location.hash = '!' + flatAvailableInterfaces[0];
+            }
+            else {
+              viewModel.selectInterface(h.substr(2));
+            }
           }
           else {
-            viewModel.selectInterface(h.substr(2));
+            new Job(viewModel, {id: h.substr(5)}).fetchJob();
           }
         }
         else {
