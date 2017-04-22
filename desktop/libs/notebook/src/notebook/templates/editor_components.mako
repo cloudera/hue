@@ -3075,7 +3075,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
 
       huePubSub.subscribe("editor.workload.upload", function () {
-        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(100);
+        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(5);
       });
 
       huePubSub.subscribe('active.editor.statement.changed', function (statement) {
