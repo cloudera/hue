@@ -1772,11 +1772,11 @@ from notebook.conf import get_ordered_interpreters
           <!-- /ko -->
         </div>
 
-        <!-- ko if: hasActiveRisks() && activeRisks()['noDDL'].length > 0 -->
+        <!-- ko if: hasMissingRisks() -->
         <div class="assist-flex-fill">
           <br>
-          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }" title="${ _('Some table and columns DDL/stats are missing. Load them in order to improve the recommendations') }">
-            <i class="fa fa-fw fa-gears"></i> ${_('Optimize more')}
+          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }, attr: { 'title': ('${ _("Add available table and columns") }'  + (isMissingDDL() ? ' DDL' : '') + (isMissingStats() ? ' stats' : '')) }">
+            <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
           </a>
         </div>
         <!-- /ko -->
@@ -1802,6 +1802,15 @@ from notebook.conf import get_ordered_interpreters
         self.activeRisks = ko.observable({});
         self.hasActiveRisks = ko.pureComputed(function () {
            return self.activeRisks().hints && self.activeRisks().hints.length > 0;
+        });
+        self.hasMissingRisks = ko.pureComputed(function () {
+          return self.isMissingDDL() || self.isMissingStats();
+        });
+        self.isMissingDDL = ko.pureComputed(function () {
+          return self.activeRisks().noDDL && self.activeRisks().noDDL.length > 0
+        });
+        self.isMissingStats = ko.pureComputed(function () {
+          return self.activeRisks().noStats && self.activeRisks().noStats.length > 0;
         });
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
