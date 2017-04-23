@@ -1642,26 +1642,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1 || $('#jobbrowserMiniComponents').is(':visible')) {
           var h = window.location.hash;
-          if (h.indexOf('#!') === 0) {
-            h = h.substr(2);
-            switch (h) {
-              case '':
-                break;
-              case 'slas':
-              case 'oozie-info':
-              case 'jobs':
-              case 'workflows':
-              case 'schedules':
-              case 'bundles':
-                viewModel.selectInterface(h);
-                break;
-              default:
-                if (h.indexOf('id=') === 0){
-                  new Job(viewModel, {id: h.substr(3)}).fetchJob();
-                } else {
-                  viewModel.selectInterface('reset');
-                }
-            }
+
+          h = h.indexOf('#!') === 0 ? h.substr(2) : '';
+          switch (h) {
+            case '':
+              h = 'jobs';
+            case 'slas':
+            case 'oozie-info':
+            case 'jobs':
+            case 'workflows':
+            case 'schedules':
+            case 'bundles':
+              viewModel.selectInterface(h);
+              break;
+            default:
+              if (h.indexOf('id=') === 0){
+                new Job(viewModel, {id: h.substr(3)}).fetchJob();
+              } else {
+                viewModel.selectInterface('reset');
+              }
           }
         }
       };
