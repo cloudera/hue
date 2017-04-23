@@ -86,8 +86,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
               </li>
             <!-- /ko -->
-            <li data-bind="css: {'active': interface() === 'dataeng-jobs'}"><a class="pointer" data-bind="click: function(){ selectInterface('dataeng-jobs'); }">${ _('Jobs') }</a></li>
-            <li data-bind="css: {'active': interface() === 'dataeng-clusters'}"><a class="pointer" data-bind="click: function(){ selectInterface('dataeng-clusters'); }">${ _('Clusters') }</a></li>
           </ul>
           % if not hiveserver2_impersonation_enabled:
             <div class="pull-right label label-warning" style="margin-top: 16px">${ _("Hive jobs are running as the 'hive' user") }</div>
@@ -1932,20 +1930,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var jobsInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
         }
+        var dataengInterfaceCondition = function () {
+          return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
+        }
         var schedulerInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['scheduler'] && self.appConfig()['scheduler']['interpreters'].length > 0;
         }
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
+          {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataengInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
+          {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataengInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
-          return i.condition()
+          return i.condition();
         });
       });
 
