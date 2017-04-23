@@ -80,7 +80,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </a>
             </li>
             <!-- ko foreach: availableInterfaces -->
-              <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()"><a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a></li>
+              <li data-bind="css: {'active': $parent.interface() === interface}, visible: condition()">
+                <a class="pointer" data-bind="click: function(){ $parent.selectInterface(interface); }, text: label"></a>
+              </li>
             <!-- /ko -->
             </ul>
           % if not hiveserver2_impersonation_enabled:
@@ -1101,6 +1103,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else if (/oozie-oozi-B/.test(self.id())) {
           interface = 'bundles';
         }
+
+        interface = vm.isValidInterface(interface);
         vm.interface(interface);
 
         lastFetchJobRequest = self._fetchJob(function (data) {
@@ -1557,7 +1561,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.interface = ko.observable();
+      self.isValidInterface = function(name) {
+        var flatAvailableInterfaces = self.availableInterfaces().map(function (i) {
+          return i.interface;
+        });
+        if (flatAvailableInterfaces.indexOf(name) != -1) {
+          return name;
+        } else {
+          return flatAvailableInterfaces[0];
+        }
+      };
       self.selectInterface = function(interface) {
+        interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
         hueUtils.changeURL('#!' + interface);
@@ -1616,11 +1631,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       viewModel.job().fetchJob();
     });
 
-    huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
-      viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
-      huePubSub.publish('jobbrowser.load.interface');
-    });
-
     $(document).ready(function () {
       viewModel = new JobBrowserViewModel();
       % if not is_mini:
@@ -1628,8 +1638,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % else:
       ko.applyBindings(viewModel, $('#jobbrowserMiniComponents')[0]);
       % endif
-
-      huePubSub.publish('cluster.config.get.config');
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1 || $('#jobbrowserMiniComponents').is(':visible')) {
@@ -1650,38 +1658,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               default:
                 if (h.indexOf('id=') === 0){
                   new Job(viewModel, {id: h.substr(3)}).fetchJob();
+                } else {
+                  viewModel.selectInterface('reset');
                 }
             }
           }
         }
       };
 
-      huePubSub.subscribe('jobbrowser.load.interface', function () {
-        var h = window.location.hash;
-        var flatAvailableInterfaces = viewModel.availableInterfaces().map(function (i) {
-          return i.interface;
-        });
-        if (h.indexOf('#!') === 0) {
-          if (h.indexOf('id=') === -1) {
-            if (flatAvailableInterfaces.indexOf(h.substr(2)) === -1) {
-              window.location.hash = '!' + flatAvailableInterfaces[0];
-            }
-            else {
-              viewModel.selectInterface(h.substr(2));
-            }
-          }
-          else {
-            new Job(viewModel, {id: h.substr(5)}).fetchJob();
-          }
-        }
-        else {
-          window.location.hash = '!' + flatAvailableInterfaces[0];
-        }
-      });
-
       window.onhashchange = function () {
         loadHash();
       }
+
+      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+        viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+        loadHash();
+      });
+
+      huePubSub.publish('cluster.config.get.config');
     });
   })();
 </script>
