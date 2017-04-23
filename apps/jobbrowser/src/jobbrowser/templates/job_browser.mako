@@ -273,13 +273,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <!-- /ko -->
       </li>
     </ul>
-    % if not is_mini:
+    <!-- ko if: ! $root.isMini() -->
       <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf(interface()) > -1 -->
       <span class="pull-right">
         <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
       </span>
       <!-- /ko -->
-    % endif
+    <!-- /ko -->
   </h3>
 </script>
 
@@ -1501,6 +1501,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.isLeftPanelVisible = ko.observable();
       self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
       self.appConfig = ko.observable();
+      self.isMini = ko.observable(false);
 
       self.availableInterfaces = ko.pureComputed(function () {
         var jobsInterfaceCondition = function () {
@@ -1637,6 +1638,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
       % else:
       ko.applyBindings(viewModel, $('#jobbrowserMiniComponents')[0]);
+      viewModel.isMini(true);
       % endif
 
       var loadHash = function () {
