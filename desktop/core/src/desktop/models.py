@@ -1541,9 +1541,7 @@ class ClusterConfig():
     pass
 
 
-  @property
-  def main_quick_action(self):
-    apps = self.get_apps()
+  def get_main_quick_action(self, apps):
     if not apps:
       raise PopupException(_('No permission to any app.'))
 
@@ -1553,8 +1551,8 @@ class ClusterConfig():
     try:
       user_default_app = json.loads(UserPreferences.objects.get(user=self.user, key='default_app').value)
       if apps.get(user_default_app['app']):
-        default_app = self.get_apps()[user_default_app['app']]
         default_interpreter = []
+        default_app = apps[user_default_app['app']]
         if default_app.get('interpreters'):
           interpreters = [interpreter for interpreter in default_app['interpreters'] if interpreter['type'] == user_default_app['interpreter']]
           if interpreters:
@@ -1570,7 +1568,7 @@ class ClusterConfig():
       return default_app
 
 
-  def _get_editor(self):
+  def _get_editor(self, cluster_type):
     interpreters = []
 
     if SHOW_NOTEBOOKS.get():
@@ -1582,7 +1580,11 @@ class ClusterConfig():
         'page': '/notebook'
       })
 
-    for interpreter in get_ordered_interpreters(self.user):
+    _interpreters = get_ordered_interpreters(self.user)
+    if cluster_type == 'dataeng':
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'java')]
+
+    for interpreter in _interpreters:
       interpreters.append({
         'name': interpreter['name'],
         'type': interpreter['type'],
@@ -1601,10 +1603,10 @@ class ClusterConfig():
     else:
       return None
 
-  def _get_dashboard(self):
+  def _get_dashboard(self, cluster_type):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
 
-    if IS_DASHBOARD_ENABLED.get():
+    if IS_DASHBOARD_ENABLED.get() and cluster_type != 'dataeng':
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
@@ -1614,10 +1616,10 @@ class ClusterConfig():
     else:
       return None
 
-  def _get_browser(self):
+  def _get_browser(self, cluster_type):
     interpreters = []
 
-    if 'filebrowser' in self.apps:
+    if 'filebrowser' in self.apps and cluster_type != 'dataeng':
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1641,7 +1643,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps:
+    if 'search' in self.apps and cluster_type != 'dataeng':
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1650,16 +1652,24 @@ class ClusterConfig():
       })
 
     if 'jobbrowser' in self.apps:
-      from hadoop.cluster import get_default_yarncluster # Circular loop
-      if get_default_yarncluster():
+      if cluster_type == 'dataeng':
         interpreters.append({
-          'type': 'yarn',
+          'type': 'dataeng',
           'displayName': _('Jobs'),
           'tooltip': _('Jobs'),
           'page': '/jobbrowser/'
         })
+      else:
+        from hadoop.cluster import get_default_yarncluster # Circular loop
+        if get_default_yarncluster():
+          interpreters.append({
+            'type': 'yarn',
+            'displayName': _('Jobs'),
+            'tooltip': _('Jobs'),
+            'page': '/jobbrowser/'
+          })
 
-    if 'hbase' in self.apps:
+    if 'hbase' in self.apps and cluster_type != 'dataeng':
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1667,7 +1677,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps:
+    if 'security' in self.apps and cluster_type != 'dataeng':
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1675,7 +1685,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps:
+    if 'sqoop' in self.apps and cluster_type != 'dataeng':
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
@@ -1694,7 +1704,7 @@ class ClusterConfig():
       return None
 
 
-  def _get_scheduler(self):
+  def _get_scheduler(self, cluster_type):
     interpreters = [{
         'type': 'oozie-workflow',
         'displayName': _('Workflow'),
@@ -1713,7 +1723,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not self.user.has_hue_permission(action="disable_editor_access", app="oozie") or self.user.is_superuser:
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser):
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1747,12 +1757,12 @@ class ClusterConfig():
       return None
 
 
-  def get_apps(self):
+  def get_apps(self, cluster_type):
     apps = OrderedDict([app for app in [
-      ('editor', self._get_editor()),
-      ('dashboard', self._get_dashboard()),
-      ('browser', self._get_browser()),
-      ('scheduler', self._get_scheduler()),
+      ('editor', self._get_editor(cluster_type)),
+      ('dashboard', self._get_dashboard(cluster_type)),
+      ('browser', self._get_browser(cluster_type)),
+      ('scheduler', self._get_scheduler(cluster_type)),
       ('sdkapps', self._get_sdk_apps()),
     ] if app[1]])
 

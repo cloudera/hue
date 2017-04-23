@@ -154,6 +154,43 @@ ${ hueIcons.symbols() }
 
 
       <div class="top-nav-middle">
+
+        <div class="btn-group pull-right">
+          <button class="btn" data-bind="text: cluster.cluster().name"></button>
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+
+          <ul class="dropdown-menu">
+            <li class="dropdown-submenu">
+              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
+                <i class="fa fa-fw fa-th-large inline-block"></i> ${ _('Data Eng') }
+              </a>
+              <ul class="dropdown-menu">
+               <li><a data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span></a></li>
+                <!-- ko foreach: cluster.clusters()[3]['clusters'] -->
+                  <li>
+                    <a href="javascript: void(0)" data-bind="click: function() { $parent.cluster.cluster($data) }">
+                      <span class="dropdown-no-icon" data-bind="text: name"></span>
+                    </a>
+                  </li>
+                <!-- /ko -->
+              </ul>
+            </li>
+            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-th-large"></i> ${ _('Team') }</a></li>
+            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-square"></i> ${ _('Athena') }</a></li>
+            <li class="dropdown-submenu">
+              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
+                <i class="fa fa-fw fa-th-large inline-block"></i> ${ _('Nightly') }
+              </a>
+              <ul class="dropdown-menu">
+              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 1</span></a></li>
+              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 2</span></a></li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+
         <div class="search-container-top">
           <input placeholder="${ _('Search data and saved documents...') }" type="text"
             data-bind="autocomplete: {
@@ -194,7 +231,7 @@ ${ hueIcons.symbols() }
       </div>
 
       <div class="top-nav-right">
-      
+
         % if user.is_authenticated() and section != 'login':
         <div class="dropdown navbar-dropdown pull-right">
           <%
@@ -226,42 +263,6 @@ ${ hueIcons.symbols() }
         <!-- ko if: hasJobBrowser -->
           <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         <!-- /ko -->
-        
-        <div class="compose-action btn-group">
-          <button class="btn" data-bind="text: cluster.cluster"></button>
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
-            <span class="caret"></span>
-          </button>
-
-          <ul class="dropdown-menu">
-            <li class="dropdown-submenu">
-              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
-                <i class="fa fa-fw fa-send inline-block"></i> ${ _('Data Eng') }
-              </a>
-              <ul class="dropdown-menu">
-               <li><a data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span></a></li>
-                <!-- ko foreach: cluster.clusters()[3]['clusters'] -->
-                  <li>
-                    <a  href="javascript: void(0)">
-                      <span class="dropdown-no-icon" data-bind="text: $data"></span>
-                    </a>
-                  </li>
-                <!-- /ko -->
-              </ul>
-            </li>
-            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-th-large"></i> ${ _('Team') }</a></li>
-            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-square"></i> ${ _('Athena') }</a></li>
-            <li class="dropdown-submenu">
-              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
-                <i class="fa fa-fw fa-th-large inline-block"></i> ${ _('Nightly') }
-              </a>
-              <ul class="dropdown-menu">
-              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 1</span></a></li>
-              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 2</span></a></li>
-              </ul>
-            </li>
-          </ul>
-        </div>
       </div>
 
     </div>
@@ -511,7 +512,7 @@ ${ koComponents.all() }
 
 ${ commonHeaderFooterComponents.header_pollers(user, is_s3_enabled, apps) }
 
-## clusterConfig makes an ajax call so it needs to be after commonHeaderFooterComponents
+## clusterConfig makes an Ajax call so it needs to be after commonHeaderFooterComponents
 <script src="${ static('desktop/js/clusterConfig.js') }"></script>
 
 ${ assist.assistJSModels() }
@@ -1173,8 +1174,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var ClusterPanelViewModel = function() {
           var self = this;
           self.apiHelper = ApiHelper.getInstance();
-  
-          self.cluster = ko.observable('Ro\'s Cluster');
+
           self.clusters = ko.observableArray([
             {'name': 'Ro\'s Cluster', 'type': 'ini'},
             {'name': 'Team', 'type': 'ini', 'clusters': ko.observableArray()},
@@ -1182,21 +1182,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             {'name': 'DataEng', 'type': 'dataeng', 'clusters': ko.observableArray()},
             {'name': 'Athena', 'type': 'athena'}
           ]);
-  
+          self.cluster = ko.observable(self.clusters()[0]);
+          self.cluster.subscribe(function() {
+            new ClusterConfig(ko.mapping.toJS(self.cluster));
+          });
+
           self.contextPanelVisible = ko.observable(false);
-          
+
           $.post("/jobbrowser/api/jobs", {
             interface: ko.mapping.toJSON('dataeng-clusters'),
             filters: ko.mapping.toJSON([]),
           }, function (data) {
             if (data.status == 0) {
-              var apps = [];
+              var clusters = [];
               if (data && data.apps) {
-                data.apps.forEach(function (job) {
-                  apps.push(job.id);
+                data.apps.forEach(function (cluster) {
+                  clusters.push({'name': cluster.id, 'type': 'dataeng'});
                 });
               }
-              self.clusters()[3]['clusters'](apps);
+              self.clusters()[3]['clusters'](clusters);
             } else {
               $(document).trigger("error", data.message);
             }
