@@ -69,12 +69,14 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   cluster_config = ClusterConfig(request.user)
-  app_config = cluster_config.get_apps()
+
+  cluster_type = request.POST.get('type', 'ini') # TODO pref
+  app_config = cluster_config.get_apps(cluster_type)
 
   return JsonResponse({
     'status': 0,
     'app_config': app_config,
-    'main_button_action': cluster_config.main_quick_action,
+    'main_button_action': cluster_config.get_main_quick_action(app_config),
     'button_actions': [
       app for app in [
         app_config.get('editor'),

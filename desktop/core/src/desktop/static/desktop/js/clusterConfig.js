@@ -14,35 +14,33 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-(function () {
 
-  function ClusterConfig () {
-    var self = this;
+function ClusterConfig (params) {
+  var self = this;
 
-    self.clusterConfig = undefined;
-    self.loading = true;
+  self.clusterConfig = undefined;
+  self.loading = true;
 
-    ApiHelper.getInstance().getClusterConfig().done(function (data) {
-      if (data.status === 0) {
-        self.loading = false;
-        self.clusterConfig = data;
-        huePubSub.publish('cluster.config.set.config', self.clusterConfig);
-      } else {
-        $(document).trigger("error", data.message);
-        huePubSub.publish('cluster.config.set.config');
-      }
-    }).fail(function () {
-      huePubSub.publish('clustser.config.set.config');
-    }).always(function () {
+  ApiHelper.getInstance().getClusterConfig(params).done(function (data) {
+    if (data.status === 0) {
       self.loading = false;
-    });
+      self.clusterConfig = data;
+      huePubSub.publish('cluster.config.set.config', self.clusterConfig);
+    } else {
+      $(document).trigger("error", data.message);
+      huePubSub.publish('cluster.config.set.config');
+    }
+  }).fail(function () {
+    huePubSub.publish('clustser.config.set.config');
+  }).always(function () {
+    self.loading = false;
+  });
 
-    huePubSub.subscribe('cluster.config.get.config', function () {
-      if (! self.loading) {
-        huePubSub.publish('cluster.config.set.config', self.clusterConfig);
-      }
-    });
-  }
+  huePubSub.subscribe('cluster.config.get.config', function () {
+    if (! self.loading) {
+      huePubSub.publish('cluster.config.set.config', self.clusterConfig);
+    }
+  });
+}
 
-  new ClusterConfig();
-}());
+new ClusterConfig();
