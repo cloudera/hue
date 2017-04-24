@@ -32,12 +32,6 @@ ${ commonheader(_('Editor'), editor_type, user, request, "68px") | n,unicode }
 <span id="editorComponents" class="editorComponents notebook">
 ${ editorComponents.includes(is_embeddable) }
 
-<style type="text/css">
-  .snippet {
-    margin-right: 10px;
-  }
-</style>
-
 ${ editorComponents.topBar() }
 ${ editorComponents.commonHTML(is_embeddable) }
 
