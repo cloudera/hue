@@ -136,7 +136,7 @@ ${ assist.assistPanel() }
                 <div class="control-group" style="margin-top: 10px">
                   <div class="controls">
                     <div class="scrollable">
-                      <table class="table table-striped">
+                      <table class="table table-condensed">
                         <thead>
                           <th id="column_names" style="width:210px">${ _('Column name') }</th>
                           <th style="width:210px">${ _('Column Type') }</th>

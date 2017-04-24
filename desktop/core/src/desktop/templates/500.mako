@@ -50,7 +50,7 @@ ${ commonheader(_('500 - Server error'), "", user, request) | n,unicode }
           &nbsp;|&nbsp;
         <a href="/logs" target="_new" title="${ _('View server logs') }">${_('View logs')}</a>
         <div id="traceback" class="hide">
-          <table class="table table-striped table-condensed margin-top-30" style="background: white; border: 1px solid #DDDDDD;">
+          <table class="table table-condensed margin-top-30" style="background: white; border: 1px solid #DDDDDD;">
             <thead>
               <tr>
                 <td>${_("File Name")}</td>

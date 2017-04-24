@@ -22,7 +22,7 @@ from django.utils.translation import ugettext as _
     % if error_list:
       <div class="alert alert-warn">${_('Potential misconfiguration detected. Fix and restart Hue.')}</div>
       <br/>
-        <table class="table table-striped">
+        <table class="table table-condensed">
       % for error in error_list:
         <tr>
             <td width="15%">

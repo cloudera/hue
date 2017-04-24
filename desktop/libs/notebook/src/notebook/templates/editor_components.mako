@@ -380,7 +380,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <h2 class="modal-title">${_('Row details')}</h2>
   </div>
   <div class="modal-body">
-    <table class="table table-striped table-condensed">
+    <table class="table table-condensed">
 
     </table>
   </div>
@@ -1379,7 +1379,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </div>
           <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
             <div data-bind="visible: showGrid, delayedOverflow, css: resultsKlass" style="display: none;">
-              <table class="table table-condensed table-striped resultTable">
+              <table class="table table-condensed resultTable">
                 <thead>
                 <tr data-bind="foreach: result.meta">
                   <th class="sorting" data-bind="text: ($index() == 0 ? '&nbsp;' : $data.name), css: typeof cssClass != 'undefined' ? cssClass : 'sort-string', attr: {title: $data.type }, style:{'width': $index() == 0 ? '1%' : '', 'height': $index() == 0 ? '32px' : ''}, click: function(obj, e){ $(e.target).parents('table').trigger('sort', obj); }"></th>

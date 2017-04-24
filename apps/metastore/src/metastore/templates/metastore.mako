@@ -112,7 +112,7 @@ ${ components.menubar() }
 
 <script type="text/html" id="metastore-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped table-condensed table-nowrap">
+    <table class="table table-condensed table-nowrap">
       <br/>
       <thead>
       <tr>
@@ -168,7 +168,7 @@ ${ components.menubar() }
 
 <script type="text/html" id="metastore-partition-columns-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped table-condensed table-nowrap">
+    <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
@@ -191,7 +191,7 @@ ${ components.menubar() }
 
 <script type="text/html" id="metastore-partition-values-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-striped table-condensed table-nowrap">
+    <table class="table table-condensed table-nowrap">
       <thead>
         <tr>
           <th style="width: 1%">&nbsp;</th>
@@ -231,7 +231,7 @@ ${ components.menubar() }
 </script>
 
 <script type="text/html" id="metastore-samples-table">
-  <table class="table table-striped table-condensed table-nowrap sample-table">
+  <table class="table table-condensed table-nowrap sample-table">
     <thead>
       <tr>
         <th style="width: 1%">&nbsp;</th>
@@ -467,7 +467,7 @@ ${ components.menubar() }
           <!-- /ko -->
         </div>
 
-        <table id="tablesTable" class="table table-striped table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
+        <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
           <thead>
           <tr>
             <th width="1%" style="text-align: center"><div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: filteredTables, selectedValues: selectedTables }"></div></th>

@@ -43,7 +43,7 @@ function showStats(options) {
     dataType: "json",
     success: function (data) {
       if (data && data.status == 0) {
-        var _stats = "<table class='table table-striped'>";
+        var _stats = "<table class='table table-condensed'>";
         if (options.isTable) {
           data.stats.forEach(function (item) {
             _stats += "<tr><th>" + item.data_type + "</th><td>" + item.comment + "</td></tr>";
@@ -103,7 +103,7 @@ function loadTerms(options) {
       if (data && data.status == 0) {
         if (data.terms.length > 0){
           $("#columnAnalysisTerms .alert").addClass("hide");
-          var _terms = '<table class="table table-striped">';
+          var _terms = '<table class="table table-condensed">';
           data.terms.forEach(function(item){
             _terms += '<tr><td>' + item[0] + '</td>';
             _terms += '<td style="width: 40px">';

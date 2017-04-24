@@ -163,7 +163,7 @@ ${ layout.menubar(section='coordinators') }
               <div class="alert">${ _('This type of coordinator does not require any dataset.') }</div>
             % endif
             % if data_input_formset.forms:
-              <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_input_missing">
+              <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_input_missing">
                 <thead>
                 <tr>
                   <th width="10%">${ _('Name') }</th>
@@ -216,7 +216,7 @@ ${ layout.menubar(section='coordinators') }
             % endif
 
             % if data_output_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_output_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_output_missing">
               <thead>
                 <tr>
                   <th width="10%">${ _('Name') }</th>
@@ -336,7 +336,7 @@ ${ layout.menubar(section='coordinators') }
           % if coordinator.id:
           <div>
             % if dataset_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#dataset_missing">
               <thead>
                 <tr>
                   <th>${ _('Name') }</th>

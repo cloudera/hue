@@ -136,7 +136,7 @@ ${ assist.assistPanel() }
                       <label class="control-label">${_('Table preview')}</label>
                       <div class="controls">
                           <div class="scrollable">
-                              <table class="table table-striped table-condensed">
+                              <table class="table table-condensed">
                                   <thead>
                                   <tr>
                                     % for i in range(n_cols):

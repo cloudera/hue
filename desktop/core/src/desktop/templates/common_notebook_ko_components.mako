@@ -481,7 +481,7 @@ except ImportError, e:
       <div class="tab-content" data-bind="with: activeCategory">
         <div class="tab-pane active">
           <!-- ko if: filteredShortcuts().length > 0 -->
-          <table class="table table-striped">
+          <table class="table table-condensed">
             <thead>
               <tr>
                 <th>${ _('Windows/Linux')}</th>

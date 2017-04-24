@@ -41,7 +41,7 @@ ${layout.menubar(section='configurations')}
   <div class="card card-small">
     <h1 class="card-heading simple">${ _('Configurations') }</h1>
 
-    <table class="table table-striped table-condensed datatables margin-top-20">
+    <table class="table table-condensed datatables margin-top-20">
       <thead>
       <tr>
         <th>${ _('Application') }</th>

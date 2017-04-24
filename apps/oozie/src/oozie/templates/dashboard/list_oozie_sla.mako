@@ -125,7 +125,7 @@ ${ layout.menubar(section='sla', dashboard=True) }
              <div class="tab-pane active" id="slaListTab">
                <div class="tabbable">
                  <div class="tab-content">
-                   <table id="slaTable" class="table table-striped table-condensed">
+                   <table id="slaTable" class="table table-condensed">
                      <thead>
                        <th>${_('Status')}</th>
                        <th>${_('Name')}</th>

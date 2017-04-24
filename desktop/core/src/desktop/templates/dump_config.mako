@@ -97,7 +97,7 @@ ${ layout.menubar(section='dump_config') }
   </%def>
 
     <%def name="recurseList(config_obj, depth=0)">
-      <table class="table table-striped recurse">
+      <table class="table table-condensed recurse">
       % for v in config_obj:
         <%
           # Don't recurse into private variables.

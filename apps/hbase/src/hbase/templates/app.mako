@@ -44,7 +44,7 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 </div>
 
 <%def name="datatable(datasource,rowTemplate = 'itemTemplate')">
-  <table data-datasource="${datasource}" class="table table-striped table-condensed datatables tablescroller-disable" style="padding-left: 0;padding-right: 0">
+  <table data-datasource="${datasource}" class="table table-condensed datatables tablescroller-disable" style="padding-left: 0;padding-right: 0">
       <thead>
         <tr>
           <th width="1%"><div data-bind="click: ${datasource}.toggleSelectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': ${datasource}.allVisibleSelected() }"></div></th>

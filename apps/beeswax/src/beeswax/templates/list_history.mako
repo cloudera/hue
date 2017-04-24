@@ -108,7 +108,7 @@ ${ layout.menubar(section='history') }
             <div class="card-body">
               <p>
 
-            <table class="table table-striped table-condensed datatables" style="padding-left: 0;">
+            <table class="table table-condensed datatables" style="padding-left: 0;">
             <thead>
               <tr>
                 <th width="15%">${_('Time')}</th>

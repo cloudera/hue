@@ -2365,7 +2365,7 @@ ${ dashboard.layout_skeleton() }
           <i class="fa fa-spinner fa-spin"></i>
         </div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no terms to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table-striped">
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0" class="table table-condensed">
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td data-bind="text: val.value"></td>
@@ -2391,7 +2391,7 @@ ${ dashboard.layout_skeleton() }
         </div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() == 'error'">${ _('This field does not support stats') }</div>
         <div class="alert" data-bind="visible: ! $parent.isLoading() && $data.data().length == 0">${ _('There are no stats to be shown') }</div>
-        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table-striped">
+        <table style="width: 100%" data-bind="visible: ! $parent.isLoading() && $data.data().length > 0 && $data.data()[0].key.toLowerCase() != 'error'" class="table table-condensed">
           <tbody data-bind="foreach: $data.data">
           <tr>
             <td style="vertical-align: top"><strong data-bind="text: key"></strong></td>
