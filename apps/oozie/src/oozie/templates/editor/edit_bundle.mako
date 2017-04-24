@@ -145,7 +145,7 @@ ${ layout.menubar(section='bundles') }
 
           <div>
             % if bundled_coordinator_formset.forms:
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-missing="#bundled_coordinator_missing">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0" data-missing="#bundled_coordinator_missing">
               <thead>
                 <tr>
                   <th data-row-selector-exclude="true">${ _('Name') }</th>

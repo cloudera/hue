@@ -56,7 +56,7 @@ ${layout.menubar(section='groups')}
       </%def>
     </%actionbar:render>
 
-    <table class="table table-striped table-condensed datatables">
+    <table class="table table-condensed datatables">
       <thead>
       <tr>
         %if user.is_superuser:

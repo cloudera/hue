@@ -126,7 +126,7 @@ from metadata.conf import has_navigator
         <div class="alert">${ _('The selected table has no data.') }</div>
         <!-- /ko -->
         <!-- ko if: rows.length > 0 -->
-        <table id="samples-table" class="samples-table table table-striped table-condensed">
+        <table id="samples-table" class="samples-table table table-condensed">
           <thead>
           <tr>
             <th style="width: 10px">&nbsp;</th>
@@ -226,7 +226,7 @@ from metadata.conf import has_navigator
         <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
       </div>
       <div>
-        <table class="table table-striped table-condensed table-nowrap">
+        <table class="table table-condensed table-nowrap">
           <thead>
           <tr>
             <th style="width: 1%">&nbsp;</th>
@@ -244,7 +244,7 @@ from metadata.conf import has_navigator
       <div style="margin: 10px 5px 0 10px;">
         <span style="font-size: 15px; font-weight: 300;">${_('Partitions')}</span>
       </div>
-      <table class="table table-striped table-condensed table-nowrap">
+      <table class="table table-condensed table-nowrap">
         <thead>
           <tr>
             <th style="width: 1%">&nbsp;</th>
@@ -1276,7 +1276,7 @@ from metadata.conf import has_navigator
         </div>
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-        <table style="width: 100%" class="table table-striped table-condensed table-nowrap">
+        <table style="width: 100%" class="table table-condensed table-nowrap">
           <!-- ko if: filteredColumns().length !== 0 -->
           <thead>
           <tr>

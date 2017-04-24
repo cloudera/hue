@@ -151,7 +151,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
     <div class="tab-content" style="min-height:200px">
       <div class="tab-pane active" id="calendar">
-        <table class="table table-striped table-condensed">
+        <table class="table table-condensed">
           <thead>
           <tr>
             <th>${ _('Coordinator') }</th>
@@ -192,7 +192,7 @@ ${ layout.menubar(section='bundles', dashboard=True) }
 
 
       <div class="tab-pane" id="actions">
-        <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+        <table class="table table-condensed" cellpadding="0" cellspacing="0">
           <thead>
           <tr>
             <th>${ _('Name') }</th>

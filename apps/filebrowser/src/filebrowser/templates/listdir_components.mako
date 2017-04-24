@@ -334,7 +334,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         <h2 class="modal-title">${_('Change Permissions')}</h2>
       </div>
       <div class="modal-body table-margin">
-        <table class="table table-striped">
+        <table class="table table-condensed">
           <thead>
             <tr>
               <th>&nbsp;</th>
@@ -537,7 +537,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
     </div>
     <div class="modal-body">
       <div data-bind="visible: isLoadingSummary"><i class="fa fa-spin fa-spinner fa-2x fa-fw" style="color: #CCC"></i></div>
-      <table class="table table-striped" data-bind="visible: !isLoadingSummary()">
+      <table class="table table-condensed" data-bind="visible: !isLoadingSummary()">
         <tr>
           <th>${ _('Disk space consumed') }</th>
           <td data-bind="text: formatBytes(contentSummary().spaceConsumed(), 4)"></td>

@@ -892,7 +892,7 @@ var SqlAutocompleter = (function () {
 
       }
     } else if (item.meta === 'column' && item.popularValues && !item.docHTML) {
-      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table table-striped"><tbody>';
+      item.docHTML = '<div style="width: 400px; height: 120px; overflow-y: auto;"><div style="margin:10px; font-size: 14px; margin-bottom: 8px;">Popular Values</div><table style="width: 380px; margin: 5px 10px 0 10px;" class="table"><tbody>';
       item.popularValues.forEach(function (value) {
         item.docHTML += '<tr><td><div style=" width: 360px; overflow-x: hidden; font-family: monospace; white-space: nowrap; text-overflow: ellipsis" title="' + value + '">' + value + '</div></td></tr>';
       });

@@ -79,7 +79,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
 
               % for index, group in enumerate(instrumentation[category]):
               <div class="nav-header">${ group['group'] }</div>
-              <table id="intrumentationTable-${ category }-${ index }" class="table table-striped table-condensed">
+              <table id="intrumentationTable-${ category }-${ index }" class="table table-condensed">
               <tbody>
                 % for item in group['data']:
                 <tr>
@@ -150,13 +150,13 @@ ${ layout.menubar(section='oozie', dashboard=True) }
     <%def name="recurse(metric)">
         % if metric:
           % if isinstance(metric, basestring):
-            <table class="table table-striped">
+            <table class="table table-condensed">
               <tr>
                 <th>${metric}</th>
               </tr>
             </table>
           % else:
-            <table class="table table-striped metricsTable">
+            <table class="table table-condensed metricsTable">
             <thead>
             <tr>
               <th>${_('Name')}</th>
@@ -189,7 +189,7 @@ ${ layout.menubar(section='oozie', dashboard=True) }
             </table>
           % endif
         % else:
-          <table class="table table-striped">
+          <table class="table table-condensed">
           <tr>
             <td>${ _('No metrics available for this section.') }</td>
           </tr>

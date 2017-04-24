@@ -135,7 +135,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
         </div>
         <div data-bind="css: {'hide': rows().length == 0}" class="hide">
           <div class="card card-small scrollable">
-            <table id="resultTable" class="table table-striped table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
+            <table id="resultTable" class="table table-condensed resultTable" cellpadding="0" cellspacing="0" data-tablescroller-min-height-disable="true" data-tablescroller-enforce-height="true">
               <thead>
                 <tr data-bind="foreach: columns">
                   <th data-bind="text: $data, css:{'datatables-counter-col': $index() == 0}"></th>

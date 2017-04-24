@@ -116,7 +116,7 @@ ${layout.menubar(section='my queries')}
     </div>
 
     <div class="tab-pane" id="recentRunQueries">
-      <table id="recentRunQueriesTable" class="table table-striped table-condensed datatables">
+      <table id="recentRunQueriesTable" class="table table-condensed datatables">
         <thead>
           <tr>
             <th width="1%"><div class="hueCheckbox selectAll" data-selectables="runCheck"></div></th>

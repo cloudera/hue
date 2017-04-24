@@ -47,7 +47,7 @@ ${ commonheader(title, "", user, request, "40px") | n,unicode }
               <br />
               <br />
               <div id="traceback" class="hide">
-                <table class="table table-striped" style="background: white; border: 1px solid #DDDDDD;">
+                <table class="table table-condensed" style="background: white; border: 1px solid #DDDDDD;">
                   <thead>
                     <tr>
                       <td>${_("File Name")}</td>

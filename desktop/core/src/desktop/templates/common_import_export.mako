@@ -72,7 +72,7 @@ from django.utils.translation import ugettext as _
       <!-- /ko -->
       <!-- ko if: $root.showTable() -->
         <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: $root.toggleShowTable">${_('Hide Details')} <i class="fa fa-caret-up"></i></a>
-        <table class="table table-striped table-condensed">
+        <table class="table table-condensed">
           <thead>
             <tr>
               <th>${_('Name')}</th>

@@ -475,7 +475,7 @@ from desktop.views import _ko
           <!-- /ko -->
           <!-- ko if: showTable() -->
           <a href="javascript:void(0)" class="margin-left-10 margin-top-10" data-bind="click: toggleShowTable">${_('Hide Details')} <i class="fa fa-caret-up"></i></a>
-            <table class="table table-striped table-condensed">
+            <table class="table table-condensed">
               <thead>
                 <tr>
                   <th>${_('Name')}</th>

@@ -221,7 +221,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
               </div>
               <div class="clearfix"></div>
 
-              <table class="table table-striped table-condensed margin-top-10">
+              <table class="table table-condensed margin-top-10">
                 <thead>
                 <tr>
                   <th width="20"><div data-bind="click: selectAll, css: { 'fa-check': allSelected }" class="hueCheckbox fa"></div></th>
@@ -278,7 +278,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
                 <a class="btn btn-status btn-danger disable-feedback" data-table="actions" data-value="ERROR">${ _('Error') }</a>
               </div>
               <div class="clearfix"></div>
-              <table class="table table-striped table-condensed margin-top-10" cellpadding="0" cellspacing="0">
+              <table class="table table-condensed margin-top-10" cellpadding="0" cellspacing="0">
                 <thead>
                 <tr>
                   <th width="1%">${ _('Number') }</th>
@@ -418,7 +418,7 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
             <div class="tab-pane" id="sla" style="padding-left: 20px">
               <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
               <div id="slaChart"></div>
-              <table id="slaTable" class="table table-striped table-condensed hide">
+              <table id="slaTable" class="table table-condensed hide">
                 <thead>
                   <th>${_('Status')}</th>
                   <th>${_('Nominal Time')}</th>

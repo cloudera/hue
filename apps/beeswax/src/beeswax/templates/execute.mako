@@ -391,7 +391,7 @@ ${ layout.menubar(section='query') }
             <div id="recentLoader">
               <i class="fa fa-spinner fa-spin" style="font-size: 20px; color: #DDD"></i>
             </div>
-            <table id="recentQueries" class="table table-striped table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+            <table id="recentQueries" class="table table-condensed datatables" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
               <thead>
                 <tr>
                   <th>${_('Time')}</th>
@@ -450,7 +450,7 @@ ${ layout.menubar(section='query') }
             <div data-bind="visible: $root.design.results.columns().length > 10">
               <input id="columnFilter" class="input-xlarge" type="text" placeholder="${_('Filter for column name or type...')}" />
             </div>
-            <table class="table table-striped table-condensed" cellpadding="0" cellspacing="0">
+            <table class="table table-condensed" cellpadding="0" cellspacing="0">
               <tbody data-bind="foreach: $root.design.results.columns">
                 <tr class="columnRow" data-bind="visible: $index() > 0">
                   <td rel="columntooltip" data-placement="left" data-bind="attr: {title: '${ _ko("Scroll to the column") }">
@@ -472,7 +472,7 @@ ${ layout.menubar(section='query') }
             </div>
 
             <div data-bind="css: {'hide': !$root.hasResults()}">
-              <table id="resultTable" class="table table-striped table-condensed" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
+              <table id="resultTable" class="table table-condensed" cellpadding="0" cellspacing="0" data-tablescroller-enforce-height="true">
                 <thead>
                 <tr data-bind="foreach: $root.design.results.columns">
                   <th data-bind="html: ($index() == 0 ? '&nbsp;' : $data.name), css: { 'sort-numeric': isNumericColumn($data.type), 'sort-date': isDateTimeColumn($data.type), 'sort-string': isStringColumn($data.type), 'datatables-counter-col': $index() == 0}"></th>

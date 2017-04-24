@@ -36,7 +36,7 @@ ${layout.menubar(section='permissions')}
       </%def>
     </%actionbar:render>
 
-    <table class="table table-striped table-condensed datatables">
+    <table class="table table-condensed datatables">
       <thead>
       <tr>
         <th>${_('Application')}</th>

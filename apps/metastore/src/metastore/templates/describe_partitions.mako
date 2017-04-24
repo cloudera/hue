@@ -121,7 +121,7 @@ ${ assist.assistPanel() }
               </div>
             </div>
 
-            <table class="table table-striped table-condensed datatables" data-bind="visible: values().length > 0, style:{'opacity': isLoading() ? '.5': '1' }">
+            <table class="table table-condensed datatables" data-bind="visible: values().length > 0, style:{'opacity': isLoading() ? '.5': '1' }">
               <tr>
                 <th width="1%"><div class="hueCheckbox selectAll fa" data-selectables="partitionCheck"></div></th>
                 <!-- ko foreach: keys -->

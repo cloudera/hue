@@ -454,7 +454,7 @@ ${ assist.assistPanel() }
       <h3 class="card-heading simple">${_('Preview')}</h3>
       <div class="card-body">
         <div style="overflow: auto">
-          <table class="table table-striped table-condensed table-preview">
+          <table class="table table-condensed table-preview">
             <thead>
             <tr data-bind="foreach: createWizard.source.sampleCols">
               ##<!-- ko template: 'field-preview-header-template' --><!-- /ko -->

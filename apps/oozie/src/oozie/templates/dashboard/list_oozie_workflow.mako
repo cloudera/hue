@@ -176,7 +176,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         % else:
         <div id="actions" class="tab-pane active">
         % endif
-          <table class="table table-striped table-condensed selectable">
+          <table class="table table-condensed selectable">
             <thead>
             <tr>
               <th>${ _('Logs') }</th>
@@ -300,7 +300,7 @@ ${ layout.menubar(section='workflows', dashboard=True) }
         <div class="tab-pane" id="sla" style="padding-left: 20px">
           <div id="yAxisLabel" class="hide">${_('Time since Nominal Time in min')}</div>
           <div id="slaChart"></div>
-          <table id="slaTable" class="table table-striped table-condensed hide">
+          <table id="slaTable" class="table table-condensed hide">
             <thead>
               <th>${_('Status')}</th>
               <th>${_('Nominal Time')}</th>

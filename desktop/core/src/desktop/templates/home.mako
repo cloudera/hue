@@ -183,7 +183,7 @@ ${ commonheader(_('Welcome Home'), "home", user, request) | n,unicode }
 
         <div class="card-body">
           <p>
-          <table id="documents" class="table table-striped table-condensed" data-bind="visible: documents().length > 0">
+          <table id="documents" class="table table-condensed" data-bind="visible: documents().length > 0">
             <thead>
               <tr>
                 <th style="width: 26px">&nbsp;</th>

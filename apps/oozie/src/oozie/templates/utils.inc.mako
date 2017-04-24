@@ -125,7 +125,7 @@
 
 
 <%def name="display_conf(configs, id=None)">
-  <table class="table table-condensed table-striped"
+  <table class="table table-condensed"
     % if id is not None:
       id="${ id }"
     % endif

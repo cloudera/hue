@@ -65,7 +65,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           ${_('There are currently no scripts defined. Please add a new script clicking on "New script"')}
         </div>
 
-        <table class="table table-striped table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
+        <table class="table table-condensed tablescroller-disable" data-bind="visible: scripts().length > 0">
           <thead>
           <tr>
             <th width="1%"><div data-bind="click: selectAll, css: {hueCheckbox: true, 'fa': true, 'fa-check': allSelected}"></div></th>
@@ -548,7 +548,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <div class="alert alert-info" data-bind="visible: runningScripts().length == 0" style="margin-bottom:0">
             ${_('There are currently no running scripts.')}
           </div>
-          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
+          <table class="table table-condensed datatables tablescroller-disable" data-bind="visible: runningScripts().length > 0">
             <thead>
             <tr>
               <th width="20%">${_('Name')}</th>
@@ -572,7 +572,7 @@ ${ commonheader(None, "pig", user, request) | n,unicode }
           <div class="alert alert-info" data-bind="visible: completedScripts().length == 0">
             ${_('There are currently no completed scripts.')}
           </div>
-          <table class="table table-striped table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
+          <table class="table table-condensed datatables tablescroller-disable" data-bind="visible: completedScripts().length > 0">
             <thead>
             <tr>
               <th width="20%">${_('Name')}</th>

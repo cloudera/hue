@@ -317,7 +317,7 @@ ${ assist.assistPanel() }
         <i class="fa fa-spinner fa-spin"></i>
         <!-- /ko -->
         <div style="overflow: auto">
-          <table class="table table-striped table-condensed" style="margin:auto;text-align:left">
+          <table class="table table-condensed" style="margin:auto;text-align:left">
             <thead>
             <tr data-bind="foreach: createWizard.fileFormat().columns">
               <!-- ko template: 'field-preview-header-template' --><!-- /ko -->
