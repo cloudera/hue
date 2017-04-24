@@ -239,7 +239,14 @@ class YarnMapReduceTaskApi(Api):
       filter_params['task_text'] = filters['text']
 
     if filters.get('states'):
-      filter_params['task_states'] = filters['states']
+      task_states = []
+      if 'completed' in filters['states']:
+        task_states.append('succeeded')
+      if 'running' in filters['states']:
+        task_states.extend(['running', 'pending'])
+      if 'failed' in filters['states']:
+        task_states.extend(['running', 'killed'])
+      filter_params['task_states'] = task_states
 
     if filters.get('types') and len(filters.get('types')) == 1:
       filter_params['task_types'] = filters['types'][0]

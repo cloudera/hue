@@ -406,7 +406,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div class="tab-pane" id="job-mapreduce-page-tasks">
       ${_('Filter')}
-      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+      <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
       <span data-bind="foreach: statesValuesFilter">
         <label class="checkbox">
@@ -998,9 +998,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.textFilter = ko.observable('').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesValuesFilter = ko.observableArray([
-        ko.mapping.fromJS({'value': 'completed', 'name': '${_("Succeeded")}', 'checked': true, 'klass': 'green'}),
-        ko.mapping.fromJS({'value': 'running', 'name': '${_("Running")}', 'checked': true, 'klass': 'orange'}),
-        ko.mapping.fromJS({'value': 'failed', 'name': '${_("Failed")}', 'checked': true, 'klass': 'red'}),
+        ko.mapping.fromJS({'value': 'completed', 'name': '${_("Succeeded")}', 'checked': false, 'klass': 'green'}),
+        ko.mapping.fromJS({'value': 'running', 'name': '${_("Running")}', 'checked': false, 'klass': 'orange'}),
+        ko.mapping.fromJS({'value': 'failed', 'name': '${_("Failed")}', 'checked': false, 'klass': 'red'}),
       ]);
       self.statesFilter = ko.computed(function () {
         var checkedStates = ko.utils.arrayFilter(self.statesValuesFilter(), function (state) {
@@ -1011,8 +1011,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       });
       self.typesValuesFilter = ko.observableArray([
-        ko.mapping.fromJS({'value': 'map', 'name': '${_("Map")}', 'checked': true, 'klass': 'green'}),
-        ko.mapping.fromJS({'value': 'reduce', 'name': '${_("Reduce")}', 'checked': true, 'klass': 'orange'}),
+        ko.mapping.fromJS({'value': 'map', 'name': '${_("Map")}', 'checked': false, 'klass': 'green'}),
+        ko.mapping.fromJS({'value': 'reduce', 'name': '${_("Reduce")}', 'checked': false, 'klass': 'orange'}),
       ]);
       self.typesFilter = ko.computed(function () {
         var checkedTypes = ko.utils.arrayFilter(self.typesValuesFilter(), function (type) {
@@ -1323,9 +1323,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.textFilter = ko.observable('user:${ user.username } ').extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 1000 } });
       self.statesValuesFilter = ko.observableArray([
-        ko.mapping.fromJS({'value': 'completed', 'name': '${_("Succeeded")}', 'checked': true, 'klass': 'green'}),
-        ko.mapping.fromJS({'value': 'running', 'name': '${_("Running")}', 'checked': true, 'klass': 'orange'}),
-        ko.mapping.fromJS({'value': 'failed', 'name': '${_("Failed")}', 'checked': true, 'klass': 'red'}),
+        ko.mapping.fromJS({'value': 'completed', 'name': '${_("Succeeded")}', 'checked': false, 'klass': 'green'}),
+        ko.mapping.fromJS({'value': 'running', 'name': '${_("Running")}', 'checked': false, 'klass': 'orange'}),
+        ko.mapping.fromJS({'value': 'failed', 'name': '${_("Failed")}', 'checked': false, 'klass': 'red'}),
       ]);
       self.statesFilter = ko.computed(function () {
         var checkedStates = ko.utils.arrayFilter(self.statesValuesFilter(), function (state) {
