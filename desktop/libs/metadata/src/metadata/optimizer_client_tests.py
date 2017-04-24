@@ -316,7 +316,7 @@ FROM
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
-    
+
     source_platform = 'hive'
     query = '''SELECT s07.description,
 s07.total_emp,

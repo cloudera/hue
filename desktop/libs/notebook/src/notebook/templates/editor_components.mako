@@ -1044,15 +1044,29 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <div class="round-icon success" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-check"></i>
         </div>
+        <!-- ko if: showOptimizer -->
+        <span class="optimizer-explanation alert-info alert-neutral">
+          ${ _('Some low risks were detected.') }
+        </span>
+        <!-- /ko -->
       <!-- /ko -->
-      <!-- ko if: topRisk().risk != 'low' -->
-        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }">
+      <!-- ko if: topRisk().risk == 'medium' -->
+        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+          <i class="fa fa-exclamation"></i>
+        </div>
+        <!-- ko if: showOptimizer -->
+        <span class="optimizer-explanation alert-warning alert-neutral">
+          ${ _('Some medium risks were detected.') }
+        </span>
+        <!-- /ko -->
+      <!-- /ko -->
+      <!-- ko if: topRisk().risk == 'high' -->
+        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
         <span class="optimizer-explanation alert-error alert-neutral">
-          <strong data-bind="text: topRisk().riskAnalysis"></strong>
-          <span data-bind="text: topRisk().riskRecommendation"></span>
+          ${ _('Some high risks were detected.') }
         </span>
         <!-- /ko -->
       <!-- /ko -->
