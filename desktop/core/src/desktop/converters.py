@@ -18,13 +18,13 @@
 import json
 import logging
 import time
-import re
 
 from django.db import transaction
+from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
-from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission, \
-  DOC2_NAME_INVALID_CHARS
+from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
+
 from notebook.api import _historify
 from notebook.models import import_saved_beeswax_query
 
@@ -204,28 +204,29 @@ class DocumentConverter(object):
 
 
   def _create_doc2(self, document, doctype, name=None, description=None, data=None):
-    with transaction.atomic():
-      name = name if name else document.name
-      name = re.sub(DOC2_NAME_INVALID_CHARS, '', name)
-      document2 = Document2.objects.create(
-        owner=self.user,
-        parent_directory=self._get_parent_directory(document),
-        name=name,
-        type=doctype,
-        description=description,
-        data=data
-      )
-      self._sync_permissions(document, document2)
+    try:
+      with transaction.atomic():
+        document2 = Document2.objects.create(
+          owner=self.user,
+          parent_directory=self._get_parent_directory(document),
+          name=name if name else document.name,
+          type=doctype,
+          description=description,
+          data=data
+        )
+        self._sync_permissions(document, document2)
 
-      # Create a doc1 copy and link it for backwards compatibility
-      Document.objects.link(
-        document2,
-        owner=document2.owner,
-        name=document2.name,
-        description=document2.description,
-        extra=document.extra
-      )
+        # Create a doc1 copy and link it for backwards compatibility
+        Document.objects.link(
+          document2,
+          owner=document2.owner,
+          name=document2.name,
+          description=document2.description,
+          extra=document.extra
+        )
 
-      document.add_tag(self.imported_tag)
-      document.save()
-      return document2
+        document.add_tag(self.imported_tag)
+        document.save()
+        return document2
+    except Exception, e:
+      raise PopupException(_("Failed to convert Document object: %s") % e)

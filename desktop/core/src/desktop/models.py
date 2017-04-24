@@ -495,64 +495,67 @@ class DocumentManager(models.Manager):
       LOG.info('Looking for documents that have no object')
 
       # Delete documents with no object.
-      with transaction.atomic():
-        # First, delete all the documents that don't have a content type
-        docs = Document.objects.filter(content_type=None)
+      try:
+        with transaction.atomic():
+          # First, delete all the documents that don't have a content type
+          docs = Document.objects.filter(content_type=None)
 
-        if docs:
-          LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
-          docs.delete()
+          if docs:
+            LOG.info('Deleting %s doc(s) that do not have a content type' % docs.count())
+            docs.delete()
 
-        # Next, it's possible that there are documents pointing at a non-existing
-        # content_type. We need to do a left join to find these records, but we
-        # can't do this directly in django. To get around writing wrap sql (which
-        # might not be portable), we'll use an aggregate to count up all the
-        # associated content_types, and delete the documents that have a count of
-        # zero.
-        #
-        # Note we're counting `content_type__name` to force the join.
-        docs = Document.objects \
-            .values('id') \
-            .annotate(content_type_count=models.Count('content_type__name')) \
-            .filter(content_type_count=0)
+          # Next, it's possible that there are documents pointing at a non-existing
+          # content_type. We need to do a left join to find these records, but we
+          # can't do this directly in django. To get around writing wrap sql (which
+          # might not be portable), we'll use an aggregate to count up all the
+          # associated content_types, and delete the documents that have a count of
+          # zero.
+          #
+          # Note we're counting `content_type__name` to force the join.
+          docs = Document.objects \
+              .values('id') \
+              .annotate(content_type_count=models.Count('content_type__name')) \
+              .filter(content_type_count=0)
 
-        if docs:
-          LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
-          docs.delete()
+          if docs:
+            LOG.info('Deleting %s doc(s) that have invalid content types' % docs.count())
+            docs.delete()
 
-        # Finally we need to delete documents with no associated content object.
-        # This is tricky because of our use of generic foreign keys. So to do
-        # this a bit more efficiently, we'll start with a query of all the
-        # documents, then step through each content type and and filter out all
-        # the documents it's referencing from our document query. Messy, but it
-        # works.
+          # Finally we need to delete documents with no associated content object.
+          # This is tricky because of our use of generic foreign keys. So to do
+          # this a bit more efficiently, we'll start with a query of all the
+          # documents, then step through each content type and and filter out all
+          # the documents it's referencing from our document query. Messy, but it
+          # works.
 
-        docs = Document.objects.all()
+          docs = Document.objects.all()
 
-        for content_type in ContentType.objects.all():
-          model_class = content_type.model_class()
+          for content_type in ContentType.objects.all():
+            model_class = content_type.model_class()
 
-          # Ignore any types that don't have a model.
-          if model_class is None:
-            continue
+            # Ignore any types that don't have a model.
+            if model_class is None:
+              continue
 
-          # Ignore types that don't have a table yet.
-          if model_class._meta.db_table not in table_names:
-            continue
+            # Ignore types that don't have a table yet.
+            if model_class._meta.db_table not in table_names:
+              continue
 
-          # Ignore classes that don't have a 'doc'.
-          if not hasattr(model_class, 'doc'):
-            continue
+            # Ignore classes that don't have a 'doc'.
+            if not hasattr(model_class, 'doc'):
+              continue
 
-          # First create a query that grabs all the document ids for this type.
-          docs_from_content = model_class.objects.values('doc__id')
+            # First create a query that grabs all the document ids for this type.
+            docs_from_content = model_class.objects.values('doc__id')
 
-          # Next, filter these from our document query.
-          docs = docs.exclude(id__in=docs_from_content)
+            # Next, filter these from our document query.
+            docs = docs.exclude(id__in=docs_from_content)
 
-        if docs.exists():
-          LOG.info('Deleting %s documents' % docs.count())
-          docs.delete()
+          if docs.exists():
+            LOG.info('Deleting %s documents' % docs.count())
+            docs.delete()
+      except Exception, e:
+        LOG.exception('Error in sync while attempting to delete documents with no object: %s' % e)
 
 
 class Document(models.Model):
@@ -1245,11 +1248,14 @@ class Document2(models.Model):
       return None
 
   def share(self, user, name='read', users=None, groups=None):
-    with transaction.atomic():
-      self.update_permission(user, name, users, groups)
-      # For directories, update all children recursively with same permissions
-      for child in self.children.all():
-        child.share(user, name, users, groups)
+    try:
+      with transaction.atomic():
+        self.update_permission(user, name, users, groups)
+        # For directories, update all children recursively with same permissions
+        for child in self.children.all():
+          child.share(user, name, users, groups)
+    except Exception, e:
+      raise PopupException(_("Failed to share document: %s") % e)
     return self
 
   def update_permission(self, user, name='read', users=None, groups=None):
