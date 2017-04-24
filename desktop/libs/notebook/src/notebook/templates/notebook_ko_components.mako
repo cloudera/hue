@@ -172,8 +172,14 @@ except ImportError, e:
     </form>
 
     <div class="hover-dropdown" data-bind="visible: snippet.status() == 'available' && snippet.result.hasSomeResults() && snippet.result.type() == 'table'" style="display:none;">
-      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown">
+      <a class="snippet-side-btn inactive-action dropdown-toggle pointer" style="padding-right:0" data-toggle="dropdown" title="${ _('Get results') }">
+        <!-- ko ifnot: isDownloading -->
         <i class="fa fa-fw fa-download"></i>
+        <!-- /ko -->
+
+        <!-- ko if: isDownloading -->
+        <i class="fa fa-fw fa-spinner fa-spin"></i>
+        <!-- /ko -->
       </a>
       <ul class="dropdown-menu less-padding">
         <li>
@@ -255,6 +261,18 @@ except ImportError, e:
         <button data-bind="click: trySaveResults" class="btn btn-primary disable-feedback">${_('Save')}</button>
       </div>
     </div>
+
+    <div id="downloadProgressModal" class="modal hide fade">
+      <div class="modal-header">
+        <h3>${_('Your download is being prepared...')}</h3>
+      </div>
+      <div class="modal-body" style="padding: 4px">
+        ${ _('Please wait, it might take a while...') } <i class="fa fa-spinner fa-spin"></i>
+      </div>
+      <div class="modal-footer">
+        <button data-bind="click: cancelDownload" class="btn btn-danger disable-feedback">${_('Cancel Download')}</button>
+      </div>
+    </div>
   </script>
 
   <script type="text/javascript" charset="utf-8">
@@ -274,6 +292,8 @@ except ImportError, e:
         self.saveTarget = ko.observable('hdfs-file');
         self.savePath = ko.observable('');
         self.saveOverwrite = ko.observable(true);
+
+        self.isDownloading = ko.observable(false);
 
         self.trySaveResults = function() {
           self.saveResults();
@@ -305,6 +325,12 @@ except ImportError, e:
             $("#saveResultsModal .loader").hide();
           });
         };
+
+        self.cancelDownload = function() {
+          console.log('Cancel download');
+          self.isDownloading(false);
+          $('#downloadProgressModal').modal('hide');
+        };
       };
 
       DownloadResultsViewModel.prototype.download = function (format) {
@@ -316,6 +342,25 @@ except ImportError, e:
         self.$downloadForm.find('input[name=\'format\']').val(format);
         self.$downloadForm.find('input[name=\'notebook\']').val(ko.mapping.toJSON(self.notebook.getContext()));
         self.$downloadForm.find('input[name=\'snippet\']').val(ko.mapping.toJSON(self.snippet.getContext()));
+
+        self.isDownloading(true);
+
+        var timesChecked = 0;
+        var checkDownloadInterval = -1;
+        checkDownloadInterval = window.setInterval(function(){
+          if ($.cookie('download-' + self.snippet.id()) === null || typeof $.cookie('download-' + self.snippet.id()) === 'undefined'){
+            if (timesChecked == 10){
+              $('#downloadProgressModal').modal('show');
+            }
+          }
+          else {
+            window.clearInterval(checkDownloadInterval);
+            self.isDownloading(false);
+            $('#downloadProgressModal').modal('hide');
+          }
+          timesChecked++;
+        }, 500);
+
         self.$downloadForm.submit();
       };
 
