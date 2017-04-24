@@ -52,6 +52,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     // global catch for ajax calls after the user has logged out
     var isLoginRequired = false;
     $(document).ajaxComplete(function (event, xhr, settings) {
+      if (IDLE_SESSION_TIMEOUT == -1 && settings && settings.url === '/jobbrowser/jobs/') {
+        return;
+      }
       if (xhr.responseText === '/* login required */' && !isLoginRequired) {
         isLoginRequired = true;
         $('.blurred').removeClass('blurred');
