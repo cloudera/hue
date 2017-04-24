@@ -201,7 +201,6 @@ ${ hueIcons.symbols() }
 
     <script type="text/html" id="tmpl-sidebar-link">
       <a role="button" class="sidebar-item" data-bind="hueLink: item.url, attr: { title: item.displayName }">
-        <!-- ko if: item.icon --><div class="sidebar-icon"><!-- ko template: { name: 'app-icon-template' } --><!-- /ko --></div><!-- /ko -->
         <span class="sidebar-item-name" data-bind="text: item.displayName"></span>
       </a>
     </script>

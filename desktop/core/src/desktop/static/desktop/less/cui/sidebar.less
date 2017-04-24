@@ -8,6 +8,7 @@
 @sidebar-animation-duration: 250ms;
 @sidebar-category-font-size: 13px;
 @sidebar-left-spacing: 16px;
+@sidebar-left-spacing-item: 30px;
 @sidebar-background-color: @cui-gray-050;
 
 .sidebar {
@@ -29,7 +30,7 @@
 
   .sidebar-content {
     top: 48px;
-    bottom: 36px;
+    bottom: 50px;
     position: absolute;
     overflow-y: auto;
     min-width: @sidebar-width;
@@ -37,7 +38,7 @@
 
   .sidebar-item {
     display: block;
-    padding-left: @sidebar-left-spacing;
+    padding-left: @sidebar-left-spacing-item;
     line-height: 38px;
     color: @text-color;
     background-color: @sidebar-background-color;
