@@ -20,11 +20,11 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
-from django.forms import ValidationError
 from django.http import HttpResponseBadRequest, HttpResponseRedirect
 from django.utils.translation import ugettext as _
 from django.views.decorators.http import require_GET, require_POST
 
+from desktop.lib.i18n import smart_str
 from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
@@ -259,6 +259,7 @@ def get_logs(request):
 
   db = get_api(request, snippet)
 
+  full_log = smart_str(request.POST.get('full_log', ''))
   logs = db.get_log(notebook, snippet, startFrom=startFrom, size=size)
 
   jobs = json.loads(request.POST.get('jobs', '[]'))
@@ -354,6 +355,18 @@ def _historify(notebook, user):
   history_doc.save()
 
   return history_doc
+
+
+def _get_statement(notebook):
+  statement = ''
+  if notebook['snippets'] and len(notebook['snippets']) > 0:
+    try:
+      statement = notebook['snippets'][0]['result']['handle']['statement']
+      if type(statement) == dict:  # Old format
+        statement = notebook['snippets'][0]['statement_raw']
+    except KeyError:  # Old format
+      statement = notebook['snippets'][0]['statement_raw']
+  return statement
 
 
 @require_GET
