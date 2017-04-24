@@ -81,6 +81,12 @@ ENABLE_CRON_SCHEDULING = Config( # Until Hue 3.8
   help=_t('Use Cron format for defining the frequency of a Coordinator instead of the old frequency number/unit.')
 )
 
+ENABLE_DOCUMENT_ACTION = Config(
+  key="enable_document_action",
+  help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
+  type=bool,
+  default=False
+)
 
 def config_validator(user):
   res = []
