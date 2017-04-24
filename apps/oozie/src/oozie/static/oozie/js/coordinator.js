@@ -38,12 +38,11 @@ function initCoordinator(coordinator_json, i18n) {
       })
       .jqCronGetInstance();
 
-  var coordViewModel = function(coordinator_json) {
+  var coordViewModel = function() {
     var self = this;
 
-    self.cronFrequency = ko.observable(typeof coordinator_json.frequency != "undefined" && coordinator_json.frequency != null ? coordinator_json.frequency : '');
     self.isSaveVisible = ko.observable(false);
-    self.isAdvancedCron = ko.observable(typeof coordinator_json.isAdvancedCron != "undefined" && coordinator_json.isAdvancedCron != null ? coordinator_json.isAdvancedCron : false);
+    self.isAdvancedCron = ko.observable(false);
     self.isAdvancedCron.subscribe(function(value) {
       if (value) {
         coordCron.disable();
@@ -53,7 +52,9 @@ function initCoordinator(coordinator_json, i18n) {
     });
   };
 
-  window.coordViewModel = new coordViewModel(coordinator_json);
+  window.coordViewModel = new coordViewModel();
+  window.coordViewModel.isAdvancedCron(coordinator_json.isAdvancedCron);
+  $('#coord-frequency').val(coordinator_json.frequency),
 
   ko.applyBindings(window.coordViewModel, document.getElementById('step2'));
 }
