@@ -263,19 +263,8 @@ def get_logs(request):
 
   jobs = json.loads(request.POST.get('jobs', '[]'))
 
-  # Get any new jobs from current logs snippet
-  new_jobs = db.get_jobs(notebook, snippet, logs)
-
-  # Append new jobs to known jobs and get the unique set
-  if new_jobs:
-    all_jobs = jobs + new_jobs
-    jobs = dict((job['name'], job) for job in all_jobs).values()
-
-  # Retrieve full log for job progress parsing
-  full_log = request.POST.get('full_log', logs)
-
-  response['logs'] = logs
-  response['progress'] = db.progress(snippet, full_log) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
+  response['logs'] = logs.strip()
+  response['progress'] = min(db.progress(snippet, full_log), 99) if snippet['status'] != 'available' and snippet['status'] != 'success' else 100
   response['jobs'] = jobs
   response['status'] = 0
 
