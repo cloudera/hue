@@ -388,30 +388,49 @@ def export_documents(request):
 
 @ensure_csrf_cookie
 def import_documents(request):
-  if request.FILES.get('documents'):
-    documents = request.FILES['documents'].read()
-  else:
-    documents = json.loads(request.POST.get('documents'))
+  def is_reserved_directory(doc):
+    return doc['fields']['type'] == 'directory' and doc['fields']['name'] in (Document2.HOME_DIR, Document2.TRASH_DIR)
+
+  try:
+    if request.FILES.get('documents'):
+      documents = request.FILES['documents'].read()
+    else:
+      documents = json.loads(request.POST.get('documents'))
+
+    documents = json.loads(documents)
+  except ValueError, e:
+    raise PopupException(_('Failed to import documents, the file does not contain valid JSON.'))
+
+  # Validate documents
+  if not _is_import_valid(documents):
+    raise PopupException(_('Failed to import documents, the file does not contain the expected JSON schema for Hue documents.'))
 
   documents = json.loads(documents)
   docs = []
 
-  uuids_map = dict((doc['fields']['uuid'], None) for doc in documents)
+  uuids_map = dict((doc['fields']['uuid'], None) for doc in documents if not is_reserved_directory(doc))
 
   for doc in documents:
-    # Remove any deprecated fields
-    if 'tags' in doc['fields']:
-      doc['fields'].pop('tags')
+    # Filter docs to import, ignoring reserved directories (home and Trash) and history docs
+    if not is_reserved_directory(doc):
+      # Remove any deprecated fields
+      if 'tags' in doc['fields']:
+        doc['fields'].pop('tags')
 
-    # If doc is not owned by current user, make a copy of the document with current user as owner
-    if doc['fields']['owner'][0] != request.user.username:
-      doc = _copy_document_with_owner(doc, request.user, uuids_map)
-    else:  # Update existing doc or create new
-      doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
+      # If doc is not owned by current user, make a copy of the document with current user as owner
+      if doc['fields']['owner'][0] != request.user.username:
+        doc = _copy_document_with_owner(doc, request.user, uuids_map)
+      else:  # Update existing doc or create new
+        doc = _create_or_update_document_with_owner(doc, request.user, uuids_map)
 
-    # Set last modified date to now
-    doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
-    docs.append(doc)
+      # If the doc contains any history dependencies, ignore them
+      # NOTE: this assumes that each dependency is exported as an array using the natural PK [uuid, version, is_history]
+      deps_minus_history = [dep for dep in doc['fields'].get('dependencies', []) if len(dep) >= 3 and not dep[2]]
+      doc['fields']['dependencies'] = deps_minus_history
+
+      # Set last modified date to now
+      doc['fields']['last_modified'] = datetime.now().replace(microsecond=0).isoformat()
+      docs.append(doc)
 
   f = tempfile.NamedTemporaryFile(mode='w+', suffix='.json')
 
@@ -430,6 +449,18 @@ def import_documents(request):
     return redirect(request.POST.get('redirect'))
   else:
     return JsonResponse({'message': stdout.getvalue()})
+
+
+def _is_import_valid(documents):
+  """
+  Validates the JSON file to be imported for schema correctness
+  :param documents: object loaded from JSON file
+  :return: True if schema seems valid, False otherwise
+  """
+  return isinstance(documents, list) and \
+    all(isinstance(d, dict) for d in documents) and \
+    all(all(k in d for k in ('pk', 'model', 'fields')) for d in documents) and \
+    all(all(k in d['fields'] for k in ('uuid', 'owner')) for d in documents)
 
 
 def _get_dependencies(documents, deps_mode=True):
