@@ -367,10 +367,10 @@
     var clonedCell = $('<table>').attr('class', self.$element.attr('class'));
     clonedCell.removeClass(self.options.classToRemove);
     clonedCell.css("margin-bottom", "0").css("table-layout", "fixed");
-    var clonedCellTHead = $('<thead>');
+    var clonedCellTHead = $('<thead><tr></tr></thead>');
     clonedCellTHead.appendTo(clonedCell);
     var clonedCellTH = originalTh.clone();
-    clonedCellTH.appendTo(clonedCellTHead);
+    clonedCellTH.appendTo(clonedCellTHead.find('tr'));
     clonedCellTH.width(originalTh.width()).css({
       "background-color": "#FFFFFF",
       "border-color": "transparent"
@@ -390,10 +390,10 @@
     clonedCellContainer.appendTo(firstColumnTopCell);
 
     $("#" + self.$element.attr("id") + "jHueTableExtenderClonedContainerColumn").remove();
-    var clonedTable = $('<table>').attr('class', self.$element.attr('class')).html('<thead></thead><tbody></tbody>');
+    var clonedTable = $('<table>').attr('class', self.$element.attr('class')).html('<thead><tr></tr></thead><tbody></tbody>');
     clonedTable.removeClass(self.options.classToRemove);
     clonedTable.css("margin-bottom", "0").css("table-layout", "fixed");
-    self.$element.find("thead>tr th:eq(0)").clone().appendTo(clonedTable.find('thead'));
+    self.$element.find("thead>tr th:eq(0)").clone().appendTo(clonedTable.find('thead tr'));
     var clonedTBody = clonedTable.find('tbody');
     var clones = self.$element.find("tbody>tr td:nth-child(1)").clone();
     var h = '';
