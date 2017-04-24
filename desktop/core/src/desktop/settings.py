@@ -160,6 +160,7 @@ MIDDLEWARE_CLASSES = [
 
     'django.middleware.http.ConditionalGetMiddleware',
     'axes.middleware.FailedLoginMiddleware',
+    'desktop.middleware.MimeTypeJSFileFixStreamingMiddleware',
 ]
 
 # if os.environ.get(ENV_DESKTOP_DEBUG):
