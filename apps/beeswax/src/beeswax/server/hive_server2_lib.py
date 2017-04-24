@@ -748,8 +748,13 @@ class HiveServerClient:
     return self.execute_query_statement(statement=query.query['query'], max_rows=max_rows, configuration=configuration)
 
 
-  def execute_query_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST):
+  def execute_query_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_FIRST,
+                              close_operation=False):
     (results, schema), operation_handle = self.execute_statement(statement=statement, max_rows=max_rows, configuration=configuration, orientation=orientation)
+
+    if close_operation:
+      self.close_operation(operation_handle)
+
     return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
@@ -924,11 +929,11 @@ class HiveServerClient:
 
     if self.query_server['server_name'] == 'impala':  # Return all configuration settings
       query = 'SET'
-      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT)
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_NEXT, close_operation=True)
       configuration = dict((row[0], row[1]) for row in results.rows())
     else:  # For Hive, only return white-listed configurations
       query = 'SET -v'
-      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST)
+      results = self.execute_query_statement(query, orientation=TFetchOrientation.FETCH_FIRST, max_rows=-1, close_operation=True)
       config_whitelist = [config.lower() for config in CONFIG_WHITELIST.get()]
       properties = [(row[0].split('=')[0], row[0].split('=')[1]) for row in results.rows() if '=' in row[0]]
       configuration = dict((prop, value) for prop, value in properties if prop.lower() in config_whitelist)
