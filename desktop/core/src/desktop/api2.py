@@ -405,7 +405,6 @@ def import_documents(request):
   if not _is_import_valid(documents):
     raise PopupException(_('Failed to import documents, the file does not contain the expected JSON schema for Hue documents.'))
 
-  documents = json.loads(documents)
   docs = []
 
   uuids_map = dict((doc['fields']['uuid'], None) for doc in documents if not is_reserved_directory(doc))
