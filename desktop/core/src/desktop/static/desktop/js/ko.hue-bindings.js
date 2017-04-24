@@ -4144,8 +4144,8 @@
       var lastMeta = {};
       var draggableTextSub = huePubSub.subscribe('draggable.text.meta', function (meta) {
         lastMeta = meta;
-        if (typeof meta !== 'undefined' && typeof meta.table !== 'undefined') {
-          $identifierDropMenu.text(meta.table)
+        if (typeof meta !== 'undefined' && typeof meta.database !== 'undefined' && typeof meta.table !== 'undefined') {
+          $identifierDropMenu.text(meta.database + '.' + meta.table)
         }
       });
 
@@ -4166,24 +4166,24 @@
       };
 
       $tableDropMenu.find('.editor-drop-value').click(function () {
-        setFromDropMenu(lastMeta.table);
+        setFromDropMenu(lastMeta.database + '.' + lastMeta.table);
       });
 
       $tableDropMenu.find('.editor-drop-select').click(function () {
-        setFromDropMenu('SELECT * FROM ' + lastMeta.table + ' LIMIT 100;');
+        setFromDropMenu('SELECT * FROM ' + lastMeta.database + '.' + lastMeta.table + ' LIMIT 100;');
         $tableDropMenu.hide();
       });
 
       $tableDropMenu.find('.editor-drop-insert').click(function () {
-        setFromDropMenu('INSERT INTO ' + lastMeta.table + ' VALUES ();');
+        setFromDropMenu('INSERT INTO ' + lastMeta.database + '.' + lastMeta.table + ' VALUES ();');
       });
 
       $tableDropMenu.find('.editor-drop-update').click(function () {
-        setFromDropMenu('UPDATE ' + lastMeta.table + ' SET ');
+        setFromDropMenu('UPDATE ' + lastMeta.database + '.' + lastMeta.table + ' SET ');
       });
 
       $tableDropMenu.find('.editor-drop-drop').click(function () {
-        setFromDropMenu('DROP TABLE ' + lastMeta.table + ';');
+        setFromDropMenu('DROP TABLE ' + lastMeta.database + '.' + lastMeta.table + ';');
       });
 
       $el.droppable({
@@ -4196,7 +4196,7 @@
           }
           editor.moveCursorToPosition(position);
           var before = editor.getTextBeforeCursor();
-          if (lastMeta.table && ! lastMeta.column && /.*;|^\s*$/.test(before)) {
+          if (lastMeta.database && lastMeta.table && ! lastMeta.column && /.*;|^\s*$/.test(before)) {
             menu.show(e);
           } else {
             if (/\S+$/.test(before) && before.charAt(before.length - 1) !== '.') {
