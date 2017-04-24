@@ -97,8 +97,7 @@ from desktop.views import _ko
       <div class="autocompleter-header"><i class="fa fa-fw fa-columns"></i> <span data-bind="text: details.name"></span></div>
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
-          <div class="details-attribute" ><i class="fa fa-database fa-fw"></i> <span data-bind="text: details.database"></span></div>
-          <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.table"></span></div>
+          <div class="details-attribute" ><i class="fa fa-table fa-fw"></i> <span data-bind="text: details.database"></span>.<span data-bind="text: details.table"></span></div>
           <!-- ko if: typeof details.primary_key !== 'undefined' && details.primary_key === 'true' -->
           <div class="details-attribute" ><i class="fa fa-key fa-fw"></i> ${ _('Primary key') }</div>
           <!-- /ko -->

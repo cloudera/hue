@@ -316,6 +316,20 @@ FROM
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
+    
+    source_platform = 'hive'
+    query = '''SELECT s07.description,
+s07.total_emp,
+s08.total_emp,
+s07.salary
+FROM sample_07 s07,
+sample_08 s08
+WHERE s07.salary > 88
+ORDER BY s07.salary DESC
+'''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
 
 
   def test_risk_5_joins(self):
@@ -380,7 +394,6 @@ GROUP BY account_client,
 
 
   def test_risk_cross_join_false_positive(self):
-
     source_platform = 'hive'
     query = '''SELECT s07.description, s07.total_emp, s08.total_emp, s07.salary
 FROM
@@ -394,6 +407,13 @@ ORDER BY s07.salary DESC
 LIMIT 1000
 
 '''
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    _assert_risks(['Cartesian or CROSS join found.'], resp['hints'], present=False)
+
+
+    source_platform = 'hive'
+    query = '''select x from x join y where x.a = y.a'''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'], present=False)
