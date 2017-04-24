@@ -457,18 +457,29 @@ div.box {
   position: relative;
 }
 
-.table tr.locked td.unlockable .fa-unlock, .table tr td.lockable .fa-lock {
+.table tr.locked td.unlockable .fa, .table tr td.lockable .fa {
   display: none;
   position: absolute;
-  right: 4px;
-  margin-top: 3px;
+  margin-top: 6px;
+}
+
+.table tr td.lockable .fa-lock {
+  right: 12px;
+}
+
+.table tr.locked td.unlockable .fa-unlock {
+  right: 8px;
+}
+
+.table tr td.lockable .fa-expand {
+  right: 28px;
 }
 
 .table tr.locked td.unlockable:hover, .table tr td.lockable:hover {
-  color: #CCC;
+  color: transparent;
 }
 
-.table tr.locked td.unlockable:hover .fa-unlock, .table tr td.lockable:hover .fa-lock {
+.table tr.locked td.unlockable:hover .fa, .table tr td.lockable:hover .fa {
   color: @cui-gray-800;
   display: block;
 }

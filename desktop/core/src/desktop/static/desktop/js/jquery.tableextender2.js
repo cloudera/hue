@@ -414,12 +414,15 @@
     }
     clonedTBody.html(h);
     if (self.options.lockSelectedRow) {
-      clonedTBody.find('td').each(function(){
+      clonedTBody.find('td').each(function(idx){
         var cell = $(this);
-        cell.attr('title', self.options.labels.LOCK).addClass('lockable pointer').on('click', function(){
-          self.drawLockedRow($(this).text()*1);
+        cell.attr('title', self.options.labels.LOCK).addClass('lockable');
+        $('<i>').addClass('fa fa-lock pointer muted').prependTo(cell).on('click', function(){
+          self.drawLockedRow($(this).parent().text()*1);
         });
-        $('<i>').addClass('fa fa-lock muted').prependTo(cell);
+        $('<i>').addClass('fa fa-expand pointer muted').prependTo(cell).on('click', function(){
+          huePubSub.publish('table.row.dblclick', {idx: idx, table: self.$element});
+        });
       });
     }
     clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
