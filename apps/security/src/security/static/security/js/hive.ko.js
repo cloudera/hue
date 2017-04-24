@@ -207,7 +207,7 @@ var Role = function (vm, role) {
   self.isEditing = ko.observable(false);
   self.isLoading = ko.observable(false);
   self.isValid = ko.computed(function () {
-    return $.grep(self.privileges(), function (privilege) {
+    return self.name().length > 0 && $.grep(self.privileges(), function (privilege) {
       return privilege.privilegeType() === 'uri' && privilege.URI() === '';
     }).length === 0;
   });
