@@ -923,3 +923,41 @@ class TestDocument2ImportExport(object):
     assert_true(owned_query.uuid != imported_doc.uuid)
     assert_equal(self.user_not_me, imported_doc.owner)
     assert_equal(self.not_me_home_dir.uuid, imported_doc.parent_directory.uuid)
+
+    data = json.loads(response.content)
+    assert_true('count' in data)
+    assert_equal(1, data['count'])
+    assert_true('created_count' in data)
+    assert_equal(1, data['created_count'])
+    assert_true('updated_count' in data)
+    assert_equal(0, data['updated_count'])
+
+  def test_import_with_history_dependencies(self):
+    query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir)
+    query2 = Document2.objects.create(name='query2.sql', type='query-hive', owner=self.user, data={},
+                                      parent_directory=self.home_dir, is_history=True)
+    workflow = Document2.objects.create(name='test.wf', type='oozie-workflow2', owner=self.user, data={},
+                                        parent_directory=self.home_dir)
+    workflow.dependencies.add(query1)
+    workflow.dependencies.add(query2)
+
+    response = self.client.get('/desktop/api2/doc/export/', {'documents': json.dumps([workflow.id]), 'format': 'json'})
+    documents = response.content
+
+    # Delete previous entries from DB, so when you import it creates them
+    query1.delete()
+    query2.delete()
+    workflow.delete()
+
+    response = self.client_not_me.post('/desktop/api2/doc/import/', {'documents': documents})
+    assert_true(Document2.objects.filter(name='query1.sql').exists())
+    assert_false(Document2.objects.filter(name='query2.sql').exists())
+
+    data = json.loads(response.content)
+    assert_true('count' in data)
+    assert_equal(2, data['count'])
+    assert_true('created_count' in data)
+    assert_equal(2, data['created_count'])
+    assert_true('updated_count' in data)
+    assert_equal(0, data['updated_count'])
