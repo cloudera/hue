@@ -392,7 +392,7 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
   def test_query_with_unicode(self):
     statement = "SELECT * FROM sample_07 WHERE code='한';"
 
-    snippet_json = json.loads("""
+    snippet = json.loads("""
         {
             "status": "running",
             "database": "default",
@@ -412,20 +412,12 @@ class TestHiveserver2ApiWithHadoop(BeeswaxSampleProvider):
         }
       """ % {'statement': statement})
 
-    notebook_json = json.loads(self.notebook_json)
-    notebook_json['snippets'] = [snippet_json]
+    notebook = json.loads(self.notebook_json)
+    notebook['snippets'] = [snippet]
     response = self.client.post(reverse('notebook:execute'),
-                                {'notebook': json.dumps(notebook_json), 'snippet': json.dumps(snippet_json)})
+                                {'notebook': json.dumps(notebook), 'snippet': json.dumps(snippet)})
     data = json.loads(response.content)
     assert_equal(0, data['status'], data)
-
-    snippet['result']['handle'] = data['handle']
-
-    response = self.client.post(reverse('notebook:get_logs'),
-                                  {'notebook': notebook.get_json(), 'snippet': json.dumps(snippet)})
-    data = json.loads(response.content)
-    assert_equal(0, data['status'], data)
-    assert_true("SELECT * FROM sample_07 WHERE code='한'" in smart_str(data['logs']))
 
 
   def test_get_current_statement(self):
