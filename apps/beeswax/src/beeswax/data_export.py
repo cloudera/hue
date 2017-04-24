@@ -15,23 +15,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import logging
-import time
 
 from django.utils.translation import ugettext as _
 
 from desktop.lib import export_csvxls
-
 from beeswax import common, conf
 
 
 LOG = logging.getLogger(__name__)
 
-_DATA_WAIT_SLEEP = 0.1                  # Sleep 0.1 sec before checking for data availability
+
 FETCH_SIZE = 1000
+DOWNLOAD_COOKIE_AGE = 60 * 5
 
 
-def download(handle, format, db):
+def download(handle, format, db, id=None):
   """
   download(query_model, format) -> HttpResponse
 
@@ -45,7 +45,20 @@ def download(handle, format, db):
 
   content_generator = HS2DataAdapter(handle, db, max_cells=max_cells, start_over=True)
   generator = export_csvxls.create_generator(content_generator, format)
-  return export_csvxls.make_response(generator, format, 'query_result')
+
+  resp = export_csvxls.make_response(generator, format, 'query_result')
+
+  if id:
+    resp.set_cookie(
+      'download-%s' % id,
+      json.dumps({
+        'truncated': content_generator.is_truncated,
+        'row_counter': content_generator.row_counter
+      }),
+      max_age=DOWNLOAD_COOKIE_AGE
+    )
+
+  return resp
 
 
 def upload(path, handle, user, db, fs, max_cells=-1):
@@ -65,44 +78,50 @@ def upload(path, handle, user, db, fs, max_cells=-1):
     fs.do_as_user(user.username, fs.append, path, dataset.csv)
 
 
-def HS2DataAdapter(handle, db, max_cells=-1, start_over=True):
-  """
-  HS2DataAdapter(query_model, db) -> headers, 2D array of data.
-  """
-  results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
+class HS2DataAdapter:
 
-  while not results.ready:
-    time.sleep(_DATA_WAIT_SLEEP)
-    results = db.fetch(handle, start_over=start_over, rows=FETCH_SIZE)
+  def __init__(self, handle, db, max_cells=-1, start_over=True):
+    self.handle = handle
+    self.db = db
+    self.max_cells = max_cells
+    self.start_over = start_over
+    self.fetch_size = FETCH_SIZE
+    self.limit_cells = max_cells > -1
 
-  headers = results.cols()
-  num_cols = len(headers)
+    self.first_fetched = True
+    self.headers = None
+    self.num_cols = None
+    self.row_counter = 1
+    self.is_truncated = False
 
-  # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
-  if num_cols > 100:
-    LOG.warn('The query results contain %d columns and may take an extremely long time to download, will reduce fetch size to 100.' % num_cols)
-    fetch_size = 100
-  else:
-    fetch_size = FETCH_SIZE
+  def __iter__(self):
+    return self
 
-  row_ctr = 1
-  limit_cells = max_cells > -1
+  def next(self):
+    results = self.db.fetch(self.handle, start_over=self.start_over, rows=self.fetch_size)
 
-  while results is not None:
-    data = []
-    for row in results.rows():
-      row_ctr += 1
-      if limit_cells and (row_ctr * num_cols) > max_cells:
-        LOG.warn('The query results exceeded the maximum cell limit of %d. Data has been truncated to first %d rows.' % (max_cells, row_ctr))
-        break
-      data.append(row)
+    if self.first_fetched:
+      self.headers = results.cols()
+      self.num_cols = len(self.headers)
 
-    yield headers, data
+      # For result sets with high num of columns, fetch in smaller batches to avoid serialization cost
+      if self.num_cols > 100:
+        LOG.warn('The query results contain %d columns and may take an extremely long time to download, will reduce fetch size to 100.' % self.num_cols)
+        self.fetch_size = 100
 
-    if limit_cells and (row_ctr * num_cols) > max_cells:
-      break
+    if not self.is_truncated and (self.first_fetched or results.has_more):
+      self.first_fetched = False
+      self.start_over = False
+      data = []
 
-    if results.has_more:
-      results = db.fetch(handle, start_over=False, rows=fetch_size)
+      for row in results.rows():
+        self.row_counter += 1
+        if self.limit_cells and (self.row_counter * self.num_cols) > self.max_cells:
+          LOG.warn('The query results exceeded the maximum cell limit of %d. Data has been truncated to first %d rows.' % (self.max_cells, self.row_counter))
+          self.is_truncated = True
+          break
+        data.append(row)
+
+      return self.headers, data
     else:
-      results = None
+      raise StopIteration

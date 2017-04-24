@@ -830,7 +830,7 @@ for x in sys.stdin:
     assert_equal(sheet_data, csv_data)
 
     # Test max cell limit truncation
-    finish = conf.DOWNLOAD_CELL_LIMIT.set_for_testing(num_cols*5)
+    finish = conf.DOWNLOAD_CELL_LIMIT.set_for_testing(num_cols * 5)
     try:
       hql = 'SELECT * FROM `%(db)s`.`test`' % {'db': self.db_name}
       query = hql_query(hql)

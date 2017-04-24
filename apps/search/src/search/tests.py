@@ -502,7 +502,7 @@ class TestWithMockedSolr(TestSearchBase):
         'collection': json.dumps(self._get_collection_param(self.collection)),
         'query': json.dumps(QUERY)
     })
-    xls_response_content = ''.join(xls_response.streaming_content)
+    xls_response_content = ''.join(xls_response.content)
     assert_not_equal(0, len(xls_response_content))
     assert_equal('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', xls_response['Content-Type'])
     assert_equal('attachment; filename=query_result.xlsx', xls_response['Content-Disposition'])

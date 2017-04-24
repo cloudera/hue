@@ -58,7 +58,7 @@ def test_export_xls():
 
 
 def _read_xls_sheet_data(response):
-  content = ''.join(response.streaming_content)
+  content = ''.join(response.content)
 
   data = StringIO.StringIO()
   data.write(content)
