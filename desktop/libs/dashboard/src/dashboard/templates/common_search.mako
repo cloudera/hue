@@ -1143,7 +1143,7 @@ ${ dashboard.layout_skeleton() }
       </a>
     </div>
     <div class="document-details pull-left">
-      <table>
+      <table class="table table-condensed">
         <tbody data-bind="foreach: details">
           <tr data-bind="css: {'readonly': ! $parent.showEdit()}">
              <th class="grid-th" data-bind="text: key"></th>
