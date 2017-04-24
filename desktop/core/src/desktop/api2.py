@@ -438,7 +438,27 @@ def import_documents(request):
 
   stdout = StringIO.StringIO()
   try:
-    management.call_command('loaddata', f.name, stdout=stdout)
+    management.call_command('loaddata', f.name, verbosity=2, traceback=True, stdout=stdout)
+    Document.objects.sync()
+
+    if request.POST.get('redirect'):
+      return redirect(request.POST.get('redirect'))
+    else:
+      return JsonResponse({
+        'status': 0,
+        'message': stdout.getvalue(),
+        'count': len(documents),
+        'created_count': len([doc for doc in documents if doc['pk'] is None]),
+        'updated_count': len([doc for doc in documents if doc['pk'] is not None]),
+        'username': request.user.username,
+        'documents': [
+          dict([
+            ('name', doc['fields']['name']),
+            ('uuid', doc['fields']['uuid']),
+            ('type', doc['fields']['type']),
+            ('owner', doc['fields']['owner'][0])
+          ]) for doc in docs]
+      })
   except Exception, e:
     return JsonResponse({'message': smart_str(e)})
 

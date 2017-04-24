@@ -885,6 +885,19 @@ class TestDocument2ImportExport(object):
 
     assert_true('message' in data, data)
     assert_true('Installed 1 object' in data['message'], data)
+    assert_true('count' in data)
+    assert_equal(1, data['count'])
+    assert_true('created_count' in data)
+    assert_equal(0, data['created_count'])
+    assert_true('updated_count' in data)
+    assert_equal(1, data['updated_count'])
+    assert_true('documents' in data)
+    assert_true('name' in data['documents'][0])
+    assert_equal('query.sql', data['documents'][0]['name'])
+    assert_true('type' in data['documents'][0])
+    assert_equal('query-hive', data['documents'][0]['type'])
+    assert_true('owner' in data['documents'][0])
+    assert_equal('perm_user', data['documents'][0]['owner'])
 
     assert_equal(1, Document2.objects.filter(name='query.sql').count())
     imported_doc = Document2.objects.get(name='query.sql')
@@ -902,6 +915,7 @@ class TestDocument2ImportExport(object):
     assert_equal(owned_query.uuid, imported_doc.uuid)
     assert_equal(owned_query.owner, imported_doc.owner)
     assert_equal(owned_query.parent_directory, imported_doc.parent_directory)
+
 
   def test_import_nonowned_document(self):
     owned_query = Document2.objects.create(
@@ -931,6 +945,7 @@ class TestDocument2ImportExport(object):
     assert_equal(1, data['created_count'])
     assert_true('updated_count' in data)
     assert_equal(0, data['updated_count'])
+
 
   def test_import_with_history_dependencies(self):
     query1 = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={},
