@@ -112,7 +112,7 @@ ${ hueIcons.symbols() }
         </a>
 
 
-        <div class="btn-group" data-bind="visible: true" style="display:none;">
+        <div class="btn-group" data-bind="visible: true" style="display:none; margin-top: 8px">
           <!-- ko if: mainQuickCreateAction -->
           <!-- ko with: mainQuickCreateAction -->
           <button class="btn btn-primary disable-feedback hue-main-create-btn" data-bind="hueLink: url, attr: {title: tooltip}">
