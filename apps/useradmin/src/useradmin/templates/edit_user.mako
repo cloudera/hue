@@ -14,8 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
+
+from desktop.views import commonheader, commonfooter
+
 from useradmin.password_policy import is_password_policy_enabled, get_password_hint
 from useradmin.views import is_user_locked_out
 %>
@@ -35,6 +37,7 @@ ${ layout.menubar(section='users') }
     % endif
 
     <br/>
+
     <form id="editForm" method="POST" class="form form-horizontal" autocomplete="off">
     ${ csrf_token(request) | n,unicode }
     <div id="properties" class="section">
@@ -96,10 +99,10 @@ ${ layout.menubar(section='users') }
         </div>
       % endif
       </div>
+
       <div class="form-actions">
         <a class="backBtn btn disabled">${ _('Back') }</a>
         <a class="nextBtn btn btn-primary disable-feedback">${ _('Next') }</a>
-
       % if username:
         <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
       % else:

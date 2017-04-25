@@ -249,6 +249,7 @@ def edit_user(request, username=None):
 
   userprofile = get_profile(request.user)
   updated = False
+  is_embeddable = request.GET.get('is_embeddable', False)
 
   if username is not None:
     instance = User.objects.get(username=username)
@@ -365,13 +366,13 @@ def edit_user(request, username=None):
     return render('change_password.mako', request, {
       'form': form,
       'username': username,
-      'is_embeddable': request.GET.get('is_embeddable', False),
+      'is_embeddable': is_embeddable
     })
   else:
     return render('edit_user.mako', request, {
       'form': form,
       'username': username,
-      'is_embeddable': request.GET.get('is_embeddable', False),
+      'is_embeddable': is_embeddable
     })
 
 
@@ -409,11 +410,12 @@ def edit_group(request, name=None):
   else:
     instance = None
 
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
   if request.method == 'POST':
     form = GroupEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.info(_('Group information updated'))
 
       # Audit log
       if name is not None:
@@ -430,7 +432,11 @@ def edit_group(request, name=None):
           'operationText': 'Created Group: %s, with member(s): %s' % (request.POST.get('name', ''), ', '.join(usernames))
         }
 
-      return redirect(reverse(list_groups))
+      if is_embeddable:
+        return redirect('/hue/useradmin/groups')
+      else:
+        request.info(_('Group information updated'))
+        return redirect('/useradmin/groups')
   else:
     form = GroupEditForm(instance=instance)
 
@@ -438,7 +444,7 @@ def edit_group(request, name=None):
     'form': form,
     'action': request.path,
     'name': name,
-    'is_embeddable': request.GET.get('is_embeddable', False),
+    'is_embeddable': is_embeddable,
   })
 
 
@@ -464,18 +470,22 @@ def edit_permission(request, app=None, priv=None):
     raise PopupException(_("You must be a superuser to change permissions."), error_code=401)
 
   instance = HuePermission.objects.get(app=app, action=priv)
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if request.method == 'POST':
     form = PermissionsEditForm(request.POST, instance=instance)
     if form.is_valid():
       form.save()
-      request.info(_('Permission information updated'))
       request.audit = {
         'operation': 'EDIT_PERMISSION',
         'operationText': 'Successfully edited permissions: %(app)s/%(priv)s' % {'app': app, 'priv': priv}
       }
 
-      return redirect(reverse(list_permissions))
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_permissions)})
+      else:
+        request.info(_('Permission information updated'))
+        return redirect(reverse(list_permissions))
   else:
     form = PermissionsEditForm(instance=instance)
 
@@ -484,7 +494,7 @@ def edit_permission(request, app=None, priv=None):
     'action': request.path,
     'app': app,
     'priv': priv,
-    'is_embeddable': request.GET.get('is_embeddable', False),
+    'is_embeddable': is_embeddable,
   })
 
 
