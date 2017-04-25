@@ -187,9 +187,9 @@ PARTITIONED BY (
     resp = self.api.query_risk(query=query, source_platform='hive', db_name='default')
 
     assert_true(len(resp) > 0, resp)
-    assert_true('riskAnalysis' in resp[0], resp)
-    assert_true('risk' in resp[0], resp)
-    assert_true('riskRecommendation' in resp[0], resp)
+    assert_true('riskAnalysis' in resp['hints'][0], resp)
+    assert_true('risk' in resp['hints'][0], resp)
+    assert_true('riskRecommendation' in resp['hints'][0], resp)
 
 
   def test_query_compatibility(self):
@@ -206,13 +206,13 @@ PARTITIONED BY (
 
 
   def test_top_filters(self):  # Requires test_upload to run before
-    resp = self.api.top_filters(db_tables='db1.Part')
+    resp = self.api.top_filters(db_tables=['db1.Part'])
 
     assert_true(len(resp['results']) > 0, resp)
 
 
   def test_top_joins(self):
-    resp = self.api.top_joins(db_tables='db1.Part')
+    resp = self.api.top_joins(db_tables=['db1.Part'])
 
     assert_true(len(resp['results']) > 0, resp)
 
@@ -225,7 +225,7 @@ PARTITIONED BY (
 
 
   def test_top_aggs(self):
-    resp = self.api.top_aggs(db_tables='db1.Part')
+    resp = self.api.top_aggs(db_tables=['db1.Part'])
 
     assert_true(len(resp['results']) > 0, resp)
 
@@ -238,7 +238,7 @@ PARTITIONED BY (
 
 
   def test_top_columns(self):
-    resp = self.api.top_columns(db_tables='db1.Part')
+    resp = self.api.top_columns(db_tables=['db1.Part'])
 
     assert_true('orderbyColumns' in resp, resp)
     assert_true('selectColumns' in resp, resp)
@@ -405,7 +405,6 @@ WHERE
  AND s07.salary > 100000 )
 ORDER BY s07.salary DESC
 LIMIT 1000
-
 '''
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
@@ -453,6 +452,17 @@ LIMIT 1000
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'], present=False)
+
+
+  def test_risk_listing_all_risk_tables_all_the_time(self):
+    source_platform = 'hive'
+    query = '''SELECT * FROM web_logs JOIN a ON web_logs.id = a.id LIMIT 100'''
+    db_name = 'default'
+
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
+    _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
+
+    assert_true('default.web_logs' in [suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'])
 
 
 def _assert_risks(risks, suggestions, present=True):
