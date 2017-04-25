@@ -23,6 +23,7 @@ from django.utils.translation import ugettext as _
 from liboozie.oozie_api import get_oozie
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
+from jobbrowser.apis.workflow_api import _manage_oozie_job
 from liboozie.utils import format_time
 
 
@@ -78,6 +79,11 @@ class BundleApi(Api):
     common['properties']['properties'] = ''
 
     return common
+
+
+  def action(self, app_ids, action):
+    return _manage_oozie_job(self.user, action, app_ids)
+
 
   def logs(self, appid, app_type, log_name=None):
     request = MockDjangoRequest(self.user)
