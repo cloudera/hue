@@ -147,11 +147,6 @@ from django.utils.translation import ugettext as _
 <div class="footer"></div>
 
 <div class="navigator">
-  <div class="pull-right">
-    <ul class="nav nav-pills">
-      <li id="jHueTourFlagPlaceholder"></li>
-    </ul>
-  </div>
   <a class="brand nav-tooltip pull-left" href="#">
     <img src="${ static('desktop/art/hue-logo-mini-white.png') }" alt="${ _('Hue logo') }"
        data-orig="${ static('desktop/art/hue-logo-mini-white.png') }"

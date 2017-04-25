@@ -36,13 +36,10 @@ def admin_wizard(request):
     apps = []
   app_names = [app.name for app in sorted(apps, key=lambda app: app.menu_index)]
 
-  tours_and_tutorials = Settings.get_settings().tours_and_tutorials
-
   return render('admin_wizard.mako', request, {
       'version': hue_version(),
       'apps': dict([(app.name, app) for app in apps]),
       'app_names': app_names,
-      'tours_and_tutorials': tours_and_tutorials,
       'is_embeddable': request.GET.get('is_embeddable', False),
       'collect_usage': collect_usage(),
   })
@@ -54,11 +51,9 @@ def update_preferences(request):
   if request.method == 'POST':
     try:
       settings = Settings.get_settings()
-      settings.tours_and_tutorials = request.POST.get('tours_and_tutorials', False)
       settings.collect_usage = request.POST.get('collect_usage', False)
       settings.save()
       response['status'] = 0
-      response['tours_and_tutorials'] = settings.tours_and_tutorials
       response['collect_usage'] = settings.collect_usage
     except Exception, e:
       response['data'] = str(e)

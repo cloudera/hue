@@ -47,6 +47,7 @@
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-tour.min.css') }" rel="stylesheet">
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
@@ -349,6 +350,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+<script src="${ static('desktop/ext/js/bootstrap-tour.min.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
@@ -391,7 +393,6 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/sqlUtils.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
 <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
-<script src="${ static('desktop/js/jquery.tour.js') }"></script>
 <script src="${ static('desktop/js/jquery.huedatatable.js') }"></script>
 <script src="${ static('desktop/js/sqlFunctions.js') }"></script>
 <script src="${ static('desktop/ext/js/selectize.min.js') }"></script>

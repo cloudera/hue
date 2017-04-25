@@ -155,19 +155,6 @@ ${ layout.menubar(section='quick_start') }
             </div>
 
             <div class="card card-home card-tab card-tab-bordertop card-listcontent margin-top-30">
-              <h2 class="card-heading simple">${ _('Tours and tutorials') }</h2>
-
-              <div class="card-body" style="margin-top: 10px">
-                <label class="checkbox">
-                  <input class="updatePreferences" type="checkbox" name="tours_and_tutorials"
-                         style="margin-right: 10px"
-                         title="${ _('Check to enable the tours and tutorials') }" ${ tours_and_tutorials and 'checked' or '' }/>
-                  ${ _('Display the "Available Tours" question mark when tours are available for a specific page.') }
-                </label>
-              </div>
-            </div>
-
-            <div class="card card-home card-tab card-tab-bordertop card-listcontent margin-top-30">
               <h2 class="card-heading simple">${ _('Anonymous usage analytics') }</h2>
 
               <div class="card-body" style="margin-top: 10px">

@@ -55,19 +55,19 @@ class TestAboutWithNoCluster(TestAboutBase):
     self.client_admin.get(reverse('about:index'), HTTP_ACCEPT_LANGUAGE='fr-fr')
 
   def test_collect_usage(self):
-    tours_and_tutorials = Settings.get_settings().tours_and_tutorials
+    collect_usage = Settings.get_settings().collect_usage
 
     try:
-      response = self.client.post(reverse('about:update_preferences'), {'tours_and_tutorials': False})
+      response = self.client.post(reverse('about:update_preferences'), {'collect_usage': False})
       data = json.loads(response.content)
       assert_equal(data['status'], 0)
-      assert_false(data['tours_and_tutorials'] == True) # Weird but works
+      assert_false(data['collect_usage'] == True) # Weird but works
 
-      response = self.client.post(reverse('about:update_preferences'), {'tours_and_tutorials': True})
+      response = self.client.post(reverse('about:update_preferences'), {'collect_usage': True})
       data = json.loads(response.content)
       assert_equal(data['status'], 0)
-      assert_true(data['tours_and_tutorials'])
+      assert_true(data['collect_usage'])
     finally:
       settings = Settings.get_settings()
-      settings.tours_and_tutorials = tours_and_tutorials
+      settings.collect_usage = collect_usage
       settings.save()

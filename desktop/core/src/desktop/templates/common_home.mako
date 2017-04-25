@@ -123,85 +123,9 @@
 
       ko.applyBindings(viewModel, $('#homeComponents')[0]);
 
-      huePubSub.publish('init.tour');
-
     });
   })();
 
-  huePubSub.subscribe('init.tour', function(){
-    if ($.totalStorage("jHueTourHideModal") == null || $.totalStorage("jHueTourHideModal") == false) {
-      $("#jHueTourModal").modal();
-      $.totalStorage("jHueTourHideModal", true);
-      $("#jHueTourModalChk").attr("checked", "checked");
-      $("#jHueTourModalChk").on("change", function () {
-        $.totalStorage("jHueTourHideModal", $(this).is(":checked"));
-      });
-      $("#jHueTourModalClose").on("click", function () {
-        $("#jHueTourFlag").click();
-        $("#jHueTourModal").modal("hide");
-      });
-    }
-  });
 </script>
 </%def>
 
-<%def name="tour()">
-<div id="jHueTourModal" class="modal hide fade" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Did you know?')}</h2>
-  </div>
-  <div class="modal-body">
-    <ul class="nav nav-tabs" style="margin-bottom: 0">
-      <li class="active"><a href="#tourStep1" data-toggle="tab">${ _('Step 1:') } ${ _('Add data') }</a></li>
-      <li><a href="#tourStep2" data-toggle="tab">${ _('Step 2:') }  ${ _('Query data') }</a></li>
-      <li><a href="#tourStep3" data-toggle="tab">${ _('Step 3:') } ${_('Do more!') }</a></li>
-    </ul>
-
-    <div class="tab-content">
-      <div id="tourStep1" class="tab-pane active">
-        <div class="pull-left step-icon"><i class="fa fa-download"></i></div>
-        <div style="margin: 40px">
-          <p>
-            ${ _('With') }  <span class="badge badge-info"><i class="fa fa-file"></i> File Browser</span>
-            ${ _('and the apps in the') }  <span class="badge badge-info">Data Browsers <b class="caret"></b></span> ${ _('section, upload, view your data and create tables.') }
-          </p>
-          <p>
-            ${ _('Pre-installed samples are also already there.') }
-          </p>
-        </div>
-      </div>
-
-      <div id="tourStep2" class="tab-pane">
-          <div class="pull-left step-icon"><i class="fa fa-search"></i></div>
-          <div style="margin: 40px">
-            <p>
-              ${ _('Then query and visualize the data with the') } <span class="badge badge-info">Query Editors <b class="caret"></b></span>
-               ${ _('and') }  <span class="badge badge-info">Search <b class="caret"></b></span>
-            </p>
-          </div>
-      </div>
-
-      <div id="tourStep3" class="tab-pane">
-        <div class="pull-left step-icon"><i class="fa fa-flag-checkered"></i></div>
-        <div style="margin: 40px">
-          % if tours_and_tutorials:
-          <p>
-            ${ _('Tours were created to guide you around.') }
-            ${ _('You can see the list of tours by clicking on the checkered flag icon') } <span class="badge badge-info"><i class="fa fa-flag-checkered"></i></span>
-            ${ ('at the top right of this page.') }
-          </p>
-          % endif
-          <p>
-            ${ _('Additional documentation is available at') } <a href="http://learn.gethue.com">learn.gethue.com</a>.
-          </p>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <label class="checkbox" style="float:left"><input id="jHueTourModalChk" type="checkbox" />${_('Do not show this dialog again')}</label>
-    <a id="jHueTourModalClose" href="#" class="btn btn-primary disable-feedback">${_('Got it!')}</a>
-  </div>
-</div>
-</%def>

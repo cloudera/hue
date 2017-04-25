@@ -61,6 +61,7 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
+  <link href="${ static('desktop/ext/css/bootstrap-tour.min.css') }" rel="stylesheet">
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue3.css') }" rel="stylesheet">
@@ -131,7 +132,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/js/jquery.tableextender2.js') }"></script>
   <script src="${ static('desktop/js/jquery.scrollleft.js') }"></script>
   <script src="${ static('desktop/js/jquery.scrollup.js') }"></script>
-  <script src="${ static('desktop/js/jquery.tour.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
@@ -142,6 +142,7 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v4.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
+  <script src="${ static('desktop/ext/js/bootstrap-tour.min.js') }"></script>
   <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/js/hue.colors.js') }"></script>
@@ -289,12 +290,7 @@ ${ hueIcons.symbols() }
     % if 'help' in apps:
     <li><a title="${_('Documentation')}" data-rel="navigator-tooltip" href="/help"><i class="fa fa-question-circle"></i></a></li>
     % endif
-    <li id="jHueTourFlagPlaceholder"></li>
     <li><a title="${_('Sign out')}" data-rel="navigator-tooltip" href="/accounts/logout/"><i class="fa fa-sign-out"></i></a></li>
-  </ul>
-  % else:
-  <ul class="nav nav-pills" style="margin-right: 40px">
-    <li id="jHueTourFlagPlaceholder"></li>
   </ul>
   % endif
 

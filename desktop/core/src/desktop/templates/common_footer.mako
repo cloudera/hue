@@ -31,9 +31,5 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
 ${ commonHeaderFooterComponents.footer(messages) }
 
-% if tours_and_tutorials:
-  <%include file="tours.mako"/>
-% endif
-
   </body>
 </html>

@@ -72,7 +72,6 @@ def hue(request):
 
   return render('hue.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
     'interpreters': get_ordered_interpreters(request.user),
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
@@ -90,7 +89,6 @@ def ko_editor(request):
 
   return render('ko_editor.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
 def ko_metastore(request):
@@ -98,7 +96,6 @@ def ko_metastore(request):
 
   return render('ko_metastore.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
 def home(request):
@@ -110,7 +107,6 @@ def home(request):
     'apps': apps,
     'json_documents': json.dumps(massaged_documents_for_json(docs, request.user)),
     'json_tags': json.dumps(massaged_tags_for_json(docs, request.user)),
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials
   })
 
 
@@ -119,7 +115,6 @@ def home2(request, is_embeddable=False):
 
   return render('home2.mako', request, {
     'apps': apps,
-    'tours_and_tutorials': Settings.get_settings().tours_and_tutorials,
     'is_embeddable': request.GET.get('is_embeddable', False)
   })
 
@@ -481,7 +476,6 @@ def commonfooter(request, messages=None, is_mobile=False):
     'messages': messages,
     'version': hue_version(),
     'collect_usage': collect_usage(),
-    'tours_and_tutorials': hue_settings.tours_and_tutorials
   })
 
 
