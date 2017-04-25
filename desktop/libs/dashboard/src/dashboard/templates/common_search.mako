@@ -87,9 +87,16 @@ from desktop.views import commonheader, commonfooter, _ko
     <a class="btn" href="javascript:void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: newSearch">
       <i class="fa fa-file-o"></i>
     </a>
+    <!-- ko if: IS_HUE_4 -->
+    <a class="btn" href="/home?type=dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+      <i class="fa fa-tags"></i>
+    </a>
+    <!-- /ko -->
+    <!-- ko ifnot: IS_HUE_4 -->
     <a class="btn" href="${ url('dashboard:admin_collections') }" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i>
     </a>
+    <!-- /ko -->
   </div>
 
   <form data-bind="visible: $root.isEditing() && columns().length == 0">
