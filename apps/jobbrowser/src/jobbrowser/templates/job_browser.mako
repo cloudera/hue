@@ -235,6 +235,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </div>
 </div>
 </div>
+
+<!-- ko if: $root.job() -->
+  <div id="rerun-modal" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
+<!-- /ko -->
+
 </div>
 
 
@@ -260,6 +265,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <h3>
     <ul class="inline hue-breadcrumbs-bar" data-bind="foreach: breadcrumbs">
       <li>
+      <!-- ko if: $index() > 1 -->
+        <span class="divider">&gt;</span>
+      <!-- /ko -->
+
       <!-- ko if: $index() != 0 -->
         <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
           <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
@@ -1033,6 +1042,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.fetchProfile('tasks');
       });
 
+      self.rerunModalContent = ko.observable('');
+
       self.hasKill = ko.pureComputed(function() {
         return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
@@ -1213,10 +1224,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.control = function (action) {
-        vm.jobs._control([self.id()], action, function(data) {
-            $(document).trigger("info", data.message);
-            self.fetchStatus();
-        });
+        if (action == 'rerun') {
+          $.get('/oozie/rerun_oozie_job/' + self.id() + '/?format=json', function(response) {
+            $('#rerun-modal').modal('show');
+            self.rerunModalContent(response);
+          });
+        } else {
+          vm.jobs._control([self.id()], action, function(data) {
+              $(document).trigger("info", data.message);
+              self.fetchStatus();
+          });
+        }
       }
 
       self.updateWorkflowGraph = function() {
@@ -1295,7 +1313,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasRerun = ko.pureComputed(function() {
-        return ['workflows'].indexOf(vm.interface()) != -1 || self.isCoordinator();
+        return self.isCoordinator();
       });
       self.rerunEnabled = ko.pureComputed(function() {
         return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1677,6 +1695,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       huePubSub.publish('cluster.config.get.config');
+
+      huePubSub.subscribe('submit.rerun.popup.return', function (data) {
+        $.jHueNotify.info('${_('Rerun submitted.')}');
+        $('#rerun-modal').modal('hide');
+        viewModel.job().apiStatus('RUNNING');
+        viewModel.job().updateJob();
+      }, 'jobbrowser');
     });
   })();
 </script>
