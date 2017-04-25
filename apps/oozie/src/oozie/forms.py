@@ -479,13 +479,18 @@ class RerunCoordForm(forms.Form):
   refresh = forms.BooleanField(initial=True, required=False, help_text=_t("Used to indicate if user wants to refresh an action's input and output events"))
   nocleanup = forms.BooleanField(initial=True, required=False, help_text=_t('Used to indicate if user wants to cleanup output events for given rerun actions'))
   actions = forms.MultipleChoiceField(required=True)
+  return_json = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
   def __init__(self, *args, **kwargs):
     oozie_coordinator = kwargs.pop('oozie_coordinator')
+    return_json = kwargs.pop('return_json', None)
 
     super(RerunCoordForm, self).__init__(*args, **kwargs)
 
     self.fields['actions'].choices = [(action.actionNumber, action.title) for action in reversed(oozie_coordinator.get_working_actions())]
+
+    if return_json is not None:
+      self.fields['return_json'].initial = return_json
 
 
 class RerunBundleForm(forms.Form):

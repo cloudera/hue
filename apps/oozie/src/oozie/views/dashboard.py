@@ -744,7 +744,8 @@ def rerun_oozie_job(request, job_id, app_path=None):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   oozie_workflow = check_job_access_permission(request, job_id)
   check_job_edition_permission(oozie_workflow, request.user)
-  app_path = oozie_workflow.appPath
+  if app_path is None:
+    app_path = oozie_workflow.appPath
   return_json = request.GET.get('format') == 'json'
 
   if request.method == 'POST':
@@ -776,7 +777,7 @@ def rerun_oozie_job(request, job_id, app_path=None):
     initial_params = ParameterForm.get_initial_params(oozie_workflow.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
-  popup = render('dashboard/rerun_job_popup.mako', request, {
+  popup = render('dashboard/rerun_workflow_popup.mako', request, {
                    'rerun_form': rerun_form,
                    'params_form': params_form,
                    'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': app_path}),
@@ -799,10 +800,13 @@ def _rerun_workflow(request, oozie_id, run_args, mapping):
 
 
 @show_oozie_error
-def rerun_oozie_coordinator(request, job_id, app_path):
+def rerun_oozie_coordinator(request, job_id, app_path=None):
   oozie_coordinator = check_job_access_permission(request, job_id)
   check_job_edition_permission(oozie_coordinator, request.user)
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
+  if app_path is None:
+    app_path = oozie_coordinator.coordJobPath
+  return_json = request.GET.get('format') == 'json'
 
   if request.method == 'POST':
     params_form = ParametersFormSet(request.POST)
@@ -823,13 +827,16 @@ def rerun_oozie_coordinator(request, job_id, app_path):
 
       _rerun_coordinator(request, job_id, args, params, properties)
 
-      request.info(_('Coordinator re-running.'))
-      return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
+      if rerun_form.cleaned_data['return_json']:
+        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+      else:
+        request.info(_('Coordinator re-running.'))
+        return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s') % smart_unicode(rerun_form.errors))
       return list_oozie_coordinator(request, job_id)
   else:
-    rerun_form = RerunCoordForm(oozie_coordinator=oozie_coordinator)
+    rerun_form = RerunCoordForm(oozie_coordinator=oozie_coordinator, return_json=return_json)
     initial_params = ParameterForm.get_initial_params(oozie_coordinator.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
@@ -837,6 +844,7 @@ def rerun_oozie_coordinator(request, job_id, app_path):
                    'rerun_form': rerun_form,
                    'params_form': params_form,
                    'action': reverse('oozie:rerun_oozie_coord', kwargs={'job_id': job_id, 'app_path': app_path}),
+                   'return_json': return_json,
                  }, force_template=True).content
 
   return JsonResponse(popup, safe=False)

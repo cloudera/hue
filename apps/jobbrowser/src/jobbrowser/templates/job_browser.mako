@@ -237,7 +237,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 <!-- ko if: $root.job() -->
-  <div id="rerun-modal" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
+  <div id="rerun-modal" class="modal" data-bind="html: $root.job().rerunModalContent"></div>
 <!-- /ko -->
 
 </div>
@@ -989,7 +989,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.properties = ko.mapping.fromJS(job.properties || {});
       self.mainType = ko.observable(vm.interface());
 
-      self.coordinatorActions = ko.computed(function() {
+      self.coordinatorActions = ko.pureComputed(function() {
         if (self.mainType() == 'schedules' && self.properties['tasks']) {
           var apps = [];
           self.properties['tasks']().forEach(function (instance) {
@@ -1168,9 +1168,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
-            // vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
-            vm.job().fetchStatus();
-            vm.job().fetchLogs();
+            if (vm.job().type() == 'schedule') {
+              vm.job(new Job(vm, data.app)); // Updates everything but redraw the page
+            } else {
+              vm.job().fetchStatus();
+              vm.job().fetchLogs();
+            }
             // vm.job().fetchProfile(); // Get name of active tab?
             // updateWorkflowGraph() // If workflow
           });
@@ -1316,7 +1319,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return self.isCoordinator();
       });
       self.rerunEnabled = ko.pureComputed(function() {
-        return self.hasRerun() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
+        return self.hasRerun() && self.selectedJobs().length == 1 && $.grep(self.selectedJobs(), function(job) {
           return job.rerunEnabled();
         }).length == self.selectedJobs().length;
       });
@@ -1481,16 +1484,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       };
 
       self.control = function (action) {
-        self._control(
-          $.map(self.selectedJobs(), function(job) {
-            return job.id();
-          }),
-          action,
-          function(data) {
-            $(document).trigger("info", data.message);
-            self.updateJobs();
-          }
-        )
+        if (action == 'rerun') {
+          $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json', function(response) {
+            $('#rerun-modal').modal('show');
+            vm.job().rerunModalContent(response);
+
+            var frag = document.createDocumentFragment();
+            vm.job().coordinatorActions().selectedJobs().forEach(function (item) {
+              var option = $('<option>', {
+                value: item.properties.number(),
+                selected: true
+              });
+              option.appendTo($(frag));
+            });
+            $('#id_actions').find('option').remove();
+            $(frag).appendTo('#id_actions');
+          });
+        } else {
+          self._control(
+            $.map(self.selectedJobs(), function(job) {
+              return job.id();
+            }),
+            action,
+            function(data) {
+              $(document).trigger("info", data.message);
+              self.updateJobs();
+            }
+          )
+        }
       }
 
       self._control = function (app_ids, action, callback) {
@@ -1696,12 +1717,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       huePubSub.publish('cluster.config.get.config');
 
+      % if not is_mini:
       huePubSub.subscribe('submit.rerun.popup.return', function (data) {
         $.jHueNotify.info('${_('Rerun submitted.')}');
         $('#rerun-modal').modal('hide');
         viewModel.job().apiStatus('RUNNING');
         viewModel.job().updateJob();
       }, 'jobbrowser');
+      % endif
     });
   })();
 </script>
