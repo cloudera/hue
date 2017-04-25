@@ -659,10 +659,10 @@ var ApiHelper = (function () {
       return;
     }
 
-    $.ajax({
+    var parameters = {
       url: DOCUMENTS_API,
       data: {
-        uuid: options.uuid
+        uuid: options.uuid,
       },
       success: function (data) {
         if (! self.successResponseIsError(data)) {
@@ -671,8 +671,14 @@ var ApiHelper = (function () {
           promise.reject(data);
         }
       }
-    })
-    .fail(promise.reject);
+    };
+
+    if (window.location.getParameter('type') !== '') {
+      parameters['data']['type'] = ['directory', window.location.getParameter('type')];
+      parameters['traditional'] = true;
+    }
+
+    $.ajax(parameters).fail(promise.reject);
   };
 
   /**
