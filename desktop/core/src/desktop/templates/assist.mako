@@ -241,20 +241,20 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-header assist-breadcrumb">
       <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length === 1 -->
       <i class="fa fa-server assist-breadcrumb-text"></i>
-      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+      <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
       <!-- /ko -->
       <!-- ko if: selectedSource()  && ! selectedSource().selectedDatabase() && sources().length > 1 -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back"></i>
         <i class="fa fa-server assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: selectedSource()  && selectedSource().selectedDatabase() -->
       <a data-bind="click: back">
         <i class="fa fa-chevron-left assist-breadcrumb-back" ></i>
         <i class="fa fa-database assist-breadcrumb-text"></i>
-        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb"></span>
+        <span class="assist-breadcrumb-text" data-bind="text: breadcrumb, attr: {'title': breadcrumb }"></span>
       </a>
       <!-- /ko -->
     </div>
@@ -297,7 +297,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: path"></span>
+        <span data-bind="text: path, attr: {'title': path }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -361,7 +361,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectGitEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: path"></span>
+        <span data-bind="text: path, attr: {'title': path }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -434,7 +434,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: path"></span>
+        <span data-bind="text: path, attr: {'title': path }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -509,7 +509,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: definition().name"></span>
+        <span data-bind="text: definition().name, attr: {'title': definition().name }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: isRoot -->
