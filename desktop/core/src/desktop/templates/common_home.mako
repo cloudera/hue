@@ -112,17 +112,17 @@
       loadUrlParam();
 
       viewModel.activeEntry.subscribe(function (newEntry) {
+        var filterType = window.location.getParameter('type') != '' ? '&type=' + window.location.getParameter('type') : '';
         if (typeof newEntry !== 'undefined' && newEntry.definition().uuid && ! newEntry.isRoot()) {
           if (window.location.getParameter('uuid') == '' || window.location.getParameter('uuid') !== newEntry.definition().uuid){
-            hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/?uuid=' + newEntry.definition().uuid);
+            hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/?uuid=' + newEntry.definition().uuid + filterType);
           }
         } else if (typeof newEntry === 'undefined' || newEntry.isRoot()) {
-          hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/');
+          hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/' + (filterType ? '?' + filterType : ''));
         }
       });
 
       ko.applyBindings(viewModel, $('#homeComponents')[0]);
-
     });
   })();
 

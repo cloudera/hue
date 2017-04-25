@@ -88,7 +88,7 @@ from desktop.views import commonheader, commonfooter, _ko
       <i class="fa fa-file-o"></i>
     </a>
     <!-- ko if: IS_HUE_4 -->
-    <a class="btn" href="/home?type=dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+    <a class="btn" href="/home?type=search-dashboard" title="${ _('Dashboards') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
       <i class="fa fa-tags"></i>
     </a>
     <!-- /ko -->
