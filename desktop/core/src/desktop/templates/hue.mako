@@ -713,6 +713,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/dashboard/*', app: 'dashboard' },
           { url: '/desktop/dump_config', app: 'dump_config' },
+          { url: '/desktop/download_logs', app: function () {
+            location.href = '/desktop/download_logs';
+          }},
           { url: '/editor', app: function () {
             // Defer to allow window.location param update
             _.defer(function () {
