@@ -813,7 +813,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/security/solr', app: 'security_solr' },
           { url: '/sqoop', app: 'sqoop' },
           { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
-          { url: '/useradmin/groups', app: 'useradmin_groups' },
           { url: '/useradmin/groups/', app: 'useradmin_groups' },
           { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
           { url: '/useradmin/groups/edit/:group', app: 'useradmin_editgroup' },
