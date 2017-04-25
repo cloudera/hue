@@ -110,17 +110,7 @@ class WorkflowApi(Api):
 
 
   def action(self, app_ids, action):
-    if action == 'change' or action == 'ignore' or len(app_ids) == 1:
-      request = MockDjangoRequest(self.user)
-      response = manage_oozie_jobs(request, app_ids[0], action['action'])
-    else:
-      request = MockDjangoRequest(self.user, post={'job_ids': ' '.join(app_ids), 'action': action['action']})
-      response = bulk_manage_oozie_jobs(request)
-
-    result = json.loads(response.content)
-    result['status'] = result.get('totalErrors', 0)
-    result['message'] = _('%s action sent to %s jobs') % (action['action'], result.get('totalRequests', 1))
-    return result
+    return _manage_oozie_job(self.user, action, app_ids)
 
 
   def logs(self, appid, app_type, log_name=None):
@@ -183,3 +173,17 @@ class WorkflowActionApi(Api):
 
   def logs(self, appid, app_type, log_name=None):
     return {'progress': 0, 'logs': ''}
+
+
+def _manage_oozie_job(user, action, app_ids):
+  if action == 'change' or action == 'ignore' or len(app_ids) == 1:
+    request = MockDjangoRequest(user)
+    response = manage_oozie_jobs(request, app_ids[0], action['action'])
+  else:
+    request = MockDjangoRequest(user, post={'job_ids': ' '.join(app_ids), 'action': action['action']})
+    response = bulk_manage_oozie_jobs(request)
+
+  result = json.loads(response.content)
+  result['status'] = result.get('totalErrors', 0)
+  result['message'] = _('%s action sent to %s jobs') % (action['action'], result.get('totalRequests', 1))
+  return result
