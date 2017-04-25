@@ -246,7 +246,6 @@ ${ common_home.navbar() }
 %endif
 
 ${ common_home.vm(is_embeddable) }
-${ common_home.tour() }
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }

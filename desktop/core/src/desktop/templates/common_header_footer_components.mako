@@ -101,15 +101,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
       }
     };
 
-    jHueTourGlobals = {
-      labels: {
-        AVAILABLE_TOURS: "${_('Available tours')}",
-        NO_AVAILABLE_TOURS: "${_('None for this page.')}",
-        MORE_INFO: "${_('Read more about it...')}",
-        TOOLTIP_TITLE: "${_('Demo tutorials')}"
-      }
-    };
-
     LeafletGlobals = {
       layer: '${ leaflet['layer'] |n,unicode }',
       attribution: '${ leaflet['attribution'] |n,unicode }'
@@ -582,21 +573,6 @@ from metadata.conf import has_optimizer, OPTIMIZER
         }
       }, 200);
     }
-    %if tours_and_tutorials:
-      $.jHueTour({});
-      if ($.totalStorage("jHueTourExtras") != null) {
-        $.jHueTour({tours: $.totalStorage("jHueTourExtras")});
-      }
-      var _qs = location.search;
-      if (_qs !== undefined && _qs.indexOf("tour=") > -1) {
-        $.jHueTour(getParameterByName("tour"), 1);
-      }
-      function getParameterByName(name) {
-        name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(_qs);
-        return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-      }
-    %endif
   });
 
   function resetPrimaryButtonsStatus() {

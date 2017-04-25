@@ -322,11 +322,6 @@ a#advanced-btn:hover {
     line-height: 28px;
 }
 
-#jHueTourVideoPlayer {
-  margin-left: -320px!important;
-  width: 640px;
-}
-
 .navigator {
   position: fixed;
   top: 0;
@@ -450,10 +445,6 @@ a#advanced-btn:hover {
 
 a, a:hover, a:active, a:focus {
   outline: 0;
-}
-
-#jHueTourVideoPlayer .modal-body {
-  max-height: 460px;
 }
 
 .hueOverlay {
