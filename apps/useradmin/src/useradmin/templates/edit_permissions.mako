@@ -14,10 +14,12 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
 import urllib
+
+from desktop.views import commonheader, commonfooter
 from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="layout" file="layout.mako" />
 
 %if not is_embeddable:
@@ -57,7 +59,13 @@ ${layout.menubar(section='permissions')}
 
       <div class="form-actions">
         <input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
-        <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
+        % if is_embeddable:
+          <input type="hidden" value="true" name="is_embeddable" />
+          ## Hue4 links?
+          <a href="/hue/useradmin/permissions" class="btn">${_('Cancel')}</a>
+        % else:
+          <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
+        % endif
       </div>
     </form>
   </div>

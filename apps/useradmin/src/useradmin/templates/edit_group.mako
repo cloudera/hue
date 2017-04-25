@@ -14,10 +14,11 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter
-from desktop.lib.django_util import extract_field_data
 import urllib
+
 from django.utils.translation import ugettext as _
+from desktop.lib.django_util import extract_field_data
+from desktop.views import commonheader, commonfooter
 %>
 
 <%namespace name="layout" file="layout.mako" />
@@ -60,9 +61,9 @@ ${layout.menubar(section='groups')}
     <form id="editForm" action="${urllib.quote(action)}" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
       <fieldset>
-          % for field in form:
-        ${render_field(field)}
-          % endfor
+        % for field in form:
+          ${render_field(field)}
+        % endfor
       </fieldset>
       <br/>
 
@@ -76,7 +77,12 @@ ${layout.menubar(section='groups')}
               <input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
           % endif
         % endif
-        <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
+        % if is_embeddable:
+          <input type="hidden" value="true" name="is_embeddable" />
+          <a href="/hue/useradmin/permissions" class="btn">${_('Cancel')}</a>
+        % else:
+          <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
+        % endif
       </div>
     </form>
   </div>
