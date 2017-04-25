@@ -1978,12 +1978,12 @@
       var $contentPanel = $(".content-panel");
       var $execStatus = $resizer.prev('.snippet-execution-status');
 
-      var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 128;
+      var lastEditorSize = $.totalStorage('hue.editor.editor.size') || 131;
       var editorHeight = Math.floor(lastEditorSize / 16);
       $target.height(lastEditorSize);
       var autoExpand = true;
 
-      ace().on('change', function () {
+      function throttleChange() {
         if (autoExpand) {
           var maxAutoLines = Math.floor((($(window).height() - 80) / 2) / 16);
           var resized = false;
@@ -2013,6 +2013,12 @@
             huePubSub.publish('redraw.fixed.headers');
           }
         }
+      }
+
+      var changeTimeout = -1;
+      ace().on('change', function () {
+        window.clearTimeout(changeTimeout);
+        changeTimeout = window.setTimeout(throttleChange, 10)
       });
 
       $resizer.draggable({
@@ -2252,7 +2258,6 @@
 
         },
         stop: function () {
-          console.log('stop');
           if (isRightPanel) {
             $.totalStorage(options.appName + "_right_panel_width", rightPanelWidth);
           } else {
