@@ -22,7 +22,7 @@
 <%namespace name="utils" file="../utils.inc.mako" />
 
 
-<form action="${ action }" method="POST">
+<form action="${ action }" method="POST" id="submit-rerun-form">
   ${ csrf_token(request) | n,unicode }
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
@@ -45,6 +45,9 @@
               </div>
             </div>
           </div>
+          % for hidden in rerun_form.hidden_fields():
+            ${ hidden | n,unicode }
+          % endfor
       </div>
 
       <div id="param-container">
@@ -85,13 +88,27 @@
 </form>
 
 <script type="text/javascript">
-    $(document).ready(function(){
-        $("#id_skip_nodes").jHueSelector({
-            selectAllLabel: "${_('Select all')}",
-            searchPlaceholder: "${_('Search')}",
-            noChoicesFound: "${_('No successful actions found.')}",
-            width:350,
-            height:150
+  $(document).ready(function(){
+      $("#id_skip_nodes").jHueSelector({
+          selectAllLabel: "${_('Select all')}",
+          searchPlaceholder: "${_('Search')}",
+          noChoicesFound: "${_('No successful actions found.')}",
+          width:350,
+          height:150
+      });
+
+      % if return_json:
+        $('#submit-rerun-form').submit(function (e) {
+          $.ajax({
+            type: "POST",
+            url: '${ action }',
+            data: $('#submit-rerun-form').serialize(),
+            success: function (data) {
+              huePubSub.publish('submit.rerun.popup.return', data);
+            }
+          });
+          e.preventDefault();
         });
+      % endif
     });
 </script>

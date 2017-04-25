@@ -740,10 +740,12 @@ def sync_coord_workflow(request, job_id):
   return JsonResponse(popup, safe=False)
 
 @show_oozie_error
-def rerun_oozie_job(request, job_id, app_path):
+def rerun_oozie_job(request, job_id, app_path=None):
   ParametersFormSet = formset_factory(ParameterForm, extra=0)
   oozie_workflow = check_job_access_permission(request, job_id)
   check_job_edition_permission(oozie_workflow, request.user)
+  app_path = oozie_workflow.appPath
+  return_json = request.GET.get('format') == 'json'
 
   if request.method == 'POST':
     rerun_form = RerunForm(request.POST, oozie_workflow=oozie_workflow)
@@ -762,12 +764,15 @@ def rerun_oozie_job(request, job_id, app_path):
 
       _rerun_workflow(request, job_id, args, mapping)
 
-      request.info(_('Workflow re-running.'))
-      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+      if rerun_form.cleaned_data['return_json']:
+        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+      else:
+        request.info(_('Workflow re-running.'))
+        return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s %s' % (rerun_form.errors, params_form.errors)))
   else:
-    rerun_form = RerunForm(oozie_workflow=oozie_workflow)
+    rerun_form = RerunForm(oozie_workflow=oozie_workflow, return_json=return_json)
     initial_params = ParameterForm.get_initial_params(oozie_workflow.conf_dict)
     params_form = ParametersFormSet(initial=initial_params)
 
@@ -775,6 +780,7 @@ def rerun_oozie_job(request, job_id, app_path):
                    'rerun_form': rerun_form,
                    'params_form': params_form,
                    'action': reverse('oozie:rerun_oozie_job', kwargs={'job_id': job_id, 'app_path': app_path}),
+                   'return_json': return_json
                  }, force_template=True).content
 
   return JsonResponse(popup, safe=False)

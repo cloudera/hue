@@ -66,13 +66,13 @@ class Api(object):
 
 class MockDjangoRequest():
 
-  def __init__(self, user, get=None, post=None):
+  def __init__(self, user, get=None, post=None, method='POST'):
     self.user = user
     self.jt = None
     self.GET = get if get is not None else {'format': 'json'}
     self.POST = post if post is not None else {}
     self.REQUEST = {}
-    self.method = "POST"
+    self.method = method
 
 
 def _extract_query_params(filters):

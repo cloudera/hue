@@ -450,9 +450,11 @@ _node_type_TO_FORM_CLS = {
 
 class RerunForm(forms.Form):
   skip_nodes = forms.MultipleChoiceField(required=False)
+  return_json = forms.BooleanField(required=False, widget=forms.HiddenInput)
 
   def __init__(self, *args, **kwargs):
     oozie_workflow = kwargs.pop('oozie_workflow')
+    return_json = kwargs.pop('return_json', None)
 
     # Build list of skip nodes
     decisions = filter(lambda node: node.type == 'switch', oozie_workflow.get_control_flow_actions())
@@ -468,6 +470,9 @@ class RerunForm(forms.Form):
 
     self.fields['skip_nodes'].choices = skip_nodes
     self.fields['skip_nodes'].initial = initial_skip_nodes
+
+    if return_json is not None:
+      self.fields['return_json'].initial = return_json
 
 
 class RerunCoordForm(forms.Form):
