@@ -100,6 +100,10 @@ def coerce_positive_integer(integer):
 
   return integer
 
+def is_lb_enabled():
+  """Check for Hue Load Balancer is available"""
+  return bool(HUE_LOAD_BALANCER.get())
+
 def coerce_zero_or_positive_integer(integer):
   integer = int(integer)
 
@@ -400,7 +404,7 @@ USE_X_FORWARDED_HOST = Config(
   key="use_x_forwarded_host",
   help=_("Enable X-Forwarded-Host header if the load balancer requires it."),
   type=coerce_bool,
-  default=False)
+  dynamic_default=is_lb_enabled)
 
 SECURE_PROXY_SSL_HEADER = Config(
   key="secure_proxy_ssl_header",
