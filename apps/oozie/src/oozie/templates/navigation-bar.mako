@@ -78,13 +78,25 @@
               % else:
                 % if is_editor:
                   <li class="${utils.is_selected(section, 'workflows')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-workflow2">${ _('Workflows') }</a>
+                    % else:
                     <a href="${url('oozie:list_editor_workflows')}">${ _('Workflows') }</a>
+                    % endif
                   </li>
                   <li class="${utils.is_selected(section, 'coordinators')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-coordinator2">${ _('Coordinators') }</a>
+                    % else:
                     <a href="${url('oozie:list_editor_coordinators')}">${ _('Coordinators') }</a>
+                    % endif
                   </li>
                   <li class="${utils.is_selected(section, 'bundles')}">
+                    % if is_embeddable:
+                    <a href="/home?type=oozie-bundle2">${ _('Bundles') }</a>
+                    % else:
                     <a href="${url('oozie:list_editor_bundles')}">${ _('Bundles') }</a>
+                    % endif
                   </li>
                 % else:
                   <li class="${utils.is_selected(section, 'workflows')}"><a href="${url('oozie:list_workflows')}">${ _('Workflows') }</a></li>
