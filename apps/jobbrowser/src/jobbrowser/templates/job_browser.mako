@@ -1500,6 +1500,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             $('#id_actions').find('option').remove();
             $(frag).appendTo('#id_actions');
           });
+        } else if (action == 'ignore') {
+          $.post('/oozie/manage_oozie_jobs/' + vm.job().id() + '/ignore', {
+            actions: $.map(vm.job().coordinatorActions().selectedJobs(), function(wf) {
+              return wf.properties.number();
+            }).join(' ')
+          }, function(response) {
+            vm.job().apiStatus('RUNNING');
+            vm.job().updateJob();
+          });
         } else {
           self._control(
             $.map(self.selectedJobs(), function(job) {
