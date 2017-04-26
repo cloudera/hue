@@ -370,7 +370,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 
     window.onpopstate = function() {
-      viewModel.assist.path(window.location.hash.substr(1));
+      if (window.location.pathname.indexOf('/security') > -1) {
+        viewModel.assist.path(window.location.hash.substr(1));
+      }
     };
 
     $("#bulkActionsModal").modal({
