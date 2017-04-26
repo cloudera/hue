@@ -60,7 +60,6 @@
   </script>
 
   <script src="${ static('desktop/js/hue4.utils.js') }"></script>
-
 </head>
 
 <body>
@@ -120,7 +119,10 @@ ${ hueIcons.symbols() }
           </button>
           <!-- /ko -->
           <!-- /ko -->
-          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown"><!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko --><span class="caret"></span></button>
+          <button class="btn btn-primary dropdown-toggle hue-main-create-btn-dropdown" data-toggle="dropdown">
+            <!-- ko ifnot: mainQuickCreateAction -->${ _('More') } <!-- /ko -->
+            <span class="caret"></span>
+          </button>
           <ul class="dropdown-menu hue-main-create-dropdown" data-bind="foreach: { data: quickCreateActions, as: 'item' }">
             <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
           </ul>
@@ -172,7 +174,9 @@ ${ hueIcons.symbols() }
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
           %>
-          <button class="btn btn-flat" data-toggle="dropdown"><i class="fa fa-user"></i> ${ user.username }</button>
+          <button class="btn btn-flat" data-toggle="dropdown">
+            <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
+          </button>
           <ul class="dropdown-menu">
             % if view_profile:
             <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
