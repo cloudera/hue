@@ -78,6 +78,10 @@ var AssistHBaseEntry = (function () {
     })
   };
 
+  AssistHBaseEntry.prototype.open = function () {
+    huePubSub.publish('assist.clickHBaseItem', this);
+  };
+
   AssistHBaseEntry.prototype.click = function () {
     huePubSub.publish('assist.clickHBaseItem', this);
   };
