@@ -22,7 +22,6 @@ import re
 
 from itertools import islice
 
-from django.core.cache import cache
 from django.utils.translation import ugettext as _
 
 from desktop.lib.i18n import smart_unicode
@@ -31,8 +30,7 @@ from desktop.lib.rest.unsecure_http_client import UnsecureHttpClient
 from desktop.lib.rest.http_client import RestException
 
 from hadoop.conf import HDFS_CLUSTERS
-from libsentry.conf import PRIVILEGE_CHECKER_CACHING
-from libsentry.privilege_checker import PrivilegeChecker, SENTRY_PRIVILEGE_CACHE_KEY
+from libsentry.privilege_checker import get_checker
 from libsentry.sentry_site import get_hive_sentry_provider
 
 from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
@@ -299,13 +297,7 @@ class NavigatorApi(object):
 
   def _secure_results(self, results, checker=None):
     if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
-
-      cache_key = SENTRY_PRIVILEGE_CACHE_KEY % {'username': self.user.username}
-      checker = checker or cache.get(cache_key)
-      if not checker:
-        checker = PrivilegeChecker(user=self.user)
-        cache.set(cache_key, checker, PRIVILEGE_CHECKER_CACHING.get())
-
+      checker = get_checker(self.user, checker)
       action = 'SELECT'
 
       def getkey(result):
