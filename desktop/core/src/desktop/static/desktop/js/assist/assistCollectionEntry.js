@@ -96,6 +96,10 @@ var AssistCollectionEntry = (function () {
     })
   };
 
+  AssistCollectionEntry.prototype.open = function () {
+    huePubSub.publish('assist.clickCollectionItem', this);
+  };
+
   AssistCollectionEntry.prototype.click = function () {
     huePubSub.publish('assist.clickCollectionItem', this);
   };
