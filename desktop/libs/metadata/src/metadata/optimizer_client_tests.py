@@ -49,7 +49,7 @@ class BaseTestOptimizerApi(object):
     grant_access("test", "test", "metadata")
     grant_access("test", "test", "optimizer")
 
-    cls.api = OptimizerApi()
+    cls.api = OptimizerApi(user=cls.user)
     cls.upload()
 
 
@@ -209,7 +209,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
     assert_true('clauseString' in resp, resp)
 
 
-  def test_top_filters(self):  # Requires test_upload to run before
+  def test_top_filters(self):
     resp = self.api.top_filters(db_tables=['db1.Part'])
 
     assert_true(len(resp['results']) > 0, resp)
@@ -220,12 +220,12 @@ class TestOptimizerApi(BaseTestOptimizerApi):
 
     assert_true(len(resp['results']) > 0, resp)
 
-    assert_true('tables' in resp['results'][0], resp)
+    assert_true(resp['results'][0]['tables'], [u'default.x', u'default.y'])
     assert_true('queryIds' in resp['results'][0], resp)
     assert_true('totalTableCount' in resp['results'][0], resp)
     assert_true('totalQueryCount' in resp['results'][0], resp)
-    assert_true('type' in resp['results'][0], resp)
-    assert_true('columns' in resp['results'][0], resp)
+    assert_true('joinType' in resp['results'][0], resp)
+    assert_equal(resp['results'][0]['joinCols'], [{u'columns': [u'default.x.a', u'default.y.a']}])
 
 
   def test_top_aggs(self):
