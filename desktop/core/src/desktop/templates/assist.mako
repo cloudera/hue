@@ -160,13 +160,27 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="document-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: open">${ _('Open') }</a></li>
+    <!-- ko if: definition().type === 'directory' -->
+    <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open folder') }</a></li>
+    <!-- /ko -->
+    <!-- ko if: definition().type !== 'directory' -->
+    <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${ _('Open document') }</a></li>
+    <!-- /ko -->
     ## Share
     ## -----
     ## Move
     ## Copy
     ## Rename
     ## Delete
+  </script>
+
+  <script type="text/html" id="hbase-context-items">
+    <!-- ko if: definition.host -->
+    <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-folder-open-o"></i> ${ _('Open cluster') }</a></li>
+    <!-- /ko -->
+    <!-- ko ifnot: definition.host -->
+    <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'hbase' } } --><!-- /ko --> ${ _('Open in HBase') }</a></li>
+    <!-- /ko -->
   </script>
 
   <script type="text/html" id="assist-database-entry">
@@ -617,7 +631,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-hbase-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hbase-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.host -->
               <i class="fa fa-fw fa-th-large muted valign-middle"></i>
@@ -1307,7 +1321,13 @@ from notebook.conf import get_ordered_interpreters
         };
 
         huePubSub.subscribe('assist.dblClickCollectionItem', function (entry) {
-          window.open('/indexer/#edit/' + entry.definition.name);
+          var link = '/indexer/#edit/' + entry.definition.name;
+          if (IS_HUE_4){
+            huePubSub.publish('open.link', link);
+          }
+          else {
+            window.open(link);
+          }
         });
 
         huePubSub.subscribe('assist.collections.refresh', function () {
@@ -1349,6 +1369,9 @@ from notebook.conf import get_ordered_interpreters
             entry.loadEntries();
             self.selectedHBaseEntry(entry);
           }
+          else {
+            huePubSub.publish('assist.dblClickHBaseItem', entry);
+          }
         });
 
         huePubSub.subscribe('assist.clickHBaseRootItem', function (entry) {
@@ -1356,7 +1379,13 @@ from notebook.conf import get_ordered_interpreters
         });
 
         huePubSub.subscribe('assist.dblClickHBaseItem', function (entry) {
-          window.open('/hbase/#' + self.selectedHBaseEntry().definition.name + '/' + entry.definition.name);
+          var link = '/hbase/#' + self.selectedHBaseEntry().definition.name + '/' + entry.definition.name;
+          if (IS_HUE_4){
+            huePubSub.publish('open.link', link);
+          }
+          else {
+            window.open(link);
+          }
         });
 
         huePubSub.subscribe('assist.hbase.refresh', function () {
