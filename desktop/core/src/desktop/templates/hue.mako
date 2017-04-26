@@ -499,7 +499,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         sqoop: '/sqoop',
       };
 
-      var SKIP_CACHE = ['home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup', 'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser', 'useradmin_addldap', 'useradmin_edituser'];
+      var SKIP_CACHE = [
+          'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard',
+          'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
+          'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
+          'useradmin_addldap', 'useradmin_edituser'
+      ];
 
       var OnePageViewModel = function () {
         var self = this;
@@ -815,6 +820,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/security/hive', app: 'security_hive' },
           { url: '/security/hive2', app: 'security_hive2' },
           { url: '/security/solr', app: 'security_solr' },
+          { url: '/security', app: 'security_hive' },
           { url: '/sqoop', app: 'sqoop' },
           { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
           { url: '/useradmin/groups/', app: 'useradmin_groups' },
