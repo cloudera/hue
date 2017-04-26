@@ -161,9 +161,9 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-history-panel-template">
     <button class="btn btn-flat pull-right" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
+      <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
+      <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
       <i class="fa fa-history"></i>
-        <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
-        <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
     </button>
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
@@ -378,9 +378,9 @@ from desktop.views import _ko
       <button class="btn btn-flat" style="padding-right: 2px">
         <a data-bind="hueLink: '/jobbrowser'">${ _('Jobs') }</a>
       </button>
-      <button class="btn btn-flat" title="${_('Running jobs')}" data-bind="toggle: jobsPanelVisible" style="padding-left: 2px">
+      <button class="btn btn-flat" title="${_('Running jobs')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
-        <span class="caret"></span>
+        <i class="fa fa-sliders"></i>
       </button>
     </div>
     <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
