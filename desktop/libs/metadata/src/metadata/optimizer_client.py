@@ -208,9 +208,8 @@ class OptimizerApi(object):
 
     return {
       'hints': hints,
-      'tables': response.get('tables', []),
       'noStats': response.get('noStats', []),
-      'noDDL': response.get('noStats', []),
+      'noDDL': response.get('noDDL', []),
     }
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
