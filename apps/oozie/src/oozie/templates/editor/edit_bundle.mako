@@ -43,7 +43,7 @@ ${ layout.menubar(section='bundles') }
   }
 </style>
 
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 
 
 <div class="container-fluid">

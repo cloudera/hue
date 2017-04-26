@@ -560,12 +560,13 @@ ${ layout.menubar(section='hive1') }
 ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight) }
 
 
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
+<script>
+  routie.setPathname('/security');
+</script>
 
 <script src="${ static('security/js/hive.ko.js') }" type="text/javascript" charset="utf-8"></script>
-
 <script src="${ static('desktop/js/jquery.filechooser.js') }" type="text/javascript" charset="utf-8"></script>
-
 
 <script type="text/javascript">
 
@@ -704,7 +705,9 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       window.onpopstate = function() {
-        viewModel.assist.path(viewModel.getPathHash());
+        if (window.location.pathname.indexOf('/security') > -1) {
+          viewModel.assist.path(viewModel.getPathHash());
+        }
       };
 
       $("#createRoleModal").modal({

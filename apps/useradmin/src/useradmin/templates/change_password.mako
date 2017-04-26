@@ -65,7 +65,11 @@ ${ layout.menubar(section='users') }
   </div>
 </div>
 
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
+<script>
+  routie.setPathname('/useradmin');
+</script>
+
 
 <script type="text/javascript">
 

@@ -136,7 +136,9 @@ var MetastoreViewModel = (function () {
     self.loadURL();
 
     window.onpopstate = function () {
-      self.loadURL();
+      if (window.location.pathname.indexOf('/metastore') > -1) {
+        self.loadURL();
+      }
     };
 
     self.databasesBreadcrumb = function () {

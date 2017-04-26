@@ -28,7 +28,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
 <link rel="stylesheet" href="${ static('jobsub/css/jobsub.css') }">
 
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.models.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('oozie/js/workflow.node-fields.js') }" type="text/javascript" charset="utf-8"></script>
