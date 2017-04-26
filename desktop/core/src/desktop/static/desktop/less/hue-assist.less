@@ -290,8 +290,9 @@
 .assist-tables > li {
   position: relative;
   padding-top: 2px;
-  margin-left: 4px;
-  margin-right: 15px;
+  padding-left-left: 4px;
+  margin-left: 0;
+  margin-right: 0;
   overflow-x: hidden;
 }
 
@@ -300,13 +301,24 @@
 }
 
 .assist-tables > li:hover {
-  .assist-table-link i {
-    color: @cui-blue-500;
+  background-color: @cui-gray-100;
+  .assist-column {
+    background-color: @cui-white;
+    .assist-actions, .assist-file-actions {
+      background-color: @cui-white;
+    }
+    &:hover {
+      background-color: @cui-gray-100;
+    }
   }
   .assist-column:hover {
-    .assist-entry {
-      color: @cui-blue-500;
+    .assist-actions, .assist-file-actions {
+      background-color: @cui-gray-100;
     }
+  }
+
+  .assist-actions, .assist-file-actions {
+    background-color: @cui-gray-100;
   }
 }
 
@@ -385,6 +397,7 @@
   top: 0;
   right: 0;
   padding-left: 4px;
+  padding-right: 15px;
   background-color: @cui-white;
 }
 
@@ -392,7 +405,7 @@
   position:absolute;
   top: 0;
   right: 0;
-  padding-right: 2px;
+  padding-right: 15px;
   padding-left:4px;
   background-color: @cui-white;
 }
