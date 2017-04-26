@@ -183,6 +183,10 @@ from notebook.conf import get_ordered_interpreters
     <!-- /ko -->
   </script>
 
+  <script type="text/html" id="collections-context-items">
+    <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Indexer') }</a></li>
+  </script>
+
   <script type="text/html" id="assist-database-entry">
     <li class="assist-table" data-bind="appAwareTemplateContextMenu: { template: 'sql-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { selector: '.database-actions' }">
       <!-- ko template: { name: 'assist-database-actions' } --><!-- /ko -->
@@ -585,7 +589,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-collections-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 20, container: '.assist-collections-scrollable' }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
               <i class="fa fa-fw fa-search muted valign-middle"></i>
               <span draggable="true" data-bind="text: definition.name, draggableText: { text: '\'' + path + '\'', meta: {'type': 'collection', 'definition': definition} }"></span>
@@ -631,7 +635,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-hbase-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hbase-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hbase-context-items', scrollContainer: '.assist-hbase-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.host -->
               <i class="fa fa-fw fa-th-large muted valign-middle"></i>
@@ -1320,7 +1324,7 @@ from notebook.conf import get_ordered_interpreters
           self.showCores(currentEntry.hasOnlyCores());
         };
 
-        huePubSub.subscribe('assist.dblClickCollectionItem', function (entry) {
+        huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
           var link = '/indexer/#edit/' + entry.definition.name;
           if (IS_HUE_4){
             huePubSub.publish('open.link', link);
