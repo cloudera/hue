@@ -26,12 +26,10 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
-from libsentry.privilege_checker import PrivilegeChecker
 from notebook.api import _get_statement
 from notebook.models import Notebook
 
-from metadata.conf import NAVIGATOR
-from metadata.optimizer_client import OptimizerApi, NavOptException
+from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name
 
 
 LOG = logging.getLogger(__name__)
@@ -94,7 +92,7 @@ def top_tables(request):
   database = request.POST.get('database', 'default')
   limit = request.POST.get('len', 1000)
 
-  api = OptimizerApi()
+  api = OptimizerApi(user=request.user)
   data = api.top_tables(database_name=database, page_size=limit)
 
   tables = [{
@@ -108,15 +106,6 @@ def top_tables(request):
       'is_fact': table['type'] != 'Dimension'
     } for table in data['results']
   ]
-
-  if NAVIGATOR.APPLY_SENTRY_PERMISSIONS.get():
-    checker = PrivilegeChecker(user=request.user)
-    action = 'SELECT'
-
-    for table in tables:
-      paths = _get_table_name(table['name'])
-      table.update({u'db': paths['database'], u'table': paths['table'], u'column': None, u'server': u'server1'})
-    tables = list(checker.filter_objects(tables, action)) #, getkey=getkey)
 
   response['top_tables'] = tables
   response['status'] = 0
@@ -431,12 +420,3 @@ def upload_status(request):
   response['status'] = 0
 
   return JsonResponse(response)
-
-
-def _get_table_name(path):
-  if '.' in path:
-    database, table = path.split('.', 1)
-  else:
-    database, table = 'default', path
-
-  return {'database': database, 'table': table}

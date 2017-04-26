@@ -19,8 +19,11 @@ import logging
 
 from collections import defaultdict
 
+from django.core.cache import cache
+
 from libsentry.api import get_api as get_api_v1
 from libsentry.api2 import get_api as get_api_v2
+from libsentry.conf import PRIVILEGE_CHECKER_CACHING
 from libsentry.sentry_site import get_hive_sentry_provider
 
 
@@ -49,6 +52,23 @@ SENTRY_OBJECTS = (
 
 SENTRY_PRIVILEGE_KEY = 'SENTRY_PRIVILEGE'
 SENTRY_PRIVILEGE_CACHE_KEY = 'checker-%(username)s'
+
+
+class MissingSentryPrivilegeException(Exception):
+  def __init__(self, objects=None):
+    self.objects = objects or _('No error message, please check the logs.')
+
+  def __str__(self):
+    return str(self.message)
+
+
+def get_checker(user, checker=None):
+  cache_key = SENTRY_PRIVILEGE_CACHE_KEY % {'username': user.username}
+  checker = checker or cache.get(cache_key)
+  if not checker:
+    checker = PrivilegeChecker(user=user)
+    cache.set(cache_key, checker, PRIVILEGE_CHECKER_CACHING.get())
+  return checker
 
 
 class PrivilegeChecker(object):
