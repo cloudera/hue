@@ -89,23 +89,25 @@
       var viewModel = new HomeViewModel(options);
 
       var loadUrlParam = function () {
-        if (location.getParameter('uuid')) {
-          viewModel.openUuid(location.getParameter('uuid'));
-        } else if (location.getParameter('path')) {
-          viewModel.openPath(location.getParameter('path'));
-        } else if (viewModel.activeEntry() && viewModel.activeEntry().loaded()) {
-          var rootEntry = viewModel.activeEntry();
-          while (rootEntry && ! rootEntry.isRoot()) {
-            rootEntry = rootEntry.parent;
-          }
-          viewModel.activeEntry(rootEntry);
-        } else {
-          viewModel.activeEntry().load(function () {
-            if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().entries()[0].definition().type === 'directory') {
-              viewModel.activeEntry(viewModel.activeEntry().entries()[0]);
-              viewModel.activeEntry().load();
+        if (window.location.pathname.indexOf('/home') > -1) {
+          if (location.getParameter('uuid')) {
+            viewModel.openUuid(location.getParameter('uuid'));
+          } else if (location.getParameter('path')) {
+            viewModel.openPath(location.getParameter('path'));
+          } else if (viewModel.activeEntry() && viewModel.activeEntry().loaded()) {
+            var rootEntry = viewModel.activeEntry();
+            while (rootEntry && !rootEntry.isRoot()) {
+              rootEntry = rootEntry.parent;
             }
-          });
+            viewModel.activeEntry(rootEntry);
+          } else {
+            viewModel.activeEntry().load(function () {
+              if (viewModel.activeEntry().entries().length === 1 && viewModel.activeEntry().entries()[0].definition().type === 'directory') {
+                viewModel.activeEntry(viewModel.activeEntry().entries()[0]);
+                viewModel.activeEntry().load();
+              }
+            });
+          }
         }
       };
       window.onpopstate = loadUrlParam;

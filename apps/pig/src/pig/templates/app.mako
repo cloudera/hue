@@ -736,7 +736,7 @@ ${ commonshare() | n,unicode }
 <script src="${ static('pig/js/pig.ko.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share.vm.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/ext/js/routie-0.3.0.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/codemirror-3.11.js') }"></script>
 <script src="${ static('desktop/js/codemirror-pig.js') }"></script>
 <script src="${ static('desktop/js/codemirror-show-hint.js') }"></script>
