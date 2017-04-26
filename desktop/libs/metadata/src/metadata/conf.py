@@ -60,6 +60,14 @@ def has_navigator(user):
       and (user.is_superuser or user.has_hue_permission(action="access", app=DJANGO_APPS[0]))
 
 
+def get_security_default():
+  '''Get default security value from Hadoop'''
+  from hadoop import cluster # Avoid dependencies conflicts
+  cluster = cluster.get_cluster_conf_for_job_submission()
+
+  return cluster.SECURITY_ENABLED.get()
+
+
 OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
@@ -102,6 +110,13 @@ OPTIMIZER = ConfigSection(
       private=True,
       type=coerce_password_from_script,
       default=None),
+
+    APPLY_SENTRY_PERMISSIONS = Config(
+      key="apply_sentry_permissions",
+      help=_t("Perform Sentry privilege filtering. Default to true automatically if the cluster is secure."),
+      dynamic_default=get_security_default,
+      type=coerce_bool
+    ),
 
     EMAIL=Config(
       key="email",
@@ -166,14 +181,6 @@ def get_navigator_ldap_password():
 def get_navigator_saml_password():
   '''Get default password from secured file'''
   return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
-
-
-def get_security_default():
-  '''Get default security value from Hadoop'''
-  from hadoop import cluster # Avoid dependencies conflicts
-  cluster = cluster.get_cluster_conf_for_job_submission()
-
-  return cluster.SECURITY_ENABLED.get()
 
 
 NAVIGATOR = ConfigSection(
