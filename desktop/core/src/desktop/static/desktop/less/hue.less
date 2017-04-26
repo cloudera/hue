@@ -173,11 +173,21 @@ body {
   color: @hue-primary-color-dark;
 }
 
+.navbar-dropdown .btn {
+  .caret {
+    opacity: 0;
+  }
+  &:hover {
+    .caret {
+      opacity: 1;
+    }
+  }
+}
+
 .jobs-badge {
   color: @hue-primary-color-dark;
   background-color: @cui-gray-050;
-  float: right;
-  margin-left: 4px;
+  display: inline-block;
   padding: 1px 5px;
   border-radius: 10px;
   font-size: 12px;
