@@ -374,11 +374,15 @@ from desktop.views import _ko
   </script>
 
   <script type="text/html" id="hue-job-browser-panel-template">
-    <button class="btn btn-flat dropdown-toggle pull-right">
-      <a data-bind="hueLink: '/jobbrowser'">${ _('Jobs') }</a>
-      <div id="jobBrowserCount" class="jobs-badge" title="${_('Running jobs')}" data-bind="visible: jobCount() > 0, text: jobCount">0</div>
-      <span class="caret" data-bind="toggle: jobsPanelVisible" title="${_('Preview Jobs')}"></span>
-    </button>
+    <div class="btn-group pull-right">
+      <button class="btn btn-flat" style="padding-right: 2px">
+        <a data-bind="hueLink: '/jobbrowser'">${ _('Jobs') }</a>
+      </button>
+      <button class="btn btn-flat" title="${_('Running jobs')}" data-bind="toggle: jobsPanelVisible" style="padding-left: 2px">
+        <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
+        <span class="caret"></span>
+      </button>
+    </div>
     <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ jobsPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ page('/jobbrowser/'); jobsPanelVisible(false); }"><i class="fa fa-fw fa-expand" title="${ _('Open Job Browser') }"></i></a>
@@ -428,11 +432,7 @@ from desktop.views import _ko
             function(data) {
               if (data != null && data.jobs != null) {
                 huePubSub.publish('jobbrowser.data', data.jobs);
-                if (data.jobs.length > 0){
-                  $("#jobBrowserCount").show().text(data.jobs.length);
-                } else {
-                  $("#jobBrowserCount").hide();
-                }
+                self.jobCount(data.jobs.length);
               }
               checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
             }).fail(function () {
