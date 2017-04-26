@@ -50,31 +50,21 @@ class BaseTestOptimizerApi(object):
     grant_access("test", "test", "optimizer")
 
     cls.api = OptimizerApi()
+    cls.upload()
 
-
-  @classmethod
-  def teardown_class(cls):
-    cls.user.is_superuser = False
-    cls.user.save()
-
-
-class TestOptimizerApi(BaseTestOptimizerApi):
-
-  def test_tenant(self):
-    resp = self.api.get_tenant(email=OPTIMIZER.EMAIL.get())
-
-    assert_true('tenant' in resp, resp)
 
   # Should run first
-  def test_upload(self):
+  @classmethod
+  def upload(cls):
     queries = [
-        (uuid_default(), 0, "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;", 'default'),
-        (uuid_default(), 0, "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;", 'default'),
+        (uuid_default(), 0, "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;", 'db1'),
+        (uuid_default(), 0, "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;", 'db1'),
         (uuid_default(), 0, "select Part.partkey, max(Part.salary), Part.name, Part.type from db1.Part where Part.yyprice > 2095", 'db1'),
-        (uuid_default(), 0, "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", 'default'),
-        (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", 'default'),
-        (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", 'default'),
-        (uuid_default(), 0, "select mgr.name from mgr where mgr.reports > 10 group by mgr.state;", 'default'),
+        (uuid_default(), 0, "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", 'db1'),
+        (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", 'db1'),
+        (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", 'db1'),
+
+        (uuid_default(), 0, "select x from x join y where x.a = y.a;", 'default'),
 
         # DDL
         (uuid_default(), 0, '''CREATE TABLE `web_logs`(
@@ -112,7 +102,7 @@ PARTITIONED BY (
 ''', 'edw')
     ]
 
-    resp = self.api.upload(data=queries, data_type='queries', source_platform='hive')
+    resp = cls.api.upload(data=queries, data_type='queries', source_platform='hive')
 
     assert_true('status' in resp, resp)
     assert_true('count' in resp, resp)
@@ -123,7 +113,7 @@ PARTITIONED BY (
     assert_true('successQueries' in resp['status'], resp)
     assert_true(resp['status']['state'] in ('WAITING', 'FINISHED', 'FAILED'), resp['status']['state'])
 
-    resp = self.api.upload_status(workload_id=resp['status']['workloadId'])
+    resp = cls.api.upload_status(workload_id=resp['status']['workloadId'])
     assert_true('status' in resp, resp)
     assert_true('state' in resp['status'], resp)
     assert_true('workloadId' in resp['status'], resp)
@@ -131,13 +121,27 @@ PARTITIONED BY (
 
     i = 0
     while i < 60 and resp['status']['state'] not in ('FINISHED', 'FAILED'):
-      resp = self.api.upload_status(workload_id=resp['status']['workloadId'])
+      resp = cls.api.upload_status(workload_id=resp['status']['workloadId'])
       i += 1
       time.sleep(1)
       LOG.info('Upload state: %(state)s' % resp['status'])
 
     assert_true(i < 60 and resp['status']['state'] == 'FINISHED', resp)
     assert_equal(resp['status']['successQueries'], 8, resp)
+
+
+  @classmethod
+  def teardown_class(cls):
+    cls.user.is_superuser = False
+    cls.user.save()
+
+
+class TestOptimizerApi(BaseTestOptimizerApi):
+
+  def test_tenant(self):
+    resp = self.api.get_tenant(email=OPTIMIZER.EMAIL.get())
+
+    assert_true('tenant' in resp, resp)
 
 
   def test_top_tables(self):
@@ -212,7 +216,7 @@ PARTITIONED BY (
 
 
   def test_top_joins(self):
-    resp = self.api.top_joins(db_tables=['db1.Part'])
+    resp = self.api.top_joins(db_tables=['default.x'])
 
     assert_true(len(resp['results']) > 0, resp)
 
@@ -392,6 +396,9 @@ GROUP BY account_client,
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
     _assert_risks(['>=10 columns present in GROUP BY list.'], resp['hints'])
 
+    assert_equal(resp['noDDL'], ['default.transactions'])
+    assert_equal(resp['noStats'], ['default.transactions'])
+
 
   def test_risk_cross_join_false_positive(self):
     source_platform = 'hive'
@@ -425,6 +432,9 @@ LIMIT 1000
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
+
+    assert_false(resp['noDDL'], resp) # DDL was uploaded already
+    assert_equal(resp['noStats'], ['default.web_logs'])
 
 
     source_platform = 'hive'
@@ -462,7 +472,9 @@ LIMIT 1000
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
-    assert_true('default.web_logs' in [suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'])
+    assert_equal([suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'], ['default.web_logs'])
+    assert_equal(resp['noDDL'], ['default.a'])
+    assert_equal(resp['noStats'], ['default.a', 'default.web_logs'])
 
 
 def _assert_risks(risks, suggestions, present=True):
