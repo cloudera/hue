@@ -147,7 +147,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="hdfs-context-items">
-    <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw fa-info"></i> ${ _('Open in File Browser') }</a></li>
+    <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> ${ _('Open in File Browser') }</a></li>
     <!-- ko if: $currentApp() === 'editor' -->
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
     ## Generate create table statement
