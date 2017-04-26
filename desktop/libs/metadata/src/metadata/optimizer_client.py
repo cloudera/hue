@@ -30,6 +30,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib import export_csvxls
 from desktop.lib.i18n import smart_unicode
 from desktop.lib.rest.http_client import RestException
+from libsentry.sentry_site import get_hive_sentry_provider
+from libsentry.privilege_checker import get_checker, MissingSentryPrivilegeException
 from navoptapi.api_lib import ApiLib
 
 from metadata.conf import OPTIMIZER, get_optimizer_url
@@ -54,7 +56,8 @@ class NavOptException(Exception):
 
 class OptimizerApi(object):
 
-  def __init__(self, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
+  def __init__(self, user=None, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
+    self.user = user
     self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._email = OPTIMIZER.EMAIL.get()
     self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
@@ -159,8 +162,26 @@ class OptimizerApi(object):
 
 
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    return self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None})
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=self.user)
+      action = 'SELECT'
+      objects = [{'server': get_hive_sentry_provider(), 'db': database_name}]
+      if not checker.filter_objects(objects, action):
+        raise MissingSentryPrivilegeException(objects)
 
+    data = self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None})
+
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=self.user)
+      action = 'SELECT'
+
+      def getkey(table):
+        names = _get_table_name(table['name']),
+        return {'server': get_hive_sentry_provider(), 'db': names['database'], 'table': names['table']}
+
+      data['results'] = checker.filter_objects(data['results'], action, key=getkey)
+
+    return data
 
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
     return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None})
@@ -263,3 +284,11 @@ def OptimizerQueryDataAdapter(data):
     rows = ([str(uuid.uuid4()), 0.0, q, 'default'] for q in data)
 
   yield headers, rows
+
+def _get_table_name(path):
+  if '.' in path:
+    database, table = path.split('.', 1)
+  else:
+    database, table = 'default', path
+
+  return {'database': database, 'table': table}
