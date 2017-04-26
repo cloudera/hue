@@ -330,7 +330,7 @@ from notebook.conf import get_ordered_interpreters
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
@@ -467,7 +467,7 @@ from notebook.conf import get_ordered_interpreters
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
         <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
-          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-db-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
+          <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
                 <i class='fa fa-info' title="${ _('Details') }"></i>
