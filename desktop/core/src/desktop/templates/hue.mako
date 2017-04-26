@@ -1157,7 +1157,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             if (browserItems.length > 0) {
               items.push({
                 isCategory: true,
-                displayName: '${ _('Browse') }',
+                displayName: '${ _('Browsers') }',
                 children: browserItems
               })
             }
