@@ -98,14 +98,19 @@ def is_ha_enabled():
   return get_sentry_server_rpc_addresses() is not None
 
 
-def get_sentry_client(username, client_class, exempt_host=None, component=None):
+def get_sentry_client(username, client_class, exempt_host=None, component=None, retries=0, seed=None):
   server = None
+
   if is_ha_enabled():
     servers = _get_server_properties(exempt_host=exempt_host)
-    if servers:
-      server = random.choice(servers)
+    seed_function = lambda: seed if seed else random.random()
 
-  if server is None:
+    random.shuffle(servers, seed_function)
+    if servers and retries < len(servers):
+      server = servers[retries]
+    else:
+      raise PopupException(_('Tried %s Sentry servers HA, none are available.') % retries)
+  else:
     if HOSTNAME.get() and PORT.get():
       LOG.info('No Sentry servers configured in %s, falling back to libsentry configured host: %s:%s' %
                (_CONF_SENTRY_SERVER_RPC_ADDRESSES, HOSTNAME.get(), PORT.get()))
