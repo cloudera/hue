@@ -17,6 +17,7 @@
 
 import logging
 import threading
+import random
 import time
 
 from django.utils.translation import ugettext as _
@@ -32,23 +33,26 @@ LOG = logging.getLogger(__name__)
 
 API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
+MAX_RETRIES = 15
 
 
 def ha_error_handler(func):
   def decorator(*args, **kwargs):
-    retries = 15
+    retries = 0
+    seed = random.random()
 
-    while retries > 0:
+    while retries <= MAX_RETRIES:
       try:
         return func(*args, **kwargs)
       except StructuredThriftTransportException, e:
-        retries -= 1
-        if not is_ha_enabled() or retries == 0:
+        if not is_ha_enabled() or retries == MAX_RETRIES:
           raise PopupException(_('Failed to retry connecting to an available Sentry server.'), detail=e)
         else:
           LOG.info('Could not connect to Sentry server %s, attempting to fetch next available client.' % args[0].client.host)
           time.sleep(1)
-          args[0].client = get_cached_client(args[0].client.username, force_reset=True)
+          args[0].client = get_cached_client(args[0].client.username, retries=retries, seed=seed)
+          LOG.info('Picked %s at attempt %s' % (args[0].client, retries))
+          retries += 1
       except SentryException, e:
         raise e
       except Exception, e:
@@ -62,8 +66,9 @@ def get_api(user):
   return SentryApi(client)
 
 
-def get_cached_client(username, force_reset=False):
+def get_cached_client(username, retries=0, seed=None):
   exempt_host = None
+  force_reset = retries > 0
 
   global API_CACHE
   if force_reset and API_CACHE is not None:
@@ -74,7 +79,7 @@ def get_cached_client(username, force_reset=False):
   if API_CACHE is None:
     API_CACHE_LOCK.acquire()
     try:
-      API_CACHE = get_sentry_client(username, SentryClient, exempt_host=exempt_host)
+      API_CACHE = get_sentry_client(username, SentryClient, exempt_host=exempt_host, retries=retries, seed=seed)
       LOG.info("Setting cached Sentry client to host: %s" % API_CACHE.host)
     finally:
       API_CACHE_LOCK.release()
