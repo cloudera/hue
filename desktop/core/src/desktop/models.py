@@ -1788,6 +1788,17 @@ def _get_apps(user, section=None):
   return current_app, other_apps, apps_list
 
 
+def get_user_preferences(user, key=None):
+  if key is None:
+    try:
+      x = UserPreferences.objects.get(user=user, key=key)
+      return {key: x.value}
+    except UserPreferences.DoesNotExist:
+      return None
+  else:
+    return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
+
+
 def get_data_link(meta):
   link = None
 

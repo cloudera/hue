@@ -43,7 +43,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig,\
-  UserPreferences
+  UserPreferences, get_user_preferences
 
 
 LOG = logging.getLogger(__name__)
@@ -586,14 +586,7 @@ def user_preferences(request, key=None):
   response = {'status': 0, 'data': {}}
 
   if request.method != "POST":
-    if key is not None:
-      try:
-        x = UserPreferences.objects.get(user=request.user, key=key)
-        response['data'] = {key: x.value}
-      except UserPreferences.DoesNotExist:
-        response['data'] = None
-    else:
-      response['data'] = dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user))
+    response['data'] = get_user_preferences(request.user, key)
   else:
     if "set" in request.POST:
       try:
