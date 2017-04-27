@@ -631,67 +631,24 @@ class HiveServerClient:
     return session
 
 
-  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS,
-           withMultipleSession=False):
-    (res, session) = self.call_return_result_and_session(fn, req, status, withMultipleSession)
+  def call(self, fn, req, status=TStatusCode.SUCCESS_STATUS, with_multiple_session=False):
+    (res, session) = self.call_return_result_and_session(fn, req, status, with_multiple_session)
     return res
 
 
-  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS,
-                                     withMultipleSession=False):
-
+  def call_return_result_and_session(self, fn, req, status=TStatusCode.SUCCESS_STATUS, with_multiple_session=False):
     n_sessions = conf.MAX_NUMBER_OF_SESSIONS.get()
 
     # When a single session is allowed, avoid multiple session logic
-    if n_sessions == 1:
-      withMultipleSession = False
+    with_multiple_session = n_sessions > 1
 
     session = None
 
-    if not withMultipleSession:
+    if not with_multiple_session:
       # Default behaviour: get one session
       session = Session.objects.get_session(self.user, self.query_server['server_name'])
-
     else:
-      # Get 2 + n_sessions sessions and filter out the busy ones
-      sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
-      LOG.debug('%s sessions found' % len(sessions))
-      if sessions:
-        # Include trashed documents to keep the query lazy
-        # and avoid retrieving all documents
-        docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
-        busy_sessions = set()
-
-        # Only check last 40 documents for performance
-        for doc in docs[:40]:
-          try:
-            snippet_data = json.loads(doc.data)['snippets'][0]
-          except (KeyError, IndexError):
-            # data might not contain a 'snippets' field or it might be empty
-            LOG.warn('No snippets in Document2 object of type query-hive')
-            continue
-          session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
-          status = snippet_data.get('status')
-
-          if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
-            if session_guid is not None and session_guid not in busy_sessions:
-              busy_sessions.add(session_guid)
-
-        n_busy_sessions = 0
-        available_sessions = []
-        for session in sessions:
-          if session.guid not in busy_sessions:
-            available_sessions.append(session)
-          else:
-            n_busy_sessions += 1
-
-        if n_busy_sessions == n_sessions:
-          raise Exception('Too many open sessions. Stop a running query before starting a new one')
-
-        if available_sessions:
-          session = available_sessions[0]
-        else:
-          session = None # No available session found
+      session = self._get_tez_session(n_sessions)
 
     if session is None:
       session = self.open_session(self.user)
@@ -724,6 +681,50 @@ class HiveServerClient:
       raise QueryServerException(Exception('Bad status for request %s:\n%s' % (req, res)), message=message)
     else:
       return (res, session)
+
+
+  def _get_tez_session(self, n_sessions):
+    # Get 2 + n_sessions sessions and filter out the busy ones
+    sessions = Session.objects.get_n_sessions(self.user, n=2 + n_sessions, application=self.query_server['server_name'])
+    LOG.debug('%s sessions found' % len(sessions))
+    if sessions:
+      # Include trashed documents to keep the query lazy
+      # and avoid retrieving all documents
+      docs = Document2.objects.get_history(doc_type='query-hive', user=self.user, include_trashed=True)
+      busy_sessions = set()
+
+      # Only check last 40 documents for performance
+      for doc in docs[:40]:
+        try:
+          snippet_data = json.loads(doc.data)['snippets'][0]
+        except (KeyError, IndexError):
+          # data might not contain a 'snippets' field or it might be empty
+          LOG.warn('No snippets in Document2 object of type query-hive')
+          continue
+        session_guid = snippet_data.get('result', {}).get('handle', {}).get('session_guid')
+        status = snippet_data.get('status')
+
+        if status in [str(QueryHistory.STATE.submitted), str(QueryHistory.STATE.running)]:
+          if session_guid is not None and session_guid not in busy_sessions:
+            busy_sessions.add(session_guid)
+
+      n_busy_sessions = 0
+      available_sessions = []
+      for session in sessions:
+        if session.guid not in busy_sessions:
+          available_sessions.append(session)
+        else:
+          n_busy_sessions += 1
+
+      if n_busy_sessions == n_sessions:
+        raise Exception('Too many open sessions. Stop a running query before starting a new one')
+
+      if available_sessions:
+        session = available_sessions[0]
+      else:
+        session = None # No available session found
+
+      return session
 
 
   def close_session(self, sessionHandle):
@@ -864,7 +865,7 @@ class HiveServerClient:
     return HiveServerDataTable(results, schema, operation_handle, self.query_server)
 
 
-  def execute_async_query(self, query, statement=0, withMultipleSession=False):
+  def execute_async_query(self, query, statement=0, with_multiple_session=False):
     if statement == 0:
       # Impala just has settings currently
       if self.query_server['server_name'] == 'beeswax':
@@ -880,8 +881,7 @@ class HiveServerClient:
     configuration.update(self._get_query_configuration(query))
     query_statement = query.get_query_statement(statement)
 
-    return self.execute_async_statement(statement=query_statement, confOverlay=configuration,
-                                        withMultipleSession=withMultipleSession)
+    return self.execute_async_statement(statement=query_statement, confOverlay=configuration, with_multiple_session=with_multiple_session)
 
 
   def execute_statement(self, statement, max_rows=1000, configuration={}, orientation=TFetchOrientation.FETCH_NEXT):
@@ -894,12 +894,12 @@ class HiveServerClient:
     return self.fetch_result(res.operationHandle, max_rows=max_rows, orientation=orientation), res.operationHandle
 
 
-  def execute_async_statement(self, statement, confOverlay, withMultipleSession=False):
+  def execute_async_statement(self, statement, confOverlay, with_multiple_session=False):
     if self.query_server['server_name'] == 'impala' and self.query_server['QUERY_TIMEOUT_S'] > 0:
       confOverlay['QUERY_TIMEOUT_S'] = str(self.query_server['QUERY_TIMEOUT_S'])
 
     req = TExecuteStatementReq(statement=statement.encode('utf-8'), confOverlay=confOverlay, runAsync=True)
-    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, withMultipleSession=withMultipleSession)
+    (res, session) = self.call_return_result_and_session(self._client.ExecuteStatement, req, with_multiple_session=with_multiple_session)
 
     return HiveServerQueryHandle(secret=res.operationHandle.operationId.secret,
                                  guid=res.operationHandle.operationId.guid,
@@ -1161,8 +1161,8 @@ class HiveServerClientCompatible(object):
     self.query_server = client.query_server
 
 
-  def query(self, query, statement=0, withMultipleSession=False):
-    return self._client.execute_async_query(query, statement, withMultipleSession=withMultipleSession)
+  def query(self, query, statement=0, with_multiple_session=False):
+    return self._client.execute_async_query(query, statement, with_multiple_session=with_multiple_session)
 
 
   def get_state(self, handle):

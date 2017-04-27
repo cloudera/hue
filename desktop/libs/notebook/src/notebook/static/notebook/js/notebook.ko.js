@@ -19,7 +19,7 @@ var EditorViewModel = (function() {
   var NOTEBOOK_MAPPING = {
     ignore: [
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
-      'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
+      'cleanedDateTimeMeta', 'cleancomplexityCheckRunningedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
       'snippetImage', 'user'
     ]
@@ -935,6 +935,7 @@ var EditorViewModel = (function() {
           },
           always: function(data) {
             self.complexityCheckRunning(false);
+            self.hasSuggestion('');
           }
         });
       };
