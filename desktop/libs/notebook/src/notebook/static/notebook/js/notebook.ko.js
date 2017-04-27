@@ -935,6 +935,9 @@ var EditorViewModel = (function() {
           },
           always: function(data) {
             self.complexityCheckRunning(false);
+          },
+          error: function(data) {
+            self.complexityCheckRunning(false);
           }
         });
       };
