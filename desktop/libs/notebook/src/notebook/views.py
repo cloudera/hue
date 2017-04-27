@@ -27,7 +27,7 @@ from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
 from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
-from desktop.models import Document2, Document
+from desktop.models import Document2, Document, FilesystemException
 
 from metadata.conf import has_optimizer, has_navigator
 
@@ -233,33 +233,68 @@ def execute_and_watch(request):
 
 @check_document_modify_permission()
 def delete(request):
+  response = {'status': -1}
+
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  ctr = 0
-  for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
-    doc = doc2.doc.get()
-    doc.can_write_or_exception(request.user)
-    doc2.trash()
-    ctr += 1
+  if not notebooks:
+    response['message'] = _('No notebooks have been selected for deletion.')
+  else:
+    ctr = 0
+    failures = []
+    for notebook in notebooks:
+      try:
+        doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
+        doc = doc2.doc.get()
+        doc.can_write_or_exception(request.user)
+        doc2.trash()
+        ctr += 1
+      except FilesystemException, e:
+        failures.append(notebook['uuid'])
+        LOG.exception("Failed to delete document with UUID %s that is writable by user %s, skipping." % (notebook['uuid'], request.user.username))
 
-  return JsonResponse({'status': 0, 'message': _('Trashed %d notebook(s)') % ctr})
+    response['status'] = 0
+    if failures:
+      response['errors'] = failures
+      response['message'] = _('Trashed %d notebook(s) and failed to delete %d notebook(s).') % (ctr, len(failures))
+    else:
+      response['message'] = _('Trashed %d notebook(s)') % ctr
+
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
 def copy(request):
+  response = {'status': -1}
+
   notebooks = json.loads(request.POST.get('notebooks', '[]'))
 
-  for notebook in notebooks:
-    doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
-    doc = doc2.doc.get()
+  if len(notebooks) == 0:
+    response['message'] = _('No notebooks have been selected for copying.')
+  else:
+    ctr = 0
+    failures = []
+    for notebook in notebooks:
+      try:
+        doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
+        doc = doc2.doc.get()
 
-    name = doc2.name + '-copy'
-    doc2 = doc2.copy(name=name, owner=request.user)
+        name = doc2.name + '-copy'
+        doc2 = doc2.copy(name=name, owner=request.user)
 
-    doc.copy(content_object=doc2, name=name, owner=request.user)
+        doc.copy(content_object=doc2, name=name, owner=request.user)
+      except FilesystemException, e:
+        failures.append(notebook['uuid'])
+        LOG.exception("Failed to copy document with UUID %s accessible by user %s, skipping." % (notebook['uuid'], request.user.username))
 
-  return JsonResponse({})
+    response['status'] = 0
+    if failures:
+      response['errors'] = failures
+      response['message'] = _('Copied %d notebook(s) and failed to copy %d notebook(s).') % (ctr, len(failures))
+    else:
+      response['message'] = _('Copied %d notebook(s)') % ctr
+
+  return JsonResponse(response)
 
 
 @check_document_access_permission()
