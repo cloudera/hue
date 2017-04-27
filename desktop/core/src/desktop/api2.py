@@ -398,11 +398,14 @@ def share_document(request):
 
   Example of input: {'read': {'user_ids': [1, 2, 3], 'group_ids': [1, 2, 3]}}
   """
-  perms_dict = json.loads(request.POST.get('data'))
-  uuid = json.loads(request.POST.get('uuid'))
+  perms_dict = request.POST.get('data')
+  uuid = request.POST.get('uuid')
 
   if not uuid or not perms_dict:
     raise PopupException(_('share_document requires uuid and perms_dict'))
+  else:
+    perms_dict = json.loads(perms_dict)
+    uuid = json.loads(uuid)
 
   doc = Document2.objects.get_by_uuid(user=request.user, uuid=uuid)
 
