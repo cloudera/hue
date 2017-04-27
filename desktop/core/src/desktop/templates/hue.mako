@@ -162,32 +162,38 @@ ${ hueIcons.symbols() }
           </button>
 
           <ul class="dropdown-menu">
-            <li class="dropdown-submenu">
-              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
-                <i class="fa fa-fw fa-th-large inline-block"></i> ${ _('Data Eng') }
-              </a>
-              <ul class="dropdown-menu">
-               <li><a data-rel="navigator-tooltip" href="#"><span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span></a></li>
-                <!-- ko foreach: cluster.clusters()[3]['clusters'] -->
-                  <li>
-                    <a href="javascript: void(0)" data-bind="click: function() { $parent.cluster.cluster($data) }">
-                      <span class="dropdown-no-icon" data-bind="text: name"></span>
-                    </a>
+            <!-- ko foreach: cluster.clusters -->
+              <li>
+              <!-- ko switch: type -->
+                <!-- ko case: 'dataeng' -->
+                <li class="dropdown-submenu">
+                  <a data-rel="navigator-tooltip" href="javascript: void(0)">
+                    <i class="fa fa-fw fa-th-large inline-block"></i> <span data-bind="text: name"></span>
+                  </a>
+                  <ul class="dropdown-menu">
+                    <li>
+                      <a data-rel="navigator-tooltip" href="#">
+                        <span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span>
+                      </a>
+                    </li>
+                    <!-- ko foreach: $data['clusters'] -->
+                      <li>
+                        <a href="javascript: void(0)" data-bind="click: function() { $root.cluster.cluster($data) }">
+                          <span class="dropdown-no-icon" data-bind="text: name"></span>
+                        </a>
+                      </li>
+                    <!-- /ko -->
+                  </ul>
+                </li>
+                <!-- /ko -->
+                <!-- ko case: $default -->
+                  <li><a href="javascript: void(0)" data-bind="click: function(){  $root.cluster.cluster($data) }">
+                    <i class="fa fa-fw fa-square"></i> <span data-bind="text: name"></span></a>
                   </li>
                 <!-- /ko -->
-              </ul>
-            </li>
-            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-th-large"></i> ${ _('Team') }</a></li>
-            <li><a href="javascript: void(0)" data-bind="click: function(){ page('/dashboard/new_search') }"><i class="fa fa-fw fa-square"></i> ${ _('Athena') }</a></li>
-            <li class="dropdown-submenu">
-              <a data-rel="navigator-tooltip" href="javascript: void(0)" data-bind="click: function(){ page('/editor'); onePageViewModel.changeEditorType('hive', true); }">
-                <i class="fa fa-fw fa-th-large inline-block"></i> ${ _('Nightly') }
-              </a>
-              <ul class="dropdown-menu">
-              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 1</span></a></li>
-              <li><a  href="javascript: void(0)"><span class="dropdown-no-icon">Cluster 2</span></a></li>
-              </ul>
-            </li>
+              <!-- /ko -->
+              </li>
+            <!-- /ko -->
           </ul>
         </div>
 
@@ -1183,8 +1189,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             {'name': 'Athena', 'type': 'athena'}
           ]);
           self.cluster = ko.observable(self.clusters()[0]);
-          self.cluster.subscribe(function() {
-            new ClusterConfig(ko.mapping.toJS(self.cluster));
+          self.cluster.subscribe(function(newValue) {
+            new ClusterConfig(ko.mapping.toJS(newValue));
           });
 
           self.contextPanelVisible = ko.observable(false);
