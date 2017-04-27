@@ -47,7 +47,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, get_clusters
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -56,7 +56,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import Settings, hue_version, ClusterConfig, _get_apps, UserPreferences
+from desktop.models import Settings, hue_version, _get_apps, UserPreferences
 
 
 LOG = logging.getLogger(__name__)
@@ -80,9 +80,10 @@ def hue(request):
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'banner_message': get_banner_message(request),
-    'cluster_config': ClusterConfig(request.user),
-    'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user))
+    'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user)),
+    'clusters_config_json': json.dumps(get_clusters().values())
   })
+
 
 def ko_editor(request):
   apps = appmanager.get_apps_dict(request.user)
@@ -91,12 +92,14 @@ def ko_editor(request):
     'apps': apps,
   })
 
+
 def ko_metastore(request):
   apps = appmanager.get_apps_dict(request.user)
 
   return render('ko_metastore.mako', request, {
     'apps': apps,
   })
+
 
 def home(request):
   docs = _get_docs(request.user)

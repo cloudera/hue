@@ -155,6 +155,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-middle">
 
+        <!-- ko if: cluster.clusters().length > 0 -->
         <div class="btn-group pull-right">
           <button class="btn" data-bind="text: cluster.cluster().name"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -196,6 +197,7 @@ ${ hueIcons.symbols() }
             <!-- /ko -->
           </ul>
         </div>
+        <!-- /ko -->
 
         <div class="search-container-top">
           <input placeholder="${ _('Search data and saved documents...') }" type="text"
@@ -1181,14 +1183,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           var self = this;
           self.apiHelper = ApiHelper.getInstance();
 
-          self.clusters = ko.observableArray([
-            {'name': 'Ro\'s Cluster', 'type': 'ini'},
-            {'name': 'Team', 'type': 'ini', 'clusters': ko.observableArray()},
-            {'name': 'Nightly', 'type': 'cm', 'clusters': ko.observableArray()},
-            {'name': 'DataEng', 'type': 'dataeng', 'clusters': ko.observableArray()},
-            {'name': 'Athena', 'type': 'athena'}
-          ]);
-          self.cluster = ko.observable(self.clusters()[0]);
+          self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
+          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[0] : null);
           self.cluster.subscribe(function(newValue) {
             new ClusterConfig(ko.mapping.toJS(newValue));
           });

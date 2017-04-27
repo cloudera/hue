@@ -22,6 +22,11 @@ import os
 import socket
 import stat
 
+try:
+  from collections import OrderedDict
+except ImportError:
+  from ordereddict import OrderedDict # Python 2.6
+
 from django.utils.translation import ugettext_lazy as _
 
 from metadata.metadata_sites import get_navigator_audit_log_dir, get_navigator_audit_max_file_size
@@ -1337,13 +1342,17 @@ IS_HUE_4 = Config( # To remove in Hue 5
 
 def get_clusters():
   if CLUSTERS.get():
-    engines = CLUSTERS.get()
-    return dict([
-      (i, {
-        'analytics': engines[i].TYPE.get(),
-        'nesting': engines[i].NESTING.get()
-      }) for i in engines]
-    )
+    clusters = CLUSTERS.get()
+  else:
+    clusters = []
+    
+  return OrderedDict([
+    (i, {
+      'name': i,
+      'type': clusters[i].TYPE.get(),
+      'interfaces': clusters[i].INTERFACES.get()
+    }) for i in clusters]
+  )
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1358,6 +1367,13 @@ CLUSTERS = UnspecifiedConfigSection(
           default='local',
           type=str,
       ),
+      INTERFACES=Config(
+          "interfaces",
+          help=_("List of cluster instances of the cluster (optional)."),
+          default=[],
+          type=list,
+      ),
+
       PRODUCT_SECRET=Config(
         key="product_secret",
         help=_("A secret passphrase associated with the productName."),
