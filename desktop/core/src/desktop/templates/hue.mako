@@ -1184,7 +1184,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.apiHelper = ApiHelper.getInstance();
 
           self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
-          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[0] : null);
+          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : null);
           self.cluster.subscribe(function(newValue) {
             new ClusterConfig(ko.mapping.toJS(newValue));
           });

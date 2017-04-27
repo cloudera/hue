@@ -1789,7 +1789,7 @@ def _get_apps(user, section=None):
 
 
 def get_user_preferences(user, key=None):
-  if key is None:
+  if key is not None:
     try:
       x = UserPreferences.objects.get(user=user, key=key)
       return {key: x.value}
