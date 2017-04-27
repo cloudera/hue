@@ -171,6 +171,11 @@ ${ hueIcons.symbols() }
         return false;
       });
     %endif
+
+    % if next:
+      var $redirect = $('input[name="next"]');
+      $redirect.val($redirect.val() + window.location.hash);
+    % endif
   });
 </script>
 
