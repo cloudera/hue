@@ -153,6 +153,11 @@ ${ commonheader(_("Welcome to Hue"), "login", user, request, "50px", True, True)
         return false;
       });
     %endif
+
+    % if next:
+      var $redirect = $('input[name="next"]');
+      $redirect.val($redirect.val() + window.location.hash);
+    % endif
   });
 </script>
 
