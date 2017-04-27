@@ -229,6 +229,40 @@ class TestNotebookApi(object):
     trash_uuids = [doc['uuid'] for doc in data['children']]
     assert_true(notebook_doc.uuid in trash_uuids, data)
 
+    # Test that any errors are reported in the response
+    nonexistant_doc = {
+      "id": 12345,
+      "uuid": "ea22da5f-b69c-4843-b17d-dea5c74c41d1",
+      "selectedSnippet": "hive",
+      "showHistory": False,
+      "description": "Test Hive Query",
+      "name": "Test Hive Query",
+      "sessions": [
+        {
+          "type": "hive",
+          "properties": [],
+          "id": None,
+        }
+      ],
+      "type": "query-hive",
+      "snippets": [{
+        "id": "e069ef32-5c95-4507-b961-e79c090b5abf",
+        "type": "hive",
+        "status": "ready",
+        "database": "default",
+        "statement": "select * from web_logs",
+        "statement_raw": "select * from web_logs",
+         "properties": {"settings": [], "files": [], "functions": []},
+        "result": {}
+      }]
+    }
+    trash_notebooks = [nonexistant_doc]
+    response = self.client.post(reverse('notebook:delete'), {'notebooks': json.dumps(trash_notebooks)})
+    data = json.loads(response.content)
+    assert_equal(0, data['status'], data)
+    assert_equal('Trashed 0 notebook(s) and failed to delete 1 notebook(s).', data['message'], data)
+    assert_equal(['ea22da5f-b69c-4843-b17d-dea5c74c41d1'], data['errors'])
+
 
   def test_query_error_encoding(self):
     @api_error_handler
