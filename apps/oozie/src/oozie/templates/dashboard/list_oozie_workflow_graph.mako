@@ -35,10 +35,14 @@ ${ dashboard.import_layout() }
 <script src="${ static('oozie/js/workflow-editor.utils.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.curvedarrow.js') }" type="text/javascript" charset="utf-8"></script>
 
-${ workflow.render() }
+<div class="oozie_workflowComponents">
 
-<div id="loaded${doc_uuid}graph">
-  ${ workflow_graph | n,unicode }
+  ${ workflow.render() }
+
+  <div id="loaded${doc_uuid}graph">
+    ${ workflow_graph | n,unicode }
+  </div>
+
 </div>
 
 <script type="text/javascript">
