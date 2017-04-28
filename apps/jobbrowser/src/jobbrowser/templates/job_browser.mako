@@ -1624,7 +1624,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
+        % if not is_mini:
         hueUtils.changeURL('#!' + interface);
+        % endif
         self.job(null);
         if (interface === 'slas'){
           % if not is_mini:
@@ -1733,6 +1735,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         viewModel.job().apiStatus('RUNNING');
         viewModel.job().updateJob();
       }, 'jobbrowser');
+      % else:
+      huePubSub.subscribe('mini.jb.navigate', function(interface){
+        viewModel.selectInterface(interface);
+      });
       % endif
     });
   })();
