@@ -29,7 +29,7 @@
 ${ commonheader(_("Workflow Dashboard"), "oozie", user, request) | n,unicode }
 ${ layout.menubar(section='workflows', dashboard=True) }
 
-<div id="oozie_workflowComponents" class="container-fluid">
+<div id="oozie_workflowComponents" class="container-fluid oozie_workflowComponents">
 <div class="card card-small">
   <div class="card-body">
   <p>

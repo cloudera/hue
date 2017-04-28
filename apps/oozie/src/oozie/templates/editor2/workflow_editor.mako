@@ -31,7 +31,7 @@ from oozie.conf import ENABLE_DOCUMENT_ACTION, ENABLE_IMPALA_ACTION
 ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicode }
 %endif
 
-<div id="oozie_workflowComponents" class="dashboard-container">
+<div id="oozie_workflowComponents" class="dashboard-container oozie_workflowComponents">
 
 <%def name="buttons()">
   <div class="pull-right" style="padding-right: 10px">
