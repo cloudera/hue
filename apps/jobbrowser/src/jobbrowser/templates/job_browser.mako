@@ -237,7 +237,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 <!-- ko if: $root.job() -->
-  <div id="rerun-modal" class="modal" data-bind="html: $root.job().rerunModalContent"></div>
+  <div id="rerun-modal" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
 <!-- /ko -->
 
 </div>
@@ -1154,7 +1154,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
 
+            if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
+              vm.job().updateWorkflowGraph();
+            }
+
             vm.job().fetchLogs();
+
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1175,7 +1180,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               vm.job().fetchLogs();
             }
             // vm.job().fetchProfile(); // Get name of active tab?
-            // updateWorkflowGraph() // If workflow
           });
         }
       };
@@ -1240,6 +1244,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       }
 
+      self.workflowGraphLoaded = false;
       self.updateWorkflowGraph = function() {
         var lastPosition = {
           top: 0,
@@ -1278,6 +1283,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             },
             dataType: "html",
             success: function (response) {
+              self.workflowGraphLoaded = true;
               $('#workflow-page-graph').html(response);
               updateArrowPosition();
               arrowsPolling();
@@ -1736,7 +1742,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         viewModel.job().updateJob();
       }, 'jobbrowser');
       % else:
-        viewModel.selectInterface('jobs');
+      viewModel.selectInterface('jobs');
       huePubSub.subscribe('mini.jb.navigate', function(interface){
         viewModel.selectInterface(interface);
       });
