@@ -1531,9 +1531,10 @@ class Document2Permission(models.Model):
 
 class ClusterConfig():
 
-  def __init__(self, user, apps=None):
+  def __init__(self, user, apps=None, cluster_type='ini'):
     self.user = user
     self.apps = appmanager.get_apps_dict(self.user) if apps is None else apps
+    self.cluster_type = cluster_type
 
 
   def refreshConfig(self):
@@ -1568,7 +1569,7 @@ class ClusterConfig():
       return default_app
 
 
-  def _get_editor(self, cluster_type):
+  def _get_editor(self):
     interpreters = []
 
     if SHOW_NOTEBOOKS.get():
@@ -1581,7 +1582,7 @@ class ClusterConfig():
       })
 
     _interpreters = get_ordered_interpreters(self.user)
-    if cluster_type == 'dataeng':
+    if self.cluster_type == 'dataeng':
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'java')]
 
     for interpreter in _interpreters:
@@ -1603,10 +1604,10 @@ class ClusterConfig():
     else:
       return None
 
-  def _get_dashboard(self, cluster_type):
+  def _get_dashboard(self):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
 
-    if IS_DASHBOARD_ENABLED.get() and cluster_type != 'dataeng':
+    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != 'dataeng':
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
@@ -1616,10 +1617,10 @@ class ClusterConfig():
     else:
       return None
 
-  def _get_browser(self, cluster_type):
+  def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and cluster_type != 'dataeng':
+    if 'filebrowser' in self.apps and self.cluster_type != 'dataeng':
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1643,7 +1644,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and cluster_type != 'dataeng':
+    if 'search' in self.apps and self.cluster_type != 'dataeng':
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1652,7 +1653,7 @@ class ClusterConfig():
       })
 
     if 'jobbrowser' in self.apps:
-      if cluster_type == 'dataeng':
+      if self.cluster_type == 'dataeng':
         interpreters.append({
           'type': 'dataeng',
           'displayName': _('Jobs'),
@@ -1669,7 +1670,7 @@ class ClusterConfig():
             'page': '/jobbrowser/'
           })
 
-    if 'hbase' in self.apps and cluster_type != 'dataeng':
+    if 'hbase' in self.apps and self.cluster_type != 'dataeng':
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1677,7 +1678,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and cluster_type != 'dataeng':
+    if 'security' in self.apps and self.cluster_type != 'dataeng':
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1685,7 +1686,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and cluster_type != 'dataeng':
+    if 'sqoop' in self.apps and self.cluster_type != 'dataeng':
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
@@ -1704,7 +1705,7 @@ class ClusterConfig():
       return None
 
 
-  def _get_scheduler(self, cluster_type):
+  def _get_scheduler(self):
     interpreters = [{
         'type': 'oozie-workflow',
         'displayName': _('Workflow'),
@@ -1757,12 +1758,12 @@ class ClusterConfig():
       return None
 
 
-  def get_apps(self, cluster_type):
+  def get_apps(self):
     apps = OrderedDict([app for app in [
-      ('editor', self._get_editor(cluster_type)),
-      ('dashboard', self._get_dashboard(cluster_type)),
-      ('browser', self._get_browser(cluster_type)),
-      ('scheduler', self._get_scheduler(cluster_type)),
+      ('editor', self._get_editor()),
+      ('dashboard', self._get_dashboard()),
+      ('browser', self._get_browser()),
+      ('scheduler', self._get_scheduler()),
       ('sdkapps', self._get_sdk_apps()),
     ] if app[1]])
 
