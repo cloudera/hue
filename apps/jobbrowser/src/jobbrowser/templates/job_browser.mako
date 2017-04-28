@@ -1736,6 +1736,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         viewModel.job().updateJob();
       }, 'jobbrowser');
       % else:
+        viewModel.selectInterface('jobs');
       huePubSub.subscribe('mini.jb.navigate', function(interface){
         viewModel.selectInterface(interface);
       });
