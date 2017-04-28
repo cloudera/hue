@@ -69,9 +69,19 @@ def is_alive(request):
 
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
+
+  default_cluster_index = 0
+  default_cluster_interface = ''
+
   clusters = get_clusters()
   default_cluster = get_user_preferences(request.user, key='cluster')
-  default_cluster_index = clusters and default_cluster and default_cluster in clusters.keys() and clusters.keys().index(default_cluster) or 0
+
+  if clusters and default_cluster:
+    default_cluster_json = json.loads(default_cluster['cluster'])
+    default_cluster_name = default_cluster_json.get('name')
+
+    default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
+    default_cluster_interface = default_cluster_json.get('interface', '')
 
   return render('hue.mako', request, {
     'apps': apps,
@@ -85,7 +95,8 @@ def hue(request):
     'banner_message': get_banner_message(request),
     'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user)),
     'clusters_config_json': json.dumps(get_clusters().values()),
-    'default_cluster_index': default_cluster_index
+    'default_cluster_index': default_cluster_index,
+    'default_cluster_interface': default_cluster_interface
   })
 
 

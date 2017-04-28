@@ -204,6 +204,9 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
 
+  # Get user pref
+  # if cluster type == 'dataeng', switch interface
+
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)

@@ -157,7 +157,7 @@ ${ hueIcons.symbols() }
 
         <!-- ko if: cluster.clusters().length > 0 -->
         <div class="btn-group pull-right">
-          <button class="btn" data-bind="text: cluster.cluster().name"></button>
+          <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -165,29 +165,28 @@ ${ hueIcons.symbols() }
           <ul class="dropdown-menu">
             <!-- ko foreach: cluster.clusters -->
               <li>
-              <!-- ko switch: type -->
-                <!-- ko case: 'dataeng' -->
+              <!-- ko if: ['dataeng', 'cm'].indexOf(type()) != -1 && interfaces().length > 0 -->
                 <li class="dropdown-submenu">
                   <a data-rel="navigator-tooltip" href="javascript: void(0)">
                     <i class="fa fa-fw fa-th-large inline-block"></i> <span data-bind="text: name"></span>
                   </a>
                   <ul class="dropdown-menu">
-                    <li>
+                    <li data-bind="visible: type() == 'dataeng'">
                       <a data-rel="navigator-tooltip" href="#">
                         <span class="dropdown-no-icon"><i class="fa fa-fw fa-plus inline-block"></i></span>
                       </a>
                     </li>
-                    <!-- ko foreach: $data['clusters'] -->
+                    <!-- ko foreach: interfaces -->
                       <li>
                         <a href="javascript: void(0)" data-bind="click: function() { $root.cluster.cluster($data) }">
-                          <span class="dropdown-no-icon" data-bind="text: name"></span>
+                          <span class="dropdown-no-icon" data-bind="text: interface"></span>
                         </a>
                       </li>
                     <!-- /ko -->
                   </ul>
                 </li>
                 <!-- /ko -->
-                <!-- ko case: $default -->
+                <!-- ko if: ['dataeng', 'cm'].indexOf(type()) == -1 || interfaces().length == 0 -->
                   <li><a href="javascript: void(0)" data-bind="click: function(){  $root.cluster.cluster($data) }">
                     <i class="fa fa-fw fa-square"></i> <span data-bind="text: name"></span></a>
                   </li>
@@ -1186,28 +1185,46 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
           self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : null);
           self.cluster.subscribe(function(newValue) {
-            new ClusterConfig(ko.mapping.toJS(newValue));
+            new ClusterConfig({'cluster': ko.mapping.toJSON(newValue)});
           });
 
           self.contextPanelVisible = ko.observable(false);
 
-          $.post("/jobbrowser/api/jobs", {
-            interface: ko.mapping.toJSON('dataeng-clusters'),
-            filters: ko.mapping.toJSON([]),
-          }, function (data) {
-            if (data.status == 0) {
-              var clusters = [];
-              if (data && data.apps) {
-                data.apps.forEach(function (cluster) {
-                  clusters.push({'name': cluster.id, 'type': 'dataeng'});
-                });
-              }
-              self.clusters()[3]['clusters'](clusters);
-            } else {
-              $(document).trigger("error", data.message);
-            }
+          var dataEngCluster = $.grep(self.clusters(), function(cluster) {
+            return cluster.type() == 'dataeng';
           });
+          if (dataEngCluster.length > 0) {
+            $.post("/jobbrowser/api/jobs", {
+              interface: ko.mapping.toJSON('dataeng-clusters'),
+              filters: ko.mapping.toJSON([]),
+            }, function (data) {
+              if (data.status == 0) {
+                var interfaces = [];
+                if (data && data.apps) {
+                  data.apps.forEach(function(cluster) {
+                    interfaces.push(ko.mapping.fromJS({'name': dataEngCluster[0].name(), 'type': 'dataeng', 'interface': cluster.id}));
+                  });
+                }
+                dataEngCluster[0]['interfaces'](interfaces);
+
+                if (dataEngCluster[0].type() == 'dataeng') {
+                  self._loadInterface();
+                }
+              } else {
+                $(document).trigger("error", data.message);
+              }
+            });
+          }
+          if (self.cluster().type() != 'dataeng') {
+            self._loadInterface();
+          }
         }
+        self._loadInterface = function() {
+          var interfaces = self.cluster().interfaces().filter(function (i) {return i.interface() == '${ default_cluster_interface }'});
+          if (interfaces.length > 0) {
+            self.cluster(interfaces[0]);
+          }
+        };
         self.cluster = new ClusterPanelViewModel();
 
         self.searchAutocompleteSource = function (request, callback) {

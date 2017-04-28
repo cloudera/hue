@@ -1345,14 +1345,18 @@ def get_clusters():
     clusters = CLUSTERS.get()
   else:
     clusters = []
-    
-  return OrderedDict([
+
+  cl = OrderedDict([
     (i, {
       'name': i,
       'type': clusters[i].TYPE.get(),
-      'interfaces': clusters[i].INTERFACES.get()
+      'interfaces': [{'name': i, 'type': clusters[i].TYPE.get(), 'interface': interface} for interface in clusters[i].INTERFACES.get()]
     }) for i in clusters]
   )
+
+  cl['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
+  cl['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
+  return cl
 
 
 CLUSTERS = UnspecifiedConfigSection(
@@ -1371,7 +1375,7 @@ CLUSTERS = UnspecifiedConfigSection(
           "interfaces",
           help=_("List of cluster instances of the cluster (optional)."),
           default=[],
-          type=list,
+          type=coerce_csv,
       ),
 
       PRODUCT_SECRET=Config(
