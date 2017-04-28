@@ -38,6 +38,7 @@ from metadata.navigator_api import search_entities_interactive as metadata_searc
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
+from desktop.conf import get_clusters
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
@@ -68,10 +69,20 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_config(request):
-  cluster_config = ClusterConfig(request.user)
+  if request.POST.get('cluster'):
+    cluster_type = json.loads(request.POST['cluster'])['type']
+    # TODO persist
+  else:
+    default_cluster = get_user_preferences(request.user, key='cluster')
+    if default_cluster:
+      clusters = get_clusters()
+      cluster_name = json.loads(default_cluster['cluster']).get('name')
+      cluster_type = cluster_name and clusters.get(cluster_name) and clusters[cluster_name]['type'] or 'ini'
+    else:
+      cluster_type = 'ini'
 
-  cluster_type = request.POST.get('type', 'ini') # TODO pref
-  app_config = cluster_config.get_apps(cluster_type)
+  cluster_config = ClusterConfig(request.user, cluster_type=cluster_type)
+  app_config = cluster_config.get_apps()
 
   return JsonResponse({
     'status': 0,
