@@ -26,6 +26,8 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 from notebook.conf import get_ordered_interpreters
+from desktop.models import get_user_preferences, USER_PREFERENCE_CLUSTER
+from desktop.conf import get_clusters
 
 
 LOG = logging.getLogger(__name__)
@@ -204,14 +206,21 @@ def get_api(request, snippet):
   if snippet.get('wasBatchExecuted'):
     return OozieApi(user=request.user, request=request)
 
-  # Get user pref
-  # if cluster type == 'dataeng', switch interface
-
   interpreter = [interpreter for interpreter in get_ordered_interpreters(request.user) if interpreter['type'] == snippet['type']]
   if not interpreter:
     raise PopupException(_('Snippet type %(type)s is not configured in hue.ini') % snippet)
   interpreter = interpreter[0]
   interface = interpreter['interface']
+
+  # Multi cluster
+  default_cluster = get_user_preferences(request.user, key=USER_PREFERENCE_CLUSTER)
+  if default_cluster:
+    clusters = get_clusters()
+    cluster_name = json.loads(default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
+    cluster_type = cluster_name and clusters.get(cluster_name) and clusters[cluster_name]['type'] or 'ini'
+
+    if cluster_type == 'dataeng':
+      interface = 'dataeng'
 
   if interface == 'hiveserver2':
     return HS2Api(user=request.user, request=request)
@@ -226,7 +235,7 @@ def get_api(request, snippet):
   elif interface == 'rdbms':
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
-    return DataEngApi(user=request.user, request=request)  
+    return DataEngApi(user=request.user, request=request)
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
