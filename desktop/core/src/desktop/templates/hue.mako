@@ -1190,6 +1190,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
           self.contextPanelVisible = ko.observable(false);
 
+          self._loadInterface = function() {
+            var interfaces = self.cluster().interfaces().filter(function (i) {return i.interface() == '${ default_cluster_interface }'});
+            if (interfaces.length > 0) {
+              self.cluster(interfaces[0]);
+            }
+          };
           var dataEngCluster = $.grep(self.clusters(), function(cluster) {
             return cluster.type() == 'dataeng';
           });
@@ -1219,12 +1225,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self._loadInterface();
           }
         }
-        self._loadInterface = function() {
-          var interfaces = self.cluster().interfaces().filter(function (i) {return i.interface() == '${ default_cluster_interface }'});
-          if (interfaces.length > 0) {
-            self.cluster(interfaces[0]);
-          }
-        };
         self.cluster = new ClusterPanelViewModel();
 
         self.searchAutocompleteSource = function (request, callback) {

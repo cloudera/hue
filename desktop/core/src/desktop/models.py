@@ -61,6 +61,8 @@ SAMPLE_USER_OWNERS = ['hue', 'sample']
 UTC_TIME_FORMAT = "%Y-%m-%dT%H:%MZ"
 HUE_VERSION = None
 
+USER_PREFERENCE_CLUSTER = 'cluster'
+
 
 def uuid_default():
   return str(uuid.uuid4())
@@ -1798,6 +1800,15 @@ def get_user_preferences(user, key=None):
       return None
   else:
     return dict((x.key, x.value) for x in UserPreferences.objects.filter(user=user))
+
+
+def set_user_preferences(user, key, value):
+  try:
+    x = UserPreferences.objects.get(user=user, key=key)
+  except UserPreferences.DoesNotExist:
+    x = UserPreferences(user=user, key=key)
+  x.value = value
+  x.save()
 
 
 def get_data_link(meta):
