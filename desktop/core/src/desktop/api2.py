@@ -44,7 +44,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig,\
-  UserPreferences, get_user_preferences
+  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER
 
 
 LOG = logging.getLogger(__name__)
@@ -69,14 +69,15 @@ def api_error_handler(func):
 
 @api_error_handler
 def get_config(request):
-  if request.POST.get('cluster'):
-    cluster_type = json.loads(request.POST['cluster'])['type']
-    # TODO persist
+  if request.POST.get(USER_PREFERENCE_CLUSTER):
+    cluster_type = json.loads(request.POST[USER_PREFERENCE_CLUSTER])['type']
+    if request.POST.get(USER_PREFERENCE_CLUSTER):
+      set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST[USER_PREFERENCE_CLUSTER])
   else:
-    default_cluster = get_user_preferences(request.user, key='cluster')
+    default_cluster = get_user_preferences(request.user, key=USER_PREFERENCE_CLUSTER)
     if default_cluster:
       clusters = get_clusters()
-      cluster_name = json.loads(default_cluster['cluster']).get('name')
+      cluster_name = json.loads(default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
       cluster_type = cluster_name and clusters.get(cluster_name) and clusters[cluster_name]['type'] or 'ini'
     else:
       cluster_type = 'ini'
@@ -600,12 +601,7 @@ def user_preferences(request, key=None):
     response['data'] = get_user_preferences(request.user, key)
   else:
     if "set" in request.POST:
-      try:
-        x = UserPreferences.objects.get(user=request.user, key=key)
-      except UserPreferences.DoesNotExist:
-        x = UserPreferences(user=request.user, key=key)
-      x.value = request.POST["set"]
-      x.save()
+      x = set_user_preferences(request.user, key, request.POST["set"])
       response['data'] = {key: x.value}
     elif "delete" in request.POST:
       try:
