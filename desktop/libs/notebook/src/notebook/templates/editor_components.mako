@@ -3103,6 +3103,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         viewModel.selectedNotebook().snippets()[0].positionStatement(statement);
       });
 
+      viewModel.selectedNotebook.subscribe(function (newVal) {
+        huePubSub.publish('selected.notebook.changed', newVal);
+      });
+
+      huePubSub.subscribe('get.selected.notebook', function () {
+        huePubSub.publish('set.selected.notebook', viewModel.selectedNotebook());
+      });
+
+
       var isAssistAvailable = viewModel.assistAvailable();
       var wasAssistVisible = viewModel.isLeftPanelVisible();
 
