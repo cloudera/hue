@@ -297,6 +297,31 @@ input[type='password']::-ms-reveal {
   }
 }
 
+.status-border {
+  &.success {
+    border-color: @cui-green!important;
+  }
+  &.running {
+    border-color: @cui-orange!important;
+  }
+  &.failed {
+    border-color: @cui-red!important;
+  }
+}
+
+.status-background {
+  &.success {
+    background-color: @cui-green!important;
+  }
+  &.running {
+    background-color: @cui-orange!important;
+  }
+  &.failed {
+    background-color: @cui-red!important;
+  }
+}
+
+
 .blue,
 .card-heading-blue {
   color: @hue-primary-color-dark!important;

@@ -861,14 +861,21 @@ a:visited {
   overflow-y: auto;
   height: 550px;
   max-height: 550px;
-  table, thead, tbody, th, td, tr {
-    display: block;
-  }
-  thead tr {
-    display: none;
-  }
   input.search-query {
     width: 70px;
+  }
+  li {
+    padding: 7px;
+    margin-top: 10px;
+    border-left: 3px solid @cui-white;
+    &:hover {
+      background-color: @cui-gray-050;
+    }
+  }
+  .status-bar {
+    height: 1px;
+    width: 0;
+    opacity: .5;
   }
 }
 
