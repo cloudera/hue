@@ -5323,6 +5323,25 @@
     }
   };
 
+  ko.bindingHandlers.moment = {
+    update: function (element, valueAccessor) {
+      var options = ko.unwrap(valueAccessor());
+      var $element = $(element);
+
+      var value = typeof options.data === 'function' ? options.data() : options.data;
+
+      function render() {
+        if (options.format) {
+          $element.text(moment(value).format(options.format));
+        }
+        else {
+          $element.text(moment(value));
+        }
+      }
+      render();
+    }
+  };
+
 
   ko.bindingHandlers.attachViewModelToElementData = {
     init: function (el, valueAccessor, allBindingsAccessor, viewModel) {
