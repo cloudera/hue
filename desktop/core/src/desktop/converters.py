@@ -59,9 +59,6 @@ class DocumentConverter(object):
             notebook = import_saved_beeswax_query(doc.content_object)
             data = notebook.get_data()
 
-            if doc.is_historic():
-              data['isSaved'] = False
-
             doc2 = self._create_doc2(
                 document=doc,
                 doctype=data['type'],
@@ -69,9 +66,6 @@ class DocumentConverter(object):
                 description=data['description'],
                 data=notebook.get_json()
             )
-
-            if doc.is_historic():
-              doc2.is_history = False
 
             self.imported_doc_count += 1
         except Exception, e:
@@ -84,7 +78,7 @@ class DocumentConverter(object):
     try:
       from beeswax.models import SavedQuery, HQL, IMPALA, RDBMS
 
-      docs = self._get_unconverted_docs(SavedQuery, with_history=True).filter(extra__in=[HQL, IMPALA, RDBMS]).order_by('-last_modified')
+      docs = self._get_unconverted_docs(SavedQuery, only_history=True).filter(extra__in=[HQL, IMPALA, RDBMS]).order_by('-last_modified')
 
       for doc in docs:
         try:
@@ -185,17 +179,19 @@ class DocumentConverter(object):
         LOG.exception("Failed to set is_trashed field with exception: %s" % e)
 
 
-  def _get_unconverted_docs(self, content_type, with_history=False):
+  def _get_unconverted_docs(self, content_type, only_history=False):
     docs = Document.objects.get_docs(self.user, content_type).filter(owner=self.user)
 
     tags = [
-      DocumentTag.objects.get_trash_tag(user=self.user), # No trashed docs
-      DocumentTag.objects.get_example_tag(user=self.user), # No examples
-      self.imported_tag # No already imported docs
+      DocumentTag.objects.get_trash_tag(user=self.user),  # No trashed docs
+      DocumentTag.objects.get_example_tag(user=self.user),  # No examples
+      self.imported_tag  # No already imported docs
     ]
 
-    if not with_history:
-      tags.append(DocumentTag.objects.get_history_tag(user=self.user)) # No history yet
+    if only_history:
+      docs = docs.filter(tags__in=[DocumentTag.objects.get_history_tag(user=self.user)])
+    else:  # Exclude history docs by default
+      tags.append(DocumentTag.objects.get_history_tag(user=self.user))
 
     return docs.exclude(tags__in=tags)
 
