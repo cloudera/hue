@@ -298,7 +298,7 @@ input[type='password']::-ms-reveal {
 }
 
 .status-border {
-  &.success {
+  &.completed {
     border-color: @cui-green!important;
   }
   &.running {
@@ -310,7 +310,7 @@ input[type='password']::-ms-reveal {
 }
 
 .status-background {
-  &.success {
+  &.completed {
     background-color: @cui-green!important;
   }
   &.running {
@@ -318,6 +318,18 @@ input[type='password']::-ms-reveal {
   }
   &.failed {
     background-color: @cui-red!important;
+  }
+}
+
+.status-content {
+  &.completed {
+    color: @cui-green!important;
+  }
+  &.running {
+    color: @cui-orange!important;
+  }
+  &.failed {
+    color: @cui-red!important;
   }
 }
 
