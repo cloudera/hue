@@ -679,82 +679,96 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="workflow-page">
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('Name') } <span data-bind="text: name"></span>
-  ${ _('Type') } <span data-bind="text: type"></span>
-  ${ _('Status') } <span data-bind="text: status"></span>
-  ${ _('User') } <span data-bind="text: user"></span>
-  ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
-  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <br><br>
-  Variables? Workspace<br>
-  Duration 8s<br>
-  <br><br>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span10">
+      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="clearfix"></div>
 
-  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
-    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+      <ul class="nav nav-tabs margin-top-20">
+        <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
+        <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="workflow-page-graph">
+        </div>
+
+        <div class="tab-pane" id="workflow-page-logs">
+          <pre data-bind="html: logs"></pre>
+        </div>
+
+        <div class="tab-pane" id="workflow-page-tasks">
+          <table id="actionsTable" class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+              <th>${_('log')}</th>
+              <th>${_('status')}</th>
+              <th>${_('errorMessage')}</th>
+              <th>${_('errorCode')}</th>
+              <th>${_('externalId')}</th>
+              <th>${_('id')}</th>
+              <th>${_('startTime')}</th>
+              <th>${_('endTime')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['actions']">
+              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }">
+                <td><div class="hueCheckbox fa"></div></td>
+                <td data-bind="text: 'logs'"></td>
+                <td data-bind="text: status"></td>
+                <td data-bind="text: errorMessage"></td>
+                <td data-bind="text: errorCode"></td>
+                <td data-bind="text: externalId"></td>
+                <td data-bind="text: id"></td>
+                <td data-bind="text: startTime"></td>
+                <td data-bind="text: endTime"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="workflow-page-metadata">
+          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+        </div>
+
+        <div class="tab-pane" id="workflow-page-xml">
+          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+        </div>
+      </div>
+    </div>
   </div>
-
-  <div data-bind="template: { name: 'job-actions' }"></div>
-
-  <ul class="nav nav-tabs margin-top-20">
-    <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
-    <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-    <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="workflow-page-graph">
-    </div>
-
-    <div class="tab-pane" id="workflow-page-logs">
-      <pre data-bind="html: logs"></pre>
-    </div>
-
-    <div class="tab-pane" id="workflow-page-tasks">
-      <table id="actionsTable" class="datatables table table-condensed">
-        <thead>
-        <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
-          <th>${_('log')}</th>
-          <th>${_('status')}</th>
-          <th>${_('errorMessage')}</th>
-          <th>${_('errorCode')}</th>
-          <th>${_('externalId')}</th>
-          <th>${_('id')}</th>
-          <th>${_('startTime')}</th>
-          <th>${_('endTime')}</th>
-        </tr>
-        </thead>
-        <tbody data-bind="foreach: properties['actions']">
-          <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }">
-            <td><div class="hueCheckbox fa"></div></td>
-            <td data-bind="text: 'logs'"></td>
-            <td data-bind="text: status"></td>
-            <td data-bind="text: errorMessage"></td>
-            <td data-bind="text: errorCode"></td>
-            <td data-bind="text: externalId"></td>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: startTime"></td>
-            <td data-bind="text: endTime"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <div class="tab-pane" id="workflow-page-metadata">
-      <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
-    </div>
-
-    <div class="tab-pane" id="workflow-page-xml">
-      <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
-    </div>
-  </div>
-
 </script>
 
 
