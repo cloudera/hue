@@ -808,106 +808,123 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       Log (if external id) | Child jobs
     </div>
   </div>
-  
+
 </script>
 
 
 <script type="text/html" id="schedule-page">
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('Name') } <span data-bind="text: name"></span>
-  ${ _('Type') } <span data-bind="text: type"></span>
-  ${ _('Status') } <span data-bind="text: status"></span>
-  ${ _('User') } <span data-bind="text: user"></span>
-  ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
-  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-
-  <br><br>
-  Variables<br>
-  Duration 8s<br>
-  nextTime<span data-bind="text: properties['nextTime']"></span><br>
-  total_actions<span data-bind="text: properties['total_actions']"></span><br>
-  endTime<span data-bind="text: properties['endTime']"></span><br>
-  <br><br>
-
-  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
-    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-  </div>
-
-  <div data-bind="template: { name: 'job-actions' }"></div>
-
-  <br>
-
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-    <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="schedule-page-calendar">
-      <!-- ko with: coordinatorActions() -->
-      <div data-bind="template: { name: 'job-actions' }"></div>
-
-      ${_('Filter')}
-      <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
-
-      <span data-bind="foreach: statesValuesFilter">
-        <label class="checkbox">
-          <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-          <span data-bind="text: name, attr: {for: name}"></span>
-        </label>
-      </span>
-
-      <table id="schedulesTable" class="datatables table table-condensed">
-        <thead>
-        <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
-          <th>${_('Status')}</th>
-          <th>${_('Title')}</th>
-          <th>${_('type')}</th>
-          <th>${_('errorMessage')}</th>
-          <th>${_('missingDependencies')}</th>
-          <th>${_('number')}</th>
-          <th>${_('errorCode')}</th>
-          <th>${_('externalId')}</th>
-          <th>${_('id')}</th>
-          <th>${_('lastModifiedTime')}</th>
-        </tr>
-        </thead>
-        <tbody data-bind="foreach: apps">
-          <tr data-bind="click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
-            <td>
-              <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
-            </td>
-            <td data-bind="text: properties.status"></td>
-            <td data-bind="text: properties.title"></td>
-            <td data-bind="text: properties.type"></td>
-            <td data-bind="text: properties.errorMessage"></td>
-            <td data-bind="text: properties.missingDependencies"></td>
-            <td data-bind="text: properties.number"></td>
-            <td data-bind="text: properties.errorCode"></td>
-            <td data-bind="text: properties.externalId"></td>
-            <td data-bind="text: properties.id"></td>
-            <td data-bind="text: properties.lastModifiedTime"></td>
-          </tr>
-        </tbody>
-      </table>
-      <!-- /ko -->
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+          <li class="nav-header">${ _('Next Run') }</li>
+          <li><span data-bind="text: properties['nextTime']"></span></li>
+          <li class="nav-header">${ _('Total Actions') }</li>
+          <li><span data-bind="text: properties['total_actions']"></span></li>
+          <li class="nav-header">${ _('End time') }</li>
+          <li><span data-bind="text: properties['endTime']"></span></li>
+        </ul>
+      </div>
     </div>
+    <div class="span10">
+      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="clearfix"></div>
 
-    <div class="tab-pane" id="schedule-page-logs">
-      <pre data-bind="html: logs"></pre>
-    </div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+      </ul>
 
-    <div class="tab-pane" id="schedule-page-metadata">
-      <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
-    </div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="schedule-page-calendar">
+          <!-- ko with: coordinatorActions() -->
+          <div data-bind="template: { name: 'job-actions' }"></div>
 
-    <div class="tab-pane" id="schedule-page-xml">
-      <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+          ${_('Filter')}
+          <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+
+          <span data-bind="foreach: statesValuesFilter">
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+              <span data-bind="text: name, attr: {for: name}"></span>
+            </label>
+          </span>
+
+          <table id="schedulesTable" class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+              <th>${_('Status')}</th>
+              <th>${_('Title')}</th>
+              <th>${_('type')}</th>
+              <th>${_('errorMessage')}</th>
+              <th>${_('missingDependencies')}</th>
+              <th>${_('number')}</th>
+              <th>${_('errorCode')}</th>
+              <th>${_('externalId')}</th>
+              <th>${_('id')}</th>
+              <th>${_('lastModifiedTime')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: apps">
+              <tr data-bind="click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
+                <td>
+                  <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
+                </td>
+                <td data-bind="text: properties.status"></td>
+                <td data-bind="text: properties.title"></td>
+                <td data-bind="text: properties.type"></td>
+                <td data-bind="text: properties.errorMessage"></td>
+                <td data-bind="text: properties.missingDependencies"></td>
+                <td data-bind="text: properties.number"></td>
+                <td data-bind="text: properties.errorCode"></td>
+                <td data-bind="text: properties.externalId"></td>
+                <td data-bind="text: properties.id"></td>
+                <td data-bind="text: properties.lastModifiedTime"></td>
+              </tr>
+            </tbody>
+          </table>
+          <!-- /ko -->
+        </div>
+
+        <div class="tab-pane" id="schedule-page-logs">
+          <pre data-bind="html: logs"></pre>
+        </div>
+
+        <div class="tab-pane" id="schedule-page-metadata">
+          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+        </div>
+
+        <div class="tab-pane" id="schedule-page-xml">
+          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+        </div>
+      </div>
     </div>
   </div>
 </script>
