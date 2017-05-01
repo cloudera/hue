@@ -52,14 +52,16 @@ RUNNING_STATES = ('QUEUED', 'RUNNING')
 
 
 class DataEngApi(Api):
-
+  
+  def __init__(self, user, cluster_name, interpreter=None, request=None):
+    Api.__init__(self, user, interpreter=interpreter, request=request)
+    self.cluster_name = cluster_name
 
   def execute(self, notebook, snippet):
     statement = snippet['statement']
-    cluster_name = 'rjustice-cluster'
 
-    handle = DataEng(self.user).submit_hive_job(cluster_name, statement, params=None, job_xml=None)
-    job = handle['job']
+    handle = DataEng(self.user).submit_hive_job(self.cluster_name, statement, params=None, job_xml=None)
+    job = handle['jobs'][0]
 
     if job['status'] not in RUNNING_STATES:
       raise QueryError('Submission failure', handle=job['status'])
@@ -199,23 +201,23 @@ class DataEng():
     return _exec(args)
 
   def submit_hive_job(self, cluster_name, script, params=None, job_xml=None):
-    args = ['submit-hive-job', '--cluster-name', cluster_name, '--script', script]
+    job = {'script': script}
 
     if params:
-      args.extend(['--params', params])
+      job['params'] =  params
     if job_xml:
-      args.extend(['--job-xml ', job_xml])
+      job['jobXml'] =  job_xml
 
-    return _exec(args)
-
+    return self.submit_jobs(cluster_name, [{'hiveJob': job}])
+  
   def submit_spark_job(self):
-    return _exec(['submit-spark-job'])
+    return _exec(['submit-jobs'])
   
   def submit_yarn_job(self):
-    return _exec(['submit-yarn-job'])
-  
-  def submit_jobs(self):
     return _exec(['submit-jobs'])
+  
+  def submit_jobs(self, cluster_name, jobs):
+    return _exec(['submit-jobs', '--cluster-name', cluster_name, '--jobs', json.dumps(jobs)])
 
   def terminate_jobs(self, job_ids):
     return _exec(['terminate-jobs', '--job-ids', job_ids])
