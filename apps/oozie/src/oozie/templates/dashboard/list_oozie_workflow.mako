@@ -665,7 +665,7 @@ ${ utils.slaGlobal() }
           }));
           % if layout_json != '':
           ko.utils.arrayForEach(actionsViewModel.actions(), function(action) {
-            var _w = viewModel.getWidgetById($("[id^=wdg_" + action.id.substr(action.id.length - 4) + "]").attr("id").substr(4));
+            var _w = viewModel.getWidgetById($("[id^=wdg_" + action.id.substr(action.id.length - 4).toLowerCase() + "]").attr("id").substr(4));
             if (_w != null) {
               if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
                 _w.status("success");
