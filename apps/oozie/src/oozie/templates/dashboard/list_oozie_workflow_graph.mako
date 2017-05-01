@@ -77,7 +77,7 @@ ${ workflow.render() }
               _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
             }
             else {
-              _w = viewModel.getWidgetById($("[id^=wdg_" + actionId + "]").attr("id").substr(4));
+              _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
             }
             if (_w != null) {
               if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
