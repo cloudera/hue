@@ -830,10 +830,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -931,96 +929,112 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="bundle-page">
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('Name') } <span data-bind="text: name"></span>
-  ${ _('Type') } <span data-bind="text: type"></span>
-  ${ _('Status') } <span data-bind="text: status"></span>
-  ${ _('User') } <span data-bind="text: user"></span>
-  ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
-  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-
-  <br><br>
-  Variables, Workspace<br>
-  Duration 8s<br>
-  nextTime<span data-bind="text: properties['nextTime']"></span><br>
-  total_actions<span data-bind="text: properties['total_actions']"></span><br>
-  endTime<span data-bind="text: properties['endTime']"></span><br>
-  <br><br>
-
-  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
-    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-  </div>
-
-  <div data-bind="template: { name: 'job-actions' }"></div>
-
-  <br>
-
-  <ul class="nav nav-tabs">
-    <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
-    <li><a href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#bundle-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-    <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="bundle-page-coordinators">
-      <div data-bind="template: { name: 'job-actions' }"></div>
-
-      ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
-      <div class="btn-group">
-        <select size="3" multiple="true"></select>
-        <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
-        <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
-        <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+          <li class="nav-header">${ _('Next Run') }</li>
+          <li><span data-bind="text: properties['nextTime']"></span></li>
+          <li class="nav-header">${ _('Total Actions') }</li>
+          <li><span data-bind="text: properties['total_actions']"></span></li>
+          <li class="nav-header">${ _('End time') }</li>
+          <li><span data-bind="text: properties['endTime']"></span></li>
+        </ul>
       </div>
-
-      <table id="coordsTable" class="datatables table table-condensed">
-        <thead>
-        <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
-          <th>${_('Status')}</th>
-          <th>${_('Name')}</th>
-          <th>${_('Type')}</th>
-          <th>${_('nextMaterializedTime')}</th>
-          <th>${_('lastAction')}</th>
-          <th>${_('frequency')}</th>
-          <th>${_('timeUnit')}</th>
-          <th>${_('externalId')}</th>
-          <th>${_('id')}</th>
-          <th>${_('pauseTime')}</th>
-        </tr>
-        </thead>
-        <tbody data-bind="foreach: properties['actions']">
-          <tr data-bind="click: function() {  if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
-            <td><div class="hueCheckbox fa"></div></td>
-            <td data-bind="text: status"></td>
-            <td data-bind="text: name"></td>
-            <td data-bind="text: type"></td>
-            <td data-bind="text: nextMaterializedTime"></td>
-            <td data-bind="text: lastAction"></td>
-            <td data-bind="text: frequency"></td>
-            <td data-bind="text: timeUnit"></td>
-            <td data-bind="text: externalId"></td>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: pauseTime"></td>
-          </tr>
-        </tbody>
-      </table>    </div>
-
-    <div class="tab-pane" id="bundle-page-logs">
-      <pre data-bind="html: logs"></pre>
     </div>
+    <div class="span10">
+      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="clearfix"></div>
 
-    <div class="tab-pane" id="bundle-page-metadata">
-      <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
-    </div>
+      <ul class="nav nav-tabs">
+        <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#bundle-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+      </ul>
 
-    <div class="tab-pane" id="bundle-page-xml">
-      <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+      <div class="tab-content">
+        <div class="tab-pane active" id="bundle-page-coordinators">
+          <div data-bind="template: { name: 'job-actions' }"></div>
+
+          ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
+          <div class="btn-group">
+            <select size="3" multiple="true"></select>
+            <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
+            <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
+            <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
+          </div>
+
+          <table id="coordsTable" class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+              <th>${_('Status')}</th>
+              <th>${_('Name')}</th>
+              <th>${_('Type')}</th>
+              <th>${_('nextMaterializedTime')}</th>
+              <th>${_('lastAction')}</th>
+              <th>${_('frequency')}</th>
+              <th>${_('timeUnit')}</th>
+              <th>${_('externalId')}</th>
+              <th>${_('id')}</th>
+              <th>${_('pauseTime')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['actions']">
+              <tr data-bind="click: function() {  if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
+                <td><div class="hueCheckbox fa"></div></td>
+                <td data-bind="text: status"></td>
+                <td data-bind="text: name"></td>
+                <td data-bind="text: type"></td>
+                <td data-bind="text: nextMaterializedTime"></td>
+                <td data-bind="text: lastAction"></td>
+                <td data-bind="text: frequency"></td>
+                <td data-bind="text: timeUnit"></td>
+                <td data-bind="text: externalId"></td>
+                <td data-bind="text: id"></td>
+                <td data-bind="text: pauseTime"></td>
+              </tr>
+            </tbody>
+          </table>    </div>
+
+        <div class="tab-pane" id="bundle-page-logs">
+          <pre data-bind="html: logs"></pre>
+        </div>
+
+        <div class="tab-pane" id="bundle-page-metadata">
+          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+        </div>
+
+        <div class="tab-pane" id="bundle-page-xml">
+          <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
+        </div>
+      </div>
     </div>
   </div>
+
 </script>
 
 
