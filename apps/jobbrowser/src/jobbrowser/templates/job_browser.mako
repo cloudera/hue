@@ -386,10 +386,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -408,101 +406,122 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="job-mapreduce-page">
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('Name') } <span data-bind="text: name"></span>
-  ${ _('Type') } <span data-bind="text: type"></span>
-  ${ _('Status') } <span data-bind="text: status"></span>
-  ${ _('User') } <span data-bind="text: user"></span>
-  ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
-  ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <br><br>
 
-  <!-- ko with: properties -->
-  Map <span data-bind="text: maps_percent_complete"></span> <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span>
-  Reduce <span data-bind="text: reduces_percent_complete"></span> <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span><br>
-  Duration <span data-bind="text: $parent.duration"></span><br>
-  <!-- /ko -->
-  <br><br>
-
-  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
-    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-  </div>
-
-  <div data-bind="template: { name: 'job-actions' }"></div>
-
-  <ul class="nav nav-tabs margin-top-20">
-    <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#job-mapreduce-page-tasks" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks\']').tab('show'); }">${ _('Tasks') }</a></li>
-    <li><a href="#job-mapreduce-page-metadata" data-bind="click: function(){ fetchProfile('metadata'); $('a[href=\'#job-mapreduce-page-metadata\']').tab('show'); }">${ _('Metadata') }</a></li>
-    <li><a href="#job-mapreduce-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="job-mapreduce-page-logs">
-      % for name in ['stdout', 'stderr', 'syslog']:
-        <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
-      % endfor
-      <br>
-
-      <pre data-bind="html: logs"></pre>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <!-- ko with: properties -->
+          <li class="nav-header">${ _('Map') }</li>
+          <li><span data-bind="text: maps_percent_complete"></span> <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span></li>
+          <li class="nav-header">${ _('Reduce') }</li>
+          <li><span data-bind="text: reduces_percent_complete"></span> <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span></li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: $parent.duration"></span></li>
+          <!-- /ko -->
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+        </ul>
+      </div>
     </div>
+    <div class="span10">
+      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="clearfix"></div>
 
-    <div class="tab-pane" id="job-mapreduce-page-tasks">
-      ${_('Filter')}
-      <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+      <ul class="nav nav-tabs margin-top-20">
+        <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-mapreduce-page-tasks" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks\']').tab('show'); }">${ _('Tasks') }</a></li>
+        <li><a href="#job-mapreduce-page-metadata" data-bind="click: function(){ fetchProfile('metadata'); $('a[href=\'#job-mapreduce-page-metadata\']').tab('show'); }">${ _('Metadata') }</a></li>
+        <li><a href="#job-mapreduce-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
+      </ul>
 
-      <span data-bind="foreach: statesValuesFilter">
-        <label class="checkbox">
-          <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-          <span data-bind="text: name, attr: {for: name}"></span>
-        </label>
-      </span>
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-mapreduce-page-logs">
+          % for name in ['stdout', 'stderr', 'syslog']:
+            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
+          % endfor
+          <br>
 
-      <span data-bind="foreach: typesValuesFilter">
-        <label class="checkbox">
-          <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-          <span data-bind="text: name, attr: {for: name}"></span>
-        </label>
-      </span>
+          <pre data-bind="html: logs"></pre>
+        </div>
 
-      <table class="table table-condensed">
-        <thead>
-        <tr>
-          <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
-          <th>${_('Type')}</th>
-          <th>${_('Id')}</th>
-          <th>${_('elapsedTime')}</th>
-          <th>${_('progress')}</th>
-          <th>${_('state')}</th>
-          <th>${_('startTime')}</th>
-          <th>${_('successfulAttempt')}</th>
-          <th>${_('finishTime')}</th>
-        </tr>
-        </thead>
-        <tbody data-bind="foreach: properties['tasks']()['task_list']">
-          <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
-            <td><div class="hueCheckbox fa"></div></td>
-            <td data-bind="text: type"></td>
-            <td data-bind="text: id"></td>
-            <td data-bind="text: elapsedTime"></td>
-            <td data-bind="text: progress"></td>
-            <td data-bind="text: state"></td>
-            <td data-bind="text: startTime"></td>
-            <td data-bind="text: successfulAttempt"></td>
-            <td data-bind="text: finishTime"></td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+        <div class="tab-pane" id="job-mapreduce-page-tasks">
+          ${_('Filter')}
+          <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
-    <div class="tab-pane" id="job-mapreduce-page-metadata">
-      <pre data-bind="text: ko.toJSON(properties['metadata'], null, 2)"></pre>
-    </div>
+          <span data-bind="foreach: statesValuesFilter">
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+              <span data-bind="text: name, attr: {for: name}"></span>
+            </label>
+          </span>
 
-    <div class="tab-pane" id="job-mapreduce-page-counters">
-      <pre data-bind="text: ko.toJSON(properties['counters'], null, 2)"></pre>
+          <span data-bind="foreach: typesValuesFilter">
+            <label class="checkbox">
+              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+              <span data-bind="text: name, attr: {for: name}"></span>
+            </label>
+          </span>
+
+          <table class="table table-condensed">
+            <thead>
+            <tr>
+              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
+              <th>${_('Type')}</th>
+              <th>${_('Id')}</th>
+              <th>${_('elapsedTime')}</th>
+              <th>${_('progress')}</th>
+              <th>${_('state')}</th>
+              <th>${_('startTime')}</th>
+              <th>${_('successfulAttempt')}</th>
+              <th>${_('finishTime')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['tasks']()['task_list']">
+              <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
+                <td><div class="hueCheckbox fa"></div></td>
+                <td data-bind="text: type"></td>
+                <td data-bind="text: id"></td>
+                <td data-bind="text: elapsedTime"></td>
+                <td data-bind="text: progress"></td>
+                <td data-bind="text: state"></td>
+                <td data-bind="text: startTime"></td>
+                <td data-bind="text: successfulAttempt"></td>
+                <td data-bind="text: finishTime"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="job-mapreduce-page-metadata">
+          <pre data-bind="text: ko.toJSON(properties['metadata'], null, 2)"></pre>
+        </div>
+
+        <div class="tab-pane" id="job-mapreduce-page-counters">
+          <pre data-bind="text: ko.toJSON(properties['counters'], null, 2)"></pre>
+        </div>
+      </div>
+
     </div>
   </div>
 
@@ -811,10 +830,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
