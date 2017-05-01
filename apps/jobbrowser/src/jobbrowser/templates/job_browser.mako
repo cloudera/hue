@@ -130,9 +130,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
               <span data-bind="foreach: jobs.statesValuesFilter">
                 <label class="checkbox">
-                  <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
-                  <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-                  <span data-bind="text: name, attr: {for: name}"></span>
+                  <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                  <div class="inline-block" data-bind="text: name, toggle: checked"></div>
                 </label>
               </span>
 
@@ -156,7 +155,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <div class="card card-small">
               <!-- ko if: $root.isMini -->
               <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
-                <li class="status-border" data-bind="css: {'success': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
+                <li class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
                   <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span></td>
                   <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                   <div class="clearfix"></div>
@@ -175,7 +174,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <thead>
                 <tr>
                   <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
-                  <th width="10"></th>
                   <th>${_('Duration')}</th>
                   <th>${_('Started')}</th>
                   <th>${_('Type')}</th>
@@ -186,12 +184,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </tr>
                 </thead>
                 <tbody data-bind="foreach: jobs.apps">
-                  <tr data-bind="click: conditionalFetchJob">
+                  <tr class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
                     <td>
                       <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
-                    </td>
-                    <td>
-                      <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': apiStatus() == 'SUCCEEDED', 'orange': isRunning(), 'red': apiStatus() == 'FAILED'}"></div>
                     </td>
                     <td data-bind="text: duration().toHHMMSS()"></td>
                     <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
@@ -439,7 +434,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <span data-bind="foreach: statesValuesFilter">
         <label class="checkbox">
-          <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
           <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
           <span data-bind="text: name, attr: {for: name}"></span>
         </label>
@@ -447,7 +441,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <span data-bind="foreach: typesValuesFilter">
         <label class="checkbox">
-          <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
           <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
           <span data-bind="text: name, attr: {for: name}"></span>
         </label>
@@ -829,7 +822,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <span data-bind="foreach: statesValuesFilter">
         <label class="checkbox">
-          <div data-bind="attr: {'class': 'status-circle ' + klass()}"></div>
           <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
           <span data-bind="text: name, attr: {for: name}"></span>
         </label>
