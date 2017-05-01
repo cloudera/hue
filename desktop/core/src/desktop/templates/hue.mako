@@ -179,7 +179,7 @@ ${ hueIcons.symbols() }
           </button>
           <ul class="dropdown-menu">
             % if view_profile:
-            <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
+            <li><a href="javascript:void(0)" data-bind="hueLink: '/useradmin/users/edit/${ user.username }'" title="${ _('View Profile') if is_ldap_setup else _('Edit Profile') }"><i class="fa fa-fw fa-user"></i> ${_('My Profile')}</a></li>
             % endif
             % if user.is_superuser:
             <li data-bind="hueLink: '/useradmin/users/'"><a href="javascript: void(0);"><i class="fa fa-fw fa-group"></i> ${_('Manage Users')}</a></li>
@@ -833,6 +833,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldap' },
           { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
           { url: '/useradmin/users/new', app: 'useradmin_newuser' },
+          { url: '/useradmin/users/', app: 'useradmin_users' },
+          { url: '/useradmin', app: 'useradmin_users' },
         ];
 
         pageMapping.forEach(function (mapping) {
