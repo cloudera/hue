@@ -155,7 +155,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <div class="card card-small">
               <!-- ko if: $root.isMini -->
               <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
-                <li class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
+                <li class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
                   <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span></td>
                   <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                   <div class="clearfix"></div>
@@ -184,7 +184,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </tr>
                 </thead>
                 <tbody data-bind="foreach: jobs.apps">
-                  <tr class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
+                  <tr class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
                     <td>
                       <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                     </td>
