@@ -147,11 +147,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <i class="fa fa-refresh"></i>
               </a>
 
+              <!-- ko ifnot: $root.isMini -->
               <div data-bind="template: { name: 'job-actions', 'data': jobs }" class="pull-right"></div>
+              <!-- /ko -->
             </form>
 
 
             <div class="card card-small">
+              <!-- ko if: $root.isMini -->
+              <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
+                <li class="status-border" data-bind="css: {'success': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: conditionalFetchJob">
+                  <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span></td>
+                  <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
+                  <div class="clearfix"></div>
+                  <strong class="pull-left" data-bind="text: type"></strong>
+                  <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
+                  <div class="clearfix"></div>
+                  <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
+                  <div class="pull-right muted" data-bind="text: id"></div>
+                  <div class="clearfix"></div>
+                </li>
+                <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
+              </ul>
+              <!-- /ko -->
+              <!-- ko ifnot: $root.isMini -->
               <table id="jobsTable" class="datatables table table-condensed">
                 <thead>
                 <tr>
@@ -174,8 +193,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <td>
                       <div class="status-circle" data-bind="attr:{ 'title': status }, css: {'green': apiStatus() == 'SUCCEEDED', 'orange': isRunning(), 'red': apiStatus() == 'FAILED'}"></div>
                     </td>
-                    <td data-bind="text: duration"></td>
-                    <td data-bind="text: submitted"></td>
+                    <td data-bind="text: duration().toHHMMSS()"></td>
+                    <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
                     <td data-bind="text: type"></td>
                     <td data-bind="text: progress"></td>
                     <td data-bind="text: name"></td>
@@ -184,6 +203,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                   </tr>
                 </tbody>
               </table>
+              <!-- /ko -->
             </div>
             <!-- /ko -->
 
