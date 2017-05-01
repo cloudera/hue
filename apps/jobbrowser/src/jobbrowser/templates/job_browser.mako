@@ -625,42 +625,62 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-mapreduce-task-attempt-page">
 
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('progress') } <span data-bind="text: progress"></span>
-  ${ _('type') } <span data-bind="text: type"></span>
+  <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <!-- ko with: properties -->
+          <li class="nav-header">${ _('State') }</li>
+          <li><span data-bind="text: state"></span></li>
+          <li class="nav-header">${ _('Assigned Container ID') }</li>
+          <li><span data-bind="text: assignedContainerId"></span></li>
+          <li class="nav-header">${ _('Rack') }</li>
+          <li><span data-bind="text: rack"></span></li>
+          <li class="nav-header">${ _('Node HTTP address') }</li>
+          <li><span data-bind="text: nodeHttpAddress"></span></li>
+          <li class="nav-header">${ _('Start time') }</li>
+          <li><span data-bind="text: startTime"></span></li>
+          <li class="nav-header">${ _('Finish time') }</li>
+          <li><span data-bind="text: finishTime"></span></li>
+          <li class="nav-header">${ _('Elapsed time') }</li>
+          <li><span data-bind="text: elapsedTime"></span></li>
+          <!-- /ko -->
 
-  <br><br>
-
-  <!-- ko with: properties -->
-  ${ _('assignedContainerId') } <span data-bind="text: assignedContainerId"></span>
-  ${ _('elapsedTime') } <span data-bind="text: elapsedTime"></span>
-  ${ _('rack') } <span data-bind="text: rack"></span>
-  ${ _('nodeHttpAddress') } <span data-bind="text: nodeHttpAddress"></span>
-  ${ _('state') } <span data-bind="text: state"></span>
-  ${ _('startTime') } <span data-bind="text: startTime"></span>
-  ${ _('finishTime') } <span data-bind="text: finishTime"></span>
-  <!-- /ko -->
-
-  <div class="progress-job progress pull-left" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
-    <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-  </div>
-
-  <ul class="nav nav-tabs margin-top-20">
-    <li class="active"><a href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-    <li><a href="#job-mapreduce-task-attempt-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-attempt-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
-  </ul>
-
-  <div class="tab-content">
-    <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs">
-      % for name in ['stdout', 'stderr', 'syslog']:
-        <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
-      % endfor
-      <br>
-      <pre data-bind="html: logs"></pre>
+        </ul>
+      </div>
     </div>
+    <div class="span10">
 
-    <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
-      <pre data-bind="text: ko.toJSON(properties['counters'], null, 2)"></pre>
+      <ul class="nav nav-tabs margin-top-20">
+        <li class="active"><a href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-mapreduce-task-attempt-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-attempt-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs">
+          % for name in ['stdout', 'stderr', 'syslog']:
+            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
+          % endfor
+          <br>
+          <pre data-bind="html: logs"></pre>
+        </div>
+
+        <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
+          <pre data-bind="text: ko.toJSON(properties['counters'], null, 2)"></pre>
+        </div>
+      </div>
+
     </div>
   </div>
 
