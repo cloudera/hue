@@ -4412,6 +4412,25 @@
     }
   };
 
+  ko.bindingHandlers.hueCheckbox = {
+    after: ['value', 'attr'],
+    init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+      var value = valueAccessor();
+      $(element).addClass('hueCheckbox fa');
+
+      var updateCheckedState = function () {
+        ko.utils.toggleDomNodeCssClass(element, 'fa-check', value());
+      };
+
+      ko.utils.registerEventHandler(element, 'click', function () {
+        value(!value());
+      });
+
+      value.subscribe(updateCheckedState);
+      updateCheckedState();
+    }
+  };
+
   ko.bindingHandlers.hueCheckAll = {
     init: function (element, valueAccessor, allBindings) {
       var allValues = ko.utils.unwrapObservable(valueAccessor()).allValues;
