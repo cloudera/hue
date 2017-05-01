@@ -206,7 +206,6 @@ var Routie = function(w, isModule) {
 
   var hashChanged = routie.reload = function() {
     if (pathname === '' || window.location.pathname.indexOf(pathname) > -1) {
-      console.log('ahsh cahgne or path', pathname)
       var hash = getHash();
       for (var i = 0, c = routes.length; i < c; i++) {
         var route = routes[i];
