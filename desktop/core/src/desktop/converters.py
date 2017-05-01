@@ -223,6 +223,7 @@ class DocumentConverter(object):
 
   def _create_doc2(self, document, doctype, name=None, description=None, data=None):
     try:
+      document2 = None
       with transaction.atomic():
         name = name if name else document.name
 
@@ -252,4 +253,8 @@ class DocumentConverter(object):
         document.save()
         return document2
     except Exception, e:
+      # Just to be sure we delete Doc2 object incase of exception.
+      # Possible when there are mixed InnoDB and MyISAM tables
+      if document2 and Document2.objects.filter(id=document2.id).exists():
+        document2.delete()
       raise PopupException(_("Failed to convert Document object: %s") % e)
