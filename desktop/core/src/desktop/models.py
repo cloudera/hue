@@ -21,6 +21,7 @@ import logging
 import os
 import urllib
 import uuid
+from desktop.conf import get_clusters
 
 try:
   from collections import OrderedDict
@@ -95,6 +96,8 @@ class UserPreferences(models.Model):
   user = models.ForeignKey(auth_models.User)
   key = models.CharField(max_length=20)
   value = models.TextField(max_length=4096)
+
+
 
 
 class Settings(models.Model):
@@ -1770,6 +1773,40 @@ class ClusterConfig():
     ] if app[1]])
 
     return apps
+
+
+class Cluster():
+
+  def __init__(self, user):
+    self.user = user
+    self.default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
+    self.data = {}
+    if self.default_cluster:
+      clusters = get_clusters()
+      cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
+      self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None
+  
+  def get_type(self):
+    return self.data and self.data['type'] or 'ini'
+
+  def get_interface(self):
+    return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('interface')
+
+  def get_list_interface_indexes(self):  
+    default_cluster_index = 0
+    default_cluster_interface = ''
+  
+    clusters = get_clusters()
+    default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
+  
+    if clusters and default_cluster:
+      default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
+      default_cluster_name = default_cluster_json.get('name')
+  
+      default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
+      default_cluster_interface = default_cluster_json.get('interface', '')
+      
+    return default_cluster_index, default_cluster_interface
 
 
 def _get_apps(user, section=None):

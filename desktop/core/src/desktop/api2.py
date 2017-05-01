@@ -38,13 +38,13 @@ from metadata.navigator_api import search_entities_interactive as metadata_searc
 from notebook.connectors.base import Notebook
 from notebook.views import upgrade_session_properties
 
-from desktop.conf import get_clusters
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
 from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig,\
-  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER
+  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER,\
+  Cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -70,17 +70,9 @@ def api_error_handler(func):
 @api_error_handler
 def get_config(request):
   if request.POST.get(USER_PREFERENCE_CLUSTER):
-    cluster_type = json.loads(request.POST[USER_PREFERENCE_CLUSTER])['type']
-    if request.POST.get(USER_PREFERENCE_CLUSTER):
-      set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST[USER_PREFERENCE_CLUSTER])
-  else:
-    default_cluster = get_user_preferences(request.user, key=USER_PREFERENCE_CLUSTER)
-    if default_cluster:
-      clusters = get_clusters()
-      cluster_name = json.loads(default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
-      cluster_type = cluster_name and clusters.get(cluster_name) and clusters[cluster_name]['type'] or 'ini'
-    else:
-      cluster_type = 'ini'
+    set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST.get(USER_PREFERENCE_CLUSTER))
+
+  cluster_type = Cluster(request.user).get_type()
 
   cluster_config = ClusterConfig(request.user, cluster_type=cluster_type)
   app_config = cluster_config.get_apps()

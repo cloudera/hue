@@ -56,7 +56,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import Settings, hue_version, _get_apps, UserPreferences, get_user_preferences, USER_PREFERENCE_CLUSTER
+from desktop.models import Settings, hue_version, _get_apps, UserPreferences, Cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -69,19 +69,8 @@ def is_alive(request):
 
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
-
-  default_cluster_index = 0
-  default_cluster_interface = ''
-
   clusters = get_clusters()
-  default_cluster = get_user_preferences(request.user, key=USER_PREFERENCE_CLUSTER)
-
-  if clusters and default_cluster:
-    default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
-    default_cluster_name = default_cluster_json.get('name')
-
-    default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
-    default_cluster_interface = default_cluster_json.get('interface', '')
+  default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
 
   return render('hue.mako', request, {
     'apps': apps,

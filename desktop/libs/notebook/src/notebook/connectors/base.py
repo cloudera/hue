@@ -26,8 +26,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 
 from notebook.conf import get_ordered_interpreters
-from desktop.models import get_user_preferences, USER_PREFERENCE_CLUSTER
-from desktop.conf import get_clusters
+from desktop.models import Cluster
 
 
 LOG = logging.getLogger(__name__)
@@ -213,14 +212,9 @@ def get_api(request, snippet):
   interface = interpreter['interface']
 
   # Multi cluster
-  default_cluster = get_user_preferences(request.user, key=USER_PREFERENCE_CLUSTER)
-  if default_cluster:
-    clusters = get_clusters()
-    cluster_name = json.loads(default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
-    cluster_type = cluster_name and clusters.get(cluster_name) and clusters[cluster_name]['type'] or 'ini'
-
-    if cluster_type == 'dataeng':
-      interface = 'dataeng'
+  cluster = Cluster(request.user)
+  if cluster and cluster.get_type() == 'dataeng':
+    interface = 'dataeng'
 
   if interface == 'hiveserver2':
     return HS2Api(user=request.user, request=request)
@@ -235,7 +229,7 @@ def get_api(request, snippet):
   elif interface == 'rdbms':
     return RdbmsApi(request.user, interpreter=snippet['type'])
   elif interface == 'dataeng':
-    return DataEngApi(user=request.user, request=request)
+    return DataEngApi(user=request.user, request=request, cluster_name=cluster.get_interface())
   elif interface == 'jdbc':
     return JdbcApi(request.user, interpreter=interpreter)
   elif interface == 'solr':
