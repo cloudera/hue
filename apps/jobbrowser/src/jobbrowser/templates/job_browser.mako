@@ -167,7 +167,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </tr>
                 </thead>
                 <tbody data-bind="foreach: jobs.apps">
-                  <tr data-bind="click: fetchJob">
+                  <tr data-bind="click: conditionalFetchJob">
                     <td>
                       <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                     </td>
@@ -1098,6 +1098,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
+      self.conditionalFetchJob = function () {
+        if (vm.isMini()) {
+          huePubSub.publish('hide.jobs.panel');
+          if (window.location.pathname.indexOf('jobbrowser') > -1) {
+            window.location.hash = '#!id=' + self.id();
+          }
+          else {
+            huePubSub.publish('open.link', '/jobbrowser/#!id=' + self.id())
+          }
+        }
+        else {
+          self.fetchJob();
+        }
+      };
+
       self.fetchJob = function () {
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
@@ -1698,7 +1713,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % endif
 
       var loadHash = function () {
-        if (window.location.pathname.indexOf('jobbrowser') > -1 || $('#jobbrowserMiniComponents').is(':visible')) {
+        if (window.location.pathname.indexOf('jobbrowser') > -1) {
           var h = window.location.hash;
 
           h = h.indexOf('#!') === 0 ? h.substr(2) : '';
@@ -1714,9 +1729,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               viewModel.selectInterface(h);
               break;
             default:
-              if (h.indexOf('id=') === 0){
+              if (h.indexOf('id=') === 0 && !viewModel.isMini()){
                 new Job(viewModel, {id: h.substr(3)}).fetchJob();
-              } else {
+              }
+              else {
                 viewModel.selectInterface('reset');
               }
           }
