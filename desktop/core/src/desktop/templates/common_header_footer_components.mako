@@ -416,6 +416,20 @@ from metadata.conf import has_optimizer, OPTIMIZER
 </div>
 
 <script type="text/javascript">
+
+  huePubSub.subscribe('set.hue.version', function (version) {
+    $.post("/desktop/api2/user_preferences/hue_version", {
+      set: version
+    }, function (data) {
+      if (data && data.status == 0) {
+        location.href = version === 3 ? '/home' : '/hue'
+      }
+      else {
+        $.jHueNotify.error("${ _('An error occurred while saving your default Hue preference. Please try again...') }");
+      }
+    });
+  });
+
   $(document).ready(function () {
     if ($.fn.editableform) {
       $.fn.editableform.buttons =

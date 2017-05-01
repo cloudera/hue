@@ -282,6 +282,7 @@ ${ hueIcons.symbols() }
           % if user.is_superuser:
             <li><a href="${ url('useradmin.views.list_users') }"><i class="fa fa-group"></i>&nbsp;&nbsp;${_('Manage Users')}</a></li>
           % endif
+          <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 4)"><i class="fa fa-exchange"></i>&nbsp;&nbsp;${_('Switch to Hue 4')}</a></li>
         </ul>
       </li>
     % else:
