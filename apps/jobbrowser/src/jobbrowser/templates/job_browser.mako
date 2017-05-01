@@ -153,51 +153,54 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
             <div class="card card-small">
-              <!-- ko if: $root.isMini -->
-              <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
-                <li class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
-                  <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span></td>
-                  <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
-                  <div class="clearfix"></div>
-                  <strong class="pull-left" data-bind="text: type"></strong>
-                  <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
-                  <div class="clearfix"></div>
-                  <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
-                  <div class="pull-right muted" data-bind="text: id"></div>
-                  <div class="clearfix"></div>
-                </li>
-                <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
-              </ul>
-              <!-- /ko -->
-              <!-- ko ifnot: $root.isMini -->
-              <table id="jobsTable" class="datatables table table-condensed">
-                <thead>
-                <tr>
-                  <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
-                  <th>${_('Duration')}</th>
-                  <th>${_('Started')}</th>
-                  <th>${_('Type')}</th>
-                  <th>${_('Progress')}</th>
-                  <th>${_('Name')}</th>
-                  <th>${_('User')}</th>
-                  <th>${_('Id')}</th>
-                </tr>
-                </thead>
-                <tbody data-bind="foreach: jobs.apps">
-                  <tr class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
-                    <td>
-                      <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
-                    </td>
-                    <td data-bind="text: duration().toHHMMSS()"></td>
-                    <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
-                    <td data-bind="text: type"></td>
-                    <td data-bind="text: progress"></td>
-                    <td data-bind="text: name"></td>
-                    <td data-bind="text: user"></td>
-                    <td data-bind="text: id"></td>
+              <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->
+              <!-- ko ifnot: jobs.loadingJobs() -->
+                <!-- ko if: $root.isMini -->
+                <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
+                  <li class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
+                    <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span></td>
+                    <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
+                    <div class="clearfix"></div>
+                    <strong class="pull-left" data-bind="text: type"></strong>
+                    <div class="inline-block pull-right"><i class="fa fa-user muted"></i> <span data-bind="text: user"></span></div>
+                    <div class="clearfix"></div>
+                    <div class="pull-left" data-bind="ellipsis: {data: name(), length: 40 }"></div>
+                    <div class="pull-right muted" data-bind="text: id"></div>
+                    <div class="clearfix"></div>
+                  </li>
+                  <div class="status-bar status-background" data-bind="css: {'running': isRunning()}, style: {'width': progress() + '%'}"></div>
+                </ul>
+                <!-- /ko -->
+                <!-- ko ifnot: $root.isMini -->
+                <table id="jobsTable" class="datatables table table-condensed">
+                  <thead>
+                  <tr>
+                    <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
+                    <th>${_('Duration')}</th>
+                    <th>${_('Started')}</th>
+                    <th>${_('Type')}</th>
+                    <th>${_('Progress')}</th>
+                    <th>${_('Name')}</th>
+                    <th>${_('User')}</th>
+                    <th>${_('Id')}</th>
                   </tr>
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody data-bind="foreach: jobs.apps">
+                    <tr class="status-border" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, attr:{ 'title': status }, click: fetchJob">
+                      <td>
+                        <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
+                      </td>
+                      <td data-bind="text: duration().toHHMMSS()"></td>
+                      <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
+                      <td data-bind="text: type"></td>
+                      <td data-bind="text: progress"></td>
+                      <td data-bind="text: name"></td>
+                      <td data-bind="text: user"></td>
+                      <td data-bind="text: id"></td>
+                    </tr>
+                  </tbody>
+                </table>
+                <!-- /ko -->
               <!-- /ko -->
             </div>
             <!-- /ko -->
