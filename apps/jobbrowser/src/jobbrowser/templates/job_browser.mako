@@ -724,16 +724,38 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="job-spark-page">
-  ${ _('Id') } <span data-bind="text: id"></span>
-  ${ _('Name') } <span data-bind="text: name"></span>
-  ${ _('Type') } <span data-bind="text: type"></span>
-  ${ _('Status') } <span data-bind="text: status"></span>
-  ${ _('User') } <span data-bind="text: user"></span>
-  ${ _('Progress') } <span data-bind="text: progress"></span>
-  ${ _('Duration') } <span data-bind="text: duration"></span>
-  ${ _('Submitted') } <span data-bind="text: submitted"></span>
-
-  <div data-bind="template: { name: 'job-actions' }"></div>
+   <div class="row-fluid">
+    <div class="span2">
+      <div class="sidebar-nav">
+        <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Name') }</li>
+          <li><span data-bind="text: name"></span></li>
+          <li class="nav-header">${ _('Type') }</li>
+          <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Status') }</li>
+          <li><span data-bind="text: status"></span></li>
+          <li class="nav-header">${ _('User') }</li>
+          <li><span data-bind="text: user"></span></li>
+          <li class="nav-header">${ _('Progress') }</li>
+          <li><span data-bind="text: progress"></span></li>
+          <li>
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
+            </div>
+          </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+        </ul>
+      </div>
+    </div>
+    <div class="span10">
+      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+    </div>
+  </div>
 </script>
 
 
