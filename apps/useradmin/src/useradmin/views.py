@@ -630,7 +630,7 @@ def add_ldap_groups(request):
   else:
     form = AddLdapGroupsForm()
 
-  return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True))
+  return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=request.GET.get('is_embeddable', False)))
 
 
 def sync_ldap_users_groups(request):

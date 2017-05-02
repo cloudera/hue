@@ -291,7 +291,8 @@ ${ hueIcons.symbols() }
       <div id="embeddable_useradmin_editpermission" class="embeddable"></div>
       <div id="embeddable_useradmin_configurations" class="embeddable"></div>
       <div id="embeddable_useradmin_newuser" class="embeddable"></div>
-      <div id="embeddable_useradmin_addldap" class="embeddable"></div>
+      <div id="embeddable_useradmin_addldapusers" class="embeddable"></div>
+      <div id="embeddable_useradmin_addldapgroups" class="embeddable"></div>
       <div id="embeddable_useradmin_edituser" class="embeddable"></div>
       <div id="embeddable_hbase" class="embeddable"></div>
       <div id="embeddable_security_hive" class="embeddable"></div>
@@ -486,8 +487,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         useradmin_editpermission: '/useradmin/permissions/edit/*',
         useradmin_configurations: '/useradmin/configurations',
         useradmin_newuser: '/useradmin/users/new',
-        useradmin_addldap: '/useradmin/users/add_ldap_users',
+        useradmin_addldapusers: '/useradmin/users/add_ldap_users',
         useradmin_edituser: '/useradmin/users/edit/:user',
+        useradmin_addldapgroups: '/useradmin/users/add_ldap_groups',
         hbase: '/hbase/',
         security_hive: '/security/hive',
         security_hdfs: '/security/hdfs',
@@ -504,7 +506,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard',
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-          'useradmin_addldap', 'useradmin_edituser'
+          'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser'
       ];
 
       var OnePageViewModel = function () {
@@ -830,7 +832,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/useradmin/permissions/', app: 'useradmin_permissions' },
           { url: '/useradmin/permissions/edit/*', app: 'useradmin_editpermission' },
           { url: '/useradmin/users/', app: 'useradmin_users' },
-          { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldap' },
+          { url: '/useradmin/users/add_ldap_users', app: 'useradmin_addldapusers' },
+          { url: '/useradmin/users/add_ldap_groups', app: 'useradmin_addldapgroups' },
           { url: '/useradmin/users/edit/:user', app: 'useradmin_edituser' },
           { url: '/useradmin/users/new', app: 'useradmin_newuser' },
           { url: '/useradmin/users/', app: 'useradmin_users' },
