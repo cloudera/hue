@@ -63,6 +63,7 @@ class TestWithSentry(object):
     self.rpc_addresses = ''
     if sentry_site.get_sentry_server_rpc_addresses() is not None:
       self.rpc_addresses = ','.join(sentry_site.get_sentry_server_rpc_addresses())
+    self.rpc_port = sentry_site.get_sentry_server_rpc_port() or '8038'
 
     self.tmpdir = tempfile.mkdtemp()
     self.resets = [
@@ -92,12 +93,12 @@ class TestWithSentry(object):
 
   def test_ha_failover_good_bad_bad(self):
     # Test with good-host,bad-host-1,bad-host-2
-    xml = self._sentry_site_xml(rpc_addresses='%s,bad-host-1,bad-host-2' % self.rpc_addresses)
+    xml = self._sentry_site_xml(rpc_addresses='%s,bad-host-1:8039,bad-host-2' % self.rpc_addresses, rpc_port=self.rpc_port)
     file(os.path.join(self.tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_equal('%s,bad-host-1,bad-host-2' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
+    assert_equal('%s,bad-host-1:8039,bad-host-2' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
     resp = api.list_sentry_roles_by_group(groupName='*')
     assert_true(isinstance(resp, list))
 
@@ -108,12 +109,12 @@ class TestWithSentry(object):
 
   def test_ha_failover_bad_bad_good(self):
     # Test with bad-host-1,bad-host-2,good-host
-    xml = self._sentry_site_xml(rpc_addresses='bad-host-1,bad-host-2,%s' % self.rpc_addresses)
+    xml = self._sentry_site_xml(rpc_addresses='bad-host-1:8039,bad-host-2,%s' % self.rpc_addresses, rpc_port=self.rpc_port)
     file(os.path.join(self.tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_equal('bad-host-1,bad-host-2,%s' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
+    assert_equal('bad-host-1:8039,bad-host-2,%s' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
     resp = api.list_sentry_roles_by_group(groupName='*')
     assert_true(isinstance(resp, list))
 
@@ -124,12 +125,12 @@ class TestWithSentry(object):
 
   def test_ha_failover_bad_good_bad(self):
     # Test with bad-host-1,good-host,bad-host-2
-    xml = self._sentry_site_xml(rpc_addresses='bad-host-1,%s,bad-host-2' % self.rpc_addresses)
+    xml = self._sentry_site_xml(rpc_addresses='bad-host-1:8039,%s,bad-host-2' % self.rpc_addresses, rpc_port=self.rpc_port)
     file(os.path.join(self.tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_equal('bad-host-1,%s,bad-host-2' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
+    assert_equal('bad-host-1:8039,%s,bad-host-2' % self.rpc_addresses, ','.join(sentry_site.get_sentry_server_rpc_addresses()))
     resp = api.list_sentry_roles_by_group(groupName='*')
     assert_true(isinstance(resp, list))
 
@@ -140,12 +141,12 @@ class TestWithSentry(object):
 
   def test_ha_failover_all_bad(self):
     # Test with all bad hosts
-    xml = self._sentry_site_xml(rpc_addresses='bad-host-1,bad-host-2')
+    xml = self._sentry_site_xml(rpc_addresses='bad-host-1:8039,bad-host-2', rpc_port=self.rpc_port)
     file(os.path.join(self.tmpdir, 'sentry-site.xml'), 'w').write(xml)
     sentry_site.reset()
 
     api = get_api(self.user)
-    assert_equal('bad-host-1,bad-host-2', ','.join(sentry_site.get_sentry_server_rpc_addresses()))
+    assert_equal('bad-host-1:8039,bad-host-2', ','.join(sentry_site.get_sentry_server_rpc_addresses()))
     assert_raises(PopupException, api.list_sentry_roles_by_group, '*')
 
     api2 = get_api2(self.user, 'solr')
@@ -169,7 +170,7 @@ class TestWithSentry(object):
     assert_true(isinstance(resp, list))
 
 
-  def _sentry_site_xml(self, rpc_addresses):
+  def _sentry_site_xml(self, rpc_addresses, rpc_port='8038'):
     config = lxml.etree.parse(self.config_path)
     root = config.getroot()
     properties = config.findall('property')
@@ -178,4 +179,7 @@ class TestWithSentry(object):
       if name.text == 'sentry.service.client.server.rpc-address':
         value = prop.find('value')
         value.text = rpc_addresses
-        return lxml.etree.tostring(root)
+      elif name.text == 'sentry.service.client.server.rpc-port':
+        value = prop.find('value')
+        value.text = rpc_port
+    return lxml.etree.tostring(root)
