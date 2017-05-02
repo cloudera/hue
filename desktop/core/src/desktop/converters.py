@@ -42,8 +42,8 @@ class DocumentConverter(object):
     # If user does not have a home directory, we need to create one and import any orphan documents to it
     self.home_dir = Document2.objects.create_user_directories(self.user)
     self.imported_tag = DocumentTag.objects.get_imported2_tag(user=self.user)
-    self.imported_docs = []
-    self.failed_docs = []
+    self.imported_doc_count = 0
+    self.failed_doc_ids = []
 
 
   def convert(self):
@@ -66,9 +66,9 @@ class DocumentConverter(object):
                 data=notebook.get_json()
             )
 
-            self.imported_docs.append(doc2)
+            self.imported_doc_count += 1
         except Exception, e:
-          self.failed_docs.append(doc)
+          self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import SavedQuery document id: %d' % doc.id)
     except ImportError:
       LOG.warn('Cannot convert Saved Query documents: beeswax app is not installed')
@@ -96,7 +96,7 @@ class DocumentConverter(object):
               doc2.save()
               Document2.objects.filter(id=doc2.id).update(last_modified=doc.last_modified)
 
-              self.imported_docs.append(doc2)
+              self.imported_doc_count += 1
 
               # Tag for not re-importing
               Document.objects.link(
@@ -110,7 +110,7 @@ class DocumentConverter(object):
               doc.add_tag(self.imported_tag)
               doc.save()
         except Exception, e:
-          self.failed_docs.append(doc)
+          self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import history document id: %d' % doc.id)
     except ImportError, e:
       LOG.warn('Cannot convert history documents: beeswax app is not installed')
@@ -133,9 +133,9 @@ class DocumentConverter(object):
                 description=doc.description,
                 data=json.dumps(data)
             )
-            self.imported_docs.append(doc2)
+            self.imported_doc_count += 1
         except Exception, e:
-          self.failed_docs.append(doc)
+          self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Job Designer document id: %d' % doc.id)
     except ImportError, e:
       LOG.warn('Cannot convert Job Designer documents: oozie app is not installed')
@@ -157,20 +157,20 @@ class DocumentConverter(object):
                 description=doc.description,
                 data=json.dumps(data)
             )
-            self.imported_docs.append(doc2)
+            self.imported_doc_count += 1
         except Exception, e:
-          self.failed_docs.append(doc)
+          self.failed_doc_ids.append(doc.id)
           LOG.exception('Failed to import Pig document id: %d' % doc.id)
     except ImportError, e:
       LOG.warn('Cannot convert Pig documents: pig app is not installed')
 
     # Add converted docs to root directory
-    if self.imported_docs:
-      LOG.info('Successfully imported %d documents for user: %s' % (len(self.imported_docs), self.user.username))
+    if self.imported_doc_count:
+      LOG.info('Successfully imported %d documents for user: %s' % (self.imported_doc_count, self.user.username))
 
     # Log docs that failed to import
-    if self.failed_docs:
-      LOG.error('Failed to import %d document(s) for user: %s - %s' % (len(self.failed_docs), self.user.username, ([doc.id for doc in self.failed_docs])))
+    if self.failed_doc_ids:
+      LOG.error('Failed to import %d document(s) for user: %s - %s' % (len(self.failed_doc_ids), self.user.username, self.failed_doc_ids))
 
 
   def _get_unconverted_docs(self, content_type, only_history=False):
