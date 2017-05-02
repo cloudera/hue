@@ -24,6 +24,7 @@ import uuid
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
+from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
@@ -54,9 +55,34 @@ class NavOptException(Exception):
     return smart_unicode(self.message)
 
 
+def check_privileges(view_func):
+  def decorate(*args, **kwargs):
+
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=args[0].user)
+      action = 'SELECT'
+      objects = []
+
+      if kwargs.get('db_tables'):
+        for db_table in kwargs['db_tables']:
+          objects.append({'server': get_hive_sentry_provider(), 'db': _get_table_name(db_table)['database'], 'table': _get_table_name(db_table)['table']})
+      else:
+        objects = [{'server': get_hive_sentry_provider()}]
+        if kwargs.get('database_name'):
+          objects[0]['db'] = kwargs['database_name']
+        if kwargs.get('database_name'):
+          objects[0]['table'] = kwargs['table_name']
+
+      if len(list(checker.filter_objects(objects, action))) != len(objects):
+        raise MissingSentryPrivilegeException(objects)
+
+    return view_func(*args, **kwargs)
+  return wraps(view_func)(decorate)
+
+
 class OptimizerApi(object):
 
-  def __init__(self, user=None, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
+  def __init__(self, user, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
     self.user = user
     self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._email = OPTIMIZER.EMAIL.get()
@@ -160,15 +186,8 @@ class OptimizerApi(object):
   def upload_status(self, workload_id):
     return self._call('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id})
 
-
+  @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      checker = get_checker(user=self.user)
-      action = 'SELECT'
-      objects = [{'server': get_hive_sentry_provider(), 'db': database_name}]
-      if not checker.filter_objects(objects, action):
-        raise MissingSentryPrivilegeException(objects)
-
     data = self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None})
 
     if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
@@ -183,6 +202,7 @@ class OptimizerApi(object):
 
     return data
 
+  @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
     return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None})
 
@@ -216,6 +236,7 @@ class OptimizerApi(object):
     return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None})
 
 
+  @check_privileges
   def top_filters(self, db_tables=None, page_size=100, startingToken=None):
     args = {
       'tenant' : self._product_name,
@@ -227,7 +248,7 @@ class OptimizerApi(object):
 
     return self._call('getTopFilters', args)
 
-
+  @check_privileges
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
     args = {
       'tenant' : self._product_name,
@@ -240,6 +261,7 @@ class OptimizerApi(object):
     return self._call('getTopAggs', args)
 
 
+  @check_privileges
   def top_columns(self, db_tables=None, page_size=100, startingToken=None):
     args = {
       'tenant' : self._product_name,
@@ -252,6 +274,7 @@ class OptimizerApi(object):
     return self._call('getTopColumns', args)
 
 
+  @check_privileges
   def top_joins(self, db_tables=None, page_size=100, startingToken=None):
     args = {
       'tenant' : self._product_name,
