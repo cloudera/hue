@@ -129,8 +129,15 @@ def _get_server_properties(exempt_host=None):
     servers = []
     sentry_servers = get_sentry_server_rpc_addresses()
     for server in sentry_servers:
-      if server != exempt_host:
-        servers.append({'hostname': server, 'port': get_sentry_server_rpc_port()})
+      host = server
+      if ':' in server:
+        host, port = server.split(':')
+      elif get_sentry_server_rpc_port():
+        port = get_sentry_server_rpc_port()
+      else:
+        port = PORT.get()
+      if host != exempt_host:
+        servers.append({'hostname': host, 'port': int(port)})
   except Exception, e:
     raise PopupException(_('Error in retrieving Sentry server properties.'), detail=e)
 
