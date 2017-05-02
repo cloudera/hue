@@ -1713,8 +1713,10 @@ var ApiHelper = (function () {
         })
       ]
     ).done(function (metadata, documents) {
-      if (metadata[0].status === 0 && !self.successResponseIsError(metadata[0])) {
-    	metadata[0].resultsHuedocuments = documents[0].results;
+      if (metadata[0].status === 0 || documents[0].status === 0) {
+        if (documents[0].status === 0) {
+           metadata[0].resultsHuedocuments = documents[0].results;
+        }
         options.successCallback(metadata[0]);
       } else {
         self.assistErrorCallback(options)(metadata);
