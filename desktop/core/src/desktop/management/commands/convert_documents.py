@@ -41,8 +41,8 @@ class Command(NoArgsCommand):
           converter.convert()
           logging.info("Document conversions for user:%s took %.3f seconds" % (user.username, time.time() - start_time))
 
-          if converter.failed_docs:
-            print >> sys.stderr, 'Failed to import %d document(s) for user: %s - %s' % (len(converter.failed_docs), user.username, ([doc.id for doc in converter.failed_docs]))
+          if converter.failed_doc_ids:
+            print >> sys.stderr, 'Failed to import %d document(s) for user: %s - %s' % (len(converter.failed_doc_ids), user.username, converter.failed_doc_ids)
     except Exception, e:
       logging.exception("Failed to execute the document conversions.")
 
