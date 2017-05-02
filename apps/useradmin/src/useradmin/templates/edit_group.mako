@@ -79,10 +79,8 @@ ${layout.menubar(section='groups')}
         % endif
         % if is_embeddable:
           <input type="hidden" value="true" name="is_embeddable" />
-          <a href="/hue/useradmin/permissions" class="btn">${_('Cancel')}</a>
-        % else:
-          <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
         % endif
+        <a href="/useradmin/groups" class="btn">${_('Cancel')}</a>
       </div>
     </form>
   </div>
