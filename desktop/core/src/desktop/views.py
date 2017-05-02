@@ -47,7 +47,7 @@ import desktop.log.log_buffer
 from desktop import appmanager
 from desktop.api import massaged_tags_for_json, massaged_documents_for_json, _get_docs
 
-from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER, HTTP_PORT
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4, HUE_LOAD_BALANCER
 from desktop.lib import django_mako
 from desktop.lib.conf import GLOBAL_CONFIG, BoundConfig
 from desktop.lib.django_util import JsonResponse, login_notrequired, render
@@ -56,7 +56,7 @@ from desktop.lib.paths import get_desktop_root
 from desktop.lib.thread_util import dump_traceback
 from desktop.log.access import access_log_level, access_warn
 from desktop.log import set_all_debug as _set_all_debug, reset_all_debug as _reset_all_debug, get_all_debug as _get_all_debug
-from desktop.models import Settings, hue_version, ClusterConfig, _get_apps
+from desktop.models import Settings, hue_version, ClusterConfig, _get_apps, UserPreferences
 
 
 LOG = logging.getLogger(__name__)
@@ -317,6 +317,12 @@ def unsupported(request):
   return render('unsupported.mako', request, None)
 
 def index(request):
+  try:
+    user_hue_version = json.loads(UserPreferences.objects.get(user=request.user, key='hue_version').value)
+    IS_HUE_4.set_for_testing(user_hue_version >= 4)
+  except UserPreferences.DoesNotExist:
+    pass
+
   if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
     return redirect(reverse('about:index'))
   else:
