@@ -61,11 +61,8 @@ ${layout.menubar(section='permissions')}
         <input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
         % if is_embeddable:
           <input type="hidden" value="true" name="is_embeddable" />
-          ## Hue4 links?
-          <a href="/hue/useradmin/permissions" class="btn">${_('Cancel')}</a>
-        % else:
-          <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
         % endif
+        <a href="/useradmin/permissions" class="btn">${_('Cancel')}</a>
       </div>
     </form>
   </div>
