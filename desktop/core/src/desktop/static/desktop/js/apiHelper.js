@@ -673,7 +673,7 @@ var ApiHelper = (function () {
       }
     };
 
-    if (window.location.getParameter('type') !== '') {
+    if (window.location.pathname.indexOf('/home') > -1 && window.location.getParameter('type') !== '') {
       parameters['data']['type'] = ['directory', window.location.getParameter('type')];
       parameters['traditional'] = true;
     }
