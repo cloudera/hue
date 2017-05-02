@@ -26,6 +26,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode
 from desktop.models import Document2
+from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
 
@@ -55,6 +56,12 @@ def error_handler(view_fn):
         'status': -1,
         'message': e.message
       }
+    except MissingSentryPrivilegeException, e:
+      LOG.exception(e)
+      response = {
+        'status': -1,
+        'message': 'Missing privileges for %s' % force_unicode(str(e))
+      }
     except Exception, e:
       LOG.exception(e)
       response = {
@@ -72,7 +79,7 @@ def get_tenant(request):
 
   email = request.POST.get('email')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.get_tenant(email=email)
 
   if data:
@@ -121,7 +128,7 @@ def table_details(request):
   database_name = request.POST.get('databaseName')
   table_name = request.POST.get('tableName')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   data = api.table_details(database_name=database_name, table_name=table_name)
 
@@ -143,7 +150,7 @@ def query_compatibility(request):
   target_platform = request.POST.get('targetPlatform')
   query = request.POST.get('query')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   data = api.query_compatibility(source_platform=source_platform, target_platform=target_platform, query=query)
 
@@ -165,7 +172,7 @@ def query_risk(request):
   source_platform = request.POST.get('sourcePlatform')
   db_name = request.POST.get('dbName')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   data = api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
 
@@ -186,7 +193,7 @@ def similar_queries(request):
   source_platform = request.POST.get('sourcePlatform')
   query = json.loads(request.POST.get('query'))
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   data = api.similar_queries(source_platform=source_platform, query=query)
 
@@ -205,9 +212,9 @@ def top_filters(request):
   response = {'status': -1}
 
   db_tables = json.loads(request.POST.get('dbTables'), '[]')
-  column_name = request.POST.get('columnName') # Unsused
+  column_name = request.POST.get('columnName') # Unused
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.top_filters(db_tables=db_tables)
 
   if data:
@@ -226,7 +233,7 @@ def top_joins(request):
 
   db_tables = json.loads(request.POST.get('dbTables'), '[]')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.top_joins(db_tables=db_tables)
 
   if data:
@@ -245,7 +252,7 @@ def top_aggs(request):
 
   db_tables = json.loads(request.POST.get('dbTables'), '[]')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.top_aggs(db_tables=db_tables)
 
   if data:
@@ -262,7 +269,7 @@ def top_aggs(request):
 def top_databases(request):
   response = {'status': -1}
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.top_databases()
 
   if data:
@@ -281,7 +288,7 @@ def top_columns(request):
 
   db_tables = json.loads(request.POST.get('dbTables'), '[]')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
   data = api.top_columns(db_tables=db_tables)
 
   if data:
@@ -322,7 +329,7 @@ def upload_history(request):
 
   queries = _convert_queries([Notebook(document=doc).get_data() for doc in history])
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   response['upload_history'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
   response['status'] = 0
@@ -394,7 +401,7 @@ def upload_table_stats(request):
     except Exception, e:
       LOG.exception('Skipping upload of %s: %s' % (db_table, e))
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   response['upload_table_stats'] = api.upload(data=table_stats, data_type='table_stats', source_platform=source_platform)
   response['status'] = 0 if response['upload_table_stats']['status']['state'] in ('WAITING', 'FINISHED', 'IN_PROGRESS') else -1
@@ -414,7 +421,7 @@ def upload_status(request):
 
   workload_id = request.POST.get('workloadId')
 
-  api = OptimizerApi()
+  api = OptimizerApi(request.user)
 
   response['upload_status'] = api.upload_status(workload_id=workload_id)
   response['status'] = 0

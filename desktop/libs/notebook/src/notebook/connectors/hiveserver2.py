@@ -530,7 +530,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     response = self._get_current_statement(db, snippet)
     query = response['statement']
 
-    api = OptimizerApi()
+    api = OptimizerApi(self.user)
 
     return api.query_risk(query=query, source_platform=snippet['type'], db_name=snippet.get('database') or 'default')
 
@@ -541,7 +541,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     response = self._get_current_statement(db, snippet)
     query = response['statement']
 
-    api = OptimizerApi()
+    api = OptimizerApi(self.user)
 
     return api.query_compatibility(source_platform, target_platform, query)
 
@@ -552,7 +552,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     response = self._get_current_statement(db, snippet)
     query = response['statement']
 
-    api = OptimizerApi()
+    api = OptimizerApi(self.user)
 
     return api.similar_queries(source_platform, query)
 
