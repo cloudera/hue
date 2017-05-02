@@ -114,7 +114,7 @@
       loadUrlParam();
 
       viewModel.activeEntry.subscribe(function (newEntry) {
-        var filterType = window.location.getParameter('type') != '' ? '&type=' + window.location.getParameter('type') : '';
+        var filterType = window.location.pathname.indexOf('/home') > -1 && window.location.getParameter('type') != '' ? '&type=' + window.location.getParameter('type') : '';
         if (typeof newEntry !== 'undefined' && newEntry.definition().uuid && ! newEntry.isRoot()) {
           if (window.location.getParameter('uuid') == '' || window.location.getParameter('uuid') !== newEntry.definition().uuid){
             hueUtils.changeURL('${ is_embeddable and '/hue' or ''}/home/?uuid=' + newEntry.definition().uuid + filterType);
