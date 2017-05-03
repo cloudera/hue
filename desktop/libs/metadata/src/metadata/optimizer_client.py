@@ -215,7 +215,7 @@ class OptimizerApi(object):
 
   @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    data = self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: None})
+    data = self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: startingToken})
 
     if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
       checker = get_checker(user=self.user)
@@ -231,11 +231,11 @@ class OptimizerApi(object):
 
   @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
-    return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: None})
+    return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: startingToken})
 
 
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
-    return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, })
+    return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, startingToken: startingToken})
 
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
@@ -260,7 +260,10 @@ class OptimizerApi(object):
     }
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
-    return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: None})
+    if self.user.is_superuser:
+      return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: startingToken})
+    else:
+      raise PopupException(_('Call not supported'))
 
 
   @check_privileges
@@ -268,7 +271,7 @@ class OptimizerApi(object):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
-      'startingToken': None
+      'startingToken': startingToken
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -290,7 +293,7 @@ class OptimizerApi(object):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
-      'startingToken': None
+      'startingToken': startingToken
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -316,7 +319,7 @@ class OptimizerApi(object):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
-      'startingToken': None
+      'startingToken': startingToken
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -334,7 +337,7 @@ class OptimizerApi(object):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
-      'startingToken': None
+      'startingToken': startingToken
     }
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
@@ -355,7 +358,7 @@ class OptimizerApi(object):
     args = {
       'tenant' : self._product_name,
       'pageSize': page_size,
-      'startingToken': None
+      'startingToken': startingToken
     }
 
     data = self._call('getTopDatabases', args)
@@ -375,6 +378,7 @@ def OptimizerQueryDataAdapter(data):
     rows = ([str(uuid.uuid4()), 0.0, q, 'default'] for q in data)
 
   yield headers, rows
+
 
 def _get_table_name(path):
   column = None
