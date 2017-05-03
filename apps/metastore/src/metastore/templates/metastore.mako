@@ -1148,7 +1148,7 @@ ${ components.menubar() }
     </form>
   </div>
 
-  <div id="import-data-modal" class="modal hide fade" style="display: block;width: 640px;margin-left: -320px!important;"></div>
+  <div id="import-data-modal" class="modal hide fade" style="display: block;width: 680px;margin-left: -340px!important;"></div>
 </div>
 </span>
 
