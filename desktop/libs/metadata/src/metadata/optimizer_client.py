@@ -335,7 +335,12 @@ class OptimizerApi(object):
       'startingToken': None
     }
 
-    return self._call('getTopDatabases', args)
+    data = self._call('getTopDatabases', args)
+
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      data['results'] = list(_secure_results(data['results'], self.user))
+
+    return data
 
 
 def OptimizerQueryDataAdapter(data):
