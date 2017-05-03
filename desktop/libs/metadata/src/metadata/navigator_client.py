@@ -33,7 +33,7 @@ from hadoop.conf import HDFS_CLUSTERS
 from libsentry.privilege_checker import get_checker
 from libsentry.sentry_site import get_hive_sentry_provider
 
-from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
+from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username, has_navigator_file_search
 from metadata.metadata_sites import get_navigator_hue_server_name
 
 
@@ -237,7 +237,7 @@ class NavigatorApi(object):
       if sources:
         default_entity_types, entity_types = self._get_types_from_sources(sources)
 
-        if 'hive' in sources or 'impala' in sources:
+        if 'sql' in sources or 'hive' in sources or 'impala' in sources:
           fq_type = default_entity_types
           filterQueries.append('sourceType:HIVE OR sourceType:IMPALA')
         elif 'hdfs' in sources:

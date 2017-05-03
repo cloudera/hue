@@ -183,6 +183,10 @@ def get_navigator_saml_password():
   return NAVIGATOR.AUTH_SAML_PASSWORD_SCRIPT.get()
 
 
+def has_navigator_file_search(user):
+  return has_navigator(user) and NAVIGATOR.ENABLE_FILE_SEARCH.get()
+
+
 NAVIGATOR = ConfigSection(
   key='navigator',
   help=_t("""Configuration options for Navigator API"""),
@@ -267,6 +271,13 @@ NAVIGATOR = ConfigSection(
       default=450,
       type=int
     ),
+
+    ENABLE_FILE_SEARCH = Config(
+      key="enable_file_search",
+      help=_t("Enable to search HDFS, S3 files."),
+      type=coerce_bool,
+      default=False
+    )
   )
 )
 
