@@ -105,15 +105,6 @@ class DocumentConverter(object):
 
               self.imported_doc_count += 1
 
-              # Tag for not re-importing
-              Document.objects.link(
-                doc2,
-                owner=doc2.owner,
-                name=doc2.name,
-                description=doc2.description,
-                extra=doc.extra
-              )
-
               doc.add_tag(self.imported_tag)
               doc.save()
         except Exception, e:
