@@ -161,9 +161,9 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-history-panel-template">
     <button class="btn btn-flat pull-right" title="${_('Task history')}" data-bind="toggle: historyPanelVisible">
+      <i class="fa fa-history"></i>
       <div class="jobs-badge" data-bind="text: historyRunningJobs().length, visible: historyRunningJobs().length > 0"></div>
       <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
-      <i class="fa fa-history"></i>
     </button>
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
@@ -411,6 +411,10 @@ from desktop.views import _ko
 
         huePubSub.subscribe('hide.jobs.panel', function () {
           self.jobsPanelVisible(false);
+        });
+
+        huePubSub.subscribe('show.jobs.panel', function () {
+          self.jobsPanelVisible(true);
         });
 
         self.jobCount = ko.observable(0);
