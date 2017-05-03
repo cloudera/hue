@@ -70,7 +70,7 @@ def check_privileges(view_func):
         objects = [{'server': get_hive_sentry_provider()}]
         if kwargs.get('database_name'):
           objects[0]['db'] = kwargs['database_name']
-        if kwargs.get('database_name'):
+        if kwargs.get('table_name'):
           objects[0]['table'] = kwargs['table_name']
 
       if len(list(checker.filter_objects(objects, action))) != len(objects):
@@ -78,6 +78,27 @@ def check_privileges(view_func):
 
     return view_func(*args, **kwargs)
   return wraps(view_func)(decorate)
+
+
+def _secure_results(results, user, action='SELECT'):
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=user)
+
+      def getkey(result):
+        key = {'server': get_hive_sentry_provider()}
+
+        if 'dbName' in result:
+          key['db'] = result['dbName']
+        if 'tableName' in result:
+          key['table'] = result['tableName']
+        if 'columnName' in result:
+          key['column'] = result['columnName']
+
+        return key
+
+      return checker.filter_objects(results, action, key=getkey)
+    else:
+      return results
 
 
 class OptimizerApi(object):
@@ -198,7 +219,7 @@ class OptimizerApi(object):
         names = _get_table_name(table['name']),
         return {'server': get_hive_sentry_provider(), 'db': names['database'], 'table': names['table']}
 
-      data['results'] = checker.filter_objects(data['results'], action, key=getkey)
+      data['results'] = list(checker.filter_objects(data['results'], action, key=getkey))
 
     return data
 
@@ -271,7 +292,10 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._call('getTopColumns', args)
+    results = self._call('getTopColumns', args)
+    for section in ['orderbyColumns', 'selectColumns', 'filterColumns', 'joinColumns', 'groupbyColumns']:
+      results[section] = list(_secure_results(results[section], self.user))
+    return results
 
 
   @check_privileges
