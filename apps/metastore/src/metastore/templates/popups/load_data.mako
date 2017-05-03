@@ -31,7 +31,7 @@ from django.utils.translation import ugettext as _
         <div class="control-group">
             ${comps.bootstrapLabel(load_form["path"])}
             <div class="controls">
-                ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xxlarge", file_chooser=True, show_errors=True)}
+                ${comps.field(load_form["path"], placeholder="/user/user_name/data_dir/file", klass="pathChooser input-xlarge", file_chooser=True, show_errors=True)}
             </div>
         </div>
 
