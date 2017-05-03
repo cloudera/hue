@@ -284,6 +284,7 @@ class OptimizerApi(object):
       results['results'] = filtered_filters
     return results
 
+
   @check_privileges
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
     args = {
@@ -294,7 +295,20 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._call('getTopAggs', args)
+    results = self._call('getTopAggs', args)
+
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=self.user)
+      action = 'SELECT'
+
+      def getkey(table):
+        names = table['aggregateInfo'][0]
+        names['server'] = get_hive_sentry_provider()
+        return names
+
+      results['results'] = list(checker.filter_objects(results['results'], action, key=getkey))
+
+    return results
 
 
   @check_privileges
