@@ -33,7 +33,7 @@ from django.views.decorators.http import require_POST
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.i18n import force_unicode, smart_str
 
-from metadata.conf import has_navigator, NAVIGATOR
+from metadata.conf import has_navigator, NAVIGATOR, has_navigator_file_search
 from metadata.navigator_client import NavigatorApi, NavigatorApiException, EntityDoesNotExistException,\
   NavigathorAuthException
 
@@ -95,6 +95,8 @@ def search_entities(request):
   offset = request.POST.get('offset', 0)
   limit = int(request.POST.get('limit', 100))
   sources = json.loads(request.POST.get('sources') or '[]')
+  if sources and not has_navigator_file_search(request.user):
+    sources = ['sql']
 
   query_s = query_s.strip() or '*'
 
@@ -127,6 +129,9 @@ def search_entities_interactive(request):
   limit = int(request.POST.get('limit', 25))
   field_facets = json.loads(request.POST.get('field_facets') or '[]')
   sources = json.loads(request.POST.get('sources') or '[]')
+
+  if sources and not has_navigator_file_search(request.user):
+    sources = ['sql']
 
   f = {
       "outputFormat" : {

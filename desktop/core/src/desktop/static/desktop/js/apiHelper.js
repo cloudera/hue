@@ -1704,7 +1704,7 @@ var ApiHelper = (function () {
       $.post('/desktop/api/search/entities_interactive', {
         query_s: ko.mapping.toJSON(options.query),
         limit: 5,
-        sources: '["*"]'
+        sources: '["sql", "hdfs", "s3"]'
       }),
       $.post('/desktop/api/search/entities_interactive', {
           query_s: ko.mapping.toJSON(options.query),

@@ -23,7 +23,7 @@ from desktop.conf import USE_NEW_SIDE_PANELS, VCS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
 
-from metadata.conf import has_navigator
+from metadata.conf import has_navigator, has_navigator_file_search
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
 from notebook.conf import get_ordered_interpreters
@@ -150,13 +150,7 @@ from notebook.conf import get_ordered_interpreters
     <li><a href="javascript:void(0);" data-bind="hueLink: definition.url"><i class="fa fa-fw" data-bind="css: {'fa-folder-open-o': definition.type === 'dir', 'fa-file-text-o': definition.type === 'file'}"></i> ${ _('Open in File Browser') }</a></li>
     <!-- ko if: $currentApp() === 'editor' -->
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
-    ## Generate create table statement
     <!-- /ko -->
-    ## ------
-    ## Move
-    ## Copy
-    ## Rename
-    ## Delete
   </script>
 
   <script type="text/html" id="document-context-items">
@@ -166,12 +160,6 @@ from notebook.conf import get_ordered_interpreters
     <!-- ko if: definition().type !== 'directory' -->
     <li><a href="javascript: void(0);" data-bind="click: open"><i class="fa fa-fw fa-edit"></i> ${ _('Open document') }</a></li>
     <!-- /ko -->
-    ## Share
-    ## -----
-    ## Move
-    ## Copy
-    ## Rename
-    ## Delete
   </script>
 
   <script type="text/html" id="hbase-context-items">
@@ -1496,6 +1484,9 @@ from notebook.conf import get_ordered_interpreters
                   type: 'hdfs',
                   icon: 'fa-folder-o',
                   minHeight: 50
+                  % if not has_navigator_file_search(user):
+                    , showNavSearch: false
+                  % endif
                 }));
               }
 
@@ -1509,6 +1500,9 @@ from notebook.conf import get_ordered_interpreters
                   type: 's3',
                   icon: 'fa-cubes',
                   minHeight: 50
+                  % if not has_navigator_file_search(user):
+                    , showNavSearch: false
+                  % endif
                 }));
               }
 
