@@ -273,7 +273,16 @@ class OptimizerApi(object):
     if db_tables:
       args['dbTableList'] = [db_table.lower() for db_table in db_tables]
 
-    return self._call('getTopFilters', args)
+    results = self._call('getTopFilters', args)
+
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      filtered_filters = []
+      for result in results['results']:
+        cols = [_get_table_name(col['columnName']) for col in result["popularValues"][0]["group"]]
+        if len(cols) == len(list(_secure_results(cols, self.user))):
+          filtered_filters.append(result)
+      results['results'] = filtered_filters
+    return results
 
   @check_privileges
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
@@ -323,8 +332,8 @@ class OptimizerApi(object):
       for result in results['results']:
         cols = [_get_table_name(col) for col in result["joinCols"][0]["columns"]]
         if len(cols) == len(list(_secure_results(cols, self.user))):
-          filtered_joins.append(cols)
-      results['resulsts'] = filtered_joins
+          filtered_joins.append(result)
+      results['results'] = filtered_joins
     return results
 
 
