@@ -317,16 +317,18 @@ def unsupported(request):
   return render('unsupported.mako', request, None)
 
 def index(request):
-  try:
-    user_hue_version = json.loads(UserPreferences.objects.get(user=request.user, key='hue_version').value)
-    IS_HUE_4.set_for_testing(user_hue_version >= 4)
-  except UserPreferences.DoesNotExist:
-    pass
+  is_hue_4 = IS_HUE_4.get()
+  if is_hue_4:
+    try:
+      user_hue_version = json.loads(UserPreferences.objects.get(user=request.user, key='hue_version').value)
+      is_hue_4 = user_hue_version >= 4
+    except UserPreferences.DoesNotExist:
+      pass
 
   if request.user.is_superuser and request.COOKIES.get('hueLandingPage') != 'home' and not IS_HUE_4.get():
     return redirect(reverse('about:index'))
   else:
-    if IS_HUE_4.get():
+    if is_hue_4:
       return redirect('desktop.views.hue')
     elif USE_NEW_EDITOR.get():
       return home2(request)
