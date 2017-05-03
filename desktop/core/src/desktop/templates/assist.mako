@@ -2025,7 +2025,7 @@ from notebook.conf import get_ordered_interpreters
         <!-- ko if: selectedNotebook() && selectedNotebook().isBatchable() -->
         <!-- ko with: selectedNotebook() -->
         <div class="tab-pane" id="scheduleTab">
-          <!-- ko if: isSaved() -->
+          <!-- ko if: isSaved() && ! isHistory() -->
           <!-- ko if: schedulerViewModelIsLoaded() && schedulerViewModel.coordinator.isDirty() -->
           <a data-bind="click: save" href="javascript: void(0);">${ _('Save changes') }</a>
           <!-- /ko -->
@@ -2042,7 +2042,7 @@ from notebook.conf import get_ordered_interpreters
           <div id="schedulerEditor"></div>
           <!-- /ko -->
 
-          <!-- ko ifnot: isSaved() -->
+          <!-- ko ifnot: isSaved() && ! isHistory() -->
           ${ _('Query needs to be saved first.') }
           <!-- /ko -->
         </div>
@@ -2062,7 +2062,7 @@ from notebook.conf import get_ordered_interpreters
         // TODO: Move all the scheduler logic out of the notebook to here.
 
         var selectedNotebookSub = self.selectedNotebook.subscribe(function (notebook) {
-          if (notebook && notebook.schedulerViewModel == null) {
+          if (notebook && notebook.schedulerViewModel == null && notebook.isSaved() && ! notebook.isHistory()) {
             notebook.loadScheduler();
           }
         });
