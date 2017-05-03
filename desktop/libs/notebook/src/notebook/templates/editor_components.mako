@@ -1058,7 +1058,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: topRisk().risk == 'medium' -->
-        <div class="round-icon error" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
+        <div class="round-icon warning" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
           <i class="fa fa-exclamation"></i>
         </div>
         <!-- ko if: showOptimizer -->
