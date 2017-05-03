@@ -646,7 +646,7 @@ def search_entities_interactive(request):
 
     return JsonResponse(response)
   else:
-    if has_navigator(request.user) and False:
+    if has_navigator(request.user):
       return metadata_search_entities_interactive(request)
     else:
       return JsonResponse({'status': 1, 'message': _('Navigator not enabled')})
