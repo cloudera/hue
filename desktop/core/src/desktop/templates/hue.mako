@@ -774,6 +774,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
             page.redirect('/jobbrowser/jobs/#!id=application_' + _.trimRight(ctx.params[0], '/'));
           }},
+          { url: '/jobbrowser/workflows', app: function () {
+            page.redirect('/jobbrowser/#!workflows');
+          }},
           { url: '/jobbrowser/jobs', app: 'jobbrowser' },
           { url: '/logs', app: 'logs' },
           { url: '/metastore', app: function () {
