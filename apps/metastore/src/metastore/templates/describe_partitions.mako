@@ -57,9 +57,8 @@ ${ assist.assistPanel() }
 
 
 <div class="main-content">
-  <div class="vertical-full container-fluid">
-    <div class="vertical-full">
-      <div class="vertical-full row-fluid panel-container">
+  <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
+    <div class="vertical-full row-fluid panel-container">
 
         <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible() && $root.assistAvailable()">
           <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { $root.isLeftPanelVisible(false) }">
@@ -84,7 +83,7 @@ ${ assist.assistPanel() }
         <div class="content-panel">
 
           <div class="metastore-main">
-            <h3>${ components.breadcrumbs(breadcrumbs) }</h3>
+            <h1>${ components.breadcrumbs(breadcrumbs) }</h1>
 
             <div class="row-fluid">
               <div class="span10">
@@ -149,7 +148,6 @@ ${ assist.assistPanel() }
 
         </div>
       </div>
-    </div>
   </div>
 </div>
 

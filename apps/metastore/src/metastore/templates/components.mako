@@ -46,16 +46,15 @@
       </li>
     %endif
     <li>
-      <a href="${url('metastore:databases')}">${_('Databases')}</a><span class="divider">&gt;</span>
+      <a href="${url('metastore:databases')}">${_('Databases')} <span class="divider">&gt;</span></a>
     </li>
     % for crumb in breadcrumbs:
     <li>
+      <a href="${ crumb['url'] }">${ crumb['name'] }
       % if not loop.last:
-        <a href="${ crumb['url'] }">${ crumb['name'] }</a>
-        <span class="divider">&gt;</span>
-      % else:
-        <span style="padding-left:12px">${ crumb['name'] }</span>
+         <span class="divider">&gt;</span>
       % endif
+      </a>
     </li>
     % endfor
   </ul>
