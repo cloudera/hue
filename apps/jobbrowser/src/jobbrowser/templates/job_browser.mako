@@ -1867,7 +1867,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var clock;
       self.job.subscribe(function(val) {
         clearInterval(clock);
-        if (self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
+        if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (val) {
             clock = setInterval(val.updateJob, 5000, 'jobbrowser');
           } else {
