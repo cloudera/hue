@@ -2843,6 +2843,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       redrawFixedHeaders(200);
     }, 'editor');
 
+    huePubSub.subscribe('app.gained.focus', function (app) {
+      if (app === 'editor') {
+        huePubSub.publish('redraw.fixed.headers');
+      }
+    }, 'editor');
+
     huePubSub.subscribe('show.saveToFile.modal', function () {
       $('#saveToFileModal').modal('show');
     }, 'editor');
