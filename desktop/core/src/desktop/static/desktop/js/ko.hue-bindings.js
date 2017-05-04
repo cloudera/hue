@@ -2086,7 +2086,7 @@
   ko.bindingHandlers.splitFlexDraggable = {
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
-      var sidePanelWidth = $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') != null ? $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') : 250;
+      var sidePanelWidth = $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') != null ? $.totalStorage(options.appName + '_' + options.orientation + '_panel_width') : 290;
 
       var $resizer = $(element);
       var $sidePanel = $(options.sidePanelSelector);
@@ -2155,7 +2155,7 @@
     init: function (element, valueAccessor) {
       var options = ko.unwrap(valueAccessor());
       var leftPanelWidth = $.totalStorage(options.appName + "_left_panel_width") != null ? Math.max($.totalStorage(options.appName + "_left_panel_width"), 250) : 250;
-      var rightPanelWidth = $.totalStorage(options.appName + "_right_panel_width") != null ? Math.max($.totalStorage(options.appName + "_right_panel_width"), 250) : 250;
+      var rightPanelWidth = $.totalStorage(options.appName + "_right_panel_width") != null ? Math.max($.totalStorage(options.appName + "_right_panel_width"), 250) : 290;
 
       var containerSelector = options.containerSelector || ".panel-container";
       var contentPanelSelector = options.contentPanelSelector || ".content-panel";
