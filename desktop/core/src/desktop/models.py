@@ -1227,8 +1227,12 @@ class Document2(models.Model):
       raise FilesystemException(_('Target with UUID %s is not a directory') % directory.uuid)
 
     if directory.can_write_or_exception(user=user):
+      # Restore last_modified date after save
+      original_last_modified = self.last_modified
       self.parent_directory = directory
       self.save()
+      # Use update instead of save() so that last_modified date is not modified automatically
+      Document2.objects.filter(id=self.id).update(last_modified=original_last_modified)
 
     return self
 
