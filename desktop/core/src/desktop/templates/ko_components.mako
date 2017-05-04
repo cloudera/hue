@@ -208,7 +208,7 @@ from desktop.views import _ko
         </div>
         <ul class="unstyled notification-history-list">
           <!-- ko foreach: history -->
-          <li data-bind="click: function() { editorViewModel.openNotebook(uuid()); }">
+          <li data-bind="click: function() {  $parents[1].editorViewModel.openNotebook(uuid()); }">
             <div class="muted pull-left" data-bind="momentFromNow: {data: lastExecuted, interval: 10000, titleFormat: 'LLL'}"></div>
             <div class="pull-right muted">
               <!-- ko switch: status -->
