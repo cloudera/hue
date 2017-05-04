@@ -3584,6 +3584,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       var _resizeTimeout = -1;
       $(window).on("resize", function () {
+        $('.notebook-name-desc').css('max-width', ($('.snippet-container').width()/4) + 'px');
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(function () {
           forceChartDraws();
