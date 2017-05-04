@@ -982,7 +982,7 @@ class Action(object):
 
   @classmethod
   def get_fields(cls):
-    credentials = [cls.DEFAULT_CREDENTIALS] if hasattr(cls, 'DEFAULT_CREDENTIALS') else []
+    credentials = [cls.DEFAULT_CREDENTIALS] if hasattr(cls, 'DEFAULT_CREDENTIALS') and cls.DEFAULT_CREDENTIALS else []
     return [(f['name'], f['value']) for f in cls.FIELDS.itervalues()] + [('sla', WorkflowConfiguration.SLA_DEFAULT), ('credentials', credentials)]
 
 
@@ -1371,7 +1371,7 @@ def _get_impala_url():
 class ImpalaAction(HiveServer2Action):
   # Executed as shell action until Oozie supports an Impala Action
   TYPE = 'impala'
-  DEFAULT_CREDENTIALS = 'impala' # None at this time, need to upload user keytab
+  DEFAULT_CREDENTIALS = '' # None at this time, need to upload user keytab
 
   FIELDS = HiveServer2Action.FIELDS.copy()
   del FIELDS['jdbc_url']
@@ -2236,11 +2236,12 @@ class HiveDocumentAction(Action):
 
 class ImpalaDocumentAction(HiveDocumentAction):
   TYPE = 'impala-document'
-  DEFAULT_CREDENTIALS = 'impala' # None at this time, need to upload user keytab
+  DEFAULT_CREDENTIALS = '' # None at this time, need to upload user keytab
 
   FIELDS = HiveServer2Action.FIELDS.copy()
   del FIELDS['jdbc_url']
   del FIELDS['password']
+
   FIELDS['impalad_host'] = {
       'name': 'impalad_host',
       'label': _('Impalad hostname'),
