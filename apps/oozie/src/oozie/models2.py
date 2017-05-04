@@ -391,7 +391,12 @@ class Workflow(Job):
           if param['value'] and '=' in param['value']:
             name, val = param['value'].split('=', 1)
             parameters[name] = val
-        extra = find_parameters(node, fields=['key_tab_path', 'user_principal'])
+        extra_fields = []
+        if node.data['properties'].get('key_tab_path'):
+          extra_fields.append('key_tab_path')
+        if node.data['properties'].get('user_principal'):
+          extra_fields.append('user_principal')
+        extra = find_parameters(node, fields=extra_fields)
       else:
         extra = node.find_parameters()
 

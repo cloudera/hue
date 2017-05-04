@@ -320,11 +320,14 @@ def job_attempt_logs_json(request, job, attempt_index=0, name='syslog', offset=L
     if app['applicationType'] == 'MAPREDUCE':
       if app['finalStatus'] in ('SUCCEEDED', 'FAILED', 'KILLED'):
         attempt_index = int(attempt_index)
-        attempt = job.job_attempts['jobAttempt'][attempt_index]
+        if not job.job_attempts['jobAttempt']:
+          response = {'status': 0, 'log': _('Job has not tasks')}
+        else:
+          attempt = job.job_attempts['jobAttempt'][attempt_index]
 
-        log_link = attempt['logsLink']
-        # Reformat log link to use YARN RM, replace node addr with node ID addr
-        log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
+          log_link = attempt['logsLink']
+          # Reformat log link to use YARN RM, replace node addr with node ID addr
+          log_link = log_link.replace(attempt['nodeHttpAddress'], attempt['nodeId'])
       elif app['state'] == 'RUNNING':
         log_link = app['amContainerLogs']
   except (KeyError, RestException), e:

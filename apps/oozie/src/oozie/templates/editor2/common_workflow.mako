@@ -670,7 +670,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="attr: {href: '/filebrowser/view=' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
+    <a data-bind="attr: { href: '/filebrowser/view=' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->
