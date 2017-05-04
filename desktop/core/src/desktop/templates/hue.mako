@@ -684,6 +684,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           huePubSub.resumeAppSubscribers(app);
           $('.embeddable').hide();
           $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
+          huePubSub.publish('app.gained.focus', app);
         };
 
         self.dropzoneError = function (filename) {
