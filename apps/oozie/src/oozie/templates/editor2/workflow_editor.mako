@@ -66,7 +66,7 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 
     <a title="${ _('Workspace') }" ${ not is_embeddable and 'target="_blank"' or ''} rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
-        data-bind="css: {'btn': true}, attr: { href: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir() }"
+        data-bind="css: {'btn': true}, hueLink: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
       >
       <i class="fa fa-fw fa-folder-open"></i>
     </a>
@@ -86,16 +86,10 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
 
     &nbsp;&nbsp;&nbsp;
 
-    %if is_embeddable:
-    <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, click: function(){ huePubSub.publish('open.link', '${ url('oozie:new_workflow') }') }">
-      <i class="fa fa-fw fa-file-o"></i>
-    </a>
-    %else:
-    <a class="btn" href="${ url('oozie:new_workflow') }" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-      <i class="fa fa-fw fa-file-o"></i>
-    </a>
-    %endif
 
+    <a class="btn" href="javascript: void(0)" title="${ _('New') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}, hueLink: '${ url('oozie:new_workflow') }'">
+      <i class="fa fa-fw fa-file-o"></i>
+    </a>
   </div>
 </%def>
 
@@ -107,10 +101,11 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
   }
 </style>
 
+
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("workflow") > -1) {
-      location.href = "/oozie/editor/workflow/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      location.href = (IS_HUE_4 ? '/hue' : '') + "/oozie/editor/workflow/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
     }
   }
 </script>
@@ -406,7 +401,7 @@ ${ workflow.render() }
               <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { value: value, document: $root.tempDocument, type: type }"></select>
             </div>
             <!-- ko if: $root.tempDocument -->
-              <a href="#" data-bind="attr: { href: $root.tempDocument().absoluteUrl }" target="_blank" title="${ _('Open') }">
+              <a href="#" data-bind="hueLink: $root.tempDocument().absoluteUrl" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
@@ -431,7 +426,7 @@ ${ workflow.render() }
 
           <!-- ko if: name() == 'workflow' && $root.getSubWorkflow(value())-->
           <span data-bind="with: $root.getSubWorkflow(value())">
-            <a href="#" data-bind="attr: { href: '${is_embeddable and '/hue' or ''}${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
+            <a href="#" data-bind="hueLink: '${is_embeddable and '/hue' or ''}${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </span>
@@ -518,7 +513,7 @@ ${ workflow.render() }
       <!-- ko foreach: $root.history -->
       <tr>
         <td data-bind="text: $data.date"></td>
-        <td><a data-bind="attr:{'href': '${is_embeddable and '/hue' or ''}/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/' }, text: $data.history.oozie_id" target="_blank"></a></td>
+        <td><a data-bind="hueLink: '${is_embeddable and '/hue' or ''}/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/', text: $data.history.oozie_id" target="_blank"></a></td>
         <td><a class="pointer" data-bind="click: function(){$data.expanded(!$data.expanded())}"><i class="fa fa-info-circle"></i></a></td>
       </tr>
       <tr data-bind="slideVisible: $data.expanded">
@@ -529,7 +524,7 @@ ${ workflow.render() }
           <dd>
             <!-- ko if: typeof $parent.history.properties[$data] == 'function' -->
               <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-                <a data-bind="text: $parent.history.properties[$data], attr: { href: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir() }" target="_blank"></a>
+                <a data-bind="text: $parent.history.properties[$data], hueLink: '${is_embeddable and '/hue' or ''}/filebrowser/view=' + $root.workflow.properties.deployment_dir()" target="_blank"></a>
               <!-- /ko -->
               <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
               <span data-bind="text: $parent.history.properties[$data]"></span>
