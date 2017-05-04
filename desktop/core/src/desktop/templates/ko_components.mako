@@ -192,6 +192,9 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- /ko -->
       </div>
+      <!-- ko ifnot: history -->
+        <span style="font-style: italic">${ _('No history to be shown.') }</span>
+      <!-- /ko -->
       <!-- ko if: history -->
       <hr>
       <div class="notification-history margin-bottom-10" data-bind="niceScroll">
@@ -239,7 +242,7 @@ from desktop.views import _ko
       <!-- /ko -->
     </div>
 
-    <div id="clearNotificationHistoryModal" class="modal hide fade">
+    <div id="clearNotificationHistoryModal" class="modal hide fade" data-backdrop="false">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_('Confirm History Clearing')}</h2>
