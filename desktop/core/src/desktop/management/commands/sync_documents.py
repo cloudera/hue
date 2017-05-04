@@ -27,5 +27,5 @@ class Command(NoArgsCommand):
   def handle_noargs(self, **options):
     logging.info('Running syncing document command.')
     self.stdout.write('Syncing document objects...\n')
-    Document.objects.sync()
+    Document.objects.sync(doc2_only=False)
     self.stdout.write('Documents synced.\n')

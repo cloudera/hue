@@ -371,7 +371,7 @@ class DocumentManager(models.Manager):
       LOG.warn('Object %s already has documents: %s' % (content_object, content_object.doc.all()))
       return content_object.doc.all()[0]
 
-  def sync(self):
+  def sync(self, doc2_only=True):
 
     def find_jobs_with_no_doc(model):
       jobs = model.objects.filter(doc__isnull=True)
@@ -477,7 +477,7 @@ class DocumentManager(models.Manager):
       LOG.exception('error syncing Document2')
 
 
-    if Document._meta.db_table in table_names:
+    if not doc2_only and Document._meta.db_table in table_names:
       # Make sure doc have at least a tag
       try:
         for doc in Document.objects.filter(tags=None):
@@ -545,6 +545,8 @@ class DocumentManager(models.Manager):
           # the documents it's referencing from our document query. Messy, but it
           # works.
 
+          # TODO: This can be several 100k entries for large databases.
+          # Need to figure out a better way to handle this scenario.
           docs = Document.objects.all()
 
           for content_type in ContentType.objects.all():
