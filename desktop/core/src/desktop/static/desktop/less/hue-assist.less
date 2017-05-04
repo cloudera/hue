@@ -834,8 +834,10 @@
   }
 
   .fixed-first-column {
-    margin-top: 3px;
     margin-left: 0 !important;
+    table>tbody>tr>td:first-child {
+      background-color: @cui-gray-050;
+    }
   }
 
   .fixed-header-row {
@@ -844,7 +846,6 @@
 
   .fixed-first-cell {
     border-right: 1px solid @cui-gray-200;
-    margin-left: -1px;
 
     thead th {
       height: 23px;
