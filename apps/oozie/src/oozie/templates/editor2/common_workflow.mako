@@ -1146,17 +1146,17 @@
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" data-bind="attr: { id: 'properties-' + id() }">
-          <!-- ko if: $root.workflow_properties.jdbc_url -->
+          <!-- ko if: typeof properties.jdbc_url != 'undefined' -->
           <span data-bind="text: $root.workflow_properties.jdbc_url.label"></span>
           <input type="text" data-bind="value: properties.jdbc_url, attr: { placeholder: $root.workflow_properties.jdbc_url.help_text }" />
           <br/>
           <!-- /ko -->
-          <!-- ko if: $root.workflow_properties.password -->
+          <!-- ko if: typeof properties.password != 'undefined' -->
           <span data-bind="text: $root.workflow_properties.password.label"></span>
           <input type="text" data-bind="value: properties.password, attr: { placeholder: $root.workflow_properties.password.help_text }" />
           <br/>
           <!-- /ko -->
-          <!-- ko if: $root.workflow_properties.impalad_host -->
+          <!-- ko if: typeof properties.impalad_host != 'undefined' -->
           <span data-bind="text: $root.workflow_properties.impalad_host.label"></span>
           <input type="text" data-bind="value: properties.impalad_host, attr: { placeholder: $root.workflow_properties.impalad_host.help_text }" />
           <br/>

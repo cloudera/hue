@@ -20,6 +20,8 @@ import logging
 import os
 import time
 
+from string import Template
+
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
@@ -211,6 +213,7 @@ class Submission(object):
             if action.data['properties'].get('uuid'):
               notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
               statements = notebook.get_str()
+              statements = Template(statements).safe_substitute(**self.properties)
               script_name = action.data['name'] + '.sql'
               self._create_file(deployment_dir, script_name, statements)
           else:
@@ -218,7 +221,7 @@ class Submission(object):
 
           if self.api.security_enabled:
             kinit = 'kinit -k -t *.keytab %(user_principal)s' % {
-              'user_principal': action.data['properties'].get('user_principal')
+              'user_principal': self.properties.get('user_principal', action.data['properties'].get('user_principal'))
             }
           else:
             kinit = ''
