@@ -42,6 +42,7 @@ from desktop.models import DefaultConfiguration, Document2, Document
 from hadoop.fs.hadoopfs import Hdfs
 from hadoop.fs.exceptions import WebHdfsException
 
+from liboozie.conf import SECURITY_ENABLED
 from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
 from liboozie.submission2 import create_directories
@@ -390,10 +391,12 @@ class Workflow(Job):
           if param['value'] and '=' in param['value']:
             name, val = param['value'].split('=', 1)
             parameters[name] = val
+        extra = find_parameters(node, fields=['key_tab_path', 'user_principal'])
       else:
         extra = node.find_parameters()
-        if extra:
-          parameters.update(dict([(param, '') for param in list(extra)]))
+
+      if extra:
+        parameters.update(dict([(param, '') for param in list(extra)]))
 
     return parameters
 
@@ -1386,14 +1389,14 @@ class ImpalaAction(HiveServer2Action):
   FIELDS['key_tab_path'] = {
       'name': 'key_tab_path',
       'label': _('Keytab path'),
-      'value': '',
+      'value': '${key_tab_path}' if SECURITY_ENABLED.get() else '',
       'help_text': _('Path to the keytab to use when on a secure cluster, e.g. /user/joe/joe.keytab.'),
       'type': ''
   }
   FIELDS['user_principal'] = {
       'name': 'user_principal',
       'label': _('User principal'),
-      'value': 'joe@PROD.EDH',
+      'value': '${user_principal}' if SECURITY_ENABLED.get() else '',
       'help_text': _('Name of the principal to use in the kinit, e.g.: kinit -k -t /home/joe/joe.keytab joe@PROD.EDH.'),
       'type': ''
   }
@@ -2246,20 +2249,20 @@ class ImpalaDocumentAction(HiveDocumentAction):
       'name': 'impalad_host',
       'label': _('Impalad hostname'),
       'value': "",
-      'help_text': _('e.g. impalad-001.cluster.com. The hostname of the Impalad to send the query to.'),
+      'help_text': _('e.g. impalad-001.cluster.com (optional)'),
       'type': ''
   }
   FIELDS['key_tab_path'] = {
       'name': 'key_tab_path',
       'label': _('Keytab path'),
-      'value': '',
+      'value': '${key_tab_path}' if SECURITY_ENABLED.get() else '',
       'help_text': _('Path to the keytab to use when on a secure cluster, e.g. /user/joe/joe.keytab.'),
       'type': ''
   }
   FIELDS['user_principal'] = {
       'name': 'user_principal',
       'label': _('User principal'),
-      'value': 'joe@PROD.EDH',
+      'value': '${user_principal}' if SECURITY_ENABLED.get() else '',
       'help_text': _('Name of the principal to use in the kinit, e.g.: kinit -k -t /home/joe/joe.keytab joe@PROD.EDH.'),
       'type': ''
   }
