@@ -2028,7 +2028,6 @@ from notebook.conf import get_ordered_interpreters
           <!-- /ko -->
           <!-- ko if: schedulerViewModelIsLoaded() && viewSchedulerId()-->
           <a data-bind="click: function() { huePubSub.publish('show.jobs.panel'); huePubSub.publish('mini.jb.navigate', 'schedules') }" href="javascript: void(0);">${ _('View') }</a>
-          ##<a data-bind="click: showSubmitPopup">${ _('Synchronize') }</a>
           <!-- /ko -->
           <br>
           <br>

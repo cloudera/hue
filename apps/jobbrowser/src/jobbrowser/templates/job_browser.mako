@@ -1887,6 +1887,31 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.resetBreadcrumbs();
+
+      self.load = function() {
+        var h = window.location.hash;
+
+        h = h.indexOf('#!') === 0 ? h.substr(2) : '';
+        switch (h) {
+          case '':
+            h = 'jobs';
+          case 'slas':
+          case 'oozie-info':
+          case 'jobs':
+          case 'workflows':
+          case 'schedules':
+          case 'bundles':
+            self.selectInterface(h);
+            break;
+          default:
+            if (h.indexOf('id=') === 0 && ! self.isMini()){
+              new Job(viewModel, {id: h.substr(3)}).fetchJob();
+            }
+            else {
+              self.selectInterface('reset');
+            }
+        }
+      }
     };
 
     var viewModel;
@@ -1912,28 +1937,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1) {
-          var h = window.location.hash;
-
-          h = h.indexOf('#!') === 0 ? h.substr(2) : '';
-          switch (h) {
-            case '':
-              h = 'jobs';
-            case 'slas':
-            case 'oozie-info':
-            case 'jobs':
-            case 'workflows':
-            case 'schedules':
-            case 'bundles':
-              viewModel.selectInterface(h);
-              break;
-            default:
-              if (h.indexOf('id=') === 0 && !viewModel.isMini()){
-                new Job(viewModel, {id: h.substr(3)}).fetchJob();
-              }
-              else {
-                viewModel.selectInterface('reset');
-              }
-          }
+          viewModel.load();
         }
       };
 

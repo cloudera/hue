@@ -757,7 +757,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.getActiveAppViewModel(function (viewModel) {
               var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
               if (! arguments) {
-                console.warn('Could not match ' + href)
+                console.warn('Could not match ' + href);
               }
               hueUtils.waitForVariable(viewModel.createWizard, function(){
                 hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
@@ -768,14 +768,19 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               });
             })
           }},
-          { url: '/jobbrowser/', app: 'jobbrowser' },
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
-            page.redirect('/jobbrowser/jobs/#!id=application_' + _.trimRight(ctx.params[0], '/'));
+            page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/'));
           }},
-          { url: '/jobbrowser/workflows', app: function () {
-            page.redirect('/jobbrowser/#!workflows');
+          { url: '/jobbrowser*', app: function (ctx) {
+            self.loadApp('jobbrowser');
+            self.getActiveAppViewModel(function (viewModel) {
+              hueUtils.waitForVariable(viewModel.selectInterface, function(){
+                hueUtils.waitForVariable(viewModel.selectInterface, function(){
+                  viewModel.load();
+                });
+              });
+            });
           }},
-          { url: '/jobbrowser/jobs', app: 'jobbrowser' },
           { url: '/logs', app: 'logs' },
           { url: '/metastore', app: function () {
             page('/metastore/tables');

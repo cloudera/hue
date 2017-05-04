@@ -1222,6 +1222,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitPopup = function () {
     $(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit/" + self.workflow.id(), {
+      format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
@@ -1232,6 +1233,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
   self.showSubmitActionPopup = function (w) {
     $(".jHueNotify").hide();
     $.get("/oozie/editor/workflow/submit_single_action/" + self.workflow.id() + "/" + self.workflow.getNodeById(w.id()).id(), {
+      format: IS_HUE_4 ? 'json' : 'html'
     }, function (data) {
       $(document).trigger("showSubmitPopup", data);
     }).fail(function (xhr, textStatus, errorThrown) {
