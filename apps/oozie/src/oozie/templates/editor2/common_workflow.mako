@@ -641,7 +641,7 @@
         <i class="fa fa-spinner fa-spin muted"></i>
       <!-- /ko -->
       <!-- ko with: associatedDocument -->
-        <a data-bind="attr: { href: absoluteUrl }" target="_blank"><span data-bind='text: name'></span></a>
+        <a data-bind="hueLink: absoluteUrl" target="_blank"><span data-bind='text: name'></span></a>
         <br/>
         <span data-bind='text: description' class="muted"></span>
       <!-- /ko -->
@@ -653,7 +653,7 @@
           <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
         </div>
         <!-- ko if: associatedDocument -->
-          <a href="#" data-bind="attr: { href: associatedDocument().absoluteUrl }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
           <div class="clearfix"></div>
@@ -670,7 +670,7 @@
 
 <script type="text/html" id="param-fs-link">
   <!-- ko if: path.split('=', 2)[1] && path.split('=', 2)[1].charAt(0) == '/' -->
-    <a data-bind="attr: { href: '/filebrowser/view=' + $data.path.split('=', 2)[1] }" target="_blank" title="${ _('Open') }">
+    <a data-bind="hueLink: '/filebrowser/view=' + $data.path.split('=', 2)[1]" target="_blank" title="${ _('Open') }">
       <i class="fa fa-external-link-square"></i>
     </a>
   <!-- /ko -->
@@ -683,11 +683,11 @@
     <a class="pull-right pointer logs-icon" data-bind="click: function(){ huePubSub.publish('oozie.action.logs.click', $parent); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
     <!-- /ko -->
     <!-- ko if: typeof $root.isEmbeddable === 'undefined' -->
-    <a class="pull-right pointer logs-icon" data-bind="click: function(){ location.href = $parent.logsURL(); }" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
+    <a class="pull-right pointer logs-icon" data-bind="hueLink: $parent.logsURL" title="${ _('View logs') }"><i class="fa fa-tasks"></i></a>
     <!-- /ko -->
   <!-- /ko -->
   <!-- ko if: $parent.widgetType() == 'subworkflow-widget' && $parent.externalIdUrl()-->
-    <a class="pull-right pointer logs-icon" data-bind="attr: { href: $parent.externalIdUrl() }" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
+    <a class="pull-right pointer logs-icon" data-bind="hueLink: $parent.externalIdUrl" title="${ _('View the workflow') }"><img src="${static('oozie/art/icon_oozie_workflow_48.png')}" class="app-icon" alt="${ _('Oozie workflow icon') }"/></a>
   <!-- /ko -->
 </script>
 
