@@ -64,7 +64,7 @@
                   <img src="${ static('oozie/art/icon_oozie_dashboard_48.png') }" class="app-icon" alt="${ _('Oozie dashboard icon') }" /> ${ _('Oozie Dashboard') }
                 </a>
                 % else:
-                <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
+                <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/#!workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
                   <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
                 </a>
                 % endif

@@ -409,8 +409,12 @@ def _submit_workflow_helper(request, workflow, submit_action):
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
       except Exception, e:
         raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
-      request.info(_('Workflow submitted'))
-      return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
+      jsonify = request.POST.get('format') == 'json'
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+      else:
+        request.info(_('Workflow submitted'))
+        return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -425,7 +429,8 @@ def _submit_workflow_helper(request, workflow, submit_action):
                      'action': submit_action,
                      'show_dryrun': True,
                      'email_id': request.user.email,
-                     'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user)
+                     'is_oozie_mail_enabled': _is_oozie_mail_enabled(request.user),
+                     'return_json': request.GET.get('format') == 'json'
                    }, force_template=True).content
     return JsonResponse(popup, safe=False)
 
