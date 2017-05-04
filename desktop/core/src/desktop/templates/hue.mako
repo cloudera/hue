@@ -455,9 +455,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 <script type="text/javascript">
 
   $(document).ready(function () {
-    $(document).on('hideHistoryModal', function (e) {
-      $('#clearNotificationHistoryModal').modal('hide');
-    });
 
     var onePageViewModel = (function () {
 
@@ -1209,6 +1206,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     })(onePageViewModel, topNavViewModel);
 
     huePubSub.publish('cluster.config.get.config');
+
+    $(document).on('hideHistoryModal', function (e) {
+      $('#clearNotificationHistoryModal').modal('hide');
+    });
+
+    var hideJobsPanels = function (e) {
+      if ($(e.target).closest('.jobs-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $('.jobs-panel').is(':visible')) {
+        huePubSub.publish('hide.jobs.panel');
+        huePubSub.publish('hide.history.panel');
+      }
+    }
+
+    var clickThrottle = -1;
+    $(window).click(function (e) {
+      window.clearTimeout(clickThrottle);
+      clickThrottle = window.setTimeout(function () {
+        hideJobsPanels(e);
+      }, 10);
+    });
 
     window.hueDebug = {
       viewModel: function (element) {
