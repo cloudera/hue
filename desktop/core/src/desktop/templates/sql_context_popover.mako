@@ -751,6 +751,15 @@ from metadata.conf import has_navigator
         self.expand = function () {
           var colsToExpand = self.selectedColumns().length === 0 ? self.columns : self.selectedColumns();
           var colIndex = {};
+          var colsTableMap = {};
+          self.columns.forEach(function (col) {
+            if (colsTableMap[col.name]) {
+              colsTableMap[col.name].push(col.table);
+            }
+            else {
+              colsTableMap[col.name] = [col.table];
+            }
+          });
           colsToExpand.forEach(function (col) {
             if (colIndex[col.name]) {
               colIndex[col.name]++;
@@ -759,7 +768,7 @@ from metadata.conf import has_navigator
             }
           });
           Object.keys(colIndex).forEach(function (name) {
-            if (colIndex[name] === 1) {
+            if (colIndex[name] === 1 && colsTableMap[name].length === 1) {
               delete colIndex[name];
             }
           });
@@ -1276,7 +1285,7 @@ from metadata.conf import has_navigator
         </div>
       </div>
       <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-        <table style="width: 100%" class="table table-condensed table-nowrap">
+        <table id="sqlColumnsTable" style="width: 100%" class="table table-condensed table-nowrap">
           <!-- ko if: filteredColumns().length !== 0 -->
           <thead>
           <tr>
@@ -1300,7 +1309,7 @@ from metadata.conf import has_navigator
             <!-- /ko -->
             <!-- ko if: typeof selected !== 'undefined' -->
             <td data-bind="toggle: selected" class="center" style="cursor: default;">
-              <div class="hueCheckbox fa" data-bind="css: {'fa-check': selected }"></div>
+              <div class="hueCheckbox fa" data-bind="multiCheck: '#sqlColumnsTable', css: {'fa-check': selected }"></div>
             </td>
 
             <!-- /ko -->
