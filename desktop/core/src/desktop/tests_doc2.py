@@ -137,6 +137,7 @@ class TestDocument2(object):
     source_dir = Directory.objects.create(name='test_mv_file_src', owner=self.user, parent_directory=self.home_dir)
     target_dir = Directory.objects.create(name='test_mv_file_dst', owner=self.user, parent_directory=self.home_dir)
     doc = Document2.objects.create(name='query1.sql', type='query-hive', owner=self.user, data={}, parent_directory=source_dir)
+    orig_last_modified = doc.last_modified
 
     # Verify original paths before move operation
     response = self.client.get('/desktop/api2/doc/', {'uuid': source_dir.uuid})
@@ -162,6 +163,10 @@ class TestDocument2(object):
     response = self.client.get('/desktop/api2/doc/', {'uuid': doc.uuid})
     data = json.loads(response.content)
     assert_equal('/test_mv_file_dst/query1.sql', data['document']['path'])
+
+    # Verify that last_modified is intact
+    doc = Document2.objects.get(id = doc.id)
+    assert_equal(orig_last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
 
 
   def test_directory_move(self):
