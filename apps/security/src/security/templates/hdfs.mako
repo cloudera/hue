@@ -28,6 +28,7 @@ ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 %endif
 ${ layout.menubar(section='hdfs') }
 
+<span id="securityHdfsComponents">
 
 <script type="text/html" id="aclDisplay">
   <div data-bind="visible: status() != 'deleted'">
@@ -81,7 +82,7 @@ ${ layout.menubar(section='hdfs') }
   </div>
 </script>
 
-<div id="securityHdfsComponents" class="container-fluid">
+<div class="container-fluid">
   <div class="row-fluid">
     <div class="span12">
       <div class="card card-small">
@@ -381,6 +382,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
   });
 </script>
+</span>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
