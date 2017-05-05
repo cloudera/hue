@@ -1119,6 +1119,9 @@ var EditorViewModel = (function() {
         if (data.status == 0) {
           self.result.handle(data.handle);
           self.result.hasResultset(data.handle.has_result_set);
+          if (vm.isOptimizerEnabled()) {
+            huePubSub.publish('editor.upload.query', data.history_id);
+          }
           if (data.handle.sync) {
             self.loadData(data.result, 100);
             self.status('available');
@@ -1616,8 +1619,8 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.loadQueryHistory = function (n) {
-      hueAnalytics.log('notebook', 'load_query_history');
+    self.uploadQueryHistory = function (n) {
+      hueAnalytics.log('notebook', 'upload_query_history');
 
       $.post("/metadata/api/optimizer/upload/history", {
         n: typeof n != "undefined" ? n : null,
@@ -1632,7 +1635,13 @@ var EditorViewModel = (function() {
       });
     };
 
-    self.loadTableStats = function (activeTables) {
+    self.uploadQuery = function (query_id) {
+      $.post("/metadata/api/optimizer/upload/query", {
+        query_id: query_id,
+      });
+    };
+
+    self.uploadTableStats = function (activeTables) {
       hueAnalytics.log('notebook', 'load_table_stats');
       $(document).trigger("info", "Preparing table data...");
 
