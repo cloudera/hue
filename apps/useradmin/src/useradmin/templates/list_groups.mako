@@ -128,6 +128,7 @@ ${layout.menubar(section='groups')}
 
   $(document).ready(function () {
     var $groupsComponents = $('#groupsComponents');
+    $(document).off('click', '#groupsComponents .groupCheck');
 
     var viewModel = {
       availableGroups: ko.observableArray(${ groups_json | n,antixss }),

@@ -144,6 +144,7 @@ ${layout.menubar(section='users')}
 
   $(document).ready(function () {
     var $usersComponents = $('#usersComponents');
+    $(document).off('click', '#usersComponents .userCheck');
 
     var viewModel = {
       availableUsers: ko.observableArray(${ users_json | n,antixss }),
