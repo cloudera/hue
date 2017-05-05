@@ -48,7 +48,7 @@ ${layout.menubar(section='users')}
             % if is_ldap_setup:
             <a href="${ url('useradmin.views.add_ldap_users') }" class="btn"><i class="fa fa-briefcase"></i> ${_('Add/Sync LDAP user')}</a>
             <a href="javascript:void(0)" class="btn confirmationModal"
-               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }"><i
+               data-confirmation-url="${ url('useradmin.views.sync_ldap_users_groups') }${ is_embeddable and '?is_embeddable=true' or ''}"><i
                 class="fa fa-refresh"></i> ${_('Sync LDAP users/groups')}</a>
             % endif
 
@@ -136,6 +136,9 @@ ${layout.menubar(section='users')}
     </form>
   </div>
 
+  <div class="modal hide fade sync-ldap">
+  </div>
+
 </div>
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
@@ -212,8 +215,20 @@ ${layout.menubar(section='users')}
         },
         dataType: "html",
         success: function (data) {
-          $usersComponents.find(".delete-user").html(data);
-          $usersComponents.find(".delete-user").modal("show");
+          $usersComponents.find(".sync-ldap").html(data);
+          % if is_embeddable:
+          $usersComponents.find('.sync-ldap form').ajaxForm({
+            dataType:  'json',
+            success: function(data) {
+              if (data && data.url){
+                huePubSub.publish('open.link', data.url);
+              }
+              $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
+              $usersComponents.find(".sync-ldap").modal("hide");
+            }
+          });
+          % endif
+          $usersComponents.find(".sync-ldap").modal("show");
         }
       });
     });
