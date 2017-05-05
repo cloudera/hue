@@ -43,8 +43,7 @@ ${layout.menubar(section='groups')}
   %endif
 </%def>
 
-
-<div class="container-fluid">
+<div id="editGroupComponents" class="container-fluid">
   <div class="card card-small">
     % if name:
         <h1 class="card-heading simple">${_('Hue Groups - Edit group: %(name)s') % dict(name=name)}</h1>
@@ -88,6 +87,8 @@ ${layout.menubar(section='groups')}
 
 <script type="text/javascript">
   $(document).ready(function () {
+    var $editGroupComponents = $('#editGroupComponents');
+
     $("#id_members").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
@@ -102,6 +103,16 @@ ${layout.menubar(section='groups')}
       width: 600,
       height: 240
     });
+    % if is_embeddable:
+    $editGroupComponents.find('#editForm').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.url){
+          huePubSub.publish('open.link', data.url);
+        }
+      }
+    });
+    % endif
   });
 </script>
 
