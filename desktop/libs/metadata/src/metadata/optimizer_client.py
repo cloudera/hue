@@ -183,11 +183,11 @@ class OptimizerApi(object):
 
           for row in queries_csv:
             f_queries.write(row)
-            LOG.debug(row)
+            LOG.debug(row[:1000])
         else:
           # Table, column stats
           f_queries.write(json.dumps(data))
-          LOG.debug(json.dumps(data))
+          LOG.debug(json.dumps(data[:10]))
 
       finally:
         f_queries.close()

@@ -15,10 +15,12 @@
 ## limitations under the License.
 
 <%!
-from desktop.views import commonheader, commonfooter
 from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
+
+from desktop.views import commonheader, commonfooter
+from metadata.conf import OPTIMIZER
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
@@ -26,6 +28,7 @@ from django.utils.translation import ugettext as _
 %if not is_embeddable:
 ${ commonheader(_('Quick Start'), "quickstart", user, request, "70px") | n,unicode }
 %endif
+
 ${ layout.menubar(section='quick_start') }
 
 <div class="container-fluid">
@@ -84,6 +87,14 @@ ${ layout.menubar(section='quick_start') }
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('impala:install_examples') }">
                       <i class="fa fa-download"></i> ${ apps['impala'].nice_name }
+                    </a>
+                  </li>
+              % endif
+              % if OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
+                  <li>
+                    <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Uploading...') }"
+                       data-sample-url="${ url('metadata:upload_history') }" title="${ _('Send and analyze past %s executed queries to provide smarter SQL recommendations') % OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() }">
+                      <i class="fa fa-upload"></i> ${ _('SQL Query history') }
                     </a>
                   </li>
               % endif

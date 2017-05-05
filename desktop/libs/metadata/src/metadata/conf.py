@@ -123,6 +123,12 @@ OPTIMIZER = ConfigSection(
       default=True,
       type=coerce_bool
     ),
+    QUERY_HISTORY_UPLOAD_LIMIT = Config(
+      key="query_history_upload_limit",
+      help=_t("Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable."),
+      default=10000,
+      type=int
+    ),
 
     EMAIL=Config(
       key="email",
