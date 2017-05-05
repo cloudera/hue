@@ -215,12 +215,17 @@ def delete_group(request):
         raise PopupException(_("The default user group may not be deleted."), error_code=401)
       Group.objects.filter(name__in=group_names).delete()
 
-      request.info(_('The groups were deleted.'))
       request.audit = {
         'operation': 'DELETE_GROUP',
         'operationText': 'Deleted Group(s): %s' % ', '.join(group_names)
       }
-      return redirect(reverse(list_groups))
+      is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_groups)})
+      else:
+        request.info(_('The groups were deleted.'))
+        return redirect(reverse(list_groups))
     except Group.DoesNotExist:
       raise PopupException(_("Group not found."), error_code=404)
   else:

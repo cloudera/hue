@@ -194,6 +194,7 @@ ${layout.menubar(section='users')}
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
         }
+        $.jHueNotify.info("${ _('The users were deleted.') }")
         $usersComponents.find(".delete-user").modal("hide");
       }
     });
