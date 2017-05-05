@@ -668,6 +668,8 @@ def sync_ldap_users_groups(request):
     }
     raise PopupException(_("You must be a superuser to sync the LDAP users/groups."), error_code=401)
 
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
   if request.method == 'POST':
     form = SyncLdapUsersGroupsForm(request.POST)
     if form.is_valid():
@@ -689,11 +691,14 @@ def sync_ldap_users_groups(request):
         unique_users = set(failed_ldap_users)
         request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-      return redirect(reverse(list_users))
+      if is_embeddable:
+        return JsonResponse({'url': '/hue' + reverse(list_users)})
+      else:
+        return redirect(reverse(list_users))
   else:
     form = SyncLdapUsersGroupsForm()
 
-  return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form))
+  return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
 
 
 def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=None, failed_users=None):
