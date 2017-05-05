@@ -1719,13 +1719,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
-        % if user.is_superuser:
-        <li>
-          <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.workload.upload'); }" title="${ _('Load past query history in order to improve recommendations') }">
-            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
-          </a>
-        </li>
-        % endif
         <!-- /ko -->
       </ul>
     </div>
@@ -3098,11 +3091,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       viewModel.init();
 
       huePubSub.subscribe("editor.table.stats.upload", function (activeTables) {
-        viewModel.selectedNotebook().snippets()[0].loadTableStats(activeTables);
+        viewModel.selectedNotebook().snippets()[0].uploadTableStats(activeTables);
       });
 
-      huePubSub.subscribe("editor.workload.upload", function () {
-        viewModel.selectedNotebook().snippets()[0].loadQueryHistory(5);
+      huePubSub.subscribe("editor.upload.history", function () {
+        viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
+      });
+
+      huePubSub.subscribe("editor.upload.query", function (query_id) {
+        viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
       });
 
       huePubSub.subscribe('active.editor.statement.changed', function (statement) {
