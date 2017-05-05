@@ -117,6 +117,12 @@ OPTIMIZER = ConfigSection(
       dynamic_default=get_security_default,
       type=coerce_bool
     ),
+    AUTO_UPLOAD_QUERIES = Config(
+      key="auto_upload_queries",
+      help=_t("Automatically upload queries after their execution in order to improve recommendations."),
+      default=True,
+      type=coerce_bool
+    ),
 
     EMAIL=Config(
       key="email",

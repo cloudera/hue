@@ -31,7 +31,7 @@ from notebook.api import _get_statement
 from notebook.models import Notebook
 
 from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name
-
+from metadata.conf import OPTIMIZER
 
 LOG = logging.getLogger(__name__)
 
@@ -332,6 +332,30 @@ def upload_history(request):
   api = OptimizerApi(request.user)
 
   response['upload_history'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@error_handler
+def upload_query(request):
+  response = {'status': -1}
+
+  if OPTIMIZER.AUTO_UPLOAD_QUERIES.get():
+    query_id = request.POST.get('query_id')
+
+    doc = Document2.objects.document(request.user, doc_id=query_id)
+
+    query_data = Notebook(document=doc).get_data()
+    queries = _convert_queries([query_data])
+    source_platform = query_data['snippets'][0]['type']
+
+    api = OptimizerApi(request.user)
+
+    response['query_upload'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
+  else:
+    response['query_upload'] = _('Skipped')
   response['status'] = 0
 
   return JsonResponse(response)
