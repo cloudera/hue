@@ -106,6 +106,9 @@ ${layout.menubar(section='groups')}
   <div class="modal hide fade delete-group">
     <form action="${ url('useradmin.views.delete_group') }" method="POST">
       ${ csrf_token(request) | n,unicode }
+      % if is_embeddable:
+        <input type="hidden" value="true" name="is_embeddable" />
+      % endif
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${_("Are you sure you want to delete the selected group(s)?")}</h2>
@@ -158,6 +161,19 @@ ${layout.menubar(section='groups')}
         "sZeroRecords": "${_('No matching records')}",
       }
     });
+
+    % if is_embeddable:
+    $groupsComponents.find('.delete-group form').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.url){
+          huePubSub.publish('open.link', data.url);
+        }
+        $.jHueNotify.info("${ _('The groups were deleted.') }");
+        $groupsComponents.find(".delete-group").modal("hide");
+      }
+    });
+    % endif
 
     $groupsComponents.find(".filter-input").jHueDelayedInput(function () {
       if (dt) {
