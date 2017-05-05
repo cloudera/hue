@@ -103,11 +103,14 @@ ${ layout.menubar(section='users') }
       <div class="form-actions">
         <a class="backBtn btn disabled">${ _('Back') }</a>
         <a class="nextBtn btn btn-primary disable-feedback">${ _('Next') }</a>
-      % if username:
+        % if is_embeddable:
+          <input type="hidden" value="true" name="is_embeddable" />
+        % endif
+        % if username:
         <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
-      % else:
+        % else:
         <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
-      % endif
+        % endif
       </div>
     </form>
   </div>
@@ -130,6 +133,19 @@ $(document).ready(function(){
     width:618,
     height:240
   });
+
+
+  % if is_embeddable:
+  $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr(4).replace(/\/$/, ''));
+  $editUserComponents.find('#editForm').ajaxForm({
+    dataType:  'json',
+    success: function(data) {
+      if (data && data.url){
+        huePubSub.publish('open.link', data.url);
+      }
+    }
+  });
+  % endif
 
  var currentStep = "step1";
 

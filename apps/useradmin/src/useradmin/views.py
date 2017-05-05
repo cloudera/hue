@@ -249,7 +249,7 @@ def edit_user(request, username=None):
 
   userprofile = get_profile(request.user)
   updated = False
-  is_embeddable = request.GET.get('is_embeddable', False)
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
 
   if username is not None:
     instance = User.objects.get(username=username)
@@ -346,9 +346,15 @@ def edit_user(request, username=None):
         else:
           return redirect(reverse('desktop.views.home'))
       elif request.user.is_superuser:
-        return redirect(reverse(list_users))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(list_users)})
+        else:
+          return redirect(reverse(list_users))
       else:
-        return redirect(reverse(edit_user, kwargs={'username': username}))
+        if is_embeddable:
+          return JsonResponse({'url': '/hue' + reverse(edit_user, kwargs={'username': username})})
+        else:
+          return redirect(reverse(edit_user, kwargs={'username': username}))
   else:
     # Initialize form values
     default_user_group = get_default_user_group()
@@ -433,7 +439,7 @@ def edit_group(request, name=None):
         }
 
       if is_embeddable:
-        return redirect('/hue/useradmin/groups')
+        return JsonResponse({'url': '/hue' + reverse(list_groups)})
       else:
         request.info(_('Group information updated'))
         return redirect('/useradmin/groups')
