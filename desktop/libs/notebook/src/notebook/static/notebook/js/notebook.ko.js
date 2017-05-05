@@ -1627,8 +1627,8 @@ var EditorViewModel = (function() {
         sourcePlatform: self.type()
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", data.upload_history.count + " queries uploaded successfully. Processing them...");
-          self.watchUploadStatus(data.upload_history.status.workloadId);
+          $(document).trigger("info", data.upload_history[self.type()].count + " queries uploaded successfully. Processing them...");
+          self.watchUploadStatus(data.upload_history[self.type()].status.workloadId);
         } else {
           $(document).trigger("error", data.message);
         }

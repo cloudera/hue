@@ -1721,6 +1721,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             <i class="fa fa-fw fa-random"></i> ${_('Check compatibility')}
           </a>
         </li>
+        % if conf.DJANGO_DEBUG_MODE.get() and user.is_superuser:
+        <li>
+          <a href="javascript:void(0)" data-bind="click: function() { huePubSub.publish('editor.upload.history'); }" title="${ _('Load recent queries in order to improve recommendations') }">
+            <i class="fa fa-fw fa-cloud-upload"></i> ${_('Upload history')}
+          </a>
+        </li>
+        % endif
         <!-- /ko -->
       </ul>
     </div>

@@ -320,19 +320,30 @@ def _convert_queries(queries_data):
 def upload_history(request):
   response = {'status': -1}
 
-  n = request.POST.get('n')
-  source_platform = request.POST.get('sourcePlatform', 'hive')
+  if request.user.is_superuser:
+    api = OptimizerApi(request.user)
+    histories = []
+    upload_stats = {}
 
-  history = Document2.objects.get_history(doc_type='query-%s' % source_platform, user=request.user)
-  if n:
-    history = history[:n]
+    if request.POST.get('sourcePlatform'):
+      n = min(request.POST.get('n', OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get()))
+      source_platform = request.POST.get('sourcePlatform', 'hive')
+      histories = [(source_platform, Document2.objects.get_history(doc_type='query-%s' % source_platform, user=request.user)[:n])]
 
-  queries = _convert_queries([Notebook(document=doc).get_data() for doc in history])
+    elif OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
+      histories = [
+        (source_platform, Document2.objects.filter(type='query-%s' % source_platform, is_history=True, is_managed=False, is_trashed=False).order_by('-last_modified')[:OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get()])
+            for source_platform in ['hive', 'impala']
+      ]
 
-  api = OptimizerApi(request.user)
+    for source_platform, history in histories:
+      queries = _convert_queries([Notebook(document=doc).get_data() for doc in history])
+      upload_stats[source_platform] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
 
-  response['upload_history'] = api.upload(data=queries, data_type='queries', source_platform=source_platform)
-  response['status'] = 0
+    response['upload_history'] = upload_stats
+    response['status'] = 0
+  else:
+    response['message'] = _('Query history upload requires Admin privileges or feature is disabled.')
 
   return JsonResponse(response)
 
