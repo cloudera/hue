@@ -186,8 +186,14 @@ def delete_user(request):
   finally:
     __users_lock.release()
 
-  request.info(_('The users were deleted.'))
-  return redirect(reverse(list_users))
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
+  if is_embeddable:
+    return JsonResponse({'url': '/hue' + reverse(list_users)})
+  else:
+    request.info(_('The users were deleted.'))
+    return redirect(reverse(list_users))
+
 
 
 def delete_group(request):
