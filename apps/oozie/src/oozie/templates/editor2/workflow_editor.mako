@@ -747,8 +747,6 @@ ${ dashboard.import_bindings() }
         _el.parent().css("height", viewModel.isEditing() ? _el.height() : (_el.height() + 17) + "px");
         _el.css("position", "absolute");
         _el.css({
-          "top": lastSeenPosition.top + "px",
-          "left": lastSeenPosition.left + "px",
           "width": _width,
           "marginBottom": "20px"
         });
