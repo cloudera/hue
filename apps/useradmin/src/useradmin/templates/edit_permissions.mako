@@ -84,6 +84,7 @@ ${layout.menubar(section='permissions')}
       success: function(data) {
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
+          $.jHueNotify.info("${ _('Permission information updated correctly') }");
         }
       }
     });
