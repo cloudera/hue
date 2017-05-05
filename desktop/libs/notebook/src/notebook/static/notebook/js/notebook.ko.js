@@ -386,8 +386,8 @@ var EditorViewModel = (function() {
     self.loadingQueries = ko.observable(false);
 
     self.queriesHasErrors = ko.observable(false);
-    self.queriesCurrentPage = ko.observable(1);
-    self.queriesTotalPages = ko.observable(1);
+    self.queriesCurrentPage = ko.observable(vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0 ? vm.selectedNotebook().snippets()[0].queriesCurrentPage() : 1);
+    self.queriesTotalPages = ko.observable(vm.selectedNotebook() && vm.selectedNotebook().snippets().length > 0 ? vm.selectedNotebook().snippets()[0].queriesTotalPages() : 1);
     self.queries = ko.observableArray([]);
 
     self.queriesFilter = ko.observable('');
