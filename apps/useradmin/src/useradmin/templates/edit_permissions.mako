@@ -43,7 +43,7 @@ ${layout.menubar(section='permissions')}
   %endif
 </%def>
 
-<div class="container-fluid">
+<div id="editPermissionsComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Permissions - Edit app: %(app)s') % dict(app=app)}</h1>
     <br/>
@@ -70,6 +70,7 @@ ${layout.menubar(section='permissions')}
 
 <script type="text/javascript">
   $(document).ready(function () {
+    var $editPermissionsComponents = $('#editPermissionsComponents');
     $("#id_groups").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
@@ -77,6 +78,16 @@ ${layout.menubar(section='permissions')}
       width: 600,
       height: 500
     });
+    % if is_embeddable:
+    $editPermissionsComponents.find('#editForm').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.url){
+          huePubSub.publish('open.link', data.url);
+        }
+      }
+    });
+    % endif
   });
 </script>
 
