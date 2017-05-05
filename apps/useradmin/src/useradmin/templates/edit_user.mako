@@ -142,6 +142,7 @@ $(document).ready(function(){
     success: function(data) {
       if (data && data.url){
         huePubSub.publish('open.link', data.url);
+        $.jHueNotify.info("${ _('User information updated correctly') }");
       }
     }
   });
