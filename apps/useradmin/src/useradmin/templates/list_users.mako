@@ -119,6 +119,9 @@ ${layout.menubar(section='users')}
   <div class="modal hide fade delete-user">
     <form action="${ url('useradmin.views.delete_user') }" method="POST">
       ${ csrf_token(request) | n,unicode }
+      % if is_embeddable:
+        <input type="hidden" value="true" name="is_embeddable" />
+      % endif
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
         <h2 class="modal-title">${ _("Are you sure you want to delete the selected user(s)?") }</h2>
@@ -182,6 +185,18 @@ ${layout.menubar(section='users')}
     $usersComponents.find('[data-rel="tooltip"]').tooltip({
       placement: 'right'
     });
+
+    % if is_embeddable:
+    $usersComponents.find('.delete-user form').ajaxForm({
+      dataType:  'json',
+      success: function(data) {
+        if (data && data.url){
+          huePubSub.publish('open.link', data.url);
+        }
+        $usersComponents.find(".delete-user").modal("hide");
+      }
+    });
+    % endif
 
     $usersComponents.find(".dataTables_wrapper").css("min-height", "0");
     $usersComponents.find(".dataTables_filter").hide();
