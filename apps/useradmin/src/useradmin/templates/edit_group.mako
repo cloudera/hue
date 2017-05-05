@@ -109,6 +109,7 @@ ${layout.menubar(section='groups')}
       success: function(data) {
         if (data && data.url){
           huePubSub.publish('open.link', data.url);
+          $.jHueNotify.info("${ _('Group information updated correctly') }");
         }
       }
     });
