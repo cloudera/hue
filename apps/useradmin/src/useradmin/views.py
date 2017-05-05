@@ -532,6 +532,8 @@ def add_ldap_users(request):
     }
     raise PopupException(_("You must be a superuser to add another user."), error_code=401)
 
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
   if request.method == 'POST':
     form = AddLdapUsersForm(request.POST)
     if form.is_valid():
@@ -568,14 +570,14 @@ def add_ldap_users(request):
           unique_users = set(failed_ldap_users)
           request.warn(_('Failed to import following users: %s') % ', '.join(unique_users))
 
-        if request.GET.get('is_embeddable', False):
+        if is_embeddable:
           return JsonResponse({'status': 0})
         else:
           return redirect(reverse(list_users))
   else:
     form = AddLdapUsersForm()
 
-  return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=request.GET.get('is_embeddable', False)))
+  return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=is_embeddable))
 
 
 def add_ldap_groups(request):

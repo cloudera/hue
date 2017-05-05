@@ -27,13 +27,16 @@ ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 
 ${ layout.menubar(section='users') }
 
-<div class="container-fluid">
+<div id="addLdapUsersComponents" class="container-fluid">
   <div class="card card-small">
     <h1 class="card-heading simple">${_('Hue Users - Add/Sync LDAP user')}</h1>
     <br/>
 
     <form id="syncForm" action="${ url('useradmin.views.add_ldap_users') }" method="POST" class="form form-horizontal" autocomplete="off">
       ${ csrf_token(request) | n,unicode }
+      % if is_embeddable:
+        <input type="hidden" value="true" name="is_embeddable" />
+      % endif
       <fieldset>
         % for field in form.fields:
           % if form[field].is_hidden:
@@ -58,7 +61,8 @@ ${ layout.menubar(section='users') }
 
 <script type="text/javascript">
   $(document).ready(function () {
-    $("#id_groups").jHueSelector({
+    var $addLdapUsersComponents = $('#addLdapUsersComponents');
+    $addLdapUsersComponents.find("#id_groups").jHueSelector({
       selectAllLabel: "${_('Select all')}",
       searchPlaceholder: "${_('Search')}",
       noChoicesFound: "${_('No groups found.')} <a href='${url('useradmin.views.edit_group')}'>${_('Create a new group now')} &raquo;</a>",
@@ -66,11 +70,12 @@ ${ layout.menubar(section='users') }
       height: 240
     });
     %if is_embeddable:
-    $('#syncForm').ajaxForm({
+    $addLdapUsersComponents.find('#syncForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
         if (data && data.status === 0){
           huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
+          $.jHueNotify.info("${ _('User added/synced correctly') }");
         }
       }
     });
