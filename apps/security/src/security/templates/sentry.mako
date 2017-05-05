@@ -28,6 +28,7 @@ ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 %endif
 ${ layout.menubar(section=component) }
 
+<span id="securityComponents">
 
 <script type="text/html" id="role">
   <div class="acl-block-title">
@@ -166,7 +167,7 @@ ${ layout.menubar(section=component) }
 </div>
 </script>
 
-<div id="securityComponents" class="container-fluid">
+<div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -856,6 +857,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
     });
 </script>
+</span>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }

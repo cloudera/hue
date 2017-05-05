@@ -28,6 +28,8 @@ ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 %endif
 ${ layout.menubar(section='hive1') }
 
+<span id="securityHiveComponents">
+
 <script type="text/html" id="role">
   <div class="acl-block-title">
     <i class="fa fa-cube muted"></i> <a class="pointer" data-bind="click: function(){  $root.showRole($data); }"><span data-bind="text: name"></span></a>
@@ -124,7 +126,7 @@ ${ layout.menubar(section='hive1') }
 </div>
 </script>
 
-<div id="securityHiveComponents" class="container-fluid">
+<div class="container-fluid">
   <div class="row-fluid">
     <div class="span2">
       <div class="sidebar-nav">
@@ -798,6 +800,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
     });
 </script>
+</span>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
