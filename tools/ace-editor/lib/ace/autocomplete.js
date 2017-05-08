@@ -420,7 +420,7 @@ Autocomplete.startCommand = {
             pos.left += rect.left - editor.renderer.scrollLeft;
             pos.left += renderer.gutterWidth;
 
-            huePubSub.publish('hue.ace.autocompleter.show', { position: pos, lineHeight: lineHeight });
+            huePubSub.publish('hue.ace.autocompleter.show', { editor: editor, position: pos, lineHeight: lineHeight });
             return;
         }
         if (!editor.completer)

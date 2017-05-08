@@ -166,7 +166,7 @@ var doLiveAutocomplete = function(e) {
             pos.left += rect.left - editor.renderer.scrollLeft;
             pos.left += renderer.gutterWidth;
 
-            huePubSub.publish('hue.ace.autocompleter.show', { position: pos, lineHeight: lineHeight });
+            huePubSub.publish('hue.ace.autocompleter.show', { editor: editor, position: pos, lineHeight: lineHeight });
         } else if (e.command.name === "backspace" && !prefix) {
             huePubSub.publish('hue.ace.autocompleter.hide');
         }
