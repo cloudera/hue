@@ -722,9 +722,11 @@ from desktop.views import _ko
             <a class="inactive-action doc-browser-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
               <i class="fa fa-fw fa-trash-o"></i>
             </a>
+            <!-- ko if: isTrash() || isTrashed() -->
             <ul class="hue-context-menu">
               <li><a href="javascript:void(0);" data-bind="click: emptyTrash"><i class="fa fa-fw fa-times"></i> ${ _('Empty trash') }</a></li>
             </ul>
+            <!-- /ko -->
           </div>
           <!-- /ko -->
           <!-- /ko -->
