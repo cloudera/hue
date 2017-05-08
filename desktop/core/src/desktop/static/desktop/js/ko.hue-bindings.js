@@ -3347,9 +3347,7 @@
 
       var editor = ace.edit($el.attr("id"));
       editor.session.setMode(snippet.getAceMode());
-      if (navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1) {
-        editor.setOptions({ fontSize: "14px" });
-      }
+      editor.setOptions({ fontSize: snippet.getApiHelper().getFromTotalStorage('hue.ace', 'fontSize', navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1 ? '14px' : '12px')});
 
       function processErrorsAndWarnings(type, list) {
         editor.clearErrorsAndWarnings(type);
@@ -3445,6 +3443,20 @@
         },
         getEnableLiveAutocompletion: function () {
           return editor.getOption('enableLiveAutocompletion');
+        },
+        setFontSize: function (size) {
+          if (size.toLowerCase().indexOf('px') === -1 && size.toLowerCase().indexOf('em') === -1) {
+            size += 'px';
+          }
+          editor.setOption('fontSize', size);
+          snippet.getApiHelper().setInTotalStorage('hue.ace', 'fontSize', size);
+        },
+        getFontSize: function () {
+          var size = editor.getOption('fontSize');
+          if (size.toLowerCase().indexOf('px') === -1 && size.toLowerCase().indexOf('em') === -1) {
+            size += 'px';
+          }
+          return size;
         }
       };
 
