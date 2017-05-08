@@ -856,6 +856,18 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       $("#deletePrivilegeModal").modal({
         show: false
       });
+
+      %if component == 'hive':
+      var loadedApp = 'security_hive2';
+      %else:
+      var loadedApp = 'security_solr';
+      %endif
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === loadedApp) {
+          window.location.hash = viewModel.lastHash;
+          showMainSection(viewModel.getSectionHash());
+        }
+      }, loadedApp);
     });
   })();
 </script>

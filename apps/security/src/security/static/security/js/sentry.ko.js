@@ -1340,6 +1340,8 @@ var SentryViewModel = (function () {
       });
     }
 
+    self.lastHash = '';
+
     self.updatePathHash = function (path) {
       var _hash = window.location.hash.replace(/(<([^>]+)>)/ig, "");
       if (_hash.indexOf("@") == -1) {
@@ -1348,6 +1350,7 @@ var SentryViewModel = (function () {
       else {
         window.location.hash = path + "@" + _hash.split("@")[1];
       }
+      self.lastHash = window.location.hash;
     }
 
     self.updateSectionHash = function (section) {
@@ -1361,6 +1364,7 @@ var SentryViewModel = (function () {
       else {
         window.location.hash = _hash.split("@")[0] + "@" + section;
       }
+      self.lastHash = window.location.hash;
     }
 
     self.getPathHash = function () {

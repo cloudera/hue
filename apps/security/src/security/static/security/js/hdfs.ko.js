@@ -116,6 +116,7 @@ var HdfsViewModel = (function () {
       self.pagenum(1);
       self.fetchPath();
       window.location.hash = path;
+      vm.lastHash = window.location.hash;
     });
     self.pathType = ko.observable('');
     self.recursive = ko.observable(false);
@@ -608,6 +609,7 @@ var HdfsViewModel = (function () {
     var self = this;
 
     self.assist = new Assist(self, initial);
+    self.lastHash = '';
 
     self.doAs = ko.observable(initial.user);
     self.doAs.subscribe(function () {
