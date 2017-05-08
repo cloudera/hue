@@ -798,6 +798,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       $("#deletePrivilegeModal").modal({
         show: false
       });
+
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === 'security_hive') {
+          window.location.hash = viewModel.lastHash;
+          showMainSection(viewModel.getSectionHash());
+        }
+      }, 'security_hive');
     });
   })();
 </script>

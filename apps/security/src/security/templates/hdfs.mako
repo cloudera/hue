@@ -380,6 +380,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === 'security_hdfs') {
+          window.location.hash = viewModel.lastHash;
+        }
+      }, 'security_hdfs');
+
     });
   })();
 </script>
