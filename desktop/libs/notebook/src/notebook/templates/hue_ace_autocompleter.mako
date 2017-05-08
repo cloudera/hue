@@ -428,6 +428,9 @@ from desktop.views import _ko
         });
 
         var autocompleterShowSub = huePubSub.subscribe('hue.ace.autocompleter.show', function (data) {
+          if (data.editor !== self.editor()) {
+            return;
+          }
           var session = self.editor().getSession();
           var pos = self.editor().getCursorPosition();
           var line = session.getLine(pos.row);
