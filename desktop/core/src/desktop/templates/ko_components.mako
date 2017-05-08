@@ -102,7 +102,7 @@ from desktop.views import _ko
             // enter
             if ($currentActive.length > 0) {
               self.value(ko.dataFor($currentActive[0]));
-              self.dropDownVisiblele(false);
+              self.dropDownVisible(false);
               $(element).find('.dropdown-menu').scrollTop(0)
             }
           } else {
