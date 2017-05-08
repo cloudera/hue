@@ -32,6 +32,14 @@
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
+                <%def name="getApp(section)"><%
+                  if section == 'coordinators':
+                    return 'oozie-coordinator'
+                  elif section == 'bundles':
+                    return 'oozie-bundle'
+                  else:
+                    return 'oozie-workflow'
+                %></%def>
                 <%def name="getURL(section, dashboard, is_v2)">
                 <%
                   if dashboard:
@@ -66,6 +74,7 @@
                 % else:
                 <a title="${ _('Switch to the dashboard') }" href="${ is_embeddable and '/hue/jobbrowser/#!workflows' or getURL(section, dashboard, ENABLE_V2.get())}">
                   <svg class="svg-app-icon"><use xmlns:xlink="http://www.w3.org/1999/xlink" xlink:href="#hi-oozie"></use></svg> ${ _('Oozie Editor') }
+                  <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: '${ getApp(section) }' }} --><!-- /ko -->
                 </a>
                 % endif
                </li>
