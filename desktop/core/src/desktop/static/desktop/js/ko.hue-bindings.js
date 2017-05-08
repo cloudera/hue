@@ -2735,7 +2735,7 @@
 
 
   ko.bindingHandlers.select2 = {
-    init: function (element, valueAccessor, allBindingsAccessor, vm) {
+    init: function (element, valueAccessor, allBindingsAccessor, viewModel) {
       var options = ko.toJS(valueAccessor()) || {};
       var $element = $(element);
 
