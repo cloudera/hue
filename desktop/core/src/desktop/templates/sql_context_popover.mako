@@ -1176,7 +1176,8 @@ from metadata.conf import has_navigator
         if ((self.isDatabase || self.isTable || self.isView) && self.data.identifierChain) {
           apiHelper.identifierChainToPath({
             sourceType: self.sourceType,
-            identifierChain: self.data.identifierChain
+            identifierChain: self.data.identifierChain,
+            defaultDatabase: self.defaultDatabase
           }, function (path) {
             pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.metastore', function (type) {
               if (IS_HUE_4) {
