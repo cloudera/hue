@@ -631,7 +631,7 @@ case 808:
      parser.selectListNoTableSuggest($$[$0-1], $$[$0-2]);
    
 break;
-case 810: case 886: case 917: case 930: case 934: case 972: case 976: case 981: case 1001: case 1023: case 1024: case 1100: case 1102: case 1104: case 1168: case 1178: case 1191: case 1203: case 1302: case 1360: case 1532: case 1533: case 1558: case 1559: case 1560: case 1751: case 1904: case 1918: case 1919:
+case 810: case 886: case 917: case 930: case 934: case 972: case 976: case 981: case 1001: case 1023: case 1024: case 1100: case 1102: case 1168: case 1178: case 1191: case 1203: case 1302: case 1360: case 1532: case 1533: case 1558: case 1559: case 1560: case 1751: case 1904: case 1918: case 1919:
 this.$ = $$[$0];
 break;
 case 813:
@@ -828,9 +828,6 @@ case 838:
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
      }
-     if ($$[$0-7].emptyFilter) {
-       parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-     }
    
 break;
 case 839:
@@ -982,12 +979,19 @@ case 858:
      }
    
 break;
+case 887:
+
+     if ($$[$0].suggestFilters) {
+       parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+   
+break;
 case 888:
 
      parser.suggestFunctions();
      parser.suggestColumns();
      parser.suggestKeywords(['EXISTS', 'NOT EXISTS']);
-     this.$ = { emptyFilter: true }
+     parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    
 break;
 case 891:
@@ -1126,7 +1130,7 @@ case 1002:
      $$[$0].types = ['NUMBER'];
    
 break;
-case 1003: case 1006: case 1007: case 1008: case 1009: case 1010: case 1011: case 1012: case 1013: case 1014: case 1015: case 1021: case 1022: case 1027: case 1029: case 1038: case 1059: case 1060: case 1061: case 1062: case 1094: case 1095: case 1096: case 1097: case 1157:
+case 1003: case 1006: case 1007: case 1008: case 1009: case 1010: case 1011: case 1012: case 1013: case 1014: case 1015: case 1021: case 1022: case 1038: case 1096: case 1097: case 1157:
 this.$ = { types: [ 'BOOLEAN' ] };
 break;
 case 1004:
@@ -1156,6 +1160,9 @@ case 1026:
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
+case 1027: case 1029:
+this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
+break;
 case 1028:
 
      parser.suggestFunctions();
@@ -1171,8 +1178,8 @@ case 1030:
      this.$ = { types: [ 'BOOLEAN' ] };
    
 break;
-case 1031: case 1105: case 1106: case 1413: case 1418: case 1419:
-this.$ = { types: [ 'T' ] };
+case 1031:
+this.$ = { types: [ 'T' ], suggestFilters: $$[$0].suggestFilters };
 break;
 case 1032:
 
@@ -1186,7 +1193,7 @@ case 1033:
      if (!$$[$0].typeSet) {
        parser.applyTypeToSuggestions('NUMBER');
      }
-     this.$ = { types: [ 'NUMBER' ] };
+     this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
    
 break;
 case 1034:
@@ -1245,7 +1252,7 @@ case 1045: case 1046: case 1047: case 1048:
        parser.applyTypeToSuggestions($$[$0].types);
        parser.addColRefIfExists($$[$0]);
      }
-     this.$ = { types: [ 'BOOLEAN' ] }
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
    
 break;
 case 1049: case 1051:
@@ -1275,7 +1282,7 @@ case 1053: case 1054: case 1055: case 1056:
        parser.applyTypeToSuggestions($$[$0-2].types);
        parser.addColRefIfExists($$[$0-2]);
      }
-     this.$ = { types: [ 'BOOLEAN' ] }
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
    
 break;
 case 1057:
@@ -1302,12 +1309,18 @@ case 1058:
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    
 break;
+case 1059: case 1060:
+this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-5].suggestFilters };
+break;
+case 1061: case 1062:
+this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-4].suggestFilters };
+break;
 case 1063:
 
      if ($$[$0-2].types[0] === $$[$0].types[0] && !$$[$0-5].typeSet) {
        parser.applyTypeToSuggestions($$[$0-2].types);
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-5].suggestFilters };
    
 break;
 case 1064:
@@ -1315,7 +1328,7 @@ case 1064:
      if ($$[$0-5].types[0] === $$[$0].types[0] && !$$[$0-2].typeSet) {
        parser.applyTypeToSuggestions($$[$0-5].types);
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
    
 break;
 case 1065:
@@ -1323,7 +1336,7 @@ case 1065:
      if ($$[$0-5].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
        parser.applyTypeToSuggestions($$[$0-5].types);
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
    
 break;
 case 1066:
@@ -1349,7 +1362,7 @@ case 1069:
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-4].typeSet) {
        parser.applyTypeToSuggestions($$[$0-4].types)
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-4].suggestFilters };
    
 break;
 case 1070:
@@ -1357,7 +1370,7 @@ case 1070:
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0-2].typeSet) {
        parser.applyTypeToSuggestions($$[$0-4].types)
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
    
 break;
 case 1071:
@@ -1365,7 +1378,7 @@ case 1071:
      if ($$[$0-4].types[0] === $$[$0-2].types[0] && !$$[$0].typeSet) {
        parser.applyTypeToSuggestions($$[$0-4].types)
      }
-     this.$ = { types: [ 'BOOLEAN' ] };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters };
    
 break;
 case 1072:
@@ -1382,28 +1395,22 @@ case 1074:
      this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
    
 break;
-case 1075: case 1077: case 1081:
+case 1075: case 1077: case 1079: case 1081:
 
      parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     this.$ = { types: [ 'BOOLEAN' ], typeSet: true  };
+     this.$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
    
 break;
 case 1076: case 1080:
 
      parser.addColRefIfExists($$[$0]);
-     this.$ = { types: [ 'BOOLEAN' ] }
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters }
    
 break;
 case 1078: case 1082:
 
      parser.addColRefIfExists($$[$0-2]);
-     this.$ = { types: [ 'BOOLEAN' ] }
-   
-break;
-case 1079:
-
-     parser.valueExpressionSuggest(undefined, $$[$0-1]);
-     this.$ = { types: [ 'BOOLEAN' ], typeSet: true };
+     this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0].suggestFilters }
    
 break;
 case 1083: case 1084:
@@ -1419,7 +1426,7 @@ case 1085: case 1086: case 1087:
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($$[$0]);
      }
-     this.$ = { types: [ 'NUMBER' ] }
+     this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0-2].suggestFilters }
    
 break;
 case 1088: case 1089: case 1090:
@@ -1435,8 +1442,14 @@ case 1091: case 1092: case 1093:
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($$[$0-2]);
      }
-     this.$ = { types: [ 'NUMBER' ] };
+     this.$ = { types: [ 'NUMBER' ], suggestFilters: $$[$0].suggestFilters };
    
+break;
+case 1094:
+this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-1].suggestFilters };
+break;
+case 1095:
+this.$ = { types: [ 'BOOLEAN' ], suggestFilters: $$[$0-2].suggestFilters };
 break;
 case 1098:
 
@@ -1465,6 +1478,18 @@ case 1103:
      this.$ = { types: [ 'T' ], typeSet: true };
    
 break;
+case 1104:
+
+      this.$ = $$[$0];
+      this.$.suggestFilters = $$[$0-1].suggestFilters;
+    
+break;
+case 1105:
+this.$ = { types: [ 'T' ], suggestFilters: $$[$0-1].suggestFilters };
+break;
+case 1106: case 1413: case 1418: case 1419:
+this.$ = { types: [ 'T' ] };
+break;
 case 1107: case 1109:
 
      $$[$0].position = 1;
@@ -1488,8 +1513,6 @@ case 1111:
 break;
 case 1112:
 
-     // $$[$0-2].position = $$[$0-4].position + 1;
-     // this.$ = $$[$0-2]
      $$[$0-4].position += 1;
    
 break;
@@ -2413,7 +2436,7 @@ break;
 case 1511: case 1513:
 this.$ = parser.findCaseType($$[$0-1]);
 break;
-case 1512: case 1515: case 1519:
+case 1512: case 1515:
 
      $$[$0-3].caseTypes.push($$[$0-1]);
      this.$ = parser.findCaseType($$[$0-3]);
@@ -2447,6 +2470,13 @@ case 1518:
        parser.suggestValueExpressionKeywords($$[$0-2], [{ value: 'ELSE', weight: 2 }, { value: 'WHEN', weight: 1 }]);
      }
      this.$ = parser.findCaseType($$[$0-2]);
+   
+break;
+case 1519:
+
+     $$[$0-3].caseTypes.push($$[$0-1]);
+     this.$ = parser.findCaseType($$[$0-3]);
+     this.$.suggestFilters = $$[$0-1].suggestFilters
    
 break;
 case 1520:
@@ -2489,11 +2519,17 @@ case 1531:
      parser.suggestValueExpressionKeywords($$[$0-2], ['WHEN']);
    
 break;
-case 1534: case 1535:
-this.$ = { caseTypes: [{ types: ['T'] }] };
+case 1534:
+this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: $$[$0].suggestFilters };
 break;
-case 1536: case 1537: case 1538:
-this.$ = { caseTypes: [$$[$0]] };
+case 1535:
+this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: $$[$0-1].suggestFilters };
+break;
+case 1536:
+this.$ = { caseTypes: [$$[$0]], suggestFilters: $$[$0-2].suggestFilters };
+break;
+case 1537: case 1538:
+this.$ = { caseTypes: [$$[$0]], suggestFilters: $$[$0].suggestFilters };
 break;
 case 1539:
 
@@ -2521,23 +2557,23 @@ case 1542:
       this.$ = { caseTypes: [{ types: ['T'] }] };
     
 break;
-case 1543: case 1545: case 1549: case 1550: case 1551: case 1552:
+case 1543: case 1545:
 
      parser.valueExpressionSuggest();
-     this.$ = { caseTypes: [{ types: ['T'] }] };
+     this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
    
 break;
 case 1544:
 
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['THEN']);
-     this.$ = { caseTypes: [{ types: ['T'] }] };
+     this.$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
    
 break;
 case 1546:
 
      parser.valueExpressionSuggest();
-     this.$ = { caseTypes: [$$[$0]] };
+     this.$ = { caseTypes: [$$[$0]], suggestFilters: true };
    
 break;
 case 1547:
@@ -2549,6 +2585,12 @@ break;
 case 1548:
 
      parser.suggestValueExpressionKeywords($$[$0-2], ['THEN']);
+     this.$ = { caseTypes: [{ types: ['T'] }] };
+   
+break;
+case 1549: case 1550: case 1551: case 1552:
+
+     parser.valueExpressionSuggest();
      this.$ = { caseTypes: [{ types: ['T'] }] };
    
 break;

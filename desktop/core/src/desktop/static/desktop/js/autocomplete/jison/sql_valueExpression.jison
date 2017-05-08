@@ -36,7 +36,7 @@ ValueExpression
  ;
 
 ValueExpression_EDIT
- : 'NOT' ValueExpression_EDIT                           -> { types: [ 'BOOLEAN' ] }
+ : 'NOT' ValueExpression_EDIT                           -> { types: [ 'BOOLEAN' ], suggestFilters: $2.suggestFilters }
  | 'NOT' 'CURSOR'
    {
      parser.suggestFunctions();
@@ -44,14 +44,14 @@ ValueExpression_EDIT
      parser.suggestKeywords(['EXISTS']);
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | '!' ValueExpression_EDIT                             -> { types: [ 'BOOLEAN' ] }
+ | '!' ValueExpression_EDIT                             -> { types: [ 'BOOLEAN' ], suggestFilters: $2.suggestFilters }
  | '!' AnyCursor
    {
      parser.suggestFunctions({ types: [ 'BOOLEAN' ] });
      parser.suggestColumns({ types: [ 'BOOLEAN' ] });
      $$ = { types: [ 'BOOLEAN' ] };
    }
- | '~' ValueExpression_EDIT                             -> { types: [ 'T' ] }
+ | '~' ValueExpression_EDIT                             -> { types: [ 'T' ], suggestFilters: $2.suggestFilters }
  | '~' 'PARTIAL_CURSOR'
    {
      parser.suggestFunctions();
@@ -63,7 +63,7 @@ ValueExpression_EDIT
      if (!$2.typeSet) {
        parser.applyTypeToSuggestions('NUMBER');
      }
-     $$ = { types: [ 'NUMBER' ] };
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $2.suggestFilters };
    }
  | '-' 'PARTIAL_CURSOR' %prec NEGATION
    {
@@ -152,7 +152,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($3.types);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression_EDIT '<' ValueExpression
    {
@@ -160,7 +160,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($3.types);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression_EDIT '>' ValueExpression
    {
@@ -168,7 +168,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($3.types);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression_EDIT 'COMPARISON_OPERATOR' ValueExpression
    {
@@ -176,7 +176,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($3.types);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression '=' PartialBacktickedOrAnyCursor
    {
@@ -208,7 +208,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($1.types);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  | ValueExpression '<' ValueExpression_EDIT
    {
@@ -216,7 +216,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($1.types);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  | ValueExpression '>' ValueExpression_EDIT
    {
@@ -224,7 +224,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($1.types);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  | ValueExpression 'COMPARISON_OPERATOR' ValueExpression_EDIT
    {
@@ -232,7 +232,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions($1.types);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  ;
 
@@ -269,10 +269,10 @@ ValueExpression_EDIT
      }
      $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
    }
- | ValueExpression_EDIT 'NOT' 'IN' '(' ValueExpressionList RightParenthesisOrError  -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubQueryInner RightParenthesisOrError   -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'IN' '(' ValueExpressionList RightParenthesisOrError        -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'IN' '(' TableSubQueryInner RightParenthesisOrError         -> { types: [ 'BOOLEAN' ] }
+ | ValueExpression_EDIT 'NOT' 'IN' '(' ValueExpressionList RightParenthesisOrError  -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
+ | ValueExpression_EDIT 'NOT' 'IN' '(' TableSubQueryInner RightParenthesisOrError   -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
+ | ValueExpression_EDIT 'IN' '(' ValueExpressionList RightParenthesisOrError        -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
+ | ValueExpression_EDIT 'IN' '(' TableSubQueryInner RightParenthesisOrError         -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
  ;
 
 ValueExpressionInSecondPart_EDIT
@@ -294,21 +294,21 @@ ValueExpression_EDIT
      if ($4.types[0] === $6.types[0] && !$1.typeSet) {
        parser.applyTypeToSuggestions($4.types);
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $6.types[0] && !$4.typeSet) {
        parser.applyTypeToSuggestions($1.types);
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $4.suggestFilters };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
    {
      if ($1.types[0] === $4.types[0] && !$6.typeSet) {
        parser.applyTypeToSuggestions($1.types);
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $6.suggestFilters };
    }
  | ValueExpression 'NOT' 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
@@ -330,21 +330,21 @@ ValueExpression_EDIT
      if ($1.types[0] === $3.types[0] && !$1.typeSet) {
        parser.applyTypeToSuggestions($1.types)
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression_EDIT 'BETWEEN_AND' ValueExpression
    {
      if ($1.types[0] === $3.types[0] && !$3.typeSet) {
        parser.applyTypeToSuggestions($1.types)
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' ValueExpression_EDIT
    {
      if ($1.types[0] === $3.types[0] && !$5.typeSet) {
        parser.applyTypeToSuggestions($1.types)
      }
-     $$ = { types: [ 'BOOLEAN' ] };
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $5.suggestFilters };
    }
  | ValueExpression 'BETWEEN' ValueExpression 'BETWEEN_AND' 'CURSOR'
    {
@@ -386,42 +386,42 @@ ValueExpression_EDIT
  : 'CURSOR' 'OR' ValueExpression
    {
      parser.valueExpressionSuggest(undefined, $2);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
    }
  | ValueExpression_EDIT 'OR' ValueExpression
    {
      parser.addColRefIfExists($3);
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression 'OR' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest(undefined, $2);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
    }
  | ValueExpression 'OR' ValueExpression_EDIT
    {
      parser.addColRefIfExists($1);
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  | 'CURSOR' 'AND' ValueExpression
    {
      parser.valueExpressionSuggest(undefined, $2);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true };
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
    }
  | ValueExpression_EDIT 'AND' ValueExpression
    {
      parser.addColRefIfExists($3);
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression 'AND' PartialBacktickedOrAnyCursor
    {
      parser.valueExpressionSuggest(undefined, $2);
-     $$ = { types: [ 'BOOLEAN' ], typeSet: true  };
+     $$ = { types: [ 'BOOLEAN' ], typeSet: true, suggestFilters: true };
    }
  | ValueExpression 'AND' ValueExpression_EDIT
    {
      parser.addColRefIfExists($1);
-     $$ = { types: [ 'BOOLEAN' ] }
+     $$ = { types: [ 'BOOLEAN' ], suggestFilters: $3.suggestFilters }
    }
  ;
 
@@ -467,7 +467,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'NUMBER' ] }
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression_EDIT '*' ValueExpression
    {
@@ -475,7 +475,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'NUMBER' ] }
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression_EDIT 'ARITHMETIC_OPERATOR' ValueExpression
    {
@@ -483,7 +483,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($3);
      }
-     $$ = { types: [ 'NUMBER' ] }
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $1.suggestFilters }
    }
  | ValueExpression '-' PartialBacktickedOrAnyCursor
    {
@@ -509,7 +509,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'NUMBER' ] };
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
    }
  | ValueExpression '*' ValueExpression_EDIT
    {
@@ -517,7 +517,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'NUMBER' ] };
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
    }
  | ValueExpression 'ARITHMETIC_OPERATOR' ValueExpression_EDIT
    {
@@ -525,7 +525,7 @@ ValueExpression_EDIT
        parser.applyTypeToSuggestions(['NUMBER']);
        parser.addColRefIfExists($1);
      }
-     $$ = { types: [ 'NUMBER' ] };
+     $$ = { types: [ 'NUMBER' ], suggestFilters: $3.suggestFilters };
    }
  ;
 
@@ -567,8 +567,8 @@ LikeRightPart_EDIT
  ;
 
 ValueExpression_EDIT
- : ValueExpression_EDIT LikeRightPart               -> { types: [ 'BOOLEAN' ] }
- | ValueExpression_EDIT 'NOT' LikeRightPart         -> { types: [ 'BOOLEAN' ] }
+ : ValueExpression_EDIT LikeRightPart               -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
+ | ValueExpression_EDIT 'NOT' LikeRightPart         -> { types: [ 'BOOLEAN' ], suggestFilters: $1.suggestFilters }
  | ValueExpression LikeRightPart_EDIT               -> { types: [ 'BOOLEAN' ] }
  | ValueExpression 'NOT' LikeRightPart_EDIT         -> { types: [ 'BOOLEAN' ] }
  | 'CURSOR' LikeRightPart
@@ -606,8 +606,12 @@ ValueExpression_EDIT
      parser.suggestValueExpressionKeywords($2, ['WHEN']);
      $$ = { types: [ 'T' ], typeSet: true };
    }
- | 'CASE' ValueExpression_EDIT CaseRightPart         -> $3
- | 'CASE' ValueExpression_EDIT EndOrError            -> { types: [ 'T' ] }
+ | 'CASE' ValueExpression_EDIT CaseRightPart
+    {
+      $$ = $3;
+      $$.suggestFilters = $2.suggestFilters;
+    }
+ | 'CASE' ValueExpression_EDIT EndOrError            -> { types: [ 'T' ], suggestFilters: $2.suggestFilters }
  | 'CASE' 'CURSOR' CaseRightPart                     -> { types: [ 'T' ] }
  ;
 
@@ -656,6 +660,7 @@ CaseRightPart_EDIT
    {
      $1.caseTypes.push($3);
      $$ = parser.findCaseType($1);
+     $$.suggestFilters = $3.suggestFilters
    }
  | CaseWhenThenList 'ELSE' 'CURSOR' EndOrError
    {
@@ -711,11 +716,11 @@ CaseWhenThenListPartTwo
  ;
 
 CaseWhenThenListPartTwo_EDIT
- : 'WHEN' ValueExpression_EDIT                         -> { caseTypes: [{ types: ['T'] }] }
- | 'WHEN' ValueExpression_EDIT 'THEN'                  -> { caseTypes: [{ types: ['T'] }] }
- | 'WHEN' ValueExpression_EDIT 'THEN' ValueExpression  -> { caseTypes: [$4] }
- | 'WHEN' ValueExpression 'THEN' ValueExpression_EDIT  -> { caseTypes: [$4] }
- | 'WHEN' 'THEN' ValueExpression_EDIT                  -> { caseTypes: [$3] }
+ : 'WHEN' ValueExpression_EDIT                         -> { caseTypes: [{ types: ['T'] }], suggestFilters: $2.suggestFilters }
+ | 'WHEN' ValueExpression_EDIT 'THEN'                  -> { caseTypes: [{ types: ['T'] }], suggestFilters: $2.suggestFilters }
+ | 'WHEN' ValueExpression_EDIT 'THEN' ValueExpression  -> { caseTypes: [$4], suggestFilters: $2.suggestFilters }
+ | 'WHEN' ValueExpression 'THEN' ValueExpression_EDIT  -> { caseTypes: [$4], suggestFilters: $4.suggestFilters }
+ | 'WHEN' 'THEN' ValueExpression_EDIT                  -> { caseTypes: [$3], suggestFilters: $3.suggestFilters }
  | 'CURSOR' ValueExpression 'THEN'
    {
      parser.suggestKeywords(['WHEN']);
@@ -741,23 +746,23 @@ CaseWhenThenListPartTwo_EDIT
  | 'WHEN' 'CURSOR'
    {
      parser.valueExpressionSuggest();
-     $$ = { caseTypes: [{ types: ['T'] }] };
+     $$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
    }
  | 'WHEN' 'CURSOR' ValueExpression
    {
      parser.valueExpressionSuggest();
      parser.suggestKeywords(['THEN']);
-     $$ = { caseTypes: [{ types: ['T'] }] };
+     $$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
    }
  | 'WHEN' 'CURSOR' 'THEN'
    {
      parser.valueExpressionSuggest();
-     $$ = { caseTypes: [{ types: ['T'] }] };
+     $$ = { caseTypes: [{ types: ['T'] }], suggestFilters: true };
    }
  | 'WHEN' 'CURSOR' 'THEN' ValueExpression
    {
      parser.valueExpressionSuggest();
-     $$ = { caseTypes: [$4] };
+     $$ = { caseTypes: [$4], suggestFilters: true };
    }
  | 'WHEN' ValueExpression 'CURSOR'
    {

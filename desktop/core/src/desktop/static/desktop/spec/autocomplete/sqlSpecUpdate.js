@@ -177,6 +177,7 @@
           lowerCase: false,
           suggestFunctions: {},
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
+          suggestFilters: { tables: [{ identifierChain: [{ name: 'bar' }, { name: 'foo' }] }] },
           suggestKeywords: ['EXISTS', 'NOT EXISTS'],
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 37 } },
@@ -219,6 +220,7 @@
           lowerCase: false,
           suggestFunctions: {},
           suggestColumns: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
+          suggestFilters: { tables: [{ identifierChain: [{ name: 'bar'}, { name: 'foo' }] }] },
           locations: [
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 48 } },
             { type: 'database', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11}, identifierChain: [{ name: 'bar' }] },
