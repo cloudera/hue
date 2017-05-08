@@ -1640,9 +1640,6 @@ OptionalSelectConditions_EDIT
      if (parser.yy.result.suggestColumns) {
        parser.yy.result.suggestColumns.source = 'where';
      }
-     if ($1.emptyFilter) {
-       parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
-     }
    }
  | OptionalWhereClause GroupByClause_EDIT OptionalHavingClause OptionalWindowClause OptionalOrderByClause OptionalClusterOrDistributeBy OptionalLimitClause OptionalOffsetClause
    {
@@ -1757,12 +1754,17 @@ WhereClause
 
 WhereClause_EDIT
  : 'WHERE' SearchCondition_EDIT
+   {
+     if ($2.suggestFilters) {
+       parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
+     }
+   }
  | 'WHERE' 'CURSOR'
    {
      parser.suggestFunctions();
      parser.suggestColumns();
      parser.suggestKeywords(['EXISTS', 'NOT EXISTS']);
-     $$ = { emptyFilter: true }
+     parser.suggestFilters({ tablePrimaries: parser.yy.latestTablePrimaries.concat() });
    }
  ;
 
@@ -2176,8 +2178,6 @@ ValueExpressionList_EDIT
    }
  | ValueExpressionList ',' ValueExpression_EDIT ',' ValueExpressionList
    {
-     // $3.position = $1.position + 1;
-     // $$ = $3
      $1.position += 1;
    }
  | ValueExpressionList ',' AnyCursor

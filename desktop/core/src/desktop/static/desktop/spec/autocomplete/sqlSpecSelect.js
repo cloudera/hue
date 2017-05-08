@@ -4379,6 +4379,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }, { identifierChain: [{ name: 'bar' }] }] },
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }, { identifierChain: [{ name: 'bar' }] }] },
             suggestIdentifiers: [{ name: 'bla.', type: 'alias' }, { name: 'bar.', type: 'table' }]
           }
@@ -4393,6 +4394,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
@@ -4407,6 +4409,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
@@ -4421,6 +4424,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'foo' }], alias: 'bla' }] },
             suggestIdentifiers: [{ name: 'bla.', type: 'alias' }]
           }
@@ -4526,6 +4530,62 @@
         });
       });
 
+      it('should suggest columns for "SELECT * FROM testTable WHERE baa = 1 AND |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE baa = 1 AND ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestFunctions: {},
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM testTable WHERE | AND baa = 1"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE ',
+          afterCursor: ' AND baa = 1',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestFunctions: {},
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM testTable WHERE baa = 1 OR |"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE baa = 1 OR ',
+          afterCursor: '',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestFunctions: {},
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT * FROM testTable WHERE | OR baa = 1"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT * FROM testTable WHERE ',
+          afterCursor: ' OR baa = 1',
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] },
+            suggestFunctions: {},
+            suggestKeywords: ['CASE', 'EXISTS', 'NOT'],
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+          }
+        });
+      });
+
       it('should suggest keywords for "SELECT * FROM testTable WHERE NOT |"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT * FROM testTable WHERE NOT ',
@@ -4573,6 +4633,7 @@
           expectedResult: {
             lowerCase: false,
             suggestFunctions: {},
+            suggestFilters: { tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
