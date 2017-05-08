@@ -416,10 +416,10 @@ function s4() {
       .substring(1);
 }
 
-
 function UUID() {
   return s4() + s4() + '-' + s4() + '-' + s4() + '-' + s4() + '-' + s4() + s4() + s4();
 }
+
 // Based on original pub/sub implementation from http://davidwalsh.name/pubsub-javascript
 var huePubSub = (function () {
   var topics = {};
