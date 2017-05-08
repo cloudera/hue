@@ -1466,7 +1466,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         var updateArrowPosition = function () {
           huePubSub.publish('draw.graph.arrows');
-          if ($('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
+          if ($('canvas').length > 0 && $('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
             lastPosition = $('canvas').position();
             window.setTimeout(updateArrowPosition, 100);
           }
