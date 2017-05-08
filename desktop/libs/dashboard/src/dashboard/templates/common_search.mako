@@ -54,6 +54,7 @@ from desktop.views import commonheader, commonfooter, _ko
     <div class="app-header">
       <a href="#" data-bind="hueLink: '${ url('search:new_search') }'">
         <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Dashboard') }
+        <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'dashboard' }} --><!-- /ko -->
       </a>
     </div>
   </div>

@@ -324,11 +324,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               <!-- ko if: ['impala', 'pig', 'hive', 'beeswax', 'rdbms', 'java', 'spark2', 'sqoop1', 'distcp', 'shell', 'mapreduce'].indexOf(editorType()) == -1 -->
                 SQL
               <!-- /ko -->
+              <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'editor', interpreter: editorType() }} --><!-- /ko -->
               </a>
             <!-- /ko -->
             <!-- ko ifnot: editorMode -->
               <i class="fa fa-file-text-o app-icon" style="vertical-align: middle"></i>
                 Notebook
+              <!-- ko component: { name: 'hue-favorite-app', params: { hue4: IS_HUE_4, app: 'notebook' }} --><!-- /ko -->
             <!-- /ko -->
           </li>
 
