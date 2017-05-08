@@ -49,6 +49,15 @@ input[type='password']::-ms-reveal {
   padding-left: 0;
   color: @hue-primary-color-dark;
   cursor: pointer;
+  .favorite-app {
+    opacity: 0;
+    .hue-linear-transition(opacity);
+  }
+  &:hover {
+    .favorite-app {
+      opacity: 1;
+    }
+  }
 }
 
 .svg-app-icon {
