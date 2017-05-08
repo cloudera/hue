@@ -628,12 +628,13 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
 
 <script type="text/javascript">
-
+  (function () {
     function deletePrivilegeModal(role) {
-      var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
-        return privilege.status() == 'deleted' && (privilege.privilegeType() == 'SERVER' || privilege.privilegeType() == 'DATABASE'); }
+      var cascadeDeletes = $.grep(role.privilegesChanged(), function (privilege) {
+            return privilege.status() == 'deleted' && (privilege.privilegeType() == 'SERVER' || privilege.privilegeType() == 'DATABASE');
+          }
       );
-      if (cascadeDeletes.length > 0 ) {
+      if (cascadeDeletes.length > 0) {
         viewModel.roleToUpdate(role);
         $('#deletePrivilegeModal').modal('show');
       } else {
@@ -657,8 +658,8 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         'html': true
       });
 
-      function setPathFromAutocomplete(path){
-        if (path.lastIndexOf(".") == path.length -1){
+      function setPathFromAutocomplete(path) {
+        if (path.lastIndexOf(".") == path.length - 1) {
           path = path.substring(0, path.length - 1);
         }
         viewModel.assist.path(path);
@@ -689,34 +690,34 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       resizeComponents();
 
-      $(document).on("rendered.tree", function() {
+      $(document).on("rendered.tree", function () {
         var _path = viewModel.assist.path();
-        if (_path[_path.length-1] == "/"){
+        if (_path[_path.length - 1] == "/") {
           _path = _path.substr(0, _path.length - 1);
         }
-        if ($("a.anchor[href^='"+_path+"']").length > 0){
+        if ($("a.anchor[href^='" + _path + "']").length > 0) {
           $("#expandableTree").animate({
-            scrollTop: ($("a.anchor[href^='"+_path+"']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4) + "px"
+            scrollTop: ($("a.anchor[href^='" + _path + "']:first").position().top + $("#expandableTree").scrollTop() - $("#expandableTree").position().top - 4) + "px"
           });
         }
       });
 
-      $(document).on("created.role", function(){
+      $(document).on("created.role", function () {
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
         $("#deletePrivilegeModal").modal("hide");
         viewModel.clearTempRoles();
-        window.setTimeout(function(){
+        window.setTimeout(function () {
           viewModel.refreshExpandedRoles();
         }, 500);
       });
 
-      $(document).on("deleted.role", function(){
+      $(document).on("deleted.role", function () {
         $("#deleteRoleModal").modal("hide");
       });
 
-      $(document).on("changed.path", function(){
-        if ($("#path").val() != viewModel.assist.path()){
+      $(document).on("changed.path", function () {
+        if ($("#path").val() != viewModel.assist.path()) {
           $("#path").val(viewModel.assist.path());
         }
       });
@@ -736,18 +737,18 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         $("a[data-toggleSection='" + mainSection + "']").parent().addClass("active");
       }
 
-      $("[data-toggleSection]").on("click", function(){
+      $("[data-toggleSection]").on("click", function () {
         showMainSection($(this).attr("data-toggleSection"));
       });
 
       showMainSection(viewModel.getSectionHash());
 
-      $(document).on("show.mainSection", function(){
+      $(document).on("show.mainSection", function () {
         showMainSection(viewModel.getSectionHash());
       });
 
-      $(document).on("show.role", function(e, role) {
-        if (typeof role != "undefined" && role.name != null){
+      $(document).on("show.role", function (e, role) {
+        if (typeof role != "undefined" && role.name != null) {
           $("#bulkActionsModal").modal("hide");
           showMainSection("roles");
           $("html, body").animate({
@@ -757,12 +758,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       var _resizeTimeout = -1;
-      $(window).resize(function(){
+      $(window).resize(function () {
         window.clearTimeout(_resizeTimeout);
         _resizeTimeout = window.setTimeout(resizeComponents, 100);
       });
 
-      window.onpopstate = function() {
+      window.onpopstate = function () {
         if (window.location.pathname.indexOf('/security') > -1) {
           viewModel.assist.path(viewModel.getPathHash());
         }
@@ -795,22 +796,22 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       $("#selectedGroup").select2("val", "");
-      $("#selectedGroup").change(function() {
+      $("#selectedGroup").change(function () {
         viewModel.list_sentry_privileges_by_authorizable();
         viewModel.list_sentry_roles_by_group();
       });
 
-      $(document).on("added.bulk.privileges", function() {
+      $(document).on("added.bulk.privileges", function () {
         $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("deleted.bulk.privileges", function() {
+      $(document).on("deleted.bulk.privileges", function () {
         $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("syncd.bulk.privileges", function() {
+      $(document).on("syncd.bulk.privileges", function () {
         $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
         $("#bulkActionsModal").modal("hide");
       });
@@ -819,7 +820,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
 
-      $("#bulkActionsModal").on("hidden", function(){
+      $("#bulkActionsModal").on("hidden", function () {
         viewModel.isApplyingBulk(false);
       });
 
@@ -841,11 +842,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         });
       });
       $(document).on('focus', '#createRoleName', function () {
-        if ($("#createRoleName").data('typeahead')){
+        if ($("#createRoleName").data('typeahead')) {
           $("#createRoleName").data('typeahead').lookup();
         }
       });
-      $(document).on("destroy.typeahead", function(){
+      $(document).on("destroy.typeahead", function () {
         $('.typeahead').unbind();
         $("ul.typeahead").hide();
       });
@@ -856,6 +857,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         show: false
       });
     });
+  })();
 </script>
 </span>
 
