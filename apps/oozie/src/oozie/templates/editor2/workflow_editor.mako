@@ -719,7 +719,7 @@ ${ dashboard.import_bindings() }
   function renderChangeables() {
     resizeDrops();
     if (viewModel.workflow.properties.show_arrows()){
-      drawArrows();
+      viewModel.drawArrows();
     }
     $(".widget-main-section").removeClass("zoom-in");
     $(".widget-main-section").each(function(){
