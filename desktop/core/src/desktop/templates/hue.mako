@@ -841,11 +841,29 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.changeEditorType('pig');
           }},
           { url: '/search/*', app: 'dashboard' },
-          { url: '/security/hdfs', app: 'security_hdfs' },
-          { url: '/security/hive', app: 'security_hive' },
-          { url: '/security/hive2', app: 'security_hive2' },
-          { url: '/security/solr', app: 'security_solr' },
-          { url: '/security', app: 'security_hive' },
+          { url: '/security/hdfs', app: function () {
+            if (loadedApps.indexOf('security_hdfs') == -1) {
+              self.loadApp('security_hdfs');
+            }
+          }},
+          { url: '/security/hive', app: function () {
+            if (loadedApps.indexOf('security_hive') == -1) {
+              self.loadApp('security_hive');
+            }
+          }},
+          { url: '/security/hive2', app: function () {
+            if (loadedApps.indexOf('security_hive2') == -1) {
+              self.loadApp('security_hive2');
+            }
+          }},
+          { url: '/security/solr', app: function () {
+            if (loadedApps.indexOf('security_solr') == -1) {
+              self.loadApp('security_solr');
+            }
+          }},
+          { url: '/security', app: function () {
+            page('/security/hive');
+          }},
           { url: '/sqoop', app: 'sqoop' },
           { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
           { url: '/useradmin/groups/', app: 'useradmin_groups' },
