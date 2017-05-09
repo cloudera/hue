@@ -33,7 +33,7 @@ SHOW_NOTEBOOKS = Config(
     key="show_notebooks",
     help=_t("Show the notebook menu or not"),
     type=coerce_bool,
-    default=True
+    default=False
 )
 
 def _remove_duplications(a_list):
@@ -134,7 +134,7 @@ ENABLE_QUERY_BUILDER = Config(
   key="enable_query_builder",
   help=_t("Flag to enable the SQL query builder of the table assist."),
   type=bool,
-  default=True
+  default=False
 )
 
 ENABLE_QUERY_SCHEDULING = Config(
