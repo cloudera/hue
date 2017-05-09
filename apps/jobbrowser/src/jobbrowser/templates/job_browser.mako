@@ -127,7 +127,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
-              ${_('Filter')} <input type="text" class="input-xlarge search-query" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
+              ${_('Filter')} <input type="text" class="input-large" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
               <span data-bind="foreach: jobs.statesValuesFilter">
                 <label class="checkbox">
                   <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
@@ -135,6 +135,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </label>
               </span>
 
+              <!-- ko ifnot: $root.isMini -->
               ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
               <select class="input-small no-margin" data-bind="value: jobs.timeUnitFilter, options: jobs.timeUnitFilterUnits, optionsText: 'name', optionsValue: 'value'">
                 <option value="days">${_('days')}</option>
@@ -146,7 +147,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <i class="fa fa-refresh"></i>
               </a>
 
-              <!-- ko ifnot: $root.isMini -->
               <div data-bind="template: { name: 'job-actions', 'data': jobs }" class="pull-right"></div>
               <!-- /ko -->
             </form>
