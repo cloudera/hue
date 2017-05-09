@@ -1484,7 +1484,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         $('canvas').remove();
 
         if (vm.job().type() === 'workflow') {
-          $('#workflow-page-graph').empty();
+          $('#workflow-page-graph').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
             url: "/oozie/list_oozie_workflow/" + vm.job().id(),
             data: {
