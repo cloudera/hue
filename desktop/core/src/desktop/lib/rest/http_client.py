@@ -160,7 +160,6 @@ class HttpClient(object):
     # Prepare URL and params
     if urlencode:
       path = urllib.quote(smart_str(path))
-    url = self._make_url(path, params)
     if http_method in ("GET", "DELETE"):
       if data is not None:
         self.logger.warn("GET and DELETE methods do not pass any data. Path '%s'" % path)
@@ -180,23 +179,32 @@ class HttpClient(object):
     if clear_cookies:
       self._session.cookies.clear()
 
-    try:
-      resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
-      if resp.status_code >= 300:
-        resp.raise_for_status()
-        raise exceptions.HTTPError(response=resp)
-      # Cache request cookie for the next http_client call.
-      self._cookies = resp.cookies
-      return resp
-    except (exceptions.ConnectionError,
-            exceptions.HTTPError,
-            exceptions.RequestException,
-            exceptions.URLRequired,
-            exceptions.TooManyRedirects), ex:
-      raise self._exc_class(ex)
+    error = None
+    for current_url in eval(self._base_url):
+      url = self._make_url(current_url, path, params)
+      try:
+        resp = getattr(self._session, http_method.lower())(url, **request_kwargs)
+        if resp.status_code >= 300:
+          resp.raise_for_status()
+          error = exceptions.HTTPError(response=resp)
+          self.logger.warn("Webhdfs url '%s' returned not good HTTP responce code: '%s'" % (current_url, resp.status_code))
+          continue
+        # Cache request cookie for the next http_client call.
+        self._cookies = resp.cookies
+        return resp
+      except (exceptions.ConnectionError,
+              exceptions.HTTPError,
+              exceptions.RequestException,
+              exceptions.URLRequired,
+              exceptions.TooManyRedirects), ex:
+        error = self._exc_class(ex)
+        self.logger.warn("Webhdfs url '%s' returned error. Trying next url if exist..." % current_url)
 
-  def _make_url(self, path, params):
-    res = self._base_url
+    if error:
+      raise error
+
+  def _make_url(self, url, path, params):
+    res = url
     if path:
       res += posixpath.normpath('/' + path.lstrip('/'))
     if params:
