@@ -327,19 +327,7 @@ def _save_notebook(notebook, user):
   notebook['isSaved'] = True
   notebook['isHistory'] = False
   notebook['id'] = notebook_doc.id
-
-  try:
-    notebook_doc1 = notebook_doc.doc.get()
-  except Exception, e:
-    LOG.error('Exception when retrieving document object for saved query: %s' % e)
-    notebook_doc1 = Document.objects.link(
-      notebook_doc,
-      owner=notebook_doc.owner,
-      name=notebook_doc.name,
-      description=notebook_doc.description,
-      extra=notebook_type
-    )
-
+  notebook_doc1 = notebook_doc._get_doc1(doc2_type=notebook_type)
   notebook_doc.update_data(notebook)
   notebook_doc.search = _get_statement(notebook)
   notebook_doc.name = notebook_doc1.name = notebook['name']

@@ -1341,6 +1341,24 @@ class Document2(models.Model):
 
     perm.save()
 
+  def _get_doc1(self, doc2_type=None):
+    if not doc2_type:
+      doc2_type = self.type
+
+    try:
+      doc = self.doc.get()
+    except Exception, e:
+      LOG.error('Exception when retrieving document object for saved query: %s' % e)
+      doc = Document.objects.link(
+        self,
+        owner=self.owner,
+        name=self.name,
+        description=self.description,
+        extra=doc2_type
+      )
+
+    return doc
+
   def _massage_permissions(self):
     """
     Returns the permissions for a given document as a dictionary
