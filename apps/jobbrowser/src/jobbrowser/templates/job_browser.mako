@@ -1902,6 +1902,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.load = function() {
         var h = window.location.hash;
+        huePubSub.publish('stop.refresh.view');
 
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
@@ -1917,7 +1918,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             break;
           default:
             if (h.indexOf('id=') === 0 && ! self.isMini()){
-              new Job(viewModel, {id: h.substr(3)}).fetchJob();
+              new Job(self, {id: h.substr(3)}).fetchJob();
             }
             else {
               self.selectInterface('reset');
@@ -1926,30 +1927,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
     };
 
-    var viewModel;
 
-    huePubSub.subscribe('oozie.action.logs.click', function (widget) {
-      viewModel.job().id(widget.externalId());
-      viewModel.job().fetchJob();
-    });
-
-    huePubSub.subscribe('oozie.action.click', function (widget) {
-      viewModel.job().id(widget.externalId());
-      viewModel.job().fetchJob();
-    });
 
     $(document).ready(function () {
-      viewModel = new JobBrowserViewModel();
+      var jobBrowserViewModel = new JobBrowserViewModel();
       % if not is_mini:
-      ko.applyBindings(viewModel, $('#jobbrowserComponents')[0]);
+      ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
+      huePubSub.subscribe('oozie.action.logs.click', function (widget) {
+        jobBrowserViewModel.job().id(widget.externalId());
+        jobBrowserViewModel.job().fetchJob();
+      });
+
+      huePubSub.subscribe('oozie.action.click', function (widget) {
+        jobBrowserViewModel.job().id(widget.externalId());
+        jobBrowserViewModel.job().fetchJob();
+      });
       % else:
-      ko.applyBindings(viewModel, $('#jobbrowserMiniComponents')[0]);
-      viewModel.isMini(true);
+      ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
+      jobBrowserViewModel.isMini(true);
       % endif
+
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1) {
-          viewModel.load();
+          jobBrowserViewModel.load();
         }
       };
 
@@ -1958,7 +1959,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       huePubSub.subscribeOnce('cluster.config.set.config', function (clusterConfig) {
-        viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
+        jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
         loadHash();
       });
 
@@ -1968,13 +1969,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('submit.rerun.popup.return', function (data) {
         $.jHueNotify.info('${_('Rerun submitted.')}');
         $('#rerun-modal').modal('hide');
-        viewModel.job().apiStatus('RUNNING');
-        viewModel.job().updateJob();
+        jobBrowserViewModel.job().apiStatus('RUNNING');
+        jobBrowserViewModel.job().updateJob();
       }, 'jobbrowser');
       % else:
-      viewModel.selectInterface('jobs');
+      jobBrowserViewModel.selectInterface('jobs');
       huePubSub.subscribe('mini.jb.navigate', function(interface){
-        viewModel.selectInterface(interface);
+        jobBrowserViewModel.selectInterface(interface);
       });
       % endif
     });

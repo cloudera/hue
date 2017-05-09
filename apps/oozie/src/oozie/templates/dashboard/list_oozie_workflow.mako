@@ -488,7 +488,7 @@ ${ dashboard.import_layout() }
 
   $(document).ready(function() {
     % if layout_json != '':
-    drawArrows();
+    viewModel.drawArrows();
     %endif
 
     var CURRENT_ZOOM = 1;
@@ -551,7 +551,7 @@ ${ dashboard.import_layout() }
     $("a[data-toggle='tab']").on("shown", function (e) {
       if ($(e.target).attr("href") == "#graph") {
         % if layout_json != '':
-        drawArrows();
+        viewModel.drawArrows();
         %endif
       }
       else {
@@ -742,7 +742,7 @@ ${ dashboard.import_layout() }
         resizeLogs();
         if ($("#graph").is(":visible")){
           % if layout_json != '':
-          drawArrows();
+          viewModel.drawArrows();
           %endif
         }
       }, 200);
