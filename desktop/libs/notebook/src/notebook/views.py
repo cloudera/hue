@@ -250,7 +250,7 @@ def delete(request):
     for notebook in notebooks:
       try:
         doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'], perm_type='write')
-        doc = doc2.doc.get()
+        doc = doc2._get_doc1()
         doc.can_write_or_exception(request.user)
         doc2.trash()
         ctr += 1
@@ -282,8 +282,7 @@ def copy(request):
     for notebook in notebooks:
       try:
         doc2 = Document2.objects.get_by_uuid(user=request.user, uuid=notebook['uuid'])
-        doc = doc2.doc.get()
-
+        doc = doc2._get_doc1()
         name = doc2.name + '-copy'
         doc2 = doc2.copy(name=name, owner=request.user)
 
