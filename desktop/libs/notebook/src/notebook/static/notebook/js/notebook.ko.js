@@ -2286,75 +2286,52 @@ var EditorViewModel = (function() {
         }
         hueAnalytics.log('notebook', 'schedule/' + _action);
 
-        function getCoordinator(loadedJs, loadedCss) {
+        function getCoordinator() {
           $.get('/oozie/editor/coordinator/' + _action + '/', {
             format: 'json',
             document: self.uuid(),
             coordinator: self.coordinatorUuid()
           }, function (data) {
             if ($("#schedulerEditor").length > 0) {
-              var response = data.layout;
-              var r = $('<span>').html(response);
-              r.find('link').each(function () {
-                $(this).attr('href', $(this).attr('href') + '?' + Math.random())
-              });
-              r.find('script[src]').each(function () {
-                var jsFile = $(this).attr('src').split('?')[0];
-                if (loadedJs.indexOf(jsFile) === -1) {
-                  loadedJs.push(jsFile);
-                  $(this).clone().appendTo($('head'));
+              huePubSub.publish('hue4.process.headers', {
+                response: data.layout,
+                callback: function (r) {
+                  $("#schedulerEditor").html(r);
+
+                  self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
+
+                  ko.cleanNode($("#schedulerEditor")[0]);
+                  ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
+
+                  huePubSub.publish('render.jqcron');
+
+                  self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
+                  self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
+                  self.schedulerViewModel.isEditing(true);
+
+                  self.schedulerViewModelIsLoaded(true);
+
+                  if (_action == 'new') {
+                    self.coordinatorUuid(UUID());
+                    self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());
+                    self.schedulerViewModel.coordinator.properties.document(self.uuid());
+                  }
                 }
-                $(this).remove();
               });
-              r.find('link[href]').each(function () {
-                var cssFile = $(this).attr('href').split('?')[0];
-                if (loadedCss.indexOf(cssFile) === -1) {
-                  loadedCss.push(cssFile);
-                  $(this).clone().appendTo($('head'));
-                }
-                $(this).remove();
-              });
-              r.find('a[href]').each(function () {
-                var link = $(this).attr('href');
-                if (link.startsWith('/') && !link.startsWith('/hue')){
-                  link = '/hue' + link;
-                }
-                $(this).attr('href', link);
-              });
-              r.unwrap('<span>');
 
-              $("#schedulerEditor").html(r);
-
-              self.schedulerViewModel = new vm.CoordinatorEditorViewModel(data.coordinator, data.credentials, data.workflows, data.can_edit);
-
-              ko.cleanNode($("#schedulerEditor")[0]);
-              ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
-
-              huePubSub.publish('render.jqcron');
-
-              self.schedulerViewModel.coordinator.properties.cron_advanced.valueHasMutated(); // Update jsCron enabled status
-              self.schedulerViewModel.coordinator.tracker().markCurrentStateAsClean();
-              self.schedulerViewModel.isEditing(true);
-
-              self.schedulerViewModelIsLoaded(true);
-
-              if (_action == 'new') {
-                self.coordinatorUuid(UUID());
-                self.schedulerViewModel.coordinator.uuid(self.coordinatorUuid());
-                self.schedulerViewModel.coordinator.properties.document(self.uuid());
-              }
             }
           }).fail(function (xhr) {
             $(document).trigger("error", xhr.responseText);
           });
         }
 
-        if (IS_HUE_4){
-          huePubSub.publish('hue4.get.globals', getCoordinator);
+        if (!IS_HUE_4) {
+          huePubSub.subscribe('hue4.process.headers', function (opts) {
+            opts.callback(opts.response);
+          });
         }
-        else {
-          getCoordinator([], []);
-        }
+
+        getCoordinator();
 
       }
     };

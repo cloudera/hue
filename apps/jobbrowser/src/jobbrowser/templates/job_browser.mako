@@ -1483,6 +1483,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         $('canvas').remove();
 
+        if (!IS_HUE_4) {
+          huePubSub.subscribe('hue4.process.headers', function (opts) {
+            opts.callback(opts.response);
+          });
+        }
+
         if (vm.job().type() === 'workflow') {
           $('#workflow-page-graph').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
@@ -1497,9 +1503,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             dataType: "html",
             success: function (response) {
               self.workflowGraphLoaded = true;
-              $('#workflow-page-graph').html(response);
-              updateArrowPosition();
-              arrowsPolling();
+
+              huePubSub.publish('hue4.process.headers', {
+                response: response,
+                callback: function (r) {
+                  $('#workflow-page-graph').html(r);
+                  updateArrowPosition();
+                  arrowsPolling();
+                }
+              });
             }
           });
         }
@@ -1945,7 +1957,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         loadHash();
       }
 
-      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+      huePubSub.subscribeOnce('cluster.config.set.config', function (clusterConfig) {
         viewModel.appConfig(clusterConfig && clusterConfig['app_config']);
         loadHash();
       });

@@ -593,12 +593,22 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
-        huePubSub.subscribe('hue4.add.global.js', function(path){
-          loadedJs.push(path);
+        huePubSub.subscribe('hue4.add.global.js', function ($el) {
+          var jsFile = $el.attr('src').split('?')[0];
+          if (loadedJs.indexOf(jsFile) === -1) {
+            loadedJs.push(jsFile);
+            $el.clone().appendTo($('head'));
+          }
+          $el.remove();
         });
 
-        huePubSub.subscribe('hue4.add.global.css', function(path){
-          loadedCss.push(path);
+        huePubSub.subscribe('hue4.add.global.css', function ($el) {
+          var cssFile = $el.attr('href').split('?')[0];
+          if (loadedCss.indexOf(cssFile) === -1) {
+            loadedCss.push(cssFile);
+            $el.clone().appendTo($('head'));
+          }
+          $el.remove();
         });
 
         huePubSub.subscribe('hue4.get.globals', function(callback){
@@ -612,20 +622,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
           });
           r.find('script[src]').each(function () {
-            var jsFile = $(this).attr('src').split('?')[0];
-            if (loadedJs.indexOf(jsFile) === -1) {
-              loadedJs.push(jsFile);
-              $(this).clone().appendTo($('head'));
-            }
-            $(this).remove();
+            huePubSub.publish('hue4.add.global.js', $(this));
           });
           r.find('link[href]').each(function () {
-            var cssFile = $(this).attr('href').split('?')[0];
-            if (loadedCss.indexOf(cssFile) === -1) {
-              loadedCss.push(cssFile);
-              $(this).clone().appendTo($('head'));
-            }
-            $(this).remove();
+            huePubSub.publish('hue4.add.global.css', $(this));
           });
           r.find('a[href]').each(function () {
             var link = $(this).attr('href');
@@ -637,6 +637,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           r.unwrap('<span>');
           return r;
         };
+
+        huePubSub.subscribe('hue4.process.headers', function(opts){
+          opts.callback(self.processHeaders(opts.response));
+        });
 
         self.loadApp = function(app){
           self.currentApp(app);
