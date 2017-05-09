@@ -1357,12 +1357,19 @@ var ApiHelper = (function () {
     self.loadDatabases({
       sourceType: options.sourceType,
       successCallback: function () {
-        if (! self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
-          hierarchy = options.defaultDatabase;
-        } else {
+        // Database
+        if (clonedIdentifierChain.length > 1 && self.containsDatabase(options.sourceType, clonedIdentifierChain[0].name)) {
           hierarchy = clonedIdentifierChain.shift().name
+        } else {
+          hierarchy = options.defaultDatabase;
         }
-        hierarchy += '/' + clonedIdentifierChain.shift().name;
+
+        // Table
+        if (clonedIdentifierChain.length > 0) {
+          hierarchy += '/' + clonedIdentifierChain.shift().name;
+        }
+
+        // Column/Complex
         if (clonedIdentifierChain.length > 0) {
           hierarchy += '/stats/' + $.map(clonedIdentifierChain, function (identifier) { return identifier.name }).join('/')
         }
