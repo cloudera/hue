@@ -1654,7 +1654,7 @@ var EditorViewModel = (function() {
         with_ddl: ko.mapping.toJSON(true)
       }, function(data) {
         if (data.status == 0) {
-          $(document).trigger("info", $.map(activeTables, function(table) { return table.name; }) + " stats sent to analyse.");
+          $(document).trigger("info", $.map(activeTables, function(table) { return table.name; }) + " stats sent to analyse");
           if (data.upload_table_ddl) {
             self.watchUploadStatus(data.upload_table_ddl.status.workloadId);
           }
