@@ -38,7 +38,7 @@ ${ layout.menubar(section='quick_start') }
         % if user.is_superuser:
           ${ _('Quick Start Wizard') } -
         % endif
-        Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Visit the project website!') }">${ _("The Hadoop UI") }</a>
+        Hue&trade; ${version} - <a href="http://gethue.com" target="_blank" style="color:#777" title="${ _('Open gethue.com in a new window.') }">${ _("Query. Explore. Repeat.") }</a>
       </h1>
 
      % if user.is_superuser:
@@ -153,7 +153,7 @@ ${ layout.menubar(section='quick_start') }
           <div id="step3" class="stepDetails hide">
             <div>
               <h3>${ _('Create or import users') }</h3>
-              <a href="${ url('useradmin.views.list_users') }"><i class="fa fa-user"></i> ${ _('User Admin') }</a>
+              <a href="${ url('useradmin.views.list_users') }" target="_blank"><i class="fa fa-user"></i> ${ _('User Admin') }</a>
             </div>
 
             <div class="margin-top-30">
@@ -173,9 +173,18 @@ ${ layout.menubar(section='quick_start') }
           <div id="step4" class="stepDetails hide">
             <div>
               <h3>${ _('Use the applications') }</h3>
-              <a href="${ url('desktop.views.home2') }"><i class="fa fa-home"></i> ${ _('Hue Home') }</a>
+              % if is_embeddable:
+              <a href="/">
+                <i class="fa fa-home"></i> ${ _('Landing page') }
+              </a>
+              % else:
+                <a href="${ url('desktop.views.home2') }">
+                  <i class="fa fa-home"></i> ${ _('Home') }
+                </a>
+              % endif
             </div>
 
+            % if not is_embeddable:
             <div class="margin-top-30">
               <h3>${ _('Skip wizard next time') }</h3>
               <label class="checkbox">
@@ -185,6 +194,7 @@ ${ layout.menubar(section='quick_start') }
                 ${ _('Skip the Quick Start Wizard at next login and land directly on the home page.') }
               </label>
             </div>
+            % endif
 
           </div>
           </div>
@@ -362,7 +372,7 @@ $(document).ready(function(){
   });
 
   $("#doneBtn").click(function () {
-    location.href = "${ url('desktop.views.home2') }";
+    location.href = "${ is_embeddable and '/' or url('desktop.views.home2') }";
   });
 
   $(".updatePreferences").click(function () {
