@@ -876,9 +876,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             console.error('Route not found', ctx);
             self.loadApp('404');
           });
-          page({
-            popstate: false
-          });
+          page();
         });
 
         huePubSub.subscribe('open.link', function (href) {
