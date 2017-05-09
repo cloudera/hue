@@ -593,6 +593,18 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           loadedCss.push($(this).attr('href'));
         });
 
+        huePubSub.subscribe('hue4.add.global.js', function(path){
+          loadedJs.push(path);
+        });
+
+        huePubSub.subscribe('hue4.add.global.css', function(path){
+          loadedCss.push(path);
+        });
+
+        huePubSub.subscribe('hue4.get.globals', function(callback){
+          callback(loadedJs, loadedCss);
+        });
+
         // Only load CSS and JS files that are not loaded before
         self.processHeaders = function(response){
           var r = $('<span>').html(response);
