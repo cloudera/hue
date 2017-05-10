@@ -390,7 +390,8 @@ def list_oozie_workflow(request, job_id):
       'status':  oozie_workflow.status,
       'progress': oozie_workflow.get_progress(full_node_list),
       'graph': workflow_graph,
-      'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions(), oozie_coordinator, oozie_bundle)
+      'actions': massaged_workflow_actions_for_json(oozie_workflow.get_working_actions(), oozie_coordinator, oozie_bundle),
+      'doc_url': doc.get_absolute_url() if doc else '',
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
