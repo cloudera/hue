@@ -807,11 +807,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="span2">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
-          <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <!-- ko if: doc_url -->
+          <li class="nav-header">${ _('Document') }</li>
+          <li>
+            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+              <span data-bind="text: name"></span>
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: doc_url -->
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
-          <li class="nav-header">${ _('Type') }</li>
+          <!-- /ko -->
+          <li class="nav-header">${ _('Workspace') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
@@ -824,10 +832,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
+          <li class="nav-header">${ _('Variables') }</li>
+          <li><span data-bind="text: type"></span></li>
         </ul>
       </div>
     </div>
@@ -883,6 +891,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-page-metadata">
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+
           <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
         </div>
 
@@ -1167,6 +1180,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.id = ko.observableDefault(job.id);
+      self.doc_url = ko.observableDefault(job.doc_url);
       self.name = ko.observableDefault(job.name);
       self.type = ko.observableDefault(job.type);
 
@@ -1451,8 +1465,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           });
         } else {
           vm.jobs._control([self.id()], action, function(data) {
-              $(document).trigger("info", data.message);
-              self.fetchStatus();
+            $(document).trigger("info", data.message);
+            self.fetchStatus();
           });
         }
       }
@@ -1845,7 +1859,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var flatAvailableInterfaces = self.availableInterfaces().map(function (i) {
           return i.interface;
         });
-        if (flatAvailableInterfaces.indexOf(name) != -1) {
+        if (flatAvailableInterfaces.indexOf(name) != -1 || name == 'oozie-info') {
           return name;
         } else {
           return flatAvailableInterfaces[0];

@@ -109,6 +109,8 @@ class WorkflowApi(Api):
     common['properties']['coordinator_id'] = workflow.get_parent_job_id()
     common['properties']['bundle_id'] = workflow.conf_dict.get('oozie.bundle.id')
 
+    common['doc_url'] = common['properties'].get('doc_url')
+
     return common
 
 

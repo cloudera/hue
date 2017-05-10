@@ -16,10 +16,12 @@
 # limitations under the License.
 
 import logging
+import posixpath
 import re
 
 from django.utils.translation import ugettext as _
 
+from hadoop.fs.hadoopfs import Hdfs
 from desktop.lib.exceptions_renderable import PopupException
 
 
@@ -89,3 +91,18 @@ def _extract_query_params(filters):
       filter_params[name] = value
 
   return filter_params
+
+
+def is_linkable(name, path):
+  return re.search('(dir|path|output|input)', name, re.I) or path.startswith('/') or path.startswith('hdfs://')
+
+
+def hdfs_link_js(url):
+  link = 'javascript:void(0)'
+
+  if url:
+    path = Hdfs.urlsplit(url)[2]
+    if path:
+      link = ('/filebrowser/view=%s' if path.startswith(posixpath.sep) else '/filebrowser/home_relative_view=/%s') % path
+
+  return link

@@ -405,6 +405,14 @@ class Job(object):
   def has_sla(self):
     return '<sla:info>' in self.definition
 
+  @property
+  def durationTime(self):
+    return self.endTime and self.startTime and ((time.mktime(self.endTime) - time.mktime(self.startTime)) * 1000) or 0
+
+  @property
+  def submissionTime(self):
+    return hasattr(self, 'createdTime') and self.createdTime and time.mktime(catch_unicode_time(self.createdTime)) or 0
+
 
 class Workflow(Job):
   _ATTRS = [
@@ -475,14 +483,6 @@ class Workflow(Job):
       else:
         total_actions = len(self.actions)
       return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
-
-  @property
-  def durationTime(self):
-    return self.endTime and self.startTime and ((time.mktime(self.endTime) - time.mktime(self.startTime)) * 1000) or 0
-
-  @property
-  def submissionTime(self):
-    return hasattr(self, 'createdTime') and self.createdTime and time.mktime(catch_unicode_time(self.createdTime)) or 0
 
 
 class Coordinator(Job):
