@@ -458,13 +458,6 @@ ${ components.menubar() }
           % if has_write_access:
             <button id="dropBtn" class="btn toolbarBtn" title="${_('Delete the selected tables')}" data-bind="click: function () { $('#dropTable').modal('show'); }, disable: selectedTables().length === 0"><i class="fa fa-times"></i>  ${_('Drop')}</button>
           % endif
-          <!-- ko if: $root.optimizerEnabled  -->
-          &nbsp;
-          &nbsp;
-          <button class="btn toolbarBtn" title="${_('View the selected table')}" data-bind="click: function () { window.open($root.optimizerUrl() + '#/table/' + selectedTables()[0].optimizerStats().eid, '_blank'); }, disable: selectedTables().length !== 1">
-            <i class="fa fa-skyatlas"></i> ${_('View in Optimizer')}
-          </button>
-          <!-- /ko -->
         </div>
 
         <table id="tablesTable" class="table table-condensed table-nowrap" style="margin-bottom: 10px; width: 100%" data-bind="visible: filteredTables().length > 0">
@@ -626,11 +619,6 @@ ${ components.menubar() }
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
     <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: 'hive' }); }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
-    % if user.is_superuser:
-    <!-- ko if: $root.optimizerEnabled() && $root.database().table().optimizerStats() -->
-      <a class="inactive-action" title="${_('View in Optimizer')}" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': $root.optimizerUrl() + '#/table/' + $root.database().table().optimizerStats().eid }" target="_blank"><i class="fa fa-skyatlas fa-fw"></i></a>
-    <!-- /ko -->
-    % endif
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
@@ -770,7 +758,7 @@ ${ components.menubar() }
     </tr>
     </thead>
     <tbody data-bind="hueach: {data: $data.optimizerDetails().queryList(), itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200}">
-    <tr class="pointer" data-bind="click: function(){ window.open($root.optimizerUrl() + '#/query/' + qid(), '_blank'); }">
+    <tr>
       <td data-bind="text: qid"></td>
       <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': queryCount()}">
         <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : Math.round(queryCount() / $parent.optimizerDetails().queryCount() * 100) + '%' }"></div>
@@ -987,7 +975,7 @@ ${ components.menubar() }
           </thead>
           <tbody data-bind="hueach: {data: $data, itemHeight: 32, scrollable: '${ MAIN_SCROLLABLE }', scrollableOffset: 200}">
           <tr>
-            <td class="pointer" data-bind="text: tableEid, click: function(){ window.open($root.optimizerUrl() + '#/table/' + tableEid(), '_blank'); }"></td>
+            <td data-bind="text: tableEid"></td>
             <td style="height: 10px; width: 70px; margin-top:5px;" data-bind="attr: {'title': joinpercent()}">
               <div class="progress bar" style="background-color: #0B7FAD" data-bind="style: { 'width' : joinpercent() + '%' }"></div>
             </td>
