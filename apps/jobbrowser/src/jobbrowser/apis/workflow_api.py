@@ -20,7 +20,7 @@ import json
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
+from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params, is_linkable, hdfs_link_js
 from liboozie.oozie_api import get_oozie
 
 
@@ -28,6 +28,7 @@ LOG = logging.getLogger(__name__)
 
 
 try:
+  from oozie.forms import ParameterForm
   from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_OOZIE_BACKEND_FILTERING
   from oozie.views.dashboard import get_oozie_job_log, list_oozie_workflow, manage_oozie_jobs, bulk_manage_oozie_jobs, has_dashboard_jobs_access, massaged_oozie_jobs_for_json
 except Exception, e:
@@ -108,7 +109,7 @@ class WorkflowApi(Api):
     common['properties']['properties'] = ''
     common['properties']['coordinator_id'] = workflow.get_parent_job_id()
     common['properties']['bundle_id'] = workflow.conf_dict.get('oozie.bundle.id')
-
+    common['properties']['parameters'] = self._get_variables(workflow)
     common['doc_url'] = common['properties'].get('doc_url')
 
     return common
@@ -156,6 +157,20 @@ class WorkflowApi(Api):
       return 'SUCCEEDED'
     else:
       return 'FAILED' # KILLED and FAILED
+
+  def _get_variables(self, workflow):
+    parameters = []
+
+    for var, val in workflow.conf_dict.iteritems():
+      if var not in ParameterForm.NON_PARAMETERS and var != 'oozie.use.system.libpath' or var == 'oozie.wf.application.path':
+        link = ''
+        if is_linkable(var, val):
+          link = hdfs_link_js(val)
+        if var == 'oozie.wf.application.path':
+          var = _('Workspace')
+        parameters.append({'name': var, 'value': val, 'link': link})
+
+    return parameters
 
 
 class WorkflowActionApi(Api):
