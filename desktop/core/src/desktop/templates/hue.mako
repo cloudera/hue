@@ -729,6 +729,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         page.base('/hue');
 
+        self.lastContext = null;
+
         var pageMapping = [
           { url: '/500', app: '500' },
           { url: '/about/', app: 'admin_wizard' },
@@ -842,25 +844,29 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.changeEditorType('pig');
           }},
           { url: '/search/*', app: 'dashboard' },
-          { url: '/security/hdfs', app: function () {
-            if (loadedApps.indexOf('security_hdfs') == -1) {
+          { url: '/security/hdfs', app: function (ctx) {
+            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
               self.loadApp('security_hdfs');
             }
+            self.lastContext = ctx;
           }},
-          { url: '/security/hive', app: function () {
-            if (loadedApps.indexOf('security_hive') == -1) {
+          { url: '/security/hive', app: function (ctx) {
+            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
               self.loadApp('security_hive');
             }
+            self.lastContext = ctx;
           }},
-          { url: '/security/hive2', app: function () {
-            if (loadedApps.indexOf('security_hive2') == -1) {
+          { url: '/security/hive2', app: function (ctx) {
+            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
               self.loadApp('security_hive2');
             }
+            self.lastContext = ctx;
           }},
-          { url: '/security/solr', app: function () {
-            if (loadedApps.indexOf('security_solr') == -1) {
+          { url: '/security/solr', app: function (ctx) {
+            if (self.lastContext == null || ctx.path !== self.lastContext.path) {
               self.loadApp('security_solr');
             }
+            self.lastContext = ctx;
           }},
           { url: '/security', app: function () {
             page('/security/hive');
