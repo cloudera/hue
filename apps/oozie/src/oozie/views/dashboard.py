@@ -21,8 +21,6 @@ import os
 import re
 import time
 
-from datetime import datetime
-
 from django.forms.formsets import formset_factory
 from django.http import HttpResponse
 from django.utils.functional import wraps
@@ -31,6 +29,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect
 
 from desktop.conf import TIME_ZONE
+from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.lib.exceptions_renderable import PopupException
@@ -41,9 +40,10 @@ from desktop.log.access import access_warn
 from desktop.models import Document, Document2
 
 from hadoop.fs.hadoopfs import Hdfs
-from liboozie.oozie_api import get_oozie
 from liboozie.credentials import Credentials
+from liboozie.oozie_api import get_oozie
 from liboozie.submission2 import Submission
+from liboozie.utils import catch_unicode_time
 
 from oozie.conf import OOZIE_JOBS_COUNT, ENABLE_CRON_SCHEDULING, ENABLE_V2, ENABLE_OOZIE_BACKEND_FILTERING
 from oozie.forms import RerunForm, ParameterForm, RerunCoordForm, RerunBundleForm, UpdateCoordinatorForm
@@ -51,7 +51,6 @@ from oozie.models import Workflow as OldWorkflow, Job, utc_datetime_format, Bund
 from oozie.models2 import History, Workflow, WORKFLOW_NODE_PROPERTIES
 from oozie.settings import DJANGO_APPS
 from oozie.utils import convert_to_server_timezone
-from desktop.lib import django_mako
 
 
 def get_history():
@@ -1077,12 +1076,6 @@ def format_time(st_time):
   else:
     return st_time
 
-def catch_unicode_time(u_time):
-  if type(u_time) == time.struct_time:
-    return u_time
-  else:
-    return datetime.timetuple(datetime.strptime(u_time, '%a, %d %b %Y %H:%M:%S %Z'))
-
 
 def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   jobs = []
@@ -1090,7 +1083,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
   for job in oozie_jobs:
     if not just_sla or (just_sla and job.has_sla) and job.appName != 'pig-app-hue-script':
       last_modified_time_millis = hasattr(job, 'lastModTime') and job.lastModTime and (time.time() - time.mktime(job.lastModTime)) * 1000 or 0
-      duration_millis = job.endTime and job.startTime and ((time.mktime(job.endTime) - time.mktime(job.startTime)) * 1000) or 0
+      duration_millis = job.durationTime
       massaged_job = {
         'id': job.id,
         'lastModTime': hasattr(job, 'lastModTime') and job.lastModTime and format_time(job.lastModTime) or None,
@@ -1118,7 +1111,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'suspendUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'suspend'}),
         'resumeUrl': reverse('oozie:manage_oozie_jobs', kwargs={'job_id':job.id, 'action':'resume'}),
         'created': hasattr(job, 'createdTime') and job.createdTime and format_time(job.createdTime) or '',
-        'createdInMillis': hasattr(job, 'createdTime') and job.createdTime and time.mktime(catch_unicode_time(job.createdTime)) or 0,
+        'createdInMillis': job.submissionTime,
         'startTime': hasattr(job, 'startTime') and format_time(job.startTime) or None,
         'startTimeInMillis': hasattr(job, 'startTime') and job.startTime and time.mktime(job.startTime) or 0,
         'run': hasattr(job, 'run') and job.run or 0,

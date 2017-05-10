@@ -27,11 +27,21 @@ except ImportError:
 import logging
 import re
 import time
+
+from datetime import datetime
 from time import strftime
 from xml.sax.saxutils import escape
 
+
 LOG = logging.getLogger(__name__)
 _NAME_REGEX = re.compile('^[a-zA-Z][\-_a-zA-Z0-0]*$')
+
+
+def catch_unicode_time(u_time):
+  if type(u_time) == time.struct_time:
+    return u_time
+  else:
+    return datetime.timetuple(datetime.strptime(u_time, '%a, %d %b %Y %H:%M:%S %Z'))
 
 
 def parse_timestamp(timestamp, time_format=None):
