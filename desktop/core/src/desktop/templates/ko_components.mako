@@ -474,8 +474,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-favorite-app-template">
     <!-- ko if: isHue4 -->
-    <div title="${ _('Toggle as the default Hue 4 action') }" class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp">
-      <i class="fa" data-bind="css: {'fa-star-o muted': !isFavorite(), 'fa-star': isFavorite }"></i>
+    <div title="${ _('Toggle as the default app') }" class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp">
+      <i class="fa inactive-action" data-bind="css: {'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
     </div>
     <!-- /ko -->
   </script>
