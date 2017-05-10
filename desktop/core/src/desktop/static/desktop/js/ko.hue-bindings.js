@@ -4030,6 +4030,8 @@
         }
       });
 
+      editor.commands.bindKey("Ctrl-P", "golineup");
+
       editor.commands.addCommand({
         name: "format",
         bindKey: {win: "Ctrl-i|Ctrl-Shift-f|Ctrl-Alt-l", mac: "Command-i|Ctrl-i|Ctrl-Shift-f|Command-Shift-f|Ctrl-Shift-l|Cmd-Shift-l"},
