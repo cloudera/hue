@@ -4455,7 +4455,7 @@
       var selectedValues = ko.utils.unwrapObservable(valueAccessor()).selectedValues;
 
       var updateCheckedState = function () {
-        ko.utils.toggleDomNodeCssClass(element, 'fa-check', selectedValues().length === allValues().length);
+        ko.utils.toggleDomNodeCssClass(element, 'fa-check', allValues().length > 0 && selectedValues().length === allValues().length);
         ko.utils.toggleDomNodeCssClass(element, 'fa-minus hue-uncheck', selectedValues().length > 0 && selectedValues().length !== allValues().length);
       };
 
