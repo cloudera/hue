@@ -40,7 +40,7 @@ ${ layout.menubar(section='hive1') }
     <span class="pointer" data-bind="visible: privilegesForViewTo() < privileges().length, click: function(){ privilegesForViewTo(privilegesForViewTo() + 50) }" title="${ _('Show 50 more...') }"><i class="fa fa-ellipsis-h"></i></span>
     <span class="pointer" data-bind="click: addPrivilege, visible: $root.is_sentry_admin" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
     <span class="pointer" data-bind="click: function() { $root.list_sentry_privileges_by_authorizable() }, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+    <span class="pointer" data-bind="click: function() { huePubSub.publish('delete.privilege.modal', $data) }, visible: privilegesChanged().length > 0" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
   </div>
   <!-- /ko -->
 </script>
@@ -361,7 +361,7 @@ ${ layout.menubar(section='hive1') }
                   <div class="acl-block acl-actions" data-bind="click: privilegesChanged().length == 0 ? addPrivilege : void(0), visible: $root.is_sentry_admin">
                     <span class="pointer" data-bind="click: addPrivilege, visible: $data.showPrivileges" title="${ _('Add privilege') }"><i class="fa fa-plus"></i></span>
                     <span class="pointer" data-bind="click: $root.list_sentry_privileges_by_role, visible: privilegesChanged().length > 0" title="${ _('Undo') }"> &nbsp; <i class="fa fa-undo"></i></span>
-                    <span class="pointer" data-bind="click: function() { deletePrivilegeModal($data) }, visible: privilegesChanged().length > 0 && isValid()" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
+                    <span class="pointer" data-bind="click: function() { huePubSub.publish('delete.privilege.modal', $data) }, visible: privilegesChanged().length > 0 && isValid()" title="${ _('Save') }"> &nbsp; <i class="fa fa-save"></i></span>
                   </div>
                 </td>
               </tr>
@@ -569,7 +569,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
   (function () {
     ko.options.deferUpdates = true;
 
-    function deletePrivilegeModal(role) {
+    huePubSub.subscribe('delete.privilege.modal', function (role) {
       var cascadeDeletes = $.grep(role.privilegesChanged(), function(privilege) {
           return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE'); }
       );
@@ -579,7 +579,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       } else {
         viewModel.role().savePrivileges(role);
       }
-    }
+    });
 
     var viewModel = new HiveViewModel(${ initial | n,unicode });
     ko.applyBindings(viewModel, $('#securityHiveComponents')[0]);
