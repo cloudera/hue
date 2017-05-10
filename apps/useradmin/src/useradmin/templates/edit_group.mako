@@ -68,12 +68,12 @@ ${layout.menubar(section='groups')}
 
       <div class="form-actions">
         % if name:
-            <input type="submit" class="btn btn-primary" value="${_('Update group')}"/>
+            <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update group')}"/>
         % else:
           % if ldap:
-              <input type="submit" class="btn btn-primary" value="${_('Add/Sync group')}"/>
+              <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add/Sync group')}"/>
           % else:
-              <input type="submit" class="btn btn-primary" value="${_('Add group')}"/>
+              <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add group')}"/>
           % endif
         % endif
         % if is_embeddable:
@@ -107,7 +107,10 @@ ${layout.menubar(section='groups')}
     $editGroupComponents.find('#editForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
-        if (data && data.url){
+        if (data && data.status == -1) {
+          renderUseradminErrors(data.errors);
+        }
+        else if (data && data.url) {
           huePubSub.publish('open.link', data.url);
           $.jHueNotify.info("${ _('Group information updated correctly') }");
         }

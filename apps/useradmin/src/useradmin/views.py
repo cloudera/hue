@@ -460,12 +460,16 @@ def edit_group(request, name=None):
   else:
     form = GroupEditForm(instance=instance)
 
-  return render('edit_group.mako', request, {
-    'form': form,
-    'action': request.path,
-    'name': name,
-    'is_embeddable': is_embeddable,
-  })
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_group.mako', request, {
+      'form': form,
+      'action': request.path,
+      'name': name,
+      'is_embeddable': is_embeddable,
+    })
 
 
 def edit_permission(request, app=None, priv=None):
