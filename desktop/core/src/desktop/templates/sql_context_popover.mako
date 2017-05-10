@@ -1056,10 +1056,6 @@ from metadata.conf import has_navigator
         self.sourceType = params.sourceType;
         self.defaultDatabase = params.defaultDatabase;
         self.close = hidePopover;
-        self.pinEnabled = false;
-        % if USE_NEW_SIDE_PANELS.get():
-          self.pinEnabled = params.pinEnabled || false;
-        % endif
         var orientation = params.orientation || 'bottom';
         self.contents = null;
         self.resizeHelper = new ResizeHelper(orientation, self.leftAdjust, self.topAdjust);
@@ -1134,6 +1130,8 @@ from metadata.conf import has_navigator
         self.isHdfs = params.data.type === 'hdfs';
         self.isAsterisk = params.data.type === 'asterisk';
         self.isView = params.data.type === 'view';
+
+        self.pinEnabled = params.pinEnabled && !self.isFunction && !self.isAsterisk && !self.isHdfs;
 
         if (self.isDatabase) {
           self.contents = new DatabaseContextTabs(self.data, self.sourceType, self.defaultDatabase);
