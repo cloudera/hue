@@ -512,14 +512,17 @@ def edit_permission(request, app=None, priv=None):
         return redirect(reverse(list_permissions))
   else:
     form = PermissionsEditForm(instance=instance)
-
-  return render('edit_permissions.mako', request, {
-    'form': form,
-    'action': request.path,
-    'app': app,
-    'priv': priv,
-    'is_embeddable': is_embeddable,
-  })
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_permissions.mako', request, {
+      'form': form,
+      'action': request.path,
+      'app': app,
+      'priv': priv,
+      'is_embeddable': is_embeddable,
+    })
 
 
 def add_ldap_users(request):
