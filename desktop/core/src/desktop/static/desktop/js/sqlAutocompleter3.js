@@ -1569,6 +1569,8 @@ var AutocompleteResults = (function () {
         path = path.substring(tablePath.length + 1);
         if (tables[i].alias) {
           path = tables[i].alias + '.' + path;
+        } else if (tables.length > 0) {
+          path = tables[i].identifierChain[tables[i].identifierChain.length - 1].name + '.' + path;
         }
         break;
       }
