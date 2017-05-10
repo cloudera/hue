@@ -58,7 +58,7 @@ ${layout.menubar(section='permissions')}
       <br/>
 
       <div class="form-actions">
-        <input type="submit" class="btn btn-primary" value="${_('Update permission')}"/>
+        <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update permission')}"/>
         % if is_embeddable:
           <input type="hidden" value="true" name="is_embeddable" />
         % endif
