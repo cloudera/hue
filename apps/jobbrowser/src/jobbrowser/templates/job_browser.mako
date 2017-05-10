@@ -819,8 +819,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Workspace') }</li>
-          <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
           <li class="nav-header">${ _('User') }</li>
@@ -835,7 +833,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Id') }</li>
           <li><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Variables') }</li>
-          <li><span data-bind="text: type"></span></li>
+          <li>
+            <ul class="nav nav-list" data-bind="foreach: properties['parameters']">
+              <!-- ko if: link -->
+              <a data-bind="hueLink: link" href="javascript: void(0);">
+                <span data-bind="text: name, attr: { title: value }"></span>
+              </a>
+              <!-- /ko -->
+              <!-- ko ifnot: link -->
+                <span data-bind="text: name, attr: { title: value }"></span>
+              <!-- /ko -->
+            </ul>
+          </li>
         </ul>
       </div>
     </div>
