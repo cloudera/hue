@@ -46,16 +46,16 @@ ${ layout.menubar(section='users') }
     <div id="properties" class="section">
       <ul class="nav nav-tabs" style="margin-bottom: 0">
         <li class="active">
-          <a href="#step1" class="step">${ _('Step 1: Credentials') }
+          <a href="javascript:void(0)" class="step" data-step="step1">${ _('Step 1: Credentials') }
           % if not username:
             ${ _('(required)') }
           % endif
           </a>
         </li>
-        <li><a href="#step2" class="step">${ user.is_superuser and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
+        <li><a href="javascript:void(0)" class="step" data-step="step2">${ user.is_superuser and _('Step 2: Profile and Groups') or _('Step 2: Profile') }</a>
         </li>
         % if user.is_superuser:
-            <li><a href="#step3" class="step">${ _('Step 3: Advanced') }</a></li>
+            <li><a href="javascript:void(0)" class="step" data-step="step3">${ _('Step 3: Advanced') }</a></li>
         % endif
       </ul>
 
@@ -110,19 +110,14 @@ ${ layout.menubar(section='users') }
           <input type="hidden" value="true" name="is_embeddable" />
         % endif
         % if username:
-        <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+        <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update user')}"/>
         % else:
-        <input type="submit" class="btn btn-primary" value="${_('Add user')}"/>
+        <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add user')}"/>
         % endif
       </div>
     </form>
   </div>
 </div>
-
-<script src="${ static('desktop/js/hue.routie.js') }" type="text/javascript" charset="utf-8"></script>
-<script>
-  routie.setPathname('/useradmin');
-</script>
 
 <script type="text/javascript">
 
@@ -174,22 +169,6 @@ $(document).ready(function(){
 
  var currentStep = "step1";
 
- routie({
-    "step1":function () {
-      showStep("step1");
-    },
-    "step2":function () {
-      if (validateStep("step1")) {
-        showStep("step2");
-      }
-    },
-    "step3":function () {
-      if (validateStep("step1") && validateStep("step2")) {
-        showStep("step3");
-      }
-    }
-  });
-
   function showStep(step) {
     currentStep = step;
     if (step != "step1") {
@@ -205,7 +184,7 @@ $(document).ready(function(){
     }
 
     $editUserComponents.find("a.step").parent().removeClass("active");
-    $editUserComponents.find("a.step[href=#" + step + "]").parent().addClass("active");
+    $editUserComponents.find("a.step[data-step=" + step + "]").parent().addClass("active");
     $editUserComponents.find(".stepDetails").hide();
     $editUserComponents.find("#" + step).show();
   }
@@ -215,7 +194,7 @@ $(document).ready(function(){
     $editUserComponents.find("#" + step).find("[validate=true]").each(function () {
       if ($(this).val().trim() == "") {
         proceed = false;
-        routie(step);
+        router(step);
         $(this).parents(".control-group").addClass("error");
         $(this).parent().find(".help-inline").remove();
         $(this).after("<span class=\"help-inline\"><strong>${ _('This field is required.') }</strong></span>");
@@ -224,17 +203,39 @@ $(document).ready(function(){
     return proceed;
   }
 
+  function router(step) {
+    switch (step) {
+      case 'step1':
+        showStep('step1');
+        break;
+      case 'step2':
+        if (validateStep('step1')){
+          showStep('step2');
+        }
+        break;
+      case 'step3':
+        if (validateStep('step1') && validateStep('step2')){
+          showStep('step3');
+        }
+        break;
+    }
+  }
+
+  $editUserComponents.find(".step").on('click', function () {
+    router($(this).data('step'));
+  });
+
   $editUserComponents.find(".backBtn").click(function () {
     var nextStep = (currentStep.substr(4) * 1 - 1);
     if (nextStep >= 1) {
-      routie("step" + nextStep);
+      router('step' + nextStep);
     }
   });
 
   $editUserComponents.find(".nextBtn").click(function () {
     var nextStep = (currentStep.substr(4) * 1 + 1);
     if (nextStep <= $(".step").length) {
-      routie("step" + nextStep);
+      router('step' + nextStep);
     }
   });
 
