@@ -1222,12 +1222,18 @@ var AutocompleteResults = (function () {
         successCallback: function (data) {
           var aggregateFunctionsSuggestions = [];
           if (data.values.length > 0) {
-            // TODO: Handle column conflicts with multiple tables
 
-            // Substitute qualified table identifiers with either alias or empty string
+            // Expand all column names to the fully qualified name including db and table.
+            data.values.forEach(function (value) {
+              value.aggregateInfo.forEach(function (info) {
+                value.aggregateClause = value.aggregateClause.replace(new RegExp('([^.])' + info.columnName, 'gi'), '$1' + info.databaseName + '.' + info.tableName + '.' + info.columnName);
+              });
+            });
+
+            // Substitute qualified table identifiers with either alias or table when multiple tables are present or just empty string
             var substitutions = [];
             suggestAggregateFunctions.tables.forEach(function (table) {
-              var replaceWith = table.alias ? table.alias + '.' : '';
+              var replaceWith = table.alias ? table.alias + '.' : (suggestAggregateFunctions.tables.length > 1 ? table.identifierChain[table.identifierChain.length - 1].name + '.' : '');
               if (table.identifierChain.length > 1) {
                 substitutions.push({
                   replace: new RegExp($.map(table.identifierChain, function (identifier) {
