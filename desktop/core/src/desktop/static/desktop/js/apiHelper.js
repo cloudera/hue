@@ -1700,7 +1700,8 @@ var ApiHelper = (function () {
       url: url,
       hash: hash,
       cacheType: 'optimizer',
-      fetchFunction: fetchFunction
+      fetchFunction: fetchFunction,
+      promise: promise
     }));
   };
 
@@ -1854,6 +1855,7 @@ var ApiHelper = (function () {
    * @param {Function} options.successCallback
    * @param {string} [options.cacheType] - Possible values 'default'|'optimizer'. Default value 'default'
    * @param {Object} [options.editor] - Ace editor
+   * @param {Object} [options.promise] - Optional promise that will be resolved if cached data exists
    */
   var fetchCached = function (options) {
     var self = this;
@@ -1873,6 +1875,10 @@ var ApiHelper = (function () {
         $.totalStorage(cacheIdentifier, cachedData);
       });
     } else {
+      if (options.promise) {
+        options.promise.resolve(cachedData[cachedId].data)
+      }
+
       options.successCallback(cachedData[cachedId].data);
     }
   };
