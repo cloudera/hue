@@ -82,7 +82,10 @@ ${layout.menubar(section='permissions')}
     $editPermissionsComponents.find('#editForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
-        if (data && data.url){
+        if (data && data.status == -1) {
+          renderUseradminErrors(data.errors);
+        }
+        else if (data && data.url) {
           huePubSub.publish('open.link', data.url);
           $.jHueNotify.info("${ _('Permission information updated correctly') }");
         }
