@@ -49,9 +49,9 @@ ${ layout.menubar(section='users') }
       <br/>
       <div class="form-actions">
         % if username:
-          <input type="submit" class="btn btn-primary" value="${_('Update user')}"/>
+          <input type="submit" class="btn btn-primary disable-feedback" value="${_('Update user')}"/>
         % else:
-          <input type="submit" class="btn btn-primary" value="${_('Add/Sync user')}"/>
+          <input type="submit" class="btn btn-primary disable-feedback" value="${_('Add/Sync user')}"/>
         % endif
         <a href="${ url('useradmin.views.list_users') }" class="btn">${_('Cancel')}</a>
       </div>
@@ -73,7 +73,10 @@ ${ layout.menubar(section='users') }
     $addLdapUsersComponents.find('#syncForm').ajaxForm({
       dataType:  'json',
       success: function(data) {
-        if (data && data.status === 0){
+        if (data && data.status == -1) {
+          renderUseradminErrors(data.errors);
+        }
+        else if (data && data.status === 0) {
           huePubSub.publish('open.link', '${ url('useradmin.views.list_users') }');
           $.jHueNotify.info("${ _('User added/synced correctly') }");
         }
@@ -82,6 +85,8 @@ ${ layout.menubar(section='users') }
     %endif
   });
 </script>
+
+${layout.commons()}
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
