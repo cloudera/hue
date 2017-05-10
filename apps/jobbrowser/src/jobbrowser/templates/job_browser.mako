@@ -293,11 +293,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
           <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
           <span data-bind="template: 'breadcrumbs-icons'"></span>
-          <span data-bind="text: id"></span></a>
+          <span data-bind="text: name"></span></a>
         <!-- /ko -->
         <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
           <span data-bind="template: 'breadcrumbs-icons'"></span>
-          <span data-bind="text: id, attr: {title: id}"></span>
+          <span data-bind="text: name, attr: { title: id }"></span>
         <!-- /ko -->
       <!-- /ko -->
       </li>
@@ -807,6 +807,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div class="span2">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
+          <li class="nav-header">${ _('Id') }</li>
+          <li><span data-bind="text: id"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -830,11 +832,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
           <li class="nav-header">${ _('Variables') }</li>
           <li>
             <ul class="nav nav-list" data-bind="foreach: properties['parameters']">
+              <li>
               <!-- ko if: link -->
               <a data-bind="hueLink: link" href="javascript: void(0);">
                 <span data-bind="text: name, attr: { title: value }"></span>
@@ -843,6 +844,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- ko ifnot: link -->
                 <span data-bind="text: name, attr: { title: value }"></span>
               <!-- /ko -->
+              </li>
             </ul>
           </li>
         </ul>
@@ -872,7 +874,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
               <th>${_('log')}</th>
               <th>${_('status')}</th>
               <th>${_('errorMessage')}</th>
@@ -885,7 +886,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </thead>
             <tbody data-bind="foreach: properties['actions']">
               <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }">
-                <td><div class="hueCheckbox fa"></div></td>
                 <td data-bind="text: 'logs'"></td>
                 <td data-bind="text: status"></td>
                 <td data-bind="text: errorMessage"></td>
@@ -1190,7 +1190,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.id = ko.observableDefault(job.id);
       self.doc_url = ko.observableDefault(job.doc_url);
-      self.name = ko.observableDefault(job.name);
+      self.name = ko.observableDefault(job.name || job.id);
       self.type = ko.observableDefault(job.type);
 
       self.status = ko.observableDefault(job.status);
@@ -1363,15 +1363,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var crumbs = [];
 
             if (/^attempt_/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
-              crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().properties['task_id'], 'type': 'task'});
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().name(), 'type': 'app'});
+              crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().name(), 'type': 'task'});
             }
             if (/^task_/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().name(), 'type': 'app'});
             }
 
             if (/-oozie-oozi-W@/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().properties['workflow_id'], 'type': 'workflow'});
+              crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().name(), 'type': 'workflow'});
             }
             else if (/-oozie-oozi-W/.test(vm.job().id())) {
               if (vm.job().properties['bundle_id']()) {
