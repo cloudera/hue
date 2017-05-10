@@ -689,8 +689,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 $('#embeddable_' + app).html(r);
                 self.isLoadingEmbeddable(false);
               },
-              error: function () {
-                page('/500');
+              error: function (xhr) {
+                console.error('Route loading problem', xhr);
+                self.loadApp('500');
               }
             });
           } else {
