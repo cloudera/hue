@@ -587,7 +587,11 @@ def add_ldap_users(request):
   else:
     form = AddLdapUsersForm()
 
-  return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=is_embeddable))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('add_ldap_users.mako', request, dict(form=form, is_embeddable=is_embeddable))
 
 
 def add_ldap_groups(request):
