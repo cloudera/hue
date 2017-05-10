@@ -17,8 +17,6 @@
 
 import logging
 import threading
-import time
-import random
 
 from django.utils.translation import ugettext as _
 
@@ -26,69 +24,84 @@ from desktop.lib.exceptions import StructuredThriftTransportException
 from desktop.lib.exceptions_renderable import PopupException
 
 from libsentry.client2 import SentryClient
-from libsentry.sentry_site import get_sentry_client, is_ha_enabled
+from libsentry.sentry_ha import get_next_available_server, create_client
+from libsentry.sentry_site import get_sentry_server, is_ha_enabled
 
 
 LOG = logging.getLogger(__name__)
 
 API_CACHE = None
 API_CACHE_LOCK = threading.Lock()
-MAX_RETRIES = 15
 
 
 def ha_error_handler(func):
-  def decorator(*args, **kwargs):
-    retries = 0
-    seed = random.random()
 
-    while retries <= MAX_RETRIES:
-      try:
-        return func(*args, **kwargs)
-      except StructuredThriftTransportException, e:
-        if not is_ha_enabled() or retries == MAX_RETRIES:
-          raise PopupException(_('Failed to retry connecting to an available Sentry server.'), detail=e)
+  def decorator(*args, **kwargs):
+    try:
+      return func(*args, **kwargs)
+    except StructuredThriftTransportException, e:
+      if not is_ha_enabled():
+        raise PopupException(_('Failed to connect to Sentry server %s, and Sentry HA is not enabled.') % args[0].client.host, detail=e)
+      else:
+        LOG.warn("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
+        server, attempts = get_next_available_server(SentryClient, args[0].client.username, args[0].client.host)
+        if server is not None:
+          args[0].client = create_client(SentryClient, args[0].client.username, server)
+          set_api_cache(server)
+          return func(*args, **kwargs)
         else:
-          LOG.info('Could not connect to Sentry server %s, attempting to fetch next available client.' % args[0].client.host)
-          time.sleep(1)
-          args[0].client = get_cached_client(args[0].client.username, retries=retries, seed=seed)
-          LOG.info('Picked %s at attempt %s' % (args[0].client, retries))
-          retries += 1
-      except SentryException, e:
-        raise e
-      except Exception, e:
-        raise PopupException(_('Encountered unexpected error in SentryApi.'), detail=e)
+          raise PopupException(_('Failed to find an available Sentry server.'))
+    except (SentryException, PopupException), e:
+      raise e
+    except Exception, e:
+      raise PopupException(_('Encountered unexpected error in SentryApi.'), detail=e)
 
   return decorator
+
+
+def clear_api_cache():
+  global API_CACHE
+  if API_CACHE is not None:
+    LOG.info("Force resetting the currently cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+    API_CACHE = None
+
+
+def set_api_cache(server):
+  global API_CACHE
+  global API_CACHE_LOCK
+  API_CACHE_LOCK.acquire()
+  try:
+    API_CACHE = server
+    LOG.info("Setting cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+  finally:
+    API_CACHE_LOCK.release()
+  return server
+
+
+def get_cached_server(current_host=None):
+  global API_CACHE
+  if current_host and API_CACHE is not None:
+    clear_api_cache()
+
+  if API_CACHE is None:
+    server = get_sentry_server(current_host)
+    if server is not None:
+      set_api_cache(server)
+    else:
+      raise PopupException(_('Failed to find an available Sentry server.'))
+  else:
+    LOG.debug("Returning cached Sentry server: %s:%s" % (API_CACHE['hostname'], API_CACHE['port']))
+
+  return API_CACHE
 
 
 def get_api(user, component):
   if component == 'solr':
     component = component.upper()
 
-  client = get_cached_client(user.username, component=component)
-
+  server = get_cached_server()
+  client = create_client(SentryClient, user.username, server, component)
   return SentryApi(client)
-
-
-def get_cached_client(username, component=None, retries=0, seed=None):
-  exempt_host = None
-  force_reset = retries > 0
-
-  global API_CACHE
-  if force_reset and API_CACHE is not None:
-    exempt_host = API_CACHE.host
-    component = API_CACHE.component
-    LOG.info("Force resetting the cached Sentry client for component %s to exempt current host: %s" % (component, exempt_host))
-    API_CACHE = None
-
-  if API_CACHE is None:
-    API_CACHE_LOCK.acquire()
-    try:
-      API_CACHE = get_sentry_client(username, SentryClient, exempt_host=exempt_host, component=component, retries=retries, seed=seed)
-      LOG.info("Setting cached Sentry client to host: %s" % API_CACHE.host)
-    finally:
-      API_CACHE_LOCK.release()
-  return API_CACHE
 
 
 class SentryApi(object):
