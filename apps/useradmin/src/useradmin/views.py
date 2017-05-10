@@ -718,7 +718,11 @@ def sync_ldap_users_groups(request):
   else:
     form = SyncLdapUsersGroupsForm()
 
-  return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render("sync_ldap_users_groups.mako", request, dict(path=request.path, form=form, is_embeddable=is_embeddable))
 
 
 def sync_ldap_users_and_groups(connection, is_ensuring_home_directory=False, fs=None, failed_users=None):

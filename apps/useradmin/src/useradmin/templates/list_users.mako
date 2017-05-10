@@ -220,11 +220,14 @@ ${layout.menubar(section='users')}
           $usersComponents.find('.sync-ldap form').ajaxForm({
             dataType:  'json',
             success: function(data) {
-              if (data && data.url){
-                huePubSub.publish('open.link', data.url);
+              if (data && data.status == -1) {
+                renderUseradminErrors(data.errors);
               }
-              $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
-              $usersComponents.find(".sync-ldap").modal("hide");
+              else if (data && data.url) {
+                huePubSub.publish('open.link', data.url);
+                $.jHueNotify.info("${ _('The users and groups were update correctly.') }")
+                $usersComponents.find(".sync-ldap").modal("hide");
+              }
             }
           });
           % endif
