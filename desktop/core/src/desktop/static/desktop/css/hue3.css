@@ -67,18 +67,6 @@ code {
   color: #B94A48;
 }
 
-ul.errorlist {
-  list-style: none outside none;
-  margin: 0;
-}
-
-ul.errorlist li {
-  color: #B94A48;
-  padding: 2px;
-  font-weight: bold;
-  font-style: italic;
-}
-
 .hueWell {
   padding-bottom: 0;
 }
