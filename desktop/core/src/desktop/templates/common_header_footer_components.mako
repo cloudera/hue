@@ -643,14 +643,14 @@ from metadata.conf import has_optimizer, OPTIMIZER
     _pathName = _splits[0] + (_splits.length > 1 && $.trim(_splits[1]) != "" ? "/" + _splits[1] : "");
 
     ga('send', 'pageview', {
-      'page': '/remote/${ version }/' + _pathName
+      'page': '/remote/${ version }/' + (IS_HUE_4 ? '4/' : '3/') + _pathName
     });
 
     function trackOnGA(path) {
       if (typeof ga != "undefined" && ga != null) {
         ga('set', 'referrer', 'http://gethue.com'); // we force the referrer to prevent leaking sensitive information
         ga('send', 'pageview', {
-          'page': '/remote/${ version }/' + path
+          'page': '/remote/${ version }/' + (IS_HUE_4 ? '4/' : '3/') + path
         });
       }
     }
