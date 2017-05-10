@@ -184,14 +184,16 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.setInTotalStorage = function(owner, id, value) {
     var self = this;
-    var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
-    if (typeof value !== 'undefined' && value !== null) {
-      cachedData[id] = value;
-      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
-    } else if (cachedData[id]) {
-      delete cachedData[id];
-      $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
-    }
+    try {
+      var cachedData = $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner)) || {};
+      if (typeof value !== 'undefined' && value !== null) {
+        cachedData[id] = value;
+        $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
+      } else if (cachedData[id]) {
+        delete cachedData[id];
+        $.totalStorage("hue.user.settings." + self.getTotalStorageUserPrefix(owner), cachedData, { secure: window.location.protocol.indexOf('https') > -1 });
+      }
+    } catch (e) {}
   };
 
   /**
@@ -1872,7 +1874,9 @@ var ApiHelper = (function () {
           timestamp: (new Date()).getTime(),
           data: data
         };
-        $.totalStorage(cacheIdentifier, cachedData);
+        try {
+          $.totalStorage(cacheIdentifier, cachedData);
+        } catch (e) {}
       });
     } else {
       if (options.promise) {
