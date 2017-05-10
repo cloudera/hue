@@ -2769,6 +2769,10 @@
         }, 10)
       }
 
+      if (typeof valueAccessor().vm != "undefined") {
+        viewModel = valueAccessor().vm;
+      }
+
       if (typeof valueAccessor().update != "undefined") {
         if (options.type == "user" && viewModel.selectableHadoopUsers().indexOf(options.update) == -1) {
           viewModel.availableHadoopUsers.push({
