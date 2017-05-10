@@ -54,7 +54,8 @@ class ParameterForm(forms.Form):
       'hue-id-b',
       'security_enabled',
       'oozie.wf.rerun.failnodes',
-      'dryrun'
+      'dryrun',
+      'send_email'
   )
 
   RERUN_HIDE_PARAMETERS = (
