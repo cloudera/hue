@@ -370,7 +370,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         _resizeTimeout = window.setTimeout(resizeComponents, 100);
       });
 
-      window.onpopstate = function() {
+      window.onhashchange = function() {
         if (window.location.pathname.indexOf('/security') > -1) {
           viewModel.assist.path(window.location.hash.substr(1));
         }
