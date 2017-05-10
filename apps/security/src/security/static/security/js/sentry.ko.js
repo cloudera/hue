@@ -931,6 +931,19 @@ var SentryViewModel = (function () {
       $(document).trigger("create.typeahead");
     };
 
+    self.deletePrivilegeModal = function (role) {
+      var cascadeDeletes = $.grep(role.privilegesChanged(), function (privilege) {
+          return privilege.status() == 'deleted' && (privilege.privilegeScope() == 'SERVER' || privilege.privilegeScope() == 'DATABASE');
+        }
+      );
+      if (cascadeDeletes.length > 0) {
+        self.roleToUpdate(role);
+        huePubSub.publish('show.delete.privilege.modal');
+      } else {
+        self.role().savePrivileges(role);
+      }
+    };
+
     self.privilege = new Privilege(self, {});
 
     self.doAs = ko.observable(initial.user);
