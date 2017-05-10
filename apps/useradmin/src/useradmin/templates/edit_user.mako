@@ -140,12 +140,31 @@ $(document).ready(function(){
 
   % if is_embeddable:
   $editUserComponents.find('#editForm').attr('action', window.location.pathname.substr(4).replace(/\/$/, ''));
+
+  function renderErrors(errors) {
+    $('.control-group').removeClass('error');
+    $('.errorlist').remove();
+    if (errors && errors.length > 0){
+      errors.forEach(function(e){
+        var $el = $('#' + e.id);
+        $el.closest('.control-group').addClass('error');
+        var html = '<span class="help-inline"><ul class="errorlist">';
+        e.message.forEach(function(message){
+          html += '<li>' + message + '</li>';
+        });
+        html += '</ul></span>';
+        $el.after(html);
+      });
+    }
+  }
+
   $editUserComponents.find('#editForm').ajaxForm({
     dataType:  'json',
     success: function(data) {
       if (data && data.status == -1) {
-        $.jHueNotify.info("${ _('Errors: ') }" + data.errors);
-      } else if (data && data.url) {
+        renderErrors(data.errors);
+      }
+      else if (data && data.url) {
         huePubSub.publish('open.link', data.url);
         $.jHueNotify.info("${ _('User information updated correctly') }");
       }
@@ -224,12 +243,14 @@ $(document).ready(function(){
     $(this).parent().find(".help-inline").remove();
   });
 
+  % if not is_embeddable:
   $editUserComponents.find("#editForm").on("submit", function(){
     if (validateStep("step1") && validateStep("step2")) {
       return true;
     }
     return false;
   })
+  % endif
 });
 </script>
 
