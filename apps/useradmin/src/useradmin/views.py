@@ -386,11 +386,14 @@ def edit_user(request, username=None):
       'is_embeddable': is_embeddable
     })
   else:
-    return render('edit_user.mako', request, {
-      'form': form,
-      'username': username,
-      'is_embeddable': is_embeddable
-    })
+    if request.method == 'POST' and is_embeddable:
+      return JsonResponse({'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+    else:
+      return render('edit_user.mako', request, {
+        'form': form,
+        'username': username,
+        'is_embeddable': is_embeddable
+      })
 
 
 def view_user(request, username):  
