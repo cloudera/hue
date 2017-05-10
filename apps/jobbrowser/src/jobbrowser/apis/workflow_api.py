@@ -96,6 +96,9 @@ class WorkflowApi(Api):
         'apiStatus': self._api_status(workflow.status),
         'progress': workflow.get_progress(),
         'type': 'workflow',
+        'user': workflow.user,
+        'duration': workflow.durationTime,
+        'submitted': workflow.submissionTime
     }
 
     request = MockDjangoRequest(self.user)

@@ -24,6 +24,7 @@ http://incubator.apache.org/oozie/docs/3.2.0-incubating/docs/WebServicesAPI.html
 
 import logging
 import re
+import time
 
 from cStringIO import StringIO
 from time import mktime
@@ -33,7 +34,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.log.access import access_warn
 
 import hadoop.confparse
-from liboozie.utils import parse_timestamp, format_time
+from liboozie.utils import parse_timestamp, format_time, catch_unicode_time
 
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
@@ -474,6 +475,14 @@ class Workflow(Job):
       else:
         total_actions = len(self.actions)
       return int(sum([action.is_finished() for action in self.actions]) / float(max(total_actions, 1)) * 100)
+
+  @property
+  def durationTime(self):
+    return self.endTime and self.startTime and ((time.mktime(self.endTime) - time.mktime(self.startTime)) * 1000) or 0
+
+  @property
+  def submissionTime(self):
+    return hasattr(self, 'createdTime') and self.createdTime and time.mktime(catch_unicode_time(self.createdTime)) or 0
 
 
 class Coordinator(Job):
