@@ -162,7 +162,7 @@ table.display td.center {
   background: url('../art/datatables/sort_desc.png') no-repeat center right;
 }
 
-.table-huedatatable {
+.table-huedatatable, .dataTables_wrapper table {
   margin-bottom: 0!important;
   thead {
     th {
@@ -170,6 +170,14 @@ table.display td.center {
       background-color: @cui-white;
     }
   }
+  border: none;
+  tbody tr:nth-child(odd) {
+    background-color: @cui-gray-050;
+  }
+}
+
+.dataTables_wrapper table th {
+  border-top: 1px solid transparent!important;
 }
 
 .table-huedatatable td.stripe {

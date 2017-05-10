@@ -1230,6 +1230,11 @@ ${ components.menubar() }
           // viewModel.database().table().getRelationships();
         } else if (tab == 'table-sample') {
           var selector = '#sample .sample-table';
+          % if conf.CUSTOM.BANNER_TOP_HTML.get():
+            var bannerTopHeight = 30;
+          % else:
+            var bannerTopHeight = 0;
+          % endif
           if ($(selector).parents('.dataTables_wrapper').length == 0){
             hueUtils.waitForRendered(selector, function(el){ return el.find('td').length > 0 }, function(){
               $(selector).dataTable({
@@ -1245,14 +1250,18 @@ ${ components.menubar() }
                 },
                 "fnDrawCallback": function (oSettings) {
                   $(selector).parents('.dataTables_wrapper').css('overflow-x', 'hidden');
-                  $(selector).jHueTableExtender({
+                  $(selector).jHueTableExtender2({
                     fixedHeader: true,
                     fixedFirstColumn: true,
                     includeNavigator: false,
                     parentId: 'sample',
                     classToRemove: 'sample-table',
                     mainScrollable: '${ MAIN_SCROLLABLE }',
-                    stickToTopPosition: 73,
+                    % if is_embeddable:
+                    stickToTopPosition: 51 + bannerTopHeight,
+                    % else:
+                    stickToTopPosition: 76 + bannerTopHeight,
+                    % endif
                     clonedContainerPosition: 'fixed',
                     app: 'metastore'
                   });

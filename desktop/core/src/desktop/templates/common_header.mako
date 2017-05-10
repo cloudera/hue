@@ -75,7 +75,7 @@ if USE_NEW_EDITOR.get():
         padding-top: ${str(int(padding[:-2]) + 30) + 'px'};
       }
       .banner {
-        height: 40px;
+        height: 30px;
         width: 100%;
         padding: 0;
         position: fixed;
