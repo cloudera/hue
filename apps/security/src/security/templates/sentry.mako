@@ -178,7 +178,7 @@ ${ layout.menubar(section=component) }
           <li class="nav-header"><i class="fa fa-group"></i> ${ _('Groups') }
             <div>
             <br/>
-             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true }" style="width: 100%"></select>
+             <select id="selectedGroup" data-bind="options: $root.selectableHadoopGroups, select2: { dropdownAutoWidth: true, update: $data.action, type: 'action', allowClear: true, vm: $root }" style="width: 100%"></select>
             </div>
           </li>
         </ul>
@@ -245,7 +245,7 @@ ${ layout.menubar(section=component) }
                         </li>
                       </ul>
                     </div>
-                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user'}" style="width: 120px"></select>
+                    <select class="user-list" data-bind="options: $root.selectableHadoopUsers, select2: { dropdownAutoWidth: true, placeholder: '${ _ko("Select a user") }', update: $root.doAs, type: 'user', vm: $root}" style="width: 120px"></select>
                     % endif
                   </div>
                   <div>
@@ -381,7 +381,7 @@ ${ layout.menubar(section=component) }
                       </a>
                     <!-- /ko -->
                     <!-- ko if: showEditGroups() || (groupsChanged() && ! $root.isLoadingRoles()) -->
-                      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group' }" size="5" multiple="true" style="width: 400px"></select>
+                      <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', vm: $root }" size="5" multiple="true" style="width: 400px"></select>
                       <span data-bind="visible: groupsChanged() && !$root.isLoadingRoles()">
                         &nbsp;
                         <a class="pointer" data-bind="click: resetGroups"><i class="fa fa-undo"></i></a>
@@ -447,7 +447,7 @@ ${ layout.menubar(section=component) }
       </div>
       <div class="span6">
         <h4>${ _('Groups') }</h4>
-        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', placeholder: '${ _ko("Optional") }' }" size="5" multiple="true" style="width: 360px"></select>
+        <select data-bind="options: $root.selectableHadoopGroups, selectedOptions: groups, select2: { dropdownAutoWidth: true, update: groups, type: 'group', placeholder: '${ _ko("Optional") }', vm: $root }" size="5" multiple="true" style="width: 360px"></select>
       </div>
     </div>
 
@@ -478,7 +478,7 @@ ${ layout.menubar(section=component) }
 
     <br/>
     <span>${ _('To role') }&nbsp;&nbsp;</span>
-    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { dropdownAutoWidth: true, update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role' }" style="width: 360px"></select>
+    <select data-bind="options: $root.selectableRoles(), value: $root.grantToPrivilegeRole, select2: { dropdownAutoWidth: true, update: $root.grantToPrivilegeRole, placeholder: '${ _ko("Select a role") }', type: 'role', vm: $root }" style="width: 360px"></select>
     <br/>
 
   </div>
