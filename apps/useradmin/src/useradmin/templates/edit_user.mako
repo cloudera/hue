@@ -23,10 +23,13 @@ from useradmin.views import is_user_locked_out
 %>
 
 <%namespace name="layout" file="layout.mako" />
+
 %if not is_embeddable:
 ${ commonheader(_('Hue Users'), "useradmin", user, request) | n,unicode }
 %endif
+
 ${ layout.menubar(section='users') }
+
 
 <div id="editUserComponents" class="container-fluid">
   <div class="card card-small">
@@ -74,20 +77,20 @@ ${ layout.menubar(section='users') }
         ${layout.render_field(form["ensure_home_directory"])}
         </div>
         <div id="step2" class="stepDetails hide">
-        % if "first_name" in form.fields:
-                  ${layout.render_field(form["first_name"])}
-                  ${layout.render_field(form["last_name"])}
-                % endif
+          % if "first_name" in form.fields:
+            ${layout.render_field(form["first_name"])}
+            ${layout.render_field(form["last_name"])}
+          % endif
 
-                ${layout.render_field(form["email"])}
+          ${layout.render_field(form["email"])}
 
-                %if request.user.username == username:
-                  ${layout.render_field(form["language"])}
-                % endif
+          %if request.user.username == username:
+            ${layout.render_field(form["language"])}
+          % endif
 
-                % if user.is_superuser:
-                  ${layout.render_field(form["groups"])}
-                % endif
+          % if user.is_superuser:
+            ${layout.render_field(form["groups"])}
+          % endif
         </div>
       % if user.is_superuser:
         <div id="step3" class="stepDetails hide">
@@ -140,7 +143,9 @@ $(document).ready(function(){
   $editUserComponents.find('#editForm').ajaxForm({
     dataType:  'json',
     success: function(data) {
-      if (data && data.url){
+      if (data && data.status == -1) {
+        $.jHueNotify.info("${ _('Errors: ') }" + data.errors);
+      } else if (data && data.url) {
         huePubSub.publish('open.link', data.url);
         $.jHueNotify.info("${ _('User information updated correctly') }");
       }
