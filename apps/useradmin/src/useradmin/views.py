@@ -612,6 +612,8 @@ def add_ldap_groups(request):
     }
     raise PopupException(_("You must be a superuser to add another group."), error_code=401)
 
+  is_embeddable = request.GET.get('is_embeddable', request.POST.get('is_embeddable', False))
+
   if request.method == 'POST':
     form = AddLdapGroupsForm(request.POST)
     if form.is_valid():
@@ -663,7 +665,11 @@ def add_ldap_groups(request):
   else:
     form = AddLdapGroupsForm()
 
-  return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=request.GET.get('is_embeddable', False)))
+  if request.method == 'POST' and is_embeddable:
+    return JsonResponse(
+      {'status': -1, 'errors': [{'id': f.id_for_label, 'message': f.errors} for f in form if f.errors]})
+  else:
+    return render('edit_group.mako', request, dict(form=form, action=request.path, ldap=True, is_embeddable=is_embeddable))
 
 
 def sync_ldap_users_groups(request):
