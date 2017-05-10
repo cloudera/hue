@@ -91,25 +91,36 @@ def get_sentry_server_rpc_addresses():
 
 
 def get_sentry_server_rpc_port():
-  return int(get_conf().get(_CONF_SENTRY_SERVER_RPC_PORT, '8038'))
+  return get_conf().get(_CONF_SENTRY_SERVER_RPC_PORT, '8038')
 
 
 def is_ha_enabled():
   return get_sentry_server_rpc_addresses() is not None
 
 
-def get_sentry_client(username, client_class, exempt_host=None, component=None, retries=0, seed=None):
-  server = None
-
+def get_sentry_server(current_host=None):
+  '''
+  Returns the next Sentry server if current_host is set, or a random server if current_host is None.
+    If servers contains a single server, the server will be set to the same current_host.
+    If servers is None, attempts to fallback to libsentry configs, else raises exception.
+  @param current_host: currently set host, if any
+  @return: server dict with hostname and port key/values
+  '''
   if is_ha_enabled():
-    servers = _get_server_properties(exempt_host=exempt_host)
-    seed_function = lambda: seed if seed else random.random()
+    servers = get_sentry_servers()
+    hosts = [s['hostname'] for s in servers]
 
-    random.shuffle(servers, seed_function)
-    if servers and retries < len(servers):
-      server = servers[retries]
-    else:
-      raise PopupException(_('Tried %s Sentry servers HA, none are available.') % retries)
+    next_idx = random.randint(0, len(servers)-1)
+    if current_host is not None and hosts:
+      try:
+        current_idx = hosts.index(current_host)
+        LOG.debug("Current Sentry host, %s, index is: %d." % (current_host, current_idx))
+        next_idx = (current_idx + 1) % len(servers)
+      except ValueError, e:
+        LOG.warn("Current host: %s not found in list of servers: %s" % (current_host, ','.join(hosts)))
+
+    server = servers[next_idx]
+    LOG.debug("Returning Sentry host, %s, at next index: %d." % (server['hostname'], next_idx))
   else:
     if HOSTNAME.get() and PORT.get():
       LOG.info('No Sentry servers configured in %s, falling back to libsentry configured host: %s:%s' %
@@ -121,15 +132,10 @@ def get_sentry_client(username, client_class, exempt_host=None, component=None, 
     else:
       raise PopupException(_('No Sentry servers are configured.'))
 
-  if component:
-    client = client_class(server['hostname'], server['port'], username, component=component)
-  else:
-    client = client_class(server['hostname'], server['port'], username)
-
-  return client
+  return server
 
 
-def _get_server_properties(exempt_host=None):
+def get_sentry_servers():
   try:
     servers = []
     sentry_servers = get_sentry_server_rpc_addresses()
@@ -141,11 +147,11 @@ def _get_server_properties(exempt_host=None):
         port = get_sentry_server_rpc_port()
       else:
         port = PORT.get()
-      if host != exempt_host:
-        servers.append({'hostname': host, 'port': int(port)})
+      servers.append({'hostname': host, 'port': int(port)})
   except Exception, e:
     raise PopupException(_('Error in retrieving Sentry server properties.'), detail=e)
 
+  LOG.debug("Sentry servers are: %s" % ', '.join(['%s:%d' % (s['hostname'], s['port']) for s in servers]))
   return servers
 
 
