@@ -24,6 +24,7 @@ import uuid
 from tempfile import NamedTemporaryFile
 from urlparse import urlparse
 
+from django.core.cache import cache
 from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 
@@ -42,6 +43,7 @@ LOG = logging.getLogger(__name__)
 
 
 _JSON_CONTENT_TYPE = 'application/json'
+OPTIMIZER_TENANT_ID_CACHE_KEY = 'navopt-tenant-id'
 
 
 class NavOptException(Exception):
@@ -80,33 +82,6 @@ def check_privileges(view_func):
   return wraps(view_func)(decorate)
 
 
-def _secure_results(results, user, action='SELECT'):
-    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
-      checker = get_checker(user=user)
-
-      def getkey(result):
-        key = {'server': get_hive_sentry_provider()}
-
-        if 'dbName' in result:
-          key['db'] = result['dbName']
-        elif 'database' in result:
-          key['db'] = result['database']
-        if 'tableName' in result:
-          key['table'] = result['tableName']
-        elif 'table' in result:
-          key['table'] = result['table']
-        if 'columnName' in result:
-          key['column'] = result['columnName']
-        elif 'column' in result:
-          key['column'] = result['column']
-
-        return key
-
-      return checker.filter_objects(results, action, key=getkey)
-    else:
-      return results
-
-
 class OptimizerApi(object):
 
   def __init__(self, user, api_url=None, auth_key=None, auth_key_secret=None, tenant_id=None):
@@ -118,7 +93,7 @@ class OptimizerApi(object):
 
     self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._auth_key, self._auth_key_secret)
 
-    self._tenant_id = tenant_id if tenant_id else (OPTIMIZER.TENANT_ID.get() or self.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())['tenant']) # Aka "workload"
+    self._tenant_id = tenant_id if tenant_id else _get_tenant_id(self) # Aka "workload"
 
 
   def _call(self, *kwargs):
@@ -390,3 +365,38 @@ def _get_table_name(path):
   if column:
     name['column'] = column
   return name
+
+
+def _secure_results(results, user, action='SELECT'):
+    if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
+      checker = get_checker(user=user)
+
+      def getkey(result):
+        key = {'server': get_hive_sentry_provider()}
+
+        if 'dbName' in result:
+          key['db'] = result['dbName']
+        elif 'database' in result:
+          key['db'] = result['database']
+        if 'tableName' in result:
+          key['table'] = result['tableName']
+        elif 'table' in result:
+          key['table'] = result['table']
+        if 'columnName' in result:
+          key['column'] = result['columnName']
+        elif 'column' in result:
+          key['column'] = result['column']
+
+        return key
+
+      return checker.filter_objects(results, action, key=getkey)
+    else:
+      return results
+
+
+def _get_tenant_id(api):
+  tenant_id = OPTIMIZER.TENANT_ID.get() or cache.get(OPTIMIZER_TENANT_ID_CACHE_KEY)
+  if not tenant_id:
+    tenant_id = api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())['tenant']
+    cache.set(OPTIMIZER_TENANT_ID_CACHE_KEY, tenant_id, 60 * 60 * 24 * 30)
+  return tenant_id
