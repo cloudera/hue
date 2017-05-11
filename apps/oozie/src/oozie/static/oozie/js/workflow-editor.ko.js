@@ -1318,8 +1318,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     }
   }
 
-  huePubSub.subscribe('draw.graph.arrows', self.drawArrows);
-
   function bareWidgetBuilder(name, type) {
     return new ExtendedWidget({
       size: 12,

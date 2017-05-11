@@ -1233,7 +1233,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.id = ko.observableDefault(job.id);
       self.id.subscribe(function () {
-        huePubSub.publish('stop.refresh.view');
+        huePubSub.publish('graph.stop.refresh.view');
       });
       self.doc_url = ko.observableDefault(job.doc_url);
       self.name = ko.observableDefault(job.name || job.id);
@@ -1530,28 +1530,47 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.workflowGraphLoaded = false;
+
+      self.lastArrowsPosition = {
+        top: 0,
+        left: 0
+      }
+
+      self.initialArrowsDrawingCount = 0;
+      self.initialArrowsDrawing = function() {
+        if (self.initialArrowsDrawingCount < 20) {
+          self.initialArrowsDrawingCount++;
+          huePubSub.publish('graph.draw.arrows');
+          window.setTimeout(self.initialArrowsDrawing, 100);
+        }
+        else if (self.initialArrowsDrawingCount < 30){
+          self.initialArrowsDrawingCount++;
+          huePubSub.publish('graph.draw.arrows');
+          window.setTimeout(self.initialArrowsDrawing, 500);
+        }
+        else {
+          self.initialArrowsDrawingCount = 0;
+        }
+      }
+
+      self.updateArrowsTimeout = -1;
+      self.updateArrows = function() {
+        if ($('canvas').length > 0 && $('canvas').position().top !== self.lastArrowsPosition.top && $('canvas').position().left !== self.lastArrowsPosition.left) {
+          self.lastArrowsPosition = $('canvas').position();
+        }
+        if ($('#workflow-page-graph').is(':visible')){
+          if ($('canvas').length === 0){
+            huePubSub.publish('graph.draw.arrows');
+          }
+        }
+        else {
+          $('canvas').remove();
+        }
+        self.updateArrowsTimeout = window.setTimeout(self.updateArrows, 100);
+      }
+
       self.updateWorkflowGraph = function() {
-        var lastPosition = {
-          top: 0,
-          left: 0
-        }
-
-        var updateArrowPosition = function () {
-          huePubSub.publish('draw.graph.arrows');
-          if ($('canvas').length > 0 && $('canvas').position().top !== lastPosition.top && $('canvas').position().left !== lastPosition.left) {
-            lastPosition = $('canvas').position();
-            window.setTimeout(updateArrowPosition, 100);
-          }
-        }
-
-        var arrowsPolling = function () {
-          if ($('#workflow-page-graph').is(':visible')){
-            window.setTimeout(arrowsPolling, 100);
-          }
-          else {
-            $('canvas').remove();
-          }
-        }
+        huePubSub.publish('graph.stop.refresh.view');
 
         $('canvas').remove();
 
@@ -1580,8 +1599,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 response: response,
                 callback: function (r) {
                   $('#workflow-page-graph').html(r);
-                  updateArrowPosition();
-                  arrowsPolling();
+                  window.clearTimeout(self.updateArrowsTimeout);
+                  self.initialArrowsDrawing();
+                  self.updateArrows();
                 }
               });
             }
@@ -1924,7 +1944,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
       self.selectInterface = function(interface) {
-        huePubSub.publish('stop.refresh.view');
+        huePubSub.publish('graph.stop.refresh.view');
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
@@ -1975,7 +1995,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.load = function() {
         var h = window.location.hash;
-        huePubSub.publish('stop.refresh.view');
+        huePubSub.publish('graph.stop.refresh.view');
 
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
