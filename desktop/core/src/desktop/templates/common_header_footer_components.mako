@@ -298,35 +298,38 @@ from metadata.conf import has_optimizer, OPTIMIZER
       });
 
       % if 'jobbrowser' in apps:
-      var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
-      var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
-      var lastJobBrowserRequest = null;
+      if (!IS_HUE_4) {
+        var JB_CHECK_INTERVAL_IN_MILLIS = 30000;
+        var checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, 10);
+        var lastJobBrowserRequest = null;
 
-      function checkJobBrowserStatus(){
-        if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
-          return;
-        }
-        window.clearTimeout(checkJobBrowserStatusIdx);
-        lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
-            "format": "json",
-            "state": "running",
-            "user": "${user.username}"
-          },
-          function(data) {
-            if (data != null && data.jobs != null) {
-              huePubSub.publish('jobbrowser.data', data.jobs);
-              if (data.jobs.length > 0){
-                $("#jobBrowserCount").show().text(data.jobs.length);
-              } else {
-                $("#jobBrowserCount").hide();
-              }
-            }
-          checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
-        }).fail(function () {
+        function checkJobBrowserStatus() {
+          if (lastJobBrowserRequest !== null && lastJobBrowserRequest.readyState < 4) {
+            return;
+          }
           window.clearTimeout(checkJobBrowserStatusIdx);
-        });
+          lastJobBrowserRequest = $.post("/jobbrowser/jobs/", {
+                "format": "json",
+                "state": "running",
+                "user": "${user.username}"
+              },
+              function (data) {
+                if (data != null && data.jobs != null) {
+                  huePubSub.publish('jobbrowser.data', data.jobs);
+                  if (data.jobs.length > 0) {
+                    $("#jobBrowserCount").show().text(data.jobs.length);
+                  } else {
+                    $("#jobBrowserCount").hide();
+                  }
+                }
+                checkJobBrowserStatusIdx = window.setTimeout(checkJobBrowserStatus, JB_CHECK_INTERVAL_IN_MILLIS);
+              }).fail(function () {
+            window.clearTimeout(checkJobBrowserStatusIdx);
+          });
+        }
+
+        huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
       }
-      huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
       % endif
 
       function openDropdown(which, timeout){
