@@ -109,23 +109,17 @@ def _secure_results(results, user, action='SELECT'):
 
 class OptimizerApi(object):
 
-  def __init__(self, user, api_url=None, product_name=None, product_secret=None, ssl_cert_ca_verify=OPTIMIZER.SSL_CERT_CA_VERIFY.get(), product_auth_secret=None):
+  def __init__(self, user, api_url=None, auth_key=None, auth_key_secret=None, tenant_id=None):
     self.user = user
     self._api_url = (api_url or get_optimizer_url()).strip('/')
+    self._auth_key = auth_key if auth_key else OPTIMIZER.AUTH_KEY.get()
+    self._auth_key_secret = auth_key_secret if auth_key_secret else (OPTIMIZER.AUTH_KEY_SECRET.get() and OPTIMIZER.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
     self._email = OPTIMIZER.EMAIL.get()
-    self._email_password = OPTIMIZER.EMAIL_PASSWORD.get()
-    self._product_secret = product_secret if product_secret else OPTIMIZER.PRODUCT_SECRET.get()
-    self._product_auth_secret = product_auth_secret if product_auth_secret else (OPTIMIZER.PRODUCT_AUTH_SECRET.get() and OPTIMIZER.PRODUCT_AUTH_SECRET.get().replace('\\n', '\n'))
 
-    self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._product_secret, self._product_auth_secret)
+    self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._auth_key, self._auth_key_secret)
 
-    self._product_name = product_name if product_name else (OPTIMIZER.PRODUCT_NAME.get() or self.get_tenant()['tenant']) # Aka "workload"
+    self._tenant_id = tenant_id if tenant_id else (OPTIMIZER.TENANT_ID.get() or self.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())['tenant']) # Aka "workload"
 
-  def _authenticate(self, force=False):
-    if self._token is None or force:
-      self._token = self.authenticate()['token']
-
-    return self._token
 
   def _call(self, *kwargs):
     resp = self._api.call_api(*kwargs)
@@ -141,12 +135,14 @@ class OptimizerApi(object):
     else:
       return data
 
-  def get_tenant(self, email=None):
-    return self._call("getTenant", {"email" : email or self._email})
 
+  def get_tenant(self, email=None, cluster_id=None):
+    if cluster_id is not None:
+      args = {'clusterId' : cluster_id}
+    else:
+      args = {'email': email or self._email}
 
-  def create_tenant(self, group):
-    return self._call('createTenant', {'userGroup' : group})
+    return self._call('getTenant', args)
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
@@ -193,7 +189,7 @@ class OptimizerApi(object):
         f_queries.close()
 
       parameters = {
-          'tenant' : self._product_name,
+          'tenant' : self._tenant_id,
           'fileLocation': f_queries.name,
           'sourcePlatform': source_platform,
       }
@@ -211,11 +207,11 @@ class OptimizerApi(object):
 
 
   def upload_status(self, workload_id):
-    return self._call('uploadStatus', {'tenant' : self._product_name, 'workloadId': workload_id})
+    return self._call('uploadStatus', {'tenant' : self._tenant_id, 'workloadId': workload_id})
 
   @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
-    data = self._call('getTopTables', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'pageSize': page_size, startingToken: startingToken})
+    data = self._call('getTopTables', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
 
     if OPTIMIZER.APPLY_SENTRY_PERMISSIONS.get():
       checker = get_checker(user=self.user)
@@ -231,16 +227,16 @@ class OptimizerApi(object):
 
   @check_privileges
   def table_details(self, database_name, table_name, page_size=100, startingToken=None):
-    return self._call('getTablesDetail', {'tenant' : self._product_name, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, startingToken: startingToken})
+    return self._call('getTablesDetail', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'tableName': table_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
 
 
   def query_compatibility(self, source_platform, target_platform, query, page_size=100, startingToken=None):
-    return self._call('getQueryCompatible', {'tenant' : self._product_name, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, startingToken: startingToken})
+    return self._call('getQueryCompatible', {'tenant' : self._tenant_id, 'query': query, 'sourcePlatform': source_platform, 'targetPlatform': target_platform, 'startingToken': startingToken})
 
 
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
     response = self._call('getQueryRisk', {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'query': query,
       'dbName': db_name,
       'sourcePlatform': source_platform,
@@ -261,7 +257,7 @@ class OptimizerApi(object):
 
   def similar_queries(self, source_platform, query, page_size=100, startingToken=None):
     if self.user.is_superuser:
-      return self._call('getSimilarQueries', {'tenant' : self._product_name, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, startingToken: startingToken})
+      return self._call('getSimilarQueries', {'tenant' : self._tenant_id, 'sourcePlatform': source_platform, 'query': query, 'pageSize': page_size, 'startingToken': startingToken})
     else:
       raise PopupException(_('Call not supported'))
 
@@ -269,7 +265,7 @@ class OptimizerApi(object):
   @check_privileges
   def top_filters(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -291,7 +287,7 @@ class OptimizerApi(object):
   @check_privileges
   def top_aggs(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -317,7 +313,7 @@ class OptimizerApi(object):
   @check_privileges
   def top_columns(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -335,7 +331,7 @@ class OptimizerApi(object):
   @check_privileges
   def top_joins(self, db_tables=None, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'pageSize': page_size,
       'startingToken': startingToken
     }
@@ -356,7 +352,7 @@ class OptimizerApi(object):
 
   def top_databases(self, page_size=100, startingToken=None):
     args = {
-      'tenant' : self._product_name,
+      'tenant' : self._tenant_id,
       'pageSize': page_size,
       'startingToken': startingToken
     }
