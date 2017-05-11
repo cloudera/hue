@@ -58,8 +58,13 @@ var AutocompleteResults = (function () {
 
   var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
     suggestions.forEach(function (suggestion) {
-      suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
-      suggestion.weightAdjust = suggestion.details.popularity.relativePopularity;
+      var relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
+      if (relativePopularity < 5) {
+        suggestion.popular(false);
+      } else {
+        suggestion.details.popularity.relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
+        suggestion.weightAdjust = suggestion.details.popularity.relativePopularity;
+      }
     });
   };
 
