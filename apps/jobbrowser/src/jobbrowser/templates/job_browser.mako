@@ -1365,21 +1365,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.conditionalFetchJob = function () {
-        if (vm.isMini()) {
-          huePubSub.publish('hide.jobs.panel');
-          if (window.location.pathname.indexOf('jobbrowser') > -1) {
-            window.location.hash = '#!id=' + self.id();
-          }
-          else {
-            huePubSub.publish('open.link', '/jobbrowser/#!id=' + self.id())
-          }
-        }
-        else {
-          self.fetchJob();
-        }
-      };
-
       self.fetchJob = function () {
         vm.apiHelper.cancelActiveRequest(lastFetchJobRequest);
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
