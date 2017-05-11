@@ -19,7 +19,7 @@ import logging
 
 from django.utils.translation import ugettext_lazy as _t
 
-from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, default_ssl_validate
+from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
 from desktop.lib.conf import Config, ConfigSection, coerce_bool, coerce_password_from_script
 from desktop.lib.paths import get_config_root
 
@@ -72,43 +72,41 @@ OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
-    CACHEABLE_TTL=Config(
-      key='cacheable_ttl',
-      type=int,
-      help=_t('The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 to disable the cache.'),
-      default=432000000),
-
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Optimizer API (e.g. - https://alpha.optimizer.cloudera.com/)'),
       default=None),
 
-    PRODUCT_NAME=Config(
-      key="product_name",
-      help=_t("The name of the product or group which will have API access to the emails associated with it."),
+    AUTH_KEY=Config(
+      key="auth_key",
+      help=_t("The name of the key of the service."),
+      private=False,
+      default=None),
+    AUTH_KEY_SECRET=Config(
+      key="auth_key_secret",
+      help=_t("The private part of the key associated with the auth_key."),
       private=True,
       default=None),
-    PRODUCT_SECRET=Config(
-      key="product_secret",
-      help=_t("A secret passphrase associated with the productName."),
-      private=True,
-      default=None),
-    PRODUCT_SECRET_SCRIPT=Config(
-      key="product_secret_script",
-      help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
+    AUTH_KEY_SECRET_SCRIPT=Config(
+      key="auth_key_secret_script",
+      help=_t("Execute this script to produce the auth_key secret. This will be used when `auth_key_secret` is not set."),
       private=True,
       type=coerce_password_from_script,
       default=None),
-    PRODUCT_AUTH_SECRET=Config(
-      key="product_auth_secret",
-      help=_t("A secret passphrase associated with the productName."),
+    TENANT_ID=Config(
+      key="tenant_id",
+      help=_t("The name of the workload where queries are uploaded and optimizations are calculated from. Automatically guessed from auth_key and cluster_id if not specified."),
       private=True,
       default=None),
-    PRODUCT_AUTH_SECRET_SCRIPT=Config(
-      key="product_auth_secret_script",
-      help=_t("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
+    CLUSTER_ID=Config(
+      key="cluster_id",
+      help=_t("The name of the cluster used to determine the tenant id when this one is not specified. Defaults to the cluster Id or 'default'."),
       private=True,
-      type=coerce_password_from_script,
+      default=DEFAULT_CLUSTER_ID.get()),
+    EMAIL=Config(
+      key="email",
+      help=_t("The email of the Optimizer account to use (deprecated)."),
+      private=True,
       default=None),
 
     APPLY_SENTRY_PERMISSIONS = Config(
@@ -117,6 +115,11 @@ OPTIMIZER = ConfigSection(
       dynamic_default=get_security_default,
       type=coerce_bool
     ),
+    CACHEABLE_TTL=Config(
+      key='cacheable_ttl',
+      type=int,
+      help=_t('The cache TTL in milliseconds for the assist/autocomplete/etc calls. Set to 0 to disable the cache.'),
+      default=432000000),
     AUTO_UPLOAD_QUERIES = Config(
       key="auto_upload_queries",
       help=_t("Automatically upload queries after their execution in order to improve recommendations."),
@@ -128,30 +131,6 @@ OPTIMIZER = ConfigSection(
       help=_t("Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable."),
       default=10000,
       type=int
-    ),
-
-    EMAIL=Config(
-      key="email",
-      help=_t("The email of the Optimizer account you want to associate with the Product."),
-      private=True,
-      dynamic_default=get_auth_username),
-    EMAIL_PASSWORD=Config(
-      key="email_password",
-      help=_t("The password associated with the Optimizer account you to associate with the Product."),
-      private=True,
-      default=None),
-    EMAIL_PASSWORD_SCRIPT=Config(
-      key="password_script",
-      help=_t("Execute this script to produce the email password. This will be used when `email_password` is not set."),
-      private=True,
-      type=coerce_password_from_script,
-      default=None),
-
-    SSL_CERT_CA_VERIFY = Config(
-      key="ssl_cert_ca_verify",
-      help=_t("In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority"),
-      dynamic_default=default_ssl_validate,
-      type=coerce_bool
     ),
   )
 )
