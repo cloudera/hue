@@ -1954,14 +1954,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.jobs = new Jobs(self);
       self.job = ko.observable();
-      var clock;
+
+      var updateJobInterval = -1;
+      var updateJobsInterval = -1;
       self.job.subscribe(function(val) {
-        clearInterval(clock);
+        window.clearInterval(updateJobInterval);
+        window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (val) {
-            clock = setInterval(val.updateJob, 5000, 'jobbrowser');
-          } else {
-            clock = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
+            updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+          }
+          else {
+            updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
           }
         }
       });
