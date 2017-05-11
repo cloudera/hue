@@ -119,7 +119,9 @@ var AssistDbSource = (function () {
           successCallback: function (data) {
             var popularityIndex = {};
             data.top_tables.forEach(function (topTable) {
-              popularityIndex[topTable.name] = topTable.popularity;
+              if (topTable.popularity >= 5) {
+                popularityIndex[topTable.name] = topTable.popularity;
+              }
             });
             var applyPopularity = function () {
               db.entries().forEach(function (entry) {
@@ -134,10 +136,15 @@ var AssistDbSource = (function () {
 
             if (db.loading()) {
               var subscription = db.loading.subscribe(function () {
-                if (subscription) {
-                  subscription.dispose();
-                }
+                subscription.dispose();
                 applyPopularity();
+              });
+            } else if (db.entries().length == 0) {
+              var subscription = db.entries.subscribe(function (newEntries) {
+                if (newEntries.length > 0) {
+                  subscription.dispose();
+                  applyPopularity();
+                }
               });
             } else {
               applyPopularity();
