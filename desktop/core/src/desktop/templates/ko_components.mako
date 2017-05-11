@@ -444,7 +444,6 @@ from desktop.views import _ko
             }).fail(function () {
             window.clearTimeout(checkJobBrowserStatusIdx);
           });
-
         };
 
         // load the mini jobbrowser
