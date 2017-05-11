@@ -929,26 +929,67 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
+          <li class="nav-header">${ _('Job') }</li>
+          <li>
+            <a data-bind="hueLink: '/jobbrowser/jobs/' + properties['externalId']()" href="javascript: void(0);">
+              <span data-bind="text: properties['externalId']"></span>
+            </a>
+          </li>
           <li class="nav-header">${ _('Status') }</li>
           <li><span data-bind="text: status"></span></li>
-          <li class="nav-header">${ _('User') }</li>
-          <li><span data-bind="text: user"></span></li>
-          <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
-          <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
-              <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
-            </div>
-          </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
         </ul>
       </div>
     </div>
+
     <div class="span10">
-      Log (if external id) | Child jobs
+      <ul class="nav nav-tabs margin-top-20">
+        <li class="active"><a href="#workflow-action-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a href="#workflow-action-page-tasks" data-toggle="tab">${ _('Child jobs') }</a></li>
+        <li><a href="#workflow-action-page-xml" data-toggle="tab">${ _('XML') }</a></li>
+      </ul>
+
+      <div class="tab-content">
+        <div class="tab-pane" id="workflow-action-page-metadata">
+          <table class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Name')}</th>
+              <th>${_('Value')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['properties']">
+              <tr>
+                <td data-bind="text: name"></td>
+                <td data-bind="text: value"></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="workflow-action-page-tasks">
+          <table class="table table-condensed datatables">
+            <thead>
+              <tr>
+                <th>${ _('Ids') }</th>
+              </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['externalChildIDs']">
+              <tr>
+                <td>
+                  <a data-bind="hueLink: '/jobbrowser/jobs/' + $data, text: $data" href="javascript: void(0);">
+                  </a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="tab-pane" id="workflow-action-page-xml">
+          <pre data-bind="text: ko.toJSON(properties['conf'], null, 2)"></pre>
+          ## <div data-bind="readonlyXML: properties['conf'](), path: 'xml'"></div>
+        </div>
+
+      </div>
     </div>
   </div>
 
@@ -1341,6 +1382,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.loadingJob(true);
 
         var interface = vm.interface();
+        if (/application_/.test(self.id())) {
+          interface = 'jobs';
+        }
         if (/oozie-oozi-W/.test(self.id())) {
           interface = 'workflows';
         }

@@ -30,7 +30,7 @@ from django.utils.functional import wraps
 from django.utils.translation import ugettext as _
 from django.core.urlresolvers import reverse
 
-from desktop.log.access import access_warn, access_log_level
+from desktop.log.access import access_log_level
 from desktop.lib.rest.http_client import RestException
 from desktop.lib.rest.resource import Resource
 from desktop.lib.django_util import JsonResponse, render_json, render, copy_query_dict
