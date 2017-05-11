@@ -443,6 +443,9 @@ var huePubSub = (function () {
         }
       };
     },
+    removeAll: function (topic) {
+      topics[topic] = [];
+    },
     subscribeOnce: function (topic, listener, app) {
       var ephemeral = this.subscribe(topic, function () {
         listener.apply(listener, arguments);

@@ -78,53 +78,65 @@ ${ dashboard.import_layout() }
       var refreshViewTimeout = -1;
 
       function refreshView() {
-        $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
+        if ($('#loaded${doc_uuid}graph').is(':visible')) {
+          $.getJSON("${ oozie_workflow.get_absolute_url(format='json') }", function (data) {
 
-          if (data.actions) {
-            % if layout_json != '':
-              ko.utils.arrayForEach(data.actions, function (action) {
-                var _w, actionId = action.id.substr(action.id.length - 4);
-                if (actionId === '@End') {
-                  _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
-                }
-                else {
-                  if ($("[id^=wdg_" + actionId.toLowerCase() + "]").length > 0) {
-                    _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
-                  }
-                  else {
+            if (data.actions) {
+              % if layout_json != '':
+                ko.utils.arrayForEach(data.actions, function (action) {
+                  var _w, actionId = action.id.substr(action.id.length - 4);
+                  if (actionId === '@End') {
                     _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
                   }
-                }
-                if (_w != null) {
-                  if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
-                    _w.status("success");
-                    _w.progress(100);
-                  }
-                  else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(action.status) > -1) {
-                    _w.status("running");
-                    _w.progress(50);
-                  }
                   else {
-                    _w.status("failed");
-                    _w.progress(100);
+                    if ($("[id^=wdg_" + actionId.toLowerCase() + "]").length > 0) {
+                      _w = viewModel.getWidgetById($("[id^=wdg_" + actionId.toLowerCase() + "]").attr("id").substr(4));
+                    }
+                    else {
+                      _w = viewModel.getWidgetById('33430f0f-ebfa-c3ec-f237-3e77efa03d0a');
+                    }
                   }
-                  _w.actionURL(action.url);
-                  _w.logsURL(action.log);
-                  _w.externalIdUrl(action.externalIdUrl);
-                  _w.externalId(action.id);
-                }
-              });
-            %endif
-          }
-          if (data.status != "RUNNING" && data.status != "PREP") {
-            return;
-          }
+                  if (_w != null) {
+                    if (['SUCCEEDED', 'OK', 'DONE'].indexOf(action.status) > -1) {
+                      _w.status("success");
+                      _w.progress(100);
+                    }
+                    else if (['RUNNING', 'READY', 'PREP', 'WAITING', 'SUSPENDED', 'PREPSUSPENDED', 'PREPPAUSED', 'PAUSED', 'SUBMITTED', 'SUSPENDEDWITHERROR', 'PAUSEDWITHERROR'].indexOf(action.status) > -1) {
+                      _w.status("running");
+                      _w.progress(50);
+                    }
+                    else {
+                      _w.status("failed");
+                      _w.progress(100);
+                    }
+                    _w.actionURL(action.url);
+                    _w.logsURL(action.log);
+                    _w.externalIdUrl(action.externalIdUrl);
+                    _w.externalId(action.id);
+                  }
+                });
+              %endif
+            }
+            if (data.status != "RUNNING" && data.status != "PREP") {
+              return;
+            }
+            else {
+              refreshViewTimeout = window.setTimeout(refreshView, 1000);
+            }
+          });
+        }
+        else {
           refreshViewTimeout = window.setTimeout(refreshView, 1000);
-        });
+        }
       }
 
-      huePubSub.subscribeOnce('stop.refresh.view', function(){
+      huePubSub.subscribe('graph.stop.refresh.view', function(){
         window.clearTimeout(refreshViewTimeout);
+        huePubSub.removeAll('graph.draw.arrows');
+      });
+
+      huePubSub.subscribe('graph.draw.arrows', function(){
+        viewModel.drawArrows();
       });
 
     %endif
