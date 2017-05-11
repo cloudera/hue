@@ -874,19 +874,23 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>
-              <th>${_('log')}</th>
-              <th>${_('status')}</th>
-              <th>${_('errorMessage')}</th>
-              <th>${_('errorCode')}</th>
-              <th>${_('externalId')}</th>
-              <th>${_('id')}</th>
-              <th>${_('startTime')}</th>
-              <th>${_('endTime')}</th>
+              <th>${_('Log')}</th>
+              <th>${_('Status')}</th>
+              <th>${_('Error message')}</th>
+              <th>${_('Error code')}</th>
+              <th>${_('ExternalId')}</th>
+              <th>${_('Id')}</th>
+              <th>${_('Start time')}</th>
+              <th>${_('End time')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['actions']">
-              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }">
-                <td data-bind="text: 'logs'"></td>
+              <tr data-bind="click: function() {  $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
+                <td>
+                  <a data-bind="hueLink: '/jobbrowser/jobs/' + externalId(), clickBubble: false">
+                    <i class="fa fa-tasks"></i>
+                  </a>
+                </td>
                 <td data-bind="text: status"></td>
                 <td data-bind="text: errorMessage"></td>
                 <td data-bind="text: errorCode"></td>
