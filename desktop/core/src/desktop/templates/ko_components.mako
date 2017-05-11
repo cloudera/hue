@@ -17,6 +17,7 @@
 <%!
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
+
 from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
@@ -473,8 +474,8 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-favorite-app-template">
     <!-- ko if: isHue4 -->
-    <div title="${ _('Toggle as the default app') }" class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp">
-      <i class="fa inactive-action" data-bind="css: {'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
+    <div class="inline pointer favorite-app" data-bind="click: setAsFavoriteApp, attr: { title: isFavorite() ? '${ _ko("Unset from default application") }' : '${ _ko("Set as default application") }' }">
+      <i class="fa inactive-action" data-bind="css: { 'fa-star-o': !isFavorite(), 'fa-star': isFavorite }"></i>
     </div>
     <!-- /ko -->
   </script>
@@ -508,7 +509,7 @@ from desktop.views import _ko
           var postParams = {
             app: self.app
           }
-          if (self.app === 'editor' && self.interpreter !== '') {
+          if (self.interpreter !== '') {
             postParams['interpreter'] = self.interpreter;
           }
           var post = {};
