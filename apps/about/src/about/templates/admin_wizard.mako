@@ -73,7 +73,7 @@ ${ layout.menubar(section='quick_start') }
           <div id="step2" class="stepDetails hide">
             <div>
               <h3>${ _('Install individual application examples') }</h3>
-              <ul class="unstyled">
+              <ul class="unstyled samples">
               % if 'beeswax' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
@@ -244,6 +244,10 @@ ${ layout.menubar(section='quick_start') }
       left:0;
       right:0;
     }
+  }
+
+  ul.samples li {
+    padding-bottom: 5px;
   }
 
   .nav-pills.nav-vertical-pills li {
