@@ -660,7 +660,7 @@
         }
         
         if (data.handle) {
-          if (vm.editorMode()) {
+          if (vm.editorMode) {
             notebook.history.unshift(
               notebook._makeHistoryRecord(
                 url,
