@@ -406,7 +406,8 @@ def list_oozie_workflow(request, job_id):
       'doc_uuid': doc.uuid if doc else '',
       'graph_element_id': request.GET.get('element') if request.GET.get('element') else 'loaded ' + doc.uuid + ' graph',
       'subworkflows_json': json.dumps(_get_workflows(request.user), cls=JSONEncoderForHTML),
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user)),
+      'is_jb2': request.GET.get('is_jb2', False)
     })
 
   oozie_slas = []
