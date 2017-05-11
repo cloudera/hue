@@ -156,7 +156,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->
               <!-- ko ifnot: jobs.loadingJobs() -->
                 <!-- ko if: $root.isMini -->
-                <ul class="unstyled" id="jobsTable" data-bind="foreach: jobs.apps">
+                <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
                   <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
                     <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span data-bind="text: status"></span></td>
                     <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
@@ -172,7 +172,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 </ul>
                 <!-- /ko -->
                 <!-- ko ifnot: $root.isMini -->
-                <table id="jobsTable" class="datatables table table-condensed">
+                <table id="jobsTable" class="datatables table table-condensed status-border-container">
                   <thead>
                   <tr>
                     <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
@@ -471,22 +471,24 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="job-mapreduce-page-tasks">
-          ${_('Filter')}
-          <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+          <form class="form-inline">
+            ${_('Filter')}
+            <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
-          <span data-bind="foreach: statesValuesFilter">
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-              <span data-bind="text: name, attr: {for: name}"></span>
-            </label>
-          </span>
+            <span data-bind="foreach: jobs.statesValuesFilter">
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+              </label>
+            </span>
 
-          <span data-bind="foreach: typesValuesFilter">
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-              <span data-bind="text: name, attr: {for: name}"></span>
-            </label>
-          </span>
+            <span data-bind="foreach: typesValuesFilter">
+              <label class="checkbox">
+                <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
+                <span data-bind="text: name, attr: {for: name}"></span>
+              </label>
+            </span>
+          </form>
 
           <table class="table table-condensed">
             <thead>
@@ -1048,19 +1050,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" id="schedule-page-calendar">
           <!-- ko with: coordinatorActions() -->
-          <div data-bind="template: { name: 'job-actions' }"></div>
+          <form class="form-inline">
+            ${_('Filter')}
+            <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
-          ${_('Filter')}
-          <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
+            <span data-bind="foreach: statesValuesFilter">
+              <label class="checkbox">
+                <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
+                <div class="inline-block" data-bind="text: name, toggle: checked"></div>
+              </label>
+            </span>
+            <div data-bind="template: { name: 'job-actions' }" class="pull-right"></div>
+          </form>
 
-          <span data-bind="foreach: statesValuesFilter">
-            <label class="checkbox">
-              <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-              <span data-bind="text: name, attr: {for: name}"></span>
-            </label>
-          </span>
-
-          <table id="schedulesTable" class="datatables table table-condensed">
+          <table id="schedulesTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
               <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
@@ -1077,7 +1080,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: apps">
-              <tr data-bind="click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
+              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': properties.status() !== 'SUCCEEDED' && properties.status() !== 'FAILED', 'failed': properties.status() == 'FAILED'}, click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
                 <td>
                   <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
@@ -1964,7 +1967,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (val) {
-            updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+            updateJobInterval = setInterval(val.updateJob, 50000, 'jobbrowser');
           }
           else {
             updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
