@@ -1382,7 +1382,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.loadingJob(true);
 
         var interface = vm.interface();
-        if (/application_/.test(self.id())) {
+        if (/application_/.test(self.id()) || /job_/.test(self.id())) {
           interface = 'jobs';
         }
         if (/oozie-oozi-W/.test(self.id())) {
@@ -2001,8 +2001,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % if not is_mini:
       ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
       huePubSub.subscribe('oozie.action.logs.click', function (widget) {
-        jobBrowserViewModel.job().id(widget.externalId());
-        jobBrowserViewModel.job().fetchJob();
+        var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
+        if (jobId) {
+          jobBrowserViewModel.job().id(jobId[1]);                
+          jobBrowserViewModel.job().fetchJob();
+        } else {
+          console.error('Unknown job log url: ' + widget.logsURL());
+        }
       });
 
       huePubSub.subscribe('oozie.action.click', function (widget) {
