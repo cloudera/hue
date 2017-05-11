@@ -85,7 +85,9 @@
         ko.bindingHandlers.click.init(element, function() {
           return function (data, event) {
             var url = ko.unwrap(valueAccessor());
-            if (event.ctrlKey || event.metaKey || event.which === 2) {
+            if ($(element).attr('target')) {
+              window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), $(element).attr('target'));
+            } else if (event.ctrlKey || event.metaKey || event.which === 2) {
               window.open('/hue' + (url.indexOf('/') === 0 ? url : '/' + url), '_blank');
             } else {
               huePubSub.publish('open.link', url);
