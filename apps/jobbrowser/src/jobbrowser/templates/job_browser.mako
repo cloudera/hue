@@ -2014,12 +2014,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         } else {
           console.error('Unknown job log url: ' + widget.logsURL());
         }
-      });
+      }, 'jobbrowser');
 
       huePubSub.subscribe('oozie.action.click', function (widget) {
         jobBrowserViewModel.job().id(widget.externalId());
         jobBrowserViewModel.job().fetchJob();
-      });
+      }, 'jobbrowser');
       % else:
       ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
       jobBrowserViewModel.isMini(true);
