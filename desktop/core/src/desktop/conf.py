@@ -421,7 +421,7 @@ APP_BLACKLIST = Config(
 
 CLUSTER_ID = Config(
   key="cluster_id",
-  help=_("Id of the cluster here Hue is located."),
+  help=_("Id of the cluster where Hue is located."),
   private=False,
   default='default')
 

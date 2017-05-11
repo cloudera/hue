@@ -1630,37 +1630,34 @@
 [metadata]
 
   [[optimizer]]
-    # Cache timeout in milliseconds for the Optimizer metadata used in assist, autocomplete, etc.
-    # defaults to 432000000 (5 days), set to 0 to disable caching
-    # cacheable_ttl=432000000
-
     # Base URL to Optimizer API.
     ## api_url=https://optimizer.cloudera.com
 
-    # Aka workload or tenant id, keep commented and it will be guessed from the email.
-    ## product_name=e0819f3a-1e6f-4904-be69-5b704bacd1244
+    # The name of the key of the service.
+    ## auth_key=e0819f3a-1e6f-4904-be69-5b704bacd1245
 
-    # A secret passphrase associated with the account.
-    ## product_secret=e0819f3a-1e6f-4904-be69-5b704bacd1245
+    # The private part of the key associated with the auth_key.
+    ## auth_key_secret='-----BEGIN PRIVATE KEY....'
 
-    # A secret key passphrase associated with the account.
-    ## product_auth_secret='-----BEGIN PRIVATE KEY....'
+    # Execute this script to produce the auth_key secret. This will be used when `auth_key_secret` is not set.
+    ## auth_key_secret_script=/path/to/script.sh
 
-    # The email of the Optimizer account you want to associate with the Product.
-    ## email=hue@gethue.com
+    # The name of the workload where queries are uploaded and optimizations are calculated from. Automatically guessed from auth_key and cluster_id if not specified.
+    ## tenant_id=
 
     # Perform Sentry privilege filtering.
     # Default to true automatically if the cluster is secure.
     ## apply_sentry_permissions=False
+
+    # Cache timeout in milliseconds for the Optimizer metadata used in assist, autocomplete, etc.
+    # defaults to 432000000 (5 days), set to 0 to disable caching.
+    # cacheable_ttl=432000000
 
     # Automatically upload queries after their execution in order to improve recommendations.
     ## auto_upload_queries=true
 
     # Allow admins to upload the last N executed queries in the quick start wizard. Use 0 to disable.
     ## query_history_upload_limit=10000
-
-    # In secure mode (HTTPS), if Optimizer SSL certificates have to be verified against certificate authority.
-    ## ssl_cert_ca_verify=True
 
   [[navigator]]
     # Navigator API URL (without version suffix).
