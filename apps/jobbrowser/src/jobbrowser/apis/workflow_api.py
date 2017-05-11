@@ -184,10 +184,15 @@ class WorkflowActionApi(Api):
 
     common['action_type'] = common['type']
     common['type'] = 'workflow-action'
+    common['properties'] = {}
+    properties = action.to_json()
+    properties.pop('toString')
+    common['properties']['conf'] = properties.pop('conf')
+    common['properties']['externalId'] = properties.get('externalId', '')
+    common['properties']['externalChildIDs'] = properties.pop('externalChildIDs').split(',')
+    common['properties']['properties'] = [{'name': key, 'value': val} for key, val in properties.iteritems()]
 
-    common['properties'] = {
-      'workflow_id': appid.split('@', 1)[0]
-    }
+    common['properties']['workflow_id'] = appid.split('@', 1)[0]
 
     return common
 
