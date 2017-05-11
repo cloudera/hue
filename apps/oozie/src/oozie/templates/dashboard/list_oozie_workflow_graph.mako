@@ -117,18 +117,22 @@ ${ dashboard.import_layout() }
                 });
               %endif
             }
+            %if not is_jb2:
             if (data.status != "RUNNING" && data.status != "PREP") {
               return;
             }
             else {
               refreshViewTimeout = window.setTimeout(refreshView, 1000);
             }
+            %endif
           });
         }
         else {
           refreshViewTimeout = window.setTimeout(refreshView, 1000);
         }
       }
+
+      huePubSub.subscribe('graph.refresh.view', refreshView);
 
       huePubSub.subscribe('graph.stop.refresh.view', function(){
         window.clearTimeout(refreshViewTimeout);

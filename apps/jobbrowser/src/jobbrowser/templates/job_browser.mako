@@ -1440,6 +1440,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.updateJob = function () {console.log('update job', vm.isMini());
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
+        huePubSub.publish('graph.refresh.view');
 
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
           lastFetchJobRequest = self._fetchJob(function (data) {
@@ -1571,7 +1572,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             url: "/oozie/list_oozie_workflow/" + vm.job().id(),
             data: {
               'graph': true,
-              'element': 'workflow-page-graph'
+              'element': 'workflow-page-graph',
+              'is_jb2': true
             },
             beforeSend: function (xhr) {
               xhr.setRequestHeader("X-Requested-With", "Hue");
