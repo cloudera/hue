@@ -491,7 +491,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table class="table table-condensed">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
               <th>${_('Type')}</th>
               <th>${_('Id')}</th>
               <th>${_('elapsedTime')}</th>
@@ -503,8 +502,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['tasks']()['task_list']">
-              <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
-                <td><div class="hueCheckbox fa"></div></td>
+              <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }" class="pointer">
                 <td data-bind="text: type"></td>
                 <td data-bind="text: id"></td>
                 <td data-bind="text: elapsedTime"></td>
@@ -878,7 +876,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('Status')}</th>
               <th>${_('Error message')}</th>
               <th>${_('Error code')}</th>
-              <th>${_('ExternalId')}</th>
+              <th>${_('External id')}</th>
               <th>${_('Id')}</th>
               <th>${_('Start time')}</th>
               <th>${_('End time')}</th>
@@ -1411,15 +1409,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             var crumbs = [];
 
             if (/^attempt_/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().name(), 'type': 'app'});
-              crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().name(), 'type': 'task'});
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
+              crumbs.push({'id': vm.job().properties['task_id'], 'name': vm.job().properties['task_id'], 'type': 'task'});
             }
             if (/^task_/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().name(), 'type': 'app'});
+              crumbs.push({'id': vm.job().properties['app_id'], 'name': vm.job().properties['app_id'], 'type': 'app'});
             }
 
             if (/-oozie-oozi-W@/.test(vm.job().id())) {
-              crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().name(), 'type': 'workflow'});
+              crumbs.push({'id': vm.job().properties['workflow_id'], 'name': vm.job().properties['workflow_id'], 'type': 'workflow'});
             }
             else if (/-oozie-oozi-W/.test(vm.job().id())) {
               if (vm.job().properties['bundle_id']()) {
@@ -2007,7 +2005,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('oozie.action.logs.click', function (widget) {
         var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
         if (jobId) {
-          jobBrowserViewModel.job().id(jobId[1]);                
+          jobBrowserViewModel.job().id(jobId[1]);
           jobBrowserViewModel.job().fetchJob();
         } else {
           console.error('Unknown job log url: ' + widget.logsURL());
