@@ -790,16 +790,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/jobbrowser/jobs/job_*', app: function (ctx) {
             page.redirect('/jobbrowser#!id=application_' + _.trimRight(ctx.params[0], '/'));
           }},
-          { url: '/jobbrowser*', app: function (ctx) {
-            self.loadApp('jobbrowser');
-            self.getActiveAppViewModel(function (viewModel) {
-              hueUtils.waitForVariable(viewModel.selectInterface, function(){
-                hueUtils.waitForVariable(viewModel.selectInterface, function(){
-                  viewModel.load();
-                });
-              });
-            });
-          }},
+          { url: '/jobbrowser*', app: 'jobbrowser'},
           { url: '/logs', app: 'logs' },
           { url: '/metastore', app: function () {
             page('/metastore/tables');
