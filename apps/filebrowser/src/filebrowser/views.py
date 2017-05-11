@@ -199,11 +199,17 @@ def view(request, path):
             return display(request, path)
     except (IOError, WebHdfsException), e:
         msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
+
         if "Connection refused" in e.message:
             msg += _(" The HDFS REST service is not available. ")
-        if request.user.is_superuser and not _is_hdfs_superuser(request):
+
+        if request.fs._get_scheme(path) == 'hdfs':
+          if request.user.is_superuser and not _is_hdfs_superuser(request):
             msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
                 % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
+        elif request.fs._get_scheme(path) == 's3a':
+            msg += _(' S3 filesystem exception.')
+
         if request.is_ajax():
           exception = {
             'error': msg

@@ -25,7 +25,7 @@ from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, co
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
 
 
-DEFAULT_CALLING_FORMAT='boto.s3.connection.S3Connection.DefaultCallingFormat'
+DEFAULT_CALLING_FORMAT='boto.s3.connection.OrdinaryCallingFormat'
 
 
 def get_default_access_key_id():
@@ -95,17 +95,35 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
         default='us-east-1',
         type=str
       ),
+      HOST=Config(
+        help=_('Alternate address for the S3 endpoint.'),
+        key='host',
+        default=None,
+        type=str
+      ),
       PROXY_ADDRESS=Config(
-        help=_('Alternate address for endpoint.'),
+        help=_('Proxy address to use for the S3 connection.'),
         key='proxy_address',
         default=None,
         type=str
       ),
       PROXY_PORT=Config(
-        help=_('Alternate port for endpoint.'),
+        help=_('Proxy port to use for the S3 connection.'),
         key='proxy_port',
-        default=None,
+        default=8080,
         type=int
+      ),
+      PROXY_USER=Config(
+        help=_('Proxy user to use for the S3 connection.'),
+        key='proxy_user',
+        default=None,
+        type=str
+      ),
+      PROXY_PASS=Config(
+        help=_('Proxy password to use for the S3 connection.'),
+        key='proxy_pass',
+        default=None,
+        type=str
       ),
       CALLING_FORMAT=Config(
         key='calling_format',
