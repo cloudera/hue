@@ -1232,6 +1232,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.id = ko.observableDefault(job.id);
+      self.id.subscribe(function () {
+        huePubSub.publish('stop.refresh.view');
+      });
       self.doc_url = ko.observableDefault(job.doc_url);
       self.name = ko.observableDefault(job.name || job.id);
       self.type = ko.observableDefault(job.type);
@@ -1450,7 +1453,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function () {console.log('update job');
+      self.updateJob = function () {console.log('update job', vm.isMini());
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
 
         if (vm.job() == self && self.apiStatus() == 'RUNNING') {
@@ -1745,7 +1748,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       }
 
-      self.updateJobs = function () {console.log('update jobs');
+      self.updateJobs = function () {console.log('update jobs', vm.isMini());
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
@@ -1921,6 +1924,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
       self.selectInterface = function(interface) {
+        huePubSub.publish('stop.refresh.view');
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
