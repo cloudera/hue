@@ -123,7 +123,7 @@ ${ dashboard.import_layout() }
         });
       }
 
-      huePubSub.subscribe('stop.refresh.view', function(){
+      huePubSub.subscribeOnce('stop.refresh.view', function(){
         window.clearTimeout(refreshViewTimeout);
       });
 
