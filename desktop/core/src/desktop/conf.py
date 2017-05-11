@@ -55,7 +55,7 @@ def coerce_port(port):
     port = int(port)
     if port == 0:
       port = ''
-  except ValueError, e:
+  except ValueError:
     port = ''
   return port
 
@@ -418,6 +418,12 @@ APP_BLACKLIST = Config(
   type=coerce_csv,
   help=_('Comma separated list of apps to not load at server startup.')
 )
+
+CLUSTER_ID = Config(
+  key="cluster_id",
+  help=_("Id of the cluster here Hue is located."),
+  private=False,
+  default='default')
 
 DEMO_ENABLED = Config( # Internal and Temporary
   key="demo_enabled",
