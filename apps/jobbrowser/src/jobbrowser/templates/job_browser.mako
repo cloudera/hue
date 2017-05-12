@@ -475,7 +475,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ${_('Filter')}
             <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
-            <span data-bind="foreach: jobs.statesValuesFilter">
+            <span data-bind="foreach: statesValuesFilter">
               <label class="checkbox">
                 <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
                 <div class="inline-block" data-bind="text: name, toggle: checked"></div>
