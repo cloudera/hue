@@ -185,6 +185,7 @@ ${ hueIcons.symbols() }
             % endif
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 3')}</a></li>
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Show welcome tour')}</span></a></li>
             % if user.is_superuser:
             <li><a href="/about/"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
             % endif
@@ -1272,6 +1273,60 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       sidePanelViewModel: sidePanelViewModel,
       topNavViewModel: topNavViewModel
     };
+
+    var tour = new Shepherd.Tour({
+      defaults: {
+        classes: 'shepherd-theme-hue'
+      }
+    });
+
+    tour.addStep('welcome', {
+      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br>${ _ko('Before you start, we want you to familiarize with the new interface. Ready?') }',
+    });
+
+    tour.addStep('topnav', {
+      text: '${ _ko('A brand new navigation bar! The default app has its own blue button now, there is a global search available, and the notifications panels are on the right.') }',
+      attachTo: '.navbar-default bottom',
+    });
+
+    %if user.is_superuser:
+      tour.addStep('admin', {
+        text: '${ _ko('Since you are a superuser, you can find the default admin wizard inside this dropdown.') }',
+        attachTo: '.top-nav-right .dropdown bottom',
+      });
+    %endif
+
+    tour.addStep('leftpanel', {
+      text: '${ _ko('The improved data panel will help you out with discovering your sources. Remember: you can right click on it!') }',
+      attachTo: '.left-panel right',
+    });
+
+    tour.addStep('pagecontent', {
+      text: '${ _ko('This is the main action spot, where all the Hue apps will work.') }',
+      attachTo: '.page-content center',
+    });
+
+    tour.addStep('rightpanel', {
+      text: '${ _ko('Some of the apps, like in this case Editor, will have a right panel too with additional information to help you out in your data discovery.') }',
+      attachTo: '.right-panel left',
+    });
+
+    tour.addStep('bye', {
+      text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your user name on top right') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
+    });
+
+    if (ApiHelper.getInstance().getFromTotalStorage('tour', 'show.at.start', true)) {
+      tour.start();
+    }
+
+    tour.on('complete', function () {
+      ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+    });
+
+    huePubSub.subscribe('show.welcome.tour', function () {
+      tour.start();
+    });
+
   });
 </script>
 
