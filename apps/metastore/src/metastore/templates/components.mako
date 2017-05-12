@@ -18,7 +18,7 @@
   from django.utils.translation import ugettext as _
 %>
 
-<%def name="menubar()">
+<%def name="menubar(is_embeddable=False)">
   <div class="navbar hue-title-bar nokids">
       <div class="navbar-inner">
         <div class="container-fluid">
@@ -27,9 +27,9 @@
               <li class="app-header">
                 <a href="/${app_name}">
                   <img src="${ static('metastore/art/icon_metastore_48.png') }" class="app-icon" alt="${ _('Metastore icon') }" />
-                  ${ _('Metastore Manager') }
+                  ${ _('Table Browser') if is_embeddable else _('Metastore Manager') }
                 </a>
-              </li>              
+              </li>
             </ul>
           </div>
         </div>
