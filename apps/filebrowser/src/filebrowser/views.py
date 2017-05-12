@@ -32,7 +32,6 @@ from datetime import datetime
 from cStringIO import StringIO
 from gzip import GzipFile
 
-from django.contrib import messages
 from django.contrib.auth.models import User, Group
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
@@ -197,26 +196,6 @@ def view(request, path):
             return listdir_paged(request, path)
         else:
             return display(request, path)
-    except (IOError, WebHdfsException), e:
-        msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
-
-        if "Connection refused" in e.message:
-            msg += _(" The HDFS REST service is not available. ")
-
-        if request.fs._get_scheme(path) == 'hdfs':
-          if request.user.is_superuser and not _is_hdfs_superuser(request):
-            msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
-                % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
-        elif request.fs._get_scheme(path) == 's3a':
-            msg += _(' S3 filesystem exception.')
-
-        if request.is_ajax():
-          exception = {
-            'error': msg
-          }
-          return JsonResponse(exception)
-        else:
-          raise PopupException(msg , detail=e)
     except S3FileSystemException, e:
         msg = _("S3 filesystem exception.")
         if request.is_ajax():
@@ -226,6 +205,24 @@ def view(request, path):
             return JsonResponse(exception)
         else:
             raise PopupException(msg, detail=e)
+    except (IOError, WebHdfsException), e:
+        msg = _("Cannot access: %(path)s. ") % {'path': escape(path)}
+
+        if "Connection refused" in e.message:
+            msg += _(" The HDFS REST service is not available. ")
+
+        if request.fs._get_scheme(path).lower() == 'hdfs':
+            if request.user.is_superuser and not _is_hdfs_superuser(request):
+                msg += _(' Note: you are a Hue admin but not a HDFS superuser, "%(superuser)s" or part of HDFS supergroup, "%(supergroup)s".') \
+                        % {'superuser': request.fs.superuser, 'supergroup': request.fs.supergroup}
+
+        if request.is_ajax():
+          exception = {
+            'error': msg
+          }
+          return JsonResponse(exception)
+        else:
+          raise PopupException(msg , detail=e)
 
 
 def home_relative_view(request, path):

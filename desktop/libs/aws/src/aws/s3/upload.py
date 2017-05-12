@@ -30,6 +30,7 @@ from django.utils.translation import ugettext as _
 
 from aws import get_s3fs
 from aws.s3 import parse_uri
+from aws.s3.s3fs import S3FileSystemException
 
 
 DEFAULT_WRITE_SIZE = 1024 * 1024 * 50  # TODO: set in configuration (currently 50 MiB)
@@ -80,7 +81,7 @@ class S3FileUploadHandler(FileUploadHandler):
         self._mp = self._bucket.initiate_multipart_upload(self.target_path)
         self.file = SimpleUploadedFile(name=file_name, content='')
         raise StopFutureHandlers()
-      except S3FileUploadError, e:
+      except (S3FileUploadError, S3FileSystemException), e:
         LOG.error("Encountered error in S3UploadHandler check_access: %s" % e)
         self.request.META['upload_failed'] = e
         raise StopUpload()
@@ -131,7 +132,7 @@ class S3FileUploadHandler(FileUploadHandler):
 
   def _check_access(self):
     if not self._fs.check_access(self.destination, permission='WRITE'):
-      raise S3FileUploadError(_('Insufficient permissions to write to S3 path "%s".') % self.destination)
+      raise S3FileSystemException('Insufficient permissions to write to S3 path "%s".' % self.destination)
 
 
   def _get_scheme(self):
@@ -140,7 +141,7 @@ class S3FileUploadHandler(FileUploadHandler):
       if dst_parts > 0:
         return dst_parts[0].upper()
       else:
-        raise IOError('Destination does not start with a valid scheme.')
+        raise S3FileSystemException('Destination does not start with a valid scheme.')
     else:
       return None
 

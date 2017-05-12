@@ -25,6 +25,7 @@ from django.contrib.auth.models import User
 
 from aws.conf import has_s3_access
 from aws.s3 import S3A_ROOT
+from aws.s3.s3fs import S3FileSystemException
 
 
 class ProxyFS(object):
@@ -57,9 +58,9 @@ class ProxyFS(object):
       try:
         user = User.objects.get(username=self.user)
         if not has_s3_access(rewrite_user(user)):
-          raise IOError(errno.EPERM, "Missing permissions for %s on %s" % (self.user, path,))
+          raise S3FileSystemException("Missing permissions for %s on %s" % (self.user, path,))
       except User.DoesNotExist:
-        raise IOError(errno.EPERM, "Can't check permissions for %s on %s" % (self.user, path))
+        raise S3FileSystemException("Can't check permissions for %s on %s" % (self.user, path))
 
     split = urlparse(path)
     if split.scheme:
@@ -70,11 +71,11 @@ class ProxyFS(object):
   def _get_fs(self, path):
     scheme = self._get_scheme(path)
     if not scheme:
-      raise IOError(errno.EINVAL, 'Can not figure out scheme for path "%s"' % path)
+      raise S3FileSystemException('Can not figure out scheme for path "%s"' % path)
     try:
       return self._fs_dict[scheme]
     except KeyError:
-      raise IOError(errno.EINVAL, 'Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
+      raise S3FileSystemException('Unknown scheme %s, available schemes: %s' % (scheme, self._fs_dict.keys()))
 
   def _get_fs_pair(self, src, dst):
     """
