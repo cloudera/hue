@@ -525,7 +525,7 @@ from desktop.views import _ko
         }
 
         if (self.isHue4()) {
-          // load the fav app status
+          // Load the fav app status
           $.get('/desktop/api2/user_preferences/default_app', function (data) {
             self.parseCurrentFavorite(data);
           });
