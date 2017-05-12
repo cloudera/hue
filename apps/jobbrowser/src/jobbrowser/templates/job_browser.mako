@@ -238,7 +238,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
           <!-- /ko -->
 
-          <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: ! $root.job()"></div>
+          <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
           <!-- /ko -->
 
           % if not is_mini:
