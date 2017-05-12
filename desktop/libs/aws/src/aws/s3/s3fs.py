@@ -43,8 +43,10 @@ BUCKET_NAME_PATTERN = re.compile("^((?:(?:[a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9_\-]*
 LOG = logging.getLogger(__name__)
 
 
-class S3FileSystemException(Exception):
-  pass
+class S3FileSystemException(IOError):
+
+  def __init__(self, *args, **kwargs):
+    super(S3FileSystemException, self).__init__(*args, **kwargs)
 
 
 def auth_error_handler(view_fn):
@@ -52,7 +54,7 @@ def auth_error_handler(view_fn):
     try:
       return view_fn(*args, **kwargs)
     except (S3ResponseError, IOError), e:
-      if 'Forbidden' in str(e) or e.status == 403:
+      if 'Forbidden' in str(e) or (hasattr(e, 'status') and e.status == 403):
         path = kwargs.get('path')
         if not path and len(args) > 1:
           path = args[1]  # We assume that the path is the first argument
