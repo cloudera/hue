@@ -75,8 +75,9 @@ def check_privileges(view_func):
         if kwargs.get('table_name'):
           objects[0]['table'] = kwargs['table_name']
 
-      if len(list(checker.filter_objects(objects, action))) != len(objects):
-        raise MissingSentryPrivilegeException(objects)
+      filtered = list(checker.filter_objects(objects, action))
+      if len(filtered) != len(objects):
+        raise MissingSentryPrivilegeException({'pre_filtering': objects, 'post_filtering': filtered, 'diff': len(objects) - len(filtered)})
 
     return view_func(*args, **kwargs)
   return wraps(view_func)(decorate)
