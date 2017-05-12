@@ -36,6 +36,7 @@ LOG = logging.getLogger(__name__)
 
 
 class BaseTestOptimizerApi(object):
+  UPLOADED = False
 
   @classmethod
   def setup_class(cls):
@@ -50,7 +51,10 @@ class BaseTestOptimizerApi(object):
     grant_access("test", "test", "optimizer")
 
     cls.api = OptimizerApi(user=cls.user)
-    cls.upload()
+
+    if not BaseTestOptimizerApi.UPLOADED:
+      cls.upload()
+      BaseTestOptimizerApi.UPLOADED = True
 
 
   # Should run first
