@@ -208,7 +208,7 @@ def save(request):
 
 
 def no_collections(request):
-  return render('no_collections.mako', request, {})
+  return render('no_collections.mako', request, {'is_embeddable': request.GET.get('is_embeddable', False)})
 
 
 def admin_collections(request, is_redirect=False, is_mobile=False):
