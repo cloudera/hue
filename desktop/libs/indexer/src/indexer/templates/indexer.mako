@@ -116,7 +116,7 @@ ${ assist.assistPanel() }
         <ul class="nav">
           <li class="app-header">
             <a href="/indexer/indexer">
-              <i class="fa fa-database app-icon"></i> ${_('Indexes')}</a>
+              <i class="fa fa-database app-icon"></i> ${ _('Index Browser') if is_embeddable else _('Indexes') }</a>
             </a>
           </li>
         </ul>

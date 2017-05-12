@@ -71,7 +71,7 @@ ${ assist.assistPanel() }
 
 <span class="notebook">
 
-${ components.menubar() }
+${ components.menubar(is_embeddable) }
 
 <script src="${ static('metastore/js/metastore.ko.js') }"></script>
 <link rel="stylesheet" href="${ static('metastore/css/metastore.css') }" type="text/css">
