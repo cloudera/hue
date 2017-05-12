@@ -32,7 +32,7 @@ ${ layout.menubar(section='users') }
 
 
 <div id="editUserComponents" class="container-fluid">
-  <div class="card card-small">
+  <div class="card card-small title">
     % if username:
       <h1 class="card-heading simple">${_('Hue Users - Edit user: %(username)s') % dict(username=username)}</h1>
     % else:
