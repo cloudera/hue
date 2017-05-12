@@ -472,7 +472,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           % endfor
           <br>
 
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="job-mapreduce-page-tasks">
@@ -583,7 +583,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           % endfor
           <br>
 
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="job-mapreduce-task-page-attempts">
@@ -682,7 +682,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
           % endfor
           <br>
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
@@ -871,7 +871,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-page-logs">
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="workflow-page-tasks">
@@ -1102,7 +1102,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="schedule-page-logs">
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="schedule-page-metadata">
@@ -1207,7 +1207,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>    </div>
 
         <div class="tab-pane" id="bundle-page-logs">
-          <pre data-bind="html: logs"></pre>
+          <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
         <div class="tab-pane" id="bundle-page-metadata">
@@ -2067,6 +2067,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         jobBrowserViewModel.selectInterface(interface);
       });
       % endif
+
+      $(document).on('shown', 'a', function (e) {
+        var dest = $(e.target).attr('href');
+        if (dest.indexOf('logs') > -1){
+          $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 30));
+        }
+      });
+
     });
   })();
 </script>
