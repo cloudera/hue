@@ -127,7 +127,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
-              ${_('Filter')} <input type="text" class="input-large" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
+              <input type="text" class="input-large" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
               <!-- ko if: jobs.statesValuesFilter -->
               <span data-bind="foreach: jobs.statesValuesFilter">
                 <label class="checkbox">
@@ -474,7 +474,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         <div class="tab-pane" id="job-mapreduce-page-tasks">
           <form class="form-inline">
-            ${_('Filter')}
             <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
             <span data-bind="foreach: statesValuesFilter">
@@ -484,10 +483,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </label>
             </span>
 
-            <span data-bind="foreach: typesValuesFilter">
+            <span data-bind="foreach: typesValuesFilter" class="margin-left-30">
               <label class="checkbox">
-                <input type="checkbox" data-bind="checked: checked, attr: {id: name}">
-                <span data-bind="text: name, attr: {for: name}"></span>
+                <div class="pull-left margin-left-5" data-bind="css: value, hueCheckbox: checked"></div>
+                <div class="inline-block" data-bind="text: name, toggle: checked"></div>
               </label>
             </span>
           </form>
@@ -1053,7 +1052,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="tab-pane active" id="schedule-page-calendar">
           <!-- ko with: coordinatorActions() -->
           <form class="form-inline">
-            ${_('Filter')}
             <input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
             <span data-bind="foreach: statesValuesFilter">
