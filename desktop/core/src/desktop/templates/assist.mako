@@ -839,7 +839,8 @@ from notebook.conf import get_ordered_interpreters
       <div class="assist-panel-switches">
         <!-- ko foreach: availablePanels -->
         <div class="inactive-action assist-type-switch" data-bind="click: function () { $parent.visiblePanel($data); }, css: { 'blue': $parent.visiblePanel() === $data }, style: { 'float': rightAlignIcon ? 'right' : 'left' },  attr: { 'title': name }">
-          <i class="fa fa-fw valign-middle" data-bind="css: icon"></i>
+          <!-- ko if: type === 'documents' --><span style="font-size:22px;"><svg class="hi"><use xlink:href="#hi-documents"></use></svg></span><!-- /ko -->
+          <!-- ko if: type !== 'documents' --><i class="fa fa-fw valign-middle" data-bind="css: icon"></i><!-- /ko -->
         </div>
         <!-- /ko -->
       </div>
@@ -1482,7 +1483,7 @@ from notebook.conf import get_ordered_interpreters
                   apiHelper: self.apiHelper,
                   name: '${ _("HDFS") }',
                   type: 'hdfs',
-                  icon: 'fa-folder-o',
+                  icon: 'fa-files-o',
                   minHeight: 50
                   % if not has_navigator_file_search(user):
                     , showNavSearch: false
