@@ -67,7 +67,7 @@ class BaseTestOptimizerApi(object):
         (uuid_default(), 0, "select x from x join y where x.a = y.a;", 'default'),
 
         # DDL
-        (uuid_default(), 0, '''CREATE TABLE `web_logs`(
+        (uuid_default(), 0, ' '.join('''CREATE TABLE `web_logs`(
   `_version_` bigint,
   `app` string COMMENT 'app',
   `bytes` smallint COMMENT 'http://demo.gethue.com/ is',
@@ -99,7 +99,7 @@ class BaseTestOptimizerApi(object):
 COMMENT 'http://demo.gethue.com/ rocks!'
 PARTITIONED BY (
   `date` string)
-''', 'edw')
+'''.splitlines()), 'edw')
     ]
 
     resp = cls.api.upload(data=queries, data_type='queries', source_platform='hive')
