@@ -639,7 +639,7 @@ def search_entities_interactive(request):
     limit = int(request.POST.get('limit', 25))
     entities = _search(user=request.user, search_text=search_text, limit=limit)
     response = {
-      'results': [{'hue_name': e.name, 'hue_description': e.description, 'type': 'HUE', 'originalName': e.name} for e in entities['documents']],
+      'results': [{'hue_name': e.name, 'hue_description': e.description, 'link': '/home?uuid=%s' % e.uuid, 'type': 'HUE', 'originalName': e.name } for e in entities['documents']],
       'count': len(entities['documents']),
       'status': 0
     }

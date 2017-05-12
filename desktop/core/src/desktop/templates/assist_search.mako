@@ -175,6 +175,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER
 
         var lastQuery = -1;
 
+        huePubSub.subscribe('assist.db.search', function (query) {
+          self.searchInput.extend({ rateLimit: 0 });
+          self.searchInput(query);
+          self.searchInput.extend({ rateLimit: 500 });
+          self.performSearch(true);
+        });
+
         self.assistPanel.visiblePanel.subscribe(function(newValue) {
           if (self.navigatorEnabled() && self.searchActive()) {
             lastQuery = 'refresh';
@@ -182,8 +189,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER
           }
         });
 
-        self.performSearch = function () {
-          huePubSub.publish('autocomplete.close');
+        self.performSearch = function (noClose) {
+          if (!noClose) {
+            huePubSub.publish('autocomplete.close');
+          }
           if (self.searchInput() === '') {
             self.searchActive(false);
             return;
