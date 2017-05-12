@@ -250,12 +250,13 @@ body {
   margin-left: 17px;
 }
 
-.top-nav-middle .search-container {
+.top-nav-middle .search-container-top {
   margin-left: auto;
   margin-right: auto;
   max-width: 600px;
 }
 
+.search-container-top,
 .search-container {
   .display-flex;
   .flex(1 1 37px);
@@ -272,6 +273,15 @@ body {
   margin-bottom: 0;
 }
 
+.search-container-top > input {
+  .flex(1 1 100%);
+  border-radius: 4px 0 0 4px;
+  border: 1px solid @cui-gray-300;
+  box-shadow: none;
+  margin-bottom: 0;
+}
+
+.search-container-top > a,
 .search-container > a {
   .flex(0 0 31px);
   margin-bottom: 0;
@@ -287,6 +297,7 @@ body {
   width: 31px;
 }
 
+.search-container-top > a > i,
 .search-container > a > i {
   margin-left: 8px;
 }

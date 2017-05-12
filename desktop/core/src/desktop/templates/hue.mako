@@ -148,23 +148,43 @@ ${ hueIcons.symbols() }
 
 
       <div class="top-nav-middle">
-        <div class="search-container">
+        <div class="search-container-top">
           <input placeholder="${ _('Search all data and saved documents...') }" type="text"
             data-bind="autocomplete: {
                 source: searchAutocompleteSource,
-                itemTemplate: 'nav-search-autocomp-item',
-                noMatchTemplate: 'nav-search-autocomp-no-match',
+                itemTemplate: 'top-search-autocomp-item',
+                noMatchTemplate: 'top-search-autocomp-no-match',
                 classPrefix: 'nav-',
                 showOnFocus: true,
-                onEnter: performSearch,
+                onSelect: mainSearchSelect,
                 reopenPattern: /.*:$/
               },
               hasFocus: searchHasFocus,
               clearable: { value: searchInput, onClear: function () { searchActive(false); huePubSub.publish('autocomplete.close'); } },
               textInput: searchInput,
               valueUpdate: 'afterkeydown'">
-          <a class="inactive-action" data-bind="click: performSearch"><i class="fa fa-search" data-bind="css: { 'blue': searchHasFocus() || searchActive() }"></i></a>
         </div>
+
+        <script type="text/html" id="top-search-autocomp-item">
+          <a href="javascript:void(0);">
+            <div class="nav-autocomplete-item-link">
+              <div class="nav-search-result-icon"><i class="fa fa-fw" data-bind="css: icon"></i></div>
+              <div class="nav-search-result-text">
+                <div class="nav-search-result-header" data-bind="html: label, style: { 'padding-top': description ? 0 : '9px' }"></div>
+                <!-- ko if: description -->
+                <div class="nav-search-result-description" data-bind="html: description"></div>
+                <!-- /ko -->
+              </div>
+            </div>
+          </a>
+        </script>
+
+        <script type="text/html" id="top-search-autocomp-no-match">
+          <div class="nav-autocomplete-item-link" style="height: 30px;">
+            <div class="nav-autocomplete-empty">${ _('No match found') }</div>
+          </div>
+        </script>
+
       </div>
 
       <div class="top-nav-right">
@@ -1092,7 +1112,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
               if (typeof data.resultsHuedocuments !== 'undefined') {
                 data.resultsHuedocuments.forEach(function (result) {
-                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description }, value: beforePartial + result.originalName });
+                  values.push({ data: { label: result.hue_name, icon: SEARCH_TYPE_ICONS[result.type],  description: result.hue_description, link: result.link }, value: beforePartial + result.originalName });
                 });
               }
               if (values.length > 0) {
@@ -1153,7 +1173,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         };
       }
 
-      TopNavViewModel.prototype.performSearch = function () { };
+      TopNavViewModel.prototype.mainSearchSelect = function (entry) {
+        if (entry.data && entry.data.link) {
+          huePubSub.publish('open.link', entry.data.link);
+        } else if (!/:\s*$/.test(entry.value)) {
+          huePubSub.publish('assist.show.sql');
+          huePubSub.publish('assist.db.search', entry.value);
+        }
+      };
 
       var topNavViewModel = new TopNavViewModel(onePageViewModel);
       ko.applyBindings(topNavViewModel, $('.top-nav')[0]);
