@@ -15,11 +15,12 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
-from django.utils.translation import ugettext as _
 from metadata.conf import has_navigator
 %>
 
@@ -27,10 +28,18 @@ from metadata.conf import has_navigator
   <script type="text/html" id="sql-context-footer">
     <div class="sql-context-flex-bottom-links">
       <div class="sql-context-link-row">
-        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }"><i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }</a>
-        <a class="inactive-action pointer" data-bind="visible: isTable || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore', isTable ? 'table' : 'db') }"><i style="font-size: 11px;" title="${ _("Open in Metastore...") }" class="fa fa-external-link"></i> ${ _("Metastore") }</a>
-        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }"><i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }</a>
-        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }"><i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }</a>
+        <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }">
+          <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
+        </a>
+        <a class="inactive-action pointer" data-bind="visible: isTable || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
+          <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
+        </a>
+        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }">
+          <i style="font-size: 11px;" title="${ _("Replace the editor content...") }" class="fa fa-pencil"></i> ${ _("Insert in the editor") }
+        </a>
+        <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.open.in.file.browser') }">
+          <i style="font-size: 11px;" title="${ _("Open in File Browser...") }" class="fa fa-external-link"></i> ${ _("File Browser") }
+        </a>
         <!-- ko if: isAsterisk -->
         <!-- ko with: contents.data -->
         <!-- ko if: selectedColumns().length > 0 -->
