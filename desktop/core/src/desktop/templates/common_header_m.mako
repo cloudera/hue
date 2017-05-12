@@ -53,7 +53,6 @@ if USE_NEW_EDITOR.get():
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootstrap-tour.min.css') }" rel="stylesheet">
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue-mobile.css') }" rel="stylesheet">
@@ -154,7 +153,6 @@ if USE_NEW_EDITOR.get():
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
   <script src="${ static('desktop/ext/js/jquery/plugins/jquery.touchSwipe.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
-  <script src="${ static('desktop/ext/js/bootstrap-tour.min.js') }"></script>
   <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
   <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
   <script src="${ static('desktop/ext/js/d3.v3.js') }"></script>
