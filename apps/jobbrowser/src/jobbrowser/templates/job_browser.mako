@@ -852,8 +852,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
-      <div class="clearfix"></div>
 
       <ul class="nav nav-tabs margin-top-20">
         <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
@@ -861,7 +859,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
+
 
       <div class="tab-content">
         <div class="tab-pane active dashboard-container" id="workflow-page-graph">
@@ -1038,14 +1038,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
-      <div class="clearfix"></div>
 
       <ul class="nav nav-tabs">
         <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
 
       <div class="tab-content">
