@@ -1803,16 +1803,15 @@ from notebook.conf import get_ordered_interpreters
             </li>
           </ul>
           <!-- /ko -->
+          <!-- ko if: hasMissingRisks() -->
+          <div class="margin-top-20">
+            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }, attr: { 'title': ('${ _("Add missing table and columns ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
+              <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
+            </a>
+          </div>
+          <!-- /ko -->
         </div>
 
-        <!-- ko if: hasMissingRisks() -->
-        <div class="assist-flex-fill">
-          <br>
-          <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }, attr: { 'title': ('${ _("Add missing table and columns ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
-            <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
-          </a>
-        </div>
-        <!-- /ko -->
         <!-- /ko -->
       </div>
     </div>
