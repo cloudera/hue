@@ -1344,21 +1344,33 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your user name on top right') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
     });
 
+    var closeTourOnEsc = function (e) {
+      if (e.keyCode === 27) {
+        tour.cancel();
+      }
+    };
+
     if (ApiHelper.getInstance().getFromTotalStorage('tour', 'show.at.start', true)) {
+      $(document).on('keyup', closeTourOnEsc);
       tour.start();
     }
 
     tour.on('complete', function () {
       ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+      $(document).off('keyup', closeTourOnEsc);
     });
 
     tour.on('cancel', function () {
       ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+      $(document).off('keyup', closeTourOnEsc);
     });
 
     huePubSub.subscribe('show.welcome.tour', function () {
+      $(document).on('keyup', closeTourOnEsc);
       tour.start();
     });
+
+
 
   });
 </script>
