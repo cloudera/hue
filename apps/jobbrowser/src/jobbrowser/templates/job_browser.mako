@@ -128,12 +128,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
               ${_('Filter')} <input type="text" class="input-large" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
+              <!-- ko if: jobs.statesValuesFilter -->
               <span data-bind="foreach: jobs.statesValuesFilter">
                 <label class="checkbox">
                   <div class="pull-left margin-left-5 status-border status-content" data-bind="css: value, hueCheckbox: checked"></div>
                   <div class="inline-block" data-bind="text: name, toggle: checked"></div>
                 </label>
               </span>
+              <!-- /ko -->
 
               <!-- ko ifnot: $root.isMini -->
               ${_('in the last')} <input class="input-mini no-margin" type="number" min="1" max="3650" data-bind="value: jobs.timeValueFilter">
