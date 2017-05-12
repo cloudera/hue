@@ -37,6 +37,7 @@ LOG = logging.getLogger(__name__)
 
 class BaseTestOptimizerApi(object):
   UPLOADED = False
+  DATABASE = 'db1'
 
   @classmethod
   def setup_class(cls):
@@ -61,14 +62,14 @@ class BaseTestOptimizerApi(object):
   @classmethod
   def upload(cls):
     queries = [
-        (uuid_default(), 0, "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;", 'db1'),
-        (uuid_default(), 0, "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;", 'db1'),
-        (uuid_default(), 0, "select Part.partkey, max(Part.salary), Part.name, Part.type from db1.Part where Part.yyprice > 2095", 'db1'),
-        (uuid_default(), 0, "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", 'db1'),
-        (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", 'db1'),
-        (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", 'db1'),
+        (uuid_default(), 0, "select emps.id from emps where emps.name = 'Joe' group by emps.mgr, emps.id;", BaseTestOptimizerApi.DATABASE),
+        (uuid_default(), 0, "select emps.name from emps where emps.num = 007 group by emps.state, emps.name;", BaseTestOptimizerApi.DATABASE),
+        (uuid_default(), 0, "select Part.partkey, max(Part.salary), Part.name, Part.type from %s.Part where Part.yyprice > 2095" % BaseTestOptimizerApi.DATABASE, BaseTestOptimizerApi.DATABASE),
+        (uuid_default(), 0, "select Part.partkey, Part.name, Part.mfgr FROM Part WHERE Part.name LIKE '%red';", BaseTestOptimizerApi.DATABASE),
+        (uuid_default(), 0, "select count(*) as loans from account a where a.account_state_id in (5,9);", BaseTestOptimizerApi.DATABASE),
+        (uuid_default(), 0, "select orders.key, orders.id from orders where orders.price < 9999", BaseTestOptimizerApi.DATABASE),
 
-        (uuid_default(), 0, "select x from x join y where x.a = y.a;", 'default'),
+        (uuid_default(), 0, "select x from x join y where x.a = y.a;", BaseTestOptimizerApi.DATABASE),
 
         # DDL
         (uuid_default(), 0, ' '.join('''CREATE TABLE `web_logs`(
@@ -103,7 +104,7 @@ class BaseTestOptimizerApi(object):
 COMMENT 'http://demo.gethue.com/ rocks!'
 PARTITIONED BY (
   `date` string)
-'''.splitlines()), 'edw')
+'''.splitlines()), BaseTestOptimizerApi.DATABASE)
     ]
 
     resp = cls.api.upload(data=queries, data_type='queries', source_platform='hive')
@@ -143,7 +144,7 @@ PARTITIONED BY (
 class TestOptimizerApi(BaseTestOptimizerApi):
 
   def test_tenant(self):
-    resp = self.api.get_tenant(email=OPTIMIZER.EMAIL.get())
+    resp = self.api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())
 
     assert_true('tenant' in resp, resp)
 
@@ -157,7 +158,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
     assert_true('eid' in resp['results'][0], resp)
     assert_true('name' in resp['results'][0], resp)
 
-    database_name = 'hue'
+    database_name = BaseTestOptimizerApi.DATABASE
     resp = self.api.top_tables(database_name=database_name)
 
     assert_true(isinstance(resp['results'], list), resp)
@@ -183,7 +184,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
     assert_true('type' in resp, resp)
     assert_true('name' in resp, resp)
 
-    resp = self.api.table_details(database_name='db1', table_name='Part')
+    resp = self.api.table_details(database_name=BaseTestOptimizerApi.DATABASE, table_name='Part')
 
     assert_true('tid' in resp, resp)
     assert_true('columnCount' in resp, resp)
@@ -192,7 +193,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
   def test_query_risk(self):
     query = 'Select * from items'
 
-    resp = self.api.query_risk(query=query, source_platform='hive', db_name='default')
+    resp = self.api.query_risk(query=query, source_platform='hive', db_name=BaseTestOptimizerApi.DATABASE)
 
     assert_true(len(resp) > 0, resp)
     assert_true('riskAnalysis' in resp['hints'][0], resp)
@@ -214,26 +215,26 @@ class TestOptimizerApi(BaseTestOptimizerApi):
 
 
   def test_top_filters(self):
-    resp = self.api.top_filters(db_tables=['db1.Part'])
+    resp = self.api.top_filters(db_tables=['%s.Part' % BaseTestOptimizerApi.DATABASE])
 
     assert_true(len(resp['results']) > 0, resp)
 
 
   def test_top_joins(self):
-    resp = self.api.top_joins(db_tables=['default.x'])
+    resp = self.api.top_joins(db_tables=['%s.x' % BaseTestOptimizerApi.DATABASE])
 
     assert_true(len(resp['results']) > 0, resp)
 
-    assert_true(resp['results'][0]['tables'], [u'default.x', u'default.y'])
+    assert_true(resp['results'][0]['tables'], [u'%s.x', u'%s.y' % (BaseTestOptimizerApi.DATABASE, BaseTestOptimizerApi.DATABASE)])
     assert_true('queryIds' in resp['results'][0], resp)
     assert_true('totalTableCount' in resp['results'][0], resp)
     assert_true('totalQueryCount' in resp['results'][0], resp)
     assert_true('joinType' in resp['results'][0], resp)
-    assert_equal(resp['results'][0]['joinCols'], [{u'columns': [u'default.x.a', u'default.y.a']}])
+    assert_equal(resp['results'][0]['joinCols'], [{u'columns': [u'%s.x.a' % BaseTestOptimizerApi.DATABASE, u'%s.y.a' % BaseTestOptimizerApi.DATABASE]}])
 
 
   def test_top_aggs(self):
-    resp = self.api.top_aggs(db_tables=['db1.Part'])
+    resp = self.api.top_aggs(db_tables=['%s.Part' % BaseTestOptimizerApi.DATABASE])
 
     assert_true(len(resp['results']) > 0, resp)
 
@@ -246,7 +247,7 @@ class TestOptimizerApi(BaseTestOptimizerApi):
 
 
   def test_top_columns(self):
-    resp = self.api.top_columns(db_tables=['db1.Part'])
+    resp = self.api.top_columns(db_tables=['%s.Part' % BaseTestOptimizerApi.DATABASE])
 
     assert_true('orderbyColumns' in resp, resp)
     assert_true('selectColumns' in resp, resp)
@@ -271,6 +272,8 @@ class TestOptimizerApi(BaseTestOptimizerApi):
 
 
   def test_similar_queries(self):
+    raise SkipTest # Experimental only
+
     source_platform = 'hive'
     query = 'Select * from (Select item.id from item)'
 
@@ -313,7 +316,7 @@ FROM
                                     FROM sample_01) t1) t2) t3) t4) t5) t6) t7) t8) t9) t10) t11) t12
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['>=10 Inline Views present in query.'], resp['hints'])
 
 
@@ -322,7 +325,7 @@ FROM
     query = '''SELECT ID, NAME, AMOUNT, DATE FROM CUSTOMERS, ORDERS
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
 
     source_platform = 'hive'
@@ -336,7 +339,7 @@ WHERE s07.salary > 88
 ORDER BY s07.salary DESC
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'])
 
 
@@ -374,7 +377,7 @@ ORDER BY s07.salary DESC
 LIMIT 1000
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['>=5 table joins or >=10 join conditions found.'], resp['hints'])
 
 
@@ -397,11 +400,11 @@ GROUP BY account_client,
          limit 5
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['>=10 columns present in GROUP BY list.'], resp['hints'])
 
-    assert_equal(resp['noDDL'], ['default.transactions'])
-    assert_equal(resp['noStats'], ['default.transactions'])
+    assert_equal(resp['noDDL'], ['%s.transactions' % BaseTestOptimizerApi.DATABASE])
+    assert_equal(resp['noStats'], ['%s.transactions' % BaseTestOptimizerApi.DATABASE])
 
 
   def test_risk_cross_join_false_positive(self):
@@ -418,27 +421,27 @@ ORDER BY s07.salary DESC
 LIMIT 1000
 '''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'], present=False)
 
 
     source_platform = 'hive'
     query = '''select x from x join y where x.a = y.a'''
 
-    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name='default')
+    resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=BaseTestOptimizerApi.DATABASE)
     _assert_risks(['Cartesian or CROSS join found.'], resp['hints'], present=False)
 
 
   def test_risk_no_filter_on_any_partitioned_column(self):
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs'''
-    db_name = 'default'
+    db_name = BaseTestOptimizerApi.DATABASE
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
     assert_false(resp['noDDL'], resp) # DDL was uploaded already
-    assert_equal(resp['noStats'], ['default.web_logs'])
+    assert_equal(resp['noStats'], ['%s.web_logs' % BaseTestOptimizerApi.DATABASE])
 
 
     source_platform = 'hive'
@@ -471,14 +474,14 @@ LIMIT 1000
   def test_risk_listing_all_risk_tables_all_the_time(self):
     source_platform = 'hive'
     query = '''SELECT * FROM web_logs JOIN a ON web_logs.id = a.id LIMIT 100'''
-    db_name = 'default'
+    db_name = BaseTestOptimizerApi.DATABASE
 
     resp = self.api.query_risk(query=query, source_platform=source_platform, db_name=db_name)
     _assert_risks(['Query on partitioned table is missing filters on partioning columns.'], resp['hints'])
 
-    assert_equal([suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'], ['default.web_logs'])
-    assert_equal(resp['noDDL'], ['default.a'])
-    assert_equal(resp['noStats'], ['default.a', 'default.web_logs'])
+    assert_equal([suggestion for suggestion in resp['hints'] if suggestion['riskId'] == 22][0]['riskTables'], ['%s.web_logs' % BaseTestOptimizerApi.DATABASE])
+    assert_equal(resp['noDDL'], ['%s.a' % BaseTestOptimizerApi.DATABASE])
+    assert_equal(resp['noStats'], ['%s.a' % BaseTestOptimizerApi.DATABASE, '%s.web_logs' % BaseTestOptimizerApi.DATABASE])
 
 
 def _assert_risks(risks, suggestions, present=True):
