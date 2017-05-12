@@ -94,14 +94,20 @@
             }
           }
         }, allBindings, viewModel, bindingContext);
-        $(element).attr('href', 'javascript: void(0);');
-      } else {
-        $(element).attr('href', ko.unwrap(valueAccessor()));
       }
+
+      ko.bindingHandlers.hueLink.update(element, valueAccessor);
     },
     update: function (element, valueAccessor) {
-      if (!IS_HUE_4) {
-        $(element).attr('href', ko.unwrap(valueAccessor()));
+      var url = ko.unwrap(valueAccessor());
+      if (url) {
+        if (IS_HUE_4) {
+          $(element).attr('href', '/hue' + (url.indexOf('/') === 0 ? url : '/' + url));
+        } else {
+          $(element).attr('href', url);
+        }
+      } else {
+        $(element).attr('href', 'javascript: void(0);');
       }
     }
 
