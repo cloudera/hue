@@ -80,9 +80,14 @@ def hue_version():
 def _version_from_properties(f):
   return dict(line.strip().split('=') for line in f.readlines() if len(line.strip().split('=')) == 2).get('version', HUE_DESKTOP_VERSION)
 
+
 ###################################################################################################
 # Custom Settings
 ###################################################################################################
+
+PREFERENCE_IS_WELCOME_TOUR_SEEN = 'is_welcome_tour_seen'
+
+
 class UserPreferences(models.Model):
   """Holds arbitrary key/value strings."""
   user = models.ForeignKey(auth_models.User)
