@@ -122,8 +122,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         <div class="content-panel">
           <div class="content-panel-inner">
-
+            <!-- ko if: $root.job() -->
             <div data-bind="template: { name: 'breadcrumbs' }"></div>
+            <!-- /ko -->
+
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
@@ -212,25 +214,25 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: $root.job() -->
           <!-- ko with: $root.job() -->
             <!-- ko if: mainType() == 'jobs' -->
-              <div data-bind="template: { name: 'job-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'job-page' }"></div>
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'workflows' -->
               <!-- ko if: type() == 'workflow' -->
-                <div data-bind="template: { name: 'workflow-page' }"></div>
+                <div class="jb-panel" data-bind="template: { name: 'workflow-page' }"></div>
               <!-- /ko -->
 
               <!-- ko if: type() == 'workflow-action' -->
-                <div data-bind="template: { name: 'workflow-action-page' }"></div>
+                <div class="jb-panel" data-bind="template: { name: 'workflow-action-page' }"></div>
               <!-- /ko -->
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'schedules' -->
-              <div data-bind="template: { name: 'schedule-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'schedule-page' }"></div>
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'bundles' -->
-              <div data-bind="template: { name: 'bundle-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'bundle-page' }"></div>
             <!-- /ko -->
 
           <!-- /ko -->
@@ -284,33 +286,36 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="breadcrumbs">
-  <h3>
-    <ul class="inline hue-breadcrumbs-bar" data-bind="foreach: breadcrumbs">
-      <li>
-      <!-- ko if: $index() > 1 -->
-        <span class="divider">&gt;</span>
+  <h3 class="jb-breadcrumbs">
+    <ul class="inline hue-breadcrumbs-bar">
+      <!-- ko foreach: breadcrumbs -->
+        <li>
+        <!-- ko if: $index() > 1 -->
+          <span class="divider">&gt;</span>
+        <!-- /ko -->
+
+        <!-- ko if: $index() != 0 -->
+          <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
+            <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
+            <span data-bind="template: 'breadcrumbs-icons'"></span>
+            <span data-bind="text: name"></span></a>
+          <!-- /ko -->
+          <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
+            <span data-bind="template: 'breadcrumbs-icons'"></span>
+            <span data-bind="text: name, attr: { title: id }"></span>
+          <!-- /ko -->
+        <!-- /ko -->
+        </li>
       <!-- /ko -->
 
-      <!-- ko if: $index() != 0 -->
-        <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
-          <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
-          <span data-bind="template: 'breadcrumbs-icons'"></span>
-          <span data-bind="text: name"></span></a>
-        <!-- /ko -->
-        <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
-          <span data-bind="template: 'breadcrumbs-icons'"></span>
-          <span data-bind="text: name, attr: { title: id }"></span>
+      <!-- ko if: !$root.isMini() -->
+        <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf(interface()) > -1 -->
+        <li class="pull-right">
+          <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
+        </li>
         <!-- /ko -->
       <!-- /ko -->
-      </li>
     </ul>
-    <!-- ko if: ! $root.isMini() -->
-      <!-- ko if: ['workflows', 'schedules', 'bundles', 'slas'].indexOf(interface()) > -1 -->
-      <span class="pull-right">
-        <a href="javascript:void(0)" data-bind="click: function() { $root.selectInterface('oozie-info') }">${ _('Configuration') }</a>
-      </span>
-      <!-- /ko -->
-    <!-- /ko -->
   </h3>
 </script>
 
@@ -452,14 +457,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
-      <div class="clearfix"></div>
-
-      <ul class="nav nav-tabs margin-top-20">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-page-tasks" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks\']').tab('show'); }">${ _('Tasks') }</a></li>
         <li><a href="#job-mapreduce-page-metadata" data-bind="click: function(){ fetchProfile('metadata'); $('a[href=\'#job-mapreduce-page-metadata\']').tab('show'); }">${ _('Metadata') }</a></li>
         <li><a href="#job-mapreduce-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
 
       <div class="tab-content">
@@ -541,7 +544,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
@@ -568,7 +571,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-      <ul class="nav nav-tabs margin-top-20">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#job-mapreduce-task-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-task-page-attempts" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-mapreduce-task-page-attempts\']').tab('show'); }">${ _('Attempts') }</a></li>
         <li><a href="#job-mapreduce-task-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
@@ -636,7 +639,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
@@ -668,7 +671,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div class="span10">
 
-      <ul class="nav nav-tabs margin-top-20">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-task-attempt-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-attempt-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
       </ul>
@@ -699,7 +702,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -735,7 +738,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -809,7 +812,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <!-- ko if: doc_url -->
           <li class="nav-header">${ _('Document') }</li>
           <li>
@@ -853,7 +856,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div class="span10">
 
-      <ul class="nav nav-tabs margin-top-20">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
         <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
@@ -929,7 +932,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -947,7 +950,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
 
     <div class="span10">
-      <ul class="nav nav-tabs margin-top-20">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#workflow-action-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
         <li><a href="#workflow-action-page-tasks" data-toggle="tab">${ _('Child jobs') }</a></li>
         <li><a href="#workflow-action-page-xml" data-toggle="tab">${ _('XML') }</a></li>
@@ -1008,7 +1011,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -1038,8 +1041,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
@@ -1123,7 +1125,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
-          <li><span data-bind="text: id"></span></li>
+          <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
           <li class="nav-header">${ _('Type') }</li>
@@ -1153,21 +1155,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div class="span10">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
-      <div class="clearfix"></div>
-
-      <ul class="nav nav-tabs">
+      <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#bundle-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
 
       <div class="tab-content">
         <div class="tab-pane active" id="bundle-page-coordinators">
-          <div data-bind="template: { name: 'job-actions' }"></div>
-
-          ${_('Filter')} <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
+          <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
           <div class="btn-group">
             <select size="3" multiple="true"></select>
             <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
