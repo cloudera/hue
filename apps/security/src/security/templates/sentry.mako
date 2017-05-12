@@ -26,7 +26,8 @@ from django.utils.translation import ugettext as _
 %if not is_embeddable:
 ${ commonheader(_('Hadoop Security'), "security", user, request) | n,unicode }
 %endif
-${ layout.menubar(section=component) }
+
+${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 
 <span id="securityComponents">
 

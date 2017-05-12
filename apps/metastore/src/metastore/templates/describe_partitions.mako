@@ -14,15 +14,16 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  from django.utils.translation import ugettext as _
   from desktop import conf
   from desktop.views import commonheader, commonfooter
-  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="assist" file="/assist.mako" />
 <%namespace name="components" file="components.mako" />
 
 ${ commonheader(_('Table Partitions: %(tableName)s') % dict(tableName=table.name), app_name, user, request) | n,unicode }
+
 <span class="notebook">
 ${ components.menubar() }
 

@@ -45,7 +45,7 @@ def is_selected(section, matcher):
 </%def>
 
 
-<%def name="menubar(section='')">
+<%def name="menubar(section='', is_embeddable=False)">
   <link href="${ static('security/css/security.css') }" rel="stylesheet">
 
   <link rel="stylesheet" href="${ static('desktop/ext/select2/select2.css') }">
@@ -59,7 +59,7 @@ def is_selected(section, matcher):
               <li class="app-header">
                 <a href="/${app_name}">
                   <i class="fa fa-lock"></i>
-                  ${ _('Hadoop Security') }
+                  ${ _('Security Browser') if is_embeddable else _('Hadoop Security') }
                 </a>
               </li>
               % if HIVE_V1.get():

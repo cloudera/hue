@@ -73,7 +73,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
           <li class="app-header">
             <a href="#manage">
               <i class="fa fa-database app-icon"></i>
-              ${_('Indexes')}
+              ${ _('Index Browser') if is_embeddable else _('Indexes') }
             </a>
           </li>
         </ul>
