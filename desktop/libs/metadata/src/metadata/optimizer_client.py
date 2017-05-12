@@ -185,7 +185,8 @@ class OptimizerApi(object):
   def upload_status(self, workload_id):
     return self._call('uploadStatus', {'tenant' : self._tenant_id, 'workloadId': workload_id})
 
-  @check_privileges
+  # Sentry permissions work bottom to top.
+  # @check_privileges
   def top_tables(self, workfloadId=None, database_name='default', page_size=1000, startingToken=None):
     data = self._call('getTopTables', {'tenant' : self._tenant_id, 'dbName': database_name.lower(), 'pageSize': page_size, 'startingToken': startingToken})
 
