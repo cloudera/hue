@@ -81,7 +81,8 @@ def hue(request):
     },
     'is_demo': desktop.conf.DEMO_ENABLED.get(),
     'banner_message': get_banner_message(request),
-    'cluster_config': ClusterConfig(request.user)
+    'cluster_config': ClusterConfig(request.user),
+    'user_preferences': dict((x.key, x.value) for x in UserPreferences.objects.filter(user=request.user))
   })
 
 def ko_editor(request):

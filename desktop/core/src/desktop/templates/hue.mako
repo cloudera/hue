@@ -18,9 +18,9 @@
   from django.utils.translation import ugettext as _
 
   from desktop import conf
-  from desktop.views import _ko
+  from desktop.views import _ko, login_modal
   from desktop.lib.i18n import smart_unicode
-  from desktop.views import login_modal
+  from desktop.models import PREFERENCE_IS_WELCOME_TOUR_SEEN
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from metadata.conf import has_optimizer, OPTIMIZER
@@ -205,9 +205,9 @@ ${ hueIcons.symbols() }
             % endif
             <li><a href="javascript:void(0)" onclick="huePubSub.publish('set.hue.version', 3)"><i class="fa fa-fw fa-exchange"></i> ${_('Switch to Hue 3')}</a></li>
             <li><a href="http://gethue.com" target="_blank"><span class="dropdown-no-icon">${_('Help')}</span></a></li>
-            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Show welcome tour')}</span></a></li>
+            <li><a href="javascript:void(0)" onclick="huePubSub.publish('show.welcome.tour')"><span class="dropdown-no-icon">${_('Welcome Tour')}</span></a></li>
             % if user.is_superuser:
-            <li><a href="/about/"><span class="dropdown-no-icon">${_('About Hue')}</span></a></li>
+            <li><a href="/about/"><span class="dropdown-no-icon">${_('Check Configuration')}</span></a></li>
             % endif
             <li class="divider"></li>
             <li><a title="${_('Sign out')}" href="/accounts/logout/"><i class="fa fa-fw fa-sign-out"></i> ${ _('Sign out') }</a></li>
@@ -1320,7 +1320,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     %if user.is_superuser:
       tour.addStep('admin', {
-        text: '${ _ko('Since you are a superuser, you can find the default admin wizard inside the user dropdown.') }',
+        text: '${ _ko('Since you are a superuser, you can find the Check Configuration inside the user dropdown and install examples of data and jobs.') }',
         attachTo: '.top-nav-right .dropdown bottom',
       });
     %endif
@@ -1331,17 +1331,17 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     tour.addStep('pagecontent', {
-      text: '${ _ko('This is the main action spot, where all the Hue apps will work.') }',
+      text: '${ _ko('This is the main action spot, where the currently selected app runs.') }',
       attachTo: '.page-content center',
     });
 
     tour.addStep('rightpanel', {
-      text: '${ _ko('Some of the apps, like in this case Editor, will have a right panel too with additional information to help you out in your data discovery.') }',
+      text: '${ _ko('Some of the apps have a right panel too with additional information to assist you out in your data discovery.') }',
       attachTo: '.right-panel left',
     });
 
     tour.addStep('bye', {
-      text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your user name on top right') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
+      text: '${ _ko('This tour will not be shown again, but you can always take it again by clicking on your username on top right.') }<br><br>${ _ko('And now go ') }<b>${ _ko('Query, Explore, Repeat') }</b>!',
     });
 
     var closeTourOnEsc = function (e) {
@@ -1350,18 +1350,22 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }
     };
 
-    if (ApiHelper.getInstance().getFromTotalStorage('tour', 'show.at.start', true)) {
+    % if not is_demo and not user_preferences.get(PREFERENCE_IS_WELCOME_TOUR_SEEN):
       $(document).on('keyup', closeTourOnEsc);
       tour.start();
-    }
+    % endif
 
     tour.on('complete', function () {
-      ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+      $.post('/desktop/api2/user_preferences/${ PREFERENCE_IS_WELCOME_TOUR_SEEN }', {
+        'set': 'seen'
+      });
       $(document).off('keyup', closeTourOnEsc);
     });
 
     tour.on('cancel', function () {
-      ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+      $.post('/desktop/api2/user_preferences/${ PREFERENCE_IS_WELCOME_TOUR_SEEN }', {
+        'set': 'seen'
+      });
       $(document).off('keyup', closeTourOnEsc);
     });
 
@@ -1369,8 +1373,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       $(document).on('keyup', closeTourOnEsc);
       tour.start();
     });
-
-
 
   });
 </script>
