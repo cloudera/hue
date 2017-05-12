@@ -618,7 +618,15 @@ def search_entities(request):
     search_text = json.loads(request.POST.get('query_s', ''))
     entities = _search(user=request.user, search_text=search_text)
     response = {
-      'entities': [{'hue_name': e.name, 'hue_description': e.description, 'type': 'HUE', 'originalName': e.name, 'link': '/home?uuid=%s' % e.uuid} for e in entities['documents']],
+      'entities': [{
+          'hue_name': e.name,
+          'hue_description': e.description,
+          'type': 'HUE',
+          'doc_type': e.type,
+          'originalName': e.name,
+          'link': e.get_absolute_url()
+        } for e in entities['documents']
+      ],
       'count': len(entities['documents']),
       'status': 0
     }
@@ -639,7 +647,15 @@ def search_entities_interactive(request):
     limit = int(request.POST.get('limit', 25))
     entities = _search(user=request.user, search_text=search_text, limit=limit)
     response = {
-      'results': [{'hue_name': e.name, 'hue_description': e.description, 'link': '/home?uuid=%s' % e.uuid, 'type': 'HUE', 'originalName': e.name } for e in entities['documents']],
+      'results': [{
+          'hue_name': e.name,
+          'hue_description': e.description,
+          'link': e.get_absolute_url(),
+          'doc_type': e.type,
+          'type': 'HUE',
+          'originalName': e.name
+        } for e in entities['documents']
+      ],
       'count': len(entities['documents']),
       'status': 0
     }
