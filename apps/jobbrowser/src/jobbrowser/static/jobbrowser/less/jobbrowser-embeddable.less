@@ -15,7 +15,6 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 */
-
 @import (reference) "hue-mixins.less";
 
 .jobbrowser-components {
@@ -64,9 +63,14 @@
     vertical-align: text-top;
   }
 
-  .sidebar-nav .nav-list li:not(.nav-header) {
-    text-overflow: ellipsis;
-    overflow-x: hidden;
-    white-space: nowrap;
+  .sidebar-nav {
+    .progress {
+      margin-bottom: 0;
+    }
+    .nav-list li:not(.nav-header) {
+      text-overflow: ellipsis;
+      overflow-x: hidden;
+      white-space: nowrap;
+    }
   }
 }

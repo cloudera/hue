@@ -836,6 +836,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
+          <li class="nav-header">${ _('Duration') }</li>
+          <li><span data-bind="text: duration"></span></li>
+          <li class="nav-header">${ _('Submitted') }</li>
+          <li><span data-bind="text: submitted"></span></li>
+
           <li class="nav-header">${ _('Variables') }</li>
           <li>
             <ul class="nav nav-list" data-bind="foreach: properties['parameters']">
@@ -908,11 +913,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-page-metadata">
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
-
           <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
         </div>
 
