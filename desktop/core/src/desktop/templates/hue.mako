@@ -1304,7 +1304,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     var tour = new Shepherd.Tour({
       defaults: {
-        classes: 'shepherd-theme-hue'
+        classes: 'shepherd-theme-hue',
+        showCancelLink: true
       }
     });
 
@@ -1319,7 +1320,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
     %if user.is_superuser:
       tour.addStep('admin', {
-        text: '${ _ko('Since you are a superuser, you can find the default admin wizard inside this dropdown.') }',
+        text: '${ _ko('Since you are a superuser, you can find the default admin wizard inside the user dropdown.') }',
         attachTo: '.top-nav-right .dropdown bottom',
       });
     %endif
@@ -1348,6 +1349,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     }
 
     tour.on('complete', function () {
+      ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
+    });
+
+    tour.on('cancel', function () {
       ApiHelper.getInstance().setInTotalStorage('tour', 'show.at.start', false);
     });
 
