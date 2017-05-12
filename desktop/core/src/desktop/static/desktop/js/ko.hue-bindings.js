@@ -294,7 +294,7 @@
             options.valueObservable(ui.item.value);
           }
           if (options.onSelect) {
-            options.onSelect();
+            options.onSelect(ui.item);
           }
           if (oldSelect) {
             oldSelect(event, ui);

@@ -1458,19 +1458,24 @@ from notebook.conf import get_ordered_interpreters
             var appConfig = clusterConfig['app_config'];
 
             if (appConfig['editor']) {
-              panels.push(
-                new AssistInnerPanel({
-                  panelData: new AssistDbPanel($.extend({
-                    apiHelper: self.apiHelper,
-                    i18n: i18n
-                  }, params.sql)),
+              var sqlPanel = new AssistInnerPanel({
+                panelData: new AssistDbPanel($.extend({
                   apiHelper: self.apiHelper,
-                  name: '${ _("SQL") }',
-                  type: 'sql',
-                  icon: 'fa-database',
-                  minHeight: 75
-                })
-              );
+                  i18n: i18n
+                }, params.sql)),
+                apiHelper: self.apiHelper,
+                name: '${ _("SQL") }',
+                type: 'sql',
+                icon: 'fa-database',
+                minHeight: 75
+              })
+              panels.push(sqlPanel);
+
+              huePubSub.subscribe('assist.show.sql', function () {
+                if (self.visiblePanel !== sqlPanel) {
+                  self.visiblePanel(sqlPanel);
+                }
+              });
             }
 
             if (self.tabsEnabled) {
@@ -1589,7 +1594,7 @@ from notebook.conf import get_ordered_interpreters
 
           var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === self.lastOpenPanelType() });
           var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
-          if (lastFoundPanel.length === 1) {
+          if (lastFoundPanel.length === 1 && dbPanel.length > 0) {
             dbPanel[0].panelData.init(); // always forces the db panel to load
           }
 
