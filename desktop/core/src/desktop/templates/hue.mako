@@ -47,7 +47,6 @@
   <link href="${ static('desktop/ext/css/cui/cui.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap2.css') }" rel="stylesheet">
   <link href="${ static('desktop/ext/css/cui/bootstrap-responsive2.css') }" rel="stylesheet">
-  <link href="${ static('desktop/ext/css/bootstrap-tour.min.css') }" rel="stylesheet">
 
   <link href="${ static('desktop/ext/css/font-awesome.min.css') }" rel="stylesheet">
   <link href="${ static('desktop/css/hue.css') }" rel="stylesheet">
@@ -356,7 +355,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/jquery.migration.js') }"></script>
 <script src="${ static('desktop/js/hue.utils.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap.min.js') }"></script>
-<script src="${ static('desktop/ext/js/bootstrap-tour.min.js') }"></script>
+<script src="${ static('desktop/ext/js/tether.js') }"></script>
+<script src="${ static('desktop/ext/js/shepherd.min.js') }"></script>
 <script src="${ static('desktop/js/bootstrap-tooltip.js') }"></script>
 <script src="${ static('desktop/ext/js/bootstrap-better-typeahead.min.js') }"></script>
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
@@ -449,6 +449,8 @@ ${ assist.assistPanel() }
 % if request is not None:
 ${ smart_unicode(login_modal(request).content) | n,unicode }
 % endif
+
+<div class="shepherd-backdrop"></div>
 
 <iframe id="zoomDetectFrame" style="width: 250px; display: none" ></iframe>
 
