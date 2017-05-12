@@ -913,7 +913,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-page-metadata">
-          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
         </div>
 
         <div class="tab-pane" id="workflow-page-xml">
@@ -1106,7 +1106,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="schedule-page-metadata">
-          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
         </div>
 
         <div class="tab-pane" id="schedule-page-xml">
@@ -1211,7 +1211,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="bundle-page-metadata">
-          <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
         </div>
 
         <div class="tab-pane" id="bundle-page-xml">
@@ -1223,6 +1223,32 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 </script>
 
+<script type="text/html" id="render-properties">
+  <!-- ko hueSpinner: { spin: !$data.properties, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko if: $data.properties -->
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th>${ _('Name') }</th>
+      <th>${ _('Value') }</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: Object.keys($data.properties)">
+      <tr>
+        <td data-bind="text: $data"></td>
+        <td>
+        <!-- ko if: $data.indexOf('dir') > -1 || $data.indexOf('path') > -1 || $data.indexOf('output') > -1 || $data.indexOf('input') > -1 || $parent.properties[$data].startsWith('/') ||  $parent.properties[$data].startsWith('hdfs://') -->
+          <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($parent.properties[$data]) , text: $parent.properties[$data]"></a>
+        <!-- /ko -->
+        <!-- ko ifnot: $data.indexOf('dir') > -1 || $data.indexOf('path') > -1 || $data.indexOf('output') > -1 || $data.indexOf('input') > -1 || $parent.properties[$data].startsWith('/') ||  $parent.properties[$data].startsWith('hdfs://') -->
+          <span data-bind="text: $parent.properties[$data]"></span>
+        <!-- /ko -->
+        </td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- /ko -->
+</script>
 
 <script type="text/javascript">
 
@@ -1983,6 +2009,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       }
 
       self.resetBreadcrumbs();
+
+      self.getHDFSPath = function (path) {
+        if (path.startsWith('hdfs://')) {
+          var bits = path.substr(7).split('/');
+          bits.shift();
+          return '/' + bits.join('/');
+        }
+        return path;
+      }
 
       self.load = function() {
         var h = window.location.hash;
