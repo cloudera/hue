@@ -94,7 +94,7 @@ from notebook.conf import get_ordered_interpreters
     <li><a href="javascript:void(0);" data-bind="click: dblClick"><i class="fa fa-fw fa-paste"></i> ${ _('Insert at cursor') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition.isView || definition.isTable || definition.isDatabase -->
-    <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Metastore') }</a></li>
+    <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Table Browser') }</a></li>
     <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
     <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
