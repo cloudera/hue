@@ -716,12 +716,34 @@ ${ components.menubar(is_embeddable) }
   <div class="tile" data-bind="visible: true" style="display: none;">
     <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
     <!-- ko if: loaded -->
+    <div data-bind="visible: filters().length > 0">
+      <div data-bind="foreach: filters">
+          <div class="filter-box">
+            <a href="javascript:void(0)" class="pull-right" data-bind="click: $parent.removeFilter">
+              <i class="fa fa-times"></i>
+            </a>
+            <select class="input-small" data-bind="options: $parent.keys, value: column"></select>
+            &nbsp;
+            <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $parent.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+        </div>
+      </div>
+      <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
+        <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
+          <i class="fa fa-plus"></i> ${ _('Add') }
+        </a>
+        <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
+        <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
+      </div>
+    </div>
+    <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
+      <i class="fa fa-plus"></i> ${ _('Add a filter') }
+    </a>
+    <div class="clearfix"></div>
     <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
     <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
     <!-- /ko -->
   </div>
   <!-- /ko -->
-  <a data-bind="attr: { 'href': '/metastore/table/' + database.name + '/' + name + '/partitions' }">${ _('View all') }</a>
 </script>
 
 <script type="text/html" id="metastore-sample-tab">

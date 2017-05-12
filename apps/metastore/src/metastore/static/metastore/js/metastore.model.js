@@ -228,6 +228,55 @@ var MetastoreTable = (function () {
     self.loaded = ko.observable(false);
     self.loading = ko.observable(true);
 
+    self.sortDesc = ko.observable(true);
+    self.filters = ko.observableArray([]);
+
+    self.typeaheadValues = function (column) {
+      var _vals = [];
+      self.values().forEach(function (row) {
+        var _cell = row.columns[self.keys().indexOf(column())];
+        if (_vals.indexOf(_cell) == -1) {
+          _vals.push(_cell);
+        }
+      });
+      return _vals
+    }
+
+    self.addFilter = function () {
+      self.filters.push(ko.mapping.fromJS({'column': '', 'value': ''}));
+    }
+
+    self.removeFilter = function (data) {
+      self.filters.remove(data);
+      if (self.filters().length == 0) {
+        self.sortDesc(true);
+        self.filter();
+      }
+    }
+
+    self.filter = function () {
+      self.loading(true);
+      self.loaded(false);
+      var _filters = JSON.parse(ko.toJSON(self.filters));
+      var _postData = {};
+      _filters.forEach(function (filter) {
+        _postData[filter.column] = filter.value;
+      });
+      _postData["sort"] = self.sortDesc() ? "desc" : "asc";
+
+      $.ajax({
+        type: "POST",
+        url: '/metastore/table/' + self.metastoreTable.database.name + '/' + self.metastoreTable.name + '/partitions',
+        data: _postData,
+        success: function (data) {
+          self.values(data.partition_values_json);
+          self.loading(false);
+          self.loaded(true);
+        },
+        dataType: "json"
+      });
+    }
+
     self.preview = {
       keys: ko.observableArray(),
       values: ko.observableArray()
