@@ -328,12 +328,12 @@ def edit_user(request, username=None):
         else:
           updated = True
 
-      # Change langugage preference, if necessary
+      # Change language preference, if necessary
       if form.cleaned_data.get('language') and form.cleaned_data.get('language') != get_language():
         request.session['django_language'] = form.cleaned_data.get('language')
         updated = True
 
-      if updated:
+      if updated and is_embeddable:
         request.info(_('User information updated'))
 
       # Audit log
