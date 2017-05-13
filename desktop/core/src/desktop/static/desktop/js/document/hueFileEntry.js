@@ -26,7 +26,7 @@ var HueFileEntry = (function () {
       if (!a.isDirectory() && b.isDirectory()) {
         return 1;
       }
-      return sorts.nameAsc(a, b);
+      return sorts.lastModifiedDesc(a, b);
     },
     nameAsc: function (a, b) {
       return a.definition().name.localeCompare(b.definition().name);
