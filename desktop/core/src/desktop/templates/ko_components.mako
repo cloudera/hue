@@ -410,6 +410,7 @@ from desktop.views import _ko
         self.jobsPanelVisible.subscribe(function (newVal) {
           if (newVal) {
             huePubSub.publish('hide.history.panel');
+            huePubSub.publish('mini.jb.navigate');
           }
         });
 
@@ -447,7 +448,7 @@ from desktop.views import _ko
           });
         };
 
-        // load the mini jobbrowser
+        // Load the mini jobbrowser
         $.ajax({
           url: '/jobbrowser/apps?is_embeddable=true&is_mini=true',
           beforeSend: function (xhr) {
