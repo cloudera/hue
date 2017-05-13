@@ -101,11 +101,14 @@ class DataEngApi(Api):
 
 
   def cancel(self, notebook, snippet):
-    job_id = snippet['result']['handle']['id']
+    if snippet['result']['handle'].get('id'):
+      job_id = snippet['result']['handle']['id']
+      DataEng(self.user).terminate_jobs(job_ids=[job_id])
+      response = {'status': 0}
+    else:
+      response = {'status': -1, 'message': _('Could not cancel because of unsuccessful submition.')}
 
-    DataEng(self.user).terminate_jobs(job_ids=[job_id])
-
-    return {'status': 0}
+    return response
 
 
   def get_log(self, notebook, snippet, startFrom=0, size=None):
