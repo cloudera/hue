@@ -27,8 +27,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <span class="notebook">
 
 <link rel="stylesheet" href="${ static('desktop/ext/css/basictable.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+
 % if not is_embeddable:
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
@@ -41,6 +42,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 % endif
 </style>
 % endif
+
 <link rel="stylesheet" href="${ static('jobbrowser/css/jobbrowser-embeddable.css') }">
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
@@ -1990,7 +1992,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         window.clearInterval(updateJobsInterval);
         if (self.interface() && self.interface() !== 'slas' && self.interface() !== 'oozie-info'){
           if (val) {
-            updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+            if (val.apiStatus() == 'RUNNING') {
+              updateJobInterval = setInterval(val.updateJob, 5000, 'jobbrowser');
+            }
           }
           else {
             updateJobsInterval = setInterval(self.jobs.updateJobs, 20000, 'jobbrowser');
@@ -2047,28 +2051,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     };
 
 
-
     $(document).ready(function () {
       var jobBrowserViewModel = new JobBrowserViewModel();
       % if not is_mini:
-      ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
-      huePubSub.subscribe('oozie.action.logs.click', function (widget) {
-        var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
-        if (jobId) {
-          jobBrowserViewModel.job().id(jobId[1]);
-          jobBrowserViewModel.job().fetchJob();
-        } else {
-          console.error('Unknown job log url: ' + widget.logsURL());
-        }
-      }, 'jobbrowser');
+        ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
+        huePubSub.subscribe('oozie.action.logs.click', function (widget) {
+          var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
+          if (jobId) {
+            jobBrowserViewModel.job().id(jobId[1]);
+            jobBrowserViewModel.job().fetchJob();
+          } else {
+            console.error('Unknown job log url: ' + widget.logsURL());
+          }
+        }, 'jobbrowser');
 
-      huePubSub.subscribe('oozie.action.click', function (widget) {
-        jobBrowserViewModel.job().id(widget.externalId());
-        jobBrowserViewModel.job().fetchJob();
-      }, 'jobbrowser');
+        huePubSub.subscribe('oozie.action.click', function (widget) {
+          jobBrowserViewModel.job().id(widget.externalId());
+          jobBrowserViewModel.job().fetchJob();
+        }, 'jobbrowser');
       % else:
-      ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
-      jobBrowserViewModel.isMini(true);
+        ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
+        jobBrowserViewModel.isMini(true);
       % endif
 
 
@@ -2090,17 +2093,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.publish('cluster.config.get.config');
 
       % if not is_mini:
-      huePubSub.subscribe('submit.rerun.popup.return', function (data) {
-        $.jHueNotify.info('${_('Rerun submitted.')}');
-        $('#rerun-modal').modal('hide');
-        jobBrowserViewModel.job().apiStatus('RUNNING');
-        jobBrowserViewModel.job().updateJob();
-      }, 'jobbrowser');
+        huePubSub.subscribe('submit.rerun.popup.return', function (data) {
+          $.jHueNotify.info('${_('Rerun submitted.')}');
+          $('#rerun-modal').modal('hide');
+          jobBrowserViewModel.job().apiStatus('RUNNING');
+          jobBrowserViewModel.job().updateJob();
+        }, 'jobbrowser');
       % else:
-      jobBrowserViewModel.selectInterface('jobs');
-      huePubSub.subscribe('mini.jb.navigate', function(interface){
-        jobBrowserViewModel.selectInterface(interface);
-      });
+        huePubSub.subscribe('mini.jb.navigate', function(interface){
+          jobBrowserViewModel.selectInterface(interface);
+        });
       % endif
 
       $(document).on('shown', 'a', function (e) {
