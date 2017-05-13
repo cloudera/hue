@@ -236,7 +236,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: mainType() == 'bundles' -->
               <div class="jb-panel" data-bind="template: { name: 'bundle-page' }"></div>
             <!-- /ko -->
-            
+
             <!-- ko if: mainType().startsWith('dataeng-job') -->
               <div data-bind="template: { name: 'dataeng-job-page' }"></div>
             <!-- /ko -->
@@ -779,12 +779,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="dataeng-job-page">
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
-    <div data-bind="template: { name: 'job-dataeng-job-hive-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'dataeng-job-hive-page', data: $root.job() }"></div>
   <!-- /ko -->
 </script>
 
 
-<script type="text/html" id="job-dataeng-job-hive-page">
+<script type="text/html" id="dataeng-job-hive-page">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -793,8 +793,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Progress') } <span data-bind="text: progress"></span>
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
-  
-  <pre data-bind="text: ko.toJSON(properties['properties'], null, 2)"></pre>
+
+  <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
 </script>
 
 
@@ -1930,7 +1930,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         var jobsInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('yarn') != -1;
         }
-        var dataengInterfaceCondition = function () {
+        var dataEngInterfaceCondition = function () {
           return self.appConfig() && self.appConfig()['browser'] && self.appConfig()['browser']['interpreter_names'].indexOf('dataeng') != -1;
         }
         var schedulerInterfaceCondition = function () {
@@ -1939,12 +1939,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
         var interfaces = [
           {'interface': 'jobs', 'label': '${ _ko('Jobs') }', 'condition': jobsInterfaceCondition},
-          {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataengInterfaceCondition},
+          {'interface': 'dataeng-jobs', 'label': '${ _ko('Jobs') }', 'condition': dataEngInterfaceCondition},
           {'interface': 'workflows', 'label': '${ _ko('Workflows') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'schedules', 'label': '${ _ko('Schedules') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'bundles', 'label': '${ _ko('Bundles') }', 'condition': schedulerInterfaceCondition},
           {'interface': 'slas', 'label': '${ _ko('SLAs') }', 'condition': schedulerInterfaceCondition},
-          {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataengInterfaceCondition},
+          {'interface': 'dataeng-clusters', 'label': '${ _ko('Clusters') }', 'condition': dataEngInterfaceCondition},
         ];
 
         return interfaces.filter(function (i) {
@@ -2129,7 +2129,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         loadHash();
       }
 
-      huePubSub.subscribeOnce('cluster.config.set.config', function (clusterConfig) {
+      huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
         jobBrowserViewModel.appConfig(clusterConfig && clusterConfig['app_config']);
         loadHash();
       });
