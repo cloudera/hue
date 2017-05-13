@@ -15,9 +15,10 @@
 ## limitations under the License.
 
 <%!
+from django.utils.translation import ugettext as _
+
 from desktop import conf
 from desktop.lib.i18n import smart_unicode
-from django.utils.translation import ugettext as _
 from desktop.views import _ko
 %>
 
@@ -428,6 +429,7 @@ from desktop.views import _ko
       <div class="doc-browser-header">
         <div class="doc-browser-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
         <div class="doc-browser-attr-group">
+          <div class="doc-browser-attr-col" data-bind="click: function () { setSort('description') }, css: { 'sorting_asc' : activeSort() === 'descriptionAsc', 'sorting_desc' : activeSort() === 'descriptionDesc', 'sorting' : activeSort().indexOf('description') !== 0 }">${ _('Description') }</div>
           <div class="doc-browser-attr-col doc-browser-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
           <div class="doc-browser-attr-col doc-browser-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
           <div class="doc-browser-attr-col doc-browser-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
@@ -480,18 +482,19 @@ from desktop.views import _ko
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
+                <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
                 <div class="doc-browser-attr-col doc-browser-type">
                   <!-- ko switch: type -->
-                  <!-- ko case: 'directory' -->${ _('Directory')}<!-- /ko -->
-                  <!-- ko case: 'link-pigscript' -->${ _('Pig Script')}<!-- /ko -->
-                  <!-- ko case: 'link-workflow' -->${ _('Job Design')}<!-- /ko -->
-                  <!-- ko case: 'notebook' -->${ _('Notebook')}<!-- /ko -->
-                  <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle')}<!-- /ko -->
-                  <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator')}<!-- /ko -->
-                  <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow')}<!-- /ko -->
-                  <!-- ko case: 'query-hive' -->${ _('Hive Query')}<!-- /ko -->
-                  <!-- ko case: 'query-impala' -->${ _('Impala Query')}<!-- /ko -->
-                  <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard')}<!-- /ko -->
+                  <!-- ko case: 'directory' -->${ _('Directory') }<!-- /ko -->
+                  <!-- ko case: 'link-pigscript' -->${ _('Pig Script') }<!-- /ko -->
+                  <!-- ko case: 'link-workflow' -->${ _('Job Design') }<!-- /ko -->
+                  <!-- ko case: 'notebook' -->${ _('Notebook') }<!-- /ko -->
+                  <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle') }<!-- /ko -->
+                  <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator') }<!-- /ko -->
+                  <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow') }<!-- /ko -->
+                  <!-- ko case: 'query-hive' -->${ _('Hive Query') }<!-- /ko -->
+                  <!-- ko case: 'query-impala' -->${ _('Impala Query') }<!-- /ko -->
+                  <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard') }<!-- /ko -->
                   <!-- ko case: $default -->
                   <!-- ko text: $value --><!-- /ko -->
                   <!-- /ko -->

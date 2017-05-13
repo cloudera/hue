@@ -149,7 +149,7 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-middle">
         <div class="search-container-top">
-          <input placeholder="${ _('Search all data and saved documents...') }" type="text"
+          <input placeholder="${ _('Search data and saved documents...') }" type="text"
             data-bind="autocomplete: {
                 source: searchAutocompleteSource,
                 itemTemplate: 'top-search-autocomp-item',
