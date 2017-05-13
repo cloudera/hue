@@ -14,9 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
+  from django.utils.translation import ugettext as _
+
   from desktop.views import commonheader, commonfooter, _ko
   from desktop import conf
-  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="assist" file="/assist.mako" />
@@ -205,11 +206,6 @@ ${ common_home.navbar() }
 %else :
 
 <div id="homeComponents" class="main-content">
-##   Uncomment to enable the assist panel
-##   <a title="${_('Toggle Assist')}" class="pointer show-assist" data-bind="visible: !$root.isLeftPanelVisible(), click: function() { $root.isLeftPanelVisible(true); }" style="display:none;">
-##     <i class="fa fa-chevron-right"></i>
-##   </a>
-
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() ? '0' : '20px' }">
     <div class="vertical-full row-fluid panel-container">
       <div class="assist-container left-panel" data-bind="visible: $root.isLeftPanelVisible" style="display: none;">

@@ -17,7 +17,7 @@
 var HueFileEntry = (function () {
   var self = this;
   self.loading = ko.observable(false);
- 
+
   var sorts = {
     defaultAsc: function (a, b) {
       if (a.isDirectory() && !b.isDirectory()) {
@@ -33,6 +33,12 @@ var HueFileEntry = (function () {
     },
     nameDesc: function (a, b) {
       return sorts.nameAsc(b, a);
+    },
+    descriptionAsc: function (a, b) {
+      return a.definition().description.localeCompare(b.definition().description);
+    },
+    descriptionDesc: function (a, b) {
+      return sorts.descriptionAsc(b, a);
     },
     typeAsc: function (a, b) {
       return a.definition().type.localeCompare(b.definition().type);
