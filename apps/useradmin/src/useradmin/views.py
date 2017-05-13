@@ -333,7 +333,7 @@ def edit_user(request, username=None):
         request.session['django_language'] = form.cleaned_data.get('language')
         updated = True
 
-      if updated and is_embeddable:
+      if updated and not is_embeddable:
         request.info(_('User information updated'))
 
       # Audit log
