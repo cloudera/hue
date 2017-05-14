@@ -69,7 +69,6 @@ def is_alive(request):
 
 def hue(request):
   apps = appmanager.get_apps_dict(request.user)
-  clusters = get_clusters()
   default_cluster_index, default_cluster_interface = Cluster(request.user).get_list_interface_indexes()
 
   return render('hue.mako', request, {
