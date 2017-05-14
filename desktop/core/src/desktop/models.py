@@ -1577,7 +1577,7 @@ class ClusterConfig():
   def _get_editor(self):
     interpreters = []
 
-    if SHOW_NOTEBOOKS.get():
+    if SHOW_NOTEBOOKS.get() and self.cluster_type != 'impalaui':
       interpreters.append({
         'name': 'notebook',
         'type': 'notebook',
@@ -1589,6 +1589,8 @@ class ClusterConfig():
     _interpreters = get_ordered_interpreters(self.user)
     if self.cluster_type == 'dataeng':
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'java')]
+    elif self.cluster_type == 'impalaui':
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
 
     for interpreter in _interpreters:
       interpreters.append({
@@ -1612,7 +1614,7 @@ class ClusterConfig():
   def _get_dashboard(self):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
 
-    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != 'dataeng':
+    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != 'dataeng' and self.cluster_type != 'impalaui':
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
@@ -1699,7 +1701,7 @@ class ClusterConfig():
         'page': '/sqoop'
       })
 
-    if interpreters:
+    if interpreters and self.cluster_type != 'impalaui':
       return {
           'name': 'browser',
           'displayName': _('Browsers'),
@@ -1729,7 +1731,7 @@ class ClusterConfig():
       }
     ]
 
-    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser):
+    if 'oozie' in self.apps and not (self.user.has_hue_permission(action="disable_editor_access", app="oozie") and not self.user.is_superuser) and self.cluster_type != 'impalaui':
       return {
           'name': 'oozie',
           'displayName': _('Scheduler'),
@@ -1781,6 +1783,7 @@ class Cluster():
     self.user = user
     self.default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
     self.data = {}
+
     if self.default_cluster:
       clusters = get_clusters()
       cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
