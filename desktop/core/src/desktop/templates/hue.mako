@@ -771,13 +771,22 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/editor', app: function () {
             // Defer to allow window.location param update
             _.defer(function () {
-              self.loadApp('editor');
-              if (window.location.getParameter('editor') !== '') {
-                self.getActiveAppViewModel(function (viewModel) {
-                  viewModel.openNotebook(window.location.getParameter('editor'));
-                });
-              } else if (window.location.getParameter('type') !== '') {
-                self.changeEditorType(window.location.getParameter('type'));
+              if (typeof self.embeddable_cache['editor'] === 'undefined'){
+                if (window.location.getParameter('editor') !== '') {
+                  self.extraEmbeddableURLParams('&editor=' + window.location.getParameter('editor'));
+                } else if (window.location.getParameter('type') !== '') {
+                  self.extraEmbeddableURLParams('&type=' + window.location.getParameter('type'));
+                }
+                self.loadApp('editor');
+              } else {
+                self.loadApp('editor');
+                if (window.location.getParameter('editor') !== '') {
+                  self.getActiveAppViewModel(function (viewModel) {
+                    viewModel.openNotebook(window.location.getParameter('editor'));
+                  });
+                } else if (window.location.getParameter('type') !== '') {
+                  self.changeEditorType(window.location.getParameter('type'));
+                }
               }
             });
           }},
