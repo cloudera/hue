@@ -1534,6 +1534,13 @@ class Document2Permission(models.Model):
     return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
 
 
+def get_config(user):
+  cluster_type = Cluster(user).get_type()
+  cluster_config = ClusterConfig(user, cluster_type=cluster_type)
+
+  return cluster_config.get_config()
+
+
 class ClusterConfig():
 
   def __init__(self, user, apps=None, cluster_type='ini'):
@@ -1634,7 +1641,8 @@ class ClusterConfig():
         'name': 'editor',
         'displayName': _('Editor'),
         'interpreters': interpreters,
-        'page': interpreters[0]['page']
+        'page': interpreters[0]['page'],
+        'default_sql_interpreter': next([interpreter['name'] for interpreter in interpreters if interpreter['is_sql']], 'hive')
       }
     else:
       return None
