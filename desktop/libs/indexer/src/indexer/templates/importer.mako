@@ -508,6 +508,9 @@ ${ assist.assistPanel() }
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
             </span>
+            <span class="help-inline muted" data-bind="visible: ! $parent.createWizard.isValidDestination()">
+              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Invalid characters') }
+            </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
               <!-- ko if: outputFormat() == 'index' -->
                 ${ _('Adding data to the existing ') } <span data-bind="text: outputFormat"></span>
@@ -1283,8 +1286,8 @@ ${ assist.assistPanel() }
           if (self.tableName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-            $.get("/beeswax/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
-              self.isTargetExisting(data.code != 500);
+            $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName() + '/' + self.tableName(), function (data) {
+              self.isTargetExisting(data.code != 500 && data.code != 404);
               self.isTargetChecking(false);
             }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
           }
@@ -1297,7 +1300,7 @@ ${ assist.assistPanel() }
           if (self.databaseName() !== '') {
             self.isTargetExisting(false);
             self.isTargetChecking(true);
-            $.get("/beeswax/api/autocomplete/" + self.databaseName(), function (data) {
+            $.get("/" + (self.apiHelperType() == 'hive' ? 'beeswax' : self.apiHelperType()) + "/api/autocomplete/" + self.databaseName(), function (data) {
               self.isTargetExisting(data.tables_meta && data.tables_meta.length > 0);
               self.isTargetChecking(false);
             }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
@@ -1512,9 +1515,11 @@ ${ assist.assistPanel() }
 
       self.indexingStarted = ko.observable(false);
 
+      self.isValidDestination = ko.pureComputed(function() {
+         return self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
+      });
       self.readyToIndex = ko.computed(function () {
         var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
-        var validDestination = self.destination.name().length > 0 && (['table', 'database'].indexOf(self.destination.outputFormat()) == -1 || /^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]+$/.test(self.destination.name()));
         var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
             return column.name().length == 0;
           }).length == 0
@@ -1528,7 +1533,7 @@ ${ assist.assistPanel() }
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
         );
 
-        return validDestination && validFields && validTableColumns && isTargetAlreadyExisting && isValidTable;
+        return self.isValidDestination() && validFields && validTableColumns && isTargetAlreadyExisting && isValidTable;
       });
 
       self.formatTypeSubscribed = false;
