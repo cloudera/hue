@@ -22,6 +22,7 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
+from desktop.models import get_cluster_config
 
 from indexer.controller2 import IndexController
 from indexer.fields import FIELD_TYPES, Field
@@ -104,6 +105,7 @@ def importer_prefill(request, source_type, target_type, target_path=None):
 
 
 def _importer(request, prefill):
+  config = get_cluster_config(user=request.user)
 
   return render('importer.mako', request, {
       'is_embeddable': request.GET.get('is_embeddable', False),
@@ -111,7 +113,8 @@ def _importer(request, prefill):
       'operators_json' : json.dumps([operator.to_dict() for operator in OPERATORS]),
       'file_types_json' : json.dumps([format_.format_info() for format_ in get_file_indexable_format_types()]),
       'default_field_type' : json.dumps(Field().to_dict()),
-      'prefill' : json.dumps(prefill)
+      'prefill' : json.dumps(prefill),
+      'sourceType': config.get('default_sql_interpreter', 'hive')
   })
 
 
