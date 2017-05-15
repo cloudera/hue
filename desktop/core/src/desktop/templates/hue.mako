@@ -1317,11 +1317,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     tour.addStep('welcome', {
-      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br>${ _ko('Before you start, we want you to familiarize with the new interface. Ready?') }',
+      text: '<b>${ _ko('Welcome to Hue 4!') }</b><br><br>${ _ko('Before you start, we want you to familiarize with the new interface. Ready?') }',
     });
 
     tour.addStep('topnav', {
-      text: '${ _ko('A brand new navigation bar! The default app has its own blue button now, there is a global search available, and the notifications panels are on the right.') }',
+      text: '${ _ko('A brand new navigation bar!') }<br><br>${ _ko('The default app has its own blue button now, there is a global search available, and the notifications panels are on the right.') }',
       attachTo: '.navbar-default bottom',
     });
 
@@ -1338,7 +1338,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     });
 
     tour.addStep('pagecontent', {
-      text: '${ _ko('This is the main action spot, where the currently selected app runs.') }',
+      text: '${ _ko('This is the main action spot, where the currently selected app runs.') }<br>${ _ko('Hover on the app name to star it as your favorite application.') }',
       attachTo: '.page-content center',
     });
 
