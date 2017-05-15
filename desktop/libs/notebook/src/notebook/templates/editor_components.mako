@@ -3099,8 +3099,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      huePubSub.subscribe("editor.table.stats.upload", function (activeTables) {
-        viewModel.selectedNotebook().snippets()[0].uploadTableStats(activeTables);
+      huePubSub.subscribe('editor.upload.table.stats', function (options) {
+        viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
       });
 
       huePubSub.subscribe("editor.upload.history", function () {

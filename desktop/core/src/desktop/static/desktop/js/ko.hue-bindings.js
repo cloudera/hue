@@ -533,7 +533,8 @@
       var options = {
         size: 'default',
         center: false,
-        overlay: false
+        overlay: false,
+        inline: false
       };
 
       var spin = false;
@@ -548,7 +549,7 @@
 
       if (spin) {
         var $container = $('<div>');
-        $container.addClass(options.overlay ? 'hue-spinner-overlay' : 'hue-spinner');
+        $container.addClass(options.overlay ? 'hue-spinner-overlay' : ( options.inline ? 'hue-spinner-inline' : 'hue-spinner'));
         if (!options.overlay) {
           var $spinner = $('<i>');
           $spinner.addClass('fa fa-spinner fa-spin');
