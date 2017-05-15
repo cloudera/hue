@@ -42,6 +42,7 @@ LOG = logging.getLogger(__name__)
 DBMS_CACHE = {}
 DBMS_CACHE_LOCK = threading.Lock()
 
+
 def get(user, query_server=None):
   global DBMS_CACHE
   global DBMS_CACHE_LOCK

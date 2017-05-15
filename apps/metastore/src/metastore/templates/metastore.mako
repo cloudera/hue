@@ -1199,7 +1199,8 @@ ${ components.menubar(is_embeddable) }
 
   function queryAndWatch(url) {
     $.post(url, {
-      format: "json"
+      format: "json",
+      sourceType: '${ source_type }'
     },function(resp) {
       if (resp.history_uuid) {
         huePubSub.publish('open.editor.query', resp.history_uuid);
@@ -1225,7 +1226,8 @@ ${ components.menubar(is_embeddable) }
         optimizerEnabled: '${ is_optimizer_enabled }' === 'True',
         navigatorEnabled: '${ is_navigator_enabled }' === 'True',
         optimizerUrl: '${ optimizer_url }',
-        navigatorUrl: '${ navigator_url }'
+        navigatorUrl: '${ navigator_url }',
+        sourceType: '${ source_type }'
       };
 
       var viewModel = new MetastoreViewModel(options);

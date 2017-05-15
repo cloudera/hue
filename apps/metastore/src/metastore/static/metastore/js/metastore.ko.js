@@ -31,6 +31,7 @@ var MetastoreViewModel = (function () {
     self.apiHelper.withTotalStorage('assist', 'assist_panel_visible', self.isLeftPanelVisible, true);
     self.optimizerEnabled = ko.observable(options.optimizerEnabled || false);
     self.navigatorEnabled = ko.observable(options.navigatorEnabled || false);
+    self.sourceType = ko.observable(options.sourceType || 'hive');
 
     self.navigatorEnabled.subscribe(function (newValue) {
       huePubSub.publish('meta.navigator.enabled', newValue);
@@ -41,7 +42,7 @@ var MetastoreViewModel = (function () {
 
     huePubSub.subscribe("assist.db.panel.ready", function () {
       huePubSub.publish('assist.set.database', {
-        source: 'hive',
+        source: self.sourceType(),
         name: null
       });
     });
@@ -75,7 +76,7 @@ var MetastoreViewModel = (function () {
       }
       self.reloading(true);
       huePubSub.publish('assist.clear.db.cache', {
-        sourceType: 'hive',
+        sourceType: self.sourceType(),
         clearAll: true
       });
       huePubSub.publish('assist.clear.db.cache', {
@@ -175,13 +176,14 @@ var MetastoreViewModel = (function () {
 
     self.loading(true);
     self.apiHelper.loadDatabases({
-      sourceType: 'hive',
+      sourceType: self.sourceType(),
       successCallback: function (databaseNames) {
         self.databases($.map(databaseNames, function (name) {
           return new MetastoreDatabase({
             name: name,
             optimizerEnabled: self.optimizerEnabled,
-            navigatorEnabled: self.navigatorEnabled
+            navigatorEnabled: self.navigatorEnabled,
+            sourceType: self.sourceType,
           })
         }));
         self.loading(false);
@@ -213,13 +215,13 @@ var MetastoreViewModel = (function () {
             self.database().setTable(foundTables[0], callback);
           } else if (clearDbCacheOnMissing) {
             huePubSub.publish('assist.clear.db.cache', {
-              sourceType: 'hive',
+              sourceType: self.sourceType(),
               clearAll: false,
               databaseName: self.database().name
             });
             self.database().load(function () {
               setTableAfterLoad(false);
-            }, self.optimizerEnabled(), self.navigatorEnabled());
+            }, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType());
           }
         };
 
@@ -314,7 +316,7 @@ var MetastoreViewModel = (function () {
     self.database(metastoreDatabase);
 
     if (!metastoreDatabase.loaded()) {
-      metastoreDatabase.load(callback, self.optimizerEnabled(), self.navigatorEnabled());
+      metastoreDatabase.load(callback, self.optimizerEnabled(), self.navigatorEnabled(), self.sourceType());
     } else if (callback) {
       callback();
     }

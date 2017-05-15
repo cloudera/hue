@@ -101,7 +101,7 @@ var MetastoreDatabase = (function () {
     };
   }
 
-  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled) {
+  MetastoreDatabase.prototype.load = function (callback, optimizerEnabled, navigatorEnabled, sourceType) {
     var self = this;
     if (self.loading()) {
       return;
@@ -109,7 +109,7 @@ var MetastoreDatabase = (function () {
 
     self.loading(true);
     self.apiHelper.fetchTables({
-      sourceType: 'hive',
+      sourceType: sourceType,
       databaseName: self.name,
       successCallback: function (data) {
         self.tables($.map(data.tables_meta, function (tableMeta) {
@@ -119,7 +119,8 @@ var MetastoreDatabase = (function () {
             type: tableMeta.type,
             comment: tableMeta.comment,
             optimizerEnabled: optimizerEnabled,
-            navigatorEnabled: navigatorEnabled
+            navigatorEnabled: navigatorEnabled,
+            sourceType: sourceType
           })
         }));
         self.loaded(true);
@@ -334,7 +335,7 @@ var MetastoreTable = (function () {
     }
     self.hasErrors(false);
     self.apiHelper.fetchTableSample({
-      sourceType: "hive",
+      sourceType: self.metastoreTable.sourceType,
       databaseName: self.metastoreTable.database.name,
       tableName: self.metastoreTable.name,
       silenceErrors: true,
@@ -368,6 +369,7 @@ var MetastoreTable = (function () {
     self.apiHelper = ApiHelper.getInstance();
     self.optimizerEnabled = options.optimizerEnabled;
     self.navigatorEnabled = options.navigatorEnabled;
+    self.sourceType = options.sourceType;
     self.name = options.name;
     self.type = options.type;
 
@@ -428,7 +430,7 @@ var MetastoreTable = (function () {
         comment: newValue ? newValue : ""
       }, function () {
         huePubSub.publish('assist.clear.db.cache', {
-          sourceType: 'hive',
+          sourceType: self.sourceType,
           databaseName: self.database.name
         })
       });
@@ -442,7 +444,7 @@ var MetastoreTable = (function () {
       self.apiHelper.refreshTableStats({
         tableName: self.name,
         databaseName: self.database.name,
-        sourceType: "hive",
+        sourceType: self.sourceType,
         successCallback: function (data) {
           self.fetchDetails();
         },
@@ -459,7 +461,7 @@ var MetastoreTable = (function () {
       var self = this;
       self.loadingColumns(true);
       self.apiHelper.fetchFields({
-        sourceType: "hive",
+        sourceType: self.sourceType,
         databaseName: self.database.name,
         tableName: self.name,
         fields: [],
@@ -483,7 +485,7 @@ var MetastoreTable = (function () {
       var self = this;
       self.loadingDetails(true);
       self.apiHelper.fetchTableDetails({
-        sourceType: "hive",
+        sourceType: self.sourceType,
         databaseName: self.database.name,
         tableName: self.name,
         successCallback: function (data) {
@@ -656,7 +658,7 @@ var MetastoreTable = (function () {
         identifierChain: [{ name: entry.name }]
       },
       orientation: orientation || 'right',
-      sourceType: 'hive',
+      sourceType: self.sourceType,
       defaultDatabase: entry.database.name,
       source: {
         element: event.target,
@@ -707,7 +709,7 @@ var MetastoreColumn = (function () {
       }, function (data) {
         if (data.status == 0) {
           huePubSub.publish('assist.clear.db.cache', {
-            sourceType: 'hive',
+            sourceType: self.sourceType,
             databaseName: self.table.database.name,
             tableName: self.table.name
           });
@@ -729,7 +731,7 @@ var MetastoreColumn = (function () {
         identifierChain: [{ name: entry.table.name }, { name: entry.name() }]
       },
       orientation: 'right',
-      sourceType: 'hive',
+      sourceType: self.sourceType,
       defaultDatabase: entry.table.database.name,
       source: {
         element: event.target,
