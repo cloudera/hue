@@ -36,6 +36,12 @@
   .hue-fade-in();
 }
 
+.hue-spinner-inline {
+  display: inline-block;
+  position: relative;
+  .hue-fade-in();
+}
+
 .hue-spinner-center {
   position: absolute;
   left: 50%;
@@ -62,7 +68,9 @@
   font-size: 60px !important;
 }
 
-.hue-spinner i {
+.hue-spinner i,
+.hue-spinner-overlay i,
+.hue-spinner-inline i {
   font-size: 16px;
-  color: #aaa;
+  color: @cui-gray-600;
 }
