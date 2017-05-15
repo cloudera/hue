@@ -341,13 +341,11 @@ ${ hueIcons.symbols() }
       <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
       <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
-      <!-- ko if: rightAssistVisible -->
       <div class="assist" data-bind="component: {
           name: 'right-assist-panel',
           params: {}
-        }">
+        }, visible: rightAssistVisible", style="display: none;">
       </div>
-      <!-- /ko -->
       <!-- /ko -->
     </div>
 
