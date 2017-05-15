@@ -42,9 +42,8 @@ from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.export_csvxls import make_response
 from desktop.lib.i18n import smart_str, force_unicode
-from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, ClusterConfig,\
-  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER,\
-  Cluster
+from desktop.models import Document2, Document, Directory, FilesystemException, uuid_default, \
+  UserPreferences, get_user_preferences, set_user_preferences, USER_PREFERENCE_CLUSTER, get_config
 
 
 LOG = logging.getLogger(__name__)
@@ -72,10 +71,8 @@ def get_config(request):
   if request.POST.get(USER_PREFERENCE_CLUSTER):
     set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST.get(USER_PREFERENCE_CLUSTER))
 
-  cluster_type = Cluster(request.user).get_type()
-  cluster_config = ClusterConfig(request.user, cluster_type=cluster_type)
 
-  config = cluster_config.get_config()
+  config = get_config(request.user)
   config['status'] = 0
 
   return JsonResponse(config)
