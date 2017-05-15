@@ -575,7 +575,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-databases-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] }); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: sourceType() }); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }" title="${_('Refresh')}"></i></a>
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'); }" title="${_('Create a new database')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -590,7 +590,7 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-tables-actions">
   <div class="inline-block pull-right">
-    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" href="javascript:void(0)" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: sourceType() }); }" title="${_('Refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
       % if is_embeddable:
         <a class="inactive-action margin-left-10" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + database().name ); }" title="${_('Create a new table')}" href="javascript:void(0)"><i class="fa fa-plus"></i></a>
@@ -618,7 +618,7 @@ ${ components.menubar(is_embeddable) }
     % else:
       <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, attr: { 'href': '/metastore/table/'+ database.name + '/' + name + '/read' }" title="${_('Browse Data')}"><i class="fa fa-play fa-fw"></i></a>
     % endif
-    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] }); }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
+    <a class="inactive-action" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function () { huePubSub.publish('assist.db.refresh', { sourceType: sourceType() }); }" title="${_('Refresh')}" href="javascript:void(0)"><i class="pointer fa fa-refresh fa-fw" data-bind="css: { 'fa-spin blue' : $root.reloading }"></i></a>
     % if has_write_access:
       <a class="inactive-action" href="#" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showImportData, visible: tableDetails() && ! tableDetails().is_view" title="${_('Import Data')}"><i class="fa fa-upload fa-fw"></i></a>
     % endif
@@ -647,7 +647,7 @@ ${ components.menubar(is_embeddable) }
     <div class="span6 tile">
       <h4>${ _('Tags') }</h4>
       <div style="margin-top: 5px" data-bind="component: { name: 'nav-tags', params: {
-        sourceType: 'hive',
+        sourceType: sourceType(),
         database: database.name,
         table: name
       } }"></div>
@@ -1303,7 +1303,7 @@ ${ components.menubar(is_embeddable) }
       ko.applyBindings(viewModel, $('#metastoreComponents')[0]);
 
       if (location.getParameter('refresh') === 'true') {
-        huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] });
+        huePubSub.publish('assist.db.refresh', { sourceType: sourceType() });
         hueUtils.replaceURL('?');
       }
 
