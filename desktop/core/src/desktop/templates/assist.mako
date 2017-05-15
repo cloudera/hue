@@ -1790,7 +1790,7 @@ from notebook.conf import get_ordered_interpreters
         <div class="assist-flex-header assist-divider"><div class="assist-inner-header">${ _('Suggestions') }</div></div>
         <div class="assist-flex-half">
           <!-- ko if: ! activeRisks().hints -->
-          <div class="assist-no-entries">...</div>
+          <div class="assist-no-entries">${ _('Select a query or start typing to get optimization hints.') }</div>
           <!-- /ko -->
           <!-- ko if: activeRisks().hints && activeRisks().hints.length === 0 -->
           <div class="assist-no-entries">${ _('No optimizations identified.') }</div>
@@ -1805,9 +1805,12 @@ from notebook.conf import get_ordered_interpreters
           <!-- /ko -->
           <!-- ko if: hasMissingRisks() -->
           <div class="margin-top-20">
-            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: function() { huePubSub.publish('editor.table.stats.upload', activeTables()); }, attr: { 'title': ('${ _("Add missing table and columns ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
+            <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
+            <!-- ko ifnot: uploadingTableStats -->
+            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: uploadTableStats, attr: { 'title': ('${ _("Add missing table and columns ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
               <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
             </a>
+            <!-- /ko -->
           </div>
           <!-- /ko -->
         </div>
@@ -1838,6 +1841,7 @@ from notebook.conf import get_ordered_interpreters
         self.hasMissingRisks = ko.pureComputed(function () {
           return self.isMissingDDL() || self.isMissingStats();
         });
+        self.uploadingTableStats = ko.observable(false);
         self.isMissingDDL = ko.pureComputed(function () {
           return self.activeRisks().noDDL && self.activeRisks().noDDL.length > 0
         });
@@ -2002,6 +2006,18 @@ from notebook.conf import get_ordered_interpreters
 
         huePubSub.publish('get.active.editor.locations');
       }
+
+      AssistantPanel.prototype.uploadTableStats = function () {
+        var self = this;
+        if (self.uploadingTableStats()) {
+          return;
+        }
+        self.uploadingTableStats(true);
+        huePubSub.publish('editor.upload.table.stats', { activeTables: activeTables(), callback: function () {
+            self.uploadingTableStats(false);
+          }
+        });
+      };
 
       AssistantPanel.prototype.dispose = function () {
         var self = this;
