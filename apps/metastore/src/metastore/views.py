@@ -186,12 +186,12 @@ def table_queries(request, database, table):
 Table Views
 """
 def show_tables(request, database=None):
+  db = dbms.get(request.user)
+
   if database is None:
     database = 'default' # Assume always 'default'
 
   if request.REQUEST.get("format", "html") == "json":
-    db = dbms.get(request.user)
-
     try:
       databases = db.get_databases()
 
