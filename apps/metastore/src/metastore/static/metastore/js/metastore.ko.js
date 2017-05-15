@@ -71,12 +71,12 @@ var MetastoreViewModel = (function () {
     self.loadDatabases();
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (options.sourceTypes.indexOf('hive') === -1 && options.sourceTypes.indexOf('impala') === -1) {
+      if (['hive', 'impala'].indexOf(options.sourceType) == -1) {
         return;
       }
       self.reloading(true);
       huePubSub.publish('assist.clear.db.cache', {
-        sourceType: self.sourceType(),
+        sourceType: 'hive',
         clearAll: true
       });
       huePubSub.publish('assist.clear.db.cache', {
