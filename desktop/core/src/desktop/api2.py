@@ -73,22 +73,12 @@ def get_config(request):
     set_user_preferences(request.user, USER_PREFERENCE_CLUSTER, request.POST.get(USER_PREFERENCE_CLUSTER))
 
   cluster_type = Cluster(request.user).get_type()
-
   cluster_config = ClusterConfig(request.user, cluster_type=cluster_type)
-  app_config = cluster_config.get_apps()
 
-  return JsonResponse({
-    'status': 0,
-    'app_config': app_config,
-    'main_button_action': cluster_config.get_main_quick_action(app_config),
-    'button_actions': [
-      app for app in [
-        app_config.get('editor'),
-        app_config.get('dashboard'),
-        app_config.get('scheduler')
-      ] if app is not None
-    ],
-  })
+  config = cluster_config.get_config()
+  config['status'] = 0
+
+  return JsonResponse(config)
 
 
 @api_error_handler
