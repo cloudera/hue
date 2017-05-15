@@ -87,6 +87,7 @@ def databases(request):
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
     'is_embeddable': request.GET.get('is_embeddable', False),
+    'source_type': db.server_name,
   })
 
 
@@ -119,7 +120,7 @@ def drop_database(request):
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(databases)s.  Error: %(error)s") % {'databases': ','.join(databases), 'error': error_message}
-      raise PopupException(error, title=_("Hive Error"), detail=log)
+      raise PopupException(error, title=_("DB Error"), detail=log)
   else:
     title = _("Do you really want to delete the database(s)?")
     return render('confirm.mako', request, {'url': request.path, 'title': title})
@@ -229,6 +230,7 @@ def show_tables(request, database=None):
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
     'is_embeddable': request.REQUEST.get('is_embeddable', False),
+    'source_type': db.server_name,
     })
 
   return resp
@@ -256,18 +258,13 @@ def get_table_metadata(request, database, table):
 
 def describe_table(request, database, table):
   app_name = get_app_name(request)
-  #query_server = get_query_server_config(app_name)
-  #db = dbms.get(request.user, query_server)
   db = dbms.get(request.user)
 
   try:
     table = db.get_table(database, table)
   except Exception, e:
     LOG.exception("Describe table error")
-    if hasattr(e, 'message') and e.message:
-      raise PopupException(_("Hive Error"), detail=e.message)
-    else:
-      raise PopupException(_("Hive Error"), detail=e)
+    raise PopupException(_("DB Error"), detail=e.message if hasattr(e, 'message') and e.message else e)
 
   if request.REQUEST.get("format", "html") == "json":
     return JsonResponse({
@@ -308,9 +305,11 @@ def describe_table(request, database, table):
       'has_write_access': has_write_access(request.user),
       'is_optimizer_enabled': has_optimizer(),
       'is_navigator_enabled': has_navigator(request.user),
+      'source_type': has_navigator(request.user),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
       'is_embeddable': request.REQUEST.get('is_embeddable', False),
+      'source_type': db.server_name,
     })
 
 
@@ -393,7 +392,7 @@ def drop_table(request, database):
         sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
             name='Execute and watch',
-            editor_type='hive',
+            editor_type=db.server_name,
             statement=sql.strip(),
             status='ready',
             database=database,
@@ -410,7 +409,7 @@ def drop_table(request, database):
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(tables)s.  Error: %(error)s") % {'tables': ','.join(tables), 'error': error_message}
-      raise PopupException(error, title=_("Hive Error"), detail=log)
+      raise PopupException(error, title=_("DB Error"), detail=log)
   else:
     title = _("Do you really want to delete the table(s)?")
     return render('confirm.mako', request, {'url': request.path, 'title': title})
@@ -452,7 +451,7 @@ def load_table(request, database, table):
         if generate_ddl_only:
           job = make_notebook(
             name='Execute and watch',
-            editor_type='hive',
+            editor_type=db.server_name,
             statement=query_history.strip(),
             status='ready',
             database=database,
@@ -539,6 +538,7 @@ def describe_partitions(request, database, table):
         'has_write_access': has_write_access(request.user),
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
+        'source_type': db.server_name,
     })
 
 
@@ -606,7 +606,7 @@ def drop_partition(request, database, table):
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(partition)s.  Error: %(error)s") % {'partition': '\n'.join(partition_specs), 'error': error_message}
-      raise PopupException(error, title=_("Hive Error"), detail=log)
+      raise PopupException(error, title=_("DB Error"), detail=log)
   else:
     title = _("Do you really want to delete the partition(s)?")
     return render('confirm.mako', request, {'url': request.path, 'title': title})
