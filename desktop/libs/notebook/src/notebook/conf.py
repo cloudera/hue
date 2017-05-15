@@ -131,6 +131,13 @@ ENABLE_QUERY_SCHEDULING = Config(
   dynamic_default=is_hue4
 )
 
+ENABLE_EXTERNAL_STATEMENT = Config(
+  key="enable_external_statements",
+  help=_t("Flag to enable the selection of queries from files, saved queries into the editor or as snippet."),
+  type=bool,
+  default=True
+)
+
 ENABLE_BATCH_EXECUTE = Config(
   key="enable_batch_execute",
   help=_t("Flag to enable the bulk submission of queries as a background task through Oozie."),
