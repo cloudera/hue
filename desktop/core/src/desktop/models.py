@@ -1645,7 +1645,7 @@ class ClusterConfig():
         'displayName': _('Editor'),
         'interpreters': interpreters,
         'page': interpreters[0]['page'],
-        'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter['is_sql']), 'hive')
+        'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
       }
     else:
       return None

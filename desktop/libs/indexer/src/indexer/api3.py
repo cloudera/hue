@@ -193,7 +193,7 @@ def create_database(request, source, destination):
     }
   )
 
-  editor_type = 'hive'
+  editor_type = destination['apiHelperType']
   on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
 
   notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url, is_task=True)
@@ -363,7 +363,7 @@ def _create_table_from_a_file(request, source, destination):
         'table_name': table_name
     }
 
-  editor_type = 'impala' if table_format == 'kudu' else 'hive'
+  editor_type = 'impala' if table_format == 'kudu' else destination['apiHelperType']
 
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
