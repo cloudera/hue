@@ -22,7 +22,7 @@ from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko, antixss
 
 from metadata.conf import has_optimizer
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT
 %>
 
 <%def name="includes(is_embeddable=False)">
@@ -909,7 +909,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 
 <script type="text/html" id="snippet-header-statement-type">
-  % if ENABLE_BATCH_EXECUTE.get():
+  % if ENABLE_EXTERNAL_STATEMENT.get():
   <!-- ko if: isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
   <!-- /ko -->
