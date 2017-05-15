@@ -1534,7 +1534,7 @@ class Document2Permission(models.Model):
     return self.groups.filter(id__in=user.groups.all()).exists() or user in self.users.all()
 
 
-def get_config(user):
+def get_cluster_config(user):
   cluster_type = Cluster(user).get_type()
   cluster_config = ClusterConfig(user, cluster_type=cluster_type)
 
@@ -1556,17 +1556,19 @@ class ClusterConfig():
 
   def get_config(self):
     app_config = self.get_apps()
+    editors = app_config.get('editor')
   
     return {
       'app_config': app_config,
       'main_button_action': self.get_main_quick_action(app_config),
       'button_actions': [
         app for app in [
-          app_config.get('editor'),
+          editors,
           app_config.get('dashboard'),
           app_config.get('scheduler')
         ] if app is not None
       ],
+      'default_sql_interpreter': editors and editors['default_sql_interpreter']
     }
 
 
@@ -1634,6 +1636,7 @@ class ClusterConfig():
         'displayName': interpreter['name'],
         'tooltip': _('%s Query') % interpreter['type'].title(),
         'page': '/editor/?type=%(type)s' % interpreter,
+        'is_sql': interpreter['is_sql']
       })
 
     if interpreters:
@@ -1642,7 +1645,7 @@ class ClusterConfig():
         'displayName': _('Editor'),
         'interpreters': interpreters,
         'page': interpreters[0]['page'],
-        'default_sql_interpreter': next([interpreter['name'] for interpreter in interpreters if interpreter['is_sql']], 'hive')
+        'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter['is_sql']), 'hive')
       }
     else:
       return None

@@ -1200,7 +1200,7 @@ ${ assist.assistPanel() }
       self.table.subscribe(function(val) {
         resizeElements();
       });
-      self.apiHelperType = ko.observable('hive');
+      self.apiHelperType = ko.observable('${ sourceType }');
 
       // Queries
       self.query = ko.observable('');
@@ -1318,7 +1318,7 @@ ${ assist.assistPanel() }
         resizeElements();
       });
 
-      self.apiHelperType = ko.observable('hive');
+      self.apiHelperType = ko.observable('${ sourceType }');
 
       self.description = ko.observable('');
       self.outputFormat = ko.observable(wizard.prefill.target_type() || 'table');
@@ -1676,7 +1676,7 @@ ${ assist.assistPanel() }
                   var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                   if (! snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                      huePubSub.publish('assist.clear.db.cache', {sourceType: 'hive'});
+                      huePubSub.publish('assist.clear.db.cache', {sourceType: self.source.apiHelperType()});
                       window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                     }
                   } else { // Perform last DROP statement execute
