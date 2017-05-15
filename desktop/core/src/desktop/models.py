@@ -1547,6 +1547,34 @@ class ClusterConfig():
     pass
 
 
+  def get_config(self):
+    app_config = self.get_apps()
+  
+    return {
+      'app_config': app_config,
+      'main_button_action': self.get_main_quick_action(app_config),
+      'button_actions': [
+        app for app in [
+          app_config.get('editor'),
+          app_config.get('dashboard'),
+          app_config.get('scheduler')
+        ] if app is not None
+      ],
+    }
+
+
+  def get_apps(self):
+    apps = OrderedDict([app for app in [
+      ('editor', self._get_editor()),
+      ('dashboard', self._get_dashboard()),
+      ('browser', self._get_browser()),
+      ('scheduler', self._get_scheduler()),
+      ('sdkapps', self._get_sdk_apps()),
+    ] if app[1]])
+
+    return apps
+
+
   def get_main_quick_action(self, apps):
     if not apps:
       raise PopupException(_('No permission to any app.'))
@@ -1763,18 +1791,6 @@ class ClusterConfig():
         }
     else:
       return None
-
-
-  def get_apps(self):
-    apps = OrderedDict([app for app in [
-      ('editor', self._get_editor()),
-      ('dashboard', self._get_dashboard()),
-      ('browser', self._get_browser()),
-      ('scheduler', self._get_scheduler()),
-      ('sdkapps', self._get_sdk_apps()),
-    ] if app[1]])
-
-    return apps
 
 
 class Cluster():

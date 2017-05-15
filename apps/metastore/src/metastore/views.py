@@ -256,8 +256,9 @@ def get_table_metadata(request, database, table):
 
 def describe_table(request, database, table):
   app_name = get_app_name(request)
-  query_server = get_query_server_config(app_name)
-  db = dbms.get(request.user, query_server)
+  #query_server = get_query_server_config(app_name)
+  #db = dbms.get(request.user, query_server)
+  db = dbms.get(request.user)
 
   try:
     table = db.get_table(database, table)
