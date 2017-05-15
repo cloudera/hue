@@ -61,8 +61,10 @@ def get_ordered_interpreters(user=None):
       "name": interpreters[i].NAME.get(),
       "type": i,
       "interface": interpreters[i].INTERFACE.get(),
-      "options": interpreters[i].OPTIONS.get()}
-      for i in reordered_interpreters
+      "options": interpreters[i].OPTIONS.get(),
+      "is_sql" : interpreters[i].INTERFACE.get() in ["hiveserver2", "rdbms", "jdbc", "solr"]
+    }
+    for i in reordered_interpreters
   ]
 
 

@@ -49,7 +49,6 @@ def get(user, query_server=None):
 
   if query_server is None:
     cluster_type = Cluster(user).get_type()
-    print cluster_type
     if cluster_type == 'impalaui':
       kwargs = {'name': 'impala'}
     else:
