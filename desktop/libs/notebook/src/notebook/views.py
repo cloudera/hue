@@ -140,7 +140,7 @@ def new(request):
 
 
 def browse(request, database, table, partition_spec=None):
-  snippet = {'type': 'hive'}
+  snippet = {'type': request.POST.get('sourceType', 'hive')}
 
   statement = get_api(request, snippet).get_browse_query(snippet, database, table, partition_spec)
 
