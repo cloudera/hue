@@ -18,9 +18,12 @@
 %options flex
 %%
 
-\s                                              { /* skip whitespace */ }
-<<EOF>>                                         { return 'EOF'; }
-[^;]*[;]?                                       { return 'STATEMENT'; }
+\s                                                                    { /* skip whitespace */ }
+'--'.*                                                                { /* skip comments */ }
+[/][*][^*]*[*]+([^/*][^*]*[*]+)*[/]                                   { /* skip comments */ }
+
+<<EOF>>                                                               { return 'EOF'; }
+([^;"'`]|(["][^"]*["])|(['][^']*['])|([`][^`]*[`]))*[;]?              { return 'STATEMENT'; }
 
 /lex
 
@@ -40,7 +43,7 @@ SqlStatementsParser
  ;
 
 Statements
- : 'STATEMENT'                                  --> [{ type: 'statement', statement: $1, location: @1 }]
+ : 'STATEMENT'                                                        --> [{ type: 'statement', statement: $1, location: @1 }]
  | Statements 'STATEMENT'
    {
      $1.push({ type: 'statement', statement: $2, location: @2 });
