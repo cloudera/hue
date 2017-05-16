@@ -229,6 +229,7 @@ var EditorViewModel = (function() {
     }
     else if (snippetType == 'shell') {
       properties['command_path'] = '';
+      properties['arguments'] = [];
       properties['env_var'] = [];
       properties['capture_output'] = true;
     }
