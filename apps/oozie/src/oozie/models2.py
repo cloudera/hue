@@ -833,9 +833,9 @@ class Node():
         self.data['properties']['shell_command'] = action['properties']['command_path']
         self.data['properties']['env_var'] = [{'value': prop} for prop in action['properties']['env_var']]
         self.data['properties']['capture_output'] = action['properties']['capture_output']
-        self.data['properties']['arguments'] = []
+        self.data['properties']['arguments'] = [{'value': prop} for prop in action['properties']['arguments']]
 
-        self.data['properties']['files'] = [{'value': action['properties']['command_path']}] + [{'value': prop} for prop in action['properties']['files']]
+        self.data['properties']['files'] = ([{'value': action['properties']['command_path']}] if not action['properties'].get('command_path', '').startswith('/') else []) + [{'value': prop} for prop in action['properties']['files']]
         self.data['properties']['archives'] = [{'value': prop} for prop in action['properties']['archives']]
 
     elif self.data['type'] == MapReduceDocumentAction.TYPE:
@@ -3964,7 +3964,7 @@ class WorkflowBuilder():
     }
 
   def get_shell_document_node(self, document, user):
-    node = self._get_shell_node(document.uuid, is_document_node=True)
+    node = self._get_shell_node(document.uuid)
 
     node['properties']['uuid'] = document.uuid
 
@@ -3991,7 +3991,7 @@ class WorkflowBuilder():
         "type": "shell-document-widget",
         "properties":{
               "command_path": "",
-              "env_var": "",
+              "env_var": [],
               "arguments": [],
               "java_opts": [],
               "retry_max": [],

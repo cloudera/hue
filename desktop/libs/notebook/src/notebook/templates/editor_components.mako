@@ -1514,9 +1514,10 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label">${_('Environment variables')}</label>
+        <label class="control-label">${_('Variables')}</label>
         <div class="controls">
-          <!-- ko template: { if: typeof properties().env_var != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Arguments') }', value: properties().env_var, title: '${ _ko('Environment variable for the script') }', placeholder: '${ _ko('e.g. MAX=10, PATH=$PATH:/user/path') }'}} --><!-- /ko -->
+          <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko("Arguments") }', value: properties().arguments, title: '${ _ko("Arguments for the script") }', placeholder: '${ _ko("e.g. MAX=10, PATH=$PATH:/user/path") }' } } --><!-- /ko -->
+          <!-- ko template: { if: typeof properties().env_var != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko("Environment") }', value: properties().env_var, title: '${ _ko("Environment variable for the script") }', placeholder: '${ _ko("e.g. CLASSPATH=/path/file.jar") }' } } --><!-- /ko -->
         </div>
       </div>
       <!-- /ko -->
@@ -1528,9 +1529,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         </div>
       </div>
       <div class="control-group">
-        <label class="control-label">${_('Hadoop properties')}</label>
+        <label class="control-label">${_('Properties')}</label>
         <div class="controls">
-          <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
+          <!-- ko template: { if: typeof properties().hadoopProperties != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko('Hadoop Properties') }', value: properties().hadoopProperties, title: '${ _ko('Name and values of Hadoop properties') }', placeholder: '${ _ko('e.g. mapred.job.queue.name=production, mapred.map.tasks.speculative.execution=false') }'}} --><!-- /ko -->
         </div>
       </div>
       <!-- /ko -->
