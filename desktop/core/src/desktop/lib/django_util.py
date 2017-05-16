@@ -172,6 +172,9 @@ def format_preserving_redirect(request, target, get_dict=None):
   if get_dict:
     my_get_dict.update(get_dict)
 
+  if request.GET.get('is_embeddable', False):
+    my_get_dict['is_embeddable'] = True
+
   if is_jframe_request(request):
     logging.info("JFrame redirection" +  target)
     my_get_dict['format'] = 'embed'
