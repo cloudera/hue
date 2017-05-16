@@ -131,11 +131,18 @@ ${ hueIcons.symbols() }
           <!-- ko if: item.dividerAbove -->
           <li class="divider"></li>
           <!-- /ko -->
-          <li data-bind="css: { 'dropdown-submenu': item.isCategory }"><a href="javascript: void(0);" data-bind="hueLink: item.url">
-            <!-- ko if: item.icon -->
-            <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
+          <li data-bind="css: { 'dropdown-submenu': item.isCategory }">
+            <!-- ko if: item.url -->
+             <a href="javascript: void(0);" data-bind="hueLink: item.url">
+                <!-- ko if: item.icon -->
+                <!-- ko template: { name: 'app-icon-template', data: item } --><!-- /ko -->
+                <!-- /ko -->
+                <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span>
+              </a>
             <!-- /ko -->
-            <span data-bind="css: { 'dropdown-no-icon': !item.icon }, text: item.displayName"></span></a>
+            <!-- ko if: item.href -->
+              <a data-bind="attr: { href: item.href }, text: item.displayName" target="_blank"></a>
+            <!-- /ko -->
             <!-- ko if: item.isCategory -->
             <ul class="dropdown-menu" data-bind="foreach: { data: item.children, as: 'item' }">
               <!-- ko template: 'quick-create-item-template' --><!-- /ko -->
@@ -144,7 +151,6 @@ ${ hueIcons.symbols() }
           </li>
         </script>
       </div>
-
 
 
       <div class="top-nav-middle">
@@ -1080,9 +1086,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                   interpreters.push({
                     displayName: '${ _('Add more...') }',
                     dividerAbove: true,
-                    click: function () {
-                      window.open('http://gethue.com/sql-editor/', '_blank');
-                    }
+                    href: 'http://gethue.com/sql-editor/'
                   });
                 }
               % endif
