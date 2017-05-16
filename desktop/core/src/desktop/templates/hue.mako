@@ -811,15 +811,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/indexer/importer/prefill/*', app: function (ctx) {
             self.loadApp('importer');
             self.getActiveAppViewModel(function (viewModel) {
-              var arguments = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
-              if (! arguments) {
+              var _params = ctx.path.match(/\/indexer\/importer\/prefill\/?([^/]+)\/?([^/]+)\/?([^/]+)?/);
+              if (! _params) {
                 console.warn('Could not match ' + href);
               }
               hueUtils.waitForVariable(viewModel.createWizard, function(){
                 hueUtils.waitForVariable(viewModel.createWizard.prefill, function(){
-                  viewModel.createWizard.prefill.source_type(arguments && arguments[1] ? arguments[1] : '');
-                  viewModel.createWizard.prefill.target_type(arguments && arguments[2] ? arguments[2] : '');
-                  viewModel.createWizard.prefill.target_path(arguments && arguments[3] ? arguments[3] : '');
+                  viewModel.createWizard.prefill.source_type(_params && _params[1] ? _params[1] : '');
+                  viewModel.createWizard.prefill.target_type(_params && _params[2] ? _params[2] : '');
+                  viewModel.createWizard.prefill.target_path(_params && _params[3] ? _params[3] : '');
                 });
               });
             })

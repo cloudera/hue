@@ -703,22 +703,14 @@ from notebook.conf import get_ordered_interpreters
       % if ENABLE_NEW_CREATE_TABLE.get():
         <!-- ko if: sourceType === 'hive' || sourceType === 'impala' -->
         <!-- ko if: typeof databaseName !== 'undefined' -->
-          <!-- ko if: IS_HUE_4 -->
-            <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName ); }" title="${_('Create table')}" href="javascript:void(0)">
-              <i class="pointer fa fa-plus" title="${_('Create table')}"></i>
-            </a>
-          <!-- /ko -->
-          <!-- ko if: ! IS_HUE_4 -->
-            <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName }"><i class="pointer fa fa-plus" title="${_('Create table')}"></i></a>
-          <!-- /ko -->
+          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='all', target_type='table') }' + databaseName" title="${_('Create table')}" href="javascript:void(0)">
+            <i class="pointer fa fa-plus" title="${_('Create table')}"></i>
+          </a>
         <!-- /ko -->
         <!-- ko if: typeof databases !== 'undefined' -->
-          <!-- ko if: IS_HUE_4 -->
-            <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('open.link', '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'); }" href="javascript:void(0)"><i class="pointer fa fa-plus" title="${_('Create database')}"></i></a>
-          <!-- /ko -->
-          <!-- ko if: ! IS_HUE_4 -->
-            <a class="inactive-action" href="javascript:void(0)" data-bind="attr: { 'href': '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }' }"><i class="pointer fa fa-plus" title="${_('Create database')}"></i></a>
-          <!-- /ko -->
+          <a class="inactive-action" data-bind="hueLink: '${ url('indexer:importer_prefill', source_type='manual', target_type='database') }'" href="javascript:void(0)">
+            <i class="pointer fa fa-plus" title="${ _('Create database') }"></i>
+          </a>
         <!-- /ko -->
         <!-- /ko -->
       % endif
