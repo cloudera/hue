@@ -16,6 +16,7 @@
 
 var version = 17;
 importScripts('/static/desktop/js/autocomplete/sqlParseSupport.js?version=' + version);
+importScripts('/static/desktop/js/autocomplete/sqlStatementsParser.js?version=' + version);
 importScripts('/static/desktop/js/autocomplete/sql.js?version=' + version);
 importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
 
@@ -31,8 +32,29 @@ importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
     clearTimeout(this.throttle);
     this.throttle = setTimeout(function () {
       if (msg.data) {
-        var parseResult = sql.parseSql(msg.data.text + ' ', '', msg.data.type, false);
-        postMessage(parseResult);
+        var statements = sqlStatementsParser.parse(msg.data.text);
+        var locations = [];
+        // For now we'll only extract the locations
+        statements.forEach(function (statement) {
+          locations.push(statement);
+          try {
+            var sqlParseResult =  sql.parseSql(statement.statement + ' ', '', msg.data.type, false);
+            if (sqlParseResult.locations) {
+              sqlParseResult.locations.forEach(function (location) {
+                if (location.type !== 'statement') {
+                  if (location.location.first_line === 1) {
+                    location.location.first_column += statement.location.first_column;
+                    location.location.last_column += statement.location.first_column;
+                  }
+                  location.location.first_line += statement.location.first_line - 1;
+                  location.location.last_line += statement.location.first_line - 1;
+                  locations.push(location);
+                }
+              })
+            }
+          } catch (error) {}
+        });
+        postMessage({ locations: locations });
       }
     }, 400);
   }
