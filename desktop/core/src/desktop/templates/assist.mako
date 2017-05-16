@@ -1820,7 +1820,7 @@ from notebook.conf import get_ordered_interpreters
         self.disposals = [];
 
         self.activeCursorLocation = ko.observable();
-        self.activeStatementLocation = ko.observable();
+        self.activeStatement = ko.observable();
         self.locationIndex = ko.observable({});
 
         self.activeSourceType = ko.observable();
@@ -1859,13 +1859,13 @@ from notebook.conf import get_ordered_interpreters
         var AceRange = ace.require('ace/range').Range;
         var lastMarkedGutterLines = [];
         var findStatementTextAtCursor = function () {
-          if (!self.activeStatementLocation() || !self.activeCursorLocation()) {
+          if (!self.activeStatement() || !self.activeCursorLocation()) {
             return; // undefined when unknown
           }
-          var statementLoc = self.activeStatementLocation();
+          var statementLoc = self.activeStatement().location;
 
           var editor = self.activeCursorLocation().editor;
-          var statementAtCursor = editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1));
+          var statementAtCursor = self.activeStatement().statement;
 
           var leadingEmptyLineCount = 0;
           var leadingWhiteSpace = statementAtCursor.match(/^\s+/);
@@ -1945,8 +1945,8 @@ from notebook.conf import get_ordered_interpreters
             var columnIndex = {};
 
             activeLocations.forEach(function (location) {
-              if (location.type === 'statement' && self.activeStatementLocation() !== location.location) {
-                self.activeStatementLocation(location.location);
+              if (location.type === 'statement' && (!self.activeStatement() || self.activeStatement().location !== location.location)) {
+                self.activeStatement(location);
                 huePubSub.publish('active.editor.statement.changed', findStatementTextAtCursor());
               } else if (location.type === 'table' && location.identifierChain.length <= 2) {
                 // tableIndex is used to make sure we only add each table once
