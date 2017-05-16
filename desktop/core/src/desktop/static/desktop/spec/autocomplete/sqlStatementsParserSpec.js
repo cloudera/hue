@@ -63,17 +63,57 @@
           { type: 'statement', statement: 'select * \nfrom bla;', location: { first_line: 1, last_line: 2, first_column: 0,  last_column: 9 } },
           { type: 'statement', statement: '\r\nselect * from ble;', location: { first_line: 2, last_line: 3, first_column: 9,  last_column: 18 } }
         ]
+      }, {
+        id: 7,
+        statements: 'select * from bla where x = ";";',
+        expectedResult: [
+          { type: 'statement', statement: 'select * from bla where x = ";";', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 32 } }
+        ]
+      }, {
+        id: 8,
+        statements: 'select * from bla where x = \';\';\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;',
+        expectedResult: [
+          { type: 'statement', statement: 'select * from bla where x = \';\';', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 32 } },
+          { type: 'statement', statement: '\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;', location: { first_line: 1, last_line: 3, first_column: 32,  last_column: 51 } }
+        ]
+      }, {
+        id: 9,
+        statements: 'select * from bla where x = "; AND boo = 1;\n\nUSE db',
+        expectedResult: [
+          { type: 'statement', statement: 'select * from bla where x = ', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 28 } },
+          { type: 'statement', statement: ';', location: { first_line: 1, last_line: 1, first_column: 29,  last_column: 30 } },
+          { type: 'statement', statement: ' AND boo = 1;', location: { first_line: 1, last_line: 1, first_column: 30,  last_column: 43 } },
+          { type: 'statement', statement: '\n\nUSE db', location: { first_line: 1, last_line: 3, first_column: 43,  last_column: 6 } }
+        ]
+      }, {
+        id: 10,
+        statements: '--- Some comment with ; ; \nselect * from bla where x = ";";',
+        expectedResult: [
+          { type: 'statement', statement: '\nselect * from bla where x = ";";', location: { first_line: 1, last_line: 2, first_column: 26,  last_column: 32 } }
+        ]
+      }, {
+        id: 11,
+        statements: 'select *\n-- bla\n from bla;',
+        expectedResult: [
+          { type: 'statement', statement: 'select *\n-- bla\n from bla;', location: { first_line: 1, last_line: 3, first_column: 0,  last_column: 10 } }
+        ]
+      }, {
+        id: 12,
+        statements: 'select *\n/* bla \n\n*/\n from bla;',
+        expectedResult: [
+          { type: 'statement', statement: 'select *\n/* bla \n\n*/\n from bla;', location: { first_line: 1, last_line: 5, first_column: 0,  last_column: 10 } }
+        ]
       }
     ];
 
     splitTests.forEach(function (splitTest) {
       it('should split correctly, test ' + splitTest.id, function () {
         try {
-        var result = sqlStatementsParser.parse(splitTest.statements);
+          var result = sqlStatementsParser.parse(splitTest.statements);
+          expect(result).toEqual(splitTest.expectedResult);
         } catch (error) {
           fail('Got error');
         }
-        expect(result).toEqual(splitTest.expectedResult);
       });
     });
   });
