@@ -599,16 +599,20 @@ var YYSTATE=YY_START;
 switch($avoiding_name_collisions) {
 case 0: /* skip whitespace */ 
 break;
-case 1: return 5; 
+case 1: /* skip comments */ 
 break;
-case 2: return 6; 
+case 2: /* skip comments */ 
 break;
-case 3:console.log(yy_.yytext);
+case 3: return 5; 
+break;
+case 4: return 6; 
+break;
+case 5:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s)/,/^(?:$)/,/^(?:[^;]*[;]?)/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3],"inclusive":true}}
+rules: [/^(?:\s)/,/^(?:--.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:$)/,/^(?:([^;"'`]|(["][^"]*["])|(['][^']*['])|([`][^`]*[`]))*[;]?)/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5],"inclusive":true}}
 });
 return lexer;
 })();
