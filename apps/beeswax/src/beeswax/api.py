@@ -110,6 +110,7 @@ def _autocomplete(db, database=None, table=None, column=None, nested=None):
     elif column is None:
       table = db.get_table(database, table)
       response['hdfs_link'] = table.hdfs_link
+      response['comment'] = table.comment
 
       cols_extended = massage_columns_for_json(table.cols)
 
