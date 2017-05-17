@@ -1144,7 +1144,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 interpreters.push({
                   displayName: interpreter.displayName,
                   % if SHOW_NOTEBOOKS.get():
-                    dividerAbove: app.name === 'editor' && index === 1,
+                    dividerAbove: app.name === 'editor' && index === 1 && interpreter.type == 'notebook',
                   % endif
                   icon: interpreter.type,
                   url: interpreter.page
