@@ -913,99 +913,219 @@ class TestExternalWorkflowGraph(object):
     assert_equal(workflow_data['workflow']['nodes'][7]['type'], 'decision-widget')
     assert_true(len(workflow_data['workflow']['nodes'][7]['children']) == 2)
 
-  def test_gen_workflow_data_from_xml_for_oozie_schema04(self):
-    self.wf.definition = """<workflow-app xmlns="uri:oozie:workflow:0.4" name="capture-output-wf">
-      <credentials>
-        <credential name="hive2" type="hive2">
-          <property>
-            <name>hive2.jdbc.url</name>
-            <value>jdbc:hive2://huetest-1.gce.cloudera.com:10000/default</value>
-          </property>
-          <property>
-            <name>hive2.server.principal</name>
-            <value>hive/huetest-1.gce.cloudera.com@GCE.CLOUDERA.COM</value>
-          </property>
-        </credential>
-      </credentials>
+  def test_gen_workflow_data_from_xml_for_oozie_old_schemas(self):
 
-        <start to="fork1"/>
-
-        <fork name="fork1">
-            <path start="capture-shell"/>
-            <path start="hive-node"/>
-        </fork>
-        <action name="capture-shell">
-            <shell xmlns="uri:oozie:shell-action:0.1">
-                <job-tracker>${jobTracker}</job-tracker>
-                <name-node>${nameNode}</name-node>
-                <exec>capture-shell.sh</exec>
-                <file>capture-shell.sh#capture-shell.sh</file>
-                <capture-output/>
-            </shell>
-            <ok to="join1"/>
-            <error to="fail"/>
-        </action>
-        <action name="hive-node" cred="hive2">
+    common_wf_definition = """<workflow-app name="My Workflow" xmlns="uri:oozie:workflow:%s">
+        <start to="fork-b429"/>
+        <kill name="Kill">
+            <message>Action failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
+        </kill>
+        <action name="hive-ee32" cred="hive2">
             <hive2 xmlns="uri:oozie:hive2-action:0.1">
                 <job-tracker>${jobTracker}</job-tracker>
                 <name-node>${nameNode}</name-node>
-                <jdbc-url>jdbc:hive2://huetest-1.gce.cloudera.com:10000/default</jdbc-url>
-                <script>/user/cconner/chris1.sql</script>
+                <jdbc-url>jdbc:hive2://nightly-unsecure-1.gce.cloudera.com:10000/default</jdbc-url>
+                <script>${wf:appPath()}/hive-ee32.sql</script>
             </hive2>
-            <ok to="join1"/>
-            <error to="fail"/>
+            <ok to="join-508b"/>
+            <error to="Kill"/>
         </action>
-
-        <join name="join1" to="email1"/>
-
-        <action name="email1">
-            <email xmlns="uri:oozie:email-action:0.1">
-                <to>oozie@admin1.sec.cloudera.com</to>
-                <subject>capture output workflow</subject>
-                <body>yay</body>
-            </email>
-            <ok to="java-decision"/>
-            <error to="fail"/>
-        </action>
-
-        <action name='java-decision'>
-            <java>
+        <action name="hive-97a4" cred="hcat">
+            <hive xmlns="uri:oozie:hive-action:0.2">
                 <job-tracker>${jobTracker}</job-tracker>
                 <name-node>${nameNode}</name-node>
-                <configuration>
-                    <property>
-                        <name>mapred.job.queue.name</name>
-                        <value>${queueName}</value>
-                    </property>
-                </configuration>
-                <main-class>com.test.CurrentTime</main-class>
-                <capture-output/>
-            </java>
-            <ok to="java-decision1" />
-            <error to="fail" />
+                  <job-xml>test.xml</job-xml>
+                <script>test.sql</script>
+            </hive>
+            <ok to="streaming-5fab"/>
+            <error to="Kill"/>
         </action>
-        <decision name="java-decision1">
-               <switch>
-               <case to="end">${(wf:actionData('java-decision')['key1'] == "true")}</case>
-               <default to="fail" />
-               </switch>
+        <fork name="fork-b429">
+            <path start="hive-97a4" />
+            <path start="pig-2bcf" />
+        </fork>
+        <join name="join-508b" to="spark-017b"/>
+        <action name="hive2-d643" cred="hive2">
+            <hive2 xmlns="uri:oozie:hive2-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <jdbc-url>jdbc:hive2://nightly-unsecure-1.gce.cloudera.com:10000/default</jdbc-url>
+                <script>test.sql</script>
+            </hive2>
+            <ok to="decision-aac9"/>
+            <error to="Kill"/>
+        </action>
+        <action name="impala-58ee">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>impala-58ee.sh</exec>
+                <file>impala-58ee.sh#impala-58ee.sh</file>
+                <file>test.impala#test.impala</file>
+            </shell>
+            <ok to="join-508b"/>
+            <error to="Kill"/>
+        </action>
+        <decision name="decision-aac9">
+            <switch>
+                <case to="hive-ee32">
+                  ${ 1 gt 0 }
+                </case>
+                <case to="impala-58ee">
+                  ${ 1 gt 0 }
+                </case>
+                <default to="join-508b"/>
+            </switch>
         </decision>
-
-        <kill name="fail">
-            <message>Hive failed, error message[${wf:errorMessage(wf:lastErrorNode())}]</message>
-        </kill>
-        <end name="end"/>
+        <action name="pig-2bcf">
+            <pig>
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <script>test.pig</script>
+            </pig>
+            <ok to="hive2-d643"/>
+            <error to="Kill"/>
+        </action>
+        <action name="spark-d71c">
+            <spark xmlns="uri:oozie:spark-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <master>yarn</master>
+                <mode>client</mode>
+                <name>MySpark</name>
+                <jar>/user/admin/test.jar</jar>
+                <file>test.spark#test.spark</file>
+            </spark>
+            <ok to="mapreduce-3787"/>
+            <error to="Kill"/>
+        </action>
+        <action name="spark-017b">
+            <spark xmlns="uri:oozie:spark-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <master>yarn</master>
+                <mode>client</mode>
+                <name>MySpark</name>
+                <jar>/user/admin/test.jar</jar>
+                <file>test.spark#test.spark</file>
+            </spark>
+            <ok to="fork-1576"/>
+            <error to="Kill"/>
+        </action>
+        <action name="sqoop-c419">
+            <sqoop xmlns="uri:oozie:sqoop-action:0.2">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <command>import  --connect jdbc:hsqldb:file:db.hsqldb --table TT --target-dir hdfs://localhost:8020/user/foo -m 1</command>
+            </sqoop>
+            <ok to="join-ebde"/>
+            <error to="Kill"/>
+        </action>
+        <action name="mapreduce-3787">
+            <map-reduce>
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+            </map-reduce>
+            <ok to="join-508b"/>
+            <error to="Kill"/>
+        </action>
+        <action name="shell-1c31">
+            <shell xmlns="uri:oozie:shell-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <exec>ls</exec>
+                  <capture-output/>
+            </shell>
+            <ok to="join-ebde"/>
+            <error to="Kill"/>
+        </action>
+        <fork name="fork-1576">
+            <path start="sqoop-c419" />
+            <path start="shell-1c31" />
+        </fork>
+        <join name="join-ebde" to="End"/>
+        <action name="ssh-8ab6">
+            <ssh xmlns="uri:oozie:ssh-action:0.1">
+                <host>user@host.com</host>
+                <command>ls</command>
+                <capture-output/>
+            </ssh>
+            <ok to="spark-d71c"/>
+            <error to="Kill"/>
+        </action>
+        <action name="email-d815">
+            <email xmlns="uri:oozie:email-action:0.2">
+                <to>test</to>
+                <subject>test</subject>
+                <body>test</body>
+                <content_type>text/plain</content_type>
+            </email>
+            <ok to="ssh-8ab6"/>
+            <error to="Kill"/>
+        </action>
+        <action name="streaming-5fab">
+            <map-reduce>
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                <streaming>
+                    <mapper>test</mapper>
+                    <reducer>test</reducer>
+                </streaming>
+            </map-reduce>
+            <ok to="distcp-daa7"/>
+            <error to="Kill"/>
+        </action>
+        <action name="distcp-daa7">
+            <distcp xmlns="uri:oozie:distcp-action:0.1">
+                <job-tracker>${jobTracker}</job-tracker>
+                <name-node>${nameNode}</name-node>
+                  <arg>test</arg>
+                  <arg>test</arg>
+            </distcp>
+            <ok to="email-d815"/>
+            <error to="Kill"/>
+        </action>
+        <end name="End"/>
     </workflow-app>
     """
 
-    workflow_data = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+    self.wf.definition = common_wf_definition % 0.4
+    workflow_data_04 = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
 
-    assert_true(len(workflow_data['layout'][0]['rows']) == 10)
-    assert_true(len(workflow_data['workflow']['nodes']) == 10)
-    assert_equal(workflow_data['layout'][0]['rows'][6]['widgets'][0]['widgetType'], 'decision-widget')
-    assert_equal(workflow_data['workflow']['nodes'][7]['type'], 'decision-widget')
-    assert_true(len(workflow_data['workflow']['nodes'][7]['children']) == 2)
+    self.wf.definition = common_wf_definition % 0.3
+    workflow_data_03 = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
 
+    self.wf.definition = common_wf_definition % 0.2
+    workflow_data_02 = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    self.wf.definition = common_wf_definition % 0.1
+    workflow_data_01 = Workflow.gen_workflow_data_from_xml(self.user, self.wf)
+
+    assert_true(len(workflow_data_01['layout'][0]['rows']) ==
+                len(workflow_data_02['layout'][0]['rows']) ==
+                len(workflow_data_03['layout'][0]['rows']) ==
+                len(workflow_data_04['layout'][0]['rows']) ==
+                10)
+    assert_true(len(workflow_data_01['workflow']['nodes']) ==
+                len(workflow_data_02['workflow']['nodes']) ==
+                len(workflow_data_03['workflow']['nodes']) ==
+                len(workflow_data_04['workflow']['nodes']) ==
+                22)
+    assert_true(workflow_data_01['layout'][0]['rows'][5]['widgets'][0]['widgetType'] ==
+                workflow_data_02['layout'][0]['rows'][5]['widgets'][0]['widgetType'] ==
+                workflow_data_03['layout'][0]['rows'][5]['widgets'][0]['widgetType'] ==
+                workflow_data_04['layout'][0]['rows'][5]['widgets'][0]['widgetType'] ==
+                'fork-widget')
+    assert_true(workflow_data_01['workflow']['nodes'][7]['type'] ==
+                workflow_data_02['workflow']['nodes'][7]['type'] ==
+                workflow_data_03['workflow']['nodes'][7]['type'] ==
+                workflow_data_04['workflow']['nodes'][7]['type'] ==
+                'hive-widget')
+    assert_true(len(workflow_data_01['workflow']['nodes'][7]['children']) ==
+                len(workflow_data_02['workflow']['nodes'][7]['children']) ==
+                len(workflow_data_03['workflow']['nodes'][7]['children']) ==
+                len(workflow_data_04['workflow']['nodes'][7]['children']) ==
+                2)
 
   def test_gen_workflow_data_from_xml_for_spark_schema02(self):
     self.wf.definition = """<workflow-app name="My_Workflow" xmlns="uri:oozie:workflow:0.5">
