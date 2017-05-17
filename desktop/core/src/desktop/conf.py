@@ -1328,9 +1328,9 @@ USE_DEFAULT_CONFIGURATION = Config(
 
 IS_HUE_4 = Config( # To remove in Hue 5
   key='is_hue_4',
-  default=False,
+  default=True,
   type=coerce_bool,
-  help=_('Choose whether to enable the new interface.')
+  help=_('Choose whether to enable the new Hue 4 interface.')
 )
 
 
