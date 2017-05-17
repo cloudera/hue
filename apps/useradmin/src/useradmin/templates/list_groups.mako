@@ -14,17 +14,20 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, antixss
 from django.utils.translation import ugettext as _
 from useradmin.models import group_permissions
+
+from desktop.views import commonheader, commonfooter, antixss
 %>
 
 
 <%namespace name="actionbar" file="actionbar.mako" />
 <%namespace name="layout" file="layout.mako" />
+
 %if not is_embeddable:
 ${ commonheader(_('Hue Groups'), "useradmin", user, request) | n,unicode }
 %endif
+
 ${layout.menubar(section='groups')}
 
 <div id="groupsComponents" class="container-fluid">
@@ -48,9 +51,9 @@ ${layout.menubar(section='groups')}
             <a id="addLdapGroupBtn" href="${url('useradmin.views.add_ldap_groups')}" class="btn"><i
                 class="fa fa-refresh"></i> ${_('Add/Sync LDAP group')}</a>
           % endif
-          <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/" class="btn"
-            title="${ ('Learn how to integrate Hue with your company') }" target="_blank">
-            <i class="fa fa-question-circle"></i> LDAP
+          <a href="http://gethue.com/making-hadoop-accessible-to-your-employees-with-ldap/"
+            title="${ _('Learn how to integrate Hue with your company LDAP') }" target="_blank">
+            <i class="fa fa-question-circle"></i>
           </a>
         %endif
       </%def>
