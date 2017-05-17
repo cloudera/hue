@@ -72,7 +72,6 @@ def hue(request):
 
   return render('hue.mako', request, {
     'apps': apps,
-    'interpreters': get_ordered_interpreters(request.user),
     'is_s3_enabled': is_s3_enabled() and has_s3_access(request.user),
     'is_ldap_setup': 'desktop.auth.backend.LdapBackend' in desktop.conf.AUTH.BACKEND.get(),
     'leaflet': {
