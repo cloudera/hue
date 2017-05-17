@@ -3415,8 +3415,6 @@
     AceLocationHandler.prototype.attachStatementLocator = function () {
       var self = this;
 
-      var changeThrottle = -1;
-
       var isPointInside = function (parseLocation, acePosition) {
         var row = acePosition.row + 1; // ace positioning has 0 based rows while the parser has 1
         var column = acePosition.column;
@@ -3427,13 +3425,19 @@
       };
 
       var lastKnownStatements = [];
-
-      var updateActiveStatement = function () {
-        var precedingStatements = [];
-        var activeStatement = null;
-        var followingStatements = [];
-
+      var activeStatement;
+      var updateActiveStatement = function (cursorChange) {
         var cursorPosition = self.editor.getCursorPosition();
+        if (cursorChange && activeStatement) {
+          // Don't update when cursor stays in the same statement
+          if (isPointInside(activeStatement.location, cursorPosition)) {
+            return;
+          }
+        }
+        var precedingStatements = [];
+        var followingStatements = [];
+        activeStatement = null;
+
         var found = false;
         var statementIndex = 0;
         lastKnownStatements.forEach(function (statement) {
@@ -3463,35 +3467,46 @@
       };
 
       var parseForStatements = function () {
-        window.clearTimeout(changeThrottle);
-        changeThrottle = window.setTimeout(function () {
-          try {
-            lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
-          } catch (error) {
-            console.warn('Could not parse statements!');
-            console.warn(error);
-          }
-        }, 200);
+        try {
+          lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
+        } catch (error) {
+          console.warn('Could not parse statements!');
+          console.warn(error);
+        }
       };
 
+      var changeThrottle = -1;
+      var updateThrottle = -1;
+
+      var cursorChangePaused = false; // On change the cursor is also moved, this limits the calls while typing
       var cursorSubscription = huePubSub.subscribe('editor.active.cursor.location', function (locationDetails) {
+        if (cursorChangePaused) {
+          return;
+        }
         if (self.editorId === locationDetails.id) {
-          updateActiveStatement();
+          window.clearTimeout(updateThrottle);
+          updateThrottle = window.setTimeout(function () {
+            updateActiveStatement(true);
+          }, 100);
         }
       });
 
-      window.setTimeout(function () {
-        parseForStatements();
-        updateActiveStatement();
-      }, 0);
+      changeThrottle = window.setTimeout(parseForStatements, 0);
+      updateThrottle = window.setTimeout(updateActiveStatement, 0);
 
       var changeListener = self.editor.on("change", function () {
-        parseForStatements();
-        updateActiveStatement();
+        window.clearTimeout(changeThrottle);
+        cursorChangePaused = true;
+        changeThrottle = window.setTimeout(function () {
+          parseForStatements();
+          updateActiveStatement();
+          cursorChangePaused = false;
+        }, 500);
       });
 
       self.disposeFunctions.push(function () {
         window.clearTimeout(changeThrottle);
+        window.clearTimeout(updateThrottle);
         self.editor.off("change", changeListener);
         cursorSubscription.remove();
       });
