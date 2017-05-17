@@ -1618,7 +1618,7 @@ class ClusterConfig():
   def _get_editor(self):
     interpreters = []
 
-    if SHOW_NOTEBOOKS.get() and self.cluster_type != IMPALAUI:
+    if SHOW_NOTEBOOKS.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'name': 'notebook',
         'type': 'notebook',
@@ -1657,7 +1657,7 @@ class ClusterConfig():
   def _get_dashboard(self):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
 
-    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != DATAENG and self.cluster_type != IMPALAUI:
+    if IS_DASHBOARD_ENABLED.get() and (self.cluster_type not in (DATAENG, IMPALAUI)):
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
