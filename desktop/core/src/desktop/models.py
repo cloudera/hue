@@ -1541,6 +1541,10 @@ def get_cluster_config(user):
   return cluster_config.get_config()
 
 
+DATAENG = 'dataeng'
+IMPALAUI = 'impalaui'
+
+
 class ClusterConfig():
 
   def __init__(self, user, apps=None, cluster_type='ini'):
@@ -1614,7 +1618,7 @@ class ClusterConfig():
   def _get_editor(self):
     interpreters = []
 
-    if SHOW_NOTEBOOKS.get() and self.cluster_type != 'impalaui':
+    if SHOW_NOTEBOOKS.get() and self.cluster_type != IMPALAUI:
       interpreters.append({
         'name': 'notebook',
         'type': 'notebook',
@@ -1624,9 +1628,9 @@ class ClusterConfig():
       })
 
     _interpreters = get_ordered_interpreters(self.user)
-    if self.cluster_type == 'dataeng':
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'java')]
-    elif self.cluster_type == 'impalaui':
+    if self.cluster_type == DATAENG:
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2')]
+    elif self.cluster_type == IMPALAUI:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
 
     for interpreter in _interpreters:
@@ -1653,7 +1657,7 @@ class ClusterConfig():
   def _get_dashboard(self):
     interpreters = [] # TODO Integrate SQL Dashboards and Solr 6 configs
 
-    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != 'dataeng' and self.cluster_type != 'impalaui':
+    if IS_DASHBOARD_ENABLED.get() and self.cluster_type != DATAENG and self.cluster_type != IMPALAUI:
       return {
         'name': 'dashboard',
         'displayName': _('Dashboard'),
@@ -1666,7 +1670,7 @@ class ClusterConfig():
   def _get_browser(self):
     interpreters = []
 
-    if 'filebrowser' in self.apps and self.cluster_type != 'dataeng':
+    if 'filebrowser' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'type': 'hdfs',
         'displayName': _('Files'),
@@ -1690,7 +1694,7 @@ class ClusterConfig():
         'page': '/metastore/tables'
       })
 
-    if 'search' in self.apps and self.cluster_type != 'dataeng':
+    if 'search' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'type': 'indexes',
         'displayName': _('Indexes'),
@@ -1698,8 +1702,8 @@ class ClusterConfig():
         'page': '/indexer/'
       })
 
-    if 'jobbrowser' in self.apps:
-      if self.cluster_type == 'dataeng':
+    if 'jobbrowser' in self.apps and self.cluster_type != IMPALAUI:
+      if self.cluster_type == DATAENG:
         interpreters.append({
           'type': 'dataeng',
           'displayName': _('Jobs'),
@@ -1716,7 +1720,7 @@ class ClusterConfig():
             'page': '/jobbrowser/'
           })
 
-    if 'hbase' in self.apps and self.cluster_type != 'dataeng':
+    if 'hbase' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'type': 'hbase',
         'displayName': _('HBase'),
@@ -1724,7 +1728,7 @@ class ClusterConfig():
         'page': '/hbase/'
       })
 
-    if 'security' in self.apps and self.cluster_type != 'dataeng':
+    if 'security' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'type': 'security',
         'displayName': _('Security'),
@@ -1732,7 +1736,7 @@ class ClusterConfig():
         'page': '/security/hive'
       })
 
-    if 'sqoop' in self.apps and self.cluster_type != 'dataeng':
+    if 'sqoop' in self.apps and (self.cluster_type not in (DATAENG, IMPALAUI)):
       interpreters.append({
         'type': 'sqoop',
         'displayName': _('Sqoop'),
@@ -1740,7 +1744,7 @@ class ClusterConfig():
         'page': '/sqoop'
       })
 
-    if interpreters and self.cluster_type != 'impalaui':
+    if interpreters:
       return {
           'name': 'browser',
           'displayName': _('Browsers'),
