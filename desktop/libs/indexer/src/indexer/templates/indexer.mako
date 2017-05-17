@@ -15,9 +15,10 @@
 ## limitations under the License.
 
 <%!
+  from django.utils.translation import ugettext as _
+
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
-  from django.utils.translation import ugettext as _
 %>
 
 <%namespace name="actionbar" file="actionbar.mako" />

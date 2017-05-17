@@ -63,7 +63,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
   <div class="navbar-inner">
     <div class="container-fluid">
       <div class="pull-right">
-        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('dashboard:admin_collections') + "')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
+        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/home?type=search-dashboard')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
           <i class="fa fa-tags"></i> ${ _('Dashboards') }
         </a>
       </div>
@@ -323,7 +323,7 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
       </tr>
     </thead>
     <tbody data-bind="foreach: collection.fields">
-      <tr data-bind="css: {'error': name.errors().length > 0}" class="editable">
+      <tr data-bind="css: {'error': name.errors().length > 0}">
         <td data-bind="editableText: name">
           <span class="pull-left fa fa-pencil"></span>
         </td>
