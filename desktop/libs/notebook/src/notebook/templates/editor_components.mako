@@ -3113,8 +3113,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
       });
 
-      huePubSub.subscribe('active.editor.statement.changed', function (statement) {
-        viewModel.selectedNotebook().snippets()[0].positionStatement(statement);
+      huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
+        viewModel.selectedNotebook().snippets()[0].positionStatement(statementDetails.activeStatement);
       });
 
       viewModel.selectedNotebook.subscribe(function (newVal) {
