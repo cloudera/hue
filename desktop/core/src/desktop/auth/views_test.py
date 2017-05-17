@@ -18,22 +18,23 @@
 import datetime
 from nose.tools import assert_true, assert_false, assert_equal
 
+from django_auth_ldap import backend as django_auth_ldap_backend
 from django.conf import settings
 from django.contrib.auth.models import User, Group
 from django.test.client import Client
 
-from desktop import conf, middleware
-from desktop.auth import backend
-from django_auth_ldap import backend as django_auth_ldap_backend
-from desktop.lib.django_test_util import make_logged_in_client
-from desktop.lib.test_utils import add_to_group
 from hadoop.test_base import PseudoHdfsTestBase
 from hadoop import pseudo_hdfs4
-
 from useradmin import ldap_access
 from useradmin.models import get_default_user_group
 from useradmin.tests import LdapTestConnection
 from useradmin.views import import_ldap_groups
+
+from desktop import conf, middleware
+from desktop.auth import backend
+from desktop.conf import is_hue4
+from desktop.lib.django_test_util import make_logged_in_client
+from desktop.lib.test_utils import add_to_group
 
 
 class TestLoginWithHadoop(PseudoHdfsTestBase):
@@ -572,7 +573,11 @@ class TestLogin(PseudoHdfsTestBase):
     client.get('/accounts/logout')
     # Login
     response = client.post('/accounts/login/', dict(username=self.test_username, password="test"), follow=True)
-    assert_true(any(["admin_wizard.mako" in _template.filename for _template in response.templates]), response.content) # Go to superuser wizard
+    if is_hue4():
+      template = 'hue.mako'
+    else:
+      template = 'admin_wizard.mako'
+    assert_true(any([template in _template.filename for _template in response.templates]), response.content) # Go to superuser wizard
 
   def test_login_expiration(self):
     """ Expiration test without superusers """
