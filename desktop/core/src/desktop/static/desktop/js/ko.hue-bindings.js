@@ -3401,7 +3401,7 @@
         while(lastMarkedGutterLines.length) {
           self.editor.session.removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
         }
-        for (var line = statementDetails.activeStatement.location.first_line - 1 + leadingEmptyLineCount; line < statementDetails.activeStatement.location.last_line; line ++) {
+        for (var line = statementDetails.activeStatement.location.first_line - 1 + leadingEmptyLineCount; line < statementDetails.activeStatement.location.last_line; line++) {
           lastMarkedGutterLines.push(line);
           self.editor.session.addGutterDecoration(line, 'ace-active-gutter-decoration');
         }
@@ -3435,11 +3435,14 @@
 
         var cursorPosition = self.editor.getCursorPosition();
         var found = false;
+        var statementIndex = 0;
         lastKnownStatements.forEach(function (statement) {
           if (isPointInside(statement.location, cursorPosition)) {
+            statementIndex++;
             found = true;
             activeStatement = statement;
           } else if (!found) {
+            statementIndex++;
             if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
               precedingStatements.shift();
             }
@@ -3451,6 +3454,7 @@
 
         huePubSub.publish('editor.active.statement.changed', {
           id: self.editorId,
+          activeStatementIndex: statementIndex,
           totalStatementCount: lastKnownStatements.length,
           precedingStatements: precedingStatements,
           activeStatement: activeStatement,
@@ -3508,7 +3512,7 @@
       var lastKnownLocations = [];
 
       var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
-        huePubSub.publish('editor.active.locations', lastKnownLocations);
+        huePubSub.publish('set.active.editor.locations', lastKnownLocations);
       });
 
       self.disposeFunctions.push(function () {
@@ -3525,7 +3529,10 @@
           id: self.editorId,
           type: self.snippet.type(),
           defaultDatabase: self.snippet.database(),
-          locations: e.data.locations
+          locations: e.data.locations,
+          activeStatementLocations: e.data.activeStatementLocations,
+          totalStatementCount: e.data.totalStatementCount,
+          activeStatementIndex: e.data.activeStatementIndex
         };
 
         // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement

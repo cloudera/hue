@@ -1819,36 +1819,28 @@ from notebook.conf import get_ordered_interpreters
 
         self.disposals = [];
 
-        self.activeCursorLocation = ko.observable();
-        self.activeStatement = ko.observable();
-        self.locationIndex = ko.observable({});
-
-        self.activeSourceType = ko.observable();
-        self.activeTables = ko.observableArray();
-        self.activeColumns = ko.observableArray();
-        self.activeRisks = ko.observable({});
-        self.hasActiveRisks = ko.pureComputed(function () {
-           return self.activeRisks().hints && self.activeRisks().hints.length > 0;
-        });
-        self.hasMissingRisks = ko.pureComputed(function () {
-          return self.isMissingDDL() || self.isMissingStats();
-        });
         self.uploadingTableStats = ko.observable(false);
-        self.isMissingDDL = ko.pureComputed(function () {
-          return self.activeRisks().noDDL && self.activeRisks().noDDL.length > 0
-        });
-        self.isMissingStats = ko.pureComputed(function () {
-          return self.activeRisks().noStats && self.activeRisks().noStats.length > 0;
-        });
+        self.activeStatement = ko.observable();
+        self.activeTables = ko.observableArray();
+        self.activeRisks = ko.observable({});
         self.statementCount = ko.observable(0);
         self.activeStatementIndex = ko.observable(0);
 
-        var isPointInside = function (location, row, col) {
-          return (location.first_line < row && row < location.last_line) ||
-              (location.first_line === row && row === location.last_line && location.first_column <= col && col <= location.last_column) ||
-              (location.first_line === row && row < location.last_line && col >= location.first_column) ||
-              (location.first_line < row && row === location.last_line && col <= location.last_column);
-        };
+        self.hasActiveRisks = ko.pureComputed(function () {
+           return self.activeRisks().hints && self.activeRisks().hints.length > 0;
+        });
+
+        self.hasMissingRisks = ko.pureComputed(function () {
+          return self.isMissingDDL() || self.isMissingStats();
+        });
+
+        self.isMissingDDL = ko.pureComputed(function () {
+          return self.activeRisks().noDDL && self.activeRisks().noDDL.length > 0
+        });
+
+        self.isMissingStats = ko.pureComputed(function () {
+          return self.activeRisks().noStats && self.activeRisks().noStats.length > 0;
+        });
 
         var createQualifiedIdentifier = function (identifierChain) {
           return $.map(identifierChain, function (identifier) {
@@ -1856,129 +1848,50 @@ from notebook.conf import get_ordered_interpreters
           }).join('.');
         };
 
-        var AceRange = ace.require('ace/range').Range;
-
-        var findStatementTextAtCursor = function () {
-          if (!self.activeStatement() || !self.activeCursorLocation()) {
-            return; // undefined when unknown
+        var handleLocationUpdate = function (activeLocations) {
+          if (!activeLocations) {
+            return;
           }
-          var statementLoc = self.activeStatement().location;
+          self.statementCount(activeLocations.totalStatementCount);
+          self.activeStatementIndex(activeLocations.activeStatementIndex);
 
-          var editor = self.activeCursorLocation().editor;
-
-          return editor.session.getTextRange(new AceRange(statementLoc.first_line - 1, statementLoc.first_column - 1, statementLoc.last_line - 1, statementLoc.last_column - 1));
-        };
-
-        var activeStatementSub = huePubSub.subscribe('get.active.editor.statement', function () {
-          huePubSub.publish('set.active.editor.statement', findStatementTextAtCursor());
-        });
-
-        self.disposals.push(activeStatementSub.remove.bind(activeStatementSub));
-
-        var initActive = function () {
-          if (!self.activeCursorLocation()) {
-            huePubSub.publish('get.active.editor.cursor.location');
-          }
-          if (typeof self.activeCursorLocation() !== 'undefined' && typeof self.locationIndex()[self.activeCursorLocation().id] !== 'undefined') {
-            var locations = self.locationIndex()[self.activeCursorLocation().id].locations;
-            self.activeSourceType(self.locationIndex()[self.activeCursorLocation().id].type);
-
-            var statements = [];
-
-            // Statement always comes first
-            var currentStatement = [];
-            locations.forEach(function (location) {
-              if (location.type === 'statement') {
-                if (currentStatement.length > 0) {
-                  statements.push(currentStatement);
-                  currentStatement = [];
-                }
-              }
-              currentStatement.push(location);
-            });
-            if (currentStatement.length > 0) {
-              statements.push(currentStatement);
-            }
-            self.statementCount(statements.length);
-
-            var activeLocations = [];
-            if (statements.length > 0) {
-              // Pick the last statement by default (only one or cursor after last ';')
-              var statementIndex = statements.length;
-              activeLocations = statements[statementIndex - 1];
-              if (statements.length > 1) {
-                var cursorPos = self.activeCursorLocation().position;
-                var index = 1;
-                statements.every(function (statement) {
-                  // First is the actual statement
-                  if (isPointInside(statement[0].location, cursorPos.row+1, cursorPos.column+1)) {
-                    activeLocations = statement;
-                    statementIndex = index;
-                    return false;
-                  }
-                  index++;
-                  return true;
-                })
-              }
-              self.activeStatementIndex(statementIndex);
-            }
-
+          if (activeLocations.activeStatementLocations) {
             var tableIndex = {};
-            var columnIndex = {};
-
-            activeLocations.forEach(function (location) {
-              if (location.type === 'statement' && (!self.activeStatement() || self.activeStatement().location !== location.location)) {
-                self.activeStatement(location);
-                huePubSub.publish('active.editor.statement.changed', findStatementTextAtCursor());
-              } else if (location.type === 'table' && location.identifierChain.length <= 2) {
-                // tableIndex is used to make sure we only add each table once
-                tableIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
-              } else if (location.type === 'column') {
-                columnIndex[createQualifiedIdentifier(location.identifierChain)] = { name: location.identifierChain[location.identifierChain.length - 1].name, identifierChain: location.identifierChain }
+            activeLocations.activeStatementLocations.forEach(function (location) {
+              if (location.type === 'table') {
+                tableIndex[createQualifiedIdentifier(location.identifierChain)] = {
+                  name: location.identifierChain[location.identifierChain.length - 1].name,
+                  identifierChain: location.identifierChain
+                };
               }
             });
 
             self.activeTables($.map(tableIndex, function (value) {
               return new MetastoreTable({
                 database: {
-                  name: value.identifierChain.length === 2 ? value.identifierChain[0].name : self.locationIndex()[self.activeCursorLocation().id].defaultDatabase
+                  name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
                 },
                 type: 'table',
                 name: value.name
               });
             }));
-            self.activeColumns($.map(columnIndex, function (value) {
-              return value;
-            }));
           }
         };
 
-        huePubSub.subscribeOnce('set.active.snippet.type', self.activeSourceType);
-        huePubSub.publish('get.active.snippet.type');
+        huePubSub.subscribeOnce('set.active.editor.locations', handleLocationUpdate);
+        huePubSub.publish('get.active.editor.locations');
 
-        var snippetTypeChangedSub = huePubSub.subscribe('active.snippet.type.changed', self.activeSourceType);
-        self.disposals.push(snippetTypeChangedSub.remove.bind(snippetTypeChangedSub));
-
-        var cursorLocationSub = huePubSub.subscribe('editor.active.cursor.location', function (location) {
-          self.activeCursorLocation(location);
-          initActive();
-        });
-        self.disposals.push(cursorLocationSub.remove.bind(cursorLocationSub));
-
-        var activeLocationsSub = huePubSub.subscribe('editor.active.locations', function (activeLocations) {
-          var index = self.locationIndex();
-          index[activeLocations.id] = activeLocations;
-          self.locationIndex(index);
-          initActive();
-        });
-        self.disposals.push(activeLocationsSub.remove.bind(activeLocationsSub));
+        var activeLocationsSub = huePubSub.subscribe('editor.active.locations', handleLocationUpdate);
 
         var activeRisksSub = huePubSub.subscribe('editor.active.risks', function (activeRisks) {
           self.activeRisks(activeRisks);
         });
-        self.disposals.push(activeRisksSub.remove.bind(activeRisksSub));
 
-        huePubSub.publish('get.active.editor.locations');
+        self.disposals.push(function () {
+          activeLocationsSub.remove();
+          activeRisksSub.remove();
+        });
+
       }
 
       AssistantPanel.prototype.uploadTableStats = function () {
