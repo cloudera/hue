@@ -100,7 +100,7 @@ ENABLE_IMPALA_ACTION = Config(
   key="enable_impala_action",
   help=_t("Flag to enable the Impala action."),
   type=bool,
-  default=is_hue4()
+  default=False
 )
 
 
