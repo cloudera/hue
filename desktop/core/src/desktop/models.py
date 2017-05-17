@@ -1629,7 +1629,7 @@ class ClusterConfig():
 
     _interpreters = get_ordered_interpreters(self.user)
     if self.cluster_type == DATAENG:
-      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2')]
+      _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] in ('hive', 'spark2', 'mapreduce')]
     elif self.cluster_type == IMPALAUI:
       _interpreters = [interpreter for interpreter in _interpreters if interpreter['type'] == 'impala']
 
