@@ -1792,7 +1792,6 @@ from notebook.conf import get_ordered_interpreters
               <span data-bind="text: name"></span>
               <div class="pull-right margin-right-10">
                 <a class="inactive-action" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }"><i class="fa fa-info"></i></a>
-                <i class="fa fa-fw fa-clock-o muted" title="02/01/2017 10:15 PM"></i>
               </div>
             </li>
           </ul>
