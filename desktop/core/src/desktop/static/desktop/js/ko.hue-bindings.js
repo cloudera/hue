@@ -3350,6 +3350,7 @@
       if (window.Worker) {
         self.attachSqlWorker();
       }
+      self.attachGutterHandler();
     }
 
     AceLocationHandler.prototype.attachCursorLocator = function () {
@@ -3380,6 +3381,37 @@
       });
     };
 
+    AceLocationHandler.prototype.attachGutterHandler = function () {
+      var self = this;
+      var lastMarkedGutterLines = [];
+
+      var changedSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
+        if (statementDetails.id !== self.editorId || !statementDetails.activeStatement) {
+          return;
+        }
+        var leadingEmptyLineCount = 0;
+        var leadingWhiteSpace = statementDetails.activeStatement.statement.match(/^\s+/);
+        if (leadingWhiteSpace) {
+          var lineBreakMatch = leadingWhiteSpace[0].match(/(\r\n)|(\n)|(\r)/g);
+          if (lineBreakMatch) {
+            leadingEmptyLineCount = lineBreakMatch.length;
+          }
+        }
+
+        while(lastMarkedGutterLines.length) {
+          self.editor.session.removeGutterDecoration(lastMarkedGutterLines.shift(), 'ace-active-gutter-decoration');
+        }
+        for (var line = statementDetails.activeStatement.location.first_line - 1 + leadingEmptyLineCount; line < statementDetails.activeStatement.location.last_line; line ++) {
+          lastMarkedGutterLines.push(line);
+          self.editor.session.addGutterDecoration(line, 'ace-active-gutter-decoration');
+        }
+      });
+
+      self.disposeFunctions.push(function () {
+        changedSubscription.remove();
+      });
+    };
+
     AceLocationHandler.prototype.attachStatementLocator = function () {
       var self = this;
 
@@ -3394,54 +3426,70 @@
           (parseLocation.first_line < row && row === parseLocation.last_line && column <= parseLocation.last_column);
       };
 
-      var updateStatementLocations = function () {
+      var lastKnownStatements = [];
+
+      var updateActiveStatement = function () {
+        var precedingStatements = [];
+        var activeStatement = null;
+        var followingStatements = [];
+
+        var cursorPosition = self.editor.getCursorPosition();
+        var found = false;
+        lastKnownStatements.forEach(function (statement) {
+          if (isPointInside(statement.location, cursorPosition)) {
+            found = true;
+            activeStatement = statement;
+          } else if (!found) {
+            if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
+              precedingStatements.shift();
+            }
+            precedingStatements.push(statement);
+          } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
+            followingStatements.push(statement);
+          }
+        });
+
+        huePubSub.publish('editor.active.statement.changed', {
+          id: self.editorId,
+          totalStatementCount: lastKnownStatements.length,
+          precedingStatements: precedingStatements,
+          activeStatement: activeStatement,
+          followingStatements: followingStatements,
+        });
+      };
+
+      var parseForStatements = function () {
         window.clearTimeout(changeThrottle);
         changeThrottle = window.setTimeout(function () {
-          var precedingStatements = [];
-          var activeStatement = null;
-          var followingStatements = [];
-          var totalStatementCount = 0;
-
-          var cursorPosition = self.editor.getCursorPosition();
-          var found = false;
           try {
-            var statements = sqlStatementsParser.parse(self.editor.getValue());
-            totalStatementCount = statements.length;
-            statements.forEach(function (statement) {
-              if (isPointInside(statement.location, cursorPosition)) {
-                found = true;
-                activeStatement = statement;
-              } else if (!found) {
-                if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
-                  precedingStatements.shift();
-                }
-                precedingStatements.push(statement);
-              } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
-                followingStatements.push(statement);
-              }
-            });
+            lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
           } catch (error) {
             console.warn('Could not parse statements!');
             console.warn(error);
           }
-
-          huePubSub.publish('editor.active.statements.changed', {
-            id: self.editorId,
-            totalStatementCount: totalStatementCount,
-            precedingStatements: precedingStatements,
-            activeStatement: activeStatement,
-            followingStatements: followingStatements,
-          });
         }, 200);
       };
 
-      window.setTimeout(updateStatementLocations, 0);
+      var cursorSubscription = huePubSub.subscribe('editor.active.cursor.location', function (locationDetails) {
+        if (self.editorId === locationDetails.id) {
+          updateActiveStatement();
+        }
+      });
 
-      var changeListener = self.editor.on("change", updateStatementLocations);
+      window.setTimeout(function () {
+        parseForStatements();
+        updateActiveStatement();
+      }, 0);
+
+      var changeListener = self.editor.on("change", function () {
+        parseForStatements();
+        updateActiveStatement();
+      });
 
       self.disposeFunctions.push(function () {
         window.clearTimeout(changeThrottle);
         self.editor.off("change", changeListener);
+        cursorSubscription.remove();
       });
     };
 
@@ -3557,7 +3605,7 @@
       };
 
 
-      var statementSubscription = huePubSub.subscribe('editor.active.statements.changed', function (statementDetails) {
+      var statementSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
         if (self.snippet.type() === 'hive' || snippet.snippet.type() === 'impala') {
           whenWorkerIsReady(function () {
             aceSqlWorker.postMessage({ statementDetails: statementDetails, type: self.snippet.type() });
