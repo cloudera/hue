@@ -379,10 +379,10 @@ from desktop.views import _ko
 
   <script type="text/html" id="hue-job-browser-panel-template">
     <div class="btn-group pull-right">
-      <button class="btn btn-flat" style="padding-right: 2px" data-bind="hueLink: '/jobbrowser', click: function(){ jobsPanelVisible(false); }">
+      <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser', click: function(){ jobsPanelVisible(false); }">
         <span>${ _('Jobs') }</span>
       </button>
-      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Running jobs')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
+      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Min job browser')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
         <i class="fa fa-sliders"></i>
       </button>
