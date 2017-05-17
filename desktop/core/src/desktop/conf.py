@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+## -*- coding: utf-8 -*-
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -1458,6 +1459,19 @@ def config_validator(user):
 
   if not _is_oozie_mail_enabled(user):
     res.append(('OOZIE_EMAIL_SERVER', unicode(_('Email notifications is disabled for Workflows and Jobs as SMTP server is localhost.'))))
+
+  from notebook.models import make_notebook
+  from notebook.api import _save_notebook
+
+  notebook = make_notebook(name='test', editor_type='hive', statement='select "ทดสอบ"', status='ready')
+  notebook_doc = None
+  try:
+    notebook_doc, save_as = _save_notebook(notebook.get_data(), user)
+  except:
+    res.append(('DATABASE_CHARACTER_SET', unicode(_('Character set of <i>search</i> field in <i>desktop_document2</i> table is not UTF-8. </br>'
+                                                    '<b>NOTE:</b> Configure the database for character set AL32UTF8 and national character set UTF8.'))))
+  if notebook_doc:
+    notebook_doc.delete()
 
   return res
 
