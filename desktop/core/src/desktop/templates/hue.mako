@@ -1175,7 +1175,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             self.quickCreateActions([]);
           }
 
-          self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser']);
+          self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser'] && (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 || clusterConfig['app_config']['browser']['interpreter_names'].indexOf('dataeng') != -1));
         });
 
         var ClusterPanelViewModel = function() {
