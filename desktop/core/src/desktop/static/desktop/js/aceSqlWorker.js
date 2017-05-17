@@ -16,13 +16,34 @@
 
 var version = 17;
 importScripts('/static/desktop/js/autocomplete/sqlParseSupport.js?version=' + version);
-importScripts('/static/desktop/js/autocomplete/sqlStatementsParser.js?version=' + version);
 importScripts('/static/desktop/js/autocomplete/sql.js?version=' + version);
 importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
 
 (function () {
 
   this.throttle = -1;
+
+  this.handleStatement = function (statement, locations, type) {
+    // Statement locations come in the message to the worker and are generally more accurate
+    locations.push(statement);
+    try {
+      var sqlParseResult = sql.parseSql(statement.statement + ' ', '', type, false);
+      if (sqlParseResult.locations) {
+        sqlParseResult.locations.forEach(function (location) {
+          // Skip statement locations from the sql parser
+          if (location.type !== 'statement') {
+            if (location.location.first_line === 1) {
+              location.location.first_column += statement.location.first_column;
+              location.location.last_column += statement.location.first_column;
+            }
+            location.location.first_line += statement.location.first_line - 1;
+            location.location.last_line += statement.location.first_line - 1;
+            locations.push(location);
+          }
+        })
+      }
+    } catch (error) {}
+  };
 
   this.onmessage = function (msg) {
     if (msg.data.ping) {
@@ -31,30 +52,19 @@ importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
     }
     clearTimeout(this.throttle);
     this.throttle = setTimeout(function () {
-      if (msg.data) {
-        var statements = sqlStatementsParser.parse(msg.data.text);
+      if (msg.data.statementDetails) {
         var locations = [];
-        // For now we'll only extract the locations
-        statements.forEach(function (statement) {
-          locations.push(statement);
-          try {
-            var sqlParseResult =  sql.parseSql(statement.statement + ' ', '', msg.data.type, false);
-            if (sqlParseResult.locations) {
-              sqlParseResult.locations.forEach(function (location) {
-                if (location.type !== 'statement') {
-                  if (location.location.first_line === 1) {
-                    location.location.first_column += statement.location.first_column;
-                    location.location.last_column += statement.location.first_column;
-                  }
-                  location.location.first_line += statement.location.first_line - 1;
-                  location.location.last_line += statement.location.first_line - 1;
-                  locations.push(location);
-                }
-              })
-            }
-          } catch (error) {}
+        msg.data.statementDetails.precedingStatements.forEach(function (statement) {
+          this.handleStatement(statement, locations, msg.data.type);
         });
-        postMessage({ locations: locations });
+        if (msg.data.statementDetails.activeStatement) {
+          this.handleStatement(msg.data.statementDetails.activeStatement, locations, msg.data.type);
+        }
+        msg.data.statementDetails.followingStatements.forEach(function (statement) {
+          this.handleStatement(statement, locations, msg.data.type);
+        });
+
+        postMessage({ locations: locations, statementCount: msg.data.totalStatementCount });
       }
     }, 400);
   }

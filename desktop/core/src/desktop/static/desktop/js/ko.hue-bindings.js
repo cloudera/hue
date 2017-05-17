@@ -3269,7 +3269,7 @@
         defaultTime: false
       });
     }
-  }
+  };
 
 
   ko.bindingHandlers.textSqueezer = {
@@ -3290,7 +3290,7 @@
 
   ko.toJSONObject = function (koObj) {
     return JSON.parse(ko.toJSON(koObj));
-  }
+  };
 
   ko.toCleanJSON = function (koObj) {
     return ko.toJSON(koObj, function (key, value) {
@@ -3301,7 +3301,7 @@
         return value;
       }
     });
-  }
+  };
 
 
   ko.bindingHandlers.delayedOverflow = {
@@ -3333,13 +3333,259 @@
     }
   };
 
+  var AceLocationHandler = (function () {
+
+    var STATEMENT_COUNT_AROUND_ACTIVE = 10;
+
+    function AceLocationHandler (editor, editorId, snippet) {
+      var self = this;
+      self.editor = editor;
+      self.editorId = editorId;
+      self.snippet = snippet;
+
+      self.disposeFunctions = [];
+
+      self.attachCursorLocator();
+      self.attachStatementLocator();
+      if (window.Worker) {
+        self.attachSqlWorker();
+      }
+    }
+
+    AceLocationHandler.prototype.attachCursorLocator = function () {
+      var self = this;
+      var changeCursorThrottle = -1;
+      var changeCursorListener = self.editor.selection.on('changeCursor', function () {
+        window.clearTimeout(changeCursorThrottle);
+        changeCursorThrottle = window.setTimeout(function () {
+          huePubSub.publish('editor.active.cursor.location', {
+            id: self.editorId,
+            position: self.editor.getCursorPosition(),
+            editor: self.editor
+          });
+        }, 150);
+      });
+
+      self.disposeFunctions.push(function () {
+        window.clearTimeout(changeCursorThrottle);
+        self.editor.selection.off('changeCursor', changeCursorListener);
+      });
+
+      var cursorLocationSub = huePubSub.subscribe('get.active.editor.cursor.location', function () {
+        huePubSub.publish('editor.active.cursor.location', { id: self.editorId, position: self.editor.getCursorPosition(), editor: self.editor });
+      });
+
+      self.disposeFunctions.push(function () {
+        cursorLocationSub.remove();
+      });
+    };
+
+    AceLocationHandler.prototype.attachStatementLocator = function () {
+      var self = this;
+
+      var changeThrottle = -1;
+
+      var isPointInside = function (parseLocation, acePosition) {
+        var row = acePosition.row + 1; // ace positioning has 0 based rows while the parser has 1
+        var column = acePosition.column;
+        return (parseLocation.first_line < row && row < parseLocation.last_line) ||
+          (parseLocation.first_line === row && row === parseLocation.last_line && parseLocation.first_column <= column && column <= parseLocation.last_column) ||
+          (parseLocation.first_line === row && row < parseLocation.last_line && column >= parseLocation.first_column) ||
+          (parseLocation.first_line < row && row === parseLocation.last_line && column <= parseLocation.last_column);
+      };
+
+      var updateStatementLocations = function () {
+        window.clearTimeout(changeThrottle);
+        changeThrottle = window.setTimeout(function () {
+          var precedingStatements = [];
+          var activeStatement = null;
+          var followingStatements = [];
+          var totalStatementCount = 0;
+
+          var cursorPosition = self.editor.getCursorPosition();
+          var found = false;
+          try {
+            var statements = sqlStatementsParser.parse(self.editor.getValue());
+            totalStatementCount = statements.length;
+            statements.forEach(function (statement) {
+              if (isPointInside(statement.location, cursorPosition)) {
+                found = true;
+                activeStatement = statement;
+              } else if (!found) {
+                if (precedingStatements.length === STATEMENT_COUNT_AROUND_ACTIVE) {
+                  precedingStatements.shift();
+                }
+                precedingStatements.push(statement);
+              } else if (found && followingStatements.length < STATEMENT_COUNT_AROUND_ACTIVE) {
+                followingStatements.push(statement);
+              }
+            });
+          } catch (error) {
+            console.warn('Could not parse statements!');
+            console.warn(error);
+          }
+
+          huePubSub.publish('editor.active.statements.changed', {
+            id: self.editorId,
+            totalStatementCount: totalStatementCount,
+            precedingStatements: precedingStatements,
+            activeStatement: activeStatement,
+            followingStatements: followingStatements,
+          });
+        }, 200);
+      };
+
+      window.setTimeout(updateStatementLocations, 0);
+
+      var changeListener = self.editor.on("change", updateStatementLocations);
+
+      self.disposeFunctions.push(function () {
+        window.clearTimeout(changeThrottle);
+        self.editor.off("change", changeListener);
+      });
+    };
+
+    AceLocationHandler.prototype.attachSqlWorker = function () {
+      var self = this;
+
+      var apiHelper = ApiHelper.getInstance();
+      var activeTokens = [];
+      var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?bust=' + Math.random());
+      var workerIsReady = false;
+
+      self.disposeFunctions.push(function () {
+        aceSqlWorker.terminate();
+      });
+
+      var lastKnownLocations = [];
+
+      var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
+        huePubSub.publish('editor.active.locations', lastKnownLocations);
+      });
+
+      self.disposeFunctions.push(function () {
+        locationsSub.remove();
+      });
+
+      aceSqlWorker.onmessage = function(e) {
+        workerIsReady = true;
+        if (e.data.ping) {
+          return;
+        }
+
+        var lastKnownLocations = {
+          id: self.editorId,
+          type: self.snippet.type(),
+          defaultDatabase: self.snippet.database(),
+          locations: e.data.locations
+        };
+
+        // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
+        while(activeTokens.length > 0) {
+          delete activeTokens.pop().parseLocation;
+        }
+
+        e.data.locations.forEach(function (location) {
+          if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
+            return;
+          }
+          if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
+            var clonedChain = location.identifierChain.concat();
+            var dbFound = false;
+            if (apiHelper.containsDatabase(self.snippet.type(), clonedChain[0].name)) {
+              clonedChain.shift();
+              dbFound = true;
+            }
+            if (dbFound && clonedChain.length > 1) {
+              location.type = 'complex';
+            }
+          }
+
+          var token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
+          if (token && token.value && /`$/.test(token.value)) {
+            // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
+            token = self.editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
+          }
+          if (token !== null) {
+            if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
+              var findIdentifierChainInTable = function (tablesToGo) {
+                var nextTable = tablesToGo.shift();
+                if (typeof nextTable.subQuery === 'undefined') {
+                  apiHelper.fetchAutocomplete({
+                    sourceType: self.snippet.type(),
+                    defaultDatabase: self.snippet.database(),
+                    identifierChain: nextTable.identifierChain,
+                    silenceErrors: true,
+                    successCallback: function (data) {
+                      try {
+                        if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
+                          location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
+                          delete location.tables;
+                          token.parseLocation = location;
+                          activeTokens.push(token);
+                        } else if (tablesToGo.length > 0) {
+                          findIdentifierChainInTable(tablesToGo);
+                        }
+                      } catch (e) {} // TODO: Ignore for subqueries
+                    }
+                  })
+                } else if (tablesToGo.length > 0) {
+                  findIdentifierChainInTable(tablesToGo);
+                }
+              };
+
+              findIdentifierChainInTable(location.tables.concat());
+            } else {
+              token.parseLocation = location;
+              activeTokens.push(token);
+            }
+          }
+        });
+
+        huePubSub.publish('editor.active.locations', lastKnownLocations);
+      };
+
+      var whenWorkerIsReady = function (callback) {
+        if (!workerIsReady) {
+          aceSqlWorker.postMessage({ ping: true });
+          window.setTimeout(function () {
+            whenWorkerIsReady(callback);
+          }, 500);
+        } else {
+          callback();
+        }
+      };
+
+
+      var statementSubscription = huePubSub.subscribe('editor.active.statements.changed', function (statementDetails) {
+        if (self.snippet.type() === 'hive' || snippet.snippet.type() === 'impala') {
+          whenWorkerIsReady(function () {
+            aceSqlWorker.postMessage({ statementDetails: statementDetails, type: self.snippet.type() });
+          });
+        }
+      });
+
+      self.disposeFunctions.push(function () {
+        statementSubscription.remove();
+      });
+    };
+
+    AceLocationHandler.prototype.dispose = function () {
+      var self = this;
+      self.disposeFunctions.forEach(function (dispose) {
+        dispose();
+      })
+    };
+
+    return AceLocationHandler;
+  })();
+
   ko.bindingHandlers.aceEditor = {
     init: function (element, valueAccessor) {
 
       var $el = $(element);
       var options = ko.unwrap(valueAccessor());
       var snippet = options.snippet;
-      var apiHelper = snippet.getApiHelper();
       var aceOptions = options.aceOptions || {};
 
       var disposeFunctions = [];
@@ -3354,11 +3600,16 @@
 
       $el.text(snippet.statement_raw());
 
-      window.setTimeout(function () {
-        huePubSub.publish('editor.refresh.locations');
-      }, 0);
-
       var editor = ace.edit($el.attr("id"));
+
+      var Tooltip = ace.require("ace/tooltip").Tooltip;
+      var AceRange = ace.require('ace/range').Range;
+
+      var aceLocationHandler = new AceLocationHandler(editor, $el.attr("id"), snippet);
+      disposeFunctions.push(function () {
+        aceLocationHandler.dispose();
+      });
+
       editor.session.setMode(snippet.getAceMode());
       editor.setOptions({ fontSize: snippet.getApiHelper().getFromTotalStorage('hue.ace', 'fontSize', navigator.platform && navigator.platform.toLowerCase().indexOf("linux") > -1 ? '14px' : '12px')});
 
@@ -3485,146 +3736,6 @@
 
       $.extend(editorOptions, aceOptions);
 
-      var activeTokens = [];
-      if (window.Worker) {
-        var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?bust=' + Math.random());
-        var workerIsReady = false;
-
-        disposeFunctions.push(function () {
-          aceSqlWorker.terminate();
-        });
-
-        var AceRange = ace.require('ace/range').Range;
-
-        var lastKnownLocations = [];
-
-        var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
-          huePubSub.publish('editor.active.locations', lastKnownLocations);
-        });
-
-        disposeFunctions.push(function () {
-          locationsSub.remove();
-        });
-
-        aceSqlWorker.onmessage = function(e) {
-          workerIsReady = true;
-          if (e.data.ping) {
-            return;
-          }
-          if (errorHighlightingEnabled) {
-            for (var id in editor.session.getMarkers()) {
-              var marker = editor.session.getMarkers()[id];
-              if (marker.clazz == "hue-ace-error"){
-                editor.session.removeMarker(marker.id);
-              }
-            }
-
-            if (e.data.errors) {
-              e.data.errors.forEach(function (error) {
-                if (error.expected.length > 0) {
-                  var token = editor.session.getTokenAt(error.loc.first_line - 1, error.loc.first_column);
-                  if (token) {
-                    token.error = error;
-                    editor.session.addMarker(new AceRange(error.loc.first_line - 1, error.loc.first_column, error.loc.last_line - 1, error.loc.last_column), 'hue-ace-error', 'fail');
-                  }
-                }
-              });
-            }
-          }
-
-
-          var lastKnownLocations = { id: $el.attr("id"), type: snippet.type(), defaultDatabase: snippet.database(), locations: e.data.locations };
-
-          // Clear out old parse locations to prevent them from being shown when there's a syntax error in the statement
-          while(activeTokens.length > 0) {
-            delete activeTokens.pop().parseLocation;
-          }
-
-          e.data.locations.forEach(function (location) {
-            if (location.type === 'statement' || ((location.type === 'table' || location.type === 'column') && typeof location.identifierChain === 'undefined')) {
-              return;
-            }
-            if ((location.type === 'table' && location.identifierChain.length > 1) || (location.type === 'column' && location.identifierChain.length > 2)) {
-              var clonedChain = location.identifierChain.concat();
-              var dbFound = false;
-              if (apiHelper.containsDatabase(snippet.type(), clonedChain[0].name)) {
-                clonedChain.shift();
-                dbFound = true;
-              }
-              if (dbFound && clonedChain.length > 1) {
-                location.type = 'complex';
-              }
-            }
-
-            var token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column);
-            if (token && token.value && /`$/.test(token.value)) {
-              // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
-              token = editor.session.getTokenAt(location.location.first_line - 1, location.location.first_column + 1);
-            }
-            if (token !== null) {
-              if (location.type === 'column' && typeof location.tables !== 'undefined' && location.identifierChain.length === 1) {
-
-                var findIdentifierChainInTable = function (tablesToGo) {
-                  var nextTable = tablesToGo.shift();
-                  if (typeof nextTable.subQuery === 'undefined') {
-                    apiHelper.fetchAutocomplete({
-                      sourceType: snippet.type(),
-                      defaultDatabase: snippet.database(),
-                      identifierChain: nextTable.identifierChain,
-                      silenceErrors: true,
-                      successCallback: function (data) {
-                        try {
-                          if (typeof data.columns !== 'undefined' && data.columns.indexOf(location.identifierChain[0].name) !== -1) {
-                            location.identifierChain = nextTable.identifierChain.concat(location.identifierChain);
-                            delete location.tables;
-                            token.parseLocation = location;
-                            activeTokens.push(token);
-                          } else if (tablesToGo.length > 0) {
-                            findIdentifierChainInTable(tablesToGo);
-                          }
-                        } catch (e) {} // TODO: Ignore for subqueries
-                      }
-                    })
-                  } else if (tablesToGo.length > 0) {
-                    findIdentifierChainInTable(tablesToGo);
-                  }
-                };
-
-                findIdentifierChainInTable(location.tables.concat());
-              } else {
-                token.parseLocation = location;
-                activeTokens.push(token);
-              }
-            }
-          });
-
-          huePubSub.publish('editor.active.locations', lastKnownLocations);
-        };
-
-        var whenWorkerIsReady = function (callback) {
-          if (!workerIsReady) {
-            aceSqlWorker.postMessage({ ping: true });
-            window.setTimeout(function () {
-              whenWorkerIsReady(callback);
-            }, 500);
-          } else {
-            callback();
-          }
-        };
-
-        var refreshSub = huePubSub.subscribe('editor.refresh.locations', function () {
-          if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
-            whenWorkerIsReady(function () {
-              aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
-            });
-          }
-        });
-
-        disposeFunctions.push(function () {
-          refreshSub.remove();
-        });
-      }
-
       editorOptions['enableBasicAutocompletion'] = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'enableBasicAutocompletion', true);
       if (editorOptions['enableBasicAutocompletion']) {
         editorOptions['enableLiveAutocompletion'] = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'enableLiveAutocompletion', true);
@@ -3737,30 +3848,12 @@
         editor.off('focus', focusListener);
       });
 
-      var changeCursorThrottle = -1;
-      var changeCursorListener = editor.selection.on('changeCursor', function () {
-        window.clearTimeout(changeCursorThrottle);
-        changeCursorThrottle = window.setTimeout(function () {
-          huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition(), editor: editor });
-        }, 150);
-      });
-
       var changeSelectionListener = editor.selection.on('changeSelection', function () {
         snippet.selectedStatement(editor.getSelectedText());
       });
 
       disposeFunctions.push(function () {
-        window.clearTimeout(changeCursorThrottle);
-        editor.selection.off('changeCursor', changeCursorListener);
         editor.selection.off('changeSelection', changeSelectionListener);
-      });
-
-      var cursorLocationSub = huePubSub.subscribe('get.active.editor.cursor.location', function () {
-        huePubSub.publish('editor.active.cursor.location', { id: $el.attr("id"), position: editor.getCursorPosition(), editor: editor });
-      });
-
-      disposeFunctions.push(function () {
-        cursorLocationSub.remove();
       });
 
       var blurListener = editor.on('blur', function () {
@@ -3777,8 +3870,6 @@
 
       // TODO: Move context menu logic to separate module
       (function () {
-        var Tooltip = ace.require("ace/tooltip").Tooltip;
-
         var contextTooltip = new Tooltip(editor.container);
         var tooltipTimeout = -1;
         var disableTooltip = false;
@@ -3981,10 +4072,6 @@
       });
 
       var changeListener = editor.on("change", function (e) {
-        if (snippet.getAceMode() === 'ace/mode/hive' || snippet.getAceMode() === 'ace/mode/impala') {
-          aceSqlWorker.postMessage({ text: editor.getValue(), type: snippet.type() });
-        }
-
         snippet.statement_raw(removeUnicodes(editor.getValue()));
         editor.session.getMode().$id = snippet.getAceMode();
         var currentSize = editor.session.getLength();
