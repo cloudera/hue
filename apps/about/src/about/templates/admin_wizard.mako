@@ -20,7 +20,7 @@ from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
 from desktop.views import commonheader, commonfooter
-from metadata.conf import OPTIMIZER
+from metadata.conf import OPTIMIZER, has_optimizer
 %>
 
 <%namespace name="layout" file="/about_layout.mako" />
@@ -90,7 +90,7 @@ ${ layout.menubar(section='quick_start') }
                     </a>
                   </li>
               % endif
-              % if OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
+              % if has_optimizer() and OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() > 0:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Uploading...') }"
                        data-sample-url="${ url('metadata:upload_history') }" title="${ _('Send and analyze past %s executed queries to provide smarter SQL recommendations') % OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() }">
