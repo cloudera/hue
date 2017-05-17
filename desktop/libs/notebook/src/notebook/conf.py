@@ -166,11 +166,8 @@ def _default_interpreters(user):
       'name': 'Pig', 'interface': 'oozie', 'options': {}
     }))
 
-  if 'oozie' in apps:
+  if 'oozie' in apps and 'jobsub' in apps:
     interpreters.extend((
-      ('pig', {
-          'name': 'Pig', 'interface': 'oozie', 'options': {}
-      }),
       ('java', {
           'name': 'Java', 'interface': 'oozie', 'options': {}
       }),
