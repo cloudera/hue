@@ -1586,7 +1586,7 @@ class ClusterConfig():
       interpreters.append({
         'name': interpreter['name'],
         'type': interpreter['type'],
-        'displayName': interpreter['type'].title(),
+        'displayName': interpreter['name'],
         'tooltip': _('%s Query') % interpreter['type'].title(),
         'page': '/editor/?type=%(type)s' % interpreter,
       })

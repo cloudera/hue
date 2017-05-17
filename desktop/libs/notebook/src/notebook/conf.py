@@ -173,12 +173,6 @@ def _default_interpreters(user):
       ('java', {
           'name': 'Java', 'interface': 'oozie', 'options': {}
       }),
-      ('sqoop1', {
-          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
-      }),
-      ('distcp', {
-          'name': 'Distcp', 'interface': 'oozie', 'options': {}
-      }),
       ('spark2', {
           'name': 'Spark', 'interface': 'oozie', 'options': {}
       }),
@@ -188,14 +182,22 @@ def _default_interpreters(user):
       ('shell', {
           'name': 'Shell', 'interface': 'oozie', 'options': {}
       }),
+      ('sqoop1', {
+          'name': 'Sqoop 1', 'interface': 'oozie', 'options': {}
+      }),
+      ('distcp', {
+          'name': 'Distcp', 'interface': 'oozie', 'options': {}
+      }),
     ))
 
-  if 'search' in apps: # And Solr 6+
+  from dashboard.conf import get_properties  # Cyclic dependency
+  dashboards = get_properties()
+  if dashboards.get('solr') and dashboards['solr']['analytics']:
     interpreters.append(('solr', {
         'name': 'Solr SQL', 'interface': 'solr', 'options': {}
     }),)
 
-  if SHOW_NOTEBOOKS.get():
+  if 'spark' in apps:
     interpreters.extend((
       ('spark', {
           'name': 'Scala', 'interface': 'livy', 'options': {}
