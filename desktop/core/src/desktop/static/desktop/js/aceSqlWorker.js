@@ -54,17 +54,24 @@ importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
     this.throttle = setTimeout(function () {
       if (msg.data.statementDetails) {
         var locations = [];
+        var activeStatementLocations = [];
         msg.data.statementDetails.precedingStatements.forEach(function (statement) {
           this.handleStatement(statement, locations, msg.data.type);
         });
         if (msg.data.statementDetails.activeStatement) {
-          this.handleStatement(msg.data.statementDetails.activeStatement, locations, msg.data.type);
+          this.handleStatement(msg.data.statementDetails.activeStatement, activeStatementLocations, msg.data.type);
+          locations = locations.concat(activeStatementLocations);
         }
         msg.data.statementDetails.followingStatements.forEach(function (statement) {
           this.handleStatement(statement, locations, msg.data.type);
         });
 
-        postMessage({ locations: locations, statementCount: msg.data.totalStatementCount });
+        postMessage({
+          locations: locations,
+          activeStatementLocations: activeStatementLocations,
+          totalStatementCount: msg.data.statementDetails.totalStatementCount,
+          activeStatementIndex: msg.data.statementDetails.activeStatementIndex
+        });
       }
     }, 400);
   }
