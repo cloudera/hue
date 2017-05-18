@@ -1523,6 +1523,7 @@ var AutocompleteResults = (function () {
           var popularityIndex = {};
           popularColumns.forEach(function (popularColumn) {
             popularityIndex[popularColumn.columnName.toLowerCase()] = popularColumn;
+            popularityIndex[popularColumn.columnName.toLowerCase() + '[]'] = popularColumn;
           });
 
           columnsDeferred.done(function (columns) {
