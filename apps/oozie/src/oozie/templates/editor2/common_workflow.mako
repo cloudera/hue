@@ -1562,7 +1562,7 @@
       <div data-bind="visible: ! $parent.ooziePropertiesExpanded()" class="nowrap">
         <select data-bind="valueAllowUnset: true, options: $root.subworkflows, optionsText: 'name', optionsValue: 'value', value: properties.workflow"></select>
         <span data-bind="visible: properties.workflow().length > 0">
-          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + properties.workflow()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </span>
