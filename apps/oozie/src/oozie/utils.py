@@ -43,8 +43,10 @@ FREQUENCY_REGEX = r'^\$\{coord:(?P<frequency_unit>\w+)\((?P<frequency_number>\d+
 
 def format_field_value(field, value):
   if field in JSON_FIELDS:
-    if not isinstance(value, basestring):
-      return json.dumps(value)
+    if isinstance(value, basestring):
+      value = json.loads(value)
+    value = [item for item in value if item['name']]
+    return json.dumps(value)
   if field in NUMBER_FIELDS_OR_NULL:
     if not isinstance(value, int) and value is not None:
       return int(value)
