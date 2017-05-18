@@ -1900,7 +1900,7 @@ from notebook.conf import get_ordered_interpreters
           return;
         }
         self.uploadingTableStats(true);
-        huePubSub.publish('editor.upload.table.stats', { activeTables: activeTables(), callback: function () {
+        huePubSub.publish('editor.upload.table.stats', { activeTables: self.activeTables(), callback: function () {
             self.uploadingTableStats(false);
           }
         });
