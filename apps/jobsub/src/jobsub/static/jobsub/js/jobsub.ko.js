@@ -17,7 +17,6 @@
 /**
  * Design representation
  */
-var jobsubAjaxQueue = 0;
 var Design = (function($, ko, NodeFields) {
   var module = function(options) {
     var self = this;
@@ -155,16 +154,7 @@ var Design = (function($, ko, NodeFields) {
         dataType: 'json',
         type: 'GET',
         success: $.noop,
-        error: $.noop,
-        beforeSend: function () {
-          jobsubAjaxQueue = jobsubAjaxQueue + 1;
-        },
-        complete: function () {
-          jobsubAjaxQueue = Math.max(jobsubAjaxQueue - 1, 0);
-          if (jobsubAjaxQueue == 0) {
-            $(document).trigger('reload.designs');
-          }
-        }
+        error: $.noop
       }, options || {});
 
       $.ajax(request);
