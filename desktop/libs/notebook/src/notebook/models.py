@@ -203,6 +203,43 @@ def import_saved_beeswax_query(bquery):
   )
 
 
+def import_saved_pig_script(pig_script):
+  snippet_properties = {}
+
+  if pig_script.dict.get('hadoopProperties'):
+    snippet_properties['hadoopProperties'] = []
+    for prop in pig_script.dict.get('hadoopProperties'):
+      snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+
+  if pig_script.dict.get('parameters'):
+    snippet_properties['parameters'] = []
+    for param in pig_script.dict.get('parameters'):
+      snippet_properties['parameters'].append("%s=%s" % (param.get('name'), param.get('value')))
+
+  if pig_script.dict.get('resources'):
+    snippet_properties['resources'] = []
+    for resource in pig_script.dict.get('resources'):
+      snippet_properties['resources'].append(resource.get('value'))
+
+  notebook = make_notebook(
+    name=pig_script.dict.get('name'),
+    editor_type='pig',
+    statement=pig_script.dict.get('script'),
+    status='ready',
+    snippet_properties=snippet_properties,
+    is_saved=True
+  )
+
+  # Remove files, functions, settings from snippet properties
+  data = notebook.get_data()
+  data['snippets'][0]['properties'].pop('files')
+  data['snippets'][0]['properties'].pop('functions')
+  data['snippets'][0]['properties'].pop('settings')
+
+  notebook.data = json.dumps(data)
+  return notebook
+
+
 def _convert_type(btype, bdata):
   from beeswax.models import HQL, IMPALA, RDBMS, SPARK
 

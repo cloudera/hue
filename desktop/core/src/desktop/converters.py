@@ -22,10 +22,11 @@ import time
 from django.db import transaction
 from django.utils.translation import ugettext as _
 
+from desktop.conf import IS_HUE_4
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
 from notebook.api import _historify
-from notebook.models import import_saved_beeswax_query
+from notebook.models import import_saved_beeswax_query, import_saved_pig_script
 
 
 LOG = logging.getLogger(__name__)
@@ -134,19 +135,32 @@ class DocumentConverter(object):
     try:
       from pig.models import PigScript
 
-      # TODO: Change this logic to actually embed the pig data in Doc2 instead of linking to old pig script
       docs = self._get_unconverted_docs(PigScript)
+
       for doc in docs:
         try:
           if doc.content_object:
-            data = doc.content_object.dict
-            data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
-            doc2 = self._create_doc2(
+            if IS_HUE_4.get():
+              notebook = import_saved_pig_script(doc.content_object)
+              data = notebook.get_data()
+
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype=data['type'],
+                name=data['name'],
+                description=data['description'],
+                data=notebook.get_json()
+              )
+            else:
+              data = doc.content_object.dict
+              data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
+              doc2 = self._create_doc2(
                 document=doc,
                 doctype='link-pigscript',
                 description=doc.description,
                 data=json.dumps(data)
-            )
+              )
+
             self.imported_doc_count += 1
         except Exception, e:
           self.failed_doc_ids.append(doc.id)
