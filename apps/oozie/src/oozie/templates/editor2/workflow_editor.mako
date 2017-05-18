@@ -872,9 +872,11 @@ ${ dashboard.import_bindings() }
     });
 
     huePubSub.subscribe('submit.popup.return', function (data) {
-      $.jHueNotify.info('${_('Workflow submitted.')}');
-      huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
-      $('.submit-modal').modal('hide');
+      if (data.type == 'workflow') {
+        $.jHueNotify.info('${_('Workflow submitted.')}');
+        huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        $('.submit-modal').modal('hide');
+      }
     }, 'oozie');
 
     huePubSub.subscribe('oozie.draggable.section.change', function(val){

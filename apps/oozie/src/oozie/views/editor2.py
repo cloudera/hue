@@ -411,7 +411,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
         raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
       jsonify = request.POST.get('format') == 'json'
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'workflow'}, safe=False)
       else:
         request.info(_('Workflow submitted'))
         return redirect(reverse('oozie:list_oozie_workflow', kwargs={'job_id': job_id}))
@@ -678,7 +678,7 @@ def submit_coordinator(request, doc_id):
       jsonify = request.POST.get('format') == 'json'
       job_id = _submit_coordinator(request, coordinator, mapping)
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'schedule'}, safe=False)
       else:
         request.info(_('Coordinator submitted.'))
         return redirect(reverse('oozie:list_oozie_coordinator', kwargs={'job_id': job_id}))
@@ -854,7 +854,7 @@ def submit_bundle(request, doc_id):
 
       jsonify = request.POST.get('format') == 'json'
       if jsonify:
-        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'bundle'}, safe=False)
       else:
         request.info(_('Bundle submitted.'))
         return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
