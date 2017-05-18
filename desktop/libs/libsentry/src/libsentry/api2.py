@@ -46,7 +46,7 @@ def ha_error_handler(func):
         LOG.warn("Failed to connect to Sentry server %s, will attempt to find next available host." % args[0].client.host)
         server, attempts = get_next_available_server(SentryClient, args[0].client.username, args[0].client.host)
         if server is not None:
-          args[0].client = create_client(SentryClient, args[0].client.username, server)
+          args[0].client = create_client(SentryClient, args[0].client.username, server, args[0].client.component)
           set_api_cache(server)
           return func(*args, **kwargs)
         else:
@@ -95,7 +95,7 @@ def get_cached_server(current_host=None):
   return API_CACHE
 
 
-def get_api(user, component):
+def get_api(user, component='hive'):
   if component == 'solr':
     component = component.upper()
 
