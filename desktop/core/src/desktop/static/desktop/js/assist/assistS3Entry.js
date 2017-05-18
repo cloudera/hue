@@ -44,6 +44,19 @@ var AssistS3Entry = (function () {
     self.currentPage = 1;
     self.hasMorePages = true;
 
+    self.isFilterVisible = ko.observable(false);
+    self.filter = ko.observable('').extend({ rateLimit: 400 });
+
+    self.isFilterVisible.subscribe(function (newValue) {
+      if (!newValue && self.filter()) {
+        self.filter('');
+      }
+    });
+
+    self.filter.subscribe(function () {
+      self.loadEntries();
+    });
+
     self.entries = ko.observableArray([]);
 
     self.loaded = false;
@@ -106,6 +119,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: successCallback,
       errorCallback: errorCallback
@@ -177,6 +191,7 @@ var AssistS3Entry = (function () {
     self.apiHelper.fetchS3Path({
       pageSize: PAGE_SIZE,
       page: self.currentPage,
+      filter: self.isFilterVisible() && self.filter().trim() ? self.filter() : undefined,
       pathParts: self.getHierarchy(),
       successCallback: function (data) {
         self.hasMorePages = data.page.next_page_number > self.currentPage;
