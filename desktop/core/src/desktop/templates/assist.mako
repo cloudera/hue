@@ -303,7 +303,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectS3Entry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: path, attr: {'title': path }"></span>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
@@ -440,7 +440,7 @@ from notebook.conf import get_ordered_interpreters
       <a href="javascript: void(0);" data-bind="click: function () { huePubSub.publish('assist.selectHdfsEntry', parent); }">
         <i class="fa fa-fw fa-chevron-left"></i>
         <i class="fa fa-fw fa-folder-o"></i>
-        <span data-bind="text: path, attr: {'title': path }"></span>
+        <span data-bind="text: definition.name, tooltip: {'title': path, 'placement': 'bottom' }"></span>
       </a>
       <!-- /ko -->
       <!-- ko if: parent === null -->
