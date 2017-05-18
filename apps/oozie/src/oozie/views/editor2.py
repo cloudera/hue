@@ -852,8 +852,12 @@ def submit_bundle(request, doc_id):
       mapping = dict([(param['name'], param['value']) for param in params_form.cleaned_data])
       job_id = _submit_bundle(request, bundle, mapping)
 
-      request.info(_('Bundle submitted.'))
-      return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
+      jsonify = request.POST.get('format') == 'json'
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id}, safe=False)
+      else:
+        request.info(_('Bundle submitted.'))
+        return redirect(reverse('oozie:list_oozie_bundle', kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -865,6 +869,7 @@ def submit_bundle(request, doc_id):
                  'params_form': params_form,
                  'name': bundle.name,
                  'action': reverse('oozie:editor_submit_bundle',  kwargs={'doc_id': bundle.id}),
+                 'return_json': request.GET.get('format') == 'json',
                  'show_dryrun': False
                 }, force_template=True).content
   return JsonResponse(popup, safe=False)

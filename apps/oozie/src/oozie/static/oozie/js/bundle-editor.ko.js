@@ -129,6 +129,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
     if (!self.bundle.isDirty()) {
       hueAnalytics.log('oozie/editor/bundle', 'submit');
       $.get("/oozie/editor/bundle/submit/" + self.bundle.id(), {
+        format: IS_HUE_4 ? 'json' : 'html'
       }, function (data) {
         $(document).trigger("showSubmitPopup", data);
       }).fail(function (xhr, textStatus, errorThrown) {
