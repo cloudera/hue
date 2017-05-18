@@ -632,7 +632,7 @@ DROP TABLE IF EXISTS `%(table)s`;
     statement_id = snippet['result']['handle'].get('statement_id', 0)
     statements_count = snippet['result']['handle'].get('statements_count', 1)
 
-    statements = self._get_statements(snippet['statement'])
+    statements = self._get_statements(snippet['statement']['statement'])
 
     statement_id = min(statement_id, len(statements) - 1) # In case of removal of statements
     previous_statement_hash = self.__compute_statement_hash(statements[statement_id]['statement'])
