@@ -22,6 +22,7 @@ import json
 from nose.tools import assert_equal, assert_false, assert_true
 from django.contrib.auth.models import User
 
+from desktop.conf import IS_HUE_4
 from desktop.converters import DocumentConverter
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
@@ -313,11 +314,21 @@ class TestDocumentConverter(object):
       'id': 1000,
       'name': 'Test',
       'script': 'A = LOAD "$data"; STORE A INTO "$output";',
-      'parameters': [],
-      'resources': [],
-      'hadoopProperties': []
+      'hadoopProperties': [
+        {u'name': u'mapred.job.queue.name', u'value': u'pig'},
+        {u'name': u'mapreduce.task.profile', u'value': u'true'}
+      ],
+      'parameters': [
+        {u'name': u'input', u'value': u'/user/test/data'},
+        {u'name': u'verbose', u'value': u'true'}
+      ],
+      'resources': [
+        {u'type': u'file', u'value': u'/user/test/test.txt'},
+        {u'type': u'archive', u'value': u'/user/test/test.jar'}
+      ],
     }
     pig_script = create_or_update_script(**attrs)
+    pig_script.save()
 
     # Setting doc.last_modified to older date
     doc = Document.objects.get(id=pig_script.doc.get().id)
@@ -325,18 +336,35 @@ class TestDocumentConverter(object):
     doc = Document.objects.get(id=doc.id)
 
     try:
-      # Test that corresponding doc2 is created after convert
-      assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-pig').exists())
 
-      converter = DocumentConverter(self.user)
-      converter.convert()
+        converter = DocumentConverter(self.user)
+        converter.convert()
 
-      doc2 = Document2.objects.get(owner=self.user, type='link-pigscript')
+        doc2 = Document2.objects.get(owner=self.user, type='query-pig')
 
-      # Verify absolute_url
-      response = self.client.get(doc2.get_absolute_url())
-      assert_equal(200, response.status_code)
-      assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement'], doc2.data_dict)
+        assert_equal(attrs['script'], doc2.data_dict['snippets'][0]['statement_raw'])
+        assert_equal(['mapred.job.queue.name=pig', 'mapreduce.task.profile=true'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['input=/user/test/data', 'verbose=true'], doc2.data_dict['snippets'][0]['properties']['parameters'])
+        assert_equal(['/user/test/test.txt', '/user/test/test.jar'], doc2.data_dict['snippets'][0]['properties']['resources'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-pigscript').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-pigscript')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
     finally:
       pig_script.delete()
 
