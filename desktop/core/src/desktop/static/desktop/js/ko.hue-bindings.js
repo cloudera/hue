@@ -4850,6 +4850,9 @@
       var resizeWrapper = function () {
         var totalHeight = 0;
         var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        if (!lastKnownHeights) {
+          return;
+        }
         $.each(lastKnownHeights, function(idx, height) {
           totalHeight += height;
         });
@@ -4960,6 +4963,9 @@
 
       var setStartAndEndFromScrollTop = function () {
         var lastKnownHeights = $parentFVOwnerElement.data('lastKnownHeights');
+        if (!lastKnownHeights) {
+          return;
+        }
 
         var parentSpace = 0;
 
