@@ -100,12 +100,12 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
           </a>
         </div>
       </div>
-          
+
       <div data-bind="foreach: bundle.coordinators">
         <div class="card card-home" style="margin-bottom: 20px; padding-bottom: 10px">
           <h1 class="card-heading simple">
             <a class="pointer" data-bind="click: function() { showChooseCoordinator(this); }, text: $root.getCoordinatorById(coordinator()).name"></a>
-            <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?coordinator=' + $root.getCoordinatorById(coordinator()).id()" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <a class="pointer pull-right" data-bind="click: function() { $root.bundle.coordinators.remove(this); }, visible: $root.isEditing">
@@ -119,7 +119,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
                 <strong data-bind="text: name"></strong>
                 <em data-bind="text: value"></em>
               </li>
-              <li data-bind="visible: $root.isEditing">              
+              <li data-bind="visible: $root.isEditing">
                 <input data-bind="value: name" type="text" class="no-margin-bottom"/>
                 <div class="controls inline-block">
                   <input data-bind="value: value, filechooser: value" type="text" class="input-xlarge filechooser-input"/>
@@ -163,7 +163,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
         <li>
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="attr: { href: '${ url('oozie:edit_coordinator') }?uuid=' + uuid() }" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>
@@ -289,7 +289,7 @@ ${ dashboard.import_bindings() }
   var tempCoordinator = null;
   function showChooseCoordinator(coord) {
     if (typeof coord != "undefined"){
-      tempCoordinator = coord;  
+      tempCoordinator = coord;
     }
     $("#chooseCoordinatorDemiModal").modal("show");
   }
@@ -298,7 +298,7 @@ ${ dashboard.import_bindings() }
     if (tempCoordinator != null){
       tempCoordinator.coordinator(coord.uuid());
       tempCoordinator = null;
-    } 
+    }
     else  {
       viewModel.addBundledCoordinator(coord.uuid());
     }

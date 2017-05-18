@@ -128,7 +128,7 @@ ENABLE_QUERY_SCHEDULING = Config(
   key="enable_query_scheduling",
   help=_t("Flag to enable the creation of a coordinator for the current SQL query."),
   type=bool,
-  dynamic_default=False
+  default=False
 )
 
 ENABLE_EXTERNAL_STATEMENT = Config(
