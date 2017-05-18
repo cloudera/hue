@@ -282,6 +282,7 @@ var CoordinatorEditorViewModel = (function () {
       if (!self.coordinator.isDirty()) {
         hueAnalytics.log('oozie/editor/coordinator', 'submit');
         $.get("/oozie/editor/coordinator/submit/" + self.coordinator.id(), {
+          format: IS_HUE_4 ? 'json' : 'html'
         }, function (data) {
           $(document).trigger("showSubmitPopup", data);
         }).fail(function (xhr, textStatus, errorThrown) {
