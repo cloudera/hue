@@ -176,11 +176,18 @@ ${ scheduler.import_sla_cron(coordinator_json) }
     $("#chooseWorkflowDemiModal").modal({
       show: false
     });
+
     $(window).bind("keydown", "esc", function () {
       if ($(".demi-modal.fade.in").length > 0) {
         $(".demi-modal.fade.in .demi-modal-chevron").click();
       }
     });
+
+    huePubSub.subscribe('submit.popup.return', function (data) {
+      $.jHueNotify.info('${_('Schedule submitted.')}');
+      huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+      $('.submit-modal').modal('hide');
+    }, 'oozie');
   });
 </script>
 
