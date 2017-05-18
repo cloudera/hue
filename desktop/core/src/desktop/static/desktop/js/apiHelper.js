@@ -1527,6 +1527,9 @@ var ApiHelper = (function () {
     var tables = [];
     var tableIndex = {};
     options.tables.forEach(function (table) {
+      if (table.subQuery || !table.identifierChain) {
+        return;
+      }
       var clonedIdentifierChain = table.identifierChain.concat();
 
       var databasePrefix;
