@@ -467,23 +467,28 @@ var ApiHelper = (function () {
    * @param {string[]} options.pathParts
    * @param {number} [options.pageSize] - Default 500
    * @param {number} [options.page] - Default 1
+   * @param {string} [options.filter]
    */
   ApiHelper.prototype.fetchS3Path = function (options) {
     var self = this;
     options.pathParts.shift(); // remove the trailing /
     var url = S3_API_PREFIX + options.pathParts.join("/") + '?format=json&sortby=name&descending=false&pagesize=' + (options.pageSize || 500) + '&pagenum=' + (options.page || 1);
+    if (options.filter) {
+      url += '&filter=' + options.filter;
+    }
     var fetchFunction = function (storeInCache) {
       if (options.timeout === 0) {
         self.assistErrorCallback(options)({ status: -1 });
         return;
       }
+
       $.ajax({
         dataType: "json",
         url: url,
         timeout: options.timeout,
         success: function (data) {
           if (!data.error && !self.successResponseIsError(data) && typeof data.files !== 'undefined' && data.files !== null) {
-            if (data.files.length > 2) {
+            if (data.files.length > 2 && !options.filter) {
               storeInCache(data);
             }
             options.successCallback(data);

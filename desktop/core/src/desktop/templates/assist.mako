@@ -292,6 +292,7 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-s3-header-actions">
     <div class="assist-db-header-actions">
+      <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.s3.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -313,6 +314,9 @@ from notebook.conf import get_ordered_interpreters
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-s3-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-file-search" data-bind="visible: isFilterVisible()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-s3-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -338,7 +342,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry"><span class="assist-no-entries">${_('Empty directory')}</span></li>
+          <li class="assist-entry"><span class="assist-no-entries"><!-- ko if: filter() -->${_('No results found')}<!-- /ko --><!-- ko ifnot: filter() -->${_('Empty directory')}<!-- /ko --></span></li>
         </ul>
         <!-- /ko -->
       </div>
