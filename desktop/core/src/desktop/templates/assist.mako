@@ -429,7 +429,8 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
 
@@ -1143,9 +1144,9 @@ from notebook.conf import get_ordered_interpreters
         self.apiHelper = options.apiHelper;
 
         self.selectedHdfsEntry = ko.observable();
-        self.reload = function () {
-          var lastKnownPath = self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '${ home_dir }');
-          var parts = lastKnownPath.split('/');
+
+        var loadPath = function (path) {
+          var parts = path.split('/');
           parts.shift();
 
           var currentEntry = new AssistHdfsEntry({
@@ -1162,6 +1163,14 @@ from notebook.conf import get_ordered_interpreters
             entry.open(true);
           });
         };
+
+        self.reload = function () {
+          loadPath(self.apiHelper.getFromTotalStorage('assist', 'currentHdfsPath', '${ home_dir }'));
+        };
+
+        huePubSub.subscribe('assist.hdfs.go.home', function () {
+          loadPath('${ home_dir }');
+        });
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
           self.selectedHdfsEntry(entry);
