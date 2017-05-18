@@ -14,8 +14,8 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%!
-from desktop.views import commonheader, commonfooter, commonshare, _ko
 from django.utils.translation import ugettext as _
+from desktop.views import commonheader, commonfooter, commonshare, _ko
 %>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -70,10 +70,15 @@ ${ commonheader(_("Coordinator Editor"), "Oozie", user, request) | n,unicode }
 
 ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons, is_embeddable=is_embeddable) }
 
+
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("coordinator") > -1) {
-      location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      % if is_embeddable:
+        huePubSub.publish('open.link', "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, ""));
+      % else:
+        location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      % endif
     }
   }
 </script>
