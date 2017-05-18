@@ -3628,7 +3628,7 @@
 
 
       var statementSubscription = huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
-        if (self.snippet.type() === 'hive' || snippet.snippet.type() === 'impala') {
+        if (self.snippet.type() === 'hive' || self.snippet.type() === 'impala') {
           whenWorkerIsReady(function () {
             aceSqlWorker.postMessage({ statementDetails: statementDetails, type: self.snippet.type() });
           });
