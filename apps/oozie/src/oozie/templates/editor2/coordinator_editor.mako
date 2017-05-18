@@ -74,10 +74,11 @@ ${ layout.menubar(section='coordinators', is_editor=True, pullright=buttons, is_
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("coordinator") > -1) {
+      var url = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
       % if is_embeddable:
-        huePubSub.publish('open.link', "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, ""));
+        huePubSub.publish('open.link', url);
       % else:
-        location.href = "/oozie/editor/coordinator/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+        location.href = url;
       % endif
     }
   }
