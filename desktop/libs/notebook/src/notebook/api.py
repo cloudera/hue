@@ -31,6 +31,7 @@ from desktop.lib.django_util import JsonResponse
 from desktop.models import Document2, Document
 
 from notebook.connectors.base import get_api, Notebook, QueryExpired, SessionExpired, QueryError, _get_snippet_name
+from notebook.connectors.hiveserver2 import HS2Api
 from notebook.decorators import api_error_handler, check_document_access_permission, check_document_modify_permission
 from notebook.models import escape_rows, make_notebook
 from notebook.views import upgrade_session_properties
@@ -745,7 +746,7 @@ def statement_risk(request):
   notebook = json.loads(request.POST.get('notebook', '{}'))
   snippet = json.loads(request.POST.get('snippet', '{}'))
 
-  api = get_api(request, snippet)
+  api = HS2Api(request.user, snippet)
 
   response['query_complexity'] = api.statement_risk(notebook, snippet)
   response['status'] = 0
