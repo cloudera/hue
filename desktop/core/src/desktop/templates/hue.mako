@@ -24,7 +24,6 @@
 
   from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
   from metadata.conf import has_optimizer, OPTIMIZER
-  from notebook.conf import SHOW_NOTEBOOKS
 %>
 
 <%namespace name="koComponents" file="/ko_components.mako" />
@@ -1140,12 +1139,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var buttonActions = clusterConfig['button_actions'];
               buttonActions.forEach(function(app) {
               var interpreters = [];
+              var hasNotebook = false;
               $.each(app['interpreters'], function(index, interpreter) {
+                hasNotebook = hasNotebook || interpreter.type == 'notebook';
                 interpreters.push({
                   displayName: interpreter.displayName,
-                  % if SHOW_NOTEBOOKS.get():
-                    dividerAbove: app.name === 'editor' && index === 1 && interpreter.type == 'notebook',
-                  % endif
+                  dividerAbove: app.name === 'editor' && index === 1 && hasNotebook,
                   icon: interpreter.type,
                   url: interpreter.page
                 });
