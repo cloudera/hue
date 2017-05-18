@@ -68,7 +68,12 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 <script type="text/javascript">
   if (window.location.hash != "") {
     if (window.location.hash.indexOf("bundle") > -1) {
-      location.href = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      var url = "/oozie/editor/bundle/edit/?" + window.location.hash.substr(1).replace(/(<([^>]+)>)/ig, "");
+      % if is_embeddable:
+        huePubSub.publish('open.link', url);
+      % else:
+        location.href = url);
+      % endif
     }
   }
 </script>
