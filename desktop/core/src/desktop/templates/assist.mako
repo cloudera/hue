@@ -430,6 +430,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-hdfs-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: goHome" title="Go to ${ home_dir }"><i class="pointer fa fa-home"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.hdfs.refresh'); }" title="${_('Manual refresh')}"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }"></i></a>
     </div>
   </script>
@@ -451,6 +452,9 @@ from notebook.conf import get_ordered_interpreters
       </div>
       <!-- /ko -->
       <!-- ko template: 'assist-hdfs-header-actions' --><!-- /ko -->
+    </div>
+    <div class="assist-flex-hdfs-search" data-bind="visible: isFilterVisible()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
     </div>
     <div class="assist-flex-fill assist-hdfs-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
@@ -476,7 +480,7 @@ from notebook.conf import get_ordered_interpreters
         </ul>
         <!-- ko if: !loading() && entries().length === 0 -->
         <ul class="assist-tables">
-          <li class="assist-entry"><span class="assist-no-entries">${_('Empty directory')}</span></li>
+          <li class="assist-entry"><span class="assist-no-entries"><!-- ko if: filter() -->${_('No results found')}<!-- /ko --><!-- ko ifnot: filter() -->${_('Empty directory')}<!-- /ko --></span></li>
         </ul>
         <!-- /ko -->
       </div>
