@@ -112,6 +112,10 @@ var AssistHdfsEntry = (function () {
     })
   };
 
+  AssistHdfsEntry.prototype.goHome = function () {
+    huePubSub.publish('assist.hdfs.go.home');
+  };
+
   AssistHdfsEntry.prototype.loadDeep = function(folders, callback) {
     var self = this;
 
