@@ -15,8 +15,10 @@
 ## limitations under the License.
 <%!
 import datetime
+
 from django.template.defaultfilters import urlencode, stringformat, date, filesizeformat, time
 from django.utils.translation import ugettext as _
+
 from aws import get_client
 %>
 
@@ -87,7 +89,7 @@ from aws import get_client
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="/${app_name}">
+                <a href="/${app_name}/">
                   <img src="${ static('filebrowser/art/icon_filebrowser_48.png') }" class="app-icon" alt="${ _('File browser icon') }" />
                   ${ _('File Browser') }
                 </a>
