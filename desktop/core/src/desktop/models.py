@@ -1572,7 +1572,8 @@ class ClusterConfig():
           app_config.get('scheduler')
         ] if app is not None
       ],
-      'default_sql_interpreter': editors and editors['default_sql_interpreter']
+      'default_sql_interpreter': editors and editors['default_sql_interpreter'],
+      'cluster_type': self.cluster_type
     }
 
 
@@ -1648,6 +1649,7 @@ class ClusterConfig():
         'name': 'editor',
         'displayName': _('Editor'),
         'interpreters': interpreters,
+        'interpreter_names': [interpreter['type'] for interpreter in interpreters],
         'page': interpreters[0]['page'],
         'default_sql_interpreter': next((interpreter['type'] for interpreter in interpreters if interpreter.get('is_sql')), 'hive')
       }

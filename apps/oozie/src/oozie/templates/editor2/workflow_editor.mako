@@ -139,70 +139,90 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     % if ENABLE_DOCUMENT_ACTION.get():
     <!-- ko if: $root.currentDraggableSection() === 'documents' -->
     <span class="draggable-documents">
+
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
+    <!-- /ko -->
 
     % if ENABLE_IMPALA_ACTION.get():
+      <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('impala') != -1 -->
       <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableImpalaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaDocumentAction());}}}"
          title="${_('Impala query')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }"></a>
       </div>
+      <!-- /ko -->
     % endif
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('java') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaDocumentAction());}}}"
          title="${_('Saved Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('spark2') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSparkDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSparkDocumentAction());}}}"
          title="${_('Saved Spark program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('pig') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggablePigDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggablePigDocumentAction());}}}"
          title="${_('Saved Pig script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('mapreduce') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableMapReduceDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableMapReduceDocumentAction());}}}"
          title="${_('Saved MapReduce job')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-archive-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('sqoop1') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSqoopDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSqoopDocumentAction());}}}"
          title="${_('Saved Sqoop command')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('distcp') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableDistCpDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableDistCpDocumentAction());}}}"
          title="${_('Saved DistCp command')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('shell') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableShellDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableShellDocumentAction());}}}"
          title="${_('Saved Shell command')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
     </div>
+    <!-- /ko -->
+
     </span>
     <!-- /ko -->
     % endif
@@ -211,134 +231,171 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     <span class="draggable-actions">
 
     % if not ENABLE_DOCUMENT_ACTION.get():
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveDocumentAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveDocumentAction());}}}"
          title="${_('Hive query')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
+    <!-- /ko -->
     % endif
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHiveAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHiveAction());}}}"
          title="${_('Hive Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableHive2Action(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableHive2Action());}}}"
          title="${_('HiveServer2 Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_beeswax_48.png') }" class="app-icon" alt="${ _('Hive icon') }"><sup style="color: #0B7FAD; margin-left: -4px; top: -14px; font-size: 12px">2</sup></a>
     </div>
+    <!-- /ko -->
 
     % if ENABLE_IMPALA_ACTION.get():
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('impala') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableImpalaAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableImpalaAction());}}}"
          title="${_('Impala Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_impala_48.png') }" class="app-icon" alt="${ _('Impala icon') }"></a>
     </div>
+    <!-- /ko -->
     % endif
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('pig') != -1 -->
     <div data-bind="css: { 'draggable-widget': true},
                     draggable: {data: draggablePigAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggablePigAction());}}}"
          title="${_('Pig Script')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_pig_48.png') }" class="app-icon" alt="${ _('Pig icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('spark2') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSparkAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSparkAction());}}}"
          title="${_('Spark program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_spark_48.png') }" class="app-icon" alt="${ _('Spark icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('java') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableJavaAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableJavaAction());}}}"
          title="${_('Java program')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-code-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('sqoop1') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSqoopAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSqoopAction());}}}"
          title="${_('Sqoop 1')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><img src="${ static('oozie/art/icon_sqoop_48.png') }" class="app-icon" alt="${ _('Sqoop icon') }"></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('mapreduce') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableMapReduceAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableMapReduceAction());}}}"
          title="${_('MapReduce job')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-archive-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSubworkflowAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSubworkflowAction());}}}"
          title="${_('Sub workflow')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code-fork"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('shell') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableShellAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableShellAction());}}}"
          title="${_('Shell')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-terminal"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('ssh') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableSshAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableSshAction());}}}"
          title="${_('Ssh')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-tty"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableFsAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableFsAction());}}}"
          title="${_('Fs')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-file-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableEmailAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableEmailAction());}}}"
          title="${_('Email')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-envelope-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableStreamingAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableStreamingAction());}}}"
          title="${_('Streaming')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-exchange"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('distcp') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableDistCpAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableDistCpAction());}}}"
          title="${_('Distcp')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-files-o"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableGenericAction(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableGenericAction());}}}"
          title="${_('Generic')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-code"></i></a>
     </div>
+    <!-- /ko -->
 
+    <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('dataeng') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
                     draggable: {data: draggableKillNode(), isEnabled: true,
                     options: {'refreshPositions': true, 'stop': function(){ $root.isDragging(false); }, 'start': function(event, ui){ $root.isDragging(true); $root.currentlyDraggedWidget(draggableKillNode());}}}"
          title="${_('Kill')}" rel="tooltip" data-placement="top">
          <a class="draggable-icon"><i class="fa fa-stop"></i></a>
     </div>
+    <!-- /ko -->
+
     </span>
     <!-- /ko -->
     <div class="clearfix"></div>
@@ -896,6 +953,18 @@ ${ dashboard.import_bindings() }
 
     $.jHueScrollUp();
     $(".custom-popover").popover();
+
+
+    huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
+      var interpreters = [];
+      $.each(clusterConfig['app_config']['editor']['interpreters'], function(index, interpreter) {
+        interpreters.push(interpreter.type);
+      });
+      viewModel.availableActions(interpreters);
+      resizeToolbar();
+    }, 'oozie');
+
+    huePubSub.publish('cluster.config.get.config');
   });
 
 </script>

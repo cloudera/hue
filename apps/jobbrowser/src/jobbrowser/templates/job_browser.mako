@@ -14,9 +14,10 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 <%
+  from django.utils.translation import ugettext as _
+
   from desktop import conf
   from desktop.views import commonheader, commonfooter, _ko
-  from django.utils.translation import ugettext as _
 %>
 
 % if not is_embeddable:
