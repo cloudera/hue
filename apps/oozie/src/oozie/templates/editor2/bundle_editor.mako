@@ -343,7 +343,11 @@ ${ dashboard.import_bindings() }
      _el.datepicker('show');
     });
 
-
+    huePubSub.subscribe('submit.popup.return', function (data) {
+      $.jHueNotify.info('${_('Bundle submitted.')}');
+      huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+      $('.submit-modal').modal('hide');
+    }, 'oozie');
   });
 </script>
 
