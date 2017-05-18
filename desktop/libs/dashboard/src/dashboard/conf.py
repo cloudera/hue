@@ -17,7 +17,6 @@
 
 from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
-from desktop.conf import is_hue4
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool
 from desktop.appmanager import get_apps_dict
 from notebook.conf import get_ordered_interpreters
@@ -41,7 +40,7 @@ IS_ENABLED = Config(
 HAS_SQL_ENABLED = Config(
   key="has_sql_enabled",
   help=_t("Activate the SQL Dashboard (beta)."),
-  dynamic_default=is_hue4,
+  default=False,
   type=coerce_bool
 )
 
