@@ -380,7 +380,7 @@ def upload_table_stats(request):
   response = {'status': -1}
 
   db_tables = json.loads(request.POST.get('db_tables'), '[]')
-  source_platform = request.POST.get('sourcePlatform', 'hive')
+  source_platform = json.loads(request.POST.get('sourcePlatform', '"hive"'))
   with_columns = json.loads(request.POST.get('with_columns', 'false'))
   with_ddl = json.loads(request.POST.get('with_ddl', 'false'))
 
