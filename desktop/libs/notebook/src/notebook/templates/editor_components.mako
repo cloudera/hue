@@ -3114,7 +3114,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
 
       huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
-        viewModel.selectedNotebook().snippets()[0].positionStatement(statementDetails.activeStatement);
+        if (statementDetails.activeStatement) {
+          viewModel.selectedNotebook().snippets()[0].positionStatement(statementDetails.activeStatement.statement);
+        } else {
+          viewModel.selectedNotebook().snippets()[0].positionStatement('');
+        }
       });
 
       viewModel.selectedNotebook.subscribe(function (newVal) {
