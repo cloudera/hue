@@ -43,13 +43,13 @@ from django.utils.translation import ugettext as _
             <!-- ko if: isEditing -->
             <a class="pointer" data-bind="click: showChooseWorkflow, text: getWorkflowById(coordinator.properties.workflow()).name"></a>
 
-            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
              <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
             <!-- ko ifnot: isEditing -->
             <span data-bind="text: getWorkflowById(coordinator.properties.workflow()).name"></span>
-            <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow() }" target="_blank" title="${ _('Open') }">
+            <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + coordinator.properties.workflow()" target="_blank" title="${ _('Open') }">
               <i class="fa fa-external-link-square"></i>
             </a>
             <!-- /ko -->
@@ -408,7 +408,7 @@ from django.utils.translation import ugettext as _
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
-          <a data-bind="attr: { href: '${ url('oozie:edit_workflow') }?workflow=' + uuid() }" target="_blank" title="${ _('Open') }">
+          <a data-bind="hueLink: '${ url('oozie:edit_workflow') }?workflow=' + uuid()" target="_blank" title="${ _('Open') }">
             <i class="fa fa-external-link-square"></i>
           </a>
         </li>
