@@ -1477,7 +1477,7 @@ from notebook.conf import get_ordered_interpreters
                 type: 'sql',
                 icon: 'fa-database',
                 minHeight: 75
-              })
+              });
               panels.push(sqlPanel);
 
               huePubSub.subscribe('assist.show.sql', function () {
@@ -1702,12 +1702,16 @@ from notebook.conf import get_ordered_interpreters
           })
         });
 
+        var apiHelper = ApiHelper.getInstance();
+
         self.activeType.subscribe(function (newType) {
           self.selectedFunction(selectedFunctionPerType[newType]);
           self.activeCategories(self.categories[newType]);
+          apiHelper.setInTotalStorage('assist', 'function.panel.active.type', newType);
         });
 
-        self.activeType(self.availableTypes()[0]);
+        var lastActiveType = apiHelper.getFromTotalStorage('assist', 'function.panel.active.type', self.availableTypes()[0]);
+        self.activeType(lastActiveType);
 
         var updateType = function (type) {
           self.availableTypes().every(function (availableType) {
@@ -2059,39 +2063,58 @@ from notebook.conf import get_ordered_interpreters
 
         self.schedulesAvailable = ko.observable(false);
 
+        var apiHelper = ApiHelper.getInstance();
+        var lastActiveTab = apiHelper.getFromTotalStorage('assist', 'last.open.right.panel');
+
         if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
           var currentAppSub = huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
             self.schedulesAvailable(!!viewModel.selectedNotebook);
+            if (lastActiveTab === 'schedules') {
+              self.activeTab(self.schedulesAvailable() ? 'schedules' : (self.assistantAvailable() ? 'assistant' : 'functions'));
+            }
           });
           self.disposals.push(currentAppSub.remove.bind(currentAppSub));
           huePubSub.publish('get.current.app.view.model');
         } else {
           // Right assist is only available in the Hue 3 editor and notebook.
           self.schedulesAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
+          if (lastActiveTab === 'schedules') {
+            self.activeTab(self.schedulesAvailable() ? 'schedules' : (self.assistantAvailable() ? 'assistant' : 'functions'));
+          }
         }
+
 
         var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', function (type) {
           if (type === 'hive' || type === 'impala') {
-            if (!self.assistantAvailable() && self.activeTab() !== 'assistant') {
+            self.assistantAvailable(true);
+            if (lastActiveTab === 'assistant') {
               self.activeTab('assistant');
             }
-            self.assistantAvailable(true);
           } else {
             if (self.activeTab() === 'assistant') {
-              self.activeTab('functions');
+              var newTab = lastActiveTab === 'assistant' ? 'functions' : lastActiveTab;
+              if (self.activeTab() !== newTab) {
+                self.activeTab(newTab);
+              }
             }
             self.assistantAvailable(false);
           }
         });
         self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
-        if (!self.activeTab()) {
+        if (lastActiveTab === 'assistant' && self.assistantAvailable()) {
+          self.activeTab(lastActiveTab);
+        } else if (lastActiveTab === 'schedules' && self.schedulesAvailable()) {
+          self.activeTab(lastActiveTab);
+        } else if (self.assistantAvailable()) {
+          self.activeTab('assistant');
+        } else {
           self.activeTab('functions');
         }
 
-        if (self.assistantAvailable()) {
-          self.activeTab('assistant');
-        }
+        self.activeTab.subscribe(function (newValue) {
+          apiHelper.setInTotalStorage('assist', 'last.open.right.panel', newValue);
+        })
       }
 
       RightAssistPanel.prototype.dispose = function () {
