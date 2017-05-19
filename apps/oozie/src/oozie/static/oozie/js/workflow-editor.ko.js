@@ -531,6 +531,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
     self.workflow_properties = ko.mapping.fromJS(workflow_properties_json);
     loadWorkflowLayout(self, layout_json);
     self.workflow.loadNodes(workflow_json);
+    self.workflow.tracker().markCurrentStateAsClean();
   };
 
   self.tempDocument = ko.observable();
@@ -1256,7 +1257,6 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
 
   self.drawArrows = function () {
-
     function linkWidgets(fromId, toId) {
       var _from = $("#wdg_" + (typeof fromId == "function" ? fromId() : fromId));
       var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));

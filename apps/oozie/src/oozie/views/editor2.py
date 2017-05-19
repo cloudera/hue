@@ -408,7 +408,7 @@ def _submit_workflow_helper(request, workflow, submit_action):
       try:
         job_id = _submit_workflow(request.user, request.fs, request.jt, workflow, mapping)
       except Exception, e:
-        raise PopupException(_('Workflow submission failed'), detail=smart_str(e))
+        raise PopupException(_('Workflow submission failed'), detail=smart_str(e), error_code=200)
       jsonify = request.POST.get('format') == 'json'
       if jsonify:
         return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'workflow'}, safe=False)
@@ -713,7 +713,7 @@ def _submit_coordinator(request, coordinator, mapping):
     return job_id
   except RestException, ex:
     LOG.exception('Error submitting coordinator')
-    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex))
+    raise PopupException(_("Error submitting coordinator %s") % (coordinator,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)
 
 
 @check_editor_access_permission
@@ -904,4 +904,4 @@ def _submit_bundle(request, bundle, properties):
     return job_id
   except RestException, ex:
     LOG.exception('Error submitting bundle')
-    raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex))
+    raise PopupException(_("Error submitting bundle %s") % (bundle,), detail=ex._headers.get('oozie-error-message', ex), error_code=200)

@@ -619,7 +619,6 @@ ${ dashboard.import_bindings() }
   viewModel.currentDraggableSection(defaultSection);
 
   viewModel.init();
-  viewModel.workflow.tracker().markCurrentStateAsClean();
   fullLayout(viewModel);
 
   var globalFilechooserOptions = {
