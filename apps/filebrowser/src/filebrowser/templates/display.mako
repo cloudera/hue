@@ -488,9 +488,11 @@ ${ fb_components.menubar() }
   $(document).ready(function () {
     ko.applyBindings(viewModel, $('#fileviewerComponents')[0]);
 
+    % if not is_embeddable:
     $(document).ajaxError(function () {
       $.jHueNotify.error("${_('There was an unexpected server error.')}");
     });
+    % endif
 
     setTimeout(function () {
       resizeText();
