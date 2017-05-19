@@ -1453,13 +1453,8 @@ from notebook.conf import get_ordered_interpreters
         self.availablePanels = ko.observableArray();
         self.visiblePanel = ko.observable();
 
-        // TODO handle panel reloading
         self.lastOpenPanelType = ko.observable();
         self.apiHelper.withTotalStorage('assist', 'last.open.panel', self.lastOpenPanelType);
-
-        self.visiblePanel.subscribe(function(newValue) {
-          newValue.panelData.init();
-        });
 
         huePubSub.subscribe('cluster.config.set.config', function (clusterConfig) {
           if (clusterConfig && clusterConfig['app_config']) {
@@ -1607,6 +1602,11 @@ from notebook.conf import get_ordered_interpreters
             dbPanel[0].panelData.init(); // always forces the db panel to load
           }
 
+          self.visiblePanel.subscribe(function(newValue) {
+            self.lastOpenPanelType(newValue.type);
+            newValue.panelData.init();
+          });
+          
           self.visiblePanel(lastFoundPanel.length === 1 ? lastFoundPanel[0] : self.availablePanels()[0]);
         });
 
