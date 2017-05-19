@@ -451,7 +451,7 @@ def get_log(request, oozie_workflow, make_links=True, log_start_pattern=None, lo
 
           if log_end_pattern:
             re_log_end = re.compile(log_end_pattern)
-            is_really_done = re_log_end.search(action_logs) is not None
+            is_really_done = re_log_end.search(action_logs) is not None or oozie_workflow.status == 'KILLED'
             if is_really_done and not action_logs:
               LOG.warn('Unable to scrape full logs, try increasing the jobbrowser log_offset configuration value.')
     except Exception:
