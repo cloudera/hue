@@ -687,6 +687,7 @@ var SqlParseSupport = (function () {
       // Reduce the tablePrimaries to the one that matches the first identifier if found
       var foundPrimary;
       var doubleMatch = false;
+      var aliasMatch = false;
       if (identifierChain.length > 0) {
         for (var i = 0; i < tablePrimaries.length; i++) {
           if (tablePrimaries[i].subQueryAlias) {
@@ -695,6 +696,7 @@ var SqlParseSupport = (function () {
             }
           } else if (tablePrimaries[i].alias === identifierChain[0].name) {
             foundPrimary = tablePrimaries[i];
+            aliasMatch = true;
             break;
           } else if (tablePrimaries[i].identifierChain.length > 1 && identifierChain.length > 1 &&
             tablePrimaries[i].identifierChain[0].name === identifierChain[0].name &&
@@ -729,7 +731,11 @@ var SqlParseSupport = (function () {
           if (foundPrimary.subQueryAlias) {
             wrapper.tables = [{ subQuery: foundPrimary.subQueryAlias }];
           } else if (foundPrimary.alias) {
-            wrapper.tables = [{ identifierChain: foundPrimary.identifierChain, alias: foundPrimary.alias }];
+            if (!isColumnLocation && isColumnWrapper && aliasMatch) {
+              wrapper.tables = [{ identifierChain: foundPrimary.identifierChain }];
+            } else {
+              wrapper.tables = [{ identifierChain: foundPrimary.identifierChain, alias: foundPrimary.alias }];
+            }
           } else {
             wrapper.tables = [{ identifierChain: foundPrimary.identifierChain }];
           }
