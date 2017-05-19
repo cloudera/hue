@@ -139,14 +139,18 @@ var AssistHdfsEntry = (function () {
     }
 
     var nextName = folders.shift();
+    var loadedPages = 0;
     var findNextAndLoadDeep = function () {
+
       var foundEntry = $.grep(self.entries(), function (entry) {
         return entry.definition.name === nextName && entry.definition.type === 'dir';
       });
+      var passedAlphabetically = self.entries().length > 0 && self.entries()[self.entries().length - 1].definition.name.localeCompare(nextName) > 0;
 
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
-      } else if (self.hasMorePages) {
+      } else if (!passedAlphabetically && self.hasMorePages && loadedPages < 50) {
+        loadedPages++;
         self.fetchMore(function () {
           findNextAndLoadDeep();
         }, function () {
