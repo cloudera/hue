@@ -23,7 +23,7 @@ from django.utils.translation import ugettext as _
 from liboozie.oozie_api import get_oozie
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
-from jobbrowser.apis.workflow_api import _manage_oozie_job
+from jobbrowser.apis.workflow_api import _manage_oozie_job, _filter_oozie_jobs
 from liboozie.utils import format_time
 
 
@@ -41,7 +41,10 @@ class BundleApi(Api):
 
   def apps(self, filters):
     oozie_api = get_oozie(self.user)
+
     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    _filter_oozie_jobs(self.user, filters, kwargs)
+
     jobs = oozie_api.get_bundles(**kwargs)
 
     return {
