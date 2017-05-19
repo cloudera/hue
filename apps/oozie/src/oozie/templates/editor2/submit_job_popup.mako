@@ -178,8 +178,17 @@
         type: "POST",
         url: '${ action }',
         data: $('.submit-form').serialize(),
+        dataType: "json",
         success: function (data) {
-          huePubSub.publish('submit.popup.return', data);
+          if (data.status == 0) {
+            huePubSub.publish('submit.popup.return', data);
+          } else {
+            var message = "${ _('Submission was not successful') }";
+            if (data.message) {
+              message = data.message;
+            }
+            $.jHueNotify.error(data.message + (data.detail ? (': ' + data.detail) : ''));
+          }
         }
       });
       e.preventDefault();
