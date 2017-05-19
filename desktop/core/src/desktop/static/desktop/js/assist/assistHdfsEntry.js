@@ -138,14 +138,21 @@ var AssistHdfsEntry = (function () {
       return;
     }
 
+    var nextName = folders.shift();
     var findNextAndLoadDeep = function () {
-      var nextName = folders.shift();
       var foundEntry = $.grep(self.entries(), function (entry) {
         return entry.definition.name === nextName && entry.definition.type === 'dir';
       });
+
       if (foundEntry.length === 1) {
         foundEntry[0].loadDeep(folders, callback);
-      } else if (! self.hasErrors()) {
+      } else if (self.hasMorePages) {
+        self.fetchMore(function () {
+          findNextAndLoadDeep();
+        }, function () {
+          callback(self);
+        });
+      } else {
         callback(self);
       }
     };
@@ -184,7 +191,7 @@ var AssistHdfsEntry = (function () {
     }
   };
 
-  AssistHdfsEntry.prototype.fetchMore = function () {
+  AssistHdfsEntry.prototype.fetchMore = function (successCallback, errorCallback) {
     var self = this;
     if (!self.hasMorePages || self.loadingMore()) {
       return;
@@ -210,9 +217,15 @@ var AssistHdfsEntry = (function () {
           })
         })));
         self.loadingMore(false);
+        if (successCallback) {
+          successCallback();
+        }
       },
       errorCallback: function () {
         self.hasErrors(true);
+        if (errorCallback) {
+          errorCallback();
+        }
       }
     });
   };
