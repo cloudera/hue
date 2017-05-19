@@ -955,7 +955,11 @@ var AutocompleteResults = (function () {
       };
 
       try {
-        self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+        if (self.parseResult.suggestColumns && self.parseResult.suggestColumns.identifierChain) {
+          self.fetchFieldsForIdentifiers(table.identifierChain.concat(self.parseResult.suggestColumns.identifierChain), callback, addColumnsDeferred.resolve);
+        } else {
+          self.fetchFieldsForIdentifiers(table.identifierChain, callback, addColumnsDeferred.resolve);
+        }
       } catch (e) {
         addColumnsDeferred.resolve();
       } // TODO: Ignore for subqueries
