@@ -102,7 +102,7 @@ class TestJobsubWithHadoop(OozieServerProvider):
       HTTP_X_REQUESTED_WITH='XMLHttpRequest')
     assert_equal(response.status_code, 200)
     self.design = Workflow.objects.get(id=self.design.id)
-    assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"name": "test", "dummy": ""}]')
+    assert_equal(self.design.start.get_child('to').get_full_node().files, '[{"dummy": "", "name": "test"}]')
 
   def test_get_design(self):
     response = self.client.get(reverse('jobsub.views.get_design',
