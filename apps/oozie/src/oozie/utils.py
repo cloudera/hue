@@ -45,7 +45,7 @@ def format_field_value(field, value):
   if field in JSON_FIELDS:
     if isinstance(value, basestring):
       value = json.loads(value)
-    value = [item for item in value if item['name']]
+    value = [item for item in value if isinstance(item, dict) and item.get('name')]
     return json.dumps(value)
   if field in NUMBER_FIELDS_OR_NULL:
     if not isinstance(value, int) and value is not None:
