@@ -38,32 +38,10 @@ except Exception, e:
 class WorkflowApi(Api):
 
   def apps(self, filters):
-    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
-
-    text_filters = _extract_query_params(filters)
-
-    if not has_dashboard_jobs_access(self.user):
-      kwargs['filters'].append(('user', self.user.username))
-    elif 'user' in text_filters:
-      kwargs['filters'].append(('user', text_filters['username']))
-
-    if 'time' in filters:
-      kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
-
-    if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
-      kwargs['filters'].extend([('text', text_filters.get('text'))])
-
-    if filters['pagination']:
-      kwargs['offset'] = filters['pagination']['offset']
-      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT.get())
-
-    if filters.get('states'):
-      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
-      for _state in filters.get('states'):
-        for _status in states_filters[_state]:
-          kwargs['filters'].extend([('status', _status)])
-
     oozie_api = get_oozie(self.user)
+
+    kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
+    _filter_oozie_jobs(self.user, filters, kwargs)
 
     wf_list = oozie_api.get_workflows(**kwargs)
 
@@ -213,3 +191,28 @@ def _manage_oozie_job(user, action, app_ids):
   result['status'] = result.get('totalErrors', 0)
   result['message'] = _('%s action sent to %s jobs') % (action['action'], result.get('totalRequests', 1))
   return result
+
+
+def _filter_oozie_jobs(user, filters, kwargs):
+    text_filters = _extract_query_params(filters)
+
+    if not has_dashboard_jobs_access(user):
+      kwargs['filters'].append(('user', user.username))
+    elif 'user' in text_filters:
+      kwargs['filters'].append(('user', text_filters['username']))
+
+    if 'time' in filters:
+      kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
+
+    if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
+      kwargs['filters'].extend([('text', text_filters.get('text'))])
+
+    if filters['pagination']:
+      kwargs['offset'] = filters['pagination']['offset']
+      kwargs['cnt'] = min(filters['pagination']['limit'], OOZIE_JOBS_COUNT.get())
+
+    if filters.get('states'):
+      states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
+      for _state in filters.get('states'):
+        for _status in states_filters[_state]:
+          kwargs['filters'].extend([('status', _status)])
