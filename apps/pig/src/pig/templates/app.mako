@@ -1200,6 +1200,8 @@ ${ commonshare() | n,unicode }
       });
     }
 
+    var refreshLogsTimeout = null;
+
     function refreshLogs() {
       if (viewModel.currentScript().watchUrl() != "") {
         $.getJSON(viewModel.currentScript().watchUrl(), function (data) {
@@ -1242,7 +1244,7 @@ ${ commonshare() | n,unicode }
             else {
               $.jHueTitleUpdater.reset();
             }
-            window.setTimeout(function () {
+            refreshLogsTimeout = window.setTimeout(function () {
               refreshLogs();
             }, 1000);
           }
@@ -1250,6 +1252,7 @@ ${ commonshare() | n,unicode }
             viewModel.currentScript().actions(data.workflow.actions);
             viewModel.currentScript().isRunning(false);
             $.jHueTitleUpdater.reset();
+            clearTimeout(refreshLogsTimeout);
           }
         });
       }
