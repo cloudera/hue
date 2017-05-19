@@ -45,7 +45,7 @@ from aws import get_client
               <a data-bind="text: label, click: show, attr: {'href': '${url('filebrowser.views.view', path=urlencode(''))}' + url}"></a><span class="divider">/</span>
             </li>
           </ul>
-          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" />
+          <input id="hueBreadcrumbText" type="text" style="display:none" data-bind="value: currentPath" autocomplete="off" class="input-xxlarge" />
         </li>
         % if is_trash_enabled:
         <li class="pull-right">
