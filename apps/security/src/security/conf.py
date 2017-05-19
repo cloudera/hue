@@ -15,25 +15,47 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext as _, ugettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool
+
+from security.settings import NICE_NAME
 
 
 HIVE_V1 = Config(
   key="hive_v1",
-  help=_("Use Sentry API V1 for Hive."),
+  help=_t("Use Sentry API V1 for Hive."),
   default=True,
   type=coerce_bool)
 
 HIVE_V2 = Config(
   key="hive_v2",
-  help=_("Use Sentry generic API V2 for Hive."),
+  help=_t("Use Sentry generic API V2 for Hive."),
   default=False,
   type=coerce_bool)
 
 SOLR_V2 = Config(
   key="solr_v2",
-  help=_("Use Sentry generic API V2 for Solr."),
+  help=_t("Use Sentry generic API V2 for Solr."),
   default=True,
   type=coerce_bool)
+
+
+def config_validator(user):
+
+  from libsentry.api import get_api
+  from libsentry.api2 import get_api as get_api2
+
+  res = []
+
+  try:
+    get_api(user).list_sentry_roles_by_group('*')
+  except Exception, e:
+    res.append(('%s: Sentry Service' % NICE_NAME, _("Failed to connect to Sentry API (version 1).")))
+
+  try:
+    get_api2(user).list_sentry_roles_by_group('*')
+  except Exception, e:
+    res.append(('%s: Sentry Service' % NICE_NAME, _("Failed to connect to Sentry API (version 2).")))
+
+  return res
