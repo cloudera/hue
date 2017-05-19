@@ -1018,7 +1018,11 @@ var SqlAutocompleter2 = (function () {
       };
 
       try {
-        self.fetchFieldsForIdentifiers(database, table.identifierChain, callback, addColumnsDeferred.resolve);
+        if (parseResult.suggestColumns && parseResult.suggestColumns.identifierChain) {
+          self.fetchFieldsForIdentifiers(database, table.identifierChain.concat(parseResult.suggestColumns.identifierChain), callback, addColumnsDeferred.resolve);
+        } else {
+          self.fetchFieldsForIdentifiers(database, table.identifierChain, callback, addColumnsDeferred.resolve);
+        }
       } catch(e) {
         addColumnsDeferred.resolve();
       } // TODO: Ignore for subqueries
