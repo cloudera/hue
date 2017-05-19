@@ -1597,9 +1597,11 @@ from notebook.conf import get_ordered_interpreters
           }
 
           var lastFoundPanel = self.availablePanels().filter(function (panel) { return panel.type === self.lastOpenPanelType() });
+
+          // always forces the db panel to load if not the last open panel
           var dbPanel = self.availablePanels().filter(function (panel) { return panel.type === 'sql' });
-          if (lastFoundPanel.length === 1 && dbPanel.length > 0) {
-            dbPanel[0].panelData.init(); // always forces the db panel to load
+          if (dbPanel.length > 0 && (lastFoundPanel.length === 0 || (lastFoundPanel[0] !== dbPanel[0]))) {
+            dbPanel[0].panelData.init();
           }
 
           self.visiblePanel.subscribe(function(newValue) {
