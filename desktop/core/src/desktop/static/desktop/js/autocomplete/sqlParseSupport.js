@@ -377,6 +377,9 @@ var SqlParseSupport = (function () {
             parser.yy.locations.splice(i, 1);
           }
         }
+        if (location.type === 'column' && location.identifierChain && location.identifierChain.length > 1 && location.tables && location.tables.length > 0) {
+          location.type = 'complex';
+        }
       }
       if (parser.yy.locations.length > 0) {
         parser.yy.allLocations = parser.yy.allLocations.concat(parser.yy.locations);

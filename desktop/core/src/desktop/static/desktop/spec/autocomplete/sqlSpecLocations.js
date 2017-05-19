@@ -518,7 +518,7 @@
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 38 } },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 11 }, identifierChain: [{ name: 'some_tbl' }] },
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 12, last_column: 15 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 20 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
+            { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 16, last_column: 20 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }], alias: 'tbl' }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 26, last_column: 34 }, identifierChain: [{ name: 'some_tbl' }] }
           ]
         });
@@ -533,7 +533,7 @@
             { type: 'statement', location: { first_line: 1, last_line: 1, first_column: 1, last_column: 39 } },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 8, last_column: 16 }, identifierChain: [{ name: 'some_tbl' }] },
             { type: 'column', location: { first_line: 1, last_line: 1, first_column: 17, last_column: 20 }, identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'some_tbl' }] }] },
-            { type: 'column', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }] }] },
+            { type: 'complex', location: { first_line: 1, last_line: 1, first_column: 21, last_column: 25 }, identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'some_tbl' }] }] },
             { type: 'table', location: { first_line: 1, last_line: 1, first_column: 31, last_column: 39 }, identifierChain: [{ name: 'some_tbl' }] }
           ]
         });

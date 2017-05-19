@@ -2895,8 +2895,8 @@
             expectedResult: {
               locations: [
                 { type: 'statement', location: { first_line: 1, last_line: 7, first_column: 1, last_column: 67 } },
-                { type: 'column', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }]},
-                { type: 'column', location: { first_line: 3, last_line: 3, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayB' },{ name: 'item'}], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }]},
+                { type: 'complex', location: { first_line: 2, last_line: 2, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayA'}, {name: 'item'}], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }]},
+                { type: 'complex', location: { first_line: 3, last_line: 3, first_column: 2, last_column: 11 }, identifierChain: [{ name: 'testArrayB' },{ name: 'item'}], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }]},
                 { type: 'table', location: { first_line: 5, last_line: 5, first_column: 3, last_column: 13 }, identifierChain: [{ name: 'testTable2' }]},
                 { type: 'function', location: { first_line: 6, last_line: 6, first_column: 16, last_column: 22 }, function: 'explode'},
                 { type: 'table', location: { first_line: 6, last_line: 6, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'testTable2' }]},
