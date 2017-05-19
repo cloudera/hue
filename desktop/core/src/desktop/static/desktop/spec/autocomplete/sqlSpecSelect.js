@@ -939,6 +939,32 @@
           }
         });
       });
+
+      it('should suggest columns for "SELECT col.cplx.| from tbl1"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT col.cplx.',
+          afterCursor: ' from tbl1',
+          dialect: 'hive',
+          containsKeywords: ['*'],
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'tbl1' }] }] }
+          }
+        })
+      })
+
+      it('should suggest columns for "SELECT col.cplx.| from tbl1, tbl2 t2"', function () {
+        assertAutoComplete({
+          beforeCursor: 'SELECT col.cplx.',
+          afterCursor: ' from tbl1, tbl2 t2',
+          dialect: 'hive',
+          containsKeywords: ['*'],
+          expectedResult: {
+            lowerCase: false,
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'col' }, { name: 'cplx' }], tables: [{ identifierChain: [{ name: 'tbl1' }] }, { identifierChain: [{ name: 'tbl2' }], alias: 't2' }] }
+          }
+        })
+      })
     });
 
     describe('Variable References', function () {
@@ -2628,7 +2654,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap', keySet: true }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testMap', keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2655,7 +2681,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap', keySet: true }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testMap', keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2668,7 +2694,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap', keySet: true }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testMap', keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2681,7 +2707,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap', keySet: true }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testMap', keySet: true }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2694,7 +2720,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray', keySet: true }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testArray', keySet: true }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2707,7 +2733,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }] }] },
+            suggestColumns: { source: 'select',  identifierChain: [{ name: 'testFoo', keySet: true }, { name: 'testBar', keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*']
           }
         });
@@ -2720,7 +2746,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap', keySet: true }] }] }
+            suggestColumns: { source: 'where', identifierChain: [{ name: 'testMap', keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -2823,7 +2849,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { types: ['ARRAY', 'MAP' ], tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'a' }, { name: 'b' }] }] }
+              suggestColumns: { types: ['ARRAY', 'MAP' ], identifierChain: [{ name: 'a' }, { name: 'b' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2866,7 +2892,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }, { name: 'item' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArray' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2880,7 +2906,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArrayA' }, { name: 'item' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArrayA' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2905,7 +2931,7 @@
                 { type: 'table', location: { first_line: 7, last_line: 7, first_column: 24, last_column: 27 }, identifierChain: [{ name: 'testTable2' }]},
                 { type: 'column', location: { first_line: 7, last_line: 7, first_column: 28, last_column: 38 }, identifierChain: [{ name: 'testArrayB'}], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }] }
               ],
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable2' }, { name: 'testArrayB' }, { name: 'item' }] }] },
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArrayB' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable2' }], alias: 'tt2' }] },
               lowerCase: false
             }
           });
@@ -2921,7 +2947,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }] }
             }
           });
         });
@@ -2933,7 +2959,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }, { name: 'item' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArray' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2945,7 +2971,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }, { name: 'item' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testArray' }, { name: 'item' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2981,7 +3007,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'value' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap' }, { name: 'value' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -2993,7 +3019,7 @@
             dialect: 'hive',
             expectedResult: {
               lowerCase: false,
-              suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'value' }] }] }
+              suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap' }, { name: 'value' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
             }
           });
         });
@@ -3053,7 +3079,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap',  keySet: true }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap',  keySet: true }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3066,7 +3092,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'columnA' }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3079,7 +3105,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'columnA' }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3092,7 +3118,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'columnA' }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3117,8 +3143,8 @@
               { type: 'column', location: { first_line: 1, last_line: 1, first_column: 32, last_column :39}, identifierChain: [{ name: 'testMap'}], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't'  }]}
             ],
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] },
-            lowerCase: false
+            lowerCase: false,
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
           }
         });
       });
@@ -3131,7 +3157,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] }
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'testMap' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] }
           }
         });
       });
@@ -3143,7 +3169,7 @@
           afterCursor: '',
           dialect: 'impala',
           expectedResult: {
-            suggestColumns: { source: 'where',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testArray' }] }] },
+            suggestColumns: { source: 'where', identifierChain: [{ name: 'testArray' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] },
             lowerCase: false
           }
         });
@@ -3156,7 +3182,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] }
           }
         });
       });
@@ -3186,7 +3212,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where', tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }] }] }
+            suggestColumns: { source: 'where', identifierChain: [{ name: 'testMap' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] }
           }
         });
       });
@@ -3198,7 +3224,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where', tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'testMap' }, { name: 'value' }] }] }
+            suggestColumns: { source: 'where', identifierChain: [{ name: 'testMap' }, { name: 'value' }], tables: [{ identifierChain: [{ name: 'testTable' }], alias: 't' }] }
           }
         });
       });
@@ -3247,7 +3273,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'], // TODO: Verify that this is true
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'columnA' }] }] }
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -3259,7 +3285,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'columnA' }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3272,7 +3298,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }, { name: 'columnA' }, { name: 'fieldC' }] }] },
+            suggestColumns: { source: 'select', identifierChain: [{ name: 'columnA' }, { name: 'fieldC' }], tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] },
             suggestKeywords: ['*'] // TODO: Verify that this is true
           }
         });
@@ -3456,7 +3482,7 @@
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where', types: ['T'], tables: [{ identifierChain: [{ name: 'tbl2' }] }] }
+            suggestColumns: { source: 'where', types: ['T'], tables: [{ identifierChain: [{ name: 'tbl2' }], alias: 'atbl2' }] }
           }
         });
       });
@@ -3467,7 +3493,7 @@
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where', types: ['T'], tables: [{ identifierChain: [{ name: 'tbl2' }] }] }
+            suggestColumns: { source: 'where', types: ['T'], tables: [{ identifierChain: [{ name: 'tbl2' }], alias: 'atbl2' }] }
           }
         });
       });
@@ -3479,7 +3505,7 @@
           dialect: 'hive',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'where', types: ['DOUBLE'], tables: [{ identifierChain: [{ name: 'tbl2' }, { name: 'bla' }] }] }
+            suggestColumns: { source: 'where', types: ['DOUBLE'], identifierChain: [{ name: 'bla' }], tables: [{ identifierChain: [{ name: 'tbl2' }], alias: 'atbl2' }] }
           }
         });
       });
@@ -3933,7 +3959,7 @@
           dialect: 'impala',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { source: 'select',  types: [ 'INT' ], tables: [{ identifierChain: [{ name: 'testTable' }, { name: 'bloo' }] }] }
+            suggestColumns: { source: 'select',  types: [ 'INT' ], identifierChain: [{ name: 'bloo' }], tables: [{ identifierChain: [{ name: 'testTable' }] }] }
           }
         });
       });
@@ -4768,7 +4794,7 @@
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }], alias: 't1' }] }
           }
         });
       });
@@ -4781,7 +4807,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'dbOne' }, { name: 'bar' }] }] }
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'dbOne' }, { name: 'bar' }], alias: 'b' }] }
           }
         });
       });
@@ -4792,7 +4818,7 @@
           afterCursor: '',
           expectedResult: {
             lowerCase: false,
-            suggestColumns: { tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable1' }] }] }
+            suggestColumns: { tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable1' }], alias: 't1' }] }
           }
         });
       });
@@ -4816,7 +4842,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTable' }] }] }
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTable' }], alias: 'tt' }] }
           }
         });
       });
@@ -4828,7 +4854,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }] }] }
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'database_two' }, { name: 'testTable' }], alias: 'tt' }] }
           }
         });
       });
@@ -4840,7 +4866,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTableA' }] }] }
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTableA' }], alias: 'tta' }] }
           }
         });
         assertAutoComplete({
@@ -4849,7 +4875,7 @@
           expectedResult: {
             lowerCase: false,
             suggestKeywords: ['*'],
-            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTableB' }] }] }
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'testTableB' }], alias: 'ttb' }] }
           }
         });
       });
@@ -6048,6 +6074,7 @@
         assertAutoComplete({
           beforeCursor: 'select * from testTable1 cross join testTable2 on testTable1.',
           afterCursor: '',
+          dialect: 'hive',
           expectedResult: {
             lowerCase: true,
             suggestColumns: { tables: [{ identifierChain: [{ name: 'testTable1' }]}] }

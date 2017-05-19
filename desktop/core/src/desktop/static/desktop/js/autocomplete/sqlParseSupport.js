@@ -371,14 +371,16 @@ var SqlParseSupport = (function () {
           if (parser.isHive() && !location.linked) {
             location.identifierChain = parser.expandLateralViews(parser.yy.lateralViews, location.identifierChain);
           }
-          parser.expandIdentifierChain(location, true, true);
+          parser.expandIdentifierChain(location, true, true, true);
 
           if (typeof location.identifierChain === 'undefined') {
             parser.yy.locations.splice(i, 1);
           }
         }
-        if (location.type === 'column' && location.identifierChain && location.identifierChain.length > 1 && location.tables && location.tables.length > 0) {
-          location.type = 'complex';
+        if (location.type === 'column' && location.identifierChain) {
+          if (location.identifierChain.length > 1 && location.tables && location.tables.length > 0) {
+            location.type = 'complex';
+          }
         }
       }
       if (parser.yy.locations.length > 0) {
@@ -465,10 +467,13 @@ var SqlParseSupport = (function () {
                 delete table.identifierChain[0].name;
                 table.identifierChain[0].cte = cte.alias;
               }
+            } else if (typeof table.identifierChain === 'undefined' && table.subQuery) {
+              table.identifierChain = [{ subQuery: table.subQuery }];
+              delete table.subQuery;
             }
           });
 
-          if (typeof suggestColumns.identifierChain !== 'undefined') {
+          if (typeof suggestColumns.identifierChain !== 'undefined' && suggestColumns.identifierChain.length === 0) {
             delete suggestColumns.identifierChain;
           }
         }
@@ -617,11 +622,10 @@ var SqlParseSupport = (function () {
       }
     };
 
-    parser.expandIdentifierChain = function (wrapper, anyOwner, isColumnLocation) {
+    parser.expandIdentifierChain = function (wrapper, anyOwner, isColumnWrapper, isColumnLocation) {
       if (typeof wrapper.identifierChain === 'undefined' || typeof parser.yy.latestTablePrimaries === 'undefined') {
         return;
       }
-
       var identifierChain = wrapper.identifierChain.concat();
       var tablePrimaries = parser.yy.latestTablePrimaries;
 
@@ -683,7 +687,7 @@ var SqlParseSupport = (function () {
       // Reduce the tablePrimaries to the one that matches the first identifier if found
       var foundPrimary;
       var doubleMatch = false;
-      if (identifierChain.length > (isColumnLocation ? 1: 0)) {
+      if (identifierChain.length > 0) {
         for (var i = 0; i < tablePrimaries.length; i++) {
           if (tablePrimaries[i].subQueryAlias) {
             if (tablePrimaries[i].subQueryAlias === identifierChain[0].name) {
@@ -698,7 +702,7 @@ var SqlParseSupport = (function () {
             foundPrimary = tablePrimaries[i];
             doubleMatch = true;
             break;
-          } else if (!foundPrimary && tablePrimaries[i].identifierChain[0].name === identifierChain[0].name) {
+          } else if (!foundPrimary && tablePrimaries[i].identifierChain[0].name === identifierChain[0].name && identifierChain.length > (isColumnLocation ? 1 : 0)) {
             foundPrimary = tablePrimaries[i];
             // No break as first two can still match.
           } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1
@@ -715,12 +719,12 @@ var SqlParseSupport = (function () {
         if (doubleMatch) {
           identifierChain.shift();
         }
-      } else if (tablePrimaries.length === 1 && !isColumnLocation) {
+      } else if (tablePrimaries.length === 1 && !isColumnWrapper) {
         foundPrimary = tablePrimaries[0];
       }
 
       if (foundPrimary) {
-        if (isColumnLocation) {
+        if (isColumnWrapper) {
           wrapper.identifierChain = identifierChain;
           if (foundPrimary.subQueryAlias) {
             wrapper.tables = [{ subQuery: foundPrimary.subQueryAlias }];
@@ -743,7 +747,7 @@ var SqlParseSupport = (function () {
           }
         }
       } else {
-        if (isColumnLocation) {
+        if (isColumnWrapper) {
           wrapper.tables = [];
         }
         tablePrimaries.forEach(function (tablePrimary) {
@@ -874,7 +878,7 @@ var SqlParseSupport = (function () {
             if (tablePrimaries.length == 1 && (tablePrimaries[0].alias || tablePrimaries[0].subQueryAlias)) {
               convertTablePrimariesToSuggestions(tablePrimaries);
             }
-            parser.expandIdentifierChain(parser.yy.result.suggestColumns);
+            parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
           }
         } else {
           // Expand exploded views in the identifier chain
@@ -889,10 +893,10 @@ var SqlParseSupport = (function () {
                 parser.yy.result.suggestKeywords[0].value === '*') {
                 delete parser.yy.result.suggestKeywords;
               }
-              parser.expandIdentifierChain(parser.yy.result.suggestColumns);
+              parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
             }
           } else {
-            parser.expandIdentifierChain(parser.yy.result.suggestColumns);
+            parser.expandIdentifierChain(parser.yy.result.suggestColumns, false, true);
           }
         }
       }

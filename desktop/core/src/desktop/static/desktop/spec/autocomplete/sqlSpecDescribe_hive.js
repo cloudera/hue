@@ -412,7 +412,7 @@
         afterCursor: '',
         expectedResult: {
           lowerCase: false,
-          suggestColumns: { tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }, { name: 'col' }] }] }
+          suggestColumns: { identifierChain: [{ name: 'col' }], tables: [{ identifierChain: [{ name: 'db' }, { name: 'tbl' }] }] }
         }
       });
     });
