@@ -1525,9 +1525,26 @@ var AutocompleteResults = (function () {
           }
 
           var popularityIndex = {};
+          var complexPrefix;
+          if (suggestColumns.identifierChain) {
+            complexPrefix = $.map(suggestColumns.identifierChain, function (val) {
+              return val.name;
+            }).join('.').toLowerCase() + '.';
+          }
           popularColumns.forEach(function (popularColumn) {
-            popularityIndex[popularColumn.columnName.toLowerCase()] = popularColumn;
-            popularityIndex[popularColumn.columnName.toLowerCase() + '[]'] = popularColumn;
+            var colName = popularColumn.columnName.toLowerCase();
+            if (complexPrefix) {
+              if (colName.indexOf(complexPrefix) == 0) {
+                colName = colName.substring(complexPrefix.length);
+              } else {
+                return;
+              }
+            }
+            if (colName.indexOf('.') !== -1) {
+              colName = colName.substring(0, colName.indexOf('.'));
+            }
+            popularityIndex[colName] = popularColumn;
+            popularityIndex[colName + '[]'] = popularColumn;
           });
 
           columnsDeferred.done(function (columns) {
