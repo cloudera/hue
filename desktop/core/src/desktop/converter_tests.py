@@ -31,6 +31,8 @@ from librdbms.design import SQLdesign
 
 from beeswax.models import SavedQuery
 from beeswax.design import hql_query
+from oozie.models import Link, Workflow
+from oozie.tests import add_node
 from pig.models import create_or_update_script
 from useradmin.models import get_default_user_group
 
@@ -42,6 +44,7 @@ class TestDocumentConverter(object):
     self.user = User.objects.get(username="doc2")
     grant_access("doc2", "doc2", "beeswax")
     grant_access("doc2", "doc2", "pig")
+    grant_access("doc2", "doc2", "jobsub")
 
     # This creates the user directories for the new user
     response = self.client.get('/desktop/api2/doc/')
@@ -159,6 +162,7 @@ class TestDocumentConverter(object):
     finally:
       query.delete()
       query2.delete()
+
 
   def test_convert_hive_query_with_special_chars(self):
     sql = 'SELECT * FROM sample_07'
@@ -303,9 +307,55 @@ class TestDocumentConverter(object):
       query.delete()
 
 
-  def test_convert_workflow(self):
-    # TODO: write me
-    pass
+  def test_convert_mapreduce(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'mapreduce', [wf.start], {
+      'description': 'Test MR job design',
+      'files': '[]',
+      'jar_path': '/user/hue/oozie/examples/lib/hadoop-examples.jar',
+      'job_properties': '[{"name": "sleep.job.map.sleep.time", "value": "5"}, {"name": "sleep.job.reduce.sleep.time", "value": "10"}]',
+      'prepares': '[{"value":"${output}","type":"delete"},{"value":"/test","type":"mkdir"}]',
+      'archives': '[]',
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-mapreduce').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-mapreduce')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('/user/hue/oozie/examples/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+        assert_equal(['sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
 
 
   def test_convert_pig_script(self):
