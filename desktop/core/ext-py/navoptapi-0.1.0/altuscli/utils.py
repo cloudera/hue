@@ -20,9 +20,9 @@ import functools
 import re
 import signal
 
-from ccscli import LIST_TYPE
-from ccscli import OBJECT_TYPE
-from ccscli.compat import OrderedDict
+from altuscli import LIST_TYPE
+from altuscli import OBJECT_TYPE
+from altuscli.compat import OrderedDict
 import dateutil.parser
 from dateutil.tz import tzlocal
 from dateutil.tz import tzutc
@@ -34,7 +34,7 @@ SAFE_CHARS = '-._~'
 def get_service_module_name(service_model):
     name = service_model.service_name
     name = name.replace('Cloudera', '')
-    name = name.replace('CCS', '')
+    name = name.replace('Altus', '')
     name = re.sub('\W+', '', name)
     return name
 
@@ -197,7 +197,7 @@ class ArgumentGenerator(object):
     """Generate sample input based on a shape model.
 
     This class contains a ``generate_skeleton`` method that will take
-    an input shape (created from ``ccscli.model``) and generate
+    an input shape (created from ``altuscli.model``) and generate
     a sample dictionary corresponding to the input shape.
 
     The specific values used are place holder values. For strings an
@@ -213,11 +213,11 @@ class ArgumentGenerator(object):
     Example usage::
 
         clidriver = CLIDriver
-        ddb = clidriver.get_service_model('mastodon')
+        ddb = clidriver.get_service_model('dataeng')
         arg_gen = ArgumentGenerator()
         sample_input = arg_gen.generate_skeleton(
             ddb.operation_model('createCluster').input_shape)
-        print("Sample input for mastodon.createCluster: %s" % sample_input)
+        print("Sample input for dataeng.createCluster: %s" % sample_input)
 
     """
     def __init__(self):

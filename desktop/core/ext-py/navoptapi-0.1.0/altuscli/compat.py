@@ -15,9 +15,11 @@
 # language governing permissions and limitations under the License.
 
 import copy
+import os
 import sys
 
-from ccscli.thirdparty import six  # noqa
+from altuscli.thirdparty import six  # noqa
+
 
 if six.PY3:
     from base64 import encodebytes  # noqa
@@ -148,7 +150,7 @@ def copy_kwargs(kwargs):
     return copy_kwargs
 
 
-def compat_input(prompt):
+def compat_input(prompt, interactive_long_input=False):
     """
     Cygwin's pty's are based on pipes. Therefore, when it interacts with a Win32
     program (such as Win32 python), what that program sees is a pipe instead of
@@ -160,6 +162,13 @@ def compat_input(prompt):
 
     See https://github.com/mintty/mintty/issues/56 for more details.
     """
+    is_windows = sys.platform.startswith('win')
+    if interactive_long_input:
+        # See THUN-222 for context on why this is necessary
+        if is_windows is False:
+            os.system('stty -icanon')
     sys.stdout.write(prompt)
     sys.stdout.flush()
+    if is_windows is False:
+        os.system('stty sane')
     return raw_input()

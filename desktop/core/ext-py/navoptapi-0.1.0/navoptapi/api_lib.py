@@ -19,9 +19,9 @@ import logging
 import os
 import platform
 
-from ccscli.auth import RSAv1Auth
-from ccscli.credentials import Credentials
-from ccscli.signers import RequestSigner
+from altuscli.auth import RSAv1Auth
+from altuscli.credentials import Credentials
+from altuscli.signers import RequestSigner
 
 from navoptapi.serialize import Serializer
 
@@ -29,7 +29,7 @@ from requests import put, Request, Session
 
 import six
 
-LOG = logging.getLogger('ccscli.navopt')
+LOG = logging.getLogger('altuscli.navopt')
 ROOT_LOGGER = logging.getLogger('')
 LOG_FORMAT = ('%(asctime)s - %(threadName)s - %(name)s - %(levelname)s - %(message)s')
 
@@ -43,17 +43,17 @@ class ApiLib(object):
         # get Credentials
         self._access_key = access_key
         self._private_key = private_key
-        self._endpoint_url = "http://" + host_name + ":8982/" + service_name + "/"
+        self._endpoint_url = "https://" + host_name + "/" + service_name + "/"
         self._service_name = service_name
         self._cred = Credentials(access_key, private_key,
                                  method='shared-credentials-file')
         self._signer = RequestSigner(RSAv1Auth.AUTH_METHOD_NAME, self._cred)
 
     def _build_user_agent_header(self):
-        return 'CCSCLI/%s Python/%s %s/%s' % (VERSION,
-                                              platform.python_version(),
-                                              platform.system(),
-                                              platform.release())
+        return 'ALTUSCLI/%s Python/%s %s/%s' % (VERSION,
+                                                platform.python_version(),
+                                                platform.system(),
+                                                platform.release())
 
     def _encode_headers(self, headers):
         # In place encoding of headers to utf-8 if they are unicode.

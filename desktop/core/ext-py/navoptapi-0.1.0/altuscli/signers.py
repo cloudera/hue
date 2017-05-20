@@ -14,9 +14,9 @@
 # ANY KIND, either express or implied. See the License for the specific
 # language governing permissions and limitations under the License.
 
-from ccscli import UNSIGNED
-import ccscli.auth
-from ccscli.exceptions import UnknownSignatureVersionError
+from altuscli import UNSIGNED
+import altuscli.auth
+from altuscli.exceptions import UnknownSignatureVersionError
 
 
 class RequestSigner(object):
@@ -45,7 +45,7 @@ class RequestSigner(object):
         Get an auth instance which can be used to sign a request
         using the given signature version.
         """
-        cls = ccscli.auth.AUTH_TYPE_MAPS.get(signature_version)
+        cls = altuscli.auth.AUTH_TYPE_MAPS.get(signature_version)
         if cls is None:
             raise UnknownSignatureVersionError(
                 signature_version=signature_version)
