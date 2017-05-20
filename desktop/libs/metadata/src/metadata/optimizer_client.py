@@ -22,7 +22,6 @@ import os
 import uuid
 
 from tempfile import NamedTemporaryFile
-from urlparse import urlparse
 
 from django.core.cache import cache
 from django.utils.functional import wraps
@@ -90,9 +89,8 @@ class OptimizerApi(object):
     self._api_url = (api_url or get_optimizer_url()).strip('/')
     self._auth_key = auth_key if auth_key else OPTIMIZER.AUTH_KEY.get()
     self._auth_key_secret = auth_key_secret if auth_key_secret else (OPTIMIZER.AUTH_KEY_SECRET.get() and OPTIMIZER.AUTH_KEY_SECRET.get().replace('\\n', '\n'))
-    self._email = OPTIMIZER.EMAIL.get()
 
-    self._api = ApiLib("navopt", urlparse(self._api_url).hostname, self._auth_key, self._auth_key_secret)
+    self._api = ApiLib("navopt", self._api_url, self._auth_key, self._auth_key_secret)
 
     self._tenant_id = tenant_id if tenant_id else _get_tenant_id(self) # Aka "workload"
 
@@ -112,13 +110,8 @@ class OptimizerApi(object):
       return data
 
 
-  def get_tenant(self, email=None, cluster_id=None):
-    if cluster_id is not None:
-      args = {'clusterId' : cluster_id}
-    else:
-      args = {'email': email or self._email}
-
-    return self._call('getTenant', args)
+  def get_tenant(self, cluster_id='default'):
+    return self._call('getTenant', {'clusterId' : cluster_id})
 
 
   def upload(self, data, data_type='queries', source_platform='generic', workload_id=None):
@@ -399,6 +392,10 @@ def _secure_results(results, user, action='SELECT'):
 def _get_tenant_id(api):
   tenant_id = OPTIMIZER.TENANT_ID.get() or cache.get(OPTIMIZER_TENANT_ID_CACHE_KEY)
   if not tenant_id:
-    tenant_id = api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())['tenant']
+    tenant = api.get_tenant(cluster_id=OPTIMIZER.CLUSTER_ID.get())
+    if 'tenant' in tenant:
+      tenant_id = tenant['tenant']
+    else:
+      raise PopupException(_('Could not get tenant id from cluster id %s: %s') % (OPTIMIZER.CLUSTER_ID.get(), tenant))
     cache.set(OPTIMIZER_TENANT_ID_CACHE_KEY, tenant_id, 60 * 60 * 24 * 30)
   return tenant_id

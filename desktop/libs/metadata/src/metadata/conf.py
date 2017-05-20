@@ -46,7 +46,7 @@ def default_navigator_url():
 
 
 def get_optimizer_url():
-  return OPTIMIZER.API_URL.get() and OPTIMIZER.API_URL.get().strip('/')
+  return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
 def has_optimizer():
   return bool(OPTIMIZER.AUTH_KEY.get())
@@ -72,10 +72,10 @@ OPTIMIZER = ConfigSection(
   key='optimizer',
   help=_t("""Configuration options for Optimizer API"""),
   members=dict(
-    API_URL=Config(
-      key='api_url',
-      help=_t('Base URL to Optimizer API or compatible service.'),
-      default='https://"navoptapi.optimizer.cloudera.com/'),
+    HOSTNAME=Config(
+      key='hostname',
+      help=_t('Hostname to Optimizer API or compatible service.'),
+      default='navoptapi.optimizer.cloudera.com'),
 
     AUTH_KEY=Config(
       key="auth_key",
@@ -103,11 +103,6 @@ OPTIMIZER = ConfigSection(
       help=_t("The name of the cluster used to determine the tenant id when this one is not specified. Defaults to the cluster Id or 'default'."),
       private=True,
       default=DEFAULT_CLUSTER_ID.get()),
-    EMAIL=Config(
-      key="email",
-      help=_t("The email of the Optimizer account to use (deprecated)."),
-      private=True,
-      default=None),
 
     APPLY_SENTRY_PERMISSIONS = Config(
       key="apply_sentry_permissions",
