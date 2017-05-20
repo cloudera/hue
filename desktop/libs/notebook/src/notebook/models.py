@@ -16,6 +16,7 @@
 # limitations under the License.
 
 import json
+import logging
 import math
 import numbers
 import uuid
@@ -25,6 +26,9 @@ from django.utils.html import escape
 from desktop.lib.i18n import smart_unicode
 
 from notebook.connectors.base import Notebook
+
+
+LOG = logging.getLogger(__name__)
 
 
 # Materialize and HTML escape results
@@ -233,6 +237,56 @@ def import_saved_pig_script(pig_script):
   # Remove files, functions, settings from snippet properties
   data = notebook.get_data()
   data['snippets'][0]['properties'].pop('files')
+  data['snippets'][0]['properties'].pop('functions')
+  data['snippets'][0]['properties'].pop('settings')
+
+  notebook.data = json.dumps(data)
+  return notebook
+
+
+def import_saved_mapreduce_job(wf):
+  snippet_properties = {}
+
+  node = wf.start.get_child('to')
+
+  try:
+    files = json.loads(node.files)
+    for filepath in files:
+      snippet_properties['files'].append({'type': 'file', 'path': filepath})
+  except ValueError, e:
+    LOG.warn('Failed to parse files for mapreduce job design "%s".' % wf.name)
+
+  snippet_properties['archives'] = []
+  try:
+    archives = json.loads(node.archives)
+    for filepath in archives:
+      snippet_properties['archives'].append(filepath)
+  except ValueError, e:
+    LOG.warn('Failed to parse archives for mapreduce job design "%s".' % wf.name)
+
+  snippet_properties['hadoopProperties'] = []
+  try:
+    properties = json.loads(node.job_properties)
+    if properties:
+      for prop in properties:
+        snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+  except ValueError, e:
+    LOG.warn('Failed to parse job properties for mapreduce job design "%s".' % wf.name)
+
+  snippet_properties['app_jar'] = node.jar_path
+
+  notebook = make_notebook(
+    name=wf.name,
+    description=wf.description,
+    editor_type='mapreduce',
+    statement='',
+    status='ready',
+    snippet_properties=snippet_properties,
+    is_saved=True
+  )
+
+  # Remove functions, settings from snippet properties
+  data = notebook.get_data()
   data['snippets'][0]['properties'].pop('functions')
   data['snippets'][0]['properties'].pop('settings')
 
