@@ -75,7 +75,7 @@ OPTIMIZER = ConfigSection(
     API_URL=Config(
       key='api_url',
       help=_t('Base URL to Optimizer API or compatible service.'),
-      default='https://optimizer.cloudera.com/'),
+      default='https://"navoptapi.optimizer.cloudera.com/'),
 
     AUTH_KEY=Config(
       key="auth_key",
