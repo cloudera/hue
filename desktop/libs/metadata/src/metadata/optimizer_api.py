@@ -77,10 +77,10 @@ def error_handler(view_fn):
 def get_tenant(request):
   response = {'status': -1}
 
-  email = request.POST.get('email')
+  cluster_id = request.POST.get('cluster_id')
 
   api = OptimizerApi(request.user)
-  data = api.get_tenant(email=email)
+  data = api.get_tenant(cluster_id=cluster_id)
 
   if data:
     response['status'] = 0
