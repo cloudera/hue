@@ -388,8 +388,8 @@ from desktop.views import _ko
                 % endif
                 % if 'search' in apps:
                   <li>
-                    <a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:index') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
-                      <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Search Dashboard')}
+                    <a title="${_('Solr Search')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('search:new_search') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
+                      <img src="${ static('search/art/icon_search_48.png') }" class="app-icon" alt="${ _('Search icon') }"/> ${_('Dashboard')}
                     </a>
                   </li>
                 % endif
@@ -406,8 +406,8 @@ from desktop.views import _ko
           <!-- ko if: app === 'documents' -->
           <div><a class="inactive-action doc-browser-action" title="${_('Share')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: function() { showSharingModal(null) }, css: { 'disabled': selectedEntries().length !== 1 || (selectedEntries().length === 1 && selectedEntries()[0].isTrashed) }"><i class="fa fa-fw fa-users"></i></a></div>
           <!-- /ko -->
-          <div style="margin-top: 2px"><a class="inactive-action doc-browser-action" title="${_('Download')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: download"><i class="fa fa-fw fa-download"></i></a></div>
-          <div><a class="inactive-action doc-browser-action" title="${_('Upload')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
+          <div style="margin-top: 2px"><a class="inactive-action doc-browser-action" title="${_('Export all or selected documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: download"><i class="fa fa-fw fa-download"></i></a></div>
+          <div><a class="inactive-action doc-browser-action" title="${_('Import documents')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showUploadModal, css: { 'disabled': isTrash() || isTrashed() }"><i class="fa fa-fw fa-upload"></i></a></div>
           <!-- ko if: app === 'documents' -->
           <div class="margin-left-20" data-bind="contextMenu: { menuSelector: '.hue-context-menu' }">
             <a class="inactive-action doc-browser-action" title="${_('Show trash')}" href="javascript:void(0);" data-bind="tooltip: { placement: 'bottom', delay: 750 }, click: showTrash, trashDroppable, css: { 'blue' : isTrash() || isTrashed() }">
