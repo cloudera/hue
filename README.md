@@ -73,27 +73,18 @@ your system:
 
 __Ubuntu:__
 
-* Oracle's JDK [(read more here)](https://help.ubuntu.com/community/Java)
-* ant
-* gcc
-* g++
-* libffi-dev
-* libkrb5-dev
-* libmysqlclient-dev
-* libsasl2-dev
-* libsasl2-modules-gssapi-mit
-* libsqlite3-dev
-* libssl-dev
-* libtidy-0.99-0 (for unit tests only)
-* libxml2-dev
-* libxslt-dev
-* make
+* sudo apt-get install git ant gcc g++ libffi-dev libkrb5-dev libmysqlclient-dev libsasl2-dev libsasl2-modules-gssapi-mit libsqlite3-dev libssl-dev libxml2-dev libxslt-dev make maven libldap2-dev python-dev python-setuptools libgmp3-dev
+
+* Oracle's JDK [(read more here)](https://help.ubuntu.com/community/Java)#```
+sudo add-apt-repository ppa:webupd8team/java
+sudo apt-get update
+sudo apt-get install oracle-java7-installer
+```
+
 * mvn (from ``maven`` package or maven3 tarball)
 * openldap-dev / libldap2-dev
-* python-dev
-* python-setuptools
-* libgmp3-dev
-* libz-dev
+* libtidy-0.99-0 (for unit tests only)
+
 
 __CentOS/RHEL:__
 
