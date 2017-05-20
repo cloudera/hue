@@ -99,7 +99,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
       <i class="fa fa-unlock muted" title="${ _('With grant option') }"></i>
     <!-- /ko -->
     <span data-bind="visible: metastorePath() != '' && privilegeType() == 'db'">
-      <a data-bind="attr: { href: metastorePath() }" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Metastore') }"><i class="fa fa-external-link"></i></a>
+      <a data-bind="hueLink: metastorePath()" class="muted" target="_blank" style="margin-left: 4px" title="${ _('Open in Table Browser') }"><i class="fa fa-external-link"></i></a>
     </span>
     <br/>
 
@@ -118,7 +118,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
     <!-- /ko -->
 
     <!-- ko if: privilegeType() == 'uri' -->
-      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="attr: { href: '/filebrowser/view=/' + URI().split('/')[3] }" target="_blank"><span data-bind="text: URI"></span></a>
+      <i class="fa fa-long-arrow-right"></i> <i class="fa fa-file-o"></i> <i class="fa fa-long-arrow-right"></i> <a data-bind="hueLink: '/filebrowser/view=/' + URI().split('/')[3]" target="_blank"><span data-bind="text: URI"></span></a>
     <!-- /ko -->
 
     <i class="fa fa-long-arrow-right"></i> action=<span data-bind="text: action"></span>
@@ -169,7 +169,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
               <div class="path-container">
                 <div class="input-append span12">
                   <input id="path" class="path" type="text" autocomplete="off" />
-                  <a data-bind="attr: { href: $root.assist.metastorePath() }" target="_blank" title="${ _('Open in Metastore Browser') }" class="btn btn-inverse">
+                  <a data-bind="hueLink: $root.assist.metastorePath()" target="_blank" title="${ _('Open in Table Browser') }" class="btn btn-inverse">
                     <i class="fa fa-external-link"></i>
                   </a>
                 </div>
