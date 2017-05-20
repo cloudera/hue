@@ -24,7 +24,7 @@ del get_versions
 
 VERSION = __version__
 
-CCSCLI_ROOT = os.path.dirname(os.path.abspath(__file__))
+ALTUSCLI_ROOT = os.path.dirname(os.path.abspath(__file__))
 
 
 # Used to specify anonymous (unsigned) request signature
@@ -49,8 +49,8 @@ COMPLEX_TYPES = set([OBJECT_TYPE,
                      LIST_TYPE])
 
 DEFAULT_PROFILE_NAME = 'default'
-CCS_ACCESS_KEY_ID_KEY_NAME = 'ccs_access_key_id'
-CCS_PRIVATE_KEY_KEY_NAME = 'ccs_private_key'
+ALTUS_ACCESS_KEY_ID_KEY_NAME = 'altus_access_key_id'
+ALTUS_PRIVATE_KEY_KEY_NAME = 'altus_private_key'
 
 # Prepopulate the cache with special cases that don't match our regular
 # transformation.

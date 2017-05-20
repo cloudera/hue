@@ -15,9 +15,9 @@
 # language governing permissions and limitations under the License.
 
 
-class CCSCLIError(Exception):
+class AltusCLIError(Exception):
     """
-    The base exception class for CCS CLI exceptions.
+    The base exception class for Altus CLI exceptions.
     """
     fmt = 'An unspecified error occured'
 
@@ -27,32 +27,32 @@ class CCSCLIError(Exception):
         self.kwargs = kwargs
 
 
-class ValidationError(CCSCLIError):
+class ValidationError(AltusCLIError):
     """
     An exception occurred validating parameters.
     """
     fmt = "Invalid value ('{value}') for param {param} of type {type_name}"
 
 
-class ParamValidationError(CCSCLIError):
+class ParamValidationError(AltusCLIError):
     fmt = 'Parameter validation failed:\n{report}'
 
 
-class DataNotFoundError(CCSCLIError):
+class DataNotFoundError(AltusCLIError):
     """
     The data associated with a particular path could not be loaded.
     """
     fmt = 'Unable to load data for: {data_path}'
 
 
-class ExecutableNotFoundError(CCSCLIError):
+class ExecutableNotFoundError(AltusCLIError):
     """
     The executable was not found.
     """
     fmt = 'Could not find executable named: {executable_name}'
 
 
-class OperationNotPageableError(CCSCLIError):
+class OperationNotPageableError(AltusCLIError):
     fmt = 'Operation cannot be paginated: {operation_name}'
 
 
@@ -78,7 +78,7 @@ class ClientError(Exception):
         self.response = error_response
 
 
-class UnseekableStreamError(CCSCLIError):
+class UnseekableStreamError(AltusCLIError):
     """
     Need to seek a stream, but stream does not support seeking.
     """
@@ -86,12 +86,12 @@ class UnseekableStreamError(CCSCLIError):
            'is not seekable.')
 
 
-class EndpointConnectionError(CCSCLIError):
+class EndpointConnectionError(AltusCLIError):
     fmt = (
         'Could not connect to the endpoint URL: "{endpoint_url}"')
 
 
-class IncompleteReadError(CCSCLIError):
+class IncompleteReadError(AltusCLIError):
     """
     HTTP response did not return expected number of bytes.
     """
@@ -99,46 +99,46 @@ class IncompleteReadError(CCSCLIError):
            'expected is {expected_bytes}.')
 
 
-class PaginationError(CCSCLIError):
+class PaginationError(AltusCLIError):
     fmt = 'Error during pagination: {message}'
 
 
-class UnknownSignatureVersionError(CCSCLIError):
+class UnknownSignatureVersionError(AltusCLIError):
     """
     Requested Signature Version is not known.
     """
     fmt = 'Unknown Signature Version: {signature_version}.'
 
 
-class UnsupportedSignatureVersionError(CCSCLIError):
+class UnsupportedSignatureVersionError(AltusCLIError):
     """
     Error when trying to access a method on a client that does not exist.
     """
     fmt = 'Signature version is not supported: {signature_version}'
 
 
-class NoCredentialsError(CCSCLIError):
+class NoCredentialsError(AltusCLIError):
     """
     No credentials could be found
     """
-    fmt = 'Unable to locate credentials'
+    fmt = 'Unable to locate Altus credentials'
 
 
-class UnknownCredentialError(CCSCLIError):
+class UnknownCredentialError(AltusCLIError):
     """
     Tried to insert before/after an unregistered credential type.
     """
     fmt = 'Credential named {name} not found.'
 
 
-class PartialCredentialsError(CCSCLIError):
+class PartialCredentialsError(AltusCLIError):
     """
     Only partial credentials were found.
     """
     fmt = 'Partial credentials found in {provider}, missing: {cred_var}'
 
 
-class BaseEndpointResolverError(CCSCLIError):
+class BaseEndpointResolverError(AltusCLIError):
     """
     Base error for endpoint resolving errors.
 
@@ -156,7 +156,7 @@ class NoRegionError(BaseEndpointResolverError):
     fmt = 'You must specify a region.'
 
 
-class ProfileNotFound(CCSCLIError):
+class ProfileNotFound(AltusCLIError):
     """
     The specified configuration profile was not found in the
     configuration file.
@@ -165,21 +165,21 @@ class ProfileNotFound(CCSCLIError):
     fmt = 'The config profile ({profile}) could not be found'
 
 
-class ConfigNotFound(CCSCLIError):
+class ConfigNotFound(AltusCLIError):
     """
     The specified configuration file could not be found.
     """
     fmt = 'The specified config file ({path}) could not be found.'
 
 
-class ConfigParseError(CCSCLIError):
+class ConfigParseError(AltusCLIError):
     """
     The configuration file could not be parsed.
     """
     fmt = 'Unable to parse config file: {path}'
 
 
-class ClusterTerminatingError(CCSCLIError):
+class ClusterTerminatingError(AltusCLIError):
 
     """
     The cluster is terminating or has already terminated.
@@ -187,7 +187,7 @@ class ClusterTerminatingError(CCSCLIError):
     fmt = 'Cluster {cluster_name} is terminating.'
 
 
-class ClusterStartingError(CCSCLIError):
+class ClusterStartingError(AltusCLIError):
 
     """
     The cluster is starting.
@@ -195,7 +195,7 @@ class ClusterStartingError(CCSCLIError):
     fmt = 'Cluster {cluster_name} is starting.'
 
 
-class ClusterFailedError(CCSCLIError):
+class ClusterFailedError(AltusCLIError):
 
     """
     The cluster failed to start.
@@ -203,7 +203,7 @@ class ClusterFailedError(CCSCLIError):
     fmt = 'Cluster {cluster_name} failed to start.'
 
 
-class ClusterDoesNotExistError(CCSCLIError):
+class ClusterDoesNotExistError(AltusCLIError):
 
     """
     Cluster with the given name does not exist.
@@ -211,7 +211,7 @@ class ClusterDoesNotExistError(CCSCLIError):
     fmt = 'Cluster {cluster_name} does not exist.'
 
 
-class ClusterStatusNotFound(CCSCLIError):
+class ClusterStatusNotFound(AltusCLIError):
 
     """
     Unable to find cluster status.
@@ -219,7 +219,7 @@ class ClusterStatusNotFound(CCSCLIError):
     fmt = 'Unable to find {cluster_name}\'s status.'
 
 
-class ClusterEndpointNotFound(CCSCLIError):
+class ClusterEndpointNotFound(AltusCLIError):
 
     """
     Unable to find cluster's Cloudera Manager Endpoint.
@@ -227,7 +227,7 @@ class ClusterEndpointNotFound(CCSCLIError):
     fmt = 'Unable to find {cluster_name}\'s Cloudera Manager Endpoint.'
 
 
-class MultipleClustersExist(CCSCLIError):
+class MultipleClustersExist(AltusCLIError):
 
     """
     Multiple clusters exist, expected single cluster.
@@ -235,7 +235,7 @@ class MultipleClustersExist(CCSCLIError):
     fmt = 'Multiple clusters exist, expected single cluster.'
 
 
-class SSHNotFoundError(CCSCLIError):
+class SSHNotFoundError(AltusCLIError):
 
     """
     SSH or Putty not available.
@@ -243,7 +243,7 @@ class SSHNotFoundError(CCSCLIError):
     fmt = 'SSH or Putty not available.'
 
 
-class WrongPuttyKeyError(CCSCLIError):
+class WrongPuttyKeyError(AltusCLIError):
 
     """
     A wrong key has been used with a compatible program.
