@@ -17,15 +17,15 @@ from base64 import urlsafe_b64encode
 from email.utils import formatdate
 import logging
 
+from altuscli.compat import json
+from altuscli.compat import OrderedDict
+from altuscli.compat import urlsplit
+from altuscli.exceptions import NoCredentialsError
 from asn1crypto import keys, pem
-from ccscli.compat import json
-from ccscli.compat import OrderedDict
-from ccscli.compat import urlsplit
-from ccscli.exceptions import NoCredentialsError
 import rsa
 
 
-LOG = logging.getLogger('ccscli.auth')
+LOG = logging.getLogger('altuscli.auth')
 
 
 class BaseSigner(object):
@@ -60,7 +60,7 @@ class RSAv1Auth(BaseSigner):
                 "corrupted or it is not in PKCS8 PEM format. The private key " \
                 "was extracted either from 'env' (environment variables), " \
                 "'shared-credentials-file' (a profile in the shared " \
-                "credential file, by default under ~/.ccs/credentials), or " \
+                "credential file, by default under ~/.altus/credentials), or " \
                 "'auth-config-file' (a file containing the credentials whose " \
                 "location was supplied on the command line.)" % \
                 self.credentials.method
@@ -71,11 +71,11 @@ class RSAv1Auth(BaseSigner):
         return urlsafe_b64encode(signature).strip().decode('utf-8')
 
     def _canonical_standard_headers(self, headers):
-        interesting_headers = ['content-type', 'x-ccs-date']
+        interesting_headers = ['content-type', 'x-altus-date']
         hoi = []
-        if 'x-ccs-date' in headers:
-            raise Exception("x-ccs-date found in headers!")
-        headers['x-ccs-date'] = self._get_date()
+        if 'x-altus-date' in headers:
+            raise Exception("x-altus-date found in headers!")
+        headers['x-altus-date'] = self._get_date()
         for ih in interesting_headers:
             found = False
             for key in headers:
@@ -114,9 +114,9 @@ class RSAv1Auth(BaseSigner):
         return formatdate(usegmt=True)
 
     def _inject_signature(self, request, signature):
-        if 'x-ccs-auth' in request.headers:
-            raise Exception("x-ccs-auth found in headers!")
-        request.headers['x-ccs-auth'] = self._get_signature_header(signature)
+        if 'x-altus-auth' in request.headers:
+            raise Exception("x-altus-auth found in headers!")
+        request.headers['x-altus-auth'] = self._get_signature_header(signature)
 
     def _get_signature_header(self, signature):
         auth_params = OrderedDict()

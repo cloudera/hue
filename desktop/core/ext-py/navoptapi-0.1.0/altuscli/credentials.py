@@ -17,16 +17,16 @@ from collections import namedtuple
 import logging
 import os
 
-from ccscli import CCS_ACCESS_KEY_ID_KEY_NAME, CCS_PRIVATE_KEY_KEY_NAME
-import ccscli.compat
-from ccscli.compat import json
-from ccscli.configloader import raw_config_parse
-from ccscli.exceptions import ConfigNotFound
-from ccscli.exceptions import NoCredentialsError
-from ccscli.exceptions import PartialCredentialsError
-from ccscli.exceptions import UnknownCredentialError
+from altuscli import ALTUS_ACCESS_KEY_ID_KEY_NAME, ALTUS_PRIVATE_KEY_KEY_NAME
+import altuscli.compat
+from altuscli.compat import json
+from altuscli.configloader import raw_config_parse
+from altuscli.exceptions import ConfigNotFound
+from altuscli.exceptions import NoCredentialsError
+from altuscli.exceptions import PartialCredentialsError
+from altuscli.exceptions import UnknownCredentialError
 
-LOG = logging.getLogger('ccscli.credentials')
+LOG = logging.getLogger('altuscli.credentials')
 ReadOnlyCredentials = namedtuple('ReadOnlyCredentials',
                                  ['access_key_id', 'private_key', 'method'])
 ACCESS_KEY_ID = 'access_key_id'
@@ -62,9 +62,9 @@ def create_credential_resolver(context):
         # concept to retrieve credentials.
         # The one edge case is if all three values are provided via
         # env vars:
-        # export CCS_ACCESS_KEY_ID=foo
-        # export CCS_PRIVATE_KEY=bar
-        # export CCS_PROFILE=baz
+        # export ALTUS_ACCESS_KEY_ID=foo
+        # export ALTUS_PRIVATE_KEY=bar
+        # export ALTUS_PROFILE=baz
         # Then, just like our client() calls, the explicit credentials
         # will take precedence.
         #
@@ -97,8 +97,8 @@ class Credentials(object):
         self._normalize()
 
     def _normalize(self):
-        self.access_key_id = ccscli.compat.ensure_unicode(self.access_key_id)
-        self.private_key = ccscli.compat.ensure_unicode(self.private_key)
+        self.access_key_id = altuscli.compat.ensure_unicode(self.access_key_id)
+        self.private_key = altuscli.compat.ensure_unicode(self.private_key)
 
     def get_frozen_credentials(self):
         return ReadOnlyCredentials(self.access_key_id,
@@ -127,8 +127,8 @@ class CredentialProvider(object):
 
 class EnvProvider(CredentialProvider):
     METHOD = 'env'
-    ACCESS_KEY_ID_ENV_VAR = 'CCS_ACCESS_KEY_ID'
-    PRIVATE_KEY_ENV_VAR = 'CCS_PRIVATE_KEY'
+    ACCESS_KEY_ID_ENV_VAR = 'ALTUS_ACCESS_KEY_ID'
+    PRIVATE_KEY_ENV_VAR = 'ALTUS_PRIVATE_KEY'
 
     def __init__(self, environ=None, mapping=None):
         super(EnvProvider, self).__init__()
@@ -277,11 +277,12 @@ class SharedCredentialProvider(CredentialProvider):
         try:
             available_creds = raw_config_parse(self._creds_filename)
         except ConfigNotFound:
+            LOG.debug("Credentials file at %s does not exist!" % self._creds_filename)
             return None
         if self._profile_name in available_creds:
             config = available_creds[self._profile_name]
             access_key_id, private_key = self._extract_creds_from_mapping(
-                config, CCS_ACCESS_KEY_ID_KEY_NAME, CCS_PRIVATE_KEY_KEY_NAME)
+                config, ALTUS_ACCESS_KEY_ID_KEY_NAME, ALTUS_PRIVATE_KEY_KEY_NAME)
             # We store the private key in the credentials file as a one-line
             # value in which the newlines in the PEM file are replaced with
             # '\n'. We need to replace them back as the RawConfigParser we use

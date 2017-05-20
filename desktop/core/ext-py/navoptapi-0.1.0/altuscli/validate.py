@@ -17,9 +17,9 @@
 import datetime
 import decimal
 
-from ccscli.compat import six
-from ccscli.exceptions import ParamValidationError
-from ccscli.utils import parse_to_aware_datetime
+from altuscli.compat import six
+from altuscli.exceptions import ParamValidationError
+from altuscli.utils import parse_to_aware_datetime
 
 
 def validate_parameters(params, shape):

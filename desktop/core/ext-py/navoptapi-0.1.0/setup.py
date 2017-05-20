@@ -20,7 +20,6 @@ requirements = ["python-dateutil>=2.1,<3.0.0",
                 "asn1crypto>=0.21.1",
                 "rsa>=3.4.2",
                 "colorama>=0.2.5,<=0.3.3",
-                "pycrypto>=2.6.1",
                 "requests>=2.9.1"]
 if sys.version_info[:2] == (2, 6):
     requirements.append("argparse>=1.1")

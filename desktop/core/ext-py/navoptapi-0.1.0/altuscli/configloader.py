@@ -19,7 +19,7 @@ import copy
 import os
 import shlex
 
-from ccscli.exceptions import ConfigNotFound, ConfigParseError
+from altuscli.exceptions import ConfigNotFound, ConfigParseError
 
 from six.moves import configparser
 
@@ -177,12 +177,12 @@ def build_profile_map(parsed_ini_config):
     default to be prepended with "profile", e.g.::
 
         [profile test]
-        ccs_... = foo
-        ccs_... = bar
+        altus_... = foo
+        altus_... = bar
 
         [profile bar]
-        ccs_... = foo
-        ccs_... = bar
+        altus_... = foo
+        altus_... = bar
 
         # This is *not* a profile
         [preview]
@@ -198,16 +198,16 @@ def build_profile_map(parsed_ini_config):
     the sub dictionary is a profile name.  For example, the above config file
     would be converted from::
 
-        {"profile test": {"ccs_...": "foo", "ccs...": "bar"},
-         "profile bar": {"ccs...": "foo", "ccs...": "bar"},
+        {"profile test": {"altus_...": "foo", "altus_...": "bar"},
+         "profile bar": {"altus_...": "foo", "altus_...": "bar"},
          "preview": {"otherstuff": ...},
          "foobar": {"morestuff": ...},
          }
 
     into::
 
-        {"profiles": {"test": {"ccs_...": "foo", "ccs...": "bar"},
-                      "bar": {"ccs...": "foo", "ccs...": "bar"},
+        {"profiles": {"test": {"altus_...": "foo", "altus_...": "bar"},
+                      "bar": {"altus_...": "foo", "altus_...": "bar"},
          "preview": {"otherstuff": ...},
          "foobar": {"morestuff": ...},
         }
