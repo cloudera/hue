@@ -1651,7 +1651,7 @@ from notebook.conf import get_ordered_interpreters
               <a class="black-link" href="javascript: void(0);" data-bind="toggle: open"><i class="fa fa-fw" data-bind="css: { 'fa-chevron-right': !open(), 'fa-chevron-down': open }"></i> <span data-bind="text: name"></span></a>
               <ul class="assist-functions" data-bind="slideVisible: open, foreach: filteredFunctions">
                 <li data-bind="tooltip: { title: description, placement: 'left', delay: 1000 }">
-                  <a class="assist-field-link" href="javascript: void(0);" data-bind="css: { 'blue': $parents[1].selectedFunction() === $data }, click: function () { $parents[1].selectedFunction($data); }, text: signature"></a>
+                  <a class="assist-field-link" href="javascript: void(0);" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, css: { 'blue': $parents[1].selectedFunction() === $data }, multiClick: { click: function () { $parents[1].selectedFunction($data); }, dblClick: function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }, text: signature"></a>
                 </li>
               </ul>
             </li>
@@ -1659,7 +1659,7 @@ from notebook.conf import get_ordered_interpreters
         </div>
         <!-- ko if: selectedFunction -->
         <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
-          <div class="assist-function-signature blue" data-bind="text: signature"></div>
+          <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }"></div>
           <!-- ko if: description -->
           <div data-bind="text: description"></div>
           <!-- /ko -->
@@ -1727,7 +1727,11 @@ from notebook.conf import get_ordered_interpreters
           });
         };
 
-        self.disposals.push(huePubSub.subscribe('active.snippet.type.changed', updateType).remove);
+        var activeSnippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', updateType);
+
+        self.disposals.push(function () {
+          activeSnippetTypeSub.remove();
+        });
 
         huePubSub.subscribeOnce('set.active.snippet.type', updateType);
         huePubSub.publish('get.active.snippet.type');
@@ -1751,6 +1755,7 @@ from notebook.conf import get_ordered_interpreters
             open: ko.observable(false),
             functions: $.map(category.functions, function(fn) {
               return {
+                draggable: fn.draggable,
                 signature: fn.signature,
                 description: fn.description
               }
