@@ -643,8 +643,12 @@ var MetastoreTable = (function () {
     self.fetchDetails();
   };
 
+
+  var contextPopoverTimeout = -1;
+
   MetastoreTable.prototype.showContextPopover = function (entry, event, orientation) {
-    var $source = $(event.target);
+    window.clearTimeout(contextPopoverTimeout);
+    var $source = $(event.currentTarget || event.target);
     var offset = $source.offset();
     huePubSub.publish('sql.context.popover.show', {
       data: {
@@ -658,10 +662,22 @@ var MetastoreTable = (function () {
         element: event.target,
         left: offset.left,
         top: offset.top - 2,
-        right: offset.left + $source.width() + 1,
+        right: offset.left + (orientation === 'left' ? 0 : $source.width() + 1),
         bottom: offset.top + $source.height() - 2
       }
     });
+  };
+
+  MetastoreTable.prototype.showContextPopoverDelayed = function (entry, event, orientation) {
+    var self = this;
+    window.clearTimeout(contextPopoverTimeout);
+    contextPopoverTimeout = window.setTimeout(function () {
+      self.showContextPopover(entry, event, orientation);
+    }, 500);
+  };
+
+  MetastoreTable.prototype.clearContextPopoverDelay = function () {
+    window.clearInterval(contextPopoverTimeout);
   };
 
   return MetastoreTable;
