@@ -1309,6 +1309,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       }, 10);
     });
 
+    $('.page-content').jHueScrollUp();
+
     window.hueDebug = {
       viewModel: function (element) {
         return element ? ko.dataFor(element) : window.hueDebug.onePageViewModel;
