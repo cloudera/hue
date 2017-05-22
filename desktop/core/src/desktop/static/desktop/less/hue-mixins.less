@@ -34,6 +34,12 @@
 
 @hue-panel-border-radius: 2px;
 
+.hue-transform(@transform) {
+  -webkit-transform: @transform;
+  -moz-transform: @transform;
+  -ms-transform: @transform;
+  -o-transform: @transform;
+}
 
 .hue-linear-transition(@attributes) {
   -webkit-transition: @attributes 0.2s linear;
