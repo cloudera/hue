@@ -72,7 +72,7 @@
    */
   window.pauseAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.app == app) {
+      if (typeof interval.app !== 'undefined' && (interval.app === app || interval.app.split('-')[0] === app)) {
         interval.status = 'paused';
         originalClearInterval(interval.id);
       }
@@ -84,7 +84,7 @@
    */
   window.resumeAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.app == app && interval.status === 'paused') {
+      if (typeof interval.app !== 'undefined' && (interval.app == app || interval.app.split('-')[0] === app) && interval.status === 'paused') {
         interval.status = 'running';
         var id = originalSetInterval(interval.fn, interval.timeout);
         interval.id = id;
@@ -97,7 +97,7 @@
    */
   window.clearAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (interval.app == app) {
+      if (interval.app == app || (interval.app && interval.app.split('-')[0] === app)) {
         window.clearInterval(interval.originalId);
       }
     });
