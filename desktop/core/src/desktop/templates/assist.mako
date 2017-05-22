@@ -1794,12 +1794,9 @@ from notebook.conf import get_ordered_interpreters
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
           <!-- /ko -->
           <!-- ko if: activeTables().length > 0 -->
-          <ul data-bind="foreach: activeTables">
-            <li>
-              <span data-bind="text: name"></span>
-              <div class="pull-right margin-right-10">
-                <a class="inactive-action" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }"><i class="fa fa-info"></i></a>
-              </div>
+          <ul class="assist-active-tables" data-bind="foreach: activeTables">
+            <li data-bind="event: { mouseover: function (data, event) { showContextPopoverDelayed(data, event, 'left'); }, mouseout: clearContextPopoverDelay },">
+              <a class="inactive-action-dark" href="javascript:void(0)" data-bind="click: function (data, event) { showContextPopover(data, event, 'left') }, text: name"></a>
             </li>
           </ul>
           <!-- /ko -->
