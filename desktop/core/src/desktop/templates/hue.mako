@@ -729,8 +729,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           } else {
             self.isLoadingEmbeddable(false);
           }
-          window.resumeAppIntervals(app);
-          huePubSub.resumeAppSubscribers(app);
+          if (app === 'editor'){
+            var affix = (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
+            window.resumeAppIntervals(app + affix);
+            huePubSub.resumeAppSubscribers(app + affix);
+          }
+          else {
+            window.resumeAppIntervals(app);
+            huePubSub.resumeAppSubscribers(app);
+          }
           $('.embeddable').hide();
           $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
           huePubSub.publish('app.gained.focus', app);
