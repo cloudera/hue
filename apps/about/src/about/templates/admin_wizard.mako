@@ -94,7 +94,7 @@ ${ layout.menubar(section='quick_start') }
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Uploading...') }"
                        data-sample-url="${ url('metadata:upload_history') }" title="${ _('Send and analyze past %s executed queries to provide smarter SQL recommendations') % OPTIMIZER.QUERY_HISTORY_UPLOAD_LIMIT.get() }">
-                      <i class="fa fa-upload"></i> ${ _('SQL Query history') }
+                      <i class="fa fa-download"></i> ${ _('SQL Query history') }
                     </a>
                   </li>
               % endif
