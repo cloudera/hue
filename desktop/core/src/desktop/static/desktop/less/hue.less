@@ -24,6 +24,8 @@
 @import "hue-cui-overrides.less";
 @import "hue-cross-version.less";
 
+@import "components/hue-hamburger.less";
+
 html {
   height: 100%;
   width: 100%;
@@ -417,83 +419,6 @@ a:focus,
 a:visited {
   text-decoration: none;
 }
-
-/*!
- * Hamburgers
- * @description Tasty CSS-animated hamburgers
- * @author Jonathan Suh @jonsuh
- * @site https://jonsuh.com/hamburgers
- * @link https://github.com/jonsuh/hamburgers
- */
-.hamburger {
-  padding: 18px 24px 0 0;
-  display: inline-block;
-  cursor: pointer;
-  .hue-ease-transition(~"opacity, filter, -webkit-filter");
-  font: inherit;
-  color: inherit;
-  text-transform: none;
-  background-color: transparent;
-  border: 0;
-  margin: 0;
-  overflow: visible;
-}
-
-.hamburger:hover {
-  opacity: 0.7;
-}
-
-.hamburger-box {
-  width: 24px;
-  height: 18px;
-  display: inline-block;
-  position: relative;
-}
-
-.hamburger-inner {
-  display: block;
-  top: 50%;
-  margin-top: -4px;
-}
-
-.hamburger-inner {
-  width: 24px;
-  height: 1px;
-  position: absolute;
-}
-
-.hamburger-inner::before, .hamburger-inner::after {
-  width: 24px;
-  height: 3px;
-  background-color: @hue-primary-color-dark;
-  border-radius: 4px;
-  position: absolute;
-  .hue-ease-transition(~"transform, -webkit-transform");
-}
-
-.hamburger-inner::before, .hamburger-inner::after {
-  content: "";
-  display: block;
-}
-
-.hamburger-inner::before {
-  top: -5px;
-}
-
-.hamburger-inner::after {
-  bottom: -5px;
-}
-
-.hamburger-hue.is-active .hamburger-inner::before {
-  -webkit-transform: translate3d(-2px, 0, 0) rotate(-40deg) scale(0.6, 1);
-  transform: translate3d(-2px, 0, 0) rotate(-40deg) scale(0.6, 1);
-}
-
-.hamburger-hue.is-active .hamburger-inner::after {
-  -webkit-transform: translate3d(-2px, 0, 0) rotate(40deg) scale(0.6, 1);
-  transform: translate3d(-2px, 0, 0) rotate(40deg) scale(0.6, 1);
-}
-
 
 /* Context menu, popover etc. */
 
