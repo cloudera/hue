@@ -1784,11 +1784,14 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assistant-panel-template">
     <div class="assist-inner-panel assist-assistant-panel">
       <div class="assist-flex-panel">
-        <!-- ko if: statementCount() > 1 -->
-        <div class="assist-flex-header">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
-        <!-- /ko -->
 
-        <div class="assist-flex-header"><div class="assist-inner-header">${ _('Tables') }</div></div>
+        <div class="assist-flex-header">
+          <div class="assist-inner-header">${ _('Tables') }
+            <!-- ko if: statementCount() > 1 -->
+            <div class="statement-count">${ _('Statement') } <span data-bind="text: activeStatementIndex() + '/' + statementCount()"></span></div>
+            <!-- /ko -->
+          </div>
+        </div>
         <div class="assist-flex-half">
           <!-- ko if: activeTables().length === 0 -->
           <div class="assist-no-entries">${ _('No tables identified.') }</div>
