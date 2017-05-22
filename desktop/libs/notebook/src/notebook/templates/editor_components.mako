@@ -1798,7 +1798,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     </div>
 
     <div>
-      <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
+      <a class="snippet-side-btn" href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('chart.hard.reset'); isResultSettingsVisible(! isResultSettingsVisible()) }, css: { 'blue' : isResultSettingsVisible }" title="${ _('Columns') }">
         <!-- ko if: isResultSettingsVisible() -->
         <i class="fa fa-fw fa-chevron-left"></i>
         <!-- /ko -->
@@ -2172,6 +2172,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       if (newValue) {
         dataScroll();
       }
+    });
+
+    huePubSub.subscribeOnce('chart.hard.reset', function(){
+      // hard reset once the default opened chart
+      var oldChartX = snippet.chartX();
+      snippet.chartX(null);
+      window.setTimeout(function(){
+        snippet.chartX(oldChartX);
+      }, 0)
     });
 
     return _dt;
