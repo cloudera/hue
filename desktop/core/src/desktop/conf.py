@@ -1290,14 +1290,14 @@ USE_NEW_AUTOCOMPLETER = Config( # This now refers to the new autocomplete dropdo
   key='use_new_autocompleter',
   default=True,
   type=coerce_bool,
-  help=_('Enable the improved editor autocomplete dropdown')
+  help=_('Enable the improved editor autocomplete dropdown.')
 )
 
 EDITOR_AUTOCOMPLETE_TIMEOUT = Config(
   key='editor_autocomplete_timeout',
   type=int,
-  default=10000,
-  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled')
+  default=30000,
+  help=_('Timeout value in ms for autocomplete of columns, tables, values etc. 0 = disabled.')
 )
 
 USE_NEW_EDITOR = Config( # To remove in Hue 4

@@ -918,7 +918,7 @@ var EditorViewModel = (function() {
         lastComplexityRequest = $.ajax({
           type: 'POST',
           url: '/notebook/api/optimizer/statement/risk',
-          timeout: 15000, // 15 seconds
+          timeout: 30000, // 30 seconds
           data: {
             notebook: ko.mapping.toJSON(notebook.getContext()),
             snippet: ko.mapping.toJSON(self.getContext())
