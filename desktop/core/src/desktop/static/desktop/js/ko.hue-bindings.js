@@ -4251,10 +4251,6 @@
         }
       });
 
-      disposeFunctions.push(function () {
-        insertTableAtCursorSub.remove();
-      });
-
       var insertColumnAtCursorSub = huePubSub.subscribe('editor.insert.column.at.cursor', function(details) {
         if ($el.data('last-active-editor')) {
           if (isNewStatement()) {
@@ -4266,8 +4262,17 @@
         }
       });
 
+      var insertAtCursorSub = huePubSub.subscribe('editor.insert.at.cursor', function(text) {
+        if ($el.data('last-active-editor')) {
+          editor.session.insert(editor.getCursorPosition(), ' ' + text + ' ');
+        }
+      });
+
       disposeFunctions.push(function () {
+        insertTableAtCursorSub.remove();
         insertColumnAtCursorSub.remove();
+        insertAtCursorSub.remove();
+
       });
 
       var dblClickHdfsItemSub = huePubSub.subscribe("assist.dblClickHdfsItem", function(assistHdfsEntry) {
