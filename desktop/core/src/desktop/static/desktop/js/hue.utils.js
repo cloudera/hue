@@ -471,7 +471,7 @@ var huePubSub = (function () {
       if (app) {
         Object.keys(topics).forEach(function (topicName) {
           topics[topicName].forEach(function (topic) {
-            if (topic.app === app) {
+            if (typeof topic.app !== 'undefined' && (topic.app === app || topic.app.split('-')[0] === app)) {
               topic.status = 'paused';
             }
           });
@@ -482,7 +482,7 @@ var huePubSub = (function () {
       if (app) {
         Object.keys(topics).forEach(function (topicName) {
           topics[topicName].forEach(function (topic) {
-            if (topic.app === app) {
+            if (typeof topic.app !== 'undefined' && (topic.app === app || topic.app.split('-')[0] === app)) {
               topic.status = 'running';
             }
           });
@@ -492,7 +492,7 @@ var huePubSub = (function () {
     clearAppSubscribers: function (app) {
       if (app) {
         Object.keys(topics).forEach(function (topicName) {
-          topics[topicName] = topics[topicName].filter(function(obj){ return obj.app !== app});
+          topics[topicName] = topics[topicName].filter(function(obj){ return obj.app !== app });
         });
       }
     }
