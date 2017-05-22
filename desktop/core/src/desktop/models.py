@@ -21,7 +21,6 @@ import logging
 import os
 import urllib
 import uuid
-from desktop.conf import get_clusters
 
 try:
   from collections import OrderedDict
@@ -47,6 +46,7 @@ from dashboard.conf import IS_ENABLED as IS_DASHBOARD_ENABLED
 from notebook.conf import SHOW_NOTEBOOKS, get_ordered_interpreters
 
 from desktop import appmanager
+from desktop.conf import get_clusters
 from desktop.lib.i18n import force_unicode
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.paths import get_run_root
@@ -1561,7 +1561,7 @@ class ClusterConfig():
   def get_config(self):
     app_config = self.get_apps()
     editors = app_config.get('editor')
-  
+
     return {
       'app_config': app_config,
       'main_button_action': self.get_main_quick_action(app_config),
@@ -1821,27 +1821,27 @@ class Cluster():
       clusters = get_clusters()
       cluster_name = json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('name')
       self.data = cluster_name and clusters.get(cluster_name) and clusters[cluster_name] or None
-  
+
   def get_type(self):
     return self.data and self.data['type'] or 'ini'
 
   def get_interface(self):
     return json.loads(self.default_cluster[USER_PREFERENCE_CLUSTER]).get('interface')
 
-  def get_list_interface_indexes(self):  
+  def get_list_interface_indexes(self):
     default_cluster_index = 0
     default_cluster_interface = ''
-  
+
     clusters = get_clusters()
     default_cluster = get_user_preferences(self.user, key=USER_PREFERENCE_CLUSTER)
-  
+
     if clusters and default_cluster:
       default_cluster_json = json.loads(default_cluster[USER_PREFERENCE_CLUSTER])
       default_cluster_name = default_cluster_json.get('name')
-  
+
       default_cluster_index = default_cluster_name in clusters.keys() and clusters.keys().index(default_cluster_name) or 0
       default_cluster_interface = default_cluster_json.get('interface', '')
-      
+
     return default_cluster_index, default_cluster_interface
 
 

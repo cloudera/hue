@@ -16,14 +16,12 @@
 # limitations under the License.
 
 import logging
-import json
 
 from datetime import datetime,  timedelta
 
 from django.utils.translation import ugettext as _
 
-from jobbrowser.apis.base_api import Api, MockDjangoRequest, _extract_query_params
-from liboozie.oozie_api import get_oozie
+from jobbrowser.apis.base_api import Api
 from notebook.connectors.dataeng import DataEng, DATE_FORMAT
 
 
@@ -33,27 +31,6 @@ LOG = logging.getLogger(__name__)
 class DataEngClusterApi(Api):
 
   def apps(self, filters):
-#     kwargs = {'cnt': OOZIE_JOBS_COUNT.get(), 'filters': []}
-#
-#     text_filters = _extract_query_params(filters)
-#
-#     if not has_dashboard_jobs_access(self.user):
-#       kwargs['filters'].append(('user', self.user.username))
-#     elif 'user' in text_filters:
-#       kwargs['filters'].append(('user', text_filters['username']))
-#
-#     if 'time' in filters:
-#       kwargs['filters'].extend([('startcreatedtime', '-%s%s' % (filters['time']['time_value'], filters['time']['time_unit'][:1]))])
-#
-#     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
-#       kwargs['filters'].extend([('text', text_filters.get('text'))])
-#
-#     if filters.get('states'):
-#       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
-#       for _state in filters.get('states'):
-#         for _status in states_filters[_state]:
-#           kwargs['filters'].extend([('status', _status)])
-
     api = DataEng(self.user)
 
     jobs = api.list_clusters()
@@ -102,14 +79,7 @@ class DataEngJobApi(Api):
 
   def apps(self, filters):
     kwargs = {}
-#
-#     text_filters = _extract_query_params(filters)
-#
-#     if not has_dashboard_jobs_access(self.user):
-#       kwargs['filters'].append(('user', self.user.username))
-#     elif 'user' in text_filters:
-#       kwargs['filters'].append(('user', text_filters['username']))
-#
+
     if 'time' in filters:
       if filters['time']['time_unit'] == 'minutes':
         delta = timedelta(minutes=int(filters['time']['time_value']))
@@ -118,15 +88,6 @@ class DataEngJobApi(Api):
       else:
         delta = timedelta(days=int(filters['time']['time_value']))
       kwargs['creation_date_after'] = (datetime.today() - delta).strftime(DATE_FORMAT)
-
-#     if ENABLE_OOZIE_BACKEND_FILTERING.get() and text_filters.get('text'):
-#       kwargs['filters'].extend([('text', text_filters.get('text'))])
-#
-#     if filters.get('states'):
-#       states_filters = {'running': ['RUNNING', 'PREP', 'SUSPENDED'], 'completed': ['SUCCEEDED'], 'failed': ['FAILED', 'KILLED'],}
-#       for _state in filters.get('states'):
-#         for _status in states_filters[_state]:
-#           kwargs['filters'].extend([('status', _status)])
 
     api = DataEng(self.user)
 
@@ -188,4 +149,3 @@ class DataEngJobApi(Api):
       return 'SUCCEEDED'
     else:
       return 'FAILED' # INTERRUPTED , KILLED, TERMINATED and FAILED
-

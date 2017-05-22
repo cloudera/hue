@@ -52,7 +52,7 @@ RUNNING_STATES = ('QUEUED', 'RUNNING')
 
 
 class DataEngApi(Api):
-  
+
   def __init__(self, user, cluster_name, interpreter=None, request=None):
     Api.__init__(self, user, interpreter=interpreter, request=request)
     self.cluster_name = cluster_name
@@ -212,20 +212,20 @@ class DataEng():
       job['jobXml'] =  job_xml
 
     return self.submit_jobs(cluster_name, [{'hiveJob': job}])
-  
+
   def submit_spark_job(self):
     return _exec(['submit-jobs'])
-  
+
   def submit_yarn_job(self):
     return _exec(['submit-jobs'])
-  
+
   def submit_jobs(self, cluster_name, jobs):
     return _exec(['submit-jobs', '--cluster-name', cluster_name, '--jobs', json.dumps(jobs)])
 
   def terminate_jobs(self, job_ids):
     return _exec(['terminate-jobs', '--job-ids', job_ids])
 
-  
+
   def list_clusters(self, names=None, page_size=None, starting_token=None):
     args = ['list-clusters']
 
@@ -240,9 +240,9 @@ class DataEng():
 
   def create_cluster(self):
     return _exec(['create-cluster'])
-  
+
   def delete_cluster(self):
     return _exec(['delete-cluster'])
-  
+
   def describe_clusters(self):
     return _exec(['describe-cluster'])
