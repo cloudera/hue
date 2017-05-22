@@ -2830,8 +2830,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       } else {
         renderer();
       }
-
+      %if not is_embeddable:
       $(MAIN_SCROLLABLE).jHueScrollUp();
+      %endif
     };
 
     var splitDraggableTimeout = -1;
