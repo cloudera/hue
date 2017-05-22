@@ -169,42 +169,47 @@ from desktop.views import _ko
 
     <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
-      <!-- ko if: editorViewModel.selectedNotebook() -->
+      <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
+        <span style="font-style: italic">${ _('No task history.') }</span>
+      <!-- /ko -->
+      <!-- ko if: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
       <!-- ko with: editorViewModel.selectedNotebook() -->
       <div>
-        ${_('Showing')}
-        <span data-bind="text: uuid"></span>
-        <a href="javascript:void(0)" data-bind="attr: { href: onSuccessUrl() }, text: onSuccessUrl" target="_blank"></a>
-        <!-- ko if: selectedSnippet -->
-        <!-- ko if: selectedSnippet().progress -->
+        <span data-bind="text: name"></span>
+        <a href="javascript:void(0)" data-bind="hueLink: onSuccessUrl()" target="_blank">
+          ${ _('Output') }
+        </a>
+        <!-- ko if: snippets()[0] -->
+        <!-- ko with: snippets()[0] -->
+        <!-- ko if: progress -->
+        <span data-bind="text: status"></span>
         <div class="snippet-progress-container">
           <div class="progress-snippet progress" data-bind="css: {
                     'progress-starting': progress() == 0 && status() == 'running',
                     'progress-warning': progress() > 0 && progress() < 100,
                     'progress-success': progress() == 100,
                     'progress-danger': progress() == 0 && errors().length > 0}" style="background-color: #FFF; width: 100%">
-            <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2,progress())) + '%'}"></div>
+            <div class="bar" data-bind="style: {'width': (errors().length > 0 ? 100 : Math.max(2, progress())) + '%'}"></div>
           </div>
         </div>
         <!-- /ko -->
-        <!-- ko if: selectedSnippet().result -->
-        <pre data-bind="visible: selectedSnippet().result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: selectedSnippet().result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
+        <!-- ko if: result -->
+        <span data-bind="text: ko.mapping.toJSON(result.handle)"></span>
+        <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
+        <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
       </div>
-      <!-- ko ifnot: history -->
-        <span style="font-style: italic">${ _('No history to be shown.') }</span>
-      <!-- /ko -->
       <!-- ko if: history -->
       <hr>
       <div class="notification-history margin-bottom-10" data-bind="niceScroll">
         <!-- ko if: history().length == 0 -->
-        <span style="font-style: italic">${ _('No history to be shown.') }</span>
+        <span style="font-style: italic">${ _('No task history.') }</span>
         <!-- /ko -->
         <!-- ko if: history().length > 0 -->
         <div class="notification-history-title">
-          <strong>${ _('History') }</strong>
+          <strong>${ _('Task History') }</strong>
           <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
             <i class="fa fa-calendar-times-o"></i>
           </div>

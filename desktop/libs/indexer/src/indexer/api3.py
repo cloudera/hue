@@ -346,6 +346,7 @@ def _create_table_from_a_file(request, source, destination):
       }
     else:
       columns_list = ['*']
+      extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
     sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
       %(extra_create_properties)s
       AS SELECT %(columns_list)s
@@ -366,7 +367,15 @@ def _create_table_from_a_file(request, source, destination):
 
   on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
 
-  return make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql.strip(), status='ready', database=database, on_success_url=on_success_url, is_task=True)
+  return make_notebook(
+      name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': table_name},
+      editor_type=editor_type,
+      statement=sql.strip(),
+      status='ready',
+      database=database,
+      on_success_url=on_success_url,
+      is_task=True
+  )
 
 
 def _index(request, file_format, collection_name, query=None):
