@@ -1040,6 +1040,9 @@ var EditorViewModel = (function() {
       if (self.status() == 'running' || self.status() == 'loading' || now - self.lastExecuted() < 1000 || ! self.isReady()) {
         return;
       }
+      if (self.isSqlDialect()) {
+        huePubSub.publish('editor.refresh.statement.locations', self);
+      }
 
       self.previousChartOptions = {
         chartScope: typeof self.chartScope() !== "undefined" ? self.chartScope() : self.previousChartOptions.chartScope,

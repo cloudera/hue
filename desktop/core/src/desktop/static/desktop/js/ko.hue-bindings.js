@@ -3504,10 +3504,20 @@
         }, 500);
       });
 
+      var locateSubscription = huePubSub.subscribe('editor.refresh.statement.locations', function (snippet) {
+        if (snippet === self.snippet) {
+          window.clearTimeout(changeThrottle);
+          window.clearTimeout(updateThrottle);
+          parseForStatements();
+          updateActiveStatement();
+        }
+      });
+
       self.disposeFunctions.push(function () {
         window.clearTimeout(changeThrottle);
         window.clearTimeout(updateThrottle);
         self.editor.off("change", changeListener);
+        locateSubscription.remove();
         cursorSubscription.remove();
       });
     };
