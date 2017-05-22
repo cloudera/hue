@@ -26,6 +26,7 @@ from desktop import appmanager
 from desktop.conf import is_hue4
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_bool, coerce_csv
+from desktop.models import Cluster
 
 
 def is_oozie_enabled():
@@ -196,6 +197,12 @@ def _default_interpreters(user):
         'name': 'Solr SQL', 'interface': 'solr', 'options': {}
     }),)
 
+  cluster = Cluster(user)
+  if cluster and cluster.get_type() == 'dataeng':
+    interpreters.append(('dataeng', {
+        'name': 'DataEng', 'interface': 'dataeng', 'options': {}
+    }))
+
   if 'spark' in apps:
     interpreters.extend((
       ('spark', {
@@ -203,9 +210,6 @@ def _default_interpreters(user):
       }),
       ('pyspark', {
           'name': 'PySpark', 'interface': 'livy', 'options': {}
-      }),
-      ('dataeng', {
-          'name': 'DataEng', 'interface': 'dataeng', 'options': {}
       }),
       ('r', {
           'name': 'R', 'interface': 'livy', 'options': {}
