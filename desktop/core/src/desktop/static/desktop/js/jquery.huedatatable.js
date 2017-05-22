@@ -194,6 +194,12 @@
         $('.hue-datatable-search').find('input').focus();
       }
       var right = -30;
+      if (IS_HUE_4){
+        var adjustRight = $(window).width() - ($('.page-content').width() + $('.page-content').offset().left);
+        if (adjustRight > 0) {
+          right = adjustRight;
+        }
+      }
       $('.hueAnchorScroller:visible').each(function () {
         var visibleRight = $(this).css('right').replace(/px/gi, '') * 1;
         if (!isNaN(visibleRight) && visibleRight > right) {

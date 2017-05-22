@@ -88,8 +88,8 @@
     huePubSub.subscribe('reposition.scroll.anchor.up', function(){
       $('#jHueScrollUpAnchor').css('right', '20px');
       if (!$(_this.element).is('body') && $(_this.element).is(':visible')) {
-        var adjustRight = $(window).width() - $(_this.element).offset().left - $(_this.element).width();
-        if (adjustRight > 20) {
+        var adjustRight = $(window).width() - ($(_this.element).width() + $(_this.element).offset().left);
+        if (adjustRight > 0) {
           $('#jHueScrollUpAnchor').css('right', adjustRight + 'px');
         }
       }
@@ -101,8 +101,10 @@
       scrolled.scroll(function () {
         if (scrolled.scrollTop() > _this.options.threshold) {
           if (link.is(":hidden")) {
-            positionOtherAnchors();
-            link.fadeIn(200, positionOtherAnchors);
+            huePubSub.publish('reposition.scroll.anchor.up');
+            link.fadeIn(200, function(){
+              huePubSub.publish('reposition.scroll.anchor.up');
+            });
           }
           if ($(_this.element).data("lastScrollTop") == null || $(_this.element).data("lastScrollTop") < scrolled.scrollTop()) {
             $("#jHueScrollUpAnchor").data("caller", scrollable);
