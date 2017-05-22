@@ -246,7 +246,6 @@ def import_saved_pig_script(pig_script):
 
 def import_saved_mapreduce_job(wf):
   snippet_properties = {}
-
   node = wf.start.get_child('to')
 
   try:
@@ -292,6 +291,71 @@ def import_saved_mapreduce_job(wf):
 
   notebook.data = json.dumps(data)
   return notebook
+
+
+def import_saved_shell_job(wf):
+    snippet_properties = {}
+    node = wf.start.get_child('to')
+
+    snippet_properties['command_path'] = node.command
+
+    snippet_properties['arguments'] = []
+    snippet_properties['env_var'] = []
+    try:
+      params = json.loads(node.params)
+      if params:
+        for param in params:
+          if param['type'] == 'argument':
+            snippet_properties['arguments'].append(param['value'])
+          else:
+            snippet_properties['env_var'].append(param['value'])
+    except ValueError, e:
+      LOG.warn('Failed to parse parameters for shell job design "%s".' % wf.name)
+
+    snippet_properties['hadoopProperties'] = []
+    try:
+      properties = json.loads(node.job_properties)
+      if properties:
+        for prop in properties:
+          snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+    except ValueError, e:
+      LOG.warn('Failed to parse job properties for shell job design "%s".' % wf.name)
+
+    snippet_properties['files'] = []
+    try:
+      files = json.loads(node.files)
+      for filepath in files:
+        snippet_properties['files'].append({'type': 'file', 'path': filepath})
+    except ValueError, e:
+      LOG.warn('Failed to parse files for shell job design "%s".' % wf.name)
+
+    snippet_properties['archives'] = []
+    try:
+      archives = json.loads(node.archives)
+      for archive in archives:
+        snippet_properties['archives'].append(archive['name'])
+    except ValueError, e:
+      LOG.warn('Failed to parse archives for shell job design "%s".' % wf.name)
+
+    snippet_properties['capture_output'] = node.capture_output
+
+    notebook = make_notebook(
+        name=wf.name,
+        description=wf.description,
+        editor_type='shell',
+        statement='',
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+    )
+
+    # Remove functions, settings from snippet properties
+    data = notebook.get_data()
+    data['snippets'][0]['properties'].pop('functions')
+    data['snippets'][0]['properties'].pop('settings')
+
+    notebook.data = json.dumps(data)
+    return notebook
 
 
 def _convert_type(btype, bdata):

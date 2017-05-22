@@ -358,6 +358,66 @@ class TestDocumentConverter(object):
       wf.delete()
 
 
+  def test_convert_shell(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'shell', [wf.start], {
+      u'job_xml': 'my-job.xml',
+      u'files': '["hello.py"]',
+      u'name': 'Shell',
+      u'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
+      u'capture_output': 'on',
+      u'command': 'hello.py',
+      u'archives': '[{"dummy": "", "name": "test.zip"}]',
+      u'prepares': '[]',
+      u'params': '[{"type": "argument", "value": "baz"}, {"type": "env-var", "value": "foo=bar"}]',
+      u'description': 'Execute a Python script printing its arguments'
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-shell').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-shell')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('hello.py', doc2.data_dict['snippets'][0]['properties']['command_path'])
+        assert_equal(['baz'], doc2.data_dict['snippets'][0]['properties']['arguments'])
+        assert_equal(['foo=bar'], doc2.data_dict['snippets'][0]['properties']['env_var'])
+        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['test.zip'], doc2.data_dict['snippets'][0]['properties']['archives'])
+        assert_equal([{'type': 'file', 'path': 'hello.py'}], doc2.data_dict['snippets'][0]['properties']['files'])
+        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
+
+
   def test_convert_pig_script(self):
     attrs = {
       'user': self.user,

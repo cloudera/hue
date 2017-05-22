@@ -26,7 +26,8 @@ from desktop.conf import IS_HUE_4
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document, DocumentPermission, DocumentTag, Document2, Directory, Document2Permission
 from notebook.api import _historify
-from notebook.models import import_saved_beeswax_query, import_saved_pig_script, import_saved_mapreduce_job
+from notebook.models import import_saved_beeswax_query, import_saved_pig_script, import_saved_mapreduce_job, \
+  import_saved_shell_job
 
 
 LOG = logging.getLogger(__name__)
@@ -152,20 +153,23 @@ class DocumentConverter(object):
         try:
           if doc.content_object:
             node = doc.content_object.start.get_child('to')
+            notebook = None
+
             if IS_HUE_4.get():
-              notebook = None
               if node.node_type == 'mapreduce':
                 notebook = import_saved_mapreduce_job(doc.content_object)
+              elif node.node_type == 'shell':
+                notebook = import_saved_shell_job(doc.content_object)
 
-              if notebook:
-                data = notebook.get_data()
-                doc2 = self._create_doc2(
-                  document=doc,
-                  doctype=data['type'],
-                  name=doc.name,
-                  description=data['description'],
-                  data=notebook.get_json()
-                )
+            if notebook:
+              data = notebook.get_data()
+              doc2 = self._create_doc2(
+                document=doc,
+                doctype=data['type'],
+                name=doc.name,
+                description=data['description'],
+                data=notebook.get_json()
+              )
             else:
               data = doc.content_object.data_dict
               data.update({'content_type': doc.content_type.model, 'object_id': doc.object_id})
