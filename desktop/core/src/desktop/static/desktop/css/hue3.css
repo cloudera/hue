@@ -96,13 +96,6 @@ div.locked {
   text-decoration: none;
 }
 
-.bar-label {
-  text-align: center;
-  color: #FFFFFF;
-  font-size: 12px;
-  text-shadow: -1px 0 1px #333, 0 1px 1px #333, 1px 0 1px #333, 0 -1px 1px #333;
-}
-
 .empty-wrapper {
   margin-top: 50px;
   color: #BBB;
@@ -285,13 +278,6 @@ a#advanced-btn:hover {
 .dt-pages {
   margin-right: 10px;
   float: right;
-}
-
-.progress {
-  height: 20px;
-  margin-bottom: 0;
-  padding: 0;
-  border: none;
 }
 
 .nav-list > li.white {
@@ -667,29 +653,6 @@ div.navigator ul.dropdown-menu {
 
 div.navigator > ul > li.oozie > ul.dropdown-menu {
   overflow-y: visible;
-}
-
-.mega-popover {
-  max-width: 1200px;
-}
-
-.mega-popover .content {
-  height: 300px;
-  overflow-y: scroll;
-}
-
-.mega-popover .popover-content {
-  min-height: 360px;
-  min-width: 440px;
-  max-width: 660px;
-}
-
-.mega-popover input[type="text"] {
-  border-radius: 20px;
-  margin: 0;
-  min-height: 26px;
-  padding-left: 12px;
-  width: 130px;
 }
 
 .hiveAutocompleteItem {
