@@ -704,15 +704,21 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                 xhr.setRequestHeader('X-Requested-With', 'Hue');
               },
               dataType: 'html',
-              success: function (response) {
-                window.clearAppIntervals(app);
-                huePubSub.clearAppSubscribers(app);
-                self.extraEmbeddableURLParams('');
-                var r = self.processHeaders(response);
-                if (SKIP_CACHE.indexOf(app) === -1) {
-                  self.embeddable_cache[app] = r;
+              success: function(response, status, xhr){
+                var type = xhr.getResponseHeader('Content-Type');
+                if (type.indexOf('text/') > -1) {
+                  window.clearAppIntervals(app);
+                  huePubSub.clearAppSubscribers(app);
+                  self.extraEmbeddableURLParams('');
+                  var r = self.processHeaders(response);
+                  if (SKIP_CACHE.indexOf(app) === -1) {
+                    self.embeddable_cache[app] = r;
+                  }
+                  $('#embeddable_' + app).html(r);
                 }
-                $('#embeddable_' + app).html(r);
+                else {
+                  window.location.href = baseURL;
+                }
                 self.isLoadingEmbeddable(false);
               },
               error: function (xhr) {
@@ -798,6 +804,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/editor?' + ctx.querystring);
           }},
           { url: '/filebrowser/view=*', app:  'filebrowser' },
+          { url: '/filebrowser/download=*', app:  'filebrowser' },
           { url: '/filebrowser/*', app: function () {
             page('/filebrowser/view=' + DropzoneGlobals.homeDir);
           }},
