@@ -3620,6 +3620,10 @@ $(document).ready(function () {
       originalEvent.pageX = originalEvent.clientX + (doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0);
       originalEvent.pageY = originalEvent.clientY + (doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0);
     }
+    if ($('#searchComponents').offset().left > 0) {
+      originalEvent.pageX = originalEvent.pageX - $('#searchComponents').offset().left;
+      originalEvent.pageY = originalEvent.pageY - $('#searchComponents').offset().top;
+    }
     $("#fieldAnalysis").show().css({
       top: Math.max(0, originalEvent.pageY - $("#fieldAnalysis").outerHeight() / 2),
       left: originalEvent.pageX
