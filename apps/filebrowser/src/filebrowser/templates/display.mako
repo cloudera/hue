@@ -78,7 +78,7 @@ ${ fb_components.menubar() }
 
           <!-- ko if: $root.isViewing -->
           <!-- ko if: $root.file().show_download_button -->
-           <li><a href="${url('filebrowser.views.download', path=path_enc)}"><i class="fa fa-download"></i> ${_('Download')}</a></li>
+           <li><a class="pointer" data-bind="click: $root.downloadFile"><i class="fa fa-download"></i> ${_('Download')}</a></li>
           <!-- /ko -->
            <li><a href="${url('filebrowser.views.view', path=dirname_enc)}"><i class="fa fa-file-text"></i> ${_('View file location')}</a></li>
            <li><a class="pointer" data-bind="click: changePage"><i class="fa fa-refresh"></i> ${_('Refresh')}</a></li>
@@ -367,6 +367,10 @@ ${ fb_components.menubar() }
       self.upperPage(1);
       self.changePage();
     }
+
+    self.downloadFile = function () {
+      location.href = "${url('filebrowser.views.download', path=path_enc)}";
+    };
 
     self.toggleDisables = function () {
       $(".next-page").removeClass("disabled");
