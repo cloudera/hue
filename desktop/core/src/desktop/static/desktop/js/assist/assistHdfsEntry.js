@@ -180,9 +180,18 @@ var AssistHdfsEntry = (function () {
     return parts;
   };
 
-  AssistHdfsEntry.prototype.toggleOpen = function () {
+  AssistHdfsEntry.prototype.toggleOpen = function (data, event) {
     var self = this;
     if (self.definition.type === 'file') {
+      if (IS_HUE_4) {
+        if (event.ctrlKey || event.metaKey || event.which === 2) {
+          window.open('/hue' + self.definition.url, '_blank');
+        } else {
+          huePubSub.publish('open.link', self.definition.url);
+        }
+      } else {
+        window.open(self.definition.url, '_blank');
+      }
       return;
     }
     self.open(!self.open());
