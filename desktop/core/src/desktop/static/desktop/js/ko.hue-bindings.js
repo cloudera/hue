@@ -4839,7 +4839,8 @@
 
         if ($.fn.niceScroll && withNiceScroll) {
           hueUtils.initNiceScroll($container, {
-            horizrailenabled: false
+            horizrailenabled: false,
+            nativeparentscrolling: false
           });
         }
       } else {
