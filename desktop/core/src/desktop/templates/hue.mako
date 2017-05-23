@@ -154,8 +154,8 @@ ${ hueIcons.symbols() }
 
       <div class="top-nav-middle">
 
-        <!-- ko if: cluster.clusters().length > 0 -->
-        <div class="btn-group pull-right">
+        <!-- ko if: cluster.clusters().length > 1 -->
+        <div class="btn-group pull-right" style="display: none;" data-bind="visible: cluster.clusters().length > 1">
           <button class="btn" data-bind="text: cluster.cluster().name() + (cluster.cluster().interface ? ' ' + cluster.cluster().interface() : '')"></button>
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
@@ -1182,7 +1182,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.apiHelper = ApiHelper.getInstance();
 
           self.clusters = ko.mapping.fromJS(${ clusters_config_json | n,unicode });
-          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : null);
+          self.cluster = ko.observable(self.clusters().length > 0 ? self.clusters()[${ default_cluster_index }] : self.clusters()[0]);
           self.cluster.subscribe(function(newValue) {
             new ClusterConfig({'cluster': ko.mapping.toJSON(newValue)});
           });
