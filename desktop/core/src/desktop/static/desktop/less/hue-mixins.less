@@ -41,6 +41,12 @@
   -o-transform: @transform;
 }
 
+.nowrap-ellipsis {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow-x: hidden;
+}
+
 .hue-linear-transition(@attributes) {
   -webkit-transition: @attributes 0.2s linear;
   -moz-transition: @attributes 0.2s linear;

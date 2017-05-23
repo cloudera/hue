@@ -429,7 +429,7 @@ from desktop.views import _ko
       <div class="doc-browser-header">
         <div class="doc-browser-primary-col" data-bind="click: function () { setSort('name') }, css: { 'sorting_asc' : activeSort() === 'nameAsc', 'sorting_desc' : activeSort() === 'nameDesc', 'sorting' : activeSort().indexOf('name') !== 0 }">${ _('Name') }</div>
         <div class="doc-browser-attr-group">
-          <div class="doc-browser-attr-col" data-bind="click: function () { setSort('description') }, css: { 'sorting_asc' : activeSort() === 'descriptionAsc', 'sorting_desc' : activeSort() === 'descriptionDesc', 'sorting' : activeSort().indexOf('description') !== 0 }">${ _('Description') }</div>
+          <div class="doc-browser-attr-col doc-browser-description" data-bind="click: function () { setSort('description') }, css: { 'sorting_asc' : activeSort() === 'descriptionAsc', 'sorting_desc' : activeSort() === 'descriptionDesc', 'sorting' : activeSort().indexOf('description') !== 0 }">${ _('Description') }</div>
           <div class="doc-browser-attr-col doc-browser-type" data-bind="click: function () { setSort('type') }, css: { 'sorting_asc' : activeSort() === 'typeAsc', 'sorting_desc' : activeSort() === 'typeDesc', 'sorting' : activeSort().indexOf('type') !== 0 }">${ _('Type') }</div>
           <div class="doc-browser-attr-col doc-browser-owner" data-bind="click: function () { setSort('owner') }, css: { 'sorting_asc' : activeSort() === 'ownerAsc', 'sorting_desc' : activeSort() === 'ownerDesc', 'sorting' : activeSort().indexOf('owner') !== 0 }">${ _('Owner') }</div>
           <div class="doc-browser-attr-col doc-browser-modified" data-bind="click: function () { setSort('lastModified') }, css: { 'sorting_asc' : activeSort() === 'lastModifiedAsc', 'sorting_desc' : activeSort() === 'lastModifiedDesc', 'sorting' : activeSort().indexOf('lastModified') !== 0 }">${ _('Last Modified') }</div>
@@ -482,7 +482,7 @@ from desktop.views import _ko
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
-                <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
+                <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }, tooltip: { placement: 'bottom' }"></div>
                 <div class="doc-browser-attr-col doc-browser-type">
                   <!-- ko switch: type -->
                   <!-- ko case: 'directory' -->${ _('Directory') }<!-- /ko -->

@@ -171,13 +171,10 @@
 }
 
 .doc-browser-primary-col {
-  .flex(2);
+  .flex(1);
+  .nowrap-ellipsis();
   vertical-align: middle;
   padding-left: 8px;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-  overflow: hidden;
-  padding-right: 20px;
 }
 
 .doc-browser-header .doc-browser-primary-col {
@@ -194,7 +191,7 @@
 }
 
 .doc-browser-attr-group {
-  .flex(1);
+  .flex(0 0 770px);
   white-space: nowrap;
   float: right;
   display: inline-block;
@@ -225,16 +222,24 @@
   color: @hue-primary-color-dark !important;
 }
 
+.doc-browser-description {
+  .nowrap-ellipsis();
+  width: 300px;
+}
+
 .doc-browser-type {
-  width: 140px;
+  .nowrap-ellipsis();
+  width: 130px;
 }
 
 .doc-browser-owner {
-  width: 170px;
+  .nowrap-ellipsis();
+  width: 130px;
 }
 
 .doc-browser-modified {
-  width: 150px;
+  .nowrap-ellipsis();
+  width: 130px;
 }
 
 .doc-browser-drag-container {
