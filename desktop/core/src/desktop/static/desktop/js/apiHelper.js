@@ -130,16 +130,20 @@ var ApiHelper = (function () {
     });
 
     huePubSub.subscribe('assist.clear.all.caches', function () {
-      huePubSub.publish('assist.clear.db.cache', {
+      self.clearDbCache({
         sourceType: 'hive',
         clearAll: true
       });
-      huePubSub.publish('assist.clear.hdfs.cache');
-      huePubSub.publish('assist.clear.git.cache');
-      huePubSub.publish('assist.clear.s3.cache');
-      huePubSub.publish('assist.clear.collections.cache');
-      huePubSub.publish('assist.clear.hbase.cache');
-      huePubSub.publish('assist.clear.document.cache');
+      self.clearDbCache({
+        sourceType: 'impala',
+        clearAll: true
+      });
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hdfs' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'git' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 's3' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
+      $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
   }
 
