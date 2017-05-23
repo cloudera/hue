@@ -223,11 +223,21 @@ ${ hueIcons.symbols() }
 
         <!-- ko component: 'hue-history-panel' --><!-- /ko -->
         <!-- ko if: hasJobBrowser -->
-          <!-- ko component: { name: 'hue-job-browser-panel', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
+          <!-- ko component: { name: 'hue-job-browser-links', params: { onePageViewModel: onePageViewModel }} --><!-- /ko -->
         <!-- /ko -->
       </div>
     </div>
   </nav>
+
+  <div id="jobsPanel" class="jobs-panel" style="display: none;">
+    <a class="pointer inactive-action pull-right" onclick="huePubSub.publish('hide.jobs.panel')"><i class="fa fa-fw fa-times"></i></a>
+    <ul class="nav nav-pills" class="inline">
+      <li><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'jobs')">${_('Jobs')}</a></li>
+      <li><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'workflows')" data-bind="click: ">${_('Workflows')}</a></li>
+      <li><a href="javascript:void(0)" onclick="huePubSub.publish('mini.jb.navigate', 'schedules')" data-bind="click: ">${_('Schedules')}</a></li>
+    </ul>
+    <div id="mini_jobbrowser"></div>
+  </div>
 
   <div class="content-wrapper">
 

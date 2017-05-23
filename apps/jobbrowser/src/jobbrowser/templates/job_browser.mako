@@ -164,7 +164,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <!-- ko if: $root.isMini -->
                 <ul class="unstyled status-border-container" id="jobsTable" data-bind="foreach: jobs.apps">
                   <li class="status-border pointer" data-bind="css: {'completed': apiStatus() == 'SUCCEEDED', 'running': isRunning(), 'failed': apiStatus() == 'FAILED'}, click: fetchJob">
-                    <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span data-bind="text: status"></span></td>
+                    <span class="muted pull-left" data-bind="momentFromNow: {data: submitted, interval: 10000, titleFormat: 'LLL'}"></span><span class="muted">&nbsp;-&nbsp;</span><span class="muted" data-bind="text: status"></span></td>
                     <span class="muted pull-right" data-bind="text: duration().toHHMMSS()"></span>
                     <div class="clearfix"></div>
                     <strong class="pull-left" data-bind="text: type"></strong>
@@ -466,6 +466,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <li><a href="#job-mapreduce-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
         <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
+
+      <div class="clearfix"></div>
 
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-page-logs">
@@ -774,33 +776,33 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div class="btn-group">
     <!-- ko if: hasResume -->
     <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
-      <i class="fa fa-play"></i> ${ _('Resume') }
+      <i class="fa fa-play"></i> <!-- ko ifnot: $root.isMini -->${ _('Resume') }<!-- /ko -->
     </button>
     <!-- /ko -->
 
     <!-- ko if: hasPause -->
     <button class="btn" title="${ _('Suspend selected') }" data-bind="click: function() { control('suspend'); }, enable: pauseEnabled">
-      <i class="fa fa-pause"></i> ${ _('Suspend') }
+      <i class="fa fa-pause"></i> <!-- ko ifnot: $root.isMini -->${ _('Suspend') }<!-- /ko -->
     </button>
     <!-- /ko -->
 
     <!-- ko if: hasRerun -->
     <button class="btn" title="${ _('Rerun selected') }" data-bind="click: function() { control('rerun'); }, enable: rerunEnabled">
-      <i class="fa fa-repeat"></i> ${ _('Rerun') }
+      <i class="fa fa-repeat"></i> <!-- ko ifnot: $root.isMini -->${ _('Rerun') }<!-- /ko -->
     </button>
     <!-- /ko -->
 
     <!-- ko if: hasKill -->
     <button class="btn btn-danger" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
       ## TODO confirmation
-      <i class="fa fa-times"></i> ${_('Kill')}
+      <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
     <!-- /ko -->
 
     <!-- ko if: hasIgnore -->
     <button class="btn btn-danger" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
       ## TODO confirmation
-      <i class="fa fa-eraser"></i> ${_('Ignore')}
+      <i class="fa fa-eraser"></i> <!-- ko ifnot: $root.isMini -->${_('Ignore')}<!-- /ko -->
     </button>
     <!-- /ko -->
   </div>
@@ -810,7 +812,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="workflow-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -861,7 +863,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
@@ -871,6 +873,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
         <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
+
+      <div class="clearfix"></div>
 
 
       <div class="tab-content">
@@ -1051,6 +1055,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
 
+      <div class="clearfix"></div>
+
       <div class="tab-content">
         <div class="tab-pane active" id="schedule-page-calendar">
           <!-- ko with: coordinatorActions() -->
@@ -1164,6 +1170,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
         <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
       </ul>
+
+      <div class="clearfix"></div>
 
       <div class="tab-content">
         <div class="tab-pane active" id="bundle-page-coordinators">
