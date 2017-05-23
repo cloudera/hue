@@ -341,7 +341,7 @@ from desktop.views import _ko
                   // or if still on initial spinner we redirect automatically to onSuccessUrl
                   if (notebook.onSuccessUrl()) {
                     if (notebook.onSuccessUrl() == 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
-                      huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
+                      huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] });
                     } else {
                       huePubSub.publish('open.link', notebook.onSuccessUrl());
                     }
