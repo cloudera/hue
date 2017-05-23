@@ -382,24 +382,19 @@ from desktop.views import _ko
     })();
   </script>
 
-  <script type="text/html" id="hue-job-browser-panel-template">
+  <script type="text/html" id="hue-job-browser-links-template">
     <div class="btn-group pull-right">
-      <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser', click: function(){ jobsPanelVisible(false); }">
+      <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser', click: function(){ huePubSub.publish('hide.jobs.panel'); }">
         <span>${ _('Jobs') }</span>
       </button>
+<<<<<<< HEAD
       <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Mini job browser')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
+=======
+      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Min job browser')}" data-bind="click: function() { huePubSub.publish('toggle.jobs.panel'); }, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
+>>>>>>> HUE-6438 [jb] Improve CSS for mini jobbrowser mode
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
         <i class="fa fa-sliders"></i>
       </button>
-    </div>
-    <div class="jobs-panel" data-bind="visible: jobsPanelVisible" style="display: none;">
-      <a class="pointer inactive-action pull-right" data-bind="click: function(){ jobsPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
-      <ul class="inline">
-        <li><a href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('mini.jb.navigate', 'jobs') }">${_('Jobs')}</a></li>
-        <li><a href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('mini.jb.navigate', 'workflows') }">${_('Workflows')}</a></li>
-        <li><a href="javascript:void(0)" data-bind="click: function(){ huePubSub.publish('mini.jb.navigate', 'schedules') }">${_('Schedules')}</a></li>
-      </ul>
-      <div id="mini_jobbrowser"></div>
     </div>
   </script>
 
@@ -410,21 +405,23 @@ from desktop.views import _ko
       var JobBrowserPanel = function (params) {
         var self = this;
 
-        self.jobsPanelVisible = ko.observable(false);
-
-        self.jobsPanelVisible.subscribe(function (newVal) {
-          if (newVal) {
-            huePubSub.publish('hide.history.panel');
-            huePubSub.publish('mini.jb.navigate');
-          }
-        });
-
         huePubSub.subscribe('hide.jobs.panel', function () {
-          self.jobsPanelVisible(false);
+          $('#jobsPanel').hide();
         });
 
         huePubSub.subscribe('show.jobs.panel', function () {
-          self.jobsPanelVisible(true);
+          huePubSub.publish('hide.history.panel');
+          $('#jobsPanel').show();
+          huePubSub.publish('mini.jb.navigate');
+        });
+
+        huePubSub.subscribe('toggle.jobs.panel', function () {
+          if ($('#jobsPanel').is(':visible')){
+            huePubSub.publish('hide.jobs.panel');
+          }
+          else {
+            huePubSub.publish('show.jobs.panel');
+          }
         });
 
         self.jobCount = ko.observable(0);
@@ -471,9 +468,9 @@ from desktop.views import _ko
         huePubSub.subscribe('check.job.browser', checkJobBrowserStatus);
       };
 
-      ko.components.register('hue-job-browser-panel', {
+      ko.components.register('hue-job-browser-links', {
         viewModel: JobBrowserPanel,
-        template: { element: 'hue-job-browser-panel-template' }
+        template: { element: 'hue-job-browser-links-template' }
       });
     })();
   </script>
