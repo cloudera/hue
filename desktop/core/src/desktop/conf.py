@@ -1342,21 +1342,21 @@ IS_HUE_4 = Config( # To remove in Hue 5
 
 def get_clusters():
   if CLUSTERS.get():
-    clusters = CLUSTERS.get()
+    cluster_config = CLUSTERS.get()
+    clusters = OrderedDict([
+      (i, {
+        'name': i,
+        'type': cluster_config[i].TYPE.get(),
+        'interfaces': [{'name': i, 'type': cluster_config[i].TYPE.get(), 'interface': interface} for interface in cluster_config[i].INTERFACES.get()]
+      }) for i in cluster_config]
+    )
   else:
-    clusters = []
+    clusters = OrderedDict([('Default', {'name': 'Default', 'type': 'ini', 'interfaces': []})])
 
-  cl = OrderedDict([
-    (i, {
-      'name': i,
-      'type': clusters[i].TYPE.get(),
-      'interfaces': [{'name': i, 'type': clusters[i].TYPE.get(), 'interface': interface} for interface in clusters[i].INTERFACES.get()]
-    }) for i in clusters]
-  )
-
-  cl['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
-  cl['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
-  return cl
+  if 'Data Eng' in clusters:
+    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c1'})
+    clusters['Data Eng']['interfaces'].append({'name': 'Data Eng', 'type': 'dataeng', 'interface': 'c2'})
+  return clusters
 
 
 CLUSTERS = UnspecifiedConfigSection(
