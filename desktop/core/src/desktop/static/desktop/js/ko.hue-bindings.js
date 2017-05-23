@@ -312,16 +312,16 @@
 
       ko.bindingHandlers.niceScroll.init($element.data('custom-hueAutocomplete').menu.element, function () {});
 
-
       var enableAutocomplete = function () {
         if ($element.data('custom-hueAutocomplete')) {
           $element.hueAutocomplete("option", "disabled", false);
+          $element.off('click', enableAutocomplete)
         } else {
           window.setTimeout(enableAutocomplete, 200);
         }
       };
       // IE 11 trick to prevent it from being shown on page refresh
-      enableAutocomplete();
+      $element.on('click', enableAutocomplete)
     }
   };
 
