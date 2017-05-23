@@ -129,7 +129,7 @@ var ApiHelper = (function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'document' }), {});
     });
 
-    huePubSub.subscribe('assist.clear.all.caches', function () {
+    var clearAllCaches = function () {
       self.clearDbCache({
         sourceType: 'hive',
         clearAll: true
@@ -144,7 +144,16 @@ var ApiHelper = (function () {
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'collections' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'hbase' }), {});
       $.totalStorage(self.getAssistCacheIdentifier({ sourceType: 'document' }), {});
-    });
+    };
+
+    huePubSub.subscribe('assist.clear.all.caches', clearAllCaches);
+
+    if (window.performance && window.performance.navigation) {
+      if (window.performance.navigation.type === 1 && location.href.indexOf('/metastore') !== -1) {
+        // Browser refresh of the metastore page
+        clearAllCaches();
+      }
+    }
   }
 
   ApiHelper.prototype.isDatabase = function (name, sourceType) {
