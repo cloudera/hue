@@ -343,7 +343,7 @@ var EditorViewModel = (function() {
     };
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (self.type() == options.sourceType) {
+      if (options.sourceTypes.indexOf(self.type()) !== -1) {
         updateDatabases();
       }
     }, 'editor');
@@ -631,7 +631,7 @@ var EditorViewModel = (function() {
     if (! vm.isNotificationManager()) {
       window.setTimeout(function () {
         self.delayedDDLNotification.subscribe(function (val) {
-          huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
+          huePubSub.publish('assist.db.refresh', { sourceTypes: self.type() === 'impala' || self.type() === 'hive' ? ['hive', 'impala'] : [self.type()] });
         });
       }, 0);
     }
