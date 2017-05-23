@@ -60,7 +60,7 @@ ${ commonheader(None, "jobsub", user, request) | n,unicode }
   % if is_hue_4:
     <div class="alert">
       ${ _('This is the old Job Editor, it is recommended to instead use the new ') }
-        <a href="${ url('notebook:editor') }?type=shell" target="_blank">${_('Editor')}</a>
+        <a href="${ url('notebook:editor') }" target="_blank">${_('Editor')}</a>
     </div>
   % endif
 
