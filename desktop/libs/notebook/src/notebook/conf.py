@@ -22,11 +22,11 @@ except ImportError:
 
 from django.utils.translation import ugettext_lazy as _t
 
+
 from desktop import appmanager
 from desktop.conf import is_hue4
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection,\
   coerce_json_dict, coerce_bool, coerce_csv
-from desktop.models import Cluster
 
 
 def is_oozie_enabled():
@@ -197,6 +197,7 @@ def _default_interpreters(user):
         'name': 'Solr SQL', 'interface': 'solr', 'options': {}
     }),)
 
+  from desktop.models import Cluster  # Cyclic dependency
   cluster = Cluster(user)
   if cluster and cluster.get_type() == 'dataeng':
     interpreters.append(('dataeng', {
