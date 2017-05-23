@@ -358,6 +358,61 @@ def import_saved_shell_job(wf):
     return notebook
 
 
+def import_saved_java_job(wf):
+    snippet_properties = {}
+    node = wf.start.get_child('to')
+
+    snippet_properties['app_jar'] = node.jar_path
+    snippet_properties['class'] = node.main_class
+    snippet_properties['args'] = node.args if node.args else ''
+    snippet_properties['java_opts'] = node.java_opts if node.java_opts else ''
+
+    snippet_properties['hadoopProperties'] = []
+    try:
+      properties = json.loads(node.job_properties)
+      if properties:
+        for prop in properties:
+          snippet_properties['hadoopProperties'].append("%s=%s" % (prop.get('name'), prop.get('value')))
+    except ValueError, e:
+      LOG.warn('Failed to parse job properties for Java job design "%s".' % wf.name)
+
+    snippet_properties['files'] = []
+    try:
+      files = json.loads(node.files)
+      for filepath in files:
+        snippet_properties['files'].append({'type': 'file', 'path': filepath})
+    except ValueError, e:
+      LOG.warn('Failed to parse files for Java job design "%s".' % wf.name)
+
+    snippet_properties['archives'] = []
+    try:
+      archives = json.loads(node.archives)
+      for archive in archives:
+        snippet_properties['archives'].append(archive['name'])
+    except ValueError, e:
+      LOG.warn('Failed to parse archives for Java job design "%s".' % wf.name)
+
+    snippet_properties['capture_output'] = node.capture_output
+
+    notebook = make_notebook(
+        name=wf.name,
+        description=wf.description,
+        editor_type='java',
+        statement='',
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+    )
+
+    # Remove functions, settings from snippet properties
+    data = notebook.get_data()
+    data['snippets'][0]['properties'].pop('functions')
+    data['snippets'][0]['properties'].pop('settings')
+
+    notebook.data = json.dumps(data)
+    return notebook
+
+
 def _convert_type(btype, bdata):
   from beeswax.models import HQL, IMPALA, RDBMS, SPARK
 
