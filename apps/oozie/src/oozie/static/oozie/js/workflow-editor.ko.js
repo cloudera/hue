@@ -195,7 +195,10 @@ var Workflow = function (vm, workflow) {
     ignore: [
       "associatedDocument",
       "associatedDocumentUuid",
-      "associatedDocumentLoading"
+      "associatedDocumentLoading",
+      "actionParameters",
+      "actionParametersFetched",
+      "actionParametersUI"
     ]
   }); // from ko.common-dashboard.js
 
