@@ -387,7 +387,7 @@ from desktop.views import _ko
       <button class="btn btn-flat" style="padding-right: 2px" title="${_('Job browser')}" data-bind="hueLink: '/jobbrowser', click: function(){ jobsPanelVisible(false); }">
         <span>${ _('Jobs') }</span>
       </button>
-      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Min job browser')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
+      <button class="btn btn-flat btn-toggle-jobs-panel" title="${_('Mini job browser')}" data-bind="toggle: jobsPanelVisible, style: {'paddingLeft': jobCount() > 0 ? '0': '4px'}">
         <span class="jobs-badge" data-bind="visible: jobCount() > 0, text: jobCount"></span>
         <i class="fa fa-sliders"></i>
       </button>
