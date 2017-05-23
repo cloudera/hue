@@ -34,7 +34,6 @@ from desktop.models import Document2
 from beeswax.design import hql_query
 from beeswax.models import SavedQuery
 from beeswax.server import dbms
-from beeswax.server.dbms import get_query_server_config
 from filebrowser.views import location_to_url
 from metadata.conf import has_optimizer, has_navigator, get_optimizer_url, get_navigator_url
 from notebook.connectors.base import Notebook, QueryError
@@ -42,7 +41,6 @@ from notebook.models import make_notebook
 
 from metastore.forms import LoadDataForm, DbForm
 from metastore.settings import DJANGO_APPS
-
 
 
 LOG = logging.getLogger(__name__)
@@ -87,7 +85,7 @@ def databases(request):
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
     'is_embeddable': request.GET.get('is_embeddable', False),
-    'source_type': db.server_name,
+    'source_type': _get_servername(db),
   })
 
 
@@ -230,7 +228,7 @@ def show_tables(request, database=None):
     'optimizer_url': get_optimizer_url(),
     'navigator_url': get_navigator_url(),
     'is_embeddable': request.REQUEST.get('is_embeddable', False),
-    'source_type': db.server_name,
+    'source_type': _get_servername(db),
     })
 
   return resp
@@ -309,7 +307,7 @@ def describe_table(request, database, table):
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
       'is_embeddable': request.REQUEST.get('is_embeddable', False),
-      'source_type': db.server_name,
+      'source_type': _get_servername(db),
     })
 
 
@@ -392,7 +390,7 @@ def drop_table(request, database):
         sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
             name='Execute and watch',
-            editor_type=db.server_name,
+            editor_type=_get_servername(db),
             statement=sql.strip(),
             status='ready',
             database=database,
@@ -451,7 +449,7 @@ def load_table(request, database, table):
         if generate_ddl_only:
           job = make_notebook(
             name='Execute and watch',
-            editor_type=db.server_name,
+            editor_type=_get_servername(db),
             statement=query_history.strip(),
             status='ready',
             database=database,
@@ -538,7 +536,7 @@ def describe_partitions(request, database, table):
         'has_write_access': has_write_access(request.user),
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
-        'source_type': db.server_name,
+        'source_type': _get_servername(db),
     })
 
 
@@ -614,3 +612,7 @@ def drop_partition(request, database, table):
 
 def has_write_access(user):
   return user.is_superuser or user.has_hue_permission(action="write", app=DJANGO_APPS[0])
+
+
+def _get_servername(db):
+  return 'hive' if db.server_name == 'beeswax' else db.server_name
