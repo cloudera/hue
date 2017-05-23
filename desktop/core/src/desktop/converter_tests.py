@@ -418,6 +418,70 @@ class TestDocumentConverter(object):
       wf.delete()
 
 
+  def test_convert_java(self):
+    wf = Workflow.objects.new_workflow(self.user)
+    wf.save()
+    Workflow.objects.initialize(wf)
+    Link.objects.filter(parent__workflow=wf).delete()
+    action = add_node(wf, 'action-name-1', 'java', [wf.start], {
+      'name': 'MyTeragen',
+      "description": "Generate N number of records",
+      "main_class": "org.apache.hadoop.examples.terasort.TeraGen",
+      "args": "1000 ${output_dir}/teragen",
+      "files": '["my_file","my_file2"]',
+      "job_xml": "",
+      "java_opts": "-Dexample-property=natty",
+      "jar_path": "/user/hue/oozie/workspaces/lib/hadoop-examples.jar",
+      'job_properties': '[{"name": "mapred.job.queue.name", "value": "test"}]',
+      "prepares": '[{"value":"/test","type":"mkdir"}]',
+      "archives": '[{"dummy":"","name":"my_archive"},{"dummy":"","name":"my_archive2"}]',
+      "capture_output": "on",
+    })
+    Link(parent=action, child=wf.end, name="ok").save()
+
+    # Setting doc.last_modified to older date
+    doc = Document.objects.get(id=wf.doc.get().id)
+    Document.objects.filter(id=doc.id).update(
+      last_modified=datetime.strptime('2000-01-01T00:00:00Z', '%Y-%m-%dT%H:%M:%SZ'))
+    doc = Document.objects.get(id=doc.id)
+
+    try:
+      if IS_HUE_4.get():
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='query-java').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='query-java')
+
+        # Verify snippet values
+        assert_equal('ready', doc2.data_dict['snippets'][0]['status'])
+        assert_equal('/user/hue/oozie/workspaces/lib/hadoop-examples.jar', doc2.data_dict['snippets'][0]['properties']['app_jar'])
+        assert_equal('org.apache.hadoop.examples.terasort.TeraGen', doc2.data_dict['snippets'][0]['properties']['class'])
+        assert_equal('1000 ${output_dir}/teragen', doc2.data_dict['snippets'][0]['properties']['args'])
+        assert_equal('-Dexample-property=natty', doc2.data_dict['snippets'][0]['properties']['java_opts'])
+        assert_equal(['mapred.job.queue.name=test'], doc2.data_dict['snippets'][0]['properties']['hadoopProperties'])
+        assert_equal(['my_archive', 'my_archive2'], doc2.data_dict['snippets'][0]['properties']['archives'])
+        assert_equal([{'type': 'file', 'path': 'my_file'}, {'type': 'file', 'path': 'my_file2'}], doc2.data_dict['snippets'][0]['properties']['files'])
+        assert_equal(True, doc2.data_dict['snippets'][0]['properties']['capture_output'])
+      else:
+        # Test that corresponding doc2 is created after convert
+        assert_false(Document2.objects.filter(owner=self.user, type='link-workflow').exists())
+
+        converter = DocumentConverter(self.user)
+        converter.convert()
+
+        doc2 = Document2.objects.get(owner=self.user, type='link-workflow')
+
+        # Verify absolute_url
+        response = self.client.get(doc2.get_absolute_url())
+        assert_equal(200, response.status_code)
+        assert_equal(doc.last_modified.strftime('%Y-%m-%dT%H:%M:%S'), doc2.last_modified.strftime('%Y-%m-%dT%H:%M:%S'))
+    finally:
+      wf.delete()
+
+
   def test_convert_pig_script(self):
     attrs = {
       'user': self.user,
