@@ -385,7 +385,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-yarn-page">
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -412,7 +412,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
     </div>
   </div>
@@ -423,7 +423,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -458,7 +458,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-page-tasks" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks\']').tab('show'); }">${ _('Tasks') }</a></li>
@@ -544,7 +544,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="job-mapreduce-task-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -574,7 +574,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-task-page-attempts" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-mapreduce-task-page-attempts\']').tab('show'); }">${ _('Attempts') }</a></li>
@@ -639,7 +639,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="job-mapreduce-task-attempt-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -673,7 +673,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
@@ -702,7 +702,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-impala-page">
    <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -729,7 +729,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
     </div>
   </div>
@@ -738,7 +738,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-spark-page">
    <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -765,7 +765,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
     </div>
   </div>
@@ -934,7 +934,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="workflow-action-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -955,7 +955,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#workflow-action-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
         <li><a href="#workflow-action-page-tasks" data-toggle="tab">${ _('Child jobs') }</a></li>
@@ -1013,7 +1013,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="schedule-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -1046,7 +1046,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a class="jb-logs-link" href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
@@ -1129,7 +1129,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="bundle-page">
 
   <div class="row-fluid">
-    <div class="span2">
+    <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
@@ -1162,7 +1162,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div class="span10">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a class="jb-logs-link" href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
