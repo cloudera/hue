@@ -135,8 +135,6 @@ var MetastoreDatabase = (function () {
             } else {
               //$(document).trigger("info", data.message);
             }
-          }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
           });
 
           $.post('/metadata/api/optimizer/top_tables', {
@@ -154,8 +152,6 @@ var MetastoreDatabase = (function () {
             } else {
               $(document).trigger("error", data.message);
             }
-          }).fail(function (xhr, textStatus, errorThrown) {
-            $(document).trigger("error", xhr.responseText);
           }).always(function () {
             if (callback) {
               callback();
@@ -550,8 +546,6 @@ var MetastoreTable = (function () {
                 } else {
                   $(document).trigger("info", data.message);
                 }
-              }).fail(function (xhr, textStatus, errorThrown) {
-                $(document).trigger("error", xhr.responseText);
               });
             }
           }
