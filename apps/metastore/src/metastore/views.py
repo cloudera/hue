@@ -303,7 +303,6 @@ def describe_table(request, database, table):
       'has_write_access': has_write_access(request.user),
       'is_optimizer_enabled': has_optimizer(),
       'is_navigator_enabled': has_navigator(request.user),
-      'source_type': has_navigator(request.user),
       'optimizer_url': get_optimizer_url(),
       'navigator_url': get_navigator_url(),
       'is_embeddable': request.REQUEST.get('is_embeddable', False),
