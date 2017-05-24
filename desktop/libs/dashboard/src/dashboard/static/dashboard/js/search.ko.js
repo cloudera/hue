@@ -2246,7 +2246,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       });
 
       return _analyse;
-    }
+    };
 
     self.save = function () {
       $.post("/dashboard/save", {
@@ -2259,6 +2259,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
           if (window.location.search.indexOf("collection") == -1) {
             hueUtils.changeURL((IS_HUE_4 ? '/hue' : '') + '/dashboard/?collection=' + data.id);
           }
+          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
@@ -2267,7 +2268,7 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
         $(document).trigger("error", xhr.responseText);
       });
     };
-  }
+  };
 
   self.reset = function() {
     self.intervalOptions(ko.bindingHandlers.daterangepicker.INTERVAL_OPTIONS);

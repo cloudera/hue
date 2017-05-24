@@ -100,7 +100,7 @@ var HueFileEntry = (function () {
         'uuids': uuids,
         'data': 'false',
         'dependencies': 'true'
-      }
+      };
 
       $.get('/desktop/api2/doc/', data, function (response) {
         var docsWithDependents = [];
@@ -113,7 +113,7 @@ var HueFileEntry = (function () {
       }).fail(function (response) {
         $(document).trigger("error", "Error getting document data: " + response.responseText);
       });
-    }
+    };
 
     self.isTrash = ko.pureComputed(function () {
       return self.definition().name === '.Trash';
@@ -177,6 +177,7 @@ var HueFileEntry = (function () {
     self.uploadComplete = ko.observable(false);
     self.uploadFailed = ko.observable(false);
     self.selectedImportFile = ko.observable('');
+
     self.importEnabled = ko.pureComputed(function () {
       return self.selectedImportFile() !== '';
     });
@@ -334,6 +335,7 @@ var HueFileEntry = (function () {
             destinationId: self.definition().uuid
           });
         } else {
+          huePubSub.publish('assist.document.refresh');
           if (self !== self.activeEntry()) {
             self.load();
           }
@@ -525,6 +527,7 @@ var HueFileEntry = (function () {
     if (self.selectedEntries().length > 0 && (self.superuser || !self.sharedWithMeSelected())) {
       self.entriesToDelete(self.selectedEntries());
       self.removeDocuments(false);
+      huePubSub.publish('assist.document.refresh');
     }
   };
 
@@ -574,6 +577,7 @@ var HueFileEntry = (function () {
             }
           });
         } else {
+          huePubSub.publish('assist.document.refresh');
           self.activeEntry().load();
         }
       };
@@ -611,6 +615,7 @@ var HueFileEntry = (function () {
         successCallback: function (data) {
           self.uploading(false);
           self.uploadComplete(true);
+          huePubSub.publish('assist.document.refresh');
           self.load();
 
           $('#importDocumentsModal').modal('hide');
@@ -697,6 +702,7 @@ var HueFileEntry = (function () {
         self.apiHelper.restoreDocument({
           uuids: uuids,
           successCallback: function () {
+            huePubSub.publish('assist.document.refresh');
             self.activeEntry().load();
           },
           errorCallback: function () {
@@ -714,7 +720,10 @@ var HueFileEntry = (function () {
     var self = this;
     if (name && self.app === 'documents') {
       self.apiHelper.createDocumentsFolder({
-        successCallback: self.load.bind(self),
+        successCallback: function () {
+          huePubSub.publish('assist.document.refresh');
+          self.load()
+        },
         parentUuid: self.definition().uuid,
         name: name
       });
@@ -726,7 +735,10 @@ var HueFileEntry = (function () {
     var self = this;
     if (name && self.app === 'documents') {
       self.apiHelper.updateDocument({
-        successCallback: self.load.bind(self),
+        successCallback: function () {
+          huePubSub.publish('assist.document.refresh');
+          self.load();
+        },
         uuid: self.definition().uuid,
         name: name
       });

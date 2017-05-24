@@ -1172,7 +1172,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       widget.name(_newName);
       $(document).trigger("drawArrows");
     }
-  }
+  };
 
   self.save = function () {
     if (! self.isSaving()) {
@@ -1195,6 +1195,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
             window.location.hash = '#workflow=' + data.id;
           }
           self.workflow.tracker().markCurrentStateAsClean();
+          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
