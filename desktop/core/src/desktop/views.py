@@ -39,7 +39,6 @@ from django.views.decorators.http import require_http_methods, require_POST
 import django.views.debug
 
 from aws.conf import is_enabled as is_s3_enabled, has_s3_access
-from notebook.conf import get_ordered_interpreters
 
 import desktop.conf
 import desktop.log.log_buffer
