@@ -19,6 +19,7 @@ from django.core.urlresolvers import reverse
 from django.utils.encoding import smart_unicode
 from django.utils.translation import ugettext as _
 
+from desktop.conf import IS_HUE_4
 from desktop.views import commonheader, commonfooter
 from metadata.conf import OPTIMIZER, has_optimizer
 %>
@@ -138,7 +139,14 @@ ${ layout.menubar(section='quick_start') }
                     </a>
                   </li>
               % endif
-              % if 'jobsub' in app_names:
+              % if IS_HUE_4.get():
+                  <li>
+                    <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
+                       data-sample-url="${ url('oozie:install_examples') }">
+                      <i class="fa fa-download"></i> ${ _('Job Editor') }
+                    </a>
+                  </li>
+              % elif 'jobsub' in app_names:
                   <li>
                     <a href="javascript:void(0)" class="installBtn" data-loading-text="${ _('Installing...') }"
                        data-sample-url="${ url('oozie:install_examples') }">

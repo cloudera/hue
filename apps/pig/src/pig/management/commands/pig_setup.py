@@ -41,6 +41,61 @@ LOG = logging.getLogger(__name__)
 
 class Command(NoArgsCommand):
 
+  def install_pig_script(self, sample_user):
+    doc2 = None
+    name = 'UpperText (example)'
+
+    if Document2.objects.filter(owner=sample_user, name=name, type='query-pig').exists():
+      LOG.info("Sample pig editor script already installed.")
+      doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig')
+    else:
+      statement = """data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);
+
+upper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);
+
+STORE upper_case INTO '${output}';
+"""
+      snippet_properties = {
+        'hadoopProperties': [],
+        'parameters': [],
+        'resources': []
+      }
+
+      notebook = make_notebook(
+        name=name,
+        description='UpperText: Example Pig script',
+        editor_type='pig',
+        statement=statement,
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+      )
+
+      # Remove files, functions, settings from snippet properties
+      data = notebook.get_data()
+      data['snippets'][0]['properties'].pop('files')
+      data['snippets'][0]['properties'].pop('functions')
+      data['snippets'][0]['properties'].pop('settings')
+
+      try:
+        with transaction.atomic():
+          doc2 = Document2.objects.create(
+            owner=sample_user,
+            name=data['name'],
+            type='query-pig',
+            description=data['description'],
+            data=json.dumps(data)
+          )
+      except Exception, e:
+        LOG.exception("Failed to create sample pig script document: %s" % e)
+        # Just to be sure we delete Doc2 object incase of exception.
+        # Possible when there are mixed InnoDB and MyISAM tables
+        if doc2 and Document2.objects.filter(id=doc2.id).exists():
+          doc2.delete()
+
+    return doc2
+
+
   def handle_noargs(self, **options):
     fs = cluster.get_hdfs()
     create_directories(fs, [REMOTE_SAMPLE_DIR.get()])
@@ -70,53 +125,7 @@ class Command(NoArgsCommand):
     if IS_HUE_4.get():
       # Install editor pig script without doc1 link
       LOG.info("Using Hue 4, will install pig editor sample.")
-      name = 'UpperText (example)'
-
-      if Document2.objects.filter(owner=sample_user, name=name, type='query-pig').exists():
-        LOG.info("Sample pig editor script already installed.")
-        doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig')
-      else:
-        statement = """data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);
-
-upper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);
-
-STORE upper_case INTO '${output}';
-"""
-        snippet_properties = {
-          'hadoopProperties': [],
-          'parameters': [],
-          'resources': []
-        }
-
-        notebook = make_notebook(
-          name=name,
-          editor_type='pig',
-          statement=statement,
-          status='ready',
-          snippet_properties=snippet_properties,
-          is_saved=True
-        )
-
-        # Remove files, functions, settings from snippet properties
-        data = notebook.get_data()
-        data['snippets'][0]['properties'].pop('files')
-        data['snippets'][0]['properties'].pop('functions')
-        data['snippets'][0]['properties'].pop('settings')
-
-        try:
-          with transaction.atomic():
-            doc2 = Document2.objects.create(
-              owner=sample_user,
-              name=data['name'],
-              type='query-pig',
-              description=data['description'],
-              data=json.dumps(data)
-          )
-        except Exception, e:
-          # Just to be sure we delete Doc2 object incase of exception.
-          # Possible when there are mixed InnoDB and MyISAM tables
-          if doc2 and Document2.objects.filter(id=doc2.id).exists():
-            doc2.delete()
+      doc2 = self.install_pig_script(sample_user)
     else:
       # Install old pig script fixture
       LOG.info("Using Hue 3, will install pig script fixture.")
