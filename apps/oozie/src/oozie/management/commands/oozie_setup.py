@@ -169,9 +169,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('Java Terasort Job')
 
-    if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce').exists():
+    if Document2.objects.filter(owner=self.user, name=name, type='query-java').exists():
       LOG.info("Sample Java editor job already installed.")
-      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-mapreduce')
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-java')
     else:
       snippet_properties = {
         'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
@@ -209,6 +209,59 @@ class Command(NoArgsCommand):
           )
       except Exception, e:
         LOG.exception("Failed to create sample Java job document: %s" % e)
+        # Just to be sure we delete Doc2 object incase of exception.
+        # Possible when there are mixed InnoDB and MyISAM tables
+        if doc2 and Document2.objects.filter(id=doc2.id).exists():
+          doc2.delete()
+
+    return doc2
+
+  def _install_spark_example(self):
+    doc2 = None
+    name = _('Spark File Copy Job')
+
+    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2').exists():
+      LOG.info("Sample Spark editor job already installed.")
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2')
+    else:
+      snippet_properties = {
+        'jars': ['/user/hue/oozie/workspaces/workflows/spark-scala/lib/oozie-examples.jar'],
+        'class': 'org.apache.oozie.example.SparkFileCopy',
+        'app_name': '',
+        'spark_opts': [],
+        'spark_arguments': [
+          "/user/hue/oozie/workspaces/data/sonnets.txt",
+          "sonnets"
+        ],
+        'files': []
+      }
+
+      notebook = make_notebook(
+        name=name,
+        description=_('File Copy: Example Spark job'),
+        editor_type='spark2',
+        statement='',
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+      )
+
+      # Remove files, functions, settings from snippet properties
+      data = notebook.get_data()
+      data['snippets'][0]['properties'].pop('functions')
+      data['snippets'][0]['properties'].pop('settings')
+
+      try:
+        with transaction.atomic():
+          doc2 = Document2.objects.create(
+            owner=self.user,
+            name=data['name'],
+            type='query-spark2',
+            description=data['description'],
+            data=json.dumps(data)
+          )
+      except Exception, e:
+        LOG.exception("Failed to create sample Spark job document: %s" % e)
         # Just to be sure we delete Doc2 object incase of exception.
         # Possible when there are mixed InnoDB and MyISAM tables
         if doc2 and Document2.objects.filter(id=doc2.id).exists():
@@ -318,6 +371,7 @@ class Command(NoArgsCommand):
       example_jobs = []
       example_jobs.append(self._install_mapreduce_example())
       example_jobs.append(self._install_java_example())
+      example_jobs.append(self._install_spark_example())
       example_jobs.append(self._install_pyspark_example())
 
       # If documents exist but have been trashed, recover from Trash
