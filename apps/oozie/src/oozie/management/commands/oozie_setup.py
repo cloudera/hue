@@ -112,7 +112,7 @@ class Command(NoArgsCommand):
 
   def _install_mapreduce_example(self):
     doc2 = None
-    name = 'MapReduce Sleep Job'
+    name = _('MapReduce Sleep Job')
 
     if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce').exists():
       LOG.info("Sample mapreduce editor job already installed.")
@@ -134,7 +134,7 @@ class Command(NoArgsCommand):
 
       notebook = make_notebook(
         name=name,
-        description='Sleep: Example MapReduce job',
+        description=_('Sleep: Example MapReduce job'),
         editor_type='mapreduce',
         statement='',
         status='ready',
@@ -167,10 +167,10 @@ class Command(NoArgsCommand):
 
   def _install_java_example(self):
     doc2 = None
-    name = 'Java Terasort Job'
+    name = _('Java Terasort Job')
 
     if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce').exists():
-      LOG.info("Sample mapreduce editor job already installed.")
+      LOG.info("Sample Java editor job already installed.")
       doc2 = Document2.objects.get(owner=self.user, name=name, type='query-mapreduce')
     else:
       snippet_properties = {
@@ -185,7 +185,7 @@ class Command(NoArgsCommand):
 
       notebook = make_notebook(
         name=name,
-        description='Terasort: Example Java job',
+        description=_('Terasort: Example Java job'),
         editor_type='java',
         statement='',
         status='ready',
@@ -216,6 +216,56 @@ class Command(NoArgsCommand):
 
     return doc2
 
+
+  def _install_pyspark_example(self):
+    doc2 = None
+    name = _('PySpark Pi Estimator Job')
+
+    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2').exists():
+      LOG.info("Sample pyspark editor job already installed.")
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2')
+    else:
+      snippet_properties = {
+        'jars': ['/user/hue/oozie/workspaces/lib/pi.py'],
+        'class': '',
+        'app_name': '',
+        'spark_opts': [],
+        'spark_arguments': [],
+        'files': []
+      }
+
+      notebook = make_notebook(
+        name=name,
+        description=_('Pi Estimator: Example PySpark job'),
+        editor_type='spark2',
+        statement='',
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+      )
+
+      # Remove files, functions, settings from snippet properties
+      data = notebook.get_data()
+      data['snippets'][0]['properties'].pop('functions')
+      data['snippets'][0]['properties'].pop('settings')
+
+      try:
+        with transaction.atomic():
+          doc2 = Document2.objects.create(
+            owner=self.user,
+            name=data['name'],
+            type='query-spark2',
+            description=data['description'],
+            data=json.dumps(data)
+          )
+      except Exception, e:
+        LOG.exception("Failed to create sample PySpark job document: %s" % e)
+        # Just to be sure we delete Doc2 object incase of exception.
+        # Possible when there are mixed InnoDB and MyISAM tables
+        if doc2 and Document2.objects.filter(id=doc2.id).exists():
+          doc2.delete()
+
+    return doc2
 
   def install_examples(self):
     data_dir = LOCAL_SAMPLE_DIR.get()
@@ -268,6 +318,7 @@ class Command(NoArgsCommand):
       example_jobs = []
       example_jobs.append(self._install_mapreduce_example())
       example_jobs.append(self._install_java_example())
+      example_jobs.append(self._install_pyspark_example())
 
       # If documents exist but have been trashed, recover from Trash
       for doc in example_jobs:
