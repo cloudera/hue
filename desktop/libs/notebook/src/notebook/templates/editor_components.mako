@@ -1104,7 +1104,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <input type="text" class="pull-left input-xxlarge filechooser-input" data-bind="value: statementPath, valueUpdate: 'afterkeydown', filechooser: statementPath, filechooserOptions: { skipInitialPathIfEmpty: true, linkMarkup: true }" placeholder="${ _('Path to file, e.g. /user/hue/sample.sql') }"/>
           <!-- ko if: statementPath() -->
           <div class="inline-block" style="margin-top: 4px">
-            <a data-bind="attr: { href: '/filebrowser/view=' + statementPath() }" target="_blank" title="${ _('Open in new tab') }">
+            <a data-bind="hueLink: '/filebrowser/view=' + statementPath()" target="_blank" title="${ _('Open in new tab') }">
               <i class="fa fa-external-link-square"></i>
             </a>
           </div>
@@ -1126,7 +1126,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           </div>
           <!-- ko if: associatedDocument() -->
             <div class="pull-left" style="margin-top: 4px">
-              <a data-bind="attr: { href: associatedDocument().absoluteUrl }" target="_blank" title="${ _('Open in new tab') }">
+              <a data-bind="hueLink: href: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
               <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
