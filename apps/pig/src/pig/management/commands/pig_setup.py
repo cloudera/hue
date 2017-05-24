@@ -43,7 +43,7 @@ class Command(NoArgsCommand):
 
   def install_pig_script(self, sample_user):
     doc2 = None
-    name = 'UpperText'
+    name = _('UpperText')
 
     if Document2.objects.filter(owner=sample_user, name=name, type='query-pig').exists():
       LOG.info("Sample pig editor script already installed.")
@@ -63,7 +63,7 @@ STORE upper_case INTO '${output}';
 
       notebook = make_notebook(
         name=name,
-        description='UpperText: Example Pig script',
+        description=_('UpperText: Example Pig script'),
         editor_type='pig',
         statement=statement,
         status='ready',
