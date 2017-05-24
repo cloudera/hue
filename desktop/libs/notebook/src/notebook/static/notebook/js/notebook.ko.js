@@ -2053,8 +2053,7 @@ var EditorViewModel = (function() {
                 existingQuery[0].description(data.description);
                 existingQuery[0].last_modified(data.last_modified);
               }
-            }
-            else {
+            } else {
               self.snippets()[0].queries.unshift(ko.mapping.fromJS(data));
             }
 
@@ -2065,19 +2064,17 @@ var EditorViewModel = (function() {
 
             if (vm.isHue4()){
               vm.changeURL(vm.URLS.hue4 + '?editor=' + data.id);
-            }
-            else {
+            } else {
               vm.changeURL('/notebook/editor' + (vm.isMobile() ? '_m' : '') + '?editor=' + data.id);
             }
-          }
-          else {
+          } else {
             if (vm.isHue4()){
               vm.changeURL(vm.URLS.hue4_notebook + '?notebook=' + data.id);
-            }
-            else {
+            } else {
               vm.changeURL('/notebook/notebook?notebook=' + data.id);
             }
           }
+          huePubSub.publish('assist.document.refresh');
         }
         else {
           $(document).trigger("error", data.message);
