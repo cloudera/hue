@@ -521,7 +521,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
 
   self.columns = ko.observableArray([]);
   self.oozieColumns = ko.observableArray([]);
-  self.availableActions = ko.observable([]);
+  self.availableActions = ko.observableArray([]);
 
   self.previewColumns = ko.observable("");
   self.workflow = new Workflow(self, workflow_json);
