@@ -492,7 +492,6 @@ ${ layout.menubar(section='coordinators', dashboard=True) }
 <div id="rerun-coord-modal" class="modal hide"></div>
 
 <script src="${ static('oozie/js/dashboard-utils.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('desktop/js/ace/ace.js') }" type="text/javascript"></script>
 
 % if oozie_coordinator.has_sla:
 <script src="${ static('oozie/js/sla.utils.js') }" type="text/javascript" charset="utf-8"></script>

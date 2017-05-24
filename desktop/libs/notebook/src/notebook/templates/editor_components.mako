@@ -158,11 +158,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <![endif]-->
 <script src="${ static('desktop/ext/js/medium-editor.min.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-<script src="${ static('desktop/js/ace.extended.js') }"></script>
 <script src="${ static('desktop/ext/js/download.min.js') }"></script>
 
 <%namespace name="dashboard" file="/common_dashboard.mako" />
@@ -2013,8 +2008,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     });
     return text;
   }
-
-  ace.config.set("basePath", "/static/desktop/js/ace");
 
   function createHueDatatable(el, snippet, vm) {
     var DATATABLES_MAX_HEIGHT = 330;
