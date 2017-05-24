@@ -52,7 +52,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.charts.js') }"></script>
 <script src="${ static('desktop/ext/js/knockout-sortable.min.js') }"></script>
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
 
 % if not is_mini:
 <div id="jobbrowserComponents" class="jobbrowser-components">

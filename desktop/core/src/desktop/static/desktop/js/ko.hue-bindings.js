@@ -5391,8 +5391,9 @@
           'ace/mode/hive_highlight_rules',
           'ace/mode/xml_highlight_rules',
           'ace/tokenizer',
-          'ace/layer/text'
-        ], function (impalaRules, hiveRules, xmlRules, tokenizer, text) {
+          'ace/layer/text',
+          'ace/config'
+        ], function (impalaRules, hiveRules, xmlRules, tokenizer, text, config) {
           var res = [];
 
           var Tokenizer = tokenizer.Tokenizer;
@@ -5400,6 +5401,8 @@
           if (options.dialect && ko.unwrap(options.dialect) == 'impala') {
             Rules = impalaRules.ImpalaHighlightRules;
           }
+
+          config.loadModule(["theme", $.totalStorage("hue.ace.theme") || "ace/theme/hue"]);
 
           var Text = text.Text;
 
