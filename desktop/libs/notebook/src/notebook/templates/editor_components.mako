@@ -1543,6 +1543,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <input type="text" class="input-xxlarge" data-bind="value: properties().class, valueUpdate: 'afterkeydown'" placeholder="${ _('Class name of application, e.g. org.apache.oozie.example.SparkFileCopy') }"/>
         </div>
       </div>
+      <div class="control-group">
+        <label class="control-label">${_('Variables')}</label>
+        <div class="controls">
+          <!-- ko template: { if: typeof properties().arguments != 'undefined', name: 'property', data: { type: 'csv-hdfs-files', label: '${ _ko("Arguments") }', value: properties().arguments, title: '${ _ko("Arguments for the script") }', placeholder: '${ _ko("e.g. MAX=10, PATH=$PATH:/user/path") }' } } --><!-- /ko -->
+        </div>
+      </div>
       <!-- /ko -->
       <!-- ko if: type() == 'py'-->
       <div class="control-group">
