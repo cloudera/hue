@@ -1882,6 +1882,7 @@ def set_user_preferences(user, key, value):
     x = UserPreferences(user=user, key=key)
   x.value = value
   x.save()
+  return x
 
 
 def get_data_link(meta):
