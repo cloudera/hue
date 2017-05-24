@@ -43,7 +43,7 @@ class Command(NoArgsCommand):
 
   def install_pig_script(self, sample_user):
     doc2 = None
-    name = 'UpperText (example)'
+    name = 'UpperText'
 
     if Document2.objects.filter(owner=sample_user, name=name, type='query-pig').exists():
       LOG.info("Sample pig editor script already installed.")
