@@ -1593,7 +1593,7 @@
       <span data-bind="template: { name: 'logs-icon' }"></span>
       <!-- ko if: $root.getSubWorkflow(properties.workflow()) -->
         <span data-bind="with: $root.getSubWorkflow(properties.workflow())">
-          <a href="#" data-bind="attr: { href: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value() }" target="_blank" title="${ _('Open') }">
+          <a href="#" data-bind="hueLink: '${ url('oozie:edit_workflow') }' + '?workflow=' + $data.value()" target="_blank" title="${ _('Open') }">
             <span data-bind="text: $data.name"></span>
           </a>
         </span>
