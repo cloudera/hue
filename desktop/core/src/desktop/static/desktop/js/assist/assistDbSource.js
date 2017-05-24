@@ -280,11 +280,17 @@ var AssistDbSource = (function () {
     };
 
     self.reload = function(allCacheTypes) {
+      if (self.invalidateOnRefresh() !== 'cache') {
+        huePubSub.publish('assist.invalidate.impala', {
+          flush: self.invalidateOnRefresh() === 'invalidateAndFlush',
+          database: self.selectedDatabase() ? self.selectedDatabase().definition.name : null
+        });
+      }
+
       self.reloading(true);
       huePubSub.publish('assist.clear.db.cache', {
         sourceType: self.sourceType,
-        clearAll: true,
-        invalidateImpala: self.invalidateOnRefresh()
+        clearAll: true
       });
       if (allCacheTypes) {
         huePubSub.publish('assist.clear.db.cache', {

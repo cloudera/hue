@@ -99,7 +99,11 @@ var ApiHelper = (function () {
     self.user = user;
     self.lastKnownDatabases = {};
     self.queueManager = ApiQueueManager.getInstance();
-    self.invalidateImpala = 'cache';
+    self.invalidateImpala = null;
+
+    huePubSub.subscribe('assist.invalidate.impala', function (details) {
+      self.invalidateImpala = details;
+    });
 
     huePubSub.subscribe('assist.clear.db.cache', function (options) {
       self.clearDbCache(options);
@@ -891,7 +895,6 @@ var ApiHelper = (function () {
    * @param {Object} options
    * @param {string} options.sourceType
    * @param {string} [options.databaseName]
-   * @param {boolean} [options.invalidateImpala]
    * @param {string} [options.tableName]
    * @param {string} [options.cacheType] - Possible values 'default', 'optimizer. Default value 'default'
    * @param {string[]} [options.fields]
@@ -899,7 +902,6 @@ var ApiHelper = (function () {
    */
   ApiHelper.prototype.clearDbCache = function (options) {
     var self = this;
-    self.invalidateImpala = options.invalidateImpala || 'cache';
     var cacheIdentifier = self.getAssistCacheIdentifier(options);
     if (options.clearAll) {
       $.totalStorage(cacheIdentifier, {});
@@ -933,7 +935,7 @@ var ApiHelper = (function () {
     var self = this;
 
     var loadFunction = function () {
-      self.invalidateImpala = 'cache';
+
       fetchAssistData.bind(self)($.extend({}, options, {
         url: AUTOCOMPLETE_API_PREFIX,
         successCallback: function (data) {
@@ -960,10 +962,13 @@ var ApiHelper = (function () {
       }));
     };
 
-    if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidateAndFlush') {
-      $.post(IMPALA_INVALIDATE_API, { flush_all: true, database: options.database }, loadFunction);
-    } else if (options.sourceType === 'impala' && self.invalidateImpala == 'invalidate') {
-      $.post(IMPALA_INVALIDATE_API, { flush_all: false, database: options.database }, loadFunction);
+    if (options.sourceType === 'impala' && self.invalidateImpala !== null) {
+      if (self.invalidateImpala.database) {
+        $.post(IMPALA_INVALIDATE_API, { flush_all:  self.invalidateImpala.flush, database: self.invalidateImpala.database }, loadFunction);
+      } else {
+        $.post(IMPALA_INVALIDATE_API, { flush_all:  self.invalidateImpala.flush }, loadFunction);
+      }
+      self.invalidateImpala = null;
     } else {
       loadFunction();
     }
