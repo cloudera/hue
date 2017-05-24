@@ -542,7 +542,7 @@ def edit_coordinator(request):
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit_json': can_edit_json
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
@@ -760,7 +760,7 @@ def edit_bundle(request):
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
       'is_embeddable': request.GET.get('is_embeddable', False),
-      'can_edit_json': can_edit_json
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
