@@ -72,7 +72,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
       % if is_embeddable:
         huePubSub.publish('open.link', url);
       % else:
-        location.href = url);
+        location.href = url;
       % endif
     }
   }
