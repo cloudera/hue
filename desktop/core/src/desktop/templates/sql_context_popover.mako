@@ -1182,7 +1182,11 @@ from metadata.conf import has_navigator
           self.iconClass = 'fa-columns'
         } else if (self.isColumn) {
           self.contents = new TableAndColumnContextTabs(self.data, self.sourceType, self.defaultDatabase, true, false);
-          self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          if (self.data.identifierChain.length > 1) {
+            self.title = self.data.identifierChain[self.data.identifierChain.length - 2].name + '.' + self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          } else {
+            self.title = self.data.identifierChain[self.data.identifierChain.length - 1].name;
+          }
           self.iconClass = 'fa-columns'
         } else if (self.isFunction) {
           self.contents = new FunctionContextTabs(self.data, self.sourceType);
