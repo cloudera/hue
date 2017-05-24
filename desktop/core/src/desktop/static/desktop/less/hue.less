@@ -356,10 +356,15 @@ body {
 }
 
 .sidebar {
-  .sidebar-footer-panel div {
-    margin-top: 15px;
-    margin-bottom: 15px;
-    text-align: center;
+  .sidebar-footer-panel {
+    .dropzone {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      text-align: center;
+    }
+    .dz-drag-hover {
+      background-color: @cui-gray-200!important;
+    }
   }
   a {
     .pointer
