@@ -76,14 +76,6 @@
       }
       el.find(".message").html("<strong>" + _this.options.message + "</strong>");
 
-      hueUtils.initNiceScroll(el.find(".message"), {
-        cursorcolor: scrollColor,
-        cursorborder: '1px solid ' + scrollColor,
-        horizrailenabled: false,
-        zindex: 14000,
-        railoffset: {left: 5},
-      });
-
       if (_this.options.css != null) {
         el.attr("style", _this.options.css);
       }
