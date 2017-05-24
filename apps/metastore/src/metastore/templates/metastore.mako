@@ -34,6 +34,10 @@ from metastore.conf import ENABLE_NEW_CREATE_TABLE
 MAIN_SCROLLABLE = is_embeddable and ".page-content" or ".content-panel"
 %>
 
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
+
 % if not is_embeddable:
 ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
@@ -51,9 +55,6 @@ ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
 ${ assist.assistJSModels() }
 
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
