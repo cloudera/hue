@@ -205,6 +205,7 @@ ${ hueIcons.symbols() }
                 noMatchTemplate: 'top-search-autocomp-no-match',
                 classPrefix: 'nav-',
                 showOnFocus: true,
+                closeOnEnter: false,
                 onSelect: mainSearchSelect,
                 reopenPattern: /.*:$/
               },
