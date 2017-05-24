@@ -519,6 +519,8 @@ def edit_coordinator(request):
     workflows = [dict([('uuid', d.uuid), ('name', d.name)])
                       for d in Document2.objects.documents(request.user, include_managed=False).search_documents(types=['oozie-workflow2'])]
 
+  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
+
   if request.GET.get('format') == 'json': # For Editor
     return JsonResponse({
       'coordinator': coordinator.get_data_for_json(),
@@ -534,7 +536,7 @@ def edit_coordinator(request):
       'credentials_json': json.dumps(credentials.credentials.keys(), cls=JSONEncoderForHTML),
       'workflows_json': json.dumps(workflows, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
@@ -740,11 +742,13 @@ def edit_bundle(request):
     coordinators = [dict([('id', d.content_object.id), ('uuid', d.content_object.uuid), ('name', d.content_object.name)])
                       for d in Document.objects.get_docs(request.user, Document2, extra='coordinator2')]
 
+  can_edit_json = doc is None or (doc.can_write(request.user) if USE_NEW_EDITOR.get() else doc.doc.get().is_editable(request.user))
+
   return render('editor2/bundle_editor.mako', request, {
       'bundle_json': bundle.to_json_for_html(),
       'coordinators_json': json.dumps(coordinators, cls=JSONEncoderForHTML),
       'doc_uuid': doc.uuid if doc else '',
-      'can_edit_json': json.dumps(doc is None or doc.doc.get().is_editable(request.user))
+      'can_edit_json': json.dumps(can_edit_json)
   })
 
 
