@@ -2497,35 +2497,45 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       $("*[rel='tooltip']").tooltip({ placement:"bottom" });
 
+      var hashchange = function () {
+        if (window.location.pathname.indexOf('/filebrowser') > -1) {
+          var targetPath = "";
+          var hash = window.location.hash.substring(1);
+          if (hash.search(/(<([^>]+)>)/ig) > -1) {
+            hash = encodeURI(hash);
+          }
+
+          if (hash != null && hash != "" && hash.indexOf('/') > -1) {
+            addPathToHistory(hash);
+
+            targetPath = "${url('filebrowser.views.view', path='')}";
+            if (hash.indexOf("!!") != 0) {
+              targetPath += stripHashes(hash);
+            }
+            else {
+              targetPath = viewModel.targetPath() + hash;
+            }
+            if (targetPath.indexOf("!!") > -1) {
+              viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!") + 2) * 1)
+              targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
+            }
+            else {
+              viewModel.targetPageNum(1)
+            }
+          }
+          if (window.location.href.indexOf("#") == -1) {
+            viewModel.targetPageNum(1);
+            targetPath = "${current_request_path | n,unicode }";
+          }
+          if (targetPath != "") {
+            viewModel.targetPath(targetPath);
+            viewModel.retrieveData();
+          }
+        }
+      }
+
       if (location.hash != null && location.hash.length > 1) {
-        var targetPath = "";
-        var hash = window.location.hash.substring(1);
-        if (hash.search(/(<([^>]+)>)/ig) > -1) {
-          hash = encodeURI(hash);
-        }
-        if (hash != null && hash != "") {
-          targetPath = "${url('filebrowser.views.view', path='')}";
-          if (hash.indexOf("!!") != 0) {
-            targetPath += stripHashes(hash);
-          }
-          else {
-            targetPath = viewModel.targetPath() + hash;
-          }
-          if (targetPath.indexOf("!!") > -1) {
-            viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!") + 2) * 1)
-            targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
-          }
-          else {
-            viewModel.targetPageNum(1)
-          }
-        }
-        if (window.location.href.indexOf("#") == -1) {
-          viewModel.targetPageNum(1);
-          targetPath = "${current_request_path | n,unicode }";
-        }
-        if (targetPath != "") {
-          viewModel.targetPath(targetPath);
-        }
+        hashchange();
       }
 
       viewModel.retrieveData();
@@ -2570,42 +2580,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       });
 
-      $(window).bind("hashchange", function () {
-        if (window.location.pathname.indexOf('/filebrowser') > -1) {
-          var targetPath = "";
-          var hash = window.location.hash.substring(1);
-          if (hash.search(/(<([^>]+)>)/ig) > -1) {
-            hash = encodeURI(hash);
-          }
-
-          if (hash != null && hash != "") {
-            addPathToHistory(hash);
-
-            targetPath = "${url('filebrowser.views.view', path='')}";
-            if (hash.indexOf("!!") != 0) {
-              targetPath += stripHashes(hash);
-            }
-            else {
-              targetPath = viewModel.targetPath() + hash;
-            }
-            if (targetPath.indexOf("!!") > -1) {
-              viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!") + 2) * 1)
-              targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
-            }
-            else {
-              viewModel.targetPageNum(1)
-            }
-          }
-          if (window.location.href.indexOf("#") == -1) {
-            viewModel.targetPageNum(1);
-            targetPath = "${current_request_path | n,unicode }";
-          }
-          if (targetPath != "") {
-            viewModel.targetPath(targetPath);
-            viewModel.retrieveData();
-          }
-        }
-      });
+      if (!$(window).data('fb_hashchange')) {
+        $(window).data('fb_hashchange', true);
+        $(window).bind("hashchange", hashchange);
+      }
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 
