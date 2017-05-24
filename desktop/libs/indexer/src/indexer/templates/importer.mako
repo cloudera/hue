@@ -403,7 +403,7 @@ ${ assist.assistPanel() }
               <input type="text" class="form-control path input-xxlarge" data-bind="value: createWizard.source.path, filechooser: createWizard.source.path, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: false }" placeholder="${ _('Click or drag from the assist') }">
             </label>
             <!-- ko if: createWizard.source.path().length > 0 -->
-              <a data-bind="attr: {href: '/filebrowser/view=' + createWizard.source.path() }" target="_blank" title="${ _('Open') }">
+              <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" target="_blank" title="${ _('Open') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
             <!-- /ko -->
@@ -518,7 +518,7 @@ ${ assist.assistPanel() }
               <!-- ko if: outputFormat() != 'index' -->
               <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Already existing') } <span data-bind="text: outputFormat"></span>
               <!-- /ko -->
-              <a href="javascript:void(0)" data-bind="attr: { href: existingTargetUrl() }, text: name" target="_blank" title="${ _('Open it.') }"></a>
+              <a href="javascript:void(0)" data-bind="hueLink: existingTargetUrl(), text: name" target="_blank" title="${ _('Open') }"></a>
             </span>
           </div>
         </div>
@@ -549,7 +549,7 @@ ${ assist.assistPanel() }
 
             <div class="control-group">
               <label class="control-label"><div>${ _('Extras') }</div>
-                <a href="javascript:void(0)" data-bind="css: {'inactive-action': !showProperties()}, click: function() {showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
                   <i class="fa fa-sliders fa-padding-top"></i>
                 </a>
               </label>
