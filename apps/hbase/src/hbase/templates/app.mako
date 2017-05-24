@@ -2562,13 +2562,6 @@ ${ commonheader(None, "hbase", user, request) | n,unicode }
 </script>
 <script src="${ static('desktop/ext/js/mustache.js') }" type="text/javascript" charset="utf-8"></script>
 
-<script src="${ static('desktop/js/ace/ace.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-impala.js') }"></script>
-<script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
-<script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
-<script src="${ static('desktop/js/ace.extended.js') }"></script>
-
-
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
 %endif

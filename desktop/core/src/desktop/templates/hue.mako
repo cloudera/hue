@@ -487,6 +487,10 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/ace/mode-hive.js') }"></script>
 <script src="${ static('desktop/js/ace/ext-language_tools.js') }"></script>
 <script src="${ static('desktop/js/ace.extended.js') }"></script>
+<script>
+  ace.config.set("basePath", "/static/desktop/js/ace");
+</script>
+
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
