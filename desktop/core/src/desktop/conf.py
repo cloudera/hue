@@ -1377,24 +1377,7 @@ CLUSTERS = UnspecifiedConfigSection(
           default=[],
           type=coerce_csv,
       ),
-
-      PRODUCT_SECRET=Config(
-        key="product_secret",
-        help=_("A secret passphrase associated with the productName."),
-        private=True,
-        default=None),
-      PRODUCT_SECRET_SCRIPT=Config(
-        key="product_secret_script",
-        help=_("Execute this script to produce the product secret. This will be used when `product_secret` is not set."),
-        private=True,
-        type=coerce_password_from_script,
-        default=None),
-      PRODUCT_AUTH_SECRET=Config(
-        key="product_auth_secret",
-        help=_("A secret passphrase associated with the productName."),
-        private=True,
-        default=None),
-      )
+    )
   )
 )
 
