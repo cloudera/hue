@@ -1708,7 +1708,7 @@ ${ assist.assistPanel() }
             $.jHueNotify.info("${ _('Task ') }" + resp.history_uuid + "${_(' submitted.') }");
             huePubSub.publish('notebook.task.submitted', resp.history_uuid);
           } else {
-            $(document).trigger("error", data.message);
+            $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }
         }).fail(function (xhr, textStatus, errorThrown) {
           $(document).trigger("error", xhr.responseText);
