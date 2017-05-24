@@ -22,19 +22,22 @@ from lxml import etree
 
 from django.core import management
 from django.core.management.base import NoArgsCommand
+from django.db import transaction
 from django.utils.translation import ugettext as _
 
-from hadoop import cluster
-
-from desktop.conf import USE_NEW_EDITOR
+from desktop.conf import USE_NEW_EDITOR, IS_HUE_4
 from desktop.models import Directory, Document, Document2, Document2Permission
+from hadoop import cluster
 from liboozie.submittion import create_directories
+from notebook.models import make_notebook
+
+from useradmin.models import get_default_user_group, install_sample_user
+
 from oozie.conf import LOCAL_SAMPLE_DATA_DIR, LOCAL_SAMPLE_DIR, REMOTE_SAMPLE_DIR, ENABLE_V2
 from oozie.models import Workflow, Coordinator, Bundle
 from oozie.importlib.workflows import import_workflow_root
 from oozie.importlib.coordinators import import_coordinator_root
 from oozie.importlib.bundles import import_bundle_root
-from useradmin.models import get_default_user_group, install_sample_user
 
 
 LOG = logging.getLogger(__name__)
@@ -104,6 +107,61 @@ class Command(NoArgsCommand):
           bundle.save()
           import_bundle_root(bundle=bundle, bundle_definition_root=bundle_root, metadata=metadata)
 
+  def _install_mapreduce_example(self):
+    doc2 = None
+    name = 'MapReduce Sleep Job (example)'
+
+    if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce').exists():
+      LOG.info("Sample mapreduce editor job already installed.")
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-mapreduce')
+    else:
+      snippet_properties = {
+        'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
+        'hadoopProperties': ['mapred.mapper.class=org.apache.hadoop.examples.SleepJob',
+          'mapred.reducer.class=org.apache.hadoop.examples.SleepJob',
+          'mapred.mapoutput.key.class=org.apache.hadoop.io.IntWritable',
+          'mapred.mapoutput.value.class=org.apache.hadoop.io.NullWritable',
+          'mapred.output.format.class=org.apache.hadoop.mapred.lib.NullOutputFormat',
+          'mapred.input.format.class=org.apache.hadoop.examples.SleepJob$SleepInputFormat',
+          'mapred.partitioner.class=org.apache.hadoop.examples.SleepJob',
+          'sleep.job.map.sleep.time=5', 'sleep.job.reduce.sleep.time=10'],
+        'archives': [],
+        'jars': []
+      }
+
+      notebook = make_notebook(
+        name=name,
+        description='Sleep: Example MapReduce job',
+        editor_type='mapreduce',
+        statement='',
+        status='ready',
+        snippet_properties=snippet_properties,
+        is_saved=True
+      )
+
+      # Remove files, functions, settings from snippet properties
+      data = notebook.get_data()
+      data['snippets'][0]['properties'].pop('functions')
+      data['snippets'][0]['properties'].pop('settings')
+
+      try:
+        with transaction.atomic():
+          doc2 = Document2.objects.create(
+            owner=self.user,
+            name=data['name'],
+            type='query-mapreduce',
+            description=data['description'],
+            data=json.dumps(data)
+          )
+      except Exception, e:
+        LOG.exception("Failed to create sample mapreduce job document: %s" % e)
+        # Just to be sure we delete Doc2 object incase of exception.
+        # Possible when there are mixed InnoDB and MyISAM tables
+        if doc2 and Document2.objects.filter(id=doc2.id).exists():
+          doc2.delete()
+
+    return doc2
+
   def install_examples(self):
     data_dir = LOCAL_SAMPLE_DIR.get()
 
@@ -147,7 +205,23 @@ class Command(NoArgsCommand):
       name=Document2.EXAMPLES_DIR
     )
 
-    if USE_NEW_EDITOR.get():
+    if IS_HUE_4.get():
+      # Install editor oozie examples without doc1 link
+      LOG.info("Using Hue 4, will install oozie editor samples.")
+
+      example_jobs = []
+      mr_job = self._install_mapreduce_example()
+      if mr_job:
+        example_jobs.append(mr_job)
+
+      # If documents exist but have been trashed, recover from Trash
+      for doc in example_jobs:
+        if doc.parent_directory != examples_dir:
+          doc.parent_directory = examples_dir
+          doc.save()
+
+    elif USE_NEW_EDITOR.get():
+      # Install as link-workflow doc2 to old Job Designs
       docs = Document.objects.get_docs(self.user, Workflow).filter(owner=self.user)
       for doc in docs:
         if doc.content_object:
@@ -176,6 +250,6 @@ class Command(NoArgsCommand):
     oozie_examples.update(parent_directory=examples_dir)
     examples_dir.share(self.user, Document2Permission.READ_PERM, groups=[get_default_user_group()])
 
-    self.install_examples()
-
-    Document.objects.sync()
+    if not IS_HUE_4.get():
+      self.install_examples()
+      Document.objects.sync()
