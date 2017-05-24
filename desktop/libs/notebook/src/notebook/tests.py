@@ -403,31 +403,31 @@ class TestNotebookApiMocked(object):
 def test_get_interpreters_to_show():
   default_interpreters = OrderedDict((
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'options': {}
+          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'is_sql': True, 'options': {}
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'options': {}
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}
       }),
       ('pig', {
-          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'options': {}
+          'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'is_sql': False, 'options': {}
       }),
       ('java', {
-          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'options': {}
+          'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}
       })
     ))
 
   expected_interpreters = OrderedDict((
       ('java', {
-        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'options': {}
+        'name': 'Java', 'interface': 'oozie', 'type': 'java', 'is_sql': False, 'options': {}
       }),
       ('pig', {
-        'name': 'Pig', 'interface': 'pig', 'type': 'pig', 'options': {}
+        'name': 'Pig', 'interface': 'pig', 'is_sql': False, 'type': 'pig', 'options': {}
       }),
       ('hive', {
-          'name': 'Hive', 'interface': 'hiveserver2', 'type': 'hive', 'options': {}
+          'name': 'Hive', 'interface': 'hiveserver2', 'is_sql': True, 'type': 'hive', 'options': {}
       }),
       ('spark', {
-          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'options': {}
+          'name': 'Scala', 'interface': 'livy', 'type': 'spark', 'is_sql': False, 'options': {}
       })
     ))
 
