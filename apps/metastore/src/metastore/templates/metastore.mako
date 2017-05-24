@@ -312,7 +312,7 @@ ${ components.menubar(is_embeddable) }
           ${_('Stored in')} Kudu
         <!-- /ko -->
         <!-- ko if: details.properties.format != 'kudu' -->
-          <a data-bind="attr: {'href': hdfs_link, 'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
+          <a data-bind="hueLink: hdfs_link, attr: {'rel': path_location}" title="${_('Open data location')}">${_('Location')}</a>
         <!-- /ko -->
       </div>
       <!-- ko with: $parent.tableStats -->
