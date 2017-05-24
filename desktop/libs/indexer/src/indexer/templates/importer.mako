@@ -1389,7 +1389,7 @@ ${ assist.assistPanel() }
         catch (err) {
         }
         $('#fieldsBulkEditor').modal('hide');
-      }
+      };
 
       self.isTargetExisting = ko.observable();
       self.isTargetChecking = ko.observable(false);
@@ -1681,7 +1681,12 @@ ${ assist.assistPanel() }
                   var snippet = self.editorVM.selectedNotebook().snippets()[0]; // Could be native to editor at some point
                   if (! snippet.result.handle().has_more_statements) {
                     if (self.editorVM.selectedNotebook().onSuccessUrl()) {
-                      huePubSub.publish('assist.clear.db.cache', {sourceType: self.source.apiHelperType()});
+                      var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
+                      if (match) {
+                        var db = match[1];
+                        huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+                      }
+                      huePubSub.publish('assist.clear.db.cache', { sourceType: self.source.apiHelperType() });
                       window.location.href = self.editorVM.selectedNotebook().onSuccessUrl();
                     }
                   } else { // Perform last DROP statement execute
@@ -1716,17 +1721,17 @@ ${ assist.assistPanel() }
 % endif
 
         hueAnalytics.log('importer', 'submit/' + self.source.inputFormat() + '/' + self.destination.outputFormat());
-      }
+      };
 
       self.removeOperation = function (operation, operationList) {
         operationList.remove(operation);
         hueAnalytics.log('importer', 'step/removeOperation');
-      }
+      };
 
       self.addOperation = function (field) {
         field.operations.push(new Operation("split"));
         hueAnalytics.log('importer', 'step/addOperation');
-      }
+      };
 
       self.load = function (state) {
         self.source.name(state.name);
@@ -1750,7 +1755,7 @@ ${ assist.assistPanel() }
         options.name = getNewFieldName();
       }
       return loadField($.extend({}, ${default_field_type | n}, options));
-    }
+    };
 
     var loadField = function (currField, parent, idx) {
       var koField = ko.mapping.fromJS(currField);
@@ -1788,7 +1793,7 @@ ${ assist.assistPanel() }
       koField.keyType.subscribe(autoExpand);
 
       return koField;
-    }
+    };
 
     var IndexerViewModel = function () {
       var self = this;
@@ -1818,13 +1823,13 @@ ${ assist.assistPanel() }
           self.currentStep(self.currentStep() + 1);
           hueAnalytics.log('importer', 'step/' + self.currentStep());
         }
-      }
+      };
       self.previousStep = function () {
         if (self.previousStepVisible()){
           self.currentStep(self.currentStep() - 1);
           hueAnalytics.log('importer', 'step/' + self.currentStep());
         }
-      }
+      };
 
       self.isLoading = ko.observable(false);
 
