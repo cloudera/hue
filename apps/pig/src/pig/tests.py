@@ -25,6 +25,7 @@ from django.core.urlresolvers import reverse
 from nose.plugins.skip import SkipTest
 from nose.tools import assert_true, assert_equal, assert_false
 
+from desktop.conf import IS_HUE_4
 from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import grant_access
 from desktop.models import SAMPLE_USER_ID
@@ -32,6 +33,7 @@ from hadoop import pseudo_hdfs4
 from hadoop.pseudo_hdfs4 import is_live_cluster
 from liboozie.oozie_api_tests import OozieServerProvider
 from liboozie.conf import SECURITY_ENABLED
+
 from oozie.tests import OozieBase
 
 from pig.models import create_or_update_script, PigScript
@@ -257,46 +259,48 @@ class TestWithHadoop(OozieBase):
     if is_live_cluster():
       raise SkipTest('HUE-2909: Skipping because test is not reentrant')
 
-    script = PigScript.objects.get(id=SAMPLE_USER_ID)
-    script_dict = script.dict
+    if not IS_HUE_4.get():
+      script = PigScript.objects.get(id=SAMPLE_USER_ID)
+      script_dict = script.dict
 
-    post_data = {
-      'id': script.id,
-      'name': script_dict['name'],
-      'script': script_dict['script'],
-      'user': script.owner,
-      'parameters': json.dumps(script_dict['parameters']),
-      'resources': json.dumps(script_dict['resources']),
-      'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_submit'}]),
-    }
+      post_data = {
+        'id': script.id,
+        'name': script_dict['name'],
+        'script': script_dict['script'],
+        'user': script.owner,
+        'parameters': json.dumps(script_dict['parameters']),
+        'resources': json.dumps(script_dict['resources']),
+        'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
+        'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_submit'}]),
+      }
 
-    response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
-    job_id = json.loads(response.content)['id']
+      response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
+      job_id = json.loads(response.content)['id']
 
-    self.wait_until_completion(job_id)
+      self.wait_until_completion(job_id)
 
   def test_stop(self):
-    script = PigScript.objects.get(id=SAMPLE_USER_ID)
-    script_dict = script.dict
+    if not IS_HUE_4.get():
+      script = PigScript.objects.get(id=SAMPLE_USER_ID)
+      script_dict = script.dict
 
-    post_data = {
-      'id': script.id,
-      'name': script_dict['name'],
-      'script': script_dict['script'],
-      'user': script.owner,
-      'parameters': json.dumps(script_dict['parameters']),
-      'resources': json.dumps(script_dict['resources']),
-      'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
-      'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_stop'}]),
-    }
+      post_data = {
+        'id': script.id,
+        'name': script_dict['name'],
+        'script': script_dict['script'],
+        'user': script.owner,
+        'parameters': json.dumps(script_dict['parameters']),
+        'resources': json.dumps(script_dict['resources']),
+        'hadoopProperties': json.dumps(script_dict['hadoopProperties']),
+        'submissionVariables': json.dumps([{"name": "output", "value": self.cluster.fs_prefix + '/test_pig_script_stop'}]),
+      }
 
-    submit_response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
-    script = PigScript.objects.get(id=json.loads(submit_response.content)['id'])
-    assert_true(script.dict['job_id'], script.dict)
+      submit_response = self.c.post(reverse('pig:run'), data=post_data, follow=True)
+      script = PigScript.objects.get(id=json.loads(submit_response.content)['id'])
+      assert_true(script.dict['job_id'], script.dict)
 
-    self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
-    self.wait_until_completion(json.loads(submit_response.content)['id'], expected_status='KILLED')
+      self.c.post(reverse('pig:stop'), data={'id': script.id}, follow=True)
+      self.wait_until_completion(json.loads(submit_response.content)['id'], expected_status='KILLED')
 
 
 OOZIE_LOGS ="""  Log Type: stdout
