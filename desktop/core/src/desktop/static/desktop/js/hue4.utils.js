@@ -72,7 +72,7 @@
    */
   window.pauseAppIntervals = function (app) {
     hueIntervals.forEach(function (interval) {
-      if (typeof interval.app !== 'undefined' && (interval.app === app || interval.app.split('-')[0] === app)) {
+      if (typeof interval.app !== 'undefined' && (interval.app === app || (interval.app.split('-') && interval.app.split('-')[0] === app))) {
         interval.status = 'paused';
         originalClearInterval(interval.id);
       }
