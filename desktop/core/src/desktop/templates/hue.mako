@@ -653,10 +653,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.loadApp('editor');
 
           self.getActiveAppViewModel(function (viewModel) {
-            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
+            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL            
             viewModel.newNotebook(editorType, function() {
-              if (statementOptions['statementType']) {
-                viewModel.selectedNotebook().snippets()[0].statementType(statementOptions['statementType']);
+              self.changeEditorType(statementOptions['statementType'] || editorType);
+
+              if (statementOptions['statementPath']) {
                 viewModel.selectedNotebook().snippets()[0].statementPath(statementOptions['statementPath']);
               }
               if (statementOptions['directoryUuid']) {

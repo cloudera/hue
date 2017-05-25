@@ -372,17 +372,17 @@ from desktop.views import _ko
                 % if 'oozie' in apps:
                   <li>
                     <a title="${_('Oozie Workflow')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_workflow') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
-                      <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Oozie Workflow')}
+                      <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/> ${_('Workflow') if is_embeddable else _('Oozie Workflow')}
                     </a>
                   </li>
                   <li>
                     <a title="${_('Oozie Coordinator')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_coordinator') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
-                      <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Oozie Coordinator')}
+                      <img src="${ static('oozie/art/icon_oozie_coordinator_48.png') }" class="app-icon" alt="${ _('Oozie coordinator icon') }"/> ${_('Coordinator') if is_embeddable else _('Oozie Coordinator')}
                     </a>
                   </li>
                   <li>
                     <a title="${_('Oozie Bundle')}" data-bind="attr: { href: addDirectoryParamToUrl('${ url('oozie:new_bundle') }') }, click: ${ is_embeddable and 'openHue4Link' or 'openExternalLink' }">
-                      <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Oozie Bundle')}
+                      <img src="${ static('oozie/art/icon_oozie_bundle_48.png') }" class="app-icon" alt="${ _('Oozie bundle icon') }"/> ${_('Bundle') if is_embeddable else _('Oozie Bundle')}
                     </a>
                   </li>
                 % endif
