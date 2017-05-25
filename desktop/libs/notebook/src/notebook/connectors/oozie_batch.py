@@ -135,7 +135,9 @@ class OozieApi(Api):
     job_id = snippet['result']['handle']['id']
 
     oozie_job = check_job_access_permission(self.request, job_id)
-    return self._get_log_output(oozie_job)
+    logs = self._get_log_output(oozie_job)
+
+    return logs if logs else oozie_job.log
 
 
   def progress(self, snippet, logs):
