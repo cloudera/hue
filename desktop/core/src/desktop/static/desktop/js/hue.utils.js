@@ -471,7 +471,7 @@ var huePubSub = (function () {
       if (app) {
         Object.keys(topics).forEach(function (topicName) {
           topics[topicName].forEach(function (topic) {
-            if (typeof topic.app !== 'undefined' && (topic.app === app || topic.app.split('-')[0] === app)) {
+            if (typeof topic.app !== 'undefined' && topic.app !== null && (topic.app === app || topic.app.split('-')[0] === app)) {
               topic.status = 'paused';
             }
           });
@@ -482,7 +482,7 @@ var huePubSub = (function () {
       if (app) {
         Object.keys(topics).forEach(function (topicName) {
           topics[topicName].forEach(function (topic) {
-            if (typeof topic.app !== 'undefined' && (topic.app === app || topic.app.split('-')[0] === app)) {
+            if (typeof topic.app !== 'undefined' && topic.app !== null && (topic.app === app || topic.app.split('-')[0] === app)) {
               topic.status = 'running';
             }
           });
