@@ -90,13 +90,13 @@
 
 ${ hueIcons.symbols() }
 
-% if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
-<div class="banner">
-  ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
-</div>
-% endif
 
 <div class="main-page">
+  % if banner_message or conf.CUSTOM.BANNER_TOP_HTML.get():
+    <div class="banner">
+      ${ banner_message or conf.CUSTOM.BANNER_TOP_HTML.get() | n,unicode }
+    </div>
+  % endif
   <nav class="navbar navbar-default">
     <div class="navbar-inner top-nav">
       <div class="top-nav-left">
