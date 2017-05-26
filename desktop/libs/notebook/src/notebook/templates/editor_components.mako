@@ -531,19 +531,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 
   % if not is_embeddable:
-    <!-- ko if: isRightPanelAvailable -->
-    <div class="resizer" data-bind="visible: isRightPanelVisible, splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
-    <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible">
+    <div class="resizer" data-bind="visible: isRightPanelAvailable() && isRightPanelVisible(), splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }" style="display: none;"><div class="resize-bar">&nbsp;</div></div>
+    <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible() && isRightPanelAvailable()" style="display:none;">
       <a title="${_('Toggle Assist')}" class="pointer hide-assist-right" data-bind="click: function() { isRightPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
         <i class="fa fa-chevron-right"></i>
       </a>
       <div class="assist" data-bind="component: {
-      name: 'right-assist-panel',
-      params: {}
-    }">
+          name: 'right-assist-panel',
+          params: {
+            rightAssistAvailable: isRightPanelAvailable
+          }
+        }" >
       </div>
     </div>
-    <!-- /ko -->
   % endif
 
 
