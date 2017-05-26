@@ -3506,6 +3506,28 @@ function loadSearch(collection, query, initial) {
   });
 
   var _refreshTimeout = null;
+  var refresh = function () {
+    _refreshTimeout = window.setTimeout(function () {
+      if (viewModel.collection.autorefresh()) {
+        viewModel.search(refresh);
+      }
+    }, ($.isNumeric(viewModel.collection.autorefreshSeconds()) ? viewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
+  }
+
+  var checkAutoRefresh = function () {
+    if (viewModel.collection.autorefresh()) {
+      window.clearTimeout(_refreshTimeout);
+      refresh();
+    }
+  }
+
+  if (viewModel.collection.autorefresh()) {
+    refresh();
+  }
+
+  huePubSub.subscribe('check.autorefresh', function () {
+    checkAutoRefresh();
+  });
 
   viewModel.collection.autorefresh.subscribe(function (value) {
     if (value) {
@@ -3519,7 +3541,7 @@ function loadSearch(collection, query, initial) {
   viewModel.collection.autorefreshSeconds.subscribe(function (value) {
     checkAutoRefresh();
   });
-  }
+}
 
 $(document).ready(function () {
 
@@ -3580,30 +3602,7 @@ $(document).ready(function () {
   var _query = ${ query | n,unicode };
 
   loadSearch(${ collection.get_json(user) | n,unicode }, ${ query | n,unicode }, ${ initial | n,unicode });
-  
-  
-  if (viewModel.collection.autorefresh()) {
-    refresh();
-  }
 
-  function checkAutoRefresh() {
-    if (viewModel.collection.autorefresh()) {
-      window.clearTimeout(_refreshTimeout);
-      refresh();
-    }
-  }
-
-  function refresh() {
-    _refreshTimeout = window.setTimeout(function () {
-      if (viewModel.collection.autorefresh()) {
-        viewModel.search(refresh);
-      }
-    }, ($.isNumeric(viewModel.collection.autorefreshSeconds()) ? viewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
-  }
-
-  huePubSub.subscribe('check.autorefresh', function () {
-    checkAutoRefresh();
-  });
 
   $("#addFacetDemiModal").on("hidden", function () {
     if (typeof selectedWidget.hasBeenSelected == "undefined"){
