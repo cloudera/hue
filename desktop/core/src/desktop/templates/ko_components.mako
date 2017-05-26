@@ -496,25 +496,27 @@ from desktop.views import _ko
         self.app = params.app;
         self.interpreter = params.interpreter;
 
-        self.parseCurrentFavorite = function (data) {
+        self.parseCurrentFavorite = function (data, announce) {
           self.isFavorite(false);
           if (data.status === 0 && data.data && data.data.default_app) {
             try {
               var defaultApp = JSON.parse(data.data.default_app);
               self.isFavorite(defaultApp.app === self.app && ((self.app === 'editor' && defaultApp.interpreter === self.interpreter) || self.app !== 'editor'));
-            }
-            catch (e) {
+              if (announce) {
+                huePubSub.publish('hue.new.default.app', defaultApp);
+              }
+            } catch (e) {
               console.error('${ _ko("There was a problem decoding the default app setting.") }');
             }
           }
-        }
+        };
 
         self.setAsFavoriteApp = function (vm, e) {
           e.originalEvent.stopPropagation();
           e.originalEvent.stopImmediatePropagation();
           var postParams = {
             app: self.app
-          }
+          };
           if (self.interpreter !== '') {
             postParams['interpreter'] = self.interpreter;
           }
@@ -526,9 +528,9 @@ from desktop.views import _ko
             post['set'] = ko.mapping.toJSON(postParams);
           }
           $.post('/desktop/api2/user_preferences/default_app', post, function (data) {
-            self.parseCurrentFavorite(data);
+            self.parseCurrentFavorite(data, true);
           });
-        }
+        };
 
         if (self.isHue4()) {
           // Load the fav app status
