@@ -65,7 +65,7 @@ ${ commonheader(_('Query'), app_name, user, request) | n,unicode }
 
 
       </div>
-      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms' }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
+      <div class="resizer" data-bind="splitDraggable : { appName: 'rdbms', leftPanelVisible: true }"><div class="resize-bar"><i class="fa fa-ellipsis-v"></i></div></div>
       <div class="content-panel">
         <div id="query">
           <div class="card card-small">
