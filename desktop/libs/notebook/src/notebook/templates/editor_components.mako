@@ -474,7 +474,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         }
       }"></div>
   </div>
-  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
+  <div class="resizer" data-bind="visible: isLeftPanelVisible() && assistAvailable(), splitDraggable : { appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }"><div class="resize-bar">&nbsp;</div></div>
   % endif
 
   <div class="content-panel" data-bind="event: { scroll: function(){ var ls = $(MAIN_SCROLLABLE).data('lastScroll'); if (ls && ls != $(MAIN_SCROLLABLE).scrollTop()){ $(document).trigger('hideAutocomplete'); }; $(MAIN_SCROLLABLE).data('lastScroll', $(MAIN_SCROLLABLE).scrollTop()) } }, with: selectedNotebook">
@@ -531,7 +531,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 
   % if not is_embeddable:
-    <div class="resizer" data-bind="visible: isRightPanelAvailable() && isRightPanelVisible(), splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, onPosition: function(){ huePubSub.publish('split.draggable.position') } }" style="display: none;"><div class="resize-bar">&nbsp;</div></div>
+    <!-- ko if: isRightPanelAvailable -->
+    <div class="resizer" data-bind="visible: isRightPanelVisible, splitDraggable : { isRightPanel: true, appName: 'notebook', leftPanelVisible: isLeftPanelVisible, rightPanelVisible: isRightPanelVisible, rightPanelAvailable: isRightPanelAvailable, onPosition: function(){ huePubSub.publish('split.draggable.position') } }" style="display: none;"><div class="resize-bar">&nbsp;</div></div>
+    <!-- /ko -->
     <div class="assist-container right-panel" data-bind="visible: isRightPanelVisible() && isRightPanelAvailable()" style="display:none;">
       <a title="${_('Toggle Assist')}" class="pointer hide-assist-right" data-bind="click: function() { isRightPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
         <i class="fa fa-chevron-right"></i>
