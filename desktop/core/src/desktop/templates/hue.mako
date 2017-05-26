@@ -887,6 +887,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           }},
           { url: '/hbase/', app: 'hbase' },
           { url: '/help', app: 'help' },
+          { url: '/home2*', app: function (ctx) {
+              page(ctx.path.replace(/home2/gi, 'home'));
+          }},
           { url: '/home*', app: 'home' },
           { url: '/indexer/', app: 'indexes' },
           { url: '/indexer/importer/', app: 'importer' },
