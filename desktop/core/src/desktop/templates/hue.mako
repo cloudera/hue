@@ -386,6 +386,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
       <div id="embeddable_sqoop" class="embeddable"></div>
+      <div id="embeddable_jobsub" class="embeddable"></div>
     </div>
 
     <div id="rightResizer" class="resizer" data-bind="visible: rightAssistVisible() && rightAssistAvailable(), splitFlexDraggable : {
@@ -582,6 +583,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         logs: { url: '/logs', title: '${_('Logs')}' },
         dump_config: { url: '/desktop/dump_config', title: '${_('Dump Configuration')}' },
         sqoop: { url: '/sqoop', title: '${_('Sqoop')}' },
+        jobsub: { url: '/jobsub/not_available', title: '${_('Job Designer')}' },
       };
 
       var SKIP_CACHE = [
@@ -973,6 +975,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             page('/security/hive');
           }},
           { url: '/sqoop', app: 'sqoop' },
+          { url: '/jobsub', app: 'jobsub' },
           { url: '/useradmin/configurations/', app: 'useradmin_configurations' },
           { url: '/useradmin/groups/', app: 'useradmin_groups' },
           { url: '/useradmin/groups/new', app: 'useradmin_newgroup' },
