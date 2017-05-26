@@ -266,7 +266,11 @@ class Job(object):
 
   @property
   def conf_keys(self):
-    return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
+    try:
+      return dict([(line['name'], line['value']) for line in self.full_job_conf['property']])
+    except Exception, e:
+      LOG.error('Failed to parse conf_keys from YARN job configuration.')
+      return None
 
   def get_task(self, task_id):
     json = self.api.task(self.id, task_id)['task']
