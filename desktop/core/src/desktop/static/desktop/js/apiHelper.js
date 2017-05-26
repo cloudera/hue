@@ -247,6 +247,7 @@ var ApiHelper = (function () {
       }
       self.setInTotalStorage(owner, id, newValue);
     });
+    return observable;
   };
 
   /**

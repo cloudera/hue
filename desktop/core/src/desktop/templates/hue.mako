@@ -397,17 +397,17 @@ ${ hueIcons.symbols() }
       onPosition: function() { huePubSub.publish('split.draggable.position') }
     }"><div class="resize-bar" style="right: 0">&nbsp;</div></div>
 
-    <div class="right-panel side-panel-closed" data-bind="css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }">
-      <!-- ko if: rightAssistAvailable -->
-      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: ! rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
-      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
+    <div class="right-panel side-panel-closed" data-bind="visible: rightAssistAvailable, css: { 'side-panel-closed': !rightAssistVisible() || !rightAssistAvailable() }, visibleOnHover: { selector: '.hide-right-side-panel' }" style="display:none;">
+      <a href="javascript:void(0);" style="display: none;" title="${_('Show Assist')}" class="pointer side-panel-toggle show-right-side-panel" data-bind="visible: rightAssistAvailable() && !rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-left"></i></a>
+      <a href="javascript:void(0);" style="display: none; opacity: 0;" title="${_('Hide Assist')}" class="pointer side-panel-toggle hide-right-side-panel" data-bind="visible: rightAssistAvailable() && rightAssistVisible(), toggle: rightAssistVisible"><i class="fa fa-chevron-right"></i></a>
 
       <div class="assist" data-bind="component: {
           name: 'right-assist-panel',
-          params: {}
-        }, visible: rightAssistVisible" style="display: none;">
+          params: {
+            rightAssistAvailable: rightAssistAvailable
+          }
+        }, visible: rightAssistAvailable() && rightAssistVisible()" style="display: none;">
       </div>
-      <!-- /ko -->
     </div>
 
     <div class="context-panel" data-bind="css: { 'visible': contextPanelVisible }">
@@ -1043,11 +1043,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
         self.rightAssistAvailable = ko.observable(false);
         self.activeAppViewModel = ko.observable();
-
-        huePubSub.subscribe('set.current.app.name', function (appName) {
-          self.rightAssistAvailable(appName === 'editor' || appName === 'notebook');
-        });
-        huePubSub.publish('get.current.app.name');
 
         self.contextPanelVisible = ko.observable(false);
         self.sessionsAvailable = ko.observable(false);

@@ -2037,17 +2037,17 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="right-assist-panel-template">
     <div style="height: 100%; width: 100%; position: relative;">
       <ul class="right-panel-tabs nav nav-pills">
-        <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeTab('assistant'); }">${ _('Assistant') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'functions' }"><a href="javascript: void(0);" data-bind="click: function() { activeTab('functions'); }">${ _('Functions') }</a></li>
-        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesAvailable"><a href="javascript: void(0);" data-bind="click: function() { activeTab('schedules'); }">${ _('Schedule') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'assistant' }, visible: assistantTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('assistant'); activeTab('assistant'); }">${ _('Assistant') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'functions' }, visible: functionsTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('functions'); activeTab('functions'); }">${ _('Functions') }</a></li>
+        <li data-bind="css: { 'active' : activeTab() === 'schedules' }, visible: schedulesTabAvailable" style="display:none;"><a href="javascript: void(0);" data-bind="click: function() { lastActiveTab('schedules'); activeTab('schedules'); }">${ _('Schedule') }</a></li>
       </ul>
 
       <div class="right-panel-tab-content tab-content">
-        <!-- ko if: activeTab() === 'assistant' -->
+        <!-- ko if: activeTab() === 'assistant' && assistantTabAvailable()-->
         <div data-bind="component: { name: 'assistant-panel' }"></div>
         <!-- /ko -->
 
-        <!-- ko if: activeTab() === 'functions' -->
+        <!-- ko if: activeTab() === 'functions' && functionsTabAvailable -->
         <div data-bind="component: { name: 'functions-panel' }"></div>
         <!-- /ko -->
 
@@ -2060,67 +2060,81 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/javascript">
     (function () {
+
+      var ASSISTANT_TAB = 'assistant';
+      var FUNCTIONS_TAB = 'functions';
+      var SCHEDULES_TAB = 'schedules';
+
       function RightAssistPanel(params) {
         var self = this;
         self.disposals = [];
 
         self.activeTab = ko.observable();
-        self.assistantAvailable = ko.observable(false);
 
-        self.schedulesAvailable = ko.observable(false);
+        self.assistantTabAvailable = ko.observable(false);
+        self.functionsTabAvailable = ko.observable(false);
+        self.schedulesTabAvailable = ko.observable(false);
 
         var apiHelper = ApiHelper.getInstance();
-        var lastActiveTab = apiHelper.getFromTotalStorage('assist', 'last.open.right.panel');
+        self.lastActiveTab = apiHelper.withTotalStorage('assist', 'last.open.right.panel', ko.observable(), ASSISTANT_TAB);
+
+        var assistEnabledApp = false;
+
+        var updateTabs = function () {
+          if (!assistEnabledApp) {
+            params.rightAssistAvailable(false);
+            return;
+          }
+          var rightAssistAvailable = true;
+          if (self.lastActiveTab() === FUNCTIONS_TAB && self.functionsTabAvailable()) {
+            self.activeTab(FUNCTIONS_TAB);
+          } else if (self.lastActiveTab() === SCHEDULES_TAB && self.schedulesTabAvailable()) {
+            self.activeTab(SCHEDULES_TAB);
+          } else if (self.assistantTabAvailable()) {
+            self.activeTab(ASSISTANT_TAB);
+          } else if (self.functionsTabAvailable()) {
+            self.activeTab(FUNCTIONS_TAB);
+          } else if (self.schedulesTabAvailable()) {
+            self.activeTab(SCHEDULES_TAB);
+          } else {
+            self.activeTab(null);
+            rightAssistAvailable = false;
+          }
+          params.rightAssistAvailable(rightAssistAvailable);
+        };
 
         if ('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True' && IS_HUE_4) {
           var currentAppSub = huePubSub.subscribe('set.current.app.view.model', function (viewModel) {
-            self.schedulesAvailable(!!viewModel.selectedNotebook);
-            if (lastActiveTab === 'schedules') {
-              self.activeTab(self.schedulesAvailable() ? 'schedules' : (self.assistantAvailable() ? 'assistant' : 'functions'));
-            }
+            // Async
+            self.schedulesTabAvailable(!!viewModel.selectedNotebook);
+            updateTabs();
           });
           self.disposals.push(currentAppSub.remove.bind(currentAppSub));
           huePubSub.publish('get.current.app.view.model');
         } else {
           // Right assist is only available in the Hue 3 editor and notebook.
-          self.schedulesAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
-          if (lastActiveTab === 'schedules') {
-            self.activeTab(self.schedulesAvailable() ? 'schedules' : (self.assistantAvailable() ? 'assistant' : 'functions'));
-          }
+          self.schedulesTabAvailable('${ ENABLE_QUERY_SCHEDULING.get() }' === 'True');
         }
 
-
         var snippetTypeSub = huePubSub.subscribe('active.snippet.type.changed', function (type) {
-          if (type === 'hive' || type === 'impala') {
-            self.assistantAvailable(true);
-            if (lastActiveTab === 'assistant') {
-              self.activeTab('assistant');
-            }
-          } else {
-            if (self.activeTab() === 'assistant') {
-              var newTab = lastActiveTab === 'assistant' ? 'functions' : lastActiveTab;
-              if (self.activeTab() !== newTab) {
-                self.activeTab(newTab);
-              }
-            }
-            self.assistantAvailable(false);
-          }
+          self.functionsTabAvailable(type === 'hive' || type === 'impala' || type === 'pig');
+          self.assistantTabAvailable(type === 'hive' || type === 'impala');
+          updateTabs();
         });
         self.disposals.push(snippetTypeSub.remove.bind(snippetTypeSub));
 
-        if (lastActiveTab === 'assistant' && self.assistantAvailable()) {
-          self.activeTab(lastActiveTab);
-        } else if (lastActiveTab === 'schedules' && self.schedulesAvailable()) {
-          self.activeTab(lastActiveTab);
-        } else if (self.assistantAvailable()) {
-          self.activeTab('assistant');
+        if (IS_HUE_4) {
+          huePubSub.subscribe('set.current.app.name', function (appName) {
+            assistEnabledApp = appName === 'editor' || appName === 'notebook';
+            if (!assistEnabledApp) {
+              params.rightAssistAvailable(false);
+            }
+          });
+          huePubSub.publish('get.current.app.name');
         } else {
-          self.activeTab('functions');
+          assistEnabledApp = true;
         }
-
-        self.activeTab.subscribe(function (newValue) {
-          apiHelper.setInTotalStorage('assist', 'last.open.right.panel', newValue);
-        })
+        updateTabs();
       }
 
       RightAssistPanel.prototype.dispose = function () {
