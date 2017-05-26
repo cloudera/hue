@@ -40,7 +40,7 @@
     });
 
     it("should pause and resume all the intervals of an app", function (done) {
-      var id = window.setInterval(intervalCallback, 10, 'jasmine');
+      var id = window.setInterval(intervalCallback, 10, 'jasmine-dash');
       expect(intervalCallback).not.toHaveBeenCalled();
       window.pauseAppIntervals('jasmine');
       window.setTimeout(function () {
@@ -55,7 +55,7 @@
     });
 
     it("should clear the original interval id after a pause and resume", function (done) {
-      var id = window.setInterval(intervalCallback, 30, 'jasmine');
+      var id = window.setInterval(intervalCallback, 30, 'jasmine-dash');
       expect(intervalCallback).not.toHaveBeenCalled();
       window.pauseAppIntervals('jasmine');
       window.resumeAppIntervals('jasmine');
