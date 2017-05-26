@@ -1063,7 +1063,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           previousVisibilityValues = {
             left: self.leftAssistVisible(),
             right: self.rightAssistVisible()
-          }
+          };
           self.leftAssistVisible(false);
           self.rightAssistVisible(false);
         });
@@ -1188,6 +1188,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.hasJobBrowser(clusterConfig && clusterConfig['app_config'] && clusterConfig['app_config']['browser'] && (clusterConfig['app_config']['browser']['interpreter_names'].indexOf('yarn') != -1 || clusterConfig['app_config']['browser']['interpreter_names'].indexOf('dataeng') != -1));
         });
 
+        huePubSub.subscribe('hue.new.default.app', function () {
+          huePubSub.publish('cluster.config.refresh.config');
+        });
+
         var ClusterPanelViewModel = function() {
           var self = this;
           self.apiHelper = ApiHelper.getInstance();
@@ -1234,7 +1238,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (self.cluster().type() != 'dataeng') {
             self._loadInterface();
           }
-        }
+        };
         self.cluster = new ClusterPanelViewModel();
 
         self.searchAutocompleteSource = function (request, callback) {
