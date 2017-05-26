@@ -3128,10 +3128,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       }, HUE_PUB_SUB_APP);
 
       huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
-        if (statementDetails.activeStatement) {
-          viewModel.selectedNotebook().snippets()[0].positionStatement(statementDetails.activeStatement.statement);
-        } else {
-          viewModel.selectedNotebook().snippets()[0].positionStatement('');
+        var foundSnippet = viewModel.selectedNotebook().snippets().filter(function (snippet) {
+          return snippet.ace() && snippet.ace().container.id === statementDetails.id;
+        });
+        if (foundSnippet.length == 1) {
+          if (statementDetails.activeStatement) {
+            foundSnippet[0].positionStatement(statementDetails.activeStatement.statement);
+          } else {
+            foundSnippet[0].positionStatement('');
+          }
         }
       }, HUE_PUB_SUB_APP);
 
