@@ -2570,7 +2570,7 @@ var EditorViewModel = (function() {
 
     self.isRightPanelAvailable = ko.observable(options.assistAvailable && HAS_OPTIMIZER);
     self.isRightPanelVisible = ko.observable();
-    ApiHelper.getInstance().withTotalStorage('assist', 'assist_right_panel_visible', self.isRightPanelVisible);
+    ApiHelper.getInstance().withTotalStorage('assist', 'right_assist_panel_visible', self.isRightPanelVisible, true);
 
     self.isContextPanelVisible = ko.observable(false);
     self.isContextPanelVisible.subscribe(function (newValue) {
