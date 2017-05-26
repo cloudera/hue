@@ -23,6 +23,9 @@ urlpatterns = patterns(
   # The base view is the "list" view, which we alias as /
   url(r'^$', 'list_designs'),
 
+  # Not available on Hue 4
+  url(r'^not_available$', 'not_available'),
+
   # Actions: get, save, clone, delete, submit, new.
   url(r'^designs$', 'list_designs'),
   url(r'^designs/(?P<design_id>\d+)$', 'get_design'),
