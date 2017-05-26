@@ -1347,7 +1347,43 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (clusterConfig && clusterConfig['app_config']) {
             var appsItems = [];
             var appConfig = clusterConfig['app_config'];
-            ['editor', 'dashboard', 'scheduler'].forEach(function(appName) {
+            if (appConfig['editor']) {
+              var editor = null;
+              if (clusterConfig['main_button_action'] && clusterConfig['main_button_action'].page.indexOf('/editor') === 0) {
+                editor = clusterConfig['main_button_action'];
+              }
+
+              if (!editor) {
+                var defaultEditor = appConfig['editor']['default_sql_interpreter'];
+                if (defaultEditor) {
+                  var foundEditor = appConfig['editor']['interpreters'].filter(function (interpreter) {
+                    return interpreter.type === defaultEditor;
+                  });
+                  if (foundEditor.length === 1) {
+                    editor = foundEditor[0];
+                  }
+                }
+              }
+
+              if (!editor && appConfig['editor']['interpreters'].length > 1) {
+                editor = appConfig['editor']['interpreters'][1];
+              }
+
+              if (editor) {
+                appsItems.push({
+                  displayName: '${ _("Editor") }',
+                  url: editor['page'],
+                  icon: 'editor'
+                });
+              } else {
+                appsItems.push({
+                  displayName: appConfig['editor']['displayName'],
+                  url: appConfig['editor']['page'],
+                  icon: 'editor'
+                });
+              }
+            }
+            ['dashboard', 'scheduler'].forEach(function(appName) {
               if (appConfig[appName]) {
                 appsItems.push({
                   displayName: appConfig[appName]['displayName'],
@@ -1427,7 +1463,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         huePubSub.publish('hide.jobs.panel');
         huePubSub.publish('hide.history.panel');
       }
-    }
+    };
 
     var clickThrottle = -1;
     $(window).click(function (e) {
