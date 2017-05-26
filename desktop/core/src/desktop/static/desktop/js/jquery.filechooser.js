@@ -187,8 +187,8 @@
         'height': '260px',
         'overflow-y': 'auto'
       });
-      if (data.title != null && data.title == "Error") {
-        var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message);
+      if (data.error || (data.title != null && data.title == "Error")) {
+        var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message ? data.message : data.error);
         _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
         var _previousLink = $("<a>").addClass("btn").text(_parent.options.labels.BACK).click(function () {
           _parent.options.onFolderChange(_parent.previousPath);
