@@ -2184,9 +2184,10 @@
 
       var positionPanels = function () {
         if (isRightPanel) {
+
           var oppositeWidth = hasLeftPanel && ko.unwrap(options.leftPanelVisible) ? $leftPanel.width() + $resizer.width() : 0;
           var totalWidth = $container.width() - oppositeWidth;
-          if (ko.unwrap(options.rightPanelVisible)) {
+          if (ko.unwrap(options.rightPanelVisible) && ko.unwrap(options.rightPanelAvailable)) {
             $resizer.show();
             rightPanelWidth = Math.min(rightPanelWidth, $container.width() - 100);
             var contentPanelWidth = totalWidth - rightPanelWidth - $resizer.width();
@@ -2204,7 +2205,7 @@
             $resizer.hide();
           }
         } else {
-          var oppositeWidth = hasRightPanel && ko.unwrap(options.rightPanelVisible) ? $rightPanel.width() + $resizer.width() : 0;
+          var oppositeWidth = hasRightPanel && ko.unwrap(options.rightPanelVisible) && ko.unwrap(options.rightPanelAvailable) ? $rightPanel.width() + $resizer.width() : 0;
           var totalWidth = $container.width() - oppositeWidth;
           if (ko.unwrap(options.leftPanelVisible)) {
             $resizer.show();
@@ -2233,6 +2234,10 @@
 
       if (ko.isObservable(options.rightPanelVisible)) {
         options.rightPanelVisible.subscribe(positionPanels);
+      }
+
+      if (ko.isObservable(options.rightPanelAvailable)) {
+        options.rightPanelAvailable.subscribe(positionPanels);
       }
 
       var dragTimeout = -1;
