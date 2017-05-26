@@ -110,6 +110,8 @@ def list_designs(request):
       'is_hue_4': IS_HUE_4.get()
     })
 
+def not_available(request):
+  return render("not_available.mako", request, {})
 
 def _get_design(user, design_id):
   """Raise PopupException if design doesn't exist"""
