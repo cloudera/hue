@@ -330,7 +330,7 @@ class S3FileSystem(object):
 
     try:
       self._get_or_create_bucket(bucket_name)
-    except S3ResponseError, e:
+    except Exception, e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e.reason))
 
     stats = self._stats(path)
