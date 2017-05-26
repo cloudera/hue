@@ -811,13 +811,20 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.getActiveAppViewModel(function (vm) {
             vm.createWizard.source.path(DropzoneGlobals.homeDir + '/' + filename);
           });
+          $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
 
         self.dropzoneComplete = function (path) {
-          self.loadApp('importer');
-          self.getActiveAppViewModel(function (vm) {
-            vm.createWizard.source.path(path);
-          });
+          if (path.toLowerCase().endsWith('.csv')){
+            self.loadApp('importer');
+            self.getActiveAppViewModel(function (vm) {
+              vm.createWizard.source.path(path);
+            });
+          }
+          else {
+            huePubSub.publish('open.link', '/filebrowser/view=' + path);
+          }
+          $('.dz-drag-hover').removeClass('dz-drag-hover');
         };
 
         // prepend /hue to all the link on this page
