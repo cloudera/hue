@@ -35,7 +35,9 @@ class TestConfig(object):
   # Some test configurations to load
   CONF_ONE="""
   foo = 123
-  list=a,b,c
+  list1=a,b,c
+  list2=abc,def
+  list3=abc
   """
   CONF_TWO = """
   req = 345
@@ -72,7 +74,9 @@ class TestConfig(object):
           "some_section",
           private=True,
           members=dict(BAZ = Config("baz", default="baz_default"))),
-        LIST          = Config("list", type=list),
+        LIST1         = Config("list1", type=list),
+        LIST2         = Config("list2", type=list),
+        LIST3         = Config("list3", type=list),
         CLUSTERS      = UnspecifiedConfigSection(
           "clusters",
           help="Details about your Hadoop cluster(s)",
@@ -106,7 +110,9 @@ class TestConfig(object):
     assert_raises(KeyError, self.conf.REQ_NOT_THERE.get)
 
   def test_list_values(self):
-    assert_equals(["a","b","c"], self.conf.LIST.get())
+    assert_equals(["a","b","c"], self.conf.LIST1.get())
+    assert_equals(["abc","def"], self.conf.LIST2.get())
+    assert_equals(["abc"], self.conf.LIST3.get())
 
   def test_sections(self):
     assert_equals(2, len(self.conf.CLUSTERS))
@@ -216,7 +222,13 @@ class TestConfig(object):
     Key: foo (optional)
       A vanilla configuration param
 
-    Key: list (optional)
+    Key: list1 (optional)
+      [no help text provided]
+
+    Key: list2 (optional)
+      [no help text provided]
+
+    Key: list3 (optional)
       [no help text provided]
 
     Key: req (required)
