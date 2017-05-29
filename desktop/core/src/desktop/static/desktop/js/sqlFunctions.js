@@ -1282,10 +1282,17 @@ var SqlFunctions = (function () {
     impala: {
       cast: {
         returnTypes: ['T'],
-        arguments: [[{type: 'T'}]],
+        arguments: [[{ type: 'T' }]],
         signature: 'cast(a as T)',
 				draggable: 'cast()',
         description: 'Converts the results of the expression expr to type T. For example, cast(\'1\' as BIGINT) will convert the string \'1\' to its integral representation. A null is returned if the conversion does not succeed. If cast(expr as boolean) Hive returns true for a non-empty string.'
+      },
+      typeof: {
+        returnTypes: ['STRING'],
+        arguments: [[{ type: 'T' }]],
+        signature: 'typeof(T a)',
+        draggable: 'typeof()',
+        description: 'Returns the name of the data type corresponding to an expression. For types with extra attributes, such as length for CHAR and VARCHAR, or precision and scale for DECIMAL, includes the full specification of the type.'
       }
     }
   };
