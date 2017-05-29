@@ -494,3 +494,10 @@ ROW_NUMBER\s*\(                            { yy.lexer.unput('('); yytext = 'row_
 <<EOF>>                                    { return 'EOF'; }
 
 .                                          { /* To prevent console logging of unknown chars */ }
+<between>.                                 { }
+<hive>.                                    { }
+<impala>.                                  { }
+<hdfs>.                                    { }
+<backtickedValue>.                         { }
+<singleQuotedValue>.                       { }
+<doubleQuotedValue>.                       { }
