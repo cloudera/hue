@@ -444,7 +444,7 @@ def export_documents(request):
   doc_ids = [doc.pk for doc in export_doc_set]
   num_docs = len(doc_ids)
 
-  if len(selection) == 1 and docs[0].name:
+  if len(selection) == 1 and num_docs >= len(selection) and docs[0].name:
     filename = docs[0].name
   else:
     filename = 'hue-documents-%s-(%s)' % (datetime.today().strftime('%Y-%m-%d'), num_docs)
