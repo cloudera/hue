@@ -68,12 +68,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
   </table>
 
   <div class="pagination">
-    <div class="pull-right flush-right">
+    <div class="pull-right">
         <div class="form-inline pagination-input-form inline">
           <span>${_('Page')}</span>
           <input type="text" data-bind="value: page().number, valueUpdate: 'afterkeydown', event: { change: skipTo }" class="pagination-input" />
           <input type="hidden" id="current_page" data-bind="value: page().number" />
-          of <span data-bind="text: page().num_pages"></span>
+          ${_('of')} <span data-bind="text: page().num_pages"></span>
         </div>
 
         <ul class="inline">
@@ -1295,11 +1295,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.goToPage = function (pageNumber) {
         self.targetPageNum(pageNumber);
-        if (location.hash.indexOf("!!") > -1){
-          location.hash =  location.hash.substring(0, location.hash.indexOf("!!")) + "!!" + pageNumber;
-        } else {
-          location.hash += "!!" + pageNumber;
-        }
+        self.retrieveData();
       };
 
       self.firstPage = function () {
@@ -2504,7 +2500,6 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           if (hash.search(/(<([^>]+)>)/ig) > -1) {
             hash = encodeURI(hash);
           }
-
           if (hash != null && hash != "" && hash.indexOf('/') > -1) {
             addPathToHistory(hash);
 
@@ -2515,13 +2510,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             else {
               targetPath = viewModel.targetPath() + hash;
             }
-            if (targetPath.indexOf("!!") > -1) {
-              viewModel.targetPageNum(targetPath.substring(targetPath.indexOf("!!") + 2) * 1)
-              targetPath = targetPath.substring(0, targetPath.indexOf("!!"));
-            }
-            else {
-              viewModel.targetPageNum(1)
-            }
+            viewModel.targetPageNum(1)
           }
           if (window.location.href.indexOf("#") == -1) {
             viewModel.targetPageNum(1);
