@@ -962,8 +962,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           // display context menu and ensure it is on-screen
           if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
             this.selected(true);
-            cm.css({ display: 'block', top: e.pageY - 15, left: (e.pageX < rect.right - 200 ) ? e.pageX : e.pageX - 250 });
-            if ($(window).height() - 55 < $('.context-menu').position().top - $('body').scrollTop() + $('.context-menu').height()) {
+            cm.css({ display: 'block', top: e.pageY - 15, left: (e.offsetX < rect.right - 300 ) ? e.offsetX + 100 : e.offsetX - 250 });
+            var scrollTop = $('body').scrollTop();
+            %if is_embeddable:
+              scrollTop = $('.page-content').scrollTop();
+            %endif
+            if ($(window).height() - 55 < $('.context-menu').position().top - scrollTop + $('.context-menu').height()) {
               cm.css({
                 top: e.pageY - $('.context-menu').height()
               });
@@ -1263,14 +1267,19 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
         $("*[rel='tooltip']").tooltip({ placement:"left" });
 
+        var $scrollable = $(window);
+        %if is_embeddable:
+          $scrollable = $('.page-content');
+        %endif
+
         if ($('.row-highlighted').length > 0) {
-          $(window).scrollTop($('.row-highlighted:eq(0)').offset().top - 150);
+          $scrollable.scrollTop($('.row-highlighted:eq(0)').offset().top - 150);
         }
         else if ($('.row-deleted').length > 0) {
-          $(window).scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+          $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
         }
         else {
-          $(window).scrollTop(0);
+          $scrollable.scrollTop(0);
         }
 
         resetActionbar();
@@ -1670,7 +1679,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
               $(self.selectedFiles()).each(function (index, file) {
                 file.deleted(true);
               });
-              $(window).scrollTop($('.row-deleted:eq(0)').offset().top - 150);
+              var $scrollable = $(window);
+              %if is_embeddable:
+                $scrollable = $('.page-content');
+              %endif
+              $scrollable.scrollTop($('.row-deleted:eq(0)').offset().top - 150);
             }, 500);
             window.setTimeout(function(){
               $(self.selectedFiles()).each(function (index, file) {
