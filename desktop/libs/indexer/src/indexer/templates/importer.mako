@@ -1333,7 +1333,9 @@ ${ assist.assistPanel() }
       });
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
+          % if ENABLE_NEW_INDEXER.get():
           {'name': 'Solr index', 'value': 'index'},
+          % endif
           {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
       ]);
