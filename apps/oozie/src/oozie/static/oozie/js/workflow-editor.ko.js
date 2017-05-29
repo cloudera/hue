@@ -1191,7 +1191,7 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
           }
           self.workflow.id(data.id);
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("workflow") == -1) {
+          if (window.location.search.indexOf("workflow") == -1 && !IS_HUE_4) {
             window.location.hash = '#workflow=' + data.id;
           }
           self.workflow.tracker().markCurrentStateAsClean();
