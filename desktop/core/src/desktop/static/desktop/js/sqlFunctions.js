@@ -2863,6 +2863,13 @@ var SqlFunctions = (function () {
       }
     },
     impala: {
+      cume_dist: {
+        returnTypes: ['T'],
+        arguments: [{type: 'T'}],
+        signature: 'cume_dist(T expr) OVER([partition_by_clause] order_by_clause)',
+        draggable: 'cume_dist() OVER()',
+        description: 'Returns the cumulative distribution of a value. The value for each row in the result set is greater than 0 and less than or equal to 1.'
+      },
       dense_rank: {
         returnTypes: ['INT'],
         arguments: [],
@@ -2897,6 +2904,20 @@ var SqlFunctions = (function () {
         signature: 'lead(expr [, offset] [, default]) OVER ([partition_by_clause] order_by_clause)',
         draggable: 'lead() OVER()',
         description: 'This function returns the value of an expression using column values from a following row. You specify an integer offset, which designates a row position some number of rows after to the current row. Any column references in the expression argument refer to column values from that later row.'
+      },
+      ntile: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T' }], [{type: 'T', multiple: true, optional: true}]],
+        signature: 'ntile(T expr [, T offset ...])',
+        draggable: 'ntile()',
+        description: 'Returns the "bucket number" associated with each row, between 1 and the value of an expression. For example, creating 100 buckets puts the lowest 1% of values in the first bucket, while creating 10 buckets puts the lowest 10% of values in the first bucket. Each partition can have a different number of buckets.'
+      },
+      percent_rank: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}]],
+        signature: 'percent_rank(T expr) OVER ([partition_by_clause] order_by_clause)',
+        draggable: 'percent_rank() OVER()',
+        description: 'Calculates the rank, expressed as a percentage, of each row within a group of rows. If rank is the value for that same row from the RANK() function (from 1 to the total number of rows in the partition group), then the PERCENT_RANK() value is calculated as (rank - 1) / (rows_in_group - 1) . If there is only a single item in the partition group, its PERCENT_RANK() value is 0. The ORDER BY clause is required. The PARTITION BY clause is optional. The window clause is not allowed.'
       },
       rank: {
         returnTypes: ['INT'],
