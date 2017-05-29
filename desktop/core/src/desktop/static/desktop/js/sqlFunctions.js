@@ -1520,38 +1520,38 @@ var SqlFunctions = (function () {
       },
       datediff: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'datediff(STRING enddate, STRING startdate)',
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
+        signature: 'datediff(TIMESTAMP enddate, TIMESTAMP startdate)',
 				draggable: 'datediff()',
-        description: 'Returns the number of days between two dates represented as strings.'
+        description: 'Returns the number of days between two TIMESTAMP values.'
       },
       day: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'day(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'day(TIMESTAMP date)',
 				draggable: 'day()',
-        description: 'Returns the day field from a date represented as a string.'
+        description: 'Returns the day field from the date portion of a TIMESTAMP. The value represents the day of the month, therefore is in the range 1-31, or less for months without 31 days.'
       },
       dayname: {
         returnTypes: ['STRING'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'dayname(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'dayname(TIMESTAMP date)',
 				draggable: 'dayname()',
-        description: 'Returns the day field from a date represented as a string, converted to the string corresponding to that day name. The range of return values is \'Sunday\' to \'Saturday\'. Used in report-generating queries, as an alternative to calling dayofweek() and turning that numeric return value into a string using a CASE expression.'
+        description: 'Returns the day field from a TIMESTAMP value, converted to the string corresponding to that day name. The range of return values is \'Sunday\' to \'Saturday\'. Used in report-generating queries, as an alternative to calling dayofweek() and turning that numeric return value into a string using a CASE expression.'
       },
       dayofmonth: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'dayofmonth(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'dayofmonth(TIMESTAMP date)',
 				draggable: 'dayofmonth()',
-        description: 'Returns the day field from a date represented as a string.'
+        description: 'Returns the day field from the date portion of a TIMESTAMP. The value represents the day of the month, therefore is in the range 1-31, or less for months without 31 days.'
       },
       dayofweek: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'dayofweek(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'dayofweek(TIMESTAMP date)',
 				draggable: 'dayofweek()',
-        description: 'Returns the day field from a date represented as a string, corresponding to the day of the week. The range of return values is 1 (Sunday) to 7 (Saturday).'
+        description: 'Returns the day field from the date portion of a TIMESTAMP, corresponding to the day of the week. The range of return values is 1 (Sunday) to 7 (Saturday).'
       },
       dayofyear: {
         returnTypes: ['INT'],
@@ -1597,10 +1597,10 @@ var SqlFunctions = (function () {
       },
       hour: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'hour(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'hour(TIMESTAMP date)',
 				draggable: 'hour()',
-        description: 'Returns the hour field from a date represented as a string.'
+        description: 'Returns the hour field from a TIMESTAMP field.'
       },
       hours_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1616,6 +1616,13 @@ var SqlFunctions = (function () {
 				draggable: 'hours_sub()',
         description: 'Returns the specified date and time minus some number of hours.'
       },
+      int_months_between: {
+        returnTypes: ['INTEGER'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
+        signature: 'int_months_between(TIMESTAMP newer, TIMESTAMP older)',
+        draggable: 'int_months_between()',
+        description: 'Returns the number of months between the date portions of two TIMESTAMP values, as an INT representing only the full months that passed.'
+      },
       microseconds_add: {
         returnTypes: ['TIMESTAMP'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'BIGINT'}, {type: 'INT'}]],
@@ -1629,6 +1636,13 @@ var SqlFunctions = (function () {
         signature: 'microseconds_sub(TIMESTAMP date, BIGINT|INT microseconds)',
 				draggable: 'microseconds_sub()',
         description: 'Returns the specified date and time minus some number of microseconds.'
+      },
+      milliseconds: {
+        returnTypes: ['INTEGER'],
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'milliseconds(TIMESTAMP date)',
+        draggable: 'milliseconds()',
+        description: 'Returns the millisecond portion of a TIMESTAMP value.'
       },
       milliseconds_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1646,10 +1660,10 @@ var SqlFunctions = (function () {
       },
       minute: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'minute(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'minute(TIMESTAMP date)',
 				draggable: 'minute()',
-        description: 'Returns the minute field from a date represented as a string.'
+        description: 'Returns the minute field from a TIMESTAMP value.'
       },
       minutes_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1667,10 +1681,10 @@ var SqlFunctions = (function () {
       },
       month: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'month(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'month(TIMESTAMP date)',
 				draggable: 'month()',
-        description: 'Returns the month field from a date represented as a string.'
+        description: 'Returns the month field, represented as an integer, from the date portion of a TIMESTAMP.'
       },
       months_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1678,6 +1692,13 @@ var SqlFunctions = (function () {
         signature: 'months_add(TIMESTAMP date, BIGINT|INT months)',
 				draggable: 'months_add()',
         description: 'Returns the specified date and time plus some number of months.'
+      },
+      months_between: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
+        signature: 'months_between(TIMESTAMP newer, TIMESTAMP older)',
+        draggable: 'months_between()',
+        description: 'Returns the number of months between the date portions of two TIMESTAMP values. Can include a fractional part representing extra days in addition to the full months between the dates. The fractional component is computed by dividing the difference in days by 31 (regardless of the month).'
       },
       months_sub: {
         returnTypes: ['TIMESTAMP'],
@@ -1709,10 +1730,10 @@ var SqlFunctions = (function () {
       },
       second: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'second(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'second(TIMESTAMP date)',
 				draggable: 'second()',
-        description: 'Returns the second field from a date represented as a string.'
+        description: 'Returns the second field from a TIMESTAMP value.'
       },
       seconds_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1734,6 +1755,20 @@ var SqlFunctions = (function () {
         signature: 'subdate(TIMESTAMP startdate, BIGINT|INT days)',
 				draggable: 'subdate()',
         description: 'Subtracts a specified number of days from a TIMESTAMP value. Similar to date_sub(), but starts with an actual TIMESTAMP value instead of a string that is converted to a TIMESTAMP.'
+      },
+      timeofday: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'timeofday()',
+        draggable: 'timeofday()',
+        description: 'Returns a string representation of the current date and time, according to the time of the local system, including any time zone designation.'
+      },
+      timestamp_cmp: {
+        returnTypes: ['INTEGER'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
+        signature: 'timestamp_cmp(TIMESTAMP t1, TIMESTAMP t2)',
+        draggable: 'timestamp_cmp()',
+        description: 'Tests if one TIMESTAMP value is newer than, older than, or identical to another TIMESTAMP. Returns either -1, 0, 1 or NULL.'
       },
       to_date: {
         returnTypes: ['STRING'],
@@ -1758,7 +1793,7 @@ var SqlFunctions = (function () {
       },
       unix_timestamp: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        arguments: [[{type: 'STRING', optional: true}], [{type: 'STRING', optional: true}]],
         altArguments: [[{type: 'TIMESTAMP'}]],
         signature: 'unix_timestamp([STRING datetime [, STRING format]]|[TIMESTAMP datetime])',
 				draggable: 'unix_timestamp()',
@@ -1766,10 +1801,10 @@ var SqlFunctions = (function () {
       },
       weekofyear: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'weekofyear(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'weekofyear(TIMESTAMP date)',
 				draggable: 'weekofyear()',
-        description: 'Returns the corresponding week (1-53) from a date represented as a string.'
+        description: 'Returns the corresponding week (1-53) from the date portion of a TIMESTAMP.'
       },
       weeks_add: {
         returnTypes: ['TIMESTAMP'],
@@ -1787,10 +1822,10 @@ var SqlFunctions = (function () {
       },
       year: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}]],
-        signature: 'year(STRING date)',
+        arguments: [[{type: 'TIMESTAMP'}]],
+        signature: 'year(TIMESTAMP date)',
 				draggable: 'year()',
-        description: 'Returns the year field from a date represented as a string.'
+        description: 'Returns the year field from the date portion of a TIMESTAMP.'
       },
       years_add: {
         returnTypes: ['TIMESTAMP'],
