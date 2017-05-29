@@ -1116,7 +1116,7 @@ from notebook.conf import get_ordered_interpreters
         var self = this;
 
         self.activeEntry = ko.observable();
-        self.activeEntry(new HueFileEntry({
+        var root = new HueFileEntry({
           activeEntry: self.activeEntry,
           trashEntry: ko.observable,
           apiHelper: options.apiHelper,
@@ -1127,7 +1127,13 @@ from notebook.conf import get_ordered_interpreters
             name: '/',
             type: 'directory'
           }
-        }));
+        });
+        self.activeEntry(root);
+
+        self.reload = function () {
+          self.activeEntry(root);
+          self.activeEntry().load();
+        };
 
         huePubSub.subscribe('assist.document.refresh', function () {
           huePubSub.publish('assist.clear.document.cache');
