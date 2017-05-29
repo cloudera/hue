@@ -2526,8 +2526,10 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       if (location.hash != null && location.hash.length > 1) {
         hashchange();
       }
+      else {
+        viewModel.retrieveData();
+      }
 
-      viewModel.retrieveData();
 
       $("#editBreadcrumb").click(function (e) {
         if ($(e.target).is('ul')){
@@ -2569,10 +2571,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
         }
       });
 
-      if (!$(window).data('fb_hashchange')) {
-        $(window).data('fb_hashchange', true);
-        $(window).bind("hashchange", hashchange);
-      }
+      $(window).bind("hashchange.fblist", hashchange);
 
       $(".actionbar").data("originalWidth", $(".actionbar").width());
 
