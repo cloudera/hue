@@ -1115,7 +1115,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: apps">
-              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': properties.status() !== 'SUCCEEDED' && properties.status() !== 'FAILED', 'failed': properties.status() == 'FAILED'}, click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
+              <tr class="status-border pointer" data-bind="css: {'completed': properties.status() == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(properties.status()) != -1, 'failed': properties.status() == 'FAILED' || properties.status() == 'KILLED'}, click: function() {  if (properties.externalId()) { $root.job().id(properties.externalId()); $root.job().fetchJob();} }">
                 <td>
                   <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#schedulesTable', value: $data, hueChecked: $parent.selectedJobs"></div>
                 </td>
