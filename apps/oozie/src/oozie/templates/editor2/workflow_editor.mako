@@ -138,7 +138,7 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
   <%def name="widgets()">
     % if ENABLE_DOCUMENT_ACTION.get():
     <!-- ko if: $root.currentDraggableSection() === 'documents' -->
-    <span class="draggable-documents">
+    <div class="draggable-documents">
 
     <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
     <div data-bind="css: { 'draggable-widget': true },
@@ -223,12 +223,14 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    </span>
+      <div class="clearfix"></div>
+
+    </div>
     <!-- /ko -->
     % endif
 
     <!-- ko if: $root.currentDraggableSection() === 'actions' -->
-    <span class="draggable-actions">
+    <div class="draggable-actions">
 
     % if not ENABLE_DOCUMENT_ACTION.get():
     <!-- ko if: $root.availableActions().length == 0 || $root.availableActions().indexOf('hive') != -1 -->
@@ -396,9 +398,10 @@ ${ layout.menubar(section='workflows', is_editor=True, pullright=buttons, is_emb
     </div>
     <!-- /ko -->
 
-    </span>
+      <div class="clearfix"></div>
+
+    </div>
     <!-- /ko -->
-    <div class="clearfix"></div>
 </%def>
 </%dashboard:layout_toolbar>
 
@@ -893,11 +896,16 @@ ${ utils.submit_popup_event() }
     function resizeToolbar() {
       $('.card-toolbar-content').width(100).css('marginLeft', '0');
       if ($('.card-toolbar').height() > 60) {
+        var loops = 0;
         while ($('.card-toolbar').height() > 60) {
           $('.card-toolbar-content').width($('.card-toolbar-content').width() + 10);
+          loops++;
+          if (loops > 120){
+            break;
+          }
         }
       }
-      var marginLeft = $('.card-toolbar').width() / 2 - $('.card-toolbar-content').width() / 2;
+      var marginLeft = Math.max(0, $('.card-toolbar').width() / 2 - $('.card-toolbar-content').width() / 2);
       $('.card-toolbar-content').css('marginLeft', marginLeft + 'px');
     }
 
