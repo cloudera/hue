@@ -2751,6 +2751,13 @@ var SqlFunctions = (function () {
 				draggable: 'current_database()',
         description: 'Returns the database that the session is currently using, either default if no database has been selected, or whatever database the session switched to through a USE statement or the impalad - d option'
       },
+      effective_user: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'effective_user()',
+        draggable: 'effective_user()',
+        description: 'Typically returns the same value as user(), except if delegation is enabled, in which case it returns the ID of the delegated user.'
+      },
       pid: {
         returnTypes: ['INT'],
         arguments: [],
@@ -2764,6 +2771,13 @@ var SqlFunctions = (function () {
         signature: 'user()',
 				draggable: 'user()',
         description: 'Returns the username of the Linux user who is connected to the impalad daemon.Typically called a single time, in a query without any FROM clause, to understand how authorization settings apply in a security context; once you know the logged - in user name, you can check which groups that user belongs to, and from the list of groups you can check which roles are available to those groups through the authorization policy file.In Impala 2.0 and later, user() returns the the full Kerberos principal string, such as user@example.com, in a Kerberized environment.'
+      },
+      uuid: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'uuid()',
+        draggable: 'uuid()',
+        description: 'Returns a universal unique identifier, a 128-bit value encoded as a string with groups of hexadecimal digits separated by dashes.'
       },
       version: {
         returnTypes: ['STRING'],
