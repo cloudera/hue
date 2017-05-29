@@ -243,7 +243,7 @@ var CoordinatorEditorViewModel = (function () {
             else {
               $(document).trigger("info", data.message);
             }
-            if (window.location.search.indexOf("coordinator") == -1) {
+            if (window.location.search.indexOf("coordinator") == -1 && !IS_HUE_4) {
               window.location.hash = '#coordinator=' + data.id;
             }
           }

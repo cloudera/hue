@@ -739,8 +739,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
           huePubSub.publish('hue.datatable.search.hide');
           huePubSub.publish('nicescroll.resize');
-          if (app === 'filebrowser'){
+          if (app === 'filebrowser') {
             $(window).unbind('hashchange.fblist');
+          }
+          if (app.startsWith('oozie')) {
+            huePubSub.clearAppSubscribers('oozie');
           }
           if (typeof self.embeddable_cache[app] === 'undefined') {
             if (loadedApps.indexOf(app) == -1){
