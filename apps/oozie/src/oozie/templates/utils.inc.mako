@@ -580,6 +580,22 @@ function renderCrons() {
 }
 </%def>
 
+<%def name="submit_popup_event()">
+  <script type="text/javascript">
+    $(document).ready(function () {
+      $(document).off('showSubmitPopup');
+      $(document).on('showSubmitPopup', function (event, data) {
+        $('.submit-modal').html(data);
+        $('.submit-modal').modal('show');
+        var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
+        if (_sel.length > 0) {
+          $('.submit-modal .modal-body').height($('.submit-modal .modal-body').height() + 60);
+        }
+      });
+    });
+  </script>
+</%def>
+
 <%def name="bulk_dashboard_functions()">
 
 <div id="bulkConfirmation" class="modal hide">
