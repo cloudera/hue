@@ -108,7 +108,7 @@ var BundleEditorViewModel = function (bundle_json, coordinators_json, can_edit_j
           self.bundle.id(data.id);
           self.bundle.tracker().markCurrentStateAsClean();
           $(document).trigger("info", data.message);
-          if (window.location.search.indexOf("bundle") == -1) {
+          if (window.location.search.indexOf("bundle") == -1 && !IS_HUE_4) {
             window.location.hash = '#bundle=' + data.id;
           }
         }
