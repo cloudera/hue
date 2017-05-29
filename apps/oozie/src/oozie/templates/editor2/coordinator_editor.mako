@@ -134,7 +134,8 @@ ${ commonshare() | n,unicode }
 ${ dashboard.import_bindings() }
 
 <script src="${ static('oozie/js/coordinator-editor.ko.js') }" type="text/javascript" charset="utf-8"></script>
-<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
+
+${ utils.submit_popup_event() }
 
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.hotkeys.js') }"></script>
 

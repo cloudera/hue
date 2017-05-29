@@ -137,8 +137,8 @@ ${ commonimportexport(request) | n,unicode }
 
 <script src="${ static('desktop/ext/js/datatables-paging-0.1.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/js/share2.vm.js') }"></script>
-<script src="${ static('oozie/js/editor2-utils.js') }" type="text/javascript" charset="utf-8"></script>
 
+${ utils.submit_popup_event() }
 
 <script type="text/javascript">
   var Editor = function () {
