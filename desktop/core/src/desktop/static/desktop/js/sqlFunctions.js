@@ -454,6 +454,13 @@ var SqlFunctions = (function () {
         draggable: 'atan()',
         description: 'Returns the arctangent of the argument.'
       },
+      atan2: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}], [{type: 'DOUBLE'}]],
+        signature: 'atan2(DOUBLE a, DOUBLE b)',
+        draggable: 'atan2()',
+        description: 'Returns the arctangent of the two arguments, with the signs of the arguments used to determine the quadrant of the result.'
+      },
       bin: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'BIGINT'}]],
@@ -489,12 +496,82 @@ var SqlFunctions = (function () {
         draggable: 'cos()',
         description: 'Returns the cosine of the argument.'
       },
+      cosh: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'cosh(DOUBLE a)',
+        draggable: 'cosh()',
+        description: 'Returns the hyperbolic cosine of the argument.'
+      },
+      cot: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'cot(DOUBLE a)',
+        draggable: 'cot()',
+        description: 'Returns the cotangent of the argument.'
+      },
+      dceil: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}]],
+        signature: 'dceil(T<DOUBLE|DECIMAL> a)',
+        draggable: 'dceil()',
+        description: 'Returns the smallest integer that is greater than or equal to the argument.'
+      },
       degrees: {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'DOUBLE'}]],
         signature: 'degrees(DOUBLE a)',
         draggable: 'degrees()',
         description: 'Converts argument value from radians to degrees.'
+      },
+      dexp: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'dexp(DOUBLE a)',
+        draggable: 'dexp()',
+        description: 'Returns the mathematical constant e raised to the power of the argument.'
+      },
+      dfloor: {
+        returnTypes: ['BIGINT'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}]],
+        signature: 'dfloor(T<DOUBLE|DECIMAL> a)',
+        draggable: 'dfloor()',
+        description: 'Returns the largest integer that is less than or equal to the argument.'
+      },
+      dlog1: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'dlog1(DOUBLE a)',
+        draggable: 'dlog1()',
+        description: 'Returns the natural logarithm of the argument.'
+      },
+      dpow: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}], [{type: 'DOUBLE'}]],
+        signature: 'dpow(DOUBLE a, DOUBLE p)',
+        draggable: 'dpow()',
+        description: 'Returns the first argument raised to the power of the second argument.'
+      },
+      dround: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DECIMAL'}, {type: 'DOUBLE'}], [{type: 'INT', optional: true}]],
+        signature: 'dround(DOUBLE a [, INT d]), round(DECIMAL val, INT d)',
+        draggable: 'dround()',
+        description: 'Rounds a floating-point value. By default (with a single argument), rounds to the nearest integer. Values ending in .5 are rounded up for positive numbers, down for negative numbers (that is, away from zero). The optional second argument specifies how many digits to leave after the decimal point; values greater than zero produce a floating-point return value rounded to the requested number of digits to the right of the decimal point.'
+      },
+      dsqrt: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'dsqrt(DOUBLE a)',
+        draggable: 'dsqrt()',
+        description: 'Returns the square root of the argument.'
+      },
+      dtrunc: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
+        signature: 'dtrunc(T<DOUBLE|DECIMAL> a, [NUMBER b])',
+        draggable: 'dtrunc()',
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
       },
       e: {
         returnTypes: ['DOUBLE'],
@@ -510,19 +587,33 @@ var SqlFunctions = (function () {
         draggable: 'exp()',
         description: 'Returns the mathematical constant e raised to the power of the argument.'
       },
+      factorial: {
+        returnTypes: ['BIGINT'],
+        arguments: [[{type: 'T'}]],
+        signature: 'factorial(T a)',
+        draggable: 'factorial()',
+        description: 'Computes the factorial of an integer value. It works with any integer type. You can use either the factorial() function or the ! operator. The factorial of 0 is 1. Likewise, the factorial() function returns 1 for any negative value. The maximum positive value for the input argument is 20; a value of 21 or greater overflows the range for a BIGINT and causes an error.'
+      },
       floor: {
         returnTypes: ['BIGINT'],
-        arguments: [[{type: 'DOUBLE'}]],
-        signature: 'floor(DOUBLE a)',
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}]],
+        signature: 'floor(T<DOUBLE|DECIMAL> a)',
         draggable: 'floor()',
         description: 'Returns the largest integer that is less than or equal to the argument.'
       },
       fmod: {
         returnTypes: ['T'],
-        arguments: [[{type: 'DOUBLE'}, {type: 'FLOAT'}], [{type: 'DOUBLE'}, {type: 'FLOAT'}]],
-        signature: 'fmod(T<DOUBLE|FLOAT> a, T<DOUBLE|FLOAT> b)',
+        arguments: [[{type: 'DOUBLE'}, {type: 'DOUBLE'}], [{type: 'FLOAT'}, {type: 'FLOAT'}]],
+        signature: 'fmod(DOUBLE a, DOUBLE b), fmod(FLOAT a, FLOAT b)',
         draggable: 'fmod()',
         description: 'Returns the modulus of a number.'
+      },
+      fpow: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}], [{type: 'DOUBLE'}]],
+        signature: 'fpow(DOUBLE a, DOUBLE p)',
+        draggable: 'fpow()',
+        description: 'Returns the first argument raised to the power of the second argument.'
       },
       fnv_hash: {
         returnTypes: ['BIGINT'],
@@ -650,6 +741,13 @@ var SqlFunctions = (function () {
         draggable: 'min_tinyint()',
         description: 'Returns the smallest value of the associated integral type (a negative number).'
       },
+      mod: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'mod(T a, T b)',
+        draggable: 'mod()',
+        description: 'Returns the modulus of a number. Equivalent to the % arithmetic operator. Works with any size integer type, any size floating-point type, and DECIMAL with any precision and scale.'
+      },
       negative: {
         returnTypes: ['T'],
         arguments: [[{type: 'T'}]],
@@ -701,8 +799,8 @@ var SqlFunctions = (function () {
       },
       quotient: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'INT'}], [{type: 'INT'}]],
-        signature: 'quotient(INT numerator, INT denominator)',
+        arguments: [[{type: 'BIGINT'}, {type: 'DOUBLE'}], [{type: 'BIGINT'}, {type: 'DOUBLE'}]],
+        signature: 'quotient(BIGINT numerator, BIGINT denominator), quotient(DOUBLE numerator, DOUBLE denominator)',
         draggable: 'quotient()',
         description: 'Returns the first argument divided by the second argument, discarding any fractional part. Avoids promoting arguments to DOUBLE as happens with the / SQL operator.'
       },
@@ -715,9 +813,16 @@ var SqlFunctions = (function () {
       },
       rand: {
         returnTypes: ['DOUBLE'],
-        arguments: [[{type: 'INT', optinal: true}]],
+        arguments: [[{type: 'INT', optional: true}]],
         signature: 'rand([INT seed])',
         draggable: 'rand()',
+        description: 'Returns a random value between 0 and 1. After rand() is called with a seed argument, it produces a consistent random sequence based on the seed value.'
+      },
+      random: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'INT', optional: true}]],
+        signature: 'random([INT seed])',
+        draggable: 'random()',
         description: 'Returns a random value between 0 and 1. After rand() is called with a seed argument, it produces a consistent random sequence based on the seed value.'
       },
       round: {
@@ -748,6 +853,13 @@ var SqlFunctions = (function () {
         draggable: 'sin()',
         description: 'Returns the sine of the argument.'
       },
+      sinh: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'sinh(DOUBLE a)',
+        draggable: 'sinh()',
+        description: 'Returns the hyperbolic sine of the argument.'
+      },
       sqrt: {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'DOUBLE'}]],
@@ -761,6 +873,20 @@ var SqlFunctions = (function () {
         signature: 'tan(DOUBLE a)',
         draggable: 'tan()',
         description: 'Returns the tangent of the argument.'
+      },
+      tanh: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'DOUBLE'}]],
+        signature: 'tanh(DOUBLE a)',
+        draggable: 'tanh()',
+        description: 'Returns the tangent of the argument.'
+      },
+      truncate: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'DOUBLE'}, {type: 'DECIMAL'}], [{ type: 'NUMBER', optional: true }]],
+        signature: 'truncate(T<DOUBLE|DECIMAL> a, [NUMBER b])',
+        draggable: 'truncate()',
+        description: 'Removes some or all fractional digits from a numeric value. With no argument, removes all fractional digits, leaving an integer value. The optional argument specifies the number of fractional digits to include in the return value, and only applies with the argument type is DECIMAL. truncate() and dtrunc() are aliases for the same function.'
       },
       unhex: {
         returnTypes: ['STRING'],
