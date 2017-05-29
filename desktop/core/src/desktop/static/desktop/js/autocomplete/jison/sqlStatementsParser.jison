@@ -25,6 +25,8 @@
 <<EOF>>                                                               { return 'EOF'; }
 ([^;"'`]|(["][^"]*["])|(['][^']*['])|([`][^`]*[`]))*[;]?              { return 'STATEMENT'; }
 
+.                                                                     { /* skip unknown chars */ }
+
 /lex
 
 %start SqlStatementsParser
