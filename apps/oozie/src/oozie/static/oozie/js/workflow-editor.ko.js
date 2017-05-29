@@ -1264,19 +1264,21 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
       var _to = $("#wdg_" + (typeof toId == "function" ? toId() : toId));
       if (_from.length > 0 && _to.length > 0) {
         var $painter = $(document.body);
+        var correction = 0;
 
         if ($('.oozie_workflowComponents').length > 0) {
           $painter = $('.oozie_workflowComponents');
+          correction = $('.page-content').scrollTop();
         }
 
         var _fromCenter = {
           x: _from.position().left + _from.outerWidth() / 2,
-          y: _from.position().top + _from.outerHeight() + 3
+          y: _from.position().top + correction + _from.outerHeight() + 3
         }
 
         var _toCenter = {
           x: _to.position().left + _to.outerWidth() / 2,
-          y: _to.position().top - 5
+          y: _to.position().top + correction - 5
         }
 
         var _curveCoords = {};
