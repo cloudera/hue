@@ -1617,7 +1617,7 @@ var SqlFunctions = (function () {
         description: 'Returns the specified date and time minus some number of hours.'
       },
       int_months_between: {
-        returnTypes: ['INTEGER'],
+        returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
         signature: 'int_months_between(TIMESTAMP newer, TIMESTAMP older)',
         draggable: 'int_months_between()',
@@ -1638,7 +1638,7 @@ var SqlFunctions = (function () {
         description: 'Returns the specified date and time minus some number of microseconds.'
       },
       milliseconds: {
-        returnTypes: ['INTEGER'],
+        returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}]],
         signature: 'milliseconds(TIMESTAMP date)',
         draggable: 'milliseconds()',
@@ -1764,7 +1764,7 @@ var SqlFunctions = (function () {
         description: 'Returns a string representation of the current date and time, according to the time of the local system, including any time zone designation.'
       },
       timestamp_cmp: {
-        returnTypes: ['INTEGER'],
+        returnTypes: ['INT'],
         arguments: [[{type: 'TIMESTAMP'}], [{type: 'TIMESTAMP'}]],
         signature: 'timestamp_cmp(TIMESTAMP t1, TIMESTAMP t2)',
         draggable: 'timestamp_cmp()',
@@ -2297,6 +2297,13 @@ var SqlFunctions = (function () {
 				draggable: 'ascii()',
         description: 'Returns the numeric ASCII code of the first character of the argument.'
       },
+      btrim: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'btrim(STRING str [, STRING chars_to_trim])',
+        draggable: 'btrim()',
+        description: 'Removes all instances of one or more characters from the start and end of a STRING value. By default, removes only spaces. If a non-NULL optional second argument is specified, the function removes all occurrences of characters in that second argument from the beginning and end of the string.'
+      },
       char_length: {
         returnTypes: ['INT'],
         arguments: [[{type: 'STRING'}]],
@@ -2310,6 +2317,13 @@ var SqlFunctions = (function () {
         signature: 'character_length(STRING a)',
 				draggable: 'character_length()',
         description: 'Returns the length in characters of the argument string. Aliases for the length() function.'
+      },
+      chr: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'INT'}]],
+        signature: 'chr(INT character_code)',
+        draggable: 'chr()',
+        description: 'Returns a character specified by a decimal code point value. The interpretation and display of the resulting character depends on your system locale. Because consistent processing of Impala string values is only guaranteed for values within the ASCII range, only use this function for values corresponding to ASCII characters. In particular, parameter values greater than 255 return an empty string.'
       },
       concat: {
         returnTypes: ['STRING'],
@@ -2348,10 +2362,10 @@ var SqlFunctions = (function () {
       },
       instr: {
         returnTypes: ['INT'],
-        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'instr(STRING str, STRING substr)',
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{ type: 'BIGINT', optional: true}], [{ type: 'BIGINT', optional: true}]],
+        signature: 'instr(STRING str, STRING substr [, BIGINT position [, BIGINT occurrence]])',
 				draggable: 'instr()',
-        description: 'Returns the position (starting from 1) of the first occurrence of a substring within a longer string.'
+        description: 'Returns the position (starting from 1) of the first occurrence of a substring within a longer string. The optional third and fourth arguments let you find instances of the substring other than the first instance starting from the left.'
       },
       length: {
         returnTypes: ['INT'],
@@ -2409,6 +2423,13 @@ var SqlFunctions = (function () {
 				draggable: 'regexp_extract()',
         description: 'Returns the specified () group from a string based on a regular expression pattern. Group 0 refers to the entire extracted string, while group 1, 2, and so on refers to the first, second, and so on (...) portion.'
       },
+      regexp_like: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING', optional: true}]],
+        signature: 'regexp_like(STRING source, STRING pattern [, STRING options])',
+        draggable: 'regexp_like()',
+        description: 'Returns true or false to indicate whether the source string contains anywhere inside it the regular expression given by the pattern. The optional third argument consists of letter flags that change how the match is performed, such as i for case-insensitive matching.'
+      },
       regexp_replace: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING'}]],
@@ -2450,6 +2471,13 @@ var SqlFunctions = (function () {
         signature: 'space(INT n)',
 				draggable: 'space()',
         description: 'Returns a concatenated string of the specified number of spaces. Shorthand for repeat(\' \', n).'
+      },
+      split_part: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'BIGINT'}]],
+        signature: 'split_part(STRING source, STRING delimiter, BIGINT n)',
+        draggable: 'split_part()',
+        description: 'Returns the nth field within a delimited string. The fields are numbered starting from 1. The delimiter can consist of multiple characters, not just a single character. All matching of the delimiter is done exactly, not using any regular expression patterns.'
       },
       strleft: {
         returnTypes: ['STRING'],
@@ -2907,50 +2935,50 @@ var SqlFunctions = (function () {
       },
       countset: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER', optional: true }]],
-        signature: 'countset(T<integer_type> a [, INTEGER b])',
+        arguments: [[{ type: 'T' }], [{ type: 'INT', optional: true }]],
+        signature: 'countset(T<integer_type> a [, INT b])',
         draggable: 'countset()',
         description: 'By default, returns the number of 1 bits in the specified integer value. If the optional second argument is set to zero, it returns the number of 0 bits instead.'
       },
       getbit: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
-        signature: 'getbit(T<integer_type> a, INTEGER b)',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }]],
+        signature: 'getbit(T<integer_type> a, INT b)',
         draggable: 'getbit()',
         description: 'Returns a 0 or 1 representing the bit at a specified position. The positions are numbered right to left, starting at zero. The position argument (b) cannot be negative.'
       },
       rotateleft: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
-        signature: 'rotateleft(T<integer_type> a, INTEGER b)',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }]],
+        signature: 'rotateleft(T<integer_type> a, INT b)',
         draggable: 'rotateleft()',
         description: 'Rotates an integer value left by a specified number of bits. As the most significant bit is taken out of the original value, if it is a 1 bit, it is "rotated" back to the least significant bit. Therefore, the final value has the same number of 1 bits as the original value, just in different positions. In computer science terms, this operation is a "circular shift".'
       },
       rotateright: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
-        signature: 'rotateright(T<integer_type> a, INTEGER b)',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }]],
+        signature: 'rotateright(T<integer_type> a, INT b)',
         draggable: 'rotateright()',
         description: 'Rotates an integer value right by a specified number of bits. As the least significant bit is taken out of the original value, if it is a 1 bit, it is "rotated" back to the most significant bit. Therefore, the final value has the same number of 1 bits as the original value, just in different positions. In computer science terms, this operation is a "circular shift".'
       },
       setbit: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }], [{ type: 'INTEGER', optional: true }]],
-        signature: 'setbit(T<integer_type> a, INTEGER b [, INTEGER c])',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }], [{ type: 'INT', optional: true }]],
+        signature: 'setbit(T<integer_type> a, INT b [, INT c])',
         draggable: 'setbit()',
         description: 'By default, changes a bit at a specified position (b) to a 1, if it is not already. If the optional third argument is set to zero, the specified bit is set to 0 instead.'
       },
       shiftleft: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
-        signature: 'shiftleft(T<integer_type> a, INTEGER b)',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }]],
+        signature: 'shiftleft(T<integer_type> a, INT b)',
         draggable: 'shiftleft()',
         description: 'Shifts an integer value left by a specified number of bits. As the most significant bit is taken out of the original value, it is discarded and the least significant bit becomes 0. In computer science terms, this operation is a "logical shift".'
       },
       shiftright: {
         returnTypes: ['T'],
-        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
-        signature: 'shiftright(T<integer_type> a, INTEGER b)',
+        arguments: [[{ type: 'T' }], [{ type: 'INT' }]],
+        signature: 'shiftright(T<integer_type> a, INT b)',
         draggable: 'shiftright()',
         description: 'Shifts an integer value right by a specified number of bits. As the least significant bit is taken out of the original value, it is discarded and the most significant bit becomes 0. In computer science terms, this operation is a "logical shift".'
       }
