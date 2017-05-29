@@ -1911,12 +1911,47 @@ var SqlFunctions = (function () {
 				draggable: 'ifnull()',
         description: 'Alias for the isnull() function, with the same behavior. To simplify porting SQL with vendor extensions to Impala.'
       },
+      isfalse: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'BOOLEAN'}]],
+        signature: 'isfalse(BOOLEAN condition)',
+        draggable: 'isfalse()',
+        description: 'Tests if a Boolean expression is false or not. Returns true if so. If the argument is NULL, returns false. Identical to isnottrue(), except it returns the opposite value for a NULL argument.'
+      },
+      isnotfalse: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'BOOLEAN'}]],
+        signature: 'isnotfalse(BOOLEAN condition)',
+        draggable: 'isnotfalse()',
+        description: 'Tests if a Boolean expression is not false (that is, either true or NULL). Returns true if so. If the argument is NULL, returns true. Identical to istrue(), except it returns the opposite value for a NULL argument.'
+      },
+      isnottrue: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'BOOLEAN'}]],
+        signature: 'isnottrue(BOOLEAN condition)',
+        draggable: 'isnottrue()',
+        description: 'Tests if a Boolean expression is not true (that is, either false or NULL). Returns true if so. If the argument is NULL, returns true. Identical to isfalse(), except it returns the opposite value for a NULL argument.'
+      },
       isnull: {
         returnTypes: ['T'],
         arguments: [[{type: 'T'}], [{type: 'T'}]],
         signature: 'isnull(T a, T ifNotNull)',
 				draggable: 'isnull()',
         description: 'Tests if an expression is NULL, and returns the expression result value if not. If the first argument is NULL, returns the second argument.'
+      },
+      istrue: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'BOOLEAN'}]],
+        signature: 'istrue(BOOLEAN condition)',
+        draggable: 'istrue()',
+        description: 'Tests if a Boolean expression is true or not. Returns true if so. If the argument is NULL, returns false. Identical to isnotfalse(), except it returns the opposite value for a NULL argument.'
+      },
+      nonnullvalue: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'T'}]],
+        signature: 'nonnullvalue(T expression)',
+        draggable: 'nonnullvalue()',
+        description: 'Tests if an expression (of any type) is NULL or not. Returns false if so. The converse of nullvalue().'
       },
       nullif: {
         returnTypes: ['T'],
@@ -1931,6 +1966,13 @@ var SqlFunctions = (function () {
         signature: 'nullifzero(T numeric_expr)',
 				draggable: 'nullifzero()',
         description: 'Returns NULL if the numeric expression evaluates to 0, otherwise returns the result of the expression.'
+      },
+      nullvalue: {
+        returnTypes: ['BOOLEAN'],
+        arguments: [[{type: 'T'}]],
+        signature: 'nullvalue(T expression)',
+        draggable: 'nullvalue()',
+        description: 'Tests if an expression (of any type) is NULL or not. Returns true if so. The converse of nonnullvalue().'
       },
       nvl: {
         returnTypes: ['T'],
