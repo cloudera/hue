@@ -366,6 +366,7 @@ except ImportError, e:
               if (IS_HUE_4) {
                 $(".modal-backdrop").remove();
                 if (self.saveTarget() == 'hdfs-file' || (self.saveTarget() == 'search-index' && typeof resp.rowcount !== 'undefined')) {
+                  $("#saveResultsModal").hide();
                   huePubSub.publish('open.link', resp.watch_url);
                 } else {
                   if (resp.history_uuid) {
