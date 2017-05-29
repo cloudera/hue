@@ -314,7 +314,7 @@ ${ hueIcons.symbols() }
             onError: onePageViewModel.dropzoneError,
             onComplete: onePageViewModel.dropzoneComplete },
             click: function(){ page('/indexer/importer/') }" class="pointer" title="${ _('Import data wizard') }">
-          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Drop files here') }</div>
+          <div class="dz-message" data-dz-message><i class="fa fa-fw fa-cloud-upload"></i> ${ _('Click or Drop files here') }</div>
         </div>
       </div>
     </div>
