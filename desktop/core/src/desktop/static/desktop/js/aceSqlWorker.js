@@ -14,7 +14,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-var version = 18;
+var version = 19;
 importScripts('/static/desktop/js/autocomplete/sqlParseSupport.js?version=' + version);
 importScripts('/static/desktop/js/autocomplete/sql.js?version=' + version);
 importScripts('/static/desktop/js/sqlFunctions.js?version=' + version);
