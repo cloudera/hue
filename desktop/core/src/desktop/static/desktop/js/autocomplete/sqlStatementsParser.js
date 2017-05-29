@@ -607,12 +607,14 @@ case 3: return 5;
 break;
 case 4: return 6; 
 break;
-case 5:console.log(yy_.yytext);
+case 5: /* skip unknown chars */ 
+break;
+case 6:console.log(yy_.yytext);
 break;
 }
 },
-rules: [/^(?:\s)/,/^(?:--.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:$)/,/^(?:([^;"'`]|(["][^"]*["])|(['][^']*['])|([`][^`]*[`]))*[;]?)/,/^(?:.)/],
-conditions: {"INITIAL":{"rules":[0,1,2,3,4,5],"inclusive":true}}
+rules: [/^(?:\s)/,/^(?:--.*)/,/^(?:[\/][*][^*]*[*]+([^\/*][^*]*[*]+)*[\/])/,/^(?:$)/,/^(?:([^;"'`]|(["][^"]*["])|(['][^']*['])|([`][^`]*[`]))*[;]?)/,/^(?:.)/,/^(?:.)/],
+conditions: {"INITIAL":{"rules":[0,1,2,3,4,5,6],"inclusive":true}}
 });
 return lexer;
 })();
