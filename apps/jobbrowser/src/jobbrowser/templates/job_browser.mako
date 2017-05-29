@@ -1201,18 +1201,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="bundle-page-coordinators">
-          <input type="text" class="input-xlarge search-query"  placeholder="${_('Filter by id, name, user...')}" />
-          <div class="btn-group">
-            <select size="3" multiple="true"></select>
-            <a class="btn btn-status btn-success" data-value="completed">${ _('Succeeded') }</a>
-            <a class="btn btn-status btn-warning" data-value="running">${ _('Running') }</a>
-            <a class="btn btn-status btn-danger disable-feedback" data-value="failed">${ _('Failed') }</a>
-          </div>
-
-          <table id="coordsTable" class="datatables table table-condensed">
+          <table id="coordsTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
               <th>${_('Status')}</th>
               <th>${_('Name')}</th>
               <th>${_('Type')}</th>
@@ -1226,8 +1217,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['actions']">
-              <tr data-bind="click: function() {  if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
-                <td><div class="hueCheckbox fa"></div></td>
+              <tr class="status-border pointer" data-bind="css: {'completed': status() == 'SUCCEEDED', 'running': ['SUCCEEDED', 'FAILED', 'KILLED'].indexOf(status()) != -1, 'failed': status() == 'FAILED' || status() == 'KILLED'}, click: function() { if (id()) { $root.job().id(id()); $root.job().fetchJob();} }">
                 <td data-bind="text: status"></td>
                 <td data-bind="text: name"></td>
                 <td data-bind="text: type"></td>
@@ -1240,7 +1230,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <td data-bind="text: pauseTime"></td>
               </tr>
             </tbody>
-          </table>    </div>
+          </table>
+        </div>
 
         <div class="tab-pane" id="bundle-page-logs">
           <pre data-bind="html: logs, logScroller: logs"></pre>
