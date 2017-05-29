@@ -167,22 +167,26 @@ from desktop.views import _ko
       <div class="jobs-badge" data-bind="text: historyFinishedJobs().length, visible: historyFinishedJobs().length > 0"></div>
     </button>
 
-    <div class="jobs-panel" data-bind="visible: historyPanelVisible" style="display: none;">
+    <div class="jobs-panel history-panel" data-bind="visible: historyPanelVisible" style="display: none;">
       <a class="pointer inactive-action pull-right" data-bind="click: function(){ historyPanelVisible(false); }"><i class="fa fa-fw fa-times"></i></a>
       <!-- ko ifnot: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
         <span style="font-style: italic">${ _('No task history.') }</span>
       <!-- /ko -->
       <!-- ko if: editorViewModel.selectedNotebook() && editorViewModel.selectedNotebook().history().length > 0 -->
       <!-- ko with: editorViewModel.selectedNotebook() -->
-      <div>
-        <span data-bind="text: name"></span>
-        <a href="javascript:void(0)" data-bind="hueLink: onSuccessUrl()" target="_blank">
-          ${ _('Output') }
-        </a>
+      <div class="notification-history margin-bottom-10">
+        <!-- ko if: onSuccessUrl() -->
+        <div class="notification-history-title">
+          <strong class="margin-left-5" data-bind="text: name"></strong>
+          <a class="pull-right margin-right-10" href="javascript:void(0)" data-bind="hueLink: onSuccessUrl()">
+            ${ _('Output') }
+          </a>
+          <div class="clearfix"></div>
+        </div>
+        <!-- /ko -->
         <!-- ko if: snippets()[0] -->
         <!-- ko with: snippets()[0] -->
         <!-- ko if: progress -->
-        <span data-bind="text: status"></span>
         <div class="snippet-progress-container">
           <div class="progress-snippet progress" data-bind="css: {
                     'progress-starting': progress() == 0 && status() == 'running',
@@ -194,9 +198,8 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
         <!-- ko if: result -->
-        <span data-bind="text: ko.mapping.toJSON(result.handle)"></span>
         <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated"></pre>
+        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated" style="height: 120px"></pre>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
@@ -209,7 +212,7 @@ from desktop.views import _ko
         <!-- /ko -->
         <!-- ko if: history().length > 0 -->
         <div class="notification-history-title">
-          <strong>${ _('Task History') }</strong>
+          <strong class="margin-left-5">${ _('Task History') }</strong>
           <div class="inactive-action pointer pull-right" title="${_('Clear the query history')}" data-target="#clearNotificationHistoryModal" data-toggle="modal" rel="tooltip">
             <i class="fa fa-calendar-times-o"></i>
           </div>

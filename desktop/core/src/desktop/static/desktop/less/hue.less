@@ -136,12 +136,22 @@ body {
 }
 
 .notification-history-title {
-  background-color: @cui-gray-050;
+  background-color: @cui-gray-100;
   padding: 4px;
 }
 
 .notification-history-list li {
   padding: 4px;
+  cursor: pointer;
+  &:hover {
+    background-color: @cui-gray-050;
+  }
+}
+
+.history-panel {
+  .progress {
+    height: 4px;
+  }
 }
 
 .btn-flat {
