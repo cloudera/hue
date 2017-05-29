@@ -2789,6 +2789,90 @@ var SqlFunctions = (function () {
     }
   };
 
+
+  var BIT_FUNCTIONS = {
+    hive: {},
+    impala: {
+      bitand: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'T' }]],
+        signature: 'bitand(T<integer_type> a, T<integer_type> b)',
+        draggable: 'bitand()',
+        description: 'Returns an integer value representing the bits that are set to 1 in both of the arguments. If the arguments are of different sizes, the smaller is promoted to the type of the larger.'
+      },
+      bitnot: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }]],
+        signature: 'bitnot(T<integer_type> a)',
+        draggable: 'bitnot()',
+        description: 'Inverts all the bits of the input argument.'
+      },
+      bitor: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'T' }]],
+        signature: 'bitor(T<integer_type> a, T<integer_type> b)',
+        draggable: 'bitor()',
+        description: 'Returns an integer value representing the bits that are set to 1 in either of the arguments. If the arguments are of different sizes, the smaller is promoted to the type of the larger.'
+      },
+      bitxor: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'T' }]],
+        signature: 'bitxor(T<integer_type> a, T<integer_type> b)',
+        draggable: 'bitxor()',
+        description: 'Returns an integer value representing the bits that are set to 1 in one but not both of the arguments. If the arguments are of different sizes, the smaller is promoted to the type of the larger.'
+      },
+      countset: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER', optional: true }]],
+        signature: 'countset(T<integer_type> a [, INTEGER b])',
+        draggable: 'countset()',
+        description: 'By default, returns the number of 1 bits in the specified integer value. If the optional second argument is set to zero, it returns the number of 0 bits instead.'
+      },
+      getbit: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
+        signature: 'getbit(T<integer_type> a, INTEGER b)',
+        draggable: 'getbit()',
+        description: 'Returns a 0 or 1 representing the bit at a specified position. The positions are numbered right to left, starting at zero. The position argument (b) cannot be negative.'
+      },
+      rotateleft: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
+        signature: 'rotateleft(T<integer_type> a, INTEGER b)',
+        draggable: 'rotateleft()',
+        description: 'Rotates an integer value left by a specified number of bits. As the most significant bit is taken out of the original value, if it is a 1 bit, it is "rotated" back to the least significant bit. Therefore, the final value has the same number of 1 bits as the original value, just in different positions. In computer science terms, this operation is a "circular shift".'
+      },
+      rotateright: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
+        signature: 'rotateright(T<integer_type> a, INTEGER b)',
+        draggable: 'rotateright()',
+        description: 'Rotates an integer value right by a specified number of bits. As the least significant bit is taken out of the original value, if it is a 1 bit, it is "rotated" back to the most significant bit. Therefore, the final value has the same number of 1 bits as the original value, just in different positions. In computer science terms, this operation is a "circular shift".'
+      },
+      setbit: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }], [{ type: 'INTEGER', optional: true }]],
+        signature: 'setbit(T<integer_type> a, INTEGER b [, INTEGER c])',
+        draggable: 'setbit()',
+        description: 'By default, changes a bit at a specified position (b) to a 1, if it is not already. If the optional third argument is set to zero, the specified bit is set to 0 instead.'
+      },
+      shiftleft: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
+        signature: 'shiftleft(T<integer_type> a, INTEGER b)',
+        draggable: 'shiftleft()',
+        description: 'Shifts an integer value left by a specified number of bits. As the most significant bit is taken out of the original value, it is discarded and the least significant bit becomes 0. In computer science terms, this operation is a "logical shift".'
+      },
+      shiftright: {
+        returnTypes: ['T'],
+        arguments: [[{ type: 'T' }], [{ type: 'INTEGER' }]],
+        signature: 'shiftright(T<integer_type> a, INTEGER b)',
+        draggable: 'shiftright()',
+        description: 'Shifts an integer value right by a specified number of bits. As the least significant bit is taken out of the original value, it is discarded and the most significant bit becomes 0. In computer science terms, this operation is a "logical shift".'
+      }
+    }
+  };
+
   var CATEGORIZED_FUNCTIONS = {
     hive: [
       { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['hive'] },
@@ -2806,6 +2890,7 @@ var SqlFunctions = (function () {
     impala: [
       { name: 'Aggregate', functions: AGGREGATE_FUNCTIONS['impala'] },
       { name: 'Analytic', functions: ANALYTIC_FUNCTIONS['impala'] },
+      { name: 'Bit', functions: BIT_FUNCTIONS['impala'] },
       { name: 'Conditional', functions: CONDITIONAL_FUNCTIONS['impala'] },
       { name: 'Date', functions: DATE_FUNCTIONS['impala'] },
       { name: 'Mathematical', functions: MATHEMATICAL_FUNCTIONS['impala'] },
@@ -2988,6 +3073,7 @@ var SqlFunctions = (function () {
 
   var getFunctionsWithReturnTypes = function (dialect, returnTypes, includeAggregate, includeAnalytic) {
     var result = {};
+    addFunctions(BIT_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(COLLECTION_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(CONDITIONAL_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(COMPLEX_TYPE_CONSTRUCTS, dialect, returnTypes, result);
@@ -3024,7 +3110,8 @@ var SqlFunctions = (function () {
   };
 
   var findFunction = function (dialect, functionName) {
-    return COLLECTION_FUNCTIONS[dialect][functionName] ||
+    return BIT_FUNCTIONS[dialect][functionName] ||
+        COLLECTION_FUNCTIONS[dialect][functionName] ||
         CONDITIONAL_FUNCTIONS[dialect][functionName] ||
         COMPLEX_TYPE_CONSTRUCTS[dialect][functionName] ||
         DATE_FUNCTIONS[dialect][functionName] ||
