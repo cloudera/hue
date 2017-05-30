@@ -1624,7 +1624,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }, function (data) {
           if (data.status == 0) {
             self.logs(data.logs.logs);
-            $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 30));
+            if ($('.jb-panel pre:visible').length > 0){
+              $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 30));
+            }
           } else {
             $(document).trigger("error", data.message);
           }
