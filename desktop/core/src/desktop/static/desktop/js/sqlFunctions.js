@@ -138,8 +138,6 @@ var PigFunctions = (function () {
   }
 })();
 
-
-
 var SqlFunctions = (function () {
 
   var MATHEMATICAL_FUNCTIONS = {
@@ -423,6 +421,13 @@ var SqlFunctions = (function () {
         signature: 'unhex(STRING a)',
         draggable: 'unhex()',
         description: 'Inverse of hex. Interprets each pair of characters as a hexadecimal number and converts to the byte representation of the number.'
+      },
+      width_bucket: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'NUMBER'}, {type: 'NUMBER'}, {type: 'NUMBER'}, {type: 'INT'}]],
+        signature: 'width_bucket(NUMBER expr, NUMBER min_value, NUMBER max_value, INT num_buckets)',
+        draggable: 'width_bucket()',
+        description: 'Returns an integer between 0 and num_buckets+1 by mapping expr into the ith equally sized bucket. Buckets are made by dividing [min_value, max_value] into equally sized regions. If expr < min_value, return 1, if expr > max_value return num_buckets+1. (as of Hive 3.0.0)'
       }
     },
     impala: {
@@ -1103,6 +1108,69 @@ var SqlFunctions = (function () {
         signature: 'var_samp(col)',
         draggable: 'var_samp()',
         description: 'Returns the unbiased sample variance of a numeric column in the group.'
+      },
+      regr_avgx: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_avgx(T independent, T dependent)',
+        draggable: 'regr_avgx()',
+        description: 'Equivalent to avg(dependent). As of Hive 2.2.0.'
+      },
+      regr_avgy: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_avgy(T independent, T dependent)',
+        draggable: 'regr_avgy()',
+        description: 'Equivalent to avg(dependent). As of Hive 2.2.0.'
+      },
+      regr_count: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_count(T independent, T dependent)',
+        draggable: 'regr_count()',
+        description: 'Returns the number of non-null pairs used to fit the linear regression line. As of Hive 2.2.0.'
+      },
+      regr_intercept: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_intercept(T independent, T dependent)',
+        draggable: 'regr_intercept()',
+        description: 'Returns the y-intercept of the linear regression line, i.e. the value of b in the equation dependent = a * independent + b. As of Hive 2.2.0.'
+      },
+      regr_r2: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_r2(T independent, T dependent)',
+        draggable: 'regr_r2()',
+        description: 'Returns the coefficient of determination for the regression. As of Hive 2.2.0.'
+      },
+      regr_slope: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_slope(T independent, T dependent)',
+        draggable: 'regr_slope()',
+        description: 'Returns the slope of the linear regression line, i.e. the value of a in the equation dependent = a * independent + b. As of Hive 2.2.0.'
+      },
+      regr_sxx: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_sxx(T independent, T dependent)',
+        draggable: 'regr_sxx()',
+        description: 'Equivalent to regr_count(independent, dependent) * var_pop(dependent). As of Hive 2.2.0.'
+      },
+      regr_sxy: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_sxy(T independent, T dependent)',
+        draggable: 'regr_sxy()',
+        description: 'Equivalent to regr_count(independent, dependent) * covar_pop(independent, dependent). As of Hive 2.2.0.'
+      },
+      regr_syy: {
+        returnTypes: ['DOUBLE'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'regr_syy(T independent, T dependent)',
+        draggable: 'regr_syy()',
+        description: 'Equivalent to regr_count(independent, dependent) * var_pop(independent). As of Hive 2.2.0.'
       }
     },
     impala: {
@@ -1173,7 +1241,7 @@ var SqlFunctions = (function () {
         returnTypes: ['DOUBLE'],
         arguments: [[{type: 'T'}]],
         signature: 'stddev_pop([DISTINCT | ALL] col)',
-			draggable: 'stddev_pop()',
+        draggable: 'stddev_pop()',
         description: 'Returns the population standard deviation of a numeric column in the group.'
       },
       stddev_samp: {
@@ -1329,8 +1397,8 @@ var SqlFunctions = (function () {
       },
       date_add: {
         returnTypes: ['T'],
-        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
-        signature: 'date_add(STRING startdate, INT days)',
+        arguments: [[{type: 'DATE'}, {type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'date_add(DATE startdate, INT days)',
 				draggable: 'date_add()',
         description: 'Adds a number of days to startdate: date_add(\'2008-12-31\', 1) = \'2009-01-01\'. T = pre 2.1.0: STRING, 2.1.0 on: DATE'
       },
@@ -1343,8 +1411,8 @@ var SqlFunctions = (function () {
       },
       date_sub: {
         returnTypes: ['T'],
-        arguments: [[{type: 'STRING'}], [{type: 'INT'}]],
-        signature: 'date_sub(STRING startdate, INT days)',
+        arguments: [[{type: 'DATE'}, {type: 'STRING'}], [{type: 'INT'}]],
+        signature: 'date_sub(DATE startdate, INT days)',
 				draggable: 'date_sub()',
         description: 'Subtracts a number of days to startdate: date_sub(\'2008-12-31\', 1) = \'2008-12-30\'. T = pre 2.1.0: STRING, 2.1.0 on: DATE'
       },
@@ -1378,8 +1446,8 @@ var SqlFunctions = (function () {
       },
       from_utc_timestamp: {
         returnTypes: ['TIMESTAMP'],
-        arguments: [[{type: 'TIMESTAMP'}], [{type: 'STRING'}]],
-        signature: 'from_utc_timestamp(TIMESTAMP a, STRING timezone)',
+        arguments: [[{type: 'T'}], [{type: 'STRING'}]],
+        signature: 'from_utc_timestamp(T a, STRING timezone)',
 				draggable: 'from_utc_timestamp()',
         description: 'Assumes given timestamp is UTC and converts to given timezone (as of Hive 0.8.0). For example, from_utc_timestamp(\'1970-01-01 08:00:00\',\'PST\') returns 1970-01-01 00:00:00'
       },
@@ -1448,8 +1516,8 @@ var SqlFunctions = (function () {
       },
       to_utc_timestamp: {
         returnTypes: ['TIMESTAMP'],
-        arguments: [[{type: 'TIMESTAMP'}]],
-        signature: 'to_utc_timestamp(TIMESTAMP a, STRING timezone)',
+        arguments: [[{type: 'T'}], [{type: 'STRING'}]],
+        signature: 'to_utc_timestamp(T a, STRING timezone)',
 				draggable: 'to_utc_timestamp()',
         description: 'Assumes given timestamp is in given timezone and converts to UTC (as of Hive 0.8.0). For example, to_utc_timestamp(\'1970-01-01 00:00:00\',\'PST\') returns 1970-01-01 08:00:00.'
       },
@@ -1462,8 +1530,8 @@ var SqlFunctions = (function () {
       },
       unix_timestamp: {
         returnTypes: ['BIGINT'],
-        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
-        signature: 'unix_timestamp(STRING date, STRING pattern)',
+        arguments: [[{type: 'STRING', optional: true}], [{type: 'STRING', optional: true}]],
+        signature: 'unix_timestamp([STRING date [, STRING pattern]])',
 				draggable: 'unix_timestamp()',
         description: 'Convert time string with given pattern to Unix time stamp (in seconds), return 0 if fail: unix_timestamp(\'2009-03-20\', \'yyyy-MM-dd\') = 1237532400.'
       },
@@ -1853,6 +1921,13 @@ var SqlFunctions = (function () {
 
   var CONDITIONAL_FUNCTIONS = {
     hive: {
+      assert_true: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'BOOLEAN'}]],
+        signature: 'assert_true(BOOLEAN condition)',
+        draggable: 'assert_true()',
+        description: 'Throw an exception if \'condition\' is not true, otherwise return null (as of Hive 0.8.0). For example, select assert_true (2<1).'
+      },
       coalesce: {
         returnTypes: ['T'],
         arguments: [[{type: 'T', multiple: true}]],
@@ -1880,6 +1955,13 @@ var SqlFunctions = (function () {
         signature: 'isnull(a)',
 				draggable: 'isnull()',
         description: 'Returns true if a is NULL and false otherwise.'
+      },
+      nullif: {
+        returnTypes: ['T'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'nullif(a, b)',
+        draggable: 'nullif()',
+        description: 'Returns NULL if a=b; otherwise returns a (as of Hive 2.2.0).'
       },
       nvl: {
         returnTypes: ['T'],
@@ -2014,6 +2096,27 @@ var SqlFunctions = (function () {
 				draggable: 'base64()',
         description: 'Converts the argument from binary to a base 64 string (as of Hive 0.12.0).'
       },
+      chr: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'BIGINT'}, {type: 'DOUBLE'}]],
+        signature: 'chr(BIGINT|DOUBLE a)',
+        draggable: 'chr()',
+        description: 'Returns the ASCII character having the binary equivalent to a (as of Hive 1.3.0 and 2.1.0). If a is larger than 256 the result is equivalent to chr(a % 256). Example: select chr(88); returns "X".'
+      },
+      char_length: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'char_length(STRING a)',
+        draggable: 'char_length()',
+        description: 'Returns the number of UTF-8 characters contained in str (as of Hive 2.2.0). This is shorthand for character_length.'
+      },
+      character_length: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'character_length(STRING a)',
+        draggable: 'character_length()',
+        description: 'Returns the number of UTF-8 characters contained in str (as of Hive 2.2.0). The function char_length is shorthand for this function.'
+      },
       concat: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING', multiple: true}, {type: 'BINARY', multiple: true}]],
@@ -2043,12 +2146,26 @@ var SqlFunctions = (function () {
 				draggable: 'decode()',
         description: 'Decodes the first argument into a String using the provided character set (one of \'US-ASCII\', \'ISO-8859-1\', \'UTF-8\', \'UTF-16BE\', \'UTF-16LE\', \'UTF-16\'). If either argument is null, the result will also be null. (As of Hive 0.12.0.)'
       },
+      elt: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'INT'}], [{type: 'STRING' , multiple: true }]],
+        signature: 'elt(INT n, STRING str, STRING str1, ...])',
+        draggable: 'elt()',
+        description: 'Return string at index number. For example elt(2,\'hello\',\'world\') returns \'world\'. Returns NULL if N is less than 1 or greater than the number of arguments.'
+      },
       encode: {
         returnTypes: ['BINARY'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
         signature: 'encode(STRING src, STRING charset)',
 				draggable: 'encode()',
         description: 'Encodes the first argument into a BINARY using the provided character set (one of \'US-ASCII\', \'ISO-8859-1\', \'UTF-8\', \'UTF-16BE\', \'UTF-16LE\', \'UTF-16\'). If either argument is null, the result will also be null. (As of Hive 0.12.0.)'
+      },
+      field: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'T' , multiple: true }]],
+        signature: 'field(T val, T val1, ...])',
+        draggable: 'field()',
+        description: 'Returns the index of val in the val1,val2,val3,... list or 0 if not found. For example field(\'world\',\'say\',\'hello\',\'world\') returns 3. All primitive types are supported, arguments are compared using str.equals(x). If val is NULL, the return value is 0.'
       },
       find_in_set: {
         returnTypes: ['INT'],
@@ -2148,6 +2265,13 @@ var SqlFunctions = (function () {
 				draggable: 'array<struct<STRING, DOUBLE>> ngrams()',
         description: 'Returns the top-k N-grams from a set of tokenized sentences, such as those returned by the sentences() UDAF.'
       },
+      octet_length: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'STRING'}]],
+        signature: 'octet_length(STRING a)',
+        draggable: 'octet_length()',
+        description: 'Returns the number of octets required to hold the string str in UTF-8 encoding (since Hive 2.2.0). Note that octet_length(str) can be larger than character_length(str).'
+      },
       parse_url: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING', optional: true}]],
@@ -2182,6 +2306,13 @@ var SqlFunctions = (function () {
         signature: 'repeat(STRING str, INT n)',
 				draggable: 'repeat()',
         description: 'Repeats str n times.'
+      },
+      replace: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}], [{type: 'STRING'}]],
+        signature: 'replace(STRING a, STRING old, STRING new)',
+        draggable: 'replace()',
+        description: 'Returns the string a with all non-overlapping occurrences of old replaced with new (as of Hive 1.3.0 and 2.1.0). Example: select replace("ababab", "abab", "Z"); returns "Zab".'
       },
       reverse: {
         returnTypes: ['STRING'],
@@ -2734,6 +2865,13 @@ var SqlFunctions = (function () {
 				draggable: 'sha2()',
         description: 'Calculates the SHA-2 family of hash functions (SHA-224, SHA-256, SHA-384, and SHA-512) (as of Hive 1.3.0). The first argument is the string or binary to be hashed. The second argument indicates the desired bit length of the result, which must have a value of 224, 256, 384, 512, or 0 (which is equivalent to 256). SHA-224 is supported starting from Java 8. If either argument is NULL or the hash length is not one of the permitted values, the return value is NULL. Example: sha2(\'ABC\', 256) = \'b5d4045c3f466fa91fe2cc6abe79232a1a57cdf104f7a26e716e0a1e2789df78\'.'
       },
+      version: {
+        returnTypes: ['STRING'],
+        arguments: [],
+        signature: 'version()',
+        draggable: 'version()',
+        description: 'Returns the Hive version (as of Hive 2.1.0). The string contains 2 fields, the first being a build number and the second being a build hash. Example: "select version();" might return "2.1.0.2.5.0.0-1245 r027527b9c5ce1a3d7d0b6d2e6de2378fb0c39232". Actual results will depend on your build.'
+      },
       xpath: {
         returnTypes: ['ARRAY'],
         arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
@@ -2990,7 +3128,6 @@ var SqlFunctions = (function () {
       }
     }
   };
-
 
   var BIT_FUNCTIONS = {
     hive: {},
