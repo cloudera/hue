@@ -1267,12 +1267,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <tr>
         <td data-bind="text: $data"></td>
         <td>
-        <!-- ko if: $data.indexOf('dir') > -1 || $data.indexOf('path') > -1 || $data.indexOf('output') > -1 || $data.indexOf('input') > -1 || $parent.properties[$data].startsWith('/') ||  $parent.properties[$data].startsWith('hdfs://') -->
-          <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($parent.properties[$data]) , text: $parent.properties[$data]"></a>
-        <!-- /ko -->
-        <!-- ko ifnot: $data.indexOf('dir') > -1 || $data.indexOf('path') > -1 || $data.indexOf('output') > -1 || $data.indexOf('input') > -1 || $parent.properties[$data].startsWith('/') ||  $parent.properties[$data].startsWith('hdfs://') -->
-          <span data-bind="text: $parent.properties[$data]"></span>
-        <!-- /ko -->
+        <!-- ko template: { name: 'link-or-text', data: { name: $data, value: $parent.properties[$data] } } --><!-- /ko -->
         </td>
       </tr>
     </tbody>
@@ -1366,10 +1361,21 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <tbody data-bind="foreach: property">
       <tr>
         <td data-bind="text: name"></td>
-        <td data-bind="text: value"></td>
+        <td>
+          <!-- ko template: { name: 'link-or-text', data: { name: name, value: value } } --><!-- /ko -->
+        </td>
       </tr>
     </tbody>
   </table>
+  <!-- /ko -->
+</script>
+
+<script type="text/html" id="link-or-text">
+  <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value) , text: $data.value"></a>
+  <!-- /ko -->
+  <!-- ko ifnot: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+    <span data-bind="text: $data.value"></span>
   <!-- /ko -->
 </script>
 
