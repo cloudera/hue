@@ -1709,7 +1709,8 @@ ${ assist.assistPanel() }
 % else:
         $.post("${ url('indexer:importer_submit') }", {
           "source": ko.mapping.toJSON(self.source),
-          "destination": ko.mapping.toJSON(self.destination)
+          "destination": ko.mapping.toJSON(self.destination),
+          "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
           if (resp.history_uuid) {
             $.jHueNotify.info("${ _('Task ') }" + resp.history_uuid + "${_(' submitted.') }");
