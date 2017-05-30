@@ -125,6 +125,15 @@ NonReservedKeyword
  | '<hive>UNIONTYPE'
  | '<hive>USE'
  | '<hive>VIEW'
+ | '<hive>DAY'
+ | '<hive>DAYOFWEEK'
+ | '<hive>HOUR'
+ | '<hive>MINUTE'
+ | '<hive>MONTH'
+ | '<hive>QUARTER'
+ | '<hive>SECOND'
+ | '<hive>WEEK'
+ | '<hive>YEAR'
 // | '<hive>ASC'      // These cause conflicts, we could use a separate lexer state for DESCRIBE, ALTER, GRANT, REVOKE and SHOW
 // | '<hive>CLUSTER'
 // | '<hive>DESC'
@@ -310,7 +319,7 @@ NonStartingToken
  | '<impala>AGGREGATE' | '<impala>AVRO' | '<impala>CACHED' | '<impala>CLOSE_FN' | '<impala>COLUMN' | '<impala>COMMENT' | '<impala>DATA' | '<impala>DATABASES' | '<impala>DELIMITED' | '<impala>ESCAPED' | '<impala>EXTENDED' |'<impala>EXTERNAL' | '<impala>FIELDS' | '<impala>FINALIZE_FN' | '<impala>FIRST' | '<impala>FORMAT' | '<impala>FORMATTED' | '<impala>FUNCTION' | '<impala>FUNCTIONS' | '<impala>GROUP' | '<impala>HASH' | '<impala>INCREMENTAL' | '<impala>INTERVAL' | '<impala>INIT_FN' | '<impala>INPATH' | '<impala>KEY' | '<impala>KUDU' | '<impala>LAST' | '<impala>LIMIT' | '<impala>LINES' | '<impala>LOCATION' | '<impala>MERGE_FN' | '<impala>NULLS' | '<impala>PARTITIONS' | '<impala>PREPARE_FN' | '<impala>PRIMARY' | '<impala>REAL' | '<impala>RETURNS' | '<impala>SCHEMAS' | '<impala>SERIALIZE_FN' | '<impala>SERVER' | '<impala>STATS' | '<impala>STRAIGHT_JOIN' | '<impala>SYMBOL' | '<impala>TABLE' | '<impala>TABLES' | '<impala>URI' | '<impala>USING' | '<impala>ANALYTIC' | '<impala>ANTI' | '<impala>CURRENT' | '<impala>GRANT' | '<impala>NOSHUFFLE' | '<impala>PARQUET' | '<impala>PARTITIONED' | '<impala>RCFILE' | '<impala>ROLE' | '<impala>ROLES' | '<impala>SEQUENCEFILE' | '<impala>SERDEPROPERTIES' | '<impala>SHUFFLE' | '<impala>STORED' | '<impala>TBLPROPERTIES' | '<impala>TERMINATED' | '<impala>TEXTFILE' | '<impala>UPDATE_FN' | '<impala>BROADCAST' | '<impala>...' | '<impala>.' | '<impala>[' | '<impala>]'
  | 'ALL' | 'AS' | 'ASC' | 'BETWEEN' | 'BIGINT' | 'BOOLEAN' | 'BY' | 'CASE' | 'CHAR' | 'CURRENT' | 'DATABASE' | 'DECIMAL' | 'DISTINCT' | 'DOUBLE' | 'DESC' | 'ELSE' | 'END' | 'EXISTS' | 'FALSE' | 'FLOAT' | 'FOLLOWING' | 'FROM' | 'FULL' | 'GROUP' | 'HAVING' | 'IF' | 'IN' | 'INNER' | 'INSERT' | 'INT' | 'INTO' | 'IS' | 'JOIN' | 'LEFT' | 'LIKE' | 'LIMIT' | 'NOT' | 'NULL' | 'ON' | 'OPTION' | 'ORDER' | 'OUTER' | 'OVER' | 'PARTITION' | 'PRECEDING' | 'RANGE' | 'REGEXP' | 'RIGHT' | 'RLIKE' | 'ROW' | 'ROWS' | 'SCHEMA' | 'SEMI' | 'SET' | 'SMALLINT' | 'STRING' | 'TABLE' | 'THEN' | 'TIMESTAMP' | 'TINYINT' | 'TRUE' | 'UNION' | 'VALUES' | 'VARCHAR' | 'WHEN' | 'WHERE' | 'WITH' | 'ROLE'
  | 'AVG' | 'CAST' | 'COUNT' | 'MAX' | 'MIN' | 'STDDEV_POP' | 'STDDEV_SAMP' | 'SUM' | 'VARIANCE' | 'VAR_POP' | 'VAR_SAMP'
- | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>HISTOGRAM_NUMERIC' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX'
+ | '<hive>COLLECT_SET' | '<hive>COLLECT_LIST' | '<hive>CORR' | '<hive>COVAR_POP' | '<hive>COVAR_SAMP' | '<hive>DAY' | '<hive>DAYOFWEEK' | '<hive>HISTOGRAM_NUMERIC' | '<hive>HOUR' | '<hive>MINUTE' | '<hive>MONTH' | '<hive>NTILE' | '<hive>PERCENTILE' | '<hive>PERCENTILE_APPROX' | '<hive>QUARTER' | '<hive>SECOND' | '<hive>WEEK' | '<hive>YEAR'
  | '<impala>APPX_MEDIAN' | '<impala>EXTRACT' | '<impala>GROUP_CONCAT' | '<impala>STDDEV' | '<impala>VARIANCE_POP' | '<impala>VARIANCE_SAMP'
  | 'ANALYTIC'
  | 'UNSIGNED_INTEGER' | 'UNSIGNED_INTEGER_E' | 'REGULAR_IDENTIFIER' | 'HDFS_START_QUOTE' | 'AND' | 'OR' | '=' | '<' | '>' | 'COMPARISON_OPERATOR' | '-' | '*' | 'ARITHMETIC_OPERATOR' | ',' | '.' | '~' | '!' | '(' | ')' | '[' | ']' | 'VARIABLE_REFERENCE' | 'BACKTICK' | 'SINGLE_QUOTE' | 'DOUBLE_QUOTE'
@@ -2950,7 +2959,8 @@ UserDefinedFunction
    }
  | AnalyticFunction OverClause
  | CastFunction
- | ExtractFunction
+ | HiveExtractFunction
+ | ImpalaExtractFunction
  ;
 
 UserDefinedFunction_EDIT
@@ -2965,7 +2975,8 @@ UserDefinedFunction_EDIT
    }
  | AnalyticFunction OverClause_EDIT
  | CastFunction_EDIT
- | ExtractFunction_EDIT
+ | HiveExtractFunction_EDIT
+ | ImpalaExtractFunction_EDIT
  ;
 
 ArbitraryFunction
@@ -3402,6 +3413,51 @@ CountFunction_EDIT
    }
  ;
 
+HiveExtractFunction
+ : '<hive>EXTRACT' '(' HiveDateField 'FROM' ValueExpression ')'  -> { types: ['INT'] }
+ ;
+
+HiveExtractFunction_EDIT
+ : '<hive>EXTRACT' '(' AnyCursor RightParenthesisOrError
+   {
+     parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
+     $$ = { types: ['INT'] }
+   }
+ | '<hive>EXTRACT' '(' HiveDateField 'CURSOR' RightParenthesisOrError
+   {
+     parser.suggestKeywords(['FROM']);
+     $$ = { types: ['INT'] }
+   }
+ | '<hive>EXTRACT' '(' HiveDateField 'FROM' 'CURSOR' RightParenthesisOrError
+   {
+     parser.valueExpressionSuggest();
+     $$ = { types: ['INT'] }
+   }
+ | '<hive>EXTRACT' '(' HiveDateField 'FROM' ValueExpression_EDIT RightParenthesisOrError  -> { types: ['INT'] }
+ | '<hive>EXTRACT' '(' AnyCursor 'FROM' ValueExpression RightParenthesisOrError
+   {
+      parser.suggestKeywords(['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']);
+      $$ = { types: ['INT'] }
+   }
+ | '<hive>EXTRACT' '(' HiveDateField 'CURSOR' ValueExpression RightParenthesisOrError
+   {
+     parser.suggestKeywords(['FROM']);
+     $$ = { types: ['INT'] }
+   }
+ ;
+
+HiveDateField
+ : '<hive>DAY'
+ | '<hive>DAYOFWEEK'
+ | '<hive>HOUR'
+ | '<hive>MINUTE'
+ | '<hive>MONTH'
+ | '<hive>QUARTER'
+ | '<hive>SECOND'
+ | '<hive>WEEK'
+ | '<hive>YEAR'
+ ;
+
 OtherAggregateFunction
  : OtherAggregateFunction_Type '(' OptionalAllOrDistinct ')'                      -> { types: parser.findReturnTypes($1) }
  | OtherAggregateFunction_Type '(' OptionalAllOrDistinct ValueExpressionList ')'  -> { types: parser.findReturnTypes($1) }
@@ -3481,12 +3537,12 @@ OtherAggregateFunction_Type
  | 'VAR_SAMP'
  ;
 
-ExtractFunction
+ImpalaExtractFunction
  : '<impala>EXTRACT' '(' ValueExpression FromOrComma ValueExpression ')'
  | '<impala>EXTRACT' '(' ')'
  ;
 
-ExtractFunction_EDIT
+ImpalaExtractFunction_EDIT
  : '<impala>EXTRACT' '(' AnyCursor FromOrComma ValueExpression RightParenthesisOrError
    {
      parser.valueExpressionSuggest();
