@@ -100,7 +100,10 @@ class S3FileSystem(object):
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
           'If you are attempting to create a bucket, this bucket name is already reserved.') % name)
       elif e.status == 404:
-        bucket = self._s3_connection.create_bucket(name, location=self._get_location())
+        kwargs = {}
+        if self._get_location():
+          kwargs['location'] = self._get_location()
+        bucket = self._s3_connection.create_bucket(name, **kwargs)
         self._bucket_cache[name] = bucket
       elif e.status == 400:
         raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
