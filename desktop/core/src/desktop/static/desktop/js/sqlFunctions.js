@@ -2545,6 +2545,54 @@ var SqlFunctions = (function () {
     }
   };
 
+  var DATA_MASKING_FUNCTIONS = {
+    hive: {
+      mask: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING', optional: true}], [{type: 'STRING', optional: true}], [{type: 'STRING', optional: true}]],
+        signature: 'mask(STRING str [, STRING upper [, STRING lower [, STRING number]]])',
+        draggable: 'mask()',
+        description: 'Returns a masked version of str (as of Hive 2.1.0). By default, upper case letters are converted to "X", lower case letters are converted to "x" and numbers are converted to "n". For example mask("abcd-EFGH-8765-4321") results in xxxx-XXXX-nnnn-nnnn. You can override the characters used in the mask by supplying additional arguments: the second argument controls the mask character for upper case letters, the third argument for lower case letters and the fourth argument for numbers. For example, mask("abcd-EFGH-8765-4321", "U", "l", "#") results in llll-UUUU-####-####.'
+      },
+      mask_first_n: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT', optional: true}]],
+        signature: 'mask_first_n(STRING str [, INT n])',
+        draggable: 'mask_first_n()',
+        description: 'Returns a masked version of str with the first n values masked (as of Hive 2.1.0). Upper case letters are converted to "X", lower case letters are converted to "x" and numbers are converted to "n". For example, mask_first_n("1234-5678-8765-4321", 4) results in nnnn-5678-8765-4321.'
+      },
+      mask_last_n: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT', optional: true}]],
+        signature: 'mask_last_n(STRING str [, INT n])',
+        draggable: 'mask_last_n()',
+        description: 'Returns a masked version of str with the last n values masked (as of Hive 2.1.0). Upper case letters are converted to "X", lower case letters are converted to "x" and numbers are converted to "n". For example, mask_last_n("1234-5678-8765-4321", 4) results in 1234-5678-8765-nnnn.'
+      },
+      mask_show_first_n: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT', optional: true}]],
+        signature: 'mask_show_first_n(STRING str [, INT n])',
+        draggable: 'mask_show_first_n()',
+        description: 'Returns a masked version of str, showing the first n characters unmasked (as of Hive 2.1.0). Upper case letters are converted to "X", lower case letters are converted to "x" and numbers are converted to "n". For example, mask_show_first_n("1234-5678-8765-4321", 4) results in 1234-nnnn-nnnn-nnnn.'
+      },
+      mask_show_last_n: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}], [{type: 'INT', optional: true}]],
+        signature: 'mask_show_last_n(STRING str [, INT n])',
+        draggable: 'mask_show_last_n()',
+        description: 'Returns a masked version of str, showing the last n characters unmasked (as of Hive 2.1.0). Upper case letters are converted to "X", lower case letters are converted to "x" and numbers are converted to "n". For example, mask_show_last_n("1234-5678-8765-4321", 4) results in nnnn-nnnn-nnnn-4321.'
+      },
+      mask_hash: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'STRING'}, {type: 'CHAR'}, {type: 'VARCHAR'}]],
+        signature: 'mask_hash(STRING|CHAR|VARCHAR str)',
+        draggable: 'mask_hash()',
+        description: 'Returns a hashed value based on str (as of Hive 2.1.0). The hash is consistent and can be used to join masked values together across tables. This function returns null for non-string types.'
+      },
+    },
+    impala: {}
+  };
+
   var TABLE_GENERATING_FUNCTIONS = {
     hive: {
       explode: {
@@ -3038,6 +3086,7 @@ var SqlFunctions = (function () {
       { name: 'Mathematical', functions: MATHEMATICAL_FUNCTIONS['hive'] },
       { name: 'Misc', functions: MISC_FUNCTIONS['hive'] },
       { name: 'String', functions: STRING_FUNCTIONS['hive'] },
+      { name: 'Data Masking', functions: DATA_MASKING_FUNCTIONS['hive'] },
       { name: 'Table Generating', functions: TABLE_GENERATING_FUNCTIONS['hive'] },
       { name: 'Type Conversion', functions: TYPE_CONVERSION_FUNCTIONS['hive'] }
     ],
@@ -3235,6 +3284,7 @@ var SqlFunctions = (function () {
     addFunctions(MATHEMATICAL_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(TYPE_CONVERSION_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(STRING_FUNCTIONS, dialect, returnTypes, result);
+    addFunctions(DATA_MASKING_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(MISC_FUNCTIONS, dialect, returnTypes, result);
     addFunctions(TABLE_GENERATING_FUNCTIONS, dialect, returnTypes, result);
     if (includeAggregate) {
@@ -3272,6 +3322,7 @@ var SqlFunctions = (function () {
         MATHEMATICAL_FUNCTIONS[dialect][functionName] ||
         TYPE_CONVERSION_FUNCTIONS[dialect][functionName] ||
         STRING_FUNCTIONS[dialect][functionName] ||
+        DATA_MASKING_FUNCTIONS[dialect][functionName] ||
         MISC_FUNCTIONS[dialect][functionName] ||
         TABLE_GENERATING_FUNCTIONS[dialect][functionName] ||
         AGGREGATE_FUNCTIONS[dialect][functionName];
