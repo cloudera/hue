@@ -962,16 +962,11 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           // display context menu and ensure it is on-screen
           if ($.inArray(row.name, ['..', '.', '.Trash']) === -1) {
             this.selected(true);
-            cm.css({ display: 'block', top: e.pageY - 15, left: (e.offsetX < rect.right - 300 ) ? e.offsetX + 100 : e.offsetX - 250 });
-            var scrollTop = $('body').scrollTop();
+            var verticalCorrection = 0;
             %if is_embeddable:
-              scrollTop = $('.page-content').scrollTop();
+              verticalCorrection = $('.page-content').scrollTop() - $('.navbar-default').height() - $('.banner').height();
             %endif
-            if ($(window).height() - 55 < $('.context-menu').position().top - scrollTop + $('.context-menu').height()) {
-              cm.css({
-                top: e.pageY - $('.context-menu').height()
-              });
-            }
+            cm.css({ display: 'block', top: e.pageY - 15 + verticalCorrection, left: (e.offsetX < rect.right - 300 ) ? e.offsetX + 100 : e.offsetX - 250 });
           } else {
             cm.css({ display: 'none' });
           }
