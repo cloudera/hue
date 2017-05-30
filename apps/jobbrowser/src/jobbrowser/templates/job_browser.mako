@@ -54,9 +54,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 % if not is_mini:
-<div id="jobbrowserComponents" class="jobbrowser-components">
+<div id="jobbrowserComponents" class="jobbrowser-components jb-panel">
 % else:
-<div id="jobbrowserMiniComponents" class="jobbrowserComponents">
+<div id="jobbrowserMiniComponents" class="jobbrowserComponents jb-panel">
 % endif
 
 % if not is_embeddable:
@@ -476,10 +476,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-page-logs">
+          <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
+            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
-          <br>
+          </ul>
 
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
@@ -587,10 +588,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </ul>
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-task-page-logs">
+          <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
+            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
-          <br>
+          </ul>
 
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
@@ -687,10 +689,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs">
+          <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
-            <a href="javascript:void(0)" data-bind="click: function() { fetchLogs('${ name }'); }, text: '${ name }'"></a>
+            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
-          <br>
+          </ul>
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
@@ -1519,7 +1522,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           name: ko.mapping.toJSON(name ? name : 'default')
         }, function (data) {
           if (data.status == 0) {
-            self.logs(data.logs.logs)
+            self.logs(data.logs.logs);
+            $('.jb-panel pre:visible').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $('.jb-panel pre:visible').offset().top - $('.page-content').scrollTop() - 30));
           } else {
             $(document).trigger("error", data.message);
           }
