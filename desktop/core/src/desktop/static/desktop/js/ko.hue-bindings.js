@@ -5275,7 +5275,7 @@
         if ($(scrollable).scrollTop() > initialTopPosition) {
           $(element).css({
             'position': 'fixed',
-            'top': '82px',
+            'top': options.topSnap,
             'width': initialSize.w + 'px'
           });
           ghost.show();
