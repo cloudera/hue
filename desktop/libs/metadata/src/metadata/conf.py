@@ -49,7 +49,7 @@ def get_optimizer_url():
   return OPTIMIZER.HOSTNAME.get() and OPTIMIZER.HOSTNAME.get().strip('/')
 
 def has_optimizer():
-  return bool(OPTIMIZER.AUTH_KEY.get())
+  return bool(OPTIMIZER.AUTH_KEY_ID.get())
 
 
 def get_navigator_url():
@@ -77,8 +77,8 @@ OPTIMIZER = ConfigSection(
       help=_t('Hostname to Optimizer API or compatible service.'),
       default='navoptapi.optimizer.cloudera.com'),
 
-    AUTH_KEY=Config(
-      key="auth_key",
+    AUTH_KEY_ID=Config(
+      key="auth_key_id",
       help=_t("The name of the key of the service."),
       private=False,
       default=None),
