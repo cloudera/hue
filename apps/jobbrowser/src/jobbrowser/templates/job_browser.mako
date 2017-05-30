@@ -533,7 +533,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="job-mapreduce-page-metadata">
-          <pre data-bind="text: ko.toJSON(properties['metadata'], null, 2)"></pre>
+          <div data-bind="template: { name: 'render-metadata', data: properties['metadata'] }"></div>
         </div>
 
         <div class="tab-pane" id="job-mapreduce-page-counters">
@@ -1352,6 +1352,27 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
   <!-- /ko -->
 </script>
+
+<script type="text/html" id="render-metadata">
+  <!-- ko hueSpinner: { spin: !$data.property, center: true, size: 'xlarge' } --><!-- /ko -->
+  <!-- ko if: $data.property -->
+  <table class="table table-condensed">
+    <thead>
+    <tr>
+      <th>${ _('Name') }</th>
+      <th width="50%">${ _('Value') }</th>
+    </tr>
+    </thead>
+    <tbody data-bind="foreach: property">
+      <tr>
+        <td data-bind="text: name"></td>
+        <td data-bind="text: value"></td>
+      </tr>
+    </tbody>
+  </table>
+  <!-- /ko -->
+</script>
+
 
 
 <script type="text/javascript">
