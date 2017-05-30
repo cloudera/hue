@@ -17,6 +17,7 @@ from __future__ import absolute_import
 
 import boto.utils
 from boto.regioninfo import get_regions
+from boto.s3.connection import Location
 
 from django.utils.translation import ugettext_lazy as _
 
@@ -45,7 +46,7 @@ def get_default_secret_key():
 
 
 def get_default_region():
-  return AWS_ACCOUNTS['default'].REGION.get() if 'default' in AWS_ACCOUNTS else 'us-east-1'
+  return AWS_ACCOUNTS['default'].REGION.get() if 'default' in AWS_ACCOUNTS else Location.DEFAULT
 
 
 AWS_ACCOUNTS = UnspecifiedConfigSection(
@@ -92,7 +93,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ),
       REGION=Config(
         key='region',
-        default='us-east-1',
+        default=None,
         type=str
       ),
       HOST=Config(
