@@ -161,6 +161,7 @@ def importer_submit(request):
   outputFormat = json.loads(request.POST.get('destination', '{}'))['outputFormat']
   destination = json.loads(request.POST.get('destination', '{}'))
   destination['ouputFormat'] = outputFormat # Workaround a very weird bug
+  start_time = json.loads(request.POST.get('start_time', '-1'))
 
   if destination['ouputFormat'] == 'index':
     _convert_format(source["format"], inverse=True)
@@ -168,14 +169,14 @@ def importer_submit(request):
     source['columns'] = destination['columns']
     job_handle = _index(request, source, collection_name)
   elif destination['ouputFormat'] == 'database':
-    job_handle = create_database(request, source, destination)
+    job_handle = create_database(request, source, destination, start_time)
   else:
-    job_handle = _create_table(request, source, destination)
+    job_handle = _create_table(request, source, destination, start_time)
 
   return JsonResponse(job_handle)
 
 
-def create_database(request, source, destination):
+def create_database(request, source, destination, start_time):
   database = destination['name']
   comment = destination['description']
 
@@ -196,16 +197,24 @@ def create_database(request, source, destination):
   editor_type = destination['apiHelperType']
   on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
 
-  notebook = make_notebook(name='Execute and watch', editor_type=editor_type, statement=sql, status='ready', on_success_url=on_success_url, is_task=True)
+  notebook = make_notebook(
+      name='Execute and watch',
+      editor_type=editor_type,
+      statement=sql,
+      status='ready',
+      on_success_url=on_success_url,
+      last_executed=start_time,
+      is_task=True
+  )
   return notebook.execute(request, batch=False)
 
 
-def _create_table(request, source, destination):
-  notebook = _create_table_from_a_file(request, source, destination)
+def _create_table(request, source, destination, start_time=-1):
+  notebook = _create_table_from_a_file(request, source, destination, start_time)
   return notebook.execute(request, batch=False)
 
 
-def _create_table_from_a_file(request, source, destination):
+def _create_table_from_a_file(request, source, destination, start_time=-1):
   if '.' in destination['name']:
     database, table_name = destination['name'].split('.', 1)
   else:
@@ -374,6 +383,7 @@ def _create_table_from_a_file(request, source, destination):
       status='ready',
       database=database,
       on_success_url=on_success_url,
+      last_executed=start_time,
       is_task=True
   )
 
