@@ -795,7 +795,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               },
               error: function (xhr) {
                 console.error('Route loading problem', xhr);
-                self.loadApp('500');
+                if (app !== '500'){
+                  self.loadApp('500');
+                }
+                else {
+                  $.jHueNotify.error("${ _('It looks like you are offline or an unknown error happened. Please refresh the page.') }")
+                }
               }
             });
           } else {
