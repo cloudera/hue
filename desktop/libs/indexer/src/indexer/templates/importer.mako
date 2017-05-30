@@ -1813,7 +1813,11 @@ ${ assist.assistPanel() }
       self.wizardEnabled = ko.observable(false);
       self.currentStep = ko.observable(self.createWizard.prefill.target_type() == 'database' ? 2 : 1);
       self.currentStep.subscribe(function () {
+        %if is_embeddable:
+        $('.page-content').scrollTop(0);
+        %else:
         $('.content-panel').scrollTop(0);
+        %endif
       });
       self.previousStepVisible = ko.pureComputed(function(){
         return self.currentStep() > 1 && self.createWizard.destination.outputFormat() != 'database';
