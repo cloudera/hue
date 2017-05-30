@@ -896,7 +896,7 @@ var EditorViewModel = (function() {
     });
 
 
-    if (HAS_OPTIMIZER) {
+    if (HAS_OPTIMIZER && ! vm.isNotificationManager()) {
       var lastComplexityRequest;
       var lastCheckedComplexityStatement;
 
@@ -1145,6 +1145,7 @@ var EditorViewModel = (function() {
               var tasks = $.grep(notebook.history(), function(row) { return row.uuid() == notebook.uuid()});
               if (tasks.length == 1) {
                 tasks[0].status(self.status());
+                self.result.logs(data.message);
               }
             } else {
               notebook.history.unshift(
