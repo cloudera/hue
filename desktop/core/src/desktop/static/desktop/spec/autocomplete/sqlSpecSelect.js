@@ -1767,16 +1767,52 @@
         });
       });
 
-      it('should suggest columns for "SELECT extract(bla FROM | FROM bar;"', function() {
+      it('should suggest keywords for "SELECT extract(| FROM bar;"', function() {
         assertAutoComplete({
-          beforeCursor: 'SELECT extract(bla FROM ',
+          beforeCursor: 'SELECT extract( ',
           afterCursor: ' FROM bar;',
-          dialect: 'impala',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT extract(month | FROM bar"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract(month ',
+          afterCursor: ' FROM bar;',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['FROM']
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT extract(month FROM | FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract(month FROM ',
+          afterCursor: ' FROM bar;',
+          dialect: 'hive',
           containsKeywords: ['CASE'],
           expectedResult: {
             lowerCase: false,
-            suggestFunctions: { types: ['TIMESTAMP'] },
-            suggestColumns: { source: 'select',  types: ['TIMESTAMP'], tables: [{ identifierChain: [{ name: 'bar' }] }] }
+            suggestFunctions: { },
+            suggestColumns: { source: 'select', tables: [{ identifierChain: [{ name: 'bar' }] }] }
+          }
+        });
+      });
+
+      it('should suggest keywords for "SELECT extract(| FROM boo) FROM bar;"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT extract( ',
+          afterCursor: ' FROM boo) FROM bar;',
+          dialect: 'hive',
+          expectedResult: {
+            lowerCase: false,
+            suggestKeywords: ['DAY', 'DAYOFWEEK', 'HOUR', 'MINUTE', 'MONTH', 'QUARTER', 'SECOND', 'WEEK', 'YEAR']
           }
         });
       });

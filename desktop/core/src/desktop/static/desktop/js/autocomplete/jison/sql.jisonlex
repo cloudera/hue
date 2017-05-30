@@ -86,6 +86,8 @@
 <hive>'CONCATENATE'                        { return '<hive>CONCATENATE'; }
 <hive>'DATA'                               { return '<hive>DATA'; }
 <hive>'DATABASES'                          { return '<hive>DATABASES'; }
+<hive>'DAY'                                { return '<hive>DAY'; }
+<hive>'DAYOFWEEK'                          { return '<hive>DAYOFWEEK'; }
 <hive>'DEFERRED'                           { return '<hive>DEFERRED'; }
 <hive>'DEFINED'                            { return '<hive>DEFINED'; }
 <hive>'DELIMITED'                          { return '<hive>DELIMITED'; }
@@ -107,6 +109,7 @@
 <hive>'FORMATTED'                          { return '<hive>FORMATTED'; }
 <hive>'FUNCTION'                           { return '<hive>FUNCTION'; }
 <hive>'FUNCTIONS'                          { return '<hive>FUNCTIONS'; }
+<hive>'HOUR'                               { return '<hive>HOUR'; }
 <hive>'IDXPROPERTIES'                      { return '<hive>IDXPROPERTIES'; }
 <hive>'INDEX'                              { return '<hive>INDEX'; }
 <hive>'INDEXES'                            { return '<hive>INDEXES'; }
@@ -121,6 +124,8 @@
 <hive>'LOCK'                               { return '<hive>LOCK'; }
 <hive>'LOCKS'                              { return '<hive>LOCKS'; }
 <hive>'METADATA'                           { return '<hive>METADATA'; }
+<hive>'MINUTE'                             { return '<hive>MINUTE'; }
+<hive>'MONTH'                              { return '<hive>MONTH'; }
 <hive>'MSCK'                               { return '<hive>MSCK'; }
 <hive>'NOSCAN'                             { return '<hive>NOSCAN'; }
 <hive>'NO_DROP'                            { return '<hive>NO_DROP'; }
@@ -134,6 +139,7 @@
 <hive>'PARTITIONS'                         { return '<hive>PARTITIONS'; }
 <hive>'PRIVILEGES'                         { return '<hive>PRIVILEGES'; }
 <hive>'PURGE'                              { return '<hive>PURGE'; }
+<hive>'QUARTER'                            { return '<hive>QUARTER'; }
 <hive>'RCFILE'                             { return '<hive>RCFILE'; }
 <hive>'REBUILD'                            { return '<hive>REBUILD'; }
 <hive>'RELOAD'                             { parser.determineCase(yytext); return '<hive>RELOAD'; }
@@ -145,6 +151,7 @@
 <hive>'RESTRICT'                           { return '<hive>RESTRICT'; }
 <hive>'ROLE'                               { return '<hive>ROLE'; }
 <hive>'ROLES'                              { return '<hive>ROLES'; }
+<hive>'SECOND'                             { return '<hive>SECOND'; }
 <hive>'SCHEMA'                             { return '<hive>SCHEMA'; }
 <hive>'SCHEMAS'                            { return '<hive>SCHEMAS'; }
 <hive>'SEQUENCEFILE'                       { return '<hive>SEQUENCEFILE'; }
@@ -175,7 +182,9 @@
 <hive>'UNIONTYPE'                          { return '<hive>UNIONTYPE'; }
 <hive>'USE'                                { parser.determineCase(yytext); return '<hive>USE'; }
 <hive>'VIEW'                               { return '<hive>VIEW'; }
+<hive>'WEEK'                               { return '<hive>WEEK'; }
 <hive>'WINDOW'                             { return '<hive>WINDOW'; }
+<hive>'YEAR'                               { return '<hive>YEAR'; }
 
 <hive>'.'                                  { return '<hive>.'; }
 <hive>'['                                  { return '<hive>['; }
@@ -386,6 +395,7 @@ VAR_SAMP\s*\(                              { yy.lexer.unput('('); yytext = 'var_
 <hive>CORR\s*\(                            { yy.lexer.unput('('); yytext = 'corr'; parser.addFunctionLocation(yylloc, yytext); return '<hive>CORR'; }
 <hive>COVAR_POP\s*\(                       { yy.lexer.unput('('); yytext = 'covar_pop'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COVAR_POP'; }
 <hive>COVAR_SAMP\s*\(                      { yy.lexer.unput('('); yytext = 'covar_samp'; parser.addFunctionLocation(yylloc, yytext); return '<hive>COVAR_SAMP'; }
+<hive>EXTRACT\s*\(                         { yy.lexer.unput('('); yytext = 'extract'; parser.addFunctionLocation(yylloc, yytext); return '<hive>EXTRACT'; }
 <hive>HISTOGRAM_NUMERIC\s*\(               { yy.lexer.unput('('); yytext = 'histogram_numeric'; parser.addFunctionLocation(yylloc, yytext); return '<hive>HISTOGRAM_NUMERIC'; }
 <hive>NTILE\s*\(                           { yy.lexer.unput('('); yytext = 'ntile'; parser.addFunctionLocation(yylloc, yytext); return '<hive>NTILE'; }
 <hive>PERCENTILE\s*\(                      { yy.lexer.unput('('); yytext = 'percentile'; parser.addFunctionLocation(yylloc, yytext); return '<hive>PERCENTILE'; }
