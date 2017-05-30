@@ -344,7 +344,7 @@ from desktop.views import _ko
                 var db = match[1];
                 huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
               }
-              huePubSub.publish('assist.db.refresh', { sourceTypes: ['hive', 'impala'] });
+              huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
             };
             notebook.snippets()[0].status.subscribe(function(val){
               if (val == 'failed'){
