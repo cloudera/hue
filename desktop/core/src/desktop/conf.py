@@ -797,7 +797,7 @@ CUSTOM = ConfigSection(
   help=_("Customizations to the UI."),
   members=dict(
     BANNER_TOP_HTML=Config("banner_top_html",
-                   default='<div style="padding: 4px; text-align: center; background-color: #003F6C; color: #DBE8F1">This is Hue 4! - Please feel free to email any feedback / questions to <a href="mailto:eng-hue@cloudera.com" target="_blank" style="color: #FFF; font-weight: bold">eng-hue@cloudera.com</a> or contact the team in person.</div>',
+                   default="",
                    help=_("Top banner HTML code. This code will be placed in the navigation bar "
                         "so that it will reside at the top of the page in a fixed position. " +
                         "One common value is `<img src=\"http://www.example.com/example.gif\" />`")),
