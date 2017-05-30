@@ -93,7 +93,7 @@ ENABLE_DOCUMENT_ACTION = Config(
   key="enable_document_action",
   help=_t("Flag to enable the saved Editor queries to be dragged and dropped into a workflow."),
   type=bool,
-  default=False
+  default=True
 )
 
 ENABLE_IMPALA_ACTION = Config(
