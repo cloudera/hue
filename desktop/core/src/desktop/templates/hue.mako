@@ -745,6 +745,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (app.startsWith('oozie')) {
             huePubSub.clearAppSubscribers('oozie');
           }
+          if (SKIP_CACHE.indexOf(app) > -1) {
+            $('#embeddable_' + app).html('');
+          }
           if (typeof self.embeddable_cache[app] === 'undefined') {
             if (loadedApps.indexOf(app) == -1){
               loadedApps.push(app);
@@ -808,7 +811,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             huePubSub.resumeAppSubscribers(app);
           }
           $('.embeddable').hide();
-          $('#embeddable_' + app).insertBefore($('.embeddable:first')).show();
+          $('#embeddable_' + app).show();
           huePubSub.publish('app.gained.focus', app);
         };
 
