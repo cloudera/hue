@@ -1362,6 +1362,13 @@ var SqlFunctions = (function () {
 				draggable: 'dayofmonth()',
         description: 'Returns the day part of a date or a timestamp string: dayofmonth(\'1970-11-01 00:00:00\') = 1, dayofmonth(\'1970-11-01\') = 1.'
       },
+      extract: {
+        returnTypes: ['INT'],
+        arguments: [[{type: 'T'}], [{type: 'T'}]],
+        signature: 'extract(field FROM source)',
+        draggable: 'extract()',
+        description: 'Retrieve fields such as days or hours from source (as of Hive 2.2.0). Source must be a date, timestamp, interval or a string that can be converted into either a date or timestamp. Supported fields include: day, dayofweek, hour, minute, month, quarter, second, week and year.'
+      },
       from_unixtime: {
         returnTypes: ['BIGINT'],
         arguments: [[{type: 'BIGINT'}], [{type: 'STRING', optional: true}]],
