@@ -67,6 +67,10 @@ def get_security_default():
 
   return cluster.SECURITY_ENABLED.get()
 
+def get_optimizer_password_script():
+  '''Get default password from secured file'''
+  return OPTIMIZER.AUTH_KEY_SECRET_SCRIPT.get()
+
 
 OPTIMIZER = ConfigSection(
   key='optimizer',
@@ -86,7 +90,7 @@ OPTIMIZER = ConfigSection(
       key="auth_key_secret",
       help=_t("The private part of the key associated with the auth_key."),
       private=True,
-      default=None),
+      dynamic_default=get_optimizer_password_script),
     AUTH_KEY_SECRET_SCRIPT=Config(
       key="auth_key_secret_script",
       help=_t("Execute this script to produce the auth_key secret. This will be used when `auth_key_secret` is not set."),
