@@ -388,7 +388,7 @@ def drop_table(request, database):
       if request.POST.get('is_embeddable'):
         sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
-            name='Execute and watch',
+            name='Dropping %s' % ','.join([table.name for table in tables_objects])[:100],
             editor_type=_get_servername(db),
             statement=sql.strip(),
             status='ready',
