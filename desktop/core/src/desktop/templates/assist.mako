@@ -727,14 +727,14 @@ from notebook.conf import get_ordered_interpreters
         <!-- /ko -->
       % endif
       <!-- ko if: sourceType === 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="templatePopover : { contentTemplate: 'ask-for-invalidate-content', titleTemplate: 'ask-for-invalidate-title', trigger: 'click', minWidth: '320px' }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- ko if: sourceType !== 'impala' -->
-      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manually refresh the table list')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="click: triggerRefresh"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Refresh')}"></i></a>
       <!-- /ko -->
       <!-- /ko -->
       <!-- ko if: loading -->
-      <i class="fa fa-refresh fa-spin blue" title="${_('Manually refresh the table list')}"></i>
+      <i class="fa fa-refresh fa-spin blue" title="${_('Refresh')}"></i>
       <!-- /ko -->
     </div>
   </script>
