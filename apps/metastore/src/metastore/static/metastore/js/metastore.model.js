@@ -200,9 +200,6 @@ var MetastoreDatabase = (function () {
     if (callback) {
       callback();
     }
-    window.setTimeout(function () {
-      $('a[href="#overview"]').click();
-    }, 200);
   };
 
   return MetastoreDatabase;
@@ -295,6 +292,7 @@ var MetastoreTable = (function () {
         self.preview.keys(self.keys());
         self.loading(false);
         self.loaded(true);
+        huePubSub.publish('metastore.loaded.partitions');
       },
       errorCallback: function (data) {
         self.loading(false);
@@ -638,6 +636,7 @@ var MetastoreTable = (function () {
     self.loading(true);
     self.fetchFields();
     self.fetchDetails();
+    huePubSub.publish('metastore.loaded.table');
   };
 
 
