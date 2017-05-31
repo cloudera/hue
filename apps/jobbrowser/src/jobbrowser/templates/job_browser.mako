@@ -899,7 +899,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
+        %if not is_mini:
         <li class="active"><a href="#workflow-page-graph${ SUFFIX }" data-toggle="tab">${ _('Graph') }</a></li>
+        %endif
         <li><a href="#workflow-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
         <li><a class="jb-logs-link" href="#workflow-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#workflow-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
@@ -911,8 +913,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
       <div class="tab-content">
-        <div class="tab-pane active dashboard-container" id="workflow-page-graph${ SUFFIX }">
-        </div>
+        %if not is_mini:
+        <div class="tab-pane active dashboard-container" id="workflow-page-graph${ SUFFIX }"></div>
+        %endif
 
         <div class="tab-pane" id="workflow-page-logs${ SUFFIX }">
           <pre data-bind="html: logs, logScroller: logs"></pre>
@@ -1392,9 +1395,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var self = this;
 
       self.id = ko.observableDefault(job.id);
+      %if not is_mini:
       self.id.subscribe(function () {
         huePubSub.publish('graph.stop.refresh.view');
       });
+      %endif
       self.doc_url = ko.observableDefault(job.doc_url);
       self.name = ko.observableDefault(job.name || job.id);
       self.type = ko.observableDefault(job.type);
@@ -1587,9 +1592,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             crumbs.push({'id': vm.job().id(), 'name': vm.job().name(), 'type': vm.job().type()});
             vm.resetBreadcrumbs(crumbs);
 
+            %if not is_mini:
             if (vm.job().type() === 'workflow' && !vm.job().workflowGraphLoaded) {
               vm.job().updateWorkflowGraph();
             }
+            %else:
+            if (vm.job().type() === 'workflow') {
+              vm.job().fetchProfile('properties');
+              $('a[href="#workflow-page-metadata${ SUFFIX }"]').tab('show');
+            }
+            %endif
 
             vm.job().fetchLogs();
 
@@ -1705,7 +1717,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       }
 
-      self.updateArrowsTimeout = -1;
+      self.updateArrowsInterval = -1;
       self.updateArrows = function() {
         if ($('canvas').length > 0 && $('canvas').position().top !== self.lastArrowsPosition.top && $('canvas').position().left !== self.lastArrowsPosition.left) {
           self.lastArrowsPosition = $('canvas').position();
@@ -1718,7 +1730,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         else {
           $('canvas').remove();
         }
-        self.updateArrowsTimeout = window.setTimeout(self.updateArrows, 100);
       }
 
       self.updateWorkflowGraph = function() {
@@ -1731,7 +1742,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             opts.callback(opts.response);
           });
         }
-
         if (vm.job().type() === 'workflow') {
           $('#workflow-page-graph${ SUFFIX }').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
@@ -1752,9 +1762,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 response: response,
                 callback: function (r) {
                   $('#workflow-page-graph${ SUFFIX }').html(r);
-                  window.clearTimeout(self.updateArrowsTimeout);
+                  window.clearInterval(self.updateArrowsInterval);
                   self.initialArrowsDrawing();
-                  self.updateArrows();
+                  self.updateArrowsInterval = window.setInterval(self.updateArrows, 100, 'jobbrowser');
                 }
               });
             }
@@ -2102,11 +2112,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
       };
       self.selectInterface = function(interface) {
-        huePubSub.publish('graph.stop.refresh.view');
         interface = self.isValidInterface(interface);
         self.interface(interface);
         self.resetBreadcrumbs();
         % if not is_mini:
+        huePubSub.publish('graph.stop.refresh.view');
         hueUtils.changeURL('#!' + interface);
         % endif
         self.job(null);
@@ -2168,7 +2178,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       self.load = function() {
         var h = window.location.hash;
+        %if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
+        %endif
 
         h = h.indexOf('#!') === 0 ? h.substr(2) : '';
         switch (h) {
@@ -2219,6 +2231,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         jobBrowserViewModel.isMini(true);
       % endif
 
+      huePubSub.subscribe('app.gained.focus', function (app) {
+        if (app === 'jobbrowser') {
+          huePubSub.publish('graph.draw.arrows');
+        }
+      }, 'jobbrowser');
 
       var loadHash = function () {
         if (window.location.pathname.indexOf('jobbrowser') > -1) {
