@@ -207,15 +207,22 @@ ${ components.menubar(hiveserver2_impersonation_enabled) }
               }
             });
             if (foundRow == null) {
-              try {
-                jobTable.fnAddData(getJobRow(job));
-                if ($("#noJobs").is(":visible")) {
-                  $("#noJobs").hide();
-                  $(".datatables").show();
+              var jobsData = jobTable.fnGetData();
+              var foundJob = jobsData.filter(function(jobData) {
+                return $(jobData[1]).text().trim() == job.shortId;
+              }).length > 0;
+
+              if(!foundJob) {
+                try {
+                  jobTable.fnAddData(getJobRow(job));
+                  if ($("#noJobs").is(":visible")) {
+                    $("#noJobs").hide();
+                    $(".datatables").show();
+                  }
+                  $("a[data-row-selector='true']").jHueRowSelector();
+                } catch (error) {
+                  $(document).trigger("error", error);
                 }
-                $("a[data-row-selector='true']").jHueRowSelector();
-              } catch (error) {
-                $(document).trigger("error", error);
               }
             } else {
               updateJobRow(job, foundRow);
