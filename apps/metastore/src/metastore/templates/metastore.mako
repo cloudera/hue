@@ -1175,6 +1175,7 @@ ${ components.menubar(is_embeddable) }
       success: function(resp) {
         if (resp.history_uuid) {
           huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          huePubSub.publish('metastore.clear.selection');
         } else if (resp && resp.message) {
           $(document).trigger("error", resp.message);
         }
@@ -1241,6 +1242,11 @@ ${ components.menubar(is_embeddable) }
         $('${ MAIN_SCROLLABLE }').scrollTop(0);
         $('${ MAIN_SCROLLABLE }').getNiceScroll().resize();
       });
+
+      huePubSub.subscribe('metastore.clear.selection', function () {
+        viewModel.selectedDatabases.removeAll();
+        viewModel.selectedTables.removeAll();
+      }, 'metastore');
 
       viewModel.currentTab.subscribe(function(tab){
         if (tab == 'table-relationships') {
