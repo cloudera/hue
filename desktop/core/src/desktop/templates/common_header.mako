@@ -353,7 +353,21 @@ ${ hueIcons.symbols() }
          </ul>
        </li>
        % elif query_apps[1] == 1:
-          <li><a href="/${apps[query_apps[0]].display_name}"><i class="fa fa-terminal hideMoreThan950"></i><span class="hide950">${apps[query_apps[0]].nice_name}</span></a></li>
+           % if 'beeswax' in apps:
+             % if USE_NEW_EDITOR.get():
+             <li><a href="${ url('notebook:editor') }?type=hive"><svg class="svg-app-icon"><use xlink:href="#hi-hive"></use></svg> ${_('Hive')}</a></li>
+             % else:
+             <li><a href="/${apps['beeswax'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-hive"></use></svg> ${_('Hive')}</a></li>
+             % endif
+           % elif 'impala' in apps:
+             % if USE_NEW_EDITOR.get(): ## impala requires beeswax anyway
+             <li><a href="${ url('notebook:editor') }?type=impala"><svg class="svg-app-icon"><use xlink:href="#hi-impala"></use></svg> ${_('Impala')}</a></li>
+             % else:
+             <li><a href="/${apps['impala'].display_name}"><svg class="svg-app-icon"><use xlink:href="#hi-impala"></use></svg> ${_('Impala')}</a></li>
+             % endif
+           % else:
+           <li><a href="/${apps[query_apps[0]].display_name}"><i class="fa fa-terminal hideMoreThan950"></i><span class="hide950">${apps[query_apps[0]].nice_name}</span></a></li>
+           % endif
        % endif
        % if 'beeswax' in apps:
         <%
