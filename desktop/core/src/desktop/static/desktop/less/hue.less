@@ -143,8 +143,10 @@ body {
 .notification-history-list li {
   padding: 4px;
   cursor: pointer;
-  &:hover {
+  border-left: 2px solid @cui-white;
+  &:hover, &.active {
     background-color: @cui-gray-050;
+    border-left-color: @cui-gray-100;
   }
 }
 
