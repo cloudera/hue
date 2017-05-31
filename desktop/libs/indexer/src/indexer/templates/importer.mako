@@ -509,7 +509,7 @@ ${ assist.assistPanel() }
               <i class="fa fa-spinner fa-spin"></i>
             </span>
             <span class="help-inline muted" data-bind="visible: ! $parent.createWizard.isValidDestination()">
-              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Invalid characters') }
+              <i class="fa fa-warning" style="color: #c09853"></i> ${ _('Empty name or invalid characters') }
             </span>
             <span class="help-inline muted" data-bind="visible: isTargetExisting()">
               <!-- ko if: outputFormat() == 'index' -->
@@ -1713,7 +1713,7 @@ ${ assist.assistPanel() }
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
           if (resp.history_uuid) {
-            $.jHueNotify.info("${ _('Task ') }" + resp.history_uuid + "${_(' submitted.') }");
+            $.jHueNotify.info("${ _('Task submitted.') }");
             huePubSub.publish('notebook.task.submitted', resp.history_uuid);
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
