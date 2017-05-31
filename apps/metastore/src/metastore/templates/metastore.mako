@@ -38,10 +38,6 @@ else:
   TOP_SNAP = is_embeddable and "52px" or "78px"
 %>
 
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
-<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
-<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
-
 % if not is_embeddable:
 ${ commonheader(_("Metastore"), app_name, user, request) | n,unicode }
 
@@ -73,6 +69,10 @@ ${ assist.assistJSModels() }
 
 ${ assist.assistPanel() }
 % endif
+
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-editable.css') }">
+<link rel="stylesheet" href="${ static('desktop/ext/css/bootstrap-wysihtml5-0.0.2.css') }">
+<link rel="stylesheet" href="${ static('notebook/css/notebook.css') }">
 
 <span class="notebook">
 
