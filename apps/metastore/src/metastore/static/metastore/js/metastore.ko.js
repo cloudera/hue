@@ -303,9 +303,20 @@ var MetastoreViewModel = (function () {
         self.setDatabaseByName(path[1]);
         break;
       case 'table':
+        huePubSub.subscribe('metastore.loaded.table', function(){
+          hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
+            $('a[href="#overview"]').click();
+          });
+        }, 'metastore');
         self.loadTableDef({
           name: path[2],
           database: path[1]
+        }, function(){
+          if (path.length > 3 && path[3] === 'partitions'){
+            huePubSub.subscribe('metastore.loaded.partitions', function(){
+              $('a[href="#partitions"]').click();
+            }, 'metastore');
+          }
         });
     }
   };
