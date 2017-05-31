@@ -1905,6 +1905,7 @@ from notebook.conf import get_ordered_interpreters
                   name: value.identifierChain.length === 2 ? value.identifierChain[0].name : activeLocations.defaultDatabase
                 },
                 type: 'table',
+                sourceType: activeLocations.type,
                 name: value.name
               });
             }));

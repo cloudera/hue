@@ -357,6 +357,7 @@ var MetastoreTable = (function () {
    * @param {string} options.name
    * @param {string} options.type
    * @param {string} options.comment
+   * @param {string} options.sourceType
    * @constructor
    */
   function MetastoreTable(options) {
