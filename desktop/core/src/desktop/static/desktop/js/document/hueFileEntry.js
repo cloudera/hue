@@ -90,6 +90,27 @@ var HueFileEntry = (function () {
     self.importedDocSummary = ko.observable();
     self.showTable = ko.observable();
 
+
+    // Filter is only used in the assist panel at the moment
+    self.isFilterVisible = ko.observable(false);
+    self.filter = ko.observable('').extend({ rateLimit: 400 });
+
+    self.isFilterVisible.subscribe(function (newValue) {
+      if (!newValue && self.filter()) {
+        self.filter('');
+      }
+    });
+
+    self.filteredEntries = ko.pureComputed(function () {
+      var filter = self.filter().toLowerCase();
+      if (filter) {
+        return self.entries().filter(function (entry) {
+          return entry.definition().name.toLowerCase().indexOf(filter) !== -1;
+        })
+      }
+      return self.entries();
+    });
+
     self.getSelectedDocsWithDependents = function() {
       self.selectedDocsWithDependents([]);
       var uuids = self.selectedEntries().map(function(entry) {

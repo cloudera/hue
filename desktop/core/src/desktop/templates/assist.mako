@@ -512,7 +512,7 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
+      <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
@@ -535,10 +535,13 @@ from notebook.conf import get_ordered_interpreters
       <!-- /ko -->
       <!-- ko template: 'assist-document-header-actions' --><!-- /ko -->
     </div>
+    <div class="assist-flex-documents-search" data-bind="visible: isFilterVisible()">
+      <div class="assist-filter"><input class="clearable" type="text" placeholder="${ _('Filter...') }" data-bind="clearable: filter, value: filter, valueUpdate: 'afterkeydown'"/></div>
+    </div>
     <div class="assist-flex-fill assist-file-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
-         <ul class="assist-tables" data-bind="foreachVisible: {data: entries, minHeight: 20, container: '.assist-file-scrollable' }">
-           <li class="assist-entry assist-file-entry" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-db-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
+         <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 24, container: '.assist-file-scrollable' }">
+           <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
              <div class="assist-file-actions table-actions" style="opacity: 0;" >
                <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
                  <i class='fa fa-info' title="${ _('Details') }"></i>
