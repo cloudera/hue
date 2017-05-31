@@ -652,7 +652,7 @@ var MetastoreTable = (function () {
         identifierChain: [{ name: entry.name }]
       },
       orientation: orientation || 'right',
-      sourceType: self.sourceType,
+      sourceType: entry.sourceType,
       defaultDatabase: entry.database.name,
       source: {
         element: event.target,
