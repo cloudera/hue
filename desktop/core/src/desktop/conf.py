@@ -918,7 +918,7 @@ AUTH = ConfigSection(
       key="behind_reverse_proxy",
       help=_("If True, it will look for the IP address from the header defined at reverse_proxy_header."),
       type=coerce_bool,
-      default=False,
+      dynamic_default=is_lb_enabled,
     ),
     REVERSE_PROXY_HEADER = Config(
       key="reverse_proxy_header",
