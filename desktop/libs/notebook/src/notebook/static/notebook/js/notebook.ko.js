@@ -343,7 +343,7 @@ var EditorViewModel = (function() {
     };
 
     huePubSub.subscribe('assist.db.refresh', function (options) {
-      if (options.sourceTypes.indexOf(self.type()) !== -1) {
+      if (['hive', 'impala'].indexOf(self.type()) !== -1) {
         updateDatabases();
       }
     }, 'editor');
