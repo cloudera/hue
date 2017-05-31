@@ -198,7 +198,7 @@ def create_database(request, source, destination, start_time):
   on_success_url = reverse('metastore:show_tables', kwargs={'database': database})
 
   notebook = make_notebook(
-      name='Execute and watch',
+      name=_('Creating database %(name)s') % destination,
       editor_type=editor_type,
       statement=sql,
       status='ready',
