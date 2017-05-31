@@ -1028,8 +1028,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </div>
 
         <div class="tab-pane" id="workflow-action-page-xml">
-          <pre data-bind="text: ko.toJSON(properties['conf'], null, 2)"></pre>
-          ## <div data-bind="readonlyXML: properties['conf'](), path: 'xml'"></div>
+          <div data-bind="readonlyXML: properties['conf']"></div>
         </div>
 
       </div>
