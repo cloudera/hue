@@ -167,7 +167,7 @@
         '<td class="column" ' + visibility + '>' + column + '</td>' +
         '<td class="rule">' + rule + '</td>' +
         '<td class="input">' + inputField + '</td>' +
-        '<td class="deleteRule" onclick="QueryBuilder.deleteRule($(this).closest("tr"))"><i class="fa fa-times"></i></td>' +
+        '<td class="deleteRule" onclick="QueryBuilder.deleteRule($(this).closest(\'tr\'))"><i class="fa fa-times"></i></td>' +
         '</tr>';
 
       // Check if the column is already in the rules
