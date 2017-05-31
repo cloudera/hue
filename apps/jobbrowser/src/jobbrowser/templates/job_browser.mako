@@ -20,6 +20,10 @@
   from desktop.views import commonheader, commonfooter, _ko
 %>
 
+<%
+SUFFIX = is_mini and "-mini" or ""
+%>
+
 % if not is_embeddable:
 ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <%namespace name="assist" file="/assist.mako" />
@@ -125,7 +129,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <div class="content-panel">
           <div class="content-panel-inner">
             <!-- ko if: $root.job() -->
-            <div data-bind="template: { name: 'breadcrumbs' }"></div>
+            <div data-bind="template: { name: 'breadcrumbs${ SUFFIX }' }"></div>
             <!-- /ko -->
 
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
@@ -153,7 +157,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                 <i class="fa fa-refresh"></i>
               </a>
 
-              <div data-bind="template: { name: 'job-actions', 'data': jobs }" class="pull-right"></div>
+              <div data-bind="template: { name: 'job-actions${ SUFFIX }', 'data': jobs }" class="pull-right"></div>
               <!-- /ko -->
             </form>
 
@@ -216,35 +220,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- ko if: $root.job() -->
           <!-- ko with: $root.job() -->
             <!-- ko if: mainType() == 'jobs' -->
-              <div class="jb-panel" data-bind="template: { name: 'job-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'job-page${ SUFFIX }' }"></div>
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'workflows' -->
               <!-- ko if: type() == 'workflow' -->
-                <div class="jb-panel" data-bind="template: { name: 'workflow-page' }"></div>
+                <div class="jb-panel" data-bind="template: { name: 'workflow-page${ SUFFIX }' }"></div>
               <!-- /ko -->
 
               <!-- ko if: type() == 'workflow-action' -->
-                <div class="jb-panel" data-bind="template: { name: 'workflow-action-page' }"></div>
+                <div class="jb-panel" data-bind="template: { name: 'workflow-action-page${ SUFFIX }' }"></div>
               <!-- /ko -->
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'schedules' -->
-              <div class="jb-panel" data-bind="template: { name: 'schedule-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'schedule-page${ SUFFIX }' }"></div>
             <!-- /ko -->
 
             <!-- ko if: mainType() == 'bundles' -->
-              <div class="jb-panel" data-bind="template: { name: 'bundle-page' }"></div>
+              <div class="jb-panel" data-bind="template: { name: 'bundle-page${ SUFFIX }' }"></div>
             <!-- /ko -->
 
             <!-- ko if: mainType().startsWith('dataeng-job') -->
-              <div data-bind="template: { name: 'dataeng-job-page' }"></div>
+              <div data-bind="template: { name: 'dataeng-job-page${ SUFFIX }' }"></div>
             <!-- /ko -->
 
           <!-- /ko -->
           <!-- /ko -->
 
-          <div data-bind="template: { name: 'pagination', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
+          <div data-bind="template: { name: 'pagination${ SUFFIX }', data: $root.jobs }, visible: !$root.job() && !jobs.loadingJobs()"></div>
           <!-- /ko -->
 
           % if not is_mini:
@@ -267,13 +271,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </div>
 
 <!-- ko if: $root.job() -->
-  <div id="rerun-modal" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
+  <div id="rerun-modal${ SUFFIX }" class="modal hide" data-bind="html: $root.job().rerunModalContent"></div>
 <!-- /ko -->
 
 </div>
 
 
-<script type="text/html" id="breadcrumbs-icons">
+<script type="text/html" id="breadcrumbs-icons${ SUFFIX }">
 <!-- ko switch: type -->
   <!-- ko case: 'workflow' -->
     <img src="${ static('oozie/art/icon_oozie_workflow_48.png') }" class="app-icon" alt="${ _('Oozie workflow icon') }"/>
@@ -291,7 +295,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="breadcrumbs">
+<script type="text/html" id="breadcrumbs${ SUFFIX }">
   <h3 class="jb-breadcrumbs">
     <ul class="inline hue-breadcrumbs-bar">
       <!-- ko foreach: breadcrumbs -->
@@ -303,11 +307,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <!-- ko if: $index() != 0 -->
           <!-- ko if: $index() != $parent.breadcrumbs().length - 1 -->
             <a href="javascript:void(0)" data-bind="click: function() { $parent.breadcrumbs.splice($index()); $root.job().id(id); $root.job().fetchJob(); }">
-            <span data-bind="template: 'breadcrumbs-icons'"></span>
+            <span data-bind="template: 'breadcrumbs-icons${ SUFFIX }'"></span>
             <span data-bind="text: name"></span></a>
           <!-- /ko -->
           <!-- ko if: $index() == $parent.breadcrumbs().length - 1 -->
-            <span data-bind="template: 'breadcrumbs-icons'"></span>
+            <span data-bind="template: 'breadcrumbs-icons${ SUFFIX }'"></span>
             <span data-bind="text: name, attr: { title: id }"></span>
           <!-- /ko -->
         <!-- /ko -->
@@ -326,7 +330,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="pagination">
+<script type="text/html" id="pagination${ SUFFIX }">
   <!-- ko ifnot: hasPagination -->
   <div class="inline">
     <span data-bind="text: paginationResultCounts()"></span>
@@ -361,34 +365,34 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="job-page">
+<script type="text/html" id="job-page${ SUFFIX }">
   <!-- ko if: type() == 'MAPREDUCE' -->
-    <div data-bind="template: { name: 'job-mapreduce-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-mapreduce-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'MAP' || type() == 'REDUCE' -->
-    <div data-bind="template: { name: 'job-mapreduce-task-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-mapreduce-task-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'MAP_ATTEMPT' || type() == 'REDUCE_ATTEMPT' -->
-    <div data-bind="template: { name: 'job-mapreduce-task-attempt-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-mapreduce-task-attempt-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'YARN' -->
-    <div data-bind="template: { name: 'job-yarn-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-yarn-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'IMPALA' -->
-    <div data-bind="template: { name: 'job-impala-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-impala-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 
   <!-- ko if: type() == 'SPARK' -->
-    <div data-bind="template: { name: 'job-spark-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'job-spark-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 </script>
 
 
-<script type="text/html" id="job-yarn-page">
+<script type="text/html" id="job-yarn-page${ SUFFIX }">
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -418,13 +422,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
   </div>
 </script>
 
 
-<script type="text/html" id="job-mapreduce-page">
+<script type="text/html" id="job-mapreduce-page${ SUFFIX }">
 
 
   <div class="row-fluid">
@@ -465,17 +469,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#job-mapreduce-page-tasks" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks\']').tab('show'); }">${ _('Tasks') }</a></li>
-        <li><a href="#job-mapreduce-page-metadata" data-bind="click: function(){ fetchProfile('metadata'); $('a[href=\'#job-mapreduce-page-metadata\']').tab('show'); }">${ _('Metadata') }</a></li>
-        <li><a href="#job-mapreduce-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
-        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
+        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-mapreduce-page-tasks${ SUFFIX }" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks${ SUFFIX }\']').tab('show'); }">${ _('Tasks') }</a></li>
+        <li><a href="#job-mapreduce-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('metadata'); $('a[href=\'#job-mapreduce-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Metadata') }</a></li>
+        <li><a href="#job-mapreduce-page-counters${ SUFFIX }" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-page-counters${ SUFFIX }\']').tab('show'); }">${ _('Counters') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="job-mapreduce-page-logs">
+        <div class="tab-pane active" id="job-mapreduce-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
             <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
@@ -485,7 +489,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-page-tasks">
+        <div class="tab-pane" id="job-mapreduce-page-tasks${ SUFFIX }">
           <form class="form-inline">
             <input data-bind="textFilter: textFilter, clearable: {value: textFilter}" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
 
@@ -532,12 +536,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-page-metadata">
-          <div data-bind="template: { name: 'render-metadata', data: properties['metadata'] }"></div>
+        <div class="tab-pane" id="job-mapreduce-page-metadata${ SUFFIX }">
+          <div data-bind="template: { name: 'render-metadata${ SUFFIX }', data: properties['metadata'] }"></div>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-page-counters">
-          <div data-bind="template: { name: 'render-page-counters', data: properties['counters'] }"></div>
+        <div class="tab-pane" id="job-mapreduce-page-counters${ SUFFIX }">
+          <div data-bind="template: { name: 'render-page-counters${ SUFFIX }', data: properties['counters'] }"></div>
         </div>
       </div>
 
@@ -547,7 +551,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="job-mapreduce-task-page">
+<script type="text/html" id="job-mapreduce-task-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -582,12 +586,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#job-mapreduce-task-page-attempts" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-mapreduce-task-page-attempts\']').tab('show'); }">${ _('Attempts') }</a></li>
-        <li><a href="#job-mapreduce-task-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
+        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-mapreduce-task-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-mapreduce-task-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
+        <li><a href="#job-mapreduce-task-page-counters${ SUFFIX }" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-page-counters${ SUFFIX }\']').tab('show'); }">${ _('Counters') }</a></li>
       </ul>
       <div class="tab-content">
-        <div class="tab-pane active" id="job-mapreduce-task-page-logs">
+        <div class="tab-pane active" id="job-mapreduce-task-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
             <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
@@ -597,7 +601,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-task-page-attempts">
+        <div class="tab-pane" id="job-mapreduce-task-page-attempts${ SUFFIX }">
 
           <table class="table table-condensed">
             <thead>
@@ -633,8 +637,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-task-page-counters">
-          <div data-bind="template: { name: 'render-task-counters', data: properties['counters'] }"></div>
+        <div class="tab-pane" id="job-mapreduce-task-page-counters${ SUFFIX }">
+          <div data-bind="template: { name: 'render-task-counters${ SUFFIX }', data: properties['counters'] }"></div>
         </div>
       </div>
     </div>
@@ -643,7 +647,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="job-mapreduce-task-attempt-page">
+<script type="text/html" id="job-mapreduce-task-attempt-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -683,12 +687,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-attempt-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#job-mapreduce-task-attempt-page-counters" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-attempt-page-counters\']').tab('show'); }">${ _('Counters') }</a></li>
+        <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-attempt-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#job-mapreduce-task-attempt-page-counters${ SUFFIX }" data-bind="click: function(){ fetchProfile('counters'); $('a[href=\'#job-mapreduce-task-attempt-page-counters${ SUFFIX }\']').tab('show'); }">${ _('Counters') }</a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs">
+        <div class="tab-pane active" id="job-mapreduce-task-attempt-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
           % for name in ['stdout', 'stderr', 'syslog']:
             <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
@@ -697,8 +701,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters">
-          <div data-bind="template: { name: 'render-attempt-counters', data: properties['counters'] }"></div>
+        <div class="tab-pane" id="job-mapreduce-task-attempt-page-counters${ SUFFIX }">
+          <div data-bind="template: { name: 'render-attempt-counters${ SUFFIX }', data: properties['counters'] }"></div>
         </div>
       </div>
 
@@ -708,7 +712,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="job-impala-page">
+<script type="text/html" id="job-impala-page${ SUFFIX }">
    <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -738,13 +742,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
   </div>
 </script>
 
 
-<script type="text/html" id="job-spark-page">
+<script type="text/html" id="job-spark-page${ SUFFIX }">
    <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -774,20 +778,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions' }"></div>
+      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
   </div>
 </script>
 
 
-<script type="text/html" id="dataeng-job-page">
+<script type="text/html" id="dataeng-job-page${ SUFFIX }">
   <!-- ko if: type() == 'dataeng-job-HIVE' -->
-    <div data-bind="template: { name: 'dataeng-job-hive-page', data: $root.job() }"></div>
+    <div data-bind="template: { name: 'dataeng-job-hive-page${ SUFFIX }', data: $root.job() }"></div>
   <!-- /ko -->
 </script>
 
 
-<script type="text/html" id="dataeng-job-hive-page">
+<script type="text/html" id="dataeng-job-hive-page${ SUFFIX }">
   ${ _('Id') } <span data-bind="text: id"></span>
   ${ _('Name') } <span data-bind="text: name"></span>
   ${ _('Type') } <span data-bind="text: type"></span>
@@ -797,11 +801,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   ${ _('Duration') } <span data-bind="text: duration"></span>
   ${ _('Submitted') } <span data-bind="text: submitted"></span>
 
-  <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
+  <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
 </script>
 
 
-<script type="text/html" id="job-actions">
+<script type="text/html" id="job-actions${ SUFFIX }">
   <div class="btn-group">
     <!-- ko if: hasResume -->
     <button class="btn" title="${ _('Resume selected') }" data-bind="click: function() { control('resume'); }, enable: resumeEnabled">
@@ -838,7 +842,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="workflow-page">
+<script type="text/html" id="workflow-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -895,26 +899,26 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#workflow-page-graph" data-toggle="tab">${ _('Graph') }</a></li>
-        <li><a href="#workflow-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-        <li><a class="jb-logs-link" href="#workflow-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#workflow-page-tasks" data-toggle="tab">${ _('Tasks') }</a></li>
-        <li><a href="#workflow-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
+        <li class="active"><a href="#workflow-page-graph${ SUFFIX }" data-toggle="tab">${ _('Graph') }</a></li>
+        <li><a href="#workflow-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#workflow-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a class="jb-logs-link" href="#workflow-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#workflow-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a href="#workflow-page-xml${ SUFFIX }" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#workflow-page-xml${ SUFFIX }\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
 
 
       <div class="tab-content">
-        <div class="tab-pane active dashboard-container" id="workflow-page-graph">
+        <div class="tab-pane active dashboard-container" id="workflow-page-graph${ SUFFIX }">
         </div>
 
-        <div class="tab-pane" id="workflow-page-logs">
+        <div class="tab-pane" id="workflow-page-logs${ SUFFIX }">
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="workflow-page-tasks">
+        <div class="tab-pane" id="workflow-page-tasks${ SUFFIX }">
           <table id="actionsTable" class="datatables table table-condensed">
             <thead>
             <tr>
@@ -947,11 +951,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="workflow-page-metadata">
-          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
+        <div class="tab-pane" id="workflow-page-metadata${ SUFFIX }">
+          <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
         </div>
 
-        <div class="tab-pane" id="workflow-page-xml">
+        <div class="tab-pane" id="workflow-page-xml${ SUFFIX }">
           <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
         </div>
       </div>
@@ -960,7 +964,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="workflow-action-page">
+<script type="text/html" id="workflow-action-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -986,13 +990,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#workflow-action-page-metadata" data-toggle="tab">${ _('Properties') }</a></li>
-        <li><a href="#workflow-action-page-tasks" data-toggle="tab">${ _('Child jobs') }</a></li>
-        <li><a href="#workflow-action-page-xml" data-toggle="tab">${ _('XML') }</a></li>
+        <li class="active"><a href="#workflow-action-page-metadata${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
+        <li><a href="#workflow-action-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Child jobs') }</a></li>
+        <li><a href="#workflow-action-page-xml${ SUFFIX }" data-toggle="tab">${ _('XML') }</a></li>
       </ul>
 
       <div class="tab-content">
-        <div class="tab-pane" id="workflow-action-page-metadata">
+        <div class="tab-pane" id="workflow-action-page-metadata${ SUFFIX }">
           <table class="datatables table table-condensed">
             <thead>
             <tr>
@@ -1009,7 +1013,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="workflow-action-page-tasks">
+        <div class="tab-pane" id="workflow-action-page-tasks${ SUFFIX }">
           <table class="table table-condensed datatables">
             <thead>
               <tr>
@@ -1027,7 +1031,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="workflow-action-page-xml">
+        <div class="tab-pane" id="workflow-action-page-xml${ SUFFIX }">
           <div data-bind="readonlyXML: properties['conf']"></div>
         </div>
 
@@ -1038,7 +1042,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="schedule-page">
+<script type="text/html" id="schedule-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -1076,17 +1080,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#schedule-page-task" data-toggle="tab">${ _('Tasks') }</a></li>
-        <li><a class="jb-logs-link" href="#schedule-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#schedule-page-metadata" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-        <li><a href="#schedule-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
+        <li class="active"><a href="#schedule-page-task${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a class="jb-logs-link" href="#schedule-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#schedule-page-metadata${ SUFFIX }" data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#schedule-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a href="#schedule-page-xml${ SUFFIX }" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#schedule-page-xml${ SUFFIX }\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="schedule-page-calendar">
+        <div class="tab-pane active" id="schedule-page-calendar${ SUFFIX }">
           <!-- ko with: coordinatorActions() -->
           <form class="form-inline">
             ##<input data-bind="value: textFilter" type="text" class="input-xlarge search-query" placeholder="${_('Filter by name')}">
@@ -1097,7 +1101,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             ##    <div class="inline-block" data-bind="text: name, toggle: checked"></div>
             ##  </label>
             ##</span>
-            <div data-bind="template: { name: 'job-actions' }" class="pull-right"></div>
+            <div data-bind="template: { name: 'job-actions${ SUFFIX }' }" class="pull-right"></div>
           </form>
 
           <table id="schedulesTable" class="datatables table table-condensed status-border-container">
@@ -1137,15 +1141,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <!-- /ko -->
         </div>
 
-        <div class="tab-pane" id="schedule-page-logs">
+        <div class="tab-pane" id="schedule-page-logs${ SUFFIX }">
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="schedule-page-metadata">
-          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
+        <div class="tab-pane" id="schedule-page-metadata${ SUFFIX }">
+          <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
         </div>
 
-        <div class="tab-pane" id="schedule-page-xml">
+        <div class="tab-pane" id="schedule-page-xml${ SUFFIX }">
           <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
         </div>
       </div>
@@ -1154,7 +1158,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 
-<script type="text/html" id="bundle-page">
+<script type="text/html" id="bundle-page${ SUFFIX }">
 
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
@@ -1192,17 +1196,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     </div>
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
-        <li class="active"><a href="#bundle-page-coordinators" data-toggle="tab">${ _('Tasks') }</a></li>
-        <li><a class="jb-logs-link" href="#bundle-page-logs" data-toggle="tab">${ _('Logs') }</a></li>
-        <li><a href="#bundle-page-metadata"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata\']').tab('show'); }">${ _('Properties') }</a></li>
-        <li><a href="#bundle-page-xml" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml\']').tab('show'); }">${ _('XML') }</a></li>
-        <li class="pull-right" data-bind="template: { name: 'job-actions' }"></li>
+        <li class="active"><a href="#bundle-page-coordinators${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
+        <li><a class="jb-logs-link" href="#bundle-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
+        <li><a href="#bundle-page-metadata${ SUFFIX }"  data-bind="click: function(){ fetchProfile('properties'); $('a[href=\'#bundle-page-metadata${ SUFFIX }\']').tab('show'); }">${ _('Properties') }</a></li>
+        <li><a href="#bundle-page-xml${ SUFFIX }" data-bind="click: function(){ fetchProfile('xml'); $('a[href=\'#bundle-page-xml${ SUFFIX }\']').tab('show'); }">${ _('XML') }</a></li>
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
       </ul>
 
       <div class="clearfix"></div>
 
       <div class="tab-content">
-        <div class="tab-pane active" id="bundle-page-coordinators">
+        <div class="tab-pane active" id="bundle-page-coordinators${ SUFFIX }">
           <table id="coordsTable" class="datatables table table-condensed status-border-container">
             <thead>
             <tr>
@@ -1235,15 +1239,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           </table>
         </div>
 
-        <div class="tab-pane" id="bundle-page-logs">
+        <div class="tab-pane" id="bundle-page-logs${ SUFFIX }">
           <pre data-bind="html: logs, logScroller: logs"></pre>
         </div>
 
-        <div class="tab-pane" id="bundle-page-metadata">
-          <div data-bind="template: { name: 'render-properties', data: properties['properties'] }"></div>
+        <div class="tab-pane" id="bundle-page-metadata${ SUFFIX }">
+          <div data-bind="template: { name: 'render-properties${ SUFFIX }', data: properties['properties'] }"></div>
         </div>
 
-        <div class="tab-pane" id="bundle-page-xml">
+        <div class="tab-pane" id="bundle-page-xml${ SUFFIX }">
           <div data-bind="readonlyXML: properties['xml'], path: 'xml'"></div>
         </div>
       </div>
@@ -1252,7 +1256,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 </script>
 
-<script type="text/html" id="render-properties">
+<script type="text/html" id="render-properties${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.properties, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.properties -->
   <table class="table table-condensed">
@@ -1266,7 +1270,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <tr>
         <td data-bind="text: $data"></td>
         <td>
-        <!-- ko template: { name: 'link-or-text', data: { name: $data, value: $parent.properties[$data] } } --><!-- /ko -->
+        <!-- ko template: { name: 'link-or-text${ SUFFIX }', data: { name: $data, value: $parent.properties[$data] } } --><!-- /ko -->
         </td>
       </tr>
     </tbody>
@@ -1274,7 +1278,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="render-page-counters">
+<script type="text/html" id="render-page-counters${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.counterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.counterGroup -->
   <!-- ko foreach: $data.counterGroup -->
@@ -1301,7 +1305,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="render-task-counters">
+<script type="text/html" id="render-task-counters${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.taskCounterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.taskCounterGroup -->
   <!-- ko foreach: $data.taskCounterGroup -->
@@ -1324,7 +1328,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="render-attempt-counters">
+<script type="text/html" id="render-attempt-counters${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.taskAttemptCounterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.taskAttemptCounterGroup -->
   <!-- ko foreach: $data.taskAttemptCounterGroup -->
@@ -1347,7 +1351,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="render-metadata">
+<script type="text/html" id="render-metadata${ SUFFIX }">
   <!-- ko hueSpinner: { spin: !$data.property, center: true, size: 'xlarge' } --><!-- /ko -->
   <!-- ko if: $data.property -->
   <table class="table table-condensed">
@@ -1361,7 +1365,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <tr>
         <td data-bind="text: name"></td>
         <td>
-          <!-- ko template: { name: 'link-or-text', data: { name: name, value: value } } --><!-- /ko -->
+          <!-- ko template: { name: 'link-or-text${ SUFFIX }', data: { name: name, value: value } } --><!-- /ko -->
         </td>
       </tr>
     </tbody>
@@ -1369,7 +1373,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="link-or-text">
+<script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
     <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value) , text: $data.value"></a>
   <!-- /ko -->
@@ -1666,7 +1670,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.control = function (action) {
         if (action == 'rerun') {
           $.get('/oozie/rerun_oozie_job/' + self.id() + '/?format=json', function(response) {
-            $('#rerun-modal').modal('show');
+            $('#rerun-modal${ SUFFIX }').modal('show');
             self.rerunModalContent(response);
           });
         } else {
@@ -1706,7 +1710,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         if ($('canvas').length > 0 && $('canvas').position().top !== self.lastArrowsPosition.top && $('canvas').position().left !== self.lastArrowsPosition.left) {
           self.lastArrowsPosition = $('canvas').position();
         }
-        if ($('#workflow-page-graph').is(':visible')){
+        if ($('#workflow-page-graph${ SUFFIX }').is(':visible')){
           if ($('canvas').length === 0){
             huePubSub.publish('graph.draw.arrows');
           }
@@ -1729,12 +1733,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         }
 
         if (vm.job().type() === 'workflow') {
-          $('#workflow-page-graph').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
+          $('#workflow-page-graph${ SUFFIX }').html('<div class="hue-spinner"><i class="fa fa-spinner fa-spin hue-spinner-center hue-spinner-xlarge"></i></div>');
           $.ajax({
             url: "/oozie/list_oozie_workflow/" + vm.job().id(),
             data: {
               'graph': true,
-              'element': 'workflow-page-graph',
+              'element': 'workflow-page-graph${ SUFFIX }',
               'is_jb2': true
             },
             beforeSend: function (xhr) {
@@ -1747,7 +1751,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               huePubSub.publish('hue4.process.headers', {
                 response: response,
                 callback: function (r) {
-                  $('#workflow-page-graph').html(r);
+                  $('#workflow-page-graph${ SUFFIX }').html(r);
                   window.clearTimeout(self.updateArrowsTimeout);
                   self.initialArrowsDrawing();
                   self.updateArrows();
@@ -1958,7 +1962,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.control = function (action) {
         if (action == 'rerun') {
           $.get('/oozie/rerun_oozie_coord/' + vm.job().id() + '/?format=json', function(response) {
-            $('#rerun-modal').modal('show');
+            $('#rerun-modal${ SUFFIX }').modal('show');
             vm.job().rerunModalContent(response);
 
             var frag = document.createDocumentFragment();
@@ -2236,7 +2240,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       % if not is_mini:
         huePubSub.subscribe('submit.rerun.popup.return', function (data) {
           $.jHueNotify.info('${_('Rerun submitted.')}');
-          $('#rerun-modal').modal('hide');
+          $('#rerun-modal${ SUFFIX }').modal('hide');
           jobBrowserViewModel.job().apiStatus('RUNNING');
           jobBrowserViewModel.job().updateJob();
         }, 'jobbrowser');
@@ -2248,7 +2252,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       $(document).on('shown', '.jb-logs-link', function (e) {
         var dest = $(e.target).attr('href');
-        if (dest.indexOf('logs') > -1){
+        if (dest.indexOf('logs') > -1 && $(dest).find('pre:visible').length > 0){
           $(dest).find('pre').css('overflow-y', 'auto').height(Math.max(200, $(window).height() - $(dest).find('pre').offset().top - $('.page-content').scrollTop() - 30));
         }
       });
