@@ -656,7 +656,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           self.loadApp('editor');
 
           self.getActiveAppViewModel(function (viewModel) {
-            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL            
+            var editorType = statementOptions['type'] || 'hive'; // Next: use file extensions and default type of Editor for SQL
             viewModel.newNotebook(editorType, function() {
               self.changeEditorType(statementOptions['statementType'] || editorType);
 
@@ -1168,15 +1168,25 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             var buttonActions = clusterConfig['button_actions'];
               buttonActions.forEach(function(app) {
               var interpreters = [];
-              var hasNotebook = false;
+              var toAddDivider = false;
+              var dividerAdded = false;
+              var lastInterpreter = null;
               $.each(app['interpreters'], function(index, interpreter) {
-                hasNotebook = hasNotebook || interpreter.type == 'notebook';
+                // Promote the first catagory of interpreters
+                if (! dividerAdded) {
+                  toAddDivider = app.name === 'editor' && (lastInterpreter != null && lastInterpreter.is_sql != interpreter.is_sql);
+                }
                 interpreters.push({
                   displayName: interpreter.displayName,
-                  dividerAbove: app.name === 'editor' && index === 1 && hasNotebook,
+                  dividerAbove: toAddDivider,
                   icon: interpreter.type,
                   url: interpreter.page
                 });
+                lastInterpreter = interpreter;
+                if (toAddDivider) {
+                  dividerAdded = true;
+                  toAddDivider = false;
+                }
               });
 
               % if user.is_superuser:

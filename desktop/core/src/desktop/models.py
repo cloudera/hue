@@ -1625,7 +1625,8 @@ class ClusterConfig():
         'type': 'notebook',
         'displayName': 'Notebook',
         'tooltip': _('Notebook'),
-        'page': '/notebook'
+        'page': '/notebook',
+        'is_sql': False
       })
 
     _interpreters = get_ordered_interpreters(self.user)
