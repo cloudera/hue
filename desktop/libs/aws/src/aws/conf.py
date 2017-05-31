@@ -15,15 +15,19 @@
 # limitations under the License.
 from __future__ import absolute_import
 
+import logging
+
 import boto.utils
-from boto.regioninfo import get_regions
 from boto.s3.connection import Location
 
-from django.utils.translation import ugettext_lazy as _
+from django.utils.translation import ugettext_lazy as _, ugettext as _t
 
+import aws
 from desktop.lib.conf import Config, UnspecifiedConfigSection, ConfigSection, coerce_bool, coerce_password_from_script
-
 from hadoop.core_site import get_s3a_access_key, get_s3a_secret_key
+
+
+LOG = logging.getLogger(__name__)
 
 
 DEFAULT_CALLING_FORMAT='boto.s3.connection.OrdinaryCallingFormat'
@@ -158,12 +162,11 @@ def config_validator(user):
   res = []
 
   if is_enabled():
-    regions = get_regions('s3')
-    region_names = [r.name for r in regions]
-
-    for name in AWS_ACCOUNTS.keys():
-      region_name = AWS_ACCOUNTS[name].REGION.get()
-      if region_name not in region_names:
-        res.append(('aws.aws_accounts.%s.region' % name, 'Unknown region %s' % region_name))
+    try:
+      conn = aws.get_client('default').get_s3_connection()
+      conn.get_canonical_user_id()
+    except Exception, e:
+      LOG.exception('AWS failed configuration check.')
+      res.append(('aws', _t('Failed to connect to S3, check your AWS credentials.')))
 
   return res
