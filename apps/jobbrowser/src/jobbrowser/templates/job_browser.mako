@@ -2234,6 +2234,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       huePubSub.subscribe('app.gained.focus', function (app) {
         if (app === 'jobbrowser') {
           huePubSub.publish('graph.draw.arrows');
+          loadHash();
         }
       }, 'jobbrowser');
 
@@ -2262,8 +2263,19 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           jobBrowserViewModel.job().updateJob();
         }, 'jobbrowser');
       % else:
-        huePubSub.subscribe('mini.jb.navigate', function(interface){
+        huePubSub.subscribe('mini.jb.navigate', function (interface) {
+          $('#jobsPanel .nav-pills li').removeClass('active');
+          interface = jobBrowserViewModel.isValidInterface(interface);
+          $('#jobsPanel .nav-pills li[data-interface="' + interface + '"]').addClass('active');
           jobBrowserViewModel.selectInterface(interface);
+        });
+        huePubSub.subscribe('mini.jb.expand', function () {
+          if (jobBrowserViewModel.job()) {
+            huePubSub.publish('open.link', '/jobbrowser/#!id=' + jobBrowserViewModel.job().id());
+          }
+          else {
+            huePubSub.publish('open.link', '/jobbrowser/#!' + jobBrowserViewModel.interface());
+          }
         });
       % endif
 
