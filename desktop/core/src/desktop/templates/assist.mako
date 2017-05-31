@@ -511,7 +511,7 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="assist-document-header-actions">
-    <div class="assist-header-actions">
+    <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
@@ -519,7 +519,7 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-documents-inner-panel">
     <!-- ko with: activeEntry -->
-    <div class="assist-flex-header assist-document-breadcrumb assist-breadcrumb">
+    <div class="assist-flex-header assist-breadcrumb">
       <!-- ko ifnot: isRoot -->
       <a href="javascript: void(0);" data-bind="click: function () { parent.makeActive(); }">
         <i class="fa fa-fw fa-chevron-left"></i>
