@@ -2053,9 +2053,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $(el).jHueTableExtender2({
           mainScrollable: MAIN_SCROLLABLE,
           % if is_embeddable:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 47 : 50 + bannerTopHeight },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 47 + bannerTopHeight : 50 + bannerTopHeight },
           % else:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 : 73 + bannerTopHeight },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 + bannerTopHeight : 73 + bannerTopHeight },
           % endif
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: 'fixed',
@@ -3147,7 +3147,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 
       var isAssistAvailable = viewModel.assistAvailable();
-      var wasAssistVisible = viewModel.isLeftPanelVisible();
+      var wasLeftPanelVisible = viewModel.isLeftPanelVisible();
+      var wasRightPanelVisible = viewModel.isRightPanelVisible();
 
       function exitPlayerMode() {
         viewModel.isPlayerMode(false);
@@ -3160,18 +3161,24 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           huePubSub.publish('side.panels.hide');
           viewModel.assistAvailable(false);
           viewModel.isLeftPanelVisible(false);
+          viewModel.isRightPanelVisible(false);
           $(".navigator").hide();
           $(".add-snippet").hide();
           if (viewModel.isFullscreenMode()){
             $(".main-content").css("top", "50px");
           } else {
+            % if conf.CUSTOM.BANNER_TOP_HTML.get():
+            $(".main-content").attr("style", "top: 31px!important");
+            % else:
             $(".main-content").css("top", "1px");
+            % endif
           }
           redrawFixedHeaders(200);
           $(window).bind("keydown", "esc", exitPlayerMode);
         } else {
           huePubSub.publish('side.panels.show');
-          viewModel.isLeftPanelVisible(wasAssistVisible);
+          viewModel.isLeftPanelVisible(wasLeftPanelVisible);
+          viewModel.isRightPanelVisible(wasRightPanelVisible);
           viewModel.assistAvailable(isAssistAvailable);
           $(".navigator").show();
           $(".add-snippet").show();
@@ -3186,7 +3193,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       });
 
       huePubSub.subscribe('assist.set.manual.visibility', function () {
-        wasAssistVisible = viewModel.isLeftPanelVisible();
+        wasLeftPanelVisible = viewModel.isLeftPanelVisible();
+        wasRightPanelVisible = viewModel.isRightPanelVisible();
       }, HUE_PUB_SUB_APP);
 
       viewModel.isLeftPanelVisible.subscribe(function (value) {
@@ -3420,7 +3428,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         var _dtElement;
         if (snippet.showGrid()) {
           _dtElement = $("#snippet_" + snippet.id()).find(".dataTables_wrapper");
-          var topCoord = viewModel.isPlayerMode() ? 1 : 73;
+          var topCoord = viewModel.isPlayerMode() ? ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '31' or '1' } : 73;
           $("#snippet_" + snippet.id()).find(".snippet-grid-settings").css({
             "height": Math.ceil($(window).height() - Math.max($('.result-settings').length > 0 ? $('.result-settings').offset().top : 0, topCoord)) + 'px'
           });
