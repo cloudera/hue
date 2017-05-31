@@ -224,15 +224,17 @@ class TestMetastoreWithHadoop(BeeswaxSampleProvider):
     wait_for_query_to_finish(self.client, resp, max=30.0)
 
     # Assert partition exists
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-    assert_true("baz_drop" in response.content)
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name, {'format': 'json'})
+    data = json.loads(response.content)
+    assert_true("baz_drop" in [part['columns'][0] for part in data['partition_values_json']], data)
 
     # Drop partition
     self.client.post("/metastore/table/%s/test_partitions/partitions/drop" % self.db_name, {'partition_selection': [partition_spec]}, follow=True)
     query = QueryHistory.objects.latest('id')
     assert_equal_mod_whitespace("ALTER TABLE `%s`.`test_partitions` DROP IF EXISTS PARTITION (%s) PURGE" % (self.db_name, partition_spec), query.query)
-    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name)
-    assert_false("baz_drop" in response.content)
+    response = self.client.get("/metastore/table/%s/test_partitions/partitions" % self.db_name, {'format': 'json'})
+    data = json.loads(response.content)
+    assert_false("baz_drop" in [part['columns'][0] for part in data['partition_values_json']], data)
 
   def test_drop_multi_tables(self):
     hql = """
