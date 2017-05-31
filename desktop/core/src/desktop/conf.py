@@ -889,7 +889,8 @@ AUTH = ConfigSection(
     ),
     LOGIN_COOLOFF_TIME = Config(
       key="login_cooloff_time",
-      help=_("If set, defines period of inactivity in seconds after which failed logins will be forgotten"),
+      help=_("If set, defines period of inactivity in hours after which failed logins will be forgotten."
+             "A value of 0 or None will disable this check. Default: None."),
       type=coerce_timedelta,
       default=None,
     ),
