@@ -116,10 +116,10 @@ ${ fb_components.menubar() }
             </div>
             <div class="pagination inline">
               <ul>
-                <li class="first-page prev disabled"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
-                <li class="previous-page disabled"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
-                <li class="next-page"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
-                <li class="last-page next"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
+                <li class="first-page prev" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: firstPage" title="${_('First page')}"><i class="fa fa-fast-backward"></i></a></li>
+                <li class="previous-page" data-bind="css: {'disabled': page() == 1}"><a href="javascript:void(0);" data-bind="click: previousPage" title="${_('Previous page')}"><i class="fa fa-backward"></i></a></li>
+                <li class="next-page" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: nextPage" title="${_('Next page')}"><i class="fa fa-forward"></i></a></li>
+                <li class="last-page next" data-bind="css: {'disabled': page() == totalPages() || upperPage() == totalPages()}"><a href="javascript:void(0);" data-bind="click: lastPage" title="${_('Last page')}"><i class="fa fa-fast-forward"></i></a></li>
               </ul>
             </div>
           </div>
@@ -372,22 +372,6 @@ ${ fb_components.menubar() }
       location.href = "${url('filebrowser.views.download', path=path_enc)}";
     };
 
-    self.toggleDisables = function () {
-      $(".next-page").removeClass("disabled");
-      $(".last-page").removeClass("disabled");
-      $(".first-page").removeClass("disabled");
-      $(".previous-page").removeClass("disabled");
-
-      if (self.page() == self.totalPages() || self.upperPage() == self.totalPages()) {
-        $(".next-page").addClass("disabled");
-        $(".last-page").addClass("disabled");
-      }
-      if (self.page() == 1) {
-        $(".first-page").addClass("disabled");
-        $(".previous-page").addClass("disabled");
-      }
-    };
-
     self.pageChanged = function () {
       self.page(self.page() * 1);
       self.upperPage(self.upperPage() * 1);
@@ -422,18 +406,10 @@ ${ fb_components.menubar() }
       self.changePage();
     };
 
-    self.page.subscribe(function (value) {
-      self.toggleDisables();
-    });
-
-    self.upperPage.subscribe(function (value) {
-      self.toggleDisables();
-    });
-
     self.nextPage = function () {
       self.page(self.page() * 1);
       self.upperPage(self.upperPage() * 1);
-      if (! ($(".next-page").hasClass("disabled"))) {
+      if (!($("#fileviewerComponents .next-page").hasClass("disabled"))) {
         if (self.page() == self.upperPage()) {
           self.page(self.page() + 1);
           self.upperPage(self.upperPage() + 1);
@@ -449,7 +425,7 @@ ${ fb_components.menubar() }
     self.previousPage = function () {
       self.page(self.page() * 1);
       self.upperPage(self.upperPage() * 1);
-      if (! ($(".previous-page").hasClass("disabled"))) {
+      if (!($("#fileviewerComponents .previous-page").hasClass("disabled"))) {
         if (self.page() == self.upperPage()) {
           self.page(self.page() - 1);
           self.upperPage(self.upperPage() - 1);
@@ -463,7 +439,7 @@ ${ fb_components.menubar() }
     };
 
     self.lastPage = function () {
-      if (! ($(".last-page").hasClass("disabled"))) {
+      if (!($("#fileviewerComponents .last-page").hasClass("disabled"))) {
         var lastDiff = self.upperPage() - self.page() + 1;
         self.page(Math.max(1, self.totalPages() - lastDiff));
         self.upperPage(self.totalPages());
@@ -472,7 +448,7 @@ ${ fb_components.menubar() }
     };
 
     self.firstPage = function () {
-      if (! ($(".first-page").hasClass("disabled"))) {
+      if (!($("#fileviewerComponents .first-page").hasClass("disabled"))) {
         var lastDiff = self.upperPage() - self.page() + 1;
         self.page(1);
         if (lastDiff > 1) {
@@ -496,9 +472,7 @@ ${ fb_components.menubar() }
 
     setTimeout(function () {
       resizeText();
-      getContent(function () {
-        viewModel.toggleDisables();
-      });
+      getContent();
     }, 100);
 
     var _resizeTimeout = -1;
@@ -507,7 +481,7 @@ ${ fb_components.menubar() }
       clearTimeout(_resizeTimeout);
       _resizeTimeout = setTimeout(function () {
         resizeText();
-        $('.fill-file-area').css('height', $("#fileArea").height() + 'px');
+        $('#fileviewerComponents .fill-file-area').css('height', $("#fileArea").height() + 'px');
       }, 300);
     });
 
