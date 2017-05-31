@@ -16,6 +16,10 @@
 
 var SqlParseSupport = (function () {
 
+  var equalIgnoreCase = function (a, b) {
+    return a && b && a.toLowerCase() === b.toLowerCase();
+  };
+
   var initSqlParser = function (parser) {
 
     var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestAggregateFunctions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
@@ -297,16 +301,16 @@ var SqlParseSupport = (function () {
         // In this testArray would be marked a type table so we need to switch it to column.
         if (location.type === 'table' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 1 && parser.yy.latestTablePrimaries) {
           var found = parser.yy.latestTablePrimaries.filter(function (primary) {
-            return primary.alias === location.identifierChain[0].name;
+            return equalIgnoreCase(primary.alias, location.identifierChain[0].name);
           });
           if (found.length > 0) {
             location.type = 'column';
           }
         }
 
-        if (location.type === 'database' && parser.yy.latestTablePrimaries) {
+        if (location.type === 'database' && typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && parser.yy.latestTablePrimaries) {
           var foundAlias = parser.yy.latestTablePrimaries.filter(function (primary) {
-            return primary.alias === location.identifierChain[0].name;
+            return equalIgnoreCase(primary.alias, location.identifierChain[0].name);
           });
           if (foundAlias.length > 0) {
             // Impala complex reference in FROM clause, i.e. FROM testTable t, t.testMap tm
@@ -316,17 +320,17 @@ var SqlParseSupport = (function () {
         }
 
         if (location.type === 'unknown') {
-          if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
+          if (typeof location.identifierChain !== 'undefined' && location.identifierChain.length > 0 && location.identifierChain.length <= 2 && parser.yy.latestTablePrimaries) {
             var found = parser.yy.latestTablePrimaries.filter(function (primary) {
-              return primary.alias === location.identifierChain[0].name || (primary.identifierChain && primary.identifierChain[0].name === location.identifierChain[0].name);
+              return equalIgnoreCase(primary.alias, location.identifierChain[0].name) || (primary.identifierChain && equalIgnoreCase(primary.identifierChain[0].name, location.identifierChain[0].name));
             });
             if (found.length > 0) {
-              if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && found[0].identifierChain[0].name === location.identifierChain[0].name) {
+              if (found[0].identifierChain.length > 1 && location.identifierChain.length === 1 && equalIgnoreCase(found[0].identifierChain[0].name, location.identifierChain[0].name)) {
                 location.type = 'database';
-              } else if (found[0].alias && location.identifierChain[0].name === found[0].alias && location.identifierChain.length > 1) {
+              } else if (found[0].alias && equalIgnoreCase(location.identifierChain[0].name, found[0].alias) && location.identifierChain.length > 1) {
                 location.type = 'column';
                 parser.expandIdentifierChain(location, true);
-              } else if (!found[0].alias && found[0].identifierChain && location.identifierChain[0].name === found[0].identifierChain[found[0].identifierChain.length - 1].name && location.identifierChain.length > 1) {
+              } else if (!found[0].alias && found[0].identifierChain && equalIgnoreCase(location.identifierChain[0].name, found[0].identifierChain[found[0].identifierChain.length - 1].name) && location.identifierChain.length > 1) {
                 location.type = 'column';
                 parser.expandIdentifierChain(location, true);
               } else {
@@ -336,7 +340,7 @@ var SqlParseSupport = (function () {
             } else {
               if (parser.yy.subQueries) {
                 found = parser.yy.subQueries.filter(function (subQuery) {
-                  return subQuery.alias === location.identifierChain[0].name;
+                  return equalIgnoreCase(subQuery.alias, location.identifierChain[0].name);
                 });
                 if (found.length > 0) {
                   location.type = 'subQuery';
@@ -406,7 +410,7 @@ var SqlParseSupport = (function () {
         } else if (typeof parser.yy.result[suggestionType] !== 'undefined' && typeof parser.yy.result[suggestionType].tables !== 'undefined') {
           for (var i = parser.yy.result[suggestionType].tables.length - 1; i >= 0; i--) {
             var table = parser.yy.result[suggestionType].tables[i];
-            if (table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined' && typeof cteIndex[table.identifierChain[0].name] !== 'undefined') {
+            if (table.identifierChain.length === 1 && typeof table.identifierChain[0].name !== 'undefined' && typeof cteIndex[table.identifierChain[0].name.toLowerCase()] !== 'undefined') {
               parser.yy.result[suggestionType].tables.splice(i, 1);
             }
           }
@@ -530,12 +534,12 @@ var SqlParseSupport = (function () {
       }
       var expand = function (identifier, expandedChain) {
         var foundPrimary = tablePrimaries.filter(function (tablePrimary) {
-          return tablePrimary.alias === identifier;
+          return equalIgnoreCase(tablePrimary.alias, identifier);
         });
 
         if (foundPrimary.length === 1 && foundPrimary[0].identifierChain) {
           var parentPrimary = tablePrimaries.filter(function (tablePrimary) {
-            return tablePrimary.alias === foundPrimary[0].identifierChain[0].name;
+            return equalIgnoreCase(tablePrimary.alias, foundPrimary[0].identifierChain[0].name);
           });
           if (parentPrimary.length === 1) {
             var keySet = expandedChain[0].keySet;
@@ -579,13 +583,13 @@ var SqlParseSupport = (function () {
           if (!lateralView.udtf.expression.columnReference) {
             return;
           }
-          if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length > 1) {
+          if (equalIgnoreCase(firstIdentifier.name, lateralView.tableAlias) && identifierChain.length > 1) {
             identifierChain.shift();
             firstIdentifier = identifierChain[0];
             if (columnSuggestion) {
               delete parser.yy.result.suggestKeywords;
             }
-          } else if (firstIdentifier.name === lateralView.tableAlias && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
+          } else if (equalIgnoreCase(firstIdentifier.name, lateralView.tableAlias) && identifierChain.length === 1 && typeof parser.yy.result.suggestColumns !== 'undefined') {
             if (columnSuggestion) {
               if (typeof parser.yy.result.suggestIdentifiers === 'undefined') {
                 parser.yy.result.suggestIdentifiers = [];
@@ -599,9 +603,9 @@ var SqlParseSupport = (function () {
             return identifierChain;
           }
           if (lateralView.columnAliases.indexOf(firstIdentifier.name) !== -1) {
-            if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[0]) {
+            if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && equalIgnoreCase(firstIdentifier.name, lateralView.columnAliases[0])) {
               identifierChain[0] = {name: 'key'};
-            } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && firstIdentifier.name === lateralView.columnAliases[1]) {
+            } else if (lateralView.columnAliases.length === 2 && lateralView.udtf.function.toLowerCase() === 'explode' && equalIgnoreCase(firstIdentifier.name, lateralView.columnAliases[1])) {
               identifierChain[0] = {name: 'value'};
             } else {
               identifierChain[0] = {name: 'item'};
@@ -638,13 +642,13 @@ var SqlParseSupport = (function () {
         var tables = [];
         tablePrimaries.forEach(function (tablePrimary) {
           if (identifierChain.length > 1 && !tablePrimary.subQueryAlias) {
-            if (identifierChain.length === 2 && tablePrimary.alias === identifierChain[0].name) {
+            if (identifierChain.length === 2 && equalIgnoreCase(tablePrimary.alias, identifierChain[0].name)) {
               addCleanTablePrimary(tables, tablePrimary);
-            } else if (identifierChain.length === 2 && tablePrimary.identifierChain[0].name === identifierChain[0].name) {
+            } else if (identifierChain.length === 2 && equalIgnoreCase(tablePrimary.identifierChain[0].name, identifierChain[0].name)) {
               addCleanTablePrimary(tables, tablePrimary);
             } else if (identifierChain.length === 3 && tablePrimary.identifierChain.length > 1 &&
-              tablePrimary.identifierChain[0].name === identifierChain[0].name &&
-              tablePrimary.identifierChain[1].name === identifierChain[1].name) {
+              equalIgnoreCase(tablePrimary.identifierChain[0].name, identifierChain[0].name) &&
+              equalIgnoreCase(tablePrimary.identifierChain[1].name, identifierChain[1].name)) {
               addCleanTablePrimary(tables, tablePrimary);
             }
           } else {
@@ -691,24 +695,24 @@ var SqlParseSupport = (function () {
       if (identifierChain.length > 0) {
         for (var i = 0; i < tablePrimaries.length; i++) {
           if (tablePrimaries[i].subQueryAlias) {
-            if (tablePrimaries[i].subQueryAlias === identifierChain[0].name) {
+            if (equalIgnoreCase(tablePrimaries[i].subQueryAlias, identifierChain[0].name)) {
               foundPrimary = tablePrimaries[i];
             }
-          } else if (tablePrimaries[i].alias === identifierChain[0].name) {
+          } else if (equalIgnoreCase(tablePrimaries[i].alias, identifierChain[0].name)) {
             foundPrimary = tablePrimaries[i];
             aliasMatch = true;
             break;
           } else if (tablePrimaries[i].identifierChain.length > 1 && identifierChain.length > 1 &&
-            tablePrimaries[i].identifierChain[0].name === identifierChain[0].name &&
-            tablePrimaries[i].identifierChain[1].name === identifierChain[1].name) {
+            equalIgnoreCase(tablePrimaries[i].identifierChain[0].name, identifierChain[0].name) &&
+            equalIgnoreCase(tablePrimaries[i].identifierChain[1].name, identifierChain[1].name)) {
             foundPrimary = tablePrimaries[i];
             doubleMatch = true;
             break;
-          } else if (!foundPrimary && tablePrimaries[i].identifierChain[0].name === identifierChain[0].name && identifierChain.length > (isColumnLocation ? 1 : 0)) {
+          } else if (!foundPrimary && equalIgnoreCase(tablePrimaries[i].identifierChain[0].name, identifierChain[0].name) && identifierChain.length > (isColumnLocation ? 1 : 0)) {
             foundPrimary = tablePrimaries[i];
             // No break as first two can still match.
           } else if (!foundPrimary && tablePrimaries[i].identifierChain.length > 1
-            && tablePrimaries[i].identifierChain[tablePrimaries[i].identifierChain.length - 1].name === identifierChain[0].name) {
+            && equalIgnoreCase(tablePrimaries[i].identifierChain[tablePrimaries[i].identifierChain.length - 1].name, identifierChain[0].name)) {
             // This is for the case SELECT baa. FROM bla.baa, blo.boo;
             foundPrimary = tablePrimaries[i];
             break;
@@ -732,6 +736,9 @@ var SqlParseSupport = (function () {
             wrapper.tables = [{ subQuery: foundPrimary.subQueryAlias }];
           } else if (foundPrimary.alias) {
             if (!isColumnLocation && isColumnWrapper && aliasMatch) {
+              // TODO: add alias on table in suggestColumns (needs support in sqlAutocomplete3.js)
+              // the case is: SELECT cu.| FROM customers cu;
+              // This prevents alias from being added automatically in sqlAutocompleter3.js
               wrapper.tables = [{ identifierChain: foundPrimary.identifierChain }];
             } else {
               wrapper.tables = [{ identifierChain: foundPrimary.identifierChain, alias: foundPrimary.alias }];
@@ -1078,7 +1085,7 @@ var SqlParseSupport = (function () {
         return;
       }
       var tableRef = parser.yy.latestTablePrimaries.filter(function (tablePrimary) {
-        return tablePrimary.alias === identifier;
+        return equalIgnoreCase(tablePrimary.alias, identifier);
       });
       if (tableRef.length > 0) {
         parser.suggestColumns({identifierChain: [{name: identifier}]});

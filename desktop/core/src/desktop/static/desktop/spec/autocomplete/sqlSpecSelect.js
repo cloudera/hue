@@ -711,6 +711,34 @@
         });
       });
 
+      it('should suggest columns for "SELECT TTA.| FROM testTableA tta"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT TTA.',
+          afterCursor: ' FROM testTableA tta',
+          containsKeywords: ['*'],
+          expectedResult: {
+            lowerCase: false,
+            // TODO: add alias on table in suggestColumns (needs support in sqlAutocomplete3.js)
+            // Case is: select cu.| from customers
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTableA' }] }] }
+          }
+        });
+      });
+
+      it('should suggest columns for "SELECT tta.| FROM testTableA TTA"', function() {
+        assertAutoComplete({
+          beforeCursor: 'SELECT tta.',
+          afterCursor: ' FROM testTableA TTA',
+          containsKeywords: ['*'],
+          expectedResult: {
+            lowerCase: false,
+            // TODO: add alias on table in suggestColumns (needs support in sqlAutocomplete3.js)
+            // Case is: select cu.| from customers
+            suggestColumns: { source: 'select',  tables: [{ identifierChain: [{ name: 'testTableA' }] }] }
+          }
+        });
+      });
+
       it('should suggest columns for "SELECT | FROM db.tbl1, db.tbl2"', function() {
         assertAutoComplete({
           beforeCursor: 'SELECT ',
