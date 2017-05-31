@@ -514,7 +514,7 @@ def describe_partitions(request, database, table):
       'partition_values_json': massaged_partitions,
     })
   else:
-    return render("describe_partitions.mako", request, {
+    return render("metastore.mako", request, {
       'breadcrumbs': [{
             'name': database,
             'url': reverse('metastore:show_tables', kwargs={'database': database})
@@ -535,6 +535,9 @@ def describe_partitions(request, database, table):
         'has_write_access': has_write_access(request.user),
         'is_optimizer_enabled': has_optimizer(),
         'is_navigator_enabled': has_navigator(request.user),
+        'optimizer_url': get_optimizer_url(),
+        'navigator_url': get_navigator_url(),
+        'is_embeddable': request.REQUEST.get('is_embeddable', False),
         'source_type': _get_servername(db),
     })
 
