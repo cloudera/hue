@@ -789,7 +789,7 @@ class HiveServerClient:
 
 
   def get_table(self, database, table_name, partition_spec=None):
-    req = TGetTablesReq(schemaName=database, tableName=table_name)
+    req = TGetTablesReq(schemaName=database.lower(), tableName=table_name.lower()) # Impala returns empty if not lower case
     res = self.call(self._client.GetTables, req)
 
     table_results, table_schema = self.fetch_result(res.operationHandle, orientation=TFetchOrientation.FETCH_NEXT)
