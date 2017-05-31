@@ -945,7 +945,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               });
             }
           }},
-          { url: '/notebook/editor', app: function (ctx) {
+          { url: '/notebook/notebook', app: function (ctx) {
             page('/notebook?' + ctx.querystring);
           }},
           { url: '/notebook/notebooks', app: function (ctx) {
