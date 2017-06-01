@@ -355,7 +355,7 @@ from metadata.conf import has_navigator
       };
 
       var hideOnClickOutside = function (event) {
-        if (jQuery.contains(document, event.target) && !$.contains($('#sqlContextPopover')[0], event.target)) {
+        if (jQuery.contains(document, event.target) && !$.contains($('#sqlContextPopover')[0], event.target) && ($('.modal')[0].length === 0 || !$.contains($('.modal')[0], event.target))) {
           hidePopover();
         }
       };
