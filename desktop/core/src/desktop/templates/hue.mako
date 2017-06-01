@@ -443,6 +443,8 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/fileuploader.js') }"></script>
 <script src="${ static('desktop/ext/js/filesize.min.js') }"></script>
 <script src="${ static('desktop/ext/js/moment-with-locales.min.js') }"></script>
+<script src="${ static('desktop/ext/js/moment-timezone-with-data.min.js') }" type="text/javascript" charset="utf-8"></script>
+<script src="${ static('desktop/ext/js/tzdetect.js') }" type="text/javascript" charset="utf-8"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.total-storage.min.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.cookie.js') }"></script>
 <script src="${ static('desktop/ext/js/jquery/plugins/jquery.dataTables.1.8.2.min.js') }"></script>
