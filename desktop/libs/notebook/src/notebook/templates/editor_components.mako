@@ -1811,19 +1811,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<div id="chooseFile" class="modal hide fade" style="z-index: 10000;" tabindex="-1">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Choose a file')}</h2>
-  </div>
-  <div class="modal-body">
-    <div id="filechooser">
-    </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
 <div class="ace-filechooser" style="display:none;">
   <div class="ace-filechooser-close">
     <a class="pointer" data-bind="click: function(){ $('.ace-filechooser').hide(); }"><i class="fa fa-times"></i></a>

@@ -220,20 +220,6 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
 
 </div>
 
-<div id="chooseFile" class="modal hide fade" style="z-index: 10000;">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 id="myModalLabel" class="modal-title">${_('Choose a file')}</h2>
-  </div>
-  <div class="modal-body">
-      <div id="filechooser">
-      </div>
-  </div>
-  <div class="modal-footer">
-  </div>
-</div>
-
-
 <script type="text/html" id="calendar-dropdown">
 <div class="btn-group">
   <a class="btn btn-default dropdown-toggle" data-toggle="dropdown">
