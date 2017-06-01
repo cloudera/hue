@@ -104,8 +104,9 @@ if USE_NEW_EDITOR.get():
       labels: {
         GO_TO_COLUMN: "${_('Go to column:')}",
         PLACEHOLDER: "${_('column name...')}",
-        LOCK: "${_('Click to lock this row')}",
-        UNLOCK: "${_('Click to unlock this row')}"
+        LOCK: "${_('Lock this row')}",
+        UNLOCK: "${_('Unlock this row')}",
+        ROW_DETAILS: "${_('Show row details')}"
       }
     };
 
