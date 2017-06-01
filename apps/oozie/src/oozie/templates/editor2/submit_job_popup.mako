@@ -80,7 +80,7 @@
          </label>
       % endif
       % if is_oozie_mail_enabled:
-        </br>
+        <br/>
         <label class="checkbox" style="display: inline-block; margin-top: 5px">
           <input type="checkbox" name="email_checkbox"
           % if not email_id:
