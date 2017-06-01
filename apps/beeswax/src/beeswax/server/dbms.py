@@ -843,17 +843,22 @@ class HiveServer2Dbms(object):
     return self.client.get_table(db_name, table_name, partition_spec=partition_spec)
 
 
-  def drop_partitions(self, db_name, table_name, partition_specs, design):
+  def drop_partitions(self, db_name, table_name, partition_specs, design=None, generate_ddl_only=False):
     hql = []
 
     for partition_spec in partition_specs:
       hql.append("ALTER TABLE `%s`.`%s` DROP IF EXISTS PARTITION (%s) PURGE" % (db_name, table_name, partition_spec))
 
-    query = hql_query(';'.join(hql), db_name)
-    design.data = query.dumps()
-    design.save()
+    hql = ';'.join(hql)
+    query = hql_query(hql, db_name)
 
-    return self.execute_query(query, design)
+    if generate_ddl_only:
+      return hql
+    else:
+      design.data = query.dumps()
+      design.save()
+
+      return self.execute_query(query, design)
 
 
   def get_indexes(self, db_name, table_name):
