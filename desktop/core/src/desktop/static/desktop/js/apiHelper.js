@@ -1834,7 +1834,12 @@ var ApiHelper = (function () {
       self.queueManager.addToQueue(promise, options.url, options.sourceType);
     }
 
-    promise.done(options.successCallback).fail(self.assistErrorCallback(options)).always(function () {
+    promise
+      .done(function (data) {
+        options.successCallback(data)
+      })
+      .fail(self.assistErrorCallback(options))
+      .always(function () {
       if (typeof options.editor !== 'undefined' && options.editor !== null) {
         options.editor.hideSpinner();
       }
@@ -1860,20 +1865,20 @@ var ApiHelper = (function () {
       },
       timeout: options.timeout
     }).success(function (data) {
-      // Safe to assume all requests in the queue have the same cacheCondition
-      if (!options.noCache && data.status === 0 && options.cacheCondition(data)) {
-        var cacheIdentifier = self.getAssistCacheIdentifier(options);
-        cachedData = $.totalStorage(cacheIdentifier) || {};
-        cachedData[options.url] = {
-          timestamp: (new Date()).getTime(),
-          data: data
-        };
-        $.totalStorage(cacheIdentifier, cachedData);
-      }
-      if (data.status === 0) {
-        promise.resolve(data);
-      } else {
+      if (self.successResponseIsError(data)) {
         promise.reject(data);
+      } else {
+        // Safe to assume all requests in the queue have the same cacheCondition
+        if (!options.noCache && data.status === 0 && options.cacheCondition(data)) {
+          var cacheIdentifier = self.getAssistCacheIdentifier(options);
+          cachedData = $.totalStorage(cacheIdentifier) || {};
+          cachedData[options.url] = {
+            timestamp: (new Date()).getTime(),
+            data: data
+          };
+          $.totalStorage(cacheIdentifier, cachedData);
+        }
+        promise.resolve(data);
       }
     }).fail(promise.reject);
   };
