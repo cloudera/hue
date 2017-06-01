@@ -324,7 +324,7 @@
 
 
 <%def name="path_chooser_libs(select_folder=False, skip_init=False)">
-  <div id="chooseFile" class="modal hide fade">
+  <div id="chooseFileModal" class="modal hide fade">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
       <h2 class="modal-title">${ _('Choose a') } ${ if_true(select_folder, _('folder'), _('file')) }</h2>
@@ -378,12 +378,12 @@
             onFolderChoose:function (filePath) {
               handleChoice(filePath);
               if (selectFolder) {
-                $("#chooseFile").modal("hide");
+                $("#chooseFileModal").modal("hide");
               }
             },
             onFileChoose:function (filePath) {
               handleChoice(filePath);
-              $("#chooseFile").modal("hide");
+              $("#chooseFileModal").modal("hide");
             },
             createFolder:false,
             uploadFile:true,
@@ -391,7 +391,7 @@
             errorRedirectPath:"",
             forceRefresh:true
           });
-          $("#chooseFile").modal("show");
+          $("#chooseFileModal").modal("show");
         }
 
         function handleChoice(filePath) {
