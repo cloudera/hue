@@ -941,10 +941,16 @@ var ApiHelper = (function () {
         url: AUTOCOMPLETE_API_PREFIX,
         successCallback: function (data) {
           var databases = data.databases || [];
-          // Blacklist of system databases
-          self.lastKnownDatabases[options.sourceType] = $.grep(databases, function (database) {
-            return database !== "_impala_builtins";
+          var cleanDatabases = [];
+          databases.forEach(function (database) {
+            // Blacklist of system databases
+            if (database !== '_impala_builtins') {
+              // Ensure lower case
+              cleanDatabases.push(database.toLowerCase());
+            }
           });
+          self.lastKnownDatabases[options.sourceType] = cleanDatabases;
+
           options.successCallback(self.lastKnownDatabases[options.sourceType]);
         },
         errorCallback: function (response) {
@@ -1223,7 +1229,7 @@ var ApiHelper = (function () {
 
   ApiHelper.prototype.containsDatabase = function (sourceType, databaseName) {
     var self = this;
-    return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName) > -1;
+    return typeof self.lastKnownDatabases[sourceType] !== 'undefined' && self.lastKnownDatabases[sourceType].indexOf(databaseName.toLowerCase()) > -1;
   };
 
   ApiHelper.prototype.expandComplexIdentifierChain = function (sourceType, database, identifierChain, successCallback, errorCallback) {
