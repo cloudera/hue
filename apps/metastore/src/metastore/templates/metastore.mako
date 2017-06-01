@@ -773,11 +773,13 @@ ${ components.menubar(is_embeddable) }
     <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
     <!-- /ko -->
   </div>
+
   % if has_write_access:
   <div id="dropPartition" class="modal hide fade">
     % if is_embeddable:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }, submit: dropAndWatch" method="POST">
         <input type="hidden" name="is_embeddable" value="true"/>
+        <input type="hidden" name="format" value="json"/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }" method="POST">
     % endif
@@ -796,9 +798,8 @@ ${ components.menubar(is_embeddable) }
     % endif
   <!-- /ko -->
 
-
-
 </script>
+
 
 <script type="text/html" id="metastore-sample-tab">
   <!-- ko with: samples -->
@@ -1295,7 +1296,9 @@ ${ components.menubar(is_embeddable) }
 
       huePubSub.subscribe('metastore.clear.selection', function () {
         viewModel.selectedDatabases.removeAll();
-        viewModel.selectedTables.removeAll();
+        if (viewModel.database()) {
+          viewModel.database().selectedTables.removeAll();
+        }
       }, 'metastore');
 
       viewModel.currentTab.subscribe(function(tab){
