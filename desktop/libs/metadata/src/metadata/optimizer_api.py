@@ -412,6 +412,7 @@ def upload_table_stats(request):
         'total_size':  stats.get('totalSize', -1),
         'raw_data_size':  stats.get('rawDataSize', -1),
         'num_files':  stats.get('numFiles', -1),
+        'num_partitions':  stats.get('numPartitions', -1),
         # bytes_cached
         # cache_replication
         # format
