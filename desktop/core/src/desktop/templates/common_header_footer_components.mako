@@ -418,6 +418,18 @@ from metadata.conf import has_optimizer, OPTIMIZER
   </div>
 </div>
 
+<div id="chooseFile" class="modal hide fade" style="z-index: 10000;" tabindex="-1">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Choose a file')}</h2>
+  </div>
+  <div class="modal-body">
+    <div id="filechooser"></div>
+  </div>
+  <div class="modal-footer"></div>
+</div>
+
+
 <script type="text/javascript">
 
   huePubSub.subscribe('set.hue.version', function (version) {
