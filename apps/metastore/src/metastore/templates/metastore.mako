@@ -365,6 +365,7 @@ ${ components.menubar(is_embeddable) }
       % if is_embeddable:
         <form action="/metastore/databases/drop" data-bind="submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
+          <input type="hidden" name="start_time" value=""/>
       % else:
         <form id="dropDatabaseForm" action="/metastore/databases/drop" method="POST">
       % endif
@@ -548,6 +549,7 @@ ${ components.menubar(is_embeddable) }
       % if is_embeddable:
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }, submit: dropAndWatch" method="POST">
           <input type="hidden" name="is_embeddable" value="true"/>
+          <input type="hidden" name="start_time" value=""/>
       % else:
         <form data-bind="attr: { 'action': '/metastore/tables/drop/' + name }" method="POST">
       % endif
@@ -780,6 +782,7 @@ ${ components.menubar(is_embeddable) }
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }, submit: dropAndWatch" method="POST">
         <input type="hidden" name="is_embeddable" value="true"/>
         <input type="hidden" name="format" value="json"/>
+        <input type="hidden" name="start_time" value=""/>
     % else:
       <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }" method="POST">
     % endif
@@ -1194,6 +1197,7 @@ ${ components.menubar(is_embeddable) }
     % if is_embeddable:
     <form data-bind="submit: dropAndWatch" method="POST">
       <input type="hidden" name="is_embeddable" value="true"/>
+      <input type="hidden" name="start_time" value=""/>
     % else:
     <form method="POST">
     % endif
@@ -1220,6 +1224,7 @@ ${ components.menubar(is_embeddable) }
 <script type="text/javascript">
 
   function dropAndWatch(formElement) {
+    $(formElement).find('input[name=start_time]').val(ko.mapping.toJSON(new Date().getTime()));
     $(formElement).ajaxSubmit({
       dataType: 'json',
       success: function(resp) {
