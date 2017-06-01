@@ -216,6 +216,20 @@ var MetastoreTable = (function () {
     self.detailedKeys = ko.observableArray();
     self.keys = ko.observableArray();
     self.values = ko.observableArray();
+    self.selectedValues = ko.observableArray();
+
+    self.valuesFlat = ko.pureComputed(function(){
+      return self.values().map(function(item){
+        return item.partitionSpec
+      });
+    });
+
+    self.selectedValuesFlat = ko.pureComputed(function(){
+      return self.selectedValues().map(function(item){
+        return item.partitionSpec
+      });
+    });
+
     self.metastoreTable = options.metastoreTable;
     self.apiHelper = ApiHelper.getInstance();
 
