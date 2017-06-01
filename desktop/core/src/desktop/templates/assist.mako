@@ -1835,7 +1835,7 @@ from notebook.conf import get_ordered_interpreters
           <div class="margin-top-20">
             <!-- ko hueSpinner: { spin: uploadingTableStats, inline: true} --><!-- /ko -->
             <!-- ko ifnot: uploadingTableStats -->
-            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: uploadTableStats, attr: { 'title': ('${ _("Add missing table and columns ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
+            <a href="javascript:void(0)" data-bind="visible: activeTables().length > 0, click: uploadTableStats, attr: { 'title': ('${ _("Add table ") }'  + (isMissingDDL() ? 'DDL' : '') + (isMissingDDL() && isMissingStats() ? ' ${ _("and") } ' : '') + (isMissingStats() ? 'stats' : '')) }">
               <i class="fa fa-fw fa-plus-circle"></i> ${_('Improve Analysis')}
             </a>
             <!-- /ko -->
