@@ -100,6 +100,7 @@ def drop_database(request):
       design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
 
       if request.POST.get('is_embeddable'):
+        last_executed = json.loads(request.POST.get('start_time'), '-1')
         sql = db.drop_databases(databases, design, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop database %s') % ', '.join(databases)[:100],
@@ -108,7 +109,8 @@ def drop_database(request):
             status='ready',
             database=None,
             on_success_url='assist.db.refresh',
-            is_task=True
+            is_task=True,
+            last_executed=last_executed
         )
         return JsonResponse(job.execute(request))
       else:
@@ -386,6 +388,7 @@ def drop_table(request, database):
       skip_trash = request.POST.get('skip_trash') == 'on'
 
       if request.POST.get('is_embeddable'):
+        last_executed = json.loads(request.POST.get('start_time'), '-1')
         sql = db.drop_tables(database, tables_objects, design=None, skip_trash=skip_trash, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop table %s') % ', '.join([table.name for table in tables_objects])[:100],
@@ -394,7 +397,8 @@ def drop_table(request, database):
             status='ready',
             database=database,
             on_success_url='assist.db.refresh',
-            is_task=True
+            is_task=True,
+            last_executed=last_executed
         )
         return JsonResponse(job.execute(request))
       else:
@@ -446,14 +450,16 @@ def load_table(request, database, table):
         }
         query_history = db.load_data(database, table.name, form_data, design, generate_ddl_only=generate_ddl_only)
         if generate_ddl_only:
+          last_executed = json.loads(request.POST.get('start_time'), '-1')
           job = make_notebook(
-            name='Execute and watch',
+            name=_('Load data in %s.%s') % (database, table.name),
             editor_type=_get_servername(db),
             statement=query_history.strip(),
             status='ready',
             database=database,
             on_success_url='assist.db.refresh',
-            is_task=True
+            is_task=True,
+            last_executed=last_executed
           )
           response = job.execute(request)
         else:
@@ -599,6 +605,7 @@ def drop_partition(request, database, table):
     partition_specs = [spec for spec in partition_specs]
     try:
       if request.REQUEST.get("format", "html") == "json":
+        last_executed = json.loads(request.POST.get('start_time'), '-1')
         sql = db.drop_partitions(database, table, partition_specs, design=None, generate_ddl_only=True)
         job = make_notebook(
             name=_('Drop partition %s') % ', '.join(partition_specs)[:100],
@@ -607,7 +614,8 @@ def drop_partition(request, database, table):
             status='ready',
             database=None,
             on_success_url='assist.db.refresh',
-            is_task=True
+            is_task=True,
+            last_executed=last_executed
         )
         return JsonResponse(job.execute(request))
       else:
