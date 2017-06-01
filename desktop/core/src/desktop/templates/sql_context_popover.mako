@@ -1143,8 +1143,8 @@ from metadata.conf import has_navigator
         if ((self.isColumn || self.isComplex) && self.data.tables && self.data.tables.length > 0) {
           var identifierChain = self.data.identifierChain;
           var foundTable = $.grep(self.data.tables, function (table) {
-            return (table.alias && table.alias === identifierChain[0].name) ||
-                    (table.identifierChain && table.identifierChain[table.identifierChain.length - 1].name === identifierChain[0].name);
+            return hueUtils.equalIgnoreCase(table.alias, identifierChain[0].name) ||
+                    (table.identifierChain && hueUtils.equalIgnoreCase(table.identifierChain[table.identifierChain.length - 1].name, identifierChain[0].name));
           });
           if (foundTable.length === 1 && foundTable.identifierChain) {
             identifierChain.shift();
