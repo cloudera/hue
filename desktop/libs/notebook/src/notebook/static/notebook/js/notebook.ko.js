@@ -1685,7 +1685,7 @@ var EditorViewModel = (function() {
               self.watchUploadStatus(workloadId);
             }, 2000);
           } else {
-            $(document).trigger("info", ko.mapping.toJSON(data.upload_status.status));
+            $(document).trigger("warn", data.upload_status.status.statusMsg + (data.upload_status.status.failedQueries > 0 ? '. ' + data.upload_status.status.failQueryDetails : ''));
           }
         } else {
           $(document).trigger("error", data.message);
