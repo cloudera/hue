@@ -348,19 +348,6 @@ from desktop.views import _ko
     <div data-bind="component: { name: 'csv-list-input', params: { value: value, inputTemplate: 'property-hdfs-file', placeholder: typeof placeholder === 'undefined' ? '' : placeholder } }"></div>
   </script>
 
-  <div id="chooseFile" class="modal hide fade">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-      <h2 class="modal-title">${_('Choose a file')}</h2>
-    </div>
-    <div class="modal-body">
-      <div id="filechooser">
-      </div>
-    </div>
-    <div class="modal-footer">
-    </div>
-  </div>
-
   <script type="text/html" id="property-hdfs-file">
     <div class="input-append">
       <input type="text" style="min-width: 300px" class="filechooser-input" data-bind="value: value, valueUpdate:'afterkeydown', filechooser: { value: value, isAddon: true}, filechooserOptions: { skipInitialPathIfEmpty: true }" placeholder="${ _('Path to the file, e.g. hdfs://localhost:8020/user/hue') }"/>
