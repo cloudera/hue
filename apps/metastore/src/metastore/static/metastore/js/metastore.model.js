@@ -200,6 +200,9 @@ var MetastoreDatabase = (function () {
     if (callback) {
       callback();
     }
+    hueUtils.waitForRendered('a[href="#overview"]', function(el){ return el.is(':visible') }, function(){
+      $('a[href="#overview"]').click();
+    });
   };
 
   return MetastoreDatabase;
