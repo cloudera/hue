@@ -424,7 +424,7 @@ ${ components.menubar(is_embeddable) }
               <div title="${ _('Owner') }">
                 <i class="fa fa-fw fa-user muted"></i>
                 <span data-bind="text: owner_name"></span> (<span data-bind="text: owner_type"></span>)
-                </br>
+                <br/>
                 <i class="fa fa-fw fa-hdd-o muted"></i> <a data-bind="attr: {'href': hdfs_link, 'rel': location }"> ${_('Location')}</a>
               </div>
             </div>
@@ -1029,7 +1029,7 @@ ${ components.menubar(is_embeddable) }
          <!-- /ko -->
         </div>
 
-        </br>
+        <br/>
 
         <h4>${ _('Targets') }</h4>
         <div class="row-fluid">
@@ -1041,7 +1041,7 @@ ${ components.menubar(is_embeddable) }
          <!-- /ko -->
         </div>
 
-        </br>
+        <br/>
 
        <h4>${ _('Source query') }</h4>
        <div class="row-fluid">
@@ -1053,7 +1053,7 @@ ${ components.menubar(is_embeddable) }
           <!-- /ko -->
         </div>
 
-        </br>
+        <br/>
 
         <h4>${ _('Target queries') }</h4>
         <div class="row-fluid">
@@ -1067,7 +1067,7 @@ ${ components.menubar(is_embeddable) }
          <!-- /ko -->
         </div>
 
-        </br>
+        <br/>
 
         <h4>${ _('Lineage') }</h4>
         <div class="row-fluid">
