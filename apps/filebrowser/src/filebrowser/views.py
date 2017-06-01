@@ -181,9 +181,8 @@ def view(request, path):
 
     # default_to_home is set in bootstrap.js
     if 'default_to_trash' in request.GET:
-        home_trash = request.fs.join(request.fs.trash_path(path), 'Current', request.user.get_home_directory()[1:])
-        if request.fs.isdir(home_trash):
-            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=home_trash)))
+        if request.fs.isdir(_home_trash_path(request.fs, request.user, path)):
+            return format_preserving_redirect(request, reverse(view, kwargs=dict(path=_home_trash_path(request.fs, request.user, path))))
         if request.fs.isdir(request.fs.trash_path(path)):
             return format_preserving_redirect(request, reverse(view, kwargs=dict(path=request.fs.trash_path(path))))
 
@@ -223,6 +222,10 @@ def view(request, path):
           return JsonResponse(exception)
         else:
           raise PopupException(msg , detail=e)
+
+
+def _home_trash_path(fs, user, path):
+  return fs.join(fs.trash_path(path), 'Current', user.get_home_directory()[1:])
 
 
 def home_relative_view(request, path):
@@ -471,7 +474,9 @@ def listdir_paged(request, path):
 
     page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
-    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs'
+    is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
+                       (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
+                        request.fs.isdir(request.fs.trash_path(path)))
 
     is_fs_superuser = _is_hdfs_superuser(request)
     data = {
