@@ -598,11 +598,24 @@ def drop_partition(request, database, table):
     partition_specs = request.POST.getlist('partition_selection')
     partition_specs = [spec for spec in partition_specs]
     try:
-      design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
-      query_history = db.drop_partitions(database, table, partition_specs, design)
-      url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + \
-            reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
-      return redirect(url)
+      if request.REQUEST.get("format", "html") == "json":
+        sql = db.drop_partitions(database, table, partition_specs, design=None, generate_ddl_only=True)
+        job = make_notebook(
+            name=_('Drop partition %s') % ', '.join(partition_specs)[:100],
+            editor_type='hive',
+            statement=sql.strip(),
+            status='ready',
+            database=None,
+            on_success_url='assist.db.refresh',
+            is_task=True
+        )
+        return JsonResponse(job.execute(request))
+      else:
+        design = SavedQuery.create_empty(app_name='beeswax', owner=request.user, data=hql_query('').dumps())
+        query_history = db.drop_partitions(database, table, partition_specs, design)
+        url = reverse('beeswax:watch_query_history', kwargs={'query_history_id': query_history.id}) + '?on_success_url=' + \
+              reverse('metastore:describe_partitions', kwargs={'database': database, 'table': table})
+        return redirect(url)
     except Exception, ex:
       error_message, log = dbms.expand_exception(ex, db)
       error = _("Failed to remove %(partition)s.  Error: %(error)s") % {'partition': '\n'.join(partition_specs), 'error': error_message}
