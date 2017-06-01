@@ -33,8 +33,9 @@
     labels: {
       GO_TO_COLUMN: "Go to column:",
       PLACEHOLDER: "column name...",
-      LOCK: "Click to lock row",
-      UNLOCK: "Click to unlock row"
+      LOCK: "Lock row",
+      UNLOCK: "Unlock row",
+      ROW_DETAILS: "Show row details"
     }
   };
 
@@ -416,13 +417,13 @@
     if (self.options.lockSelectedRow) {
       clonedTBody.find('td').each(function(idx){
         var cell = $(this);
-        cell.attr('title', self.options.labels.LOCK).addClass('lockable');
+        cell.addClass('lockable');
         $('<i>').addClass('fa fa-lock pointer muted').prependTo(cell).on('click', function(){
           self.drawLockedRow($(this).parent().text()*1);
-        });
+        }).attr('title', self.options.labels.LOCK);
         $('<i>').addClass('fa fa-expand pointer muted').prependTo(cell).on('click', function(){
           huePubSub.publish('table.row.dblclick', {idx: idx, table: self.$element});
-        });
+        }).attr('title', self.options.labels.ROW_DETAILS);
       });
     }
     clonedTable.find("thead>tr th:eq(0)").width(originalTh.width()).css("background-color", "#FFFFFF");
