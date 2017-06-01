@@ -2016,9 +2016,10 @@
           if (ace().session.getLength() == editorHeight) {
             resized = false;
           }
-          if (resized) {
+          if (resized && $target.height() !== lastEditorSize) {
             ace().resize();
             editorHeight = Math.min(maxAutoLines, ace().session.getLength());
+            lastEditorSize = $target.height();
             huePubSub.publish('redraw.fixed.headers');
           }
         }
