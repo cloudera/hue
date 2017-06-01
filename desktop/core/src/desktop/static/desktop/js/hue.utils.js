@@ -178,7 +178,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         document.documentElement.webkitRequestFullscreen(Element.ALLOW_KEYBOARD_INPUT);
       }
     }
-  }
+  };
 
   hueUtils.exitFullScreen = function () {
     if (document.fullscreenElement ||
@@ -193,18 +193,18 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         document.webkitExitFullscreen();
       }
     }
-  }
+  };
 
   hueUtils.changeURL = function (newURL) {
     if (window.location.hash !== '' && newURL.indexOf('#') === -1){
       newURL = newURL + window.location.hash;
     }
     window.history.pushState(null, null, newURL);
-  }
+  };
 
   hueUtils.replaceURL = function (newURL) {
     window.history.replaceState(null, null, newURL);
-  }
+  };
 
   hueUtils.changeURLParameter = function (param, value) {
     var newSearch = '';
@@ -228,11 +228,11 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     }
 
     hueUtils.changeURL(window.location.pathname + newSearch);
-  }
+  };
 
   hueUtils.removeURLParameter = function (param) {
     hueUtils.changeURLParameter(param, null);
-  }
+  };
 
   /**
    * @param {string} pseudoJson
@@ -251,14 +251,14 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       });
     }
     return parsedParams;
-  }
+  };
 
   hueUtils.isOverflowing = function (element) {
     if (element instanceof jQuery) {
       element = element[0];
     }
     return element.scrollHeight > element.clientHeight || element.scrollWidth > element.clientWidth;
-  }
+  };
 
   /**
    * @param {string} selector
@@ -277,7 +277,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         hueUtils.waitForRendered(selector, condition, callback);
       }, timeout || 100)
     }
-  }
+  };
 
   /**
    * @param {Function} observable
@@ -297,7 +297,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         }
       });
     }
-  }
+  };
 
   /**
    * @param {Function} variable
@@ -314,11 +314,8 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
         hueUtils.waitForVariable(variable, callback);
       }, timeout || 100)
     }
-  }
+  };
 
-  /**
-   * @constructor
-   */
   hueUtils.scrollbarWidth = function () {
     var $parent, $children, width;
     $parent = $('<div style="width:50px;height:50px;overflow:auto"><div/></div>').appendTo('body');
@@ -326,7 +323,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
     width = $children.innerWidth() - $children.height(99).innerWidth();
     $parent.remove();
     return width;
-  }
+  };
 
   hueUtils.getSearchParameter = function (search, name, returnNull) {
     name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
@@ -336,7 +333,7 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       return null;
     }
     return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  }
+  };
 
   hueUtils.logError = function (error) {
     if (typeof window.console !== 'undefined' && typeof window.console.error !== 'undefined') {
@@ -361,8 +358,12 @@ if (!('addRule' in CSSStyleSheet.prototype)) {
       cursorminheight: 20,
       horizrailenabled: true,
       autohidemode: "leave"
-    }
+    };
     return $el.niceScroll($.extend(defaults, options || {}));
+  };
+
+  hueUtils.equalIgnoreCase = function (a, b) {
+    return a && b && a.toLowerCase() === b.toLowerCase();
   };
 
 }(hueUtils = window.hueUtils || {}));
