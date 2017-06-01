@@ -56,10 +56,6 @@ var AutocompleteResults = (function () {
 
   var POPULAR_CATEGORIES = [CATEGORIES.POPULAR_AGGREGATE, CATEGORIES.POPULAR_GROUP_BY, CATEGORIES.POPULAR_ORDER_BY, CATEGORIES.POPULAR_FILTER, CATEGORIES.POPULAR_ACTIVE_JOIN, CATEGORIES.POPULAR_JOIN_CONDITION, CATEGORIES.POPULAR_JOIN];
 
-  var equalIgnoreCase = function (a, b) {
-    return a && b && a.toLowerCase() === b.toLowerCase();
-  };
-
   var adjustWeightsBasedOnPopularity = function(suggestions, totalPopularity) {
     suggestions.forEach(function (suggestion) {
       var relativePopularity = Math.round(100 * suggestion.details.popularity.popularity / totalPopularity);
@@ -84,7 +80,7 @@ var AutocompleteResults = (function () {
       return null;
     }
     var foundSubQueries = subQueries.filter(function (knownSubQuery) {
-      return equalIgnoreCase(knownSubQuery.alias, subQueryName)
+      return hueUtils.equalIgnoreCase(knownSubQuery.alias, subQueryName)
     });
     if (foundSubQueries.length > 0) {
       return foundSubQueries[0];
@@ -595,7 +591,7 @@ var AutocompleteResults = (function () {
       if (self.snippet.type() == 'impala' && self.parseResult.suggestTables.identifierChain && self.parseResult.suggestTables.identifierChain.length === 1) {
         databasesDeferred.done(function (databases) {
           var foundDb = databases.filter(function (db) {
-            return equalIgnoreCase(db, self.parseResult.suggestTables.identifierChain[0].name);
+            return hueUtils.equalIgnoreCase(db, self.parseResult.suggestTables.identifierChain[0].name);
           });
           if (foundDb.length > 0) {
             fetchTables();
@@ -678,7 +674,7 @@ var AutocompleteResults = (function () {
     if (typeof table.identifierChain !== 'undefined' && table.identifierChain.length === 1 && typeof table.identifierChain[0].cte !== 'undefined') {
       if (typeof self.parseResult.commonTableExpressions !== 'undefined' && self.parseResult.commonTableExpressions.length > 0) {
         self.parseResult.commonTableExpressions.every(function (cte) {
-          if (equalIgnoreCase(cte.alias, table.identifierChain[0].cte)) {
+          if (hueUtils.equalIgnoreCase(cte.alias, table.identifierChain[0].cte)) {
             cte.columns.forEach(function (column) {
               var type = typeof column.type !== 'undefined' && column.type !== 'COLREF' ? column.type : 'T';
               if (typeof column.alias !== 'undefined') {
@@ -1615,7 +1611,7 @@ var AutocompleteResults = (function () {
       if (navOptColumn.dbName && (navOptColumn.dbName !== self.activeDatabase || navOptColumn.dbName !== tables[i].identifierChain[0].name)) {
         continue;
       }
-      if (navOptColumn.tableName && equalIgnoreCase(navOptColumn.tableName, tables[i].identifierChain[tables[i].identifierChain.length - 1].name) && tables[i].alias) {
+      if (navOptColumn.tableName && hueUtils.equalIgnoreCase(navOptColumn.tableName, tables[i].identifierChain[tables[i].identifierChain.length - 1].name) && tables[i].alias) {
         return tables[i].alias + '.' + navOptColumn.columnName;
       }
     }
@@ -1634,7 +1630,7 @@ var AutocompleteResults = (function () {
     var aliases = [];
     var tablesHasDefaultDatabase = false;
     tables.forEach(function (table) {
-      tablesHasDefaultDatabase = tablesHasDefaultDatabase || equalIgnoreCase(table.identifierChain[0].name.toLowerCase(), self.activeDatabase.toLowerCase());
+      tablesHasDefaultDatabase = tablesHasDefaultDatabase || hueUtils.equalIgnoreCase(table.identifierChain[0].name.toLowerCase(), self.activeDatabase.toLowerCase());
       if (table.alias) {
         aliases.push({ qualifiedName: $.map(table.identifierChain, function (identifier) { return identifier.name }).join('.').toLowerCase(), alias: table.alias });
       }
@@ -1730,7 +1726,7 @@ var AutocompleteResults = (function () {
           successCallback: function (data) {
             try {
               var foundDb = data.filter(function (db) {
-                return equalIgnoreCase(db, identifierChain[0].name.toLowerCase());
+                return hueUtils.equalIgnoreCase(db, identifierChain[0].name.toLowerCase());
               });
               var databaseName = foundDb.length > 0 ? identifierChain.shift().name : self.activeDatabase;
               var tableName = identifierChain.shift().name;
