@@ -2051,6 +2051,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         % endif
         $(el).jHueTableExtender2({
           mainScrollable: MAIN_SCROLLABLE,
+          fixedFirstColumn: vm.editorMode(),
           % if is_embeddable:
           stickToTopPosition: function() { return vm.isPlayerMode() ? 47 + bannerTopHeight : 50 + bannerTopHeight },
           % else:
@@ -2064,6 +2065,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       } else {
         $(el).jHueTableExtender2({
           mainScrollable: $(el).parents('.dataTables_wrapper')[0],
+          fixedFirstColumn: vm.editorMode(),
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: 'absolute',
           app: 'editor'
