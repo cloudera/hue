@@ -136,13 +136,13 @@ ${ components.menubar(is_embeddable) }
           <td data-bind="text: $index() + $indexOffset() + 1"></td>
           <td><a class="blue" href="javascript:void(0)" data-bind="click: showContextPopover"><i class="fa fa-fw fa-info" title="${_('Show details')}"></i></a></td>
           <td title="${ _("Scroll to the column") }">
-            <!-- ko if: $root.database().table().samples.loading() -->
+            <!-- ko if: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
             <span data-bind="text: name"></span>
             <!-- ko if: typeof primary_key !== 'undefined' && primary_key() == 'true' -->
               <i class="fa fa-key"></i>
             <!-- /ko -->
             <!-- /ko -->
-            <!-- ko ifnot: $root.database().table().samples.loading() -->
+            <!-- ko ifnot: $root.database() && $root.database().table() && $root.database().table().samples && $root.database().table().samples.loading() -->
             <a href="javascript:void(0)" class="column-selector" data-bind="text: name, click: scrollToColumn"></a>
             <!-- /ko -->
           </td>
@@ -196,19 +196,33 @@ ${ components.menubar(is_embeddable) }
 
 <script type="text/html" id="metastore-partition-values-table">
   <div style="overflow-x: auto; overflow-y: hidden">
-    <table class="table table-condensed table-nowrap">
+    <table id="partitionsTable" class="table table-condensed table-nowrap">
       <thead>
         <tr>
-          <th style="width: 1%">&nbsp;</th>
+          <th style="width: 1%">
+            <!-- ko ifnot: $data.withDrop -->
+            &nbsp;
+            <!-- /ko -->
+            <!-- ko if: $data.withDrop -->
+            <div class="hueCheckbox fa" data-bind="hueCheckAll: { allValues: $data.values, selectedValues: $data.selectedValues }"></div>
+            <!-- /ko -->
+          </th>
           <th>${_('Values')}</th>
           <th>${_('Spec')}</th>
           <th>${_('Browse')}</th>
         </tr>
       </thead>
       <tbody>
-      <!-- ko foreach: values -->
+      <!-- ko foreach: $data.values -->
       <tr>
-        <td data-bind="text: $index() + 1"></td>
+        <td>
+          <!-- ko ifnot: $parent.withDrop -->
+            <span data-bind="text: $index() + 1"></span>
+          <!-- /ko -->
+          <!-- ko if: $parent.withDrop -->
+          <div class="hueCheckbox fa" data-bind="multiCheck: '#partitionsTable', value: $data, hueChecked: $parent.selectedValues"></div>
+          <!-- /ko -->
+        </td>
         <td title="${_('Query partition data')}">
           <!-- ko if: IS_HUE_4 -->
             <a data-bind="click: function() { queryAndWatch(notebookUrl, $root.sourceType()); }, text: '[\'' + columns.join('\',\'') + '\']'" href="javascript:void(0)"></a>
@@ -695,7 +709,7 @@ ${ components.menubar(is_embeddable) }
     <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
     <!-- ko if: loaded -->
     <!-- ko with: preview -->
-    <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
+    <!-- ko template: { if: values().length, name: 'metastore-partition-values-table', data: { values: values, withDrop: false } } --><!-- /ko -->
     <a class="pointer" data-bind="visible: values().length >= 3, click: function() { $('li a[href=\'#partitions\']').click(); }"  style="display: none;">
       ${_('View more...')}
     </a>
@@ -721,34 +735,69 @@ ${ components.menubar(is_embeddable) }
   <div class="tile" data-bind="visible: true" style="display: none;">
     <h4>${ _('Partitions') } <i data-bind="visible: loading" class='fa fa-spinner fa-spin' style="display: none;"></i></h4>
     <!-- ko if: loaded -->
-    <div data-bind="visible: filters().length > 0">
-      <div data-bind="foreach: filters">
-          <div class="filter-box">
-            <a href="javascript:void(0)" class="pull-right" data-bind="click: $parent.removeFilter">
-              <i class="fa fa-times"></i>
+    <div class="row-fluid">
+      <div class="span10">
+        <div data-bind="visible: filters().length > 0">
+          <div data-bind="foreach: filters">
+              <div class="filter-box">
+                <a href="javascript:void(0)" class="pull-right" data-bind="click: $parent.removeFilter">
+                  <i class="fa fa-times"></i>
+                </a>
+                <select class="input-small" data-bind="options: $parent.keys, value: column"></select>
+                &nbsp;
+                <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $parent.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+            </div>
+          </div>
+          <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
+            <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
+              <i class="fa fa-plus"></i> ${ _('Add') }
             </a>
-            <select class="input-small" data-bind="options: $parent.keys, value: column"></select>
-            &nbsp;
-            <input class="input-small" type="text" data-bind="value: value, typeahead: { target: value, source: $parent.typeaheadValues(column), triggerOnFocus: true, forceUpdateSource: true}" placeholder="${ _('Value to filter...') }" />
+            <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
+            <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
+          </div>
         </div>
-      </div>
-      <div class="pull-left" style="margin-top: 4px; margin-bottom: 10px">
-        <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter">
-          <i class="fa fa-plus"></i> ${ _('Add') }
+        <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
+          <i class="fa fa-plus"></i> ${ _('Add a filter') }
         </a>
-        <label class="checkbox inline pulled">${ _('Sort Desc') } <input type="checkbox" data-bind="checked: sortDesc" /></label>
-        <button class="btn" data-bind="click: filter"><i class="fa fa-filter"></i> ${ _('Filter') }</button>
+        <div class="clearfix"></div>
+      </div>
+      <div class="span2">
+      % if has_write_access:
+        <div class="pull-right">
+          <button class="btn" title="${_('Delete the selected partitions')}" data-bind="click: function () { $('#dropPartition').modal('show'); }, disable: selectedValues().length === 0"><i class="fa fa-trash-o"></i>  ${_('Drop partition(s)')}</button>
+        </div>
+      % endif
       </div>
     </div>
-    <a class="add-filter" href="javascript: void(0)" data-bind="click: addFilter, visible: values().length > 0 && filters().length == 0" style="margin-bottom: 20px; margin-left: 14px">
-      <i class="fa fa-plus"></i> ${ _('Add a filter') }
-    </a>
-    <div class="clearfix"></div>
-    <!-- ko template: { if: values().length, name: 'metastore-partition-values-table' } --><!-- /ko -->
+    <!-- ko template: { if: values().length, name: 'metastore-partition-values-table', data: { values: values, selectedValues: selectedValues, withDrop: true } } --><!-- /ko -->
     <span data-bind="visible: !values().length" style="display: none;">${ _('The partition does not contain any values') }</span>
     <!-- /ko -->
   </div>
+  % if has_write_access:
+  <div id="dropPartition" class="modal hide fade">
+    % if is_embeddable:
+      <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }, submit: dropAndWatch" method="POST">
+        <input type="hidden" name="is_embeddable" value="true"/>
+    % else:
+      <form data-bind="attr: { 'action': '/metastore/table/' + $parent.database.name + '/' + $parent.name + '/partitions/drop' }" method="POST">
+    % endif
+      ${ csrf_token(request) | n,unicode }
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+        <h2 id="dropPartitionMessage" class="modal-title">${_('Confirm action')}</h2>
+      </div>
+      <div class="modal-footer">
+        <input type="button" class="btn" data-dismiss="modal" value="${_('Cancel')}" />
+        <input type="submit" class="btn btn-danger" value="${_('Yes')}"/>
+      </div>
+      <select class="hide" name="partition_selection" data-bind="options: valuesFlat, selectedOptions: selectedValuesFlat" size="5" multiple="true"></select>
+    </form>
+  </div>
+    % endif
   <!-- /ko -->
+
+
+
 </script>
 
 <script type="text/html" id="metastore-sample-tab">
@@ -1182,6 +1231,7 @@ ${ components.menubar(is_embeddable) }
         $("#dropTable").modal('hide');
         $("#dropSingleTable").modal('hide');
         $("#dropDatabase").modal('hide');
+        $("#dropPartition").modal('hide');
       },
       error: function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
