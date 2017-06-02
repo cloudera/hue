@@ -408,7 +408,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -446,24 +446,22 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
           <!-- ko with: properties -->
-          <li class="nav-header">${ _('Map') }</li>
-          <li><span data-bind="text: maps_percent_complete"></span> <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span></li>
-          <li class="nav-header">${ _('Reduce') }</li>
-          <li><span data-bind="text: reduces_percent_complete"></span> <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span></li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: $parent.duration"></span></li>
+            <li class="nav-header">${ _('Map') }</li>
+            <li><span data-bind="text: maps_percent_complete"></span>% <span data-bind="text: finishedMaps"></span> /<span data-bind="text: desiredMaps"></span></li>
+            <li class="nav-header">${ _('Reduce') }</li>
+            <li><span data-bind="text: reduces_percent_complete"></span>% <span data-bind="text: finishedReduces"></span> / <span data-bind="text: desiredReduces"></span></li>
+            <li class="nav-header">${ _('Duration') }</li>
+            <li><span data-bind="text: durationFormatted"></span></li>
+            <li class="nav-header">${ _('Submitted') }</li>
+            <li><span data-bind="text: startTimeFormatted"></span></li>
           <!-- /ko -->
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
-          <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
         </ul>
       </div>
     </div>
@@ -513,12 +511,12 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tr>
               <th>${_('Type')}</th>
               <th>${_('Id')}</th>
-              <th>${_('elapsedTime')}</th>
-              <th>${_('progress')}</th>
-              <th>${_('state')}</th>
-              <th>${_('startTime')}</th>
-              <th>${_('successfulAttempt')}</th>
-              <th>${_('finishTime')}</th>
+              <th>${_('Elapsed Time')}</th>
+              <th>${_('Progress')}</th>
+              <th>${_('State')}</th>
+              <th>${_('Start Time')}</th>
+              <th>${_('Successful Attempt')}</th>
+              <th>${_('Finish Time')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['tasks']()['task_list']">
@@ -562,7 +560,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -607,16 +605,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <thead>
             <tr>
               <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
-              <th>${_('assignedContainerId')}</th>
-              <th>${_('progress')}</th>
-              <th>${_('elapsedTime')}</th>
-              <th>${_('state')}</th>
-              <th>${_('rack')}</th>
-              <th>${_('nodeHttpAddress')}</th>
-              <th>${_('type')}</th>
-              <th>${_('startTime')}</th>
-              <th>${_('id')}</th>
-              <th>${_('finishTime')}</th>
+              <th>${_('Assigned Container Id')}</th>
+              <th>${_('Progress')}</th>
+              <th>${_('Elapsed Time')}</th>
+              <th>${_('State')}</th>
+              <th>${_('Rack')}</th>
+              <th>${_('NodeHttpA ddress')}</th>
+              <th>${_('Type')}</th>
+              <th>${_('Start Time')}</th>
+              <th>${_('Id')}</th>
+              <th>${_('Finish Time')}</th>
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
@@ -658,7 +656,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -728,7 +726,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -764,7 +762,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -867,7 +865,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -1063,7 +1061,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
@@ -1179,7 +1177,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('User') }</li>
           <li><span data-bind="text: user"></span></li>
           <li class="nav-header">${ _('Progress') }</li>
-          <li><span data-bind="text: progress"></span></li>
+          <li><span data-bind="text: progress"></span>%</li>
           <li>
             <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>

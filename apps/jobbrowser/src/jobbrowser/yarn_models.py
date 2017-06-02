@@ -209,10 +209,12 @@ class Job(object):
         self.reduces_percent_complete = 0
       else:
         self.reduces_percent_complete = int(round(float(self.finishedReduces) / self.desiredReduces * 100))
-      if self.progress is not None:
-        self.progress = int((self.progress + self.reduces_percent_complete) / 2)
-      else:
-        self.progress = self.reduces_percent_complete
+
+      if self.desiredReduces > 0:
+        if self.progress is not None:
+          self.progress = int((self.progress + self.reduces_percent_complete) / 2)
+        else:
+          self.progress = self.reduces_percent_complete
 
 
   def _fixup(self):
