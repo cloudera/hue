@@ -813,7 +813,12 @@ class Node():
       action = notebook.get_data()['snippets'][0]
 
       name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
-      self.data['properties']['command'] = action['statement']
+
+      command = action['statement']
+      if command.startswith('sqoop '):
+        _ignore, command = command.split('sqoop ', 1)
+      self.data['properties']['command'] = command
+
       self.data['properties']['arguments'] = []
 
     elif self.data['type'] == DistCpDocumentAction.TYPE:
