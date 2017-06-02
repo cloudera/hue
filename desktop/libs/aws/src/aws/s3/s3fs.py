@@ -63,7 +63,10 @@ def auth_error_handler(view_fn):
           msg = _('User is not authorized to write or modify path: %s. Check that the user has write permissions.') % path
         raise S3FileSystemException(msg)
       else:
-        raise S3FileSystemException(e.message or e.reason)
+        msg = str(e)
+        if isinstance(e, S3ResponseError):
+          msg = e.message or e.reason
+        raise S3FileSystemException(msg)
     except Exception, e:
       raise e
   return decorator
@@ -78,8 +81,12 @@ class S3FileSystem(object):
     if self._bucket_cache is None:
       try:
         buckets = self._s3_connection.get_all_buckets()
+      except S3FileSystemException, e:
+        raise e
       except S3ResponseError, e:
-        raise S3FileSystemException(e.message or e.reason)
+        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e.reason)
+      except Exception, e:
+        raise S3FileSystemException(_('Failed to initialize bucket cache: %s') % e)
       self._bucket_cache = {}
       for bucket in buckets:
         self._bucket_cache[bucket.name] = bucket
@@ -331,8 +338,12 @@ class S3FileSystem(object):
 
     try:
       self._get_or_create_bucket(bucket_name)
-    except Exception, e:
+    except S3FileSystemException, e:
+      raise e
+    except S3ResponseError, e:
       raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e.reason))
+    except Exception, e:
+      raise S3FileSystemException(_('Failed to create S3 bucket "%s": %s') % (bucket_name, e))
 
     stats = self._stats(path)
     if stats:
