@@ -304,24 +304,38 @@ from desktop.views import _ko
 
         self.keyboardHandler = new HashHandler();
         self.keyboardHandler.bindKeys({
-          'Up': function() {
-            if (self.selectedIndex() > 0) {
+          'Up': function(editor, evt) {
+            if (self.suggestions.filtered().length <= 1) {
+              self.detach();
+              self.editor().execCommand('golineup');
+            } else if (self.selectedIndex() > 0) {
               self.selectedIndex(self.selectedIndex() - 1);
               self.scrollSelectionIntoView();
             }
           },
-          'Down': function() {
-            if (self.selectedIndex() < self.suggestions.filtered().length - 1) {
+          'Down': function(editor) {
+            if (self.suggestions.filtered().length <= 1) {
+              self.detach();
+              self.editor().execCommand('golinedown');
+            } else if (self.selectedIndex() < self.suggestions.filtered().length - 1) {
               self.selectedIndex(self.selectedIndex() + 1);
               self.scrollSelectionIntoView();
             }
           },
           'Ctrl-Up|Ctrl-Home': function() {
-            self.selectedIndex(0);
-            self.scrollSelectionIntoView();
+            if (self.suggestions.filtered().length <= 1) {
+              self.detach();
+              self.editor().execCommand('gotostart');
+            } else {
+              self.selectedIndex(0);
+              self.scrollSelectionIntoView();
+            }
           },
           'Ctrl-Down|Ctrl-End': function() {
-            if (self.suggestions.filtered().length > 0 ) {
+            if (self.suggestions.filtered().length <= 1) {
+              self.detach();
+              self.editor().execCommand('gotoend');
+            } else if (self.suggestions.filtered().length > 0 ) {
               self.selectedIndex(self.suggestions.filtered().length - 1);
               self.scrollSelectionIntoView();
             }
@@ -330,14 +344,18 @@ from desktop.views import _ko
             self.detach();
           },
           'Return': function() {
-            self.insertSuggestion();
+            self.insertSuggestion(function () {
+              self.editor().execCommand('insertstring', '\n');
+            });
           },
           'Shift-Return': function() {
             // TODO: Delete suffix
             self.insertSuggestion();
           },
           'Tab': function() {
-            self.insertSuggestion();
+            self.insertSuggestion(function () {
+              self.editor().execCommand('indent');
+            });
           }
         });
 
@@ -466,20 +484,25 @@ from desktop.views import _ko
         var self = this;
         self.disposeFunctions.forEach(function (disposeFunction) {
           disposeFunction();
-        })
+        });
         self.detach();
       };
 
-      HueAceAutocompleter.prototype.insertSuggestion = function () {
+      HueAceAutocompleter.prototype.insertSuggestion = function (emptyCallback) {
         var self = this;
         if (self.suggestions.filtered().length === 0) {
           self.detach();
+          if (emptyCallback) {
+            emptyCallback();
+          }
           return;
         }
+        var equalLengthReplace = false;
         if (self.suggestions.filter()) {
           var ranges = self.editor().selection.getAllRanges();
           for (var i = 0, range; range = ranges[i]; i++) {
             range.start.column -= self.suggestions.filter().length;
+            equalLengthReplace = (range.end.column - range.start.column === self.suggestions.filtered()[self.selectedIndex()].value.length);
             self.editor().session.remove(range);
           }
         }
@@ -492,6 +515,9 @@ from desktop.views import _ko
         self.editor().execCommand('insertstring', self.suggestions.filtered()[self.selectedIndex()].value);
         self.editor().renderer.scrollCursorIntoView();
         self.detach();
+        if (equalLengthReplace && emptyCallback) {
+          emptyCallback();
+        }
       };
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
