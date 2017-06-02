@@ -3068,17 +3068,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       ko.applyBindings(viewModel, $('#${ bindableElement }')[0]);
       viewModel.init();
 
-      huePubSub.subscribe('editor.upload.table.stats', function (options) {
-        viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
-      }, HUE_PUB_SUB_APP);
+      if (viewModel.isOptimizerEnabled()) {
+        huePubSub.subscribe('editor.upload.table.stats', function (options) {
+          viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
+        }, HUE_PUB_SUB_APP);
 
-      huePubSub.subscribe("editor.upload.history", function () {
-        viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
-      }, HUE_PUB_SUB_APP);
+        huePubSub.subscribe("editor.upload.history", function () {
+          viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
+        }, HUE_PUB_SUB_APP);
 
-      huePubSub.subscribe("editor.upload.query", function (query_id) {
-        viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
-      }, HUE_PUB_SUB_APP);
+        huePubSub.subscribe("editor.upload.query", function (query_id) {
+          viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
+        }, HUE_PUB_SUB_APP);
+      }
 
       huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
         var foundSnippet = viewModel.selectedNotebook().snippets().filter(function (snippet) {
