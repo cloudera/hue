@@ -880,15 +880,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
           <li class="nav-header">${ _('Variables') }</li>
           <li>
-            <ul class="nav nav-list" data-bind="foreach: properties['parameters']">
-              <li>
+            <ul class="unstyled" data-bind="foreach: properties['parameters']">
+              <li class="margin-top-5">
+              <span data-bind="text: name, attr: { title: value }" class="muted"></span><br>
+                &nbsp;
               <!-- ko if: link -->
-              <a data-bind="hueLink: link" href="javascript: void(0);">
-                <span data-bind="text: name, attr: { title: value }"></span>
+              <a data-bind="hueLink: link, text: value, attr: { title: value }" href="javascript: void(0);">
               </a>
               <!-- /ko -->
               <!-- ko ifnot: link -->
-                <span data-bind="text: name, attr: { title: value }"></span>
+                <span data-bind="text: value, attr: { title: value }"></span>
               <!-- /ko -->
               </li>
             </ul>
