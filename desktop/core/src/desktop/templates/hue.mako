@@ -593,7 +593,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           'home', 'oozie_workflow', 'oozie_coordinator', 'oozie_bundle', 'dashboard', 'metastore',
           'filebrowser', 'useradmin_users', 'useradmin_groups', 'useradmin_newgroup', 'useradmin_editgroup',
           'useradmin_permissions', 'useradmin_editpermission', 'useradmin_configurations', 'useradmin_newuser',
-          'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer'
+          'useradmin_addldapusers', 'useradmin_addldapgroups', 'useradmin_edituser', 'importer',
+          'security_hive', 'security_hdfs', 'security_hive2', 'security_solr'
       ];
 
       var OnePageViewModel = function () {

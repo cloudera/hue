@@ -268,7 +268,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
                 </div>
               </div>
 
-              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender', component='security') }
 
             </div>
             <div class="span6 acl-panel">
@@ -602,7 +602,7 @@ ${ layout.menubar(section=component, is_embeddable=is_embeddable) }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight) }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight, component='security') }
 
 
 <script src="${ static('security/js/sentry.ko.js') }" type="text/javascript" charset="utf-8"></script>
@@ -616,6 +616,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 
     var viewModel = new SentryViewModel(${ initial | n,unicode });
+    ko.cleanNode($('#securityComponents')[0]);
     ko.applyBindings(viewModel, $('#securityComponents')[0]);
 
     $(document).ready(function () {
