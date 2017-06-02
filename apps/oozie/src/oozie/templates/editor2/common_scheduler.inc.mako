@@ -413,7 +413,7 @@ from django.utils.translation import ugettext as _
           </a>
         </li>
       </ul>
-      <div class="label label-danger inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="line-height: 30px">
+      <div class="label inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="line-height: 30px">
         ${_('There are no workflows matching your search term.')}
       </div>
     </div>
