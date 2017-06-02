@@ -3540,7 +3540,7 @@
         aceSqlWorker.terminate();
       });
 
-      var lastKnownLocations = [];
+      var lastKnownLocations = {};
 
       var locationsSub = huePubSub.subscribe('get.active.editor.locations', function () {
         huePubSub.publish('set.active.editor.locations', lastKnownLocations);
@@ -3556,7 +3556,7 @@
           return;
         }
 
-        var lastKnownLocations = {
+        lastKnownLocations = {
           id: self.editorId,
           type: self.snippet.type(),
           defaultDatabase: self.snippet.database(),
