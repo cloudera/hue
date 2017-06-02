@@ -459,7 +459,7 @@ from desktop.views import _ko
       <!-- /ko -->
 
       <div class="doc-browser-list" data-bind="with: activeEntry" >
-        <ul class="doc-browser-entries" data-bind="foreachVisible: { data: entries, minHeight: 39, container: '.doc-browser-list' }">
+        <ul class="doc-browser-entries" data-bind="foreachVisible: { data: entries, minHeight: 42, container: '.doc-browser-list' }">
           <li data-bind="docSelect: $parent.entries, docDroppable: { entries: $parent.entries }, css: { 'doc-browser-selected': selected }">
             <div class="doc-browser-row" data-bind="contextMenu: { scrollContainer: '.doc-browser-list', menuSelector: '.hue-context-menu', beforeOpen: beforeContextOpen }">
               <ul class="hue-context-menu">
@@ -486,7 +486,7 @@ from desktop.views import _ko
               </div>
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
-                <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }, tooltip: { placement: 'bottom' }"></div>
+                <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
                 <div class="doc-browser-attr-col doc-browser-type">
                   <!-- ko switch: type -->
                   <!-- ko case: 'directory' -->${ _('Directory') }<!-- /ko -->
