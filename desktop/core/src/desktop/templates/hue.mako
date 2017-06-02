@@ -750,6 +750,12 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (app.startsWith('oozie')) {
             huePubSub.clearAppSubscribers('oozie');
           }
+          if (app.startsWith('security')) {
+            $('#embeddable_security_hive').html('');
+            $('#embeddable_security_hdfs').html('');
+            $('#embeddable_security_hive2').html('');
+            $('#embeddable_security_solr').html('');
+          }
           if (SKIP_CACHE.indexOf(app) > -1) {
             $('#embeddable_' + app).html('');
           }
