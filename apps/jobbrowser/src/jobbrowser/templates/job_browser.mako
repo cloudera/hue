@@ -430,7 +430,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 <script type="text/html" id="job-mapreduce-page${ SUFFIX }">
 
-
   <div class="row-fluid">
     <div data-bind="css:{'span2': !$root.isMini(), 'span12': $root.isMini() }">
       <div class="sidebar-nav">
@@ -465,6 +464,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
+
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
@@ -682,7 +682,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+
+    <div data-bind="css: {'span10': !$root.isMini(), 'span12': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-attempt-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
@@ -775,8 +776,35 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
+
     <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
-      <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
+      <ul class="nav nav-pills margin-top-20">
+        <li class="active"><a href="#job-spark-page-properties${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
+
+        <li class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></li>
+      </ul>
+
+      <div class="clearfix"></div>
+
+      <div class="tab-content">
+        <div class="tab-pane active" id="job-spark-page-properties${ SUFFIX }">
+          <table class="datatables table table-condensed">
+            <thead>
+            <tr>
+              <th>${_('Name')}</th>
+              <th>${_('Value')}</th>
+            </tr>
+            </thead>
+            <tbody data-bind="foreach: properties['metadata']">
+              <tr>
+                <td data-bind="text: name"></td>
+                <!-- ko template: { name: 'link-or-text', data: { name: name(), value: value() } } --><!-- /ko -->
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
     </div>
   </div>
 </script>
@@ -1374,6 +1402,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   </table>
   <!-- /ko -->
 </script>
+
 
 <script type="text/html" id="link-or-text${ SUFFIX }">
   <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
