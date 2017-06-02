@@ -977,7 +977,7 @@ class Document2Manager(models.Manager, Document2QueryMixin):
     return self.documents(user, perms='owned', include_history=True, include_trashed=include_trashed).filter(type=doc_type, is_history=True)
 
   def get_tasks_history(self, user):
-    return self.documents(user, perms='owned', include_history=True, include_trashed=False, include_managed=True).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script')
+    return self.documents(user, perms='owned', include_history=True, include_trashed=False, include_managed=True).filter(is_history=True, is_managed=True).exclude(name='pig-app-hue-script').exclude(type='oozie-workflow2')
 
   def get_home_directory(self, user):
     try:
