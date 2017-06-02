@@ -45,6 +45,7 @@ var AssistS3Entry = (function () {
     self.hasMorePages = true;
 
     self.isFilterVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
     self.isFilterVisible.subscribe(function (newValue) {
@@ -75,6 +76,12 @@ var AssistS3Entry = (function () {
       return self.entries().length > 0;
     });
   }
+
+  AssistS3Entry.prototype.toggleSearch = function () {
+    var self = this;
+    self.isFilterVisible(!self.isFilterVisible());
+    self.editingSearch(self.isFilterVisible());
+  };
 
   AssistS3Entry.prototype.dblClick = function () {
     var self = this;
