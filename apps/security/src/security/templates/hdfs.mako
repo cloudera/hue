@@ -137,7 +137,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
                 </div>
               </div>
 
-              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender', component='hdfs') }
             </div>
             <div class="span4">
               <div class="acl-panel" data-bind="visible: ! $root.assist.isLoadingAcls()">
@@ -290,7 +290,7 @@ ${ layout.menubar(section='hdfs', is_embeddable=is_embeddable) }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked', itemChecked='isChecked') }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', iconModifier=treeIcons, styleModifier='aclBit', styleModifierPullRight=aclBitPullRight, anchorProperty='path', showMore='$root.assist.loadMore', strikedProperty='striked', itemChecked='isChecked', component='hdfs') }
 
 
 <script src="${ static('security/js/hdfs.ko.js') }" type="text/javascript" charset="utf-8"></script>
@@ -298,6 +298,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 <script type="text/javascript">
   (function () {
     var viewModel = new HdfsViewModel(${ initial | n,unicode });
+    ko.cleanNode($('#securityHdfsComponents')[0]);
     ko.applyBindings(viewModel, $('#securityHdfsComponents')[0]);
 
     $(document).ready(function () {
