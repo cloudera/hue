@@ -149,6 +149,8 @@
           search.hide();
           var $t = self.$table;
           if ($t.data('scrollToRow') != null) {
+            $t.data('scrollToCol', null);
+            $t.data('scrollToRow', null);
             $t.find('.columnSelected').removeClass('columnSelected');
           }
         });
