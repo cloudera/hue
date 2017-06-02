@@ -178,7 +178,7 @@ var AutocompleteResults = (function () {
               suggestion.filterWeight = 2;
             }
           } else {
-            if (suggestion.details && suggestion.details.comment) {
+            if (suggestion.details && suggestion.details.comment && lowerCaseFilter.indexOf(' ') === -1) {
               foundIndex = suggestion.details.comment.toLowerCase().indexOf(lowerCaseFilter);
               if (foundIndex !== -1) {
                 suggestion.filterWeight = 1;
