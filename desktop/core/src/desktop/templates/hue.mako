@@ -742,6 +742,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           });
           huePubSub.publish('hue.datatable.search.hide');
           huePubSub.publish('nicescroll.resize');
+          huePubSub.publish('context.panel.visible.editor', false);
           if (app === 'filebrowser') {
             $(window).unbind('hashchange.fblist');
           }
