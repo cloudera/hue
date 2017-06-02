@@ -149,7 +149,7 @@ class YarnApi(Api):
         'duration': app['durationMs'],
         'submitted': app['startTimeMs']
     }
-
+    
     if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
       common['type'] = 'MAPREDUCE'
 
@@ -166,6 +166,11 @@ class YarnApi(Api):
           'tasks': [],
           'metadata': [],
           'counters': []
+      }
+    elif app['applicationType'] == 'SPARK':
+      common['type'] = 'SPARK'
+      common['properties'] = {
+        'metadata': [{'name': name, 'value': value} for name, value in app.iteritems()]
       }
 
     return common
