@@ -45,6 +45,7 @@ var AssistHdfsEntry = (function () {
     self.hasMorePages = true;
 
     self.isFilterVisible = ko.observable(false);
+    self.editingSearch = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
 
     self.isFilterVisible.subscribe(function (newValue) {
@@ -79,6 +80,12 @@ var AssistHdfsEntry = (function () {
   AssistHdfsEntry.prototype.dblClick = function () {
     var self = this;
     huePubSub.publish('assist.dblClickHdfsItem', self);
+  };
+
+  AssistHdfsEntry.prototype.toggleSearch = function () {
+    var self = this;
+    self.isFilterVisible(!self.isFilterVisible());
+    self.editingSearch(self.isFilterVisible());
   };
 
   AssistHdfsEntry.prototype.loadEntries = function(callback) {
