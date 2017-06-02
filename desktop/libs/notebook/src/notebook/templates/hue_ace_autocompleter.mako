@@ -497,12 +497,21 @@ from desktop.views import _ko
           }
           return;
         }
-        var equalLengthReplace = false;
+        var valueToInsert = self.suggestions.filtered()[self.selectedIndex()].value;
+
+        // Not always the case as we also match in comments
+        if (valueToInsert.toLowerCase() === self.suggestions.filter().toLowerCase()) {
+          // Close the autocompleter when the user has typed a complete suggestion
+          self.detach();
+          if (emptyCallback) {
+            emptyCallback();
+          }
+          return;
+        }
         if (self.suggestions.filter()) {
           var ranges = self.editor().selection.getAllRanges();
           for (var i = 0, range; range = ranges[i]; i++) {
             range.start.column -= self.suggestions.filter().length;
-            equalLengthReplace = (range.end.column - range.start.column === self.suggestions.filtered()[self.selectedIndex()].value.length);
             self.editor().session.remove(range);
           }
         }
@@ -512,12 +521,9 @@ from desktop.views import _ko
 ##           self.editor().removeTextAfterCursor(match[0].length);
 ##         }
         // TODO: Move cursor handling for '? FROM tbl' here
-        self.editor().execCommand('insertstring', self.suggestions.filtered()[self.selectedIndex()].value);
+        self.editor().execCommand('insertstring', valueToInsert);
         self.editor().renderer.scrollCursorIntoView();
         self.detach();
-        if (equalLengthReplace && emptyCallback) {
-          emptyCallback();
-        }
       };
 
       HueAceAutocompleter.prototype.scrollSelectionIntoView = function () {
