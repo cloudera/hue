@@ -481,8 +481,8 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       <div class="tab-content">
         <div class="tab-pane active" id="job-mapreduce-page-logs${ SUFFIX }">
           <ul class="nav nav-tabs">
-          % for name in ['stdout', 'stderr', 'syslog']:
-            <li class="${ name == 'syslog' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
+          % for name in ['default', 'stdout', 'stderr', 'syslog']:
+            <li class="${ name == 'default' and 'active' or '' }"><a href="javascript:void(0)" data-bind="click: function(data, e) { $(e.currentTarget).parent().siblings().removeClass('active'); $(e.currentTarget).parent().addClass('active'); fetchLogs('${ name }'); }, text: '${ name }'"></a></li>
           % endfor
           </ul>
 

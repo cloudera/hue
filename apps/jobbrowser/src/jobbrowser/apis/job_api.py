@@ -23,6 +23,7 @@ from hadoop.yarn import resource_manager_api
 
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
+from jobbrowser.views import job_single_logs
 
 
 LOG = logging.getLogger(__name__)
@@ -183,12 +184,13 @@ class YarnApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
-    if log_name == 'default':
-      log_name = 'syslog'
-
     if app_type == 'MAPREDUCE':
-      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
-      logs = json.loads(response.content).get('log')
+      if log_name == 'default':
+        response = job_single_logs(MockDjangoRequest(self.user), job=appid)
+        logs = json.loads(response.content).get('logs')
+      else:
+        response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
+        logs = json.loads(response.content).get('log')
     else:
       logs = None
     return {'logs': logs}
