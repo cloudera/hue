@@ -610,7 +610,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <th>${_('Elapsed Time')}</th>
               <th>${_('State')}</th>
               <th>${_('Rack')}</th>
-              <th>${_('NodeHttpA ddress')}</th>
+              <th>${_('Node Http Address')}</th>
               <th>${_('Type')}</th>
               <th>${_('Start Time')}</th>
               <th>${_('Id')}</th>
@@ -798,7 +798,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <tbody data-bind="foreach: properties['metadata']">
               <tr>
                 <td data-bind="text: name"></td>
-                <!-- ko template: { name: 'link-or-text', data: { name: name(), value: value() } } --><!-- /ko -->
+                <td><!-- ko template: { name: 'link-or-text', data: { name: name(), value: value() } } --><!-- /ko --></td>
               </tr>
             </tbody>
           </table>
@@ -1405,10 +1405,15 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
 
 <script type="text/html" id="link-or-text${ SUFFIX }">
-  <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
-    <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value) , text: $data.value"></a>
+  <!-- ko if: typeof $data.value === 'string' -->
+    <!-- ko if: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+      <a href="javascript:void(0)" data-bind="hueLink: '/filebrowser/view=' + $root.getHDFSPath($data.value) , text: $data.value"></a>
+    <!-- /ko -->
+    <!-- ko ifnot: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+      <span data-bind="text: $data.value"></span>
+    <!-- /ko -->
   <!-- /ko -->
-  <!-- ko ifnot: $data.name.indexOf('dir') > -1 || $data.name.indexOf('path') > -1 || $data.name.indexOf('output') > -1 || $data.name.indexOf('input') > -1 || $data.value.startsWith('/') ||  $data.value.startsWith('hdfs://') -->
+  <!-- ko ifnot: typeof $data.value === 'string' -->
     <span data-bind="text: $data.value"></span>
   <!-- /ko -->
 </script>

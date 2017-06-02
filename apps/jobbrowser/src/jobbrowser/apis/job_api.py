@@ -149,7 +149,7 @@ class YarnApi(Api):
         'duration': app['durationMs'],
         'submitted': app['startTimeMs']
     }
-    
+
     if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
       common['type'] = 'MAPREDUCE'
 
