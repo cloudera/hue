@@ -69,6 +69,19 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
 
+    DocumentTypeGlobals = {
+      'all': '${_('All')}',
+      'link-pigscript': '${_('Pig')}',
+      'link-workflow': '${_('Workflow')}',
+      'notebook': '${_('Notebook')}',
+      'oozie-bundle2': '${_('Bundle')}',
+      'oozie-coordinator2': '${_('Coordinator')}',
+      'oozie-workflow2': '${_('Workflow')}',
+      'query-hive': '${_('Hive')}',
+      'query-impala': '${_('Impala')}',
+      'search-dashboard': '${_('Dashboard')}'
+    };
+
     // jHue plugins global configuration
     jHueFileChooserGlobals = {
       labels: {
