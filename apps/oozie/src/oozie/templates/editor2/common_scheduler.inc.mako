@@ -404,7 +404,7 @@ from django.utils.translation import ugettext as _
     <div>
       <ul data-bind="foreach: $root.filteredModalWorkflows().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalWorkflows().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li>
+        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
           <span class="badge badge-info" data-bind="click: selectWorkflow">
             <span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
@@ -413,7 +413,7 @@ from django.utils.translation import ugettext as _
           </a>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+      <div class="label label-danger inline" data-bind="visible: $root.filteredModalWorkflows().length == 0" style="line-height: 30px">
         ${_('There are no workflows matching your search term.')}
       </div>
     </div>
