@@ -1332,9 +1332,7 @@ class Document2(models.Model):
   def update_permission(self, user, name='read', users=None, groups=None):
     # Check if user has access to grant permissions
     if users or groups:
-      if name == 'read':
-        self.can_read_or_exception(user)
-      elif name == 'write':
+      if name == 'read' or name == 'write':
         self.can_write_or_exception(user)
       else:
         raise ValueError(_('Invalid permission type: %s') % name)

@@ -49,11 +49,17 @@ function ShareViewModel(updateDocF) {
 
   self.docUuid;
 
+  self.docUserPerms = ko.observable(ko.mapping.fromJS({
+    can_read: true,
+    can_write: false
+  }));
+
   self.setDocUuid = function(docUuid) {
     if (docUuid === '') { return false; }
     self.docUuid = docUuid;
     $.get('/desktop/api2/doc', { uuid : docUuid }, function (data) {
-      shareViewModel.selectedDoc(data.document)
+      shareViewModel.selectedDoc(data.document);
+      shareViewModel.docUserPerms(data.user_perms);
     }).fail(function (response) {
       $(document).trigger("error", "There was an error processing your action: " + response.responseText);
     });
