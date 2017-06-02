@@ -430,6 +430,17 @@ from metadata.conf import has_optimizer, OPTIMIZER
   <div class="modal-footer"></div>
 </div>
 
+<div id="rowDetailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important;z-index:1071">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
+    <h2 class="modal-title">${_('Row details')}</h2>
+  </div>
+  <div class="modal-body">
+    <table class="table table-condensed">
+
+    </table>
+  </div>
+</div>
 
 <script type="text/javascript">
 
@@ -446,7 +457,27 @@ from metadata.conf import has_optimizer, OPTIMIZER
     });
   });
 
+
   $(document).ready(function () {
+
+    huePubSub.subscribe('table.row.dblclick', function(data){
+      var $el = $(data.table);
+      var $t = $('#rowDetailsModal').find('table');
+      $t.html('');
+      var html = '';
+      $el.find('thead th').each(function (colIdx, col) {
+        if (colIdx > 0){
+          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + $el.data('data')[data.idx][colIdx] + '</td></tr>';
+        }
+      });
+      $t.html(html);
+      $('#rowDetailsModal').modal('show');
+    });
+
+    $('#rowDetailsModal').on('shown', function () {
+      $('.modal-backdrop').css('z-index', '1070');
+    });
+
     if ($.fn.editableform) {
       $.fn.editableform.buttons =
           '<button type="submit" class="btn btn-primary editable-submit disable-feedback">' +

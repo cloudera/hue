@@ -373,18 +373,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <%def name="commonHTML(is_embeddable=False)">
 
-<div id="detailsModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${_('Row details')}</h2>
-  </div>
-  <div class="modal-body">
-    <table class="table table-condensed">
-
-    </table>
-  </div>
-</div>
-
 <div id="helpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
@@ -2870,26 +2858,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
       }
-    }, HUE_PUB_SUB_APP);
-
-    huePubSub.subscribe('table.row.dblclick', function(data){
-      var $el = $(data.table);
-
-      var $t = $('#detailsModal').find('table');
-      $t.html('');
-
-      var html = '';
-
-      $el.find('thead th').each(function (colIdx, col) {
-        if (colIdx > 0){
-          html += '<tr><th width="10%">' + $(col).text() + '</th><td>' + $el.data('data')[data.idx][colIdx] + '</td></tr>';
-        }
-      });
-
-      $t.html(html);
-
-      $('#detailsModal').modal('show');
-
     }, HUE_PUB_SUB_APP);
 
     window.redrawFixedHeaders = redrawFixedHeaders;
