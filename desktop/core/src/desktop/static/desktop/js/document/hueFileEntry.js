@@ -89,11 +89,56 @@ var HueFileEntry = (function () {
     self.selectedDocsWithDependents = ko.observable([]);
     self.importedDocSummary = ko.observable();
     self.showTable = ko.observable();
+    self.entries = ko.observableArray([]);
 
 
     // Filter is only used in the assist panel at the moment
     self.isFilterVisible = ko.observable(false);
     self.filter = ko.observable('').extend({ rateLimit: 400 });
+
+    self.availableTypeFilters = ko.pureComputed(function () {
+      var filters = {};
+
+      self.entries().forEach(function (entry) {
+        var type = entry.definition().type;
+        if (!filters[type] && type !== 'directory') {
+
+          var label = DocumentTypeGlobals[type];
+          if (!label) {
+            if (type.indexOf('query-') === 0) {
+              label = type.substring(6);
+            } else {
+              label = type
+            }
+            if (label.length > 0) {
+              label = label.charAt(0).toUpperCase() + label.slice(1);
+            }
+          }
+          if (label) {
+            filters[type] = {
+              type: type,
+              label: label
+            }
+          }
+        }
+      });
+      var result = [];
+      Object.keys(filters).forEach(function (key) {
+        result.push(filters[key]);
+      });
+      result.sort(function (a, b) {
+        return a.label.localeCompare(b.label);
+      });
+
+      result.unshift({
+        type: 'all',
+        label: DocumentTypeGlobals['all']
+      });
+
+      return result;
+    });
+
+    self.typeFilter = ko.observable(self.availableTypeFilters()[0]); // First one is always 'all'
 
     self.isFilterVisible.subscribe(function (newValue) {
       if (!newValue && self.filter()) {
@@ -103,9 +148,10 @@ var HueFileEntry = (function () {
 
     self.filteredEntries = ko.pureComputed(function () {
       var filter = self.filter().toLowerCase();
-      if (filter) {
+      var typeFilter = self.typeFilter().type;
+      if (filter || typeFilter !== 'all') {
         return self.entries().filter(function (entry) {
-          return entry.definition().name.toLowerCase().indexOf(filter) !== -1;
+          return (typeFilter === 'all' || entry.definition().type === typeFilter) && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1);
         })
       }
       return self.entries();
@@ -202,9 +248,6 @@ var HueFileEntry = (function () {
     self.importEnabled = ko.pureComputed(function () {
       return self.selectedImportFile() !== '';
     });
-
-
-    self.entries = ko.observableArray([]);
 
     self.activeSort = options.activeSort;
 
