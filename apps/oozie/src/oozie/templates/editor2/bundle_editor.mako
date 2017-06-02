@@ -161,7 +161,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
     <div>
       <ul data-bind="foreach: $root.filteredModalCoordinators().sort(function (l, r) { return l.name() > r.name() ? 1 : -1 }), visible: $root.filteredModalCoordinators().length > 0"
           class="unstyled inline fields-chooser" style="height: 100px; overflow-y: auto">
-        <li>
+        <li style="${ not is_embeddable and 'line-height: 30px' or ''}">
           <span data-bind="click: selectCoordinator" class="badge badge-info"><span data-bind="text: name(), attr: {'title': uuid()}"></span>
           </span>
           <a data-bind="hueLink: '${ url('oozie:edit_coordinator') }?uuid=' + uuid()" target="_blank" title="${ _('Open') }">
@@ -169,7 +169,7 @@ ${ layout.menubar(section='bundles', is_editor=True, pullright=buttons, is_embed
           </a>
         </li>
       </ul>
-      <div class="alert alert-info inline" data-bind="visible: $root.filteredModalCoordinators().length == 0" style="margin-left: 250px;margin-right: 50px; height: 42px;line-height: 42px">
+      <div class="label inline" data-bind="visible: $root.filteredModalCoordinators().length == 0" style="line-height: 30px">
         ${_('There are no coordinators matching your search term.')}
       </div>
     </div>
