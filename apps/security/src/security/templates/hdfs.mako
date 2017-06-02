@@ -373,7 +373,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       window.onhashchange = function() {
-        if (window.location.pathname.indexOf('/security') > -1) {
+        if (window.location.pathname.indexOf('/security/hdfs') > -1) {
           viewModel.assist.path(window.location.hash.substr(1));
         }
       };

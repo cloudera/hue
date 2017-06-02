@@ -682,7 +682,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
       });
 
       window.onhashchange = function() {
-        if (window.location.pathname.indexOf('/security') > -1) {
+        if (window.location.pathname.indexOf('/security/hive') > -1) {
           viewModel.assist.path(viewModel.getPathHash());
         }
       };
