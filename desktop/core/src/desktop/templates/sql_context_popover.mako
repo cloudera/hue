@@ -128,6 +128,14 @@ from metadata.conf import has_navigator
     </div>
   </script>
 
+  <script type="text/html" id="sql-context-table-and-column-unknown">
+    <div class="sql-context-flex-fill">
+      <div style="margin: 15px;">
+        <div class="alert" data-bind="text: message"></div>
+      </div>
+    </div>
+  </script>
+
   <script type="text/html" id="sql-context-table-and-column-sample">
     <div class="sql-context-flex-fill context-sample-container" data-bind="with: fetchedData">
       <div class="context-sample sample-scroll">
@@ -299,7 +307,7 @@ from metadata.conf import has_navigator
         </li>
       </ul>
       <div class="sql-context-tab-container" data-bind="foreach: tabs">
-        <div class="sql-context-tab-pane tab-pane" id="sampleTab" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }">
+        <div class="sql-context-tab-pane tab-pane" data-bind="visible : $parent.activeTab() === id, attr: { id: id }, css: { 'active' : $parent.activeTab() === id }">
           <div class="sql-context-flex">
             <!-- ko with: templateData -->
             <div class="sql-context-flex-fill" data-bind="visible: loading"><!-- ko hueSpinner: { spin: loading, center: true, size: 'large' } --><!-- /ko --></div>
@@ -307,7 +315,7 @@ from metadata.conf import has_navigator
             <div class="sql-context-flex-fill">
                 <div class="alert">
                 <span data-bind="text: $parent.errorText"></span>
-                <!-- ko if: $parent.enableSampleError -->
+                <!-- ko if: $parent.enableSampleError && $parent.activeTab() === 'sample' -->
                 <a href="javascript:void(0);" data-bind="click: function(){ huePubSub.publish('sample.error.insert.click', $data); huePubSub.publish('sql.context.popover.hide');}">${_('Insert ')}<span data-bind="text:$parent.title"></span> ${_(' sample query')}</a> ${_('at cursor')}
                 <!-- /ko -->
                 </div>
@@ -360,13 +368,14 @@ from metadata.conf import has_navigator
         }
       };
 
-      function GenericTabContents(identifierChain, sourceType, defaultDatabase, apiFunction) {
+      function GenericTabContents(identifierChain, sourceType, defaultDatabase, apiFunction, parent) {
         var self = this;
         self.identifierChain = identifierChain;
         self.sourceType = sourceType;
         self.defaultDatabase = defaultDatabase;
         self.apiHelper = ApiHelper.getInstance();
         self.apiFunction = apiFunction;
+        self.parent = parent;
 
         self.fetchedData = ko.observable();
         self.loading = ko.observable(false);
@@ -400,6 +409,9 @@ from metadata.conf import has_navigator
             if (data.code === 500) {
               self.loading(false);
               self.hasErrors(true);
+              if (data.notFound) {
+                self.parent.notFound(data);
+              }
               return;
             }
             if (typeof data.extended_columns !== 'undefined') {
@@ -449,12 +461,15 @@ from metadata.conf import has_navigator
 
         var apiHelper = ApiHelper.getInstance();
 
-        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
-        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete);
-        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
-        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples);
-        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis);
-        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions);
+        self.columns = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
+        self.columnDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAutocomplete, self);
+        self.tableDetails = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
+        self.sample = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchSamples, self);
+        self.analysis = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchAnalysis, self);
+        self.partitions = new GenericTabContents(data.identifierChain, sourceType, defaultDatabase, apiHelper.fetchPartitions, self);
+
+        self.hasErrors = false;
+        self.isTable = !isColumn && !isComplex;
 
         self.title = data.identifierChain[data.identifierChain.length - 1].name;
 
@@ -492,7 +507,7 @@ from metadata.conf import has_navigator
                 }
               })
             }
-          } else if (typeof self[newValue].fetchedData() === 'undefined') {
+          } else if (!self.hasErrors && typeof self[newValue].fetchedData() === 'undefined') {
             self[newValue].fetch();
           }
         });
@@ -647,6 +662,29 @@ from metadata.conf import has_navigator
           }));
         });
       }
+
+      TableAndColumnContextTabs.prototype.notFound = function (data) {
+        var self = this;
+        self.hasErrors = true;
+        var message;
+        if (data.error && data.error.indexOf('10001]:') !== -1) {
+          message = data.error.substring(data.error.indexOf('10001]:') + 8);
+        } else {
+          message = '${ _("Could not load") }' + ': ' + self.title
+        }
+        self.tabs([{
+          id: 'notFound',
+          label: '${ _("Details") }',
+          templateData: {
+            loading: ko.observable(false),
+            hasErrors: ko.observable(false),
+            message: message
+          },
+          template: 'sql-context-table-and-column-unknown',
+          title: self.title
+        }]);
+        self.activeTab('notFound');
+      };
 
       TableAndColumnContextTabs.prototype.refetchSamples = function () {
         var self = this;
