@@ -1643,6 +1643,7 @@ var EditorViewModel = (function() {
     self.uploadQuery = function (query_id) {
       $.post("/metadata/api/optimizer/upload/query", {
         query_id: query_id,
+        sourcePlatform: self.type()
       });
     };
 
