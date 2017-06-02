@@ -27,7 +27,7 @@ from desktop.views import _ko
     <!-- ko if: !dropDownVisible() || !searchable -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
-      <span data-bind="text: value, visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
+      <span data-bind="text: typeof value().label !== 'undefined' ? value().label : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
       <i class="fa fa-caret-down"></i>
     </a>
     <!-- /ko -->
@@ -39,12 +39,12 @@ from desktop.views import _ko
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="overflow-y: scroll; width: 190px; margin-left: 10px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
-          <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.value($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
         </ul>
         <!-- /ko -->
         <!-- ko ifnot: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreach: filteredEntries">
-          <li><a href="javascript:void(0)" data-bind="text: $data, click: function () { $parent.value($data); }"></a></li>
+          <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
         </ul>
         <!-- /ko -->
       </div>
