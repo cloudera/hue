@@ -26,6 +26,7 @@ from desktop.views import _ko
   <script type="text/html" id="hue-drop-down-template">
     <!-- ko if: !dropDownVisible() || !searchable -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
+      <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
       <span data-bind="text: value, visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
       <i class="fa fa-caret-down"></i>
     </a>
@@ -55,6 +56,7 @@ from desktop.views import _ko
       var HueDropDown = function (params, element) {
         var self = this;
         self.dropDownVisible = ko.observable(false);
+        self.icon = params.icon;
         self.value = params.value;
         self.entries = params.entries;
         self.searchable = params.searchable || false;
