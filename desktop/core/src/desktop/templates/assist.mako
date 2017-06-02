@@ -512,7 +512,10 @@ from notebook.conf import get_ordered_interpreters
 
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
-      <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
+      <!-- ko if: !loading() && availableTypeFilters().length > 1 -->
+      <div data-bind="component: { name: 'hue-drop-down', params: { value: typeFilter, entries: availableTypeFilters, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
+      <!-- /ko -->
+      <a class="inactive-action" href="javascript:void(0)" data-bind="visible: !loading(), toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
