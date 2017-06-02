@@ -572,8 +572,8 @@
       },
       template: '<div class="qq-uploader">' +
       '<div class="qq-upload-drop-area"><span></span></div>' +
-      '<div class="qq-upload-button">' + labels.UPLOAD_FILE + '</div>' +
-      '<ul class="qq-upload-list" style="position: fixed"></ul>' +
+      '<div class="qq-upload-button">' + labels.UPLOAD_FILE + '</div><br>' +
+      '<ul class="qq-upload-list"></ul>' +
       '</div>',
       fileTemplate: '<li>' +
       '<span class="qq-upload-file"></span>' +
