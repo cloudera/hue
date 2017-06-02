@@ -96,6 +96,7 @@ function initSharing(id, updateFunc) {
     updateFunc = function () {}
   }
   shareViewModel = new ShareViewModel(updateFunc);
+  ko.cleanNode($(id)[0]);
   ko.applyBindings(shareViewModel, $(id)[0]);
   shareViewModel.hasInitBeenCalled = true;
   return shareViewModel;
