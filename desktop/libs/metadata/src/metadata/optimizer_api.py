@@ -30,8 +30,9 @@ from libsentry.privilege_checker import MissingSentryPrivilegeException
 from notebook.api import _get_statement
 from notebook.models import Notebook
 
-from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name
+from metadata.optimizer_client import OptimizerApi, NavOptException, _get_table_name, _clean_query
 from metadata.conf import OPTIMIZER
+
 
 LOG = logging.getLogger(__name__)
 
@@ -309,7 +310,7 @@ def _convert_queries(queries_data):
       if 'guid' in snippet['result']['handle']: # Not failed query
         original_query_id = '%s:%s' % struct.unpack(b"QQ", base64.decodestring(snippet['result']['handle']['guid']))
         execution_time = snippet['result']['executionTime'] * 100 if snippet['status'] in ('available', 'expired') else -1
-        statement = ' '.join([line for line in _get_statement(query_data).strip().splitlines() if not line.strip().startswith('--')])
+        statement = _clean_query(_get_statement(query_data))
         queries.append((original_query_id, execution_time, statement, snippet.get('database', 'default').strip()))
     except Exception, e:
       LOG.warning('Skipping upload of %s: %s' % (query_data['uuid'], e))
