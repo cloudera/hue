@@ -215,7 +215,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
                 </div>
               </div>
 
-              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender') }
+              ${ tree.render(id='expandableTree', data='$root.assist.treeData', afterRender='$root.assist.afterRender', component='hive') }
 
             </div>
             <div class="span6 acl-panel">
@@ -546,7 +546,7 @@ ${ layout.menubar(section='hive1', is_embeddable=is_embeddable) }
 </%def>
 
 
-${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight) }
+${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assist.togglePath', itemSelected='$root.assist.path() == path()', styleModifier='withPrivileges', iconModifier=treeIcons, anchorProperty='path', itemChecked='isChecked', styleModifierPullRight=withPrivilegesPullRight, component='hive') }
 
 
 <script src="${ static('security/js/hive.ko.js') }" type="text/javascript" charset="utf-8"></script>
@@ -561,6 +561,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
     });
 
     var viewModel = new HiveViewModel(${ initial | n,unicode });
+    ko.cleanNode($('#securityHiveComponents')[0]);
     ko.applyBindings(viewModel, $('#securityHiveComponents')[0]);
 
     $(document).ready(function () {
