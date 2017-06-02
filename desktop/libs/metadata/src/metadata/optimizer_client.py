@@ -207,7 +207,7 @@ class OptimizerApi(object):
   def query_risk(self, query, source_platform, db_name, page_size=100, startingToken=None):
     response = self._call('getQueryRisk', {
       'tenant' : self._tenant_id,
-      'query': query,
+      'query': _clean_query(query),
       'dbName': db_name,
       'sourcePlatform': source_platform,
       'pageSize': page_size,
@@ -387,6 +387,10 @@ def _secure_results(results, user, action='SELECT'):
       return checker.filter_objects(results, action, key=getkey)
     else:
       return results
+
+
+def _clean_query(query):
+  return ' '.join([line for line in query.strip().splitlines() if not line.strip().startswith('--')])
 
 
 def _get_tenant_id(api):
