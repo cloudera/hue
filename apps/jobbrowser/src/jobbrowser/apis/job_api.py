@@ -152,15 +152,16 @@ class YarnApi(Api):
 
     if app['applicationType'] == 'MR2' or app['applicationType'] == 'MAPREDUCE':
       common['type'] = 'MAPREDUCE'
-      common['durationFormatted'] = app['durationFormatted']
 
       common['properties'] = {
-          'maps_percent_complete': app['mapsPercentComplete'],
-          'reduces_percent_complete': app['reducesPercentComplete'],
+          'maps_percent_complete': app['mapsPercentComplete'] or 100,
+          'reduces_percent_complete': app['reducesPercentComplete'] or 100,
           'finishedMaps': app['finishedMaps'],
           'finishedReduces': app['finishedReduces'],
           'desiredMaps': app['desiredMaps'],
           'desiredReduces': app['desiredReduces'],
+          'durationFormatted': app['durationFormatted'],
+          'startTimeFormatted': app['startTimeFormatted'],
 
           'tasks': [],
           'metadata': [],
