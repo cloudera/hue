@@ -489,27 +489,29 @@
             _createFolderDetails.slideUp();
           });
           _folderBtn.click(function () {
-            $.ajax({
-              type: "POST",
-              url: "/filebrowser/mkdir",
-              data: {
-                name: _folderName.val(),
-                path: path
-              },
-              success: function (xhr, status) {
-                if (status == "success") {
-                  _parent.navigateTo(path);
-                  if (_uploadFileBtn) {
-                    _uploadFileBtn.removeClass("disabled");
+            if (_folderName.val().length > 0) {
+              $.ajax({
+                type: "POST",
+                url: "/filebrowser/mkdir",
+                data: {
+                  name: _folderName.val(),
+                  path: path
+                },
+                success: function (xhr, status) {
+                  if (status == "success") {
+                    _parent.navigateTo(path);
+                    if (_uploadFileBtn) {
+                      _uploadFileBtn.removeClass("disabled");
+                    }
+                    _createFolderBtn.removeClass("disabled");
+                    _createFolderDetails.slideUp();
                   }
-                  _createFolderBtn.removeClass("disabled");
-                  _createFolderDetails.slideUp();
+                },
+                error: function (xhr) {
+                  $(document).trigger("error", xhr.responseText);
                 }
-              },
-              error: function (xhr) {
-                $(document).trigger("error", xhr.responseText);
-              }
-            });
+              });
+            }
           });
 
           _createFolderDetails.appendTo(_actions);
