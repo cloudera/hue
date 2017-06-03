@@ -78,7 +78,7 @@ class WorkflowApi(Api):
         'type': 'workflow',
         'user': workflow.user,
         'duration': workflow.durationTime,
-        'submitted': workflow.submissionTime
+        'submitted': workflow.submissionTime * 1000
     }
 
     request = MockDjangoRequest(self.user)

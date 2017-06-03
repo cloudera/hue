@@ -75,7 +75,8 @@ class BundleApi(Api):
         'apiStatus': self._api_status(bundle.status),
         'progress': bundle.get_progress(),
         'type': 'bundle',
-        'startTime': format_time(bundle.startTime),
+        'user': bundle.user,
+        'submitted': format_time(bundle.kickoffTime),
         'properties': {}
     }
     common['properties']['actions'] = massaged_bundle_actions_for_json(bundle)
