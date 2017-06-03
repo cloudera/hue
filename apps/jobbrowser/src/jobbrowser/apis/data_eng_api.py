@@ -44,6 +44,7 @@ class DataEngClusterApi(Api):
         'type': app['serviceType'],
         'user': app['clusterName'].split('-', 1)[0],
         'progress': 100,
+        'queue': 'group',
         'duration': 10 * 3600,
         'submitted': app['creationDate']
       } for app in jobs['clusters']],

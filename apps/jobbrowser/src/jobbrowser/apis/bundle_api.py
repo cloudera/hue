@@ -56,8 +56,9 @@ class BundleApi(Api):
         'type': 'bundle',
         'user': app['user'],
         'progress': app['progress'],
+        'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['kickoffTimeInMillis']
+        'submitted': app['kickoffTimeInMillis'] * 1000
       } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
       'total': jobs.total
     }

@@ -56,8 +56,9 @@ class ScheduleApi(Api):
         'type': 'schedule',
         'user': app['user'],
         'progress': app['progress'],
+        'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['startTimeInMillis']
+        'submitted': app['startTimeInMillis'] * 1000
       } for app in massaged_oozie_jobs_for_json(jobs.jobs, self.user)['jobs']],
       'total': jobs.total
     }
