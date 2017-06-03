@@ -1101,6 +1101,7 @@ def massaged_oozie_jobs_for_json(oozie_jobs, user, just_sla=False):
         'concurrency': hasattr(job, 'concurrency') and job.concurrency or None,
         'endTimeInMillis': job.endTime and time.mktime(job.endTime) or 0,
         'status': job.status,
+        'group': job.group,
         'isRunning': job.is_running(),
         'duration': duration_millis and format_duration_in_millis(duration_millis) or None,
         'durationInMillis': duration_millis,
