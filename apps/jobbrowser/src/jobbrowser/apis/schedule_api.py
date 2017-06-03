@@ -78,7 +78,8 @@ class ScheduleApi(Api):
         'apiStatus': self._api_status(coordinator.status),
         'progress': coordinator.get_progress(),
         'type': 'schedule',
-        'startTime': format_time(coordinator.startTime),
+        'submitted': format_time(coordinator.startTime),
+        'user': coordinator.user,
     }
     common['properties'] = json.loads(response.content)
     common['properties']['tasks'] = common['properties']['actions']
