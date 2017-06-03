@@ -188,7 +188,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
                     <th width="15%">${_('Id')}</th>
                     <th width="20%">${_('Name')}</th>
-                    <th width="6%">${_('User')}</th>                    
+                    <th width="6%">${_('User')}</th>
                     <th width="6%">${_('Type')}</th>
                     <th width="5%">${_('Status')}</th>
                     <th width="3%">${_('Progress')}</th>
@@ -203,7 +203,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                         <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                       </td>
                       <td data-bind="text: id"></td>
-                      <td data-bind="text: name"></td>                      
+                      <td data-bind="text: name"></td>
                       <td data-bind="text: user"></td>
                       <td data-bind="text: type"></td>
                       <td data-bind="text: status"></td>
@@ -572,13 +572,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('State') }</li>
           <li><span data-bind="text: state"></span></li>
           <li class="nav-header">${ _('Start time') }</li>
-          <li><span data-bind="text: startTime"></span></li>
+          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
           <li class="nav-header">${ _('Successful attempt') }</li>
           <li><span data-bind="text: successfulAttempt"></span></li>
           <li class="nav-header">${ _('Finish time') }</li>
-          <li><span data-bind="text: finishTime"></span></li>
+          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
           <li class="nav-header">${ _('Elapsed time') }</li>
-          <li><span data-bind="text: elapsedTime"></span></li>
+          <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
           <!-- /ko -->
 
         </ul>
@@ -606,7 +606,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <table class="table table-condensed">
             <thead>
             <tr>
-              <th width="1%"><div class="select-all hueCheckbox fa"></div></th>
               <th>${_('Assigned Container Id')}</th>
               <th>${_('Progress')}</th>
               <th>${_('Elapsed Time')}</th>
@@ -620,18 +619,17 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             </tr>
             </thead>
             <tbody data-bind="foreach: properties['attempts']()['task_list']">
-              <tr data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
-                <td><div class="hueCheckbox fa"></div></td>
+              <tr class="pointer" data-bind="click: function() { $root.job().id(id); $root.job().fetchJob(); }">
                 <td data-bind="text: assignedContainerId"></td>
                 <td data-bind="text: progress"></td>
-                <td data-bind="text: elapsedTime"></td>
+                <td data-bind="text: elapsedTime.toHHMMSS()"></td>
                 <td data-bind="text: state"></td>
                 <td data-bind="text: rack"></td>
                 <td data-bind="text: nodeHttpAddress"></td>
                 <td data-bind="text: type"></td>
-                <td data-bind="text: startTime"></td>
+                <td data-bind="moment: {data: startTime, format: 'LLL'}"></td>
                 <td data-bind="text: id"></td>
-                <td data-bind="text: finishTime"></td>
+                <td data-bind="moment: {data: finishTime, format: 'LLL'}"></td>
               </tr>
             </tbody>
           </table>
@@ -674,11 +672,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Node HTTP address') }</li>
           <li><span data-bind="text: nodeHttpAddress"></span></li>
           <li class="nav-header">${ _('Start time') }</li>
-          <li><span data-bind="text: startTime"></span></li>
+          <li><span data-bind="moment: {data: startTime, format: 'LLL'}"></span></li>
           <li class="nav-header">${ _('Finish time') }</li>
-          <li><span data-bind="text: finishTime"></span></li>
+          <li><span data-bind="moment: {data: finishTime, format: 'LLL'}"></span></li>
           <li class="nav-header">${ _('Elapsed time') }</li>
-          <li><span data-bind="text: elapsedTime"></span></li>
+          <li><span data-bind="text: elapsedTime().toHHMMSS()"></span></li>
           <!-- /ko -->
 
         </ul>
