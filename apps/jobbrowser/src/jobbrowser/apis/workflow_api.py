@@ -54,8 +54,9 @@ class WorkflowApi(Api):
         'type': 'workflow',
         'user': app['user'],
         'progress': app['progress'],
+        'queue': app['group'],
         'duration': app['durationInMillis'],
-        'submitted': app['startTimeInMillis']
+        'submitted': app['startTimeInMillis'] * 1000
       } for app in massaged_oozie_jobs_for_json(wf_list.jobs, self.user)['jobs']],
       'total': wf_list.total
     }
