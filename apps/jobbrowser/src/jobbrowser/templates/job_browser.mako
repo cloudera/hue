@@ -188,12 +188,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
                     <th width="15%">${_('Id')}</th>
                     <th width="20%">${_('Name')}</th>
-                    <th width="3%">${_('Queue')}</th>
-                    <th width="10%">${_('Started')}</th>
-                    <th width="7%">${_('Type')}</th>
+                    <th width="6%">${_('User')}</th>                    
+                    <th width="6%">${_('Type')}</th>
                     <th width="5%">${_('Status')}</th>
-                    <th width="5%">${_('Progress')}</th>
-                    <th width="10%">${_('User')}</th>
+                    <th width="3%">${_('Progress')}</th>
+                    <th width="5%">${_('Group')}</th>
+                    <th width="10%">${_('Started')}</th>
+                    <th width="6%">${_('Duration')}</th>
                   </tr>
                   </thead>
                   <tbody data-bind="foreach: jobs.apps">
@@ -202,13 +203,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                         <div class="hueCheckbox fa" data-bind="click: function() {}, clickBubble: false, multiCheck: '#jobsTable', value: $data, hueChecked: $parent.jobs.selectedJobs"></div>
                       </td>
                       <td data-bind="text: id"></td>
-                      <td data-bind="text: name"></td>
-                      <td data-bind="text: queue"></td>
-                      <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
+                      <td data-bind="text: name"></td>                      
+                      <td data-bind="text: user"></td>
                       <td data-bind="text: type"></td>
                       <td data-bind="text: status"></td>
                       <td data-bind="text: progress"></td>
-                      <td data-bind="text: user"></td>
+                      <td data-bind="text: queue"></td>
+                      <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
+                      <td data-bind="text: duration().toHHMMSS()"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -895,7 +897,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED', 'progress-danger': apiStatus() === 'FAILED'}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': isRunning(), 'progress-success': apiStatus() === 'SUCCEEDED' }">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
@@ -1091,12 +1093,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100, 'progress-danger': apiStatus() === 'FAILED'}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
           <li class="nav-header">${ _('Next Run') }</li>
@@ -1207,20 +1207,20 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Progress') }</li>
           <li><span data-bind="text: progress"></span>%</li>
           <li>
-            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-warning': progress() < 100, 'progress-success': progress() === 100}">
+            <div class="progress-job progress" style="background-color: #FFF; width: 100%" data-bind="css: {'progress-danger': apiStatus() === 'FAILED', 'progress-warning': apiStatus() !== 'FAILED' && progress() < 100, 'progress-success': apiStatus() !== 'FAILED' && progress() === 100}">
               <div class="bar" data-bind="style: {'width': progress() + '%'}"></div>
             </div>
           </li>
-          <li class="nav-header">${ _('Duration') }</li>
-          <li><span data-bind="text: duration"></span></li>
+          ##<li class="nav-header">${ _('Duration') }</li>
+          ##<li><span data-bind="text: duration"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="text: submitted"></span></li>
-          <li class="nav-header">${ _('Next Run') }</li>
-          <li><span data-bind="text: properties['nextTime']"></span></li>
-          <li class="nav-header">${ _('Total Actions') }</li>
-          <li><span data-bind="text: properties['total_actions']"></span></li>
-          <li class="nav-header">${ _('End time') }</li>
-          <li><span data-bind="text: properties['endTime']"></span></li>
+          ##<li class="nav-header">${ _('Next Run') }</li>
+          ##<li><span data-bind="text: properties['nextTime']"></span></li>
+          ##<li class="nav-header">${ _('Total Actions') }</li>
+          ##<li><span data-bind="text: properties['total_actions']"></span></li>
+          ##<li class="nav-header">${ _('End time') }</li>
+          ##<li><span data-bind="text: properties['endTime']"></span></li>
         </ul>
       </div>
     </div>
