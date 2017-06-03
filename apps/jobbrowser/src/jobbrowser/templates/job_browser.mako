@@ -188,7 +188,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                     <th width="1%"><div class="select-all hueCheckbox fa" data-bind="hueCheckAll: { allValues: jobs.apps, selectedValues: jobs.selectedJobs }"></div></th>
                     <th width="15%">${_('Id')}</th>
                     <th width="20%">${_('Name')}</th>
-                    <th width="3%">${_('Duration')}</th>
+                    <th width="3%">${_('Queue')}</th>
                     <th width="10%">${_('Started')}</th>
                     <th width="7%">${_('Type')}</th>
                     <th width="5%">${_('Status')}</th>
@@ -203,7 +203,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                       </td>
                       <td data-bind="text: id"></td>
                       <td data-bind="text: name"></td>
-                      <td data-bind="text: duration().toHHMMSS()"></td>
+                      <td data-bind="text: queue"></td>
                       <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
                       <td data-bind="text: type"></td>
                       <td data-bind="text: status"></td>
@@ -902,7 +902,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li class="nav-header">${ _('Duration') }</li>
           <li><span data-bind="text: duration"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
-          <li><span data-bind="text: submitted"></span></li>
+          <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
 
           <li class="nav-header">${ _('Variables') }</li>
           <li>
@@ -1445,6 +1445,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.user = ko.observableDefault(job.user);
+      self.queue = ko.observableDefault(job.queue);
       self.cluster = ko.observableDefault(job.cluster);
       self.duration = ko.observableDefault(job.duration);
       self.submitted = ko.observableDefault(job.submitted);

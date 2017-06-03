@@ -112,6 +112,7 @@ class YarnApi(Api):
         'apiStatus': self._api_status(app['yarnStatus']),
         'user': app['user'],
         'progress': app['progress'],
+        'queue': app['queueName'],
         'duration': app['durationMs'],
         'submitted': app['startTimeMs']
       } for app in apps],
