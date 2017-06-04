@@ -554,16 +554,81 @@ var EditorViewModel = (function() {
     self.variables.subscribe(function (newValue) {
       $(document).trigger("updateResultHeaders", self);
     });
-    self.variableNames = ko.computed(function () {
-      var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
+    self.hasCurlyBracketParameters = ko.computed(function() {
+      return self.type() != 'pig';
+    });
+    self.getPigParameters = function() {
+      var params = {};
+      var variables = self.statement_raw().match(/([^\\]|^)\$[^\d'"](\w*)/g);
+      var declares = self.statement_raw().match(/%declare +([^ ])+/gi);
+      var defaults = self.statement_raw().match(/%default +([^;])+/gi);
+      var macro_defines = self.statement_raw().match(/define [^ ]+ *\(([^\)]*)\)/gi); // no multiline
+      var macro_returns = self.statement_raw().match(/returns +([^\{]*)/gi); // no multiline
 
-      var match, matches = [];
-      while (match = re.exec(self.statement_raw())) {
-        if (matches.indexOf(match[1]) == -1) {
-          matches.push(match[1]);
-        }
+      if (variables) {
+        $.each(variables, function(index, param) {
+          var p = param.substring(param.indexOf('$') + 1);
+          params[p] = '';
+        });
       }
-      return matches;
+      if (declares) {
+        $.each(declares, function(index, param) {
+          param = param.match(/(\w+)/g);
+          if (param && param.length >= 2) {
+            delete params[param[1]];
+          }
+        });
+      }
+      if (defaults) {
+        $.each(defaults, function(index, param) {
+          var line = param.match(/(\w+)/g);
+          if (line && line.length >= 2) {
+            var name = line[1];
+            params[name] = param.substring(param.indexOf(name) + name.length + 1);
+          }
+        });
+      }
+      if (macro_defines) {
+        $.each(macro_defines, function(index, params_line) {
+          var param_line = params_line.match(/(\w+)/g);
+          if (param_line && param_line.length > 2) {
+            $.each(param_line, function(index, param) {
+              if (index >= 2) { // Skips define NAME
+                delete params[param];
+              }
+            });
+          }
+        });
+      }
+      if (macro_returns) {
+        $.each(macro_returns, function(index, params_line) {
+          var param_line = params_line.match(/(\w+)/g);
+          if (param_line) {
+            $.each(param_line, function(index, param) {
+              if (index >= 1) { // Skip returns
+                delete params[param];
+              }
+            });
+          }
+        });
+      }
+
+      return params;
+    };
+    self.variableNames = ko.computed(function () {
+      if (self.type() == 'pig') {
+        return Object.keys(self.getPigParameters());
+      } else {
+        var re = /(?:^|\W)\${(\w+)(?!\w)}/g;
+
+        var match, matches = [];
+        while (match = re.exec(self.statement_raw())) {
+          if (matches.indexOf(match[1]) == -1) {
+            matches.push(match[1]);
+          }
+        }
+        return matches;
+      }
     });
     self.variableNames.extend({ rateLimit: 150 });
     self.variableNames.subscribe(function (newVal) {
@@ -611,7 +676,7 @@ var EditorViewModel = (function() {
     self.statement = ko.computed(function () {
       var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() && HAS_OPTIMIZER ? self.positionStatement() : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
-        statement = statement.replace(RegExp("([^\\\\])?\\${" + variable.name() + "}", "g"), "$1" + variable.value());
+        statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
       });
       return statement;
     });
