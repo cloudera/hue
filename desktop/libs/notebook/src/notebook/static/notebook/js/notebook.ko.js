@@ -218,6 +218,10 @@ var EditorViewModel = (function() {
       properties['files'] = [];
     }
 
+    if (snippetType == 'sqoop1') {
+      properties['files'] = [];
+    }
+
     if (snippetType == 'jar' || snippetType == 'java') {
       properties['app_jar'] = '';
       properties['class'] = '';
