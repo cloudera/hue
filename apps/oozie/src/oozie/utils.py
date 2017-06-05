@@ -190,12 +190,11 @@ def convert_to_server_timezone(date, local_tz='UTC', server_tz=None, user=DEFAUL
     date_local_tz = date_local_tz.replace(tzinfo=tz.gettz(local_tz))
     date_server_tz = date_local_tz.astimezone(tz.gettz(server_tz))
 
-    date_server_tz = date_server_tz.strftime('%Y-%m-%dT%H:%M')
     # Oozie timezone is either UTC or GMT(+/-)####
     if 'UTC' == server_tz:
-      return date_server_tz + u'Z'
+      return date_server_tz.strftime('%Y-%m-%dT%H:%M') + u'Z'
     else:
-      return date_server_tz + u'+' + re.split('[+-]', server_tz)[1]
+      return date_server_tz.strftime('%Y-%m-%dT%H:%M') + date_server_tz.strftime('%z')
   except TypeError, ValueError:
     LOG.error("Failed to convert Oozie timestamp: %s" % date)
   return None
