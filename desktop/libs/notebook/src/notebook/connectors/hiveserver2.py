@@ -797,8 +797,7 @@ DROP TABLE IF EXISTS `%(table)s`;
 
     query_id = self._get_impala_query_id(snippet)
     session = Session.objects.get_session(self.user, application='impala')
-    protocol = 'https' if get_webserver_certificate_file() else 'http'
-    server_url = '%s://%s' % (protocol, self._get_impala_server_url(session))
+    server_url = self._get_impala_server_url(session)
     if query_id:
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
 
@@ -828,6 +827,8 @@ DROP TABLE IF EXISTS `%(table)s`;
   def _get_impala_server_url(self, session):
     impala_settings = session.get_formatted_properties()
     http_addr = next((setting['value'] for setting in impala_settings if setting['key'].lower() == 'http_addr'), None)
+    # Remove scheme if found
+    http_addr = http_addr.replace('http://', '').replace('https://', '')
     return ('https://' if get_webserver_certificate_file() else 'http://') + http_addr
 
 
