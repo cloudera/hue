@@ -2212,7 +2212,7 @@ var EditorViewModel = (function() {
     self.updateHistory = function (statuses, interval) {
       var items = $.grep(self.history(), function (item) {
         return statuses.indexOf(item.status()) != -1;
-      });
+      }).slice(0, 25);
 
       function updateHistoryCall(item) {
         $.post("/notebook/api/check_status", {
