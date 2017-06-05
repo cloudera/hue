@@ -819,6 +819,7 @@ class Node():
         _ignore, command = command.split('sqoop ', 1)
       self.data['properties']['command'] = command
 
+      self.data['properties']['files'] = [{'value': f['path']} for f in action['properties']['files']]
       self.data['properties']['arguments'] = []
 
     elif self.data['type'] == DistCpDocumentAction.TYPE:
@@ -3922,7 +3923,8 @@ class WorkflowBuilder():
               "prepares": [],
               "credentials": credentials,
               "sla": [{"value":False, "key":"enabled"}, {"value":"${nominal_time}", "key":"nominal-time"}, {"value":"", "key":"should-start"}, {"value":"${30 * MINUTES}", "key":"should-end"}, {"value":"", "key":"max-duration"}, {"value":"", "key":"alert-events"}, {"value":"", "key":"alert-contact"}, {"value":"", "key":"notification-msg"}, {"value":"", "key":"upstream-apps"}],
-              "archives": []
+              "archives": [],
+              "files": []
         },
         "children": [
             {"to": "33430f0f-ebfa-c3ec-f237-3e77efa03d0a"},
