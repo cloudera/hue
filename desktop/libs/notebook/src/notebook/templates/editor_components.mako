@@ -1108,11 +1108,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <!-- /ko -->
           <label class="pull-left" style="margin-top: 6px;margin-right: 10px;" data-bind="visible: !associatedDocumentLoading()">${_('Document')}</label>
           <div class="selectize-wrapper" style="width: 300px;" data-bind="visible: !associatedDocumentLoading()">
-            <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument }"></select>
+            <select placeholder="${ _('Search your documents...') }" data-bind="documentChooser: { loading: associatedDocumentLoading, value: associatedDocumentUuid, document: associatedDocument, type: type }"></select>
           </div>
           <!-- ko if: associatedDocument() -->
             <div class="pull-left" style="margin-top: 4px">
-              <a data-bind="hueLink: href: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open in new tab') }">
+              <a data-bind="hueLink: associatedDocument().absoluteUrl" target="_blank" title="${ _('Open in new tab') }">
                 <i class="fa fa-external-link-square"></i>
               </a>
               <span data-bind='text: associatedDocument().description' style="padding: 3px; margin-top: 2px" class="muted"></span>
