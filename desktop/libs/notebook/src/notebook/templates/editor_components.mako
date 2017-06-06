@@ -25,7 +25,7 @@ from metadata.conf import has_optimizer
 from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_BATCH_EXECUTE, ENABLE_EXTERNAL_STATEMENT
 %>
 
-<%def name="includes(is_embeddable=False)">
+<%def name="includes(is_embeddable=False, suffix='')">
 <link rel="stylesheet" href="${ static('dashboard/css/common_dashboard.css') }">
 % if not is_embeddable:
 <link rel="stylesheet" href="${ static('notebook/css/notebook-layout.css') }">
@@ -92,7 +92,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   function generateQuery() {
     var result = QueryBuilder.buildHiveQuery();
     if (result.status == "fail") {
-      $("#invalidQueryBuilder").modal("show");
+      $("#invalidQueryBuilder${ suffix }").modal("show");
     } else {
       replaceAce(result.query);
     }
@@ -166,7 +166,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 </%def>
 
-<%def name="topBar()">
+<%def name="topBar(suffix='')">
 <style type="text/css">
 % if conf.CUSTOM.BANNER_TOP_HTML.get():
   .search-bar {
@@ -199,13 +199,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <div class="pull-right">
 
         <div class="btn-group">
-          <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
+          <a class="btn" rel="tooltip" data-placement="bottom" data-loading-text="${ _("Saving...") }" data-bind="click: function() { if ($root.canSave() ) { saveNotebook() } else { $('#saveAsModal${ suffix }').modal('show');} }, attr: { title: $root.canSave() ? '${ _ko('Save') }' : '${ _ko('Save As') }' }"><i class="fa fa-save"></i></a>
 
           <!-- ko if: $root.canSave -->
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><span class="caret"></span></a>
           <ul class="dropdown-menu">
             <li>
-              <a class="pointer" data-bind="click: function() { $('#saveAsModal').modal('show'); }">
+              <a class="pointer" data-bind="click: function() { $('#saveAsModal${ suffix }').modal('show'); }">
                 <i class="fa fa-save"></i> ${ _('Save as...') }
               </a>
             </li>
@@ -371,9 +371,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </%def>
 
 
-<%def name="commonHTML(is_embeddable=False)">
+<%def name="commonHTML(is_embeddable=False, suffix='')">
 
-<div id="helpModal" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
+<div id="helpModal${ suffix }" class="modal transparent-modal hide" data-backdrop="true" style="width:980px;margin-left:-510px!important">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Editor keyboard shortcuts')}</h2>
@@ -386,7 +386,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </div>
 
-<div id="combinedContentModal" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
+<div id="combinedContentModal${ suffix }" class="modal hide" data-backdrop="true" style="width:780px;margin-left:-410px!important">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('All Notebook content')}</h2>
@@ -400,7 +400,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </div>
 
 % if ENABLE_QUERY_BUILDER.get():
-<div id="invalidQueryBuilder" class="modal hide">
+<div id="invalidQueryBuilder${ suffix }" class="modal hide">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Invalid Query')}</h2>
@@ -427,13 +427,13 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <div data-bind="css: {'main-content': true, 'editor-mode': $root.editorMode()}">
   <div class="vertical-full container-fluid" data-bind="style: { 'padding-left' : $root.isLeftPanelVisible() || $root.isPlayerMode() ? '0' : '20px' }" >
     <div class="vertical-full">
-      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook'}">
+      <div class="vertical-full tab-pane row-fluid panel-container" data-bind="css: { active: selectedNotebook() === $data }, template: { name: 'notebook${ suffix }'}">
       </div>
     </div>
   </div>
 </div>
 
-<script type="text/html" id="notebook">
+<script type="text/html" id="notebook${ suffix }">
   % if not is_embeddable:
   <div class="assist-container left-panel" data-bind="visible: isLeftPanelVisible() && assistAvailable()">
     <a title="${_('Toggle Assist')}" class="pointer hide-assist" data-bind="click: function() { isLeftPanelVisible(false); huePubSub.publish('assist.set.manual.visibility'); }">
@@ -464,7 +464,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <div>
       <div class="row-fluid row-container sortable-snippets" data-bind="css: {'is-editing': $root.isEditing},
         sortable: {
-          template: 'snippet',
+          template: 'snippet${ suffix }',
           data: snippets,
           isEnabled: true,
           options: {
@@ -540,14 +540,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <div class="tab-content" style="border: none">
       <div class="tab-pane active" id="sessionsTab">
         <div class="row-fluid">
-          <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: $root }"></div>
+          <div class="span12" data-bind="template: { name: 'notebook-session-config-template${ suffix }', data: $root }"></div>
         </div>
       </div>
     </div>
   </div>
 </script>
 
-<script type="text/html" id="notebook-session-config-template">
+<script type="text/html" id="notebook-session-config-template${ suffix }">
   <!-- ko with: selectedNotebook() -->
   <form class="form-horizontal session-config">
     <fieldset>
@@ -594,7 +594,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="snippetIcon">
+<script type="text/html" id="snippetIcon${ suffix }">
   <!-- ko if: viewSettings().snippetImage -->
   <img class="snippet-icon-image" data-bind="attr: { 'src': viewSettings().snippetImage }" alt="${ _('Snippet icon') }">
   <!-- /ko -->
@@ -603,7 +603,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- /ko -->
 </script>
 
-<script type="text/html" id="snippet-log">
+<script type="text/html" id="snippet-log${ suffix }">
   <div class="snippet-log-container margin-bottom-10" data-bind="visible: showLogs() && status() != 'ready' && status() != 'loading'" style="display: none;">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul data-bind="visible: jobs().length > 0, foreach: jobs" class="unstyled jobs-overlay">
@@ -644,7 +644,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="query-tabs">
+<script type="text/html" id="query-tabs${ suffix }">
   <div class="query-history-container" data-bind="onComplete: function(){ redrawFixedHeaders(200); }">
     <div data-bind="delayedOverflow, css: resultsKlass" style="margin-top: 5px; position: relative;">
       <ul class="nav nav-tabs">
@@ -652,7 +652,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           <a class="inactive-action" href="#queryHistory" data-toggle="tab">${_('Query History')}
             <div class="inline-block inactive-action margin-left-10 pointer" title="${_('Search the query history')}" data-bind="click: function(data, e){ $parent.historyFilterVisible(!$parent.historyFilterVisible()); if ($parent.historyFilterVisible()) { window.setTimeout(function(){ $(e.target).parent().siblings('input').focus(); }, 0); } else { $parent.historyFilter('') }}"><i class="snippet-icon fa fa-search"></i></div>
             <input class="input-small inline-tab-filter" type="text" data-bind="visible: $parent.historyFilterVisible, clearable: $parent.historyFilter, valueUpdate:'afterkeydown'" placeholder="${ _('Search...') }">
-            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
+            <div class="inline-block inactive-action pointer" title="${_('Clear the query history')}" data-target="#clearHistoryModal${ suffix }" data-toggle="modal" rel="tooltip" data-bind="visible: $parent.history().length > 0"><i class="snippet-icon fa fa-calendar-times-o"></i></div>
           </a>
         </li>
         <li data-bind="click: function(){ currentQueryTab('savedQueries'); }, css: {'active': currentQueryTab() == 'savedQueries'}, clickOutside: function () { if (queriesFilterVisible() && queriesFilter() === '') { queriesFilterVisible(false) } }">
@@ -815,11 +815,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         % endif
 
         <div class="tab-pane" id="queryResults" data-bind="css: {'active': currentQueryTab() == 'queryResults'}">
-          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
         </div>
         <!-- ko if: result.explanation().length > 0 -->
         <div class="tab-pane" id="queryExplain" data-bind="css: {'active': currentQueryTab() == 'queryExplain'}">
-          <!-- ko template: { name: 'snippet-explain' } --><!-- /ko -->
+          <!-- ko template: { name: 'snippet-explain${ suffix }' } --><!-- /ko -->
         </div>
         <!-- /ko -->
 
@@ -842,27 +842,27 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </a>
 </script>
 
-<script type="text/html" id="longer-operation">
+<script type="text/html" id="longer-operation${ suffix }">
   <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: showLongOperationWarning" title="${ _('The query is hanging and taking longer than expected.') }" class="inline-block margin-right-10">
     <i class="fa fa-exclamation-triangle warning"></i>
   </div>
 </script>
 
-<script type="text/html" id="query-redacted">
+<script type="text/html" id="query-redacted${ suffix }">
   <div rel="tooltip" data-placement="bottom" data-bind="tooltip, fadeVisible: is_redacted" title="${ _('The current query has been redacted to hide sensitive information.') }" class="inline-block margin-right-10">
     <i class="fa fa-low-vision warning"></i>
   </div>
 </script>
 
-<script type="text/html" id="notebook-snippet-header">
+<script type="text/html" id="notebook-snippet-header${ suffix }">
   <div class="inactive-action hover-actions inline"><span class="inactive-action" data-bind="css: { 'empty-title': name() === '' }, editable: name, editableOptions: { emptytext: '${_ko('My Snippet')}', mode: 'inline', enabled: true, placement: 'right' }" style="border:none;color: #DDD"></span></div>
   <div class="hover-actions inline pull-right" style="font-size: 15px;">
-    <!-- ko template: { name: 'query-redacted' } --><!-- /ko -->
-    <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
+    <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
+    <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <a class="inactive-action" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading' && errors().length == 0, click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
 
-    <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->
+    <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
     <a class="inactive-action move-widget" href="javascript:void(0)"><i class="fa fa-arrows"></i></a>
     <a class="inactive-action" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
@@ -870,26 +870,26 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="editor-snippet-header">
+<script type="text/html" id="editor-snippet-header${ suffix }">
   <div class="hover-actions inline pull-right" style="font-size: 15px; position: relative;" data-bind="style: { 'marginRight': $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode() ? '40px' : '0' }">
-    <!-- ko template: { name: 'query-redacted' } --><!-- /ko -->
-    <!-- ko template: { name: 'longer-operation' } --><!-- /ko -->
+    <!-- ko template: { name: 'query-redacted${ suffix }' } --><!-- /ko -->
+    <!-- ko template: { name: 'longer-operation${ suffix }' } --><!-- /ko -->
     <span class="execution-timer" data-bind="visible: type() != 'text' && status() != 'ready' && status() != 'loading', text: result.executionTime().toHHMMSS()" title="${ _('Execution time') }"></span>
     <!-- ko if: availableDatabases().length > 0 && isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { icon: 'fa-database', value: database, entries: availableDatabases, foreachVisible: true, searchable: true, linkTitle: '${ _ko('Active database') }' } }" style="display: inline-block"></div>
     <!-- /ko -->
 
-   <!-- ko template: { name: 'snippet-header-statement-type' } --><!-- /ko -->
+   <!-- ko template: { name: 'snippet-header-statement-type${ suffix }' } --><!-- /ko -->
 
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="visible: status() != 'ready' && status() != 'loading', click: function() { hideFixedHeaders(); $data.showLogs(!$data.showLogs());}, css: {'blue': $data.showLogs}" title="${ _('Show Logs') }"><i class="fa fa-file-text-o"></i></a>
     <a class="inactive-action margin-left-10" href="javascript:void(0)" data-bind="toggle: settingsVisible, visible: hasProperties, css: { 'blue' : settingsVisible }" title="${ _('Settings and properties') }"><i class="fa fa-cog"></i></a>
-    <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal"><i class="fa fa-question"></i></a>
+    <a class="inactive-action margin-left-10 pointer" title="${ _('Show editor shortcuts') }" data-toggle="modal" data-target="#helpModal${ suffix }"><i class="fa fa-question"></i></a>
   </div>
   <a class="hueAnchor collapse-results" href="javascript:void(0)" title="${ _('Collapse results') }" data-bind="visible: $root.editorMode() && !$root.isFullscreenMode() && $root.isPlayerMode(), click: function(){ $root.isPlayerMode(false); }" style="display: none;"><i class="fa fa-times fa-fw"></i></a>
 </script>
 
 
-<script type="text/html" id="snippet-header-statement-type">
+<script type="text/html" id="snippet-header-statement-type${ suffix }">
   % if ENABLE_EXTERNAL_STATEMENT.get():
   <!-- ko if: isSqlDialect() -->
     <div class="margin-left-10" data-bind="component: { name: 'hue-drop-down', params: { value: statementType, entries: statementTypes, linkTitle: '${ _ko('Statement type') }' } }" style="display: inline-block"></div>
@@ -897,41 +897,41 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   % endif
 </script>
 
-<script type="text/html" id="snippet">
+<script type="text/html" id="snippet${ suffix }">
   <div data-bind="visibleOnHover: { override: inFocus() || settingsVisible() || dbSelectionVisible() || $root.editorMode() || saveResultsModalVisible(), selector: '.hover-actions' }">
     <div class="snippet-container row-fluid" data-bind="visibleOnHover: { override: $root.editorMode() || inFocus() || saveResultsModalVisible(), selector: '.snippet-actions' }">
       <div class="snippet card card-widget" data-bind="css: {'notebook-snippet' : ! $root.editorMode(), 'editor-mode': $root.editorMode(), 'active-editor': inFocus, 'snippet-text' : type() == 'text'}, attr: {'id': 'snippet_' + id()}, clickForAceFocus: ace">
         <div style="position: relative;">
           <div class="snippet-row" style="position: relative;">
             <div class="snippet-left-bar">
-              <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-type-controls' } --><!-- /ko -->
-              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls' } --><!-- /ko -->
+              <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-type-controls${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-controls${ suffix }' } --><!-- /ko -->
             </div>
             <div class="snippet-body" data-bind="clickForAceFocus: ace">
               <h5 class="card-heading-print" data-bind="text: name, css: {'visible': name() != ''}"></h5>
 
               <h2 style="margin-left:5px;padding: 3px 0" class="card-heading simple" data-bind="dblclick: function(){ if (!$root.editorMode()) { $parent.newSnippetAbove(id()) } }, clickForAceFocus: ace">
-                <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header' } --><!-- /ko -->
-                <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header' } --><!-- /ko -->
+                <!-- ko template: { if: $root.editorMode(), name: 'editor-snippet-header${ suffix }' } --><!-- /ko -->
+                <!-- ko template: { if: ! $root.editorMode(), name: 'notebook-snippet-header${ suffix }' } --><!-- /ko -->
               </h2>
-              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: type() == 'text', name: 'text-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body' } --><!-- /ko -->
-              <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body' } --><!-- /ko -->
+              <!-- ko template: { if: ['text', 'jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'code-editor-snippet-body${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'text', name: 'text-snippet-body${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: type() == 'markdown', name: 'markdown-snippet-body${ suffix }' } --><!-- /ko -->
+              <!-- ko template: { if: ['java', 'distcp', 'shell', 'mapreduce', 'jar', 'py', 'spark2'].indexOf(type()) != -1, name: 'executable-snippet-body${ suffix }' } --><!-- /ko -->
             </div>
             <div style="position: absolute; top:25px; margin-left:35px; width: calc(100% - 35px)" data-bind="style: { 'z-index': 400 - $index() }">
-              <!-- ko template: 'snippet-settings' --><!-- /ko -->
+              <!-- ko template: 'snippet-settings${ suffix }' --><!-- /ko -->
             </div>
           </div>
-          <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status' } --><!-- /ko -->
-          <!-- ko template: { if: $root.editorMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer' } --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'markdown'].indexOf(type()) == -1, name: 'snippet-execution-status${ suffix }' } --><!-- /ko -->
+          <!-- ko template: { if: $root.editorMode() && ['jar', 'java', 'spark2', 'distcp', 'shell', 'mapreduce'].indexOf(type()) == -1, name: 'snippet-code-resizer${ suffix }' } --><!-- /ko -->
           <!-- ko if: $root.editorMode() -->
-          <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: 'query-tabs' --><!-- /ko -->
+          <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
+          <!-- ko template: 'query-tabs${ suffix }' --><!-- /ko -->
           <!-- /ko -->
           <!-- ko ifnot: $root.editorMode() -->
-          <!-- ko template: 'snippet-log' --><!-- /ko -->
-          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results' } --><!-- /ko -->
+          <!-- ko template: 'snippet-log${ suffix }' --><!-- /ko -->
+          <!-- ko template: { if: ['text', 'jar', 'java', 'distcp', 'shell', 'mapreduce', 'py', 'markdown'].indexOf(type()) == -1, name: 'snippet-results${ suffix }' } --><!-- /ko -->
           <!-- /ko -->
 
           <div class="clearfix"></div>
@@ -941,7 +941,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-settings">
+<script type="text/html" id="snippet-settings${ suffix }">
   <div class="snippet-settings" data-bind="slideVisible: settingsVisible" style="position: relative; z-index: 100;">
     <div class="snippet-settings-header">
       <h4><i class="fa fa-cog"></i> ${ _('Settings') }</h4>
@@ -969,7 +969,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="code-editor-snippet-body">
+<script type="text/html" id="code-editor-snippet-body${ suffix }">
   <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
   <div data-bind="css: { 'active': showOptimizer }">
     <div class="round-icon empty">&nbsp;</div>
@@ -1164,7 +1164,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <div class="clearfix"></div>
 </script>
 
-<script type="text/html" id="snippet-chart-settings">
+<script type="text/html" id="snippet-chart-settings${ suffix }">
   <div>
     <!-- ko if: chartType() != '' && chartType() == ko.HUE_CHARTS.TYPES.TIMELINECHART -->
     <ul class="nav nav-list" style="border: none; background-color: #FFF">
@@ -1310,7 +1310,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-grid-settings">
+<script type="text/html" id="snippet-grid-settings${ suffix }">
   <div class="snippet-grid-settings" style="overflow: auto">
     <table class="table table-condensed margin-top-10">
       <thead>
@@ -1348,14 +1348,14 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-explain">
+<script type="text/html" id="snippet-explain${ suffix }">
   <pre class="no-margin-bottom" data-bind="text: result.explanation"></pre>
 </script>
 
-<script type="text/html" id="snippet-results">
+<script type="text/html" id="snippet-results${ suffix }">
   <div class="snippet-row" data-bind="slideVisible: result.hasSomeResults">
     <div class="snippet-left-bar">
-      <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls' }--><!-- /ko -->
+      <!-- ko template: { if: result.type() == 'table' && result.hasSomeResults(), name: 'snippet-result-controls${ suffix }' }--><!-- /ko -->
     </div>
     <div class="result-body">
       <div class="row-fluid" data-bind="visible: result.type() != 'table'" style="display:none; max-height: 400px; margin: 10px 0; overflow-y: auto">
@@ -1377,8 +1377,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       <div class="row-fluid table-results" data-bind="visible: result.type() == 'table'" style="display: none; max-height: 400px; min-height: 260px;">
         <div>
           <div class="column-side" data-bind="visible: isResultSettingsVisible, css:{'span3 result-settings': isResultSettingsVisible, 'hidden': ! isResultSettingsVisible()}" style="position:relative;white-space: nowrap;">
-            <!-- ko template: { name: 'snippet-grid-settings', if: showGrid } --><!-- /ko -->
-            <!-- ko template: { name: 'snippet-chart-settings', if: showChart } --><!-- /ko -->
+            <!-- ko template: { name: 'snippet-grid-settings${ suffix }', if: showGrid } --><!-- /ko -->
+            <!-- ko template: { name: 'snippet-chart-settings${ suffix }', if: showChart } --><!-- /ko -->
             <div class="resize-bar" style="top: 0; right: -10px; cursor: col-resize;"></div>
           </div>
           <div class="grid-side" data-bind="css: {'span9': isResultSettingsVisible, 'span12 nomargin': ! isResultSettingsVisible() }">
@@ -1445,12 +1445,12 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 
-<script type="text/html" id="text-snippet-body">
+<script type="text/html" id="text-snippet-body${ suffix }">
   <div data-bind="attr:{'id': 'editor_' + id()}, html: statement_raw, value: statement_raw, medium: {}" data-placeHolder="${ _('Type your text here, select some text to format it') }" class="text-snippet"></div>
 </script>
 
 
-<script type="text/html" id="markdown-snippet-body">
+<script type="text/html" id="markdown-snippet-body${ suffix }">
   <!-- ko ifnot: $root.isPlayerMode() -->
   <div class="row-fluid">
     <div class="span6" data-bind="clickForAceFocus: ace">
@@ -1470,7 +1470,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </script>
 
 
-<script type="text/html" id="executable-snippet-body">
+<script type="text/html" id="executable-snippet-body${ suffix }">
   <div style="padding:10px;">
     <form class="form-horizontal">
       <!-- ko if: type() == 'distcp' -->
@@ -1566,7 +1566,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-execution-status">
+<script type="text/html" id="snippet-execution-status${ suffix }">
   <div class="snippet-execution-status" data-bind="clickForAceFocus: ace">
     <div class="snippet-progress-container" data-bind="visible: status() != 'canceled' && status() != 'with-optimizer-report'">
       <div class="progress-snippet progress" data-bind="css: {
@@ -1600,16 +1600,16 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-code-resizer">
+<script type="text/html" id="snippet-code-resizer${ suffix }">
   <div class="snippet-code-resizer" data-bind="aceResizer : { ace: ace, target: '.ace-container-resizable', onStart: hideFixedHeaders, onStop: redrawFixedHeaders }">
     <i class="fa fa-ellipsis-h"></i>
   </div>
 </script>
 
-<script type="text/html" id="notebook-snippet-type-controls">
+<script type="text/html" id="notebook-snippet-type-controls${ suffix }">
   <div class="inactive-action dropdown hover-actions">
     <a class="snippet-side-btn" style="padding-right: 0; padding-left: 2px;" data-toggle="dropdown" href="javascript: void(0);">
-      <span data-bind="template: { name: 'snippetIcon', data: $data }"></span>
+      <span data-bind="template: { name: 'snippetIcon${ suffix }', data: $data }"></span>
     </a>
     <a class="inactive-action dropdown-toggle snippet-side-btn" style="padding:0" data-toggle="dropdown" href="javascript: void(0);">
       <i class="fa fa-caret-down"></i>
@@ -1621,7 +1621,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type ="text/html" id="snippet-execution-controls">
+<script type ="text/html" id="snippet-execution-controls${ suffix }">
   <div class="snippet-actions" style="position: absolute; bottom: 0">
     <!-- ko if: status() == 'loading' -->
     <a class="snippet-side-btn blue" style="cursor: default;" title="${ _('Creating session') }">
@@ -1723,7 +1723,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </script>
 
-<script type="text/html" id="snippet-result-controls">
+<script type="text/html" id="snippet-result-controls${ suffix }">
   <div class="snippet-actions" style="opacity:1">
     <div style="margin-top:25px;">
       <a class="snippet-side-btn" href="javascript: void(0)" data-bind="click: function() { $data.showGrid(true); huePubSub.publish('redraw.fixed.headers'); huePubSub.publish('table.extender.redraw'); }, css: {'active': $data.showGrid}" title="${ _('Grid') }">
@@ -1807,7 +1807,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   </div>
 </div>
 
-<div id="removeSnippetModal" class="modal hide fade">
+<div id="removeSnippetModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Confirm Remove')}</h2>
@@ -1816,8 +1816,8 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     <p>${_('Are you sure you want to remove this snippet?')}</p>
   </div>
   <div class="modal-footer" data-bind="with: $root.removeSnippetConfirmation">
-    <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }">${_('No')}</a>
-    <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); redrawFixedHeaders(100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal').modal('hide'); }" />
+    <a class="btn" data-bind="click: function() { $root.removeSnippetConfirmation(null); $('#removeSnippetModal${ suffix }').modal('hide'); }">${_('No')}</a>
+    <input type="submit" value="${_('Yes')}" class="btn btn-danger" data-bind="click: function() { notebook.snippets.remove(snippet); redrawFixedHeaders(100); $root.removeSnippetConfirmation(null); $('#removeSnippetModal${ suffix }').modal('hide'); }" />
   </div>
 </div>
 
@@ -1832,7 +1832,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </div>
 
 
-<div id="saveAsModal" class="modal hide fade">
+<div id="saveAsModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <!-- ko if: $root.editorMode() -->
@@ -1867,7 +1867,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- /ko -->
 </div>
 
-<div id="saveToFileModal" class="modal hide fade">
+<div id="saveToFileModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Are you sure you want to save back to File?')}</h2>
@@ -1880,7 +1880,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </div>
 
 
-<div id="authModal" class="modal hide fade">
+<div id="authModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Connect to the data source')}</h2>
@@ -1908,7 +1908,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </div>
 
 
-<div id="clearHistoryModal" class="modal hide fade">
+<div id="clearHistoryModal${ suffix }" class="modal hide fade">
   <div class="modal-header">
     <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
     <h2 class="modal-title">${_('Confirm History Clear')}</h2>
@@ -1924,7 +1924,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <!-- ko if: $root.selectedNotebook() -->
   <!-- ko with: $root.selectedNotebook() -->
-  <div id="retryModal" class="modal hide fade" data-keyboard="false" data-backdrop="static">
+  <div id="retryModal${ suffix }" class="modal hide fade" data-keyboard="false" data-backdrop="static">
     <div class="modal-header">
       <h2 class="modal-title">${_('Operation timed out')}</h2>
     </div>
@@ -1944,7 +1944,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 </%def>
 
 
-<%def name="commonJS(is_embeddable=False, bindableElement='editorComponents')">
+<%def name="commonJS(is_embeddable=False, bindableElement='editorComponents', suffix='')">
 
 <script type="text/javascript">
   % if is_embeddable:
@@ -2625,6 +2625,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
       user: '${ user.username }',
       userId: ${ user.id },
+      suffix: '${ suffix }',
       % if is_embeddable:
       hue4: true,
       % endif
@@ -2841,7 +2842,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     }, HUE_PUB_SUB_APP);
 
     huePubSub.subscribe('show.saveToFile.modal', function () {
-      $('#saveToFileModal').modal('show');
+      $('#saveToFileModal${ suffix }').modal('show');
     }, HUE_PUB_SUB_APP);
 
     huePubSub.subscribe('tab.switched', function (tab) {
@@ -3169,19 +3170,19 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         viewModel.authSessionPassword('');
         viewModel.authSessionType(data['type']);
         viewModel.authSessionCallback(data['callback']);
-        $("#authModal").modal("show");
+        $("#authModal${ suffix }").modal("show");
       });
 
       $(document).on("hideHistoryModal", function (e) {
-        $("#clearHistoryModal").modal("hide");
+        $("#clearHistoryModal${ suffix }").modal("hide");
       });
 
       huePubSub.subscribe('show.retry.modal', function (data) {
-        $('#retryModal').modal('show');
+        $('#retryModal${ suffix }').modal('show');
       }, HUE_PUB_SUB_APP);
 
       huePubSub.subscribe('hide.retry.modal', function (data) {
-        $('#retryModal').modal('hide');
+        $('#retryModal${ suffix }').modal('hide');
       }, HUE_PUB_SUB_APP);
 
       // Close the notebook snippets when leaving the page
@@ -3199,7 +3200,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           viewModel.saveNotebook();
         }
         else {
-          $('#saveAsModal').modal('show');
+          $('#saveAsModal${ suffix }').modal('show');
         }
       }
 
@@ -3213,7 +3214,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       $(document).bind('keyup', function (e) {
         if (e.keyCode == 191 && e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
-          $('#helpModal').modal('show');
+          $('#helpModal${ suffix }').modal('show');
         }
 
         if (e.keyCode == 191 && !e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
