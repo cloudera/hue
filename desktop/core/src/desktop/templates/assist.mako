@@ -1335,12 +1335,24 @@ from notebook.conf import get_ordered_interpreters
         };
 
         huePubSub.subscribe('assist.clickCollectionItem', function (entry) {
-          var link = '/indexer/#edit/' + entry.definition.name;
-          if (IS_HUE_4){
-            huePubSub.publish('open.link', link);
+          var hash = '#edit/' + entry.definition.name;
+          if (IS_HUE_4) {
+            if (window.location.pathname.startsWith('/hue/indexer') && !window.location.pathname.startsWith('/hue/indexer/importer')) {
+              window.location.hash = hash;
+            }
+            else {
+              huePubSub.subscribeOnce('app.gained.focus', function(app){
+                if (app === 'indexes'){
+                  window.setTimeout(function(){
+                    window.location.hash = hash;
+                  }, 0)
+                }
+              });
+              huePubSub.publish('open.link', '/indexer');
+            }
           }
           else {
-            window.open(link);
+            window.open('/indexer/' + hash);
           }
         });
 
