@@ -419,10 +419,10 @@ ${ hueIcons.symbols() }
       </ul>
 
       <div class="tab-content">
-        <!-- ko if: sessionsAvailable -->
+        <!-- ko if: sessionsAvailable() && templateApp() -->
         <div class="tab-pane active" id="sessionsTab">
           <div class="row-fluid">
-            <div class="span12" data-bind="template: { name: 'notebook-session-config-template' + currentApp(), data: activeAppViewModel }"></div>
+            <div class="span12" data-bind="template: { name: 'notebook-session-config-template' + templateApp(), data: activeAppViewModel }"></div>
           </div>
         </div>
         <!-- /ko -->
@@ -1087,6 +1087,14 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.rightAssistAvailable = ko.observable(false);
         self.activeAppViewModel = ko.observable();
         self.currentApp = ko.observable('');
+        self.templateApp = ko.pureComputed(function(){
+          if (['editor', 'notebook'].indexOf(self.currentApp()) > -1){
+            return self.currentApp()
+          }
+          else {
+            return '';
+          }
+        });
 
         self.contextPanelVisible = ko.observable(false);
         self.sessionsAvailable = ko.observable(false);
