@@ -316,7 +316,7 @@ ${ layout.menubar(section='bundles') }
       var ViewModel = function() {
         var self = this;
 
-        self.parameters = ko.observableArray(${ bundle.parameters | n });
+        self.parameters = ko.observableArray(${ bundle.parameters_escapejs | n });
         self.add_parameters = function() {
           self.parameters.push({name: "", value: ""});
         };

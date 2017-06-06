@@ -42,7 +42,7 @@ $(document).ready(function () {
   var ViewModel = function() {
     var self = this;
 
-    self.edit_bundled_coordinator_parameters = ko.observableArray(${ bundled_coordinator_instance.parameters | n,unicode });
+    self.edit_bundled_coordinator_parameters = ko.observableArray(${ bundled_coordinator_instance.parameters_escapejs | n,unicode });
     self.add_edit_bundled_coordinator_parameters = function() {
       self.edit_bundled_coordinator_parameters.push({name: "", value: ""});
     };
