@@ -176,11 +176,12 @@ class Command(NoArgsCommand):
       snippet_properties = {
         'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
         'class': 'org.apache.hadoop.examples.terasort.TeraSort',
-        'args': '${output_dir}/teragen ${output_dir}/terasort',
         'java_opts': '',
         'hadoopProperties': [],
         'archives': [],
-        'files': []
+        'files': [],
+        'arguments': ['output_dir/teragen', 'output_dir/terasort'],
+        'capture_output': False
       }
 
       notebook = make_notebook(
