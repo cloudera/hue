@@ -16,105 +16,190 @@
 (function () {
   describe('sqlStatementsParser.js', function () {
 
-    var splitTests = [
-      {
-        id: 1,
-        statements: '',
-        expectedResult: []
-      }, {
-        id: 2,
-        statements: 'select * from bla',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 17 } }
-        ]
-      }, {
-        id: 3,
-        statements: 'select * from bla;',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla;', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 18 } }
-        ]
-      }, {
-        id: 4,
-        statements: 'select * from bla;select * from ble',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla;', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 18 } },
-          { type: 'statement', statement: 'select * from ble', location: { first_line: 1, last_line: 1, first_column: 18,  last_column: 35 } }
-        ]
-      }, {
-        id: 5,
-        statements: 'select * from bla;;select * from ble',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla;', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 18 } },
-          { type: 'statement', statement: ';', location: { first_line: 1, last_line: 1, first_column: 18,  last_column: 19 } },
-          { type: 'statement', statement: 'select * from ble', location: { first_line: 1, last_line: 1, first_column: 19,  last_column: 36 } }
-        ]
-      }, {
-        id: 6,
-        statements: 'select * from bla;\n;select * from ble',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla;', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 18 } },
-          { type: 'statement', statement: '\n;', location: { first_line: 1, last_line: 2, first_column: 18,  last_column: 1 } },
-          { type: 'statement', statement: 'select * from ble', location: { first_line: 2, last_line: 2, first_column: 1,  last_column: 18 } }
-        ]
-      }, {
-        id: 5,
-        statements: 'select * \nfrom bla;\r\nselect * from ble;\n',
-        expectedResult: [
-          { type: 'statement', statement: 'select * \nfrom bla;', location: { first_line: 1, last_line: 2, first_column: 0,  last_column: 9 } },
-          { type: 'statement', statement: '\r\nselect * from ble;', location: { first_line: 2, last_line: 3, first_column: 9,  last_column: 18 } }
-        ]
-      }, {
-        id: 7,
-        statements: 'select * from bla where x = ";";',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla where x = ";";', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 32 } }
-        ]
-      }, {
-        id: 8,
-        statements: 'select * from bla where x = \';\';\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla where x = \';\';', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 32 } },
-          { type: 'statement', statement: '\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;', location: { first_line: 1, last_line: 3, first_column: 32,  last_column: 51 } }
-        ]
-      }, {
-        id: 9,
-        statements: 'select * from bla where x = "; AND boo = 1;\n\nUSE db',
-        expectedResult: [
-          { type: 'statement', statement: 'select * from bla where x = ', location: { first_line: 1, last_line: 1, first_column: 0,  last_column: 28 } },
-          { type: 'statement', statement: ';', location: { first_line: 1, last_line: 1, first_column: 29,  last_column: 30 } },
-          { type: 'statement', statement: ' AND boo = 1;', location: { first_line: 1, last_line: 1, first_column: 30,  last_column: 43 } },
-          { type: 'statement', statement: '\n\nUSE db', location: { first_line: 1, last_line: 3, first_column: 43,  last_column: 6 } }
-        ]
-      }, {
-        id: 10,
-        statements: '--- Some comment with ; ; \nselect * from bla where x = ";";',
-        expectedResult: [
-          { type: 'statement', statement: '\nselect * from bla where x = ";";', location: { first_line: 1, last_line: 2, first_column: 26,  last_column: 32 } }
-        ]
-      }, {
-        id: 11,
-        statements: 'select *\n-- bla\n from bla;',
-        expectedResult: [
-          { type: 'statement', statement: 'select *\n-- bla\n from bla;', location: { first_line: 1, last_line: 3, first_column: 0,  last_column: 10 } }
-        ]
-      }, {
-        id: 12,
-        statements: 'select *\n/* bla \n\n*/\n from bla;',
-        expectedResult: [
-          { type: 'statement', statement: 'select *\n/* bla \n\n*/\n from bla;', location: { first_line: 1, last_line: 5, first_column: 0,  last_column: 10 } }
-        ]
-      }
-    ];
-
-    splitTests.forEach(function (splitTest) {
-      it('should split correctly, test ' + splitTest.id, function () {
-        try {
-          var result = sqlStatementsParser.parse(splitTest.statements);
-          expect(result).toEqual(splitTest.expectedResult);
-        } catch (error) {
-          fail('Got error');
-        }
+    var stringifySplitResult = function (result) {
+      var s = '[';
+      var first = true;
+      result.forEach(function (entry) {
+        s += first ? '{\n' : ', {\n';
+        s += '  statement: \'' + entry.statement.replace(/\n/g, '\\n') + '\',\n';
+        s += '  location: { first_line: ' + entry.location.first_line + ', first_column: ' + entry.location.first_column + ', last_line: ' + entry.location.last_line + ', last_column: ' + entry.location.last_column + ' }'
+        s += '\n}';
+        first = false;
       });
+      s += ']';
+      return s;
+    };
+
+    var testParser = function (input, expectedOutput) {
+      try {
+        expectedOutput.forEach(function (entry) {
+          entry.type = 'statement';
+        });
+        var result = sqlStatementsParser.parse(input);
+        var because = '\n\nParser output: ' + stringifySplitResult(result) + '\nExpected output: ' + stringifySplitResult(expectedOutput);
+        expect(result).toEqual(expectedOutput, because);
+      } catch (error) {
+        console.error(error);
+        console.log(error.message);
+
+        fail('Got error');
+      }
+    };
+
+    it('should split "" correctly', function () {
+      testParser('', []);
+    });
+
+    it('should split ";" correctly', function () {
+      testParser(';', [{
+        statement: ';',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 1 }
+      }]);
+    });
+
+    it('should split ";   \\n;   \\r\\n;" correctly', function () {
+      testParser(';   \n;   \r\n;', [{
+        statement: ';',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 1 }
+      }, {
+        statement: '   \n;',
+        location: { first_line: 1, first_column: 1, last_line: 2, last_column: 1 }
+      }, {
+        statement: '   \r\n;',
+        location: { first_line: 2, first_column: 1, last_line: 3, last_column: 1 }
+      }]);
+    });
+
+    it('should split "select * from bla" correctly', function () {
+      testParser('select * from bla', [{
+        statement: 'select * from bla',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 17 }
+      }]);
+    });
+
+    it('should split ";;select * from bla" correctly', function () {
+      testParser(';;select * from bla', [{
+        statement: ';',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 1 }
+      }, {
+        statement: ';',
+        location: { first_line: 1, first_column: 1, last_line: 1, last_column: 2 }
+      }, {
+        statement: 'select * from bla',
+        location: { first_line: 1, first_column: 2, last_line: 1, last_column: 19 }
+      }]);
+    });
+
+    it('should split "select * from bla;" correctly', function () {
+      testParser('select * from bla;', [{
+        statement: 'select * from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 18 }
+      }]);
+    });
+
+    it('should split "select * from bla;select * from ble" correctly', function () {
+      testParser('select * from bla;select * from ble', [{
+        statement: 'select * from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 18 }
+      }, {
+        statement: 'select * from ble',
+        location: { first_line: 1, first_column: 18, last_line: 1, last_column: 35 }
+      }]);
+    });
+
+    it('should split "select * from bla;;select * from ble" correctly', function () {
+      testParser('select * from bla;;select * from ble', [{
+        statement: 'select * from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 18 }
+      }, {
+        statement: ';',
+        location: { first_line: 1, first_column: 18, last_line: 1, last_column: 19 }
+      },{
+        statement: 'select * from ble',
+        location: { first_line: 1, first_column: 19, last_line: 1, last_column: 36 }
+      }]);
+    });
+
+    it('should split "select * from bla;\\n;select * from ble" correctly', function () {
+      testParser('select * from bla;\n;select * from ble', [{
+        statement: 'select * from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 18 }
+      }, {
+        statement: '\n;',
+        location: { first_line: 1, first_column: 18, last_line: 2, last_column: 1 }
+      },{
+        statement: 'select * from ble',
+        location: { first_line: 2, first_column: 1, last_line: 2, last_column: 18 }
+      }]);
+    });
+
+    it('should split "select * \\nfrom bla;\\r\\nselect * from ble;\\n" correctly', function () {
+      testParser('select * \nfrom bla;\r\nselect * from ble;\n', [{
+        statement: 'select * \nfrom bla;',
+        location: { first_line: 1, first_column: 0, last_line: 2, last_column: 9 }
+      }, {
+        statement: '\r\nselect * from ble;',
+        location: { first_line: 2, first_column: 9, last_line: 3, last_column: 18 }
+      }]);
+    });
+
+    it('should split "select * from bla where x = ";";" correctly', function () {
+      testParser('select * from bla where x = ";";', [{
+        statement: 'select * from bla where x = ";";',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 32 }
+      }]);
+    });
+
+    it('should split "select * from bla where x = \';\';\\n\\nSELECT bla FROM foo WHERE y = `;` AND true = false;" correctly', function () {
+      testParser('select * from bla where x = \';\';\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;', [{
+        statement: 'select * from bla where x = \';\';',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 32 }
+      }, {
+        statement: '\n\nSELECT bla FROM foo WHERE y = `;` AND true = false;',
+        location: { first_line: 1, first_column: 32, last_line: 3, last_column: 51 }
+      }]);
+    });
+
+    it('should split "select * from bla where x = "; AND boo = 1;\\n\\nUSE db" correctly', function () {
+      testParser('select * from bla where x = "; AND boo = 1;\n\nUSE db', [{
+        statement: 'select * from bla where x = "; AND boo = 1;\n\nUSE db',
+        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 6 }
+      }]);
+    });
+
+    it('should split "--- Some comment with ; ; \\nselect * from bla where x = ";";" correctly', function () {
+      testParser('--- Some comment with ; ; \nselect * from bla where x = ";";', [{
+        statement: '--- Some comment with ; ; \nselect * from bla where x = ";";',
+        location: { first_line: 1, first_column: 0, last_line: 2, last_column: 32 }
+      }]);
+    });
+
+    it('should split "select *\n-- bla\n from bla;" correctly', function () {
+      testParser('select *\n-- bla\n from bla;', [{
+        statement: 'select *\n-- bla\n from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 10 }
+      }]);
+    });
+
+    it('should split "select *\\n/* bla \\n\\n*/\\n from bla;" correctly', function () {
+      testParser('select *\n/* bla \n\n*/\n from bla;', [{
+        statement: 'select *\n/* bla \n\n*/\n from bla;',
+        location: { first_line: 1, first_column: 0, last_line: 5, last_column: 10 }
+      }]);
+    });
+
+    it('should split "SELECT\\n id -- some ID\\n FROM customers;" correctly', function () {
+      testParser('SELECT\n id -- some ID\n FROM customers;', [{
+        statement: 'SELECT\n id -- some ID\n FROM customers;',
+        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 16 }
+      }]);
+    });
+
+    it('should split "SELECT\n id -- some ID;\n FROM customers;" correctly', function () {
+      testParser('SELECT\n id -- some ID;\n FROM customers;', [{
+        statement: 'SELECT\n id -- some ID;\n FROM customers;',
+        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 16 }
+      }]);
     });
   });
 })();
