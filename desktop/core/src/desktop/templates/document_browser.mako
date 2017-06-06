@@ -499,6 +499,13 @@ from desktop.views import _ko
                   <!-- ko case: 'query-hive' -->${ _('Hive Query') }<!-- /ko -->
                   <!-- ko case: 'query-impala' -->${ _('Impala Query') }<!-- /ko -->
                   <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard') }<!-- /ko -->
+                  <!-- ko case: 'query-mapreduce' -->${ _('MapReduce Job') }<!-- /ko -->
+                  <!-- ko case: 'query-sqoop1' -->${ _('Import Job') }<!-- /ko -->
+                  <!-- ko case: 'query-spark2' -->${ _('Spark Job') }<!-- /ko -->
+                  <!-- ko case: 'query-java' -->${ _('Java Job') }<!-- /ko -->
+                  <!-- ko case: 'query-pig' -->${ _('Pig Script') }<!-- /ko -->
+                  <!-- ko case: 'query-shell' -->${ _('Shell Script') }<!-- /ko -->
+                  <!-- ko case: 'query-distcp' -->${ _('DistCp Job') }<!-- /ko -->
                   <!-- ko case: $default -->
                   <!-- ko text: $value --><!-- /ko -->
                   <!-- /ko -->
