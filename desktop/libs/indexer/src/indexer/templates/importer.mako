@@ -400,7 +400,7 @@ ${ assist.assistPanel() }
 
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
-              <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: createWizard.source.apiHelperType, mainScrollable: $('.content-panel')" placeholder="${ _('Table name or <database>.<table>') }">
+              <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: createWizard.source.apiHelperType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
             </label>
           </div>
 
@@ -492,7 +492,7 @@ ${ assist.assistPanel() }
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
-              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $('.content-panel'), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
+              <input type="text" data-bind="value: name, hivechooser: name, skipColumns: true, skipTables: outputFormat() == 'database', valueUpdate: 'afterkeydown', apiHelperUser: '${ user }', apiHelperType: apiHelperType, mainScrollable: $(MAIN_SCROLLABLE), attr: { 'placeholder': outputFormat() == 'table' ? '${  _ko('Table name or <database>.<table>') }' : '${  _ko('Database name') }' }" pattern="^([a-zA-Z0-9_]+\.)?[a-zA-Z0-9_]*$" title="${ _('Only alphanumeric and underscore characters') }">
             <!-- /ko -->
             <span class="help-inline muted" data-bind="visible: !isTargetExisting() && isTargetChecking()">
               <i class="fa fa-spinner fa-spin"></i>
@@ -682,7 +682,7 @@ ${ assist.assistPanel() }
               <!-- /ko -->
 
               <!-- ko ifnot: $root.createWizard.source.inputFormat() === 'manual' -->
-              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: '.content-panel', disableNiceScroll: true }">
+              <form class="form-inline inline-table" data-bind="foreachVisible: { data: columns, minHeight: 44, container: MAIN_SCROLLABLE, disableNiceScroll: true }">
                 <!-- ko if: $parent.outputFormat() == 'table' -->
                   <div data-bind="template: { name: 'table-field-template', data: $data }" class="margin-top-10 field inline-block"></div>
                   <div class="clearfix"></div>
@@ -959,7 +959,14 @@ ${ assist.assistPanel() }
 
 
 <script type="text/javascript">
+  % if is_embeddable:
+  var MAIN_SCROLLABLE = '.page-content';
+  % else:
+  var MAIN_SCROLLABLE = '.content-panel';
+  % endif
+
   (function () {
+
     ko.options.deferUpdates = true;
 
     var MAPPINGS = {
