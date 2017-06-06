@@ -201,5 +201,25 @@
         location: { first_line: 1, first_column: 0, last_line: 3, last_column: 16 }
       }]);
     });
+
+    it('should split "SELECT id\\n\\n /* from customers; */ FROM other;" correctly', function () {
+      testParser('SELECT id\n\n /* from customers; */ FROM other;', [{
+        statement: 'SELECT id\n\n /* from customers; */ FROM other;',
+        location: { first_line: 1, first_column: 0, last_line: 3, last_column: 34 }
+      }]);
+    });
+
+    it('should split "SELECT " \\" ;; ", \'"\', \' ;\' from bla; /* \\n\\n"" ; \\n; */ FROM other;" correctly', function () {
+      testParser('USE `db;`;\r\nSELECT " \\" ;; ", \'"\', \' ;\' from bla; /* \n\n"" ; \n;  FROM other;*/', [{
+        statement: 'USE `db;`;',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 10 }
+      }, {
+        statement: '\r\nSELECT " \\" ;; ", \'"\', \' ;\' from bla;',
+        location: { first_line: 1, first_column: 10, last_line: 2, last_column: 37 }
+      }, {
+        statement: ' /* \n\n"" ; \n;  FROM other;*/',
+        location: { first_line: 2, first_column: 37, last_line: 5, last_column: 16 }
+      }]);
+    });
   });
 })();

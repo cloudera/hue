@@ -20,7 +20,8 @@
 %%
 
 '/*'                                                                  { this.begin("multiLineComment"); return 'PART_OF_STATEMENT'; }
-<multiLineComment>^(?![*][/])*                                        { return 'PART_OF_STATEMENT'; }
+<multiLineComment>[^*]+                                               { return 'PART_OF_STATEMENT'; }
+<multiLineComment>[*][^/]                                             { return 'PART_OF_STATEMENT'; }
 <multiLineComment><<EOF>>                                             { this.popState(); return 'PART_OF_STATEMENT'; }
 <multiLineComment>'*/'                                                { this.popState(); return 'PART_OF_STATEMENT'; }
 
@@ -44,9 +45,10 @@
 <backTick><<EOF>>                                                     { this.popState(); return 'PART_OF_STATEMENT'; }
 <backTick>'`'                                                         { this.popState(); return 'PART_OF_STATEMENT'; }
 
-[^"\\;'`-]+                                                           { return 'PART_OF_STATEMENT'; }
+[^"\/;'`-]+                                                           { return 'PART_OF_STATEMENT'; }
 [-][^;-]                                                              { return 'PART_OF_STATEMENT'; }
 [/][^;*]                                                              { return 'PART_OF_STATEMENT'; }
+
 ';'                                                                   { return ';'; }
 
 <<EOF>>                                                               { return 'EOF'; }
