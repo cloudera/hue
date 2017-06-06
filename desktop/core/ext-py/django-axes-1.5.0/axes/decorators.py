@@ -104,8 +104,14 @@ def get_ip_address_from_request(request):
     ip_address = ''
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR', '')
     if x_forwarded_for and ',' not in x_forwarded_for:
-        if not x_forwarded_for.startswith(PRIVATE_IPS_PREFIX) and is_valid_ip(x_forwarded_for):
+        # Hue's LB can be hosted on Private IP address.
+        if is_valid_ip(x_forwarded_for):
             ip_address = x_forwarded_for.strip()
+    elif x_forwarded_for and ',' in x_forwarded_for:
+        # Hue Server may have more than one reverse proxy in front of it.
+        x_forwarded_for_first_ip = x_forwarded_for.split(',')[0]
+        if is_valid_ip(x_forwarded_for_first_ip):
+            ip_address = x_forwarded_for_first_ip.strip()
     else:
         ips = [ip.strip() for ip in x_forwarded_for.split(',')]
         for ip in ips:
@@ -134,21 +140,7 @@ def get_ip_address_from_request(request):
 
 
 def get_ip(request):
-    if not BEHIND_REVERSE_PROXY:
-        ip = get_ip_address_from_request(request)
-    else:
-        ip = request.META.get(REVERSE_PROXY_HEADER, '')
-        ip = ip.split(",", 1)[0].strip()
-        if ip == '':
-            if not BEHIND_REVERSE_PROXY_WITH_DIRECT_ACCESS:
-                raise Warning('Axes is configured for operation behind a reverse proxy but could not find '\
-                    'an HTTP header value {0}. Check your proxy server settings '\
-                    'to make sure this header value is being passed.'.format(REVERSE_PROXY_HEADER))
-            else:
-                ip = request.META.get('REMOTE_ADDR', '')
-                if ip not in IP_WHITELIST:
-                    raise Warning('Axes is configured for operation behind a reverse proxy and to allow some'\
-                        'IP addresses to have direct access. {0} is not on the white list'.format(ip))
+    ip = get_ip_address_from_request(request)
     return ip
 
 
