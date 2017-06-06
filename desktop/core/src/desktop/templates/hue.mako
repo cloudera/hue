@@ -422,7 +422,7 @@ ${ hueIcons.symbols() }
         <!-- ko if: sessionsAvailable -->
         <div class="tab-pane active" id="sessionsTab">
           <div class="row-fluid">
-            <div class="span12" data-bind="template: { name: 'notebook-session-config-template', data: activeAppViewModel }"></div>
+            <div class="span12" data-bind="template: { name: 'notebook-session-config-template' + currentApp(), data: activeAppViewModel }"></div>
           </div>
         </div>
         <!-- /ko -->
@@ -506,6 +506,15 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/js/hue.json.js') }"></script>
 <script src="${ static('notebook/js/notebook.ko.js') }"></script>
 <script src="${ static('metastore/js/metastore.model.js') }"></script>
+
+<%namespace name="configKoComponents" file="/config_ko_components.mako" />
+<%namespace name="notebookKoComponents" file="/common_notebook_ko_components.mako" />
+<%namespace name="hueAceAutocompleter" file="/hue_ace_autocompleter.mako" />
+
+${ configKoComponents.config() }
+${ notebookKoComponents.aceKeyboardShortcuts() }
+${ notebookKoComponents.downloadSnippetResults() }
+${ hueAceAutocompleter.hueAceAutocompleter() }
 
 
 <script type="text/javascript">
@@ -798,6 +807,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
                     self.embeddable_cache[app] = r;
                   }
                   $('#embeddable_' + app).html(r);
+                  huePubSub.publish('app.dom.loaded', app);
                 }
                 else {
                   window.location.href = baseURL;
@@ -1076,6 +1086,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
         self.rightAssistAvailable = ko.observable(false);
         self.activeAppViewModel = ko.observable();
+        self.currentApp = ko.observable('');
 
         self.contextPanelVisible = ko.observable(false);
         self.sessionsAvailable = ko.observable(false);
@@ -1089,6 +1100,8 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         });
 
         huePubSub.subscribe('set.current.app.view.model', self.activeAppViewModel);
+        huePubSub.subscribe('app.dom.loaded', self.currentApp);
+
         huePubSub.publish('get.current.app.view.model');
 
         var previousVisibilityValues = {};
