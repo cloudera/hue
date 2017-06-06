@@ -202,8 +202,8 @@ from desktop.views import _ko
         </div>
         <!-- /ko -->
         <!-- ko if: result -->
-        <pre data-bind="visible: result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
-        <pre data-bind="visible: result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated" style="height: 120px"></pre>
+        <pre data-bind="visible: result.logs() && result.logs().length == 0" class="logs logs-bigger">${ _('No logs available at this moment.') }</pre>
+        <pre data-bind="visible: result.logs() && result.logs().length > 0, text: result.logs, logScroller: result.logs, logScrollerVisibilityEvent: showLogs, niceScroll" class="logs logs-bigger logs-populated" style="height: 120px"></pre>
         <!-- /ko -->
         <!-- /ko -->
         <!-- /ko -->
