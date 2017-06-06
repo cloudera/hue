@@ -2524,6 +2524,7 @@ var EditorViewModel = (function() {
 
     self.user = options.user;
     self.userId = options.userId;
+    self.suffix = options.suffix;
     self.isMobile = ko.observable(options.mobile);
     self.isHue4 = ko.observable(options.hue4);
     self.isNotificationManager = ko.observable(options.is_notification_manager || false);
@@ -2606,7 +2607,7 @@ var EditorViewModel = (function() {
         });
         self.combinedContent(statements);
       }
-      $("#combinedContentModal").modal("show");
+      $("#combinedContentModal" + self.suffix).modal("show");
     };
 
     self.isEditing = ko.observable(false);
@@ -2633,7 +2634,7 @@ var EditorViewModel = (function() {
       }
       if (hasContent) {
         self.removeSnippetConfirmation({ notebook: notebook, snippet: snippet });
-        $("#removeSnippetModal").modal("show");
+        $("#removeSnippetModal" + self.suffix).modal("show");
       }
       else {
         notebook.snippets.remove(snippet);
