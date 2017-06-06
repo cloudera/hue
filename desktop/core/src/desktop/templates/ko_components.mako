@@ -27,7 +27,9 @@ from desktop.views import _ko
     <!-- ko if: !dropDownVisible() || !searchable -->
     <a class="inactive-action hue-drop-down-active" href="javascript:void(0)" data-bind="toggle: dropDownVisible, css: { 'blue': dropDownVisible }">
       <!-- ko if: icon --><i class="fa" data-bind="css: icon"></i><!-- /ko -->
+      <!-- ko if: value -->
       <span data-bind="text: typeof value().label !== 'undefined' ? value().label : value(), visible: ! dropDownVisible() || !searchable, attr: { 'title': linkTitle }" ></span>
+      <!-- /ko -->
       <i class="fa fa-caret-down"></i>
     </a>
     <!-- /ko -->
