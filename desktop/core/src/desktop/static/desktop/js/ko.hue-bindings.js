@@ -3475,6 +3475,9 @@
       var parseForStatements = function () {
         try {
           lastKnownStatements = sqlStatementsParser.parse(self.editor.getValue());
+          if (typeof hueDebug !== 'undefined' && hueDebug.logStatementLocations) {
+            console.log(lastKnownStatements);
+          }
         } catch (error) {
           console.warn('Could not parse statements!');
           console.warn(error);
