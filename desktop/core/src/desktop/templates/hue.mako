@@ -163,7 +163,6 @@ ${ hueIcons.symbols() }
 
           <ul class="dropdown-menu">
             <!-- ko foreach: cluster.clusters -->
-              <li>
               <!-- ko if: ['dataeng', 'cm'].indexOf(type()) != -1 && interfaces().length > 0 -->
                 <li class="dropdown-submenu">
                   <a data-rel="navigator-tooltip" href="javascript: void(0)">
@@ -191,7 +190,6 @@ ${ hueIcons.symbols() }
                   </li>
                 <!-- /ko -->
               <!-- /ko -->
-              </li>
             <!-- /ko -->
           </ul>
         </div>
