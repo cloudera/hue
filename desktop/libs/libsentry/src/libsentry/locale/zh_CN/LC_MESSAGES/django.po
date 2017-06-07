@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -17,13 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsentry/api.py:239 src/libsentry/api2.py:238
-msgid "No Sentry servers are available."
-msgstr "无 Sentry 服务器可用。"
+#: src/libsentry/api.py:44 src/libsentry/api2.py:44
+#, python-format
+msgid "Failed to connect to Sentry server %s, and Sentry HA is not enabled."
+msgstr "无法连接到 Sentry 服务器 %s，并且 Sentry HA 未启用。"
 
-#: src/libsentry/api.py:268 src/libsentry/api2.py:267
-msgid "Error in retrieving Sentry server properties from Zookeeper."
-msgstr "从 Zookeeper 检索 Sentry 服务器属性时出错。"
+#: src/libsentry/api.py:53 src/libsentry/api.py:91 src/libsentry/api2.py:53
+#: src/libsentry/api2.py:91
+msgid "Failed to find an available Sentry server."
+msgstr "找不到可用的 Sentry 服务器。"
+
+#: src/libsentry/api.py:57 src/libsentry/api2.py:57
+msgid "Encountered unexpected error in SentryApi."
+msgstr "SentryApi 发生意外错误。"
 
 #: src/libsentry/conf.py:29
 msgid "Hostname or IP of server."
@@ -36,3 +42,34 @@ msgstr "正在其上运行 Sentry 服务的端口。"
 #: src/libsentry/conf.py:43
 msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr "Sentry 配置目录，即 sentry-site.xml 的所在位置。"
+
+#: src/libsentry/conf.py:49
+msgid "Number of seconds when the privilege list of a user is cached."
+msgstr "缓存用户权限列表的秒数。"
+
+#: src/libsentry/sentry_ha.py:46 src/libsentry/tests.py:58
+msgid "Cannot create a Sentry client without server hostname and port."
+msgstr "未提供服务器主机名和端口，无法创建 Sentry 客户端。"
+
+#: src/libsentry/sentry_ha.py:76
+#, python-format
+msgid ""
+"Encountered unexpected error while trying to find available Sentry "
+"client: %s"
+msgstr ""
+"尝试查找可用的 Sentry 客户端时"
+"发生意外错误：%s"
+
+#: src/libsentry/sentry_site.py:133
+msgid "No Sentry servers are configured."
+msgstr "没有配置 Sentry 服务器。"
+
+#: src/libsentry/sentry_site.py:152
+msgid "Error in retrieving Sentry server properties."
+msgstr "检索 Sentry 服务器属性时出错。"
+
+#~ msgid "No Sentry servers are available."
+#~ msgstr ""
+
+#~ msgid "Error in retrieving Sentry server properties from Zookeeper."
+#~ msgstr ""

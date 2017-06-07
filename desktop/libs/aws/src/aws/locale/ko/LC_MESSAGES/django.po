@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -42,14 +42,26 @@ msgstr ""
 "EC2 프로필)."
 
 #: src/aws/conf.py:99
-msgid "Alternate address for endpoint."
-msgstr "끝점에 대한 대체 주소입니다."
+msgid "Alternate address for the S3 endpoint."
+msgstr "S3 끝점에 대한 대체 주소입니다."
 
 #: src/aws/conf.py:105
-msgid "Alternate port for endpoint."
-msgstr "끝점에 대한 대체 포트입니다."
+msgid "Proxy address to use for the S3 connection."
+msgstr "S3 연결에 사용할 프록시 주소입니다."
 
-#: src/aws/s3/s3fs.py:59
+#: src/aws/conf.py:111
+msgid "Proxy port to use for the S3 connection."
+msgstr "S3 연결에 사용할 프록시 포트입니다."
+
+#: src/aws/conf.py:117
+msgid "Proxy user to use for the S3 connection."
+msgstr "S3 연결에 사용할 프록시 사용자입니다."
+
+#: src/aws/conf.py:123
+msgid "Proxy password to use for the S3 connection."
+msgstr "S3 연결에 사용할 프록시 암호입니다."
+
+#: src/aws/s3/s3fs.py:61
 msgid ""
 "User is not authorized to perform the attempted operation. Check that the"
 " user has appropriate permissions."
@@ -57,7 +69,7 @@ msgstr ""
 "시도된 작업을 수행할 권한이 사용자에게 없습니다. "
 "사용자에게 적절한 권한이 있는지 확인하십시오."
 
-#: src/aws/s3/s3fs.py:61
+#: src/aws/s3/s3fs.py:63
 #, python-format
 msgid ""
 "User is not authorized to write or modify path: %s. Check that the user "
@@ -66,7 +78,7 @@ msgstr ""
 "%s 경로를 쓰거나 수정할 권한이 사용자에게 없습니다. "
 "사용자에게 쓰기 권한이 있는지 확인하십시오."
 
-#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#: src/aws/s3/s3fs.py:100 src/aws/s3/s3fs.py:124
 #, python-format
 msgid ""
 "User is not authorized to access bucket named \"%s\". If you are "
@@ -75,12 +87,12 @@ msgstr ""
 "이름이 \"%s\"인 버킷에 액세스할 권한이 사용자에게 없습니다. "
 "버킷 생성을 시도하고 있다면 이 버킷 이름이 이미 예약되었습니다."
 
-#: src/aws/s3/s3fs.py:104
+#: src/aws/s3/s3fs.py:106
 #, python-format
 msgid "Failed to create bucket named \"%s\": %s"
 msgstr "이름이 \"%s\"인 버킷을 생성하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:134
+#: src/aws/s3/s3fs.py:136
 #, python-format
 msgid ""
 "Failed to access path: \"%s\" Check that you have access to read this "
@@ -89,44 +101,48 @@ msgstr ""
 "다음 경로에 액세스하지 못함: \"%s\" 버킷을 읽을 권한이 "
 "있는지 영역이 올바른지 확인하십시오."
 
-#: src/aws/s3/s3fs.py:156
+#: src/aws/s3/s3fs.py:160
 #, python-format
 msgid "User is not authorized to access path: \"%s\""
 msgstr "사용자에게 경로에 액세스할 권한이 없음: \"%s\""
 
-#: src/aws/s3/s3fs.py:158
+#: src/aws/s3/s3fs.py:162
 #, python-format
 msgid "Failed to access path \"%s\": %s"
 msgstr "경로 \"%s\"에 액세스하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:253
+#: src/aws/s3/s3fs.py:257
 msgid "Option `glob` is not implemented"
 msgstr "옵션 `glob`가 구현되지 않음"
 
-#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
+#: src/aws/s3/s3fs.py:284 src/aws/s3/s3fs.py:316
 msgid "Moving to trash is not implemented for S3"
 msgstr "휴지통으로 이동하는 기능은 S3에서 구현되지 않음"
 
-#: src/aws/s3/s3fs.py:324
+#: src/aws/s3/s3fs.py:328
 #, python-format
 msgid "Invalid bucket name: %s"
 msgstr "잘못된 버킷 이름: %s"
 
-#: src/aws/s3/s3fs.py:329
+#: src/aws/s3/s3fs.py:333
 #, python-format
 msgid "Failed to create S3 bucket \"%s\": %s"
 msgstr "S3 버킷 \"%s\"을(를) 생성하지 못함: %s"
 
-#: src/aws/s3/s3fs.py:385
+#: src/aws/s3/s3fs.py:389
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "변환할 키가 올바르지 않음: %s"
 
-#: src/aws/s3/upload.py:123
+#: src/aws/s3/upload.py:124
 msgid "No S3 filesystem found."
 msgstr "S3 파일 시스템이 없습니다."
 
-#: src/aws/s3/upload.py:134
-#, python-format
-msgid "Insufficient permissions to write to S3 path \"%s\"."
-msgstr "S3 경로 \"%s\"에 쓸 권한이 부족합니다."
+#~ msgid "Alternate address for endpoint."
+#~ msgstr ""
+
+#~ msgid "Alternate port for endpoint."
+#~ msgstr ""
+
+#~ msgid "Insufficient permissions to write to S3 path \"%s\"."
+#~ msgstr ""

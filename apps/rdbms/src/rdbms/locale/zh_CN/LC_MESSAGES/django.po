@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:58-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "查询编辑器"
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "无效设计类型 %(type)s"
+
+#: src/rdbms/templates/common.mako:26
+msgid "DBQuery icon"
+msgstr "DBQuery 图标"
 
 #: src/rdbms/templates/common.mako:27
 msgid "DB Query"
@@ -108,106 +112,110 @@ msgstr "表名..."
 msgid "The selected database has no tables."
 msgstr "所选数据库没有表。"
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:818
+#: src/rdbms/templates/execute.mako:95 src/rdbms/templates/execute.mako:815
 msgid "Query name"
 msgstr "查询名称"
 
-#: src/rdbms/templates/execute.mako:104
+#: src/rdbms/templates/execute.mako:103
 msgid "Query description"
 msgstr "查询描述"
 
-#: src/rdbms/templates/execute.mako:115
+#: src/rdbms/templates/execute.mako:114
 msgid "Your query has the following error(s):"
 msgstr "您的查询有下列错误："
 
-#: src/rdbms/templates/execute.mako:124
+#: src/rdbms/templates/execute.mako:123
 msgid "Execute"
 msgstr "执行"
 
-#: src/rdbms/templates/execute.mako:125 src/rdbms/templates/execute.mako:199
+#: src/rdbms/templates/execute.mako:124 src/rdbms/templates/execute.mako:196
 msgid "Save"
 msgstr "保存"
 
-#: src/rdbms/templates/execute.mako:126
+#: src/rdbms/templates/execute.mako:125
 msgid "Save as..."
 msgstr "另存为..."
 
-#: src/rdbms/templates/execute.mako:127
+#: src/rdbms/templates/execute.mako:126
 msgid "Explain"
 msgstr "解释"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "or create a"
 msgstr "或创建一个"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "New query"
 msgstr "新查询"
 
-#: src/rdbms/templates/execute.mako:154
+#: src/rdbms/templates/execute.mako:152
 msgid "The server returned no results."
 msgstr "服务器未返回结果。"
 
-#: src/rdbms/templates/execute.mako:179
+#: src/rdbms/templates/execute.mako:175
+msgid "Close"
+msgstr "关闭"
+
+#: src/rdbms/templates/execute.mako:176
 msgid "Save your query"
 msgstr "保存您的查询"
 
-#: src/rdbms/templates/execute.mako:184
+#: src/rdbms/templates/execute.mako:181
 msgid "Name"
 msgstr "名称"
 
-#: src/rdbms/templates/execute.mako:190
+#: src/rdbms/templates/execute.mako:187
 msgid "Description"
 msgstr "描述"
 
-#: src/rdbms/templates/execute.mako:198
+#: src/rdbms/templates/execute.mako:195
 msgid "Cancel"
 msgstr "取消"
 
-#: src/rdbms/templates/execute.mako:392
+#: src/rdbms/templates/execute.mako:389
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "示例：SELECT * FROM 表名，或按 CTRL + 空格键"
 
-#: src/rdbms/templates/execute.mako:581
+#: src/rdbms/templates/execute.mako:578
 msgid "Did you know?"
 msgstr "您知道吗？"
 
-#: src/rdbms/templates/execute.mako:667
+#: src/rdbms/templates/execute.mako:664
 msgid "No query provided to save."
 msgstr "没有提供要保存的查询。"
 
-#: src/rdbms/templates/execute.mako:689
+#: src/rdbms/templates/execute.mako:686
 msgid "Oops, no server found!"
 msgstr "很抱歉，找不到服务器！"
 
-#: src/rdbms/templates/execute.mako:695
+#: src/rdbms/templates/execute.mako:692
 msgid "Oops, no database found!"
 msgstr "很抱歉，找不到数据库！"
 
-#: src/rdbms/templates/execute.mako:812
+#: src/rdbms/templates/execute.mako:809
 msgid "This field is required."
 msgstr "此字段为必填字段。"
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:822
 msgid "Empty description"
 msgstr "空描述"
 
-#: src/rdbms/templates/execute.mako:831
+#: src/rdbms/templates/execute.mako:828
 msgid "Query saved successfully!"
 msgstr "查询已成功保存！"
 
-#: src/rdbms/templates/execute.mako:877
+#: src/rdbms/templates/execute.mako:874
 msgid "No data available"
 msgstr "没有可用数据"
 
-#: src/rdbms/templates/execute.mako:878
+#: src/rdbms/templates/execute.mako:875
 msgid "No matching records"
 msgstr "没有匹配记录"
 
-#: src/rdbms/templates/execute.mako:916
+#: src/rdbms/templates/execute.mako:913
 msgid "Server error occured: "
 msgstr "出现服务器错误： "
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:916
 msgid "Unmanageable server error occured: "
 msgstr "出现无法管理的服务器错误： "
