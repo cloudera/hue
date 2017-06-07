@@ -749,7 +749,7 @@ from desktop.views import _ko
         var keepSelectionSelector = '.doc-browser-entries, .doc-browser-folder-actions, .doc-browser-header, .doc-browser-search-container, .modal';
         $(document).click(function (event) {
           var $target = $(event.target);
-          if (!$target.is(keepSelectionSelector) && $target.parents(keepSelectionSelector).length === 0) {
+          if (!$target.is(keepSelectionSelector) && $target.parents(keepSelectionSelector).length === 0 && self.activeEntry()) {
             self.activeEntry().selectedEntries().forEach(function (entry) {
               entry.selected(false);
             });
@@ -758,7 +758,7 @@ from desktop.views import _ko
         $(window).bind('keydown', 'ctrl+a alt+a meta+a', function (e) {
           self.activeEntry().entries().forEach(function (entry) {
             entry.selected(true);
-          })
+          });
           e.preventDefault();
           return false;
         });
