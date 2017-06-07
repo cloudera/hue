@@ -58,9 +58,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script src="${ static('desktop/js/ko.editable.js') }"></script>
 
 % if not is_mini:
-<div id="jobbrowserComponents" class="jobbrowser-components jb-panel">
+<div id="jobbrowserComponents" class="jobbrowser-components jobbrowser-full jb-panel">
 % else:
-<div id="jobbrowserMiniComponents" class="jobbrowserComponents jb-panel">
+<div id="jobbrowserMiniComponents" class="jobbrowser-components jobbrowser-mini jb-panel">
 % endif
 
 % if not is_embeddable:
@@ -423,7 +423,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
   </div>
@@ -467,7 +467,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-page-tasks${ SUFFIX }" data-bind="click: function(){ fetchProfile('tasks'); $('a[href=\'#job-mapreduce-page-tasks${ SUFFIX }\']').tab('show'); }">${ _('Tasks') }</a></li>
@@ -584,7 +584,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a class="jb-logs-link" href="#job-mapreduce-task-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
         <li><a href="#job-mapreduce-task-page-attempts${ SUFFIX }" data-bind="click: function(){ fetchProfile('attempts'); $('a[href=\'#job-mapreduce-task-page-attempts${ SUFFIX }\']').tab('show'); }">${ _('Attempts') }</a></li>
@@ -740,7 +740,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <div class="pull-right" data-bind="template: { name: 'job-actions${ SUFFIX }' }"></div>
     </div>
   </div>
@@ -777,7 +777,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#job-spark-page-properties${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
 
@@ -923,7 +923,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
 
       <ul class="nav nav-pills margin-top-20">
         %if not is_mini:
@@ -1018,7 +1018,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       </div>
     </div>
 
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#workflow-action-page-metadata${ SUFFIX }" data-toggle="tab">${ _('Properties') }</a></li>
         <li><a href="#workflow-action-page-tasks${ SUFFIX }" data-toggle="tab">${ _('Child jobs') }</a></li>
@@ -1106,7 +1106,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#schedule-page-task${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a class="jb-logs-link" href="#schedule-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
@@ -1222,7 +1222,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         </ul>
       </div>
     </div>
-    <div data-bind="css:{'span10': !$root.isMini(), 'span12': $root.isMini() }">
+    <div data-bind="css:{'span10': !$root.isMini(), 'span12 no-margin': $root.isMini() }">
       <ul class="nav nav-pills margin-top-20">
         <li class="active"><a href="#bundle-page-coordinators${ SUFFIX }" data-toggle="tab">${ _('Tasks') }</a></li>
         <li><a class="jb-logs-link" href="#bundle-page-logs${ SUFFIX }" data-toggle="tab">${ _('Logs') }</a></li>
