@@ -1307,75 +1307,93 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 </script>
 
 <script type="text/html" id="render-page-counters${ SUFFIX }">
-  <!-- ko hueSpinner: { spin: !$data.counterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
-  <!-- ko if: $data.counterGroup -->
-  <!-- ko foreach: $data.counterGroup -->
-    <h3 data-bind="text: counterGroupName"></h3>
-    <table class="table table-condensed">
-      <thead>
-      <tr>
-        <th>${ _('Name') }</th>
-        <th width="15%">${ _('Maps total') }</th>
-        <th width="15%">${ _('Reduces total') }</th>
-        <th width="15%">${ _('Total') }</th>
-      </tr>
-      </thead>
-      <tbody data-bind="foreach: counter">
+  <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
+
+  <!-- ko if: $data.id -->
+    <!-- ko ifnot: $data.counterGroup -->
+      <span class="muted">${ _('There are currently no counters to be displayed.') }</span>
+    <!-- /ko -->
+    <!-- ko if: $data.counterGroup -->
+    <!-- ko foreach: $data.counterGroup -->
+      <h3 data-bind="text: counterGroupName"></h3>
+      <table class="table table-condensed">
+        <thead>
         <tr>
-          <td data-bind="text: name"></td>
-          <td data-bind="text: mapCounterValue"></td>
-          <td data-bind="text: reduceCounterValue"></td>
-          <td data-bind="text: totalCounterValue"></td>
+          <th>${ _('Name') }</th>
+          <th width="15%">${ _('Maps total') }</th>
+          <th width="15%">${ _('Reduces total') }</th>
+          <th width="15%">${ _('Total') }</th>
         </tr>
-      </tbody>
-    </table>
-  <!-- /ko -->
+        </thead>
+        <tbody data-bind="foreach: counter">
+          <tr>
+            <td data-bind="text: name"></td>
+            <td data-bind="text: mapCounterValue"></td>
+            <td data-bind="text: reduceCounterValue"></td>
+            <td data-bind="text: totalCounterValue"></td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="render-task-counters${ SUFFIX }">
-  <!-- ko hueSpinner: { spin: !$data.taskCounterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
-  <!-- ko if: $data.taskCounterGroup -->
-  <!-- ko foreach: $data.taskCounterGroup -->
-    <h3 data-bind="text: counterGroupName"></h3>
-    <table class="table table-condensed">
-      <thead>
-      <tr>
-        <th>${ _('Name') }</th>
-        <th width="30%">${ _('Value') }</th>
-      </tr>
-      </thead>
-      <tbody data-bind="foreach: counter">
+  <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
+
+  <!-- ko if: $data.id -->
+    <!-- ko ifnot: $data.taskCounterGroup -->
+      <span class="muted">${ _('There are currently no counters to be displayed.') }</span>
+    <!-- /ko -->
+    <!-- ko if: $data.taskCounterGroup -->
+    <!-- ko foreach: $data.taskCounterGroup -->
+      <h3 data-bind="text: counterGroupName"></h3>
+      <table class="table table-condensed">
+        <thead>
         <tr>
-          <td data-bind="text: name"></td>
-          <td data-bind="text: value"></td>
+          <th>${ _('Name') }</th>
+          <th width="30%">${ _('Value') }</th>
         </tr>
-      </tbody>
-    </table>
-  <!-- /ko -->
+        </thead>
+        <tbody data-bind="foreach: counter">
+          <tr>
+            <td data-bind="text: name"></td>
+            <td data-bind="text: value"></td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 
 <script type="text/html" id="render-attempt-counters${ SUFFIX }">
-  <!-- ko hueSpinner: { spin: !$data.taskAttemptCounterGroup, center: true, size: 'xlarge' } --><!-- /ko -->
-  <!-- ko if: $data.taskAttemptCounterGroup -->
-  <!-- ko foreach: $data.taskAttemptCounterGroup -->
-    <h3 data-bind="text: counterGroupName"></h3>
-    <table class="table table-condensed">
-      <thead>
-      <tr>
-        <th>${ _('Name') }</th>
-        <th width="30%">${ _('Value') }</th>
-      </tr>
-      </thead>
-      <tbody data-bind="foreach: counter">
+  <!-- ko hueSpinner: { spin: !$data.id, center: true, size: 'xlarge' } --><!-- /ko -->
+
+  <!-- ko if: $data.id -->
+    <!-- ko ifnot: $data.taskAttemptCounterGroup -->
+      <span class="muted">${ _('There are currently no counters to be displayed.') }</span>
+    <!-- /ko -->
+    <!-- ko if: $data.taskAttemptCounterGroup -->
+    <!-- ko foreach: $data.taskAttemptCounterGroup -->
+      <h3 data-bind="text: counterGroupName"></h3>
+      <table class="table table-condensed">
+        <thead>
         <tr>
-          <td data-bind="text: name"></td>
-          <td data-bind="text: value"></td>
+          <th>${ _('Name') }</th>
+          <th width="30%">${ _('Value') }</th>
         </tr>
-      </tbody>
-    </table>
-  <!-- /ko -->
+        </thead>
+        <tbody data-bind="foreach: counter">
+          <tr>
+            <td data-bind="text: name"></td>
+            <td data-bind="text: value"></td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- /ko -->
+    <!-- /ko -->
   <!-- /ko -->
 </script>
 
