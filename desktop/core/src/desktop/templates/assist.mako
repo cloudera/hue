@@ -1189,6 +1189,7 @@ from notebook.conf import get_ordered_interpreters
 
         huePubSub.subscribe('assist.hdfs.go.home', function () {
           loadPath('${ home_dir }');
+          self.apiHelper.setInTotalStorage('assist', 'currentHdfsPath', '${ home_dir }');
         });
 
         huePubSub.subscribe('assist.selectHdfsEntry', function (entry) {
