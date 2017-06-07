@@ -41,6 +41,7 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * ',
         afterCursor: '',
+        containsKeywords: ['FROM'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -58,6 +59,7 @@
       assertAutoComplete({
         beforeCursor: 'SELECT *\r\n',
         afterCursor: '',
+        containsKeywords: ['FROM'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -85,7 +87,7 @@
       assertAutoComplete({
         beforeCursor: 'SELECT foo, bar ',
         afterCursor: '',
-        containsKeywords: ['AS', '+'],
+        containsKeywords: ['AS', '+', 'FROM'],
         expectedResult: {
           lowerCase: false,
           suggestTables:{
@@ -137,6 +139,7 @@
       assertAutoComplete({
         beforeCursor: 'SELECT * fr',
         afterCursor: '',
+        containsKeywords: ['FROM'],
         expectedResult: {
           lowerCase: false,
           suggestTables: {
