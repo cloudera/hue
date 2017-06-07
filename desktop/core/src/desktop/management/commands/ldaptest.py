@@ -509,4 +509,4 @@ class Command(NoArgsCommand):
         LOG.info('Now test further by providing test ldap user in CM')
         LOG.info('test_ldap_user=someusername')
 
-    self.sys_exit(0)
+    self.sys_exit(err_code)
