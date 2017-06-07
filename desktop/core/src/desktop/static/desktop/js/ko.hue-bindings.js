@@ -978,12 +978,18 @@
         $element.data('lastScrollTop', $element.scrollTop());
       });
 
+      $element.on("wheel", function () {
+        $element.data('hasUserScrolled', true);
+      });
+
       function autoLogScroll () {
         var elementHeight = $element.innerHeight();
+        var lastHeight = $element.data('lastHeight') || elementHeight;
         var lastScrollTop = $element.data('lastScrollTop') || 0;
+        var hasUserScrolled = $element.data('hasUserScrolled') || false;
         var lastScrollHeight = $element.data('lastScrollHeight') || elementHeight;
 
-        var stickToBottom = (lastScrollTop + elementHeight) === lastScrollHeight;
+        var stickToBottom = !hasUserScrolled || elementHeight !== lastHeight || (lastScrollTop + elementHeight) === lastScrollHeight;
 
         if (stickToBottom) {
           $element.scrollTop(element.scrollHeight - $element.height());
@@ -991,6 +997,7 @@
         }
 
         $element.data('lastScrollHeight', element.scrollHeight);
+        $element.data('lastHeight', elementHeight);
       }
 
       var logValue = valueAccessor();
@@ -1004,7 +1011,7 @@
         });
       }
 
-      autoLogScroll();
+      hueUtils.waitForRendered(element, function(el){ return el.is(':visible') }, autoLogScroll);
     }
   };
 
