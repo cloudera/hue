@@ -1115,7 +1115,6 @@ from notebook.conf import get_ordered_interpreters
        * @param {Object} options
        * @param {ApiHelper} options.apiHelper
        * @param {string} options.user
-       * @param {Object} options.i18n
        * @constructor
        **/
       function AssistDocumentsPanel (options) {
@@ -1462,12 +1461,7 @@ from notebook.conf import get_ordered_interpreters
         var self = this;
         var i18n = {
           errorLoadingDatabases: "${ _('There was a problem loading the databases') }",
-          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }",
-          documentTypes: {
-            'query-hive': "${ _('Hive Query') }",
-            'query': "${ _('Query') }",
-            'notebook': "${ _('Notebook') }"
-          }
+          errorLoadingTablePreview: "${ _('There was a problem loading the table preview.') }"
         };
 
         self.apiHelper = ApiHelper.getInstance();
@@ -1571,8 +1565,7 @@ from notebook.conf import get_ordered_interpreters
               panels.push(new AssistInnerPanel({
                 panelData: new AssistDocumentsPanel({
                   user: params.user,
-                  apiHelper: self.apiHelper,
-                  i18n: i18n
+                  apiHelper: self.apiHelper
                 }),
                 apiHelper: self.apiHelper,
                 name: '${ _("Documents") }',
