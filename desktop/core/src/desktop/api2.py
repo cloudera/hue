@@ -707,7 +707,7 @@ def _copy_document_with_owner(doc, owner, uuids_map):
 
   # Remap parent directory if needed
   parent_uuid = None
-  if 'parent_directory' in doc['fields']:
+  if doc['fields'].get('parent_directory'):
     parent_uuid = doc['fields']['parent_directory'][0]
 
   if parent_uuid is not None and parent_uuid in uuids_map.keys():
