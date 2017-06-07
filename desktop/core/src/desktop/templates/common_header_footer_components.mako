@@ -71,15 +71,23 @@ from metadata.conf import has_optimizer, OPTIMIZER
 
     DocumentTypeGlobals = {
       'all': '${_('All')}',
-      'link-pigscript': '${_('Pig')}',
-      'link-workflow': '${_('Workflow')}',
+      'directory': '${ _('Directory') }',
+      'link-pigscript': '${_('Pig Script')}',
+      'link-workflow': '${_('Job Design')}',
       'notebook': '${_('Notebook')}',
-      'oozie-bundle2': '${_('Bundle')}',
-      'oozie-coordinator2': '${_('Coordinator')}',
-      'oozie-workflow2': '${_('Workflow')}',
-      'query-hive': '${_('Hive')}',
-      'query-impala': '${_('Impala')}',
-      'search-dashboard': '${_('Dashboard')}'
+      'oozie-bundle2': '${_('Oozie Bundle')}',
+      'oozie-coordinator2': '${_('Oozie Coordinator')}',
+      'oozie-workflow2': '${_('Oozie Workflow')}',
+      'query-hive': '${_('Hive Query')}',
+      'query-impala': '${_('Impala Query')}',
+      'search-dashboard': '${_('Search Dashboard')}',
+      'query-mapreduce': '${_('MapReduce Job')}',
+      'query-sqoop1': '${_('Import Job')}',
+      'query-spark2': '${_('Spark Job')}',
+      'query-java': '${_('Java Job')}',
+      'query-pig': '${_('Pig Script')}',
+      'query-shell': '${_('Shell Script')}',
+      'query-distcp': '${_('DistCp Job')}',
     };
 
     // jHue plugins global configuration
