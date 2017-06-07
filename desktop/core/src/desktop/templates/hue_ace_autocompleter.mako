@@ -456,15 +456,19 @@ from desktop.views import _ko
           var newBase = session.doc.createAnchor(pos.row, pos.column - prefix.length);
           self.top(data.position.top + data.lineHeight + 3);
           self.left(data.position.left);
+          var newAutocomp = false;
           if (!self.active() || (!self.base || newBase.column !== self.base.column || newBase.row !== self.base.row)) {
             self.autocompleter.autocomplete();
+            newAutocomp = true;
           }
           newBase.$insertRight = true;
           self.base = newBase;
           self.suggestions.filter(prefix);
           self.active(true);
-          self.attach();
           self.selectedIndex(0);
+          if (newAutocomp) {
+            self.attach();
+          }
         });
 
         self.disposeFunctions.push(function () {
