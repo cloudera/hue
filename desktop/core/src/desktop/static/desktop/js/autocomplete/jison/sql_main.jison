@@ -1402,6 +1402,11 @@ SelectStatement_EDIT
  | 'SELECT' OptionalAllOrDistinct SelectList 'CURSOR'
    {
      parser.checkForSelectListKeywords($3);
+     var keywords = ['FROM'];
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      parser.suggestTables({ prependFrom: true });
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
    }
