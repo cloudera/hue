@@ -38,14 +38,14 @@ from desktop.views import _ko
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
     <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }">
-      <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="overflow-y: scroll; width: 190px; margin-left: 10px; min-height: 34px; max-height: 200px;">
+      <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="min-width: 190px; max-width: 250px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
-        <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
+        <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
         </ul>
         <!-- /ko -->
         <!-- ko ifnot: foreachVisible -->
-        <ul class="hue-inner-drop-down" data-bind="foreach: filteredEntries">
+        <ul class="hue-inner-drop-down" style="overflow-x: hidden;" data-bind="foreach: filteredEntries">
           <li><a href="javascript:void(0)" data-bind="text: typeof $data.label !== 'undefined' ? $data.label : $data, click: function () { $parent.value($data); }"></a></li>
         </ul>
         <!-- /ko -->
