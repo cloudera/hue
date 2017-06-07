@@ -62,10 +62,10 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="sql-context-table-details">
     <!-- ko with: fetchedData -->
-    <div style="flex: 1; padding: 10px 10px 0 10px;">
+    <div class="sql-context-table-details">
       <!-- ko if: details && details.properties -->
-      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Properties") }</div>
-      <div style="margin-left: 15px;">
+      <div class="sql-context-header">${ _("Properties") }</div>
+      <div class="sql-context-section">
         <span style="margin-right: 5px;" title="${ _('Owner') }">
           <i class="fa fa-fw fa-user muted"></i> <span data-bind="text: details.properties.owner"></span>
         </span>
@@ -81,20 +81,20 @@ from metadata.conf import has_navigator
       </div>
       <!-- /ko -->
       <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
-      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
-      <div style="margin-left: 15px; font-style: italic;" data-bind="text: comment"></div>
+      <div class="sql-context-header">${ _("Comment") }</div>
+      <div class="sql-context-section" style="font-style: italic;" data-bind="text: comment"></div>
       <!-- /ko -->
       %if has_navigator(user):
         <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
-        <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
-        <div style="margin-left: 15px;" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+        <div class="sql-context-header">${ _("Tags") }</div>
+        <div class="sql-context-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
         <!-- /ko -->
       %endif
       <!-- ko if: typeof viewSql !== 'undefined' -->
-      <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("View SQL") }</div>
+      <div class="sql-context-header">${ _("View SQL") }</div>
       <!-- ko hueSpinner: { spin: loadingViewSql, center: true, size: 'large' } --><!-- /ko -->
       <!-- ko ifnot: loadingViewSql -->
-      <div style="margin: 0 10px;" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: { value: viewSql, formatted: true, dialect: $parent.sourceType }"></div>
+      <div class="sql-context-section" class="pointer" title="${ _("Click to copy") }" data-bind="tooltip: { placement: 'bottom' }, clickToCopy: viewSql, click: function () { huePubSub.publish('sql.context.popover.hide'); }, highlight: { value: viewSql, formatted: true, dialect: $parent.sourceType }"></div>
       <!-- /ko -->
       <!-- /ko -->
     </div>
@@ -103,16 +103,16 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="sql-context-column-details">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, nicescroll">
-      <div style="margin: 15px;">
-        <a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko -->
+      <div>
+        <div style="margin: 0 0 5px 10px;"><a class="pointer" data-bind="text: name, attr: { title: name }, click: function() { huePubSub.publish('sql.context.popover.scroll.to.column', name); }"></a> <!-- ko if: typeof type !== 'undefined' -->(<span data-bind="text: type.indexOf('<') !== -1 ? type.substring(0, type.indexOf('<')) : type, attr: { title: type }"></span>)<!-- /ko --></div>
         <!-- ko if: typeof comment !== 'undefined' && comment !== '' && comment !== null -->
-        <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
-        <div data-bind="text: comment"></div>
+        <div class="sql-context-header">${ _("Comment") }</div>
+        <div class="sql-context-section" data-bind="text: comment"></div>
         <!-- /ko -->
         %if has_navigator(user):
           <!-- ko if: $parent.sourceType === 'hive' || $parent.sourceType === 'impala' -->
-          <div style="margin-top: 10px; font-size: 15px; font-weight: 300;">${ _("Tags") }</div>
-          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
+          <div class="sql-context-header">${ _("Tags") }</div>
+          <div class="sql-context-section" data-bind="component: { name: 'nav-tags', params: $parent } "></div>
           <!-- /ko -->
         %endif
       </div>
@@ -192,14 +192,12 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex-fill">
       <div class="sql-context-flex">
         <div data-bind="if: $parent.comment">
-          <div style="margin: 10px; font-size: 15px; font-weight: 300;">${ _("Comment") }</div>
-          <div style="margin-left: 15px; font-style: italic;" data-bind="text: $parent.comment"></div>
+          <div class="sql-context-header">${ _("Comment") }</div>
+          <div class="sql-context-section" style="font-style: italic;" data-bind="text: $parent.comment"></div>
         </div>
-        <div style="margin: 10px 5px 0 10px;">
-          <span style="font-size: 15px; font-weight: 300;">${_('Tags')}</span>
-        </div>
+        <div class="sql-context-header">${_('Tags')}</div>
         <div class="sql-context-flex-fill sql-columns-table" style="position:relative; height: 100%; overflow-y: auto;">
-          <div style="margin: 10px" data-bind="component: { name: 'nav-tags', params: $data } "></div>
+          <div data-bind="component: { name: 'nav-tags', params: $data } "></div>
         </div>
       </div>
     </div>
@@ -239,9 +237,7 @@ from metadata.conf import has_navigator
 
   <script type="text/html" id="sql-context-table-partitions">
     <div class="sql-context-flex-fill" data-bind="with: fetchedData, niceScroll">
-      <div style="margin: 10px 5px 0 10px;">
-        <span style="font-size: 15px; font-weight: 300;">${_('Columns')}</span>
-      </div>
+      <div class="sql-context-header">${_('Columns')}</div>
       <div>
         <table class="table table-condensed table-nowrap">
           <thead>
@@ -258,9 +254,7 @@ from metadata.conf import has_navigator
           </tbody>
         </table>
       </div>
-      <div style="margin: 10px 5px 0 10px;">
-        <span style="font-size: 15px; font-weight: 300;">${_('Partitions')}</span>
-      </div>
+      <div class="sql-context-header">${_('Partitions')}</div>
       <table class="table table-condensed table-nowrap">
         <thead>
           <tr>
@@ -1351,7 +1345,7 @@ from metadata.conf import has_navigator
     <div class="sql-context-flex">
       <div class="sql-context-flex-header">
         <div style="margin: 10px 5px 0 10px;">
-          <span style="font-size: 15px; font-weight: 300;">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</span>
+          <span class="sql-context-header">${_('Columns')} (<span data-bind="text: filteredColumns().length"></span>)</span>
           <a href="#" data-bind="toggle: searchVisible"><i class="snippet-icon fa fa-search inactive-action margin-left-10" data-bind="css: { 'blue': searchVisible }"></i></a>
           <input class="input-large sql-context-inline-search" type="text" data-bind="visible: searchVisible, hasFocus: searchFocus, clearable: searchInput, valueUpdate:'afterkeydown'" placeholder="${ _('Filter columns...') }">
         </div>
