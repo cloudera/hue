@@ -187,7 +187,31 @@
         'height': '260px',
         'overflow-y': 'auto'
       });
+      var $homeBreadcrumb = $("<ul>").addClass("hue-breadcrumbs").css({
+        'padding': '0',
+        'marginLeft': '0',
+        'float': 'left',
+        'white-space': 'nowrap'
+      });
+      var _home = $("<li>");
+      var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
+        _parent.navigateTo("/?default_to_home");
+      });
+
+      if (_parent.options.fsSelected === 's3a') {
+        _homelink = $("<a>").addClass("nounderline muted").html('<i class="fa fa-cubes"></i> ').css("cursor", "pointer").click(function () {
+          _parent.navigateTo("S3A://");
+        });
+      }
+
+      _homelink.appendTo(_home);
+      _home.appendTo($homeBreadcrumb);
+
+      $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
+
       if (data.error || (data.title != null && data.title == "Error")) {
+        $homeBreadcrumb.appendTo($(_parent.element).find('.filechooser-tree'));
+        $("<div class='clearfix'>").appendTo($(_parent.element).find('.filechooser-tree'));
         var _errorMsg = $("<div>").addClass("alert").addClass("alert-error").text(data.message ? data.message : data.error);
         _errorMsg.appendTo($(_parent.element).find('.filechooser-tree'));
         var _previousLink = $("<a>").addClass("btn").text(_parent.options.labels.BACK).click(function () {
@@ -262,13 +286,6 @@
 
         $search.appendTo($(_parent.element).find('.filechooser-tree'));
 
-        var $homeBreadcrumb = $("<ul>").addClass("hue-breadcrumbs").css({
-          'padding': '0',
-          'marginLeft': '0',
-          'float': 'left',
-          'white-space': 'nowrap'
-        });
-
         var $scrollingBreadcrumbs = $("<ul>").addClass("hue-breadcrumbs editable-breadcrumbs").css({
           'padding': '0',
           'marginLeft': '10px',
@@ -280,22 +297,6 @@
           'overflow-y': 'hidden',
           'white-space': 'nowrap'
         });
-
-        var _home = $("<li>");
-        var _homelink = $("<a>").addClass("nounderline").html('<i class="fa fa-home"></i> ' + _parent.options.labels.HOME).css("cursor", "pointer").click(function () {
-          _parent.navigateTo("/?default_to_home");
-        });
-
-        if (_parent.options.fsSelected === 's3a') {
-          _homelink = $("<a>").addClass("nounderline muted").html('<i class="fa fa-cubes"></i> ').css("cursor", "pointer").click(function () {
-            _parent.navigateTo("S3A://");
-          });
-        }
-
-        _homelink.appendTo(_home);
-
-        $("<span>").addClass("divider").css("margin-right", "20px").appendTo(_home);
-        _home.appendTo($homeBreadcrumb);
 
         if (_parent.options.showExtraHome) {
           var _extraHome = $("<li>");
