@@ -17,15 +17,16 @@
 */
 @import (reference) "hue-mixins.less";
 
-.jobbrowser-components {
+.jobbrowser-mini {
+  .span12.no-margin {
+    margin-left: 0!important;
+  }
+}
+
+.jobbrowser-full {
   .content-panel-inner {
     padding: 10px;
   }
-  .tab-content {
-    padding: 10px;
-    border: none !important;
-  }
-
   .jb-breadcrumbs {
     margin-bottom: 0;
   }
@@ -33,6 +34,13 @@
   .jb-panel {
     padding-left: 10px;
     padding-right: 10px;
+  }
+}
+
+.jobbrowser-components {
+  .tab-content {
+    padding: 10px;
+    border: none !important;
   }
 
   .hue-breadcrumbs-bar {
