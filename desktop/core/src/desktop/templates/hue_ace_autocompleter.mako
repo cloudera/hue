@@ -61,7 +61,7 @@ from desktop.views import _ko
       <div class="autocompleter-details-contents">
         <div class="autocompleter-details-contents-inner">
           <div class="details-code" data-bind="text: details.signature"></div>
-          <div class="details-comment" data-bind="text: details.description"></div>
+          <div class="details-description" data-bind="text: details.description"></div>
         </div>
       </div>
     </div>
