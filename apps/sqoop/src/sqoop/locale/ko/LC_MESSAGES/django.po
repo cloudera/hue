@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:57-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -104,7 +104,7 @@ msgstr "Job을 삭제할 수 없습니다."
 msgid "Could not start job."
 msgstr "Job을 시작할 수 없습니다."
 
-#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:848
+#: src/sqoop/api/job.py:217 src/sqoop/templates/app.mako:851
 msgid "Could not stop job."
 msgstr "Job을 중지할 수 없습니다."
 
@@ -140,177 +140,182 @@ msgstr "링크를 삭제할 수 없습니다."
 msgid "Could not get submissions."
 msgstr "제안을 가져올 수 없습니다."
 
-#: src/sqoop/templates/app.mako:29 src/sqoop/templates/app.mako:52
+#: src/sqoop/templates/app.mako:33 src/sqoop/templates/app.mako:56
 msgid "Create a new job"
 msgstr "새 Job 생성"
 
-#: src/sqoop/templates/app.mako:29 src/sqoop/templates/app.mako:52
+#: src/sqoop/templates/app.mako:33 src/sqoop/templates/app.mako:56
 msgid "New job"
 msgstr "새 Job"
 
-#: src/sqoop/templates/app.mako:32
+#: src/sqoop/templates/app.mako:36
 msgid "Manage links"
 msgstr "링크 관리"
 
-#: src/sqoop/templates/app.mako:34 src/sqoop/templates/app.mako:54
-#: src/sqoop/templates/app.mako:55
+#: src/sqoop/templates/app.mako:38 src/sqoop/templates/app.mako:58
+#: src/sqoop/templates/app.mako:59
 msgid "Sqoop Jobs"
 msgstr "Sqoop Job"
 
-#: src/sqoop/templates/app.mako:35
+#: src/sqoop/templates/app.mako:39
 msgid "Search for job name or content"
 msgstr "job 이름 또는 콘텐츠 검색"
 
-#: src/sqoop/templates/app.mako:40
+#: src/sqoop/templates/app.mako:44
 msgid "Create a new link"
 msgstr "새 링크 생성"
 
-#: src/sqoop/templates/app.mako:40
+#: src/sqoop/templates/app.mako:44
 msgid "New link"
 msgstr "새 링크"
 
-#: src/sqoop/templates/app.mako:43
+#: src/sqoop/templates/app.mako:47
 msgid "Manage jobs"
 msgstr "Job 관리"
 
-#: src/sqoop/templates/app.mako:45 src/sqoop/templates/app.mako:61
-#: src/sqoop/templates/app.mako:62
+#: src/sqoop/templates/app.mako:49 src/sqoop/templates/app.mako:65
+#: src/sqoop/templates/app.mako:66
 msgid "Sqoop Links"
 msgstr "Sqoop 링크"
 
-#: src/sqoop/templates/app.mako:46
+#: src/sqoop/templates/app.mako:50
 msgid "Search for link name or content"
 msgstr "링크 이름 또는 콘텐츠 검색"
 
-#: src/sqoop/templates/app.mako:54 src/sqoop/templates/app.mako:55
-#: src/sqoop/templates/app.mako:61 src/sqoop/templates/app.mako:62
+#: src/sqoop/templates/app.mako:58 src/sqoop/templates/app.mako:59
+#: src/sqoop/templates/app.mako:65 src/sqoop/templates/app.mako:66
 msgid "Back to jobs list"
 msgstr "Job 목록으로 돌아가기"
 
-#: src/sqoop/templates/app.mako:54
+#: src/sqoop/templates/app.mako:58
 msgid "New Job"
 msgstr "새 Job"
 
-#: src/sqoop/templates/app.mako:61
+#: src/sqoop/templates/app.mako:65
 msgid "New Connection"
 msgstr "새 연결"
 
-#: src/sqoop/templates/app.mako:71
+#: src/sqoop/templates/app.mako:75
 msgid "Sqoop error"
 msgstr "Sqoop 오류"
 
-#: src/sqoop/templates/app.mako:92 src/sqoop/templates/app.mako:110
-#: src/sqoop/templates/app.mako:231
+#: src/sqoop/templates/app.mako:91 src/sqoop/templates/app.mako:109
+#: src/sqoop/templates/app.mako:230
 msgid "Click to edit"
 msgstr "편집하려면 클릭"
 
-#: src/sqoop/templates/app.mako:118
+#: src/sqoop/templates/app.mako:117
 msgid "There are currently no jobs."
 msgstr "현재 Job이 없습니다."
 
-#: src/sqoop/templates/app.mako:118 src/sqoop/templates/app.mako:238
+#: src/sqoop/templates/app.mako:117 src/sqoop/templates/app.mako:237
 msgid "Click here to add one."
 msgstr "추가하려면 여기를 클릭합니다."
 
-#: src/sqoop/templates/app.mako:130
+#: src/sqoop/templates/app.mako:129
 msgid "Actions"
 msgstr "작업"
 
-#: src/sqoop/templates/app.mako:132
+#: src/sqoop/templates/app.mako:131
 msgid "Run the job"
 msgstr "Job 실행"
 
-#: src/sqoop/templates/app.mako:133
+#: src/sqoop/templates/app.mako:132
 msgid "Run"
 msgstr "실행"
 
-#: src/sqoop/templates/app.mako:137
+#: src/sqoop/templates/app.mako:136
 msgid "Stop the job"
 msgstr "Job 중지"
 
-#: src/sqoop/templates/app.mako:138
+#: src/sqoop/templates/app.mako:137
 msgid "Stop"
 msgstr "중지"
 
-#: src/sqoop/templates/app.mako:142
+#: src/sqoop/templates/app.mako:141
 msgid "Copy the job"
 msgstr "Job 복사"
 
-#: src/sqoop/templates/app.mako:143
+#: src/sqoop/templates/app.mako:142
 msgid "Copy"
 msgstr "복사"
 
-#: src/sqoop/templates/app.mako:147
+#: src/sqoop/templates/app.mako:146
 msgid "Delete the job"
 msgstr "Job 삭제"
 
-#: src/sqoop/templates/app.mako:148 src/sqoop/templates/app.mako:425
+#: src/sqoop/templates/app.mako:147 src/sqoop/templates/app.mako:425
 #: src/sqoop/templates/app.mako:443 src/sqoop/templates/app.mako:520
 #: src/sqoop/templates/app.mako:614
 msgid "Delete"
 msgstr "삭제"
 
-#: src/sqoop/templates/app.mako:151
+#: src/sqoop/templates/app.mako:150
 msgid "Submissions"
 msgstr "제출"
 
-#: src/sqoop/templates/app.mako:153
+#: src/sqoop/templates/app.mako:152
 msgid "Browse output directory"
 msgstr "출력 디렉토리 찾아보기"
 
-#: src/sqoop/templates/app.mako:154
+#: src/sqoop/templates/app.mako:153
 msgid "Output directory"
 msgstr "출력 디렉토리"
 
-#: src/sqoop/templates/app.mako:158
+#: src/sqoop/templates/app.mako:157
 msgid "Browse input directory"
 msgstr "입력 디렉토리 찾아보기"
 
-#: src/sqoop/templates/app.mako:159
+#: src/sqoop/templates/app.mako:158
 msgid "Input directory"
 msgstr "입력 디렉토리"
 
-#: src/sqoop/templates/app.mako:163 src/sqoop/templates/app.mako:165
+#: src/sqoop/templates/app.mako:162 src/sqoop/templates/app.mako:164
 msgid "Logs"
 msgstr "로그"
 
-#: src/sqoop/templates/app.mako:168
+#: src/sqoop/templates/app.mako:167
 msgid "Last status"
 msgstr "마지막 상태"
 
-#: src/sqoop/templates/app.mako:207
+#: src/sqoop/templates/app.mako:206
 msgid "Back"
 msgstr "뒤로"
 
-#: src/sqoop/templates/app.mako:211
+#: src/sqoop/templates/app.mako:210
 msgid "Next"
 msgstr "다음"
 
-#: src/sqoop/templates/app.mako:214 src/sqoop/templates/app.mako:276
+#: src/sqoop/templates/app.mako:213 src/sqoop/templates/app.mako:275
 msgid "Save"
 msgstr "저장"
 
-#: src/sqoop/templates/app.mako:216
+#: src/sqoop/templates/app.mako:215
 msgid "Save and run"
 msgstr "저장 후 실행"
 
-#: src/sqoop/templates/app.mako:238
+#: src/sqoop/templates/app.mako:237
 msgid "There are currently no links."
 msgstr "현재 링크가 없습니다."
 
-#: src/sqoop/templates/app.mako:252 src/sqoop/templates/app.mako:408
+#: src/sqoop/templates/app.mako:251 src/sqoop/templates/app.mako:408
 msgid "Name"
 msgstr "이름"
 
-#: src/sqoop/templates/app.mako:258
+#: src/sqoop/templates/app.mako:257
 msgid "Connector"
 msgstr "커넥터"
 
-#: src/sqoop/templates/app.mako:275
+#: src/sqoop/templates/app.mako:274
 msgid "Cancel"
 msgstr "취소"
 
-#: src/sqoop/templates/app.mako:290
+#: src/sqoop/templates/app.mako:288 src/sqoop/templates/app.mako:300
+#: src/sqoop/templates/app.mako:312
+msgid "Close"
+msgstr "닫기"
+
+#: src/sqoop/templates/app.mako:289
 msgid "Choose a folder"
 msgstr "폴더 선택"
 
@@ -374,86 +379,86 @@ msgstr "True"
 msgid "False"
 msgstr "False"
 
-#: src/sqoop/templates/app.mako:722
+#: src/sqoop/templates/app.mako:725
 msgid "Step 1: From"
 msgstr "1단계: 원본"
 
-#: src/sqoop/templates/app.mako:723 src/sqoop/templates/app.mako:745
+#: src/sqoop/templates/app.mako:726 src/sqoop/templates/app.mako:748
 msgid "Database"
 msgstr "데이터베이스"
 
-#: src/sqoop/templates/app.mako:729
+#: src/sqoop/templates/app.mako:732
 msgid "Step 2: To"
 msgstr "2단계: 대상"
 
-#: src/sqoop/templates/app.mako:730 src/sqoop/templates/app.mako:752
+#: src/sqoop/templates/app.mako:733 src/sqoop/templates/app.mako:755
 msgid "HDFS"
 msgstr "HDFS"
 
-#: src/sqoop/templates/app.mako:737
+#: src/sqoop/templates/app.mako:740
 msgid "Step 1: Information"
 msgstr "1단계: 정보"
 
-#: src/sqoop/templates/app.mako:738
+#: src/sqoop/templates/app.mako:741
 msgid "Connection"
 msgstr "연결"
 
-#: src/sqoop/templates/app.mako:744
+#: src/sqoop/templates/app.mako:747
 msgid "Step 2: From"
 msgstr "2단계: 원본"
 
-#: src/sqoop/templates/app.mako:751
+#: src/sqoop/templates/app.mako:754
 msgid "Step 3: To"
 msgstr "3단계: 대상"
 
-#: src/sqoop/templates/app.mako:818
+#: src/sqoop/templates/app.mako:821
 msgid "Please specify a link."
 msgstr "링크를 지정하십시오."
 
-#: src/sqoop/templates/app.mako:827
+#: src/sqoop/templates/app.mako:830
 msgid "Cannot connect to sqoop server."
 msgstr "Sqoop Server에 연결할 수 없습니다."
 
-#: src/sqoop/templates/app.mako:832
+#: src/sqoop/templates/app.mako:835
 msgid "The job is starting..."
 msgstr "Job을 시작하는 중..."
 
-#: src/sqoop/templates/app.mako:836
+#: src/sqoop/templates/app.mako:839
 msgid "Started job."
 msgstr "Job을 시작했습니다."
 
-#: src/sqoop/templates/app.mako:840
+#: src/sqoop/templates/app.mako:843
 msgid "Error: "
 msgstr "오류: "
 
-#: src/sqoop/templates/app.mako:844
+#: src/sqoop/templates/app.mako:847
 msgid "Stopped job."
 msgstr "Job을 중지했습니다."
 
-#: src/sqoop/templates/app.mako:852
+#: src/sqoop/templates/app.mako:855
 msgid "Could not load node."
 msgstr "노드를 로드할 수 없습니다."
 
-#: src/sqoop/templates/app.mako:901
+#: src/sqoop/templates/app.mako:904
 msgid ""
 "Did you know? You can use the tab key or CTRL + Space to autocomplete "
 "file and folder names"
 msgstr "유용한 정보: tab 키 또는 Ctrl + Space를 사용하여 파일 및 폴더 이름을 자동 완성할 수 있습니다."
 
-#: src/sqoop/templates/app.mako:968
+#: src/sqoop/templates/app.mako:971
 msgid ""
 "There was a problem with the server. Look at the Sqoop2 server logs for "
 "more details."
 msgstr "서버에 문제가 발생했습니다. 자세한 내용을 Sqoop2 server 로그를 참조하십시오."
 
-#: src/sqoop/templates/app.mako:971
+#: src/sqoop/templates/app.mako:974
 msgid "Unknown error."
 msgstr "알 수 없는 오류입니다."
 
-#: src/sqoop/templates/app.mako:1076
+#: src/sqoop/templates/app.mako:1079
 msgid "Watch out! This path currently does not exist."
 msgstr "주의하십시오! 이 경로가 현재 존재하지 않습니다."
 
-#: src/sqoop/templates/app.mako:1157
+#: src/sqoop/templates/app.mako:1160
 msgid "Untitled Job"
 msgstr "제목 없는 Job"

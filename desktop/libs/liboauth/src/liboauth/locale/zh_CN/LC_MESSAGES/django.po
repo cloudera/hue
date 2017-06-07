@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2014-01-03 20:09+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -131,38 +131,59 @@ msgstr "Hue - 注册"
 msgid "Hue - Sign in"
 msgstr "Hue - 登录"
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:151
+#: src/liboauth/templates/oauth-login.mako:167
+msgid "Hue logo"
+msgstr "Hue 徽标"
+
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Visit gethue.com"
 msgstr "访问 gethue.com"
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "感觉昏昏欲睡？不如访问 gethue.com 提提神吧！"
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Error!"
 msgstr "错误！"
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Invalid username or password."
 msgstr "用户名或密码无效。"
 
-#: src/liboauth/templates/oauth-login.mako:180
+#: src/liboauth/templates/oauth-login.mako:178
 msgid "This is your first time logging in."
 msgstr "这是您第一次登录。"
 
-#: src/liboauth/templates/oauth-login.mako:181
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "You will become Hue superuser."
 msgstr "您将成为 Hue 超级用户。"
 
-#: src/liboauth/templates/oauth-login.mako:183
+#: src/liboauth/templates/oauth-login.mako:181
 msgid "Sign Up via"
 msgstr "通过以下项签约"
 
-#: src/liboauth/templates/oauth-login.mako:186
+#: src/liboauth/templates/oauth-login.mako:184
 msgid "Sign In via"
 msgstr "通过以下项注册"
 
-#: src/liboauth/templates/oauth-login.mako:215
+#: src/liboauth/templates/oauth-login.mako:190
+msgid "Google icon"
+msgstr "Google 图标"
+
+#: src/liboauth/templates/oauth-login.mako:196
+msgid "Facebook icon"
+msgstr "Facebook 图标"
+
+#: src/liboauth/templates/oauth-login.mako:202
+msgid "Linkedin icon"
+msgstr "Linkedin 图标"
+
+#: src/liboauth/templates/oauth-login.mako:208
+msgid "Twitter icon"
+msgstr "Twitter 图标"
+
+#: src/liboauth/templates/oauth-login.mako:213
 msgid "The oauth app is not configured with any provider."
 msgstr "未通过提供程序配置 oauth 应用程序。"

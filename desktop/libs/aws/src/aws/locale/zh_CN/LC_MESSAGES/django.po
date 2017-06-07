@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: zh_CN <LL@li.org>\n"
@@ -42,14 +42,26 @@ msgstr ""
 "EC2 配置文件）。"
 
 #: src/aws/conf.py:99
-msgid "Alternate address for endpoint."
-msgstr "端点的备用地址。"
+msgid "Alternate address for the S3 endpoint."
+msgstr "S3 端点的备用地址。"
 
 #: src/aws/conf.py:105
-msgid "Alternate port for endpoint."
-msgstr "端点的备用端口。"
+msgid "Proxy address to use for the S3 connection."
+msgstr "用于 S3 连接的代理地址。"
 
-#: src/aws/s3/s3fs.py:59
+#: src/aws/conf.py:111
+msgid "Proxy port to use for the S3 connection."
+msgstr "用于 S3 连接的代理端口。"
+
+#: src/aws/conf.py:117
+msgid "Proxy user to use for the S3 connection."
+msgstr "用于 S3 连接的代理用户。"
+
+#: src/aws/conf.py:123
+msgid "Proxy password to use for the S3 connection."
+msgstr "用于 S3 连接的代理密码。"
+
+#: src/aws/s3/s3fs.py:61
 msgid ""
 "User is not authorized to perform the attempted operation. Check that the"
 " user has appropriate permissions."
@@ -57,7 +69,7 @@ msgstr ""
 "用户无权执行尝试的操作。请检查"
 "用户是否具有相应的权限。"
 
-#: src/aws/s3/s3fs.py:61
+#: src/aws/s3/s3fs.py:63
 #, python-format
 msgid ""
 "User is not authorized to write or modify path: %s. Check that the user "
@@ -66,7 +78,7 @@ msgstr ""
 "用户无权写入或修改路径：%s。请检查用户"
 "是否具有写入权限。"
 
-#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#: src/aws/s3/s3fs.py:100 src/aws/s3/s3fs.py:124
 #, python-format
 msgid ""
 "User is not authorized to access bucket named \"%s\". If you are "
@@ -75,12 +87,12 @@ msgstr ""
 "用户无权访问名为“%s”的分段。如果您正"
 "在尝试创建分段，则此分段名称已保留。"
 
-#: src/aws/s3/s3fs.py:104
+#: src/aws/s3/s3fs.py:106
 #, python-format
 msgid "Failed to create bucket named \"%s\": %s"
 msgstr "无法创建名为“%s”的分段：%s"
 
-#: src/aws/s3/s3fs.py:134
+#: src/aws/s3/s3fs.py:136
 #, python-format
 msgid ""
 "Failed to access path: \"%s\" Check that you have access to read this "
@@ -89,44 +101,48 @@ msgstr ""
 "无法访问路径：“%s”请检查您是否有权读取此"
 "分段，并且此区域是否正确。"
 
-#: src/aws/s3/s3fs.py:156
+#: src/aws/s3/s3fs.py:160
 #, python-format
 msgid "User is not authorized to access path: \"%s\""
 msgstr "用户无权访问路径：“%s”"
 
-#: src/aws/s3/s3fs.py:158
+#: src/aws/s3/s3fs.py:162
 #, python-format
 msgid "Failed to access path \"%s\": %s"
 msgstr "无法访问路径“%s”：%s"
 
-#: src/aws/s3/s3fs.py:253
+#: src/aws/s3/s3fs.py:257
 msgid "Option `glob` is not implemented"
 msgstr "未实施选项 `glob`"
 
-#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
+#: src/aws/s3/s3fs.py:284 src/aws/s3/s3fs.py:316
 msgid "Moving to trash is not implemented for S3"
 msgstr "未对 S3 执行移动至垃圾桶"
 
-#: src/aws/s3/s3fs.py:324
+#: src/aws/s3/s3fs.py:328
 #, python-format
 msgid "Invalid bucket name: %s"
 msgstr "无效的分段名称：%s"
 
-#: src/aws/s3/s3fs.py:329
+#: src/aws/s3/s3fs.py:333
 #, python-format
 msgid "Failed to create S3 bucket \"%s\": %s"
 msgstr "无法创建 S3 分段“%s”：%s"
 
-#: src/aws/s3/s3fs.py:385
+#: src/aws/s3/s3fs.py:389
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "要转换的密钥无效：%s"
 
-#: src/aws/s3/upload.py:123
+#: src/aws/s3/upload.py:124
 msgid "No S3 filesystem found."
 msgstr "未找到 S3 文件系统。"
 
-#: src/aws/s3/upload.py:134
-#, python-format
-msgid "Insufficient permissions to write to S3 path \"%s\"."
-msgstr "没有足够的权限写入 S3 路径“%s”。"
+#~ msgid "Alternate address for endpoint."
+#~ msgstr ""
+
+#~ msgid "Alternate port for endpoint."
+#~ msgstr ""
+
+#~ msgid "Insufficient permissions to write to S3 path \"%s\"."
+#~ msgstr ""

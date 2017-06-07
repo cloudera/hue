@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:57-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:211 src/pig/templates/app.mako:761
+#: src/pig/api.py:211 src/pig/templates/app.mako:754
 msgid "Unsaved script"
 msgstr ""
 
@@ -79,6 +79,10 @@ msgstr ""
 #: src/pig/management/commands/pig_setup.py:56
 #, python-format
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
+msgstr ""
+
+#: src/pig/templates/app.mako:33
+msgid "Pig icon"
 msgstr ""
 
 #: src/pig/templates/app.mako:34
@@ -331,7 +335,7 @@ msgstr ""
 msgid "No available logs."
 msgstr ""
 
-#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1117
 msgid "Running"
 msgstr ""
 
@@ -367,6 +371,13 @@ msgstr ""
 msgid "Click to view"
 msgstr ""
 
+#: src/pig/templates/app.mako:623 src/pig/templates/app.mako:638
+#: src/pig/templates/app.mako:646 src/pig/templates/app.mako:652
+#: src/pig/templates/app.mako:672 src/pig/templates/app.mako:683
+#: src/pig/templates/app.mako:696 src/pig/templates/app.mako:712
+msgid "Close"
+msgstr ""
+
 #: src/pig/templates/app.mako:624
 msgid "Confirm Delete"
 msgstr ""
@@ -387,10 +398,6 @@ msgstr ""
 #: src/pig/templates/app.mako:632 src/pig/templates/app.mako:666
 #: src/pig/templates/app.mako:677 src/pig/templates/app.mako:706
 msgid "Yes"
-msgstr ""
-
-#: src/pig/templates/app.mako:646
-msgid "Close"
 msgstr ""
 
 #: src/pig/templates/app.mako:653
@@ -435,47 +442,47 @@ msgstr ""
 msgid "Cancel"
 msgstr ""
 
-#: src/pig/templates/app.mako:757
+#: src/pig/templates/app.mako:750
 msgid "The Pig job could not be killed."
 msgstr ""
 
-#: src/pig/templates/app.mako:758
+#: src/pig/templates/app.mako:751
 msgid "Run this Pig script."
 msgstr ""
 
-#: src/pig/templates/app.mako:759
+#: src/pig/templates/app.mako:752
 msgid "Stop execution."
 msgstr ""
 
-#: src/pig/templates/app.mako:760
+#: src/pig/templates/app.mako:753
 msgid "Saved"
 msgstr ""
 
-#: src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:1110
 msgid "Saving"
 msgstr ""
 
-#: src/pig/templates/app.mako:1128
+#: src/pig/templates/app.mako:1121
 msgid "has been saved correctly."
 msgstr ""
 
-#: src/pig/templates/app.mako:1393
+#: src/pig/templates/app.mako:1386
 msgid "Did you know?"
 msgstr ""
 
-#: src/pig/templates/app.mako:1400
+#: src/pig/templates/app.mako:1393
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr ""
 
-#: src/pig/templates/app.mako:1407
+#: src/pig/templates/app.mako:1400
 msgid "Names and values of Hadoop properties, e.g."
 msgstr ""
 
-#: src/pig/templates/app.mako:1414
+#: src/pig/templates/app.mako:1407
 msgid "Include files or compressed files"
 msgstr ""
 
-#: src/pig/templates/app.mako:1423
+#: src/pig/templates/app.mako:1416
 msgid "You have unsaved changes in this pig script."
 msgstr ""
 

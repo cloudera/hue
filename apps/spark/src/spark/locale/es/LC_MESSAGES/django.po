@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:58-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -31,14 +31,18 @@ msgstr ""
 "Configure Livy para que se inicie en el modo de 'process' local o de "
 "trabajadores de 'yarn'."
 
-#: src/spark/conf.py:50
+#: src/spark/conf.py:49
+msgid "Whether Livy requires client to perform Kerberos authentication."
+msgstr "Indica si Livy requiere que el cliente realice la autenticación de Kerberos."
+
+#: src/spark/conf.py:56
 msgid "Host where SparkSQL server is running."
 msgstr "Host donde se ejecuta el servidor SparkSQL."
 
-#: src/spark/conf.py:55
+#: src/spark/conf.py:61
 msgid "Port the SparkSQL server runs on."
 msgstr "Puerto sobre el que se ejecuta el servidor SparkSQL."
 
-#: src/spark/conf.py:83
+#: src/spark/conf.py:89
 msgid "The app won't work without a running Livy Spark Server"
 msgstr "La aplicación no funcionará sin un servidor Livy Spark en ejecución"
