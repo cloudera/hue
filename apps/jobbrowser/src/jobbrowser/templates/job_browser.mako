@@ -1645,7 +1645,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       };
 
-      self.updateJob = function () {console.log('update job', vm.isMini());
+      self.updateJob = function () {
         vm.apiHelper.cancelActiveRequest(lastUpdateJobRequest);
         huePubSub.publish('graph.refresh.view');
 
@@ -1963,7 +1963,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         });
       }
 
-      self.updateJobs = function () {console.log('update jobs', vm.isMini());
+      self.updateJobs = function () {
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
