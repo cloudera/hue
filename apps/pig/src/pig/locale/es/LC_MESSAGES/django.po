@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:57-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: es <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/pig/api.py:211 src/pig/templates/app.mako:761
+#: src/pig/api.py:211 src/pig/templates/app.mako:754
 msgid "Unsaved script"
 msgstr "Secuencia de comandos sin guardar"
 
@@ -84,6 +84,10 @@ msgstr "Copiando ejemplos de %(local_dir)s a %(remote_data_dir)s\n"
 #, python-format
 msgid "Copying data %(local_dir)s to %(remote_data_dir)s\n"
 msgstr "Copiando datos de %(local_dir)s a %(remote_data_dir)s\n"
+
+#: src/pig/templates/app.mako:33
+msgid "Pig icon"
+msgstr "Icono de Pig"
 
 #: src/pig/templates/app.mako:34
 msgid "Pig Editor"
@@ -343,7 +347,7 @@ msgstr "%"
 msgid "No available logs."
 msgstr "No hay registros disponibles."
 
-#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1124
+#: src/pig/templates/app.mako:545 src/pig/templates/app.mako:1117
 msgid "Running"
 msgstr "En ejecución"
 
@@ -379,6 +383,13 @@ msgstr "Haga clic para editar"
 msgid "Click to view"
 msgstr "Haga clic para ver"
 
+#: src/pig/templates/app.mako:623 src/pig/templates/app.mako:638
+#: src/pig/templates/app.mako:646 src/pig/templates/app.mako:652
+#: src/pig/templates/app.mako:672 src/pig/templates/app.mako:683
+#: src/pig/templates/app.mako:696 src/pig/templates/app.mako:712
+msgid "Close"
+msgstr "Cerrar"
+
 #: src/pig/templates/app.mako:624
 msgid "Confirm Delete"
 msgstr "Confirmar eliminación"
@@ -400,10 +411,6 @@ msgstr "No"
 #: src/pig/templates/app.mako:677 src/pig/templates/app.mako:706
 msgid "Yes"
 msgstr "Sí"
-
-#: src/pig/templates/app.mako:646
-msgid "Close"
-msgstr "Cerrar"
 
 #: src/pig/templates/app.mako:653
 msgid "Run Script"
@@ -449,46 +456,46 @@ msgstr "Dé un nombre significativo a esta secuencia de comandos."
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: src/pig/templates/app.mako:757
+#: src/pig/templates/app.mako:750
 msgid "The Pig job could not be killed."
 msgstr "El job de Pig no se ha podido eliminar."
 
-#: src/pig/templates/app.mako:758
+#: src/pig/templates/app.mako:751
 msgid "Run this Pig script."
 msgstr "Ejecutar esta secuencia de comandos de Pig."
 
-#: src/pig/templates/app.mako:759
+#: src/pig/templates/app.mako:752
 msgid "Stop execution."
 msgstr "Detener ejecución."
 
-#: src/pig/templates/app.mako:760
+#: src/pig/templates/app.mako:753
 msgid "Saved"
 msgstr "Guardado"
 
-#: src/pig/templates/app.mako:1117
+#: src/pig/templates/app.mako:1110
 msgid "Saving"
 msgstr "Guardando"
 
-#: src/pig/templates/app.mako:1128
+#: src/pig/templates/app.mako:1121
 msgid "has been saved correctly."
 msgstr "se ha guardado correctamente."
 
-#: src/pig/templates/app.mako:1393
+#: src/pig/templates/app.mako:1386
 msgid "Did you know?"
 msgstr "¿Lo sabía?"
 
-#: src/pig/templates/app.mako:1400
+#: src/pig/templates/app.mako:1393
 msgid "Names and values of Pig parameters and options, e.g."
 msgstr "Nombres y valores de parámetros y opciones de Pig, p. ej.,"
 
-#: src/pig/templates/app.mako:1407
+#: src/pig/templates/app.mako:1400
 msgid "Names and values of Hadoop properties, e.g."
 msgstr "Nombres y valores de propiedades de Hadoop, p. ej.,"
 
-#: src/pig/templates/app.mako:1414
+#: src/pig/templates/app.mako:1407
 msgid "Include files or compressed files"
 msgstr "Incluir archivos o archivos comprimidos"
 
-#: src/pig/templates/app.mako:1423
+#: src/pig/templates/app.mako:1416
 msgid "You have unsaved changes in this pig script."
 msgstr "Hay cambios sin guardar en esta secuencia de comandos de Pig."

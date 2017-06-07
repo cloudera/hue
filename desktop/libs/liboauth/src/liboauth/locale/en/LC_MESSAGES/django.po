@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2014-01-03 20:09+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -128,39 +128,60 @@ msgstr ""
 msgid "Hue - Sign in"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:151
+#: src/liboauth/templates/oauth-login.mako:167
+msgid "Hue logo"
+msgstr ""
+
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Visit gethue.com"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Error!"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Invalid username or password."
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:180
+#: src/liboauth/templates/oauth-login.mako:178
 msgid "This is your first time logging in."
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:181
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "You will become Hue superuser."
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:183
+#: src/liboauth/templates/oauth-login.mako:181
 msgid "Sign Up via"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:186
+#: src/liboauth/templates/oauth-login.mako:184
 msgid "Sign In via"
 msgstr ""
 
-#: src/liboauth/templates/oauth-login.mako:215
+#: src/liboauth/templates/oauth-login.mako:190
+msgid "Google icon"
+msgstr ""
+
+#: src/liboauth/templates/oauth-login.mako:196
+msgid "Facebook icon"
+msgstr ""
+
+#: src/liboauth/templates/oauth-login.mako:202
+msgid "Linkedin icon"
+msgstr ""
+
+#: src/liboauth/templates/oauth-login.mako:208
+msgid "Twitter icon"
+msgstr ""
+
+#: src/liboauth/templates/oauth-login.mako:213
 msgid "The oauth app is not configured with any provider."
 msgstr ""
 

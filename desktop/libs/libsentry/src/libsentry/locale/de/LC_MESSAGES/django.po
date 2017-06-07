@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:40-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -17,13 +17,19 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 0.9.6\n"
 
-#: src/libsentry/api.py:239 src/libsentry/api2.py:238
-msgid "No Sentry servers are available."
-msgstr "Keine Sentry-Server verfügbar."
+#: src/libsentry/api.py:44 src/libsentry/api2.py:44
+#, python-format
+msgid "Failed to connect to Sentry server %s, and Sentry HA is not enabled."
+msgstr "Die Verbindung mit dem Sentry-Server %s konnte nicht hergestellt werden, und Sentry HA ist nicht aktiviert."
 
-#: src/libsentry/api.py:268 src/libsentry/api2.py:267
-msgid "Error in retrieving Sentry server properties from Zookeeper."
-msgstr "Fehler beim Abrufen der Sentry-Servereigenschaften aus ZooKeeper."
+#: src/libsentry/api.py:53 src/libsentry/api.py:91 src/libsentry/api2.py:53
+#: src/libsentry/api2.py:91
+msgid "Failed to find an available Sentry server."
+msgstr "Es konnte kein verfügbarer Sentry-Server gefunden werden."
+
+#: src/libsentry/api.py:57 src/libsentry/api2.py:57
+msgid "Encountered unexpected error in SentryApi."
+msgstr "Unerwarteter Fehler in SentryApi."
 
 #: src/libsentry/conf.py:29
 msgid "Hostname or IP of server."
@@ -38,3 +44,34 @@ msgid "Sentry configuration directory, where sentry-site.xml is located."
 msgstr ""
 "Verzeichnis der Sentry-Konfiguration, in dem sich sentry-site.xml "
 "befindet."
+
+#: src/libsentry/conf.py:49
+msgid "Number of seconds when the privilege list of a user is cached."
+msgstr "Anzahl von Sekunden, in denen die Berechtigungsliste eines Benutzers zwischengespeichert wird."
+
+#: src/libsentry/sentry_ha.py:46 src/libsentry/tests.py:58
+msgid "Cannot create a Sentry client without server hostname and port."
+msgstr "Ohne Serverhostname und Port kann kein Sentry-Client erstellt werden."
+
+#: src/libsentry/sentry_ha.py:76
+#, python-format
+msgid ""
+"Encountered unexpected error while trying to find available Sentry "
+"client: %s"
+msgstr ""
+"Unerwarteter Fehler beim Suchen nach einem verfügbaren Sentry-"
+"Client: %s"
+
+#: src/libsentry/sentry_site.py:133
+msgid "No Sentry servers are configured."
+msgstr "Es ist kein Sentry-Server konfiguriert."
+
+#: src/libsentry/sentry_site.py:152
+msgid "Error in retrieving Sentry server properties."
+msgstr "Fehler beim Abrufen der Sentry-Servereigenschaften."
+
+#~ msgid "No Sentry servers are available."
+#~ msgstr ""
+
+#~ msgid "Error in retrieving Sentry server properties from Zookeeper."
+#~ msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -42,14 +42,26 @@ msgstr ""
 "許可します。"
 
 #: src/aws/conf.py:99
-msgid "Alternate address for endpoint."
-msgstr "エンドポイントの代替アドレスです。"
+msgid "Alternate address for the S3 endpoint."
+msgstr "S3 エンドポイントの代替アドレスです。"
 
 #: src/aws/conf.py:105
-msgid "Alternate port for endpoint."
-msgstr "エンドポイントの代替ポートです。"
+msgid "Proxy address to use for the S3 connection."
+msgstr "S3 接続に使用するプロキシアドレスです。"
 
-#: src/aws/s3/s3fs.py:59
+#: src/aws/conf.py:111
+msgid "Proxy port to use for the S3 connection."
+msgstr "S3 接続に使用するプロキシポートです。"
+
+#: src/aws/conf.py:117
+msgid "Proxy user to use for the S3 connection."
+msgstr "S3 接続に使用するプロキシユーザーです。"
+
+#: src/aws/conf.py:123
+msgid "Proxy password to use for the S3 connection."
+msgstr "S3 接続に使用するプロキシパスワードです。"
+
+#: src/aws/s3/s3fs.py:61
 msgid ""
 "User is not authorized to perform the attempted operation. Check that the"
 " user has appropriate permissions."
@@ -57,7 +69,7 @@ msgstr ""
 "試行した操作の実行はユーザーに許可されていません。ユーザーに適切なパーミッションがあることを"
 "確認してください。"
 
-#: src/aws/s3/s3fs.py:61
+#: src/aws/s3/s3fs.py:63
 #, python-format
 msgid ""
 "User is not authorized to write or modify path: %s. Check that the user "
@@ -66,7 +78,7 @@ msgstr ""
 "パスの書き込みまたは変更はユーザーに許可されていません：%s。ユーザーに書き込みパーミッションがあることを"
 "確認してください。"
 
-#: src/aws/s3/s3fs.py:98 src/aws/s3/s3fs.py:122
+#: src/aws/s3/s3fs.py:100 src/aws/s3/s3fs.py:124
 #, python-format
 msgid ""
 "User is not authorized to access bucket named \"%s\". If you are "
@@ -75,12 +87,12 @@ msgstr ""
 "\"%s\" という名前のバケットへのアクセスはユーザーに許可されていません。バケットの作成を"
 "試行している場合、このバケット名はすでに予約されています。"
 
-#: src/aws/s3/s3fs.py:104
+#: src/aws/s3/s3fs.py:106
 #, python-format
 msgid "Failed to create bucket named \"%s\": %s"
 msgstr "\"%s\" という名前のバケットを作成できませんでした：%s"
 
-#: src/aws/s3/s3fs.py:134
+#: src/aws/s3/s3fs.py:136
 #, python-format
 msgid ""
 "Failed to access path: \"%s\" Check that you have access to read this "
@@ -89,44 +101,48 @@ msgstr ""
 "パスにアクセスできませんでした：\"%s\"。このバケットを読み取る権限があること、"
 "および領域が正しいことを確認してください。"
 
-#: src/aws/s3/s3fs.py:156
+#: src/aws/s3/s3fs.py:160
 #, python-format
 msgid "User is not authorized to access path: \"%s\""
 msgstr "パスへのアクセスを許可されていません：\"%s\""
 
-#: src/aws/s3/s3fs.py:158
+#: src/aws/s3/s3fs.py:162
 #, python-format
 msgid "Failed to access path \"%s\": %s"
 msgstr "パス \"%s\" にアクセスできませんでした：%s"
 
-#: src/aws/s3/s3fs.py:253
+#: src/aws/s3/s3fs.py:257
 msgid "Option `glob` is not implemented"
 msgstr "オプション `glob` は実装されません"
 
-#: src/aws/s3/s3fs.py:280 src/aws/s3/s3fs.py:312
+#: src/aws/s3/s3fs.py:284 src/aws/s3/s3fs.py:316
 msgid "Moving to trash is not implemented for S3"
 msgstr "ゴミ箱への移動機能は S3 では実装されません"
 
-#: src/aws/s3/s3fs.py:324
+#: src/aws/s3/s3fs.py:328
 #, python-format
 msgid "Invalid bucket name: %s"
 msgstr "バケット名が無効です：%s"
 
-#: src/aws/s3/s3fs.py:329
+#: src/aws/s3/s3fs.py:333
 #, python-format
 msgid "Failed to create S3 bucket \"%s\": %s"
 msgstr "S3 バケット \"%s\" を作成できませんでした：%s"
 
-#: src/aws/s3/s3fs.py:385
+#: src/aws/s3/s3fs.py:389
 #, python-format
 msgid "Invalid key to transform: %s"
 msgstr "変換に対して無効なキー：%s"
 
-#: src/aws/s3/upload.py:123
+#: src/aws/s3/upload.py:124
 msgid "No S3 filesystem found."
 msgstr "S3 ファイルシステムが見つかりません。"
 
-#: src/aws/s3/upload.py:134
-#, python-format
-msgid "Insufficient permissions to write to S3 path \"%s\"."
-msgstr "S3 パス \"%s\" への書き込みに必要なパーミッションがありません。"
+#~ msgid "Alternate address for endpoint."
+#~ msgstr ""
+
+#~ msgid "Alternate port for endpoint."
+#~ msgstr ""
+
+#~ msgid "Insufficient permissions to write to S3 path \"%s\"."
+#~ msgstr ""

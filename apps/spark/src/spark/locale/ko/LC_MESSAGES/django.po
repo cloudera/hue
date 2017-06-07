@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:58-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -29,14 +29,18 @@ msgstr "Livy 서버의 포트입니다."
 msgid "Configure livy to start in local 'process' mode, or 'yarn' workers."
 msgstr "로컬 'process' 모드 또는 'yarn' 작업자로 시작하도록 Livy를 구성합니다."
 
-#: src/spark/conf.py:50
+#: src/spark/conf.py:49
+msgid "Whether Livy requires client to perform Kerberos authentication."
+msgstr "Livy에서 클라이언트의 Kerberos 인증 수행을 요구하는지 여부를 나타냅니다."
+
+#: src/spark/conf.py:56
 msgid "Host where SparkSQL server is running."
 msgstr "SparkSQL 서버가 실행 중인 호스트입니다."
 
-#: src/spark/conf.py:55
+#: src/spark/conf.py:61
 msgid "Port the SparkSQL server runs on."
 msgstr "SparkSQL 서버가 실행되는 포트입니다."
 
-#: src/spark/conf.py:83
+#: src/spark/conf.py:89
 msgid "The app won't work without a running Livy Spark Server"
 msgstr "Livy Spark 서버를 실행하지 않으면 이 앱을 사용할 수 없습니다."
