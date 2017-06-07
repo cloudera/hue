@@ -487,30 +487,7 @@ from desktop.views import _ko
               <div class="doc-browser-attr-group">
                 <!-- ko with: definition -->
                 <div class="doc-browser-attr-col doc-browser-description" data-bind="text: description, attr: { 'title': description }"></div>
-                <div class="doc-browser-attr-col doc-browser-type">
-                  <!-- ko switch: type -->
-                  <!-- ko case: 'directory' -->${ _('Directory') }<!-- /ko -->
-                  <!-- ko case: 'link-pigscript' -->${ _('Pig Script') }<!-- /ko -->
-                  <!-- ko case: 'link-workflow' -->${ _('Job Design') }<!-- /ko -->
-                  <!-- ko case: 'notebook' -->${ _('Notebook') }<!-- /ko -->
-                  <!-- ko case: 'oozie-bundle2' -->${ _('Oozie Bundle') }<!-- /ko -->
-                  <!-- ko case: 'oozie-coordinator2' -->${ _('Oozie Coordinator') }<!-- /ko -->
-                  <!-- ko case: 'oozie-workflow2' -->${ _('Oozie Workflow') }<!-- /ko -->
-                  <!-- ko case: 'query-hive' -->${ _('Hive Query') }<!-- /ko -->
-                  <!-- ko case: 'query-impala' -->${ _('Impala Query') }<!-- /ko -->
-                  <!-- ko case: 'search-dashboard' -->${ _('Search Dashboard') }<!-- /ko -->
-                  <!-- ko case: 'query-mapreduce' -->${ _('MapReduce Job') }<!-- /ko -->
-                  <!-- ko case: 'query-sqoop1' -->${ _('Import Job') }<!-- /ko -->
-                  <!-- ko case: 'query-spark2' -->${ _('Spark Job') }<!-- /ko -->
-                  <!-- ko case: 'query-java' -->${ _('Java Job') }<!-- /ko -->
-                  <!-- ko case: 'query-pig' -->${ _('Pig Script') }<!-- /ko -->
-                  <!-- ko case: 'query-shell' -->${ _('Shell Script') }<!-- /ko -->
-                  <!-- ko case: 'query-distcp' -->${ _('DistCp Job') }<!-- /ko -->
-                  <!-- ko case: $default -->
-                  <!-- ko text: $value --><!-- /ko -->
-                  <!-- /ko -->
-                  <!-- /ko -->
-                </div>
+                <div class="doc-browser-attr-col doc-browser-type" data-bind="text: DocumentTypeGlobals[type] || type"></div>
                 <div class="doc-browser-attr-col doc-browser-owner" data-bind="text: owner, attr: { 'title': owner }"></div>
                 <div class="doc-browser-attr-col doc-browser-modified" data-bind="text: localeFormat(last_modified)"></div>
                 <!-- /ko -->
