@@ -37,7 +37,7 @@ from desktop.views import _ko
     <input class="hue-drop-down-input" type="text" data-bind="textInput: filter, attr: { 'placeHolder': value }, visible: dropDownVisible, style: { color: filterEdited() ? '#000' : '#AAA', 'min-height': '22px', 'margin-left': '10px' }"/>
     <i class="fa fa-caret-down"></i>
     <!-- /ko -->
-    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible }">
+    <div class="hue-drop-down-container" data-bind="css: { 'open' : dropDownVisible, 'hue-drop-down-fixed': fixedPosition }">
       <div class="dropdown-menu" data-bind="visible: filteredEntries().length > 0" style="overflow-y: scroll; width: 190px; margin-left: 10px; min-height: 34px; max-height: 200px;">
         <!-- ko if: foreachVisible -->
         <ul class="hue-inner-drop-down" data-bind="foreachVisible: { data: filteredEntries, minHeight: 34, container: '.dropdown-menu' }">
@@ -64,6 +64,7 @@ from desktop.views import _ko
         self.searchable = params.searchable || false;
         self.foreachVisible = params.foreachVisible || false;
         self.linkTitle = params.linkTitle || '${ _('Selected entry') }';
+        self.fixedPosition = !!params.fixedPosition;
 
         var closeOnOutsideClick = function (e) {
           var $input = $(element).find('.hue-drop-down-input');
