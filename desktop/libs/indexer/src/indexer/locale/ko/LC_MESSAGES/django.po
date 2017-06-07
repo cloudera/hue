@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ko <LL@li.org>\n"
@@ -110,9 +110,10 @@ msgstr "별칭을 생성하거나 수정할 수 없음: %s"
 msgid "Could not get index schema: %s"
 msgstr "인덱스 스키마를 가져올 수 없음: %s"
 
-#: src/indexer/api3.py:196 src/indexer/api3.py:204
-msgid "The table could not be created."
-msgstr "테이블을 생성할 수 없습니다."
+#: src/indexer/api3.py:76
+#, python-format
+msgid "Path %(path)s is not a file"
+msgstr "%(path)s 경로는 파일이 아닙니다."
 
 #: src/indexer/conf.py:64
 msgid "Flag to turn on the new metadata importer."
@@ -122,23 +123,23 @@ msgstr "새 메타데이터 가져오기 도구를 켜는 플래그입니다."
 msgid "Flag to turn on the new Solr indexer."
 msgstr "새 Solr 인덱서를 켜는 플래그입니다."
 
-#: src/indexer/conf.py:80
+#: src/indexer/conf.py:78 src/indexer/conf.py:105
+msgid "oozie workspace template for indexing:"
+msgstr "인덱싱에 사용할 Oozie 작업 영역 템플릿:"
+
+#: src/indexer/conf.py:87
 msgid "Batch indexer path in HDFS."
 msgstr "HDFS의 배치 indexer 경로입니다."
 
-#: src/indexer/conf.py:86
+#: src/indexer/conf.py:93
 msgid ""
 "Local path to Hue folder where Solr instance directories will be created "
 "in non-solrcloud mode."
 msgstr "Solr 인스턴스 디렉토리가 solrcloud 외 모드로 생성될 Hue 폴더에 대한 로컬 경로입니다."
 
-#: src/indexer/conf.py:92
+#: src/indexer/conf.py:99
 msgid "Default template used at collection creation."
 msgstr "컬렉션 생성 시 사용된 기본 템플릿입니다."
-
-#: src/indexer/conf.py:98 src/indexer/conf.py:105
-msgid "oozie workspace template for indexing:"
-msgstr "인덱싱에 사용할 Oozie 작업 영역 템플릿:"
 
 #: src/indexer/conf.py:112
 msgid "Location of the solrctl binary."
@@ -284,8 +285,8 @@ msgstr "단편"
 msgid "Host"
 msgstr "호스트"
 
-#: src/indexer/operations.py:81 src/indexer/templates/importer.mako:396
-#: src/indexer/templates/indexer.mako:263
+#: src/indexer/operations.py:81 src/indexer/templates/importer.mako:402
+#: src/indexer/templates/indexer.mako:253
 #: src/indexer/templates/indexes.mako:174
 msgid "Path"
 msgstr "경로"
@@ -294,8 +295,8 @@ msgstr "경로"
 msgid "Port"
 msgstr "포트"
 
-#: src/indexer/operations.py:83 src/indexer/templates/importer.mako:413
-#: src/indexer/templates/indexer.mako:275
+#: src/indexer/operations.py:83 src/indexer/templates/importer.mako:419
+#: src/indexer/templates/indexer.mako:265
 msgid "Query"
 msgstr "쿼리"
 
@@ -360,7 +361,11 @@ msgstr "교체"
 msgid "%s is not a boolean value"
 msgstr "%s은(는) Boolean 값이 아님"
 
-#: src/indexer/views.py:107
+#: src/indexer/views.py:38 src/indexer/views.py:47 src/indexer/views.py:62
+msgid "Missing permission."
+msgstr "권한이 없습니다."
+
+#: src/indexer/views.py:122
 msgid "A POST request is required."
 msgstr "POST 요청이 필요합니다."
 
@@ -392,636 +397,663 @@ msgstr "로그 컬렉션이 설치됨"
 msgid "Search Indexes"
 msgstr "인덱스 검색"
 
-#: src/indexer/templates/collections.mako:64
-#: src/indexer/templates/collections.mako:193
+#: src/indexer/templates/collections.mako:66
+#: src/indexer/templates/collections.mako:207
 #: src/indexer/templates/indexes.mako:63
 msgid "Collections"
 msgstr "컬렉션"
 
-#: src/indexer/templates/collections.mako:65
+#: src/indexer/templates/collections.mako:67
 msgid "Dashboards"
 msgstr "대시보드"
 
-#: src/indexer/templates/collections.mako:68
-#: src/indexer/templates/collections.mako:539
-#: src/indexer/templates/indexer.mako:125
+#: src/indexer/templates/collections.mako:76
+#: src/indexer/templates/indexer.mako:119
+msgid "Index Browser"
+msgstr "인덱스 브라우저"
+
+#: src/indexer/templates/collections.mako:76
+#: src/indexer/templates/collections.mako:556
+#: src/indexer/templates/indexer.mako:119
 msgid "Indexes"
 msgstr "인덱스"
 
-#: src/indexer/templates/collections.mako:91
-#: src/indexer/templates/importer.mako:322
-#: src/indexer/templates/indexer.mako:183
+#: src/indexer/templates/collections.mako:104
+#: src/indexer/templates/collections.mako:118
+#: src/indexer/templates/collections.mako:136
+#: src/indexer/templates/importer.mako:323
+#: src/indexer/templates/importer.mako:767
+#: src/indexer/templates/indexer.mako:172
+#: src/indexer/templates/indexes.mako:203
+msgid "Close"
+msgstr "닫기"
+
+#: src/indexer/templates/collections.mako:105
+#: src/indexer/templates/importer.mako:324
+#: src/indexer/templates/indexer.mako:173
 msgid "Choose a file"
 msgstr "파일 선택"
 
-#: src/indexer/templates/collections.mako:105
+#: src/indexer/templates/collections.mako:119
 msgid "Do you really want to delete the following index(es)?"
 msgstr "다음 인덱스를 삭제하시겠습니까?"
 
-#: src/indexer/templates/collections.mako:113
-#: src/indexer/templates/collections.mako:129
-#: src/indexer/templates/importer.mako:752
+#: src/indexer/templates/collections.mako:127
+#: src/indexer/templates/collections.mako:143
+#: src/indexer/templates/importer.mako:774
 #: src/indexer/templates/indexes.mako:104
 #: src/indexer/templates/indexes.mako:122
 #: src/indexer/templates/indexes.mako:164
 msgid "Cancel"
 msgstr "취소"
 
-#: src/indexer/templates/collections.mako:114
-#: src/indexer/templates/collections.mako:130
-#: src/indexer/templates/indexes.mako:213
+#: src/indexer/templates/collections.mako:128
+#: src/indexer/templates/collections.mako:144
+#: src/indexer/templates/indexes.mako:208
 msgid "Yes"
 msgstr "예"
 
-#: src/indexer/templates/collections.mako:123
+#: src/indexer/templates/collections.mako:137
 msgid "Confirm Delete"
 msgstr "삭제 확인"
 
-#: src/indexer/templates/collections.mako:126
+#: src/indexer/templates/collections.mako:140
 msgid "Are you sure you want to delete the index"
 msgstr "인덱스를 삭제하시겠습니까?"
 
-#: src/indexer/templates/collections.mako:162
+#: src/indexer/templates/collections.mako:176
 msgid "Filter indexes..."
 msgstr "인덱스 필터링..."
 
-#: src/indexer/templates/collections.mako:164
+#: src/indexer/templates/collections.mako:178
 msgid ""
 "Delete the selected indexes. These must be solr cloud collections. Cores "
 "cannot be deleted currently."
 msgstr "선택한 인덱스를 삭제합니다. solr 클라우드 컬렉션이 있어야 합니다. 현재 코어를 삭제할 수 없습니다."
 
-#: src/indexer/templates/collections.mako:165
-#: src/indexer/templates/collections.mako:370
+#: src/indexer/templates/collections.mako:179
+#: src/indexer/templates/collections.mako:384
 #: src/indexer/templates/indexes.mako:38
 msgid "Delete"
 msgstr "삭제"
 
-#: src/indexer/templates/collections.mako:167
+#: src/indexer/templates/collections.mako:181
 msgid "Show cores"
 msgstr "코어 표시"
 
-#: src/indexer/templates/collections.mako:173
-#: src/indexer/templates/importer.mako:374
+#: src/indexer/templates/collections.mako:187
+#: src/indexer/templates/importer.mako:376
 #: src/indexer/templates/indexes.mako:161
 msgid "Create"
 msgstr "생성"
 
-#: src/indexer/templates/collections.mako:181
+#: src/indexer/templates/collections.mako:195
 msgid "There are currently no indexes defined."
 msgstr "현재 정의된 인덱스가 없습니다."
 
-#: src/indexer/templates/collections.mako:181
+#: src/indexer/templates/collections.mako:195
 msgid "Click here to add"
 msgstr "추가하려면 여기 클릭"
 
-#: src/indexer/templates/collections.mako:181
+#: src/indexer/templates/collections.mako:195
 msgid "one or more."
 msgstr "하나 이상입니다."
 
-#: src/indexer/templates/collections.mako:192
-#: src/indexer/templates/collections.mako:239
-#: src/indexer/templates/collections.mako:301
-#: src/indexer/templates/collections.mako:382
-#: src/indexer/templates/importer.mako:492
-#: src/indexer/templates/importer.mako:494
-#: src/indexer/templates/importer.mako:770
-#: src/indexer/templates/importer.mako:811
-#: src/indexer/templates/indexer.mako:281
-#: src/indexer/templates/indexer.mako:401 src/indexer/templates/indexes.mako:61
+#: src/indexer/templates/collections.mako:206
+#: src/indexer/templates/collections.mako:253
+#: src/indexer/templates/collections.mako:315
+#: src/indexer/templates/collections.mako:396
+#: src/indexer/templates/importer.mako:500
+#: src/indexer/templates/importer.mako:502
+#: src/indexer/templates/importer.mako:785
+#: src/indexer/templates/importer.mako:843
+#: src/indexer/templates/indexer.mako:271
+#: src/indexer/templates/indexer.mako:391 src/indexer/templates/indexes.mako:61
 #: src/indexer/templates/indexes.mako:133
 msgid "Name"
 msgstr "이름"
 
-#: src/indexer/templates/collections.mako:224
-#: src/indexer/templates/collections.mako:437
-#: src/indexer/templates/indexer.mako:357
-#: src/indexer/templates/indexes.mako:414
+#: src/indexer/templates/collections.mako:238
+#: src/indexer/templates/collections.mako:451
+#: src/indexer/templates/indexer.mako:347
+#: src/indexer/templates/indexes.mako:409
 msgid "Previous"
 msgstr "이전"
 
-#: src/indexer/templates/collections.mako:225
-#: src/indexer/templates/collections.mako:438
-#: src/indexer/templates/importer.mako:721
-#: src/indexer/templates/indexer.mako:362
-#: src/indexer/templates/indexer.mako:368
-#: src/indexer/templates/indexes.mako:413
+#: src/indexer/templates/collections.mako:239
+#: src/indexer/templates/collections.mako:452
+#: src/indexer/templates/importer.mako:745
+#: src/indexer/templates/indexer.mako:352
+#: src/indexer/templates/indexer.mako:358
+#: src/indexer/templates/indexes.mako:408
 msgid "Next"
 msgstr "다음"
 
-#: src/indexer/templates/collections.mako:226
-#: src/indexer/templates/collections.mako:439
+#: src/indexer/templates/collections.mako:240
+#: src/indexer/templates/collections.mako:453
 msgid "Finish"
 msgstr "완료"
 
-#: src/indexer/templates/collections.mako:236
+#: src/indexer/templates/collections.mako:250
 msgid "Pick a name and a CSV or Tab separated file with header to index from HDFS"
 msgstr "이름 및 HDFS의 인덱스에 대한 헤더가 포함된 CSV 또는 탭으로 분리된 파일 선택"
 
-#: src/indexer/templates/collections.mako:241
+#: src/indexer/templates/collections.mako:255
 msgid "Name of index"
 msgstr "인덱스 이름"
 
-#: src/indexer/templates/collections.mako:246
-#: src/indexer/templates/collections.mako:451
+#: src/indexer/templates/collections.mako:260
+#: src/indexer/templates/collections.mako:465
 msgid "Files"
 msgstr "파일"
 
-#: src/indexer/templates/collections.mako:253
-#: src/indexer/templates/collections.mako:458
+#: src/indexer/templates/collections.mako:267
+#: src/indexer/templates/collections.mako:472
 msgid "Source type"
 msgstr "소스 유형"
 
-#: src/indexer/templates/collections.mako:262
-#: src/indexer/templates/collections.mako:467
+#: src/indexer/templates/collections.mako:276
+#: src/indexer/templates/collections.mako:481
 msgid "Format of the selected file to index"
 msgstr "인덱싱할 선택 파일의 형식"
 
-#: src/indexer/templates/collections.mako:265
-#: src/indexer/templates/collections.mako:470
+#: src/indexer/templates/collections.mako:279
+#: src/indexer/templates/collections.mako:484
 msgid "Separator"
 msgstr "분리자"
 
-#: src/indexer/templates/collections.mako:272
-#: src/indexer/templates/collections.mako:477
+#: src/indexer/templates/collections.mako:286
+#: src/indexer/templates/collections.mako:491
 msgid "Quote character"
 msgstr "할당량 문자"
 
-#: src/indexer/templates/collections.mako:281
+#: src/indexer/templates/collections.mako:295
 msgid "Morphlines config name"
 msgstr "Morphlines 구성 이름"
 
-#: src/indexer/templates/collections.mako:289
+#: src/indexer/templates/collections.mako:303
 msgid "Morphlines config expression"
 msgstr "Morphlines 구성식"
 
-#: src/indexer/templates/collections.mako:302
-#: src/indexer/templates/collections.mako:383
-#: src/indexer/templates/importer.mako:390
-#: src/indexer/templates/importer.mako:487
-#: src/indexer/templates/importer.mako:774
-#: src/indexer/templates/importer.mako:814
-#: src/indexer/templates/indexer.mako:257
-#: src/indexer/templates/indexer.mako:404 src/indexer/templates/indexes.mako:62
+#: src/indexer/templates/collections.mako:316
+#: src/indexer/templates/collections.mako:397
+#: src/indexer/templates/importer.mako:392
+#: src/indexer/templates/importer.mako:495
+#: src/indexer/templates/importer.mako:789
+#: src/indexer/templates/importer.mako:846
+#: src/indexer/templates/indexer.mako:247
+#: src/indexer/templates/indexer.mako:394 src/indexer/templates/indexes.mako:62
 msgid "Type"
 msgstr "유형"
 
-#: src/indexer/templates/collections.mako:303
-#: src/indexer/templates/collections.mako:384
+#: src/indexer/templates/collections.mako:317
+#: src/indexer/templates/collections.mako:398
 msgid "ID"
 msgstr "ID"
 
-#: src/indexer/templates/collections.mako:304
-#: src/indexer/templates/collections.mako:385
-#: src/indexer/templates/importer.mako:826
-#: src/indexer/templates/indexer.mako:418
+#: src/indexer/templates/collections.mako:318
+#: src/indexer/templates/collections.mako:399
+#: src/indexer/templates/importer.mako:858
+#: src/indexer/templates/indexer.mako:408
 msgid "Required"
 msgstr "요구됨"
 
-#: src/indexer/templates/collections.mako:305
-#: src/indexer/templates/collections.mako:386
+#: src/indexer/templates/collections.mako:319
+#: src/indexer/templates/collections.mako:400
 msgid "Indexed"
 msgstr "인덱스됨"
 
-#: src/indexer/templates/collections.mako:306
-#: src/indexer/templates/collections.mako:387
+#: src/indexer/templates/collections.mako:320
+#: src/indexer/templates/collections.mako:401
 msgid "Stored"
 msgstr "저장됨"
 
-#: src/indexer/templates/collections.mako:307
+#: src/indexer/templates/collections.mako:321
 msgid "Default Field"
 msgstr "기본 필드"
 
-#: src/indexer/templates/collections.mako:353
-#: src/indexer/templates/collections.mako:416
+#: src/indexer/templates/collections.mako:367
+#: src/indexer/templates/collections.mako:430
 msgid "Add"
 msgstr "추가"
 
-#: src/indexer/templates/collections.mako:355
+#: src/indexer/templates/collections.mako:369
 msgid "Generate a random ID"
 msgstr "무작위 ID 생성"
 
-#: src/indexer/templates/collections.mako:356
+#: src/indexer/templates/collections.mako:370
 msgid "Add ID"
 msgstr "ID 추가"
 
-#: src/indexer/templates/collections.mako:367
+#: src/indexer/templates/collections.mako:381
 msgid "Actions"
 msgstr "작업"
 
-#: src/indexer/templates/collections.mako:368
+#: src/indexer/templates/collections.mako:382
 msgid "Search"
 msgstr "검색"
 
-#: src/indexer/templates/collections.mako:369
+#: src/indexer/templates/collections.mako:383
 msgid "Index file"
 msgstr "인덱스 파일"
 
-#: src/indexer/templates/collections.mako:420
+#: src/indexer/templates/collections.mako:434
 msgid "Update"
 msgstr "업데이트"
 
-#: src/indexer/templates/collections.mako:448
+#: src/indexer/templates/collections.mako:462
 msgid "CSV or TSV file to index"
 msgstr "인덱싱할 CSV 또는 TSV 파일"
 
-#: src/indexer/templates/collections.mako:512
+#: src/indexer/templates/collections.mako:529
 msgid "Name is missing"
 msgstr "이름이 누락됨"
 
-#: src/indexer/templates/collections.mako:513
-#: src/indexer/templates/collections.mako:555
+#: src/indexer/templates/collections.mako:530
+#: src/indexer/templates/collections.mako:572
 msgid "File path is missing"
 msgstr "파일 경로가 누락됨"
 
-#: src/indexer/templates/collections.mako:530
+#: src/indexer/templates/collections.mako:547
 msgid "Field name is missing"
 msgstr "필드 이름이 누락됨"
 
-#: src/indexer/templates/collections.mako:531
+#: src/indexer/templates/collections.mako:548
 msgid "Field type is missing"
 msgstr "필드 유형이 누락됨"
 
-#: src/indexer/templates/collections.mako:540
+#: src/indexer/templates/collections.mako:557
 msgid "Upload data"
 msgstr "데이터 업로드"
 
 #: src/indexer/templates/importer.mako:30
-#: src/indexer/templates/importer.mako:264
+#: src/indexer/templates/importer.mako:270
 msgid "Importer"
 msgstr "가져오기 도구"
 
-#: src/indexer/templates/importer.mako:274
-#: src/indexer/templates/importer.mako:285
-#: src/indexer/templates/indexer.mako:135
-#: src/indexer/templates/indexer.mako:146
+#: src/indexer/templates/importer.mako:280
+#: src/indexer/templates/importer.mako:291
+#: src/indexer/templates/indexer.mako:129
+#: src/indexer/templates/indexer.mako:140
 msgid "Toggle Assist"
 msgstr "지원 전환"
 
-#: src/indexer/templates/importer.mako:335
-#: src/indexer/templates/indexer.mako:196
+#: src/indexer/templates/importer.mako:337
+#: src/indexer/templates/indexer.mako:186
 msgid "Go to Step 1"
 msgstr "1단계로 이동"
 
-#: src/indexer/templates/importer.mako:350
+#: src/indexer/templates/importer.mako:352
 msgid "Pick data from "
 msgstr "다음에서 데이터 선택"
 
-#: src/indexer/templates/importer.mako:353
+#: src/indexer/templates/importer.mako:355
 msgid "No source data"
 msgstr "소스 데이터 없음"
 
-#: src/indexer/templates/importer.mako:359
-#: src/indexer/templates/indexer.mako:212
+#: src/indexer/templates/importer.mako:361
+#: src/indexer/templates/indexer.mako:202
 msgid "Go to Step 2"
 msgstr "2단계로 이동"
 
-#: src/indexer/templates/importer.mako:371
+#: src/indexer/templates/importer.mako:373
 msgid "Move it to "
 msgstr "다음으로 이동"
 
-#: src/indexer/templates/importer.mako:386
+#: src/indexer/templates/importer.mako:388
 msgid "Source"
 msgstr "소스"
 
-#: src/indexer/templates/importer.mako:397
-msgid "Click or drag & drop"
-msgstr "클릭 또는 끌어다 놓기"
+#: src/indexer/templates/importer.mako:398
+msgid "No source is needed for creating a database."
+msgstr "데이터베이스를 생성하기 위해 소스가 필요하지 않습니다."
 
-#: src/indexer/templates/importer.mako:400
-#: src/indexer/templates/importer.mako:732
-#: src/indexer/templates/indexer.mako:379
-#: src/indexer/templates/indexer.mako:382
+#: src/indexer/templates/importer.mako:403
+msgid "Click or drag from the assist"
+msgstr "지원 기능에서 클릭 또는 끌어오기"
+
+#: src/indexer/templates/importer.mako:406
+#: src/indexer/templates/importer.mako:756
+#: src/indexer/templates/indexer.mako:369
+#: src/indexer/templates/indexer.mako:372
 msgid "Open"
 msgstr "열기"
 
-#: src/indexer/templates/importer.mako:407
-#: src/indexer/templates/indexer.mako:269
+#: src/indexer/templates/importer.mako:413
+#: src/indexer/templates/indexer.mako:259
 #: src/indexer/templates/indexes.mako:187
 msgid "Table"
 msgstr "테이블"
 
-#: src/indexer/templates/importer.mako:408
-#: src/indexer/templates/importer.mako:498
+#: src/indexer/templates/importer.mako:414
 msgid "Table name or <database>.<table>"
 msgstr "테이블 이름 또는 <database>.<table>"
 
-#: src/indexer/templates/importer.mako:414
+#: src/indexer/templates/importer.mako:420
 msgid "Search your documents..."
 msgstr "문서 검색..."
 
-#: src/indexer/templates/importer.mako:424
+#: src/indexer/templates/importer.mako:430
 msgid "Guessing format..."
 msgstr "형식 추측 중..."
 
-#: src/indexer/templates/importer.mako:427
-#: src/indexer/templates/importer.mako:524
-#: src/indexer/templates/indexer.mako:297
+#: src/indexer/templates/importer.mako:433
+#: src/indexer/templates/importer.mako:530
+#: src/indexer/templates/indexer.mako:287
 msgid "Format"
 msgstr "형식"
 
-#: src/indexer/templates/importer.mako:430
-#: src/indexer/templates/indexer.mako:300
+#: src/indexer/templates/importer.mako:436
+#: src/indexer/templates/indexer.mako:290
 msgid "File Type"
 msgstr "파일 유형"
 
-#: src/indexer/templates/importer.mako:443
+#: src/indexer/templates/importer.mako:451
 msgid "Generating preview..."
 msgstr "미리 보기 생성 중..."
 
-#: src/indexer/templates/importer.mako:446
-#: src/indexer/templates/indexer.mako:324
+#: src/indexer/templates/importer.mako:454
+#: src/indexer/templates/indexer.mako:314
 msgid "Preview"
 msgstr "미리 보기"
 
-#: src/indexer/templates/importer.mako:484
+#: src/indexer/templates/importer.mako:492
 msgid "Destination"
 msgstr "대상"
 
-#: src/indexer/templates/importer.mako:498
+#: src/indexer/templates/importer.mako:506
 msgid "Only alphanumeric and underscore characters"
 msgstr "영숫자 및 밑줄 문자만"
 
-#: src/indexer/templates/importer.mako:502
-msgid "Create a new "
-msgstr "새로 생성"
-
-#: src/indexer/templates/importer.mako:506
+#: src/indexer/templates/importer.mako:513
 msgid "Adding data to the existing "
 msgstr "기존에 데이터 추가 중"
 
-#: src/indexer/templates/importer.mako:509
+#: src/indexer/templates/importer.mako:516
 msgid "Already existing"
 msgstr "이미 있음"
 
-#: src/indexer/templates/importer.mako:521
-#: src/indexer/templates/importer.mako:691
+#: src/indexer/templates/importer.mako:518
+msgid "Open it."
+msgstr "여십시오."
+
+#: src/indexer/templates/importer.mako:527
+#: src/indexer/templates/importer.mako:715
 msgid "Properties"
 msgstr "속성"
 
-#: src/indexer/templates/importer.mako:531
+#: src/indexer/templates/importer.mako:537
 msgid "Store in Default location"
 msgstr "기본 위치에 저장"
 
-#: src/indexer/templates/importer.mako:536
-#: src/indexer/templates/importer.mako:701
+#: src/indexer/templates/importer.mako:542
+#: src/indexer/templates/importer.mako:725
 msgid "External location"
 msgstr "외부 위치"
 
-#: src/indexer/templates/importer.mako:542
+#: src/indexer/templates/importer.mako:548
 msgid "Extras"
 msgstr "추가"
 
-#: src/indexer/templates/importer.mako:543
+#: src/indexer/templates/importer.mako:549
 msgid "Show extra properties"
 msgstr "추가 속성 표시"
 
-#: src/indexer/templates/importer.mako:552
+#: src/indexer/templates/importer.mako:558
 msgid "Import data"
 msgstr "데이터 가져오기"
 
-#: src/indexer/templates/importer.mako:556
-#: src/indexer/templates/importer.mako:557
-#: src/indexer/templates/importer.mako:693
-#: src/indexer/templates/importer.mako:694
+#: src/indexer/templates/importer.mako:562
+#: src/indexer/templates/importer.mako:563
+#: src/indexer/templates/importer.mako:717
+#: src/indexer/templates/importer.mako:718
 msgid "Description"
 msgstr "설명"
 
-#: src/indexer/templates/importer.mako:562
+#: src/indexer/templates/importer.mako:568
 msgid "Use first row as header"
 msgstr "첫 행을 헤더로 사용"
 
-#: src/indexer/templates/importer.mako:567
+#: src/indexer/templates/importer.mako:573
 msgid "Custom char delimiters"
 msgstr "사용자 지정 문자 구분 기호"
 
-#: src/indexer/templates/importer.mako:571
+#: src/indexer/templates/importer.mako:577
 msgid "Field"
 msgstr "필드"
 
-#: src/indexer/templates/importer.mako:574
+#: src/indexer/templates/importer.mako:580
 msgid "Array, Map"
 msgstr "어레이, Map"
 
-#: src/indexer/templates/importer.mako:577
+#: src/indexer/templates/importer.mako:583
 msgid "Struct"
 msgstr "Struct"
 
-#: src/indexer/templates/importer.mako:584
+#: src/indexer/templates/importer.mako:590
 msgid "Regexp"
 msgstr "Regexp"
 
-#: src/indexer/templates/importer.mako:590
+#: src/indexer/templates/importer.mako:596
 msgid "Primary keys"
 msgstr "기본 키"
 
-#: src/indexer/templates/importer.mako:596
+#: src/indexer/templates/importer.mako:602
 msgid "Partitions"
 msgstr "파티션"
 
-#: src/indexer/templates/importer.mako:605
+#: src/indexer/templates/importer.mako:611
 msgid "Add Partition"
 msgstr "파티션 추가"
 
-#: src/indexer/templates/importer.mako:605
-#: src/indexer/templates/importer.mako:652
+#: src/indexer/templates/importer.mako:611
+#: src/indexer/templates/importer.mako:658
 msgid "Add partition"
 msgstr "파티션 추가"
 
-#: src/indexer/templates/importer.mako:640
+#: src/indexer/templates/importer.mako:646
 msgid "Add value"
 msgstr "값 추가"
 
-#: src/indexer/templates/importer.mako:646
+#: src/indexer/templates/importer.mako:652
 msgid "Add column"
 msgstr "열 추가"
 
-#: src/indexer/templates/importer.mako:663
-#: src/indexer/templates/indexer.mako:310
+#: src/indexer/templates/importer.mako:669
+#: src/indexer/templates/indexer.mako:300
 msgid "Fields"
 msgstr "필드"
 
-#: src/indexer/templates/importer.mako:683
+#: src/indexer/templates/importer.mako:688
 msgid "Add Field"
 msgstr "필드 추가"
 
-#: src/indexer/templates/importer.mako:698
+#: src/indexer/templates/importer.mako:722
 msgid "Default location"
 msgstr "기본 위치"
 
-#: src/indexer/templates/importer.mako:716
+#: src/indexer/templates/importer.mako:740
 msgid "Back"
 msgstr "뒤로"
 
-#: src/indexer/templates/importer.mako:727
+#: src/indexer/templates/importer.mako:751
 msgid "Submit"
 msgstr "제출"
 
-#: src/indexer/templates/importer.mako:733
-msgid "Status"
-msgstr "상태"
+#: src/indexer/templates/importer.mako:757
+msgid "Check status"
+msgstr "상태 확인"
 
-#: src/indexer/templates/importer.mako:736
-#: src/indexer/templates/indexer.mako:386
-msgid "View collection"
-msgstr "컬렉션 보기"
-
-#: src/indexer/templates/importer.mako:746
+#: src/indexer/templates/importer.mako:768
 msgid "Write or paste comma separated field names"
 msgstr "쉼표로 구분된 필드 이름 쓰기 또는 붙여넣기"
 
-#: src/indexer/templates/importer.mako:749
+#: src/indexer/templates/importer.mako:771
 msgid "e.g. id, name, salary"
 msgstr "예: id, 이름, 급여"
 
-#: src/indexer/templates/importer.mako:753
+#: src/indexer/templates/importer.mako:775
 msgid "Change field names"
 msgstr "필드 이름 변경"
 
-#: src/indexer/templates/importer.mako:771
-#: src/indexer/templates/importer.mako:812
-#: src/indexer/templates/indexer.mako:402
+#: src/indexer/templates/importer.mako:786
+#: src/indexer/templates/importer.mako:844
+#: src/indexer/templates/indexer.mako:392
 msgid "Field name"
 msgstr "필드 이름"
 
-#: src/indexer/templates/importer.mako:783
+#: src/indexer/templates/importer.mako:798
 msgid "Length"
 msgstr "길이"
 
-#: src/indexer/templates/importer.mako:787
-#: src/indexer/templates/importer.mako:817
+#: src/indexer/templates/importer.mako:800
+msgid "Precision"
+msgstr "정밀도"
+
+#: src/indexer/templates/importer.mako:801
+msgid "Scale"
+msgstr "배율"
+
+#: src/indexer/templates/importer.mako:806
+msgid "Value"
+msgstr "값"
+
+#: src/indexer/templates/importer.mako:807
+msgid "Partition value"
+msgstr "파티션 값"
+
+#: src/indexer/templates/importer.mako:812
+#: src/indexer/templates/importer.mako:849
 msgid "Show field properties"
 msgstr "필드 속성 표시"
 
-#: src/indexer/templates/importer.mako:790
+#: src/indexer/templates/importer.mako:815
 msgid "Field comment"
 msgstr "필드 설명"
 
-#: src/indexer/templates/importer.mako:820
-#: src/indexer/templates/indexer.mako:412
+#: src/indexer/templates/importer.mako:830
+msgid "No sample to be shown"
+msgstr "표시할 샘플 없음"
+
+#: src/indexer/templates/importer.mako:852
+#: src/indexer/templates/indexer.mako:402
 msgid "Unique"
 msgstr "고유"
 
-#: src/indexer/templates/importer.mako:823
-#: src/indexer/templates/indexer.mako:415
+#: src/indexer/templates/importer.mako:855
+#: src/indexer/templates/indexer.mako:405
 msgid "Keep in index"
 msgstr "인덱스에 유지"
 
-#: src/indexer/templates/importer.mako:831
-#: src/indexer/templates/importer.mako:839
-#: src/indexer/templates/indexer.mako:422
-#: src/indexer/templates/indexer.mako:428
+#: src/indexer/templates/importer.mako:863
+#: src/indexer/templates/importer.mako:871
+#: src/indexer/templates/indexer.mako:412
+#: src/indexer/templates/indexer.mako:418
 msgid "Add Operation"
 msgstr "작업 추가"
 
-#: src/indexer/templates/importer.mako:831
-#: src/indexer/templates/indexer.mako:422
+#: src/indexer/templates/importer.mako:863
+#: src/indexer/templates/indexer.mako:412
 msgid "Operation"
 msgstr "작업"
 
-#: src/indexer/templates/importer.mako:839
-#: src/indexer/templates/indexer.mako:428
+#: src/indexer/templates/importer.mako:871
+#: src/indexer/templates/indexer.mako:418
 msgid "Operation to"
 msgstr "다음에 대한 작업:"
 
-#: src/indexer/templates/importer.mako:849
-#: src/indexer/templates/indexer.mako:437
+#: src/indexer/templates/importer.mako:881
+#: src/indexer/templates/indexer.mako:427
 msgid "Number of expected fields"
 msgstr "예상되는 필드 수"
 
-#: src/indexer/templates/importer.mako:853
-#: src/indexer/templates/indexer.mako:441
+#: src/indexer/templates/importer.mako:885
+#: src/indexer/templates/indexer.mako:431
 msgid "Remove"
 msgstr "제거"
 
-#: src/indexer/templates/importer.mako:892
-#: src/indexer/templates/indexer.mako:473
+#: src/indexer/templates/importer.mako:924
+#: src/indexer/templates/indexer.mako:463
 msgid "Remove Pair"
 msgstr "쌍 제거"
 
-#: src/indexer/templates/importer.mako:895
-#: src/indexer/templates/indexer.mako:476
+#: src/indexer/templates/importer.mako:927
+#: src/indexer/templates/indexer.mako:466
 msgid "Add Pair"
 msgstr "쌍 추가"
 
-#: src/indexer/templates/importer.mako:911
-#: src/indexer/templates/indexer.mako:492
+#: src/indexer/templates/importer.mako:943
+#: src/indexer/templates/indexer.mako:482
 msgid "generated"
 msgstr "생성됨"
 
-#: src/indexer/templates/importer.mako:1548
-#: src/indexer/templates/importer.mako:1554
+#: src/indexer/templates/importer.mako:1644
+#: src/indexer/templates/importer.mako:1650
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "예: SELECT * FROM 테이블 이름 또는 Ctrl + space 누르기"
 
-#: src/indexer/templates/importer.mako:1606
+#: src/indexer/templates/importer.mako:1703
 msgid "Task "
 msgstr "작업"
 
-#: src/indexer/templates/importer.mako:1606
+#: src/indexer/templates/importer.mako:1703
 msgid " submitted."
 msgstr " 제출되었습니다."
-
-#: src/indexer/templates/importer.mako:1737
-#: src/indexer/templates/indexer.mako:1003
-msgid "There was a problem loading the databases"
-msgstr "데이터베이스를 로드하는 중에 문제 발생"
-
-#: src/indexer/templates/importer.mako:1738
-#: src/indexer/templates/indexer.mako:1004
-msgid "There was a problem loading the table preview."
-msgstr "테이블 미리 보기를 로드하는 중에 문제가 발생했습니다."
 
 #: src/indexer/templates/indexer.mako:27 src/indexer/templates/indexes.mako:23
 #: src/indexer/templates/indexes.mako:28
 msgid "Solr Indexes"
 msgstr "Solr 인덱스"
 
-#: src/indexer/templates/indexer.mako:209
+#: src/indexer/templates/indexer.mako:199
 msgid "Pick data"
 msgstr "데이터 선택"
 
-#: src/indexer/templates/indexer.mako:225
+#: src/indexer/templates/indexer.mako:215
 msgid "Get fields"
 msgstr "필드 가져오기"
 
-#: src/indexer/templates/indexer.mako:228
+#: src/indexer/templates/indexer.mako:218
 msgid "Go to Step 3"
 msgstr "3단계로 이동"
 
-#: src/indexer/templates/indexer.mako:244
+#: src/indexer/templates/indexer.mako:234
 msgid "Index!"
 msgstr "인덱스!"
 
-#: src/indexer/templates/indexer.mako:251
+#: src/indexer/templates/indexer.mako:241
 msgid "Collection details"
 msgstr "컬렉션 세부 정보"
 
-#: src/indexer/templates/indexer.mako:282
+#: src/indexer/templates/indexer.mako:272
 msgid "Collection name"
 msgstr "컬렉션 이름"
 
-#: src/indexer/templates/indexer.mako:283
+#: src/indexer/templates/indexer.mako:273
 msgid "A new collection will be created"
 msgstr "새 컬렉션이 생성될 예정임"
 
-#: src/indexer/templates/indexer.mako:285
+#: src/indexer/templates/indexer.mako:275
 msgid "Adding data to this existing collection"
 msgstr "데이터를 기존 컬렉션에 추가하는 중"
 
-#: src/indexer/templates/indexer.mako:374
+#: src/indexer/templates/indexer.mako:364
 msgid "Index it!"
 msgstr "인덱스!"
 
-#: src/indexer/templates/indexer.mako:380
+#: src/indexer/templates/indexer.mako:370
 msgid "Oozie Status"
 msgstr "Oozie 상태"
 
-#: src/indexer/templates/indexer.mako:383
+#: src/indexer/templates/indexer.mako:373
 msgid "View indexing status"
 msgstr "인덱싱 상태 보기"
 
-#: src/indexer/templates/indexer.mako:407
+#: src/indexer/templates/indexer.mako:376
+msgid "View collection"
+msgstr "컬렉션 보기"
+
+#: src/indexer/templates/indexer.mako:397
 msgid "Show indexing properties"
 msgstr "인덱싱 속성 표시"
 
@@ -1061,53 +1093,56 @@ msgstr "샘플 가져오기"
 msgid "Database"
 msgstr "데이터베이스"
 
-#: src/indexer/templates/indexes.mako:209
+#: src/indexer/templates/indexes.mako:204
 msgid "Delete the selected index(es)?"
 msgstr "선택한 인덱스를 삭제하시겠습니까?"
 
-#: src/indexer/templates/indexes.mako:212
+#: src/indexer/templates/indexes.mako:207
 msgid "No"
 msgstr "아니요"
 
-#: src/indexer/templates/indexes.mako:405
+#: src/indexer/templates/indexes.mako:400
 msgid "No data available"
 msgstr "데이터를 이용할 수 없음"
 
-#: src/indexer/templates/indexes.mako:406
+#: src/indexer/templates/indexes.mako:401
 msgid "Showing _START_ to _END_ of _TOTAL_ entries"
 msgstr "_START_ to _END_ of _TOTAL_ 항목 표시"
 
-#: src/indexer/templates/indexes.mako:407
+#: src/indexer/templates/indexes.mako:402
 msgid "Showing 0 to 0 of 0 entries"
 msgstr "0~0개(전체 0개 중) 항목 표시"
 
-#: src/indexer/templates/indexes.mako:408
+#: src/indexer/templates/indexes.mako:403
 msgid "(filtered from _MAX_ total entries)"
 msgstr "(총 _MAX_ 항목에서 필터링됨)"
 
-#: src/indexer/templates/indexes.mako:409
+#: src/indexer/templates/indexes.mako:404
 msgid "No matching records"
 msgstr "일치하는 레코드가 없음"
 
-#: src/indexer/templates/indexes.mako:411
+#: src/indexer/templates/indexes.mako:406
 msgid "First"
 msgstr "처음"
 
-#: src/indexer/templates/indexes.mako:412
+#: src/indexer/templates/indexes.mako:407
 msgid "Last"
 msgstr "마지막"
 
-#~ msgid "Flag to turn on the morphline based Solr indexer."
+#~ msgid "The table could not be created."
 #~ msgstr ""
 
-#~ msgid "Could not update index. Could not fetch any data from Hive."
+#~ msgid "Click or drag & drop"
 #~ msgstr ""
 
-#~ msgid "Delete indexes"
+#~ msgid "Create a new "
 #~ msgstr ""
 
-#~ msgid "Confirm"
+#~ msgid "Status"
 #~ msgstr ""
 
-#~ msgid "Delete index "
+#~ msgid "There was a problem loading the databases"
+#~ msgstr ""
+
+#~ msgid "There was a problem loading the table preview."
 #~ msgstr ""

@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:58-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: de <LL@li.org>\n"
@@ -45,6 +45,10 @@ msgstr "Abfrage-Editor"
 #, python-format
 msgid "Invalid design type %(type)s"
 msgstr "Ungültiger Designtyp %(type)s"
+
+#: src/rdbms/templates/common.mako:26
+msgid "DBQuery icon"
+msgstr "DBQuery-Symbol"
 
 #: src/rdbms/templates/common.mako:27
 msgid "DB Query"
@@ -112,106 +116,110 @@ msgstr "Tabellenname..."
 msgid "The selected database has no tables."
 msgstr "Die ausgewählte Datenbank enthält keine Tabellen."
 
-#: src/rdbms/templates/execute.mako:96 src/rdbms/templates/execute.mako:818
+#: src/rdbms/templates/execute.mako:95 src/rdbms/templates/execute.mako:815
 msgid "Query name"
 msgstr "Abfragename"
 
-#: src/rdbms/templates/execute.mako:104
+#: src/rdbms/templates/execute.mako:103
 msgid "Query description"
 msgstr "Abfragebeschreibung"
 
-#: src/rdbms/templates/execute.mako:115
+#: src/rdbms/templates/execute.mako:114
 msgid "Your query has the following error(s):"
 msgstr "Ihre Abfrage enthält folgende(n) Fehler:"
 
-#: src/rdbms/templates/execute.mako:124
+#: src/rdbms/templates/execute.mako:123
 msgid "Execute"
 msgstr "Ausführen"
 
-#: src/rdbms/templates/execute.mako:125 src/rdbms/templates/execute.mako:199
+#: src/rdbms/templates/execute.mako:124 src/rdbms/templates/execute.mako:196
 msgid "Save"
 msgstr "Speichern"
 
-#: src/rdbms/templates/execute.mako:126
+#: src/rdbms/templates/execute.mako:125
 msgid "Save as..."
 msgstr "Speichern unter..."
 
-#: src/rdbms/templates/execute.mako:127
+#: src/rdbms/templates/execute.mako:126
 msgid "Explain"
 msgstr "Erklären"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "or create a"
 msgstr "oder erstellen Sie eine"
 
-#: src/rdbms/templates/execute.mako:128
+#: src/rdbms/templates/execute.mako:127
 msgid "New query"
 msgstr "Neue Abfrage"
 
-#: src/rdbms/templates/execute.mako:154
+#: src/rdbms/templates/execute.mako:152
 msgid "The server returned no results."
 msgstr "Vom Server wurden keine Ergebnisse ausgegeben."
 
-#: src/rdbms/templates/execute.mako:179
+#: src/rdbms/templates/execute.mako:175
+msgid "Close"
+msgstr "Schließen"
+
+#: src/rdbms/templates/execute.mako:176
 msgid "Save your query"
 msgstr "Abfrage speichern"
 
-#: src/rdbms/templates/execute.mako:184
+#: src/rdbms/templates/execute.mako:181
 msgid "Name"
 msgstr "Name"
 
-#: src/rdbms/templates/execute.mako:190
+#: src/rdbms/templates/execute.mako:187
 msgid "Description"
 msgstr "Beschreibung"
 
-#: src/rdbms/templates/execute.mako:198
+#: src/rdbms/templates/execute.mako:195
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/rdbms/templates/execute.mako:392
+#: src/rdbms/templates/execute.mako:389
 msgid "Example: SELECT * FROM tablename, or press CTRL + space"
 msgstr "Beispiel: \"SELECT * FROM Tabellenname\", oder STRG + Leerzeichen drücken"
 
-#: src/rdbms/templates/execute.mako:581
+#: src/rdbms/templates/execute.mako:578
 msgid "Did you know?"
 msgstr "Wussten Sie schon?"
 
-#: src/rdbms/templates/execute.mako:667
+#: src/rdbms/templates/execute.mako:664
 msgid "No query provided to save."
 msgstr "Keine zu speichernde Abfrage angegeben."
 
-#: src/rdbms/templates/execute.mako:689
+#: src/rdbms/templates/execute.mako:686
 msgid "Oops, no server found!"
 msgstr "Kein Server gefunden!"
 
-#: src/rdbms/templates/execute.mako:695
+#: src/rdbms/templates/execute.mako:692
 msgid "Oops, no database found!"
 msgstr "Keine Datenbank gefunden!"
 
-#: src/rdbms/templates/execute.mako:812
+#: src/rdbms/templates/execute.mako:809
 msgid "This field is required."
 msgstr "Dieses Feld ist erforderlich."
 
-#: src/rdbms/templates/execute.mako:825
+#: src/rdbms/templates/execute.mako:822
 msgid "Empty description"
 msgstr "Leere Beschreibung"
 
-#: src/rdbms/templates/execute.mako:831
+#: src/rdbms/templates/execute.mako:828
 msgid "Query saved successfully!"
 msgstr "Abfrage erfolgreich gespeichert!"
 
-#: src/rdbms/templates/execute.mako:877
+#: src/rdbms/templates/execute.mako:874
 msgid "No data available"
 msgstr "Keine Daten verfügbar"
 
-#: src/rdbms/templates/execute.mako:878
+#: src/rdbms/templates/execute.mako:875
 msgid "No matching records"
 msgstr "Keine übereinstimmenden Datensätze"
 
-#: src/rdbms/templates/execute.mako:916
+#: src/rdbms/templates/execute.mako:913
 msgid "Server error occured: "
 msgstr "Serverfehler aufgetreten: "
 
-#: src/rdbms/templates/execute.mako:919
+#: src/rdbms/templates/execute.mako:916
 msgid "Unmanageable server error occured: "
 msgstr "Unlösbarer Serverfehler: "
