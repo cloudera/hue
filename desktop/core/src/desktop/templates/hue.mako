@@ -242,7 +242,7 @@ ${ hueIcons.symbols() }
           <%
             view_profile = user.has_hue_permission(action="access_view:useradmin:edit_user", app="useradmin") or user.is_superuser
           %>
-          <button class="btn btn-flat" data-toggle="dropdown">
+          <button class="btn btn-flat" data-toggle="dropdown" data-bind="click: function(){ huePubSub.publish('hide.jobs.panel'); huePubSub.publish('hide.history.panel'); }">
             <i class="fa fa-user"></i> ${ user.username } <span class="caret"></span>
           </button>
           <ul class="dropdown-menu">
