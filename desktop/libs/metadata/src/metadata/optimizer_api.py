@@ -423,7 +423,7 @@ def upload_table_stats(request):
       })
 
       if with_columns:
-        for col in full_table_stats['columns']:
+        for col in full_table_stats['columns'][:25]:
           col_stats = json.loads(get_table_stats(request, database=path['database'], table=path['table'], column=col).content)['stats']
           col_stats = dict([(key, val) for col_stat in col_stats for key, val in col_stat.iteritems()])
 
