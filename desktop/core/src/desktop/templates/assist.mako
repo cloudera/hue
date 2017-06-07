@@ -513,7 +513,7 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-document-header-actions">
     <div class="assist-db-header-actions">
       <!-- ko if: !loading() && availableTypeFilters().length > 1 -->
-      <div data-bind="component: { name: 'hue-drop-down', params: { value: typeFilter, entries: availableTypeFilters, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
+      <div data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: typeFilter, entries: availableTypeFilters, linkTitle: '${ _ko('Document type') }' } }" style="display: inline-block"></div>
       <!-- /ko -->
       <a class="inactive-action" href="javascript:void(0)" data-bind="visible: !loading(), toggle: isFilterVisible, css: { 'blue': isFilterVisible }" title="Filter"><i class="pointer fa fa-filter"></i></a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.file.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
@@ -1651,7 +1651,7 @@ from notebook.conf import get_ordered_interpreters
       <div class="assist-flex-panel">
         <div class="assist-flex-header">
           <div class="assist-inner-header">
-            <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
+            <div class="function-dialect-dropdown" data-bind="component: { name: 'hue-drop-down', params: { fixedPosition: true, value: activeType, entries: availableTypes, linkTitle: '${ _ko('Selected dialect') }' } }" style="display: inline-block"></div>
             <div class="assist-db-header-actions" style="margin-right:10px;">
               <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { searchVisible(!searchVisible()); query(''); }, css: { 'blue' : searchVisible }"><i class="pointer fa fa-filter" title="${ _('Filter') }"></i></a>
             </div>
