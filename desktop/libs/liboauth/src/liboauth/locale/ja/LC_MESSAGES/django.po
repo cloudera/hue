@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:56-0800\n"
+"POT-Creation-Date: 2017-05-16 08:39-0700\n"
 "PO-Revision-Date: 2014-01-03 20:09+0000\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: ja <LL@li.org>\n"
@@ -131,38 +131,59 @@ msgstr "Hue - サインアップ"
 msgid "Hue - Sign in"
 msgstr "Hue - サインイン"
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:151
+#: src/liboauth/templates/oauth-login.mako:167
+msgid "Hue logo"
+msgstr "Hue ロゴ"
+
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Visit gethue.com"
 msgstr "gethue.com にアクセス"
 
-#: src/liboauth/templates/oauth-login.mako:158
+#: src/liboauth/templates/oauth-login.mako:156
 msgid "Fell asleep? Visit us on gethue.com instead!"
 msgstr "寝ていないでぜひ gethue.com にアクセスしてください。"
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Error!"
 msgstr "エラーが発生しました。"
 
-#: src/liboauth/templates/oauth-login.mako:173
+#: src/liboauth/templates/oauth-login.mako:171
 msgid "Invalid username or password."
 msgstr "無効なユーザー名またはパスワードです。"
 
-#: src/liboauth/templates/oauth-login.mako:180
+#: src/liboauth/templates/oauth-login.mako:178
 msgid "This is your first time logging in."
 msgstr "これは初回のログインです。"
 
-#: src/liboauth/templates/oauth-login.mako:181
+#: src/liboauth/templates/oauth-login.mako:179
 msgid "You will become Hue superuser."
 msgstr "Hue スーパーユーザーになります。"
 
-#: src/liboauth/templates/oauth-login.mako:183
+#: src/liboauth/templates/oauth-login.mako:181
 msgid "Sign Up via"
 msgstr "サインアップ方法"
 
-#: src/liboauth/templates/oauth-login.mako:186
+#: src/liboauth/templates/oauth-login.mako:184
 msgid "Sign In via"
 msgstr "サインイン方法"
 
-#: src/liboauth/templates/oauth-login.mako:215
+#: src/liboauth/templates/oauth-login.mako:190
+msgid "Google icon"
+msgstr "Google アイコン"
+
+#: src/liboauth/templates/oauth-login.mako:196
+msgid "Facebook icon"
+msgstr "Facebook アイコン"
+
+#: src/liboauth/templates/oauth-login.mako:202
+msgid "Linkedin icon"
+msgstr "Linkedin アイコン"
+
+#: src/liboauth/templates/oauth-login.mako:208
+msgid "Twitter icon"
+msgstr "Twitter アイコン"
+
+#: src/liboauth/templates/oauth-login.mako:213
 msgid "The oauth app is not configured with any provider."
 msgstr "どのプロバイダーでも、oauth アプリが設定されていません。"

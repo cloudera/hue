@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Hue VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-15 09:57-0800\n"
+"POT-Creation-Date: 2017-05-16 08:41-0700\n"
 "PO-Revision-Date: 2013-10-28 10:31-0700\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: en <LL@li.org>\n"
@@ -129,94 +129,4 @@ msgid ""
 "Execute this script to produce the auth password. This will be used when "
 "`auth_password` is not set."
 msgstr ""
-
-#~ msgid "Page saved !"
-#~ msgstr ""
-
-#~ msgid "There is no dashboard to search."
-#~ msgstr ""
-
-#~ msgid "Grid Results"
-#~ msgstr ""
-
-#~ msgid "Text Facet"
-#~ msgstr ""
-
-#~ msgid "Pie Chart"
-#~ msgstr ""
-
-#~ msgid "Bar Chart"
-#~ msgstr ""
-
-#~ msgid "Line Chart"
-#~ msgstr ""
-
-#~ msgid "Timeline"
-#~ msgstr ""
-
-#~ msgid "Filter Bar"
-#~ msgstr ""
-
-#~ msgid "Map"
-#~ msgstr ""
-
-#~ msgid "Edit"
-#~ msgstr ""
-
-#~ msgid "Save"
-#~ msgstr ""
-
-#~ msgid "Saving..."
-#~ msgstr ""
-
-#~ msgid "New"
-#~ msgstr ""
-
-#~ msgid "Select a database and a table"
-#~ msgstr ""
-
-#~ msgid "Choose a database..."
-#~ msgstr ""
-
-#~ msgid "Choose a table..."
-#~ msgstr ""
-
-#~ msgid "Manually refresh the dropdowns"
-#~ msgstr ""
-
-#~ msgid "Search"
-#~ msgstr ""
-
-#~ msgid "Filter fields"
-#~ msgstr ""
-
-#~ msgid "Field Name"
-#~ msgstr ""
-
-#~ msgid "Your search did not match any documents."
-#~ msgstr ""
-
-#~ msgid "Exclude this value"
-#~ msgstr ""
-
-#~ msgid "There are currently no filters applied."
-#~ msgstr ""
-
-#~ msgid "field"
-#~ msgstr ""
-
-#~ msgid "value"
-#~ msgstr ""
-
-#~ msgid "from"
-#~ msgstr ""
-
-#~ msgid "to"
-#~ msgstr ""
-
-#~ msgid "Oops, no database found!"
-#~ msgstr ""
-
-#~ msgid "Oops, no table found!"
-#~ msgstr ""
 
