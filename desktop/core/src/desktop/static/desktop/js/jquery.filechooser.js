@@ -379,7 +379,7 @@
         }, 100);
 
         $(data.files).each(function (cnt, file) {
-          var _addFile = true;
+          var _addFile = file.name !== '.';
           if (_parent.options.filterExtensions != "" && file.type == "file") {
             var _allowedExtensions = _parent.options.filterExtensions.split(",");
             var _fileExtension = file.name.split(".").pop().toLowerCase();
