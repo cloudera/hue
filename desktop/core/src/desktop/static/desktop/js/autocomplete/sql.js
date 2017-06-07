@@ -622,6 +622,11 @@ break;
 case 825:
 
      parser.checkForSelectListKeywords($$[$0-1]);
+     var keywords = ['FROM'];
+     if (parser.yy.result.suggestKeywords) {
+       keywords = parser.yy.result.suggestKeywords.concat(keywords);
+     }
+     parser.suggestKeywords(keywords);
      parser.suggestTables({ prependFrom: true });
      parser.suggestDatabases({ prependFrom: true, appendDot: true });
    
