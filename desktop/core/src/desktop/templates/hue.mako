@@ -696,7 +696,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           var jsFile = $el.attr('src').split('?')[0];
           if (loadedJs.indexOf(jsFile) === -1) {
             loadedJs.push(jsFile);
+            $.ajaxSetup({ cache: true });
             $el.clone().appendTo($('head'));
+            $.ajaxSetup({ cache: false });
           }
           $el.remove();
         });
@@ -705,7 +707,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           var cssFile = $el.attr('href').split('?')[0];
           if (loadedCss.indexOf(cssFile) === -1) {
             loadedCss.push(cssFile);
+            $.ajaxSetup({ cache: true });
             $el.clone().appendTo($('head'));
+            $.ajaxSetup({ cache: false });
           }
           $el.remove();
         });
@@ -717,9 +721,11 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         // Only load CSS and JS files that are not loaded before
         self.processHeaders = function(response){
           var r = $('<span>').html(response);
+          % if conf.DJANGO_DEBUG_MODE.get():
           r.find('link').each(function () {
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
           });
+          % endif
           r.find('script[src]').each(function () {
             huePubSub.publish('hue4.add.global.js', $(this));
           });
