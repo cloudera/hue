@@ -1,0 +1,11 @@
+[cloudera-cdh2]
+name=Cloudera's Distribution for Hadoop, Version 2
+mirrorlist=http://archive.cloudera.com/redhat/cdh/2/mirrors
+gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera 
+gpgcheck = 0
+
+[hue]
+name=Hue 0.9, Beta
+baseurl=http://archive.cloudera.com/desktop-0.9/redhat
+gpgkey = http://archive.cloudera.com/redhat/cdh/RPM-GPG-KEY-cloudera 
+gpgcheck = 0
