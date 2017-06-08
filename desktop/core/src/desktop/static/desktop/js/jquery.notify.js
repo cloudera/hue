@@ -48,9 +48,9 @@
     var _this = this;
     var MARGIN = 4;
 
-    _this.options.message = $("<span>").text(_this.options.message).html(); // escape HTML messages
+    _this.options.message = $.trim($("<span>").text(_this.options.message).html()); // escape HTML messages
 
-    if ($.trim(_this.options.message) !== '') {
+    if (_this.options.message !== '' && $(".jHueNotify .message").last().text() !== _this.options.message) {
 
       var el = $("#jHueNotify").clone();
       el.removeAttr("id");
@@ -82,7 +82,6 @@
 
       el.on('dblclick', function () {
         el.toggleClass('expanded');
-        el.find('.message').getNiceScroll().resize();
       });
 
       if (_this.options.sticky) {
