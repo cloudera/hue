@@ -5062,8 +5062,12 @@
         }
 
         clearTimeout(renderThrottle);
-        if (Math.abs($parentFVOwnerElement.data('startIndex') - startIndex) > incrementLimit ||
-            Math.abs($parentFVOwnerElement.data('endIndex') - endIndex) > incrementLimit) {
+        var startDiff = Math.abs($parentFVOwnerElement.data('startIndex') - startIndex);
+        var endDiff = Math.abs($parentFVOwnerElement.data('endIndex') - endIndex);
+        if (startDiff > incrementLimit
+          || endDiff > incrementLimit
+          || (startDiff !== 0 && startIndex === 0)
+          || (endDiff !== 0 && endIndex === allEntries.length - 1))  {
           renderThrottle = setTimeout(render, 0);
         }
       };
