@@ -42,7 +42,7 @@
 
 '`'                                                                   { this.begin("backTick"); return 'PART_OF_STATEMENT'; }
 <backTick>[^`]+                                                       { return 'PART_OF_STATEMENT'; }
-<backTick><<EOF>>                                                     { this.popState(); return 'PART_OF_STATEMENT'; }
+<backTick><<EOF>>                                                     { this.popState(); return 'EOF'; }
 <backTick>'`'                                                         { this.popState(); return 'PART_OF_STATEMENT'; }
 
 [^"\/;'`-]+                                                           { return 'PART_OF_STATEMENT'; }
