@@ -528,7 +528,6 @@
       self.$table.unbind('sort');
       self.$table.bind('sort', function (e, obj) {
         self.$table.find('thead tr th:not(:eq(' + obj.originalIndex + '))').removeClass('sorting_desc').removeClass('sorting_asc');
-        self.$table.data('scrollToCol', obj.originalIndex);
         self.$table.data('scrollAnimate', true);
         self.$table.data('scrollAnimateDirect', true);
         var $cell = self.$table.find('thead tr th:eq(' + obj.originalIndex + ')');
