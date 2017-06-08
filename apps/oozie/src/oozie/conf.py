@@ -61,9 +61,14 @@ REMOTE_SAMPLE_DIR = Config(
   help=_t("Location on HDFS where the Oozie workflows are stored. Parameters are $TIME and $USER, e.g. /user/$USER/hue/workspaces/workflow-$TIME")
 )
 
+
+def get_oozie_job_count():
+  '''Returns the maximum of jobs fetched by the API depending on the Hue version'''
+  return 100 if is_hue4() else 50
+
 OOZIE_JOBS_COUNT = Config(
   key='oozie_jobs_count',
-  default=50,
+  dynamic_default=get_oozie_job_count,
   type=int,
   help=_t('Maximum number of Oozie workflows or coodinators or bundles to retrieve in one API call.')
 )
