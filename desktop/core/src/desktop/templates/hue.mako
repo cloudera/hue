@@ -725,6 +725,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           r.find('link').each(function () {
             $(this).attr('href', $(this).attr('href') + '?' + Math.random())
           });
+          r.find('script[src]').each(function () {
+            $(this).attr('src', $(this).attr('src') + '?' + Math.random())
+          });
           % endif
           r.find('script[src]').each(function () {
             huePubSub.publish('hue4.add.global.js', $(this));
