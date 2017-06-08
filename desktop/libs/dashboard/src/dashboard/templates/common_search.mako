@@ -381,7 +381,7 @@ from desktop.views import commonheader, commonfooter, _ko
 </div>
 
 
-${ dashboard.layout_skeleton() }
+${ dashboard.layout_skeleton(suffix='search') }
 
 <script type="text/html" id="empty-widget">
   ${ _('This is an empty widget.')}
@@ -1379,16 +1379,16 @@ ${ dashboard.layout_skeleton() }
       onClick: function(d) {
         if (d.obj.field != undefined) {
           if ($data.type == 'range-up') {
-            viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
+            searchViewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
           } else {
-            viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+            searchViewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
           }
         } else {
-          viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+          searchViewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
         }
       },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+      onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
     <div class="clearfix"></div>
     <!-- /ko -->
@@ -1618,16 +1618,16 @@ ${ dashboard.layout_skeleton() }
               onClick: function(d) {
                 if (d.obj.field != undefined) {
                   if ($data.type == 'range-up') {
-                    viewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
+                    searchViewModel.query.selectRangeUpFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field, 'exclude': false, is_up: d.obj.is_up});
                   } else {
-                    viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
+                    searchViewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field});
                   }
                 } else {
-                  viewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
+                  searchViewModel.query.toggleFacet({facet: d.obj, widget_id: d.obj.widget_id});
                 }
               },
-              onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-              onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+              onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1641,7 +1641,7 @@ ${ dashboard.layout_skeleton() }
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
               },
-              onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+              onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
             />
             <div class="clearfix"></div>
           <!-- /ko -->
@@ -1669,7 +1669,7 @@ ${ dashboard.layout_skeleton() }
               onClick: function(d) {
                 $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
               },
-              onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+              onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
            <!-- /ko -->
          <!-- /ko -->
 
@@ -1692,8 +1692,8 @@ ${ dashboard.layout_skeleton() }
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: rangePieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
 
@@ -1702,8 +1702,8 @@ ${ dashboard.layout_skeleton() }
         transformer: rangeUpPieChartDataTransformer,
         rangeUp: true,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
 
@@ -1711,8 +1711,8 @@ ${ dashboard.layout_skeleton() }
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
     <!-- /ko -->
@@ -1822,9 +1822,9 @@ ${ dashboard.layout_skeleton() }
 
     <div data-bind="lineChart: {datum: {counts: counts(), widget_id: $parent.id(), label: label()}, field: field, label: label(),
       transformer: lineChartDataTransformer,
-      onClick: function(d){ viewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
-      onSelectRange: function(from, to){ viewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
-      onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+      onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.obj.value, widget_id: d.obj.widget_id, from: d.obj.from, to: d.obj.to, cat: d.obj.field}) },
+      onSelectRange: function(from, to){ searchViewModel.collection.selectTimelineFacet({from: from, to: to, cat: field, widget_id: $parent.id()}) },
+      onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
     />
     <div class="clearfix"></div>
   </div>
@@ -1845,8 +1845,8 @@ ${ dashboard.layout_skeleton() }
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: rangePieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.selectRangeFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type() == 'range-up' -->
@@ -1854,16 +1854,16 @@ ${ dashboard.layout_skeleton() }
         transformer: rangeUpPieChartDataTransformer,
         rangeUp: true,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.selectRangeUpFacet({count: d.data.obj.value, widget_id: d.data.obj.widget_id, from: d.data.obj.from, to: d.data.obj.to, cat: d.data.obj.field, 'exclude': false, is_up: d.data.obj.is_up}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
       <!-- ko if: type().indexOf('range') == -1 -->
       <div data-bind="pieChart: {data: {counts: $parent.counts(), widget_id: $parent.id()}, field: field, fqs: $root.query.fqs,
         transformer: pieChartDataTransformer,
         maxWidth: 250,
-        onClick: function(d){ viewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
-        onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false)} }" />
+        onClick: function(d){ searchViewModel.query.toggleFacet({facet: d.data.obj, widget_id: d.data.obj.widget_id}) },
+        onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false)} }" />
       <div class="clearfix"></div>
       <!-- /ko -->
     </div>
@@ -1950,7 +1950,7 @@ ${ dashboard.layout_skeleton() }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -1981,7 +1981,7 @@ ${ dashboard.layout_skeleton() }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -2049,7 +2049,7 @@ ${ dashboard.layout_skeleton() }
           onClick: function(d) {
             $root.query.togglePivotFacet({facet: d.obj, widget_id: id()});
           },
-          onComplete: function(){ viewModel.getWidgetById($parent.id()).isLoading(false) } }"
+          onComplete: function(){ searchViewModel.getWidgetById($parent.id()).isLoading(false) } }"
         />
       <div class="clearfix"></div>
       <!-- /ko -->
@@ -2288,7 +2288,7 @@ ${ dashboard.layout_skeleton() }
         onClick: function(d) {
           $root.query.togglePivotFacet({facet: {'fq_fields': d.fields, 'fq_values': d.value}, widget_id: id()});
         },
-        onComplete: function(){ var widget = viewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
+        onComplete: function(){ var widget = searchViewModel.getWidgetById($parent.id()); if (widget != null) { widget.isLoading(false)}; } }" />
       <div class="clearfix"></div>
     </div>
   </div>
@@ -2345,7 +2345,7 @@ ${ dashboard.layout_skeleton() }
     <div data-bind="leafletMapChart: {showMoveCheckbox: true, moveCheckboxLabel: '${ _ko('Search as I move the map') }', visible: $root.hasRetrievedResults() && $root.collection.template.leafletmapOn(), isLoading: isLoading(), datum: {counts: $root.response()},
       transformer: leafletMapChartDataTransformer,
       onRegionChange: function(bounds){ $root.query.selectMapRegionFacet({widget_id: id(), 'bounds': ko.toJS(bounds, null, 2), lat: $root.collection.template.leafletmap.latitudeField(), lon: $root.collection.template.leafletmap.longitudeField()}); },
-      onComplete: function(){ var widget = viewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
+      onComplete: function(){ var widget = searchViewModel.getWidgetById(id()); if (widget != null) { widget.isLoading(false)}; } }">
     </div>
     <div class="clearfix"></div>
   </div>
@@ -2794,7 +2794,7 @@ ${ dashboard.import_charts() }
 
 <script type="text/javascript">
 
-var viewModel;
+var searchViewModel;
 
 moment.suppressDeprecationWarnings = true;
 
@@ -2956,8 +2956,8 @@ function rangeUpPieChartDataTransformer(data) {
 
 function pieChartDataTransformerGrid(data) {
   var _data = [];
-  var chartX = viewModel.collection.template.chartSettings.chartX();
-  var chartY = viewModel.collection.template.chartSettings.chartYSingle();
+  var chartX = searchViewModel.collection.template.chartSettings.chartX();
+  var chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
   $(data.counts).each(function (cnt, item) {
     item.widget_id = data.widget_id;
     if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
@@ -3243,14 +3243,14 @@ function gradientMapChartDataTransformer(data) {
 
 function leafletMapChartDataTransformer(data) {
   var _data = [];
-  if (!$.isEmptyObject(data.counts) && data.counts.response.docs && viewModel.collection.template.leafletmap.latitudeField() != "" && viewModel.collection.template.leafletmap.longitudeField() != "") {
+  if (!$.isEmptyObject(data.counts) && data.counts.response.docs && searchViewModel.collection.template.leafletmap.latitudeField() != "" && searchViewModel.collection.template.leafletmap.longitudeField() != "") {
     data.counts.response.docs.forEach(function (record) {
       var _obj = {
-        lat: record[viewModel.collection.template.leafletmap.latitudeField()],
-        lng: record[viewModel.collection.template.leafletmap.longitudeField()]
+        lat: record[searchViewModel.collection.template.leafletmap.latitudeField()],
+        lng: record[searchViewModel.collection.template.leafletmap.longitudeField()]
       }
-      if (viewModel.collection.template.leafletmap.labelField() != "") {
-        _obj.label = record[viewModel.collection.template.leafletmap.labelField()];
+      if (searchViewModel.collection.template.leafletmap.labelField() != "") {
+        _obj.label = record[searchViewModel.collection.template.leafletmap.labelField()];
       }
       _data.push(_obj);
     });
@@ -3261,9 +3261,9 @@ function leafletMapChartDataTransformer(data) {
 function leafletMapChartDataTransformerGrid(data) {
   var _data = [];
   $(data.counts).each(function (cnt, item) {
-    var chartX = viewModel.collection.template.chartSettings.chartX();
-    var chartY = viewModel.collection.template.chartSettings.chartYSingle();
-    var chartMapLabel = viewModel.collection.template.chartSettings.chartMapLabel();
+    var chartX = searchViewModel.collection.template.chartSettings.chartX();
+    var chartY = searchViewModel.collection.template.chartSettings.chartYSingle();
+    var chartMapLabel = searchViewModel.collection.template.chartSettings.chartMapLabel();
     if (chartX != "" && item.item[chartX] && chartY != "" && item.item[chartY]) {
       var _obj = {
         lat: item.item[chartX](),
@@ -3331,8 +3331,8 @@ function multiSerieDataTransformer(rawDatum) {
 function multiSerieDataTransformerGrid(rawDatum) {
   var _datum = [];
 
-  var chartX = viewModel.collection.template.chartSettings.chartX();
-  var chartY = viewModel.collection.template.chartSettings.chartYMulti();
+  var chartX = searchViewModel.collection.template.chartSettings.chartX();
+  var chartY = searchViewModel.collection.template.chartSettings.chartYMulti();
 
   if (chartX != null && chartY.length > 0 && rawDatum.counts.length > 0) {
     var _plottedSerie = 0;
@@ -3419,7 +3419,7 @@ function toggleDocDetails(doc) {
   doc.showDetails(! doc.showDetails());
 
   if (doc.details().length == 0) {
-    viewModel.getDocument(doc, resizeFieldsList);
+    searchViewModel.getDocument(doc, resizeFieldsList);
   }
   else {
     resizeFieldsListThrottled();
@@ -3428,14 +3428,14 @@ function toggleDocDetails(doc) {
 
 
 function queryTypeahead(query, process) {
-  var _source = viewModel.collection.template.fieldsNames();
+  var _source = searchViewModel.collection.template.fieldsNames();
   _source = _source.concat("AND OR TO".split(" "))
 
-  if (viewModel.collection.suggest.enabled()) {
-    viewModel.suggest(query, function (data) {
+  if (searchViewModel.collection.suggest.enabled()) {
+    searchViewModel.suggest(query, function (data) {
       var _tmp = [];
-      if (typeof data != "undefined" && data.response && data.response.suggest && data.response.suggest[viewModel.collection.suggest.dictionary()]) {
-        var suggestions = data.response.suggest[viewModel.collection.suggest.dictionary()][query].suggestions;
+      if (typeof data != "undefined" && data.response && data.response.suggest && data.response.suggest[searchViewModel.collection.suggest.dictionary()]) {
+        var suggestions = data.response.suggest[searchViewModel.collection.suggest.dictionary()][query].suggestions;
         suggestions.forEach(function (sugg) {
           _tmp.push(sugg.term + "<i class='muted fa fa-search'></i>");
         });
@@ -3450,20 +3450,20 @@ function queryTypeahead(query, process) {
 
 function newSearch() {
   $.getJSON('/search/new_search?format=json', function(data){
-    viewModel.collectionJson = data.collection;
-    viewModel.queryJson = data.query;
-    viewModel.initialJson = data.initial;
-    viewModel.reset();
+    searchViewModel.collectionJson = data.collection;
+    searchViewModel.queryJson = data.query;
+    searchViewModel.initialJson = data.initial;
+    searchViewModel.reset();
   });
 }
 
 function loadSearch(collection, query, initial) {
   
-  viewModel = new SearchViewModel(collection, query, initial);
+  searchViewModel = new SearchViewModel(collection, query, initial);
 
-  ko.applyBindings(viewModel, $('#searchComponents')[0]);
+  ko.applyBindings(searchViewModel, $('#searchComponents')[0]);
 
-  viewModel.timelineChartTypes = ko.observableArray([
+  searchViewModel.timelineChartTypes = ko.observableArray([
     {
       value: "line",
       label: "${ _('Lines')}"
@@ -3474,17 +3474,17 @@ function loadSearch(collection, query, initial) {
     }
   ]);
 
-  viewModel.init(function(data){
+  searchViewModel.init(function(data){
     $(".chosen-select").trigger("chosen:updated");
   });
 
-  viewModel.isRetrievingResults.subscribe(function(value){
+  searchViewModel.isRetrievingResults.subscribe(function(value){
     if (! value){
       resizeFieldsList();
     }
   });
 
-  viewModel.isEditing.subscribe(function(value){
+  searchViewModel.isEditing.subscribe(function(value){
     if (value){
       window.setTimeout(function(){
         if ($(".slider-cnt").length > 0 && $(".slider-cnt").data("slider")){
@@ -3494,7 +3494,7 @@ function loadSearch(collection, query, initial) {
     }
   });
 
-  viewModel.isPlayerMode.subscribe(function(value) {
+  searchViewModel.isPlayerMode.subscribe(function(value) {
     if (value){
       $(".navigator").hide();
       $("body").css("paddingTop", "40px");
@@ -3508,20 +3508,20 @@ function loadSearch(collection, query, initial) {
   var _refreshTimeout = null;
   var refresh = function () {
     _refreshTimeout = window.setTimeout(function () {
-      if (viewModel.collection.autorefresh()) {
-        viewModel.search(refresh);
+      if (searchViewModel.collection.autorefresh()) {
+        searchViewModel.search(refresh);
       }
-    }, ($.isNumeric(viewModel.collection.autorefreshSeconds()) ? viewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
+    }, ($.isNumeric(searchViewModel.collection.autorefreshSeconds()) ? searchViewModel.collection.autorefreshSeconds() * 1 : 60) * 1000)
   }
 
   var checkAutoRefresh = function () {
-    if (viewModel.collection.autorefresh()) {
+    if (searchViewModel.collection.autorefresh()) {
       window.clearTimeout(_refreshTimeout);
       refresh();
     }
   }
 
-  if (viewModel.collection.autorefresh()) {
+  if (searchViewModel.collection.autorefresh()) {
     refresh();
   }
 
@@ -3529,7 +3529,7 @@ function loadSearch(collection, query, initial) {
     checkAutoRefresh();
   });
 
-  viewModel.collection.autorefresh.subscribe(function (value) {
+  searchViewModel.collection.autorefresh.subscribe(function (value) {
     if (value) {
       refresh();
     }
@@ -3538,7 +3538,7 @@ function loadSearch(collection, query, initial) {
     }
   });
 
-  viewModel.collection.autorefreshSeconds.subscribe(function (value) {
+  searchViewModel.collection.autorefreshSeconds.subscribe(function (value) {
     checkAutoRefresh();
   });
 }
@@ -3612,7 +3612,7 @@ $(document).ready(function () {
 
   $(document).on("shownAnalysis", function (e, originalEvent) {
     var _fieldElement = $(".field-selector").filter(function () {
-      return $(this).text().toLowerCase() === viewModel.fieldAnalysesName().toLowerCase();
+      return $(this).text().toLowerCase() === searchViewModel.fieldAnalysesName().toLowerCase();
     }).parent();
     if (originalEvent.pageX == null && originalEvent.clientX != null) {
       var doc = document.documentElement, body = document.body;
@@ -3632,7 +3632,7 @@ $(document).ready(function () {
   % if is_owner:
   $(window).bind("keydown", "ctrl+s alt+s meta+s", function(e){
     e.preventDefault();
-    viewModel.save();
+    searchViewModel.save();
     return false;
   });
   % endif
@@ -3644,7 +3644,7 @@ $(document).ready(function () {
 
   $("#newqname").bind("keydown", "return", function (e) {
     e.preventDefault();
-    viewModel.collection.addQDefinition();
+    searchViewModel.collection.addQDefinition();
   });
 
   $(document).on("loadedQDefinition", function() {
@@ -3654,9 +3654,9 @@ $(document).ready(function () {
   });
 
   function loadQueryDefinition(id) {
-    var _qdef = viewModel.collection.getQDefinition(id);
+    var _qdef = searchViewModel.collection.getQDefinition(id);
     if (_qdef != null) {
-      viewModel.collection.loadQDefinition(_qdef);
+      searchViewModel.collection.loadQDefinition(_qdef);
     }
   }
 
@@ -3702,7 +3702,7 @@ $(document).ready(function () {
 
   function toggleGridFieldsSelection(widget) {
     if (widget.widgetType() == 'resultset-widget') {
-      viewModel.resultsHash = '';
+      searchViewModel.resultsHash = '';
     } else {
       widget.resultsHash = '';
     }
@@ -3717,7 +3717,7 @@ $(document).ready(function () {
 
   function selectAllCollectionFields(widget) {
     if (! widget) {
-      widget = viewModel.collection;
+      widget = searchViewModel.collection;
     }
     var _fields = [];
     $.each(widget.fields(), function (index, field) {
@@ -3727,10 +3727,10 @@ $(document).ready(function () {
   }
 
   function columnDropAdditionalHandler(widget) {
-    if (viewModel.collection.getFacetById(widget.id()) == null) {
+    if (searchViewModel.collection.getFacetById(widget.id()) == null) {
       showAddFacetDemiModal(widget);
     }
-    viewModel.search();
+    searchViewModel.search();
   }
 
   function widgetDraggedAdditionalHandler(widget, row) {
@@ -3758,18 +3758,18 @@ $(document).ready(function () {
   var selectedRow = null;
   function showAddFacetDemiModal(widget, row) {
     if (["resultset-widget", "html-resultset-widget", "filter-widget", "leafletmap-widget"].indexOf(widget.widgetType()) == -1) {
-      viewModel.collection.template.fieldsModalFilter("");
-      viewModel.collection.template.fieldsModalType(widget.widgetType());
+      searchViewModel.collection.template.fieldsModalFilter("");
+      searchViewModel.collection.template.fieldsModalType(widget.widgetType());
 
       selectedWidget = widget;
       selectedRow = row;
 
-      if (viewModel.collection.template.availableWidgetFields().length == 1){
-        addFacetDemiModalFieldPreview(viewModel.collection.template.availableWidgetFields()[0]);
+      if (searchViewModel.collection.template.availableWidgetFields().length == 1){
+        addFacetDemiModalFieldPreview(searchViewModel.collection.template.availableWidgetFields()[0]);
       }
       else {
         $('#addFacetInput').typeahead({
-          'source': viewModel.collection.template.availableWidgetFieldsNames(),
+          'source': searchViewModel.collection.template.availableWidgetFieldsNames(),
           'updater': function (item) {
             addFacetDemiModalFieldPreview({'name': function () {
               return item
@@ -3788,11 +3788,11 @@ $(document).ready(function () {
 
 
   function addFacetDemiModalFieldPreview(field) {
-    var _existingFacet = viewModel.collection.getFacetById(selectedWidget.id());
+    var _existingFacet = searchViewModel.collection.getFacetById(selectedWidget.id());
     if (selectedWidget != null) {
       selectedWidget.hasBeenSelected = true;
       selectedWidget.isLoading(true);
-      viewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
+      searchViewModel.collection.addFacet({'name': field.name(), 'widget_id': selectedWidget.id(), 'widgetType': selectedWidget.widgetType()});
       if (_existingFacet != null) {
         _existingFacet.label(field.name());
         _existingFacet.field(field.name());
@@ -3805,7 +3805,7 @@ $(document).ready(function () {
   }
 
   function addFacetDemiModalFieldCancel() {
-    viewModel.removeWidget(selectedWidget);
+    searchViewModel.removeWidget(selectedWidget);
     selectedRow = null;
   }
 
@@ -3820,7 +3820,7 @@ $(document).ready(function () {
   function highlightColumn(column, e) {
     var $resultContainer = $(e.target).parents('.card-widget').find('.result-container');
     var _colName = $.trim(column.name());
-    if (viewModel.collection.template.fieldsSelected.indexOf(_colName) > -1) {
+    if (searchViewModel.collection.template.fieldsSelected.indexOf(_colName) > -1) {
       var _t = $resultContainer;
       var _col = _t.find("th").filter(function () {
         return $.trim($(this).text()) == _colName;
@@ -3839,7 +3839,7 @@ $(document).ready(function () {
   }
 
   function checkResultHighlightingAvailability() {
-    if (! viewModel.collection.idField()) {
+    if (! searchViewModel.collection.idField()) {
       $(document).trigger("warn", "${ _('Result highlighting is unavailable: the collection does not have an index field') }");
     }
   }
