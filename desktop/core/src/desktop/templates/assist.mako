@@ -224,7 +224,7 @@ from notebook.conf import get_ordered_interpreters
     </ul>
     <!-- /ko -->
     <!-- ko if: ! hasErrors() && hasEntries() && ! loading() && filteredEntries().length > 0 -->
-    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: (definition.isTable || definition.isView ? 20 : 25), container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
+    <ul class="database-tree" data-bind="foreachVisible: { data: filteredEntries, minHeight: 23, container: '.assist-db-scrollable' }, css: { 'assist-tables': definition.isDatabase }">
       <!-- ko template: { if: definition.isTable || definition.isView, name: 'assist-table-entry' } --><!-- /ko -->
       <!-- ko template: { ifnot: definition.isTable || definition.isView, name: 'assist-column-entry' } --><!-- /ko -->
     </ul>
@@ -321,7 +321,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-s3-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-s3-scrollable', fetchMore: $data.fetchMore.bind($data) }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-s3-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 's3-details-content', titleTemplate: 's3-details-title', minWidth: '320px' }">
@@ -385,7 +385,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-git-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-git-scrollable' }">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-git-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="visibleOnHover: { 'selector': '.assist-actions' }">
 
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: toggleOpen, dblClick: dblClick }, attr: {'title': definition.name }">
@@ -463,7 +463,7 @@ from notebook.conf import get_ordered_interpreters
     <div class="assist-flex-fill assist-hdfs-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
         <!-- ko hueSpinner: { spin: loadingMore, overlay: true } --><!-- /ko -->
-        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hdfs-scrollable', fetchMore: $data.fetchMore.bind($data) }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hdfs-context-items', scrollContainer: '.assist-hdfs-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <div class="assist-actions table-actions" style="opacity: 0;" >
               <a style="padding: 0 3px;" class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'hdfs-details-content', titleTemplate: 'hdfs-details-title', minWidth: '320px' }">
@@ -543,7 +543,7 @@ from notebook.conf import get_ordered_interpreters
     </div>
     <div class="assist-flex-fill assist-file-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors() && entries().length > 0">
-         <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 24, container: '.assist-file-scrollable' }">
+         <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 27, container: '.assist-file-scrollable' }">
            <li class="assist-entry assist-file-entry" data-bind="appAwareTemplateContextMenu: { template: 'document-context-items', scrollContainer: '.assist-file-scrollable' }, assistFileDroppable, visibleOnHover: { 'selector': '.assist-file-actions' }">
              <div class="assist-file-actions table-actions">
                <a class="inactive-action" href="javascript:void(0);" data-bind="templatePopover : { contentTemplate: 'file-details-content', titleTemplate: 'file-details-title', minWidth: '350px' }">
@@ -591,7 +591,7 @@ from notebook.conf import get_ordered_interpreters
     </div>
     <div class="assist-flex-fill assist-collections-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-        <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 20, container: '.assist-collections-scrollable' }">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: filteredEntries, minHeight: 22, container: '.assist-collections-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'collections-context-items', scrollContainer: '.assist-collections-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
               <i class="fa fa-fw fa-search muted valign-middle"></i>
@@ -637,7 +637,7 @@ from notebook.conf import get_ordered_interpreters
     </div>
     <div class="assist-flex-fill assist-hbase-scrollable">
       <div data-bind="visible: ! loading() && ! hasErrors()" style="position: relative;">
-        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 20, container: '.assist-hbase-scrollable' }">
+        <ul class="assist-tables" data-bind="foreachVisible: { data: entries, minHeight: 22, container: '.assist-hbase-scrollable' }">
           <li class="assist-entry assist-table-link" style="position: relative;" data-bind="appAwareTemplateContextMenu: { template: 'hbase-context-items', scrollContainer: '.assist-hbase-scrollable' }, visibleOnHover: { 'selector': '.assist-actions' }">
             <a href="javascript:void(0)" class="assist-entry assist-table-link" data-bind="multiClick: { click: click, dblClick: dblClick }, attr: {'title': definition.name }">
               <!-- ko if: definition.host -->
@@ -758,7 +758,7 @@ from notebook.conf import get_ordered_interpreters
         <li class="assist-entry no-entries">${_('No results found')}</li>
       </ul>
       <!-- /ko -->
-      <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 20, container: '.assist-db-scrollable' }">
+      <ul class="assist-tables" data-bind="foreachVisible: {data: filteredEntries, minHeight: 23, container: '.assist-db-scrollable' }">
         <!-- ko template: { name: 'assist-database-entry' } --><!-- /ko -->
       </ul>
     </div>
