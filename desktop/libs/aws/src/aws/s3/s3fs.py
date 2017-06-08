@@ -142,16 +142,13 @@ class S3FileSystem(object):
     except S3ResponseError, e:
       if e.status == 301:
         raise S3FileSystemException(_('Failed to access path: "%s" '
-          'Check that you have access to read this bucket and that the region is correct.') % path)
+          'Check that you have access to read this bucket and that the region is correct: %s') % (path, e.message or e.reason))
       else:
         raise S3FileSystemException(e.message or e.reason)
 
   def _get_location(self):
-
-    if get_default_region() in (Location.EU, Location.EUCentral1, Location.EUWest, Location.EUWest2,
-                                Location.CACentral, Location.USEast, Location.USEast2, Location.USWest,
-                                Location.USWest2, Location.SAEast, Location.APNortheast, Location.APNortheast2,
-                                Location.APSoutheast, Location.APSoutheast2, Location.APSouth, Location.CNNorth1):
+    if get_default_region() in (Location.EU, Location.EUCentral1, Location.CACentral, Location.USWest, Location.USWest2, Location.SAEast,
+                                Location.APNortheast, Location.APSoutheast, Location.APSoutheast2, Location.CNNorth1):
       return get_default_region()
     else:
       return Location.DEFAULT
