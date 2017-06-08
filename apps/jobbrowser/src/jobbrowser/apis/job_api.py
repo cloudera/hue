@@ -23,6 +23,7 @@ from hadoop.yarn import resource_manager_api
 
 from desktop.lib.exceptions import MessageException
 from desktop.lib.exceptions_renderable import PopupException
+from jobbrowser.conf import MAX_JOB_FETCH
 from jobbrowser.views import job_single_logs
 
 
@@ -98,6 +99,8 @@ class YarnApi(Api):
     if 'time' in filters:
       filter_params['time_value'] = int(filters['time']['time_value'])
       filter_params['time_unit'] = filters['time']['time_unit']
+
+    filter_params['limit'] = MAX_JOB_FETCH.get()
 
     jobs = NativeYarnApi(self.user).get_jobs(**filter_params)
 
