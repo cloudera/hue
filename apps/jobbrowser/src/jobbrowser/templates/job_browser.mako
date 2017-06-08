@@ -18,6 +18,7 @@
 
   from desktop import conf
   from desktop.views import commonheader, commonfooter, _ko
+  from jobbrowser.conf import MAX_JOB_FETCH
 %>
 
 <%
@@ -161,6 +162,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               <!-- /ko -->
             </form>
 
+            <div data-bind="visible: jobs.showJobCountBanner" class="pull-center alert alert-warning">${ _("Showing oldest %s jobs. Use days filter to get the recent ones.") % MAX_JOB_FETCH.get() }</div>
 
             <div class="card card-small">
               <!-- ko hueSpinner: { spin: jobs.loadingJobs(), center: true, size: 'xlarge' } --><!-- /ko -->
@@ -1960,6 +1962,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var lastFetchJobsRequest = null;
       var lastUpdateJobsRequest = null;
+      self.showJobCountBanner = ko.computed(function() {
+        return self.apps().length == ${ MAX_JOB_FETCH.get() };
+      });
 
       self.fetchJobs = function () {
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
