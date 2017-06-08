@@ -1656,6 +1656,13 @@ var SqlFunctions = (function () {
         draggable: 'extract()',
         description: 'Returns one of the numeric date or time fields from a TIMESTAMP value.'
       },
+      from_timestamp: {
+        returnTypes: ['STRING'],
+        arguments: [[{type: 'TIMESTAMP'}], [{type: 'STRING'}]],
+        signature: 'from_timestamp(TIMESTAMP val, STRING format)',
+        draggable: 'from_timestamp()',
+        description: 'Converts a specified timestamp to a string with the given format. Example: from_timestamp(cast(\'1999-01-01 10:10:10\' as timestamp), \'yyyy-MM-dd\')" results in "1999-01-01"'
+      },
       from_unixtime: {
         returnTypes: ['STRING'],
         arguments: [[{type: 'BIGINT'}], [{type: 'STRING', optional: true}]],
@@ -1851,6 +1858,14 @@ var SqlFunctions = (function () {
         signature: 'to_date(TIMESTAMP date)',
 				draggable: 'to_date()',
         description: 'Returns a string representation of the date field from a timestamp value.'
+      },
+      to_timestamp: {
+        returnTypes: ['TIMESTAMP'],
+        arguments: [[{type: 'STRING'}], [{type: 'STRING'}]],
+        altArguments: [[{type: 'BIGINT'}]],
+        signature: 'to_timestamp([STRING val, STRING format]|[BIGINT val])',
+        draggable: 'to_timestamp()',
+        description: 'Converts a bigint (delta from the Unix epoch) or a string with the specified format to a timestamp. Example: to_timestamp(\'1970-01-01 00:00:00\', \'yyyy-MM-dd HH:mm:ss\').'
       },
       to_utc_timestamp: {
         returnTypes: ['TIMESTAMP'],
