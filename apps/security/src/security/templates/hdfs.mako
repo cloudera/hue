@@ -303,7 +303,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
     $(document).ready(function () {
 
-      $(document).on("loaded.users", function(){
+      $(document).on("loadedUsers", function(){
         $(".user-list").select2("val", viewModel.doAs());
       });
 
@@ -333,7 +333,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       resizeComponents();
 
-      $(document).on("rendered.tree", function() {
+      $(document).on("renderedTree", function() {
         var _path = viewModel.assist.path();
         if (_path[_path.length-1] == "/"){
           _path = _path.substr(0, _path.length - 1);
@@ -347,21 +347,21 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }, 200)
       });
 
-      $(document).on("updated.acls", function() {
+      $(document).on("updatedAcls", function() {
         $(document).trigger("info", "${ _('The selected ACLs have been successfully updated.') }");
       });
 
-      $(document).on("added.bulk.acls", function() {
+      $(document).on("addedBulkAcls", function() {
         $(document).trigger("info", "${ _('The current ACLs have been successfully added to the checked paths.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("deleted.bulk.acls", function() {
+      $(document).on("deletedBulkAcls", function() {
         $(document).trigger("info", "${ _('All the ACLs have been successfully removed from the checked paths.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("syncd.bulk.acls", function() {
+      $(document).on("syncdBulkAcls", function() {
         $(document).trigger("info", "${ _('All the ACLs for the checked items have been replaced with the current selection.') }");
         $("#bulkActionsModal").modal("hide");
       });

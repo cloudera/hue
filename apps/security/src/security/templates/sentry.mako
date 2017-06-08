@@ -664,7 +664,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       resizeComponents();
 
-      $(document).on("rendered.tree", function () {
+      $(document).on("renderedTree", function () {
         var _path = viewModel.assist.path();
         if (_path[_path.length - 1] == "/") {
           _path = _path.substr(0, _path.length - 1);
@@ -676,7 +676,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }
       });
 
-      $(document).on("created.role", function () {
+      $(document).on("createdRole", function () {
         $("#createRoleModal").modal("hide");
         $("#grantPrivilegeModal").modal("hide");
         $("#deletePrivilegeModal").modal("hide");
@@ -686,11 +686,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         }, 500);
       });
 
-      $(document).on("deleted.role", function () {
+      $(document).on("deletedRole", function () {
         $("#deleteRoleModal").modal("hide");
       });
 
-      $(document).on("changed.path", function () {
+      $(document).on("changedPath", function () {
         if ($("#path").val() != viewModel.assist.path()) {
           $("#path").val(viewModel.assist.path());
         }
@@ -717,11 +717,11 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
 
       showMainSection(viewModel.getSectionHash());
 
-      $(document).on("show.mainSection", function () {
+      $(document).on("showMainSection", function () {
         showMainSection(viewModel.getSectionHash());
       });
 
-      $(document).on("show.role", function (e, role) {
+      $(document).on("showRole", function (e, role) {
         if (typeof role != "undefined" && role.name != null) {
           $("#bulkActionsModal").modal("hide");
           showMainSection("roles");
@@ -775,17 +775,17 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.list_sentry_roles_by_group();
       });
 
-      $(document).on("added.bulk.privileges", function () {
+      $(document).on("addedBulkPrivileges", function () {
         $(document).trigger("info", "${ _('The current privileges have been successfully added to the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("deleted.bulk.privileges", function () {
+      $(document).on("deletedBulkPrivileges", function () {
         $(document).trigger("info", "${ _('All the privileges have been successfully removed from the checked items.') }");
         $("#bulkActionsModal").modal("hide");
       });
 
-      $(document).on("syncd.bulk.privileges", function () {
+      $(document).on("syncdBulkPrivileges", function () {
         $(document).trigger("info", "${ _('All the privileges for the checked items have been replaced with the current selection.') }");
         $("#bulkActionsModal").modal("hide");
       });
@@ -798,7 +798,7 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
         viewModel.isApplyingBulk(false);
       });
 
-      $(document).on("create.typeahead", function () {
+      $(document).on("createTypeahead", function () {
         $("#createRoleName").typeahead({
           source: function (query) {
             var _options = [];
@@ -820,12 +820,12 @@ ${ tree.import_templates(itemClick='$root.assist.setPath', iconClick='$root.assi
           $("#createRoleName").data('typeahead').lookup();
         }
       });
-      $(document).on("destroy.typeahead", function () {
+      $(document).on("destroyTypeahead", function () {
         $('.typeahead').unbind();
         $("ul.typeahead").hide();
       });
 
-      $(document).trigger("create.typeahead");
+      $(document).trigger("createTypeahead");
 
       $("#deletePrivilegeModal").modal({
         show: false
