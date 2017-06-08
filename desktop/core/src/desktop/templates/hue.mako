@@ -752,6 +752,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
 
         self.loadApp = function(app){
           self.currentApp(app);
+          if (!app.startsWith('security')) {
+            self.lastContext = null;
+          }
           self.isLoadingEmbeddable(true);
           loadedApps.forEach(function (loadedApp) {
             window.pauseAppIntervals(loadedApp);
