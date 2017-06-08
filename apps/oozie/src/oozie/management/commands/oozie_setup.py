@@ -114,9 +114,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('MapReduce Sleep Job')
 
-    if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce').exists():
+    if Document2.objects.filter(owner=self.user, name=name, type='query-mapreduce', is_history=False).exists():
       LOG.info("Sample mapreduce editor job already installed.")
-      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-mapreduce')
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-mapreduce', is_history=False)
     else:
       snippet_properties = {
         'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
@@ -169,9 +169,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('Java Terasort Job')
 
-    if Document2.objects.filter(owner=self.user, name=name, type='query-java').exists():
+    if Document2.objects.filter(owner=self.user, name=name, type='query-java', is_history=False).exists():
       LOG.info("Sample Java editor job already installed.")
-      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-java')
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-java', is_history=False)
     else:
       snippet_properties = {
         'app_jar': '/user/hue/oozie/workspaces/lib/hadoop-examples.jar',
@@ -221,9 +221,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('Spark File Copy Job')
 
-    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2').exists():
+    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2', is_history=False).exists():
       LOG.info("Sample Spark editor job already installed.")
-      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2')
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2', is_history=False)
     else:
       snippet_properties = {
         'jars': ['/user/hue/oozie/workspaces/workflows/spark-scala/lib/oozie-examples.jar'],
@@ -275,9 +275,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('PySpark Pi Estimator Job')
 
-    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2').exists():
+    if Document2.objects.filter(owner=self.user, name=name, type='query-spark2', is_history=False).exists():
       LOG.info("Sample pyspark editor job already installed.")
-      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2')
+      doc2 = Document2.objects.get(owner=self.user, name=name, type='query-spark2', is_history=False)
     else:
       snippet_properties = {
         'jars': ['/user/hue/oozie/workspaces/lib/pi.py'],

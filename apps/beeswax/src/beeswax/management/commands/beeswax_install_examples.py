@@ -322,7 +322,7 @@ class SampleQuery(object):
 
       try:
         # Don't overwrite
-        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type))
+        doc2 = Document2.objects.get(owner=django_user, name=self.name, type=self._document_type(self.type), is_history=False)
         # If document exists but has been trashed, recover from Trash
         if doc2.parent_directory != examples_dir:
           doc2.parent_directory = examples_dir
