@@ -4906,16 +4906,25 @@
           return;
         }
         var diff = false;
+        var updateEntryCount = false;
         $.each(renderedElements, function (idx, renderedElement) {
           // TODO: Figure out why it goes over index at the end scroll position
           if (startIndex + idx < lastKnownHeights.length) {
             var renderedHeight = $(renderedElement).outerHeight(true);
             if (renderedHeight > 5 && lastKnownHeights[startIndex + idx] !== renderedHeight) {
+              if (renderedHeight < entryMinHeight) {
+                entryMinHeight = renderedHeight;
+                updateEntryCount = true;
+              }
               lastKnownHeights[startIndex + idx] = renderedHeight;
               diff = true;
             }
           }
         });
+
+        if (updateEntryCount) {
+          updateVisibleEntryCount();
+        }
         // Only resize if a difference in height was noticed.
         if (diff) {
           $parentFVOwnerElement.data('lastKnownHeights', lastKnownHeights);
