@@ -346,9 +346,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div class="inline">
     <div class="inline">
       ${ _('Showing') }
-      <span data-bind="text: Math.min((paginationPage() - 1) * paginationResultPage() + 1, paginationResultCounts())"></span>
+      <span data-bind="text: Math.min(paginationOffset(), paginationResultCounts())"></span>
       ${ _('to')}
-      <span data-bind="text: Math.min(paginationPage() * paginationResultPage(), paginationResultCounts())"></span>
+      <span data-bind="text: Math.min(paginationOffset() - 1 + paginationResultPage(), paginationResultCounts())"></span>
       ${ _('of') }
       <span data-bind="text: paginationResultCounts"></span>
 
@@ -1906,10 +1906,10 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1;
       });
       self.paginationPage = ko.observable(1);
-      self.paginationOffset = ko.observable(1);
+      self.paginationOffset = ko.observable(1); // Starting index
       self.paginationResultPage = ko.observable(100);
       self.paginationResultCounts = ko.computed(function() {
-        return self.apps().length;
+        return self.totalApps();
       });
       self.pagination = ko.computed(function() {
         return {
