@@ -1929,13 +1929,23 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.paginationOffset(self.paginationOffset() + self.paginationResultPage());
       };
 
-      self.filters = ko.pureComputed(function() {
+      self.searchFilters = ko.pureComputed(function() {
         return [
           {'text': self.textFilter()},
           {'time': {'time_value': self.timeValueFilter(), 'time_unit': self.timeUnitFilter()}},
           {'states': ko.mapping.toJS(self.statesFilter())},
+        ];
+      });
+      self.searchFilters.subscribe(function() {
+        self.paginationOffset(1);
+      });
+      self.paginationFilters = ko.pureComputed(function() {
+        return [
           {'pagination': self.pagination()},
         ];
+      });
+      self.filters = ko.pureComputed(function() {
+        return self.searchFilters().concat(self.paginationFilters());
       });
       self.filters.subscribe(function(value) {
         self.fetchJobs();
