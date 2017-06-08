@@ -971,7 +971,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
 <script type="text/html" id="code-editor-snippet-body${ suffix }">
   <!-- ko if: HAS_OPTIMIZER && (type() == 'impala' || type() == 'hive') -->
-  <div data-bind="css: { 'active': showOptimizer }">
+  <div class="optimizer-container" data-bind="css: { 'active': showOptimizer }">
     <div class="round-icon empty">&nbsp;</div>
     <!-- ko if: hasSuggestion() == null -->
     <div class="round-icon idle">
@@ -1067,14 +1067,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       </div>
       <!-- ko if: showOptimizer -->
         <span class="optimizer-explanation alert-success alert-neutral">${ _('Query validated.') }</span>
-      <!-- /ko -->
-    <!-- /ko -->
-    <!-- ko if: hasSuggestion() == 'error'  -->
-      <div class="round-icon idle" data-bind="click: function(){ showOptimizer(! showOptimizer()) }, attr: { 'title': showOptimizer() ? '${ _ko('Close Validator') }' : '${ _ko('Open Validator') }'}">
-        <i class="fa"></i>
-      </div>
-      <!-- ko if: showOptimizer -->
-        <span class="optimizer-explanation alert-neutral">${ _('Not validated.') }</span>
       <!-- /ko -->
     <!-- /ko -->
   </div>
