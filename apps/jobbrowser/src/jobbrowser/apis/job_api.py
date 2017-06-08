@@ -119,7 +119,7 @@ class YarnApi(Api):
         'duration': app['durationMs'],
         'submitted': app['startTimeMs']
       } for app in apps],
-      'total': None
+      'total': len(apps)
     }
 
 
@@ -263,9 +263,11 @@ class YarnMapReduceTaskApi(Api):
     if filters.get('types') and len(filters.get('types')) == 1:
       filter_params['task_types'] = filters['types'][0]
 
+    tasks = NativeYarnApi(self.user).get_tasks(**filter_params)
+
     return {
-      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_tasks(**filter_params)],
-      'total': None
+      'apps': [self._massage_task(task) for task in tasks],
+      'total': len(tasks)
     }
 
 
@@ -324,9 +326,11 @@ class YarnMapReduceTaskAttemptApi(Api):
 
 
   def apps(self):
+    attempts = NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts
+
     return {
-      'apps': [self._massage_task(task) for task in NativeYarnApi(self.user).get_task(jobid=self.app_id, task_id=self.task_id).attempts],
-      'total': None
+      'apps': [self._massage_task(task) for task in attempts],
+      'total': len(attempts)
     }
 
 
