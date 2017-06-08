@@ -768,8 +768,8 @@ ${ utils.submit_popup_event() }
     if (viewModel.workflow.properties.show_arrows()){
       viewModel.drawArrows();
     }
-    $(".widget-main-section").removeClass("zoom-in");
-    $(".widget-main-section").each(function(){
+    $("#oozie_workflowComponents .widget-main-section").removeClass("zoom-in");
+    $("#oozie_workflowComponents .widget-main-section").each(function(){
       var $el = $(this);
       if (!$el.is("a") && !$el.is("input") && !$el.is("i") && !$el.is("button")) {
         var w = ko.dataFor($el.parents(".card-widget")[0]);
@@ -866,7 +866,7 @@ ${ utils.submit_popup_event() }
       $("canvas").remove();
       exposeOverlayClickHandler();
       if (viewModel.isEditing()) {
-        hueUtils.waitForRendered('.card-toolbar-content', function (el) {
+        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
           return el.height() > 40 && el.height() < 200
         }, function () {
           resizeToolbar();
@@ -874,30 +874,30 @@ ${ utils.submit_popup_event() }
         });
       }
       else {
-        hueUtils.waitForRendered('.card-toolbar-content', function (el) {
+        hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar-content', function (el) {
           return !el.is(':visible')
         }, renderChangeables);
       }
     });
 
     function resizeToolbar() {
-      $('.card-toolbar-content').width(100).css('marginLeft', '0');
-      if ($('.card-toolbar').height() > 60) {
+      $('#oozie_workflowComponents .card-toolbar-content').width(100).css('marginLeft', '0');
+      if ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
         var loops = 0;
-        while ($('.card-toolbar').height() > 60) {
-          $('.card-toolbar-content').width($('.card-toolbar-content').width() + 10);
+        while ($('#oozie_workflowComponents .card-toolbar').height() > 60) {
+          $('#oozie_workflowComponents .card-toolbar-content').width($('#oozie_workflowComponents .card-toolbar-content').width() + 10);
           loops++;
           if (loops > 120){
             break;
           }
         }
       }
-      var marginLeft = Math.max(0, $('.card-toolbar').width() / 2 - $('.card-toolbar-content').width() / 2);
-      $('.card-toolbar-content').css('marginLeft', marginLeft + 'px');
+      var marginLeft = Math.max(0, $('#oozie_workflowComponents .card-toolbar').width() / 2 - $('#oozie_workflowComponents .card-toolbar-content').width() / 2);
+      $('#oozie_workflowComponents .card-toolbar-content').css('marginLeft', marginLeft + 'px');
     }
 
     if (viewModel.isEditing()){
-      hueUtils.waitForRendered('.card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
+      hueUtils.waitForRendered('#oozie_workflowComponents .card-toolbar', function(el){ return el.height() > 40 && el.height() < 200 }, resizeToolbar);
     }
 
     $(document).on("blur", "[validate]", function() {
