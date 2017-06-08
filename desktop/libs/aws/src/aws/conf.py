@@ -97,7 +97,7 @@ AWS_ACCOUNTS = UnspecifiedConfigSection(
       ),
       REGION=Config(
         key='region',
-        default=None,
+        default='us-east-1',
         type=str
       ),
       HOST=Config(
