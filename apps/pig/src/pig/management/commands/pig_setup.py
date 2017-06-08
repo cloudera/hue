@@ -45,9 +45,9 @@ class Command(NoArgsCommand):
     doc2 = None
     name = _('UpperText')
 
-    if Document2.objects.filter(owner=sample_user, name=name, type='query-pig').exists():
+    if Document2.objects.filter(owner=sample_user, name=name, type='query-pig', is_history=False).exists():
       LOG.info("Sample pig editor script already installed.")
-      doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig')
+      doc2 = Document2.objects.get(owner=sample_user, name=name, type='query-pig', is_history=False)
     else:
       statement = """data = LOAD '/user/hue/pig/examples/data/midsummer.txt' as (text:CHARARRAY);
 
