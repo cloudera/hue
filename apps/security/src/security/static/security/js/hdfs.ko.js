@@ -155,7 +155,7 @@ var HdfsViewModel = (function () {
 
     self.afterRender = function () {
       if (!self.fromLoadMore && !self.fromRebuildTree) {
-        $(document).trigger("rendered.tree");
+        $(document).trigger("renderedTree");
       }
       self.fromLoadMore = false;
       self.fromRebuildTree = false;
@@ -399,7 +399,7 @@ var HdfsViewModel = (function () {
             self.convertItemToObject(_item);
           }
         });
-        $(document).trigger("loaded.parents");
+        $(document).trigger("loadedParents");
       }
     }
 
@@ -487,7 +487,7 @@ var HdfsViewModel = (function () {
           self.owner(data.owner);
           self.group(data.group);
           self.isLoadingAcls(false);
-          $(document).trigger("loaded.acls");
+          $(document).trigger("loadedAcls");
         }
       }).fail(function (xhr, textStatus, errorThrown) {
         if (xhr.responseText.search('FileNotFoundException') == -1) { // TODO only fetch on existing path
@@ -518,7 +518,7 @@ var HdfsViewModel = (function () {
               self.acls.remove(item);
             });
             self.refreshTree();
-            $(document).trigger("updated.acls");
+            $(document).trigger("updatedAcls");
           }
       ).fail(function (xhr, textStatus, errorThrown) {
          $(document).trigger("error", JSON.parse(xhr.responseText).message);
@@ -557,7 +557,7 @@ var HdfsViewModel = (function () {
               self.acls.removeAll();
             }
             self.refreshTree();
-            $(document).trigger("deleted.bulk.acls");
+            $(document).trigger("deletedBulkAcls");
           }
       ).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", JSON.parse(xhr.responseText).message);
@@ -577,7 +577,7 @@ var HdfsViewModel = (function () {
             'recursive': ko.mapping.toJSON(self.recursive())
           }, function (data) {
             self.refreshTree();
-            $(document).trigger("added.bulk.acls");
+            $(document).trigger("addedBulkAcls");
           }
       ).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", JSON.parse(xhr.responseText).message);
@@ -597,7 +597,7 @@ var HdfsViewModel = (function () {
             'recursive': ko.mapping.toJSON(self.recursive())
           }, function (data) {
             self.refreshTree();
-            $(document).trigger("syncd.bulk.acls");
+            $(document).trigger("syncdBulkAcls");
           }
       ).fail(function (xhr, textStatus, errorThrown) {
          $(document).trigger("error", JSON.parse(xhr.responseText).message);
@@ -636,7 +636,7 @@ var HdfsViewModel = (function () {
     self.init = function (path) {
       self.fetchUsers();
       self.assist.path(path);
-      $(document).one("loaded.parents", function () {
+      $(document).one("loadedParents", function () {
         self.assist.isLoadingTree(true);
         var _paths = self.assist.rebuildTree(self.assist.growingTree().nodes[0], []);
         _paths.forEach(function (ipath, cnt) {
@@ -662,7 +662,7 @@ var HdfsViewModel = (function () {
       }, function (data) {
         self.availableHadoopUsers(data.users);
         self.availableHadoopGroups(data.groups);
-        $(document).trigger("loaded.users");
+        $(document).trigger("loadedUsers");
       });
     }
   };
