@@ -1444,8 +1444,12 @@ var AutocompleteResults = (function () {
     if (HAS_OPTIMIZER && self.parseResult.suggestTables) {
       initLoading(self.loadingPopularTables, popularTablesDeferred);
 
+      var db = self.parseResult.suggestTables.identifierChain
+        && self.parseResult.suggestTables.identifierChain.length === 1
+        && self.parseResult.suggestTables.identifierChain[0].name ? self.parseResult.suggestTables.identifierChain[0].name : self.activeDatabase;
+
       self.apiHelper.fetchNavOptTopTables({
-        database: self.activeDatabase,
+        database: db,
         sourceType: self.snippet.type(),
         silenceErrors: true,
         successCallback: function (data) {
