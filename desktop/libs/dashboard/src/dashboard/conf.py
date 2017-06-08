@@ -57,7 +57,7 @@ def get_properties():
   else:
     return {
       'solr': {
-        'analytics': False,
+        'analytics': True,
         'nesting': False,
       },
       'sql': {
