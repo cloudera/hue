@@ -45,3 +45,10 @@ ENABLE_V2 = Config(
     type=coerce_bool,
     default=False
 )
+
+MAX_JOB_FETCH = Config(
+  key='max_job_fetch',
+  default=500,
+  type=int,
+  help=_('Maximum number of jobs to fetch and display when pagination is not supported for the type.')
+)
