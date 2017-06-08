@@ -209,6 +209,27 @@
       }]);
     });
 
+    it('should split "SELECT `   " correctly', function () {
+      testParser('SELECT `   ', [{
+        statement: 'SELECT `   ',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 11 }
+      }]);
+    });
+
+    it('should split "SELECT "   " correctly', function () {
+      testParser('SELECT "   ', [{
+        statement: 'SELECT "   ',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 11 }
+      }]);
+    });
+
+    it('should split "SELECT \'   " correctly', function () {
+      testParser('SELECT \'   ', [{
+        statement: 'SELECT \'   ',
+        location: { first_line: 1, first_column: 0, last_line: 1, last_column: 11 }
+      }]);
+    });
+
     it('should split "SELECT " \\" ;; ", \'"\', \' ;\' from bla; /* \\n\\n"" ; \\n; */ FROM other;" correctly', function () {
       testParser('USE `db;`;\r\nSELECT " \\" ;; ", \'"\', \' ;\' from bla; /* \n\n"" ; \n;  FROM other;*/', [{
         statement: 'USE `db;`;',
