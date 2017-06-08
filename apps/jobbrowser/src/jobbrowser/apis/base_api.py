@@ -47,6 +47,8 @@ def get_api(user, interface):
     return DataEngClusterApi(user)
   elif interface == 'dataeng-jobs':
     return DataEngJobApi(user)
+  elif interface == 'slas':
+    return Api(user)
   else:
     raise PopupException(_('Interface %s is unknown') % interface)
 
@@ -57,7 +59,7 @@ class Api(object):
     self.user = user
     self.request = None
 
-  def apps(self, filters): return []
+  def apps(self, filters): return {'apps': [], 'total': 0}
 
   def app(self, appid): return {} # Also contains progress (0-100) and status [RUNNING, FINISHED, PAUSED]
 
