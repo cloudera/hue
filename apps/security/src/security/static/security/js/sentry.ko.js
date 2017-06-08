@@ -178,7 +178,7 @@ var SentryViewModel = (function () {
       if (_found) {
         vm.role().isEditing(true);
         vm.list_sentry_privileges_by_role(vm.role());
-        $(document).trigger("destroy.typeahead");
+        $(document).trigger("destroyTypeahead");
       }
     });
     self.selected = ko.observable(false);
@@ -310,7 +310,7 @@ var SentryViewModel = (function () {
             role.showPrivileges(true);
             vm.originalRoles.unshift(role);
             vm.list_sentry_privileges_by_authorizable();
-            $(document).trigger("created.role");
+            $(document).trigger("createdRole");
           } else {
             $(document).trigger("error", data.message);
           }
@@ -331,7 +331,7 @@ var SentryViewModel = (function () {
             $(document).trigger("info", data.message);
             vm.showCreateRole(false);
             vm.list_sentry_privileges_by_authorizable();
-            $(document).trigger("created.role");
+            $(document).trigger("createdRole");
           } else {
             $(document).trigger("error", data.message);
           }
@@ -350,7 +350,7 @@ var SentryViewModel = (function () {
         if (data.status == 0) {
           vm.removeRole(role.name());
           vm.list_sentry_privileges_by_authorizable();
-          $(document).trigger("removed.role");
+          $(document).trigger("removedRole");
         } else {
           $(document).trigger("error", data.message);
         }
@@ -367,7 +367,7 @@ var SentryViewModel = (function () {
       }, function (data) {
         if (data.status == 0) {
           vm.list_sentry_privileges_by_authorizable();
-          $(document).trigger("created.role");
+          $(document).trigger("createdRole");
         } else {
           $(document).trigger("error", data.message);
         }
@@ -668,7 +668,7 @@ var SentryViewModel = (function () {
       else {
         self.path(obj.path());
       }
-      $(document).trigger("changed.path");
+      $(document).trigger("changedPath");
 
       if (self.getTreeAdditionalDataForPath(obj.path()).loaded){
         if (typeof skipListAuthorizable == "undefined" || !skipListAuthorizable) {
@@ -849,7 +849,7 @@ var SentryViewModel = (function () {
     };
 
     self.afterRender = function () {
-      $(document).trigger("rendered.tree");
+      $(document).trigger("renderedTree");
     }
   }
 
@@ -928,7 +928,7 @@ var SentryViewModel = (function () {
     self.resetCreateRole = function() {
       self.roles(self.originalRoles());
       self.role(new Role(self, {}));
-      $(document).trigger("create.typeahead");
+      $(document).trigger("createTypeahead");
     };
 
     self.deletePrivilegeModal = function (role) {
@@ -994,7 +994,7 @@ var SentryViewModel = (function () {
       ko.utils.arrayForEach(self.selectedRoles(), function (role) {
         role.remove(role);
       });
-      $(document).trigger("deleted.role");
+      $(document).trigger("deletedRole");
     };
 
     self.expandSelectedRoles = function () {
@@ -1079,7 +1079,7 @@ var SentryViewModel = (function () {
     }
 
     self.showRole = function (role) {
-      $(document).trigger("show.role", role);
+      $(document).trigger("showRole", role);
       ko.utils.arrayForEach(self.filteredRoles(), function (r) {
         if (r.name() == role.name()){
           self.list_sentry_privileges_by_role(r);
@@ -1184,7 +1184,7 @@ var SentryViewModel = (function () {
             $(document).trigger("info", data.message);
             self.assist.refreshTree();
             self.clearTempRoles();
-            $(document).trigger("created.role");
+            $(document).trigger("createdRole");
           } else {
             $(document).trigger("error", data.message);
           }
@@ -1300,7 +1300,7 @@ var SentryViewModel = (function () {
         if (data.status == 0) {
           if (norefresh == undefined) {
             self.list_sentry_privileges_by_authorizable(); // Refresh
-            $(document).trigger("deleted.bulk.privileges");
+            $(document).trigger("deletedBulkPrivileges");
           }
         } else {
           $(document).trigger("error", data.message);
@@ -1322,7 +1322,7 @@ var SentryViewModel = (function () {
       }, function (data) {
         if (data.status == 0) {
           self.list_sentry_privileges_by_authorizable(); // Refresh
-          $(document).trigger("added.bulk.privileges");
+          $(document).trigger("addedBulkPrivileges");
         } else {
           $(document).trigger("error", data.message);
         }
@@ -1349,7 +1349,7 @@ var SentryViewModel = (function () {
       $.getJSON('/desktop/api/users/autocomplete', data, function (data) {
         self.availableHadoopUsers(data.users);
         self.availableHadoopGroups(data.groups);
-        $(document).trigger("loaded.users");
+        $(document).trigger("loadedUsers");
       });
     }
 
@@ -1405,10 +1405,10 @@ var SentryViewModel = (function () {
 
     self.linkToBrowse = function (path) {
       self.assist.path(path);
-      $(document).trigger("changed.path");
+      $(document).trigger("changedPath");
       self.assist.loadParents();
       self.updateSectionHash("edit");
-      $(document).trigger("show.mainSection");
+      $(document).trigger("showMainSection");
     }
   };
 
