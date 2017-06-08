@@ -337,7 +337,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 <script type="text/html" id="pagination${ SUFFIX }">
   <!-- ko ifnot: hasPagination -->
   <div class="inline">
-    <span data-bind="text: paginationResultCounts()"></span>
+    <span data-bind="text: totalApps()"></span>
     ${ _('jobs') }
   </div>
   <!-- /ko -->
@@ -346,11 +346,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
   <div class="inline">
     <div class="inline">
       ${ _('Showing') }
-      <span data-bind="text: Math.min(paginationOffset(), paginationResultCounts())"></span>
+      <span data-bind="text: Math.min(paginationOffset(), totalApps())"></span>
       ${ _('to')}
-      <span data-bind="text: Math.min(paginationOffset() - 1 + paginationResultPage(), paginationResultCounts())"></span>
+      <span data-bind="text: Math.min(paginationOffset() - 1 + paginationResultPage(), totalApps())"></span>
       ${ _('of') }
-      <span data-bind="text: paginationResultCounts"></span>
+      <span data-bind="text: totalApps"></span>
 
       ##${ _('Show')}
       ##<span data-bind="text: paginationResultPage"></span>
@@ -1908,9 +1908,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.paginationPage = ko.observable(1);
       self.paginationOffset = ko.observable(1); // Starting index
       self.paginationResultPage = ko.observable(100);
-      self.paginationResultCounts = ko.computed(function() {
-        return self.totalApps();
-      });
       self.pagination = ko.computed(function() {
         return {
             'page': self.paginationPage(),
@@ -1962,7 +1959,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       var lastFetchJobsRequest = null;
       var lastUpdateJobsRequest = null;
-      self.showJobCountBanner = ko.computed(function() {
+      self.showJobCountBanner = ko.pureComputed(function() {
         return self.apps().length == ${ MAX_JOB_FETCH.get() };
       });
 
