@@ -2380,11 +2380,11 @@ var EditorViewModel = (function() {
                   ko.applyBindings(self.schedulerViewModel, $("#schedulerEditor")[0]);
                   $(document).off("showSubmitPopup");
                   $(document).on("showSubmitPopup", function (event, data) {
-                    $('.submit-modal').html(data);
-                    $('.submit-modal').modal('show');
+                    $('.submit-modal-editor').html(data);
+                    $('.submit-modal-editor').modal('show');
                     var _sel = $('.submit-form .control-group[rel!="popover"]:visible');
                     if (_sel.length > 0) {
-                      $('.submit-modal .modal-body').height($('.submit-modal .modal-body').height() + 60);
+                      $('.submit-modal-editor .modal-body').height($('.submit-modal-editor .modal-body').height() + 60);
                     }
                   });
 

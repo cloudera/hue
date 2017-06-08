@@ -1939,7 +1939,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
   <!-- /ko -->
 <!-- /ko -->
 
-<div class="submit-modal modal hide"></div>
+<div class="submit-modal-editor modal hide"></div>
 
 </%def>
 
@@ -3493,7 +3493,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
         $.jHueNotify.info('${_('Coordinator submitted.')}');
-        $('.submit-modal').modal('hide');
+        $('.submit-modal-editor').modal('hide');
 
         $('a[href=\'#scheduledJobsTab\']').click();
       }, HUE_PUB_SUB_APP);
