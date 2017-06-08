@@ -43,18 +43,18 @@
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    <a href="javascript: oneSixthLeftLayout(viewModel)" onmouseover="viewModel.previewColumns('oneSixthLeft')" onmouseout="viewModel.previewColumns('')">
+    <a href="javascript: oneSixthLeftLayout(viewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
         <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
       </div>
     </a>
-    <a href="javascript: fullLayout(viewModel)" onmouseover="viewModel.previewColumns('full')" onmouseout="viewModel.previewColumns('')">
+    <a href="javascript: fullLayout(viewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
       </div>
     </a>
-    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(viewModel)" onmouseover="viewModel.previewColumns('magic')" onmouseout="viewModel.previewColumns('')">
+    <a data-bind="visible: columns().length == 0" href="javascript: magicSearchLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('magic')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"><i class="fa fa-table"></i></div>
       </div>
@@ -82,7 +82,7 @@
 
 </%def>
 
-<%def name="layout_skeleton()">
+<%def name="layout_skeleton(suffix='')">
   <div id="emptyDashboard" data-bind="fadeVisible: !isEditing() && columns().length == 0">
   <div style="float:left; padding-top: 90px; margin-right: 20px; text-align: center; width: 260px">${ _('Click on the pencil to get started with your dashboard!') }</div>
     <img src="${ static('desktop/art/hint_arrow.png') }" alt="${ _('Hint arrow') }" />
@@ -137,18 +137,18 @@
       </div>
     </div>
     <!-- /ko -->
-    <div class="row-fluid" data-bind="template: { name: 'column-template', foreach: columns}">
+    <div class="row-fluid" data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
     </div>
     <div class="clearfix"></div>
   </div>
 </div>
 
-<script type="text/html" id="column-template">
+<script type="text/html" id="column-template${ suffix }">
   <div data-bind="css: klass">
     <div class="container-fluid" data-bind="visible: $root.isEditing()">
       <div data-bind="click: function(){$data.addEmptyRow(true)}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(true); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
     </div>
-    <div data-bind="template: { name: 'row-template', foreach: rows}">
+    <div data-bind="template: { name: 'row-template${ suffix }', foreach: rows}">
     </div>
     <div class="container-fluid" data-bind="visible: $root.isEditing() && rows().length > 0">
       <div data-bind="click: function(){$data.addEmptyRow()}, css: {'add-row': true, 'is-editing': $root.isEditing}, sortable: { data: drops, isEnabled: $root.isEditing, 'afterMove': function(event){var widget=event.item; var _r = $data.addEmptyRow(); _r.addWidget(widget);$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)}); columnDropAdditionalHandler(widget)}, options: {'placeholder': 'add-row-highlight', 'greedy': true, 'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});}}}"></div>
@@ -156,7 +156,7 @@
   </div>
 </script>
 
-<script type="text/html" id="row-template">
+<script type="text/html" id="row-template${ suffix }">
   <div class="emptyRow" data-bind="visible: widgets().length == 0 && $index() == 0 && $root.isEditing() && $parent.size() > 4 && $parent.rows().length == 1">
     <img src="${ static('desktop/art/hint_arrow_flipped.png') }" style="float:left; margin-right: 10px" alt="${ _('Hint arrow') }"/>
     <div style="float:left; text-align: center; width: 260px">${_('Drag any of the widgets inside your empty row')}</div>
@@ -172,7 +172,7 @@
       </div>
     </div>
     <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing},
-        sortable: { template: 'widget-template', data: widgets, isEnabled: $root.isEditing,
+        sortable: { template: 'widget-template${ suffix }', data: widgets, isEnabled: $root.isEditing,
         options: {'handle': '.move-widget', 'opacity': 0.7, 'placeholder': 'row-highlight', 'greedy': true,
             'stop': function(event, ui){$('.card-body').slideDown('fast', function(){$(window).scrollTop(lastWindowScrollPosition)});},
             'helper': function(event){lastWindowScrollPosition = $(window).scrollTop(); $('.card-body').slideUp('fast'); var _par = $('<div>');_par.addClass('card card-widget');var _title = $('<h2>');_title.addClass('card-heading simple');_title.text($(event.toElement).text());_title.appendTo(_par);_par.height(80);_par.width(180);return _par;}},
@@ -180,14 +180,14 @@
     </div>
     <div class="container-fluid" data-bind="visible: $root.isNested() && columns().length > 0" style="border: 1px solid #e5e5e5; border-top: none; background-color: #F3F3F3;">
       <div data-bind="css: {'row-fluid': true, 'row-container':true, 'is-editing': $root.isEditing}">
-        <div data-bind="template: { name: 'column-template', foreach: columns}">
+        <div data-bind="template: { name: 'column-template${ suffix }', foreach: columns}">
         </div>
       </div>
     </div>
   </div>
 </script>
 
-<script type="text/html" id="widget-template">
+<script type="text/html" id="widget-template${ suffix }">
   <div data-bind="attr: {'id': 'wdg_'+ id(),}, css: klass">
     <h2 class="card-heading simple">
       <span data-bind="visible: $root.isEditing">
