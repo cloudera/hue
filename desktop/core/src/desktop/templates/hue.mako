@@ -345,7 +345,7 @@ ${ hueIcons.symbols() }
     }"><div class="resize-bar"></div></div>
 
 
-    <div class="page-content" data-bind="niceScroll: {horizrailenabled: false}">
+    <div class="page-content">
       <!-- ko hueSpinner: { spin: isLoadingEmbeddable, center: true, size: 'xlarge' } --><!-- /ko -->
       <div id="embeddable_editor" class="embeddable"></div>
       <div id="embeddable_notebook" class="embeddable"></div>
