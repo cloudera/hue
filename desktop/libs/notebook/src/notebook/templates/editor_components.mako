@@ -2028,9 +2028,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
           mainScrollable: MAIN_SCROLLABLE,
           fixedFirstColumn: vm.editorMode(),
           % if is_embeddable:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 47 + bannerTopHeight : 50 + bannerTopHeight },
+          stickToTopPosition: 48 + bannerTopHeight + ${ conf.CUSTOM.BANNER_TOP_HTML.get() and '0' or '2' },
           % else:
-          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 + bannerTopHeight : 73 + bannerTopHeight },
+          stickToTopPosition: function() { return vm.isPlayerMode() ? 1 + bannerTopHeight : 76 + bannerTopHeight },
           % endif
           parentId: 'snippet_' + snippet.id(),
           clonedContainerPosition: 'fixed',
@@ -2111,6 +2111,9 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               offsetTop = (snippetEl.find('.dataTables_wrapper').offset().top - topCoord) * -1;
             }
             var margin = Math.max(offsetTop, 0);
+            %if conf.CUSTOM.BANNER_TOP_HTML.get():
+              margin += 31;
+            %endif
             if (snippet.isResultSettingsVisible()) {
               snippetEl.find('.snippet-grid-settings').css({
                 "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
