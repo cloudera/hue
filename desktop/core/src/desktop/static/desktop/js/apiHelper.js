@@ -1871,13 +1871,12 @@ var ApiHelper = (function () {
       },
       timeout: options.timeout
     }).success(function (data) {
-      if (data.status === 0 && data.code === 500 && data.error && data.error.indexOf('Error 10001') !== -1) {
-        // TODO: Display warning in autocomplete when an entity can't be found
-        // Example data.error: [...] SemanticException [Error 10001]: Table not found default.foo
-        // By resolving the promise we at least cache the response to prevent a bunch of unnecessary calls
-        data.notFound = true;
-        promise.resolve(data)
-      } else if (self.successResponseIsError(data)) {
+      data.notFound = data.status === 0 && data.code === 500 && data.error && (data.error.indexOf('Error 10001') !== -1 || data.error.indexOf('AnalysisException') !== -1);
+      // TODO: Display warning in autocomplete when an entity can't be found
+      // Hive example: data.error: [...] SemanticException [Error 10001]: Table not found default.foo
+      // Impala example: data.error: [...] AnalysisException: Could not resolve path: 'default.foo'
+      if (!data.notFound && self.successResponseIsError(data)) {
+        // When not found we at least cache the response to prevent a bunch of unnecessary calls
         promise.reject(data);
       } else {
         // Safe to assume all requests in the queue have the same cacheCondition
