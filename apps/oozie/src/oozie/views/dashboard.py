@@ -474,7 +474,8 @@ def list_oozie_coordinator(request, job_id):
       'nextTime': format_time(oozie_coordinator.nextMaterializedTime),
       'endTime': format_time(oozie_coordinator.endTime),
       'actions': actions,
-      'total_actions': oozie_coordinator.total
+      'total_actions': oozie_coordinator.total,
+      'doc_url': coordinator.get_absolute_url() if coordinator else '',
     }
     return JsonResponse(return_obj, encoder=JSONEncoderForHTML)
 
