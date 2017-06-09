@@ -1266,8 +1266,8 @@ var WorkflowEditorViewModel = function (layout_json, workflow_json, credentials_
         var $painter = $(document.body);
         var correction = 0;
 
-        if ($('.oozie_workflowComponents').length > 0) {
-          $painter = $('.oozie_workflowComponents');
+        if ($('.oozie_workflowComponents:visible').length > 0) {
+          $painter = $('.oozie_workflowComponents:visible');
           correction = $('.page-content').scrollTop();
         }
 
