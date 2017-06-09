@@ -519,10 +519,14 @@ def list_oozie_bundle(request, job_id):
   if request.GET.get('format') == 'json':
     return_obj = {
       'id': oozie_bundle.id,
+      'user': oozie_bundle.user,
+      'name': oozie_bundle.bundleJobName,
       'status':  oozie_bundle.status,
       'progress': oozie_bundle.get_progress(),
       'endTime': format_time(oozie_bundle.endTime),
-      'actions': massaged_bundle_actions_for_json(oozie_bundle)
+      'actions': massaged_bundle_actions_for_json(oozie_bundle),
+      'submitted': format_time(oozie_bundle.kickoffTime),
+      'doc_url': bundle.get_absolute_url() if bundle else '',
     }
     return HttpResponse(json.dumps(return_obj).replace('\\\\', '\\'), content_type="application/json")
 
