@@ -336,7 +336,7 @@ def index(request):
     if is_hue_4:
       return redirect('desktop.views.hue')
     elif USE_NEW_EDITOR.get():
-      return home2(request)
+      return redirect('desktop.views.home2')
     else:
       return home(request)
 
