@@ -104,6 +104,41 @@ Many apps will evolve to have a bit of custom JavaScript and
 CSS styles.  Apps that need to talk to an external service
 will pull in the code necessary to talk to that service.
 
+File Layout
+-----------
+The Hue "framework" is in ``desktop/core/`` and contains the Web components.
+``desktop/libs/`` is the API for talking to various Hadoop services.
+The installable apps live in ``apps/``.  Please place third-party dependencies in the app's ext-py/
+directory.
+
+The typical directory structure for inside an application includes:
+```
+  src/
+    for Python/Django code
+      models.py
+      urls.py
+      views.py
+      forms.py
+      settings.py
+
+  conf/
+    for configuration (``.ini``) files to be installed
+
+  static/
+    for static HTML/js resources and help doc
+
+  templates/
+    for data to be put through a template engine
+
+  locales/
+    for localizations in multiple languages
+```
+
+For the URLs within your application, you should make your own ``urls.py``
+which will be automatically rooted at ``/yourappname/`` in the global
+namespace.  See ``apps/about/src/about/urls.py`` for an example.
+
+
 Pre-requisites
 ==============
 
