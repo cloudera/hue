@@ -799,14 +799,18 @@ class Node():
 
       name = '%s-%s' % (self.data['type'].split('-')[0], self.data['id'][:4])
       self.data['properties']['script_path'] = "${wf:appPath()}/" + name + ".pig"
-      self.data['properties']['parameters'] = [{'value': prop} for prop in action['properties']['parameters']]
-      self.data['properties']['arguments'] = []
+      if 'parameters' not in self.data['properties']:
+        self.data['properties']['parameters'] = []
+      for param in action['variables']:
+        self.data['properties']['parameters'].insert(0, {'value': '%(name)s=%(value)s' % param})
+      self.data['properties']['arguments'] = [] # Not Picked yet
+
       job_properties = []
       for prop in action['properties']['hadoopProperties']:
         name, value = prop.split('=', 1)
         job_properties.append({'name': name, 'value': value})
       self.data['properties']['job_properties'] = job_properties
-      self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['parameters']]
+      self.data['properties']['files'] = [{'value': prop} for prop in action['properties']['resources']]
 
     elif self.data['type'] == SqoopDocumentAction.TYPE:
       notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=self.data['properties']['uuid']))
