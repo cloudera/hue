@@ -60,10 +60,6 @@ ${ commonheader(_("Workflow Editor"), "Oozie", user, request, "40px") | n,unicod
       <i class="fa fa-fw fa-cog"></i>
     </a>
 
-    <a title="${ _('History') }" rel="tooltip" data-placement="bottom" data-toggle="modal" data-target="#historyModal" data-bind="css: {'btn': true}, visible: workflow.id() != null && history().length > 0">
-      <i class="fa fa-fw fa-history"></i>
-    </a>
-
     <a title="${ _('Workspace') }" ${ not is_embeddable and 'target="_blank"' or ''} rel="tooltip" data-placement="right"
         data-original-title="${ _('Go upload additional files and libraries to the deployment directory') }"
         data-bind="css: {'btn': true}, hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()"
@@ -558,52 +554,6 @@ ${ workflow.render() }
 </div>
 
 
-<div id="historyModal" class="modal fade hide">
-  <div class="modal-header" style="padding-bottom: 2px">
-    <button type="button" class="close" data-dismiss="modal" aria-label="${ _('Close') }"><span aria-hidden="true">&times;</span></button>
-    <h2 class="modal-title">${ _('Submission History') }</h2>
-  </div>
-  <div class="modal-body">
-    <table class="table table-condensed margin-top-20">
-      <tr>
-        <th width="30%">${ _('Date') }</th>
-        <th>${ _('ID') }</th>
-        <th width="20">&nbsp;</th>
-      </tr>
-      <!-- ko foreach: $root.history -->
-      <tr>
-        <td data-bind="text: $data.date"></td>
-        <td><a data-bind="hueLink: '/oozie/list_oozie_workflow/' + $data.history.oozie_id() + '/', text: $data.history.oozie_id" target="_blank"></a></td>
-        <td><a class="pointer" data-bind="click: function(){$data.expanded(!$data.expanded())}"><i class="fa fa-info-circle"></i></a></td>
-      </tr>
-      <tr data-bind="slideVisible: $data.expanded">
-        <td colspan="3" style="padding-left: 20px;border-left: 5px solid #DDD;">
-        <dl>
-          <!-- ko foreach: Object.keys($data.history.properties) -->
-          <dt data-bind="text: $data"></dt>
-          <dd>
-            <!-- ko if: typeof $parent.history.properties[$data] == 'function' -->
-              <!-- ko if: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-                <a data-bind="text: $parent.history.properties[$data], hueLink: '/filebrowser/view=' + $root.workflow.properties.deployment_dir()" target="_blank"></a>
-              <!-- /ko -->
-              <!-- ko ifnot: typeof $parent.history.properties[$data]() == 'string' && $parent.history.properties[$data]().indexOf('/') == 0 -->
-              <span data-bind="text: $parent.history.properties[$data]"></span>
-              <!-- /ko -->
-            <!-- /ko -->
-          </dd>
-          <!-- /ko -->
-          </dl>
-        </td>
-      </tr>
-      <!-- /ko -->
-    </table>
-  </div>
-  <div class="modal-footer">
-    <a class="btn" data-dismiss="modal">${_('Close')}</a>
-  </div>
-</div>
-
-
 <div class="submit-modal modal hide"></div>
 
 
@@ -651,7 +601,7 @@ ${ utils.submit_popup_event() }
 
   var apiHelper = ApiHelper.getInstance();
 
-  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode }, ${ history_json | n,unicode });
+  var viewModel = new WorkflowEditorViewModel(${ layout_json | n,unicode }, ${ workflow_json | n,unicode }, ${ credentials_json | n,unicode }, ${ workflow_properties_json | n,unicode }, ${ subworkflows_json | n,unicode }, ${ can_edit_json | n,unicode });
   ko.applyBindings(viewModel, $("#oozie_workflowComponents")[0]);
 
   var shareViewModel = initSharing("#documentShareModal");
