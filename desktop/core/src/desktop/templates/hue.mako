@@ -755,6 +755,9 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           if (!app.startsWith('security')) {
             self.lastContext = null;
           }
+          SKIP_CACHE.forEach(function (skipped) {
+            $('#embeddable_' + skipped).html('');
+          });
           self.isLoadingEmbeddable(true);
           loadedApps.forEach(function (loadedApp) {
             window.pauseAppIntervals(loadedApp);
@@ -774,9 +777,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             $('#embeddable_security_hdfs').html('');
             $('#embeddable_security_hive2').html('');
             $('#embeddable_security_solr').html('');
-          }
-          if (SKIP_CACHE.indexOf(app) > -1) {
-            $('#embeddable_' + app).html('');
           }
           if (typeof self.embeddable_cache[app] === 'undefined') {
             if (loadedApps.indexOf(app) == -1){
