@@ -647,7 +647,10 @@ def test_last_access_time():
 
 
 def test_ui_customizations():
-  custom_message = 'test ui customization'
+  if desktop.conf.is_lb_enabled():  # Assumed that live cluster connects to direct Hue
+    custom_message = 'You are accessing a non-optimized Hue, please switch to one of the available addresses'
+  else:
+    custom_message = 'test ui customization'
   reset = (
     desktop.conf.CUSTOM.BANNER_TOP_HTML.set_for_testing(custom_message),
     desktop.conf.CUSTOM.LOGIN_SPLASH_HTML.set_for_testing(custom_message),
