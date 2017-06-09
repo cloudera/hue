@@ -17,6 +17,7 @@
 
 import logging
 
+from nose.plugins.skip import SkipTest
 from nose.tools import assert_equal
 
 from django.core.cache import cache
