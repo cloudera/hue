@@ -2317,14 +2317,13 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
 
       huePubSub.publish('cluster.config.get.config');
 
-      % if not is_mini:
-        huePubSub.subscribe('submit.rerun.popup.return', function (data) {
-          $.jHueNotify.info('${_('Rerun submitted.')}');
-          $('#rerun-modal${ SUFFIX }').modal('hide');
-          jobBrowserViewModel.job().apiStatus('RUNNING');
-          jobBrowserViewModel.job().updateJob();
-        }, 'jobbrowser');
-      % else:
+      huePubSub.subscribe('submit.rerun.popup.return', function (data) {
+        $.jHueNotify.info('${_('Rerun submitted.')}');
+        $('#rerun-modal${ SUFFIX }').modal('hide');
+        jobBrowserViewModel.job().apiStatus('RUNNING');
+        jobBrowserViewModel.job().updateJob();
+      }, 'jobbrowser');
+      % if is_mini:
         huePubSub.subscribe('mini.jb.navigate', function (interface) {
           $('#jobsPanel .nav-pills li').removeClass('active');
           interface = jobBrowserViewModel.isValidInterface(interface);
