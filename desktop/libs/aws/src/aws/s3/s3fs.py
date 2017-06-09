@@ -129,6 +129,8 @@ class S3FileSystem(object):
     bucket = self._get_bucket(bucket_name)
     try:
       return bucket.get_key(key_name, validate=validate)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to access path at "%s": %s') % (path, e.reason))
     except S3ResponseError, e:
       if e.status == 301:
         raise S3FileSystemException(_('Failed to access path: "%s" '
