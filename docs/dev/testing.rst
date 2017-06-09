@@ -1,23 +1,22 @@
 The short story
 ===============
 
-Python-based tests:
+Install the mini cluster (only once):
+```
+$ ./tools/jenkins/jenkins.sh slow
+```
 
-  "build/env/bin/hue test all" runs all the tests.
+Run all the tests:
+```
+$ build/env/bin/hue test all
+```
 
-You should be running that before you push.
-
-Windmill-tests:
-
-  build/env/bin/hue test windmill
-
-runs all the windmill tests.  It uses port 8999.
-
-  build/env/bin/hue runserver_plus
-
-followed by
-
-  build/env/bin/windmill -e test=core/src/desktop/windmilltests.py firefox http://localhost:8000/
+Or just some parts of the tests, e.g.:
+```
+$ build/env/bin/hue test specific impala
+$ build/env/bin/hue test specific impala.tests:TestMockedImpala
+$ build/env/bin/hue test specific impala.tests:TestMockedImpala.test_basic_flow
+```
 
 Jasmine tests (from your browser):
 
@@ -62,6 +61,13 @@ Start up pdb on test failures:
 
 Point to an Impalad and trigger the Impala tests:
   build/env/bin/hue test impala impalad-01.gethue.com
+
+
+Run the Jasmine tests
+=====================
+
+* NodeJS (https://nodejs.org/)
+* PhantomJS (npm install -g phantomjs-prebuilt)
 
 
 Special environment variables
