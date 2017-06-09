@@ -877,7 +877,9 @@ ${ utils.submit_popup_event() }
       if (data.type == 'workflow') {
         $.jHueNotify.info('${_('Workflow submitted.')}');
         huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        huePubSub.publish('browser.job.open.link', data.job_id);
         $('.submit-modal').modal('hide');
+        $('.modal-backdrop').hide();
       }
     }, 'oozie');
 
