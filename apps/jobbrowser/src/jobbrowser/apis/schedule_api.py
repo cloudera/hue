@@ -86,6 +86,7 @@ class ScheduleApi(Api):
     common['properties']['xml'] = ''
     common['properties']['properties'] = ''
     common['properties']['bundle_id'] = coordinator.conf_dict.get('oozie.bundle.id')
+    common['doc_url'] = common['properties'].get('doc_url')
 
     return common
 
