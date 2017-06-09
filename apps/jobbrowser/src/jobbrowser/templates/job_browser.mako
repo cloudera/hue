@@ -2288,6 +2288,11 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           jobBrowserViewModel.job().id(widget.externalId());
           jobBrowserViewModel.job().fetchJob();
         }, 'jobbrowser');
+
+        huePubSub.subscribe('browser.job.open.link', function (id) {
+          jobBrowserViewModel.job().id(id);
+          jobBrowserViewModel.job().fetchJob();
+        }, 'jobbrowser');
       % else:
         ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
         jobBrowserViewModel.isMini(true);
