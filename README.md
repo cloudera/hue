@@ -23,10 +23,10 @@ Getting Started
 ---------------
 Add the development packages, build and get the development server running:
 ```
-$ git clone https://github.com/cloudera/hue.git
-$ cd hue
-$ make apps
-$ build/env/bin/hue runserver
+git clone https://github.com/cloudera/hue.git
+cd hue
+make apps
+build/env/bin/hue runserver
 ```
 Now Hue should be running on [http://localhost:8000](http://localhost:8000) !
 
