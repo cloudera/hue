@@ -171,7 +171,9 @@ ${ scheduler.import_sla_cron(coordinator_json) }
       if (data.type == 'schedule') {
         $.jHueNotify.info('${_('Schedule submitted.')}');
         huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        huePubSub.publish('browser.job.open.link', data.job_id);
         $('.submit-modal').modal('hide');
+        $('.modal-backdrop').hide();
       }
     }, 'oozie');
   });
