@@ -23,7 +23,7 @@ import posixpath
 import re
 import time
 
-from boto.exception import S3ResponseError
+from boto.exception import BotoClientError, S3ResponseError
 from boto.s3.connection import Location
 from boto.s3.key import Key
 from boto.s3.prefix import Prefix
@@ -100,6 +100,8 @@ class S3FileSystem(object):
   def _get_or_create_bucket(self, name):
     try:
       bucket = self._get_bucket(name)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to create bucket named "%s": %s') % (name, e.reason))
     except S3ResponseError, e:
       if e.status == 403 or e.status == 301:
         raise S3FileSystemException(_('User is not authorized to access bucket named "%s". '
