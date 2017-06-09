@@ -53,7 +53,7 @@ class Command(NoArgsCommand):
 
 upper_case = FOREACH data GENERATE org.apache.pig.piggybank.evaluation.string.UPPER(text);
 
-STORE upper_case INTO '${output}';
+STORE upper_case INTO '$output';
 """
       snippet_properties = {
         'hadoopProperties': [],
