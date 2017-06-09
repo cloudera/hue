@@ -40,6 +40,7 @@ from liboozie.credentials import Credentials
 
 LOG = logging.getLogger(__name__)
 
+
 def submit_dryrun(run_func):
   def decorate(self, deployment_dir=None):
     if self.oozie_id is not None:
@@ -283,7 +284,7 @@ STORED AS TEXTFILE %s""" % (self.properties.get('send_result_path'), '\n\n\n'.jo
         elif action.data['type'] == 'pig-document':
           from notebook.models import Notebook
           notebook = Notebook(document=Document2.objects.get_by_uuid(user=self.user, uuid=action.data['properties']['uuid']))
-          statements = notebook.get_data()['snippets'][0]['statement']
+          statements = notebook.get_data()['snippets'][0]['statement_raw']
 
           self._create_file(deployment_dir, action.data['name'] + '.pig', statements)
 
