@@ -335,7 +335,9 @@ ${ utils.submit_popup_event() }
       if (data.type == 'bundle') {
         $.jHueNotify.info('${_('Bundle submitted.')}');
         huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+        huePubSub.publish('browser.job.open.link', data.job_id);
         $('.submit-modal').modal('hide');
+        $('.modal-backdrop').hide();
       }
     }, 'oozie');
   });
