@@ -2473,6 +2473,13 @@ class PigDocumentAction(Action):
         'help_text': _('Select a saved Spark program you want to schedule.'),
         'type': 'pig'
      },
+     'parameters': {
+          'name': 'parameters',
+          'label': _('Parameters'),
+          'value': [],
+          'help_text': _('The %(type)s parameters of the script. E.g. N=5, INPUT=${inputDir}')  % {'type': TYPE.title()},
+          'type': ''
+     },
      # Common
      'files': {
           'name': 'files',
