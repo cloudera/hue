@@ -24,7 +24,8 @@ from liboozie.oozie_api import get_oozie
 
 from jobbrowser.apis.base_api import Api, MockDjangoRequest
 from jobbrowser.apis.workflow_api import _manage_oozie_job, _filter_oozie_jobs
-from liboozie.utils import format_time
+from jobbrowser.apis.schedule_api import MockGet
+from oozie.views.dashboard import list_oozie_bundle
 
 
 LOG = logging.getLogger(__name__)
@@ -32,7 +33,7 @@ LOG = logging.getLogger(__name__)
 
 try:
   from oozie.conf import OOZIE_JOBS_COUNT
-  from oozie.views.dashboard import get_oozie_job_log, massaged_bundle_actions_for_json, massaged_oozie_jobs_for_json
+  from oozie.views.dashboard import get_oozie_job_log, massaged_oozie_jobs_for_json
 except Exception, e:
   LOG.exception('Some application are not enabled: %s' % e)
 
@@ -65,23 +66,25 @@ class BundleApi(Api):
 
 
   def app(self, appid):
-    oozie_api = get_oozie(self.user)
-    bundle = oozie_api.get_bundle(jobid=appid)
+    request = MockDjangoRequest(self.user, get=MockGet())
+    response = list_oozie_bundle(request, job_id=appid)
+    bundle = json.loads(response.content)
 
     common = {
-        'id': bundle.bundleJobId,
-        'name': bundle.bundleJobName,
-        'status': bundle.status,
-        'apiStatus': self._api_status(bundle.status),
-        'progress': bundle.get_progress(),
+        'id': bundle['id'],
+        'name': bundle['name'],
+        'status': bundle['status'],
+        'apiStatus': self._api_status(bundle['status']),
+        'progress': bundle['progress'],
         'type': 'bundle',
-        'user': bundle.user,
-        'submitted': format_time(bundle.kickoffTime),
+        'user': bundle['user'],
+        'submitted': bundle['submitted'],
         'properties': {}
     }
-    common['properties']['actions'] = massaged_bundle_actions_for_json(bundle)
+    common['properties']['actions'] = bundle['actions']
     common['properties']['xml'] = ''
     common['properties']['properties'] = ''
+    common['doc_url'] = bundle.get('doc_url')
 
     return common
 

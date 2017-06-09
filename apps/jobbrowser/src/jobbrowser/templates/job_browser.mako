@@ -1206,8 +1206,18 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         <ul class="nav nav-list">
           <li class="nav-header">${ _('Id') }</li>
           <li><span data-bind="text: id, attr: { 'title': id }"></span></li>
+          <!-- ko if: doc_url -->
+          <li class="nav-header">${ _('Document') }</li>
+          <li>
+            <a data-bind="hueLink: doc_url" href="javascript: void(0);" title="${ _('Open in editor') }">
+              <span data-bind="text: name"></span>
+            </a>
+          </li>
+          <!-- /ko -->
+          <!-- ko ifnot: doc_url -->
           <li class="nav-header">${ _('Name') }</li>
           <li><span data-bind="text: name"></span></li>
+          <!-- /ko -->
           <li class="nav-header">${ _('Type') }</li>
           <li><span data-bind="text: type"></span></li>
           <li class="nav-header">${ _('Status') }</li>
