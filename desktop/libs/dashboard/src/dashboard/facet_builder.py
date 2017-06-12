@@ -55,11 +55,6 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       SLOTS = 100
       
     is_date = widget_type == 'timeline-widget'
-    is_big_int_date = is_date and stat_facet.get('maybe_is_big_int_date')
-
-    if is_big_int_date:
-      stat_facet['min'] = stat_facet['min_date_if_bigint']
-      stat_facet['max'] = stat_facet['max_date_if_bigint']
 
     if isinstance(stat_facet['min'], numbers.Number):
       stats_min = int(stat_facet['min']) # Cast floats to int currently
@@ -159,7 +154,6 @@ def _compute_range_facet(widget_type, stat_facet, properties, start=None, end=No
       'gap': gap,
       'canRange': True,
       'isDate': is_date,
-      'isBigIntDate': is_big_int_date,
     })
 
     if widget_type == 'histogram-widget':
