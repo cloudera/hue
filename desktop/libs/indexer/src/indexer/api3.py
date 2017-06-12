@@ -25,7 +25,9 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
+from librdbms.server import dbms as rdbms
 from notebook.connectors.base import get_api, Notebook
+from notebook.connectors.rdbms import Assist
 from notebook.decorators import api_error_handler
 from notebook.models import make_notebook
 
@@ -99,6 +101,8 @@ def guess_format(request):
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
+  elif file_format['inputFormat'] == 'rdbms':
+    format_ = {"type": "csv"}
 
   format_['status'] = 0
   return JsonResponse(format_)
@@ -145,6 +149,20 @@ def guess_field_types(request):
             for col in sample.meta
         ]
     }
+  elif file_format['inputFormat'] == 'rdbms':
+    query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
+    db = rdbms.get(request.user, query_server=query_server)
+    assist = Assist(db)
+    sample = assist.get_sample_data(database=file_format['rdbmsDatabaseName'], table=file_format['rdbmsTableName'])
+    table_metadata = db.get_columns(file_format['rdbmsDatabaseName'], file_format['rdbmsTableName'], names_only=False)
+
+    format_ = {
+        "sample": list(sample.rows()),
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in table_metadata
+        ]
+    }
 
   return JsonResponse(format_)
 
@@ -169,9 +187,11 @@ def importer_submit(request):
       job_handle = _create_index(request.user, request.fs, client, source, destination, index_name)
   elif destination['ouputFormat'] == 'database':
     job_handle = _create_database(request, source, destination, start_time)
+  elif destination['outputFormat'] == 'file' and source['inputFormat'] == 'rdbms':
+    job_handle = run_morphline(request, source, 'sqoop')
   else:
     job_handle = _create_table(request, source, destination, start_time)
-
+  print JsonResponse(job_handle)
   return JsonResponse(job_handle)
 
 
@@ -277,7 +297,6 @@ def _index(request, file_format, collection_name, query=None, start_time=None, l
       fields=request.POST.get('fields', schema_fields),
       unique_key_field=unique_field
     )
-
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
     table_metadata = db.get_table(database=file_format['databaseName'], table_name=file_format['tableName'])

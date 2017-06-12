@@ -20,7 +20,7 @@
   from desktop import conf
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport, _ko
 
-  from indexer.conf import ENABLE_NEW_INDEXER, CONFIG_INDEXER_LIBS_PATH
+  from indexer.conf import ENABLE_NEW_INDEXER, ENABLE_SQOOP, CONFIG_INDEXER_LIBS_PATH
   from notebook.conf import ENABLE_SQL_INDEXER
 %>
 
@@ -228,6 +228,18 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </div>
 
+          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsName" class="control-label"><div>${ _('Database') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsName" placeholder="${ _('Enter name of your database') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="rdbmsTable" class="control-label"><div>${ _('Table') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTable" placeholder="${ _('Enter name of your table') }">
+            </label>
+          </div>
+
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
               <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: createWizard.source.apiHelperType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
@@ -244,7 +256,7 @@ ${ assist.assistPanel() }
     </div>
 
     <!-- ko if: createWizard.source.show() && createWizard.source.inputFormat() != 'manual' -->
-    <div class="card step">
+    <div class="card step" data-bind="visible: createWizard.source.inputFormat() == 'file'">
       <!-- ko if: createWizard.isGuessingFormat -->
       <h4>${_('Guessing format...')} <i class="fa fa-spinner fa-spin"></i></h4>
       <!-- /ko -->
@@ -311,7 +323,7 @@ ${ assist.assistPanel() }
           <div class="control-group">
             <label for="collectionName" class="control-label "><div>${ _('Name') }</div></label>
             <!-- ko if: outputFormat() != 'table' && outputFormat() != 'database' -->
-              <input type="text" class="form-control input-xlarge" id="collectionName" data-bind="value: name, valueUpdate: 'afterkeydown'" placeholder="${ _('Name') }">
+              <input type="text" class="form-control name input-xlarge" id="collectionName" data-bind="value: name, filechooser: name, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true, openOnFocus: true, selectFolder: true, uploadFile: false, uploadFolder: true}" placeholder="${ _('Name') }">
             <!-- /ko -->
 
             <!-- ko if: outputFormat() == 'table' || outputFormat() == 'database' -->
@@ -1060,11 +1072,13 @@ ${ assist.assistPanel() }
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
-          % if ENABLE_SQL_INDEXER.get():
+          % if ENABLE_SQOOP.get():
+          {'value': 'rdbms', 'name': 'External Database'},
+          % endif
+          % if ENABLE_NEW_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
           % endif
-          ##{'value': 'dbms', 'name': 'DBMS'},
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
@@ -1093,6 +1107,23 @@ ${ assist.assistPanel() }
       self.isObjectStore.subscribe(function(newVal) {
         vm.createWizard.destination.useDefaultLocation(!newVal);
       });
+
+      // Rdbms
+      self.rdbmsName = ko.observable('');
+      self.rdbmsTable = ko.observable('');
+      self.rdbmsTableName = ko.computed(function() {
+        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[1] : self.rdbmsTable();
+      });
+      self.rdbmsTableName.subscribe(function(val) {
+        if (val) {
+          vm.createWizard.guessFormat();
+        }
+        resizeElements();
+      });
+      self.rdbmsDatabaseName = ko.computed(function() {
+        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[0] : 'default';
+      });
+
 
       // Table
       self.table = ko.observable('');
@@ -1138,6 +1169,8 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
+        }  else if (self.inputFormat() == 'rdbms') {
+          return self.rdbmsName().length > 0 && self.rdbmsTable().length > 0;
         }
       });
     };
@@ -1240,9 +1273,16 @@ ${ assist.assistPanel() }
           if (format.value == 'database' && wizard.source.inputFormat() != 'manual') {
             return false;
           }
-          else if (format.value == 'file' && wizard.source.inputFormat() != 'manual') {
+          if (format.value == 'file' && wizard.source.inputFormat() == 'manual') {
             return false;
           }
+          else if (format.value == 'file' && wizard.source.inputFormat() == 'file') {
+            return false;
+          }
+          else if (format.value == 'table' && wizard.source.inputFormat() == 'rdbms') {
+            return false;
+          }
+
           return true;
         })
       });
@@ -1460,7 +1500,7 @@ ${ assist.assistPanel() }
          );
       });
       self.readyToIndex = ko.computed(function () {
-        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database';
+        var validFields = self.destination.columns().length || self.destination.outputFormat() == 'database' || self.destination.outputFormat() == 'file';
         var validTableColumns = self.destination.outputFormat() != 'table' || ($.grep(self.destination.columns(), function(column) {
             return column.name().length == 0;
           }).length == 0
@@ -1468,7 +1508,7 @@ ${ assist.assistPanel() }
             return column.name().length == 0 || (self.source.inputFormat() != 'manual' && column.partitionValue().length == 0);
           }).length == 0
         );
-        var isTargetAlreadyExisting = !self.destination.isTargetExisting() || self.destination.outputFormat() == 'index';
+        var isTargetAlreadyExisting = ! self.destination.isTargetExisting() || self.destination.outputFormat() == 'index' || self.destination.outputFormat() == 'file';
         var isValidTable = self.destination.outputFormat() != 'table' || (
           self.destination.tableFormat() != 'kudu' || (self.destination.kuduPartitionColumns().length > 0 &&
               $.grep(self.destination.kuduPartitionColumns(), function(partition) { return partition.columns().length > 0 }).length == self.destination.kuduPartitionColumns().length && self.destination.primaryKeys().length > 0)
