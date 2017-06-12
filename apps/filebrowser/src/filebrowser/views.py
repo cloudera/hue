@@ -33,6 +33,7 @@ from cStringIO import StringIO
 from gzip import GzipFile
 
 from django.contrib.auth.models import User, Group
+from django.core.paginator import EmptyPage
 from django.core.urlresolvers import reverse
 from django.template.defaultfilters import stringformat, filesizeformat
 from django.http import Http404, HttpResponse, HttpResponseNotModified, HttpResponseForbidden
@@ -451,8 +452,13 @@ def listdir_paged(request, path):
 
 
     # Do pagination
-    page = paginator.Paginator(all_stats, pagesize).page(pagenum)
-    shown_stats = page.object_list
+    try:
+      page = paginator.Paginator(all_stats, pagesize).page(pagenum)
+      shown_stats = page.object_list
+    except EmptyPage:
+      logger.warn("No results found for requested page.")
+      page = None
+      shown_stats = []
 
     # Include parent dir always as second option, unless at filesystem root.
     if not request.fs.isroot(path):
@@ -472,7 +478,8 @@ def listdir_paged(request, path):
     current_stat['name'] = "."
     shown_stats.insert(1, current_stat)
 
-    page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
+    if page:
+      page.object_list = [ _massage_stats(request, s) for s in shown_stats ]
 
     is_trash_enabled = request.fs._get_scheme(path) == 'hdfs' and \
                        (request.fs.isdir(_home_trash_path(request.fs, request.user, path)) or
@@ -484,8 +491,8 @@ def listdir_paged(request, path):
         'breadcrumbs': breadcrumbs,
         'current_request_path': request.path,
         'is_trash_enabled': is_trash_enabled,
-        'files': page.object_list,
-        'page': _massage_page(page),
+        'files': page.object_list if page else [],
+        'page': _massage_page(page) if page else None,
         'pagesize': pagesize,
         'home_directory': request.fs.isdir(home_dir_path) and home_dir_path or None,
         'descending': descending_param,
