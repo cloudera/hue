@@ -27,8 +27,6 @@ from desktop.models import Settings, hue_version
 from desktop.views import collect_usage
 
 
-@login_notrequired
-@access_log_level(logging.DEBUG)
 def admin_wizard(request):
   if request.user.is_superuser:
     apps = appmanager.get_apps(request.user)
