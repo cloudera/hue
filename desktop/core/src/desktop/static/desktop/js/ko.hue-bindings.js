@@ -2201,7 +2201,7 @@
             var contentPanelWidth = totalWidth - rightPanelWidth - $resizer.width();
             $rightPanel.css("width", rightPanelWidth + "px");
             $contentPanel.css("width", contentPanelWidth + "px");
-            $resizer.css("right", rightPanelWidth + $resizer.width() + "px");
+            $resizer.css("left", $container.width() - rightPanelWidth - $resizer.width() + "px");
             $contentPanel.css("right", rightPanelWidth + $resizer.width() + "px");
           } else {
             if (oppositeWidth === 0) {
@@ -3701,9 +3701,16 @@
       var Tooltip = ace.require("ace/tooltip").Tooltip;
       var AceRange = ace.require('ace/range').Range;
 
-      var resizePubSub = huePubSub.subscribe('split.panel.resized', editor.resize);
-      });
+      var resizeAce = function () {
+        window.setTimeout(function () {
+          editor.resize(true);
+        }, 0);
+      };
+
+      var assistToggleSub = huePubSub.subscribe('assist.set.manual.visibility', resizeAce);
+      var resizePubSub = huePubSub.subscribe('split.panel.resized', resizeAce);
       disposeFunctions.push(function () {
+        assistToggleSub.remove();
         resizePubSub.remove();
       });
 
