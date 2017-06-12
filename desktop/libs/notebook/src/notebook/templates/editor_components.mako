@@ -3078,19 +3078,6 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         }, HUE_PUB_SUB_EDITOR_ID);
       }
 
-      huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
-        var foundSnippet = viewModel.selectedNotebook().snippets().filter(function (snippet) {
-          return snippet.ace() && snippet.ace().container.id === statementDetails.id;
-        });
-        if (foundSnippet.length == 1) {
-          if (statementDetails.activeStatement) {
-            foundSnippet[0].positionStatement(statementDetails.activeStatement.statement);
-          } else {
-            foundSnippet[0].positionStatement('');
-          }
-        }
-      }, HUE_PUB_SUB_EDITOR_ID);
-
       viewModel.selectedNotebook.subscribe(function (newVal) {
         huePubSub.publish('selected.notebook.changed', newVal);
       });
@@ -3500,8 +3487,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
               }
             }
           });
-        }
-        else {
+        } else {
           if (viewModel.selectedNotebook()) {
             viewModel.selectedNotebook().snippets().forEach(function (snippet) {
               snippet.jobs().forEach(function (job) {
