@@ -508,6 +508,13 @@ class TestFileBrowserWithHadoop(object):
     listing = self.c.get('/filebrowser/view=' + BASE + '?filter=1&sortby=name&descending=true&pagesize=1&pagenum=2').context['files']
     assert_equal(['..', '.', '1'], [ f['name'] for f in listing ])
 
+    # Check filter with empty results
+    resp = self.c.get('/filebrowser/view=' + BASE + '?filter=empty&sortby=name&descending=true&pagesize=1&pagenum=2')
+    listing = resp.context['files']
+    assert_equal([], listing)
+    page = resp.context['page']
+    assert_equal(None, page)
+
 
   def test_view_snappy_compressed(self):
     if not snappy_installed():
