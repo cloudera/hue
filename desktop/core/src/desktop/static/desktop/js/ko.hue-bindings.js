@@ -3703,7 +3703,11 @@
 
       var resizeAce = function () {
         window.setTimeout(function () {
-          editor.resize(true);
+          try {
+            editor.resize(true);
+          } catch (e) {
+            // Can happen when the editor hasn't been initialized
+          }
         }, 0);
       };
 
