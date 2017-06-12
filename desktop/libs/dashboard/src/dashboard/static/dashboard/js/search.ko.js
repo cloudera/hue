@@ -1825,6 +1825,10 @@ var SearchViewModel = function (collection_json, query_json, initial_json) {
       hueAnalytics.log('dashboard', 'search');
       self.isRetrievingResults(true);
 
+      if (! self.collection.name()) {
+        return;
+      }
+
       if (self.selectedQDefinition() != null) {
         var _prop = ko.mapping.fromJSON(self.selectedQDefinition().data());
         if (ko.toJSON(_prop.qs()) != ko.mapping.toJSON(self.query.qs())
