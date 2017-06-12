@@ -3701,6 +3701,11 @@
       var Tooltip = ace.require("ace/tooltip").Tooltip;
       var AceRange = ace.require('ace/range').Range;
 
+      var resizePubSub = huePubSub.subscribe('split.panel.resized', editor.resize);
+      disposeFunctions.push(function () {
+        resizePubSub.remove();
+      });
+
       var aceLocationHandler = new AceLocationHandler(editor, $el.attr("id"), snippet);
       disposeFunctions.push(function () {
         aceLocationHandler.dispose();
