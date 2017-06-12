@@ -1941,18 +1941,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 <script type="text/javascript">
   % if is_embeddable:
   var MAIN_SCROLLABLE = '.page-content';
-  var HUE_PUB_SUB_AFFIX = (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
+  var HUE_PUB_SUB_EDITOR_ID = 'editor' + (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
   % else:
   var MAIN_SCROLLABLE = '.content-panel';
-  var HUE_PUB_SUB_AFFIX = '';
+  var HUE_PUB_SUB_EDITOR_ID = 'editor';
   % endif
 
-  var HUE_PUB_SUB_APP = 'editor' + HUE_PUB_SUB_AFFIX;
 
   var isLeftNavOpen = false;
   huePubSub.subscribe('left.nav.open.toggle', function(val) {
     isLeftNavOpen = val;
-  }, HUE_PUB_SUB_APP);
+  }, HUE_PUB_SUB_EDITOR_ID);
 
   var showHoverMsg = function (e) {
     var dt = null;
@@ -2618,6 +2617,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
     ko.options.deferUpdates = true;
 
     var VIEW_MODEL_OPTIONS = $.extend(${ options_json | n,unicode,antixss }, {
+      huePubSubId: HUE_PUB_SUB_EDITOR_ID,
       user: '${ user.username }',
       userId: ${ user.id },
       suffix: '${ suffix }',
@@ -2823,28 +2823,28 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       splitDraggableTimeout = window.setTimeout(function () {
         redrawFixedHeaders(100);
       }, 200);
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('redraw.fixed.headers', function () {
       hideFixedHeaders();
       redrawFixedHeaders(200);
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('app.gained.focus', function (app) {
       if (app === 'editor') {
         huePubSub.publish('redraw.fixed.headers');
       }
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('show.saveToFile.modal', function () {
       $('#saveToFileModal${ suffix }').modal('show');
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('tab.switched', function (tab) {
       if (tab !== 'queryResults') {
         $('.hue-datatable-search').hide();
       }
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     huePubSub.subscribe('detach.scrolls', function (snippet) {
       var scrollElement = $('#snippet_' + snippet.id()).find('.dataTables_wrapper');
@@ -2854,7 +2854,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       if (scrollElement.data('scrollFnDt')) {
         scrollElement.off('scroll', scrollElement.data('scrollFnDt'));
       }
-    }, HUE_PUB_SUB_APP);
+    }, HUE_PUB_SUB_EDITOR_ID);
 
     window.redrawFixedHeaders = redrawFixedHeaders;
 
@@ -3067,15 +3067,15 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       if (viewModel.isOptimizerEnabled()) {
         huePubSub.subscribe('editor.upload.table.stats', function (options) {
           viewModel.selectedNotebook().snippets()[0].uploadTableStats(options);
-        }, HUE_PUB_SUB_APP);
+        }, HUE_PUB_SUB_EDITOR_ID);
 
         huePubSub.subscribe("editor.upload.history", function () {
           viewModel.selectedNotebook().snippets()[0].uploadQueryHistory(5);
-        }, HUE_PUB_SUB_APP);
+        }, HUE_PUB_SUB_EDITOR_ID);
 
         huePubSub.subscribe("editor.upload.query", function (query_id) {
           viewModel.selectedNotebook().snippets()[0].uploadQuery(query_id);
-        }, HUE_PUB_SUB_APP);
+        }, HUE_PUB_SUB_EDITOR_ID);
       }
 
       huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
@@ -3089,7 +3089,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             foundSnippet[0].positionStatement('');
           }
         }
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       viewModel.selectedNotebook.subscribe(function (newVal) {
         huePubSub.publish('selected.notebook.changed', newVal);
@@ -3097,7 +3097,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       huePubSub.subscribe('get.selected.notebook', function () {
         huePubSub.publish('set.selected.notebook', viewModel.selectedNotebook());
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
 
       var isAssistAvailable = viewModel.assistAvailable();
@@ -3149,7 +3149,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       huePubSub.subscribe('assist.set.manual.visibility', function () {
         wasLeftPanelVisible = viewModel.isLeftPanelVisible();
         wasRightPanelVisible = viewModel.isRightPanelVisible();
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       viewModel.isLeftPanelVisible.subscribe(function (value) {
         redrawFixedHeaders(200);
@@ -3174,11 +3174,11 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       huePubSub.subscribe('show.retry.modal', function (data) {
         $('#retryModal${ suffix }').modal('show');
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('hide.retry.modal', function (data) {
         $('#retryModal${ suffix }').modal('hide');
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       // Close the notebook snippets when leaving the page
       window.onbeforeunload = function (e) {
@@ -3205,7 +3205,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         return false;
       });
 
-      huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_APP);
+      huePubSub.subscribe('editor.save', saveKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).bind('keyup', function (e) {
         if (e.keyCode == 191 && e.shiftKey && !$(e.target).is('input') && !$(e.target).is('textarea')) {
@@ -3237,7 +3237,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         return false;
       });
 
-      huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_APP);
+      huePubSub.subscribe('editor.create.new', newKeyHandler, HUE_PUB_SUB_EDITOR_ID);
 
       var initialResizePosition = 100;
 
@@ -3449,7 +3449,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '0'});
         $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '0'});
         $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '0.55'});
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('editor.snippet.result.normal', function (snippet) {
         var $snippet = $("#snippet_" + snippet.id());
@@ -3457,7 +3457,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $snippet.find(".dataTables_wrapper .fixed-header-row").css({opacity: '1'});
         $snippet.find(".dataTables_wrapper .fixed-first-cell").css({opacity: '1'});
         $snippet.find(".dataTables_wrapper .resultTable").css({opacity: '1'});
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).on("renderDataError", function (e, options) {
         huePubSub.publish('editor.snippet.result.normal', options.snippet);
@@ -3480,7 +3480,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         if (typeof renderJqCron !== 'undefined'){
           renderJqCron();
         }
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('submit.popup.return', function (data) {
         viewModel.selectedNotebook().viewSchedulerId(data.job_id);
@@ -3488,7 +3488,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
         $('.submit-modal-editor').modal('hide');
 
         $('a[href=\'#scheduledJobsTab\']').click();
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       huePubSub.subscribe('jobbrowser.data', function (jobs) {
         if (jobs.length > 0) {
@@ -3510,7 +3510,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             });
           }
         }
-      }, HUE_PUB_SUB_APP);
+      }, HUE_PUB_SUB_EDITOR_ID);
 
       $(document).on("gridShown", function (e, snippet) {
         window.setTimeout(function () {
