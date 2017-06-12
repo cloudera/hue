@@ -29,6 +29,7 @@ from libsentry.privilege_checker import SENTRY_PRIVILEGE_CACHE_KEY, PrivilegeChe
 from libsentry.test_privilege_checker import MockSentryApiV2
 
 from metadata.conf import NAVIGATOR
+from metadata.metadata_sites import get_navigator_hue_server_name
 from metadata.navigator_client import NavigatorApi
 
 
@@ -37,7 +38,10 @@ LOG = logging.getLogger(__name__)
 
 class MockedRoot():
   def get(self, relpath=None, params=None, headers=None, clear_cookies=False):
-    return params
+    if relpath == 'entities' and params and params[0] and params[0][0] == 'query' and params[0][1] and params[0][1].startswith('clusterName:'):
+      return [{'sourceId': 1}, {'identity': 2}]
+    else:
+      return params
 
 
 class NavigatorClientTest:
@@ -153,7 +157,7 @@ class TestNavigatorClientSecure(NavigatorClientTest):
       cache.delete(cache_key)
 
 
-class TestNavigatorClientTest(NavigatorClientTest):
+class TestNavigatorClient(NavigatorClientTest):
 
   def setUp(self):
     self.reset = NAVIGATOR.APPLY_SENTRY_PERMISSIONS.set_for_testing(False)
@@ -162,18 +166,23 @@ class TestNavigatorClientTest(NavigatorClientTest):
     self.reset()
 
   def test_search_entities(self):
+    if get_navigator_hue_server_name():
+      cluster_filter = '(sourceId:1 OR sourceId:2) AND (%s)'
+    else:
+      cluster_filter = '%s'
+
     assert_equal(
-        '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
+        cluster_filter % '((originalName:*cases*)OR(originalDescription:*cases*)OR(name:*cases*)OR(description:*cases*)OR(tags:*cases*)) AND (*) AND ((type:TABLE)OR(type:VIEW)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='cases', sources=['hive'])[0][1]
     )
 
     assert_equal(
-        '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
+        cluster_filter % '* AND ((type:FIELD*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='type:FIELD', sources=['hive'])[0][1]
     )
 
     assert_equal(
-        '* AND ((type:\\{\\}\\(\\)\\[\\]*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
+        cluster_filter % '* AND ((type:\\{\\}\\(\\)\\[\\]*)) AND ((type:TABLE)OR(type:VIEW)OR(type:DATABASE)OR(type:PARTITION)OR(type:FIELD)) AND (sourceType:HIVE OR sourceType:IMPALA)',
         self.api.search_entities(query_s='type:{}()[]*', sources=['hive'])[0][1]
     )
 

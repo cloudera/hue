@@ -33,7 +33,7 @@ from hadoop.conf import HDFS_CLUSTERS
 from libsentry.privilege_checker import get_checker
 from libsentry.sentry_site import get_hive_sentry_provider
 
-from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username, has_navigator_file_search
+from metadata.conf import NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.metadata_sites import get_navigator_hue_server_name
 
 
@@ -56,7 +56,7 @@ def get_cluster_source_ids(api):
       LOG.info('Navigator cluster source ids: %s' % (sources,))
       if sources:
         # Sometimes sourceId seems to be missing
-        source_ids = ['sourceId:%s' % _id.get('sourceId') or _id.get('identity') for _id in sources]
+        source_ids = ['sourceId:%s' % (_id.get('sourceId') or _id.get('identity')) for _id in sources]
         CLUSTER_SOURCE_IDS = '(' + ' OR '.join(source_ids) + ') AND '
       else:
         # 0 means always false
