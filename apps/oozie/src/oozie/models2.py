@@ -3931,7 +3931,7 @@ class WorkflowBuilder():
         'name': 'sqoop-%s' % node_id[:4],
         "type": "sqoop-document-widget",
         "properties":{
-              "command": "",
+              "statement": "",
               "arguments": [],
               "retry_max": [],
               "retry_interval": [],
