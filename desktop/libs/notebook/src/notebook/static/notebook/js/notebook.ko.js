@@ -21,7 +21,7 @@ var EditorViewModel = (function() {
       'ace', 'aceMode', 'autocompleter', 'availableDatabases', 'availableSnippets', 'avoidClosing', 'canWrite',
       'cleanedDateTimeMeta', 'cleanedMeta', 'cleanedNumericMeta', 'cleanedStringMeta', 'dependents', 'errorLoadingQueries',
       'hasProperties', 'history', 'images', 'inFocus', 'queries', 'saveResultsModalVisible', 'selectedStatement',
-      'snippetImage', 'user'
+      'snippetImage', 'user', 'positionStatement'
     ]
   };
 
@@ -516,7 +516,18 @@ var EditorViewModel = (function() {
     });
     self.statement_raw = ko.observable(typeof snippet.statement_raw != "undefined" && snippet.statement_raw != null ? snippet.statement_raw : '');
     self.selectedStatement = ko.observable('');
-    self.positionStatement = ko.observable('');
+    self.positionStatement = ko.observable(null);
+
+    huePubSub.subscribe('editor.active.statement.changed', function (statementDetails) {
+      if (self.ace() && self.ace().container.id === statementDetails.id) {
+        if (statementDetails.activeStatement) {
+          self.positionStatement(statementDetails.activeStatement);
+        } else {
+          self.positionStatement(null);
+        }
+      }
+    }, vm.huePubSubId);
+
     self.aceSize = ko.observable(typeof snippet.aceSize != "undefined" && snippet.aceSize != null ? snippet.aceSize : 100);
     // self.statement_raw.extend({ rateLimit: 150 }); // Should prevent lag from typing but currently send the old query when using the key shortcut
     self.status = ko.observable(typeof snippet.status != "undefined" && snippet.status != null ? snippet.status : 'loading');
@@ -674,7 +685,7 @@ var EditorViewModel = (function() {
       }
     });
     self.statement = ko.computed(function () {
-      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() && HAS_OPTIMIZER ? self.positionStatement() : self.statement_raw())) : self.statement_raw();
+      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null && HAS_OPTIMIZER ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
         statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
       });
@@ -1034,39 +1045,55 @@ var EditorViewModel = (function() {
         } else {
           notebook.createSession(new Session(vm, {'type': self.type()}), callback);
         }
-      }
-      else if (data.status == -3) { // Statement expired
+      } else if (data.status == -3) { // Statement expired
         self.status('expired');
         if (data.message) {
           self.errors.push({message: data.message, line: null, col: null});
           huePubSub.publish('editor.snippet.result.normal', self);
         }
-      }
-      else if (data.status == -4) { // Operation timed out
+      } else if (data.status == -4) { // Operation timed out
         notebook.retryModalCancel = function () {
           self.status('failed');
           huePubSub.publish('hide.retry.modal');
-        }
+        };
         notebook.retryModalConfirm = function () {
           if (callback) {
             callback();
-          };
+          }
           huePubSub.publish('hide.retry.modal');
-        }
+        };
         huePubSub.publish('show.retry.modal');
-      }
-      else if (data.status == 401) { // Auth required
+      } else if (data.status == 401) { // Auth required
         self.status('expired');
         $(document).trigger("showAuthModal", {'type': self.type(), 'callback': self.execute});
-      }
-      else if (data.status == 1 || data.status == -1) {
+      } else if (data.status == 1 || data.status == -1) {
         self.status('failed');
         var match = ERROR_REGEX.exec(data.message);
-        self.errors.push({
-          message: data.message,
-          line: match === null ? null : parseInt(match[1]) - 1,
-          col: match === null ? null : (typeof match[3] !== 'undefined' ? parseInt(match[3]) : null)
-        });
+        if (match) {
+          var errorLine = parseInt(match[1]);
+          var errorCol;
+          if (typeof match[3] !== 'undefined') {
+            errorCol = parseInt(match[3]);
+          }
+          if (self.positionStatement()) {
+            if (errorCol && errorLine === 1) {
+              errorCol += self.positionStatement().location.first_column;
+            }
+            errorLine += self.positionStatement().location.first_line - 1;
+          }
+
+          self.errors.push({
+            message: data.message.replace(match[0], 'line ' + errorLine + (errorCol !== null ? ':' + errorCol : '')),
+            line: errorLine - 1,
+            col: errorCol
+          })
+        } else {
+          self.errors.push({
+            message: data.message,
+            line: null,
+            col: null
+          });
+        }
       } else {
         $(document).trigger("error", data.message);
         self.status('failed');
@@ -1141,6 +1168,7 @@ var EditorViewModel = (function() {
       self.status('running');
       self.statusForButtons('executing');
       self.errors([]);
+      huePubSub.publish('editor.clear.highlighted.errors', self.ace());
       self.result.clear();
       self.progress(0);
       self.jobs([]);
