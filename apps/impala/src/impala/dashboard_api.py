@@ -206,7 +206,6 @@ class SQLApi():
     if result:
       stats = list(result['data'])
       min_value, max_value = stats[0]
-      maybe_is_big_int_date = isinstance(min_value, (int, long))
 
       if not isinstance(min_value, numbers.Number):
         min_value = min_value.replace(' ', 'T') + 'Z'
@@ -218,9 +217,6 @@ class SQLApi():
             fields[0]: {
               'min': min_value,
               'max': max_value,
-              'min_date_if_bigint': datetime.fromtimestamp(min_value).strftime('%Y-%m-%dT%H:%M:%SZ') if maybe_is_big_int_date else min_value,
-              'max_date_if_bigint': datetime.fromtimestamp(max_value).strftime('%Y-%m-%dT%H:%M:%SZ') if maybe_is_big_int_date else max_value,
-              'maybe_is_big_int_date': maybe_is_big_int_date
             }
           }
         }
@@ -357,9 +353,6 @@ class SQLApi():
           quote = "'"
         else:
           quote = ''
-          if  any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == fq['field']]):
-            fq['properties'][0]['from'] = "unix_timestamp('%(from)s')" % fq['properties'][0]
-            fq['properties'][0]['to'] = "unix_timestamp('%(to)s')" % fq['properties'][0]
         clauses.append("`%(field)s` >= %(quote)s%(from)s%(quote)s AND `%(field)s` < %(quote)s%(to)s%(quote)s" % {
           'field': fq['field'],
           'to': fq['properties'][0]['to'],
@@ -410,10 +403,7 @@ class SQLApi():
       field_name = '%(field)s_range' % facet
       order_by = '`%(field)s_range` ASC' % facet
       if facet['properties']['isDate']:
-        if facet['properties']['isBigIntDate']:
-          field = 'cast(`%(field)s` AS timestamp)' % facet
-        else:
-          field = '`%(field)s`' % facet
+        field = '`%(field)s`' % facet
 
         slot = self._gap_to_units(facet['properties']['gap'])
 
@@ -456,6 +446,7 @@ class SQLApi():
 
   def _gap_to_units(self, gap):
     skip, coeff, unit = re.split('(\d+)', gap.strip('+')) # e.g. +1HOURS
+
     duration = {
       'coeff': int(coeff),
       'unit': unit.rstrip('S'),
@@ -472,11 +463,11 @@ class SQLApi():
       duration['sql_trunc'] = 'HH'
       duration['sql_interval'] = '1 HOUR'
       duration['timedelta'] = timedelta(seconds=60 * 60)
-    elif duration['unit'] == 'DAY'  and duration['coeff'] == 1:
+    elif duration['unit'] == 'DAY' and duration['coeff'] == 1:
       duration['sql_trunc'] = 'DD'
       duration['sql_interval'] = '1 DAY'
       duration['timedelta'] = timedelta(days=1)
-    elif duration['unit'] == 'WEEK':
+    elif duration['unit'] == 'WEEK' or (duration['unit'] == 'DAY' and duration['coeff'] == 7):
       duration['sql_trunc'] = 'WW'
       duration['sql_interval'] = '1 WEEK'
       duration['timedelta'] = timedelta(days=7)
@@ -492,6 +483,9 @@ class SQLApi():
       duration['sql_trunc'] = 'YY'
       duration['sql_interval'] = '1 YEAR'
       duration['timedelta'] = timedelta(days=365)
+
+    if not duration['sql_trunc']:
+      LOG.warn('Duration %s not converted to SQL buckets.' % duration)
 
     return duration
 
@@ -530,10 +524,6 @@ class SQLApi():
 
         props['from'] = "now() - interval %(coeff)s %(unit)s" % duration
         props['to'] = 'now()' # TODO +/- Proper Tz of user
-
-        if any([c['properties'].get('isBigIntDate') for c in collection['facets'] if c['field'] == time_field]):
-          props['from'] = 'unix_timestamp(%(from)s)' % props
-          props['to'] = 'unix_timestamp(%(to)s)' % props
 
       elif collection['timeFilter']['type'] == 'fixed':
         props['from'] = collection['timeFilter'].get('from', 'now() - interval 7 DAY')
