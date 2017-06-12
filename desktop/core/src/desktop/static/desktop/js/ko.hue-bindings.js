@@ -3702,6 +3702,7 @@
       var AceRange = ace.require('ace/range').Range;
 
       var resizePubSub = huePubSub.subscribe('split.panel.resized', editor.resize);
+      });
       disposeFunctions.push(function () {
         resizePubSub.remove();
       });
