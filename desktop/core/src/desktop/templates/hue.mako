@@ -1087,11 +1087,16 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         var self = this;
         self.apiHelper = ApiHelper.getInstance();
         self.leftAssistVisible = ko.observable();
+        self.leftAssistVisible.subscribe(function () {
+          huePubSub.publish('split.panel.resized');
+        });
+
         self.rightAssistVisible = ko.observable();
         self.rightAssistVisible.subscribe(function () {
           window.setTimeout(function () {
             huePubSub.publish('reposition.scroll.anchor.up');
             huePubSub.publish('nicescroll.resize');
+            huePubSub.publish('split.panel.resized');
           }, 0);
         });
         self.rightAssistAvailable = ko.observable(false);
