@@ -305,7 +305,7 @@ var EditorViewModel = (function() {
       if (self.inFocus() || notebook.snippets().length === 1) {
         huePubSub.publish('set.active.snippet.type', self.type());
       }
-    }, 'editor');
+    }, vm.huePubSubId);
 
     self.getAceMode = function() {
       return vm.getSnippetViewSettings(self.type()).aceMode;
@@ -350,13 +350,13 @@ var EditorViewModel = (function() {
       if (['hive', 'impala'].indexOf(self.type()) !== -1) {
         updateDatabases();
       }
-    }, 'editor');
+    }, vm.huePubSubId);
 
     huePubSub.subscribe('save.snippet.to.file', function() {
       var data = {
         path: self.statementPath(),
         contents: self.statement()
-      }
+      };
       var options = {
         successCallback: function(result) {
           if (result && result.exists) {
@@ -365,10 +365,10 @@ var EditorViewModel = (function() {
             self._ajaxError(result);
           }
         }
-      }
+      };
       var apiHelper = ApiHelper.getInstance();
       apiHelper.saveSnippetToFile(data, options);
-    }, 'editor');
+    }, vm.huePubSubId);
 
     // History is currently in Notebook, same with saved queries by snippets, might be better in assist
     self.currentQueryTab = ko.observable(typeof snippet.currentQueryTab != "undefined" && snippet.currentQueryTab != null ? snippet.currentQueryTab : 'queryHistory');
@@ -378,7 +378,7 @@ var EditorViewModel = (function() {
       contextData.tabId = 'context' + self.pinnedContextTabs().length;
       self.pinnedContextTabs.push(contextData);
       self.currentQueryTab(contextData.tabId);
-    }, 'editor');
+    }, vm.huePubSubId);
 
     self.removeContextTab = function (context) {
       if (context.tabId === self.currentQueryTab()) {
@@ -460,7 +460,7 @@ var EditorViewModel = (function() {
       if (source !== self.type()) {
         huePubSub.publish('assist.set.source', self.type());
       }
-    });
+    }, vm.huePubSubId);
 
     huePubSub.publish('assist.get.source');
 
@@ -470,8 +470,8 @@ var EditorViewModel = (function() {
       }
     };
 
-    huePubSub.subscribe("assist.database.set", handleAssistSelection);
-    huePubSub.subscribe("assist.database.selected", handleAssistSelection);
+    huePubSub.subscribe("assist.database.set", handleAssistSelection, vm.huePubSubId);
+    huePubSub.subscribe("assist.database.selected", handleAssistSelection, vm.huePubSubId);
 
     if (! self.database()) {
       huePubSub.publish("assist.get.database", self.type());
@@ -2413,7 +2413,7 @@ var EditorViewModel = (function() {
         if (!IS_HUE_4) {
           huePubSub.subscribe('hue4.process.headers', function (opts) {
             opts.callback(opts.response);
-          });
+          }, vm.huePubSubId);
         }
 
         getCoordinator();
@@ -2492,7 +2492,7 @@ var EditorViewModel = (function() {
           name: self.snippets()[0].database()
         });
       }
-    });
+    }, vm.huePubSubId);
 
     huePubSub.publish('assist.is.db.panel.ready');
 
@@ -2510,7 +2510,6 @@ var EditorViewModel = (function() {
     }
   };
 
-
   function EditorViewModel(editor_id, notebooks, options, CoordinatorEditorViewModel, RunningCoordinatorModel) {
     var self = this;
 
@@ -2522,6 +2521,7 @@ var EditorViewModel = (function() {
       hue4_notebook: '/hue/notebook'
     };
 
+    self.huePubSubId = options.huePubSubId || 'editor';
     self.user = options.user;
     self.userId = options.userId;
     self.suffix = options.suffix;
@@ -2539,7 +2539,7 @@ var EditorViewModel = (function() {
     self.editorTypeTitle = ko.pureComputed(function () {
       var foundInterpreter = $.grep(options.languages, function (interpreter) {
         return interpreter.type === self.editorType();
-      })
+      });
       return foundInterpreter.length > 0 ? foundInterpreter[0].name : self.editorType();
     });
     self.useNewAutocompleter = options.useNewAutocompleter || false;
@@ -2660,7 +2660,7 @@ var EditorViewModel = (function() {
 
     huePubSub.subscribe('context.panel.visible.editor', function (value) {
       self.isContextPanelVisible(false);
-    });
+    }, self.huePubSubId);
 
     self.availableSnippets = ko.mapping.fromJS(options.languages);
 
