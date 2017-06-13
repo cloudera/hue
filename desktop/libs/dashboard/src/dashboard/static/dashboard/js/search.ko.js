@@ -40,7 +40,7 @@ function loadSearchLayout(viewModel, json_layout) {
       });
       _rows.push(row);
     });
-    var column = new Column(json_col.size, _rows);
+    var column = new Column(json_col.size, _rows, viewModel);
     _columns = _columns.concat(column);
   });
 
