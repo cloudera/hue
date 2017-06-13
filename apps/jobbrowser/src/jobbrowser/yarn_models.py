@@ -279,10 +279,14 @@ class Job(object):
     return Task(self, json)
 
   def filter_tasks(self, task_types=None, task_states=None, task_text=None):
-    return [Task(self, task) for task in self.api.tasks(self.id).get('tasks', {}).get('task', [])
-          if (not task_types or task['type'].lower() in task_types) and
-             (not task_states or task['state'].lower() in task_states) and
-             (not task_text or task_text.lower() in str(task).lower())]
+    tasks = self.api.tasks(self.id).get('tasks', {})
+    if tasks and tasks.get('task'):
+      return [Task(self, task) for task in tasks.get('task', [])
+              if (not task_types or task['type'].lower() in task_types) and
+              (not task_states or task['state'].lower() in task_states) and
+              (not task_text or task_text.lower() in str(task).lower())]
+    else:
+      return []
 
   @property
   def job_attempts(self):
