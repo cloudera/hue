@@ -151,6 +151,8 @@ class S3FileSystem(object):
 
     try:
       key = self._get_key(path, validate=True)
+    except BotoClientError, e:
+      raise S3FileSystemException(_('Failed to access path "%s": %s') % (path, e.reason))
     except S3ResponseError as e:
       if e.status == 404:
         return None
