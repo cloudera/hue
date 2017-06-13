@@ -286,9 +286,12 @@ class YarnMapReduceTaskApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
-    response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
-    logs = json.loads(response.content)['log']
-
+    try:
+      response = job_attempt_logs_json(MockDjangoRequest(self.user), job=self.app_id, name=log_name)
+      logs = json.loads(response.content)['log']
+    except PopupException, e:
+      LOG.warn('No task attempt found for default logs: %s' % e)
+      logs = ''
     return {'progress': 0, 'logs': logs}
 
 
