@@ -17,6 +17,8 @@
 
 import logging
 
+from subprocess import CalledProcessError
+
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.conf import AUTH_USERNAME as DEFAULT_AUTH_USERNAME, CLUSTER_ID as DEFAULT_CLUSTER_ID
@@ -152,13 +154,15 @@ def get_navigator_auth_username():
 def get_navigator_auth_password():
   '''Get the password to authenticate with.'''
 
-  if get_navigator_auth_type() == 'ldap':
-    return NAVIGATOR.AUTH_LDAP_PASSWORD.get()
-  elif get_navigator_auth_type() == 'saml':
-    return NAVIGATOR.AUTH_SAML_PASSWORD.get()
-  else:
-    return NAVIGATOR.AUTH_CM_PASSWORD.get()
-
+  try:
+    if get_navigator_auth_type() == 'ldap':
+      return NAVIGATOR.AUTH_LDAP_PASSWORD.get()
+    elif get_navigator_auth_type() == 'saml':
+      return NAVIGATOR.AUTH_SAML_PASSWORD.get()
+    else:
+      return NAVIGATOR.AUTH_CM_PASSWORD.get()
+  except CalledProcessError:
+    LOG.exception('Could not read Navigator password file, need to restart Hue to re-enable it.')
 
 def get_navigator_cm_password():
   '''Get default password from secured file'''
