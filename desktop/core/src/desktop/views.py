@@ -140,6 +140,12 @@ def server_error(request):
   })
 
 
+def path_forbidden(request):
+  return render('403.mako', request, {
+    'is_embeddable': request.GET.get('is_embeddable', False)
+  })
+
+
 @access_log_level(logging.WARN)
 def log_view(request):
   """
