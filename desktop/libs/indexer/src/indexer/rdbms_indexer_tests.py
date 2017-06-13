@@ -16,34 +16,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
-
 import json
-
 import logging
 
-from django.core.urlresolvers import reverse
+from django.contrib.auth.models import User
+from indexer.templates.rdbms_indexer import RdbmsIndexer
+from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
-
-
+#from django.core.urlresolvers import reverse
 LOG = logging.getLogger(__name__)
-
 
 class RdbmsIndexerTests():
 
-  def test_get_sample_data(self, connect_credentials, db_name):
-    db_name = 'test'
-    connect_credentials = {}
-    connect_credentials['input_format'] = 'db'
-    connect_credentials['host_name'] = 'localhost'
-    connect_credentials['user_name'] = 'root'
-    connect_credentials['password'] = 'root'
-    connect_credentials['port'] = '3306'
-    connect_credentials['column_name'] = 'empid'
-    connect_credentials['table_name'] = 'employee'
+  def test_get_sample_data(self):
+    self.client = make_logged_in_client()
+    self.user = User.objects.get(username='root')
 
-    client = make_logged_in_client()
-    resp = client.get(reverse('rdbms_indexer:get_sample_data', kwargs={'database': db_name, 'table': connect_credentials['table_name']})) # not sure how to instantiate RdbmsIndexer class and pas the dictionary.
+    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+    resp = indexer.get_sample_data(database='test', table='employee')
+    #resp = client.get(reverse('rdbms_indexer:get_sample_data', kwargs={'database': db_name, 'table': connect_credentials['table_name']}))
     data = json.loads(resp.content)
 
     assert_equal(0, data['status'], data)
