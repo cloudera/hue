@@ -32,19 +32,21 @@ def test_impala_flags():
   test_impala_conf_dir = tempfile.mkdtemp()
   resets = []
 
-  try:
-    if conf.QUERYCACHE_ROWS.get() != 50000:
-      resets.append(conf.QUERYCACHE_ROWS.set_for_testing(50000))
+  expected_rows = 50000
 
-    assert_equal(conf.QUERYCACHE_ROWS.get(), 50000)
+  try:
+    if conf.QUERYCACHE_ROWS.get() != expected_rows:
+      resets.append(conf.QUERYCACHE_ROWS.set_for_testing(expected_rows))
+
+    assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
     assert_equal(conf.IMPERSONATION_ENABLED.get(), False)
 
     flags = """
       -webserver_certificate_file=/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem
       -ssl_server_certificate=/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem
-      -max_result_cache_size=100000
+      -max_result_cache_size=%d
       -authorized_proxy_user_config=hue=*
-    """
+    """ % expected_rows
     file(os.path.join(test_impala_conf_dir, 'impalad_flags'), 'w').write(flags)
 
     resets.append(conf.IMPALA_CONF_DIR.set_for_testing(test_impala_conf_dir))
@@ -52,11 +54,11 @@ def test_impala_flags():
 
     assert_equal(impala_flags.get_webserver_certificate_file(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
     assert_equal(impala_flags.get_ssl_server_certificate(), '/etc/test-ssl-conf/CA_STANDARD/impala-cert.pem')
-    assert_equal(impala_flags.get_max_result_cache_size(), 100000)
+    assert_equal(impala_flags.get_max_result_cache_size(), expected_rows)
     assert_equal(impala_flags.get_authorized_proxy_user_config(), 'hue=*')
 
     # From Config
-    assert_equal(conf.QUERYCACHE_ROWS.get(), 50000)
+    assert_equal(conf.QUERYCACHE_ROWS.get(), expected_rows)
     assert_equal(conf.IMPERSONATION_ENABLED.get(), True)
   finally:
     impala_flags.reset()
