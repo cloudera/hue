@@ -708,13 +708,16 @@ var EditorViewModel = (function() {
 
     self.ddlNotification = ko.observable();
     self.delayedDDLNotification = ko.pureComputed(self.ddlNotification).extend({ rateLimit: { method: "notifyWhenChangesStop", timeout: 5000 } });
-    if (! vm.isNotificationManager()) {
-      window.setTimeout(function () {
-        self.delayedDDLNotification.subscribe(function (val) {
-          huePubSub.publish('assist.db.refresh', { sourceTypes: self.type() === 'impala' || self.type() === 'hive' ? ['hive', 'impala'] : [self.type()] });
-        });
-      }, 0);
-    }
+    window.setTimeout(function () {
+      self.delayedDDLNotification.subscribe(function (val) {
+        var match = self.statement().match(/(?:CREATE|DROP) (?:TABLE|DATABASE) `([^`]+)`/i); // For importer/metastore generated DDL only currently
+        if (match) {
+          var db = match[1];
+          huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
+        }
+        huePubSub.publish('assist.db.refresh', { sourceType: self.type() });
+      });
+    }, 0);
 
     self.progress.subscribe(function (val) {
       $(document).trigger("progress", {data: val, snippet: self});
