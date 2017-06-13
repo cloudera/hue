@@ -16,7 +16,7 @@
 
 var version = 20;
 importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?version=' + version);
-importScripts('${ static('desktop/js/autocomplete/sql.js') }' + '?version=' + version);
+importScripts('${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }' + '?version=' + version);
 importScripts('${ static('desktop/js/sqlFunctions.js') }' + '?version=' + version);
 
 (function () {
@@ -27,7 +27,7 @@ importScripts('${ static('desktop/js/sqlFunctions.js') }' + '?version=' + versio
     // Statement locations come in the message to the worker and are generally more accurate
     locations.push(statement);
     try {
-      var sqlParseResult = sql.parseSql(statement.statement + ' ', '', type, false);
+      var sqlParseResult = sqlAutocompleteParser.parseSql(statement.statement + ' ', '', type, false);
       if (sqlParseResult.locations) {
         sqlParseResult.locations.forEach(function (location) {
           // Skip statement locations from the sql parser

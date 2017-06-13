@@ -506,7 +506,7 @@ ${ hueIcons.symbols() }
 <script src="${ static('desktop/ext/js/dropzone.min.js') }"></script>
 
 <script src="${ static('desktop/js/autocomplete/sqlParseSupport.js') }"></script>
-<script src="${ static('desktop/js/autocomplete/sql.js') }"></script>
+<script src="${ static('desktop/js/autocomplete/sqlAutocompleteParser.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter.js') }"></script>
 <script src="${ static('desktop/js/sqlAutocompleter2.js') }"></script>
 <script src="${ static('desktop/js/hdfsAutocompleter.js') }"></script>

@@ -14,19 +14,92 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-%left 'AND' 'OR'
-%left 'BETWEEN'
-%left 'NOT' '!' '~'
-%left '=' '<' '>' 'COMPARISON_OPERATOR'
-%left '-' '*' 'ARITHMETIC_OPERATOR'
+SqlAutocomplete
+ : NewStatement SqlStatements EOF
+   {
+     return parser.yy.result;
+   }
+ | NewStatement SqlStatements_EDIT EOF
+   {
+     return parser.yy.result;
+   }
+ ;
 
-%left ';' ','
-%nonassoc 'CURSOR' 'PARTIAL_CURSOR'
-%nonassoc 'IN' 'IS' 'LIKE' 'RLIKE' 'REGEXP' 'EXISTS' NEGATION
+NewStatement
+ : /* empty */
+   {
+     parser.prepareNewStatement();
+   }
+ ;
 
-%start Sql
+SqlStatements
+ :
+ | SqlStatement
+   {
+     parser.addStatementLocation(@1);
+   }
+ | SqlStatements ';' NewStatement SqlStatements
+ ;
 
-%%
+SqlStatements_EDIT
+ : SqlStatement_EDIT
+   {
+     parser.addStatementLocation(@1);
+   }
+ | SqlStatement_EDIT ';' NewStatement SqlStatements
+   {
+     parser.addStatementLocation(@1);
+   }
+ | SqlStatements ';' NewStatement SqlStatement_EDIT
+   {
+     parser.addStatementLocation(@4);
+   }
+ | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
+   {
+     parser.addStatementLocation(@4);
+   }
+ ;
+
+SqlStatement
+ : DataDefinition
+ | DataManipulation
+ | QuerySpecification
+ | SetSpecification
+ | ExplainClause DataDefinition
+ | ExplainClause DataManipulation
+ | ExplainClause QuerySpecification
+ ;
+
+SqlStatement_EDIT
+ : AnyCursor
+   {
+     if (parser.isHive()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
+     } else if (parser.isImpala()) {
+       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
+     } else {
+       parser.suggestDdlAndDmlKeywords();
+     }
+   }
+ | CommonTableExpression 'CURSOR'
+   {
+     if (parser.isHive() || parser.isImpala()) {
+       parser.suggestKeywords(['INSERT', 'SELECT']);
+     } else {
+       parser.suggestKeywords(['SELECT']);
+     }
+   }
+ | ExplainClause_EDIT
+ | DataDefinition_EDIT
+ | DataManipulation_EDIT
+ | QuerySpecification_EDIT
+ | ExplainClause DataDefinition_EDIT
+ | ExplainClause DataManipulation_EDIT
+ | ExplainClause QuerySpecification_EDIT
+ | ExplainClause_EDIT DataDefinition
+ | ExplainClause_EDIT DataManipulation
+ | ExplainClause_EDIT QuerySpecification
+ ;
 
 NonReservedKeyword
  : '<hive>ADD'
@@ -178,93 +251,6 @@ RegularIdentifier
  : 'REGULAR_IDENTIFIER'
  | 'VARIABLE_REFERENCE'
  | NonReservedKeyword
- ;
-
-NewStatement
- : /* empty */
-   {
-     parser.prepareNewStatement();
-   }
- ;
-
-Sql
- : NewStatement SqlStatements EOF
-   {
-     return parser.yy.result;
-   }
- | NewStatement SqlStatements_EDIT EOF
-   {
-     return parser.yy.result;
-   }
- ;
-
-SqlStatements
- :
- | SqlStatement
-   {
-     parser.addStatementLocation(@1);
-   }
- | SqlStatements ';' NewStatement SqlStatements
- ;
-
-SqlStatements_EDIT
- : SqlStatement_EDIT
-   {
-     parser.addStatementLocation(@1);
-   }
- | SqlStatement_EDIT ';' NewStatement SqlStatements
-   {
-     parser.addStatementLocation(@1);
-   }
- | SqlStatements ';' NewStatement SqlStatement_EDIT
-   {
-     parser.addStatementLocation(@4);
-   }
- | SqlStatements ';' NewStatement SqlStatement_EDIT ';' NewStatement SqlStatements
-   {
-     parser.addStatementLocation(@4);
-   }
- ;
-
-SqlStatement
- : DataDefinition
- | DataManipulation
- | QuerySpecification
- | SetSpecification
- | ExplainClause DataDefinition
- | ExplainClause DataManipulation
- | ExplainClause QuerySpecification
- ;
-
-SqlStatement_EDIT
- : AnyCursor
-   {
-     if (parser.isHive()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN', 'FROM']);
-     } else if (parser.isImpala()) {
-       parser.suggestDdlAndDmlKeywords(['EXPLAIN']);
-     } else {
-       parser.suggestDdlAndDmlKeywords();
-     }
-   }
- | CommonTableExpression 'CURSOR'
-   {
-     if (parser.isHive() || parser.isImpala()) {
-       parser.suggestKeywords(['INSERT', 'SELECT']);
-     } else {
-       parser.suggestKeywords(['SELECT']);
-     }
-   }
- | ExplainClause_EDIT
- | DataDefinition_EDIT
- | DataManipulation_EDIT
- | QuerySpecification_EDIT
- | ExplainClause DataDefinition_EDIT
- | ExplainClause DataManipulation_EDIT
- | ExplainClause QuerySpecification_EDIT
- | ExplainClause_EDIT DataDefinition
- | ExplainClause_EDIT DataManipulation
- | ExplainClause_EDIT QuerySpecification
  ;
 
 SetSpecification

@@ -15,10 +15,10 @@
 // limitations under the License.
 
 (function () {
-  describe('sql.js Error statements', function() {
+  describe('sqlAutocompleteParser.js Error statements', function() {
 
     beforeAll(function () {
-      sql.yy.parseError = function (msg) {
+      sqlAutocompleteParser.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);

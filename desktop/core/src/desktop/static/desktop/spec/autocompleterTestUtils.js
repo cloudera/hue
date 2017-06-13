@@ -547,13 +547,13 @@ var SqlTestUtils = (function() {
     assertAutocomplete: function(testDefinition) {
       var debug = false;
       if (typeof testDefinition.dialect === 'undefined') {
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
         testDefinition.dialect = 'hive';
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
         testDefinition.dialect = 'impala';
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor,  testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
       } else {
-        expect(sql.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
+        expect(sqlAutocompleteParser.parseSql(testDefinition.beforeCursor, testDefinition.afterCursor, testDefinition.dialect, debug)).toEqualDefinition(testDefinition);
       }
     },
     LOTS_OF_PARSE_RESULTS: LOTS_OF_PARSE_RESULTS

@@ -54,7 +54,7 @@ var SqlAutocompleter2 = (function () {
 
   SqlAutocompleter2.prototype.autocomplete = function (beforeCursor, afterCursor, callback, editor) {
     var self = this;
-    var parseResult = sql.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
+    var parseResult = sqlAutocompleteParser.parseSql(beforeCursor, afterCursor, self.snippet.type(), false);
 
     if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
       console.log(parseResult);

@@ -15,10 +15,10 @@
 // limitations under the License.
 
 (function () {
-  describe('sql.js Hive DESCRIBE statements', function() {
+  describe('sqlAutocompleteParser.js Hive DESCRIBE statements', function() {
 
     beforeAll(function () {
-      sql.yy.parseError = function (msg) {
+      sqlAutocompleteParser.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
