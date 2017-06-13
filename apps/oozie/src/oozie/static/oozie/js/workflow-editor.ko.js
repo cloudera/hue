@@ -58,7 +58,7 @@ function loadWorkflowColumns(viewModel, json_layout) {
       row.columns(loadWorkflowColumns(viewModel, json_row.columns));
       _rows.push(row);
     });
-    var column = new ExtendedColumn(json_col.size, _rows);
+    var column = new ExtendedColumn(json_col.size, _rows, viewModel);
     _columns = _columns.concat(column);
   });
   return _columns;
@@ -1372,8 +1372,8 @@ function getOtherSubworkflows(vm, workflows) {
   return _cleanedSubworkflows;
 }
 
-var ExtendedColumn = function (size, rows) {
-  var self = new Column(size, rows);
+var ExtendedColumn = function (size, rows, viewModel) {
+  var self = new Column(size, rows, viewModel);
   self.rowPrototype = ExtendedRow;
   self.oozieStartRow = ko.computed(function () {
     var _row = null;
