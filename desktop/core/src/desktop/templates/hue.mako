@@ -382,6 +382,7 @@ ${ hueIcons.symbols() }
       <div id="embeddable_admin_wizard" class="embeddable"></div>
       <div id="embeddable_logs" class="embeddable"></div>
       <div id="embeddable_dump_config" class="embeddable"></div>
+      <div id="embeddable_403" class="embeddable"></div>
       <div id="embeddable_404" class="embeddable"></div>
       <div id="embeddable_500" class="embeddable"></div>
       <div id="embeddable_sqoop" class="embeddable"></div>
@@ -555,6 +556,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
     var onePageViewModel = (function () {
 
       var EMBEDDABLE_PAGE_URLS = {
+        403: { url: '/403', title: '403' },
         404: { url: '/404', title: '404' },
         500: { url: '/500', title: '500' },
         editor: { url: '/editor', title: '${_('Editor')}' },
@@ -826,7 +828,10 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               },
               error: function (xhr) {
                 console.error('Route loading problem', xhr);
-                if (app !== '500'){
+                if ((xhr.status === 401 || xhr.status === 403) && app !== '403') {
+                  self.loadApp('403');
+                }
+                else if (app !== '500') {
                   self.loadApp('500');
                 }
                 else {
@@ -886,6 +891,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
         self.lastContext = null;
 
         var pageMapping = [
+          { url: '/403', app: '403' },
           { url: '/500', app: '500' },
           { url: '/about/', app: 'admin_wizard' },
           { url: '/about/admin_wizard', app: 'admin_wizard' },
