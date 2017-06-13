@@ -2107,7 +2107,7 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
             %endif
             if (snippet.isResultSettingsVisible()) {
               snippetEl.find('.snippet-grid-settings').css({
-                "height": Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)) + 'px'
+                "height": Math.max(100, Math.ceil($(window).height() - Math.max($('#queryResults').offset().top, topCoord)))+ 'px'
               });
               snippetEl.find('.result-settings').animate({
                 'marginTop': margin
