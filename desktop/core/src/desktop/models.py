@@ -1678,7 +1678,7 @@ class ClusterConfig():
         'type': 'hdfs',
         'displayName': _('Files'),
         'tooltip': _('Files'),
-        'page': '/filebrowser/'
+        'page': '/filebrowser/' + (not self.user.is_anonymous() and 'view=' + self.user.get_home_directory() or '')
       })
 
     if is_s3_enabled() and has_s3_access(self.user):
