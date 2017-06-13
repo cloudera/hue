@@ -15,10 +15,10 @@
 // limitations under the License.
 
 (function () {
-  describe('sql.js', function() {
+  describe('sqlAutocompleteParser.js', function() {
 
     beforeAll(function () {
-      sql.yy.parseError = function (msg) {
+      sqlAutocompleteParser.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
@@ -466,24 +466,24 @@
     describe('partial removal', function () {
       it('should identify part lengths', function () {
         var limitChars = [' ', '\n', '\t', '&', '~', '%', '!', '.', ',', '+', '-', '*', '/', '=', '<', '>', ')', '[', ']', ';'];
-        expect(sql.identifyPartials('', '')).toEqual({left: 0, right: 0});
-        expect(sql.identifyPartials('foo', '')).toEqual({left: 3, right: 0});
-        expect(sql.identifyPartials(' foo', '')).toEqual({left: 3, right: 0});
-        expect(sql.identifyPartials('asdf 1234', '')).toEqual({left: 4, right: 0});
-        expect(sql.identifyPartials('foo', 'bar')).toEqual({left: 3, right: 3});
-        expect(sql.identifyPartials('fo', 'o()')).toEqual({left: 2, right: 3});
-        expect(sql.identifyPartials('fo', 'o(')).toEqual({left: 2, right: 2});
-        expect(sql.identifyPartials('fo', 'o(bla bla)')).toEqual({left: 2, right: 10});
-        expect(sql.identifyPartials('foo ', '')).toEqual({left: 0, right: 0});
-        expect(sql.identifyPartials('foo \'', '\'')).toEqual({left: 0, right: 0});
-        expect(sql.identifyPartials('foo "', '"')).toEqual({left: 0, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('', '')).toEqual({left: 0, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('foo', '')).toEqual({left: 3, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials(' foo', '')).toEqual({left: 3, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('asdf 1234', '')).toEqual({left: 4, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('foo', 'bar')).toEqual({left: 3, right: 3});
+        expect(sqlAutocompleteParser.identifyPartials('fo', 'o()')).toEqual({left: 2, right: 3});
+        expect(sqlAutocompleteParser.identifyPartials('fo', 'o(')).toEqual({left: 2, right: 2});
+        expect(sqlAutocompleteParser.identifyPartials('fo', 'o(bla bla)')).toEqual({left: 2, right: 10});
+        expect(sqlAutocompleteParser.identifyPartials('foo ', '')).toEqual({left: 0, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('foo \'', '\'')).toEqual({left: 0, right: 0});
+        expect(sqlAutocompleteParser.identifyPartials('foo "', '"')).toEqual({left: 0, right: 0});
         limitChars.forEach(function (char) {
-          expect(sql.identifyPartials('bar foo' + char, '')).toEqual({left: 0, right: 0});
-          expect(sql.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({left: 6, right: 0});
-          expect(sql.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({left: 0, right: 0});
-          expect(sql.identifyPartials('', char + 'foo bar')).toEqual({left: 0, right: 0});
-          expect(sql.identifyPartials('', 'foofoo' + char)).toEqual({left: 0, right: 6});
-          expect(sql.identifyPartials('', ' foofoo' + char)).toEqual({left: 0, right: 0});
+          expect(sqlAutocompleteParser.identifyPartials('bar foo' + char, '')).toEqual({left: 0, right: 0});
+          expect(sqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo', '')).toEqual({left: 6, right: 0});
+          expect(sqlAutocompleteParser.identifyPartials('bar foo' + char + 'foofoo ', '')).toEqual({left: 0, right: 0});
+          expect(sqlAutocompleteParser.identifyPartials('', char + 'foo bar')).toEqual({left: 0, right: 0});
+          expect(sqlAutocompleteParser.identifyPartials('', 'foofoo' + char)).toEqual({left: 0, right: 6});
+          expect(sqlAutocompleteParser.identifyPartials('', ' foofoo' + char)).toEqual({left: 0, right: 0});
         });
       });
     });
@@ -500,7 +500,7 @@
         }];
 
         var identifierChain = [{ name: 'testItem' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -516,13 +516,13 @@
 
         var identifierChain = [{ name: 'explodedMap' }, { name: 'testMapValue' }];
 
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
       });
 
       it('should expand 03', function () {
         var identifierChain = [{ name: 'testMap', keySet: true }];
-        var result = sql.expandLateralViews([], identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews([], identifierChain);
         expect(result).toEqual([{ name: 'testMap', keySet: true }]);
       });
 
@@ -537,7 +537,7 @@
         }];
 
         var identifierChain = [{ name: 'testItem' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -559,7 +559,7 @@
         }];
 
         var identifierChain = [{ name: 'testItemA' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArrayA' }, { name: 'item' }]);
       });
 
@@ -580,7 +580,7 @@
           }
         }];
         var identifierChain = [{ name: 'testItemB' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'tt2' }, { name: 'testArrayB' }, { name: 'item' }]);
       });
 
@@ -602,7 +602,7 @@
         }];
 
         var identifierChain = [{ name: 'ta2_exp' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'tt' }, { name: 'testArray1' }, { name: 'item' }, { name: 'testArray2' }, { name: 'item' }]);
       });
 
@@ -617,7 +617,7 @@
         }];
 
         var identifierChain = [{ name: 'testValue' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -632,7 +632,7 @@
         }];
 
         var identifierChain = [{ name: 'testMapValue' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testMap' }, { name: 'value' }]);
       });
 
@@ -648,7 +648,7 @@
         }];
 
         var identifierChain = [{ name: 'testItem' }];
-        var result = sql.expandLateralViews(lateralViews, identifierChain);
+        var result = sqlAutocompleteParser.expandLateralViews(lateralViews, identifierChain);
         expect(result).toEqual([{ name: 'testArray' }, { name: 'item' }]);
       });
 
@@ -660,7 +660,7 @@
 
         var identifierChain = [{ name: 'm', keySet: true }, { name: 'bar' }];
 
-        var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+        var actual = sqlAutocompleteParser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
         expect(actual).toEqual([{ name: 't' }, { name: 'someMap', keySet: true }, { name: 'bar' }]);
       });
@@ -673,7 +673,7 @@
 
         var identifierChain = [{ name: 'tm' }];
 
-        var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+        var actual = sqlAutocompleteParser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
         expect(actual).toEqual([{ name: 't' }, { name: 'testMap' }]);
       });
@@ -686,7 +686,7 @@
 
         var identifierChain = [{ name: 't1' }];
 
-        var actual = sql.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
+        var actual = sqlAutocompleteParser.expandImpalaIdentifierChain(tablePrimaries, identifierChain);
 
         expect(actual).toEqual([{ name: 't1' }]);
       });

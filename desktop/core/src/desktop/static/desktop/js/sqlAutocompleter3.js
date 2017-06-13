@@ -1771,7 +1771,7 @@ var SqlAutocompleter3 = (function () {
   SqlAutocompleter3.prototype.autocomplete = function () {
     var self = this;
     try {
-      var parseResult = sql.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
+      var parseResult = sqlAutocompleteParser.parseSql(self.editor().getTextBeforeCursor(), self.editor().getTextAfterCursor(), self.snippet.type(), false);
 
       if (typeof hueDebug !== 'undefined' && hueDebug.showParseResult) {
         console.log(parseResult);
