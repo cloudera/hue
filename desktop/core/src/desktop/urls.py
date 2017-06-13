@@ -94,6 +94,7 @@ dynamic_patterns += patterns('desktop.views',
   (r'^assist_m', 'assist_m'),
   # Hue 4
   (r'^hue.*/$', 'hue'),
+  (r'^403$', 'path_forbidden'),
   (r'^404$', 'not_found'),
   (r'^500$', 'server_error'),
 
