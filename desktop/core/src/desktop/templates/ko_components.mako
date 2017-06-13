@@ -343,14 +343,6 @@ from desktop.views import _ko
               }
             });
 
-            var refreshAssist = function (snippet) {
-              var match = snippet.statement_raw().match(/CREATE TABLE `([^`]+)`/i);
-              if (match) {
-                var db = match[1];
-                huePubSub.publish('assist.invalidate.impala', { flush: false, database: db });
-              }
-              huePubSub.publish('assist.db.refresh', { sourceType: 'hive' });
-            };
             notebook.snippets()[0].status.subscribe(function(val){
               if (val == 'failed'){
                 //self.isIndexing(false);
@@ -361,13 +353,11 @@ from desktop.views import _ko
                 if (! snippet.result.handle().has_more_statements) {
                   // TODO: Show finish notification and clicking on it does onSuccessUrl
                   // or if still on initial spinner we redirect automatically to onSuccessUrl
-                  refreshAssist(snippet);
                   if (notebook.onSuccessUrl() && notebook.onSuccessUrl() !== 'assist.db.refresh') { // TODO: Similar if in in FB directory, also refresh FB dir
                     huePubSub.publish('open.link', notebook.onSuccessUrl());
                   }
                 } else { // Perform last DROP statement execute
                   snippet.execute();
-                  refreshAssist(snippet);
                 }
               }
             });
