@@ -15,10 +15,10 @@
 // limitations under the License.
 
 (function () {
-  describe('sql.js LOAD statements', function() {
+  describe('sqlAutocompleteParser.js LOAD statements', function() {
 
     beforeAll(function () {
-      sql.yy.parseError = function (msg) {
+      sqlAutocompleteParser.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
@@ -310,10 +310,10 @@
     });
   });
 
-  describe('sql.js IMPORT and EXPORT statements', function() {
+  describe('sqlAutocompleteParser.js IMPORT and EXPORT statements', function() {
 
     beforeAll(function () {
-      sql.yy.parseError = function (msg) {
+      sqlAutocompleteParser.yy.parseError = function (msg) {
         throw Error(msg);
       };
       jasmine.addMatchers(SqlTestUtils.testDefinitionMatcher);
