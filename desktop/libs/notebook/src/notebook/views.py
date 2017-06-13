@@ -28,6 +28,7 @@ from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document
+from desktop.views import serve_403_error
 
 from metadata.conf import has_optimizer, has_navigator
 
@@ -43,6 +44,9 @@ LOG = logging.getLogger(__name__)
 
 
 def notebooks(request):
+  if not SHOW_NOTEBOOKS.get():
+    return serve_403_error(request)
+
   editor_type = request.GET.get('type', 'notebook')
 
   if editor_type != 'notebook':
@@ -64,6 +68,9 @@ def notebooks(request):
 
 @check_document_access_permission()
 def notebook(request):
+  if not SHOW_NOTEBOOKS.get():
+    return serve_403_error(request)
+
   notebook_id = request.GET.get('notebook')
 
   is_yarn_mode = False
