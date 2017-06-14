@@ -354,7 +354,7 @@ class Task:
     setattr(self, 'execStartTimeFormatted', format_unixtime_ms(self.startTime))
     setattr(self, 'execFinishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
-    setattr(self, 'progress', self.progress / 100)
+    setattr(self, 'progress', self.progress)
 
   @property
   def attempts(self):
