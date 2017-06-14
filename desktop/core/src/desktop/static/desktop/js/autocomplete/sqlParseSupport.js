@@ -1483,7 +1483,52 @@ var SqlParseSupport = (function () {
     };
   };
 
+  var initSyntaxParser = function (parser) {
+    parser.prepareNewStatement = function () {
+      // Empty for compatibility with the autocomplete parser
+    };
+
+    var lexerModified = false;
+
+    parser.yy.parseError = function (str, hash) {
+      parser.yy.error = hash;
+    };
+
+    parser.parseSyntax = function (sql, dialect, debug) {
+      parser.yy.error = undefined;
+
+      parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
+
+      // Hack to set the inital state of the lexer without first having to hit a token
+      // has to be done as the first token found can be dependant on dialect
+      if (!lexerModified) {
+        var originalSetInput = parser.lexer.setInput;
+        parser.lexer.setInput = function (input, yy) {
+          var lexer = originalSetInput.bind(parser.lexer)(input, yy);
+          if (typeof parser.yy.activeDialect !== 'undefined') {
+            lexer.begin(parser.yy.activeDialect);
+          }
+          return lexer;
+        };
+        lexerModified = true;
+      }
+
+      // TODO: Find a way around throwing an exception when the parser finds a syntax error
+      try {
+        parser.yy.error = false;
+        parser.parse(sql);
+      } catch (err) {
+        if (debug) {
+          console.log(err);
+          console.error(err.stack);
+        }
+      }
+      return parser.yy.error || false;
+    }
+  };
+
   return {
-    initSqlParser: initSqlParser
+    initSqlParser: initSqlParser,
+    initSyntaxParser: initSyntaxParser
   };
 })();
