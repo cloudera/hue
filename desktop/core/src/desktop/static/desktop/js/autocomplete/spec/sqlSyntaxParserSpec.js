@@ -17,8 +17,38 @@
 (function () {
   describe('sqlSyntaxParser.js', function() {
 
-    it('should find errors for "SLELECT"', function() {
-      var result = sqlSyntaxParser.parseSyntax('SLELECT');
+    it('should not find errors for ""', function () {
+      var result = sqlSyntaxParser.parseSyntax('', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should not find errors for "SEL"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SEL', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should not find errors for "SELECT"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should not find errors for "SELECT "', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT ', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should not find errors for "SELECT *"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT *', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should not find errors for "SELECT * FR"', function () {
+      var result = sqlSyntaxParser.parseSyntax('SELECT * FR', '');
+      expect(result).toBeFalsy();
+    });
+
+    it('should find errors for "SLELECT "', function() {
+      var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();
       expect(result.text).toEqual('SLELECT');
       expect(result.expected.length).toBeGreaterThan(0);
