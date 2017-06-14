@@ -20,12 +20,6 @@ var SqlParseSupport = (function () {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };
 
-  var identifyPartials = function (beforeCursor, afterCursor) {
-    var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-    var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
-    return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
-  };
-
   var initSqlParser = function (parser) {
 
     var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestAggregateFunctions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
@@ -574,6 +568,12 @@ var SqlParseSupport = (function () {
         return expandedChain;
       };
       return expand(expandedChain[0].name, expandedChain);
+    };
+
+    parser.identifyPartials = function (beforeCursor, afterCursor) {
+      var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
+      var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
+      return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
     };
 
     parser.expandLateralViews = function (lateralViews, originalIdentifierChain, columnSuggestion) {
@@ -1356,7 +1356,7 @@ var SqlParseSupport = (function () {
         }
       }
 
-      parser.yy.partialLengths = identifyPartials(beforeCursor, afterCursor);
+      parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
 
       if (parser.yy.partialLengths.left > 0) {
         beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
@@ -1494,6 +1494,11 @@ var SqlParseSupport = (function () {
       parser.yy.error = hash;
     };
 
+    var IGNORED_EXPECTED = {
+      ';': true,
+      'EOF': true
+    };
+
     parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
       parser.yy.error = undefined;
 
@@ -1524,6 +1529,21 @@ var SqlParseSupport = (function () {
         }
       }
       if (parser.yy.error && !beforeCursor.endsWith(parser.yy.error.text)) {
+
+        var cleanExpected = [];
+        parser.yy.error.expected.forEach(function (expected) {
+          // Strip away the surrounding ' chars
+          expected = expected.substring(1, expected.length - 1);
+          if (!IGNORED_EXPECTED[expected]) {
+            if (expected.length > 0 && expected.indexOf('<') !== 0) {
+              cleanExpected.push(expected);
+            } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
+              cleanExpected.push(expected.substring(dialect.length + 2));
+            }
+          }
+        });
+        cleanExpected.sort();
+        parser.yy.error.expected = cleanExpected;
         return parser.yy.error;
       }
       return false;
