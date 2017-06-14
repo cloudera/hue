@@ -104,6 +104,9 @@ dynamic_patterns += patterns('desktop.views',
   # Jasmine
   (r'^jasmine', 'jasmine'),
 
+  # Web workers
+  (r'^desktop/workers/aceSqlWorker.js', 'ace_sql_worker'),
+
   # Unsupported browsers
   (r'^boohoo$','unsupported'),
 
