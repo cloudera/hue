@@ -112,7 +112,7 @@ class YarnApi(Api):
         'name': app['name'],
         'type': app['applicationType'],
         'status': app['status'],
-        'apiStatus': self._api_status(app['yarnStatus']),
+        'apiStatus': self._api_status(app['status']),
         'user': app['user'],
         'progress': app['progress'],
         'queue': app['queueName'],
@@ -147,7 +147,7 @@ class YarnApi(Api):
         'name': app['name'],
         'type': app['applicationType'],
         'status': app['status'],
-        'apiStatus': self._api_status(app['yarnStatus']),
+        'apiStatus': self._api_status(app['status']),
         'user': app['user'],
         'progress': app['progress'],
         'duration': app['durationMs'],
@@ -223,7 +223,7 @@ class YarnApi(Api):
   def _api_status(self, status):
     if status in ['NEW', 'NEW_SAVING', 'SUBMITTED', 'ACCEPTED', 'RUNNING']:
       return 'RUNNING'
-    elif status == 'FINISHED':
+    elif status == 'SUCCEEDED':
       return 'SUCCEEDED'
     else:
       return 'FAILED' # FAILED, KILLED
