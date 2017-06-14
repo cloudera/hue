@@ -20,6 +20,12 @@ var SqlParseSupport = (function () {
     return a && b && a.toLowerCase() === b.toLowerCase();
   };
 
+  var identifyPartials = function (beforeCursor, afterCursor) {
+    var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
+    var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
+    return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
+  };
+
   var initSqlParser = function (parser) {
 
     var SIMPLE_TABLE_REF_SUGGESTIONS = ['suggestJoinConditions', 'suggestAggregateFunctions', 'suggestFilters', 'suggestGroupBys', 'suggestOrderBys'];
@@ -568,12 +574,6 @@ var SqlParseSupport = (function () {
         return expandedChain;
       };
       return expand(expandedChain[0].name, expandedChain);
-    };
-
-    parser.identifyPartials = function (beforeCursor, afterCursor) {
-      var beforeMatch = beforeCursor.match(/[0-9a-zA-Z_]*$/);
-      var afterMatch = afterCursor.match(/^[0-9a-zA-Z_]*(?:\((?:[^)]*\))?)?/);
-      return {left: beforeMatch ? beforeMatch[0].length : 0, right: afterMatch ? afterMatch[0].length : 0};
     };
 
     parser.expandLateralViews = function (lateralViews, originalIdentifierChain, columnSuggestion) {
@@ -1356,7 +1356,7 @@ var SqlParseSupport = (function () {
         }
       }
 
-      parser.yy.partialLengths = parser.identifyPartials(beforeCursor, afterCursor);
+      parser.yy.partialLengths = identifyPartials(beforeCursor, afterCursor);
 
       if (parser.yy.partialLengths.left > 0) {
         beforeCursor = beforeCursor.substring(0, beforeCursor.length - parser.yy.partialLengths.left);
@@ -1494,7 +1494,7 @@ var SqlParseSupport = (function () {
       parser.yy.error = hash;
     };
 
-    parser.parseSyntax = function (sql, dialect, debug) {
+    parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
       parser.yy.error = undefined;
 
       parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
@@ -1516,14 +1516,17 @@ var SqlParseSupport = (function () {
       // TODO: Find a way around throwing an exception when the parser finds a syntax error
       try {
         parser.yy.error = false;
-        parser.parse(sql);
+        parser.parse(beforeCursor + afterCursor);
       } catch (err) {
         if (debug) {
           console.log(err);
           console.error(err.stack);
         }
       }
-      return parser.yy.error || false;
+      if (parser.yy.error && !beforeCursor.endsWith(parser.yy.error.text)) {
+        return parser.yy.error;
+      }
+      return false;
     }
   };
 
