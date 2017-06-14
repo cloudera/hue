@@ -2043,7 +2043,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
 
             newJobs.forEach(function (job) {
-              self.apps.push(job);
+              self.apps.unshift(job);
             });
 
             self.totalApps(data.total);
