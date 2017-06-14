@@ -35,11 +35,12 @@ var SqlParseSupport = (function () {
       parser.yy.selectListAliases = [];
       parser.yy.latestTablePrimaries = [];
 
-      parser.parseError = function (message, error) {
-        parser.yy.errors.push(error);
-        return message;
-      };
       prioritizeSuggestions();
+    };
+
+    parser.yy.parseError = function (message, error) {
+      parser.yy.errors.push(error);
+      return message;
     };
 
     parser.addCommonTableExpressions = function (identifiers) {
