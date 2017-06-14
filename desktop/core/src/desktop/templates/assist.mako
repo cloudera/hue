@@ -1677,6 +1677,7 @@ from notebook.conf import get_ordered_interpreters
         </div>
         <!-- ko if: selectedFunction -->
         <div class="assist-flex-half assist-function-details" data-bind="with: selectedFunction">
+          <div class="assist-panel-close"><button class="close" data-bind="click: function() { $parent.selectedFunction(null); }">&times;</button></div>
           <div class="assist-function-signature blue" data-bind="draggableText: { text: draggable, meta: { type: 'function' } }, text: signature, event: { 'dblclick': function () { huePubSub.publish('editor.insert.at.cursor', draggable); } }"></div>
           <!-- ko if: description -->
           <div data-bind="text: description"></div>
