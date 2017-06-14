@@ -685,7 +685,7 @@ var EditorViewModel = (function() {
       }
     });
     self.statement = ko.computed(function () {
-      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null && HAS_OPTIMIZER ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
+      var statement = self.isSqlDialect() ? (self.selectedStatement() ? self.selectedStatement() : (self.positionStatement() !== null ? self.positionStatement().statement : self.statement_raw())) : self.statement_raw();
       $.each(self.variables(), function (index, variable) {
         statement = statement.replace(RegExp("([^\\\\])?\\$" + (self.hasCurlyBracketParameters() ? "{" : "") + variable.name() + (self.hasCurlyBracketParameters() ? "}" : ""), "g"), "$1" + variable.value());
       });
