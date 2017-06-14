@@ -226,10 +226,17 @@ class Job(object):
     setattr(self, 'is_retired', False)
     setattr(self, 'maps_percent_complete', None)
     setattr(self, 'reduces_percent_complete', None)
-    if self.finishTime == 0 or self.startTime == 0:
-      setattr(self, 'duration', None)
+
+    if self.finishTime == 0:
+      finishTime = int(time.time() * 1000)
     else:
-      setattr(self, 'duration', self.finishTime - self.startTime)
+      finishTime = self.finishTime
+    if self.startTime == 0:
+      durationInMillis = None
+    else:
+      durationInMillis = finishTime - self.startTime
+
+    setattr(self, 'duration', durationInMillis)
     setattr(self, 'durationFormatted', self.duration and format_duration_in_millis(self.duration))
     setattr(self, 'finishTimeFormatted', format_unixtime_ms(self.finishTime))
     setattr(self, 'startTimeFormatted', format_unixtime_ms(self.startTime))
