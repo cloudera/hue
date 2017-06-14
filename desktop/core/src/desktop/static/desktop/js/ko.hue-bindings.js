@@ -3543,7 +3543,7 @@
 
       var apiHelper = ApiHelper.getInstance();
       var activeTokens = [];
-      var aceSqlWorker = new Worker('/static/desktop/js/aceSqlWorker.js?bust=' + Math.random());
+      var aceSqlWorker = new Worker('/desktop/workers/aceSqlWorker.js');
       var workerIsReady = false;
 
       self.disposeFunctions.push(function () {
