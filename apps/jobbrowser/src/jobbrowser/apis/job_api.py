@@ -198,6 +198,8 @@ class YarnApi(Api):
       if log_name == 'default':
         response = job_single_logs(MockDjangoRequest(self.user), job=appid)
         logs = json.loads(response.content).get('logs')
+        if logs and len(logs) == 4:
+          logs = logs[3]
       else:
         response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
         logs = json.loads(response.content).get('log')
