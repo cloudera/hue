@@ -136,7 +136,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             <!-- ko if: interface() !== 'slas' && interface() !== 'oozie-info' -->
             <!-- ko if: !$root.job() -->
             <form class="form-inline">
-              <input type="text" class="input-large" data-bind="textInput: jobs.textFilter" placeholder="${_('Filter by id, name, user...')}" />
+              <input type="text" class="input-large" data-bind="clearable: jobs.textFilter, valueUpdate: 'afterkeydown'" placeholder="${_('Filter by id, name, user...')}" />
               <!-- ko if: jobs.statesValuesFilter -->
               <span data-bind="foreach: jobs.statesValuesFilter">
                 <label class="checkbox">
