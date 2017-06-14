@@ -194,17 +194,21 @@ class YarnApi(Api):
 
 
   def logs(self, appid, app_type, log_name):
-    if app_type == 'MAPREDUCE':
-      if log_name == 'default':
-        response = job_single_logs(MockDjangoRequest(self.user), job=appid)
-        logs = json.loads(response.content).get('logs')
-        if logs and len(logs) == 4:
-          logs = logs[3]
+    logs = ''
+    try:
+      if app_type == 'MAPREDUCE':
+        if log_name == 'default':
+          response = job_single_logs(MockDjangoRequest(self.user), job=appid)
+          logs = json.loads(response.content).get('logs')
+          if logs and len(logs) == 4:
+            logs = logs[3]
+        else:
+          response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
+          logs = json.loads(response.content).get('log')
       else:
-        response = job_attempt_logs_json(MockDjangoRequest(self.user), job=appid, name=log_name)
-        logs = json.loads(response.content).get('log')
-    else:
-      logs = None
+        logs = None
+    except PopupException, e:
+      LOG.warn('No task attempt found for logs: %s' % e)
     return {'logs': logs}
 
 
