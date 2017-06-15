@@ -327,8 +327,11 @@ def jasmine(request):
   return render('jasmine.mako', request, None)
 
 
-def ace_sql_worker(request):
-  return HttpResponse(render('ace_sql_worker.mako', request, None), content_type="application/javascript")
+def ace_sql_location_worker(request):
+  return HttpResponse(render('ace_sql_location_worker.mako', request, None), content_type="application/javascript")
+
+def ace_sql_syntax_worker(request):
+  return HttpResponse(render('ace_sql_syntax_worker.mako', request, None), content_type="application/javascript")
 
 def assist_m(request):
   return render('assist_m.mako', request, None)
