@@ -3377,6 +3377,7 @@
       self.editor = editor;
       self.editorId = editorId;
       self.snippet = snippet;
+      self.aceSqlSyntaxWorker = null;
 
       self.disposeFunctions = [];
 
@@ -3497,8 +3498,12 @@
           totalStatementCount: lastKnownStatements.length,
           precedingStatements: precedingStatements,
           activeStatement: activeStatement,
-          followingStatements: followingStatements,
+          followingStatements: followingStatements
         });
+
+        if (activeStatement) {
+          self.checkForSyntaxErrors(activeStatement.location, cursorPosition);
+        }
       };
 
       var parseForStatements = function () {
@@ -3560,12 +3565,40 @@
       });
     };
 
+    AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
+      var self = this;
+      if (self.aceSqlSyntaxWorker !== null) {
+        var AceRange = ace.require('ace/range').Range;
+        var beforeCursor = self.editor.session.getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
+        var afterCursor = self.editor.session.getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
+        self.aceSqlSyntaxWorker.postMessage({ beforeCursor: beforeCursor, afterCursor: afterCursor, statementLocation: statementLocation, type: self.snippet.type() });
+      }
+    };
+
+    AceLocationHandler.prototype.attachSqlSyntaxWorker = function () {
+      var self = this;
+      if (window.Worker) {
+        self.aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+        self.aceSqlSyntaxWorker.onmessage = function(e) {
+          // TODO: Add error marking e.data.syntaxError
+          console.log(e.data);
+        }
+      }
+    };
+
+    AceLocationHandler.prototype.detachSqlSyntaxWorker = function () {
+      if (self.aceSqlSyntaxWorker !== null) {
+        self.aceSqlSyntaxWorker.terminate();
+        self.aceSqlSyntaxWorker = null;
+      }
+    };
+
     AceLocationHandler.prototype.attachSqlWorker = function () {
       var self = this;
 
       var apiHelper = ApiHelper.getInstance();
       var activeTokens = [];
-      var aceSqlWorker = new Worker('/desktop/workers/aceSqlWorker.js');
+      var aceSqlWorker = new Worker('/desktop/workers/aceSqlLocationWorker.js?bust=' + Math.random());
       var workerIsReady = false;
 
       self.disposeFunctions.push(function () {
@@ -3696,6 +3729,7 @@
 
     AceLocationHandler.prototype.dispose = function () {
       var self = this;
+      self.detachSqlSyntaxWorker();
       self.disposeFunctions.forEach(function (dispose) {
         dispose();
       })
@@ -3824,8 +3858,6 @@
         setShowGutter: true
       };
 
-      var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', false);
-
       editor.customMenuOptions = {
         setEnableAutocompleter: function (enabled) {
           editor.setOption('enableBasicAutocompletion', enabled);
@@ -3866,11 +3898,22 @@
       };
 
       if (window.Worker) {
-        editor.customMenuOptions.setExperimentalErrorHighlighting = function (enabled) {
+        var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', false);
+
+        if (errorHighlightingEnabled) {
+          aceLocationHandler.attachSqlSyntaxWorker();
+        }
+
+        editor.customMenuOptions.setErrorHighlighting = function (enabled) {
           errorHighlightingEnabled = enabled;
           snippet.getApiHelper().setInTotalStorage('hue.ace', 'errorHighlightingEnabled', enabled);
+          if (enabled) {
+            aceLocationHandler.attachSqlSyntaxWorker();
+          } else {
+            aceLocationHandler.detachSqlSyntaxWorker();
+          }
         };
-        editor.customMenuOptions.getExperimentalErrorHighlighting = function () {
+        editor.customMenuOptions.getErrorHighlighting = function () {
           return errorHighlightingEnabled;
         };
       }
