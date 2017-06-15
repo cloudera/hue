@@ -513,7 +513,7 @@ class TestFileBrowserWithHadoop(object):
     listing = resp.context['files']
     assert_equal([], listing)
     page = resp.context['page']
-    assert_equal(None, page)
+    assert_equal({}, page)
 
 
   def test_view_snappy_compressed(self):
