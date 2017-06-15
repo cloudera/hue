@@ -72,23 +72,43 @@
       }
 
       var sortType = 'alpha';
-      if (obj.cssClass && obj.cssClass === 'sort-numeric'){
-        sortType = 'numeric';
+      if (obj.cssClass) {
+        if (obj.cssClass === 'sort-numeric') {
+          sortType = 'numeric';
+        }
+        if (obj.cssClass === 'sort-date') {
+          sortType = 'date';
+        }
       }
 
       if (way === -1 || way === 0) {
         data.sort(function (a, b) {
-          if (sortType === 'numeric'){
-            if (a[idx] === 'NULL'){
+          if (sortType === 'date') {
+            if (a[idx] === 'NULL') {
               return -1;
             }
-            if (b[idx] === 'NULL'){
+            if (b[idx] === 'NULL') {
               return 1;
             }
-            if (a[idx]*1 > b[idx]*1) {
+            if (moment(a[idx].replace(/\&nbsp;/, ' ')).valueOf() > moment(b[idx].replace(/\&nbsp;/, ' ')).valueOf()) {
               return 1;
             }
-            if (a[idx]*1 < b[idx]*1) {
+            if (moment(a[idx].replace(/\&nbsp;/, ' ')).valueOf() < moment(b[idx].replace(/\&nbsp;/, ' ')).valueOf()) {
+              return -1;
+            }
+            return 0;
+          }
+          else if (sortType === 'numeric') {
+            if (a[idx] === 'NULL') {
+              return -1;
+            }
+            if (b[idx] === 'NULL') {
+              return 1;
+            }
+            if (a[idx] * 1 > b[idx] * 1) {
+              return 1;
+            }
+            if (a[idx] * 1 < b[idx] * 1) {
               return -1;
             }
             return 0;
@@ -106,17 +126,32 @@
       }
       else {
         data.sort(function (a, b) {
-          if (sortType === 'numeric'){
-            if (a[idx] === 'NULL'){
+          if (sortType === 'date') {
+            if (a[idx] === 'NULL') {
               return 1;
             }
-            if (b[idx] === 'NULL'){
+            if (b[idx] === 'NULL') {
               return -1;
             }
-            if (a[idx]*1 > b[idx]*1) {
+            if (moment(a[idx].replace(/\&nbsp;/, ' ')).valueOf() > moment(b[idx].replace(/\&nbsp;/, ' ')).valueOf()) {
               return -1;
             }
-            if (a[idx]*1 < b[idx]*1) {
+            if (moment(a[idx].replace(/\&nbsp;/, ' ')).valueOf() < moment(b[idx].replace(/\&nbsp;/, ' ')).valueOf()) {
+              return 1;
+            }
+            return 0;
+          }
+          else if (sortType === 'numeric') {
+            if (a[idx] === 'NULL') {
+              return 1;
+            }
+            if (b[idx] === 'NULL') {
+              return -1;
+            }
+            if (a[idx] * 1 > b[idx] * 1) {
+              return -1;
+            }
+            if (a[idx] * 1 < b[idx] * 1) {
               return 1;
             }
             return 0;
