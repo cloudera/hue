@@ -4960,6 +4960,9 @@
       var afterRender = function () {
         renderedElements = isTable ? $element.children('tbody').children() : $element.children();
         $container.data('busyRendering', false);
+        if (typeof options.fetchMore !== 'undefined' && endIndex === allEntries.length - 1) {
+          options.fetchMore();
+        }
         huePubSub.publish('foreach.visible.update.heights', id);
       };
 
@@ -5057,9 +5060,6 @@
         lastScrollTop = $container.scrollTop();
 
         setStartAndEndFromScrollTop();
-        if (typeof options.fetchMore !== 'undefined' && endIndex === allEntries.length - 1) {
-          options.fetchMore();
-        }
 
         clearTimeout(renderThrottle);
         var startDiff = Math.abs($parentFVOwnerElement.data('startIndex') - startIndex);
