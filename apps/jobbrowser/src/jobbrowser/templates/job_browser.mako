@@ -209,7 +209,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
                       <td data-bind="text: user"></td>
                       <td data-bind="text: type"></td>
                       <td data-bind="text: status"></td>
-                      <td data-bind="text: progress"></td>
+                      <td data-bind="text: $root.formatProgress(progress)"></td>
                       <td data-bind="text: queue"></td>
                       <td data-bind="moment: {data: submitted, format: 'LLL'}"></td>
                       <td data-bind="text: duration().toHHMMSS()"></td>
@@ -2256,6 +2256,16 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           return '/' + bits.join('/');
         }
         return path;
+      }
+
+      self.formatProgress = function (progress) {
+        if (typeof progress === 'function') {
+          progress = progress();
+        }
+        if (!isNaN(progress)) {
+          return Math.round(progress*100)/100 + '%';
+        }
+        return progress;
       }
 
       self.load = function() {
