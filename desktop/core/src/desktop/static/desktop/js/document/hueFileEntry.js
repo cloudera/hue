@@ -151,7 +151,9 @@ var HueFileEntry = (function () {
       var typeFilter = self.typeFilter().type;
       if (filter || typeFilter !== 'all') {
         return self.entries().filter(function (entry) {
-          return (typeFilter === 'all' || entry.definition().type === typeFilter) && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1);
+          return (typeFilter === 'all' || entry.definition().type === typeFilter)
+            && (!filter || entry.definition().name.toLowerCase().indexOf(filter) !== -1 ||
+            (DocumentTypeGlobals[entry.definition().type] && DocumentTypeGlobals[entry.definition().type].toLowerCase().indexOf(filter) !== -1));
         })
       }
       return self.entries();
