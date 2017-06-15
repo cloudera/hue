@@ -16,7 +16,7 @@
 
 var AssistHdfsEntry = (function () {
 
-  var PAGE_SIZE = 50;
+  var PAGE_SIZE = 100;
 
   /**
    * @param {object} options
