@@ -704,7 +704,7 @@ def validate_thrift_transport(confvar):
   return []
 
 def coerce_password_from_script(script):
-  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+  p = subprocess.Popen(script, shell=True, stdout=subprocess.PIPE)
   stdout, stderr = p.communicate()
 
   if p.returncode != 0:
