@@ -20,6 +20,7 @@ import logging
 
 from django.core.urlresolvers import reverse
 from django.db.models import Q
+from django.http import HttpResponseForbidden
 from django.shortcuts import redirect
 from django.utils.translation import ugettext as _
 
@@ -28,7 +29,6 @@ from desktop.lib.django_util import render, JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.json_utils import JSONEncoderForHTML
 from desktop.models import Document2, Document, FilesystemException
-from desktop.views import serve_403_error
 
 from metadata.conf import has_optimizer, has_navigator
 
@@ -44,9 +44,6 @@ LOG = logging.getLogger(__name__)
 
 
 def notebooks(request):
-  if not SHOW_NOTEBOOKS.get():
-    return serve_403_error(request)
-
   editor_type = request.GET.get('type', 'notebook')
 
   if editor_type != 'notebook':
@@ -69,7 +66,7 @@ def notebooks(request):
 @check_document_access_permission()
 def notebook(request, is_embeddable=False):
   if not SHOW_NOTEBOOKS.get():
-    return serve_403_error(request)
+    return HttpResponseForbidden()
 
   notebook_id = request.GET.get('notebook')
 
