@@ -44,9 +44,6 @@ LOG = logging.getLogger(__name__)
 
 
 def notebooks(request):
-  if not SHOW_NOTEBOOKS.get():
-    return serve_403_error(request)
-
   editor_type = request.GET.get('type', 'notebook')
 
   if editor_type != 'notebook':
