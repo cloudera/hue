@@ -1552,7 +1552,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['MAPREDUCE', 'SPARK', 'workflow', 'schedule', 'bundle'].indexOf(self.type()) != -1;
       });
       self.killEnabled = ko.pureComputed(function() {
-        return self.hasKill() && self.apiStatus() == 'RUNNING';
+        return self.hasKill() && (self.apiStatus() == 'RUNNING' || self.apiStatus() == 'PAUSED');
       });
 
       self.hasResume = ko.pureComputed(function() {
