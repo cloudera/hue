@@ -81,10 +81,13 @@ class IndexController(object):
         indexes.append({'name': name, 'type': 'core', 'collections': []})
 
       if self.is_solr_cloud_mode():
-        solr_aliases = self.api.aliases()
-        for name in solr_aliases:
-          collections = solr_aliases[name].split()
-          indexes.append({'name': name, 'type': 'alias', 'collections': collections})
+        try:
+          solr_aliases = self.api.aliases()
+          for name in solr_aliases:
+            collections = solr_aliases[name].split()
+            indexes.append({'name': name, 'type': 'alias', 'collections': collections})
+        except Exception:
+          LOG.exception('Aliases could not be retrieved')
 
     except Exception, e:
       msg = _('Solr server could not be contacted properly: %s') % e
