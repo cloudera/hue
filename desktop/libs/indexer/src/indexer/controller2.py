@@ -64,8 +64,6 @@ class IndexController(object):
         setattr(self, '_solr_cloud_mode', False)
     return getattr(self, '_solr_cloud_mode')
 
-#  def collection_exists(self, collection):
-#    return collection in self.get_collections()
 
   def get_indexes(self):
     indexes = []

@@ -53,7 +53,22 @@ def list_collections(request):
 
   api = SolrApi(user=request.user)
 
-  response['collections'] = api.collections2()
+  response['collections'] = [{'isCoreOnly': False, 'isAlias': False, 'collections': [], 'name': name} for name in api.collections2()]
+  response['status'] = 0
+
+  return JsonResponse(response)
+
+
+@require_POST
+@api_error_handler
+def delete_collections(request):
+  response = {'status': -1}
+
+  names = request.POST.get_list('name')
+
+  api = SolrApi(user=request.user)
+
+  response['statuses'] = [api.remove_collection(name) for name in names]
   response['status'] = 0
 
   return JsonResponse(response)

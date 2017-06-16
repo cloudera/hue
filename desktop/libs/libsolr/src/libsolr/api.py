@@ -442,12 +442,11 @@ class SolrApi(object):
     except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def remove_collection(self, name, replication=1):
+  def remove_collection(self, name):
     try:
       params = self._get_params() + (
         ('action', 'DELETE'),
         ('name', name),
-        ('replicationFactor', replication),
         ('wt', 'json')
       )
 
