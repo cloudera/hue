@@ -1705,7 +1705,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       self.submitSelected = function() {
         % if 'oozie' in apps:
-          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, function (response) {
+          $.get("${ url('oozie:submit_external_job', application_path='/') }../" + self.selectedFile().path, {'format': IS_HUE_4 ? 'json' : 'html'}, function (response) {
             $('#submit-wf-modal').html(response);
             $('#submit-wf-modal').modal('show');
           });
@@ -2426,6 +2426,16 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           isS3: viewModel.isS3()
         });
       });
+
+      huePubSub.subscribe('submit.popup.return', function (data) {
+        if (data.type == 'external_workflow') {
+          $.jHueNotify.info('${_('Workflow submitted.')}');
+          huePubSub.publish('open.link', '/jobbrowser/#!id=' + data.job_id);
+          huePubSub.publish('browser.job.open.link', data.job_id);
+          $('.submit-modal').modal('hide');
+          $('.modal-backdrop').hide();
+        }
+      }, 'filebrowser');
 
       huePubSub.subscribe('update.history', function(){
         if (getHistory().length == 0) {

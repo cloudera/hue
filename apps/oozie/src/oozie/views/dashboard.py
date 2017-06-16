@@ -953,14 +953,16 @@ def submit_external_job(request, application_path):
         detail = ex._headers.get('oozie-error-message', ex)
         if 'Max retries exceeded with url' in str(detail):
           detail = '%s: %s' % (_('The Oozie server is not running'), detail)
-
         LOG.exception(smart_str(detail))
-
         raise PopupException(_("Error submitting job %s") % (application_path,), detail=detail)
 
-      request.info(_('Oozie job submitted'))
-      view = 'list_oozie_bundle' if application_name == 'bundle.xml' else 'list_oozie_coordinator' if application_name == 'coordinator.xml' else 'list_oozie_workflow'
-      return redirect(reverse('oozie:%s' % view, kwargs={'job_id': job_id}))
+      jsonify = request.POST.get('format') == 'json'
+      if jsonify:
+        return JsonResponse({'status': 0, 'job_id': job_id, 'type': 'external_workflow'}, safe=False)
+      else:
+        request.info(_('Oozie job submitted'))
+        view = 'list_oozie_bundle' if application_name == 'bundle.xml' else 'list_oozie_coordinator' if application_name == 'coordinator.xml' else 'list_oozie_workflow'
+        return redirect(reverse('oozie:%s' % view, kwargs={'job_id': job_id}))
     else:
       request.error(_('Invalid submission form: %s' % params_form.errors))
   else:
@@ -972,7 +974,8 @@ def submit_external_job(request, application_path):
                    'params_form': params_form,
                    'name': _('Job'),
                    'action': reverse('oozie:submit_external_job', kwargs={'application_path': application_path}),
-                   'show_dryrun': os.path.basename(application_path) != 'bundle.xml'
+                   'show_dryrun': os.path.basename(application_path) != 'bundle.xml',
+                   'return_json': request.GET.get('format') == 'json'
                  }, force_template=True).content
   return JsonResponse(popup, safe=False)
 
