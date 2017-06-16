@@ -100,6 +100,10 @@ var AssistCollectionEntry = (function () {
     huePubSub.publish('assist.clickCollectionItem', this);
   };
 
+  AssistCollectionEntry.prototype.browse = function () {
+    huePubSub.publish('open.link', '/hue/search/browse/' + this.definition.name);
+  };
+
   AssistCollectionEntry.prototype.click = function () {
     huePubSub.publish('assist.clickCollectionItem', this);
   };

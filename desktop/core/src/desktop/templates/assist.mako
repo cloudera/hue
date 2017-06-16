@@ -172,7 +172,8 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="collections-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Indexer') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: browse"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
   </script>
 
   <script type="text/html" id="assist-database-entry">
