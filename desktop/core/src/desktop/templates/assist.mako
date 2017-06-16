@@ -1130,7 +1130,8 @@ from notebook.conf import get_ordered_interpreters
         self.activeEntry = ko.observable();
         var root = new HueFileEntry({
           activeEntry: self.activeEntry,
-          trashEntry: ko.observable,
+          trashEntry: ko.observable(),
+          serverTypeFilter: ko.observable(),
           apiHelper: options.apiHelper,
           app: 'documents',
           user: options.user,

@@ -675,11 +675,19 @@ var ApiHelper = (function () {
   ApiHelper.prototype.fetchDocuments = function (options) {
     var self = this;
 
-    var promise = self.queueManager.getQueued(DOCUMENTS_API, options.uuid);
+    var id = '';
+    if (options.uuid) {
+      id += options.uuid;
+    }
+    if (options.type) {
+      id += options.type;
+    }
+
+    var promise = self.queueManager.getQueued(DOCUMENTS_API, id);
     var firstInQueue = typeof promise === 'undefined';
     if (firstInQueue) {
       promise = $.Deferred();
-      self.queueManager.addToQueue(promise, DOCUMENTS_API, options.uuid);
+      self.queueManager.addToQueue(promise, DOCUMENTS_API, id);
     }
 
     promise.done(options.successCallback).fail(self.assistErrorCallback(options));
@@ -688,15 +696,18 @@ var ApiHelper = (function () {
       return;
     }
 
-    var types = options.type ? [options.type, 'directory'] : ['directory'];
+    var data = {
+      uuid: options.uuid
+    };
+
+    if (options.type) {
+      data.type = ['directory', options.type];
+    }
 
     $.ajax({
       url: DOCUMENTS_API,
-      data: {
-        uuid: options.uuid,
-        type: types
-      },
-      traditional: !!options.type,
+      data: data,
+      traditional: true,
       success: function (data) {
         if (! self.successResponseIsError(data)) {
           promise.resolve(data);
