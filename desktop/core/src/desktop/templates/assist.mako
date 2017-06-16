@@ -172,8 +172,8 @@ from notebook.conf import get_ordered_interpreters
   </script>
 
   <script type="text/html" id="collections-context-items">
-    <li><a href="javascript: void(0);" data-bind="click: browse"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
     <li><a href="javascript: void(0);" data-bind="click: open"><!-- ko template: { name: 'app-icon-template', data: { icon: 'indexes' } } --><!-- /ko --> ${ _('Open in Browser') }</a></li>
+    <li><a href="javascript: void(0);" data-bind="click: browse"><!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
   </script>
 
   <script type="text/html" id="assist-database-entry">
@@ -574,6 +574,9 @@ from notebook.conf import get_ordered_interpreters
   <script type="text/html" id="assist-collections-header-actions">
     <div class="assist-db-header-actions">
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: $parent.toggleSearch, css: { 'blue' : $parent.isSearchVisible }"><i class="pointer fa fa-filter" title="${_('Filter')}"></i></a>
+      <a class="inactive-action" data-bind="hueLink: '/indexer#create'" title="${_('Create index')}" href="javascript:void(0)">
+        <i class="pointer fa fa-plus" title="${_('Create index')}"></i>
+      </a>
       <a class="inactive-action" href="javascript:void(0)" data-bind="click: function () { huePubSub.publish('assist.collections.refresh'); }"><i class="pointer fa fa-refresh" data-bind="css: { 'fa-spin blue' : loading }" title="${_('Manual refresh')}"></i></a>
     </div>
   </script>
