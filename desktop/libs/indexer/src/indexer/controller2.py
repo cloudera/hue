@@ -17,6 +17,7 @@
 # limitations under the License.
 
 import logging
+import json
 import os
 import shutil
 
@@ -74,9 +75,9 @@ class IndexController(object):
         for name in collections:
           indexes.append({'name': name, 'type': 'collection', 'collections': []})
 
-      solr_cores = self.api.cores()
-      for name in solr_cores:
-        indexes.append({'name': name, 'type': 'core', 'collections': []})
+#       solr_cores = self.api.cores()
+#       for name in solr_cores:
+#         indexes.append({'name': name, 'type': 'core', 'collections': []})
 
       if self.is_solr_cloud_mode():
         try:
@@ -164,18 +165,22 @@ class IndexController(object):
     if not self.is_solr_cloud_mode():
       raise PopupException(_('Cannot remove non-Solr cloud cores.'))
 
-    if self.api.remove_collection(name):
+    result = self.api.delete_collection(name)
+        
+    if result['status'] == 0:
       # Delete instance directory.
-      try:
-        root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
-        with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
-          zc.delete_path(root_node)
-      except Exception, e:
-        # Re-create collection so that we don't have an orphan config
-        self.api.add_collection(name)
-        raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+#       try:
+#         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
+#         with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
+#           zc.delete_path(root_node)
+#       except Exception, e:
+#         # Re-create collection so that we don't have an orphan config
+#         self.api.add_collection(name)
+#         raise PopupException(_('Error in deleting Solr configurations.'), detail=e)
+      pass
     else:
-      raise PopupException(_('Could not remove collection. Check error logs for more info.'))
+      if not 'Cannot unload non-existent core' in json.dumps(result):
+        raise PopupException(_('Could not remove collection: %(message)s') % result)
 
 
   def get_index_schema(self, index_name):
