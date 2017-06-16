@@ -33,7 +33,7 @@ from desktop.lib.rest.http_client import HttpClient, RestException
 from desktop.lib.rest import resource
 from dashboard.facet_builder import _compute_range_facet
 
-from search.conf import EMPTY_QUERY, SECURITY_ENABLED
+from search.conf import EMPTY_QUERY, SECURITY_ENABLED, SOLR_URL
 
 from libsolr.conf import SSL_CERT_CA_VERIFY
 
@@ -52,7 +52,7 @@ class SolrApi(object):
   """
   http://wiki.apache.org/solr/CoreAdmin#CoreAdminHandler
   """
-  def __init__(self, solr_url, user,
+  def __init__(self, solr_url=SOLR_URL.get(), user=None,
                security_enabled=SECURITY_ENABLED.get() if search_enabled() else SECURITY_ENABLED.default,
                ssl_cert_ca_verify=SSL_CERT_CA_VERIFY.get()):
     self._url = solr_url
