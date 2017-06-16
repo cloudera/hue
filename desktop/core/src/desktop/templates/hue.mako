@@ -1543,6 +1543,21 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
       $('#clearNotificationHistoryModal').modal('hide');
     });
 
+    huePubSub.subscribe('query.and.watch', function (query) {
+      $.post(query['url'], {
+        format: "json",
+        sourceType: query['sourceType']
+      },function(resp) {
+        if (resp.history_uuid) {
+          huePubSub.publish('open.editor.query', resp.history_uuid);
+        } else if (resp.message) {
+          $(document).trigger("error", resp.message);
+        }
+      }).fail(function (xhr) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    });
+
     var hideJobsPanels = function (e) {
       if ($(e.target).closest('.jobs-panel').length === 0 && $(e.target).closest('.btn-toggle-jobs-panel').length === 0 && $('.jobs-panel').is(':visible')) {
         huePubSub.publish('hide.jobs.panel');
