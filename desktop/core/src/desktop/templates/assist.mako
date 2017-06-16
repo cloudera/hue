@@ -1131,7 +1131,6 @@ from notebook.conf import get_ordered_interpreters
         var root = new HueFileEntry({
           activeEntry: self.activeEntry,
           trashEntry: ko.observable(),
-          serverTypeFilter: ko.observable(),
           apiHelper: options.apiHelper,
           app: 'documents',
           user: options.user,

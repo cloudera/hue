@@ -679,7 +679,7 @@ var ApiHelper = (function () {
     if (options.uuid) {
       id += options.uuid;
     }
-    if (options.type) {
+    if (options.type && options.type !== 'all') {
       id += options.type;
     }
 
@@ -700,7 +700,7 @@ var ApiHelper = (function () {
       uuid: options.uuid
     };
 
-    if (options.type) {
+    if (options.type && options.type !== 'all') {
       data.type = ['directory', options.type];
     }
 
