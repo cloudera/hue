@@ -2825,9 +2825,9 @@ var EditorViewModel = (function() {
               self.editorType(data.document.type.substring('query-'.length));
               huePubSub.publish('active.snippet.type.changed', self.editorType());
               if (self.isHue4()){
-                self.changeURL(self.URLS.hue4 + '?editor=' + data.document.id);
+                self.changeURL(self.URLS.hue4 + '?editor=' + data.document.id + '&type=' + self.editorType());
               } else {
-                self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id);
+                self.changeURL((self.isMobile() ? self.URLS.editorMobile : self.URLS.editor) + '?editor=' + data.document.id + '&type=' + self.editorType());
               }
             } else {
               if (self.isHue4()){
