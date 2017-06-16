@@ -785,7 +785,6 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
               loadedApps.push(app);
             }
             var baseURL = EMBEDDABLE_PAGE_URLS[app].url;
-            window.document.title = 'Hue - ' + EMBEDDABLE_PAGE_URLS[app].title;
             if (self.currentContextParams() !== null) {
               var route = new page.Route(baseURL);
               route.keys.forEach(function (key) {
@@ -842,6 +841,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           } else {
             self.isLoadingEmbeddable(false);
           }
+          window.document.title = 'Hue - ' + EMBEDDABLE_PAGE_URLS[app].title;
           if (app === 'editor'){
             var affix = (window.location.getParameter('type') ? '-' + window.location.getParameter('type') : '');
             window.resumeAppIntervals(app + affix);
