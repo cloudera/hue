@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # Licensed to Cloudera, Inc. under one
 # or more contributor license agreements.  See the NOTICE file
 # distributed with this work for additional information
@@ -13,9 +14,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
-
 import logging
-
 from librdbms.server import dbms
 from notebook.connectors.rdbms import Assist
 LOG = logging.getLogger(__name__)
@@ -33,8 +32,8 @@ class RdbmsIndexer():
     return {}
 
   def get_sample_data(self, database=None, table=None, column=None):
-    query_server = dbms.get_query_server_config(server={'type': self.db_conf_name})
-    db = dbms.get(self.user, query_server)
+    query_server = dbms.get_query_server_config(server=self.db_conf_name)
+    db = dbms.get(self.user, query_server=query_server)
 
     assist = Assist(db)
     response = {'status': -1}

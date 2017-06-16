@@ -15,27 +15,24 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 import json
 import logging
-
 from django.contrib.auth.models import User
-from indexer.templates.rdbms_indexer import RdbmsIndexer
+#from django.core.urlresolvers import reverse
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
-#from django.core.urlresolvers import reverse
+from indexer.rdbms_indexer import RdbmsIndexer
 LOG = logging.getLogger(__name__)
 
-class RdbmsIndexerTests():
+class TestRdbmsIndexer():
 
   def test_get_sample_data(self):
     self.client = make_logged_in_client()
-    self.user = User.objects.get(username='root')
+    self.user = User.objects.get(username='test')
 
     indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
-    resp = indexer.get_sample_data(database='test', table='employee')
-    #resp = client.get(reverse('rdbms_indexer:get_sample_data', kwargs={'database': db_name, 'table': connect_credentials['table_name']}))
-    data = json.loads(resp.content)
+    data = indexer.get_sample_data(database='hue', table='employee')
+    #data = json.loads(resp.content)
 
-    assert_equal(0, data['status'], data)
+    assert_equal(1, data['status'], data)
     assert_true(data['rows'], data)
