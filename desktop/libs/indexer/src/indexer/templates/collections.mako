@@ -62,12 +62,6 @@ ${ commonheader(_('Search Indexes'), "indexer", user, request, "90px") | n,unico
 <div class="navbar hue-title-bar nokids">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <div class="pull-right">
-        <a class="btn importBtn" href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '/home?type=search-dashboard')" or url('dashboard:admin_collections') }" title="${ _('Collections') }" rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}">
-          <i class="fa fa-tags"></i> ${ _('Dashboards') }
-        </a>
-      </div>
-
       <div class="nav-collapse">
         <ul class="nav">
           <li class="app-header">
