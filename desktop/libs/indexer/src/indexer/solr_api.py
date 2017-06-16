@@ -51,7 +51,7 @@ def api_error_handler(func):
 def list_collections(request):
   response = {'status': -1}
 
-  api = SolrApi()
+  api = SolrApi(user=request.user)
 
   response['collections'] = api.collections2()
   response['status'] = 0
