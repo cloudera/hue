@@ -939,20 +939,22 @@
     padding: 4px 0;
   }
 
-  .ace-highlight .ace-hue {
-    background-color: transparent !important;
-  }
-
-  .ace-highlight .ace_invalid {
-    display: none;
-  }
-
-  .ace-highlight .ace_line {
-    white-space: normal;
-  }
-
-  .ace-highlight .ace-highlight-pre {
-    white-space: pre !important;
+  .ace-highlight {
+    .ace_layer {
+      pointer-events: all;
+    }
+    .ace-hue {
+      background-color: transparent !important;
+    }
+    .ace_invalid {
+      display: none;
+    }
+    .ace_line {
+      white-space: normal;
+    }
+    .ace-highlight-pre {
+      white-space: pre !important;
+    }
   }
 
   .history-status {
