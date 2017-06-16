@@ -457,6 +457,13 @@ ${ assist.assistPanel() }
   <br>
 </script>
 
+<script type="text/html" id="arg-text-delimiter">
+  <label>
+    <div data-bind="text: description"></div>
+    <select data-bind="selectize: $root.createWizard.customDelimiters, selectizeOptions: { onOptionAdd: function(value){ $root.createWizard.customDelimiters.push({ 'value': value, 'name': value }) }, create: true, maxLength: 2 }, value: value, optionsValue: 'value', optionsText: 'name', attr: {placeholder: description}"></select>
+  </label>
+</script>
+
 <script type="text/html" id="field-preview-header-template">
   <th data-bind="visible: keep, text: name" style="padding-right:60px"></th>
   <!-- ko foreach: operations -->

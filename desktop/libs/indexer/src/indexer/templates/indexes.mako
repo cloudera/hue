@@ -18,14 +18,15 @@
   from desktop.views import commonheader, commonfooter, commonshare, commonimportexport
   from django.utils.translation import ugettext as _
 %>
+
 <%namespace name="actionbar" file="actionbar.mako" />
 
-${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode }
+${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode }
 
 
 <div class="container-fluid">
   <div class="card card-small">
-  <h1 class="card-heading simple">${ _('Solr Indexes') }</h1>
+  <h1 class="card-heading simple">${ _('Index Browser') }</h1>
 
   <%actionbar:render>
     <%def name="search()">
@@ -43,9 +44,6 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
     <%def name="creation()">
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-      </a>
-      <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(true) }">
-        <i class="fa fa-plus-circle"></i> ${ _('Create index from a file') }
       </a>      
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
@@ -122,72 +120,6 @@ ${ commonheader(_("Solr Indexes"), "search", user, request, "60px") | n,unicode 
       <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
     </a>
   </div>
-</script>
-
-
-<!-- ko template: 'create-index-wizard' --><!-- /ko -->
-
-<script type="text/html" id="create-index-wizard">
-  <div class="snippet-settings" data-bind="visible: createWizard.show">
-
-    ${ _('Name') } <input type="text" data-bind="value: createWizard.name"/>
-    
-    <!-- ko if: createWizard.name() -->
-    <select data-bind="options: createWizard.availableWizards, value: createWizard.wizard, optionsText: 'name'" size="5"></select>
-
-    <span data-bind="template: { name: 'create-index-from-file', data: createWizard.wizard }"></span>
-    <span data-bind="template: { name: 'create-index-from-hive', data: createWizard.wizard }"></span>
-    
-    <ul data-bind="foreach: createWizard.wizard().sample">
-      <li>
-        <div data-bind="foreach: $data">
-          <span data-bind="text: $data"></span>
-        </div>
-        <a rel="tooltip" data-placement="bottom" data-bind="css: {'btn': true}" class="btn" data-original-title="Edit">
-          <i class="fa fa-pencil"></i>
-        </a>
-      </li>
-    </ul>
-
-    <a href="javascript:void(0)" class="btn" data-bind="click: createWizard.getSample">
-      <i class="fa fa-list-alt"></i> ${ _('Get Sample') }
-    </a>
-
-    <!-- /ko -->
-
-    <br/>
-
-    <a href="javascript:void(0)" class="btn" data-bind="visible: createWizard.showCreate, click: createWizard.create">
-      <i class="fa fa-plus-circle"></i> ${ _('Create') }
-    </a>
-    <a href="javascript:void(0)" class="btn" data-bind="click: function() { createWizard.show(false) }">
-      <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
-    </a>
-  </div>
-</script>
-
-
-<script type="text/html" id="create-index-from-file">
-  <!-- ko if: name() == 'file' -->
-    <div class="snippet-settings" data-bind="visible: show">
-
-      ${ _('Path') } <input type="text" data-bind="value: path"/>
-      <select data-bind="visible: path, options: availableFormats, value: format" size="5"></select>
-
-    </div>
-  <!-- /ko -->
-</script>
-
-
-<script type="text/html" id="create-index-from-hive">
-  <!-- ko if: name() == 'hive' -->
-    <div class="snippet-settings" data-bind="visible: show">
-
-      ${ _('Database') } <input type="text" data-bind="value: database"/>
-      ${ _('Table') } <input type="text" data-bind="value: table"/>
-
-    </div>
-  <!-- /ko -->
 </script>
 
 

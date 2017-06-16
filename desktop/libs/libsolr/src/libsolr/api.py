@@ -442,6 +442,7 @@ class SolrApi(object):
     except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
+  # Deprecated
   def remove_collection(self, name):
     try:
       params = self._get_params() + (
@@ -458,6 +459,28 @@ class SolrApi(object):
         return False
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def delete_collection(self, name):
+    response = {'status': -1, 'message': ''}
+
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETE'),
+        ('name', name),
+        ('wt', 'json')
+      )
+
+      result = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in result:
+        response['status'] = 0
+      else:
+        LOG.error("Could not remove collection: %s" % result)
+        response['message'] = result.get('failure')
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+    return response
+    
 
   def remove_core(self, name):
     try:
