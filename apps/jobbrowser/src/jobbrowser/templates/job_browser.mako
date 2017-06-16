@@ -905,7 +905,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           <li><span data-bind="text: duration"></span></li>
           <li class="nav-header">${ _('Submitted') }</li>
           <li><span data-bind="moment: {data: submitted, format: 'LLL'}"></span></li>
-
+          <!-- ko if: properties['parameters'].length > 0 -->
           <li class="nav-header">${ _('Variables') }</li>
           <li>
             <ul class="unstyled" data-bind="foreach: properties['parameters']">
@@ -922,6 +922,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
               </li>
             </ul>
           </li>
+          <!-- /ko -->
         </ul>
       </div>
     </div>
