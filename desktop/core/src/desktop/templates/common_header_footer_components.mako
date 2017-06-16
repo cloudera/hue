@@ -87,7 +87,7 @@ from metadata.conf import has_optimizer, OPTIMIZER
       'query-java': '${_('Java Job')}',
       'query-pig': '${_('Pig Script')}',
       'query-shell': '${_('Shell Script')}',
-      'query-distcp': '${_('DistCp Job')}',
+      'query-distcp': '${_('DistCp Job')}'
     };
 
     // jHue plugins global configuration
