@@ -61,3 +61,8 @@ urlpatterns += patterns('indexer.api3',
 
   url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
 )
+
+
+urlpatterns += patterns('indexer.solr_api',
+  url(r'^api/collections/list/$', 'list_collections', name='list_collections'),
+)
