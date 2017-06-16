@@ -688,11 +688,15 @@ var ApiHelper = (function () {
       return;
     }
 
-    var parameters = {
+    var types = options.type ? [options.type, 'directory'] : ['directory'];
+
+    $.ajax({
       url: DOCUMENTS_API,
       data: {
         uuid: options.uuid,
+        type: types
       },
+      traditional: !!options.type,
       success: function (data) {
         if (! self.successResponseIsError(data)) {
           promise.resolve(data);
@@ -700,14 +704,7 @@ var ApiHelper = (function () {
           promise.reject(data);
         }
       }
-    };
-
-    if (window.location.pathname.indexOf('/home') > -1 && window.location.getParameter('type') !== '') {
-      parameters['data']['type'] = ['directory', window.location.getParameter('type')];
-      parameters['traditional'] = true;
-    }
-
-    $.ajax(parameters).fail(promise.reject);
+    }).fail(promise.reject);
   };
 
   /**

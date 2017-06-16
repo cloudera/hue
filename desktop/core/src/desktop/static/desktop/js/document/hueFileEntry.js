@@ -84,6 +84,7 @@ var HueFileEntry = (function () {
     self.user = options.user;
     self.userGroups = options.userGroups;
     self.superuser = options.superuser;
+    self.serverTypeFilter = options.serverTypeFilter;
 
     self.document = ko.observable();
     self.selectedDocsWithDependents = ko.observable([]);
@@ -408,7 +409,7 @@ var HueFileEntry = (function () {
           self.activeEntry().load();
         }
       };
-    };
+    }
     moveNext();
   };
 
@@ -419,6 +420,7 @@ var HueFileEntry = (function () {
       activeSort: self.activeSort,
       trashEntry: self.trashEntry,
       apiHelper: self.apiHelper,
+      serverTypeFilter: self.serverTypeFilter,
       app: self.app,
       user: self.user,
       superuser: self.superuser
@@ -452,6 +454,7 @@ var HueFileEntry = (function () {
     self.apiHelper.searchDocuments({
       uuid: owner.uuid,
       query: query,
+      type: self.serverTypeFilter(),
       successCallback: function (data) {
         resultEntry.hasErrors(false);
         var newEntries = [];
@@ -522,6 +525,7 @@ var HueFileEntry = (function () {
     if (self.app === 'documents') {
       self.apiHelper.fetchDocuments({
         uuid: self.definition().uuid,
+        type: self.serverTypeFilter(),
         successCallback: function(data) {
           self.definition(data.document);
           self.hasErrors(false);
