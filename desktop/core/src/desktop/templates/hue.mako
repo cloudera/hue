@@ -931,15 +931,15 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
           { url: '/notebook/editor', app: function (ctx) {
             page('/editor?' + ctx.querystring);
           }},
-          { url: '/filebrowser/view=*', app:  'filebrowser' },
-          { url: '/filebrowser/download=*', app:  'filebrowser' },
+          { url: '/filebrowser/view=*', app: 'filebrowser' },
+          { url: '/filebrowser/download=*', app: 'filebrowser' },
           { url: '/filebrowser/*', app: function () {
             page('/filebrowser/view=' + DropzoneGlobals.homeDir);
           }},
           { url: '/hbase/', app: 'hbase' },
           { url: '/help', app: 'help' },
           { url: '/home2*', app: function (ctx) {
-              page(ctx.path.replace(/home2/gi, 'home'));
+            page(ctx.path.replace(/home2/gi, 'home'));
           }},
           { url: '/home*', app: 'home' },
           { url: '/indexer/', app: 'indexes' },
