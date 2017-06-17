@@ -26,7 +26,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from libsolr.api import SolrApi
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
-from indexer.controller2 import IndexController
+from indexer.solr_client import SolrClient
 from indexer.utils import get_default_fields
 
 
@@ -42,7 +42,7 @@ def create_index(request):
   name = request.POST.get('name')
 
   if name:
-    searcher = IndexController(request.user)
+    searcher = SolrClient(request.user)
 
     try:
       collection = searcher.create_index(
@@ -74,7 +74,7 @@ def delete_indexes(request):
   if not indexes:
     response['message'] = _('No indexes to remove.')
   else:
-    searcher = IndexController(request.user)
+    searcher = SolrClient(request.user)
 
     for index in indexes:
       if index['type'] == 'collection':
@@ -150,7 +150,7 @@ def design_schema(request, index):
   result = {'status': -1, 'message': ''}
 
   try:
-    searcher = IndexController(request.user)
+    searcher = SolrClient(request.user)
     unique_key, fields = searcher.get_index_schema(index)
 
     result['status'] = 0
