@@ -103,14 +103,14 @@ class SolrClient(object):
     Create schema.xml file so that we can set UniqueKey field.
     """
     if self.is_solr_cloud_mode():
-      self._create_solr_cloud_index(name, fields, unique_key_field, df)
-
-    else:  # Non-solrcloud mode
+      self._create_solr_cloud_index_config_name(name, fields, unique_key_field, df)
+      if not self.api.create_collection(name):
+        raise Exception('Failed to create collection: %s' % name)
+    else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
-    return name
 
-  def _create_solr_cloud_index(self, name, fields, unique_key_field, df):
+  def _create_solr_cloud_index_config_name(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
 
@@ -122,16 +122,12 @@ class SolrClient(object):
         if is_enabled():
           with open(os.path.join(config_root_path, 'solrconfig.xml.secure')) as f:
             zc.set(os.path.join(root_node, 'conf', 'solrconfig.xml'), f.read())
-
-        if not self.api.create_collection(name):
-          raise Exception('Failed to create collection: %s' % name)
       except Exception, e:
         if zc.path_exists(root_node):
           # Remove the root node from Zookeeper
           zc.delete_path(root_node)
         raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
       finally:
-        # Remove tmp config directory
         shutil.rmtree(tmp_path)
 
 
