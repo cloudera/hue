@@ -46,11 +46,11 @@ ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 IS_SOLR_CLOUD = None
 
 
-class IndexControllerException(Exception):
+class SolrClientException(Exception):
   pass
 
 
-class IndexController(object):
+class SolrClient(object):
   """
   Glue the models to the views.
   """
@@ -195,7 +195,7 @@ class IndexController(object):
       return uniquekey, fields
     except Exception, e:
       LOG.exception(e.message)
-      raise IndexControllerException(_("Error in getting schema information for index '%s'" % index_name))
+      raise SolrClientException(_("Error in getting schema information for index '%s'" % index_name))
 
 
   def delete_alias(self, name):

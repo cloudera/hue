@@ -24,7 +24,7 @@ from desktop.lib.django_util import JsonResponse, render
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import get_cluster_config
 
-from indexer.controller2 import IndexController
+from indexer.solr_client import SolrClient
 from indexer.fields import FIELD_TYPES, Field
 from indexer.file_format import get_file_indexable_format_types
 from indexer.management.commands import indexer_setup
@@ -47,7 +47,7 @@ def indexes(request):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
-  searcher = IndexController(request.user)
+  searcher = SolrClient(request.user)
   indexes = searcher.get_indexes()
 
   for index in indexes:
@@ -62,7 +62,7 @@ def indexer(request):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
-  searcher = IndexController(request.user)
+  searcher = SolrClient(request.user)
   indexes = searcher.get_indexes()
 
   for index in indexes:
