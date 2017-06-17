@@ -30,6 +30,7 @@ urlpatterns = patterns('indexer.views',
   url(r'^importer/prefill/(?P<source_type>[^/]+)/(?P<target_type>[^/]+)/(?P<target_path>[^/]+)?$', 'importer_prefill', name='importer_prefill'),
 )
 
+# Current v1
 urlpatterns += patterns('indexer.api',
   url(r'^api/fields/parse/$', 'parse_fields', name='api_parse_fields'),
   url(r'^api/autocomplete/$', 'autocomplete', name='api_autocomplete'),
@@ -43,7 +44,7 @@ urlpatterns += patterns('indexer.api',
 )
 
 
-urlpatterns += patterns('indexer.api2',
+urlpatterns += patterns('indexer.solr_api',
   # V2
   url(r'^api/aliases/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
   url(r'^api/indexes/create/$', 'create_index', name='create_index'),
@@ -53,17 +54,17 @@ urlpatterns += patterns('indexer.api2',
   url(r'^api/indexes/(?P<index>\w+)/schema/$', 'design_schema', name='design_schema')
 )
 
+urlpatterns += patterns('indexer.solr_api',
+  url(r'^api/collections/list/$', 'list_collections', name='list_collections'),
+  url(r'^api/collections/delete/$', 'delete_collections', name='delete_collections'),
+)
+
+
 urlpatterns += patterns('indexer.api3',
-  # V3
+  # Importer
   url(r'^api/indexer/guess_format/$', 'guess_format', name='guess_format'),
   url(r'^api/indexer/index_file/$', 'index_file', name='index_file'),
   url(r'^api/indexer/guess_field_types/$', 'guess_field_types', name='guess_field_types'),
 
   url(r'^api/importer/submit', 'importer_submit', name='importer_submit')
-)
-
-
-urlpatterns += patterns('indexer.solr_api',
-  url(r'^api/collections/list/$', 'list_collections', name='list_collections'),
-  url(r'^api/collections/delete/$', 'delete_collections', name='delete_collections'),
 )
