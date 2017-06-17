@@ -28,6 +28,8 @@ from desktop.lib.paths import get_config_root
 from metadata.settings import DJANGO_APPS
 
 
+NAVIGATOR_AUTH_PASSWORD = None
+
 LOG = logging.getLogger(__name__)
 
 
@@ -153,16 +155,20 @@ def get_navigator_auth_username():
 
 def get_navigator_auth_password():
   '''Get the password to authenticate with.'''
+  global NAVIGATOR_AUTH_PASSWORD
 
-  try:
-    if get_navigator_auth_type() == 'ldap':
-      return NAVIGATOR.AUTH_LDAP_PASSWORD.get()
-    elif get_navigator_auth_type() == 'saml':
-      return NAVIGATOR.AUTH_SAML_PASSWORD.get()
-    else:
-      return NAVIGATOR.AUTH_CM_PASSWORD.get()
-  except CalledProcessError:
-    LOG.exception('Could not read Navigator password file, need to restart Hue to re-enable it.')
+  if NAVIGATOR_AUTH_PASSWORD is None:
+    try:
+      if get_navigator_auth_type() == 'ldap':
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_LDAP_PASSWORD.get()
+      elif get_navigator_auth_type() == 'saml':
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_SAML_PASSWORD.get()
+      else:
+        NAVIGATOR_AUTH_PASSWORD = NAVIGATOR.AUTH_CM_PASSWORD.get()
+    except CalledProcessError:
+      LOG.exception('Could not read Navigator password file, need to restart Hue to re-enable it.')
+
+  return NAVIGATOR_AUTH_PASSWORD
 
 def get_navigator_cm_password():
   '''Get default password from secured file'''
