@@ -607,6 +607,17 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+  def info_system(self):
+    try:
+      params = self._get_params() + (
+        ('wt', 'json'),
+      )
+
+      response = self._root.get('admin/info/system', params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
   def sql(self, collection, statement):
     try:
       if 'limit' not in statement.lower(): # rows is not supported
