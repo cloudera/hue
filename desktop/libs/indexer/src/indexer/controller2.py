@@ -25,21 +25,25 @@ from django.utils.translation import ugettext as _
 
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
-from indexer.conf import CORE_INSTANCE_DIR
-from indexer.controller import get_solr_ensemble
-from indexer.utils import copy_configs
 from libsolr.api import SolrApi
 from libsentry.conf import is_enabled
 from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
+from indexer.conf import CORE_INSTANCE_DIR
+from indexer.controller import get_solr_ensemble
+from indexer.utils import copy_configs
+
 
 LOG = logging.getLogger(__name__)
+
+
 MAX_UPLOAD_SIZE = 100 * 1024 * 1024 # 100 MB
 ALLOWED_FIELD_ATTRIBUTES = set(['name', 'type', 'indexed', 'stored'])
 FLAGS = [('I', 'indexed'), ('T', 'tokenized'), ('S', 'stored'), ('M', 'multivalued')]
 ZK_SOLR_CONFIG_NAMESPACE = 'configs'
+IS_SOLR_CLOUD = None
 
 
 class IndexControllerException(Exception):
@@ -56,14 +60,11 @@ class IndexController(object):
 
 
   def is_solr_cloud_mode(self):
-    if not hasattr(self, '_solr_cloud_mode'):
-      try:
-        self.api.collections2()
-        setattr(self, '_solr_cloud_mode', True)
-      except Exception, e:
-        LOG.info('Non SolrCloud server: %s' % e)
-        setattr(self, '_solr_cloud_mode', False)
-    return getattr(self, '_solr_cloud_mode')
+    global IS_SOLR_CLOUD
+    if IS_SOLR_CLOUD is None:
+      print self.api.info_system()
+      IS_SOLR_CLOUD = self.api.info_system().get('mode', 'solrcloud') == 'solrcloud'
+    return IS_SOLR_CLOUD
 
 
   def get_indexes(self):
