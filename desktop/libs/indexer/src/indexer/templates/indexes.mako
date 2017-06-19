@@ -156,11 +156,17 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     self.create = function() {
       $.post("${ url('indexer:create_index') }", {
         "name": self.name
-      }, function() {
-        window.location.reload();
+      }, function (data) {
+        if (data.status == 0) {
+          window.location.reload();
+        } else {
+          $(document).trigger("error", data.message);
+        }
       }).fail(function (xhr, textStatus, errorThrown) {
         $(document).trigger("error", xhr.responseText);
+        self.status('failed');
       });
+
     }
   };
 
@@ -232,28 +238,6 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     });
     self.wizard(self.fileWizard);
     self.availableWizards = ko.observableArray([self.fileWizard, self.hiveWizard]);
-
-    self.getSample = function() {
-      $.post("${ url('indexer:create_wizard_get_sample') }", {
-        "wizard": ko.mapping.toJSON(self.wizard)
-      }, function(resp) {
-        self.wizard().sample(resp.data);
-        self.showCreate(true);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
-
-    self.create = function() {
-      $.post("${ url('indexer:create_wizard_create') }", {
-        "wizard": ko.mapping.toJSON(self.wizard)
-      }, function(resp) {
-        self.wizard().sample(resp.data);
-        self.showCreate(true);
-      }).fail(function (xhr, textStatus, errorThrown) {
-        $(document).trigger("error", xhr.responseText);
-      });
-    }
 
     self.edit = function() {
       self.show(true);
