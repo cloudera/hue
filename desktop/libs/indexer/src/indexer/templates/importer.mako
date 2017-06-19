@@ -402,6 +402,9 @@ ${ assist.assistPanel() }
             <label for="db" class="control-label"><div>${ _('Database') }</div>
               <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.db" placeholder="${ _('Enter name of your database') }">
             </label>
+              <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
+                <i class="fa fa-external-link-square"></i>
+              </a>
           </div>
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
@@ -1201,6 +1204,15 @@ ${ assist.assistPanel() }
         vm.createWizard.destination.useDefaultLocation(! newVal);
       });
 
+      // Rdbms
+      self.rdbms = ko.observable('');
+      self.db = ko.computed(function() {
+        return self.db();
+      });
+      self.db_table = ko.computed(function() {
+        return self.db_table();
+      });
+
       // Table
       self.table = ko.observable('');
       self.tableName = ko.computed(function() {
@@ -1245,6 +1257,8 @@ ${ assist.assistPanel() }
           return self.query();
         } else if (self.inputFormat() == 'manual') {
           return true;
+        }  else if (self.inputFormat() == 'rdbms') {
+          return (self.db().length > 0 && self.db_table().length > 0);
         }
       });
 

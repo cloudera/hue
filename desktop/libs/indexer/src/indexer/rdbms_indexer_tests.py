@@ -45,9 +45,10 @@ class TestRdbmsIndexer():
     assert_true(data['rows'], data)
 
   def test_get_databases(self):
+    self.client = make_logged_in_client()
     self.user = User.objects.get(username='test')
 
     indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
 
     data = indexer.get_databases()
-    assert_equal(1, data['status'], data)
+    assert_equal(0, data['status'], data)

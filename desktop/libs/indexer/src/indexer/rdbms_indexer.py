@@ -62,7 +62,7 @@ class RdbmsIndexer():
 
     if sample_data:
       response['status'] = 0
-      response['data'] = sample_data.rows()
+      response['data'] = sample_data
     else:
       response['message'] = _('Failed to get sample data.')
 
