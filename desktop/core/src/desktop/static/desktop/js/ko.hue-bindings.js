@@ -3568,6 +3568,13 @@
     AceLocationHandler.prototype.checkForSyntaxErrors = function (statementLocation, cursorPosition) {
       var self = this;
       if (self.aceSqlSyntaxWorker !== null) {
+        for (var marker in self.editor.session.$backMarkers) {
+          if (self.editor.session.$backMarkers[marker].clazz === 'hue-ace-syntax-error') {
+            var token = self.editor.session.$backMarkers[marker].token;
+            delete token.syntaxError;
+            self.editor.session.removeMarker(self.editor.session.$backMarkers[marker].id);
+          }
+        }
         var AceRange = ace.require('ace/range').Range;
         var beforeCursor = self.editor.session.getTextRange(new AceRange(statementLocation.first_line - 1, statementLocation.first_column, cursorPosition.row, cursorPosition.column));
         var afterCursor = self.editor.session.getTextRange(new AceRange(cursorPosition.row, cursorPosition.column, statementLocation.last_line - 1, statementLocation.last_column));
@@ -3579,9 +3586,20 @@
       var self = this;
       if (window.Worker) {
         self.aceSqlSyntaxWorker = new Worker('/desktop/workers/aceSqlSyntaxWorker.js?bust=' + Math.random());
+
         self.aceSqlSyntaxWorker.onmessage = function(e) {
-          // TODO: Add error marking e.data.syntaxError
-          console.log(e.data);
+          if (e.data.syntaxError) {
+            var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column);
+            if (token && token.value && /`$/.test(token.value)) {
+              // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
+              token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column + 1);
+            }
+            token.syntaxError = e.data.syntaxError;
+            var AceRange = ace.require('ace/range').Range;
+            var range = new AceRange(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column, e.data.syntaxError.loc.last_line - 1, e.data.syntaxError.loc.first_column + e.data.syntaxError.text.length);
+            var markerId = self.editor.session.addMarker(range, 'hue-ace-syntax-error');
+            self.editor.session.$backMarkers[markerId].token = token;
+          }
         }
       }
     };
@@ -4119,10 +4137,18 @@
 
                   var tooltipText = token.parseLocation.type === 'asterisk' ? options.expandStar : options.contextTooltip;
                   if (token.parseLocation.identifierChain) {
-                    tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) { return identifier.name }).join('.') + ')';
+                    tooltipText += ' (' + $.map(token.parseLocation.identifierChain, function (identifier) {
+                        return identifier.name
+                      }).join('.') + ')';
                   } else if (token.parseLocation.function) {
                     tooltipText += ' (' + token.parseLocation.function + ')';
                   }
+                  contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
+                }, 500);
+              } else if (token !== null && token.syntaxError) {
+                tooltipTimeout = window.setTimeout(function () {
+                  var tooltipText = 'Did you mean "' + token.syntaxError.expected[0] + '"?';
+                  var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                   contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                 }, 500);
               } else {
