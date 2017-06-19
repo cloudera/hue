@@ -35,8 +35,7 @@ from desktop.lib.i18n import force_unicode, smart_str
 from libsentry.conf import is_enabled
 
 from indexer import conf
-from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES,\
-                           DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
+from indexer.models import DATE_FIELD_TYPES, TEXT_FIELD_TYPES, INTEGER_FIELD_TYPES, DECIMAL_FIELD_TYPES, BOOLEAN_FIELD_TYPES
 
 
 LOG = logging.getLogger(__name__)
@@ -60,6 +59,7 @@ def get_config_template_path(solr_cloud_mode):
 
 
 class SchemaXml(object):
+
   def __init__(self, xml):
     self.xml = xml
     self.unique_key_field = None
@@ -80,6 +80,7 @@ class SchemaXml(object):
 
 
 class SolrConfigXml(object):
+
   def __init__(self, xml):
     self.xml = xml
 

@@ -15,7 +15,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import csv
 import json
 import logging
 
@@ -27,8 +26,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from libsolr.api import SolrApi
 
-from indexer.solr_client import SolrClient
-from indexer.utils import get_default_fields
+from indexer.solr_client import SolrClient, _get_fields
 
 
 LOG = logging.getLogger(__name__)
@@ -79,32 +77,24 @@ def delete_collections(request):
   return JsonResponse(response)
 
 
+@require_POST
+@api_error_handler
 def create_index(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
   response = {'status': -1}
 
   name = request.POST.get('name')
+  fields = json.loads(request.POST.get('fields', '[]'))
 
-  if name:
-    searcher = SolrClient(request.user)
+  client = SolrClient(request.user)
 
-    try:
-      collection = searcher.create_index(
-          name,
-          request.POST.get('fields', get_default_fields()),
-          request.POST.get('uniqueKeyField', 'id'),
-          request.POST.get('df', 'text')
-      )
+  collection = client.create_index(
+      name=name,
+      fields=request.POST.get('fields', _get_fields(name='id', type='string')),
+  )
 
-      response['status'] = 0
-      response['collection'] = collection
-      response['message'] = _('Index created!')
-    except Exception, e:
-      response['message'] = _('Index could not be created: %s') % e
-  else:
-    response['message'] = _('Index requires a name field.')
+  response['status'] = 0
+  response['collection'] = collection
+  response['message'] = _('Index created!')
 
   return JsonResponse(response)
 
@@ -157,37 +147,6 @@ def create_or_edit_alias(request):
   return JsonResponse(response)
 
 
-def create_wizard_get_sample(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
-  response = {'status': -1}
-
-  wizard = json.loads(request.POST.get('wizard', '{}'))
-
-  f = request.fs.open(wizard['path'])
-
-  response['status'] = 0
-  response['data'] = _read_csv(f)
-
-  return JsonResponse(response)
-
-
-def create_wizard_create(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
-  response = {'status': -1}
-
-  wizard = json.loads(request.POST.get('wizard', '{}'))
-
-  f = request.fs.open(wizard['path'])
-
-  response['status'] = 0
-  response['data'] = _read_csv(f)
-
-  return JsonResponse(response)
-
 
 def design_schema(request, index):
   if request.method == 'POST':
@@ -216,15 +175,5 @@ def design_schema(request, index):
     result['message'] = _('Could not get index schema: %s') % e
 
   return JsonResponse(result)
-
-
-def _read_csv(f):
-  content = f.read(1024 * 1024)
-
-  dialect = csv.Sniffer().sniff(content)
-  lines = content.splitlines()[:5]
-  reader = csv.reader(lines, delimiter=dialect.delimiter)
-  
-  return [row for row in reader]
 
 

@@ -46,14 +46,28 @@ ZK_SOLR_CONFIG_NAMESPACE = 'configs'
 IS_SOLR_CLOUD = None
 
 
+DEFAULT_FIELD = {
+  'name': None,
+  'type': 'text',
+  'indexed': True,
+  'stored': True,
+  'required': False,
+  'multiValued': False
+}
+
+
 class SolrClientException(Exception):
   pass
 
 
+def _get_fields(name='id', type='text'):
+  default_field = DEFAULT_FIELD.copy()
+  default_field.update({'name': name, 'type': type})
+  return [default_field]
+
+
 class SolrClient(object):
-  """
-  Glue the models to the views.
-  """
+
   def __init__(self, user):
     self.user = user
     self.api = SolrApi(SOLR_URL.get(), self.user, SECURITY_ENABLED.get())
@@ -61,9 +75,10 @@ class SolrClient(object):
 
   def is_solr_cloud_mode(self):
     global IS_SOLR_CLOUD
+
     if IS_SOLR_CLOUD is None:
-      print self.api.info_system()
       IS_SOLR_CLOUD = self.api.info_system().get('mode', 'solrcloud') == 'solrcloud'
+
     return IS_SOLR_CLOUD
 
 
@@ -76,9 +91,10 @@ class SolrClient(object):
         for name in collections:
           indexes.append({'name': name, 'type': 'collection', 'collections': []})
 
-#       solr_cores = self.api.cores()
-#       for name in solr_cores:
-#         indexes.append({'name': name, 'type': 'core', 'collections': []})
+      if not self.is_solr_cloud_mode():
+        solr_cores = self.api.cores()
+        for name in solr_cores:
+          indexes.append({'name': name, 'type': 'core', 'collections': []})
 
       if self.is_solr_cloud_mode():
         try:
@@ -97,20 +113,31 @@ class SolrClient(object):
     return indexes
 
 
-  def create_index(self, name, fields, unique_key_field='id', df='text'):
+  def create_index(self, name, fields, config_name=None):
     """
     Create solr collection or core and instance dir.
     Create schema.xml file so that we can set UniqueKey field.
     """
+    unique_key_field = 'id'
+    df = 'text'
+
     if self.is_solr_cloud_mode():
-      self._create_solr_cloud_index_config_name(name, fields, unique_key_field, df)
-      if not self.api.create_collection(name):
-        raise Exception('Failed to create collection: %s' % name)
+      if config_name is None:
+        self._create_cloud_config(name, fields, unique_key_field, df) # Create config set
+      
+      self.api.create_collection2(name, config_name=config_name)
+      fields = [{
+          'name': field['name'],
+          'type': field['type'],
+          'stored': field.get('stored', True)
+        } for field in fields
+      ]
+      self.api.add_fields(name, fields)
     else:
       self._create_non_solr_cloud_index(name, fields, unique_key_field, df)
 
 
-  def _create_solr_cloud_index_config_name(self, name, fields, unique_key_field, df):
+  def _create_cloud_config(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
       tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
 
@@ -152,7 +179,7 @@ class SolrClient(object):
     finally:
       # Delete instance directory if we couldn't create the core.
       shutil.rmtree(instancedir)
-#
+
 
   def delete_index(self, name):
     """
