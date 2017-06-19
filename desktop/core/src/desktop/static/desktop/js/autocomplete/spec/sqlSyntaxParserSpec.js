@@ -57,14 +57,14 @@
     it('should suggest expected words for "SLELECT "', function() {
       var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();
-      expect(result.expected).toEqual(['ALTER', 'CREATE', 'DROP', 'FROM', 'INSERT', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']);
+      expect(result.expected).toEqual(['SELECT', 'SET', 'INSERT', 'ALTER', 'CREATE', 'SHOW', 'USE', 'WITH', 'FROM', 'DROP', 'TRUNCATE', 'UPDATE']);
     });
 
     describe('Hive specific', function () {
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
         expect(result).toBeTruthy();
-        expect(result.expected).toEqual(['ALTER', 'ANALYZE', 'CREATE', 'CREATE', 'DELETE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'EXPORT', 'FROM', 'GRANT', 'IMPORT', 'INSERT', 'INSERT', 'LOAD', 'MSCK', 'RELOAD', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'USE', 'WITH']);
+        expect(result.expected).toEqual(['SELECT', 'SET', 'DELETE', 'RELOAD', 'INSERT', 'ALTER', 'INSERT', 'CREATE', 'EXPORT', 'GRANT', 'SHOW', 'LOAD', 'IMPORT', 'EXPLAIN', 'CREATE', 'REVOKE', 'MSCK', 'ANALYZE', 'SHOW', 'USE', 'USE', 'TRUNCATE', 'DROP', 'UPDATE', 'WITH', 'FROM', 'DESCRIBE']);
       });
     });
 
@@ -72,7 +72,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
         expect(result).toBeTruthy();
-        expect(result.expected).toEqual(['ALTER', 'COMPUTE', 'CREATE', 'CREATE', 'DESCRIBE', 'DROP', 'EXPLAIN', 'FROM', 'GRANT', 'INSERT', 'INSERT', 'INVALIDATE', 'LOAD', 'REFRESH', 'REVOKE', 'SELECT', 'SET', 'SHOW', 'TRUNCATE', 'UPDATE', 'USE', 'WITH']);
+        expect(result.expected).toEqual(['SELECT', 'SET', 'INSERT', 'ALTER', 'INSERT', 'GRANT', 'CREATE', 'CREATE', 'REVOKE', 'EXPLAIN', 'SHOW', 'USE', 'REFRESH', 'LOAD', 'COMPUTE', 'TRUNCATE', 'UPDATE', 'WITH', 'FROM', 'DROP', 'INVALIDATE', 'DESCRIBE']);
       });
     })
 
