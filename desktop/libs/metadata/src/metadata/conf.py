@@ -81,7 +81,7 @@ OPTIMIZER = ConfigSection(
     HOSTNAME=Config(
       key='hostname',
       help=_t('Hostname to Optimizer API or compatible service.'),
-      default='navoptapi.optimizer.cloudera.com'),
+      default='navoptapi.us-west-1.optimizer.altus.cloudera.com'),
 
     AUTH_KEY_ID=Config(
       key="auth_key_id",
