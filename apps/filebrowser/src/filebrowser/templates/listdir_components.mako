@@ -2597,6 +2597,17 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
 
       resetActionbar();
 
+      %if is_embeddable:
+      $('.page-content').scroll(function () {
+        if ($('.page-content').scrollTop() > 50) {
+          $(".actionbar").width($(".actionbar").data("originalWidth"));
+          $(".actionbar").css("position", "fixed").css("top", "50px").css("zIndex", "1001");
+          $(".actionbarGhost").removeClass("hide");
+        } else {
+          resetActionbar();
+        }
+      });
+      %else:
       $(window).scroll(function () {
         if ($(window).scrollTop() > 20) {
           $(".actionbar").width($(".actionbar").data("originalWidth"));
@@ -2606,6 +2617,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           resetActionbar();
         }
       });
+      %endif
 
       $("#uploadFileModal").on("shown", function () {
         if (typeof _dropzone != "undefined") {
