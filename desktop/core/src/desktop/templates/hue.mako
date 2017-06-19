@@ -765,6 +765,7 @@ ${ smart_unicode(login_modal(request).content) | n,unicode }
             window.pauseAppIntervals(loadedApp);
             huePubSub.pauseAppSubscribers(loadedApp);
           });
+          $('.tooltip').hide();
           huePubSub.publish('hue.datatable.search.hide');
           huePubSub.publish('nicescroll.resize');
           huePubSub.publish('context.panel.visible.editor', false);
