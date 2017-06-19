@@ -23,6 +23,7 @@ import logging
 import re
 import StringIO
 import struct
+import time
 import urllib
 
 from django.core.urlresolvers import reverse
@@ -307,7 +308,8 @@ class HS2Api(Api):
       'message': ''
     }
 
-    if snippet.get('status') != 'available':
+    if snippet.get('status') != 'available' or not snippet.get('result') or not snippet['result'].get('handle') or \
+      not snippet['result']['handle'].get('has_result_set'):
       raise QueryError(_('Result status is not available'))
 
     if snippet['type'] not in ('hive', 'impala'):
@@ -794,11 +796,14 @@ DROP TABLE IF EXISTS `%(table)s`;
   def _get_impala_result_size(self, notebook, snippet):
     total_records_match = None
     total_records, total_size, msg = None, None, None
+    QUERY_PROFILE_WAIT_S = 2.0
 
     query_id = self._get_impala_query_id(snippet)
     session = Session.objects.get_session(self.user, application='impala')
     server_url = self._get_impala_server_url(session)
     if query_id:
+      LOG.info("Waiting for %d seconds for query profile to complete..." % QUERY_PROFILE_WAIT_S)
+      time.sleep(QUERY_PROFILE_WAIT_S)
       LOG.info("Attempting to get Impala query profile at server_url %s for query ID: %s" % (server_url, query_id))
 
       fragment = self._get_impala_query_profile(server_url, query_id=query_id)
