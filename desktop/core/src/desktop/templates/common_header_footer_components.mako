@@ -73,9 +73,11 @@ from metadata.conf import has_optimizer, OPTIMIZER
       optimizer: ${ OPTIMIZER.CACHEABLE_TTL.get() }
     };
 
-    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() }
+    var AUTOCOMPLETE_TIMEOUT = ${ conf.EDITOR_AUTOCOMPLETE_TIMEOUT.get() };
 
-    DocumentTypeGlobals = {
+    var ENABLE_SQL_SYNTAX_CHECK = '${ conf.ENABLE_SQL_SYNTAX_CHECK.get() }' === 'True';
+
+    var DocumentTypeGlobals = {
       'all': '${_('All')}',
       'directory': '${ _('Directory') }',
       'link-pigscript': '${_('Pig Script')}',

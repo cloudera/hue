@@ -3897,8 +3897,8 @@
         }
       };
 
-      if (window.Worker) {
-        var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', false);
+      if (ENABLE_SQL_SYNTAX_CHECK && window.Worker) {
+        var errorHighlightingEnabled = snippet.getApiHelper().getFromTotalStorage('hue.ace', 'errorHighlightingEnabled', true);
 
         if (errorHighlightingEnabled) {
           aceLocationHandler.attachSqlSyntaxWorker();
