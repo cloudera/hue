@@ -715,7 +715,7 @@ ${ utils.submit_popup_event() }
 
   function renderChangeables() {
     resizeDrops();
-    if (viewModel.workflow.properties.show_arrows()){
+    if (viewModel.workflow && viewModel.workflow.properties && viewModel.workflow.properties.show_arrows()){
       viewModel.drawArrows();
     }
     $("#oozie_workflowComponents .widget-main-section").removeClass("zoom-in");
