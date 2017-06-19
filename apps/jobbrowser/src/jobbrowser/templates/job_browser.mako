@@ -854,14 +854,14 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
     <!-- /ko -->
 
     <!-- ko if: hasKill -->
-    <button class="btn btn-danger" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
+    <button class="btn btn-danger disable-feedback" title="${_('Stop selected')}" data-bind="click: function() { control('kill'); }, enable: killEnabled">
       ## TODO confirmation
       <i class="fa fa-times"></i> <!-- ko ifnot: $root.isMini -->${_('Kill')}<!-- /ko -->
     </button>
     <!-- /ko -->
 
     <!-- ko if: hasIgnore -->
-    <button class="btn btn-danger" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
+    <button class="btn btn-danger disable-feedback" title="${_('Ignore selected')}" data-bind="click: function() { control('ignore'); }, enable: ignoreEnabled">
       ## TODO confirmation
       <i class="fa fa-eraser"></i> <!-- ko ifnot: $root.isMini -->${_('Ignore')}<!-- /ko -->
     </button>
@@ -1567,7 +1567,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['workflow', 'schedule-task'].indexOf(self.type()) != -1;
       });
       self.rerunEnabled = ko.pureComputed(function() {
-        return self.hasRerun() && ! self.isRunning();
+        return self.hasRerun() && !self.isRunning();
       });
 
       self.hasPause = ko.pureComputed(function() {
@@ -1581,7 +1581,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         return ['schedule-task'].indexOf(self.type()) != -1;
       });
       self.ignoreEnabled = ko.pureComputed(function() {
-        return self.hasIgnore() && ! self.isRunning();
+        return self.hasIgnore() && !self.isRunning();
       });
 
       self.loadingJob = ko.observable(false);
@@ -1857,7 +1857,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       self.selectedJobs = ko.observableArray();
 
       self.hasKill = ko.pureComputed(function() {
-        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
+        return ['jobs', 'workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.killEnabled = ko.pureComputed(function() {
         return self.hasKill() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1866,7 +1866,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasResume = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.resumeEnabled = ko.pureComputed(function() {
         return self.hasResume() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -1884,7 +1884,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       });
 
       self.hasPause = ko.pureComputed(function() {
-        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && ! self.isCoordinator();
+        return ['workflows', 'schedules', 'bundles'].indexOf(vm.interface()) != -1 && !self.isCoordinator();
       });
       self.pauseEnabled = ko.pureComputed(function() {
         return self.hasPause() && self.selectedJobs().length > 0 && $.grep(self.selectedJobs(), function(job) {
@@ -2290,7 +2290,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             self.selectInterface(h);
             break;
           default:
-            if (h.indexOf('id=') === 0 && ! self.isMini()){
+            if (h.indexOf('id=') === 0 && !self.isMini()){
               new Job(self, {id: h.substr(3)}).fetchJob();
             }
             else {
