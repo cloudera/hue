@@ -263,6 +263,7 @@ class CollectionManagerController(object):
         else:
           raise PopupException(_('Could not update index. Unknown type %s') % data_type)
         fh.close()
+
       if not api.update(collection_or_core_name, data, content_type=content_type):
         raise PopupException(_('Could not update index. Check error logs for more info.'))
     else:
