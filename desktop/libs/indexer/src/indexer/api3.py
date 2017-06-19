@@ -25,7 +25,9 @@ from desktop.lib import django_mako
 from desktop.lib.django_util import JsonResponse
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.models import Document2
+from librdbms.server import dbms as rdbms
 from notebook.connectors.base import get_api, Notebook
+from notebook.connectors.rdbms import Assist
 from notebook.decorators import api_error_handler
 from notebook.models import make_notebook
 
@@ -96,6 +98,20 @@ def guess_format(request):
       raise PopupException('Hive table format %s is not supported.' % table_metadata.details['properties']['format'])
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
+  elif file_format['inputFormat'] == 'rdbms':
+    query_server = rdbms.get_query_server_config(server=request.db_conf_name)
+    db = rdbms.get(request.user, query_server=query_server)
+    assist = Assist(db)
+    response = {'status': -1}
+    sample = assist.get_sample_data(file_format['databaseName'], table_name=file_format['tableName'], column_name=file_format['columnName'])
+    format_ = {
+        "sample": sample['rows'][:4],
+        "sample_cols": sample.meta,
+        "columns": [
+            Field(col['name'], HiveFormat.FIELD_TYPE_TRANSLATE.get(col['type'], 'string')).to_dict()
+            for col in sample.meta
+        ]
+    }
 
   format_['status'] = 0
   return JsonResponse(format_)

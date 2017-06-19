@@ -15,14 +15,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+
 import json
 import logging
+
 from django.contrib.auth.models import User
 #from django.core.urlresolvers import reverse
+
 from nose.tools import assert_equal, assert_false, assert_not_equal, assert_true
 from desktop.lib.django_test_util import make_logged_in_client
+
 from indexer.rdbms_indexer import RdbmsIndexer
+
+
 LOG = logging.getLogger(__name__)
+
 
 class TestRdbmsIndexer():
 
@@ -34,5 +41,13 @@ class TestRdbmsIndexer():
     data = indexer.get_sample_data(database='hue', table='employee')
     #data = json.loads(resp.content)
 
-    assert_equal(1, data['status'], data)
+    assert_equal(0, data['status'], data)
     assert_true(data['rows'], data)
+
+  def test_get_databases(self):
+    self.user = User.objects.get(username='test')
+
+    indexer = RdbmsIndexer(self.user, db_conf_name='mysql')
+
+    data = indexer.get_databases()
+    assert_equal(1, data['status'], data)

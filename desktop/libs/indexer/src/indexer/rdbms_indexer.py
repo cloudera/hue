@@ -14,10 +14,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.import logging
+
 import logging
+
 from librdbms.server import dbms
 from notebook.connectors.rdbms import Assist
+
+
 LOG = logging.getLogger(__name__)
+
 
 class RdbmsIndexer():
 
@@ -43,6 +48,21 @@ class RdbmsIndexer():
       response['status'] = 0
       response['headers'] = sample_data.columns
       response['rows'] = list(sample_data.rows())
+    else:
+      response['message'] = _('Failed to get sample data.')
+
+    return response
+
+  def get_databases(self):
+    query_server = dbms.get_query_server_config(server=self.db_conf_name)
+    db = dbms.get(self.user, query_server=query_server)
+    assist = Assist(db)
+    response = {'status': -1}
+    sample_data = assist.get_databases()
+
+    if sample_data:
+      response['status'] = 0
+      response['data'] = sample_data.rows()
     else:
       response['message'] = _('Failed to get sample data.')
 

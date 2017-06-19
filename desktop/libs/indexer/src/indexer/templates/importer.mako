@@ -398,6 +398,18 @@ ${ assist.assistPanel() }
             <!-- /ko -->
           </div>
 
+          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="db" class="control-label"><div>${ _('Database') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.db" placeholder="${ _('Enter name of your database') }">
+            </label>
+          </div>
+
+          <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
+            <label for="db_table" class="control-label"><div>${ _('Table') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.db_table" placeholder="${ _('Enter name of your table') }">
+            </label>
+          </div>
+
           <div class="control-group" data-bind="visible: createWizard.source.inputFormat() == 'table'">
             <label for="path" class="control-label"><div>${ _('Table') }</div>
               <input type="text" class="input-xlarge" data-bind="value: createWizard.source.table, hivechooser: createWizard.source.table, skipColumns: true, apiHelperUser: '${ user }', apiHelperType: createWizard.source.apiHelperType, mainScrollable: $(MAIN_SCROLLABLE)" placeholder="${ _('Table name or <database>.<table>') }">
@@ -1144,7 +1156,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : 'file');
+      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : (wizard.prefill.source_type() == 'file' ? 'file' : 'rdbms'));
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
         self.sample.removeAll();
@@ -1154,6 +1166,7 @@ ${ assist.assistPanel() }
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
+          {'value': 'rdbms', 'name': 'Rdbms'},
           % if ENABLE_NEW_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
