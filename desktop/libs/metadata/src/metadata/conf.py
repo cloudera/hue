@@ -28,6 +28,7 @@ from desktop.lib.paths import get_config_root
 from metadata.settings import DJANGO_APPS
 
 
+OPTIMIZER_AUTH_PASSWORD = None
 NAVIGATOR_AUTH_PASSWORD = None
 
 LOG = logging.getLogger(__name__)
@@ -71,9 +72,15 @@ def get_security_default():
 
   return cluster.SECURITY_ENABLED.get()
 
+
 def get_optimizer_password_script():
   '''Get default password from secured file'''
-  return OPTIMIZER.AUTH_KEY_SECRET_SCRIPT.get()
+  global OPTIMIZER_AUTH_PASSWORD
+
+  if OPTIMIZER_AUTH_PASSWORD is None:
+    OPTIMIZER_AUTH_PASSWORD = OPTIMIZER.AUTH_KEY_SECRET_SCRIPT.get()
+
+  return OPTIMIZER_AUTH_PASSWORD
 
 
 OPTIMIZER = ConfigSection(
