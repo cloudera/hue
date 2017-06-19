@@ -2304,24 +2304,30 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
       var jobBrowserViewModel = new JobBrowserViewModel();
       % if not is_mini:
         ko.applyBindings(jobBrowserViewModel, $('#jobbrowserComponents')[0]);
+
+        function openJob(id) {
+          if (jobBrowserViewModel.job() == null) {
+            jobBrowserViewModel.job(new Job(jobBrowserViewModel, {}));
+          }
+          jobBrowserViewModel.job().id(id);
+          jobBrowserViewModel.job().fetchJob();
+        }
+
         huePubSub.subscribe('oozie.action.logs.click', function (widget) {
           var jobId = widget.logsURL().match(/jobbrowser\/jobs\/(.+?)\/single_logs$/i);
           if (jobId) {
-            jobBrowserViewModel.job().id(jobId[1]);
-            jobBrowserViewModel.job().fetchJob();
+            openJob(jobId[1]);
           } else {
             console.error('Unknown job log url: ' + widget.logsURL());
           }
         }, 'jobbrowser');
 
         huePubSub.subscribe('oozie.action.click', function (widget) {
-          jobBrowserViewModel.job().id(widget.externalId());
-          jobBrowserViewModel.job().fetchJob();
+          openJob(widget.externalId());
         }, 'jobbrowser');
 
         huePubSub.subscribe('browser.job.open.link', function (id) {
-          jobBrowserViewModel.job().id(id);
-          jobBrowserViewModel.job().fetchJob();
+          openJob(id);
         }, 'jobbrowser');
       % else:
         ko.applyBindings(jobBrowserViewModel, $('#jobbrowserMiniComponents')[0]);
