@@ -1632,8 +1632,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
           if (data.status == 0) {
             vm.interface(interface);
             vm.job(new Job(vm, data.app));
-
-            hueUtils.changeURL('#!id=' + vm.job().id());
+            if (window.location.hash !== '#!id=' + vm.job().id()) {
+              hueUtils.changeURL('#!id=' + vm.job().id());
+            }
             var crumbs = [];
 
             if (/^attempt_/.test(vm.job().id())) {
@@ -2199,7 +2200,9 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         self.resetBreadcrumbs();
         % if not is_mini:
         huePubSub.publish('graph.stop.refresh.view');
-        hueUtils.changeURL('#!' + interface);
+        if (window.location.hash !== '#!' + interface) {
+          hueUtils.changeURL('#!' + interface);
+        }
         % endif
         self.job(null);
         if (interface === 'slas'){
