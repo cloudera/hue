@@ -1308,7 +1308,8 @@ ${ assist.assistPanel() }
         }
         else if (self.outputFormat() == 'index') {
           $.post("/search/get_collection", {
-              name: self.name()
+              name: self.name(),
+              engine: 'solr'
           }, function (data) {
             self.isTargetExisting(data.status == 0);
             self.isTargetChecking(false);
