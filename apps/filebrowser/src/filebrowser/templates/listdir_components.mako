@@ -2141,12 +2141,12 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
       // Drag and drop uploads from anywhere on filebrowser screen
       if (window.FileReader) {
         var showHoverMsg = function (msg) {
-          $('.hoverText').html(msg);
-          $('.hoverMsg').removeClass('hide');
+          $('.filebrowser .hoverText').html(msg);
+          $('.filebrowser .hoverMsg').removeClass('hide');
         };
 
         var hideHoverMsg = function () {
-          $('.hoverMsg').addClass('hide');
+          $('.filebrowser .hoverMsg').addClass('hide');
         };
 
         var _isDraggingOverText = false,
@@ -2170,14 +2170,14 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           }
         });
 
-        $('.hoverText').on('dragenter', function (e) {
+        $('.filebrowser .hoverText').on('dragenter', function (e) {
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
           _isDraggingOverText = true;
         });
 
-        $('.hoverText').on('dragleave', function (e) {
+        $('.filebrowser .hoverText').on('dragleave', function (e) {
           e.preventDefault();
           e.stopPropagation();
           e.stopImmediatePropagation();
@@ -2185,7 +2185,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
           _isExternalFile = true;
         });
 
-        $('.hoverMsg').on('dragleave', function (e) {
+        $('.filebrowser .hoverMsg').on('dragleave', function (e) {
           if (!_isDraggingOverText) {
             hideHoverMsg();
           }
@@ -2216,7 +2216,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
                 '<div class="progress-row-bar" data-dz-uploadprogress></div>' +
                 '</div>',
             drop: function (e) {
-              $('.hoverMsg').addClass('hide');
+              $('.filebrowser .hoverMsg').addClass('hide');
 
               // Ensure dropped item was a file
               if (e.dataTransfer.files.length > 0) {
@@ -2266,7 +2266,7 @@ from filebrowser.conf import ENABLE_EXTRACT_UPLOADED_ARCHIVE
             }
           };
           if (ops.path.toLowerCase() !== 's3a://') {
-            _dropzone = new Dropzone($('.hoverMsg')[0], options);
+            _dropzone = new Dropzone($('.filebrowser .hoverMsg')[0], options);
 
             _dropzone.on('queuecomplete', function () {
               setTimeout(function () {

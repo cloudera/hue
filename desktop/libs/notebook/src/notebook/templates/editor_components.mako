@@ -1959,17 +1959,17 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
       dt = e.dataTransfer;
     }
     if (!isLeftNavOpen && (!dt || (dt.types && (dt.types.indexOf ? dt.types.indexOf('Files') != -1 : dt.types.contains('Files'))))) {
-      $(".hoverMsg").removeClass("hide");
+      $('#${ bindableElement }').find(".hoverMsg").removeClass("hide");
     }
   };
 
   var hideHoverMsg = function (vm) {
     if (vm.editorMode()){
-      $(".hoverText").html("${_('Drop a SQL file here')}");
+      $('#${ bindableElement }').find(".hoverText").html("${_('Drop a SQL file here')}");
     } else {
-      $(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
+      $('#${ bindableElement }').find(".hoverText").html("${_('Drop iPython/Zeppelin notebooks here')}");
     }
-    $(".hoverMsg").addClass("hide");
+    $('#${ bindableElement }').find(".hoverMsg").addClass("hide");
   };
 
   function renderMarkdown(text, snippetId) {
@@ -3033,21 +3033,21 @@ from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, ENABLE_
 
       var isDraggingOverText = false;
 
-      $(".hoverText").on("dragenter", function (e) {
+      $('#${ bindableElement }').find(".hoverText").on("dragenter", function (e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         isDraggingOverText = true;
       });
 
-      $(".hoverText").on("dragleave", function (e) {
+      $('#${ bindableElement }').find(".hoverText").on("dragleave", function (e) {
         e.preventDefault();
         e.stopPropagation();
         e.stopImmediatePropagation();
         isDraggingOverText = false;
       });
 
-      $(".hoverMsg").on("dragleave", function (e) {
+      $('#${ bindableElement }').find(".hoverMsg").on("dragleave", function (e) {
         if (!isDraggingOverText) {
           hideHoverMsg(viewModel);
         }
