@@ -51,12 +51,12 @@ def api_error_handler(func):
 
 @require_POST
 @api_error_handler
-def list_collections(request):
+def list_indexes(request):
   response = {'status': -1}
 
-  api = SolrApi(user=request.user)
+  client = SolrClient(user=request.user)
 
-  response['collections'] = [{'isCoreOnly': False, 'isAlias': False, 'collections': [], 'name': name} for name in api.collections2()]
+  response['collections'] = client.get_indexes()
   response['status'] = 0
 
   return JsonResponse(response)
