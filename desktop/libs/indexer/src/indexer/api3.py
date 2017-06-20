@@ -33,10 +33,11 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.smart_indexer import Indexer
-from libsolr.api import SolrApi
+from indexer.solr_client import SolrClient, SolrClientException
 
 
 LOG = logging.getLogger(__name__)
+
 
 try:
   from beeswax.server import dbms
@@ -399,11 +400,15 @@ def _index(request, file_format, collection_name, query=None):
   if is_unique_generated:
     schema_fields += [{"name": unique_field, "type": "string"}]
 
-  api = SolrApi(user=request.user)
-   
-  collection_manager = CollectionManagerController(request.user)
-  if not collection_manager.collection_exists(collection_name):
-    collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
+  client = SolrClient(user=request.user) 
+  try:
+    client.get_index_schema(collection_name)
+  except SolrClientException:
+    client.create_index(
+      name=collection_name,
+      fields=request.POST.get('fields', schema_fields),
+      unique_key_field=unique_field
+    )
 
   if file_format['inputFormat'] == 'table':
     db = dbms.get(request.user)
