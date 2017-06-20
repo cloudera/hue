@@ -27,7 +27,6 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from libsolr.api import SolrApi
 from libsentry.conf import is_enabled
-from libzookeeper.conf import ENSEMBLE
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
@@ -82,7 +81,7 @@ class SolrClient(object):
     return IS_SOLR_CLOUD
 
 
-  def get_indexes(self):
+  def get_indexes(self, include_cores=False):
     indexes = []
 
     try:
@@ -100,7 +99,7 @@ class SolrClient(object):
         except Exception:
           LOG.exception('Aliases could not be retrieved')
 
-      if not self.is_solr_cloud_mode():
+      if not self.is_solr_cloud_mode() or include_cores:
         solr_cores = self.api.cores()
         for name in solr_cores:
           indexes.append({'name': name, 'type': 'core', 'collections': []})
