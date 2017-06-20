@@ -365,27 +365,6 @@ class SolrApi(object):
     except Exception, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  # Deprecated
-  def create_collection(self, name, shards=1, replication=1):
-    try:
-      params = self._get_params() + (
-        ('action', 'CREATE'),
-        ('name', name),
-        ('numShards', shards),
-        ('replicationFactor', replication),
-        ('collection.configName', name),
-        ('wt', 'json')
-      )
-
-      response = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in response:
-        return True
-      else:
-        LOG.error("Could not create collection. Check response:\n%s" % json.dumps(response, indent=2))
-        return False
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def create_collection2(self, name, config_name=None, shards=1, replication=1, **kwargs):
     try:
@@ -446,6 +425,7 @@ class SolrApi(object):
       else:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
+
   def create_alias(self, name, collections):
     try:
       params = self._get_params() + (
@@ -480,24 +460,6 @@ class SolrApi(object):
     except RestException, e:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-  # Deprecated
-  def remove_collection(self, name):
-    try:
-      params = self._get_params() + (
-        ('action', 'DELETE'),
-        ('name', name),
-        ('wt', 'json')
-      )
-
-      response = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in response:
-        return True
-      else:
-        LOG.error("Could not remove collection. Check response:\n%s" % json.dumps(response, indent=2))
-        return False
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
-
 
   def delete_collection(self, name):
     response = {'status': -1, 'message': ''}
@@ -509,12 +471,11 @@ class SolrApi(object):
         ('wt', 'json')
       )
 
-      result = self._root.post('admin/collections', params=params, contenttype='application/json')
-      if 'success' in result:
+      data = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in data['responseHeader']['status'] == 0:
         response['status'] = 0
       else:
-        LOG.error("Could not remove collection: %s" % result)
-        response['message'] = result.get('failure')
+        response['message'] = "Could not remove collection: %s" % data
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
@@ -538,12 +499,12 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def add_fields(self, collection, fields):
-    try:
-      params = self._get_params()
-      return self._root.post('%s/schema/fields' % collection, params=params, data=json.dumps(fields), contenttype='application/json')
-    except RestException, e:
-      raise PopupException(e, title=_('Error while accessing Solr'))
+#   def add_fields(self, collection, fields):
+#     try:
+#       params = self._get_params()
+#       return self._root.post('%s/schema/fields' % collection, params=params, data=json.dumps(fields), contenttype='application/json')
+#     except RestException, e:
+#       raise PopupException(e, title=_('Error while accessing Solr'))
 
   def cores(self):
     try:
@@ -645,6 +606,7 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
 
+
   def info_system(self):
     try:
       params = self._get_params() + (
@@ -655,6 +617,7 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def sql(self, collection, statement):
     try:
@@ -685,6 +648,64 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def export(self, name, query, fl, sort, rows=100):
+    # /solr/demo6/export?user.name=hue&doAs=romain&q=code_s:[0%20TO%20400]&wt=json&rows=25&start=0&fl=code_s&sort=code_s+desc
+    try:
+      params = self._get_params() + (
+          ('q', query),
+          ('fl', fl),
+          ('sort', sort),
+          ('rows', rows),
+          ('wt', 'json'),
+      )
+      response = self._root.get('%(name)s/export' % {'name': name}, params=params)
+      return self._get_json(response)
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  # Deprecated
+  def create_collection(self, name, shards=1, replication=1):
+    try:
+      params = self._get_params() + (
+        ('action', 'CREATE'),
+        ('name', name),
+        ('numShards', shards),
+        ('replicationFactor', replication),
+        ('collection.configName', name),
+        ('wt', 'json')
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in response:
+        return True
+      else:
+        LOG.error("Could not create collection. Check response:\n%s" % json.dumps(response, indent=2))
+        return False
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  # Deprecated
+  def remove_collection(self, name):
+    try:
+      params = self._get_params() + (
+        ('action', 'DELETE'),
+        ('name', name),
+        ('wt', 'json')
+      )
+
+      response = self._root.post('admin/collections', params=params, contenttype='application/json')
+      if 'success' in response:
+        return True
+      else:
+        LOG.error("Could not remove collection. Check response:\n%s" % json.dumps(response, indent=2))
+        return False
+    except RestException, e:
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def _get_params(self):
     if self.security_enabled:

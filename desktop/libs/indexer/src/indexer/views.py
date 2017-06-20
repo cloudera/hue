@@ -47,15 +47,7 @@ def indexes(request):
   if not request.user.has_hue_permission(action="access", app='search'):
     raise PopupException(_('Missing permission.'), error_code=403)
 
-  searcher = SolrClient(request.user)
-  indexes = searcher.get_indexes()
-
-  for index in indexes:
-    index['isSelected'] = False
-
-  return render('indexes.mako', request, {
-      'indexes_json': json.dumps(indexes)
-  })
+  return render('indexes.mako', request, {})
 
 
 def indexer(request):

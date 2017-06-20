@@ -91,11 +91,6 @@ class SolrClient(object):
         for name in collections:
           indexes.append({'name': name, 'type': 'collection', 'collections': []})
 
-      if not self.is_solr_cloud_mode():
-        solr_cores = self.api.cores()
-        for name in solr_cores:
-          indexes.append({'name': name, 'type': 'core', 'collections': []})
-
       if self.is_solr_cloud_mode():
         try:
           solr_aliases = self.api.aliases()
@@ -104,6 +99,11 @@ class SolrClient(object):
             indexes.append({'name': name, 'type': 'alias', 'collections': collections})
         except Exception:
           LOG.exception('Aliases could not be retrieved')
+
+      if not self.is_solr_cloud_mode():
+        solr_cores = self.api.cores()
+        for name in solr_cores:
+          indexes.append({'name': name, 'type': 'core', 'collections': []})
 
     except Exception, e:
       msg = _('Solr server could not be contacted properly: %s') % e
