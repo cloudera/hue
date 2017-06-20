@@ -1609,6 +1609,9 @@ var SqlParseSupport = (function () {
           }
         });
         weightedExpected.sort(function (a, b) {
+          if (a.distance === b.distance) {
+            return a.text.localeCompare(b.text);
+          }
           return a.distance - b.distance
         });
         parser.yy.error.expected = weightedExpected;
