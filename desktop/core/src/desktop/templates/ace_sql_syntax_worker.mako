@@ -14,9 +14,17 @@
 ## See the License for the specific language governing permissions and
 ## limitations under the License.
 
-var version = 1;
-importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?version=' + version);
-importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }' + '?version=' + version);
+<%!
+  from desktop import conf
+%>
+
+% if conf.DJANGO_DEBUG_MODE.get():
+importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }' + '?' + Math.random());
+importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }' + '?' + Math.random());
+% else:
+importScripts('${ static('desktop/js/autocomplete/sqlParseSupport.js') }');
+importScripts('${ static('desktop/js/autocomplete/sqlSyntaxParser.js') }');
+% endif
 
 (function () {
 
