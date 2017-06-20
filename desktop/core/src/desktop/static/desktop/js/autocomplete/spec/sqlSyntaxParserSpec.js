@@ -58,10 +58,21 @@
       expect(result.expected.length).toBeGreaterThan(0);
     });
 
+    it ('should find errors for "select * form ', function () {
+      var result = sqlSyntaxParser.parseSyntax('select * form ', '', 'hive', true);
+      expect(result).toBeTruthy();
+    });
+
     it('should suggest expected words for "SLELECT "', function() {
       var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();
       expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'SET', 'ALTER', 'INSERT', 'CREATE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH']);
+    });
+
+    it('should suggest expected words for "slelect "', function() {
+      var result = sqlSyntaxParser.parseSyntax('slelect ', '');
+      expect(result).toBeTruthy();
+      expect(expectedToStrings(result.expected)).toEqual(['select', 'set', 'alter', 'insert', 'create', 'show', 'use', 'drop', 'from', 'truncate', 'update', 'with']);
     });
 
     describe('Hive specific', function () {
