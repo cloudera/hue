@@ -446,7 +446,7 @@ class SolrApi(object):
       else:
         raise PopupException(e, title=_('Error while accessing Solr'))
 
-  def create_or_modify_alias(self, name, collections):
+  def create_alias(self, name, collections):
     try:
       params = self._get_params() + (
         ('action', 'CREATEALIAS'),
@@ -457,11 +457,12 @@ class SolrApi(object):
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
       if response.get('responseHeader', {}).get('status', -1) != 0:
-        msg = _("Could not create or edit alias. Check response:\n%s") % json.dumps(response, indent=2)
-        LOG.error(msg)
-        raise PopupException(msg)
+        raise PopupException(_("Could not create or edit alias: %s") % response)
+      else:
+        return response
     except RestException, e:
-        raise PopupException(e, title=_('Error while accessing Solr'))
+      raise PopupException(e, title=_('Error while accessing Solr'))
+
 
   def delete_alias(self, name):
     try:
