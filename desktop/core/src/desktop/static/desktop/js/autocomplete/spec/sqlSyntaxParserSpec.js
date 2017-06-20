@@ -56,11 +56,24 @@
       expect(result).toBeTruthy();
       expect(result.text).toEqual('SLELECT');
       expect(result.expected.length).toBeGreaterThan(0);
+      expect(result.loc.first_column).toEqual(0);
+      expect(result.loc.last_column).toEqual(7);
     });
 
-    it ('should find errors for "select * form ', function () {
-      var result = sqlSyntaxParser.parseSyntax('select * form ', '', 'hive', true);
+    it('should find errors for "alter tabel "', function() {
+      var result = sqlSyntaxParser.parseSyntax('alter tabel ', '');
       expect(result).toBeTruthy();
+      expect(result.text).toEqual('tabel');
+      expect(result.expected.length).toBeGreaterThan(0);
+      expect(result.loc.first_column).toEqual(6);
+      expect(result.loc.last_column).toEqual(11);
+    });
+
+    it ('should find errors for "select *  form ', function () {
+      var result = sqlSyntaxParser.parseSyntax('select *  form ', '');
+      expect(result).toBeTruthy();
+      expect(result.loc.first_column).toEqual(10);
+      expect(result.loc.last_column).toEqual(14);
     });
 
     it('should suggest expected words for "SLELECT "', function() {
