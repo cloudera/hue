@@ -44,19 +44,30 @@ def zkensemble():
   ZooKeeper Ensemble
   """
   try:
-    from zookeeper.conf import CLUSTERS
-    clusters = CLUSTERS.get()
-    if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
-      return '%s/solr' % clusters['default'].HOST_PORTS.get()
+    from libzookeeper.conf import ENSEMBLE
+    parsed = urlparse(ENSEMBLE.get())
+    if parsed.port == 9983:
+      return ENSEMBLE.get()
+#     elif clusters['default'].HOST_PORTS.get() != 'localhost:2181':
+#       return '%s/solr' % clusters['default'].HOST_PORTS.get()
+      #return "%s:2181/" % (parsed.hostname or 'localhost')
   except:
-    LOG.exception('failed to get zookeeper ensemble')
+    LOG.warn('Failed to get Zookeeper ensemble')
+
+#   try:
+#     from zookeeper.conf import CLUSTERS
+#     clusters = CLUSTERS.get()
+#     if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
+#       return '%s/solr' % clusters['default'].HOST_PORTS.get()
+#   except:
+#     LOG.warn('Failed to get Zookeeper ensemble')
 
   try:
     from search.conf import SOLR_URL
     parsed = urlparse(SOLR_URL.get())
     return "%s:2181/solr" % (parsed.hostname or 'localhost')
   except:
-    LOG.exception('failed to get solr url')
+    LOG.warn('Failed to get Solr url')
 
 
 ENABLE_NEW_IMPORTER = Config(
