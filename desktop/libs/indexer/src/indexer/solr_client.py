@@ -113,14 +113,11 @@ class SolrClient(object):
     return indexes
 
 
-  def create_index(self, name, fields, config_name=None):
+  def create_index(self, name, fields, config_name=None, unique_key_field=None, df=None):
     """
     Create solr collection or core and instance dir.
     Create schema.xml file so that we can set UniqueKey field.
     """
-    unique_key_field = 'id'
-    df = 'text'
-
     if self.is_solr_cloud_mode():
       if config_name is None:
         self._create_cloud_config(name, fields, unique_key_field, df) # Create config set

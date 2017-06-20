@@ -84,12 +84,14 @@ def create_index(request):
 
   name = request.POST.get('name')
   fields = json.loads(request.POST.get('fields', '[]'))
+  unique_key_field = request.POST.get('name')
+  df = request.POST.get('name')
 
   client = SolrClient(request.user)
 
   collection = client.create_index(
       name=name,
-      fields=request.POST.get('fields', _get_fields(name='id', type='string')),
+      fields=request.POST.get('fields', fields, unique_key_field=unique_key_field, df=df),
   )
 
   response['status'] = 0
