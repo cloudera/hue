@@ -4147,7 +4147,7 @@
                 }, 500);
               } else if (token !== null && token.syntaxError) {
                 tooltipTimeout = window.setTimeout(function () {
-                  var tooltipText = 'Did you mean "' + token.syntaxError.expected[0] + '"?';
+                  var tooltipText = 'Did you mean "' + token.syntaxError.expected[0].text + '"?';
                   var endCoordinates = editor.renderer.textToScreenCoordinates(pointerPosition.row, token.start);
                   contextTooltip.show(tooltipText, endCoordinates.pageX, endCoordinates.pageY + editor.renderer.lineHeight + 3);
                 }, 500);

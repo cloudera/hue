@@ -17,6 +17,10 @@
 (function () {
   describe('sqlSyntaxParser.js', function() {
 
+    var expectedToStrings = function (expected) {
+      return $.map(expected, function(ex) { return ex.text; })
+    };
+
     it('should not find errors for ""', function () {
       var result = sqlSyntaxParser.parseSyntax('', '');
       expect(result).toBeFalsy();
@@ -57,14 +61,14 @@
     it('should suggest expected words for "SLELECT "', function() {
       var result = sqlSyntaxParser.parseSyntax('SLELECT ', '');
       expect(result).toBeTruthy();
-      expect(result.expected).toEqual(['SELECT', 'SET', 'INSERT', 'ALTER', 'CREATE', 'SHOW', 'USE', 'WITH', 'FROM', 'DROP', 'TRUNCATE', 'UPDATE']);
+      expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'SET', 'ALTER', 'INSERT', 'CREATE', 'SHOW', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH']);
     });
 
     describe('Hive specific', function () {
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'hive');
         expect(result).toBeTruthy();
-        expect(result.expected).toEqual(['SELECT', 'SET', 'DELETE', 'RELOAD', 'INSERT', 'ALTER', 'INSERT', 'CREATE', 'EXPORT', 'GRANT', 'SHOW', 'LOAD', 'IMPORT', 'EXPLAIN', 'CREATE', 'REVOKE', 'MSCK', 'ANALYZE', 'SHOW', 'USE', 'USE', 'TRUNCATE', 'DROP', 'UPDATE', 'WITH', 'FROM', 'DESCRIBE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'DELETE', 'SET', 'ALTER', 'INSERT', 'INSERT', 'RELOAD', 'ANALYZE', 'CREATE', 'CREATE', 'EXPLAIN', 'EXPORT', 'GRANT', 'IMPORT', 'LOAD', 'MSCK', 'REVOKE', 'SHOW', 'SHOW', 'USE', 'USE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE']);
       });
     });
 
@@ -72,7 +76,7 @@
       it('should suggest expected words for "SLELECT "', function() {
         var result = sqlSyntaxParser.parseSyntax('SLELECT ', '', 'impala');
         expect(result).toBeTruthy();
-        expect(result.expected).toEqual(['SELECT', 'SET', 'INSERT', 'ALTER', 'INSERT', 'GRANT', 'CREATE', 'CREATE', 'REVOKE', 'EXPLAIN', 'SHOW', 'USE', 'REFRESH', 'LOAD', 'COMPUTE', 'TRUNCATE', 'UPDATE', 'WITH', 'FROM', 'DROP', 'INVALIDATE', 'DESCRIBE']);
+        expect(expectedToStrings(result.expected)).toEqual(['SELECT', 'SET', 'ALTER', 'INSERT', 'INSERT', 'CREATE', 'CREATE', 'EXPLAIN', 'GRANT', 'LOAD', 'REFRESH', 'REVOKE', 'SHOW', 'USE', 'COMPUTE', 'DROP', 'FROM', 'TRUNCATE', 'UPDATE', 'WITH', 'DESCRIBE', 'INVALIDATE']);
       });
     })
 
