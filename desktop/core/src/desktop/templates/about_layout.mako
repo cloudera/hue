@@ -31,20 +31,20 @@ def is_selected(section, matcher):
           <div class="nav-collapse">
             <ul class="nav">
               <li class="app-header">
-                <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('about:admin_wizard') + "')" or url('about:admin_wizard') }">
+                <a href="${ url('about:admin_wizard') }">
                   <img src="${ static('desktop/art/icon_hue_48.png') }" class="app-icon"  alt="${ _('Hue icon') }"/>
                   ${ _('About Hue') }
                 </a>
                </li>
               % if user.is_superuser:
                 <li class="${is_selected(section, 'quick_start')}">
-                  <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('about:admin_wizard') + "')" or url('about:admin_wizard') }">${_('Quick start')}</a>
+                  <a href="${ url('about:admin_wizard') }">${_('Quick start')}</a>
                 </li>
                 <li class="${is_selected(section, 'dump_config')}">
-                  <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('desktop.views.dump_config') + "')" or url('desktop.views.dump_config') }">${_('Configuration')}</a>
+                  <a href="${ url('desktop.views.dump_config') }">${_('Configuration')}</a>
                 </li>
                 <li class="${is_selected(section, 'log_view')}">
-                  <a href="${ is_embeddable and "javascript: huePubSub.publish('open.link', '" + url('desktop.views.log_view') + "')" or url('desktop.views.log_view') }">${_('Server Logs')}</a>
+                  <a href="${ url('desktop.views.log_view') }">${_('Server Logs')}</a>
                 </li>
               % endif
             </ul>
