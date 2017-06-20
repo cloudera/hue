@@ -15,10 +15,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
+from urlparse import urlparse
+
 from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config, coerce_bool
 from desktop.conf import default_ssl_validate
+from libzookeeper.conf import ENSEMBLE
+
+
+LOG = logging.getLogger(__name__)
 
 
 SSL_CERT_CA_VERIFY = Config(
@@ -28,9 +35,24 @@ SSL_CERT_CA_VERIFY = Config(
   type=coerce_bool
 )
 
+
+def zkensemble_path():
+  """
+  Try to guess Solr path in ZooKeeper.
+  """
+  try:
+    parsed = urlparse(ENSEMBLE.get())
+    if parsed.port == 9983:
+      return ENSEMBLE.get()
+  except:
+    LOG.warn('Failed to get Zookeeper ensemble path')
+
+  return '/solr'
+
+
 SOLR_ZK_PATH = Config(
   key="solr_zk_path",
   help=_t("Default path to Solr in ZooKeeper"),
-  default='/solr',
+  dynamic_default=zkensemble_path,
   type=str
 )
