@@ -399,17 +399,14 @@ ${ assist.assistPanel() }
           </div>
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="db" class="control-label"><div>${ _('Database') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.db" placeholder="${ _('Enter name of your database') }">
+            <label for="rdbmsName" class="control-label"><div>${ _('Database') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsName" placeholder="${ _('Enter name of your database') }">
             </label>
-              <a data-bind="hueLink: '/filebrowser/view=' + createWizard.source.path()" title="${ _('Open') }" style="font-size: 14px" class="margin-left-10">
-                <i class="fa fa-external-link-square"></i>
-              </a>
           </div>
 
           <div class="control-group input-append" data-bind="visible: createWizard.source.inputFormat() == 'rdbms'">
-            <label for="db_table" class="control-label"><div>${ _('Table') }</div>
-              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.db_table" placeholder="${ _('Enter name of your table') }">
+            <label for="rdbmsTable" class="control-label"><div>${ _('Table') }</div>
+              <input type="text" class="input-xxlarge" data-bind="value: createWizard.source.rdbmsTable" placeholder="${ _('Enter name of your table') }">
             </label>
           </div>
 
@@ -1159,7 +1156,7 @@ ${ assist.assistPanel() }
       self.sample = ko.observableArray();
       self.sampleCols = ko.observableArray();
 
-      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : (wizard.prefill.source_type() == 'file' ? 'file' : 'rdbms'));
+      self.inputFormat = ko.observable(wizard.prefill.source_type() == 'manual' ? 'manual' : file);
       self.inputFormat.subscribe(function(val) {
         wizard.destination.columns.removeAll();
         self.sample.removeAll();
@@ -1169,12 +1166,11 @@ ${ assist.assistPanel() }
       self.inputFormatsAll = ko.observableArray([
           {'value': 'file', 'name': 'File'},
           {'value': 'manual', 'name': 'Manually'},
-          {'value': 'rdbms', 'name': 'Rdbms'},
+          {'value': 'rdbms', 'name': 'External Database'},
           % if ENABLE_NEW_INDEXER.get():
           {'value': 'query', 'name': 'SQL Query'},
           {'value': 'table', 'name': 'Table'},
           % endif
-          ##{'value': 'dbms', 'name': 'DBMS'},
           ##{'value': 'text', 'name': 'Paste Text'},
       ]);
       self.inputFormatsManual = ko.observableArray([
@@ -1205,12 +1201,13 @@ ${ assist.assistPanel() }
       });
 
       // Rdbms
-      self.rdbms = ko.observable('');
-      self.db = ko.computed(function() {
-        return self.db();
+      self.rdbmsName = ko.observable('');
+      self.rdbmsTable = ko.observable('');
+      self.rdbmsTableName = ko.computed(function() {
+        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[1] : self.rdbmsTable();
       });
-      self.db_table = ko.computed(function() {
-        return self.db_table();
+      self.rdbmsDatabaseName = ko.computed(function() {
+        return self.rdbmsTable().indexOf('.') > 0 ? self.rdbmsTable().split('.', 2)[0] : 'default';
       });
 
       // Table
@@ -1258,7 +1255,7 @@ ${ assist.assistPanel() }
         } else if (self.inputFormat() == 'manual') {
           return true;
         }  else if (self.inputFormat() == 'rdbms') {
-          return (self.db().length > 0 && self.db_table().length > 0);
+          return (self.rdbmsName().length > 0 && self.rdbmsTable().length > 0);
         }
       });
 

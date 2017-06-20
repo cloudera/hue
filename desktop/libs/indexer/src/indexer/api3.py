@@ -99,11 +99,11 @@ def guess_format(request):
   elif file_format['inputFormat'] == 'query':
     format_ = {"quoteChar": "\"", "recordSeparator": "\\n", "type": "csv", "hasHeader": False, "fieldSeparator": "\u0001"}
   elif file_format['inputFormat'] == 'rdbms':
-    query_server = rdbms.get_query_server_config(server=request.db_conf_name)
+    query_server = rdbms.get_query_server_config(server=file_format['rdbmsName'])
     db = rdbms.get(request.user, query_server=query_server)
     assist = Assist(db)
     response = {'status': -1}
-    sample = assist.get_sample_data(file_format['databaseName'], table_name=file_format['tableName'], column_name=file_format['columnName'])
+    sample = assist.get_sample_data(file_format['rdbmsDatabaseName'], table_name=file_format['tableName'])
     format_ = {
         "sample": sample['rows'][:4],
         "sample_cols": sample.meta,
