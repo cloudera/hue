@@ -23,6 +23,7 @@ from django.utils.translation import ugettext_lazy as _t
 
 from desktop.lib.conf import Config
 
+
 LOG = logging.getLogger(__name__)
 
 
@@ -44,23 +45,12 @@ def zkensemble():
   ZooKeeper Ensemble
   """
   try:
-    from libzookeeper.conf import ENSEMBLE
-    parsed = urlparse(ENSEMBLE.get())
-    if parsed.port == 9983:
-      return ENSEMBLE.get()
-#     elif clusters['default'].HOST_PORTS.get() != 'localhost:2181':
-#       return '%s/solr' % clusters['default'].HOST_PORTS.get()
-      #return "%s:2181/" % (parsed.hostname or 'localhost')
+    from zookeeper.conf import CLUSTERS
+    clusters = CLUSTERS.get()
+    if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
+      return '%s/solr' % clusters['default'].HOST_PORTS.get()
   except:
     LOG.warn('Failed to get Zookeeper ensemble')
-
-#   try:
-#     from zookeeper.conf import CLUSTERS
-#     clusters = CLUSTERS.get()
-#     if clusters['default'].HOST_PORTS.get() != 'localhost:2181':
-#       return '%s/solr' % clusters['default'].HOST_PORTS.get()
-#   except:
-#     LOG.warn('Failed to get Zookeeper ensemble')
 
   try:
     from search.conf import SOLR_URL
