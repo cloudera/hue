@@ -46,7 +46,7 @@ urlpatterns += patterns('indexer.api',
 
 urlpatterns += patterns('indexer.solr_api',
   # V2
-  url(r'^api/aliases/create_or_edit/$', 'create_or_edit_alias', name='create_or_edit_alias'),
+  url(r'^api/aliases/create/$', 'create_alias', name='create_alias'),
   url(r'^api/indexes/create/$', 'create_index', name='create_index'),
   url(r'^api/indexes/delete/$', 'delete_indexes', name='delete_indexes'),
   url(r'^api/indexes/(?P<index>\w+)/schema/$', 'design_schema', name='design_schema')

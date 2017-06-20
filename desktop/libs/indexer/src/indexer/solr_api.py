@@ -110,13 +110,13 @@ def delete_indexes(request):
   if not indexes:
     response['message'] = _('No indexes to remove.')
   else:
-    searcher = SolrClient(request.user)
+    client = SolrClient(request.user)
 
     for index in indexes:
       if index['type'] == 'collection':
-        searcher.delete_index(index['name'])
+        client.delete_index(index['name'])
       elif index['type'] == 'alias':
-        searcher.delete_alias(index['name'])
+        client.delete_alias(index['name'])
       else:
         LOG.warn('We could not delete: %s' % index)
 
@@ -126,26 +126,21 @@ def delete_indexes(request):
   return JsonResponse(response)
 
 
-def create_or_edit_alias(request):
-  if request.method != 'POST':
-    raise PopupException(_('POST request required.'))
-
+@require_POST
+@api_error_handler
+def create_alias(request):
   response = {'status': -1}
 
   alias = request.POST.get('alias', '')
   collections = json.loads(request.POST.get('collections', '[]'))
 
-  api = SolrApi(SOLR_URL.get(), request.user, SECURITY_ENABLED.get())
+  client = SolrClient(request.user)
 
-  try:
-    api.create_or_modify_alias(alias, collections)
-    response['status'] = 0
-    response['message'] = _('Alias created or modified!')
-  except Exception, e:
-    response['message'] = _('Alias could not be created or modified: %s') % e
+  client.create_alias(alias, collections)
+  response['status'] = 0
+  response['message'] = _('Alias created or modified!')
 
   return JsonResponse(response)
-
 
 
 def design_schema(request, index):
