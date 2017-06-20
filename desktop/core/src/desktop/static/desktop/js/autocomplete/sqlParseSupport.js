@@ -1548,6 +1548,13 @@ var SqlParseSupport = (function () {
       // Empty for compatibility with the autocomplete parser
     };
 
+    parser.determineCase = function (text) {
+      if (!parser.yy.caseDetermined) {
+        parser.yy.lowerCase = text.toLowerCase() === text;
+        parser.yy.caseDetermined = true;
+      }
+    };
+
     var lexerModified = false;
 
     parser.yy.parseError = function (str, hash) {
@@ -1560,6 +1567,7 @@ var SqlParseSupport = (function () {
     };
 
     parser.parseSyntax = function (beforeCursor, afterCursor, dialect, debug) {
+      parser.yy.caseDetermined = false;
       parser.yy.error = undefined;
 
       parser.yy.activeDialect = (dialect !== 'hive' && dialect !== 'impala') ? undefined : dialect;
@@ -1590,19 +1598,21 @@ var SqlParseSupport = (function () {
       }
       if (parser.yy.error && !beforeCursor.endsWith(parser.yy.error.text)) {
         var weightedExpected = [];
+
+        var isLowerCase = parser.yy.caseDetermined && parser.yy.lowerCase || parser.yy.error.text.toLowerCase() === parser.yy.error.text;
         parser.yy.error.expected.forEach(function (expected) {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           if (!IGNORED_EXPECTED[expected]) {
             if (expected.length > 0 && expected.indexOf('<') !== 0) {
               weightedExpected.push({
-                text: expected,
+                text: isLowerCase ? expected.toLowerCase() : expected,
                 distance: stringDistance(parser.yy.error.text, expected, true)
               });
             } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
               var dialectTrimmed = expected.substring(dialect.length + 2);
               weightedExpected.push({
-                text: dialectTrimmed,
+                text: isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed,
                 distance: stringDistance(parser.yy.error.text, dialectTrimmed, true)
               });
             }
