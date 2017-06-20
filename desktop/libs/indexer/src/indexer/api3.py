@@ -33,6 +33,7 @@ from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
 from indexer.smart_indexer import Indexer
+from libsolr.api import SolrApi
 
 
 LOG = logging.getLogger(__name__)
@@ -398,6 +399,8 @@ def _index(request, file_format, collection_name, query=None):
   if is_unique_generated:
     schema_fields += [{"name": unique_field, "type": "string"}]
 
+  api = SolrApi(user=request.user)
+   
   collection_manager = CollectionManagerController(request.user)
   if not collection_manager.collection_exists(collection_name):
     collection_manager.create_collection(collection_name, schema_fields, unique_key_field=unique_field)
