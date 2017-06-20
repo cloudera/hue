@@ -2019,7 +2019,6 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
         vm.apiHelper.cancelActiveRequest(lastUpdateJobsRequest);
 
         lastFetchJobsRequest = self._fetchJobs(function(data) {
-          var apps = [];
           if (data && data.apps) {
             var i = 0, j = 0;
             var newJobs = [];
@@ -2041,7 +2040,7 @@ ${ commonheader("Job Browser", "jobbrowser", user, request) | n,unicode }
             }
 
             if (i < self.apps().length) {
-              self.apps().splice(i, self.apps().length - i);
+              self.apps.splice(i, self.apps().length - i);
             }
 
             newJobs.forEach(function (job) {
