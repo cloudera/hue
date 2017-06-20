@@ -151,9 +151,8 @@ class SolrClient(object):
             zc.set(os.path.join(root_node, 'conf', 'solrconfig.xml'), f.read())
       except Exception, e:
         if zc.path_exists(root_node):
-          # Remove the root node from Zookeeper
           zc.delete_path(root_node)
-        raise PopupException(_('Could not create index. Check error logs for more info.'), detail=e)
+        raise PopupException(_('Could not create index: %s') % e)
       finally:
         shutil.rmtree(tmp_path)
 

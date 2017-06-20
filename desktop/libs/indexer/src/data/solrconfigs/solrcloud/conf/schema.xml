@@ -224,9 +224,6 @@
 
     <fieldType name="location" class="solr.LatLonType" subFieldSuffix="_coordinate"/>
 
-    <fieldType name="location_rpt" class="solr.SpatialRecursivePrefixTreeFieldType"
-        geo="true" distErrPct="0.025" maxDistErr="0.000009" units="degrees" />
-
     <fieldType name="currency" class="solr.CurrencyField" precisionStep="8" defaultCurrency="USD" currencyConfig="currency.xml" />
 
     <!-- Arabic -->
@@ -557,16 +554,6 @@
         <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_sv.txt" format="snowball" />
         <filter class="solr.SnowballPorterFilterFactory" language="Swedish"/>
         <!-- less aggressive: <filter class="solr.SwedishLightStemFilterFactory"/> -->
-      </analyzer>
-    </fieldType>
-
-    <!-- Thai -->
-    <fieldType name="text_th" class="solr.TextField" positionIncrementGap="100">
-      <analyzer>
-        <tokenizer class="solr.StandardTokenizerFactory"/>
-        <filter class="solr.LowerCaseFilterFactory"/>
-        <filter class="solr.ThaiWordFilterFactory"/>
-        <filter class="solr.StopFilterFactory" ignoreCase="true" words="lang/stopwords_th.txt" />
       </analyzer>
     </fieldType>
 
