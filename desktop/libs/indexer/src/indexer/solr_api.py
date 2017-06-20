@@ -26,7 +26,7 @@ from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_unicode
 from libsolr.api import SolrApi
 
-from indexer.solr_client import SolrClient, _get_fields
+from indexer.solr_client import SolrClient
 
 
 LOG = logging.getLogger(__name__)
