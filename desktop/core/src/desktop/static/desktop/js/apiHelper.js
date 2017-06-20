@@ -62,7 +62,7 @@ var ApiHelper = (function () {
   var IMPALA_INVALIDATE_API = '/impala/api/invalidate';
   var CONFIG_SAVE_API = '/desktop/api/configurations/save/';
   var CONFIG_APPS_API = '/desktop/api/configurations';
-  var SOLR_COLLECTIONS_API = '/indexer/api/collections/list/';
+  var SOLR_COLLECTIONS_API = '/indexer/api/indexes/list/';
   var HBASE_API_PREFIX = '/hbase/api/';
   var SAVE_TO_FILE = '/filebrowser/save';
 

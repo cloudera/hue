@@ -17,6 +17,7 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import HAS_SQL_ENABLED
 from desktop import appmanager
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS, VCS
@@ -25,8 +26,7 @@ from desktop.views import _ko
 
 from metadata.conf import has_navigator, has_navigator_file_search
 from metastore.conf import ENABLE_NEW_CREATE_TABLE
-from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING
-from notebook.conf import get_ordered_interpreters
+from notebook.conf import ENABLE_QUERY_BUILDER, ENABLE_QUERY_SCHEDULING, get_ordered_interpreters
 %>
 
 <%def name="assistJSModels()">
@@ -97,7 +97,15 @@ from notebook.conf import get_ordered_interpreters
     <li><a href="javascript:void(0);" data-bind="click: openInMetastore"><i class="fa fa-fw fa-table"></i> ${ _('Open in Browser') }</a></li>
     <!-- /ko -->
     <!-- ko if: definition.isView || definition.isTable -->
-    <li><a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }"><i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }</a></li>
+    <li>
+      <a href="javascript:void(0);" data-bind="click: function() { huePubSub.publish('query.and.watch', {'url': '/notebook/browse/' + databaseName + '/' + tableName + '/', sourceType: sourceType}); }">
+        <i class="fa fa-fw fa-code"></i> ${ _('Open in Editor') }
+      </a>
+    </li>
+    % if HAS_SQL_ENABLED.get():
+    <li><a href="javascript: void(0);" data-bind="click: explore">
+      <!-- ko template: { name: 'app-icon-template', data: { icon: 'dashboard' } } --><!-- /ko --> ${ _('Open in Dashboard') }</a></li>
+    % endif
     <!-- /ko -->
     %if ENABLE_QUERY_BUILDER.get():
     <!-- ko if: definition.isColumn && $currentApp() === 'editor' -->
