@@ -23,10 +23,12 @@ import shutil
 
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import get_properties
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from libsolr.api import SolrApi
-from libsentry.conf import is_enabled
+from libsolr.conf import FS_STORAGE
+from libsentry.conf import is_enabled as is_sentry_enabled
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
 
@@ -120,7 +122,7 @@ class SolrClient(object):
     if self.is_solr_cloud_mode():
       if config_name is None:
         self._create_cloud_config(name, fields, unique_key_field, df) # Create config set
-      
+
       self.api.create_collection2(name, config_name=config_name)
       fields = [{
           'name': field['name'],
@@ -135,16 +137,12 @@ class SolrClient(object):
 
   def _create_cloud_config(self, name, fields, unique_key_field, df):
     with ZookeeperClient(hosts=get_solr_ensemble(), read_only=False) as zc:
-      tmp_path, solr_config_path = copy_configs(fields, unique_key_field, df, True)
+      tmp_path, solr_config_path = copy_configs(fields=fields, unique_key_field=unique_key_field, df=df, solr_cloud_mode=True)
 
       try:
         root_node = '%s/%s' % (ZK_SOLR_CONFIG_NAMESPACE, name)
         config_root_path = '%s/%s' % (solr_config_path, 'conf')
         zc.copy_path(root_node, config_root_path)
-
-        if is_enabled():
-          with open(os.path.join(config_root_path, 'solrconfig.xml.secure')) as f:
-            zc.set(os.path.join(root_node, 'conf', 'solrconfig.xml'), f.read())
       except Exception, e:
         if zc.path_exists(root_node):
           zc.delete_path(root_node)
@@ -185,7 +183,7 @@ class SolrClient(object):
       raise PopupException(_('Cannot remove non-Solr cloud cores.'))
 
     result = self.api.delete_collection(name)
-        
+
     if result['status'] == 0:
       # Delete instance directory.
 #       try:
