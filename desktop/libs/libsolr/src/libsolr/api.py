@@ -392,12 +392,12 @@ class SolrApi(object):
   def add_fields(self, name, fields):
     try:
       params = self._get_params() + (        
-        ('wt', 'json')
+        ('wt', 'json'),
       )
 
       data = {'add-field': fields}
 
-      response = self._root.post('%(collection)s/schema' % name, params=params, data=json.dumps(data), contenttype='application/json')
+      response = self._root.post('%(collection)s/schema' % {'collection': name}, params=params, data=json.dumps(data), contenttype='application/json')
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
