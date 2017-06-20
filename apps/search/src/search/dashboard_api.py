@@ -20,9 +20,9 @@ import logging
 from dashboard.dashboard_api import DashboardApi
 from dashboard.models import augment_solr_response
 from libsolr.api import SolrApi
+from indexer.solr_client import SolrClient
 
 from search.conf import SOLR_URL
-from search.controller import SearchController
 
 
 LOG = logging.getLogger(__name__)
@@ -39,7 +39,8 @@ class SearchApi(DashboardApi):
     return augment_solr_response(response, collection, query)
 
   def datasets(self, show_all=False):
-    return SearchController(self.user).get_all_indexes(show_all=show_all)
+    client = SolrClient(user=self.user)
+    return [index['name'] for index in client.get_indexes(include_cores=show_all)]
 
   def fields(self, collection):
     return self.api.fields(collection)
