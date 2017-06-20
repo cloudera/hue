@@ -56,3 +56,10 @@ SOLR_ZK_PATH = Config(
   dynamic_default=zkensemble_path,
   type=str
 )
+
+FS_STORAGE = Config(
+  key="fa_storage",
+  help=_t("If Solr is saving its data on HDFS (hdfs) or local filesystem (fs)."),
+  default='hdfs',
+  type=str
+)
