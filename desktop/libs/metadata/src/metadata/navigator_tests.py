@@ -30,8 +30,8 @@ from desktop.lib.django_test_util import make_logged_in_client
 from desktop.lib.test_utils import add_to_group, grant_access
 from hadoop.pseudo_hdfs4 import is_live_cluster
 
-from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password,\
-  get_navigator_auth_username
+from metadata import conf
+from metadata.conf import has_navigator, NAVIGATOR, get_navigator_auth_password, get_navigator_auth_username
 from metadata.navigator_api import _augment_highlighting
 from metadata.navigator_client import NavigatorApi
 
@@ -173,23 +173,27 @@ class TestNavigatorAPI(object):
     ]
 
     reset = NAVIGATOR.AUTH_TYPE.set_for_testing('CMDB')
+    conf.NAVIGATOR_AUTH_PASSWORD = None
 
     try:
       assert_equal('cm_username', get_navigator_auth_username())
       assert_equal('cm_pwd', get_navigator_auth_password())
 
       reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
       reset = NAVIGATOR.AUTH_TYPE.set_for_testing('ldap')
 
       assert_equal('ldap_username', get_navigator_auth_username())
       assert_equal('ldap_pwd', get_navigator_auth_password())
 
       reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
       reset = NAVIGATOR.AUTH_TYPE.set_for_testing('SAML')
 
       assert_equal('saml_username', get_navigator_auth_username())
       assert_equal('saml_pwd', get_navigator_auth_password())
     finally:
       reset()
+      conf.NAVIGATOR_AUTH_PASSWORD = None
       for _reset in resets:
         _reset()
