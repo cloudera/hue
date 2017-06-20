@@ -44,7 +44,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     <%def name="creation()">
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { index.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create index') }
-      </a>      
+      </a>
       <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(true) }">
         <i class="fa fa-plus-circle"></i> ${ _('Create alias') }
       </a>
@@ -191,7 +191,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
         $(document).trigger("error", xhr.responseText);
       });
     }
-    
+
     self.edit = function(alias) {
       self.name(alias.name());
       self.chosenCollections(alias.collections());
@@ -227,9 +227,9 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
 
     self.show = ko.observable(false);
     self.showCreate = ko.observable(false);
-    
+
     self.fileWizard = new FileWizard(vm);
-    self.hiveWizard = new HiveWizard(vm);    
+    self.hiveWizard = new HiveWizard(vm);
 
     self.name = ko.observable('');
     self.wizard = ko.observable();
@@ -247,7 +247,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
   var Editor = function () {
     var self = this;
 
-    self.indexes = ko.mapping.fromJS(${ indexes_json | n });
+    self.indexes = ko.observable([]);
 
     self.index = new Index(self);
     self.alias = new Alias(self);
@@ -278,6 +278,20 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     }
 
     self.datatable = null;
+
+    self.fetchIndexes = function() {
+      $.post("${ url('indexer:list_indexes') }", {
+      }, function(data) {
+        var indexes = []
+        data.collections.forEach(function(index) {
+          index.isSelected = false;
+          indexes.push(ko.mapping.fromJS(index));
+        });
+        self.indexes(indexes);
+      }).fail(function (xhr, textStatus, errorThrown) {
+        $(document).trigger("error", xhr.responseText);
+      });
+    };
 
     self.deleteIndexes = function() {
       $.post("${ url('indexer:delete_indexes') }", {
@@ -345,8 +359,9 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     });
 
     $("a[data-row-selector='true']").jHueRowSelector();
+
+    viewModel.fetchIndexes();
   });
 </script>
-
 
 ${ commonfooter(request, messages) | n,unicode }
