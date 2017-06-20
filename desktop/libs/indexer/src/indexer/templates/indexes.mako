@@ -114,7 +114,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     <select data-bind="options: alias.availableCollections, selectedOptions: alias.chosenCollections, optionsText: 'name', optionsValue: 'name'" size="5" multiple="true"></select>
 
     <a href="javascript:void(0)" class="btn" data-bind="click: alias.create, visible: alias.chosenCollections().length > 0">
-      <i class="fa fa-plus-circle"></i> ${ _('Create or edit') }
+      <i class="fa fa-plus-circle"></i> ${ _('Create') }
     </a>
     <a href="javascript:void(0)" class="btn" data-bind="click: function() { alias.showCreateModal(false) }">
       <i class="fa fa-plus-circle"></i> ${ _('Cancel') }
@@ -182,7 +182,7 @@ ${ commonheader(_("Index Browser"), "search", user, request, "60px") | n,unicode
     });
 
     self.create = function() {
-      $.post("${ url('indexer:create_or_edit_alias') }", {
+      $.post("${ url('indexer:create_alias') }", {
         "alias": self.name,
         "collections": ko.mapping.toJSON(self.chosenCollections)
       }, function() {
