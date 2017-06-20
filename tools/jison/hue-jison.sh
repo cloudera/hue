@@ -44,6 +44,8 @@ cat syntax_header.jison sql_main.jison sql_valueExpression.jison  sql_alter.jiso
 
 echo "Creating SQL syntax parser..."
 jison sqlSyntaxParser.jison sql.jisonlex
+# Workaround for a parser bug where it reports the location of the previous token on error (pull-request submitted for jison)
+sed -i '' 's/loc: yyloc,/loc: lexer.yylloc,/' sqlSyntaxParser.js
 cat license.txt sqlSyntaxParser.js > ../sqlSyntaxParser.js
 rm sqlSyntaxParser.jison
 rm sqlSyntaxParser.js

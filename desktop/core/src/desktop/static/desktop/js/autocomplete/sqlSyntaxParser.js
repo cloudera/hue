@@ -4589,7 +4589,7 @@ _handle_error:
                     text: lexer.match,
                     token: this.terminals_[symbol] || symbol,
                     line: lexer.yylineno,
-                    loc: yyloc,
+                    loc: lexer.yylloc,
                     expected: expected,
                     recoverable: (error_rule_depth !== false)
                 });

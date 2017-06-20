@@ -3589,6 +3589,9 @@
 
         self.aceSqlSyntaxWorker.onmessage = function(e) {
           if (e.data.syntaxError) {
+            if (hueDebug.showSyntaxParseResult) {
+              console.log(e.data.syntaxError);
+            }
             var token = self.editor.session.getTokenAt(e.data.syntaxError.loc.first_line - 1, e.data.syntaxError.loc.first_column);
             if (token && token.value && /`$/.test(token.value)) {
               // Ace getTokenAt() thinks the first ` is a token, column +1 will include the first and last.
