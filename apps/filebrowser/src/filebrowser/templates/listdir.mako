@@ -204,11 +204,11 @@ ${ fb_components.menubar() }
       </div>
     </div>
   </div>
+  <div class="hoverMsg hide">
+    <p class="hoverText"></p>
+  </div>
 </div>
 
-<div class="hoverMsg hide">
-  <p class="hoverText"></p>
-</div>
 
 %if not is_embeddable:
 ${ commonfooter(request, messages) | n,unicode }
