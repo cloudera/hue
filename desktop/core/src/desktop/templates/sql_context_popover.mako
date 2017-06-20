@@ -17,10 +17,12 @@
 <%!
 from django.utils.translation import ugettext as _
 
+from dashboard.conf import HAS_SQL_ENABLED
 from desktop import conf
 from desktop.conf import USE_NEW_SIDE_PANELS
 from desktop.lib.i18n import smart_unicode
 from desktop.views import _ko
+
 from metadata.conf import has_navigator
 %>
 
@@ -31,7 +33,12 @@ from metadata.conf import has_navigator
         <a class="inactive-action pointer" data-bind="visible: showInAssistEnabled && (isTable || isColumn), click: function() { huePubSub.publish('sql.context.popover.show.in.assist') }">
           <i style="font-size: 11px;" title="${ _("Show in Assist...") }" class="fa fa-search"></i> ${ _("Assist") }
         </a>
-        <a class="inactive-action pointer" data-bind="visible: isTable || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
+        % if HAS_SQL_ENABLED.get():
+        <a class="inactive-action pointer" data-bind="visible: isTable || isView || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.dashboard') }">
+          <i style="font-size: 11px;" title="${ _("Open in Dashboard...") }" class="fa fa-external-link"></i> ${ _("Dashboard") }
+        </a>
+        % endif
+        <a class="inactive-action pointer" data-bind="visible: isTable || isView || isDatabase, click: function() { huePubSub.publish('sql.context.popover.open.in.metastore', isTable ? 'table' : 'db') }">
           <i style="font-size: 11px;" title="${ _("Open in Table Browser...") }" class="fa fa-external-link"></i> ${ _("Table Browser") }
         </a>
         <a class="inactive-action pointer" data-bind="visible: isHdfs, click: function() { huePubSub.publish('sql.context.popover.replace.in.editor') }">
@@ -1252,6 +1259,16 @@ from metadata.conf import has_navigator
                 window.open('/metastore/table' + (type === 'table' ? '/' : 's/') + path.join('/'), '_blank');
               }
             }));
+            % if HAS_SQL_ENABLED.get():
+            pubSubs.push(huePubSub.subscribe('sql.context.popover.open.in.dashboard', function () {
+              if (IS_HUE_4) {
+                huePubSub.publish('open.link', '/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType);
+                huePubSub.publish('sql.context.popover.hide');
+              } else {
+                window.open('/hue/dashboard/browse/' + path.join('.') + '?engine=' + self.sourceType, '_blank');
+              }
+            }));
+            % endif
           });
         }
 
