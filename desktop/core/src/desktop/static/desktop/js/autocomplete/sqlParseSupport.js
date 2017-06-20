@@ -1589,24 +1589,29 @@ var SqlParseSupport = (function () {
         }
       }
       if (parser.yy.error && !beforeCursor.endsWith(parser.yy.error.text)) {
-
-        var cleanExpected = [];
+        var weightedExpected = [];
         parser.yy.error.expected.forEach(function (expected) {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           if (!IGNORED_EXPECTED[expected]) {
             if (expected.length > 0 && expected.indexOf('<') !== 0) {
-              cleanExpected.push(expected);
+              weightedExpected.push({
+                text: expected,
+                distance: stringDistance(parser.yy.error.text, expected, true)
+              });
             } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
-              cleanExpected.push(expected.substring(dialect.length + 2));
+              var dialectTrimmed = expected.substring(dialect.length + 2);
+              weightedExpected.push({
+                text: dialectTrimmed,
+                distance: stringDistance(parser.yy.error.text, dialectTrimmed, true)
+              });
             }
           }
         });
-        cleanExpected.sort(function (a, b) {
-          // TODO: Possible performance boost when initializing the distances algorithm given parser.yy.error.text
-          return stringDistance(parser.yy.error.text, a, true) - stringDistance(parser.yy.error.text, b, true);
+        weightedExpected.sort(function (a, b) {
+          return a.distance - b.distance
         });
-        parser.yy.error.expected = cleanExpected;
+        parser.yy.error.expected = weightedExpected;
         return parser.yy.error;
       }
       return false;
