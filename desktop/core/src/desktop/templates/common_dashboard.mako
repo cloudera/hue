@@ -43,13 +43,13 @@
   %if not hasattr(caller, "skipLayout"):
   <div style="float: left">
     <div class="toolbar-label">${_('LAYOUT')}</div>
-    <a href="javascript: oneSixthLeftLayout(viewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: oneSixthLeftLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('oneSixthLeft')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 24px"></div>
         <div class="layout-box" style="width: 72px; margin-left: 4px"></div>
       </div>
     </a>
-    <a href="javascript: fullLayout(viewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
+    <a href="javascript: fullLayout(searchViewModel)" onmouseover="searchViewModel.previewColumns('full')" onmouseout="searchViewModel.previewColumns('')">
       <div class="layout-container">
         <div class="layout-box" style="width: 100px;"></div>
       </div>
