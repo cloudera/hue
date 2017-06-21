@@ -32,7 +32,8 @@ from notebook.models import make_notebook
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
-from indexer.indexers.morphline import Indexer
+from indexer.indexers.morphline import MorhlineIndexer
+from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, SolrClientException
 
 
@@ -73,7 +74,7 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
-    indexer = Indexer(request.user, request.fs)
+    indexer = MorhlineIndexer(request.user, request.fs)
     if not request.fs.isfile(file_format["path"]):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
 
@@ -107,7 +108,7 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
-    indexer = Indexer(request.user, request.fs)
+    indexer = MorhlineIndexer(request.user, request.fs)
     stream = request.fs.open(file_format["path"])
     _convert_format(file_format["format"], inverse=True)
 
@@ -212,186 +213,12 @@ def create_database(request, source, destination, start_time):
 
 
 def _create_table(request, source, destination, start_time=-1):
-  notebook = _create_table_from_a_file(request, source, destination, start_time)
+  notebook = SQLIndexer(user=request.user, fs=request.fs).create_table_from_a_file(source, destination, start_time)
   return notebook.execute(request, batch=False)
 
 
-def _create_table_from_a_file(request, source, destination, start_time=-1):
-  if '.' in destination['name']:
-    database, table_name = destination['name'].split('.', 1)
-  else:
-    database = 'default'
-    table_name = destination['name']
-  final_table_name = table_name
-
-  table_format = destination['tableFormat']
-
-  columns = destination['columns']
-  partition_columns = destination['partitionColumns']
-  kudu_partition_columns = destination['kuduPartitionColumns']
-  comment = destination['description']
-
-  source_path = source['path']
-  external = not destination['useDefaultLocation']
-  external_path = destination['nonDefaultLocation']
-
-  load_data = destination['importData']
-  skip_header = destination['hasHeader']
-
-  primary_keys = destination['primaryKeys']
-
-  if destination['useCustomDelimiters']:
-    field_delimiter = destination['customFieldDelimiter']
-    collection_delimiter = destination['customCollectionDelimiter']
-    map_delimiter = destination['customMapDelimiter']
-  else:
-    field_delimiter = ','
-    collection_delimiter = r'\002'
-    map_delimiter = r'\003'
-  regexp_delimiter = destination['customRegexp']
-
-  file_format = 'TextFile'
-  row_format = 'Delimited'
-  serde_name = ''
-  serde_properties = ''
-  extra_create_properties = ''
-  sql = ''
-
-  if source['inputFormat'] == 'manual':
-    load_data = False
-    source['format'] = {
-      'quoteChar': '"',
-      'fieldSeparator': ','
-    }
-
-  if table_format == 'json':
-    row_format = 'serde'
-    serde_name = 'org.apache.hive.hcatalog.data.JsonSerDe'
-  elif table_format == 'regexp':
-    row_format = 'serde'
-    serde_name = 'org.apache.hadoop.hive.serde2.RegexSerDe'
-    serde_properties = '"input.regex" = "%s"' % regexp_delimiter
-  elif table_format == 'csv':
-    if source['format']['quoteChar'] == '"':
-      source['format']['quoteChar'] = '\\"'
-    row_format = 'serde'
-    serde_name = 'org.apache.hadoop.hive.serde2.OpenCSVSerde'
-    serde_properties = '''"separatorChar" = "%(fieldSeparator)s",
-  "quoteChar"     = "%(quoteChar)s",
-  "escapeChar"    = "\\\\"
-  ''' % source['format']
-
-
-  if table_format in ('parquet', 'kudu'):
-    if load_data:
-      table_name, final_table_name = 'hue__tmp_%s' % table_name, table_name
-
-      sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
-          'database': database,
-          'table_name': table_name
-      }
-    else: # Manual
-      row_format = ''
-      file_format = table_format
-      skip_header = False
-      if table_format == 'kudu':
-        columns = [col for col in columns if col['name'] in primary_keys] + [col for col in columns if col['name'] not in primary_keys]
-
-  if table_format == 'kudu':
-    collection_delimiter = None
-    map_delimiter = None
-
-  if external or (load_data and table_format in ('parquet', 'kudu')):
-    if not request.fs.isdir(external_path): # File selected
-      external_path, external_file_name = request.fs.split(external_path)
-
-      if len(request.fs.listdir(external_path)) > 1:
-        external_path = external_path + '/%s_table' % external_file_name # If dir not just the file, create data dir and move file there.
-        request.fs.mkdir(external_path)
-        request.fs.rename(source_path, external_path)
-
-  sql += django_mako.render_to_string("gen/create_table_statement.mako", {
-      'table': {
-          'name': table_name,
-          'comment': comment,
-          'row_format': row_format,
-          'field_terminator': field_delimiter,
-          'collection_terminator': collection_delimiter, # Only if Hive
-          'map_key_terminator': map_delimiter, # Only if Hive
-          'serde_name': serde_name,
-          'serde_properties': serde_properties,
-          'file_format': file_format,
-          'external': external or load_data and table_format in ('parquet', 'kudu'),
-          'path': external_path,
-          'skip_header': skip_header,
-          'primary_keys': primary_keys if table_format == 'kudu' and not load_data else [],
-       },
-      'columns': columns,
-      'partition_columns': partition_columns,
-      'kudu_partition_columns': kudu_partition_columns,
-      'database': database
-    }
-  )
-
-  if table_format in ('text', 'json', 'csv', 'regexp') and not external and load_data:
-    form_data = {
-      'path': source_path,
-      'overwrite': False,
-      'partition_columns': [(partition['name'], partition['partitionValue']) for partition in partition_columns],
-    }
-    db = dbms.get(request.user)
-    sql += "\n\n%s;" % db.load_data(database, table_name, form_data, None, generate_ddl_only=True)
-
-  if load_data and table_format in ('parquet', 'kudu'):
-    file_format = table_format
-    if table_format == 'kudu':
-      columns_list = ['`%s`' % col for col in primary_keys + [col['name'] for col in destination['columns'] if col['name'] not in primary_keys]]
-      extra_create_properties = """PRIMARY KEY (%(primary_keys)s)
-      PARTITION BY HASH PARTITIONS 16
-      STORED AS %(file_format)s
-      TBLPROPERTIES(
-      'kudu.num_tablet_replicas' = '1'
-      )""" % {
-        'file_format': file_format,
-        'primary_keys': ', '.join(primary_keys)
-      }
-    else:
-      columns_list = ['*']
-      extra_create_properties = 'STORED AS %(file_format)s' % {'file_format': file_format}
-    sql += '''\n\nCREATE TABLE `%(database)s`.`%(final_table_name)s`%(comment)s
-      %(extra_create_properties)s
-      AS SELECT %(columns_list)s
-      FROM `%(database)s`.`%(table_name)s`;''' % {
-        'database': database,
-        'final_table_name': final_table_name,
-        'table_name': table_name,
-        'extra_create_properties': extra_create_properties,
-        'columns_list': ', '.join(columns_list),
-        'comment': ' COMMENT "%s"' % comment if comment else ''
-    }
-    sql += '\n\nDROP TABLE IF EXISTS `%(database)s`.`%(table_name)s`;\n' % {
-        'database': database,
-        'table_name': table_name
-    }
-
-  editor_type = 'impala' if table_format == 'kudu' else destination['apiHelperType']
-
-  on_success_url = reverse('metastore:describe_table', kwargs={'database': database, 'table': table_name})
-
-  return make_notebook(
-      name=_('Creating table %(database)s.%(table)s') % {'database': database, 'table': table_name},
-      editor_type=editor_type,
-      statement=sql.strip(),
-      status='ready',
-      database=database,
-      on_success_url=on_success_url,
-      last_executed=start_time,
-      is_task=True
-  )
-
-
 def _index(request, file_format, collection_name, query=None, start_time=None):
-  indexer = Indexer(request.user, request.fs)
+  indexer = MorhlineIndexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
   is_unique_generated = indexer.is_unique_generated(file_format)
