@@ -57,7 +57,7 @@ def escape_rows(rows, nulls_only=False):
 
 def make_notebook(name='Browse', description='', editor_type='hive', statement='', status='ready',
                   files=None, functions=None, settings=None, is_saved=False, database='default', snippet_properties=None, batch_submit=False,
-                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1):
+                  on_success_url=None, skip_historify=False, is_task=False, last_executed=-1, is_notebook=False):
   '''
   skip_historify: do not add the task to the query history. e.g. SQL Dashboard
   isManaged: true when being a managed by Hue operation (include_managed=True in document), e.g. exporting query result, dropping some tables
@@ -99,7 +99,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
       }
     ],
     'selectedSnippet': editor_type,
-    'type': 'query-%s' % editor_type,
+    'type': 'notebook' if is_notebook else 'query-%s' % editor_type,
     'showHistory': True,
     'isSaved': is_saved,
     'onSuccessUrl': on_success_url,
@@ -124,7 +124,7 @@ def make_notebook(name='Browse', description='', editor_type='hive', statement='
          'result': {'handle':{}},
          'variables': []
       }
-    ]
+    ] if not is_notebook else []
   }
 
   if snippet_properties:
@@ -162,9 +162,9 @@ def make_notebook2(name='Browse', description='', is_saved=False, snippets=None)
     'description': description,
     'sessions': [
       {
-         'type': _snippet['type'],
-         'properties': HS2Api.get_properties(snippet['type']),
-         'id': None
+        'type': _snippet['type'],
+        'properties': HS2Api.get_properties(snippet['type']),
+        'id': None
       } for _snippet in _snippets # Non unique types currently
     ],
     'selectedSnippet': _snippets[0]['type'],
