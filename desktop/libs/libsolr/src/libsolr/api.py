@@ -372,7 +372,7 @@ class SolrApi(object):
         ('action', 'CREATE'),
         ('name', name),
         ('numShards', shards),
-        ('replicationFactor', replication),        
+        ('replicationFactor', replication),
         ('wt', 'json')
       )
       if config_name:
@@ -380,8 +380,7 @@ class SolrApi(object):
           ('collection.configName', config_name),
         )
       if kwargs:
-        params += ((key, val) for key, val in kwargs.iteritems())
-        
+        params += tuple(((key, val) for key, val in kwargs.iteritems()))
 
       response = self._root.post('admin/collections', params=params, contenttype='application/json')
       return self._get_json(response)
@@ -391,7 +390,7 @@ class SolrApi(object):
 
   def add_fields(self, name, fields):
     try:
-      params = self._get_params() + (        
+      params = self._get_params() + (
         ('wt', 'json'),
       )
 
@@ -479,7 +478,7 @@ class SolrApi(object):
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
     return response
-    
+
 
   def remove_core(self, name):
     try:
@@ -664,6 +663,31 @@ class SolrApi(object):
       return self._get_json(response)
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
+
+
+  def update(self, collection_or_core_name, data, content_type='csv', version=None, **kwargs):
+    if content_type == 'csv':
+      content_type = 'application/csv'
+    elif content_type == 'json':
+      content_type = 'application/json'
+    else:
+      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
+
+    params = self._get_params() + (
+        ('wt', 'json'),
+        ('overwrite', 'true'),
+        ('commit', 'true'),
+    )
+    if version is not None:
+      params += (
+        ('_version_', version),
+        ('versions', 'true')
+      )
+    if kwargs:
+      params += tuple(((key, val) for key, val in kwargs.iteritems()))
+
+    response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
+    return self._get_json(response)
 
 
   # Deprecated
@@ -881,27 +905,6 @@ class SolrApi(object):
       return self._get_json(response)['uniqueKey']
     except RestException, e:
       raise PopupException(e, title=_('Error while accessing Solr'))
-
-  def update(self, collection_or_core_name, data, content_type='csv', version=None):
-    if content_type == 'csv':
-      content_type = 'application/csv'
-    elif content_type == 'json':
-      content_type = 'application/json'
-    else:
-      LOG.error("Trying to update collection  %s with content type %s. Allowed content types: csv/json" % (collection_or_core_name, content_type))
-
-    params = self._get_params() + (
-        ('wt', 'json'),
-        ('overwrite', 'true'),
-        ('commit', 'true'),
-    )
-    if version is not None:
-      params += (
-        ('_version_', version),
-        ('versions', 'true')
-      )
-    response = self._root.post('%s/update' % collection_or_core_name, contenttype=content_type, params=params, data=data)
-    return self._get_json(response)
 
 
 GAPS = {
