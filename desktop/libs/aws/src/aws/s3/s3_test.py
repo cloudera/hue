@@ -74,7 +74,7 @@ def test_s3datetime_to_timestamp():
 
 def test_get_default_region():
   # Verify that Hue can infer region from subdomain hosts
-  finish = conf.AWS_ACCOUNTS['default'].HOST.set_for_testing('s3.ap-northeast-2.amazonaws.com')
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3.ap-northeast-2.amazonaws.com'}})
   try:
     assert_equal('ap-northeast-2', get_default_region())
   finally:
@@ -82,7 +82,7 @@ def test_get_default_region():
       finish()
 
   # Verify that Hue can infer region from hyphenated hosts
-  finish = conf.AWS_ACCOUNTS['default'].HOST.set_for_testing('s3-ap-south-1.amazonaws.com')
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3-ap-south-1.amazonaws.com'}})
   try:
     assert_equal('ap-south-1', get_default_region())
   finally:
@@ -90,7 +90,7 @@ def test_get_default_region():
       finish()
 
   # Verify that Hue can infer region from hyphenated hosts
-  finish = conf.AWS_ACCOUNTS['default'].HOST.set_for_testing('s3.dualstack.ap-southeast-2.amazonaws.com')
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3.dualstack.ap-southeast-2.amazonaws.com'}})
   try:
     assert_equal('ap-southeast-2', get_default_region())
   finally:
@@ -98,7 +98,7 @@ def test_get_default_region():
       finish()
 
   # Verify that Hue falls back to the default if the region is not valid
-  finish = conf.AWS_ACCOUNTS['default'].HOST.set_for_testing('s3-external-1.amazonaws.com')
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': 's3-external-1.amazonaws.com'}})
   try:
     assert_equal(Location.DEFAULT, get_default_region())
   finally:
@@ -106,12 +106,9 @@ def test_get_default_region():
       finish()
 
   # Verify that Hue uses the region if specified
-  finish = [
-    conf.AWS_ACCOUNTS['default'].HOST.set_for_testing(''),
-    conf.AWS_ACCOUNTS['default'].REGION.set_for_testing('ca-central-1'),
-  ]
+  finish = conf.AWS_ACCOUNTS.set_for_testing({'default': {'host': '', 'region': 'ca-central-1'}})
   try:
     assert_equal('ca-central-1', get_default_region())
   finally:
-    for reset in finish:
-      reset()
+    if finish:
+      finish()
