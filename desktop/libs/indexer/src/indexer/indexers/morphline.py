@@ -39,7 +39,7 @@ from indexer.indexers.morphline_operations import get_checked_args
 LOG = logging.getLogger(__name__)
 
 
-class MorhlineIndexer(object):
+class MorphlineIndexer(object):
 
   def __init__(self, username, fs=None, jt=None):
     self.fs = fs
@@ -68,7 +68,7 @@ class MorhlineIndexer(object):
     workspace_path = self._upload_workspace(morphline)
 
     task = make_notebook(
-      name=_('MorhlineIndexer job for %s') % collection_name,
+      name=_('MorphlineIndexer job for %s') % collection_name,
       editor_type='notebook',
       on_success_url=reverse('search:browse', kwargs={'name': collection_name}),
       is_task=True,

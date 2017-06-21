@@ -656,6 +656,73 @@ ${ assist.assistPanel() }
         </div>
         <!-- /ko -->
 
+        <!-- ko if: outputFormat() == 'index' -->
+        <div class="card step">
+          <h3 class="card-heading simple">${_('Properties')}</h3>
+          <div class="card-body">
+            <div class="control-group">
+              <label class="checkbox inline-block">
+                <input type="checkbox" data-bind="checked: indexerRunJob"> ${_('Run Indexer job')}
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label for="kuduPks" class="control-label"><div>${ _('Primary key') }</div>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label for="kuduPks" class="control-label"><div>${ _('Default field') }</div>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+              </label>
+            </div>
+
+            <div class="control-group">
+              <label class="control-label"><div>${ _('Extras') }</div>
+                <a href="javascript:void(0)" data-bind="css: { 'inactive-action': !showProperties() }, click: function() { showProperties(!showProperties()) }" title="${ _('Show extra properties') }">
+                  <i class="fa fa-sliders fa-padding-top"></i>
+                </a>
+              </label>
+            </div>
+
+            <span data-bind="visible: showProperties">
+              <div class="control-group">
+                <label for="destinationFormat" class="control-label"><div>${ _('Config set') }</div>
+                  <select id="destinationFormat" data-bind="selectize: indexerConfigSets, value: indexerConfigSet, optionsValue: 'value', optionsText: 'name'"></select>
+                </label>
+              </div>
+
+              <div class="control-group">
+                <label for="path" class="control-label" data-bind="indexerRunJob"><div>${ _('Libs') }</div>
+                  <input type="text" class="form-control path input-xxlarge" data-bind="value: indexerJobLibPath, filechooser: indexerJobLibPath, filechooserOptions: { linkMarkup: true, skipInitialPathIfEmpty: true }, valueUpdate: 'afterkeydown'">
+                </label>
+              </div>
+
+              <div class="control-group">
+                <label for="indexerNumShards" class="control-label"><div>${ _('Num shards') }</div>
+                  <input type="number" class="input-small" placeholder="1" data-bind="value: indexerNumShards">
+                </label>
+              </div>
+              
+              <div class="control-group">
+                <label for="indexerReplicationFactor" class="control-label"><div>${ _('Replication factor') }</div>
+                  <input type="number" class="input-small" placeholder="1" data-bind="value: indexerReplicationFactor">
+                </label>
+              </div>
+
+              ## Router, maxShardsPer, shards, routerField
+
+              <div class="control-group" data-bind="visible: $root.createWizard.source.inputFormat() == 'file'">
+                <label class="checkbox inline-block">
+                  <input type="checkbox" data-bind="checked: hasHeader"> ${_('Use first row as header')}
+                </label>
+              </div>
+            </span>
+          </div>
+        </div>
+        <!-- /ko -->
+
         <!-- ko if: outputFormat() == 'table' || outputFormat() == 'index' -->
           <div class="card step">
             <h3 class="card-heading simple show-edit-on-hover">${_('Fields')} <!-- ko if: $root.createWizard.isGuessingFieldTypes --><i class="fa fa-spinner fa-spin"></i><!-- /ko --> <a class="inactive-action pointer" data-bind="visible: columns().length > 0" href="#fieldsBulkEditor" data-toggle="modal"><i class="fa fa-edit"></i></a></h3>
@@ -852,7 +919,7 @@ ${ assist.assistPanel() }
   </span>
 
   <!-- ko if: operations().length == 0 -->
-  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
+  <a class="pointer margin-left-20" data-bind="click: $root.createWizard.addOperation, visible: $root.createWizard.destination.indexerRunJob" title="${_('Add Operation')}"><i class="fa fa-plus"></i> ${_('Operation')}</a>
   <!-- /ko -->
 
   <div data-bind="foreach: operations">
@@ -876,7 +943,7 @@ ${ assist.assistPanel() }
     <!-- /ko -->
     <a class="pointer margin-left-20" data-bind="click: function(){$root.createWizard.removeOperation(operation, list)}" title="${ _('Remove') }"><i class="fa fa-times"></i></a>
     <div class="margin-left-20" data-bind="foreach: operation.fields">
-      <div data-bind="template: { name:'index-field-template', data:$data }" class="margin-top-10 field index-field"></div>
+      <div data-bind="template: { name: 'index-field-template', data: $data }" class="margin-top-10 field index-field"></div>
     </div>
   </div>
 </script>
@@ -1313,6 +1380,7 @@ ${ assist.assistPanel() }
           }, function (data) {
             self.isTargetExisting(data.status == 0);
             self.isTargetChecking(false);
+            // Fetch indexerConfigSets
           }).fail(function (xhr, textStatus, errorThrown) { self.isTargetExisting(false); self.isTargetChecking(false); });
         }
         resizeElements();
@@ -1331,7 +1399,7 @@ ${ assist.assistPanel() }
       self.outputFormatsList = ko.observableArray([
           {'name': 'Table', 'value': 'table'},
           % if ENABLE_NEW_INDEXER.get():
-          {'name': 'Solr index', 'value': 'index'},
+          {'name': 'Search index', 'value': 'index'},
           % endif
           {'name': 'File', 'value': 'file'},
           {'name': 'Database', 'value': 'database'},
@@ -1456,6 +1524,12 @@ ${ assist.assistPanel() }
       self.customRegexp = ko.observable('');
 
       // Index
+      self.indexerRunJob = ko.observable(false);
+      self.indexerJobLibPath = ko.observable('');
+      self.indexerConfigSet = ko.observable('');
+      self.indexerConfigSets = ko.observableArray([]);
+      self.indexerNumShards = ko.observable('');
+      self.indexerReplicationFactor = ko.observable(1);
     };
 
     var CreateWizard = function (vm) {
