@@ -1619,22 +1619,26 @@ var SqlParseSupport = (function () {
       if (parser.yy.error && (parser.yy.error.loc.last_column < beforeCursor.length || !beforeCursor.endsWith(parser.yy.error.text))) {
         var weightedExpected = [];
 
+        var addedExpected = {};
+
         var isLowerCase = parser.yy.caseDetermined && parser.yy.lowerCase || parser.yy.error.text.toLowerCase() === parser.yy.error.text;
         parser.yy.error.expected.forEach(function (expected) {
           // Strip away the surrounding ' chars
           expected = expected.substring(1, expected.length - 1);
           // TODO: Only suggest alphanumeric?
           if (!IGNORED_EXPECTED[expected] && /[a-z_]+/i.test(expected)) {
+            var text = null;
             if (expected.length > 0 && expected.indexOf('<') !== 0) {
-              weightedExpected.push({
-                text: isLowerCase ? expected.toLowerCase() : expected,
-                distance: stringDistance(parser.yy.error.text, expected, true)
-              });
+              text = isLowerCase ? expected.toLowerCase() : expected;
             } else if (dialect && expected.indexOf('<' + dialect + '>') == 0) {
               var dialectTrimmed = expected.substring(dialect.length + 2);
+              text = isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed;
+            }
+            if (text && !addedExpected[text]) {
+              addedExpected[text] = true;
               weightedExpected.push({
-                text: isLowerCase ? dialectTrimmed.toLowerCase() : dialectTrimmed,
-                distance: stringDistance(parser.yy.error.text, dialectTrimmed, true)
+                text: text,
+                distance: stringDistance(parser.yy.error.text, text, true)
               });
             }
           }
