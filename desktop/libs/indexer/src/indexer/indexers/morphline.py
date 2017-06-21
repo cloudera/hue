@@ -177,7 +177,7 @@ class MorphlineIndexer(object):
       "fields": self.get_field_list(data['columns']),
       "num_base_fields": len(data['columns']),
       "uuid_name" : uuid_name,
-      "get_regex": Indexer._get_regex_for_type,
+      "get_regex": MorphlineIndexer._get_regex_for_type,
       "format_settings": data['format'],
       "format_class": get_file_format_class(data['format']['type']),
       "get_kept_args": get_checked_args,

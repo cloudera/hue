@@ -668,13 +668,13 @@ ${ assist.assistPanel() }
 
             <div class="control-group">
               <label for="kuduPks" class="control-label"><div>${ _('Primary key') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerPrimaryKey, selectedObjects: indexerPrimaryKeyObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
             <div class="control-group">
               <label for="kuduPks" class="control-label"><div>${ _('Default field') }</div>
-                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: primaryKeys, selectedObjects: primaryKeyObjects, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
+                <select id="kuduPks" data-bind="selectize: columns, selectedOptions: indexerDefaultField, selectedObjects: indexerDefaultFieldObject, optionsValue: 'name', optionsText: 'name', innerSubscriber: 'name'" size="1" multiple="false"></select>
               </label>
             </div>
 
@@ -1530,6 +1530,10 @@ ${ assist.assistPanel() }
       self.indexerConfigSets = ko.observableArray([]);
       self.indexerNumShards = ko.observable('');
       self.indexerReplicationFactor = ko.observable(1);
+      self.indexerPrimaryKey = ko.observableArray();
+      self.indexerPrimaryKeyObject = ko.observableArray();
+      self.indexerDefaultField = ko.observableArray();
+      self.indexerDefaultFieldObject = ko.observableArray();
     };
 
     var CreateWizard = function (vm) {
@@ -1783,9 +1787,13 @@ ${ assist.assistPanel() }
           "destination": ko.mapping.toJSON(self.destination),
           "start_time": ko.mapping.toJSON((new Date()).getTime())
         }, function (resp) {
-          if (resp.status == 0 && resp.history_uuid) {
-            $.jHueNotify.info("${ _('Task submitted.') }");
-            huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+          if (resp.status == 0) {
+            if (resp.history_uuid) {
+              $.jHueNotify.info("${ _('Task submitted.') }");
+              huePubSub.publish('notebook.task.submitted', resp.history_uuid);
+            } else {
+              $.jHueNotify.info("${ _('Creation success.') }");
+            }
           } else {
             $(document).trigger("error", resp && resp.message ? resp.message : '${ _("Error importing") }');
           }
