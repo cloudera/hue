@@ -23,11 +23,9 @@ import shutil
 
 from django.utils.translation import ugettext as _
 
-from dashboard.conf import get_properties
 from desktop.lib.exceptions_renderable import PopupException
 from desktop.lib.i18n import smart_str
 from libsolr.api import SolrApi
-from libsolr.conf import FS_STORAGE
 from libsentry.conf import is_enabled as is_sentry_enabled
 from libzookeeper.models import ZookeeperClient
 from search.conf import SOLR_URL, SECURITY_ENABLED
@@ -121,7 +119,7 @@ class SolrClient(object):
     """
     if self.is_solr_cloud_mode():
       if config_name is None:
-        self._create_cloud_config(name, fields, unique_key_field, df) # Create config set
+        self._create_cloud_config(name, fields, unique_key_field, df)
 
       self.api.create_collection2(name, config_name=config_name)
       fields = [{
@@ -198,6 +196,10 @@ class SolrClient(object):
     else:
       if not 'Cannot unload non-existent core' in json.dumps(result):
         raise PopupException(_('Could not remove collection: %(message)s') % result)
+
+
+  def list_configs(self):    
+    return self.api.configs()
 
 
   def get_index_schema(self, index_name):
