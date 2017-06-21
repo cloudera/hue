@@ -32,7 +32,7 @@ from notebook.models import make_notebook
 from indexer.controller import CollectionManagerController
 from indexer.file_format import HiveFormat
 from indexer.fields import Field
-from indexer.indexers.morphline import MorhlineIndexer
+from indexer.indexers.morphline import MorphlineIndexer
 from indexer.indexers.sql import SQLIndexer
 from indexer.solr_client import SolrClient, SolrClientException
 
@@ -74,7 +74,7 @@ def guess_format(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
-    indexer = MorhlineIndexer(request.user, request.fs)
+    indexer = MorphlineIndexer(request.user, request.fs)
     if not request.fs.isfile(file_format["path"]):
       raise PopupException(_('Path %(path)s is not a file') % file_format)
 
@@ -108,7 +108,7 @@ def guess_field_types(request):
   file_format = json.loads(request.POST.get('fileFormat', '{}'))
 
   if file_format['inputFormat'] == 'file':
-    indexer = MorhlineIndexer(request.user, request.fs)
+    indexer = MorphlineIndexer(request.user, request.fs)
     stream = request.fs.open(file_format["path"])
     _convert_format(file_format["format"], inverse=True)
 
@@ -172,14 +172,14 @@ def importer_submit(request):
     source['columns'] = destination['columns']
     job_handle = _index(request, source, collection_name, start_time=start_time)
   elif destination['ouputFormat'] == 'database':
-    job_handle = create_database(request, source, destination, start_time)
+    job_handle = _create_database(request, source, destination, start_time)
   else:
     job_handle = _create_table(request, source, destination, start_time)
 
   return JsonResponse(job_handle)
 
 
-def create_database(request, source, destination, start_time):
+def _create_database(request, source, destination, start_time):
   database = destination['name']
   comment = destination['description']
 
@@ -218,7 +218,7 @@ def _create_table(request, source, destination, start_time=-1):
 
 
 def _index(request, file_format, collection_name, query=None, start_time=None):
-  indexer = MorhlineIndexer(request.user, request.fs)
+  indexer = MorphlineIndexer(request.user, request.fs)
 
   unique_field = indexer.get_unique_field(file_format)
   is_unique_generated = indexer.is_unique_generated(file_format)
